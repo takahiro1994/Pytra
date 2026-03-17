@@ -6,7 +6,7 @@
   <img alt="Read in English" src="https://img.shields.io/badge/docs-English-2563EB?style=flat-square">
 </a>
 
-最終更新: 2026-03-18（P5-CPP-PY-IS-TYPE-DEAD-CODE-REMOVE-01 完了）
+最終更新: 2026-03-18（P5-EAST3-FLOORDIV-MOD-NODE-01 完了）
 
 ## 文脈運用ルール
 
@@ -44,7 +44,8 @@
 
 文脈: [docs/ja/plans/p5-east3-floordiv-mod-node.md](../plans/p5-east3-floordiv-mod-node.md)
 
-2. [ ] [ID: P5-EAST3-FLOORDIV-MOD-NODE-01] `py_floordiv` / `py_mod` を EAST3 IR ノード経由の C++ インライン emit に変更し、`py_runtime.h` から除去する。各言語バックエンドが floor 除算・modulo を言語ネイティブに生成できる基盤を整える。
+2. [x] [ID: P5-EAST3-FLOORDIV-MOD-NODE-01] `py_floordiv` / `py_mod` を EAST3 IR ノード経由の C++ インライン emit に変更し、`py_runtime.h` から除去する。各言語バックエンドが floor 除算・modulo を言語ネイティブに生成できる基盤を整える。
+- 進捗メモ: 完了。py_div/floordiv/mod を py_runtime.h から除去し scalar_ops.h へ移動。py_div は算術型確定時インライン化（object 境界は fallback 維持）。mismatches=0。cpp 0.581.1。
 
 ### P6: py_runtime.h 縮小・多言語対応
 

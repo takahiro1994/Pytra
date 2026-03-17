@@ -4,6 +4,47 @@
 #include "runtime/cpp/generated/built_in/scalar_ops.h"
 #include "runtime/cpp/native/core/py_runtime.h"
 
+// Python 互換の真除算・floor 除算・modulo。
+// py_div: 型未確定の object 境界フォールバック用。算術型確定時は emitter がインライン化。
+// py_floordiv / py_mod: floor_div_mode=python / mod_mode=python 時に emitter が emit する。
+template <class A, class B>
+static inline float64 py_div(A lhs, B rhs) {
+    return static_cast<float64>(lhs) / static_cast<float64>(rhs);
+}
+
+
+template <class A, class B>
+static inline auto py_floordiv(A lhs, B rhs) {
+    using R = ::std::common_type_t<A, B>;
+    if constexpr (::std::is_integral_v<A> && ::std::is_integral_v<B>) {
+        if (rhs == 0) throw ::std::runtime_error("division by zero");
+        R q = static_cast<R>(lhs / rhs);
+        R r = static_cast<R>(lhs % rhs);
+        if (r != 0 && ((r > 0) != (rhs > 0))) q -= 1;
+        return q;
+    } else {
+        return ::std::floor(static_cast<float64>(lhs) / static_cast<float64>(rhs));
+    }
+}
+
+template <class A, class B>
+static inline auto py_mod(A lhs, B rhs) {
+    using R = ::std::common_type_t<A, B>;
+    if constexpr (::std::is_integral_v<A> && ::std::is_integral_v<B>) {
+        if (rhs == 0) throw ::std::runtime_error("integer modulo by zero");
+        R r = static_cast<R>(lhs % rhs);
+        if (r != 0 && ((r > 0) != (rhs > 0))) r += static_cast<R>(rhs);
+        return r;
+    } else {
+        float64 lf = static_cast<float64>(lhs);
+        float64 rf = static_cast<float64>(rhs);
+        if (rf == 0.0) throw ::std::runtime_error("float modulo");
+        float64 r = ::std::fmod(lf, rf);
+        if (r != 0.0 && ((r > 0.0) != (rf > 0.0))) r += rf;
+        return r;
+    }
+}
+
 inline int64 py_to_int64_base(const str& v, int64 base) {
     int b = static_cast<int>(base);
     if (b < 2 || b > 36) b = 10;

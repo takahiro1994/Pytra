@@ -562,42 +562,6 @@ static inline auto operator-(const rc<T>& v) -> decltype(v->__neg__()) {
     return v->__neg__();
 }
 
-// `/` / `//` / `%` の Python 互換セマンティクス（とくに負数時の扱い）を提供する。
-template <class A, class B>
-static inline float64 py_div(A lhs, B rhs) {
-    return py_to_float64(lhs) / py_to_float64(rhs);
-}
-
-template <class A, class B>
-static inline auto py_floordiv(A lhs, B rhs) {
-    using R = ::std::common_type_t<A, B>;
-    if constexpr (::std::is_integral_v<A> && ::std::is_integral_v<B>) {
-        if (rhs == 0) throw ::std::runtime_error("division by zero");
-        R q = static_cast<R>(lhs / rhs);
-        R r = static_cast<R>(lhs % rhs);
-        if (r != 0 && ((r > 0) != (rhs > 0))) q -= 1;
-        return q;
-    } else {
-        return ::std::floor(static_cast<float64>(lhs) / static_cast<float64>(rhs));
-    }
-}
-
-template <class A, class B>
-static inline auto py_mod(A lhs, B rhs) {
-    using R = ::std::common_type_t<A, B>;
-    if constexpr (::std::is_integral_v<A> && ::std::is_integral_v<B>) {
-        if (rhs == 0) throw ::std::runtime_error("integer modulo by zero");
-        R r = static_cast<R>(lhs % rhs);
-        if (r != 0 && ((r > 0) != (rhs > 0))) r += static_cast<R>(rhs);
-        return r;
-    } else {
-        float64 lf = static_cast<float64>(lhs);
-        float64 rf = static_cast<float64>(rhs);
-        if (rf == 0.0) throw ::std::runtime_error("float modulo");
-        float64 r = ::std::fmod(lf, rf);
-        if (r != 0.0 && ((r > 0.0) != (rf > 0.0))) r += rf;
-        return r;
-    }
-}
+// py_div / py_floordiv / py_mod は native/built_in/scalar_ops.h へ移動済み。
 
 #endif  // PYTRA_BUILT_IN_PY_RUNTIME_H

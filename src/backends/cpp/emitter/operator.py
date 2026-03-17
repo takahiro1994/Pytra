@@ -136,6 +136,10 @@ class CppBinaryOperatorEmitter:
                 return f"({left}).__truediv__({right})"
             if left_t in {"float32", "float64"} and right_t in {"float32", "float64"}:
                 return f"{left} / {right}"
+            _arith = {"int8", "uint8", "int16", "uint16", "int32", "uint32", "int64", "uint64", "float32", "float64", "bool"}
+            if left_t in _arith and right_t in _arith:
+                # 型確定済み算術型: py_div(a,b) = static_cast<float64>(a) / static_cast<float64>(b)
+                return f"static_cast<float64>({left}) / static_cast<float64>({right})"
             return f"py_div({left}, {right})"
         if op_name == "Pow":
             return f"::std::pow(py_to_float64({left}), py_to_float64({right}))"
