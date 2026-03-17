@@ -6,7 +6,7 @@
   <img alt="Read in English" src="https://img.shields.io/badge/docs-English-2563EB?style=flat-square">
 </a>
 
-最終更新: 2026-03-17（S4-01 完了）
+最終更新: 2026-03-18（S4-02 完了）
 
 ## 文脈運用ルール
 
@@ -45,3 +45,4 @@
   - [ID: P5-ANY-ELIM-OBJECT-FREE-01-S3-01] 完了: `json.py` 内部表現を `_JsonVal` closed 型へ移行。`JsonObj.raw: dict[str,_JsonVal]`、`_jv_to_object`/`_object_to_jv` を `json_adapters.py` に追加。decode boundary ガード 8 ファイル対応済み。
   - [ID: P5-ANY-ELIM-OBJECT-FREE-01-S3-02] 完了: `assertions.py` の `object` 除去。`_eq_any` / `py_assert_eq` 引数型を `str | int | float | bool | None` へ変更。`py_assert_stdout fn: object`（callable stub）・`enum.py`（S4）・`sys.py`（S5-01）は後続フェーズで対応。
   - [ID: P5-ANY-ELIM-OBJECT-FREE-01-S4-01] 完了: ユーザー定義 ref クラス基底を `PyObj` → `RcObject` に変更。emitter・`gc.h`（py_type_id() 仮想追加）・`py_runtime.h`（rc<T> isinstance 特殊化）を更新。
+  - [ID: P5-ANY-ELIM-OBJECT-FREE-01-S4-02] 完了: `obj_to_rc<T>` の `static_assert` を `PyObj` → `RcObject` に緩和。`list[Base]` → `list<rc<Base>>` emit はすでに正しく動作していた。

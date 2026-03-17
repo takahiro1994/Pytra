@@ -1,6 +1,6 @@
 # P5: `Any` アノテーション禁止と `object`/`PyObj` フリーランタイムへの移行
 
-最終更新: 2026-03-18（S4-01 完了）
+最終更新: 2026-03-18（S4-02 完了）
 
 関連 TODO:
 - `docs/ja/todo/index.md` の `ID: P5-ANY-ELIM-OBJECT-FREE-01`
@@ -101,7 +101,7 @@
   - GC 管理は `rc<UserClass>` で行い、`PyObj` 基底を経由しない。
   - `class_def.py` の `bases.append("public PyObj")` 自動挿入ロジックを廃止する。
 
-- [ ] [ID: P5-ANY-ELIM-OBJECT-FREE-01-S4-02] `list[Base]` 等のコレクション格納を `list<rc<Base>>` として emit する。
+- [x] [ID: P5-ANY-ELIM-OBJECT-FREE-01-S4-02] `list[Base]` 等のコレクション格納を `list<rc<Base>>` として emit する。
   - emitter の型描画で `list[Base]` → `list<rc<Base>>` となるよう `type_bridge` を更新する。
   - `pyobj` list モデル（P1-LIST-PYOBJ-MIG-01 で導入）との関係を整理し、`list<object>` 経路を除去する。
 
@@ -305,4 +305,12 @@
   - ユニットテスト（`test_py2cpp_features.py`）の `public PyObj` アサーションを `public RcObject` に更新。
   - cpp バージョン `0.577 → 0.578`。
   - pre-existing 失敗以外の非退行なし（C++ codegen 124 件 pass）。
+
+- 2026-03-18 [S4-02 完了]: `list[Base]` コレクション `list<rc<Base>>` emit とランタイム互換性調整。
+
+  **変更内容:**
+  - `obj_to_rc<T>` の `static_assert(is_base_of_v<PyObj, T>)` → `static_assert(is_base_of_v<RcObject, T>)` に緩和。User class（`T : RcObject, !T : PyObj`）でもコンパイル可能になった（`dynamic_cast<T*>(PyObj*)` は nullptr を返す）。
+  - `list[Base]` → `list<rc<Base>>` emit は `type_bridge.py` の `_cpp_type_text` 汎用パスですでに正しく動作していた（ref_classes in → `rc<ClassName>` 返す）。
+  - cpp バージョン `0.578 → 0.579`。
+  - pre-existing 失敗以外の非退行なし。
 
