@@ -6,7 +6,7 @@
   <img alt="Read in English" src="https://img.shields.io/badge/docs-English-2563EB?style=flat-square">
 </a>
 
-最終更新: 2026-03-17（S1-01 完了）
+最終更新: 2026-03-17（S1 全設計仕様固定）
 
 ## 文脈運用ルール
 
@@ -36,3 +36,6 @@
 1. [ ] [ID: P5-ANY-ELIM-OBJECT-FREE-01] `Any` アノテーションを禁止し、C++ ランタイムから `object`/`PyObj` 階層を除去する。`extern` 未知型は C++ テンプレート透過、クラス多態性は `rc<Base>` へ、stdlib 内部 `object` は closed 型へ置き換え。
 文脈: [docs/ja/plans/p5-any-elimination-object-free.md](../plans/p5-any-elimination-object-free.md)
   - [ID: P5-ANY-ELIM-OBJECT-FREE-01-S1-01] 完了: `Any`/`object` 全量調査。std: `json.py`(S3)、`enum.py`/`argparse.py`(S2)、`sys.py`(S5)、`assertions.py`(S2)。emitter: `is_any_like_type`×80+、`make_object`×22、`"public PyObj"` 自動挿入(S4)。決定ログに分類・フェーズ割当記録済み。
+  - [ID: P5-ANY-ELIM-OBJECT-FREE-01-S1-02] 完了: extern 未知型設計仕様固定。`extern_var_v1` schema v2 拡張、`extern auto {name};` emit 方針、メタデータ収集拡張（`Any`以外のアノテーション対応）を決定ログに記録。
+  - [ID: P5-ANY-ELIM-OBJECT-FREE-01-S1-03] 完了: クラス多態性 rc<Base> 設計仕様固定。`public PyObj` → `public RcObject` 変更方針、type_id 比較での `isinstance` 実装、`list<rc<Base>>` への直接 emit 方針を決定ログに記録。
+  - [ID: P5-ANY-ELIM-OBJECT-FREE-01-S1-04] 完了: JSON/stdlib 置き換え設計仕様固定。`JsonValue` 再帰 union 型方針、`assertions.py`/`json_adapters.py` 対応フェーズを決定ログに記録。

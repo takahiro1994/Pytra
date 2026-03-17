@@ -1,6 +1,6 @@
 # P5: `Any` アノテーション禁止と `object`/`PyObj` フリーランタイムへの移行
 
-最終更新: 2026-03-17（S1-01 決定ログ追記）
+最終更新: 2026-03-17（S1 全サブタスク設計仕様固定）
 
 関連 TODO:
 - `docs/ja/todo/index.md` の `ID: P5-ANY-ELIM-OBJECT-FREE-01`
@@ -60,15 +60,15 @@
   - C++ emitter が `object` 型を生成するトリガー条件の全列挙。
   - 結果を決定ログに固定し、phase ごとの除去対象を確定する。
 
-- [ ] [ID: P5-ANY-ELIM-OBJECT-FREE-01-S1-02] `extern` 未知型の代替設計仕様を固定する。
+- [x] [ID: P5-ANY-ELIM-OBJECT-FREE-01-S1-02] `extern` 未知型の代替設計仕様を固定する。
   - `extern` 宣言された変数・関数の型を C++ テンプレートパラメータまたは前方宣言として透過させる方式を設計する。
   - EAST3 および C++ emitter での表現方法を仕様化する。
 
-- [ ] [ID: P5-ANY-ELIM-OBJECT-FREE-01-S1-03] クラス多態性（`list[Base]` 等）の `rc<Base>` 代替設計を仕様化する。
+- [x] [ID: P5-ANY-ELIM-OBJECT-FREE-01-S1-03] クラス多態性（`list[Base]` 等）の `rc<Base>` 代替設計を仕様化する。
   - `PyObj` 継承なしでユーザー定義クラスを GC 管理する emitter 方針を定める。
   - `isinstance` / `type_id` の `PyObj` なし実装方針を定める。
 
-- [ ] [ID: P5-ANY-ELIM-OBJECT-FREE-01-S1-04] JSON / stdlib 内部 `object` の置き換え設計を仕様化する。
+- [x] [ID: P5-ANY-ELIM-OBJECT-FREE-01-S1-04] JSON / stdlib 内部 `object` の置き換え設計を仕様化する。
   - `JsonValue` を `object` ではなく closed enum または専用クラスで表現する設計案を作成する。
   - `dict[str, object]` / `list[object]` を内部で使っている他の stdlib モジュールを列挙する。
 
@@ -186,3 +186,47 @@
 
   **`sys.py` extern 設計（S5-01 先取り確認）:**
   - `stderr: object = extern(...)` は `extern` 型を `object` に落とすのではなく、C++ template 透過（`auto` / `decltype(stderr)` 等）に変えるべき。S5-01 で設計を固定する。
+
+- 2026-03-17 [S1-02 完了]: `extern` 未知型の代替設計仕様。
+
+  **現行の extern 変数処理（コードベース調査結果）:**
+  - `core_extern_semantics.py:55`: `if annotation != "Any": return None` — メタデータ収集は `Any` アノテーション専用。`object` でアノテーションされた `sys.py` の `stderr`/`stdout` はメタデータが収集されていない。
+  - `extern(...)` 呼び出し式の `resolved_type` は `"unknown"` — 型情報はアノテーション側から来る。
+  - C++ emitter は `object` アノテーションをそのまま使い、`object stderr;` を生成する（`PyObj` を介したボックス化）。
+
+  **S5-01 設計仕様（確定）:**
+  1. `extern` 変数のアノテーションに `object` / `Any` が使われている場合、C++ emitter は `object` 型変数を生成するのではなく、C++ `extern` 宣言（`extern auto` または `extern decltype(symbol) name;`）を生成する。
+  2. Python 側では `extern` 変数の型注釈を **オプション化**：アノテーションがある場合はそれをヒントとして使い、なければ `auto` 推論とする。
+  3. EAST3 表現: `extern_var_v1` メタデータの `schema_version` を 2 に上げ、`annotation_type` フィールド（`"Any"` / `"object"` / `"<具体型>"` / `""` を許容）を追加。`"Any"` と `"object"` はどちらも「emitter 側で C++ 型を推論する」フラグとして統一扱いする。
+  4. C++ emitter 生成規則: `extern_var_v1` メタデータがある場合、`annotation_type` が `"Any"` / `"object"` / `""` → `extern auto {name};`（C++17）。具体型あり → `extern {cpp_type} {name};`。
+  5. メタデータ収集ロジック（`core_extern_semantics.py`）を拡張し、`Any` 以外のアノテーションでも `extern(...)` 初期化を認識するよう修正する。
+  6. `src/pytra/std/sys.py` の `stderr: object` / `stdout: object` は、S5-01 実装後に `stderr = extern(__s.stderr)` (アノテーション省略) または `stderr: auto = extern(__s.stderr)` に変更する（設計確定後に選択）。
+
+- 2026-03-17 [S1-03 完了]: クラス多態性 `rc<Base>` 代替設計仕様。
+
+  **現行の PyObj 継承注入（コードベース調査結果）:**
+  - `class_def.py:194`: `if gc_managed and not base_is_gc: bases.append("public PyObj")` — `ref_classes` に属し基底が ref でない場合に自動注入。
+  - `gc_managed` は `cls_name in self.ref_classes`。`ref_classes` は `class_storage_hint="ref"` から収集・推移閉包。
+  - RTTI: `PYTRA_DECLARE_CLASS_TYPE(base_type_id_expr)` で静的型 ID を定義。
+  - ポリモーフィック代入: `obj_to_rc_or_raise<Base>(value)` で `object` から `rc<Base>` にダウンキャスト。
+  - `list[Base]`: `py_to_rc_list_from_object<Base>(...)` で `list<object>` → `list<rc<Base>>` 変換。
+
+  **S4-01/02/03 設計仕様（確定）:**
+  1. **基底クラス**: `gc_managed` かつ `base_is_gc` でないクラスは `PyObj` の代わりに `RcObject` を継承する（`RcObject` は `rc<T>` の参照カウント基底クラスで、`PyObj` 階層の親）。`public PyObj` 注入ロジックを `public RcObject` に変更する。これで `object = rc<PyObj>` を経由しないダイレクトな `rc<UserClass>` が実現できる。
+  2. **型 ID / RTTI**: `PYTRA_DECLARE_CLASS_TYPE()` マクロは維持する。`type_id` 比較（`dynamic_cast` より高速）を `isinstance` の実装に引き続き使用する。`PyObj` が持っていた `type_id` フィールドを `RcObject` へ移動する（または `PYTRA_DECLARE_CLASS_TYPE()` マクロが `RcObject` ベースの仕組みで動作するよう変更する）。
+  3. **ポリモーフィック代入**: `obj_to_rc_or_raise<Base>(value)` は `object` 経由だが、S6 で `object` 型を除去した後は直接 `rc<Derived>` → `rc<Base>` の implicit upcasting を生成する（C++ の自然な継承で動作）。代入先が `rc<Base>` 型の変数なら、`rc<Derived>` を右辺に持つ代入はキャストなしで動作する。
+  4. **`list[Base]` コレクション**: `list<rc<Base>>` として emit する。`list<object>` 経路（現在の `py_to_rc_list_from_object`）は S4-02/S6-03 で除去し、直接 `list<rc<Base>>` に push_back する emitter に変える。
+  5. **`isinstance`**: `dynamic_cast<T*>(rc_ptr.get()) != nullptr` または `x->PYTRA_TYPE_ID == T::PYTRA_TYPE_ID` で実装。S4-03 で選択するが、type_id 比較を基本とし、継承チェーンには `type_id <= T::PYTRA_TYPE_ID_MAX` 等の範囲比較を使う（現行の `py_runtime_value_isinstance` 実装を参考に拡張）。
+
+- 2026-03-17 [S1-04 完了]: JSON / stdlib 内部 `object` の置き換え設計仕様。
+
+  **S3-01 設計仕様（json.py 確定）:**
+  1. `JsonValue` 再帰 union 型を Python 側で定義する: `JsonValue = str | int | float | bool | None | list["JsonValue"] | dict[str, "JsonValue"]`。ただし transpiler が再帰 union 型をサポートしているか確認が必要（S3-01 着手前に確認する）。サポートしていない場合は closed class 階層（`class JsonNode`）を使う。
+  2. `_parse_value() -> JsonValue`、`_parse_object() -> dict[str, JsonValue]`、`_parse_array() -> list[JsonValue]`、`_parse_number() -> JsonValue` に変更する。
+  3. `_dump_json_value(v: JsonValue, ...)` に変更する。`dumps(obj: JsonValue, ...)` も同様。
+  4. 公開 API `loads(text: str) -> JsonValue`、`loads_obj(text: str) -> dict[str, JsonValue]`、`loads_arr(text: str) -> list[JsonValue]` を維持する（戻り型が `object` から `JsonValue` へ変わるが parity は維持）。
+  5. `JsonObj` / `JsonArr` 内部クラスが使う `raw: dict[str, object]` / `raw: list[object]` も `JsonValue` に置き換える。
+
+  **他 stdlib での `object` 使用（S3-02 対象）:**
+  - `src/pytra/utils/assertions.py`: `py_assert_eq(actual: object, expected: object, ...)` — S1-01 調査時点ではこれが主要な残り。`JsonValue` 移行後に `str | int | float | bool | None` などの共通スーパー型 or Generic へ変更する。
+  - `src/toolchain/json_adapters.py`: `coerce_json_object_doc(doc: object, ...)` — toolchain 側（transpile 対象でない）なので S2-01 禁止パス後に対応。
