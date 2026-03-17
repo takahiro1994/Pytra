@@ -6,7 +6,7 @@
   <img alt="Read in English" src="https://img.shields.io/badge/docs-English-2563EB?style=flat-square">
 </a>
 
-最終更新: 2026-03-18（S7-03 完了・P5-ANY-ELIM-OBJECT-FREE-01 全完了）
+最終更新: 2026-03-18（P5-ANY-ELIM-OBJECT-FREE-01 完了・アーカイブ）
 
 ## 文脈運用ルール
 
@@ -31,26 +31,4 @@
 
 ## 未完了タスク
 
-### P5
-
-1. [ ] [ID: P5-ANY-ELIM-OBJECT-FREE-01] `Any` アノテーションを禁止し、C++ ランタイムから `object`/`PyObj` 階層を除去する。`extern` 未知型は C++ テンプレート透過、クラス多態性は `rc<Base>` へ、stdlib 内部 `object` は closed 型へ置き換え。
-文脈: [docs/ja/plans/p5-any-elimination-object-free.md](../plans/p5-any-elimination-object-free.md)
-  - [ID: P5-ANY-ELIM-OBJECT-FREE-01-S1-01] 完了: `Any`/`object` 全量調査。std: `json.py`(S3)、`enum.py`/`argparse.py`(S2)、`sys.py`(S5)、`assertions.py`(S2)。emitter: `is_any_like_type`×80+、`make_object`×22、`"public PyObj"` 自動挿入(S4)。決定ログに分類・フェーズ割当記録済み。
-  - [ID: P5-ANY-ELIM-OBJECT-FREE-01-S1-02] 完了: extern 未知型設計仕様固定。`extern_var_v1` schema v2 拡張、`extern auto {name};` emit 方針、メタデータ収集拡張（`Any`以外のアノテーション対応）を決定ログに記録。
-  - [ID: P5-ANY-ELIM-OBJECT-FREE-01-S1-03] 完了: クラス多態性 rc<Base> 設計仕様固定。`public PyObj` → `public RcObject` 変更方針、type_id 比較での `isinstance` 実装、`list<rc<Base>>` への直接 emit 方針を決定ログに記録。
-  - [ID: P5-ANY-ELIM-OBJECT-FREE-01-S1-04] 完了: JSON/stdlib 置き換え設計仕様固定。`JsonValue` 再帰 union 型方針、`assertions.py`/`json_adapters.py` 対応フェーズを決定ログに記録。
-  - [ID: P5-ANY-ELIM-OBJECT-FREE-01-S2-01] 完了: `AnyAnnotationProhibitionPass` 新規実装。`FunctionDef.arg_types`/`return_type` と `AnnAssign.annotation` を検査し `Any` 検出時に `RuntimeError` raise。デフォルト無効（stdlib 移行後に有効化）。ユニットテスト 20 件 pass。
-  - [ID: P5-ANY-ELIM-OBJECT-FREE-01-S2-02] 完了: stdlib の `Any` 移行。`enum.py`（`object`/具体型に変換）、`argparse.py`（`str | bool | None` に変換）、`json.py`（`dumps(obj: object)`）。`AnyAnnotationProhibitionPass` による検証 PASS。
-  - [ID: P5-ANY-ELIM-OBJECT-FREE-01-S2-03] 完了: `Any` 禁止ドキュメント整備。`docs/ja/spec/spec-any-prohibition.md` 新規作成。移行手順・エラーガイド・パス有効化方法を記載。
-  - [ID: P5-ANY-ELIM-OBJECT-FREE-01-S3-01] 完了: `json.py` 内部表現を `_JsonVal` closed 型へ移行。`JsonObj.raw: dict[str,_JsonVal]`、`_jv_to_object`/`_object_to_jv` を `json_adapters.py` に追加。decode boundary ガード 8 ファイル対応済み。
-  - [ID: P5-ANY-ELIM-OBJECT-FREE-01-S3-02] 完了: `assertions.py` の `object` 除去。`_eq_any` / `py_assert_eq` 引数型を `str | int | float | bool | None` へ変更。`py_assert_stdout fn: object`（callable stub）・`enum.py`（S4）・`sys.py`（S5-01）は後続フェーズで対応。
-  - [ID: P5-ANY-ELIM-OBJECT-FREE-01-S4-01] 完了: ユーザー定義 ref クラス基底を `PyObj` → `RcObject` に変更。emitter・`gc.h`（py_type_id() 仮想追加）・`py_runtime.h`（rc<T> isinstance 特殊化）を更新。
-  - [ID: P5-ANY-ELIM-OBJECT-FREE-01-S4-02] 完了: `obj_to_rc<T>` の `static_assert` を `PyObj` → `RcObject` に緩和。`list[Base]` → `list<rc<Base>>` emit はすでに正しく動作していた。
-  - [ID: P5-ANY-ELIM-OBJECT-FREE-01-S4-03] 完了: S4-01 で実装済み（`py_runtime_value_isinstance` の `rc<T>` 特殊化で `py_type_id()` 仮想比較を使用、type_id 比較方式に固定）。
-  - [ID: P5-ANY-ELIM-OBJECT-FREE-01-S5-01] 完了: `sys.py` の `stderr`/`stdout` から `object` アノテーションを除去。`sys.h` の `extern object stderr;` が消去された。`core_extern_semantics.py` に `object`/`""` アノテーションサポートを追加。
-  - [ID: P5-ANY-ELIM-OBJECT-FREE-01-S6-01] 完了: `py_runtime.h` から `PyObj` 継承階層（`PyIntObj` 等 7 クラス + イテレータ）を除去。`gc.h` の `class PyObj` も削除。`gc.cpp` に `RcObject` 仮想メソッド実装を追加。
-  - [ID: P5-ANY-ELIM-OBJECT-FREE-01-S6-02] 完了: `object` を `rc<RcObject>` に再定義。`make_object`/`obj_to_*`/`py_to<T>(const object&)` を除去。`json.py` dumps 系を `_JsonVal` ベースに変更。`py_any`/`py_all` を typed template に変更。
-  - [ID: P5-ANY-ELIM-OBJECT-FREE-01-S6-03] 完了: `cpp_list_model=pyobj` テスト削除、boxing テスト削除。`list.h`/`dict.h`/`set.h` の `object` 変換演算子を除去。319件実行、pre-existing 以外の非退行なし。
-  - [ID: P5-ANY-ELIM-OBJECT-FREE-01-S7-01] 完了: S6 起因 regression を修正。`py_assert_*` を template 化、`contains`/`iter_ops` の dead object 関数を除去。fixture 3/3・sample 18/18 pass。
-  - [ID: P5-ANY-ELIM-OBJECT-FREE-01-S7-02] 完了: selfhost diff / direct compile 非退行確認 (mismatches=0, failures=0)。
-  - [ID: P5-ANY-ELIM-OBJECT-FREE-01-S7-03] 完了: `docs/en/todo/index.md` に S3-01〜S7-02 進捗を追加。`spec-any-prohibition.md`（ja/en）更新。`spec-boxing.md`（ja/en）に廃止済みノート追加。
+（現在 P5 以上の未完了タスクはありません。次の優先 TODO を追加してください。）

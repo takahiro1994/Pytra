@@ -4,7 +4,7 @@
   <img alt="Read in English" src="https://img.shields.io/badge/docs-English-2563EB?style=flat-square">
 </a>
 
-最終更新: 2026-03-17
+最終更新: 2026-03-18
 
 ## 運用方針
 
@@ -14,6 +14,8 @@
 - `docs/` 側は `docs/ja/` を正として翻訳を同期します。
 
 ## 完了 plan アーカイブ
+
+- [2026-03-18 / P5-ANY-ELIM-OBJECT-FREE-01](../plans/archive/20260318-p5-any-elimination-object-free.md)
 
 - [2026-03-17 / P1-CPP-SUBSCRIPT-IDX-OPT-01](../plans/archive/20260317-p1-cpp-subscript-index-cast-tuple-get.md)
 - [2026-03-17 / P2-CPP-PYRUNTIME-UPSTREAM-FALLBACK-SHRINK-01](../plans/archive/20260317-p2-cpp-pyruntime-upstream-fallback-shrink.md)
@@ -208,6 +210,8 @@
 - [2026-03-06 / P4-MULTILANG-SH-01](../plans/archive/20260306-p4-multilang-selfhost-full-rollout.md)（ABI 確立後に再投入）
 
 ## 日付別リンク
+
+- [2026-03-18](20260318.md)（1 セクション）
 
 - [2026-03-14](20260314.md)（7 セクション）
 

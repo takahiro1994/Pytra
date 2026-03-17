@@ -6,7 +6,7 @@
   <img alt="Read in Japanese" src="https://img.shields.io/badge/docs-日本語-2563EB?style=flat-square">
 </a>
 
-Last updated: 2026-03-18 (S7-02 complete)
+Last updated: 2026-03-18 (P5-ANY-ELIM-OBJECT-FREE-01 complete, archived)
 
 ## Context Operation Rules
 
@@ -31,25 +31,4 @@ Last updated: 2026-03-18 (S7-02 complete)
 
 ## Unfinished Tasks
 
-### P5
-
-1. [ ] [ID: P5-ANY-ELIM-OBJECT-FREE-01] Prohibit `Any` annotations and remove the `object`/`PyObj` hierarchy from the C++ runtime. Replace `extern` unknown types with C++ template transparency, class polymorphism with `rc<Base>`, and stdlib internal `object` with closed types.
-Context: [docs/ja/plans/p5-any-elimination-object-free.md](../../ja/plans/p5-any-elimination-object-free.md)
-  - [ID: P5-ANY-ELIM-OBJECT-FREE-01-S1-01] Done: Full audit of `Any`/`object` usage. std: `json.py`(S3), `enum.py`/`argparse.py`(S2), `sys.py`(S5), `assertions.py`(S2). Emitter: `is_any_like_type`×80+, `make_object`×22, `"public PyObj"` auto-insertion (S4). Findings with phase assignments recorded in decision log.
-  - [ID: P5-ANY-ELIM-OBJECT-FREE-01-S1-02] Done: `extern` unknown-type design spec fixed. `extern_var_v1` schema v2 extension, `extern auto {name};` emit strategy, metadata collection extended to accept non-`Any` annotations. Recorded in decision log.
-  - [ID: P5-ANY-ELIM-OBJECT-FREE-01-S1-03] Done: Class polymorphism `rc<Base>` design spec fixed. `public PyObj` → `public RcObject` migration, `type_id` comparison for `isinstance`, direct `list<rc<Base>>` emit strategy. Recorded in decision log.
-  - [ID: P5-ANY-ELIM-OBJECT-FREE-01-S1-04] Done: JSON/stdlib replacement design spec fixed. `JsonValue` recursive union type strategy, `assertions.py`/`json_adapters.py` phase assignments. Recorded in decision log.
-  - [ID: P5-ANY-ELIM-OBJECT-FREE-01-S2-01] Done: `AnyAnnotationProhibitionPass` implemented. Checks `FunctionDef.arg_types`/`return_type` and `AnnAssign.annotation`; raises `RuntimeError` on `Any` detection. Disabled by default until stdlib migration (S2-02); enable via `--east3-opt-pass +AnyAnnotationProhibitionPass`. 20 unit tests pass.
-  - [ID: P5-ANY-ELIM-OBJECT-FREE-01-S2-02] Done: stdlib `Any` migration. `enum.py` (`object`/concrete types), `argparse.py` (`str | bool | None`), `json.py` (`dumps(obj: object)`). `AnyAnnotationProhibitionPass` verification PASS on argparse.py and json.py.
-  - [ID: P5-ANY-ELIM-OBJECT-FREE-01-S2-03] Done: `Any` prohibition documentation. Created `docs/ja/spec/spec-any-prohibition.md` with migration guide, error message format, and pass activation instructions.
-  - [ID: P5-ANY-ELIM-OBJECT-FREE-01-S3-01] Done: `json.py` internal representation migrated to `_JsonVal` closed type. `JsonObj.raw: dict[str,_JsonVal]`, `_jv_to_object`/`_object_to_jv` added to `json_adapters.py`. decode boundary guards applied to 8 files.
-  - [ID: P5-ANY-ELIM-OBJECT-FREE-01-S3-02] Done: `assertions.py` `object` removed. `_eq_any`/`py_assert_eq` changed to `str | int | float | bool | None`.
-  - [ID: P5-ANY-ELIM-OBJECT-FREE-01-S4-01] Done: User-defined ref class base changed from `PyObj` → `RcObject`. emitter, `gc.h` (`py_type_id()` virtual), `py_runtime.h` (`rc<T>` isinstance specialization) updated.
-  - [ID: P5-ANY-ELIM-OBJECT-FREE-01-S4-02] Done: `obj_to_rc<T>` `static_assert` relaxed from `PyObj` → `RcObject`. `list[Base]` → `list<rc<Base>>` emit already correct.
-  - [ID: P5-ANY-ELIM-OBJECT-FREE-01-S4-03] Done: `isinstance` without `PyObj` confirmed (implemented in S4-01 via `py_type_id()` virtual dispatch).
-  - [ID: P5-ANY-ELIM-OBJECT-FREE-01-S5-01] Done: `sys.py` `stderr`/`stdout` `object` annotations removed. `sys.h` `extern object stderr;` eliminated. `core_extern_semantics.py` extended.
-  - [ID: P5-ANY-ELIM-OBJECT-FREE-01-S6-01] Done: `py_runtime.h` PyObj inheritance hierarchy removed (`PyIntObj` etc. 7 classes + iterators). `gc.h` `class PyObj` deleted. `gc.cpp` `RcObject` virtual method impls added.
-  - [ID: P5-ANY-ELIM-OBJECT-FREE-01-S6-02] Done: `object` redefined as `rc<RcObject>`. `make_object`/`obj_to_*`/`py_to<T>(const object&)` removed. `json.py` dumps family migrated to `_JsonVal`. `py_any`/`py_all` converted to typed templates.
-  - [ID: P5-ANY-ELIM-OBJECT-FREE-01-S6-03] Done: `cpp_list_model=pyobj` test files deleted. `list.h`/`dict.h`/`set.h` `object` conversion operators removed. 319 tests, no new regressions.
-  - [ID: P5-ANY-ELIM-OBJECT-FREE-01-S7-01] Done: S6 regressions fixed. `py_assert_*` templatized, dead `contains`/`iter_ops` object functions removed. fixture 3/3, sample 18/18 pass.
-  - [ID: P5-ANY-ELIM-OBJECT-FREE-01-S7-02] Done: selfhost diff (mismatches=0) and direct compile (failures=0) non-regression confirmed.
+(No unfinished tasks at P5 or above. Please add the next priority TODO.)
