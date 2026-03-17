@@ -399,7 +399,7 @@ static inline decltype(auto) py_at_bounds_debug(const Seq& v, int64 idx) {
 #endif
 }
 
-// Python の型判定（isinstance 的な分岐）で使う述語群。
+// is None 判定（optional / object / 任意型）。
 template <class T>
 static inline bool py_is_none(const ::std::optional<T>& v) {
     return !v.has_value();
@@ -414,20 +414,6 @@ static inline bool py_is_none(const object& v) {
     return !static_cast<bool>(v);
 }
 
-template <class T> static inline bool py_is_dict(const T&) { return false; }
-template <class T> static inline bool py_is_list(const T&) { return false; }
-template <class T> static inline bool py_is_set(const T&) { return false; }
-template <class T> static inline bool py_is_str(const T&) { return false; }
-template <class T> static inline bool py_is_bool(const T&) { return false; }
-
-template <class K, class V> static inline bool py_is_dict(const dict<K, V>&) { return true; }
-template <class U> static inline bool py_is_list(const list<U>&) { return true; }
-template <class U> static inline bool py_is_list(const rc<list<U>>&) { return true; }
-template <class U> static inline bool py_is_set(const set<U>&) { return true; }
-static inline bool py_is_str(const str&) { return true; }
-template <class T> static inline bool py_is_int(const T&) { return ::std::is_integral_v<T> && !::std::is_same_v<T, bool>; }
-template <class T> static inline bool py_is_float(const T&) { return ::std::is_floating_point_v<T>; }
-static inline bool py_is_bool(const bool&) { return true; }
 
 // P0-contract-shrink label: shared_type_id_contract seam.
 // type_id 判定ロジックは generated built_in 層（py_tid_*）を正本とする。

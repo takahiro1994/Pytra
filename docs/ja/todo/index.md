@@ -6,7 +6,7 @@
   <img alt="Read in English" src="https://img.shields.io/badge/docs-English-2563EB?style=flat-square">
 </a>
 
-最終更新: 2026-03-18（P5-CPP-PY-IS-TYPE-DEAD-CODE-REMOVE-01 追加）
+最終更新: 2026-03-18（P5-CPP-PY-IS-TYPE-DEAD-CODE-REMOVE-01 完了）
 
 ## 文脈運用ルール
 
@@ -37,7 +37,8 @@
 
 文脈: [docs/ja/plans/p5-cpp-py-is-type-dead-code-remove.md](../plans/p5-cpp-py-is-type-dead-code-remove.md)
 
-1. [ ] [ID: P5-CPP-PY-IS-TYPE-DEAD-CODE-REMOVE-01] `py_is_dict` / `py_is_list` / `py_is_set` / `py_is_str` / `py_is_bool` / `py_is_int` / `py_is_float` を `py_runtime.h` から削除する。emitter は `PYTRA_TID_*` + `py_runtime_value_isinstance` 体系に移行済みでありデッドコード化している。
+1. [x] [ID: P5-CPP-PY-IS-TYPE-DEAD-CODE-REMOVE-01] `py_is_dict` / `py_is_list` / `py_is_set` / `py_is_str` / `py_is_bool` / `py_is_int` / `py_is_float` を `py_runtime.h` から削除する。emitter は `PYTRA_TID_*` + `py_runtime_value_isinstance` 体系に移行済みでありデッドコード化している。
+- 進捗メモ: 完了。7 関数削除・テスト1件修正。fixture/sample pass、selfhost mismatches=0。
 
 #### P5-2: FloorDiv / Mod の EAST3 IR ノード化
 

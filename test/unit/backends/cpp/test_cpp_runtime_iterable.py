@@ -137,7 +137,6 @@ int main() {
     assert(typed_repeat[0] == 7);
     assert(typed_repeat[3] == 7);
     assert(typed_repeat[5] == 9);
-    assert(py_is_list(typed_iter));
 
     list<int64> plain = list<int64>{4, 5, 6};
     list<int64> plain_slice = py_slice(plain, 0, 2);
