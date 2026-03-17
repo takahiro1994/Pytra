@@ -42,14 +42,20 @@ class CppRuntimeTypeIdTest(unittest.TestCase):
 #include <cassert>
 #include <iostream>
 
-class BaseObj : public PyObj {
+class BaseObj : public RcObject {
 public:
-    explicit BaseObj(uint32 type_id) : PyObj(type_id) {}
+    explicit BaseObj(uint32 tid) : RcObject(), tid_(tid) {}
+    uint32 py_type_id() const noexcept override { return tid_; }
+private:
+    uint32 tid_;
 };
 
-class ChildObj : public BaseObj {
+class ChildObj : public RcObject {
 public:
-    explicit ChildObj(uint32 type_id) : BaseObj(type_id) {}
+    explicit ChildObj(uint32 tid) : RcObject(), tid_(tid) {}
+    uint32 py_type_id() const noexcept override { return tid_; }
+private:
+    uint32 tid_;
 };
 
 int main() {
@@ -67,20 +73,18 @@ int main() {
     assert(py_runtime_type_id_is_subtype(child_tid, base_tid));
     assert(py_runtime_type_id_issubclass(child_tid, base_tid));
 
-    object base_obj = object_new<BaseObj>(base_tid);
-    object child_obj = object_new<ChildObj>(child_tid);
+    rc<BaseObj> base_obj = rc<BaseObj>::adopt(pytra::gc::rc_new<BaseObj>(base_tid));
+    rc<ChildObj> child_obj = rc<ChildObj>::adopt(pytra::gc::rc_new<ChildObj>(child_tid));
     assert(py_runtime_value_type_id(child_obj) == child_tid);
-    assert(py_runtime_object_isinstance(child_obj, base_tid));
-    assert(py_runtime_object_isinstance(base_obj, base_tid));
-    assert(py_runtime_object_isinstance(child_obj, child_tid));
-    assert(py_runtime_object_isinstance(child_obj, base_tid));
-    assert(py_runtime_object_isinstance(child_obj, PYTRA_TID_OBJECT));
-    assert(!py_runtime_object_isinstance(base_obj, child_tid));
+    assert(py_runtime_value_isinstance(child_obj, base_tid));
+    assert(py_runtime_value_isinstance(base_obj, base_tid));
+    assert(py_runtime_value_isinstance(child_obj, child_tid));
+    assert(py_runtime_value_isinstance(child_obj, base_tid));
+    assert(py_runtime_value_isinstance(child_obj, PYTRA_TID_OBJECT));
+    assert(!py_runtime_value_isinstance(base_obj, child_tid));
 
     set<str> names = set<str>{"a", "b"};
     assert(py_runtime_value_isinstance(names, PYTRA_TID_SET));
-    object names_obj = make_object(names);
-    assert(py_runtime_object_isinstance(names_obj, PYTRA_TID_SET));
 
     std::cout << "runtime type_id ok" << std::endl;
     return 0;
@@ -128,14 +132,12 @@ int main() {
 #include <cassert>
 #include <iostream>
 
-class BaseObj : public PyObj {
+class ChildObj : public RcObject {
 public:
-    explicit BaseObj(uint32 type_id) : PyObj(type_id) {}
-};
-
-class ChildObj : public BaseObj {
-public:
-    explicit ChildObj(uint32 type_id) : BaseObj(type_id) {}
+    explicit ChildObj(uint32 tid) : RcObject(), tid_(tid) {}
+    uint32 py_type_id() const noexcept override { return tid_; }
+private:
+    uint32 tid_;
 };
 
 int main() {
@@ -148,7 +150,7 @@ int main() {
     assert(py_tid_is_subtype(child_tid, base_tid));
     assert(py_tid_issubclass(child_tid, base_tid));
 
-    object child_obj = object_new<ChildObj>(static_cast<uint32>(child_tid));
+    rc<ChildObj> child_obj = rc<ChildObj>::adopt(pytra::gc::rc_new<ChildObj>(static_cast<uint32>(child_tid)));
     assert(py_tid_runtime_type_id(child_obj) == child_tid);
     assert(py_tid_isinstance(child_obj, base_tid));
     assert(py_tid_isinstance(child_obj, child_tid));
@@ -200,9 +202,9 @@ int main() {
 #include <iostream>
 #include <utility>
 
-class BaseObj : public pytra::gc::PyObj {
+class BaseObj : public pytra::gc::RcObject {
 public:
-    BaseObj() : pytra::gc::PyObj(1000) {}
+    BaseObj() : pytra::gc::RcObject() {}
 };
 
 class ChildObj : public BaseObj {

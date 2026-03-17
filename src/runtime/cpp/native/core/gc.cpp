@@ -10,6 +10,14 @@ void RcObject::rc_release_refs() {
     // デフォルト実装: 子参照を持たないオブジェクト。
 }
 
+RcHandle<RcObject> RcObject::py_iter_or_raise() const {
+    throw ::std::runtime_error("object is not iterable");
+}
+
+::std::optional<RcHandle<RcObject>> RcObject::py_next_or_stop() {
+    return ::std::nullopt;
+}
+
 void incref(RcObject* obj) noexcept {
     // obj:
     //   参照カウントを増やす対象オブジェクト。nullptr は無視する。

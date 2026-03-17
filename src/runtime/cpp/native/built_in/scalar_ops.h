@@ -14,9 +14,6 @@ inline int64 py_to_int64_base(const ::std::string& v, int64 base) {
     return py_to_int64_base(str(v), base);
 }
 
-inline int64 py_to_int64_base(const object& v, int64 base) {
-    return py_to_int64_base(obj_to_str(v), base);
-}
 
 inline int64 py_ord(const str& ch) {
     const ::std::string& s = ch;
@@ -39,10 +36,6 @@ inline int64 py_ord(const str& ch) {
         return static_cast<int64>(((b0 & 0x07) << 18) | ((b1 & 0x3F) << 12) | ((b2 & 0x3F) << 6) | (b3 & 0x3F));
     }
     return static_cast<int64>(b0);
-}
-
-inline int64 py_ord(const object& v) {
-    return py_ord(obj_to_str(v));
 }
 
 inline str py_chr(int64 codepoint) {
@@ -68,8 +61,5 @@ inline str py_chr(int64 codepoint) {
     return str(out);
 }
 
-inline str py_chr(const object& v) {
-    return py_chr(obj_to_int64(v));
-}
 
 #endif  // PYTRA_NATIVE_BUILT_IN_SCALAR_OPS_H

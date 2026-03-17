@@ -20,10 +20,6 @@ static inline list<T> py_reversed(const rc<list<T>>& values) {
     return py_reversed_list_copy(rc_list_ref(values));
 }
 
-static inline list<object> py_reversed(const object& values) {
-    return list<object>(py_reversed_object(values));
-}
-
 template <class T>
 static inline list<::std::tuple<int64, T>> py_enumerate_list_copy(const list<T>& values, int64 start) {
     list<::std::tuple<int64, T>> out;
@@ -70,31 +66,6 @@ static inline list<::std::tuple<int64, str>> py_enumerate(const str& values, int
         out.append(::std::make_tuple(start + static_cast<int64>(i), values[i]));
     }
     return out;
-}
-
-static inline list<object> py_enumerate(const object& values) {
-    return list<object>(py_enumerate_object(values, 0));
-}
-
-static inline list<object> py_enumerate(const object& values, int64 start) {
-    return list<object>(py_enumerate_object(values, start));
-}
-
-template <class T>
-static inline list<::std::tuple<int64, T>> py_enumerate_list_as(const object& values, int64 start) {
-    list<::std::tuple<int64, T>> out;
-    if (const auto* p = obj_to_list_ptr(values)) {
-        out.reserve(p->size());
-        for (::std::size_t i = 0; i < p->size(); ++i) {
-            out.append(::std::make_tuple(start + static_cast<int64>(i), py_to<T>((*p)[i])));
-        }
-    }
-    return out;
-}
-
-template <class T>
-static inline list<::std::tuple<int64, T>> py_enumerate_list_as(const object& values) {
-    return py_enumerate_list_as<T>(values, 0);
 }
 
 #endif  // PYTRA_NATIVE_BUILT_IN_ITER_OPS_H

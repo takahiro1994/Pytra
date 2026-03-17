@@ -20,30 +20,30 @@ namespace pytra::std::pathlib {
             this->_value = value;
     }
 
-    str Path::__str__() {
+    str Path::__str__() const {
             return this->_value;
     }
 
-    str Path::__repr__() {
+    str Path::__repr__() const {
             return "Path(" + this->_value + ")";
     }
 
-    str Path::__fspath__() {
+    str Path::__fspath__() const {
             return this->_value;
     }
 
-    Path Path::__truediv__(const str& rhs) {
+    Path Path::__truediv__(const str& rhs) const {
             return Path(pytra::std::os_path::join(this->_value, rhs));
     }
 
-    Path Path::parent() {
+    Path Path::parent() const {
             str parent_txt = pytra::std::os_path::dirname(this->_value);
             if (parent_txt == "")
                 parent_txt = ".";
             return Path(parent_txt);
     }
 
-    rc<list<Path>> Path::parents() {
+    rc<list<Path>> Path::parents() const {
             rc<list<Path>> out = rc_list_from_value(list<Path>{});
             str current = pytra::std::os_path::dirname(this->_value);
             while (true) {
@@ -60,33 +60,33 @@ namespace pytra::std::pathlib {
             return out;
     }
 
-    str Path::name() {
+    str Path::name() const {
             return pytra::std::os_path::basename(this->_value);
     }
 
-    str Path::suffix() {
+    str Path::suffix() const {
             auto __tuple_1 = pytra::std::os_path::splitext(pytra::std::os_path::basename(this->_value));
             str _ = ::std::get<0>(__tuple_1);
             str ext = ::std::get<1>(__tuple_1);
             return ext;
     }
 
-    str Path::stem() {
+    str Path::stem() const {
             auto __tuple_2 = pytra::std::os_path::splitext(pytra::std::os_path::basename(this->_value));
             str root = ::std::get<0>(__tuple_2);
             str _ = ::std::get<1>(__tuple_2);
             return root;
     }
 
-    Path Path::resolve() {
+    Path Path::resolve() const {
             return Path(pytra::std::os_path::abspath(this->_value));
     }
 
-    bool Path::exists() {
+    bool Path::exists() const {
             return pytra::std::os_path::exists(this->_value);
     }
 
-    void Path::mkdir(bool parents, bool exist_ok) {
+    void Path::mkdir(bool parents, bool exist_ok) const {
             if (parents) {
                 pytra::std::os::makedirs(this->_value, exist_ok);
                 return;
@@ -96,7 +96,7 @@ namespace pytra::std::pathlib {
             pytra::std::os::mkdir(this->_value);
     }
 
-    str Path::read_text(const str& encoding) {
+    str Path::read_text(const str& encoding) const {
             pytra::runtime::cpp::base::PyFile f = open(this->_value, "r");
             {
                 auto __finally_3 = py_make_scope_exit([&]() {
@@ -106,7 +106,7 @@ namespace pytra::std::pathlib {
             }
     }
 
-    int64 Path::write_text(const str& text, const str& encoding) {
+    int64 Path::write_text(const str& text, const str& encoding) const {
             pytra::runtime::cpp::base::PyFile f = open(this->_value, "w");
             {
                 auto __finally_4 = py_make_scope_exit([&]() {
@@ -116,7 +116,7 @@ namespace pytra::std::pathlib {
             }
     }
 
-    rc<list<Path>> Path::glob(const str& pattern) {
+    rc<list<Path>> Path::glob(const str& pattern) const {
             rc<list<str>> paths = pytra::std::glob::glob(pytra::std::os_path::join(this->_value, pattern));
             rc<list<Path>> out = rc_list_from_value(list<Path>{});
             for (str p : rc_list_ref(paths)) {

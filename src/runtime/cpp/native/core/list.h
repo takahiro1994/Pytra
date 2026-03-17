@@ -4,11 +4,6 @@
 #include <algorithm>
 
 template <class T>
-object make_object(const T& v);
-template <class D>
-::std::optional<D> py_object_try_cast(const object& v);
-
-template <class T>
 class list : public pytra::gc::RcObject {
 public:
     using value_type = T;
@@ -36,25 +31,6 @@ public:
             data_.push_back(static_cast<uint8>(static_cast<unsigned char>(ch)));
         }
     }
-    template <class U = T, ::std::enable_if_t<::std::is_same_v<U, object>, int> = 0>
-    list(const object& v) {
-        if (const auto* p = obj_to_list_ptr(v)) data_ = *p;
-    }
-    template <class U = T, ::std::enable_if_t<!::std::is_same_v<U, object>, int> = 0>
-    list(const object& v) {
-        if (const auto* p = obj_to_list_ptr(v)) {
-            reserve(p->size());
-            for (const object& elem : *p) {
-                if constexpr (::std::is_constructible_v<T, object>) {
-                    data_.push_back(T(elem));
-                } else {
-                    auto casted = py_object_try_cast<T>(elem);
-                    if (casted.has_value()) data_.push_back(*casted);
-                }
-            }
-        }
-    }
-
     template <class It>
     list(It first, It last) : data_(first, last) {}
 
@@ -62,16 +38,7 @@ public:
     list(const list<U>& other) {
         reserve(other.size());
         for (const auto& v : other) {
-            if constexpr (::std::is_same_v<U, object>) {
-                if constexpr (::std::is_constructible_v<T, object>) {
-                    data_.push_back(T(v));
-                } else {
-                    auto casted = py_object_try_cast<T>(v);
-                    if (casted.has_value()) data_.push_back(*casted);
-                }
-            } else {
-                data_.push_back(static_cast<T>(v));
-            }
+            data_.push_back(static_cast<T>(v));
         }
     }
 
@@ -86,28 +53,12 @@ public:
         const list<U>& ref = rc_list_ref(other);
         reserve(ref.size());
         for (const auto& v : ref) {
-            if constexpr (::std::is_same_v<U, object>) {
-                if constexpr (::std::is_constructible_v<T, object>) {
-                    data_.push_back(T(v));
-                } else {
-                    auto casted = py_object_try_cast<T>(v);
-                    if (casted.has_value()) data_.push_back(*casted);
-                }
-            } else {
-                data_.push_back(static_cast<T>(v));
-            }
+            data_.push_back(static_cast<T>(v));
         }
     }
 
     operator const ::std::vector<T>&() const { return data_; }  // NOLINT(google-explicit-constructor)
     operator ::std::vector<T>&() { return data_; }              // NOLINT(google-explicit-constructor)
-    operator object() const { return make_object(*this); }      // NOLINT(google-explicit-constructor)
-    template <class U = T, ::std::enable_if_t<::std::is_same_v<U, object>, int> = 0>
-    list& operator=(const object& v) {
-        if (const auto* p = obj_to_list_ptr(v)) data_ = *p;
-        else data_.clear();
-        return *this;
-    }
 
     iterator begin() { return data_.begin(); }
     iterator end() { return data_.end(); }

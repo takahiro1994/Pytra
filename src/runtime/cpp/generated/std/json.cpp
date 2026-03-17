@@ -16,6 +16,13 @@ namespace pytra::std::json {
     str _EMPTY;
     str _COMMA_NL;
     str _HEX_DIGITS;
+    int64 _JV_NULL;
+    int64 _JV_BOOL;
+    int64 _JV_INT;
+    int64 _JV_FLOAT;
+    int64 _JV_STR;
+    int64 _JV_ARR;
+    int64 _JV_OBJ;
     
     /* Pure Python JSON utilities for selfhost-friendly transpilation. */
     
@@ -71,24 +78,6 @@ namespace pytra::std::json {
         return p0 + p1 + p2 + p3;
     }
     
-    list<object> _json_array_items(const object& raw) {
-        return list<object>(raw);
-    }
-    
-    list<object> _json_new_array() {
-        return list<object>{};
-    }
-    
-    object _json_obj_require(const dict<str, object>& raw, const str& key) {
-        for (::std::tuple<str, object> __itobj_1 : raw) {
-            str k = py_to_string(py_at(__itobj_1, 0));
-            auto value = py_at(__itobj_1, 1);
-            if (k == key)
-                return value;
-        }
-        throw ValueError("json object key not found: " + key);
-    }
-    
     int64 _json_indent_value(const ::std::optional<int64>& indent) {
         if (py_is_none(indent))
             throw ValueError("json indent is required");
@@ -97,162 +86,192 @@ namespace pytra::std::json {
     }
     
 
-    JsonObj::JsonObj(const dict<str, object>& raw) {
+    _JsonVal::_JsonVal(int64 tag, bool bool_val, int64 int_val, float64 float_val, const str& str_val, const rc<list<_JsonVal>>& arr_val, const dict<str, _JsonVal>& obj_val) {
+            this->tag = tag;
+            this->bool_val = bool_val;
+            this->int_val = int_val;
+            this->float_val = float_val;
+            this->str_val = str_val;
+            this->arr_val = arr_val;
+            this->obj_val = obj_val;
+    }
+    
+    _JsonVal _jv_null() {
+        return _JsonVal(_JV_NULL, false, 0, 0.0, "", rc_list_from_value(list<_JsonVal>{}), dict<str, object>{});
+    }
+    
+    _JsonVal _jv_bool(bool v) {
+        return _JsonVal(_JV_BOOL, v, 0, 0.0, "", rc_list_from_value(list<_JsonVal>{}), dict<str, object>{});
+    }
+    
+    _JsonVal _jv_int(int64 v) {
+        return _JsonVal(_JV_INT, false, v, 0.0, "", rc_list_from_value(list<_JsonVal>{}), dict<str, object>{});
+    }
+    
+    _JsonVal _jv_float(float64 v) {
+        return _JsonVal(_JV_FLOAT, false, 0, v, "", rc_list_from_value(list<_JsonVal>{}), dict<str, object>{});
+    }
+    
+    _JsonVal _jv_str(const str& v) {
+        return _JsonVal(_JV_STR, false, 0, 0.0, v, rc_list_from_value(list<_JsonVal>{}), dict<str, object>{});
+    }
+    
+    _JsonVal _jv_arr(const rc<list<_JsonVal>>& v) {
+        return _JsonVal(_JV_ARR, false, 0, 0.0, "", v, dict<str, object>{});
+    }
+    
+    _JsonVal _jv_obj(const dict<str, _JsonVal>& v) {
+        return _JsonVal(_JV_OBJ, false, 0, 0.0, "", rc_list_from_value(list<_JsonVal>{}), v);
+    }
+    
+    _JsonVal _jv_obj_require(const dict<str, _JsonVal>& raw, const str& key) {
+        for (::std::tuple<str, _JsonVal> __itobj_1 : raw) {
+            str k = py_to_string(py_at(__itobj_1, 0));
+            _JsonVal value = py_at(__itobj_1, 1);
+            if (k == key)
+                return value;
+        }
+        throw ValueError("json object key not found: " + key);
+    }
+    
+
+    JsonObj::JsonObj(const dict<str, _JsonVal>& raw) {
             this->raw = raw;
     }
 
     ::std::optional<JsonValue> JsonObj::get(const str& key) const {
             if (!py_contains(this->raw, key))
                 return ::std::nullopt;
-            object value = make_object(_json_obj_require(this->raw, key));
-            return JsonValue(value);
+            return JsonValue(_jv_obj_require(this->raw, key));
     }
 
     ::std::optional<JsonObj> JsonObj::get_obj(const str& key) const {
             if (!py_contains(this->raw, key))
                 return ::std::nullopt;
-            object value = make_object(_json_obj_require(this->raw, key));
-            return JsonValue(value).as_obj();
+            return JsonValue(_jv_obj_require(this->raw, key)).as_obj();
     }
 
     ::std::optional<JsonArr> JsonObj::get_arr(const str& key) const {
             if (!py_contains(this->raw, key))
                 return ::std::nullopt;
-            object value = make_object(_json_obj_require(this->raw, key));
-            return JsonValue(value).as_arr();
+            return JsonValue(_jv_obj_require(this->raw, key)).as_arr();
     }
 
     ::std::optional<str> JsonObj::get_str(const str& key) const {
             if (!py_contains(this->raw, key))
                 return ::std::nullopt;
-            object value = make_object(_json_obj_require(this->raw, key));
-            return JsonValue(value).as_str();
+            return JsonValue(_jv_obj_require(this->raw, key)).as_str();
     }
 
     ::std::optional<int64> JsonObj::get_int(const str& key) const {
             if (!py_contains(this->raw, key))
                 return ::std::nullopt;
-            object value = make_object(_json_obj_require(this->raw, key));
-            return JsonValue(value).as_int();
+            return JsonValue(_jv_obj_require(this->raw, key)).as_int();
     }
 
     ::std::optional<float64> JsonObj::get_float(const str& key) const {
             if (!py_contains(this->raw, key))
                 return ::std::nullopt;
-            object value = make_object(_json_obj_require(this->raw, key));
-            return JsonValue(value).as_float();
+            return JsonValue(_jv_obj_require(this->raw, key)).as_float();
     }
 
     ::std::optional<bool> JsonObj::get_bool(const str& key) const {
             if (!py_contains(this->raw, key))
                 return ::std::nullopt;
-            object value = make_object(_json_obj_require(this->raw, key));
-            return JsonValue(value).as_bool();
+            return JsonValue(_jv_obj_require(this->raw, key)).as_bool();
     }
     
 
-    JsonArr::JsonArr(const list<object>& raw) {
+    JsonArr::JsonArr(const rc<list<_JsonVal>>& raw) {
             this->raw = raw;
     }
 
     ::std::optional<JsonValue> JsonArr::get(int64 index) const {
-            if ((index < 0) || (index >= (_json_array_items(make_object(this->raw))).size()))
+            if ((index < 0) || (index >= (rc_list_ref(this->raw)).size()))
                 return ::std::nullopt;
-            return JsonValue(_json_array_items(make_object(this->raw))[index]);
+            return JsonValue(py_list_at_ref(rc_list_ref(this->raw), index));
     }
 
     ::std::optional<JsonObj> JsonArr::get_obj(int64 index) const {
-            if ((index < 0) || (index >= (_json_array_items(make_object(this->raw))).size()))
+            if ((index < 0) || (index >= (rc_list_ref(this->raw)).size()))
                 return ::std::nullopt;
-            return JsonValue(_json_array_items(make_object(this->raw))[index]).as_obj();
+            return JsonValue(py_list_at_ref(rc_list_ref(this->raw), index)).as_obj();
     }
 
     ::std::optional<JsonArr> JsonArr::get_arr(int64 index) const {
-            if ((index < 0) || (index >= (_json_array_items(make_object(this->raw))).size()))
+            if ((index < 0) || (index >= (rc_list_ref(this->raw)).size()))
                 return ::std::nullopt;
-            return JsonValue(_json_array_items(make_object(this->raw))[index]).as_arr();
+            return JsonValue(py_list_at_ref(rc_list_ref(this->raw), index)).as_arr();
     }
 
     ::std::optional<str> JsonArr::get_str(int64 index) const {
-            if ((index < 0) || (index >= (_json_array_items(make_object(this->raw))).size()))
+            if ((index < 0) || (index >= (rc_list_ref(this->raw)).size()))
                 return ::std::nullopt;
-            return JsonValue(_json_array_items(make_object(this->raw))[index]).as_str();
+            return JsonValue(py_list_at_ref(rc_list_ref(this->raw), index)).as_str();
     }
 
     ::std::optional<int64> JsonArr::get_int(int64 index) const {
-            if ((index < 0) || (index >= (_json_array_items(make_object(this->raw))).size()))
+            if ((index < 0) || (index >= (rc_list_ref(this->raw)).size()))
                 return ::std::nullopt;
-            return JsonValue(_json_array_items(make_object(this->raw))[index]).as_int();
+            return JsonValue(py_list_at_ref(rc_list_ref(this->raw), index)).as_int();
     }
 
     ::std::optional<float64> JsonArr::get_float(int64 index) const {
-            if ((index < 0) || (index >= (_json_array_items(make_object(this->raw))).size()))
+            if ((index < 0) || (index >= (rc_list_ref(this->raw)).size()))
                 return ::std::nullopt;
-            return JsonValue(_json_array_items(make_object(this->raw))[index]).as_float();
+            return JsonValue(py_list_at_ref(rc_list_ref(this->raw), index)).as_float();
     }
 
     ::std::optional<bool> JsonArr::get_bool(int64 index) const {
-            if ((index < 0) || (index >= (_json_array_items(make_object(this->raw))).size()))
+            if ((index < 0) || (index >= (rc_list_ref(this->raw)).size()))
                 return ::std::nullopt;
-            return JsonValue(_json_array_items(make_object(this->raw))[index]).as_bool();
+            return JsonValue(py_list_at_ref(rc_list_ref(this->raw), index)).as_bool();
     }
     
 
-    JsonValue::JsonValue(const object& raw) {
-            this->raw = make_object(raw);
+    JsonValue::JsonValue(const _JsonVal& raw) {
+            this->raw = raw;
     }
 
     ::std::optional<JsonObj> JsonValue::as_obj() const {
-            object raw = make_object(this->raw);
-            if (py_runtime_value_isinstance(raw, PYTRA_TID_DICT)) {
-                dict<str, object> raw_obj = dict<str, object>(raw);
-                return JsonObj(raw_obj);
-            }
+            _JsonVal raw = this->raw;
+            if (raw.tag == _JV_OBJ)
+                return JsonObj(raw.obj_val);
             return ::std::nullopt;
     }
 
     ::std::optional<JsonArr> JsonValue::as_arr() const {
-            object raw = make_object(this->raw);
-            if (py_runtime_value_isinstance(raw, PYTRA_TID_LIST)) {
-                list<object> raw_arr = make_object(list<object>(raw));
-                return JsonArr(raw_arr);
-            }
+            _JsonVal raw = this->raw;
+            if (raw.tag == _JV_ARR)
+                return JsonArr(raw.arr_val);
             return ::std::nullopt;
     }
 
     ::std::optional<str> JsonValue::as_str() const {
-            object raw = make_object(this->raw);
-            if (py_runtime_value_isinstance(raw, PYTRA_TID_STR))
-                return raw;
+            _JsonVal raw = this->raw;
+            if (raw.tag == _JV_STR)
+                return raw.str_val;
             return ::std::nullopt;
     }
 
     ::std::optional<int64> JsonValue::as_int() const {
-            object raw = make_object(this->raw);
-            if (py_runtime_value_isinstance(raw, PYTRA_TID_BOOL))
-                return ::std::nullopt;
-            if (py_runtime_value_isinstance(raw, PYTRA_TID_INT)) {
-                int64 raw_i = py_to_int64(raw);
-                return raw_i;
-            }
+            _JsonVal raw = this->raw;
+            if (raw.tag == _JV_INT)
+                return raw.int_val;
             return ::std::nullopt;
     }
 
     ::std::optional<float64> JsonValue::as_float() const {
-            object raw = make_object(this->raw);
-            if (py_runtime_value_isinstance(raw, PYTRA_TID_FLOAT)) {
-                float64 raw_f = py_to_float64(raw);
-                return raw_f;
-            }
+            _JsonVal raw = this->raw;
+            if (raw.tag == _JV_FLOAT)
+                return raw.float_val;
             return ::std::nullopt;
     }
 
     ::std::optional<bool> JsonValue::as_bool() const {
-            object raw = make_object(this->raw);
-            if (py_runtime_value_isinstance(raw, PYTRA_TID_BOOL)) {
-                bool raw_b = py_to<bool>(raw);
-                return raw_b;
-            }
+            _JsonVal raw = this->raw;
+            if (raw.tag == _JV_BOOL)
+                return raw.bool_val;
             return ::std::nullopt;
     }
     
@@ -263,9 +282,9 @@ namespace pytra::std::json {
             this->i = 0;
     }
 
-    object _JsonParser::parse() {
+    _JsonVal _JsonParser::parse() {
             this->_skip_ws();
-            object out = make_object(this->_parse_value());
+            _JsonVal out = this->_parse_value();
             this->_skip_ws();
             if (this->i != this->n)
                 throw ValueError("invalid json: trailing characters");
@@ -278,33 +297,33 @@ namespace pytra::std::json {
             }
     }
 
-    object _JsonParser::_parse_value() {
+    _JsonVal _JsonParser::_parse_value() {
             if (this->i >= this->n)
                 throw ValueError("invalid json: unexpected end");
             str ch = this->text[this->i];
             if (ch == "{")
-                return make_object(this->_parse_object());
+                return _jv_obj(this->_parse_object());
             if (ch == "[")
-                return make_object(this->_parse_array());
+                return _jv_arr(this->_parse_array());
             if (ch == "\"")
-                return make_object(this->_parse_string());
+                return _jv_str(this->_parse_string());
             if ((ch == "t") && (py_slice(this->text, this->i, this->i + 4) == "true")) {
                 this->i += 4;
-                return make_object(true);
+                return _jv_bool(true);
             }
             if ((ch == "f") && (py_slice(this->text, this->i, this->i + 5) == "false")) {
                 this->i += 5;
-                return make_object(false);
+                return _jv_bool(false);
             }
             if ((ch == "n") && (py_slice(this->text, this->i, this->i + 4) == "null")) {
                 this->i += 4;
-                return make_object(::std::nullopt);
+                return _jv_null();
             }
             return this->_parse_number();
     }
 
-    dict<str, object> _JsonParser::_parse_object() {
-            dict<str, object> out = dict<str, object>{};
+    dict<str, _JsonVal> _JsonParser::_parse_object() {
+            dict<str, _JsonVal> out = {};
             this->i++;
             this->_skip_ws();
             if ((this->i < this->n) && (this->text[this->i] == "}")) {
@@ -321,7 +340,7 @@ namespace pytra::std::json {
                     throw ValueError("invalid json object: missing ':'");
                 this->i++;
                 this->_skip_ws();
-                out[key] = make_object(this->_parse_value());
+                out[key] = this->_parse_value();
                 this->_skip_ws();
                 if (this->i >= this->n)
                     throw ValueError("invalid json object: unexpected end");
@@ -334,8 +353,8 @@ namespace pytra::std::json {
             }
     }
 
-    list<object> _JsonParser::_parse_array() {
-            list<object> out = _json_new_array();
+    rc<list<_JsonVal>> _JsonParser::_parse_array() {
+            rc<list<_JsonVal>> out = rc_list_from_value(list<_JsonVal>{});
             this->i++;
             this->_skip_ws();
             if ((this->i < this->n) && (this->text[this->i] == "]")) {
@@ -344,7 +363,7 @@ namespace pytra::std::json {
             }
             while (true) {
                 this->_skip_ws();
-                out.append(this->_parse_value());
+                py_list_append_mut(rc_list_ref(out), this->_parse_value());
                 this->_skip_ws();
                 if (this->i >= this->n)
                     throw ValueError("invalid json array: unexpected end");
@@ -404,7 +423,7 @@ namespace pytra::std::json {
             throw ValueError("unterminated json string");
     }
 
-    object _JsonParser::_parse_number() {
+    _JsonVal _JsonParser::_parse_number() {
             int64 start = this->i;
             if (this->text[this->i] == "-")
                 this->i++;
@@ -449,41 +468,37 @@ namespace pytra::std::json {
             str token = py_slice(this->text, start, this->i);
             if (is_float) {
                 float64 num_f = py_to_float64(token);
-                return make_object(num_f);
+                return _jv_float(num_f);
             }
             int64 num_i = py_to_int64(token);
-            return make_object(num_i);
+            return _jv_int(num_i);
     }
     
-    object loads(const str& text) {
-        return _JsonParser(text).parse();
+    JsonValue loads(const str& text) {
+        return JsonValue(_JsonParser(text).parse());
     }
     
     ::std::optional<JsonObj> loads_obj(const str& text) {
-        object value = make_object(_JsonParser(text).parse());
-        if (py_runtime_value_isinstance(value, PYTRA_TID_DICT)) {
-            dict<str, object> raw_obj = dict<str, object>(value);
-            return JsonObj(raw_obj);
-        }
+        _JsonVal val = _JsonParser(text).parse();
+        if (val.tag == _JV_OBJ)
+            return JsonObj(val.obj_val);
         return ::std::nullopt;
     }
     
     ::std::optional<JsonArr> loads_arr(const str& text) {
-        object value = make_object(_JsonParser(text).parse());
-        if (py_runtime_value_isinstance(value, PYTRA_TID_LIST)) {
-            list<object> raw_arr = make_object(list<object>(value));
-            return JsonArr(raw_arr);
-        }
+        _JsonVal val = _JsonParser(text).parse();
+        if (val.tag == _JV_ARR)
+            return JsonArr(val.arr_val);
         return ::std::nullopt;
     }
     
     str _join_strs(const rc<list<str>>& parts, const str& sep) {
         if ((rc_list_ref(parts)).empty())
             return "";
-        str out = py_list_at_ref(rc_list_ref(parts), py_to<int64>(0));
+        str out = py_list_at_ref(rc_list_ref(parts), 0);
         int64 i = 1;
         while (i < (rc_list_ref(parts)).size()) {
-            out = out + sep + py_list_at_ref(rc_list_ref(parts), py_to<int64>(i));
+            out = out + sep + py_list_at_ref(rc_list_ref(parts), i);
             i++;
         }
         return out;
@@ -517,47 +532,35 @@ namespace pytra::std::json {
         return _join_strs(out, _EMPTY);
     }
     
-    str _dump_json_list(const list<object>& values, bool ensure_ascii, const ::std::optional<int64>& indent, const str& item_sep, const str& key_sep, int64 level) {
-        if (values.empty())
+    str _dump_json_list(const rc<list<_JsonVal>>& values, bool ensure_ascii, const ::std::optional<int64>& indent, const str& item_sep, const str& key_sep, int64 level) {
+        if ((rc_list_ref(values)).empty())
             return "[]";
         if (py_is_none(indent)) {
             rc<list<str>> dumped = rc_list_from_value(list<str>{});
-            {
-                object __iter_obj_2 = ([&]() -> object { object __obj = values; if (!__obj) throw TypeError("NoneType is not iterable"); return __obj->py_iter_or_raise(); }());
-                while (true) {
-                    ::std::optional<object> __next_3 = ([&]() -> ::std::optional<object> { object __iter = __iter_obj_2; if (!__iter) throw TypeError("NoneType is not an iterator"); return __iter->py_next_or_stop(); }());
-                    if (!__next_3.has_value()) break;
-                    object x = *__next_3;
-                    str dumped_txt = _dump_json_value(x, ensure_ascii, indent, item_sep, key_sep, level);
-                    py_list_append_mut(rc_list_ref(dumped), dumped_txt);
-                }
+            for (_JsonVal x : rc_list_ref(values)) {
+                str dumped_txt = _dump_json_value(x, ensure_ascii, indent, item_sep, key_sep, level);
+                py_list_append_mut(rc_list_ref(dumped), dumped_txt);
             }
             return "[" + _join_strs(dumped, item_sep) + "]";
         }
         int64 indent_i = _json_indent_value(indent);
         rc<list<str>> inner = rc_list_from_value(list<str>{});
-        {
-            object __iter_obj_4 = ([&]() -> object { object __obj = values; if (!__obj) throw TypeError("NoneType is not iterable"); return __obj->py_iter_or_raise(); }());
-            while (true) {
-                ::std::optional<object> __next_5 = ([&]() -> ::std::optional<object> { object __iter = __iter_obj_4; if (!__iter) throw TypeError("NoneType is not an iterator"); return __iter->py_next_or_stop(); }());
-                if (!__next_5.has_value()) break;
-                object x = *__next_5;
-                str prefix = py_repeat(" ", indent_i * (level + 1));
-                str value_txt = _dump_json_value(x, ensure_ascii, indent, item_sep, key_sep, level + 1);
-                py_list_append_mut(rc_list_ref(inner), prefix + value_txt);
-            }
+        for (_JsonVal x : rc_list_ref(values)) {
+            str prefix = py_repeat(" ", indent_i * (level + 1));
+            str value_txt = _dump_json_value(x, ensure_ascii, indent, item_sep, key_sep, level + 1);
+            py_list_append_mut(rc_list_ref(inner), prefix + value_txt);
         }
         return "[\n" + _join_strs(inner, _COMMA_NL) + "\n" + py_repeat(" ", indent_i * level) + "]";
     }
     
-    str _dump_json_dict(const dict<str, object>& values, bool ensure_ascii, const ::std::optional<int64>& indent, const str& item_sep, const str& key_sep, int64 level) {
+    str _dump_json_dict(const dict<str, _JsonVal>& values, bool ensure_ascii, const ::std::optional<int64>& indent, const str& item_sep, const str& key_sep, int64 level) {
         if (py_len(values) == 0)
             return "{}";
         if (py_is_none(indent)) {
             rc<list<str>> parts = rc_list_from_value(list<str>{});
-            for (::std::tuple<str, object> __itobj_6 : values) {
-                str k = py_to_string(py_at(__itobj_6, 0));
-                auto x = py_at(__itobj_6, 1);
+            for (::std::tuple<str, _JsonVal> __itobj_2 : values) {
+                str k = py_to_string(py_at(__itobj_2, 0));
+                _JsonVal x = py_at(__itobj_2, 1);
                 str k_txt = _escape_str(k, ensure_ascii);
                 str v_txt = _dump_json_value(x, ensure_ascii, indent, item_sep, key_sep, level);
                 py_list_append_mut(rc_list_ref(parts), k_txt + key_sep + v_txt);
@@ -566,9 +569,9 @@ namespace pytra::std::json {
         }
         int64 indent_i = _json_indent_value(indent);
         rc<list<str>> inner = rc_list_from_value(list<str>{});
-        for (::std::tuple<str, object> __itobj_7 : values) {
-            str k = py_to_string(py_at(__itobj_7, 0));
-            auto x = py_at(__itobj_7, 1);
+        for (::std::tuple<str, _JsonVal> __itobj_3 : values) {
+            str k = py_to_string(py_at(__itobj_3, 0));
+            _JsonVal x = py_at(__itobj_3, 1);
             str prefix = py_repeat(" ", indent_i * (level + 1));
             str k_txt = _escape_str(k, ensure_ascii);
             str v_txt = _dump_json_value(x, ensure_ascii, indent, item_sep, key_sep, level + 1);
@@ -577,39 +580,46 @@ namespace pytra::std::json {
         return "{\n" + _join_strs(inner, _COMMA_NL) + "\n" + py_repeat(" ", indent_i * level) + "}";
     }
     
-    str _dump_json_value(const object& v, bool ensure_ascii, const ::std::optional<int64>& indent, const str& item_sep, const str& key_sep, int64 level) {
-        if (py_is_none(v))
+    str _dump_json_value(const _JsonVal& v, bool ensure_ascii, const ::std::optional<int64>& indent, const str& item_sep, const str& key_sep, int64 level) {
+        if (v.tag == _JV_NULL)
             return "null";
-        if (py_runtime_value_isinstance(v, PYTRA_TID_BOOL)) {
-            bool raw_b = py_to<bool>(v);
+        if (v.tag == _JV_BOOL) {
+            bool raw_b = v.bool_val;
             return (raw_b ? "true" : "false");
         }
-        if (py_runtime_value_isinstance(v, PYTRA_TID_INT))
-            return py_to_string(v);
-        if (py_runtime_value_isinstance(v, PYTRA_TID_FLOAT))
-            return py_to_string(v);
-        if (py_runtime_value_isinstance(v, PYTRA_TID_STR))
-            return _escape_str(py_to_string(v), ensure_ascii);
-        if (py_runtime_value_isinstance(v, PYTRA_TID_LIST)) {
-            list<object> as_list = make_object(list<object>(v));
-            return _dump_json_list(as_list, ensure_ascii, indent, item_sep, key_sep, level);
-        }
-        if (py_runtime_value_isinstance(v, PYTRA_TID_DICT)) {
-            dict<str, object> as_dict = dict<str, object>(v);
-            return _dump_json_dict(as_dict, ensure_ascii, indent, item_sep, key_sep, level);
-        }
+        if (v.tag == _JV_INT)
+            return py_to_string(v.int_val);
+        if (v.tag == _JV_FLOAT)
+            return py_to_string(v.float_val);
+        if (v.tag == _JV_STR)
+            return _escape_str(v.str_val, ensure_ascii);
+        if (v.tag == _JV_ARR)
+            return _dump_json_list(v.arr_val, ensure_ascii, indent, item_sep, key_sep, level);
+        if (v.tag == _JV_OBJ)
+            return _dump_json_dict(v.obj_val, ensure_ascii, indent, item_sep, key_sep, level);
         throw TypeError("json.dumps unsupported type");
     }
     
-    str dumps(const object& obj, bool ensure_ascii, const ::std::optional<int64>& indent, const ::std::optional<::std::tuple<str, str>>& separators) {
+    str dumps(const _JsonVal& obj, bool ensure_ascii, const ::std::optional<int64>& indent, const ::std::optional<::std::tuple<str, str>>& separators) {
         str item_sep = ",";
         str key_sep = (py_is_none(indent) ? ":" : ": ");
         if (!py_is_none(separators)) {
-            auto __tuple_8 = *(separators);
-            item_sep = ::std::get<0>(__tuple_8);
-            key_sep = ::std::get<1>(__tuple_8);
+            auto __tuple_4 = *(separators);
+            item_sep = ::std::get<0>(__tuple_4);
+            key_sep = ::std::get<1>(__tuple_4);
         }
         return _dump_json_value(obj, ensure_ascii, indent, item_sep, key_sep, 0);
+    }
+    
+    str dumps_jv(const _JsonVal& jv, bool ensure_ascii, const ::std::optional<int64>& indent, const ::std::optional<::std::tuple<str, str>>& separators) {
+        str item_sep = ",";
+        str key_sep = (py_is_none(indent) ? ":" : ": ");
+        if (!py_is_none(separators)) {
+            auto __tuple_5 = *(separators);
+            item_sep = ::std::get<0>(__tuple_5);
+            key_sep = ::std::get<1>(__tuple_5);
+        }
+        return _dump_json_value(jv, ensure_ascii, indent, item_sep, key_sep, 0);
     }
     
     static void __pytra_module_init() {
@@ -619,6 +629,13 @@ namespace pytra::std::json {
         _EMPTY = "";
         _COMMA_NL = ",\n";
         _HEX_DIGITS = "0123456789abcdef";
+        _JV_NULL = 0;
+        _JV_BOOL = 1;
+        _JV_INT = 2;
+        _JV_FLOAT = 3;
+        _JV_STR = 4;
+        _JV_ARR = 5;
+        _JV_OBJ = 6;
     }
     
     namespace {

@@ -500,7 +500,7 @@ def _escape_str(s: str, ensure_ascii: bool) -> str:
 
 
 def _dump_json_list(
-    values: list[object],
+    values: list[_JsonVal],
     ensure_ascii: bool,
     indent: int | None,
     item_sep: str,
@@ -525,7 +525,7 @@ def _dump_json_list(
 
 
 def _dump_json_dict(
-    values: dict[str, object],
+    values: dict[str, _JsonVal],
     ensure_ascii: bool,
     indent: int | None,
     item_sep: str,
@@ -552,35 +552,33 @@ def _dump_json_dict(
 
 
 def _dump_json_value(
-    v: object,
+    v: _JsonVal,
     ensure_ascii: bool,
     indent: int | None,
     item_sep: str,
     key_sep: str,
     level: int,
 ) -> str:
-    if v is None:
+    if v.tag == _JV_NULL:
         return "null"
-    if isinstance(v, bool):
-        raw_b: bool = bool(v)
+    if v.tag == _JV_BOOL:
+        raw_b: bool = v.bool_val
         return "true" if raw_b else "false"
-    if isinstance(v, int):
-        return str(v)
-    if isinstance(v, float):
-        return str(v)
-    if isinstance(v, str):
-        return _escape_str(v, ensure_ascii)
-    if isinstance(v, list):
-        as_list: list[object] = list(v)
-        return _dump_json_list(as_list, ensure_ascii, indent, item_sep, key_sep, level)
-    if isinstance(v, dict):
-        as_dict: dict[str, object] = dict(v)
-        return _dump_json_dict(as_dict, ensure_ascii, indent, item_sep, key_sep, level)
+    if v.tag == _JV_INT:
+        return str(v.int_val)
+    if v.tag == _JV_FLOAT:
+        return str(v.float_val)
+    if v.tag == _JV_STR:
+        return _escape_str(v.str_val, ensure_ascii)
+    if v.tag == _JV_ARR:
+        return _dump_json_list(v.arr_val, ensure_ascii, indent, item_sep, key_sep, level)
+    if v.tag == _JV_OBJ:
+        return _dump_json_dict(v.obj_val, ensure_ascii, indent, item_sep, key_sep, level)
     raise TypeError("json.dumps unsupported type")
 
 
 def dumps(
-    obj: object,
+    obj: _JsonVal,
     *,
     ensure_ascii: bool = True,
     indent: int | None = None,
@@ -591,3 +589,17 @@ def dumps(
     if separators is not None:
         item_sep, key_sep = separators
     return _dump_json_value(obj, ensure_ascii, indent, item_sep, key_sep, 0)
+
+
+def dumps_jv(
+    jv: _JsonVal,
+    *,
+    ensure_ascii: bool = True,
+    indent: int | None = None,
+    separators: tuple[str, str] | None = None,
+) -> str:
+    item_sep = ","
+    key_sep = ":" if indent is None else ": "
+    if separators is not None:
+        item_sep, key_sep = separators
+    return _dump_json_value(jv, ensure_ascii, indent, item_sep, key_sep, 0)

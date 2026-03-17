@@ -107,6 +107,23 @@ def export_json_value_raw(value: json.JsonValue | None) -> object | None:
     return _jv_to_object(value.raw)
 
 
+def dumps_object(
+    obj: object,
+    *,
+    ensure_ascii: bool = True,
+    indent: int | None = None,
+    separators: tuple[str, str] | None = None,
+) -> str:
+    """Serialize a plain Python object (dict/list/str/int/float/bool/None) as JSON.
+
+    This is a Python-only compatibility wrapper. It converts the input to a
+    _JsonVal ADT and delegates to json.dumps_jv, which is the transpiler-safe
+    entry point.
+    """
+    jv = _object_to_jv(obj)
+    return json.dumps_jv(jv, ensure_ascii=ensure_ascii, indent=indent, separators=separators)
+
+
 def unwrap_east_root_json_doc(doc: json.JsonObj) -> json.JsonObj | None:
     east_doc = doc.get_obj("east")
     if doc.get_bool("ok") is True and east_doc is not None:

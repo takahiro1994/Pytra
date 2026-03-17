@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 from pytra.std import json
+from toolchain.json_adapters import dumps_object as _json_dumps_object
 
 from toolchain.ir.core_numeric_types import FLOAT_TYPES
 from toolchain.ir.core_numeric_types import INT_TYPES
@@ -11,8 +12,8 @@ from toolchain.ir.core_numeric_types import INT_TYPES
 def _dump_json(obj: dict[str, Any], *, pretty: bool) -> str:
     """Serialize output JSON in compact or pretty mode."""
     if pretty:
-        return json.dumps(obj, ensure_ascii=False, indent=2)
-    return json.dumps(obj, ensure_ascii=False, separators=(",", ":"))
+        return _json_dumps_object(obj, ensure_ascii=False, indent=2)
+    return _json_dumps_object(obj, ensure_ascii=False, separators=(",", ":"))
 
 
 def _indent(lines: list[str], level: int = 1) -> list[str]:

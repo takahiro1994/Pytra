@@ -18,6 +18,7 @@ from toolchain.compiler.transpile_cli import (
 
 from backends.cpp.program_writer import write_cpp_rendered_program
 from backends.cpp.emitter.cpp_emitter import CppEmitter
+from toolchain.json_adapters import dumps_object as _json_dumps_object
 from backends.cpp.emitter.header_builder import build_cpp_header_from_east
 from backends.cpp.optimizer import optimize_cpp_ir
 from backends.cpp.optimizer import render_cpp_opt_trace
@@ -92,7 +93,7 @@ def write_multi_file_cpp(
             if is_entry and dump_cpp_ir_before_opt != "":
                 _write_debug_text(
                     dump_cpp_ir_before_opt,
-                    json.dumps(east, ensure_ascii=False, indent=2) + "\n",
+                    _json_dumps_object(east, ensure_ascii=False, indent=2) + "\n",
                 )
             optimized_east, cpp_opt_report = optimize_cpp_ir(
                 east,
@@ -112,7 +113,7 @@ def write_multi_file_cpp(
             if is_entry and dump_cpp_ir_after_opt != "":
                 _write_debug_text(
                     dump_cpp_ir_after_opt,
-                    json.dumps(optimized_east, ensure_ascii=False, indent=2) + "\n",
+                    _json_dumps_object(optimized_east, ensure_ascii=False, indent=2) + "\n",
                 )
             if is_entry and dump_cpp_opt_trace != "":
                 _write_debug_text(dump_cpp_opt_trace, render_cpp_opt_trace(cpp_opt_report))

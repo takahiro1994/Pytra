@@ -1,9 +1,6 @@
 #ifndef PYTRA_BUILT_IN_DICT_H
 #define PYTRA_BUILT_IN_DICT_H
 
-template <class T>
-object make_object(const T& v);
-
 template <class K, class V>
 class dict {
 public:
@@ -25,14 +22,6 @@ public:
             data_[K(kv.first)] = _convert_value(V(kv.second));
         }
     }
-    template <class KK = K, ::std::enable_if_t<::std::is_same_v<KK, str>, int> = 0>
-    dict(const object& v) {
-        const dict<str, object> src = obj_to_dict(v);
-        for (const auto& kv : src) {
-            data_[kv.first] = _convert_value(kv.second);
-        }
-    }
-
     template <class It>
     dict(It first, It last) : data_(first, last) {}
 
@@ -45,16 +34,6 @@ public:
 
     operator const base_type&() const { return data_; }  // NOLINT(google-explicit-constructor)
     operator base_type&() { return data_; }              // NOLINT(google-explicit-constructor)
-    operator object() const { return make_object(*this); }  // NOLINT(google-explicit-constructor)
-    template <class KK = K, ::std::enable_if_t<::std::is_same_v<KK, str>, int> = 0>
-    dict& operator=(const object& v) {
-        data_.clear();
-        const dict<str, object> src = obj_to_dict(v);
-        for (const auto& kv : src) {
-            data_[kv.first] = _convert_value(kv.second);
-        }
-        return *this;
-    }
 
     template <class U, ::std::enable_if_t<!::std::is_same_v<U, V>, int> = 0>
     dict& operator=(const dict<K, U>& other) {
@@ -191,13 +170,7 @@ public:
 private:
     template <class U>
     static V _convert_value(const U& value) {
-        if constexpr (::std::is_same_v<V, object>) {
-            return make_object(value);
-        } else if constexpr (::std::is_same_v<U, object> && ::std::is_same_v<V, str>) {
-            return str(value);
-        } else {
-            return static_cast<V>(value);
-        }
+        return static_cast<V>(value);
     }
 
     base_type data_;

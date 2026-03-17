@@ -14,6 +14,7 @@ from toolchain.compiler.transpile_cli import (
     mkdirs_for_cli,
     write_text_file,
 )
+from toolchain.json_adapters import dumps_object as _json_dumps_object
 
 
 def _dict(value: Any) -> dict[str, Any]:
@@ -145,7 +146,7 @@ def write_cpp_rendered_program(
         "modules": manifest_modules,
     }
     manifest_path = output_root / "manifest.json"
-    manifest_txt = json.dumps(manifest_for_dump, ensure_ascii=False, indent=2)
+    manifest_txt = _json_dumps_object(manifest_for_dump, ensure_ascii=False, indent=2)
     generated_lines_total += count_text_lines(manifest_txt)
     _check_generated_limit(generated_lines_total, max_generated_lines, entry)
     write_text_file(manifest_path, manifest_txt)

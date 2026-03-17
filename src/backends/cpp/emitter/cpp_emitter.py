@@ -13,6 +13,7 @@ from toolchain.compiler.transpile_cli import (
     set_import_module_binding,
     set_import_symbol_binding_and_module_set,
 )
+from toolchain.json_adapters import dumps_object as _json_dumps_object
 from backends.cpp.emitter.analysis import CppAnalysisEmitter
 from backends.cpp.emitter.builtin_runtime import CppBuiltinRuntimeEmitter
 from backends.cpp.emitter.call import CppCallEmitter
@@ -54,7 +55,7 @@ def _write_text_file(path_text: str, text: str) -> None:
 def _dump_json_file(path_text: str, payload: dict[str, Any]) -> None:
     """Write JSON dump with stable formatting."""
     json_obj: Any = payload
-    text = json.dumps(json_obj, ensure_ascii=False, indent=2) + "\n"
+    text = _json_dumps_object(json_obj, ensure_ascii=False, indent=2) + "\n"
     _write_text_file(path_text, text)
 
 

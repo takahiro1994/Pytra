@@ -7,8 +7,6 @@ namespace pytra::std::sys {
 
 list<str> argv = py_runtime_argv();
 list<str> path = {};
-object stderr = make_object(::std::nullopt);
-object stdout = make_object(::std::nullopt);
 
 void exit(int64 code) {
     py_runtime_exit(code);

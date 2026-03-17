@@ -18,7 +18,7 @@ T sum(const list<T>& values) {
         return 0;
     auto acc = values[0] - values[0];
     int64 i = 0;
-    int64 n = py_len(values);
+    int64 n = values.size();
     while (i < n) {
         acc += values[i];
         i++;

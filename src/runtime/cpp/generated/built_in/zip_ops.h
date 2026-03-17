@@ -16,9 +16,9 @@ template <class A, class B>
 list<::std::tuple<A, B>> zip(const list<A>& lhs, const list<B>& rhs) {
     rc<list<::std::tuple<A, B>>> out = rc_list_from_value(list<::std::tuple<A, B>>{});
     int64 i = 0;
-    int64 n = py_len(lhs);
-    if (py_len(rhs) < n)
-        n = py_len(rhs);
+    int64 n = lhs.size();
+    if (rhs.size() < n)
+        n = rhs.size();
     while (i < n) {
         py_list_append_mut(rc_list_ref(out), ::std::make_tuple(lhs[i], rhs[i]));
         i++;

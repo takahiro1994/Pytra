@@ -11,6 +11,7 @@ from toolchain.frontends.type_expr import sync_type_expr_mirrors
 from pytra.std import json
 from pytra.std.pathlib import Path
 from typing import Any
+from toolchain.json_adapters import dumps_object as _json_dumps_object
 
 
 def lower_east2_to_east3_document(
@@ -133,7 +134,7 @@ def load_east3_document(
         if dump_east3_before_opt != "":
             before_path = Path(dump_east3_before_opt)
             before_path.parent.mkdir(parents=True, exist_ok=True)
-            before_path.write_text(json.dumps(east3_doc, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+            before_path.write_text(_json_dumps_object(east3_doc, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         optimized_doc, report = optimize_east3_document(
             east3_doc,
             opt_level=east3_opt_level,
@@ -143,7 +144,7 @@ def load_east3_document(
         if dump_east3_after_opt != "":
             after_path = Path(dump_east3_after_opt)
             after_path.parent.mkdir(parents=True, exist_ok=True)
-            after_path.write_text(json.dumps(optimized_doc, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+            after_path.write_text(_json_dumps_object(optimized_doc, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         if dump_east3_opt_trace != "":
             trace_path = Path(dump_east3_opt_trace)
             trace_path.parent.mkdir(parents=True, exist_ok=True)

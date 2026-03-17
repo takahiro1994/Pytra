@@ -5,7 +5,6 @@ template <class T>
 class list;
 template <class T>
 ::std::string py_to_string(const T& v);
-static inline ::std::string py_to_string(const object& v);
 
 class str {
 public:
@@ -19,14 +18,9 @@ public:
     str(::std::string&& s) : data_(::std::move(s)) {}
     str(::std::size_t count, char ch) : data_(count, ch) {}
     str(char c) : data_(1, c) {}
-    str(const object& v) : data_(obj_to_str(v).std()) {}
 
     str& operator=(const char* s) {
         data_ = (s == nullptr ? "" : s);
-        return *this;
-    }
-    str& operator=(const object& v) {
-        data_ = obj_to_str(v).std();
         return *this;
     }
 
