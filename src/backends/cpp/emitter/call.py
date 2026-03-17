@@ -247,32 +247,8 @@ class CppCallEmitter:
         args: list[str],
         arg_nodes: list[Any],
     ) -> list[str]:
-        """`py_assert_*` 呼び出しで object 引数が必要な位置を boxing する。"""
-        out: list[str] = []
-        nodes = arg_nodes
-        for i, arg in enumerate(args):
-            a = arg
-            needs_object = False
-            if fn_name == "py_assert_stdout":
-                needs_object = i == 1
-            elif fn_name == "py_assert_eq":
-                needs_object = i < 2
-            if needs_object and not self.is_boxed_object_expr(a):
-                arg_t = ""
-                if i < len(nodes):
-                    at = self.get_expr_type(nodes[i])
-                    if isinstance(at, str):
-                        arg_t = at
-                arg_t = self.infer_rendered_arg_type(a, arg_t, self.declared_var_types)
-                if not self.is_any_like_type(arg_t):
-                    arg_node = nodes[i] if i < len(nodes) else {}
-                    arg_node_d = arg_node if isinstance(arg_node, dict) else {}
-                    if len(arg_node_d) > 0:
-                        a = self.render_expr(self._build_box_expr_node(arg_node))
-                    else:
-                        a = f"make_object({a})"
-            out.append(a)
-        return out
+        # py_assert_eq / py_assert_stdout は template 化済み（S6）のため boxing 不要
+        return args
 
     def _requires_builtin_call_lowering(self, raw: str) -> bool:
         """parser 側で BuiltinCall へ lower 済みであるべき Name を返す。"""

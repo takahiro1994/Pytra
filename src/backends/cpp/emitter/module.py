@@ -1075,6 +1075,9 @@ class CppModuleEmitter:
         arg_nodes: list[Any],
     ) -> list[str]:
         """モジュール関数シグネチャに基づいて引数を必要最小限で coercion する。"""
+        # py_assert_* は S6 で template 化済みのため boxing 不要
+        if fn_name.startswith("py_assert_"):
+            return args
         target_types = self._module_function_arg_types(module_name, fn_name)
         if len(target_types) == 0:
             return args

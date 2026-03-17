@@ -110,6 +110,13 @@ static inline ::std::string py_to_string(const ::std::optional<T>& v) {
     return py_to_string(*v);
 }
 
+// object (= rc<RcObject>) は py_str() を持たないため "<object>" を返す。
+// py_assert_eq 等のデバッグ用途に限定。
+static inline ::std::string py_to_string(const object& v) {
+    if (!v) return "None";
+    return "<object>";
+}
+
 template <class T>
 static inline T py_to(const T& v);
 

@@ -32,11 +32,11 @@ bytes _lzw_encode(const bytes& data, int64 min_code_size = 8) {
     int64 clear_code = 1 << min_code_size;
     int64 end_code = clear_code + 1;
     int64 code_size = min_code_size + 1;
-
+    
     list<int64> out = {};
     int64 bit_buffer = 0;
     int64 bit_count = 0;
-
+    
     bit_buffer |= clear_code << bit_count;
     bit_count += code_size;
     while (bit_count >= 8) {
@@ -45,7 +45,7 @@ bytes _lzw_encode(const bytes& data, int64 min_code_size = 8) {
         bit_count -= 8;
     }
     code_size = min_code_size + 1;
-
+    
     for (uint8 v : data) {
         bit_buffer |= v << bit_count;
         bit_count += code_size;
@@ -112,16 +112,16 @@ void save_gif(const str& path, int64 width, int64 height, const list<bytes>& fra
     out.append(int64(0));
     out.append(int64(0));
     _gif_append_list(out, palette_list);
-
+    
     _gif_append_list(out, list<int64>{0x21, 0xFF, 0x0B, 78, 69, 84, 83, 67, 65, 80, 69, 50, 46, 48, 0x03, 0x01});
     _gif_append_list(out, _gif_u16le(loop));
     out.append(int64(0));
-
+    
     for (list<int64> fr_list : frame_lists) {
         _gif_append_list(out, list<int64>{0x21, 0xF9, 0x04, 0x00});
         _gif_append_list(out, _gif_u16le(delay_cs));
         _gif_append_list(out, list<int64>{0x00, 0x00});
-
+        
         out.append(int64(0x2C));
         _gif_append_list(out, _gif_u16le(0));
         _gif_append_list(out, _gif_u16le(0));
@@ -145,7 +145,7 @@ void save_gif(const str& path, int64 width, int64 height, const list<bytes>& fra
         out.append(int64(0));
     }
     out.append(int64(0x3B));
-
+    
     pytra::runtime::cpp::base::PyFile f = open(path, "wb");
     {
         auto __finally_1 = py_make_scope_exit([&]() {

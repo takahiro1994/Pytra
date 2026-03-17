@@ -3,7 +3,7 @@
 // generated-by: tools/gen_runtime_from_manifest.py
 
 mod py_runtime;
-pub use crate::py_runtime::{math, pytra, time};
+pub use crate::py_runtime::{pytra};
 use crate::py_runtime::*;
 
 fn _png_append_list(mut dst: Vec<i64>, src: &[i64]) {
