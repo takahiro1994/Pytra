@@ -1,6 +1,6 @@
 # P5: `Any` アノテーション禁止と `object`/`PyObj` フリーランタイムへの移行
 
-最終更新: 2026-03-17（S2-02 stdlib Any 移行完了）
+最終更新: 2026-03-17（S2 全完了）
 
 関連 TODO:
 - `docs/ja/todo/index.md` の `ID: P5-ANY-ELIM-OBJECT-FREE-01`
@@ -83,7 +83,7 @@
   - `src/pytra/std/json.py` の `_dump_json_value(v: object, ...)` 等を具体的な union 型 or 専用型へ変更する。
   - その他の stdlib / utils で `Any` / `object` を使っている関数を列挙して順次置き換える。
 
-- [ ] [ID: P5-ANY-ELIM-OBJECT-FREE-01-S2-03] `Any` 禁止に関するドキュメント / エラーガイドを整備する。
+- [x] [ID: P5-ANY-ELIM-OBJECT-FREE-01-S2-03] `Any` 禁止に関するドキュメント / エラーガイドを整備する。
   - 移行手順（`Any` を使っていたコードをどう書き直すか）を `docs/ja/` に追記する。
 
 ### S3: stdlib 内部 `object` 依存の除去
@@ -263,3 +263,9 @@
   - `src/pytra/std/json.py`: `dumps(obj: Any, ...)` → `dumps(obj: object, ...)`。`import typing.Any` 削除。
   - **検証**: `AnyAnnotationProhibitionPass` を `argparse.py`、`json.py` に対して実行し、検出なし（PASS）を確認。`enum.py` は multiple inheritance による pre-existing パースエラーのため EAST3 生成不可だが、ソース上の `Any` は除去済み。
   - pre-existing 失敗以外の非退行なし（全 C++ codegen 124件 pass、IR 352件 pass）。
+
+- 2026-03-17 [S2-03 完了]: `Any` 禁止ドキュメント整備。
+  - `docs/ja/spec/spec-any-prohibition.md` を新規作成。
+  - 禁止理由、エラーメッセージフォーマット、変数/引数/戻り値/コンテナ/extern 型の移行手順を記載。
+  - `from typing import Any` インポートは許容（annotation-only）の旨を明記。
+  - `AnyAnnotationProhibitionPass` 有効化コマンド例を記載。
