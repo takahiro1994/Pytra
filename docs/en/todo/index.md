@@ -6,7 +6,7 @@
   <img alt="Read in Japanese" src="https://img.shields.io/badge/docs-日本語-2563EB?style=flat-square">
 </a>
 
-Last updated: 2026-03-18 (P5-ANY-ELIM-OBJECT-FREE-01 complete, archived)
+Last updated: 2026-03-18 (P5/P6 py_runtime.h shrink / multi-language support tasks added)
 
 ## Context Operation Rules
 
@@ -31,4 +31,22 @@ Last updated: 2026-03-18 (P5-ANY-ELIM-OBJECT-FREE-01 complete, archived)
 
 ## Unfinished Tasks
 
-(No unfinished tasks at P5 or above. Please add the next priority TODO.)
+### P5: FloorDiv / Mod EAST3 IR Node
+
+Context: [docs/ja/plans/p5-east3-floordiv-mod-node.md](../../ja/plans/p5-east3-floordiv-mod-node.md)
+
+1. [ ] [ID: P5-EAST3-FLOORDIV-MOD-NODE-01] Convert `py_floordiv` / `py_mod` to C++ inline emit via EAST3 IR nodes and remove from `py_runtime.h`. Lays the groundwork for each language backend to generate floor-division and modulo natively.
+
+### P6: py_runtime.h Shrink / Multi-language Support
+
+#### P6-1: Fix C++ Emitter List-Mutation IR Bypass
+
+Context: [docs/ja/plans/p6-cpp-list-mut-ir-bypass-fix.md](../../ja/plans/p6-cpp-list-mut-ir-bypass-fix.md)
+
+1. [ ] [ID: P6-CPP-LIST-MUT-IR-BYPASS-FIX-01] Route all `py_list_*_mut()` direct-emit paths in `cpp_emitter.py` through IR nodes (ListAppend, etc.) and remove the 6 functions from `py_runtime.h`.
+
+#### P6-2: py_len / py_slice EAST3 IR Nodes
+
+Context: [docs/ja/plans/p6-east3-len-slice-node.md](../../ja/plans/p6-east3-len-slice-node.md)
+
+2. [ ] [ID: P6-EAST3-LEN-SLICE-NODE-01] Add EAST3 IR nodes for `py_len` / `py_slice`, update the C++ emitter to generate inline expressions, and remove both from `py_runtime.h`.

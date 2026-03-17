@@ -6,7 +6,7 @@
   <img alt="Read in English" src="https://img.shields.io/badge/docs-English-2563EB?style=flat-square">
 </a>
 
-最終更新: 2026-03-18（P5-ANY-ELIM-OBJECT-FREE-01 完了・アーカイブ）
+最終更新: 2026-03-18（P5/P6 py_runtime.h 縮小・多言語対応タスク追加）
 
 ## 文脈運用ルール
 
@@ -31,4 +31,22 @@
 
 ## 未完了タスク
 
-（現在 P5 以上の未完了タスクはありません。次の優先 TODO を追加してください。）
+### P5: FloorDiv / Mod の EAST3 IR ノード化
+
+文脈: [docs/ja/plans/p5-east3-floordiv-mod-node.md](../plans/p5-east3-floordiv-mod-node.md)
+
+1. [ ] [ID: P5-EAST3-FLOORDIV-MOD-NODE-01] `py_floordiv` / `py_mod` を EAST3 IR ノード経由の C++ インライン emit に変更し、`py_runtime.h` から除去する。各言語バックエンドが floor 除算・modulo を言語ネイティブに生成できる基盤を整える。
+
+### P6: py_runtime.h 縮小・多言語対応
+
+#### P6-1: C++ emitter リストミューテーション IR バイパス修正
+
+文脈: [docs/ja/plans/p6-cpp-list-mut-ir-bypass-fix.md](../plans/p6-cpp-list-mut-ir-bypass-fix.md)
+
+1. [ ] [ID: P6-CPP-LIST-MUT-IR-BYPASS-FIX-01] `cpp_emitter.py` が `py_list_*_mut()` を直接 emit しているパスを IR ノード（ListAppend 等）経由に統一し、`py_runtime.h` から 6 関数を除去する。
+
+#### P6-2: py_len / py_slice の EAST3 IR ノード化
+
+文脈: [docs/ja/plans/p6-east3-len-slice-node.md](../plans/p6-east3-len-slice-node.md)
+
+2. [ ] [ID: P6-EAST3-LEN-SLICE-NODE-01] `py_len` / `py_slice` を EAST3 IR ノード化し、C++ emitter がインライン式を生成するよう変更。`py_runtime.h` から除去する。
