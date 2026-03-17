@@ -2698,6 +2698,8 @@ class CppEmitter(
         idx = self.render_expr(node.get("slice"))
         idx_t0 = self.get_expr_type(node.get("slice"))
         idx_t = idx_t0 if isinstance(idx_t0, str) else ""
+        # resolved_type が int64 と確定している場合は identity cast を省略する
+        idx_lval_as_int64 = idx if idx_t == "int64" else f"py_to<int64>({idx})"
         if val_ty.startswith("dict["):
             idx = self._coerce_dict_key_expr(node.get("value"), idx, node.get("slice"))
             return f"{val}[{idx}]"
@@ -2706,8 +2708,8 @@ class CppEmitter(
                 (not self._uses_pyobj_ref_first_list_lvalue_expr(node.get("value")))
                 and self._is_pyobj_value_model_list_type(self.normalize_type_name(val_ty))
             ):
-                return f"py_list_at_ref({val}, py_to<int64>({idx}))"
-            return self._render_pyobj_ref_first_list_index(expr.get("value"), val, f"py_to<int64>({idx})")
+                return f"py_list_at_ref({val}, {idx_lval_as_int64})"
+            return self._render_pyobj_ref_first_list_index(expr.get("value"), val, idx_lval_as_int64)
         if self.is_indexable_sequence_type(val_ty):
             if self.is_any_like_type(idx_t):
                 idx = f"py_to<int64>({idx})"
@@ -3838,6 +3840,8 @@ class CppEmitter(
             "int64",
             "uint64",
         }
+        # resolved_type が int64 と確定している場合は identity cast を省略する
+        idx_as_int64 = idx if idx_ty == "int64" else f"py_to<int64>({idx})"
         if val_ty.startswith("dict["):
             idx = self._coerce_dict_key_expr(expr.get("value"), idx, sl)
             owner_tmp = self.next_tmp("__dict")
@@ -3852,16 +3856,16 @@ class CppEmitter(
         if val_ty in {"", "unknown"} or self.is_any_like_type(val_ty):
             if idx_is_str_key:
                 return f"py_at({val}, {idx})"
-            return f"py_at({val}, py_to<int64>({idx}))"
+            return f"py_at({val}, {idx_as_int64})"
         if self._uses_pyobj_ref_first_list_ops(expr.get("value")):
-            at_expr = self._render_pyobj_ref_first_list_index(expr.get("value"), val, f"py_to<int64>({idx})")
+            at_expr = self._render_pyobj_ref_first_list_index(expr.get("value"), val, idx_as_int64)
             return at_expr
         if (
             self._is_pyobj_runtime_list_type(val_ty)
             and (not self._is_pyobj_value_model_list_type(val_ty))
             and not self._expr_is_stack_list_local(expr.get("value"))
         ):
-            at_expr = f"py_at({val}, py_to<int64>({idx}))"
+            at_expr = f"py_at({val}, {idx_as_int64})"
             expr_t = self.normalize_type_name(self.get_expr_type(expr))
             if expr_t != "" and not self.is_any_like_type(expr_t) and self._can_runtime_cast_target(expr_t):
                 return self._render_unbox_target_cast(at_expr, expr_t, "subscript:list")
@@ -3874,7 +3878,7 @@ class CppEmitter(
                 return self._render_sequence_index(val, idx, sl, f"list[{homogeneous_tuple_item_t}]")
             parts = self.split_generic(val_ty[6:-1])
             if idx_const is None:
-                return f"py_at({val}, py_to<int64>({idx}))"
+                return f"py_at({val}, {idx_as_int64})"
             n_parts = len(parts)
             idx_norm = int(idx_const)
             if idx_norm < 0:

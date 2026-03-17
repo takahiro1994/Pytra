@@ -475,7 +475,7 @@ def f() -> float:
         cpp = transpile_to_cpp(east, cpp_list_model="pyobj")
         self.assertIn("int64 single_tag = py_to<int64>(single_char_token_tags.get(ch, 0));", cpp)
         self.assertIn(
-            "py_list_at_ref(rc_list_ref(single_char_token_kinds), py_to<int64>(single_tag - 1))",
+            "py_list_at_ref(rc_list_ref(single_char_token_kinds), single_tag - 1)",
             cpp,
         )
         self.assertNotIn('if (ch == "+")', cpp)
@@ -519,7 +519,7 @@ def f() -> float:
         self.assertIn("this->tokens = tokens;", cpp)
         self.assertIn("this->expr_nodes = this->new_expr_nodes();", cpp)
         self.assertIn(
-            "return py_list_at_ref(rc_list_ref(this->tokens), py_to<int64>(this->pos));",
+            "return py_list_at_ref(rc_list_ref(this->tokens), this->pos);",
             cpp,
         )
         self.assertIn("py_list_append_mut(rc_list_ref(this->expr_nodes), node);", cpp)
@@ -533,7 +533,7 @@ def f() -> float:
             cpp,
         )
         self.assertIn(
-            "ExprNode node = py_list_at_ref(rc_list_ref(expr_nodes), py_to<int64>(expr_index));",
+            "ExprNode node = py_list_at_ref(rc_list_ref(expr_nodes), expr_index);",
             cpp,
         )
         self.assertNotIn("const rc<ExprNode>& node = expr_nodes[expr_index];", cpp)
@@ -641,14 +641,14 @@ def f() -> float:
             cpp,
         )
         self.assertIn(
-            "::std::tuple<int64, int64, int64, int64> sel = py_list_at_ref(rc_list_ref(candidates), py_to<int64>(__idx_",
+            "::std::tuple<int64, int64, int64, int64> sel = py_list_at_ref(rc_list_ref(candidates), __idx_",
             cpp,
         )
         self.assertNotIn("candidates[__idx_", cpp)
         self.assertNotIn("int64(py_to<int64>(", cpp)
         self.assertNotIn("float64(py_to<float64>(", cpp)
         self.assertIn(
-            "int64 v = (py_list_at_ref(py_list_at_ref(rc_list_ref(grid), py_to<int64>(y)), py_to<int64>(x)) == 0 ? 255 : 40);",
+            "int64 v = (py_list_at_ref(py_list_at_ref(rc_list_ref(grid), y), x) == 0 ? 255 : 40);",
             cpp,
         )
         self.assertNotIn("object(py_at(grid, ", cpp)
@@ -843,6 +843,7 @@ def new_nodes() -> list[Node]:
         self.assertTrue(
             ("py_at(t, py_to_int64(i))" in cpp)
             or ("py_at(t, py_to<int64>(i))" in cpp)
+            or ("py_at(t, i)" in cpp)
         )
 
     def test_string_negative_index_uses_str_operator(self) -> None:
@@ -1541,7 +1542,7 @@ def check(x: object) -> bool:
         self.assertIn("py_list_extend_mut(rc_list_ref(xs), list<int64>{4, 5});", cpp)
         self.assertIn("auto v = py_list_pop_mut(rc_list_ref(xs));", cpp)
         self.assertIn(
-            "int64 head = py_list_at_ref(rc_list_ref(xs), py_to<int64>(0));",
+            "int64 head = py_list_at_ref(rc_list_ref(xs), 0);",
             cpp,
         )
         self.assertIn("rc<list<int64>> seg = rc_list_from_value(py_slice(xs, 0, 2));", cpp)
@@ -1580,7 +1581,7 @@ def check(x: object) -> bool:
         self.assertIn("rc<list<int64>> ys = rc_list_from_value([&]() -> list<int64> {", cpp)
         self.assertIn("for (auto x : rc_list_ref(xs)) {", cpp)
         self.assertIn(
-            "return py_list_at_ref(rc_list_ref(ys), py_to<int64>(0));",
+            "return py_list_at_ref(rc_list_ref(ys), 0);",
             cpp,
         )
 
@@ -1618,7 +1619,7 @@ def f() -> int:
 
         self.assertIn("void paint(rc<list<list<int64>>>& grid, int64 x, int64 y) {", cpp)
         self.assertIn(
-            "py_list_at_ref(py_list_at_ref(rc_list_ref(grid), py_to<int64>(y)), py_to<int64>(x)) = 1;",
+            "py_list_at_ref(py_list_at_ref(rc_list_ref(grid), y), x) = 1;",
             cpp,
         )
         self.assertNotIn("py_set_at(", cpp)
@@ -1738,7 +1739,7 @@ def f(xs: list[int], ws: list[float]) -> int:
             cpp = em.transpile()
 
         self.assertIn(
-            "auto [x, y] = py_list_at_ref(rc_list_ref(stack), py_to<int64>(-(1)));",
+            "auto [x, y] = py_list_at_ref(rc_list_ref(stack), -(1));",
             cpp,
         )
         self.assertNotIn("auto __tuple_1 = py_at(stack, -1);", cpp)
@@ -1761,7 +1762,7 @@ def f(xs: list[int], ws: list[float]) -> int:
             cpp = em.transpile()
 
         self.assertIn(
-            "auto __tuple_1 = py_list_at_ref(rc_list_ref(stack), py_to<int64>(-(1)));",
+            "auto __tuple_1 = py_list_at_ref(rc_list_ref(stack), -(1));",
             cpp,
         )
         self.assertIn("x = ::std::get<0>(__tuple_1);", cpp)
@@ -1787,7 +1788,7 @@ def f(xs: list[int], ws: list[float]) -> int:
         self.assertIn("rc<list<int64>> ys = xs;", cpp)
         self.assertIn("py_list_append_mut(rc_list_ref(ys), 1);", cpp)
         self.assertIn(
-            "return py_list_at_ref(rc_list_ref(xs), py_to<int64>(0));",
+            "return py_list_at_ref(rc_list_ref(xs), 0);",
             cpp,
         )
         self.assertNotIn("list<int64> ys = xs;", cpp)
@@ -1859,7 +1860,7 @@ def f() -> str:
         self.assertIn("py_list_append_mut(rc_list_ref(xs), 1);", cpp)
         self.assertIn("py_list_append_mut(rc_list_ref(xs), 2);", cpp)
         self.assertIn(
-            "int64 head = py_list_at_ref(rc_list_ref(xs), py_to<int64>(0));",
+            "int64 head = py_list_at_ref(rc_list_ref(xs), 0);",
             cpp,
         )
         self.assertNotIn("list<int64> xs = {};", cpp)
@@ -1882,11 +1883,11 @@ def f() -> str:
 
         self.assertIn("rc<list<list<int64>>> grid = py_to<rc<list<list<int64>>>>([&]() -> object {", cpp)
         self.assertIn(
-            "py_list_at_ref(py_list_at_ref(rc_list_ref(grid), py_to<int64>(y)), py_to<int64>(x)) = 1;",
+            "py_list_at_ref(py_list_at_ref(rc_list_ref(grid), y), x) = 1;",
             cpp,
         )
         self.assertIn(
-            "return py_list_at_ref(py_list_at_ref(rc_list_ref(grid), py_to<int64>(y)), py_to<int64>(x));",
+            "return py_list_at_ref(py_list_at_ref(rc_list_ref(grid), y), x);",
             cpp,
         )
         self.assertNotIn("rc_list_from_value([&]() -> object {", cpp)
@@ -1930,7 +1931,7 @@ def f() -> int:
             cpp = em.transpile()
 
         self.assertIn(
-            "return py_list_at_ref(rc_list_ref(make()), py_to<int64>(0));",
+            "return py_list_at_ref(rc_list_ref(make()), 0);",
             cpp,
         )
         self.assertNotIn("return make()[0];", cpp)
@@ -2143,6 +2144,95 @@ def use(xs: list[int]) -> list[int]:
         self.assertIn("return rc_list_from_value(clone(rc_list_ref(xs)));", cpp)
         self.assertIn("list<int64> clone(const list<int64>& xs);", header)
         self.assertIn("rc<list<int64>> use(const rc<list<int64>>& xs);", header)
+
+
+    # --- S3-01: subscript index identity cast elision tests ---
+
+    def test_subscript_index_int64_var_elides_py_to_int64(self) -> None:
+        """int64 型変数を list 添字に使う場合は py_to<int64> ラップを省略する。"""
+        src = """def f(xs: list[int], i: int) -> int:
+    return xs[i]
+"""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            src_py = Path(tmpdir) / "subscript_int64_var.py"
+            src_py.write_text(src, encoding="utf-8")
+            east = load_east(src_py)
+            cpp = transpile_to_cpp(east, emit_main=False)
+
+        self.assertNotIn("py_to<int64>(i)", cpp)
+        self.assertIn("xs[i]", cpp)
+
+    def test_subscript_index_int64_const_elides_py_to_int64(self) -> None:
+        """resolved_type が int64 の定数 index は py_to<int64> ラップを省略する。"""
+        src = """def f(xs: list[int]) -> int:
+    return xs[0]
+"""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            src_py = Path(tmpdir) / "subscript_int64_const.py"
+            src_py.write_text(src, encoding="utf-8")
+            east = load_east(src_py)
+            cpp = transpile_to_cpp(east, emit_main=False)
+
+        self.assertNotIn("py_to<int64>(0)", cpp)
+
+    def test_subscript_index_any_keeps_py_to_int64(self) -> None:
+        """object/Any 境界の index は py_to<int64> を維持する（fail-closed）。"""
+        src = """def f(xs: list[int], idx: object) -> int:
+    return xs[idx]
+"""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            src_py = Path(tmpdir) / "subscript_any_idx.py"
+            src_py.write_text(src, encoding="utf-8")
+            east = load_east(src_py)
+            cpp = transpile_to_cpp(east, emit_main=False)
+
+        self.assertIn("py_to<int64>(idx)", cpp)
+
+    def test_tuple_const_index_emits_std_get(self) -> None:
+        """タプル定数 index アクセスは std::get<I> を直接 emit する。"""
+        src = """def f(t: tuple[int, str]) -> int:
+    return t[0]
+"""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            src_py = Path(tmpdir) / "tuple_const_index.py"
+            src_py.write_text(src, encoding="utf-8")
+            east = load_east(src_py)
+            cpp = transpile_to_cpp(east, emit_main=False)
+
+        self.assertIn("::std::get<0>(t)", cpp)
+        self.assertNotIn("py_at(t,", cpp)
+        self.assertNotIn("py_to<int64>", cpp)
+
+    def test_tuple_dynamic_index_with_int64_var_elides_py_to_int64_in_py_at(self) -> None:
+        """タプル非定数 index で index 型が int64 の場合は py_at の引数の py_to<int64> を省略する。"""
+        src = """def f(i: int) -> object:
+    t: tuple[int, int, int] = (10, 20, 30)
+    return t[i]
+"""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            src_py = Path(tmpdir) / "tuple_dynamic_int64_index.py"
+            src_py.write_text(src, encoding="utf-8")
+            east = load_east(src_py)
+            cpp = transpile_to_cpp(east, emit_main=False)
+
+        self.assertIn("py_at(t, i)", cpp)
+        self.assertNotIn("py_to<int64>(i)", cpp)
+
+    def test_subscript_lvalue_int64_var_elides_py_to_int64(self) -> None:
+        """左辺値文脈でも index が int64 の場合は py_to<int64> を省略する。"""
+        src = """def f(xs: list[int], i: int, v: int) -> None:
+    xs[i] = v
+"""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            src_py = Path(tmpdir) / "subscript_lval_int64.py"
+            src_py.write_text(src, encoding="utf-8")
+            east = load_east(src_py)
+            em = CppEmitter(east, {}, emit_main=False)
+            em.cpp_list_model = "pyobj"
+            cpp = em.transpile()
+
+        self.assertIn("py_list_at_ref(rc_list_ref(xs), i) = v;", cpp)
+        self.assertNotIn("py_to<int64>(i)", cpp)
 
 
 if __name__ == "__main__":

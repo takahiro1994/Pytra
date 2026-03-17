@@ -1048,7 +1048,7 @@ class East3CppBridgeTest(unittest.TestCase):
 
         self.assertNotIn("obj_to_list_ref_or_raise", cpp)
         self.assertNotIn("py_set_at(", cpp)
-        self.assertIn("py_list_at_ref(rc_list_ref(xs), py_to<int64>(i)) = v;", cpp)
+        self.assertIn("py_list_at_ref(rc_list_ref(xs), i) = v;", cpp)
 
     def test_render_expr_dispatch_routes_collection_literal_handlers(self) -> None:
         emitter = CppEmitter({"kind": "Module", "body": [], "meta": {}}, {})
