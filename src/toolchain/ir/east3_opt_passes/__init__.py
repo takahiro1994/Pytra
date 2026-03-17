@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from toolchain.ir.east3_opt_passes.any_annotation_prohibition_pass import AnyAnnotationProhibitionPass
 from toolchain.ir.east3_opt_passes.dict_str_key_normalization_pass import DictStrKeyNormalizationPass
 from toolchain.ir.east3_opt_passes.cpp_list_value_local_hint_pass import CppListValueLocalHintPass
 from toolchain.ir.east3_opt_passes.empty_init_shorthand_pass import EmptyInitShorthandPass

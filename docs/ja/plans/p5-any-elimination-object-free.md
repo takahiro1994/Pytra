@@ -1,6 +1,6 @@
 # P5: `Any` アノテーション禁止と `object`/`PyObj` フリーランタイムへの移行
 
-最終更新: 2026-03-17（S1 全サブタスク設計仕様固定）
+最終更新: 2026-03-17（S2-01 AnyAnnotationProhibitionPass 実装完了）
 
 関連 TODO:
 - `docs/ja/todo/index.md` の `ID: P5-ANY-ELIM-OBJECT-FREE-01`
@@ -74,7 +74,7 @@
 
 ### S2: `Any` アノテーション禁止（transpiler 型チェック層）
 
-- [ ] [ID: P5-ANY-ELIM-OBJECT-FREE-01-S2-01] EAST 型チェックパスに `Any` 検出・エラー化を追加する。
+- [x] [ID: P5-ANY-ELIM-OBJECT-FREE-01-S2-01] EAST 型チェックパスに `Any` 検出・エラー化を追加する。
   - 変数 / 引数 / 返り値の型注釈に `Any` が現れた場合にコンパイルエラーを出す pass を実装する。
   - `typing` import（annotation-only no-op）は除外し、型として実際に使用された `Any` のみを対象とする。
   - エラーメッセージに「`Any` の代わりに使うべき型」のヒントを含める。
@@ -230,3 +230,15 @@
   **他 stdlib での `object` 使用（S3-02 対象）:**
   - `src/pytra/utils/assertions.py`: `py_assert_eq(actual: object, expected: object, ...)` — S1-01 調査時点ではこれが主要な残り。`JsonValue` 移行後に `str | int | float | bool | None` などの共通スーパー型 or Generic へ変更する。
   - `src/toolchain/json_adapters.py`: `coerce_json_object_doc(doc: object, ...)` — toolchain 側（transpile 対象でない）なので S2-01 禁止パス後に対応。
+
+- 2026-03-17 [S2-01 完了]: `AnyAnnotationProhibitionPass` 実装。
+
+  **実装詳細:**
+  - `src/toolchain/ir/east3_opt_passes/any_annotation_prohibition_pass.py` に新規作成。
+  - 検出対象: `FunctionDef.arg_types` (引数型)、`FunctionDef.return_type` (戻り値型)、`AnnAssign.annotation` (変数アノテーション)。
+  - `Any` トークン検出: `[], |` で区切ってトークン化し `"Any"` と完全一致を確認（`AnyFoo` 等の誤検出なし）。
+  - 違反時: 全違反を列挙した `RuntimeError` を raise（コンパイル停止）。
+  - `from typing import Any` のインポート行は `Import`/`ImportFrom` として除外済み（チェック対象外）。
+  - `src/toolchain/compiler/east_parts/east3_opt_passes/any_annotation_prohibition_pass.py` にシムを追加。
+  - **デフォルトでは `build_local_only_passes()` に含めない**。stdlib（`enum.py`, `argparse.py` 等）が `Any` を使用中のため、S2-02 での stdlib 移行完了後に有効化する。明示的に `--east3-opt-pass +AnyAnnotationProhibitionPass` で有効化可能。
+  - ユニットテスト 20 件（`test/unit/ir/test_east3_any_annotation_prohibition_pass.py`）全件 pass。pre-existing 失敗以外の非退行なし。
