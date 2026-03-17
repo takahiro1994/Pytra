@@ -286,7 +286,7 @@ static inline T* py_obj_cast(const object& obj) {
 
 template <class T>
 static inline rc<T> obj_to_rc(const object& v) {
-    static_assert(::std::is_base_of_v<PyObj, T>, "obj_to_rc<T>: T must derive from PyObj");
+    static_assert(::std::is_base_of_v<RcObject, T>, "obj_to_rc<T>: T must derive from RcObject");
     if (!v) return rc<T>();
     if (auto* p = dynamic_cast<T*>(v.get())) return rc<T>(p);
     return rc<T>();
