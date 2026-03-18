@@ -54,7 +54,7 @@
 
 文脈: [docs/ja/plans/p1-runtime-layout-restructure.md](../plans/p1-runtime-layout-restructure.md)
 
-1. [ ] [ID: P1-RUNTIME-LAYOUT-RESTRUCTURE-01] `runtime/generated/` に `.east` を言語非依存で配置し、`runtime/cpp/` は手書きコードのみにする。言語ごとの `generated/` を廃止。P2 の前提。
+1. [x] [ID: P1-RUNTIME-LAYOUT-RESTRUCTURE-01] .east 生成完了（26モジュール）。native/ 移動・旧 generated/ 削除は P2 で実施。 `runtime/generated/` に `.east` を言語非依存で配置し、`runtime/cpp/` は手書きコードのみにする。言語ごとの `generated/` を廃止。P2 の前提。
 
 ### P2: compile / link パイプライン分離
 
