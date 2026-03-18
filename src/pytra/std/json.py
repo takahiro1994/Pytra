@@ -1,22 +1,16 @@
 """Pure Python JSON utilities for selfhost-friendly transpilation."""
+
+from __future__ import annotations
+
+from pytra.typing import cast
 from pytra.types import int64
-
-
 from pytra.std import abi
 
+type JsonVal = None | bool | int | float | str | list[JsonVal] | dict[str, JsonVal]
 
 _EMPTY: str = ""
 _COMMA_NL: str = ",\n"
 _HEX_DIGITS: str = "0123456789abcdef"
-
-# Tag constants for _JsonVal
-_JV_NULL: int = 0
-_JV_BOOL: int = 1
-_JV_INT: int = 2
-_JV_FLOAT: int = 3
-_JV_STR: int = 4
-_JV_ARR: int = 5
-_JV_OBJ: int = 6
 
 
 def _is_ws(ch: str) -> bool:
@@ -78,63 +72,7 @@ def _json_indent_value(indent: int | None) -> int:
     return indent_i
 
 
-class _JsonVal:
-    tag: int
-    bool_val: bool
-    int_val: int
-    float_val: float
-    str_val: str
-    arr_val: list["_JsonVal"]
-    obj_val: dict[str, "_JsonVal"]
-
-    def __init__(
-        self,
-        tag: int,
-        bool_val: bool,
-        int_val: int,
-        float_val: float,
-        str_val: str,
-        arr_val: list["_JsonVal"],
-        obj_val: dict[str, "_JsonVal"],
-    ) -> None:
-        self.tag = tag
-        self.bool_val = bool_val
-        self.int_val = int_val
-        self.float_val = float_val
-        self.str_val = str_val
-        self.arr_val = arr_val
-        self.obj_val = obj_val
-
-
-def _jv_null() -> _JsonVal:
-    return _JsonVal(_JV_NULL, False, 0, 0.0, "", [], {})
-
-
-def _jv_bool(v: bool) -> _JsonVal:
-    return _JsonVal(_JV_BOOL, v, 0, 0.0, "", [], {})
-
-
-def _jv_int(v: int) -> _JsonVal:
-    return _JsonVal(_JV_INT, False, v, 0.0, "", [], {})
-
-
-def _jv_float(v: float) -> _JsonVal:
-    return _JsonVal(_JV_FLOAT, False, 0, v, "", [], {})
-
-
-def _jv_str(v: str) -> _JsonVal:
-    return _JsonVal(_JV_STR, False, 0, 0.0, v, [], {})
-
-
-def _jv_arr(v: list[_JsonVal]) -> _JsonVal:
-    return _JsonVal(_JV_ARR, False, 0, 0.0, "", v, {})
-
-
-def _jv_obj(v: dict[str, _JsonVal]) -> _JsonVal:
-    return _JsonVal(_JV_OBJ, False, 0, 0.0, "", [], v)
-
-
-def _jv_obj_require(raw: dict[str, _JsonVal], key: str) -> _JsonVal:
+def _jv_obj_require(raw: dict[str, JsonVal], key: str) -> JsonVal:
     for k, value in raw.items():
         if k == key:
             return value
@@ -142,22 +80,22 @@ def _jv_obj_require(raw: dict[str, _JsonVal], key: str) -> _JsonVal:
 
 
 class JsonObj:
-    raw: dict[str, _JsonVal]
+    raw: dict[str, JsonVal]
 
-    def __init__(self, raw: dict[str, _JsonVal]) -> None:
+    def __init__(self, raw: dict[str, JsonVal]) -> None:
         self.raw = raw
 
-    def get(self, key: str) -> "JsonValue | None":
+    def get(self, key: str) -> JsonValue | None:
         if key not in self.raw:
             return None
         return JsonValue(_jv_obj_require(self.raw, key))
 
-    def get_obj(self, key: str) -> "JsonObj | None":
+    def get_obj(self, key: str) -> JsonObj | None:
         if key not in self.raw:
             return None
         return JsonValue(_jv_obj_require(self.raw, key)).as_obj()
 
-    def get_arr(self, key: str) -> "JsonArr | None":
+    def get_arr(self, key: str) -> JsonArr | None:
         if key not in self.raw:
             return None
         return JsonValue(_jv_obj_require(self.raw, key)).as_arr()
@@ -184,22 +122,22 @@ class JsonObj:
 
 
 class JsonArr:
-    raw: list[_JsonVal]
+    raw: list[JsonVal]
 
-    def __init__(self, raw: list[_JsonVal]) -> None:
+    def __init__(self, raw: list[JsonVal]) -> None:
         self.raw = raw
 
-    def get(self, index: int) -> "JsonValue | None":
+    def get(self, index: int) -> JsonValue | None:
         if index < 0 or index >= len(self.raw):
             return None
         return JsonValue(self.raw[index])
 
-    def get_obj(self, index: int) -> "JsonObj | None":
+    def get_obj(self, index: int) -> JsonObj | None:
         if index < 0 or index >= len(self.raw):
             return None
         return JsonValue(self.raw[index]).as_obj()
 
-    def get_arr(self, index: int) -> "JsonArr | None":
+    def get_arr(self, index: int) -> JsonArr | None:
         if index < 0 or index >= len(self.raw):
             return None
         return JsonValue(self.raw[index]).as_arr()
@@ -226,45 +164,45 @@ class JsonArr:
 
 
 class JsonValue:
-    raw: _JsonVal
+    raw: JsonVal
 
-    def __init__(self, raw: _JsonVal) -> None:
+    def __init__(self, raw: JsonVal) -> None:
         self.raw = raw
 
     def as_obj(self) -> JsonObj | None:
-        raw = self.raw
-        if raw.tag == _JV_OBJ:
-            return JsonObj(raw.obj_val)
+        jv: JsonVal = self.raw
+        if isinstance(jv, dict):
+            return JsonObj(cast(dict, jv))
         return None
 
     def as_arr(self) -> JsonArr | None:
-        raw = self.raw
-        if raw.tag == _JV_ARR:
-            return JsonArr(raw.arr_val)
+        jv: JsonVal = self.raw
+        if isinstance(jv, list):
+            return JsonArr(cast(list, jv))
         return None
 
     def as_str(self) -> str | None:
-        raw = self.raw
-        if raw.tag == _JV_STR:
-            return raw.str_val
+        jv: JsonVal = self.raw
+        if isinstance(jv, str):
+            return cast(str, jv)
         return None
 
     def as_int(self) -> int | None:
-        raw = self.raw
-        if raw.tag == _JV_INT:
-            return raw.int_val
+        jv: JsonVal = self.raw
+        if isinstance(jv, int):
+            return cast(int, jv)
         return None
 
     def as_float(self) -> float | None:
-        raw = self.raw
-        if raw.tag == _JV_FLOAT:
-            return raw.float_val
+        jv: JsonVal = self.raw
+        if isinstance(jv, float):
+            return cast(float, jv)
         return None
 
     def as_bool(self) -> bool | None:
-        raw = self.raw
-        if raw.tag == _JV_BOOL:
-            return raw.bool_val
+        jv: JsonVal = self.raw
+        if isinstance(jv, bool):
+            return cast(bool, jv)
         return None
 
 
@@ -278,9 +216,9 @@ class _JsonParser:
         self.n = len(text)
         self.i = 0
 
-    def parse(self) -> _JsonVal:
+    def parse(self) -> JsonVal:
         self._skip_ws()
-        out = self._parse_value()
+        out: JsonVal = self._parse_value()
         self._skip_ws()
         if self.i != self.n:
             raise ValueError("invalid json: trailing characters")
@@ -290,29 +228,29 @@ class _JsonParser:
         while self.i < self.n and _is_ws(self.text[self.i]):
             self.i += 1
 
-    def _parse_value(self) -> _JsonVal:
+    def _parse_value(self) -> JsonVal:
         if self.i >= self.n:
             raise ValueError("invalid json: unexpected end")
         ch = self.text[self.i]
         if ch == "{":
-            return _jv_obj(self._parse_object())
+            return self._parse_object()
         if ch == "[":
-            return _jv_arr(self._parse_array())
+            return self._parse_array()
         if ch == '"':
-            return _jv_str(self._parse_string())
+            return self._parse_string()
         if ch == "t" and self.text[self.i : self.i + 4] == "true":
             self.i += 4
-            return _jv_bool(True)
+            return True
         if ch == "f" and self.text[self.i : self.i + 5] == "false":
             self.i += 5
-            return _jv_bool(False)
+            return False
         if ch == "n" and self.text[self.i : self.i + 4] == "null":
             self.i += 4
-            return _jv_null()
+            return None
         return self._parse_number()
 
-    def _parse_object(self) -> dict[str, _JsonVal]:
-        out: dict[str, _JsonVal] = {}
+    def _parse_object(self) -> dict[str, JsonVal]:
+        out: dict[str, JsonVal] = {}
         self.i += 1
         self._skip_ws()
         if self.i < self.n and self.text[self.i] == "}":
@@ -339,8 +277,8 @@ class _JsonParser:
             if ch != ",":
                 raise ValueError("invalid json object separator")
 
-    def _parse_array(self) -> list[_JsonVal]:
-        out: list[_JsonVal] = []
+    def _parse_array(self) -> list[JsonVal]:
+        out: list[JsonVal] = []
         self.i += 1
         self._skip_ws()
         if self.i < self.n and self.text[self.i] == "]":
@@ -402,7 +340,7 @@ class _JsonParser:
                 out_chars.append(ch)
         raise ValueError("unterminated json string")
 
-    def _parse_number(self) -> _JsonVal:
+    def _parse_number(self) -> JsonVal:
         start = self.i
         if self.text[self.i] == "-":
             self.i += 1
@@ -439,9 +377,9 @@ class _JsonParser:
         token = self.text[start : self.i]
         if is_float:
             num_f: float = float(token)
-            return _jv_float(num_f)
+            return num_f
         num_i: int = int(token)
-        return _jv_int(num_i)
+        return num_i
 
 
 def loads(text: str) -> JsonValue:
@@ -449,16 +387,16 @@ def loads(text: str) -> JsonValue:
 
 
 def loads_obj(text: str) -> JsonObj | None:
-    val = _JsonParser(text).parse()
-    if val.tag == _JV_OBJ:
-        return JsonObj(val.obj_val)
+    val: JsonVal = _JsonParser(text).parse()
+    if isinstance(val, dict):
+        return JsonObj(cast(dict, val))
     return None
 
 
 def loads_arr(text: str) -> JsonArr | None:
-    val = _JsonParser(text).parse()
-    if val.tag == _JV_ARR:
-        return JsonArr(val.arr_val)
+    val: JsonVal = _JsonParser(text).parse()
+    if isinstance(val, list):
+        return JsonArr(cast(list, val))
     return None
 
 
@@ -500,7 +438,7 @@ def _escape_str(s: str, ensure_ascii: bool) -> str:
 
 
 def _dump_json_list(
-    values: list[_JsonVal],
+    values: list[JsonVal],
     ensure_ascii: bool,
     indent: int | None,
     item_sep: str,
@@ -525,7 +463,7 @@ def _dump_json_list(
 
 
 def _dump_json_dict(
-    values: dict[str, _JsonVal],
+    values: dict[str, JsonVal],
     ensure_ascii: bool,
     indent: int | None,
     item_sep: str,
@@ -552,33 +490,35 @@ def _dump_json_dict(
 
 
 def _dump_json_value(
-    v: _JsonVal,
+    v: JsonVal,
     ensure_ascii: bool,
     indent: int | None,
     item_sep: str,
     key_sep: str,
     level: int,
 ) -> str:
-    if v.tag == _JV_NULL:
+    if v is None:
         return "null"
-    if v.tag == _JV_BOOL:
-        raw_b: bool = v.bool_val
-        return "true" if raw_b else "false"
-    if v.tag == _JV_INT:
-        return str(v.int_val)
-    if v.tag == _JV_FLOAT:
-        return str(v.float_val)
-    if v.tag == _JV_STR:
-        return _escape_str(v.str_val, ensure_ascii)
-    if v.tag == _JV_ARR:
-        return _dump_json_list(v.arr_val, ensure_ascii, indent, item_sep, key_sep, level)
-    if v.tag == _JV_OBJ:
-        return _dump_json_dict(v.obj_val, ensure_ascii, indent, item_sep, key_sep, level)
+    if isinstance(v, bool):
+        raw_b: bool = cast(bool, v)
+        if raw_b:
+            return "true"
+        return "false"
+    if isinstance(v, int):
+        return str(cast(int, v))
+    if isinstance(v, float):
+        return str(cast(float, v))
+    if isinstance(v, str):
+        return _escape_str(cast(str, v), ensure_ascii)
+    if isinstance(v, list):
+        return _dump_json_list(cast(list, v), ensure_ascii, indent, item_sep, key_sep, level)
+    if isinstance(v, dict):
+        return _dump_json_dict(cast(dict, v), ensure_ascii, indent, item_sep, key_sep, level)
     raise TypeError("json.dumps unsupported type")
 
 
 def dumps(
-    obj: _JsonVal,
+    obj: JsonVal,
     *,
     ensure_ascii: bool = True,
     indent: int | None = None,
@@ -592,7 +532,7 @@ def dumps(
 
 
 def dumps_jv(
-    jv: _JsonVal,
+    jv: JsonVal,
     *,
     ensure_ascii: bool = True,
     indent: int | None = None,

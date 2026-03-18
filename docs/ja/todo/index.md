@@ -43,10 +43,10 @@
 
 文脈: [docs/ja/plans/p0-json-rewrite-steps.md](../plans/p0-json-rewrite-steps.md)
 
-2. [ ] [ID: P0-JSON-REWRITE-S1-01] json.py S1: `_JsonVal` クラス・タグ定数・ファクトリ関数を削除し `type JsonVal = ...` に置き換え。
-3. [ ] [ID: P0-JSON-REWRITE-S2-01] json.py S2: `_JsonParser` の戻り値型を `JsonVal` に変更し、ファクトリ呼び出しを直接値の return に置き換え。
-4. [ ] [ID: P0-JSON-REWRITE-S3-01] json.py S3: ダンパー（`_dump_json_value` 等）のタグ判定を `isinstance` + `cast` に変更。
-5. [ ] [ID: P0-JSON-REWRITE-S4-01] json.py S4: 公開 API（`JsonObj` / `JsonArr` / `JsonValue` / `loads` / `dumps`）の内部型を `JsonVal` に更新。テスト検証。
+2. [x] [ID: P0-JSON-REWRITE-S1-01] S1 完了。
+3. [x] [ID: P0-JSON-REWRITE-S2-01] S2 完了。
+4. [x] [ID: P0-JSON-REWRITE-S3-01] S3 完了。
+5. [x] [ID: P0-JSON-REWRITE-S4-01] S4 完了。json_adapters.py も更新。
 
 ### P2: compile / link パイプライン分離
 

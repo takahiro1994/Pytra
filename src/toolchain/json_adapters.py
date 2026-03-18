@@ -6,43 +6,42 @@ from pytra.std import json
 from pytra.std.pathlib import Path
 
 
-def _jv_to_object(v: json._JsonVal) -> object:
-    """Recursively convert a _JsonVal to a Python-native object."""
-    tag = v.tag
-    if tag == json._JV_NULL:
+def _jv_to_object(v: json.JsonVal) -> object:
+    """Recursively convert a JsonVal to a Python-native object."""
+    if v is None:
         return None
-    if tag == json._JV_BOOL:
-        return v.bool_val
-    if tag == json._JV_INT:
-        return v.int_val
-    if tag == json._JV_FLOAT:
-        return v.float_val
-    if tag == json._JV_STR:
-        return v.str_val
-    if tag == json._JV_ARR:
-        return [_jv_to_object(x) for x in v.arr_val]
-    if tag == json._JV_OBJ:
-        return {k: _jv_to_object(vv) for k, vv in v.obj_val.items()}
+    if isinstance(v, bool):
+        return v
+    if isinstance(v, int):
+        return v
+    if isinstance(v, float):
+        return v
+    if isinstance(v, str):
+        return v
+    if isinstance(v, list):
+        return [_jv_to_object(x) for x in v]
+    if isinstance(v, dict):
+        return {k: _jv_to_object(vv) for k, vv in v.items()}
     return None
 
 
-def _object_to_jv(v: object) -> json._JsonVal:
-    """Recursively convert a Python-native object to a _JsonVal."""
+def _object_to_jv(v: object) -> json.JsonVal:
+    """Recursively convert a Python-native object to a JsonVal."""
     if v is None:
-        return json._jv_null()
+        return None
     if isinstance(v, bool):
-        return json._jv_bool(v)
+        return v
     if isinstance(v, int):
-        return json._jv_int(v)
+        return v
     if isinstance(v, float):
-        return json._jv_float(v)
+        return v
     if isinstance(v, str):
-        return json._jv_str(v)
+        return v
     if isinstance(v, list):
-        return json._jv_arr([_object_to_jv(x) for x in v])
+        return [_object_to_jv(x) for x in v]
     if isinstance(v, dict):
-        return json._jv_obj({k: _object_to_jv(vv) for k, vv in v.items() if isinstance(k, str)})
-    return json._jv_null()
+        return {k: _object_to_jv(vv) for k, vv in v.items() if isinstance(k, str)}
+    return None
 
 
 def empty_json_object_doc() -> json.JsonObj:
@@ -70,7 +69,7 @@ def coerce_json_object_doc(doc: object, *, label: str) -> json.JsonObj:
         return doc
     if not isinstance(doc, dict):
         raise RuntimeError(label + " must be an object")
-    raw: dict[str, json._JsonVal] = {}
+    raw: dict[str, json.JsonVal] = {}
     for key, value in doc.items():
         if isinstance(key, str):
             raw[key] = _object_to_jv(value)
@@ -114,12 +113,7 @@ def dumps_object(
     indent: int | None = None,
     separators: tuple[str, str] | None = None,
 ) -> str:
-    """Serialize a plain Python object (dict/list/str/int/float/bool/None) as JSON.
-
-    This is a Python-only compatibility wrapper. It converts the input to a
-    _JsonVal ADT and delegates to json.dumps_jv, which is the transpiler-safe
-    entry point.
-    """
+    """Serialize a plain Python object (dict/list/str/int/float/bool/None) as JSON."""
     jv = _object_to_jv(obj)
     return json.dumps_jv(jv, ensure_ascii=ensure_ascii, indent=indent, separators=separators)
 
