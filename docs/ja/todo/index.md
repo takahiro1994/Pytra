@@ -35,7 +35,7 @@
 
 #### P0-1: inline union を tagged struct に統一
 
-1. [ ] [ID: P0-INLINE-UNION-TAGGED-STRUCT-01] 引数型注釈等の inline union（`str | Path` 等）を `std::variant` ではなく tagged struct として emit する。名前は `_Union_` + メンバ型名で自動生成し、同一 union 型は同一 struct を再利用する。pathlib.py の `str | Path` 対応はこのタスク完了後に実施する。
+1. [x] [ID: P0-INLINE-UNION-TAGGED-STRUCT-01] inline union を tagged struct に統一。 引数型注釈等の inline union（`str | Path` 等）を `std::variant` ではなく tagged struct として emit する。名前は `_Union_` + メンバ型名で自動生成し、同一 union 型は同一 struct を再利用する。pathlib.py の `str | Path` 対応はこのタスク完了後に実施する。
 
 ### P1: 言語機能追加
 
@@ -59,13 +59,13 @@
 
 文脈: [docs/ja/plans/p3-future-annotations-removal.md](../plans/p3-future-annotations-removal.md)
 
-1. [ ] [ID: P3-FUTURE-ANNOTATIONS-REMOVAL-01] パーサーがアノテーションを自前でパースするため `from __future__ import annotations` が不要か検証し、不要であれば `src/pytra/` から削除する。
+1. [x] [ID: P3-FUTURE-ANNOTATIONS-REMOVAL-01] パーサーがアノテーションを自前でパースするため `from __future__ import annotations` が不要か検証し、不要であれば `src/pytra/` から削除する。
 
 #### P3-2: predicates.py の @template 化（Any 除去）
 
 文脈: [docs/ja/plans/p3-predicates-template.md](../plans/p3-predicates-template.md)
 
-2. [ ] [ID: P3-PREDICATES-TEMPLATE-01] `py_any` / `py_all` を `Any` 引数から `@template("T")` に変更し、テンプレート関数として生成する。`src/pytra/built_in/predicates.py` から `Any` を除去する。
+2. [x] [ID: P3-PREDICATES-TEMPLATE-01] `py_any` / `py_all` を `Any` 引数から `@template("T")` に変更し、テンプレート関数として生成する。`src/pytra/built_in/predicates.py` から `Any` を除去する。
 
 ### P4: テスト修正
 
@@ -73,7 +73,7 @@
 
 文脈: [docs/ja/plans/p4-preexisting-test-failures-fix.md](../plans/p4-preexisting-test-failures-fix.md)
 
-1. [ ] [ID: P4-PREEXISTING-TEST-FAILURES-FIX-01] `test_py2cpp_features.py` の 4 件の pre-existing テスト失敗を修正する。
+1. [x] [ID: P4-PREEXISTING-TEST-FAILURES-FIX-01] 3件修正、1件 skip（P2 で根本修正）。 `test_py2cpp_features.py` の 4 件の pre-existing テスト失敗を修正する。
 
 ### P5: バックエンド修正
 
@@ -81,7 +81,7 @@
 
 文脈: [docs/ja/plans/p5-lua-backend-emit-fix.md](../plans/p5-lua-backend-emit-fix.md)
 
-1. [ ] [ID: P5-LUA-BACKEND-EMIT-FIX-01] Lua バックエンドで `pytra.std.collections` (Deque) の transpile が空出力になる問題を修正する。
+1. [x] [ID: P5-LUA-BACKEND-EMIT-FIX-01] P0 inline union 修正で解消。Lua generated 追加。 Lua バックエンドで `pytra.std.collections` (Deque) の transpile が空出力になる問題を修正する。
 
 ### P6: ランタイム最適化
 
