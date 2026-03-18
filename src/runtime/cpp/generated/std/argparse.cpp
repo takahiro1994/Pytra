@@ -15,17 +15,19 @@ namespace pytra::std::argparse {
 
     /* Minimal pure-Python argparse subset for selfhost usage. */
     
+    using ArgValue = ::std::variant<str, bool, ::std::monostate>;
+    
 
-    Namespace::Namespace(const ::std::optional<dict<str, ::std::variant<str, bool, ::std::monostate>>>& values) {
+    Namespace::Namespace(const ::std::optional<dict<str, ArgValue>>& values) {
             if (!values.has_value()) {
-                this->values = dict<str, ::std::variant<str, bool, ::std::monostate>>{};
+                this->values = dict<str, ArgValue>{};
                 return;
             }
             this->values = values.value();
     }
     
 
-    _ArgSpec::_ArgSpec(const rc<list<str>>& names, const str& action, const rc<list<str>>& choices, const ::std::variant<str, bool, ::std::monostate>& py_default, const str& help_text) {
+    _ArgSpec::_ArgSpec(const rc<list<str>>& names, const str& action, const rc<list<str>>& choices, const ArgValue& py_default, const str& help_text) {
             this->names = names;
             this->action = action;
             this->choices = choices;
@@ -46,7 +48,7 @@ namespace pytra::std::argparse {
             this->_specs = rc_list_from_value(list<_ArgSpec>{});
     }
 
-    void ArgumentParser::add_argument(const str& name0, const str& name1, const str& name2, const str& name3, const str& help, const str& action, const rc<list<str>>& choices, const ::std::variant<str, bool, ::std::monostate>& py_default) {
+    void ArgumentParser::add_argument(const str& name0, const str& name1, const str& name2, const str& name3, const str& help, const str& action, const rc<list<str>>& choices, const ArgValue& py_default) {
             rc<list<str>> names = rc_list_from_value(list<str>{});
             if (name0 != "")
                 rc_list_ref(names).append(name0);
@@ -68,7 +70,7 @@ namespace pytra::std::argparse {
             throw SystemExit(2);
     }
 
-    dict<str, ::std::variant<str, bool, ::std::monostate>> ArgumentParser::parse_args(const ::std::optional<rc<list<str>>>& argv) const {
+    dict<str, ArgValue> ArgumentParser::parse_args(const ::std::optional<rc<list<str>>>& argv) const {
             rc<list<str>> args;
             if (!argv.has_value())
                 args = py_to<rc<list<str>>>(py_list_slice_copy(py_runtime_argv(), 1, static_cast<int64>((py_runtime_argv()).size())));
@@ -90,7 +92,7 @@ namespace pytra::std::argparse {
                 }
                 spec_i++;
             }
-            dict<str, ::std::variant<str, bool, ::std::monostate>> values = dict<str, ::std::variant<str, bool, ::std::monostate>>{};
+            dict<str, ArgValue> values = dict<str, ArgValue>{};
             for (_ArgSpec s : rc_list_ref(this->_specs)) {
                 if (s.action == "store_true") {
                     values[s.dest] = (!::std::holds_alternative<::std::monostate>(s.py_default) ? py_variant_to_bool(s.py_default) : false);
