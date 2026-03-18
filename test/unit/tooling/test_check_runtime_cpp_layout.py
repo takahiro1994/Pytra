@@ -67,7 +67,7 @@ class CheckRuntimeCppLayoutTest(unittest.TestCase):
             rc, out = self._run_main(root)
         self.assertEqual(rc, 1)
         self.assertIn("files violating runtime naming policy", out)
-        self.assertIn("src/runtime/cpp/native/core/dict.ext.h", out)
+        self.assertIn("src/runtime/cpp/core/dict.ext.h", out)
 
     def test_main_fails_when_legacy_core_surface_reappears(self) -> None:
         with tempfile.TemporaryDirectory() as td:
@@ -98,7 +98,7 @@ class CheckRuntimeCppLayoutTest(unittest.TestCase):
             _make_valid_tree(root)
             _write(
                 root / "src" / "runtime" / "cpp" / "generated" / "std" / "time.cpp",
-                '// AUTO-GENERATED FILE. DO NOT EDIT.\n#include "runtime/cpp/native/core/py_runtime.h"\n',
+                '// AUTO-GENERATED FILE. DO NOT EDIT.\n#include "runtime/cpp/core/py_runtime.h"\n',
             )
             rc, out = self._run_main(root)
         self.assertEqual(rc, 0, out)
@@ -110,7 +110,7 @@ class CheckRuntimeCppLayoutTest(unittest.TestCase):
             _make_valid_tree(root)
             _write(
                 root / "src" / "runtime" / "cpp" / "pytra" / "std" / "time.h",
-                '// AUTO-GENERATED FILE. DO NOT EDIT.\n#include "runtime/cpp/native/core/py_runtime.h"\n',
+                '// AUTO-GENERATED FILE. DO NOT EDIT.\n#include "runtime/cpp/core/py_runtime.h"\n',
             )
             rc, out = self._run_main(root)
         self.assertEqual(rc, 1)
@@ -123,12 +123,12 @@ class CheckRuntimeCppLayoutTest(unittest.TestCase):
             _make_valid_tree(root)
             _write(
                 root / "src" / "runtime" / "cpp" / "native" / "core" / "py_runtime.h",
-                '#pragma once\n#include "runtime/cpp/generated/built_in/sequence.h"\n',
+                '#pragma once\n#include "runtime/generated/built_in/sequence.h"\n',
             )
             rc, out = self._run_main(root)
         self.assertEqual(rc, 1)
         self.assertIn("py_runtime core header still contains duplicated high-level runtime bodies", out)
-        self.assertIn('#include "runtime/cpp/generated/built_in/sequence.h"', out)
+        self.assertIn('#include "runtime/generated/built_in/sequence.h"', out)
 
     def test_main_fails_when_py_runtime_reintroduces_template_helper_bodies(self) -> None:
         with tempfile.TemporaryDirectory() as td:
@@ -151,7 +151,7 @@ class CheckRuntimeCppLayoutTest(unittest.TestCase):
             rc, out = self._run_main(root)
         self.assertEqual(rc, 1)
         self.assertIn("required core ownership directories are missing", out)
-        self.assertIn("src/runtime/cpp/generated/core", out)
+        self.assertIn("src/runtime/generated/core", out)
 
 
 if __name__ == "__main__":

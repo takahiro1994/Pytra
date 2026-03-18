@@ -72,8 +72,8 @@ class BuildSelfhostStage2Test(unittest.TestCase):
     def test_build_stage2_compile_cmd_uses_stage2_cpp_and_runtime_sources(self) -> None:
         mod = _load_module()
         fake_sources = [
-            "src/runtime/cpp/generated/std/json.cpp",
-            "src/runtime/cpp/native/compiler/transpile_cli.cpp",
+            "src/runtime/generated/std/json.cpp",
+            "src/runtime/cpp/compiler/transpile_cli.cpp",
         ]
         with patch.object(mod, "collect_runtime_cpp_sources", return_value=fake_sources):
             cmd = mod.build_stage2_compile_cmd(mod.STAGE2_CPP)
@@ -86,8 +86,8 @@ class BuildSelfhostStage2Test(unittest.TestCase):
                 "-Isrc",
                 "-Isrc/runtime/cpp",
                 str(mod.STAGE2_CPP),
-                str(mod.ROOT / "src/runtime/cpp/generated/std/json.cpp"),
-                str(mod.ROOT / "src/runtime/cpp/native/compiler/transpile_cli.cpp"),
+                str(mod.ROOT / "src/runtime/generated/std/json.cpp"),
+                str(mod.ROOT / "src/runtime/cpp/compiler/transpile_cli.cpp"),
                 "-o",
                 str(mod.STAGE2_BIN),
             ],

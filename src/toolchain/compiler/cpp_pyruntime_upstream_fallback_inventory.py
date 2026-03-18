@@ -58,7 +58,7 @@ CPP_PYRUNTIME_UPSTREAM_FALLBACK_INVENTORY_V1: Final[
     {
         "inventory_id": "header_object_bridge_mut_list_cast",
         "bucket": "header_bulk",
-        "scope_rel": "src/runtime/cpp/native/core/py_runtime.h",
+        "scope_rel": "src/runtime/cpp/core/py_runtime.h",
         "matcher_kind": "literal",
         "needle": (
             'static inline list<object>& obj_to_list_ref_or_raise(object& v, const char* ctx = "obj_to_list_ref_or_raise") {'
@@ -67,7 +67,7 @@ CPP_PYRUNTIME_UPSTREAM_FALLBACK_INVENTORY_V1: Final[
         "shrink_stage": "P2-CPP-PYRUNTIME-UPSTREAM-FALLBACK-SHRINK-01-S2-01",
         "evidence_refs": (
             {
-                "relpath": "src/runtime/cpp/native/core/py_runtime.h",
+                "relpath": "src/runtime/cpp/core/py_runtime.h",
                 "needle": 'static inline list<object>& obj_to_list_ref_or_raise(object& v, const char* ctx = "obj_to_list_ref_or_raise") {',
             },
         ),
@@ -76,7 +76,7 @@ CPP_PYRUNTIME_UPSTREAM_FALLBACK_INVENTORY_V1: Final[
     {
         "inventory_id": "header_object_bridge_const_list_cast",
         "bucket": "header_bulk",
-        "scope_rel": "src/runtime/cpp/native/core/py_runtime.h",
+        "scope_rel": "src/runtime/cpp/core/py_runtime.h",
         "matcher_kind": "literal",
         "needle": (
             'static inline const list<object>& obj_to_list_ref_or_raise(const object& v, const char* ctx = "obj_to_list_ref_or_raise") {'
@@ -85,7 +85,7 @@ CPP_PYRUNTIME_UPSTREAM_FALLBACK_INVENTORY_V1: Final[
         "shrink_stage": "P2-CPP-PYRUNTIME-UPSTREAM-FALLBACK-SHRINK-01-S2-02",
         "evidence_refs": (
             {
-                "relpath": "src/runtime/cpp/native/core/py_runtime.h",
+                "relpath": "src/runtime/cpp/core/py_runtime.h",
                 "needle": 'static inline const list<object>& obj_to_list_ref_or_raise(const object& v, const char* ctx = "obj_to_list_ref_or_raise") {',
             },
         ),
@@ -94,14 +94,14 @@ CPP_PYRUNTIME_UPSTREAM_FALLBACK_INVENTORY_V1: Final[
     {
         "inventory_id": "header_object_bridge_py_at",
         "bucket": "header_bulk",
-        "scope_rel": "src/runtime/cpp/native/core/py_runtime.h",
+        "scope_rel": "src/runtime/cpp/core/py_runtime.h",
         "matcher_kind": "literal",
         "needle": "static inline object py_at(const object& v, int64 idx) {",
         "expected_count": 1,
         "shrink_stage": "P2-CPP-PYRUNTIME-UPSTREAM-FALLBACK-SHRINK-01-S2-01",
         "evidence_refs": (
             {
-                "relpath": "src/runtime/cpp/native/core/py_runtime.h",
+                "relpath": "src/runtime/cpp/core/py_runtime.h",
                 "needle": "static inline object py_at(const object& v, int64 idx) {",
             },
         ),
@@ -110,14 +110,14 @@ CPP_PYRUNTIME_UPSTREAM_FALLBACK_INVENTORY_V1: Final[
     {
         "inventory_id": "header_object_bridge_py_append",
         "bucket": "header_bulk",
-        "scope_rel": "src/runtime/cpp/native/core/py_runtime.h",
+        "scope_rel": "src/runtime/cpp/core/py_runtime.h",
         "matcher_kind": "literal",
         "needle": "static inline void py_append(object& v, const U& item) {",
         "expected_count": 1,
         "shrink_stage": "P2-CPP-PYRUNTIME-UPSTREAM-FALLBACK-SHRINK-01-S2-02",
         "evidence_refs": (
             {
-                "relpath": "src/runtime/cpp/native/core/py_runtime.h",
+                "relpath": "src/runtime/cpp/core/py_runtime.h",
                 "needle": "static inline void py_append(object& v, const U& item) {",
             },
         ),
@@ -126,14 +126,14 @@ CPP_PYRUNTIME_UPSTREAM_FALLBACK_INVENTORY_V1: Final[
     {
         "inventory_id": "header_typed_list_copy_from_object",
         "bucket": "header_bulk",
-        "scope_rel": "src/runtime/cpp/native/core/py_runtime.h",
+        "scope_rel": "src/runtime/cpp/core/py_runtime.h",
         "matcher_kind": "literal",
         "needle": "static inline list<T> py_copy_typed_list_from_object(const object& value, const char* ctx) {",
         "expected_count": 1,
         "shrink_stage": "P2-CPP-PYRUNTIME-UPSTREAM-FALLBACK-SHRINK-01-S2-03",
         "evidence_refs": (
             {
-                "relpath": "src/runtime/cpp/native/core/py_runtime.h",
+                "relpath": "src/runtime/cpp/core/py_runtime.h",
                 "needle": "static inline list<T> py_copy_typed_list_from_object(const object& value, const char* ctx) {",
             },
         ),
@@ -142,14 +142,14 @@ CPP_PYRUNTIME_UPSTREAM_FALLBACK_INVENTORY_V1: Final[
     {
         "inventory_id": "header_generic_make_object_fallback",
         "bucket": "header_bulk",
-        "scope_rel": "src/runtime/cpp/native/core/py_runtime.h",
+        "scope_rel": "src/runtime/cpp/core/py_runtime.h",
         "matcher_kind": "literal",
         "needle": "static inline object make_object(const T& v) {",
         "expected_count": 1,
         "shrink_stage": "P2-CPP-PYRUNTIME-UPSTREAM-FALLBACK-SHRINK-01-S2-03",
         "evidence_refs": (
             {
-                "relpath": "src/runtime/cpp/native/core/py_runtime.h",
+                "relpath": "src/runtime/cpp/core/py_runtime.h",
                 "needle": "static inline object make_object(const T& v) {",
             },
         ),
@@ -158,14 +158,14 @@ CPP_PYRUNTIME_UPSTREAM_FALLBACK_INVENTORY_V1: Final[
     {
         "inventory_id": "header_generic_py_to_object_fallback",
         "bucket": "header_bulk",
-        "scope_rel": "src/runtime/cpp/native/core/py_runtime.h",
+        "scope_rel": "src/runtime/cpp/core/py_runtime.h",
         "matcher_kind": "literal",
         "needle": "static inline T py_to(const object& v) {",
         "expected_count": 1,
         "shrink_stage": "P2-CPP-PYRUNTIME-UPSTREAM-FALLBACK-SHRINK-01-S2-03",
         "evidence_refs": (
             {
-                "relpath": "src/runtime/cpp/native/core/py_runtime.h",
+                "relpath": "src/runtime/cpp/core/py_runtime.h",
                 "needle": "static inline T py_to(const object& v) {",
             },
         ),
@@ -174,14 +174,14 @@ CPP_PYRUNTIME_UPSTREAM_FALLBACK_INVENTORY_V1: Final[
     {
         "inventory_id": "header_object_py_to_call_sites",
         "bucket": "header_bulk",
-        "scope_rel": "src/runtime/cpp/native/core/py_runtime.h",
+        "scope_rel": "src/runtime/cpp/core/py_runtime.h",
         "matcher_kind": "regex",
         "needle": r"py_to<[^>]+>\([^\n]*object",
         "expected_count": 1,
         "shrink_stage": "P2-CPP-PYRUNTIME-UPSTREAM-FALLBACK-SHRINK-01-S2-03",
         "evidence_refs": (
             {
-                "relpath": "src/runtime/cpp/native/core/py_runtime.h",
+                "relpath": "src/runtime/cpp/core/py_runtime.h",
                 "needle": 'static_assert(!::std::is_same_v<T, T>, "py_to<T>(object): unsupported target type");',
             },
         ),

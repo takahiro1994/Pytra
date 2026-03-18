@@ -168,7 +168,7 @@ def _build_cpp_template_header_only_module(cpp_text: str, header_path: Path) -> 
     out_lines.append("#define " + guard)
     out_lines.append("")
     for line in body_lines:
-        if line.startswith('#include "runtime/cpp/generated/') and line.endswith('.h"'):
+        if line.startswith('#include "runtime/generated/') and line.endswith('.h"'):
             continue
         out_lines.append(line)
     if len(out_lines) > 0 and out_lines[-1] != "":
@@ -240,9 +240,9 @@ SCOPE_NESTING_KINDS: set[str] = {
 }
 
 
-CPP_HEADER = """#include "runtime/cpp/native/core/py_runtime.h"
-#include "runtime/cpp/native/core/process_runtime.h"
-#include "runtime/cpp/native/core/scope_exit.h"
+CPP_HEADER = """#include "runtime/cpp/core/py_runtime.h"
+#include "runtime/cpp/core/process_runtime.h"
+#include "runtime/cpp/core/scope_exit.h"
 
 """
 
@@ -1194,9 +1194,9 @@ def main(argv: list[str]) -> int:
                 return 0
             own_runtime_header = '#include "runtime/cpp/' + rel_tail + '.h"'
             if own_runtime_header not in cpp_txt_runtime:
-                old_runtime_include = '#include "runtime/cpp/native/core/py_runtime.h"\n'
+                old_runtime_include = '#include "runtime/cpp/core/py_runtime.h"\n'
                 new_runtime_include = (
-                    '#include "runtime/cpp/native/core/py_runtime.h"\n\n' + own_runtime_header + "\n"
+                    '#include "runtime/cpp/core/py_runtime.h"\n\n' + own_runtime_header + "\n"
                 )
                 cpp_txt_runtime = replace_first(
                     cpp_txt_runtime,
@@ -1204,9 +1204,9 @@ def main(argv: list[str]) -> int:
                     new_runtime_include,
                 )
             if own_runtime_header not in cpp_txt_runtime_for_header:
-                old_runtime_include = '#include "runtime/cpp/native/core/py_runtime.h"\n'
+                old_runtime_include = '#include "runtime/cpp/core/py_runtime.h"\n'
                 new_runtime_include = (
-                    '#include "runtime/cpp/native/core/py_runtime.h"\n\n' + own_runtime_header + "\n"
+                    '#include "runtime/cpp/core/py_runtime.h"\n\n' + own_runtime_header + "\n"
                 )
                 cpp_txt_runtime_for_header = replace_first(
                     cpp_txt_runtime_for_header,

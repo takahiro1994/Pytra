@@ -499,6 +499,12 @@ def build_cpp_header_from_east(
             return result
         fn_lines = _apply_alias_subs(fn_lines)
         var_lines = _apply_alias_subs(var_lines)
+    # inline union struct を .cpp テキストから抽出して class_blocks の前に挿入
+    import re as _re
+    for m in _re.finditer(r"^(struct _Union_\w+ \{.*?^\};)", cpp_text, _re.MULTILINE | _re.DOTALL):
+        union_block = m.group(1)
+        if union_block not in class_blocks:
+            class_blocks.insert(0, union_block)
     decl_text = join_str_list("\n", class_blocks + class_lines + alias_lines + var_lines + fn_lines)
     raw_include_lines = _extract_cpp_include_lines(cpp_text, output_path)
     include_lines = _filter_cpp_include_lines_for_header(raw_include_lines, decl_text, top_namespace)
@@ -511,11 +517,11 @@ def build_cpp_header_from_east(
         if _header_decl_uses_imported_symbol_include(include_line, decl_text, import_include_symbol_map):
             includes.append(include_line)
     if _header_decl_uses_exception_support(decl_text):
-        exceptions_include = '#include "runtime/cpp/native/core/exceptions.h"'
+        exceptions_include = '#include "runtime/cpp/core/exceptions.h"'
         if exceptions_include not in includes:
             includes.append(exceptions_include)
     if _header_decl_uses_class_type_support(decl_text):
-        runtime_include = '#include "runtime/cpp/native/core/py_runtime.h"'
+        runtime_include = '#include "runtime/cpp/core/py_runtime.h"'
         if runtime_include not in includes:
             includes.append(runtime_include)
 
@@ -530,7 +536,7 @@ def build_cpp_header_from_east(
     lines.append("")
     runtime_types_include = _header_runtime_types_include(used_types, len(class_blocks) > 0)
     if runtime_types_include != "":
-        lines.append('#include "runtime/cpp/native/core/' + runtime_types_include + '"')
+        lines.append('#include "runtime/cpp/core/' + runtime_types_include + '"')
         lines.append("")
     for include in includes:
         lines.append(include)
@@ -540,6 +546,13 @@ def build_cpp_header_from_east(
     if ns != "":
         lines.append("namespace " + ns + " {")
         lines.append("")
+    # inline union struct 定義を class forward decl の後、struct 定義の前に挿入
+    for inline_line in _HEADER_INLINE_UNION_LINES:
+        lines.append(inline_line)
+    if len(_HEADER_INLINE_UNION_LINES) > 0:
+        lines.append("")
+    _HEADER_INLINE_UNION_LINES.clear()
+    _HEADER_INLINE_UNION_EMITTED.clear()
     for class_line in class_lines:
         lines.append(class_line)
     if len(class_lines) > 0:
@@ -979,7 +992,7 @@ def _extract_cpp_include_lines(cpp_text: str, output_path: Path) -> list[str]:
                 inc_path = line[q0 + 1 : q1].replace("\\", "/")
                 if inc_path.split("/")[-1] == own_name:
                     continue
-        if line == '#include "runtime/cpp/native/core/py_runtime.h"':
+        if line == '#include "runtime/cpp/core/py_runtime.h"':
             continue
         if line in seen:
             continue
@@ -1424,6 +1437,11 @@ def _tagged_union_field_name(east_type: str) -> str:
     return east_type.lower().replace("[", "_").replace("]", "").replace(",", "_").replace(" ", "") + "_val"
 
 
+# inline union struct 定義の蓄積用グローバル
+_HEADER_INLINE_UNION_EMITTED: set[str] = set()
+_HEADER_INLINE_UNION_LINES: list[str] = []
+
+
 def _build_tagged_union_struct_lines(
     name: str, non_none: list[str], has_none: bool,
     ref_classes: set[str], class_names: set[str],
@@ -1523,8 +1541,12 @@ def _header_cpp_type_from_east(
         if has_none:
             name_parts.append("None")
         struct_name = "_Union_" + "_".join(name_parts)
-        # struct 定義は _build_tagged_union_struct_lines で生成される想定
-        # header_builder 側では名前だけ返す（定義は alias_lines に積まれる）
+        # inline union struct 定義をグローバルに蓄積
+        if struct_name not in _HEADER_INLINE_UNION_EMITTED:
+            _HEADER_INLINE_UNION_EMITTED.add(struct_name)
+            _HEADER_INLINE_UNION_LINES.extend(
+                _build_tagged_union_struct_lines(struct_name, non_none, has_none, ref_classes, class_names)
+            )
         return struct_name
     if t.startswith("list[") and t.endswith("]"):
         inner = t[5:-1].strip()

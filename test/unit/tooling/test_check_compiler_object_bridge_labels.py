@@ -22,17 +22,17 @@ class CheckCompilerObjectBridgeLabelsTest(unittest.TestCase):
             bridge_mod._collect_all_labeled_usages(),
             [
                 (
-                    "src/runtime/cpp/native/compiler/transpile_cli.cpp",
+                    "src/runtime/cpp/compiler/transpile_cli.cpp",
                     137,
                     "legacy_migration_adapter",
                 ),
                 (
-                    "src/runtime/cpp/native/compiler/transpile_cli.cpp",
+                    "src/runtime/cpp/compiler/transpile_cli.cpp",
                     162,
                     "legacy_migration_adapter",
                 ),
                 (
-                    "src/runtime/cpp/native/compiler/transpile_cli.cpp",
+                    "src/runtime/cpp/compiler/transpile_cli.cpp",
                     181,
                     "legacy_migration_adapter",
                 ),

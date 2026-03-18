@@ -280,10 +280,10 @@ def lookup_target_module_primary_header(target: str, module_id: str) -> str:
     headers = lookup_target_module_public_headers(target, module_id)
     if target == "cpp":
         for header in headers:
-            if header.startswith("src/runtime/cpp/generated/"):
+            if header.startswith("src/runtime/generated/"):
                 return header
         for header in headers:
-            if header.startswith("src/runtime/cpp/native/"):
+            if header.startswith("src/runtime/cpp/"):
                 return header
     for suffix in (".gen.h", ".ext.h", ".h"):
         for header in headers:
@@ -298,10 +298,10 @@ def lookup_target_module_primary_compiler_header(target: str, module_id: str) ->
     headers = lookup_target_module_compiler_headers(target, module_id)
     if target == "cpp":
         for header in headers:
-            if header.startswith("src/runtime/cpp/generated/"):
+            if header.startswith("src/runtime/generated/"):
                 return header
         for header in headers:
-            if header.startswith("src/runtime/cpp/native/"):
+            if header.startswith("src/runtime/cpp/"):
                 return header
     for suffix in (".gen.h", ".ext.h", ".h"):
         for header in headers:

@@ -17,7 +17,7 @@ class GenRuntimeFromManifestTest(unittest.TestCase):
     def test_load_manifest_items_contains_png_cpp_rs_and_cs_built_in_std(self) -> None:
         items = gen_mod.load_manifest_items(ROOT / "tools" / "runtime_generation_manifest.json")
         pairs = {(item.item_id, item.target, item.output_rel) for item in items}
-        self.assertIn(("utils/png", "cpp", "src/runtime/cpp/generated/utils/png.cpp"), pairs)
+        self.assertIn(("utils/png", "cpp", "src/runtime/generated/utils/png.cpp"), pairs)
         self.assertIn(("utils/png", "rs", "src/runtime/rs/generated/utils/png.rs"), pairs)
         self.assertIn(("utils/png", "ruby", "src/runtime/ruby/generated/utils/png.rb"), pairs)
         self.assertIn(("utils/gif", "ruby", "src/runtime/ruby/generated/utils/gif.rb"), pairs)

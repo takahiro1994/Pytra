@@ -1586,10 +1586,10 @@
           ],
           "compile_sources": [],
           "compiler_headers": [
-            "src/runtime/cpp/native/core/dict.h"
+            "src/runtime/cpp/core/dict.h"
           ],
           "public_headers": [
-            "src/runtime/cpp/native/core/dict.h"
+            "src/runtime/cpp/core/dict.h"
           ]
         },
         "pytra.core.exceptions": {
@@ -1598,10 +1598,10 @@
           ],
           "compile_sources": [],
           "compiler_headers": [
-            "src/runtime/cpp/native/core/exceptions.h"
+            "src/runtime/cpp/core/exceptions.h"
           ],
           "public_headers": [
-            "src/runtime/cpp/native/core/exceptions.h"
+            "src/runtime/cpp/core/exceptions.h"
           ]
         },
         "pytra.core.gc": {
@@ -1609,13 +1609,13 @@
             "native"
           ],
           "compile_sources": [
-            "src/runtime/cpp/native/core/gc.cpp"
+            "src/runtime/cpp/core/gc.cpp"
           ],
           "compiler_headers": [
-            "src/runtime/cpp/native/core/gc.h"
+            "src/runtime/cpp/core/gc.h"
           ],
           "public_headers": [
-            "src/runtime/cpp/native/core/gc.h"
+            "src/runtime/cpp/core/gc.h"
           ]
         },
         "pytra.core.io": {
@@ -1623,13 +1623,13 @@
             "native"
           ],
           "compile_sources": [
-            "src/runtime/cpp/native/core/io.cpp"
+            "src/runtime/cpp/core/io.cpp"
           ],
           "compiler_headers": [
-            "src/runtime/cpp/native/core/io.h"
+            "src/runtime/cpp/core/io.h"
           ],
           "public_headers": [
-            "src/runtime/cpp/native/core/io.h"
+            "src/runtime/cpp/core/io.h"
           ]
         },
         "pytra.core.list": {
@@ -1638,10 +1638,10 @@
           ],
           "compile_sources": [],
           "compiler_headers": [
-            "src/runtime/cpp/native/core/list.h"
+            "src/runtime/cpp/core/list.h"
           ],
           "public_headers": [
-            "src/runtime/cpp/native/core/list.h"
+            "src/runtime/cpp/core/list.h"
           ]
         },
         "pytra.core.process_runtime": {
@@ -1650,10 +1650,10 @@
           ],
           "compile_sources": [],
           "compiler_headers": [
-            "src/runtime/cpp/native/core/process_runtime.h"
+            "src/runtime/cpp/core/process_runtime.h"
           ],
           "public_headers": [
-            "src/runtime/cpp/native/core/process_runtime.h"
+            "src/runtime/cpp/core/process_runtime.h"
           ]
         },
         "pytra.core.py_runtime": {
@@ -1662,10 +1662,10 @@
           ],
           "compile_sources": [],
           "compiler_headers": [
-            "src/runtime/cpp/native/core/py_runtime.h"
+            "src/runtime/cpp/core/py_runtime.h"
           ],
           "public_headers": [
-            "src/runtime/cpp/native/core/py_runtime.h"
+            "src/runtime/cpp/core/py_runtime.h"
           ]
         },
         "pytra.core.py_scalar_types": {
@@ -1674,10 +1674,10 @@
           ],
           "compile_sources": [],
           "compiler_headers": [
-            "src/runtime/cpp/native/core/py_scalar_types.h"
+            "src/runtime/cpp/core/py_scalar_types.h"
           ],
           "public_headers": [
-            "src/runtime/cpp/native/core/py_scalar_types.h"
+            "src/runtime/cpp/core/py_scalar_types.h"
           ]
         },
         "pytra.core.py_types": {
@@ -1686,10 +1686,10 @@
           ],
           "compile_sources": [],
           "compiler_headers": [
-            "src/runtime/cpp/native/core/py_types.h"
+            "src/runtime/cpp/core/py_types.h"
           ],
           "public_headers": [
-            "src/runtime/cpp/native/core/py_types.h"
+            "src/runtime/cpp/core/py_types.h"
           ]
         },
         "pytra.core.scope_exit": {
@@ -1698,10 +1698,10 @@
           ],
           "compile_sources": [],
           "compiler_headers": [
-            "src/runtime/cpp/native/core/scope_exit.h"
+            "src/runtime/cpp/core/scope_exit.h"
           ],
           "public_headers": [
-            "src/runtime/cpp/native/core/scope_exit.h"
+            "src/runtime/cpp/core/scope_exit.h"
           ]
         },
         "pytra.core.set": {
@@ -1710,10 +1710,10 @@
           ],
           "compile_sources": [],
           "compiler_headers": [
-            "src/runtime/cpp/native/core/set.h"
+            "src/runtime/cpp/core/set.h"
           ],
           "public_headers": [
-            "src/runtime/cpp/native/core/set.h"
+            "src/runtime/cpp/core/set.h"
           ]
         },
         "pytra.core.str": {
@@ -1722,10 +1722,10 @@
           ],
           "compile_sources": [],
           "compiler_headers": [
-            "src/runtime/cpp/native/core/str.h"
+            "src/runtime/cpp/core/str.h"
           ],
           "public_headers": [
-            "src/runtime/cpp/native/core/str.h"
+            "src/runtime/cpp/core/str.h"
           ]
         },
         "pytra.std.argparse": {
@@ -1748,7 +1748,7 @@
             "native"
           ],
           "compile_sources": [
-            "src/runtime/cpp/native/std/glob.cpp"
+            "src/runtime/cpp/std/glob.cpp"
           ],
           "compiler_headers": [
             "src/runtime/cpp/generated/std/glob.h"
@@ -1777,7 +1777,7 @@
             "native"
           ],
           "compile_sources": [
-            "src/runtime/cpp/native/std/math.cpp"
+            "src/runtime/cpp/std/math.cpp"
           ],
           "compiler_headers": [
             "src/runtime/cpp/generated/std/math.h"
@@ -1792,7 +1792,7 @@
             "native"
           ],
           "compile_sources": [
-            "src/runtime/cpp/native/std/os.cpp"
+            "src/runtime/cpp/std/os.cpp"
           ],
           "compiler_headers": [
             "src/runtime/cpp/generated/std/os.h"
@@ -1807,7 +1807,7 @@
             "native"
           ],
           "compile_sources": [
-            "src/runtime/cpp/native/std/os_path.cpp"
+            "src/runtime/cpp/std/os_path.cpp"
           ],
           "compiler_headers": [
             "src/runtime/cpp/generated/std/os_path.h"
@@ -1864,7 +1864,7 @@
             "native"
           ],
           "compile_sources": [
-            "src/runtime/cpp/native/std/sys.cpp"
+            "src/runtime/cpp/std/sys.cpp"
           ],
           "compiler_headers": [
             "src/runtime/cpp/generated/std/sys.h"
@@ -1879,7 +1879,7 @@
             "native"
           ],
           "compile_sources": [
-            "src/runtime/cpp/native/std/time.cpp"
+            "src/runtime/cpp/std/time.cpp"
           ],
           "compiler_headers": [
             "src/runtime/cpp/generated/std/time.h"

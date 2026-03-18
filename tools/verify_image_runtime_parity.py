@@ -3,7 +3,7 @@
 
 This script generates tiny PNG/GIF outputs with:
 - Python canonical implementations: src/pytra/utils/png.py, src/pytra/utils/gif.py
-- C++ runtimes: src/runtime/cpp/generated/utils/png.cpp, src/runtime/cpp/generated/utils/gif.cpp
+- C++ runtimes: src/runtime/generated/utils/png.cpp, src/runtime/generated/utils/gif.cpp
 
 It compares resulting bytes and exits non-zero on mismatch.
 """
@@ -21,9 +21,9 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def _write_cpp_harness(path: Path) -> None:
     src = r'''
-#include "runtime/cpp/native/core/py_runtime.h"
-#include "runtime/cpp/generated/utils/png.h"
-#include "runtime/cpp/generated/utils/gif.h"
+#include "runtime/cpp/core/py_runtime.h"
+#include "runtime/generated/utils/png.h"
+#include "runtime/generated/utils/gif.h"
 
 #include <cstdint>
 #include <string>
@@ -69,10 +69,10 @@ def _build_and_run_cpp(work: Path, out_png: Path, out_gif: Path) -> None:
         "-I",
         "src/runtime/cpp",
         str(harness),
-        "src/runtime/cpp/generated/utils/png.cpp",
-        "src/runtime/cpp/generated/utils/gif.cpp",
-        "src/runtime/cpp/native/core/gc.cpp",
-        "src/runtime/cpp/native/core/io.cpp",
+        "src/runtime/generated/utils/png.cpp",
+        "src/runtime/generated/utils/gif.cpp",
+        "src/runtime/cpp/core/gc.cpp",
+        "src/runtime/cpp/core/io.cpp",
         "-o",
         str(exe),
     ]

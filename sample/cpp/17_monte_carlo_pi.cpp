@@ -1,5 +1,5 @@
-#include "runtime/cpp/native/core/py_runtime.h"
-#include "runtime/cpp/native/core/process_runtime.h"
+#include "runtime/cpp/core/py_runtime.h"
+#include "runtime/cpp/core/process_runtime.h"
 #include "generated/built_in/io_ops.h"
 #include "generated/std/time.h"
 

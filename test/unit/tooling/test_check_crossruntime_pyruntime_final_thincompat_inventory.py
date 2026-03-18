@@ -50,8 +50,8 @@ class CheckCrossRuntimePyRuntimeFinalThinCompatInventoryTest(unittest.TestCase):
         self.assertEqual(
             inventory_mod.EXPECTED_BUCKETS["cpp_header_final_thincompat_defs"],
             {
-                ("py_runtime_type_id", "src/runtime/cpp/native/core/py_runtime.h"),
-                ("py_isinstance", "src/runtime/cpp/native/core/py_runtime.h"),
+                ("py_runtime_type_id", "src/runtime/cpp/core/py_runtime.h"),
+                ("py_isinstance", "src/runtime/cpp/core/py_runtime.h"),
             },
         )
 

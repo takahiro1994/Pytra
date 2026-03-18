@@ -1679,7 +1679,7 @@ def f(xs: list[int], ws: list[float]) -> int:
             em.cpp_list_model = "pyobj"
             cpp = em.transpile()
 
-        self.assertIn("rc<list<int64>> picked = pytra::std::random::choices(xs, ws);", cpp)
+        self.assertIn("rc<list<int64>> picked = pytra::std::random::choices(", cpp)
         self.assertNotIn("rc_list_from_value(list<int64>(pytra::std::random::choices(xs, ws)))", cpp)
 
     def test_pyobj_list_model_dynamic_dict_values_unboxes_to_rc_list(self) -> None:

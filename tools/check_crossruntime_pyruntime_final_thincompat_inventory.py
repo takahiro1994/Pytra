@@ -11,17 +11,17 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 TRACKED_PATHS = {
-    "src/runtime/cpp/native/core/py_runtime.h",
-    "src/runtime/cpp/generated/std/json.cpp",
+    "src/runtime/cpp/core/py_runtime.h",
+    "src/runtime/generated/std/json.cpp",
     "src/runtime/rs/native/built_in/py_runtime.rs",
     "src/runtime/cs/native/built_in/py_runtime.cs",
 }
 
 CPP_HEADER_RULES = {
-    ("py_runtime_type_id", "src/runtime/cpp/native/core/py_runtime.h"): re.compile(
+    ("py_runtime_type_id", "src/runtime/cpp/core/py_runtime.h"): re.compile(
         r"template <class T>\s*static inline uint32 py_runtime_type_id\s*\("
     ),
-    ("py_isinstance", "src/runtime/cpp/native/core/py_runtime.h"): re.compile(
+    ("py_isinstance", "src/runtime/cpp/core/py_runtime.h"): re.compile(
         r"template <class T>\s*static inline bool py_isinstance\s*\("
     ),
 }
@@ -69,8 +69,8 @@ CS_PUBLIC_ALIAS_RULES = {
 
 EXPECTED_BUCKETS = {
     "cpp_header_final_thincompat_defs": {
-        ("py_runtime_type_id", "src/runtime/cpp/native/core/py_runtime.h"),
-        ("py_isinstance", "src/runtime/cpp/native/core/py_runtime.h"),
+        ("py_runtime_type_id", "src/runtime/cpp/core/py_runtime.h"),
+        ("py_isinstance", "src/runtime/cpp/core/py_runtime.h"),
     },
     "cpp_generated_final_thincompat_blocker": set(),
     "rs_runtime_generic_alias_surface": {

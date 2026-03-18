@@ -13,9 +13,9 @@ PYTRA_TEST_COMPILE_TIMEOUT_SEC = float(os.environ.get("PYTRA_TEST_COMPILE_TIMEOU
 PYTRA_TEST_RUN_TIMEOUT_SEC = float(os.environ.get("PYTRA_TEST_RUN_TIMEOUT_SEC", "2"))
 
 CPP_RUNTIME_SRCS = [
-    "src/runtime/cpp/native/core/gc.cpp",
-    "src/runtime/cpp/native/core/io.cpp",
-    "src/runtime/cpp/generated/built_in/type_id.cpp",
+    "src/runtime/cpp/core/gc.cpp",
+    "src/runtime/cpp/core/io.cpp",
+    "src/runtime/generated/built_in/type_id.cpp",
 ]
 
 
@@ -37,7 +37,7 @@ class CppRuntimeTypeIdTest(unittest.TestCase):
 
     def test_runtime_type_id_subtype_and_isinstance_contract(self) -> None:
         cpp_src = r'''
-#include "runtime/cpp/native/core/py_runtime.h"
+#include "runtime/cpp/core/py_runtime.h"
 
 #include <cassert>
 #include <iostream>
@@ -127,7 +127,7 @@ int main() {
 
     def test_generated_type_id_registry_accepts_preallocated_user_ids(self) -> None:
         cpp_src = r'''
-#include "runtime/cpp/native/core/py_runtime.h"
+#include "runtime/cpp/core/py_runtime.h"
 
 #include <cassert>
 #include <iostream>
@@ -196,7 +196,7 @@ int main() {
 
     def test_rc_handle_upcast_from_derived_compiles(self) -> None:
         cpp_src = r'''
-#include "runtime/cpp/native/core/gc.h"
+#include "runtime/cpp/core/gc.h"
 
 #include <cassert>
 #include <iostream>
@@ -251,7 +251,7 @@ int main() {
                     "-I",
                     "src/runtime/cpp",
                     str(src),
-                    "src/runtime/cpp/native/core/gc.cpp",
+                    "src/runtime/cpp/core/gc.cpp",
                     "-o",
                     str(exe),
                 ],

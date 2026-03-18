@@ -839,9 +839,9 @@ class Py2xEntrypointsContractTest(unittest.TestCase):
 
         self.assertFalse(legacy_public_header.exists())
         self.assertTrue(generated_cpp.exists())
-        self.assertIn('#include "runtime/cpp/native/compiler/transpile_cli.h"', generated_header)
+        self.assertIn('#include "runtime/cpp/compiler/transpile_cli.h"', generated_header)
         self.assertNotIn('#include "runtime/cpp/pytra/compiler/transpile_cli.h"', generated_header)
-        self.assertIn('#include "runtime/cpp/generated/compiler/transpile_cli.h"', generated_cpp_src)
+        self.assertIn('#include "runtime/generated/compiler/transpile_cli.h"', generated_cpp_src)
         self.assertIn("CompilerRootDocument load_east3_document_typed(", generated_cpp_src)
         self.assertNotIn('#include "runtime/cpp/pytra/compiler/transpile_cli.h"', generated_cpp_src)
 

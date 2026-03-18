@@ -82,7 +82,7 @@ def main(input_path: str) -> None:
 """,
             "frontend_facade_symbol_case.py",
         )
-        self.assertIn('#include "runtime/cpp/generated/compiler/transpile_cli.h"', cpp)
+        self.assertIn('#include "runtime/generated/compiler/transpile_cli.h"', cpp)
         self.assertIn("pytra::compiler::transpile_cli::load_east3_document_typed(", cpp)
 
     def test_runtime_paths_uses_index_for_std_and_core_modules(self) -> None:
@@ -98,7 +98,7 @@ def main(input_path: str) -> None:
 """,
             "core_include_surface_case.py",
         )
-        self.assertIn('#include "runtime/cpp/native/core/py_runtime.h"', cpp)
+        self.assertIn('#include "runtime/cpp/core/py_runtime.h"', cpp)
         self.assertNotIn('runtime/cpp/core/py_runtime.h', cpp)
 
     def test_transpiled_cpp_emits_direct_built_in_headers_after_py_runtime_slimming(self) -> None:
@@ -113,7 +113,7 @@ def main(input_path: str) -> None:
 """,
             "built_in_include_surface_case.py",
         )
-        self.assertIn('#include "runtime/cpp/native/core/py_runtime.h"', cpp)
+        self.assertIn('#include "runtime/cpp/core/py_runtime.h"', cpp)
         self.assertIn('#include "generated/built_in/predicates.h"', cpp)
         self.assertIn('#include "generated/built_in/sequence.h"', cpp)
         self.assertIn('#include "generated/built_in/iter_ops.h"', cpp)

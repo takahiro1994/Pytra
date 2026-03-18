@@ -8,7 +8,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-HEADER = ROOT / "src/runtime/cpp/native/core/py_runtime.h"
+HEADER = ROOT / "src/runtime/cpp/core/py_runtime.h"
 
 EXPECTED_BUCKETS = {
     "object_bridge_mutation": {

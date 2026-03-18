@@ -108,7 +108,7 @@ def _collect_inventory_count_issues() -> list[str]:
 
 
 def _collect_header_line_issues() -> list[str]:
-    header = ROOT / "src/runtime/cpp/native/core/py_runtime.h"
+    header = ROOT / "src/runtime/cpp/core/py_runtime.h"
     with header.open("r", encoding="utf-8") as handle:
         actual = sum(1 for _ in handle)
     if actual != inventory_mod.HEADER_LINE_BASELINE:

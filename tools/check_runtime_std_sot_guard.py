@@ -113,32 +113,32 @@ CPP_HEADER_ONLY_STD_MODULES = {
 }
 
 CPP_STD_HEADER_LOCATIONS: dict[str, str] = {
-    "argparse": "src/runtime/cpp/generated/std/argparse.h",
-    "glob": "src/runtime/cpp/generated/std/glob.h",
-    "json": "src/runtime/cpp/generated/std/json.h",
-    "math": "src/runtime/cpp/generated/std/math.h",
-    "os": "src/runtime/cpp/generated/std/os.h",
-    "os_path": "src/runtime/cpp/generated/std/os_path.h",
-    "pathlib": "src/runtime/cpp/generated/std/pathlib.h",
-    "random": "src/runtime/cpp/generated/std/random.h",
-    "re": "src/runtime/cpp/generated/std/re.h",
-    "sys": "src/runtime/cpp/generated/std/sys.h",
-    "time": "src/runtime/cpp/generated/std/time.h",
-    "timeit": "src/runtime/cpp/generated/std/timeit.h",
+    "argparse": "src/runtime/generated/std/argparse.h",
+    "glob": "src/runtime/generated/std/glob.h",
+    "json": "src/runtime/generated/std/json.h",
+    "math": "src/runtime/generated/std/math.h",
+    "os": "src/runtime/generated/std/os.h",
+    "os_path": "src/runtime/generated/std/os_path.h",
+    "pathlib": "src/runtime/generated/std/pathlib.h",
+    "random": "src/runtime/generated/std/random.h",
+    "re": "src/runtime/generated/std/re.h",
+    "sys": "src/runtime/generated/std/sys.h",
+    "time": "src/runtime/generated/std/time.h",
+    "timeit": "src/runtime/generated/std/timeit.h",
 }
 
 CPP_STD_SOURCE_LOCATIONS: dict[str, str] = {
-    "argparse": "src/runtime/cpp/generated/std/argparse.cpp",
-    "glob": "src/runtime/cpp/generated/std/glob.cpp",
-    "json": "src/runtime/cpp/generated/std/json.cpp",
-    "os": "src/runtime/cpp/generated/std/os.cpp",
-    "os_path": "src/runtime/cpp/generated/std/os_path.cpp",
-    "pathlib": "src/runtime/cpp/generated/std/pathlib.cpp",
-    "random": "src/runtime/cpp/generated/std/random.cpp",
-    "re": "src/runtime/cpp/generated/std/re.cpp",
-    "sys": "src/runtime/cpp/generated/std/sys.cpp",
-    "time": "src/runtime/cpp/generated/std/time.cpp",
-    "timeit": "src/runtime/cpp/generated/std/timeit.cpp",
+    "argparse": "src/runtime/generated/std/argparse.cpp",
+    "glob": "src/runtime/generated/std/glob.cpp",
+    "json": "src/runtime/generated/std/json.cpp",
+    "os": "src/runtime/generated/std/os.cpp",
+    "os_path": "src/runtime/generated/std/os_path.cpp",
+    "pathlib": "src/runtime/generated/std/pathlib.cpp",
+    "random": "src/runtime/generated/std/random.cpp",
+    "re": "src/runtime/generated/std/re.cpp",
+    "sys": "src/runtime/generated/std/sys.cpp",
+    "time": "src/runtime/generated/std/time.cpp",
+    "timeit": "src/runtime/generated/std/timeit.cpp",
 }
 
 CPP_GENERATED_UTILS_MODULES = [
@@ -148,15 +148,15 @@ CPP_GENERATED_UTILS_MODULES = [
 ]
 
 CPP_UTILS_HEADER_LOCATIONS: dict[str, str] = {
-    "assertions": "src/runtime/cpp/generated/utils/assertions.h",
-    "gif": "src/runtime/cpp/generated/utils/gif.h",
-    "png": "src/runtime/cpp/generated/utils/png.h",
+    "assertions": "src/runtime/generated/utils/assertions.h",
+    "gif": "src/runtime/generated/utils/gif.h",
+    "png": "src/runtime/generated/utils/png.h",
 }
 
 CPP_UTILS_SOURCE_LOCATIONS: dict[str, str] = {
-    "assertions": "src/runtime/cpp/generated/utils/assertions.cpp",
-    "gif": "src/runtime/cpp/generated/utils/gif.cpp",
-    "png": "src/runtime/cpp/generated/utils/png.cpp",
+    "assertions": "src/runtime/generated/utils/assertions.cpp",
+    "gif": "src/runtime/generated/utils/gif.cpp",
+    "png": "src/runtime/generated/utils/png.cpp",
 }
 
 # module basename -> canonical Python source path.
@@ -180,12 +180,12 @@ CPP_CANONICAL_SOURCE_BY_MODULE: dict[str, str] = {
 
 # required handwritten native companion files.
 CPP_REQUIRED_CORE_IMPL_FILES: dict[str, str] = {
-    "glob.cpp": "src/runtime/cpp/native/std/glob.cpp",
-    "math.cpp": "src/runtime/cpp/native/std/math.cpp",
-    "os.cpp": "src/runtime/cpp/native/std/os.cpp",
-    "os_path.cpp": "src/runtime/cpp/native/std/os_path.cpp",
-    "sys.cpp": "src/runtime/cpp/native/std/sys.cpp",
-    "time.cpp": "src/runtime/cpp/native/std/time.cpp",
+    "glob.cpp": "src/runtime/cpp/std/glob.cpp",
+    "math.cpp": "src/runtime/cpp/std/math.cpp",
+    "os.cpp": "src/runtime/cpp/std/os.cpp",
+    "os_path.cpp": "src/runtime/cpp/std/os_path.cpp",
+    "sys.cpp": "src/runtime/cpp/std/sys.cpp",
+    "time.cpp": "src/runtime/cpp/std/time.cpp",
 }
 
 CPP_ROOT_GENERATED_RUNTIME_FILES: set[str] = set()

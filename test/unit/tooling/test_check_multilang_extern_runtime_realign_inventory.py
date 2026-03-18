@@ -73,7 +73,7 @@ class CheckMultilangExternRuntimeRealignInventoryTest(unittest.TestCase):
                 "php:php_std_native_owner_wrapper",
             ),
         )
-        self.assertEqual(row["cpp_native_owner_paths"], ("src/runtime/cpp/native/std/math.cpp",))
+        self.assertEqual(row["cpp_native_owner_paths"], ("src/runtime/cpp/std/math.cpp",))
         self.assertEqual(
             row["noncpp_native_owner_paths"],
             (

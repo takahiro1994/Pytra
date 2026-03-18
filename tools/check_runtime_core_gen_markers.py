@@ -9,8 +9,8 @@ Policy:
   backends that have not yet rolled over to the `generated/native` layout.
 - Generated lanes must include both `source:` and `generated-by:` markers.
 - Handwritten lanes must not include generated markers.
-- `src/runtime/cpp/generated/core/**` files must include both markers, while
-  `src/runtime/cpp/native/core/**` must not.
+- `src/runtime/generated/core/**` files must include both markers, while
+  `src/runtime/cpp/core/**` must not.
 - Legacy `src/runtime/cpp/core/**` compatibility files are not canonical and are checked
   only if they reappear unexpectedly.
 """

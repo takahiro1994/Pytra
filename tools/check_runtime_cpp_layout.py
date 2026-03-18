@@ -4,11 +4,11 @@
 Rules:
 - Module runtime under `src/runtime/cpp/{built_in,std,utils}` is legacy-closed and must not contain `.h/.cpp`.
 - Compiler runtime under `src/runtime/cpp/{generated,native}/compiler` is the stage1 bootstrap lane.
-- Module runtime under `src/runtime/cpp/generated/{built_in,std,utils,compiler}` must contain the auto-generated marker.
-- Module runtime under `src/runtime/cpp/native/{built_in,std,utils,compiler}` must NOT contain the auto-generated marker.
+- Module runtime under `src/runtime/generated/{built_in,std,utils,compiler}` must contain the auto-generated marker.
+- Module runtime under `src/runtime/cpp/{built_in,std,utils,compiler}` must NOT contain the auto-generated marker.
 - Legacy shim/compat trees under `src/runtime/cpp/pytra/**` and `src/runtime/cpp/core/**` must not exist.
-- Compiler-facing `generated/**` and `native/**` files may include `runtime/cpp/native/core/**` directly.
-- `src/runtime/cpp/generated/core/**` and `src/runtime/cpp/native/core/**` must obey generated/handwritten marker rules.
+- Compiler-facing `generated/**` and `native/**` files may include `runtime/cpp/core/**` directly.
+- `src/runtime/generated/core/**` and `src/runtime/cpp/core/**` must obey generated/handwritten marker rules.
 """
 
 from __future__ import annotations
@@ -46,23 +46,23 @@ BANNED_PY_RUNTIME_PATTERNS = {
     "static inline bool py_contains(const object&": "contains duplicate must not live in the py_runtime core header",
 }
 BANNED_PY_RUNTIME_INCLUDE_PATTERNS = {
-    '#include "runtime/cpp/generated/built_in/predicates.h"': (
+    '#include "runtime/generated/built_in/predicates.h"': (
         "predicate helper companions must not be re-aggregated via py_runtime"
     ),
-    '#include "runtime/cpp/generated/built_in/sequence.h"': (
+    '#include "runtime/generated/built_in/sequence.h"': (
         "sequence helper companions must not be re-aggregated via py_runtime"
     ),
-    '#include "runtime/cpp/native/built_in/sequence.h"': (
+    '#include "runtime/cpp/built_in/sequence.h"': (
         "sequence native helpers must not be re-aggregated via py_runtime"
     ),
-    '#include "runtime/cpp/generated/built_in/iter_ops.h"': (
+    '#include "runtime/generated/built_in/iter_ops.h"': (
         "iter helper companions must not be re-aggregated via py_runtime"
     ),
-    '#include "runtime/cpp/native/built_in/iter_ops.h"': (
+    '#include "runtime/cpp/built_in/iter_ops.h"': (
         "iter native helpers must not be re-aggregated via py_runtime"
     ),
 }
-DIRECT_NATIVE_CORE_INCLUDE_RE = re.compile(r'^\s*#include\s+"(runtime/cpp/native/core/[^"]+)"', re.MULTILINE)
+DIRECT_NATIVE_CORE_INCLUDE_RE = re.compile(r'^\s*#include\s+"(runtime/cpp/core/[^"]+)"', re.MULTILINE)
 
 
 def _runtime_cpp_path(*parts: str) -> Path:
