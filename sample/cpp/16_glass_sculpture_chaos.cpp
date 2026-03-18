@@ -1,10 +1,10 @@
 #include "runtime/cpp/core/py_runtime.h"
 #include "runtime/cpp/core/process_runtime.h"
-#include "generated/built_in/io_ops.h"
-#include "generated/built_in/numeric_ops.h"
-#include "generated/std/math.h"
-#include "generated/std/time.h"
-#include "generated/utils/gif.h"
+#include "built_in/io_ops.h"
+#include "built_in/numeric_ops.h"
+#include "std/math.h"
+#include "std/time.h"
+#include "utils/gif.h"
 
 // 16: Sample that ray-traces chaotic rotation of glass sculptures and outputs a GIF.
 

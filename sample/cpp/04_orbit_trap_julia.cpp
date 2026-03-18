@@ -1,8 +1,8 @@
 #include "runtime/cpp/core/py_runtime.h"
 #include "runtime/cpp/core/process_runtime.h"
-#include "generated/built_in/io_ops.h"
-#include "generated/std/time.h"
-#include "generated/utils/png.h"
+#include "built_in/io_ops.h"
+#include "std/time.h"
+#include "utils/png.h"
 
 // 04: Sample that renders an orbit-trap Julia set and writes a PNG image.
 

@@ -1,9 +1,9 @@
 #include "runtime/cpp/core/py_runtime.h"
 #include "runtime/cpp/core/process_runtime.h"
-#include "generated/built_in/io_ops.h"
-#include "generated/std/math.h"
-#include "generated/std/time.h"
-#include "generated/utils/png.h"
+#include "built_in/io_ops.h"
+#include "std/math.h"
+#include "std/time.h"
+#include "utils/png.h"
 
 // 02: Sample that runs a mini sphere-only ray tracer and outputs a PNG image.
 // Dependencies are kept minimal (time only) for transpilation compatibility.

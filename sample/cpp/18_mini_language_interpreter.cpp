@@ -1,10 +1,10 @@
 #include "runtime/cpp/core/py_runtime.h"
 #include "runtime/cpp/core/process_runtime.h"
-#include "generated/built_in/contains.h"
-#include "generated/built_in/io_ops.h"
-#include "generated/built_in/iter_ops.h"
-#include "generated/built_in/string_ops.h"
-#include "generated/std/time.h"
+#include "built_in/contains.h"
+#include "built_in/io_ops.h"
+#include "built_in/iter_ops.h"
+#include "built_in/string_ops.h"
+#include "std/time.h"
 
 struct Token {
     str kind;

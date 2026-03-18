@@ -1,8 +1,8 @@
 #include "runtime/cpp/core/py_runtime.h"
 #include "runtime/cpp/core/process_runtime.h"
-#include "generated/built_in/io_ops.h"
-#include "generated/std/time.h"
-#include "generated/utils/png.h"
+#include "built_in/io_ops.h"
+#include "std/time.h"
+#include "utils/png.h"
 
 // 01: Sample that outputs the Mandelbrot set as a PNG image.
 // Syntax is kept straightforward with future transpilation in mind.

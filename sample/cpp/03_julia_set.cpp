@@ -1,8 +1,8 @@
 #include "runtime/cpp/core/py_runtime.h"
 #include "runtime/cpp/core/process_runtime.h"
-#include "generated/built_in/io_ops.h"
-#include "generated/std/time.h"
-#include "generated/utils/png.h"
+#include "built_in/io_ops.h"
+#include "std/time.h"
+#include "utils/png.h"
 
 // 03: Sample that outputs a Julia set as a PNG image.
 // Implemented with simple loop-centric logic for transpilation compatibility.

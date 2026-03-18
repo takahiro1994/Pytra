@@ -1,9 +1,9 @@
 #include "runtime/cpp/core/py_runtime.h"
 #include "runtime/cpp/core/process_runtime.h"
-#include "generated/built_in/io_ops.h"
-#include "generated/built_in/sequence.h"
-#include "generated/std/time.h"
-#include "generated/utils/gif.h"
+#include "built_in/io_ops.h"
+#include "built_in/sequence.h"
+#include "std/time.h"
+#include "utils/gif.h"
 
 // 08: Sample that outputs Langton's Ant trajectories as a GIF.
 
