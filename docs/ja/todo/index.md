@@ -6,7 +6,7 @@
   <img alt="Read in English" src="https://img.shields.io/badge/docs-English-2563EB?style=flat-square">
 </a>
 
-最終更新: 2026-03-18（P0 追加: widening cast 冗長除去 / P1 追加: type alias サポート）
+最終更新: 2026-03-18（P1-TAGGED-UNION-ALL-BACKENDS-01 追加 / P1-TYPE-ALIAS-SUPPORT-01 完了）
 
 ## 文脈運用ルール
 
@@ -45,7 +45,13 @@
 
 文脈: [docs/ja/plans/p1-type-alias-support.md](../plans/p1-type-alias-support.md)
 
-2. [ ] [ID: P1-TYPE-ALIAS-SUPPORT-01] Python の `type X = T`（PEP 695）をモジュールレベルの型エイリアス宣言として認識し、C++ では `using X = <cpp_type>;` を emit する。型式レンダリング時に alias 名を逆引きして使用することで、`::std::variant<str, bool, ::std::monostate>` のような長い型を alias 名で置き換え、生成コードの可読性を改善する。
+2. [x] [ID: P1-TYPE-ALIAS-SUPPORT-01] Python の `type X = T`（PEP 695）をモジュールレベルの型エイリアス宣言として認識し、C++ では `using X = <cpp_type>;` を emit する。型式レンダリング時に alias 名を逆引きして使用することで、`::std::variant<str, bool, ::std::monostate>` のような長い型を alias 名で置き換え、生成コードの可読性を改善する。
+
+#### P1-2: `type X = A | B | ...` タグ付き union struct 全バックエンド対応
+
+文脈: [docs/ja/plans/p1-tagged-union-all-backends.md](../plans/p1-tagged-union-all-backends.md)
+
+3. [ ] [ID: P1-TAGGED-UNION-ALL-BACKENDS-01] `type X = A | B | ...` 宣言をタグ付き struct（tagged union）として全バックエンドで emit する。`std::variant` の再帰型制約を解消し、JSON のような再帰的データ構造を `type` 宣言で自然に表現可能にする。C++ union によるメモリ最適化は後続の CLI オプションとして分離する。
 
 ### P5: py_runtime.h 縮小
 

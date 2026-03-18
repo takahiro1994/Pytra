@@ -100,3 +100,4 @@ static void __pytra_module_init() { ArgValue = str | bool | ::std::nullopt; }
 - 2026-03-18: ユーザー指摘。argparse.h の `::std::optional<dict<str, ::std::variant<str, bool, ::std::monostate>>>` が可読性を著しく損なっている。
 - 2026-03-18: 選択肢（A: 自動 typedef / B: 固定挿入 / C: Python type alias）の中から C を採用。ソースと出力の透明な対応が最も設計として正しい。
 - 2026-03-18: Python 3.12 `type` 文（PEP 695）を対象に決定。Pytra はセルフホストパーサーを持つため実行環境の Python バージョンは制約にならない。`X: TypeAlias = T` 形式は後続タスクとする。
+- 2026-03-18: 実装完了。`argparse.py` への直接追加は Python 3.11（実行環境）が PEP 695 構文を parse できないため見送り。`pytra.std.re` への新パターン追加・`core_module_parser.py` / `cpp_emitter.py` / `header_builder.py` / `type_bridge.py` / `module.py` を修正。バージョン: shared 0.121.0 / cpp 0.585.0。fixture 145/145・sample 18/18 pass、selfhost mismatches=0。
