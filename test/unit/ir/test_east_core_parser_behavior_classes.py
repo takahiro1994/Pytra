@@ -117,7 +117,7 @@ class B:
     def test_dataclass_field_call_is_absorbed_into_static_metadata(self) -> None:
         src = """
 from dataclasses import dataclass, field
-from collections import deque
+from pytra.std.collections import deque
 
 @dataclass
 class PadState:

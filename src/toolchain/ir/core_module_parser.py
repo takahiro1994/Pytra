@@ -515,10 +515,11 @@ def convert_source_to_east_self_hosted_impl(source: str, filename: str) -> dict[
                         hint="Use `import module` or `import module as alias` form.",
                     )
                 mod_name, as_name_txt = parsed_alias
-                if mod_name in {"typing", "dataclasses", "enum"}:
+                if mod_name in {"typing", "dataclasses", "enum", "collections"}:
+                    pytra_mod = f"pytra.std.{mod_name}" if mod_name == "collections" else f"pytra.{mod_name}"
                     raise _make_east_build_error(
                         kind="unsupported_syntax",
-                        message=f"import {mod_name} is not allowed. Use `from pytra.{mod_name} import ...` instead.",
+                        message=f"import {mod_name} is not allowed. Use `from {pytra_mod} import ...` instead.",
                         source_span=_sh_span(i, 0, len(ln)),
                         hint=f"Replace with: from pytra.{mod_name} import ...",
                     )
@@ -548,12 +549,13 @@ def convert_source_to_east_self_hosted_impl(source: str, filename: str) -> dict[
         import_from_clause = _sh_parse_import_from_clause(s)
         if import_from_clause is not None:
             mod_name, names_txt, mod_level = import_from_clause
-            if mod_name in {"typing", "dataclasses", "enum"}:
+            if mod_name in {"typing", "dataclasses", "enum", "collections"}:
+                pytra_mod = f"pytra.std.{mod_name}" if mod_name == "collections" else f"pytra.{mod_name}"
                 raise _make_east_build_error(
                     kind="unsupported_syntax",
-                    message=f"from {mod_name} import ... is not allowed. Use `from pytra.{mod_name} import ...` instead.",
+                    message=f"from {mod_name} import ... is not allowed. Use `from {pytra_mod} import ...` instead.",
                     source_span=_sh_span(i, 0, len(ln)),
-                    hint=f"Replace with: from pytra.{mod_name} import ...",
+                    hint=f"Replace with: from {pytra_mod} import ...",
                 )
             if mod_name in {"pytra.types", "pytra.typing", "pytra.enum", "pytra.dataclasses"}:
                 # 言語補助モジュール: パーサーが型名・構文を既に認識しているため、import を無視する。

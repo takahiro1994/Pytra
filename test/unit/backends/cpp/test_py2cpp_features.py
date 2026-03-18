@@ -4296,7 +4296,7 @@ if __name__ == "__main__":
                 encoding="utf-8",
             )
             pad_state_py.write_text(
-                "from collections import deque\n"
+                "from pytra.std.collections import deque\n"
                 "from pytra.dataclasses import dataclass, field\n"
                 "\n"
                 "@dataclass\n"
@@ -5147,7 +5147,7 @@ if __name__ == "__main__":
 
     def test_dataclass_field_call_no_longer_leaks_into_cpp_runtime_expr(self) -> None:
         src = """from pytra.dataclasses import dataclass, field
-from collections import deque
+from pytra.std.collections import deque
 
 @dataclass
 class PadState:
@@ -5164,7 +5164,7 @@ class PadState:
 
     def test_dataclass_field_init_false_is_omitted_from_ctor_params(self) -> None:
         src = """from pytra.dataclasses import dataclass, field
-from collections import deque
+from pytra.std.collections import deque
 
 @dataclass
 class PadState:
@@ -5182,7 +5182,7 @@ class PadState:
 
     def test_dataclass_deque_init_false_only_uses_zero_arg_ctor(self) -> None:
         src = """from pytra.dataclasses import dataclass, field
-from collections import deque
+from pytra.std.collections import deque
 
 @dataclass
 class PadState:
@@ -5199,7 +5199,7 @@ class PadState:
 
     def test_dataclass_deque_default_factory_builds_in_cpp_representative_lane(self) -> None:
         src = """from pytra.dataclasses import dataclass, field
-from collections import deque
+from pytra.std.collections import deque
 
 @dataclass
 class PadState:
@@ -5339,7 +5339,7 @@ print(read_child_value())
             self.assertEqual(run.stdout.strip(), "0")
 
     def test_deque_annotation_lowers_to_std_deque_cpp_type(self) -> None:
-        src = """from collections import deque
+        src = """from pytra.std.collections import deque
 
 class PadState:
     timestamps: deque[float]
@@ -5353,7 +5353,7 @@ class PadState:
         self.assertNotIn("deque[float64] timestamps;", cpp)
 
     def test_deque_annotation_builds_in_cpp_representative_lane(self) -> None:
-        src = """from collections import deque
+        src = """from pytra.std.collections import deque
 
 class PadState:
     timestamps: deque[float]
@@ -5397,7 +5397,7 @@ class PadState:
             self.assertEqual(comp.returncode, 0, msg=comp.stderr)
 
     def test_deque_expr_len_truthiness_lower_to_std_deque_cpp_surface(self) -> None:
-        src = """from collections import deque
+        src = """from pytra.std.collections import deque
 
 q: deque[int] = deque()
 q.append(1)
@@ -5424,7 +5424,7 @@ print(front)
         self.assertNotIn("py_len(q)", cpp)
 
     def test_deque_expr_method_builds_and_runs_in_cpp_representative_lane(self) -> None:
-        src = """from collections import deque
+        src = """from pytra.std.collections import deque
 
 q: deque[int] = deque()
 q.append(1)
@@ -5480,7 +5480,7 @@ print(front)
             self.assertEqual(run.stdout.strip().splitlines(), ["False", "0", "1"])
 
     def test_deque_endops_lower_to_std_deque_cpp_surface(self) -> None:
-        src = """from collections import deque
+        src = """from pytra.std.collections import deque
 
 q: deque[int] = deque()
 q.appendleft(1)
@@ -5499,7 +5499,7 @@ print(back)
         self.assertNotIn("q.pop()", cpp)
 
     def test_deque_endops_untyped_pop_still_lowers_to_valid_cpp_surface(self) -> None:
-        src = """from collections import deque
+        src = """from pytra.std.collections import deque
 
 q: deque[int] = deque()
 q.appendleft(1)
@@ -5518,7 +5518,7 @@ print(back)
         self.assertNotIn("q.pop()", cpp)
 
     def test_deque_endops_builds_and_runs_in_cpp_representative_lane(self) -> None:
-        src = """from collections import deque
+        src = """from pytra.std.collections import deque
 
 q: deque[int] = deque()
 q.appendleft(1)
@@ -5575,7 +5575,7 @@ print(untyped_back)
             self.assertEqual(run.stdout.strip().splitlines(), ["1", "2"])
 
     def test_deque_iterable_lowers_to_std_deque_cpp_surface(self) -> None:
-        src = """from collections import deque
+        src = """from pytra.std.collections import deque
 
 q: deque[int] = deque([1, 2])
 q.extendleft([3, 4])
@@ -5600,7 +5600,7 @@ print(len(q))
         self.assertIn("push_front", cpp)
 
     def test_deque_iterable_builds_and_runs_in_cpp_representative_lane(self) -> None:
-        src = """from collections import deque
+        src = """from pytra.std.collections import deque
 
 q: deque[int] = deque([1, 2])
 q.extendleft([3, 4])
@@ -5656,7 +5656,7 @@ print(q.popleft())
             self.assertEqual(run.stdout.strip().splitlines(), ["4", "3", "1", "2"])
 
     def test_deque_reverse_lowers_to_std_reverse_cpp_surface(self) -> None:
-        src = """from collections import deque
+        src = """from pytra.std.collections import deque
 
 q: deque[int] = deque([1, 2])
 q.reverse()
@@ -5675,7 +5675,7 @@ print(q.popleft())
         self.assertNotIn("q.reverse();", cpp)
 
     def test_deque_reverse_builds_and_runs_in_cpp_representative_lane(self) -> None:
-        src = """from collections import deque
+        src = """from pytra.std.collections import deque
 
 q: deque[int] = deque([1, 2, 3])
 q.reverse()
@@ -5730,7 +5730,7 @@ print(q.popleft())
             self.assertEqual(run.stdout.strip().splitlines(), ["3", "2", "1"])
 
     def test_deque_rotate_lowers_to_std_rotate_cpp_surface(self) -> None:
-        src = """from collections import deque
+        src = """from pytra.std.collections import deque
 
 q: deque[int] = deque([1, 2, 3])
 q.rotate()
@@ -5753,7 +5753,7 @@ print(q.popleft())
         self.assertNotIn("q.rotate(-(1));", cpp)
 
     def test_deque_rotate_builds_and_runs_in_cpp_representative_lane(self) -> None:
-        src = """from collections import deque
+        src = """from pytra.std.collections import deque
 
 q_default: deque[int] = deque([1, 2, 3])
 q_default.rotate()
@@ -5812,7 +5812,7 @@ print(q_neg.popleft())
             self.assertEqual(run.stdout.strip().splitlines(), ["3", "3", "2"])
 
     def test_deque_searchmut_lowers_to_std_algorithm_cpp_surface(self) -> None:
-        src = """from collections import deque
+        src = """from pytra.std.collections import deque
 
 q: deque[int] = deque([1, 2, 1])
 print(q.count(1))
@@ -5834,7 +5834,7 @@ q.remove(1)
         self.assertNotIn("q.remove(1);", cpp)
 
     def test_deque_searchmut_builds_and_runs_in_cpp_representative_lane(self) -> None:
-        src = """from collections import deque
+        src = """from pytra.std.collections import deque
 
 q: deque[int] = deque([1, 2, 1])
 print(q.count(1))
@@ -5889,7 +5889,7 @@ print(q.count(1))
             self.assertEqual(run.stdout.strip().splitlines(), ["2", "2", "1"])
 
     def test_deque_copyindex_lowers_to_std_cpp_surface(self) -> None:
-        src = """from collections import deque
+        src = """from pytra.std.collections import deque
 
 q: deque[int] = deque([1, 2, 1])
 r = q.copy()
@@ -5922,7 +5922,7 @@ print(q.index(1))
         )
 
     def test_deque_copyindex_builds_and_runs_in_cpp_representative_lane(self) -> None:
-        src = """from collections import deque
+        src = """from pytra.std.collections import deque
 
 q: deque[int] = deque([1, 2, 1])
 r: deque[int] = q.copy()
