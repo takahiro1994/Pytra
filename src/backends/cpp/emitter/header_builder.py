@@ -1515,14 +1515,17 @@ def _header_cpp_type_from_east(
         if len(folded) == 1:
             only = folded[0]
             return _header_cpp_type_from_east(only, ref_classes, class_names)
-        # 一般ユニオン（2型以上）→ std::variant<T1, T2, ..., std::monostate>
+        # 一般ユニオン（2型以上）→ tagged struct
         has_none = len(non_none) < len(parts)
-        variant_args: list[str] = [
-            _header_cpp_type_from_east(p, ref_classes, class_names) for p in non_none
-        ]
+        name_parts: list[str] = []
+        for p in non_none:
+            name_parts.append(p.replace("[", "_").replace("]", "").replace(",", "_").replace(" ", ""))
         if has_none:
-            variant_args.append("::std::monostate")
-        return "::std::variant<" + ", ".join(variant_args) + ">"
+            name_parts.append("None")
+        struct_name = "_Union_" + "_".join(name_parts)
+        # struct 定義は _build_tagged_union_struct_lines で生成される想定
+        # header_builder 側では名前だけ返す（定義は alias_lines に積まれる）
+        return struct_name
     if t.startswith("list[") and t.endswith("]"):
         inner = t[5:-1].strip()
         return "list<" + _header_cpp_type_from_east(inner, ref_classes, class_names) + ">"

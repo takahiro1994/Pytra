@@ -30,12 +30,12 @@ class CppTypeTest(unittest.TestCase):
         self.assertEqual(em._cpp_type_text("Any|None"), "object")
         self.assertEqual(em._cpp_type_text("bytes|bytearray|None"), "bytes")
 
-    def test_general_union_emits_std_variant(self) -> None:
+    def test_general_union_emits_tagged_struct(self) -> None:
         em = CppEmitter({"body": []}, {}, emit_main=False)
-        self.assertEqual(em._cpp_type_text("int64|bool"), "::std::variant<int64, bool>")
+        self.assertEqual(em._cpp_type_text("int64|bool"), "_Union_int64_bool")
         self.assertEqual(
             _header_cpp_type_from_east("int64|bool", set(), set()),
-            "::std::variant<int64, bool>",
+            "_Union_int64_bool",
         )
 
     def test_list_type_text_can_switch_to_pyobj_model(self) -> None:
@@ -53,12 +53,12 @@ class CppTypeTest(unittest.TestCase):
             "::std::deque<float64>",
         )
 
-    def test_type_expr_path_emits_general_union_as_variant(self) -> None:
+    def test_type_expr_path_emits_general_union_as_tagged_struct(self) -> None:
         em = CppEmitter({"body": []}, {}, emit_main=False)
         result = em.cpp_type(parse_type_expr_text("int | bool"))
-        self.assertIn("variant", result)
+        self.assertIn("_Union_", result)
         result2 = em.cpp_signature_type(parse_type_expr_text("list[int | bool]"))
-        self.assertIn("variant", result2)
+        self.assertIn("_Union_", result2)
 
 
 if __name__ == "__main__":

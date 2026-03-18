@@ -271,9 +271,9 @@ class East3CppBridgeTest(unittest.TestCase):
         }
         emitter.emit_stmt(stmt)
         text = "\n".join(emitter.lines)
-        self.assertIn("variant", text)
+        self.assertIn("_Union_", text)
 
-    def test_emit_function_accepts_general_union_type_expr_as_variant(self) -> None:
+    def test_emit_function_accepts_general_union_type_expr_as_tagged_struct(self) -> None:
         emitter = CppEmitter({"kind": "Module", "body": [], "meta": {}}, {})
         stmt = {
             "kind": "FunctionDef",
@@ -290,7 +290,7 @@ class East3CppBridgeTest(unittest.TestCase):
         }
         emitter.emit_stmt(stmt)
         text = "\n".join(emitter.lines)
-        self.assertIn("variant", text)
+        self.assertIn("_Union_", text)
 
     def test_emit_stmt_annassign_empty_dict_with_marker_uses_brace_shorthand(self) -> None:
         emitter = CppEmitter({"kind": "Module", "body": [], "meta": {}}, {})

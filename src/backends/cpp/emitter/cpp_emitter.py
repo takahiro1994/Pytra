@@ -261,7 +261,9 @@ class CppEmitter(
         self._type_alias_reverse_map: dict[str, str] = {}
         self._tagged_union_types: dict[str, list[str]] = {}  # name → [non_none_parts]
         self._tagged_union_has_none: dict[str, bool] = {}  # name → has_none
-        self._narrowed_union_vars: dict[str, str] = {}  # var_name → field_name (type narrowing)
+        self._inline_union_structs: dict[str, str] = {}  # east_type → struct_name
+        self._inline_union_struct_lines: list[str] = []  # 生成する struct 定義行
+        self._inline_union_insert_pos: int = -1  # struct 定義を挿入する位置
         self.current_function_return_type: str = ""
         self.current_function_return_abi_mode: str = "default"
         self.current_function_is_generator: bool = False
@@ -1536,6 +1538,8 @@ class CppEmitter(
         for inc in extra_includes:
             self.emit(f"#include \"{inc}\"")
         self.emit("")
+        # inline union struct 定義の挿入位置を記録
+        self._inline_union_insert_pos = len(self.lines)
 
         if self.top_namespace != "":
             self.emit(f"namespace {self.top_namespace} {{")
@@ -1652,6 +1656,9 @@ class CppEmitter(
             self.indent -= 1
             self.emit(f"}}  // namespace {self.top_namespace}")
             self.emit("")
+        # inline union struct 定義を挿入
+        if len(self._inline_union_struct_lines) > 0 and self._inline_union_insert_pos >= 0:
+            self.lines[self._inline_union_insert_pos:self._inline_union_insert_pos] = self._inline_union_struct_lines
         return "\n".join(self.lines)
 
     def _infer_name_assign_type(self, stmt: dict[str, Any], target_node: dict[str, Any]) -> str:
