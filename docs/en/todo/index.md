@@ -6,7 +6,7 @@
   <img alt="Read in Japanese" src="https://img.shields.io/badge/docs-日本語-2563EB?style=flat-square">
 </a>
 
-Last updated: 2026-03-18 (P6-EAST3-LEN-SLICE-NODE-01 completed)
+Last updated: 2026-03-18 (Added P6-EAST3-IS-NONE-INLINE-01 and 3 more tasks)
 
 ## Context Operation Rules
 
@@ -62,3 +62,27 @@ Context: [docs/ja/plans/p6-east3-len-slice-node.md](../../ja/plans/p6-east3-len-
 
 2. [x] [ID: P6-EAST3-LEN-SLICE-NODE-01] Add EAST3 IR nodes for `py_len` / `py_slice`, update the C++ emitter to generate inline expressions, and remove both from `py_runtime.h`.
 - Progress: Completed. py_len moved to base_ops.h; py_slice str variant renamed to py_str_slice (same file); list variants removed (emitter emits py_list_slice_copy directly). truthy_len_expr override generates .empty() check. selfhost mismatches=0. cpp 0.581.3.
+
+#### P6-3: Inline emit for py_is_none
+
+Context: [docs/ja/plans/p6-east3-is-none-inline.md](../../ja/plans/p6-east3-is-none-inline.md)
+
+3. [ ] [ID: P6-EAST3-IS-NONE-INLINE-01] Replace `py_is_none(v)` with type-based inline expressions (`!v.has_value()` / `!v` / `false`) and remove from `py_runtime.h`.
+
+#### P6-4: Inline emit for py_to family
+
+Context: [docs/ja/plans/p6-east3-py-to-inline.md](../../ja/plans/p6-east3-py-to-inline.md)
+
+4. [ ] [ID: P6-EAST3-PY-TO-INLINE-01] Replace `py_to<T>` / `py_to_int64` / `py_to_float64` with `static_cast` / `std::stoll` etc. for type-certain cases and remove from `py_runtime.h`.
+
+#### P6-5: Inline emit for py_to_string
+
+Context: [docs/ja/plans/p6-east3-py-to-string-inline.md](../../ja/plans/p6-east3-py-to-string-inline.md)
+
+5. [ ] [ID: P6-EAST3-PY-TO-STRING-INLINE-01] Replace `py_to_string(v)` with `std::to_string` / identity etc. for type-certain cases and remove from `py_runtime.h`.
+
+#### P6-6: Inline emit for py_at (list/rc variants)
+
+Context: [docs/ja/plans/p6-east3-py-at-inline.md](../../ja/plans/p6-east3-py-at-inline.md)
+
+6. [ ] [ID: P6-EAST3-PY-AT-INLINE-01] Unify `py_at(list_or_rc, idx)` emit to direct `py_list_at_ref` emit and remove the list/rc variants of `py_at` from `py_runtime.h`.
