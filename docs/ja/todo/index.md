@@ -6,7 +6,7 @@
   <img alt="Read in English" src="https://img.shields.io/badge/docs-English-2563EB?style=flat-square">
 </a>
 
-最終更新: 2026-03-18（P0-TAGGED-UNION-TID-UNIFY-01 追加）
+最終更新: 2026-03-18（P0-TAGGED-UNION-CAST-NARROWING-01 追加）
 
 ## 文脈運用ルール
 
@@ -44,6 +44,12 @@
 文脈: [docs/ja/plans/p0-tagged-union-tid-unify.md](../plans/p0-tagged-union-tid-unify.md)
 
 2. [x] [ID: P0-TAGGED-UNION-TID-UNIFY-01] tagged struct の tag をローカル enum から `uint32` (PYTRA_TID) に変更し、isinstance を既存の type_id レンジ方式で統一する。isinstance ガード内の型ナローイング（フィールドアクセス自動挿入）を実装し、json.py を `type JsonVal = ...` で書き直して動作確認する。
+
+#### P0-3: tagged union の型ナローイングを cast() 方式に統一
+
+文脈: [docs/ja/plans/p0-tagged-union-cast-narrowing.md](../plans/p0-tagged-union-cast-narrowing.md)
+
+3. [ ] [ID: P0-TAGGED-UNION-CAST-NARROWING-01] tagged union 変数からの値取り出しを `typing.cast(T, v)` による明示的フィールドアクセスに統一する。isinstance ガードによる暗黙ナローイングを除去し、`cast()` を `v.{T_field}` に変換する emitter パスを実装する。
 
 ### P1: 言語機能追加
 
