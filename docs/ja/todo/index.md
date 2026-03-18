@@ -6,7 +6,7 @@
   <img alt="Read in English" src="https://img.shields.io/badge/docs-English-2563EB?style=flat-square">
 </a>
 
-最終更新: 2026-03-18（P6-EAST3-IS-NONE-INLINE-01 ほか 3 件 追加）
+最終更新: 2026-03-18（P7-SELFHOST-NATIVE-COMPILER-ELIM-01 追加）
 
 ## 文脈運用ルール
 
@@ -86,3 +86,11 @@
 文脈: [docs/ja/plans/p6-east3-py-at-inline.md](../plans/p6-east3-py-at-inline.md)
 
 6. [ ] [ID: P6-EAST3-PY-AT-INLINE-01] `py_at(list_or_rc, idx)` の emit を `py_list_at_ref` 直接 emit に統一し、list/rc 版の `py_at` を `py_runtime.h` から除去する。
+
+### P7: selfhost 完全自立化
+
+#### P7-1: native/compiler/ 完全削除
+
+文脈: [docs/ja/plans/p7-selfhost-native-compiler-elim.md](../plans/p7-selfhost-native-compiler-elim.md)
+
+1. [ ] [ID: P7-SELFHOST-NATIVE-COMPILER-ELIM-01] `src/runtime/cpp/native/compiler/` を完全削除し、selfhost バイナリがホスト Python をシェルアウトなしで動作できるようにする。

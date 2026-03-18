@@ -6,7 +6,7 @@
   <img alt="Read in Japanese" src="https://img.shields.io/badge/docs-日本語-2563EB?style=flat-square">
 </a>
 
-Last updated: 2026-03-18 (Added P6-EAST3-IS-NONE-INLINE-01 and 3 more tasks)
+Last updated: 2026-03-18 (Added P7-SELFHOST-NATIVE-COMPILER-ELIM-01)
 
 ## Context Operation Rules
 
@@ -86,3 +86,11 @@ Context: [docs/ja/plans/p6-east3-py-to-string-inline.md](../../ja/plans/p6-east3
 Context: [docs/ja/plans/p6-east3-py-at-inline.md](../../ja/plans/p6-east3-py-at-inline.md)
 
 6. [ ] [ID: P6-EAST3-PY-AT-INLINE-01] Unify `py_at(list_or_rc, idx)` emit to direct `py_list_at_ref` emit and remove the list/rc variants of `py_at` from `py_runtime.h`.
+
+### P7: Selfhost Full Independence
+
+#### P7-1: Complete deletion of native/compiler/
+
+Context: [docs/ja/plans/p7-selfhost-native-compiler-elim.md](../../ja/plans/p7-selfhost-native-compiler-elim.md)
+
+1. [ ] [ID: P7-SELFHOST-NATIVE-COMPILER-ELIM-01] Completely delete `src/runtime/cpp/native/compiler/` so that the selfhost binary operates without shelling out to host Python.
