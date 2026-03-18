@@ -4,20 +4,31 @@
 #include "runtime/cpp/native/core/py_runtime.h"
 
 #include "runtime/cpp/generated/std/pathlib.h"
-#include "runtime/cpp/native/core/process_runtime.h"
 #include "runtime/cpp/native/core/scope_exit.h"
-
 #include "generated/std/glob.h"
 #include "generated/std/os.h"
 #include "generated/std/os_path.h"
+
+struct _Union_str_Path {
+    pytra_type_id tag;
+    str str_val;
+    Path path_val;
+
+    _Union_str_Path() : tag(PYTRA_TID_STR) {}
+    _Union_str_Path(const str& v) : tag(PYTRA_TID_STR), str_val(v) {}
+    _Union_str_Path(const Path& v) : tag(Path::PYTRA_TYPE_ID), path_val(v) {}
+};
 
 namespace pytra::std::pathlib {
 
     /* Pure Python Path helper compatible with a subset of pathlib.Path. */
     
 
-    Path::Path(const str& value) {
-            this->_value = value;
+    Path::Path(const _Union_str_Path& value) {
+            if (false)
+                this->_value = cast(Path, value)._value;
+            else
+                this->_value = cast(str, value);
     }
 
     str Path::__str__() const {
@@ -32,8 +43,10 @@ namespace pytra::std::pathlib {
             return this->_value;
     }
 
-    Path Path::__truediv__(const str& rhs) const {
-            return Path(pytra::std::os_path::join(this->_value, rhs));
+    Path Path::__truediv__(const _Union_str_Path& rhs) const {
+            if (false)
+                return Path(pytra::std::os_path::join(this->_value, cast(Path, rhs)._value));
+            return Path(pytra::std::os_path::join(this->_value, cast(str, rhs)));
     }
 
     Path Path::parent() const {

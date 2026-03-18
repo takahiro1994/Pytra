@@ -14,13 +14,11 @@ namespace pytra::std::pathlib {
 struct Path;
 
     struct Path {
-        str _value;
-        
-        Path(const str& value);
+        Path(const _Union_str_Path& value);
         str __str__() const;
         str __repr__() const;
         str __fspath__() const;
-        Path __truediv__(const str& rhs) const;
+        Path __truediv__(const _Union_str_Path& rhs) const;
         Path parent() const;
         rc<list<Path>> parents() const;
         str name() const;

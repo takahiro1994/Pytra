@@ -39,7 +39,13 @@
 
 #### P0-3: パーサーの型エイリアス展開を抑止
 
-2. [ ] [ID: P0-TYPE-ALIAS-NO-EXPAND-01] EAST1 パーサーが `type X = T` で登録した型エイリアスを `_sh_ann_to_type` で展開しないようにする。`v: JsonVal` の `resolved_type` はエイリアス名 `"JsonVal"` のまま EAST IR に残す。P1-JSON-TAGGED-UNION-REWRITE-01 のブロッカー。 引数型注釈等の inline union（`str | Path` 等）を `std::variant` ではなく tagged struct として emit する。名前は `_Union_` + メンバ型名で自動生成し、同一 union 型は同一 struct を再利用する。pathlib.py の `str | Path` 対応はこのタスク完了後に実施する。
+2. [ ] [ID: P0-TYPE-ALIAS-NO-EXPAND-01] EAST1 パーサーが型エイリアスを展開しないようにする。P1 ブロッカー。
+
+#### P0-4: pathlib.Path の str | Path 対応
+
+文脈: [docs/ja/plans/p0-pathlib-str-path-union.md](../plans/p0-pathlib-str-path-union.md)
+
+3. [x] [ID: P0-PATHLIB-STR-PATH-UNION-01] `pathlib.Path.__init__` / `__truediv__` を `str | Path` に変更し、`Path(other_path)` / `path1 / path2` を受け付けるようにする。 EAST1 パーサーが `type X = T` で登録した型エイリアスを `_sh_ann_to_type` で展開しないようにする。`v: JsonVal` の `resolved_type` はエイリアス名 `"JsonVal"` のまま EAST IR に残す。P1-JSON-TAGGED-UNION-REWRITE-01 のブロッカー。 引数型注釈等の inline union（`str | Path` 等）を `std::variant` ではなく tagged struct として emit する。名前は `_Union_` + メンバ型名で自動生成し、同一 union 型は同一 struct を再利用する。pathlib.py の `str | Path` 対応はこのタスク完了後に実施する。
 
 ### P1: 言語機能追加
 
