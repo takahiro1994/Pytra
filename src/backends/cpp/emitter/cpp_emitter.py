@@ -2715,7 +2715,7 @@ class CppEmitter(
         idx_t0 = self.get_expr_type(node.get("slice"))
         idx_t = idx_t0 if isinstance(idx_t0, str) else ""
         # resolved_type が int64 と確定している場合は identity cast を省略する
-        idx_lval_as_int64 = idx if idx_t == "int64" else f"static_cast<int64>({idx})"
+        idx_lval_as_int64 = idx if idx_t == "int64" else f"int64({idx})"
         if val_ty.startswith("dict["):
             idx = self._coerce_dict_key_expr(node.get("value"), idx, node.get("slice"))
             return f"{val}[{idx}]"
@@ -3650,7 +3650,7 @@ class CppEmitter(
             return "true" if negated else "false"
         if val_t == "object":
             if negated:
-                return f"static_cast<bool>({base})"
+                return f"bool({base})"
             return f"!{base}" if self._is_identifier_expr(base) else f"!({base})"
         prefix = "!" if negated else ""
         return f"{prefix}py_is_none({base})"
@@ -3896,14 +3896,14 @@ class CppEmitter(
             val_ty_norm = self.normalize_type_name(self.infer_rendered_arg_type(val, val_ty_norm, self.declared_var_types))
         if val_ty_norm.startswith("list[") and val_ty_norm.endswith("]"):
             if self._uses_pyobj_ref_first_list_lvalue_expr(val_node):
-                return f"static_cast<int64>(rc_list_ref({val}).size())"
+                return f"int64(rc_list_ref({val}).size())"
             if self._is_identifier_expr(val):
-                return f"static_cast<int64>({val}.size())"
-            return f"static_cast<int64>(({val}).size())"
+                return f"int64({val}.size())"
+            return f"int64(({val}).size())"
         # str / bytes など
         if self._is_identifier_expr(val):
-            return f"static_cast<int64>({val}.size())"
-        return f"static_cast<int64>(({val}).size())"
+            return f"int64({val}.size())"
+        return f"int64(({val}).size())"
 
     def _render_subscript_expr(self, expr: dict[str, Any]) -> str:
         """Subscript/Slice 式を C++ 式へ変換する。"""
@@ -3940,7 +3940,7 @@ class CppEmitter(
             "uint64",
         }
         # resolved_type が int64 と確定している場合は identity cast を省略する
-        idx_as_int64 = idx if idx_ty == "int64" else f"static_cast<int64>({idx})"
+        idx_as_int64 = idx if idx_ty == "int64" else f"int64({idx})"
         if val_ty.startswith("dict["):
             idx = self._coerce_dict_key_expr(expr.get("value"), idx, sl)
             owner_tmp = self.next_tmp("__dict")
@@ -4367,12 +4367,12 @@ class CppEmitter(
             non_none, _ = self.split_union_non_none(value_t)
             if len(non_none) >= 2:
                 return f"py_variant_to_bool({value_expr})"
-        # 算術型確定ケース → static_cast<bool>
+        # 算術型確定ケース → bool(x)
         _arith_bool = {"bool", "int8", "uint8", "int16", "uint16", "int32", "uint32", "int64", "uint64", "float32", "float64"}
         if value_t in _arith_bool:
             if value_t == "bool":
                 return value_expr
-            return f"static_cast<bool>({value_expr})"
+            return f"bool({value_expr})"
         return f"py_to<bool>({value_expr})"
 
     def _render_expr_kind_obj_len(self, expr: Any, expr_d: dict[str, Any]) -> str:
@@ -4579,7 +4579,7 @@ class CppEmitter(
                         f"return rc_list_ref({list_tmp}).pop(); "
                         f"}}())"
                     )
-                index_expr = f"static_cast<int64>({index_expr})"
+                index_expr = f"int64({index_expr})"
                 if self._uses_pyobj_ref_first_list_lvalue_expr(owner_node):
                     return f"{list_ref_expr}.pop({index_expr})"
                 list_tmp = self.next_tmp("__list")
@@ -4597,7 +4597,7 @@ class CppEmitter(
                 index_expr = self.render_expr(index_node)
                 if index_expr in {"", "/* none */"}:
                     return f"{list_ref_expr}.pop()"
-                return f"{list_ref_expr}.pop(static_cast<int64>({index_expr}))"
+                return f"{list_ref_expr}.pop(int64({index_expr}))"
             if not has_index:
                 return f"{owner_expr}.pop()"
             index_node = expr_d.get("index")
@@ -4777,11 +4777,11 @@ class CppEmitter(
             if not has_start:
                 return f"{fn_name}({owner_expr}, {needle_expr})"
             start_expr = self.render_expr(expr_d.get("start"))
-            start_cast = f"static_cast<int64>({start_expr})"
+            start_cast = f"int64({start_expr})"
             end_expr = self._render_container_size_expr(owner_expr)
             if self.any_dict_has(expr_d, "end"):
                 end_raw = self.render_expr(expr_d.get("end"))
-                end_expr = f"static_cast<int64>({end_raw})"
+                end_expr = f"int64({end_raw})"
             sliced = f"py_str_slice({owner_expr}, {start_cast}, {end_expr})"
             return f"{fn_name}({sliced}, {needle_expr})"
         if kind == "StrFindOp":

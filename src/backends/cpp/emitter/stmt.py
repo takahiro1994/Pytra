@@ -1651,7 +1651,7 @@ class CppStatementEmitter:
                 start_expr = self.render_expr(args[1])
                 if start_expr == "":
                     return ""
-                return f"py_enumerate({src_expr}, static_cast<int64>({start_expr}))"
+                return f"py_enumerate({src_expr}, int64({start_expr}))"
             return f"py_enumerate({src_expr})"
         if not self._forcore_type_has_list_of(src_t, elem_t):
             return ""
@@ -1662,7 +1662,7 @@ class CppStatementEmitter:
             start_expr = self.render_expr(args[1])
             if start_expr == "":
                 return ""
-            return f"py_enumerate_list_as<{elem_cpp_t}>({src_expr}, static_cast<int64>({start_expr}))"
+            return f"py_enumerate_list_as<{elem_cpp_t}>({src_expr}, int64({start_expr}))"
         return f"py_enumerate_list_as<{elem_cpp_t}>({src_expr})"
 
     def _render_forcore_typed_reversed_iter_expr(self, iter_expr: dict[str, Any], iter_item_t: str) -> str:

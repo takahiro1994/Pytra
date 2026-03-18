@@ -46,7 +46,7 @@ class CppExpressionEmitter:
         cast_cpp = self._cpp_type_text(norm_t)
         if cast_cpp in {"", "auto"}:
             return rendered_expr
-        return f"static_cast<{cast_cpp}>({rendered_expr})"
+        return f"{cast_cpp}({rendered_expr})"
 
     def render_to_string(self, expr: Any) -> str:
         """式を文字列化する（型に応じて最適な変換関数を選ぶ）。"""

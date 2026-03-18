@@ -138,8 +138,8 @@ class CppBinaryOperatorEmitter:
                 return f"{left} / {right}"
             _arith = {"int8", "uint8", "int16", "uint16", "int32", "uint32", "int64", "uint64", "float32", "float64", "bool"}
             if left_t in _arith and right_t in _arith:
-                # 型確定済み算術型: py_div(a,b) = static_cast<float64>(a) / static_cast<float64>(b)
-                return f"static_cast<float64>({left}) / static_cast<float64>({right})"
+                # 型確定済み算術型: py_div(a,b) = float64(a) / float64(b)
+                return f"float64({left}) / float64({right})"
             return f"py_div({left}, {right})"
         if op_name == "Pow":
             left_pt_raw = self.get_expr_type(expr.get("left"))
@@ -147,8 +147,8 @@ class CppBinaryOperatorEmitter:
             left_pt = self.normalize_type_name(left_pt_raw if isinstance(left_pt_raw, str) else "")
             right_pt = self.normalize_type_name(right_pt_raw if isinstance(right_pt_raw, str) else "")
             _arith_pt = {"int8", "uint8", "int16", "uint16", "int32", "uint32", "int64", "uint64", "float32", "float64", "bool"}
-            lf = f"static_cast<float64>({left})" if left_pt in _arith_pt else f"py_to_float64({left})"
-            rf = f"static_cast<float64>({right})" if right_pt in _arith_pt else f"py_to_float64({right})"
+            lf = f"float64({left})" if left_pt in _arith_pt else f"py_to_float64({left})"
+            rf = f"float64({right})" if right_pt in _arith_pt else f"py_to_float64({right})"
             return f"::std::pow({lf}, {rf})"
         if op_name == "FloorDiv":
             if self.floor_div_mode == "python":

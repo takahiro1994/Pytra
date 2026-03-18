@@ -681,7 +681,7 @@ class CppCallEmitter:
             f"auto&& {source_tmp} = {owner_expr}; "
             f"auto {iter_tmp} = ::std::find({source_tmp}.begin(), {source_tmp}.end(), {index_expr}); "
             f"if ({iter_tmp} == {source_tmp}.end()) throw ValueError(\"deque.index missing value\"); "
-            f"return static_cast<int64>({iter_tmp} - {source_tmp}.begin()); "
+            f"return int64({iter_tmp} - {source_tmp}.begin()); "
             "}())"
         )
 
@@ -697,7 +697,7 @@ class CppCallEmitter:
         arg0_t = self.normalize_type_name(arg0_t_raw) if isinstance(arg0_t_raw, str) else ""
         inner_t = deque_owner_t[6:-1].strip()
         if inner_t == "uint8":
-            a0 = f"static_cast<uint8>(static_cast<int64>({a0}))"
+            a0 = f"uint8({a0})"
         elif self.is_any_like_type(inner_t):
             if not self.is_boxed_object_expr(a0):
                 arg0_node_d = self.any_to_dict_or_empty(value_node)
@@ -989,7 +989,7 @@ class CppCallEmitter:
             if attr == "count" and len(args) == 1 and len(kw) == 0:
                 value_node = arg_nodes[0] if len(arg_nodes) > 0 else {}
                 count_expr = self._coerce_typed_deque_item_expr(owner_t, args[0], value_node)
-                return f"static_cast<int64>(::std::count({owner_expr}.begin(), {owner_expr}.end(), {count_expr}))"
+                return f"int64(::std::count({owner_expr}.begin(), {owner_expr}.end(), {count_expr}))"
             if attr == "index" and len(args) == 1 and len(kw) == 0:
                 value_node = arg_nodes[0] if len(arg_nodes) > 0 else {}
                 return self._render_typed_deque_index_call(owner_t, owner_expr, args[0], value_node)
@@ -1017,8 +1017,8 @@ class CppCallEmitter:
                 return (
                     "([&]() -> decltype(nullptr) { "
                     f"if (!{owner_expr}.empty()) {{ "
-                    f"int64 {rotate_tmp} = static_cast<int64>({rotate_expr}); "
-                    f"int64 {size_tmp} = static_cast<int64>({owner_expr}.size()); "
+                    f"int64 {rotate_tmp} = int64({rotate_expr}); "
+                    f"int64 {size_tmp} = int64({owner_expr}.size()); "
                     f"{rotate_tmp} %= {size_tmp}; "
                     f"if ({rotate_tmp} < 0) {rotate_tmp} += {size_tmp}; "
                     f"if ({rotate_tmp} != 0) {{ "
