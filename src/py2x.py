@@ -57,15 +57,18 @@ def _fatal(msg: str) -> None:
 
 def _print_help() -> None:
     print(
-        "usage: py2x.py INPUT.py --target {cpp,rs,cs,js,ts,go,java,kotlin,swift,ruby,lua,scala,php,nim} "
-        "[-o OUTPUT] [--parser-backend self_hosted] [--east-stage 3] "
-        "[--object-dispatch-mode {native,type_id}] [--east3-opt-level {0,1,2}] "
-        "[--east3-opt-pass SPEC] [--dump-east3-before-opt PATH] "
-        "[--dump-east3-after-opt PATH] [--dump-east3-opt-trace PATH] [--dump-east3-dir DIR] [--link-only] "
-        "[--from-link-output] [--output-dir DIR] "
-        "[--lower-option key=value] [--optimizer-option key=value] [--emitter-option key=value]\n"
-        "note: for --target cpp, py2cpp compatibility flags (e.g. --multi-file, --header-output, "
-        "--emit-runtime-cpp, --dump-deps, --dump-options, -O*) are also accepted."
+        "usage:\n"
+        "  py2x.py compile INPUT.py [-o OUTPUT.east]                    Compile .py to .east (EAST3 JSON)\n"
+        "  py2x.py link INPUT.east [INPUT2.east ...] --target TARGET [-o OUTPUT]  Link .east files to target language\n"
+        "  py2x.py INPUT.py --target TARGET [-o OUTPUT]                 Legacy single-step mode\n"
+        "\n"
+        "options:\n"
+        "  --target {cpp,rs,cs,js,ts,go,java,kotlin,swift,ruby,lua,scala,php,nim}\n"
+        "  --east3-opt-level {0,1,2}  --east3-opt-pass SPEC\n"
+        "  --dump-east3-dir DIR  --link-only  --from-link-output  --output-dir DIR\n"
+        "  --lower-option key=value  --optimizer-option key=value  --emitter-option key=value\n"
+        "\n"
+        "note: for --target cpp, py2cpp compatibility flags are also accepted."
     )
 
 
@@ -346,12 +349,121 @@ def _entry_module_east_doc(program: LinkedProgram) -> dict[str, object]:
     raise RuntimeError("linked program entry module not found")
 
 
+def _compile_to_east(argv: list[str]) -> int:
+    """pytra compile: .py → .east (EAST3 JSON)"""
+    parser = argparse.ArgumentParser(description="Compile .py to .east (EAST3 JSON)")
+    parser.add_argument("input", help="Input .py file")
+    parser.add_argument("-o", "--output", default="", help="Output .east file (default: INPUT.east)")
+    parser.add_argument("--east3-opt-level", default="1", help="EAST3 optimization level")
+    parser.add_argument("--east3-opt-pass", default="", help="EAST3 optimization pass spec")
+    args = parser.parse_args(argv)
+    if not isinstance(args, dict):
+        raise RuntimeError("argparse result must be dict")
+
+    input_path = Path(_arg_get_str(args, "input"))
+    output_text = _arg_get_str(args, "output")
+    if output_text == "":
+        output_text = str(input_path).removesuffix(".py") + ".east"
+    output_path = Path(output_text)
+    east3_opt_level = _arg_get_str(args, "east3_opt_level", "1")
+    east3_opt_pass = _arg_get_str(args, "east3_opt_pass")
+
+    east_doc = export_compiler_root_document(
+        load_east3_document_typed(
+            input_path,
+            parser_backend="self_hosted",
+            object_dispatch_mode="native",
+            east3_opt_level=east3_opt_level,
+            east3_opt_pass=east3_opt_pass,
+            dump_east3_before_opt="",
+            dump_east3_after_opt="",
+            dump_east3_opt_trace="",
+            target_lang="",
+        )
+    )
+    import json as _json
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(
+        _json.dumps(east_doc, ensure_ascii=False, indent=2, default=str) + "\n",
+        encoding="utf-8",
+    )
+    print("compiled: " + str(output_path))
+    return 0
+
+
+def _link_east_files(argv: list[str]) -> int:
+    """pytra link: .east 群 → ターゲット言語。
+    .east ファイルから link-input bundle を構築し、既存の linked program 経路で emit する。
+    """
+    # 引数を手動パース（最初の .east ファイル群、--target、-o）
+    input_paths: list[Path] = []
+    target = "cpp"
+    output_text = ""
+    i = 0
+    while i < len(argv):
+        tok = argv[i]
+        if tok == "--target" and i + 1 < len(argv):
+            target = argv[i + 1]
+            i += 2
+            continue
+        if tok == "-o" and i + 1 < len(argv):
+            output_text = argv[i + 1]
+            i += 2
+            continue
+        if tok.endswith(".east") or tok.endswith(".json"):
+            input_paths.append(Path(tok))
+        i += 1
+    if len(input_paths) == 0:
+        _fatal("no .east input files specified")
+
+    # 各 .east を読み込んで module_map を構築
+    import json as _json
+    module_map: dict[str, dict[str, object]] = {}
+    entry_source_path: str = ""
+    for east_path in input_paths:
+        east_text = east_path.read_text(encoding="utf-8")
+        east_doc = _json.loads(east_text)
+        source_path = east_doc.get("source_path", "")
+        key = source_path if isinstance(source_path, str) and source_path != "" else str(east_path.resolve())
+        module_map[key] = east_doc
+        if entry_source_path == "":
+            entry_source_path = key
+    entry_path = Path(entry_source_path)
+
+    program = build_linked_program_from_module_map(
+        entry_path,
+        module_map,
+        target=target,
+        dispatch_mode="native",
+        options={},
+    )
+
+    # link-output を書き出し、ir2lang 経由で emit（C++ の場合）
+    import tempfile
+    with tempfile.TemporaryDirectory() as tmpdir:
+        link_output_dir = Path(tmpdir) / "linked"
+        link_output_path, linked_paths = write_link_output_bundle(
+            link_output_dir, optimize_linked_program(program),
+        )
+        # ir2lang に link-output.json を渡して emit
+        forwarded = [str(link_output_path), "--target", target]
+        if output_text != "":
+            forwarded.extend(["-o", output_text])
+        return _invoke_ir2lang_main(forwarded)
+
+
 def main() -> int:
     argv = sys.argv[1:] if isinstance(sys.argv, list) else []
     for arg in argv:
         if arg == "-h" or arg == "--help":
             _print_help()
             return 0
+
+    # サブコマンド: compile / link
+    if len(argv) > 0 and argv[0] == "compile":
+        return _compile_to_east(argv[1:])
+    if len(argv) > 0 and argv[0] == "link":
+        return _link_east_files(argv[1:])
 
     cleaned_argv, layer_option_items = _extract_layer_options(argv)
     target_hint = _peek_target(cleaned_argv)

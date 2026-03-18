@@ -101,3 +101,4 @@ linker がクラスツリー全体を見て DFS オーダーで `type_id` を割
 ## 決定ログ
 
 - 2026-03-19: ユーザー提案。gcc の compile/link 分離と同じモデルを採用。.east は EAST3 JSON。type_id は linker で DFS 確定。
+- 2026-03-19: 実装完了。`pytra compile` で .py → .east (EAST3 JSON)、`pytra link` で .east → ターゲット言語。link は既存の linked program + ir2lang 経路を使用。18 sample compile+link 成功。type_id のlinker確定は後続タスク。
