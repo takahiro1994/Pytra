@@ -37,7 +37,11 @@
 
 文脈: [docs/ja/plans/p0-pytra-import-unify.md](../plans/p0-pytra-import-unify.md)
 
-1. [x] [ID: P0-PYTRA-IMPORT-UNIFY-01] `pytra.typing` / `pytra.enum` / `pytra.dataclasses` ダミーモジュールを作成し、Python 標準モジュールの import を `pytra.*` 経由に統一する。変換器はこれらの import を無視する。
+1. [x] [ID: P0-PYTRA-IMPORT-UNIFY-01]
+
+#### P0-2: inline union を tagged struct に統一
+
+2. [ ] [ID: P0-INLINE-UNION-TAGGED-STRUCT-01] 引数型注釈等の inline union（`str | Path` 等）を `std::variant` ではなく tagged struct として emit する。名前は `_Union_` + メンバ型名で自動生成し、同一 union 型は同一 struct を再利用する。pathlib.py の `str | Path` 対応はこのタスク完了後に実施する。 `pytra.typing` / `pytra.enum` / `pytra.dataclasses` ダミーモジュールを作成し、Python 標準モジュールの import を `pytra.*` 経由に統一する。変換器はこれらの import を無視する。
 
 ### P6: ランタイム最適化
 
