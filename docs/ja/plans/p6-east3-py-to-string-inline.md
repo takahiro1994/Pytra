@@ -42,3 +42,4 @@
 ## 決定ログ
 
 - 2026-03-18: py_len と同一パターン（型確定でインライン化、object 境界は fallback 維持）で起票。str() ビルトインの emit 路線整理。
+- 2026-03-18: 実装完了。render_to_string() で算術型→std::to_string、str→identity、bool→三項演算子、Path→__str__() が既にインライン化済み。py_to_string を py_runtime.h から base_ops.h へ移動。object 境界の fallback は維持。241 test pass。

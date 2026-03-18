@@ -58,46 +58,7 @@ inline str str::join(const list<str>& parts) const {
 // py_len / py_str_slice（旧 py_slice の str 版）は native/built_in/base_ops.h へ移動済み。
 #include "runtime/cpp/native/built_in/base_ops.h"
 
-// Python 組み込み相当の基本ユーティリティ（文字列化）。
-template <class T>
-static inline ::std::string py_to_string(const T& v) {
-    ::std::ostringstream oss;
-    oss << v;
-    return oss.str();
-}
-
-static inline ::std::string py_to_string(const ::std::string& v) {
-    return v;
-}
-
-static inline ::std::string py_to_string(const ::std::exception& v) {
-    return ::std::string(v.what());
-}
-
-static inline ::std::string py_to_string(uint8 v) {
-    return ::std::to_string(static_cast<int>(v));
-}
-
-static inline ::std::string py_to_string(int8 v) {
-    return ::std::to_string(static_cast<int>(v));
-}
-
-static inline ::std::string py_to_string(const char* v) {
-    return ::std::string(v);
-}
-
-template <class T>
-static inline ::std::string py_to_string(const ::std::optional<T>& v) {
-    if (!v.has_value()) return "None";
-    return py_to_string(*v);
-}
-
-// object (= rc<RcObject>) は py_str() を持たないため "<object>" を返す。
-// py_assert_eq 等のデバッグ用途に限定。
-static inline ::std::string py_to_string(const object& v) {
-    if (!v) return "None";
-    return "<object>";
-}
+// py_to_string は base_ops.h へ移動済み（P6-EAST3-PY-TO-STRING-INLINE-01）。
 
 template <class T>
 static inline T py_to(const T& v);

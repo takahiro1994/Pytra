@@ -51,4 +51,46 @@ static inline str py_str_slice(const str& v, int64 lo, int64 up) {
     return v.substr(static_cast<::std::size_t>(lo), static_cast<::std::size_t>(up - lo));
 }
 
+// py_to_string: 文字列化。
+// py_runtime.h から移動（P6-EAST3-PY-TO-STRING-INLINE-01）。
+// emitter は型確定ケースで ::std::to_string 等にインライン化済み。
+// object 境界の fallback として残す。
+template <class T>
+static inline ::std::string py_to_string(const T& v) {
+    ::std::ostringstream oss;
+    oss << v;
+    return oss.str();
+}
+
+static inline ::std::string py_to_string(const ::std::string& v) {
+    return v;
+}
+
+static inline ::std::string py_to_string(const ::std::exception& v) {
+    return ::std::string(v.what());
+}
+
+static inline ::std::string py_to_string(uint8 v) {
+    return ::std::to_string(static_cast<int>(v));
+}
+
+static inline ::std::string py_to_string(int8 v) {
+    return ::std::to_string(static_cast<int>(v));
+}
+
+static inline ::std::string py_to_string(const char* v) {
+    return ::std::string(v);
+}
+
+template <class T>
+static inline ::std::string py_to_string(const ::std::optional<T>& v) {
+    if (!v.has_value()) return "None";
+    return py_to_string(*v);
+}
+
+static inline ::std::string py_to_string(const object& v) {
+    if (!v) return "None";
+    return "<object>";
+}
+
 #endif  // PYTRA_NATIVE_BUILT_IN_BASE_OPS_H

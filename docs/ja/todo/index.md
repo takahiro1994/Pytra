@@ -123,7 +123,7 @@
 
 文脈: [docs/ja/plans/p6-east3-py-to-string-inline.md](../plans/p6-east3-py-to-string-inline.md)
 
-7. [ ] [ID: P6-EAST3-PY-TO-STRING-INLINE-01] `py_to_string(v)` を型確定ケースで `std::to_string` / identity 等にインライン置き換えし、`py_runtime.h` から除去する。
+7. [x] [ID: P6-EAST3-PY-TO-STRING-INLINE-01] `py_to_string(v)` を型確定ケースで `std::to_string` / identity 等にインライン置き換えし、`py_runtime.h` から除去する。
 
 #### P6-6: py_at（list/rc 版）のインライン emit 化
 
