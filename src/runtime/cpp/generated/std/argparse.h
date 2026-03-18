@@ -13,7 +13,18 @@ struct Namespace;
 struct _ArgSpec;
 struct ArgumentParser;
 
-using ArgValue = ::std::variant<str, bool, ::std::monostate>;
+struct ArgValue {
+    enum Tag { TAG_STR, TAG_BOOL, TAG_NONE };
+    Tag tag;
+    str str_val;
+    bool bool_val;
+
+    ArgValue() : tag(TAG_NONE) {}
+    ArgValue(const str& v) : tag(TAG_STR), str_val(v) {}
+    ArgValue(Tag, bool v) : tag(TAG_BOOL), bool_val(v) {}
+    ArgValue(::std::monostate) : tag(TAG_NONE) {}
+};
+
 
     struct Namespace {
         dict<str, ArgValue> values;
@@ -30,7 +41,7 @@ using ArgValue = ::std::variant<str, bool, ::std::monostate>;
         bool is_optional;
         str dest;
         
-        _ArgSpec(const rc<list<str>>& names, const str& action = "", const rc<list<str>>& choices = rc_list_from_value(list<str>{}), const ArgValue& py_default = ::std::monostate{}, const str& help_text = "");
+        _ArgSpec(const rc<list<str>>& names, const str& action = "", const rc<list<str>>& choices = rc_list_from_value(list<str>{}), const ArgValue& py_default = ArgValue(), const str& help_text = "");
     };
 
     struct ArgumentParser {
@@ -38,7 +49,7 @@ using ArgValue = ::std::variant<str, bool, ::std::monostate>;
         rc<list<_ArgSpec>> _specs;
         
         ArgumentParser(const str& description = "");
-        void add_argument(const str& name0, const str& name1 = "", const str& name2 = "", const str& name3 = "", const str& help = "", const str& action = "", const rc<list<str>>& choices = rc_list_from_value(list<str>{}), const ArgValue& py_default = ::std::monostate{});
+        void add_argument(const str& name0, const str& name1 = "", const str& name2 = "", const str& name3 = "", const str& help = "", const str& action = "", const rc<list<str>>& choices = rc_list_from_value(list<str>{}), const ArgValue& py_default = ArgValue());
         void _fail(const str& msg) const;
         dict<str, ArgValue> parse_args(const ::std::optional<rc<list<str>>>& argv = ::std::nullopt) const;
     };

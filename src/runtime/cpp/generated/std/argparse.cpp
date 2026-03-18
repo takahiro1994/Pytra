@@ -15,8 +15,6 @@ namespace pytra::std::argparse {
 
     /* Minimal pure-Python argparse subset for selfhost usage. */
     
-    using ArgValue = ::std::variant<str, bool, ::std::monostate>;
-    
 
     Namespace::Namespace(const ::std::optional<dict<str, ArgValue>>& values) {
             if (!values.has_value()) {
@@ -95,11 +93,11 @@ namespace pytra::std::argparse {
             dict<str, ArgValue> values = dict<str, ArgValue>{};
             for (_ArgSpec s : rc_list_ref(this->_specs)) {
                 if (s.action == "store_true") {
-                    values[s.dest] = (!::std::holds_alternative<::std::monostate>(s.py_default) ? py_variant_to_bool(s.py_default) : false);
-                } else if (!::std::holds_alternative<::std::monostate>(s.py_default)) {
+                    values[s.dest] = (s.py_default.tag != ArgValue::TAG_NONE ? s.py_default.tag != ArgValue::TAG_NONE : false);
+                } else if (s.py_default.tag != ArgValue::TAG_NONE) {
                     values[s.dest] = s.py_default;
                 } else {
-                    values[s.dest] = ::std::monostate{};
+                    values[s.dest] = ArgValue();
                 }
             }
             int64 pos_i = 0;
