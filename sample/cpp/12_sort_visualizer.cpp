@@ -11,15 +11,15 @@
 bytes render(const rc<list<int64>>& values, int64 w, int64 h) {
     bytearray frame = bytearray(w * h);
     int64 n = (rc_list_ref(values)).size();
-    float64 bar_w = static_cast<float64>(w) / static_cast<float64>(n);
-    float64 __hoisted_cast_1 = static_cast<float64>(n);
-    float64 __hoisted_cast_2 = static_cast<float64>(h);
+    float64 bar_w = float64(w) / float64(n);
+    float64 __hoisted_cast_1 = float64(n);
+    float64 __hoisted_cast_2 = float64(h);
     for (int64 i = 0; i < n; ++i) {
-        int64 x0 = static_cast<int64>(static_cast<float64>(i) * bar_w);
-        int64 x1 = static_cast<int64>((static_cast<float64>(i + 1)) * bar_w);
+        int64 x0 = int64(float64(i) * bar_w);
+        int64 x1 = int64((float64(i + 1)) * bar_w);
         if (x1 <= x0)
             x1 = x0 + 1;
-        int64 bh = static_cast<int64>((static_cast<float64>(py_list_at_ref(rc_list_ref(values), i)) / __hoisted_cast_1) * __hoisted_cast_2);
+        int64 bh = int64((float64(py_list_at_ref(rc_list_ref(values), i)) / __hoisted_cast_1) * __hoisted_cast_2);
         int64 y = h - bh;
         auto __for_start_1 = y;
         for (int64 y = __for_start_1; y < h; ++y) {

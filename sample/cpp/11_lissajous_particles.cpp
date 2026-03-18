@@ -16,9 +16,9 @@ bytes color_palette() {
         int64 r = i;
         int64 g = i * 3 % 256;
         int64 b = 255 - i;
-        p.append(static_cast<uint8>(static_cast<int64>(r)));
-        p.append(static_cast<uint8>(static_cast<int64>(g)));
-        p.append(static_cast<uint8>(static_cast<int64>(b)));
+        p.append(uint8(r));
+        p.append(uint8(g));
+        p.append(uint8(b));
     }
     return p;
 }
@@ -35,12 +35,12 @@ void run_11_lissajous_particles() {
     
     for (int64 t = 0; t < frames_n; ++t) {
         bytearray frame = bytearray(w * h);
-        float64 __hoisted_cast_1 = static_cast<float64>(t);
+        float64 __hoisted_cast_1 = float64(t);
         
         for (int64 p = 0; p < particles; ++p) {
-            float64 phase = static_cast<float64>(p) * 0.261799;
-            int64 x = static_cast<int64>(static_cast<float64>(w) * 0.5 + static_cast<float64>(w) * 0.38 * pytra::std::math::sin(0.11 * __hoisted_cast_1 + phase * 2.0));
-            int64 y = static_cast<int64>(static_cast<float64>(h) * 0.5 + static_cast<float64>(h) * 0.38 * pytra::std::math::sin(0.17 * __hoisted_cast_1 + phase * 3.0));
+            float64 phase = float64(p) * 0.261799;
+            int64 x = int64(float64(w) * 0.5 + float64(w) * 0.38 * pytra::std::math::sin(0.11 * __hoisted_cast_1 + phase * 2.0));
+            int64 y = int64(float64(h) * 0.5 + float64(h) * 0.38 * pytra::std::math::sin(0.17 * __hoisted_cast_1 + phase * 3.0));
             int64 color = 30 + p * 9 % 220;
             
             for (int64 dy = -(2); dy < 3; ++dy) {
@@ -52,9 +52,9 @@ void run_11_lissajous_particles() {
                         if (d2 <= 4) {
                             int64 idx = yy * w + xx;
                             int64 v = color - d2 * 20;
-                            v = ::std::max<int64>(static_cast<int64>(0), static_cast<int64>(v));
+                            v = ::std::max<int64>(0, v);
                             if (v > frame[idx])
-                                frame[idx] = uint8(static_cast<int64>(v));
+                                frame[idx] = uint8(v);
                         }
                     }
                 }

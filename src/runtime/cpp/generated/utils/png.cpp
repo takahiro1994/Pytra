@@ -19,7 +19,7 @@ void _png_append_list(list<int64>& dst, const list<int64>& src) {
     int64 i = 0;
     int64 n = src.size();
     while (i < n) {
-        dst.append(int64(src[i]));
+        dst.append(src[i]);
         i++;
     }
 }
@@ -79,7 +79,7 @@ list<int64> _zlib_deflate_store(const list<int64>& data) {
         int64 i = pos;
         int64 end = pos + chunk_len;
         while (i < end) {
-            out.append(int64(data[i]));
+            out.append(data[i]);
             i++;
         }
         pos += chunk_len;
@@ -104,7 +104,7 @@ list<int64> _chunk(const list<int64>& chunk_type, const list<int64>& data) {
 void write_rgb_png(const str& path, int64 width, int64 height, const bytes& pixels) {
     list<int64> raw = {};
     for (uint8 b : pixels) {
-        raw.append(int64(static_cast<int64>(b)));
+        raw.append(b);
     }
     int64 expected = width * height * 3;
     if (raw.size() != expected)
@@ -113,12 +113,12 @@ void write_rgb_png(const str& path, int64 width, int64 height, const bytes& pixe
     int64 row_bytes = width * 3;
     int64 y = 0;
     while (y < height) {
-        scanlines.append(int64(0));
+        scanlines.append(0);
         int64 start = y * row_bytes;
         int64 end = start + row_bytes;
         int64 i = start;
         while (i < end) {
-            scanlines.append(int64(raw[i]));
+            scanlines.append(raw[i]);
             i++;
         }
         y++;

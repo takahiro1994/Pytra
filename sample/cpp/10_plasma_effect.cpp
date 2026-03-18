@@ -25,8 +25,8 @@ void run_10_plasma_effect() {
             for (int64 x = 0; x < w; ++x) {
                 int64 dx = x - 160;
                 int64 dy = y - 120;
-                float64 v = pytra::std::math::sin((static_cast<float64>(x) + static_cast<float64>(t) * 2.0) * 0.045) + pytra::std::math::sin((static_cast<float64>(y) - static_cast<float64>(t) * 1.2) * 0.05) + pytra::std::math::sin((static_cast<float64>(x + y) + static_cast<float64>(t) * 1.7) * 0.03) + pytra::std::math::sin(pytra::std::math::sqrt(dx * dx + dy * dy) * 0.07 - static_cast<float64>(t) * 0.18);
-                int64 c = static_cast<int64>((v + 4.0) * (255.0 / 8.0));
+                float64 v = pytra::std::math::sin((float64(x) + float64(t) * 2.0) * 0.045) + pytra::std::math::sin((float64(y) - float64(t) * 1.2) * 0.05) + pytra::std::math::sin((float64(x + y) + float64(t) * 1.7) * 0.03) + pytra::std::math::sin(pytra::std::math::sqrt(dx * dx + dy * dy) * 0.07 - float64(t) * 0.18);
+                int64 c = int64((v + 4.0) * (255.0 / 8.0));
                 if (c < 0)
                     c = 0;
                 if (c > 255)

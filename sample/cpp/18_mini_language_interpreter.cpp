@@ -65,7 +65,7 @@ rc<list<Token>> tokenize(const rc<list<str>>& lines) {
                 i++;
                 continue;
             }
-            int64 single_tag = static_cast<int64>(single_char_token_tags.get(ch, 0));
+            int64 single_tag = int64(single_char_token_tags.get(ch, 0));
             if (single_tag > 0) {
                 rc_list_ref(tokens).append(Token(py_list_at_ref(rc_list_ref(single_char_token_kinds), single_tag - 1), ch, i, 0));
                 i++;
@@ -77,7 +77,7 @@ rc<list<Token>> tokenize(const rc<list<str>>& lines) {
                     i++;
                 }
                 str text = py_str_slice(source, start, i);
-                rc_list_ref(tokens).append(Token("NUMBER", text, start, static_cast<int64>(::std::stoll(text))));
+                rc_list_ref(tokens).append(Token("NUMBER", text, start, int64(::std::stoll(text))));
                 continue;
             }
             if ((ch.isalpha()) || (ch == "_")) {

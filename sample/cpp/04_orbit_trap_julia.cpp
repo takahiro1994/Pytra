@@ -10,14 +10,14 @@
 
 bytearray render_orbit_trap_julia(int64 width, int64 height, int64 max_iter, float64 cx, float64 cy) {
     bytearray pixels = bytearray{};
-    float64 __hoisted_cast_1 = static_cast<float64>(height - 1);
-    float64 __hoisted_cast_2 = static_cast<float64>(width - 1);
-    float64 __hoisted_cast_3 = static_cast<float64>(max_iter);
+    float64 __hoisted_cast_1 = float64(height - 1);
+    float64 __hoisted_cast_2 = float64(width - 1);
+    float64 __hoisted_cast_3 = float64(max_iter);
     
     for (int64 y = 0; y < height; ++y) {
-        float64 zy0 = -(1.3) + 2.6 * (static_cast<float64>(y) / __hoisted_cast_1);
+        float64 zy0 = -(1.3) + 2.6 * (float64(y) / __hoisted_cast_1);
         for (int64 x = 0; x < width; ++x) {
-            float64 zx = -(1.9) + 3.8 * (static_cast<float64>(x) / __hoisted_cast_2);
+            float64 zx = -(1.9) + 3.8 * (float64(x) / __hoisted_cast_2);
             float64 zy = zy0;
             
             float64 trap = 1.0e9;
@@ -59,11 +59,11 @@ bytearray render_orbit_trap_julia(int64 width, int64 height, int64 max_iter, flo
                     trap_scaled = 1.0;
                 if (trap_scaled < 0.0)
                     trap_scaled = 0.0;
-                float64 t = static_cast<float64>(i) / __hoisted_cast_3;
-                int64 tone = static_cast<int64>(255.0 * (1.0 - trap_scaled));
-                r = static_cast<int64>(static_cast<float64>(tone) * (0.35 + 0.65 * t));
-                g = static_cast<int64>(static_cast<float64>(tone) * (0.15 + 0.85 * (1.0 - t)));
-                b = static_cast<int64>(255.0 * (0.25 + 0.75 * t));
+                float64 t = float64(i) / __hoisted_cast_3;
+                int64 tone = int64(255.0 * (1.0 - trap_scaled));
+                r = int64(float64(tone) * (0.35 + 0.65 * t));
+                g = int64(float64(tone) * (0.15 + 0.85 * (1.0 - t)));
+                b = int64(255.0 * (0.25 + 0.75 * t));
                 if (r > 255)
                     r = 255;
                 if (g > 255)
@@ -71,9 +71,9 @@ bytearray render_orbit_trap_julia(int64 width, int64 height, int64 max_iter, flo
                 if (b > 255)
                     b = 255;
             }
-            pixels.append(static_cast<uint8>(static_cast<int64>(r)));
-            pixels.append(static_cast<uint8>(static_cast<int64>(g)));
-            pixels.append(static_cast<uint8>(static_cast<int64>(b)));
+            pixels.append(uint8(r));
+            pixels.append(uint8(g));
+            pixels.append(uint8(b));
         }
     }
     return pixels;

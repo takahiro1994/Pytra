@@ -15,7 +15,7 @@ void _gif_append_list(list<int64>& dst, const list<int64>& src) {
     int64 i = 0;
     int64 n = src.size();
     while (i < n) {
-        dst.append(int64(src[i]));
+        dst.append(src[i]);
         i++;
     }
 }
@@ -40,7 +40,7 @@ bytes _lzw_encode(const bytes& data, int64 min_code_size = 8) {
     bit_buffer |= clear_code << bit_count;
     bit_count += code_size;
     while (bit_count >= 8) {
-        out.append(int64(bit_buffer & 0xFF));
+        out.append(bit_buffer & 0xFF);
         bit_buffer = bit_buffer >> 8;
         bit_count -= 8;
     }
@@ -50,14 +50,14 @@ bytes _lzw_encode(const bytes& data, int64 min_code_size = 8) {
         bit_buffer |= v << bit_count;
         bit_count += code_size;
         while (bit_count >= 8) {
-            out.append(int64(bit_buffer & 0xFF));
+            out.append(bit_buffer & 0xFF);
             bit_buffer = bit_buffer >> 8;
             bit_count -= 8;
         }
         bit_buffer |= clear_code << bit_count;
         bit_count += code_size;
         while (bit_count >= 8) {
-            out.append(int64(bit_buffer & 0xFF));
+            out.append(bit_buffer & 0xFF);
             bit_buffer = bit_buffer >> 8;
             bit_count -= 8;
         }
@@ -66,12 +66,12 @@ bytes _lzw_encode(const bytes& data, int64 min_code_size = 8) {
     bit_buffer |= end_code << bit_count;
     bit_count += code_size;
     while (bit_count >= 8) {
-        out.append(int64(bit_buffer & 0xFF));
+        out.append(bit_buffer & 0xFF);
         bit_buffer = bit_buffer >> 8;
         bit_count -= 8;
     }
     if (bit_count > 0)
-        out.append(int64(bit_buffer & 0xFF));
+        out.append(bit_buffer & 0xFF);
     return bytes(out);
 }
 
@@ -94,41 +94,41 @@ void save_gif(const str& path, int64 width, int64 height, const list<bytes>& fra
     for (bytes fr : frames) {
         list<int64> fr_list = {};
         for (uint8 v : fr) {
-            fr_list.append(int64(static_cast<int64>(v)));
+            fr_list.append(v);
         }
         if (fr_list.size() != width * height)
             throw ValueError("frame size mismatch");
-        frame_lists.append(list<int64>(fr_list));
+        frame_lists.append(fr_list);
     }
     list<int64> palette_list = {};
     for (uint8 v : palette) {
-        palette_list.append(int64(static_cast<int64>(v)));
+        palette_list.append(v);
     }
     list<int64> out = {};
     _gif_append_list(out, list<int64>{71, 73, 70, 56, 57, 97});
     _gif_append_list(out, _gif_u16le(width));
     _gif_append_list(out, _gif_u16le(height));
-    out.append(int64(0xF7));
-    out.append(int64(0));
-    out.append(int64(0));
+    out.append(0xF7);
+    out.append(0);
+    out.append(0);
     _gif_append_list(out, palette_list);
     
     _gif_append_list(out, list<int64>{0x21, 0xFF, 0x0B, 78, 69, 84, 83, 67, 65, 80, 69, 50, 46, 48, 0x03, 0x01});
     _gif_append_list(out, _gif_u16le(loop));
-    out.append(int64(0));
+    out.append(0);
     
     for (list<int64> fr_list : frame_lists) {
         _gif_append_list(out, list<int64>{0x21, 0xF9, 0x04, 0x00});
         _gif_append_list(out, _gif_u16le(delay_cs));
         _gif_append_list(out, list<int64>{0x00, 0x00});
         
-        out.append(int64(0x2C));
+        out.append(0x2C);
         _gif_append_list(out, _gif_u16le(0));
         _gif_append_list(out, _gif_u16le(0));
         _gif_append_list(out, _gif_u16le(width));
         _gif_append_list(out, _gif_u16le(height));
-        out.append(int64(0));
-        out.append(int64(8));
+        out.append(0);
+        out.append(8);
         bytes compressed = _lzw_encode(bytes(fr_list), 8);
         int64 pos = 0;
         while (pos < compressed.size()) {
@@ -137,14 +137,14 @@ void save_gif(const str& path, int64 width, int64 height, const list<bytes>& fra
             out.append(chunk_len);
             int64 i = 0;
             while (i < chunk_len) {
-                out.append(int64(compressed[pos + i]));
+                out.append(compressed[pos + i]);
                 i++;
             }
             pos += chunk_len;
         }
-        out.append(int64(0));
+        out.append(0);
     }
-    out.append(int64(0x3B));
+    out.append(0x3B);
     
     pytra::runtime::cpp::base::PyFile f = open(path, "wb");
     {

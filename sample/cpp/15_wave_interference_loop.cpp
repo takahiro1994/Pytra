@@ -20,14 +20,14 @@ void run_15_wave_interference_loop() {
     
     for (int64 t = 0; t < frames_n; ++t) {
         bytearray frame = bytearray(w * h);
-        float64 phase = static_cast<float64>(t) * 0.12;
+        float64 phase = float64(t) * 0.12;
         for (int64 y = 0; y < h; ++y) {
             int64 row_base = y * w;
             for (int64 x = 0; x < w; ++x) {
                 int64 dx = x - 160;
                 int64 dy = y - 120;
-                float64 v = pytra::std::math::sin((static_cast<float64>(x) + static_cast<float64>(t) * 1.5) * 0.045) + pytra::std::math::sin((static_cast<float64>(y) - static_cast<float64>(t) * 1.2) * 0.04) + pytra::std::math::sin((static_cast<float64>(x + y)) * 0.02 + phase) + pytra::std::math::sin(pytra::std::math::sqrt(dx * dx + dy * dy) * 0.08 - phase * 1.3);
-                int64 c = static_cast<int64>((v + 4.0) * (255.0 / 8.0));
+                float64 v = pytra::std::math::sin((float64(x) + float64(t) * 1.5) * 0.045) + pytra::std::math::sin((float64(y) - float64(t) * 1.2) * 0.04) + pytra::std::math::sin((float64(x + y)) * 0.02 + phase) + pytra::std::math::sin(pytra::std::math::sqrt(dx * dx + dy * dy) * 0.08 - phase * 1.3);
+                int64 c = int64((v + 4.0) * (255.0 / 8.0));
                 if (c < 0)
                     c = 0;
                 if (c > 255)

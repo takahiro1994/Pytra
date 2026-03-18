@@ -36,7 +36,7 @@ namespace pytra::std::json {
     
     int64 _hex_value(const str& ch) {
         if ((ch >= "0") && (ch <= "9"))
-            return static_cast<int64>(::std::stoll(ch));
+            return int64(::std::stoll(ch));
         if ((ch == "a") || (ch == "A"))
             return 10;
         if ((ch == "b") || (ch == "B"))
@@ -467,10 +467,10 @@ namespace pytra::std::json {
             }
             str token = py_str_slice(this->text, start, this->i);
             if (is_float) {
-                float64 num_f = static_cast<float64>(::std::stod(token.std()));
+                float64 num_f = float64(::std::stod(token.std()));
                 return _jv_float(num_f);
             }
-            int64 num_i = static_cast<int64>(::std::stoll(token));
+            int64 num_i = int64(::std::stoll(token));
             return _jv_int(num_i);
     }
     
@@ -507,7 +507,7 @@ namespace pytra::std::json {
     str _escape_str(const str& s, bool ensure_ascii) {
         rc<list<str>> out = rc_list_from_value(list<str>{"\""});
         for (str ch : s) {
-            int64 code = static_cast<int64>(py_ord(ch));
+            int64 code = int64(py_ord(ch));
             if (ch == "\"") {
                 rc_list_ref(out).append("\\\"");
             } else if (ch == "\\") {
@@ -588,9 +588,9 @@ namespace pytra::std::json {
             return (raw_b ? "true" : "false");
         }
         if (v.tag == _JV_INT)
-            return py_to_string(v.int_val);
+            return ::std::to_string(v.int_val);
         if (v.tag == _JV_FLOAT)
-            return py_to_string(v.float_val);
+            return ::std::to_string(v.float_val);
         if (v.tag == _JV_STR)
             return _escape_str(v.str_val, ensure_ascii);
         if (v.tag == _JV_ARR)

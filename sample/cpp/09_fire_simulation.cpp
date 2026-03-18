@@ -28,9 +28,9 @@ bytes fire_palette() {
             g = 255;
             b = (i - 170) * 3;
         }
-        p.append(static_cast<uint8>(static_cast<int64>(r)));
-        p.append(static_cast<uint8>(static_cast<int64>(g)));
-        p.append(static_cast<uint8>(static_cast<int64>(b)));
+        p.append(uint8(r));
+        p.append(uint8(g));
+        p.append(uint8(b));
     }
     return p;
 }
