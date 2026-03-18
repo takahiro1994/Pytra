@@ -330,8 +330,11 @@ class LayerOptionsCarrier:
     layer: str
     values: dict[str, CompilerOptionScalar]
 
-    def get(self, key: str, default: object = None) -> object:
-        return self.values.get(key, default)
+    def get(self, key: str, default: str = "") -> str:
+        v = self.values.get(key)
+        if v is None:
+            return default
+        return str(v)
 
     def to_legacy_dict(self) -> dict[str, CompilerOptionScalar]:
         return export_layer_options_carrier(self)
