@@ -6,7 +6,7 @@
   <img alt="Read in English" src="https://img.shields.io/badge/docs-English-2563EB?style=flat-square">
 </a>
 
-最終更新: 2026-03-18（P0 追加: widening cast 冗長除去）
+最終更新: 2026-03-18（P0 追加: widening cast 冗長除去 / P1 追加: type alias サポート）
 
 ## 文脈運用ルール
 
@@ -38,6 +38,14 @@
 文脈: [docs/ja/plans/p0-cpp-redundant-widening-cast.md](../plans/p0-cpp-redundant-widening-cast.md)
 
 1. [ ] [ID: P0-CPP-REDUNDANT-WIDENING-CAST-01] `int64(static_cast<int64>(b))` のような三重冗長キャストを除去し、narrowing cast を `uint8(x)` 形式に統一する。(1) widening cast（uint8→int64 等）は C++ 暗黙変換で足りるため cast を emit しない。(2) narrowing cast / 同型 cast は `static_cast<T>` より短い関数形式 `T(x)` に統一して可読性を改善する。
+
+### P1: 言語機能追加
+
+#### P1-1: `type X = T` 型エイリアスサポート
+
+文脈: [docs/ja/plans/p1-type-alias-support.md](../plans/p1-type-alias-support.md)
+
+2. [ ] [ID: P1-TYPE-ALIAS-SUPPORT-01] Python の `type X = T`（PEP 695）をモジュールレベルの型エイリアス宣言として認識し、C++ では `using X = <cpp_type>;` を emit する。型式レンダリング時に alias 名を逆引きして使用することで、`::std::variant<str, bool, ::std::monostate>` のような長い型を alias 名で置き換え、生成コードの可読性を改善する。
 
 ### P5: py_runtime.h 縮小
 
