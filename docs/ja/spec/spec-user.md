@@ -65,9 +65,20 @@ Pytra は、型注釈付き Python コードを複数言語へ変換するトラ
   - Python 非合法構文である `import .m` はサポート対象外です。
 - 文末セミコロン（`;`）はサポート対象外です（self_hosted parser では入力エラーとして扱います）。
 - `# type:ignore` はコメントとして扱い、構文/意味解釈には使いません。
+- `pytra.types` モジュールは Pytra 固有のスカラー型（`int8`, `uint8`, `int64`, `float64` 等）を提供します。
+  - Python 実行時は `int` / `float` のエイリアスとして動作します。
+  - `from pytra.types import int64, uint8` のように import して使用します。
+  - 変換器はこの import を無視します（型名はパーサーが既に認識しているため）。
+  - VS Code の Pylance で未定義警告が出る場合はこの import を追加してください。
+- `type X = A | B | ...`（PEP 695）で union 型（tagged union）を宣言できます。
+  - 各ターゲット言語のネイティブな tagged union に変換されます。
+  - 再帰型（`type JsonVal = ... | list[JsonVal]`）もサポートします。
+  - union 変数から値を取り出すには `typing.cast(T, v)` を使用します。
+  - 詳細は [tagged union 仕様](./spec-tagged-union.md) を参照してください。
 - トランスパイル対象コードでは、Python 標準モジュールの直接 import は原則非推奨です。
   - 推奨は `pytra.std.*` の明示 import です。
   - ただし `typing` は注釈専用 no-op import として許可します（`import typing` / `from typing import ...` は依存解決に残さない）。
+  - `pytra.types` も型定義専用 no-op import として許可します（変換器は依存解決に残さない）。
   - `dataclasses` も decorator 解決専用 no-op import として許可します（`import dataclasses` / `from dataclasses import ...` は依存解決に残さない）。
   - `math` / `random` / `timeit` / `enum` などの実行時利用は、`pytra.std.*` 対応 shim へ正規化して扱います。
 - import 可能なのは `src/pytra/` 配下のモジュールと、ユーザーが作成した自作 `.py` モジュールです。
