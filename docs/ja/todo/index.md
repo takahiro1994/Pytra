@@ -6,7 +6,7 @@
   <img alt="Read in English" src="https://img.shields.io/badge/docs-English-2563EB?style=flat-square">
 </a>
 
-最終更新: 2026-03-18（P0〜P6 完了分を archive へ移管）
+最終更新: 2026-03-19（P0-PYTRA-IMPORT-UNIFY-01 追加）
 
 ## 文脈運用ルール
 
@@ -30,6 +30,14 @@
 - `docs/ja/todo/archive/index.md` は索引のみを保持し、履歴本文は `docs/ja/todo/archive/YYYYMMDD.md` に日付単位で保存します。
 
 ## 未完了タスク
+
+### P0: 緊急修正
+
+#### P0-1: Python 標準モジュール import を pytra.* 経由に統一
+
+文脈: [docs/ja/plans/p0-pytra-import-unify.md](../plans/p0-pytra-import-unify.md)
+
+1. [ ] [ID: P0-PYTRA-IMPORT-UNIFY-01] `pytra.typing` / `pytra.enum` / `pytra.dataclasses` ダミーモジュールを作成し、Python 標準モジュールの import を `pytra.*` 経由に統一する。変換器はこれらの import を無視する。
 
 ### P7: selfhost 完全自立化
 

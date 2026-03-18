@@ -81,7 +81,7 @@ isinstance(v, int)   # v: JsonVal
 tagged union 変数から特定の型の値を取り出すには `typing.cast` を使用する。
 
 ```python
-from typing import cast
+from pytra.typing import cast
 
 if isinstance(v, int):
     x = cast(int, v)      # v の int 値を取り出す

@@ -75,13 +75,16 @@ Pytra は、型注釈付き Python コードを複数言語へ変換するトラ
   - 再帰型（`type JsonVal = ... | list[JsonVal]`）もサポートします。
   - union 変数から値を取り出すには `typing.cast(T, v)` を使用します。
   - 詳細は [tagged union 仕様](./spec-tagged-union.md) を参照してください。
-- トランスパイル対象コードでは、Python 標準モジュールの直接 import は原則非推奨です。
-  - 推奨は `pytra.std.*` の明示 import です。
-  - ただし `typing` は注釈専用 no-op import として許可します（`import typing` / `from typing import ...` は依存解決に残さない）。
-  - `pytra.types` も型定義専用 no-op import として許可します（変換器は依存解決に残さない）。
-  - `dataclasses` も decorator 解決専用 no-op import として許可します（`import dataclasses` / `from dataclasses import ...` は依存解決に残さない）。
-  - `math` / `random` / `timeit` / `enum` などの実行時利用は、`pytra.std.*` 対応 shim へ正規化して扱います。
-- import 可能なのは `src/pytra/` 配下のモジュールと、ユーザーが作成した自作 `.py` モジュールです。
+- トランスパイル対象コードでは、**Python 標準モジュールの直接 import は禁止**です。すべて `pytra.*` 経由で import してください。
+  - `from pytra.typing import cast` — `typing.cast` の代わり
+  - `from pytra.enum import Enum, IntEnum, IntFlag` — `enum` の代わり
+  - `from pytra.dataclasses import dataclass, field` — `dataclasses` の代わり
+  - `from pytra.types import int64, uint8` — Pytra 固有スカラー型
+  - `from pytra.std.math import sqrt` — `math` 等の実行時モジュール
+  - これらのモジュールは Python 実行時は標準モジュールを re-export するため、Python でもそのまま動作します。
+  - 変換器はこれらの import を無視します（パーサーが `cast` / `Enum` / `dataclass` 等を既に認識しているため）。
+  - 後方互換のため `from typing import ...` / `from enum import ...` / `from dataclasses import ...` も当面は受け付けますが、将来的に警告→エラー化する予定です。
+- import 可能なのは `pytra.*` 配下のモジュールと、ユーザーが作成した自作 `.py` モジュールです。
 - 自作モジュール import は仕様上合法ですが、複数ファイル依存解決は段階的に実装中です。
 - `object` 型（`Any` 由来を含む）に対する属性アクセス・メソッド呼び出しは禁止です。
   - 例: `x: object` に対して `x.foo()` / `x.bar` は不可。
