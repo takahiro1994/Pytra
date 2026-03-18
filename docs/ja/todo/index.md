@@ -39,6 +39,12 @@
 
 1. [x] [ID: P0-PYTRA-IMPORT-UNIFY-01] `pytra.typing` / `pytra.enum` / `pytra.dataclasses` ダミーモジュールを作成し、Python 標準モジュールの import を `pytra.*` 経由に統一する。変換器はこれらの import を無視する。
 
+### P6: C++ include 最適化
+
+#### P6-1: CPP_HEADER の固定 include を必要性判定に変更
+
+1. [ ] [ID: P6-CPP-INCLUDE-OPTIMIZE-01] C++ 生成コード冒頭の `#include` を固定文字列ではなく、emitter が生成コードの内容に応じて必要な include のみを emit するよう変更する。
+
 ### P7: selfhost 完全自立化
 
 #### P7-1: native/compiler/ 完全削除

@@ -1521,10 +1521,8 @@ class CppEmitter(
             current.update(methods)
 
         self.emit_module_leading_trivia()
-        header_text: str = CPP_HEADER
-        if len(header_text) > 0 and header_text[-1] == NEWLINE_CHAR:
-            header_text = header_text[:-1]
-        self.emit(header_text)
+        _CPP_HEADER = '#include "runtime/cpp/native/core/py_runtime.h"\n#include "runtime/cpp/native/core/process_runtime.h"\n#include "runtime/cpp/native/core/scope_exit.h"'
+        self.emit(_CPP_HEADER)
         extra_includes = self._collect_import_cpp_includes(body, meta)
         helper_includes = self._cpp_helper_header_includes()
         for inc in helper_includes:
@@ -1649,7 +1647,7 @@ class CppEmitter(
             self.indent -= 1
             self.emit(f"}}  // namespace {self.top_namespace}")
             self.emit("")
-        return NEWLINE_CHAR.join(self.lines)
+        return "\n".join(self.lines)
 
     def _infer_name_assign_type(self, stmt: dict[str, Any], target_node: dict[str, Any]) -> str:
         """`Name = ...` / `AnnAssign Name` の宣言候補型を推定する。"""
