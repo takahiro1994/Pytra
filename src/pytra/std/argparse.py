@@ -116,9 +116,8 @@ class ArgumentParser:
         values: dict[str, ArgValue] = {}
         for s in self._specs:
             if s.action == "store_true":
-                dv: ArgValue = s.default
-                if isinstance(dv, bool):
-                    values[s.dest] = cast(bool, dv)
+                if isinstance(s.default, bool):
+                    values[s.dest] = cast(bool, s.default)
                 else:
                     values[s.dest] = False
             elif s.default is not None:
