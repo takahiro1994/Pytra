@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from pytra.std import json
 from pytra.std.pathlib import Path
 from typing import Any
@@ -12,6 +13,91 @@ from toolchain.link.program_model import LinkedProgram
 from toolchain.link.program_model import LinkedProgramModule
 from toolchain.link.program_model import LINK_INPUT_SCHEMA
 from toolchain.link.program_validator import validate_raw_east3_doc
+
+_RUNTIME_EAST_ROOT = Path(__file__).resolve().parents[2] / "runtime" / "generated"
+
+_RUNTIME_MODULE_BUCKETS: dict[str, str] = {
+    "pytra.built_in.": "built_in",
+    "pytra.std.": "std",
+    "pytra.utils.": "utils",
+}
+
+
+def _resolve_runtime_east_path(module_id: str) -> Path | None:
+    """Resolve a runtime module ID to its .east file path, or None."""
+    for prefix, bucket in _RUNTIME_MODULE_BUCKETS.items():
+        if module_id.startswith(prefix):
+            name = module_id[len(prefix):]
+            east_path = _RUNTIME_EAST_ROOT / bucket / (name + ".east")
+            if east_path.exists():
+                return east_path
+    return None
+
+
+def add_runtime_east_to_module_map(
+    module_map: dict[str, dict[str, Any]],
+) -> dict[str, dict[str, Any]]:
+    """Scan module_map for runtime imports and add their .east files.
+
+    Iterates until no new runtime dependencies are found (transitive closure).
+    """
+    result = dict(module_map)
+    seen_paths: set[str] = set(result.keys())
+
+    changed = True
+    while changed:
+        changed = False
+        new_deps: list[tuple[str, Path]] = []
+        for east_doc in list(result.values()):
+            if not isinstance(east_doc, dict):
+                continue
+            meta = east_doc.get("meta")
+            if not isinstance(meta, dict):
+                continue
+            bindings = meta.get("import_bindings")
+            if isinstance(bindings, list):
+                for binding in bindings:
+                    if not isinstance(binding, dict):
+                        continue
+                    mod_id = binding.get("module_id")
+                    if isinstance(mod_id, str) and mod_id != "":
+                        east_path = _resolve_runtime_east_path(mod_id)
+                        if east_path is not None and str(east_path) not in seen_paths:
+                            new_deps.append((str(east_path), east_path))
+            # Also scan body for Import/ImportFrom
+            body = east_doc.get("body")
+            if isinstance(body, list):
+                for stmt in body:
+                    if not isinstance(stmt, dict):
+                        continue
+                    kind = stmt.get("kind")
+                    if kind == "ImportFrom":
+                        mod = stmt.get("module")
+                        if isinstance(mod, str) and mod != "":
+                            east_path = _resolve_runtime_east_path(mod)
+                            if east_path is not None and str(east_path) not in seen_paths:
+                                new_deps.append((str(east_path), east_path))
+                    elif kind == "Import":
+                        names = stmt.get("names")
+                        if isinstance(names, list):
+                            for ent in names:
+                                if isinstance(ent, dict):
+                                    name = ent.get("name")
+                                    if isinstance(name, str):
+                                        east_path = _resolve_runtime_east_path(name)
+                                        if east_path is not None and str(east_path) not in seen_paths:
+                                            new_deps.append((str(east_path), east_path))
+        for path_str, east_path in new_deps:
+            if path_str in seen_paths:
+                continue
+            seen_paths.add(path_str)
+            try:
+                east_doc = _load_raw_east3(east_path)
+                result[path_str] = east_doc
+                changed = True
+            except Exception:
+                pass
+    return result
 
 
 def _load_raw_east3(path: Path) -> dict[str, object]:

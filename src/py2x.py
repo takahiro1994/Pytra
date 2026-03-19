@@ -34,6 +34,7 @@ from toolchain.link import load_linked_program
 from toolchain.link import optimize_linked_program
 from toolchain.link import write_link_input_bundle
 from toolchain.link import write_link_output_bundle
+from toolchain.link.program_loader import add_runtime_east_to_module_map
 from pytra.std import argparse
 from pytra.std import json
 from pytra.std.pathlib import Path
@@ -224,6 +225,9 @@ def _build_linked_program_for_input(
                 object_dispatch_mode=object_dispatch_mode,
             )
         }
+
+    # Add runtime .east files for imported runtime modules (transitive closure).
+    module_map = add_runtime_east_to_module_map(module_map)
 
     return build_linked_program_from_module_map(
         input_path,

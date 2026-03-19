@@ -2085,7 +2085,7 @@ class CppEmitter(
             if isinstance(val, float):
                 return str(val)
             if isinstance(val, str):
-                return cpp_string_lit(val)
+                return self._cpp_str_lit(val)
             return ""
         if kind == "Name":
             ident = self.any_to_str(nd.get("id"))

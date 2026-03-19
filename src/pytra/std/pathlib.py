@@ -11,6 +11,7 @@ from pytra.std import os_path as path
 
 class Path:
     __pytra_class_storage_hint__ = "value"
+    _value: str
 
     def __init__(self, value: str | "Path") -> None:
         if isinstance(value, Path):
