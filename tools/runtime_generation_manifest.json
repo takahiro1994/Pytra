@@ -438,6 +438,12 @@
       "bucket": "built_in",
       "targets": [
         {
+          "target": "cpp",
+          "output": "src/runtime/cpp/generated/built_in/numeric_ops.h",
+          "postprocess": "cpp_program_to_header",
+          "helper_name": "PYTRA_GEN_BUILT_IN_NUMERIC_OPS_H"
+        },
+        {
           "target": "rs",
           "output": "src/runtime/rs/generated/built_in/numeric_ops.rs"
         },
@@ -505,6 +511,12 @@
       "source": "src/pytra/built_in/predicates.py",
       "bucket": "built_in",
       "targets": [
+        {
+          "target": "cpp",
+          "output": "src/runtime/cpp/generated/built_in/predicates.h",
+          "postprocess": "cpp_program_to_header",
+          "helper_name": "PYTRA_GEN_BUILT_IN_PREDICATES_H"
+        },
         {
           "target": "rs",
           "output": "src/runtime/rs/generated/built_in/predicates.rs"
@@ -647,6 +659,12 @@
       "source": "src/pytra/built_in/sequence.py",
       "bucket": "built_in",
       "targets": [
+        {
+          "target": "cpp",
+          "output": "src/runtime/cpp/generated/built_in/sequence.h",
+          "postprocess": "cpp_program_to_header",
+          "helper_name": "PYTRA_GEN_BUILT_IN_SEQUENCE_H"
+        },
         {
           "target": "rs",
           "output": "src/runtime/rs/generated/built_in/sequence.rs"
@@ -864,6 +882,12 @@
       "bucket": "built_in",
       "targets": [
         {
+          "target": "cpp",
+          "output": "src/runtime/cpp/generated/built_in/zip_ops.h",
+          "postprocess": "cpp_program_to_header",
+          "helper_name": "PYTRA_GEN_BUILT_IN_ZIP_OPS_H"
+        },
+        {
           "target": "rs",
           "output": "src/runtime/rs/generated/built_in/zip_ops.rs"
         },
@@ -1013,6 +1037,12 @@
       "bucket": "std",
       "targets": [
         {
+          "target": "cpp",
+          "output": "src/runtime/cpp/generated/std/json.h",
+          "postprocess": "cpp_program_to_header",
+          "helper_name": "PYTRA_GEN_STD_JSON_H"
+        },
+        {
           "target": "rs",
           "output": "src/runtime/rs/generated/std/json.rs"
         },
@@ -1079,6 +1109,12 @@
       "source": "src/pytra/std/pathlib.py",
       "bucket": "std",
       "targets": [
+        {
+          "target": "cpp",
+          "output": "src/runtime/cpp/generated/std/pathlib.h",
+          "postprocess": "cpp_program_to_header",
+          "helper_name": "PYTRA_GEN_STD_PATHLIB_H"
+        },
         {
           "target": "rs",
           "output": "src/runtime/rs/generated/std/pathlib.rs"
@@ -1446,6 +1482,12 @@
       "bucket": "std",
       "targets": [
         {
+          "target": "cpp",
+          "output": "src/runtime/cpp/generated/std/argparse.h",
+          "postprocess": "cpp_program_to_header",
+          "helper_name": "PYTRA_GEN_STD_ARGPARSE_H"
+        },
+        {
           "target": "rs",
           "output": "src/runtime/rs/generated/std/argparse.rs"
         },
@@ -1512,6 +1554,12 @@
       "bucket": "std",
       "targets": [
         {
+          "target": "cpp",
+          "output": "src/runtime/cpp/generated/std/random.h",
+          "postprocess": "cpp_program_to_header",
+          "helper_name": "PYTRA_GEN_STD_RANDOM_H"
+        },
+        {
           "target": "rs",
           "output": "src/runtime/rs/generated/std/random.rs"
         },
@@ -1577,6 +1625,12 @@
       "source": "src/pytra/std/re.py",
       "bucket": "std",
       "targets": [
+        {
+          "target": "cpp",
+          "output": "src/runtime/cpp/generated/std/re.h",
+          "postprocess": "cpp_program_to_header",
+          "helper_name": "PYTRA_GEN_STD_RE_H"
+        },
         {
           "target": "rs",
           "output": "src/runtime/rs/generated/std/re.rs"
@@ -1718,6 +1772,12 @@
       "bucket": "std",
       "targets": [
         {
+          "target": "cpp",
+          "output": "src/runtime/cpp/generated/std/timeit.h",
+          "postprocess": "cpp_program_to_header",
+          "helper_name": "PYTRA_GEN_STD_TIMEIT_H"
+        },
+        {
           "target": "rs",
           "output": "src/runtime/rs/generated/std/timeit.rs"
         },
@@ -1775,6 +1835,19 @@
           "target": "php",
           "output": "src/runtime/php/generated/std/timeit.php",
           "postprocess": "php_program_to_library"
+        }
+      ]
+    },
+    {
+      "id": "built_in/format_value",
+      "source": "src/pytra/built_in/format_value.py",
+      "bucket": "built_in",
+      "targets": [
+        {
+          "target": "cpp",
+          "output": "src/runtime/cpp/generated/built_in/format_value.h",
+          "postprocess": "cpp_program_to_header",
+          "helper_name": "PYTRA_GEN_BUILT_IN_FORMAT_VALUE_H"
         }
       ]
     }
