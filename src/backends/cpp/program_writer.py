@@ -19,7 +19,9 @@ from toolchain.compiler.transpile_cli import (
 from toolchain.json_adapters import dumps_object as _json_dumps_object
 
 
-_RUNTIME_CPP_ROOT = Path(__file__).resolve().parents[3] / "src" / "runtime" / "cpp"
+_PROJECT_ROOT = Path(__file__).resolve().parents[3]
+_RUNTIME_CPP_ROOT = _PROJECT_ROOT / "src" / "runtime" / "cpp"
+_RUNTIME_EAST_ROOT = _PROJECT_ROOT / "src" / "runtime" / "generated"
 
 
 def _copy_native_runtime_to_output(output_root: Path) -> list[str]:
@@ -47,6 +49,93 @@ def _copy_native_runtime_to_output(output_root: Path) -> list[str]:
                     shutil.copy2(src_file, dst_file)
                     copied.append(dst_file)
     return copied
+
+
+def _generate_runtime_east_headers(output_root: Path) -> list[str]:
+    """Transpile runtime .east files to C++ headers in output directory.
+
+    Each .east → transpile_to_cpp → strip to header-only → write to namespace folder.
+    """
+    generated: list[str] = []
+    east_root_str = str(_RUNTIME_EAST_ROOT)
+    if not os.path.isdir(east_root_str):
+        return generated
+    from backends.cpp.emitter import transpile_to_cpp
+    import json as _json
+    for bucket in ("built_in", "std", "utils"):
+        bucket_dir = os.path.join(east_root_str, bucket)
+        if not os.path.isdir(bucket_dir):
+            continue
+        dst_dir = output_root / bucket
+        dst_dir.mkdir(parents=True, exist_ok=True)
+        for name in sorted(os.listdir(bucket_dir)):
+            if not name.endswith(".east"):
+                continue
+            east_path = os.path.join(bucket_dir, name)
+            stem = name[:-5]  # remove .east
+            dst_h = str(dst_dir / (stem + ".h"))
+            # Skip if native header already exists (native takes precedence).
+            if os.path.isfile(dst_h):
+                continue
+            try:
+                east_text = open(east_path, "r", encoding="utf-8").read()
+                east_doc = _json.loads(east_text)
+                cpp_text = transpile_to_cpp(east_doc, emit_main=False)
+                # Strip only py_runtime.h / process_runtime.h includes (already in chain).
+                # Keep other includes — generated headers may depend on other modules.
+                _SKIP = {
+                    '#include "core/py_runtime.h"',
+                    '#include "core/process_runtime.h"',
+                    '#include "core/scope_exit.h"',
+                }
+                lines = cpp_text.splitlines()
+                body: list[str] = []
+                for line in lines:
+                    stripped = line.strip()
+                    if stripped in _SKIP:
+                        continue
+                    body.append(line)
+                # Trim blank prefix/suffix.
+                while body and body[0].strip() == "":
+                    body.pop(0)
+                while body and body[-1].strip() == "":
+                    body.pop()
+                # Extract forward declarations for functions defined in this header.
+                import re as _re
+                _func_re = _re.compile(
+                    r"^((?:static\s+inline\s+|inline\s+|static\s+)?)"
+                    r"([A-Za-z_][\w:*&<>, ]*\S)\s+"
+                    r"([A-Za-z_]\w*)\s*"
+                    r"(\([^)]*\))"
+                    r"\s*\{"
+                )
+                fwd_decls: list[str] = []
+                fwd_seen: set[str] = set()
+                for line in body:
+                    m = _func_re.match(line)
+                    if m and m.group(3) not in fwd_seen:
+                        fwd_seen.add(m.group(3))
+                        quals = m.group(1).strip()
+                        parts = ([quals] if quals else []) + [m.group(2).strip()]
+                        fwd_decls.append(" ".join(parts) + " " + m.group(3) + m.group(4) + ";")
+                guard = "PYTRA_GEN_" + bucket.upper() + "_" + stem.upper() + "_H"
+                fwd_block = ""
+                if fwd_decls:
+                    fwd_block = "// forward declarations\n" + "\n".join(fwd_decls) + "\n\n"
+                header = (
+                    "// AUTO-GENERATED from " + bucket + "/" + name + "\n"
+                    "#ifndef " + guard + "\n"
+                    "#define " + guard + "\n\n"
+                    + fwd_block
+                    + "\n".join(body) + "\n\n"
+                    "#endif  // " + guard + "\n"
+                )
+                with open(dst_h, "w", encoding="utf-8") as fh:
+                    fh.write(header)
+                generated.append(dst_h)
+            except Exception:
+                pass  # Skip modules that fail to transpile.
+    return generated
 
 
 def _dict(value: Any) -> dict[str, Any]:
@@ -134,8 +223,9 @@ def write_cpp_rendered_program(
     mkdirs_for_cli(str(include_dir))
     mkdirs_for_cli(str(src_dir))
 
-    # Copy native runtime to output directory for self-contained build.
+    # Copy native runtime and generate C++ from .east for self-contained build.
     runtime_files = _copy_native_runtime_to_output(output_root)
+    runtime_files.extend(_generate_runtime_east_headers(output_root))
 
     generated_lines_total = 0
     output_files: list[str] = list(runtime_files)
