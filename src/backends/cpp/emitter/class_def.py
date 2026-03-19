@@ -53,7 +53,7 @@ class CppClassEmitter:
             return coerced
         if coerced in {"object{}", "object()"} or self.is_boxed_object_expr(coerced):
             return coerced
-        return f"make_object({coerced})"
+        return f"object({coerced})"
 
     def _render_dataclass_field_default_factory(self, field_type: str, factory_expr: dict[str, Any]) -> str:
         if not self._expr_node_has_payload(factory_expr):

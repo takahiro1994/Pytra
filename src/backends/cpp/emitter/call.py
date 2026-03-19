@@ -628,7 +628,7 @@ class CppCallEmitter:
                     if len(arg0_node_d) > 0:
                         a0 = self.render_expr(self._build_box_expr_node(arg0_node))
                     else:
-                        a0 = f"make_object({a0})"
+                        a0 = f"object({a0})"
             elif inner_t != "" and not self.is_any_like_type(inner_t):
                 inner_t_norm = self.normalize_type_name(inner_t)
                 if not (inner_t_norm == "bytes" and arg0_t == "bytes"):
@@ -667,7 +667,7 @@ class CppCallEmitter:
                 if len(arg0_node_d) > 0:
                     a0 = self.render_expr(self._build_box_expr_node(arg0_node))
                 else:
-                    a0 = f"make_object({a0})"
+                    a0 = f"object({a0})"
             list_ref_expr = self._render_pyobj_runtime_list_bridge_ref_for_op(owner_expr, "append")
             return f"py_list_append_mut({list_ref_expr}, {a0})"
         return None
@@ -738,7 +738,7 @@ class CppCallEmitter:
                 if len(arg0_node_d) > 0:
                     a0 = self.render_expr(self._build_box_expr_node(value_node))
                 else:
-                    a0 = f"make_object({a0})"
+                    a0 = f"object({a0})"
         elif inner_t != "" and not self.is_any_like_type(inner_t):
             inner_t_norm = self.normalize_type_name(inner_t)
             if not (inner_t_norm == "bytes" and arg0_t == "bytes"):

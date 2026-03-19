@@ -2064,7 +2064,7 @@ class CppEmitter(
             return out
         if self.is_boxed_object_expr(out):
             return out
-        return f"make_object({out})"
+        return f"object({out})"
 
     def _render_param_default_expr(self, node: Any, east_target_t: str) -> str:
         """関数引数既定値ノードを C++ 式へ変換する。"""
@@ -2933,7 +2933,7 @@ class CppEmitter(
             key_node_d = self.any_to_dict_or_empty(key_node)
             if len(key_node_d) > 0:
                 return self.render_expr(self._build_box_expr_node(key_node))
-            return f"make_object({key_expr})"
+            return f"object({key_expr})"
         if key_t == "str":
             key_node_d = self.any_to_dict_or_empty(key_node)
             key_verified = bool(key_node_d.get("dict_key_verified", False))
@@ -3521,7 +3521,7 @@ class CppEmitter(
         orelse_node = self.any_to_dict_or_empty(expr.get("orelse"))
         if self._is_isinstance_ctor_ifexp_pattern(test_node, body_node, orelse_node):
             if not self.is_boxed_object_expr(orelse):
-                orelse = f"make_object({orelse})"
+                orelse = f"object({orelse})"
         test_expr = self.render_cond(test_node)
         return self.render_ifexp_common(
             test_expr,
@@ -4009,7 +4009,7 @@ class CppEmitter(
                 src_t = declared_t
         if self.is_any_like_type(src_t):
             return expr_txt
-        return f"make_object({expr_txt})"
+        return f"object({expr_txt})"
 
     def _box_any_target_value(self, expr_txt: str, source_node: Any) -> str:
         """Any/object ターゲット代入用に値を boxing する（None は object{}）。"""
@@ -4026,9 +4026,9 @@ class CppEmitter(
             boxed_expr = self.render_expr(self._build_box_expr_node(source_node))
             # 既存挙動互換: source が Any/object の場合も代入先 Any では明示 boxing を維持する。
             if boxed_expr == expr_txt and not self.is_boxed_object_expr(expr_txt):
-                return f"make_object({expr_txt})"
+                return f"object({expr_txt})"
             return boxed_expr
-        return f"make_object({expr_txt})"
+        return f"object({expr_txt})"
 
     # repr-string fallback helpers removed; keep EAST3 structured-node path only.
 
@@ -4243,8 +4243,8 @@ class CppEmitter(
             ctx = f"{variant_name}.{field_name}"
             base_obj = base
             if not self.is_boxed_object_expr(base_obj):
-                base_obj = f"make_object({base_obj})"
-            return f'obj_to_rc_or_raise<{variant_name}>({base_obj}, "{ctx}")->' + emitted_field_name
+                base_obj = f"object({base_obj})"
+            return f'({base_obj}).as<{variant_name}>()->' + emitted_field_name
         if base == "self" or base == "*this":
             if self.current_class_name is not None and attr in self.current_class_static_fields:
                 return f"{self.current_class_name}::{emitted_attr}"
@@ -4304,23 +4304,23 @@ class CppEmitter(
             ctx = f"{self.current_class_name}.{attr}"
             base_obj = base
             if not self.is_boxed_object_expr(base_obj):
-                base_obj = f"make_object({base_obj})"
-            return f"obj_to_rc_or_raise<{self.current_class_name}>({base_obj}, \"{ctx}\")->{attr}"
+                base_obj = f"object({base_obj})"
+            return f"({base_obj}).as<{self.current_class_name}>()->{attr}"
         if bt in {"", "unknown"} or self.is_any_like_type(bt):
             owner_cls = self.class_field_owner_unique.get(attr, "")
             if owner_cls != "" and owner_cls in self.ref_classes:
                 ctx = f"{owner_cls}.{attr}"
                 base_obj = base
                 if not self.is_boxed_object_expr(base_obj):
-                    base_obj = f"make_object({base_obj})"
-                return f"obj_to_rc_or_raise<{owner_cls}>({base_obj}, \"{ctx}\")->{emitted_attr}"
+                    base_obj = f"object({base_obj})"
+                return f"({base_obj}).as<{owner_cls}>()->{emitted_attr}"
             owner_m_cls = self.class_method_owner_unique.get(attr, "")
             if owner_m_cls != "" and owner_m_cls in self.ref_classes:
                 ctx = f"{owner_m_cls}.{attr}"
                 base_obj = base
                 if not self.is_boxed_object_expr(base_obj):
-                    base_obj = f"make_object({base_obj})"
-                return f"obj_to_rc_or_raise<{owner_m_cls}>({base_obj}, \"{ctx}\")->{emitted_attr}"
+                    base_obj = f"object({base_obj})"
+                return f"({base_obj}).as<{owner_m_cls}>()->{emitted_attr}"
         owner_cls = self.class_field_owner_unique.get(attr, "")
         if (
             owner_cls != ""
@@ -4331,8 +4331,8 @@ class CppEmitter(
             ctx = f"{owner_cls}.{attr}"
             base_obj = base
             if not self.is_boxed_object_expr(base_obj):
-                base_obj = f"make_object({base_obj})"
-            return f"obj_to_rc_or_raise<{owner_cls}>({base_obj}, \"{ctx}\")->{emitted_attr}"
+                base_obj = f"object({base_obj})"
+            return f"({base_obj}).as<{owner_cls}>()->{emitted_attr}"
         if self._use_ref_class_member_arrow(base_node, base, bt):
             return f"{base}->{emitted_attr}"
         return f"{base}.{emitted_attr}"

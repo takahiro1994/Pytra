@@ -122,8 +122,7 @@ class CppStatementEmitter:
             if len(bind_nodes) > 0:
                 variant_tmp = self.next_tmp("__match_variant")
                 self.emit(
-                    f'auto {variant_tmp} = obj_to_rc_or_raise<{variant_name}>('
-                    f'make_object({subject_tmp}), "match:{family_name}.{variant_name}");'
+                    f'auto* {variant_tmp} = (object({subject_tmp})).as<{variant_name}>();'
                 )
                 for bind_node in bind_nodes:
                     if self._node_kind_from_dict(bind_node) != "PatternBind":

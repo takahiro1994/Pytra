@@ -254,7 +254,7 @@ class CppTypeBridgeEmitter:
             if cpp_t.startswith("rc<") and cpp_t.endswith(">"):
                 ref_inner = cpp_t[3:-1]
             ctx_safe = ctx.replace("\\", "\\\\").replace('"', '\\"')
-            return f'obj_to_rc_or_raise<{ref_inner}>({expr_txt}, "{ctx_safe}")'
+            return f'({expr_txt}).as<{ref_inner}>()'
         if t_norm in {"float32", "float64"}:
             if t_norm == "float64" and (
                 expr_txt.startswith("float64(")
@@ -378,9 +378,9 @@ class CppTypeBridgeEmitter:
                             items.append("object(static_cast<PyObj*>(this), true)")
                         else:
                             items.append(self.render_expr(elem))
-                    return f"make_object(::std::make_tuple({join_str_list(', ', items)}))"
+                    return f"object(::std::make_tuple({join_str_list(', ', items)}))"
                 return self.render_expr(self._build_box_expr_node(arg_node))
-            return f"make_object({arg_txt})"
+            return f"object({arg_txt})"
         if not self._can_runtime_cast_target(target_t):
             return arg_txt
         if t_norm == "list[str]" and self._is_pyobj_runtime_list_type(at):

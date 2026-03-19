@@ -377,7 +377,7 @@ class CppCollectionExprEmitter:
             lines.append(f"        if ({cond}) __out.append({list_elt});")
         lines.append("    }")
         if pyobj_runtime_list_mode:
-            lines.append("    return make_object(__out);")
+            lines.append("    return object(__out);")
         else:
             lines.append("    return __out;")
         lines.append("}()")
