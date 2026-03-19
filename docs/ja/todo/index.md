@@ -61,10 +61,18 @@
 3. [x] [ID: P0-SELF-CONTAINED-CPP-OUTPUT-01-S3] エミッターの `#include` 出力パスを `out/cpp/` 基準に変更する。
 4. [x] [ID: P0-SELF-CONTAINED-CPP-OUTPUT-01-S4] Makefile 生成を `out/cpp/` 自己完結に対応させる。
 5. [ ] [ID: P0-SELF-CONTAINED-CPP-OUTPUT-01-S5] `pytra-cli.py --build` フローを新パイプラインに対応させる。
-6. [ ] [ID: P0-SELF-CONTAINED-CPP-OUTPUT-01-S6] 最小 repro（pathlib import）が `out/cpp/` 内で `make` でビルドできることを検証する。
+6. [ ] [ID: P0-SELF-CONTAINED-CPP-OUTPUT-01-S6] 最小 repro（pathlib import）が `out/cpp/` 内で `make` でビルドできることを検証する。→ P0-TAGGED-UNION-OBJECT-BOX-01 が前提。
 
-#### P0-4: リンカーによる C++ include パス確定
-TODO
+#### P0-4: tagged union を object + type_id に統一（S6 の前提）
+
+文脈: [docs/ja/plans/p0-tagged-union-object-box.md](../plans/p0-tagged-union-object-box.md)
+
+1. [ ] [ID: P0-TAGGED-UNION-OBJECT-BOX-01-S1] C++ emitter の tagged union 生成を `object + type_id` 方式に変更する。`_Union_*` struct 生成を除去。
+2. [ ] [ID: P0-TAGGED-UNION-OBJECT-BOX-01-S2] unbox 時の `isinstance` → `static_cast` emit を実装する。
+3. [ ] [ID: P0-TAGGED-UNION-OBJECT-BOX-01-S3] `pathlib.py` を含む `out/cpp/` g++ ビルドを検証する。
+4. [ ] [ID: P0-TAGGED-UNION-OBJECT-BOX-01-S4] 他バックエンド（Rust, Go 等）への展開を検討する。
+
+#### P0-5: リンカーによる C++ include パス確定
 文脈: [docs/ja/plans/p0-linker-resolved-includes.md](../plans/p0-linker-resolved-includes.md)
 
 1. [x] [ID: P0-LINKER-RESOLVED-INCLUDES-01-S1] `global_optimizer.py` に `_build_resolved_dependencies` を実装。`import_bindings` + 暗黙 runtime 依存を収集し `resolved_dependencies_v1: list[str]` をメタデータに格納。
