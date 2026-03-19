@@ -1,6 +1,6 @@
 #include <chrono>
 
-#include "runtime/cpp/generated/std/time.h"
+#include "std/time.h"
 
 namespace pytra::std::time {
 

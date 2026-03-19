@@ -1,7 +1,7 @@
 #ifndef PYTRA_NATIVE_BUILT_IN_BASE_OPS_H
 #define PYTRA_NATIVE_BUILT_IN_BASE_OPS_H
 
-#include "runtime/cpp/core/py_types.h"
+#include "core/py_types.h"
 
 // 基本スカラー長さ演算・文字列スライス。
 // py_runtime.h から移動（P6-EAST3-LEN-SLICE-NODE-01）。

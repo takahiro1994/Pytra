@@ -1,6 +1,6 @@
 #pragma once
 
-#include "runtime/cpp/core/py_runtime.h"
+#include "core/py_runtime.h"
 
 #include "generated/std/pathlib.h"
 

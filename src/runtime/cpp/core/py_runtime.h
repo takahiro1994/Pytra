@@ -16,15 +16,15 @@
 #include <utility>
 #include <vector>
 
-#include "py_types.h"
-#include "exceptions.h"
-#include "io.h"
+#include "core/py_types.h"
+#include "core/exceptions.h"
+#include "core/io.h"
 
 // base_ops.h provides py_str_slice / py_find_window used by generated string_ops.h.
-#include "runtime/cpp/built_in/base_ops.h"
+#include "built_in/base_ops.h"
 
 // Generated string helpers (py_split, py_join, py_count, etc.).
-#include "runtime/cpp/generated/built_in/string_ops.h"
+#include "built_in/string_ops.h"
 
 // PYTRA_TID_* 定数は py_scalar_types.h へ移動済み（P2-COMPILE-LINK-PIPELINE-01）。
 
@@ -96,7 +96,7 @@ static inline T py_to(const T& v) {
 
 // リスト操作（at / append_mut 等）は native/built_in/list_ops.h へ移動済み。
 // py_slice（list/rc 版）は emitter が py_list_slice_copy を直接 emit するため除去。
-#include "runtime/cpp/built_in/list_ops.h"
+#include "built_in/list_ops.h"
 
 // list/rc<list> 版の py_at は除去済み（P6-EAST3-PY-AT-INLINE-01）。
 // emitter は py_list_at_ref を直接 emit する。
@@ -182,7 +182,7 @@ static inline decltype(auto) py_at_bounds_debug(const Seq& v, int64 idx) {
 
 // P0-contract-shrink label: shared_type_id_contract seam.
 // type_id 判定ロジックは generated built_in 層（py_tid_*）を正本とする。
-#include "runtime/cpp/generated/built_in/type_id.h"
+#include "built_in/type_id.h"
 
 // Runtime type_id registration machinery removed (P2-COMPILE-LINK-PIPELINE-01).
 // Type IDs are now assigned by the linker at compile time.

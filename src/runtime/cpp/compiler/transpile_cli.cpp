@@ -1,4 +1,4 @@
-#include "runtime/cpp/generated/compiler/transpile_cli.h"
+#include "compiler/transpile_cli.h"
 
 #include <stdexcept>
 

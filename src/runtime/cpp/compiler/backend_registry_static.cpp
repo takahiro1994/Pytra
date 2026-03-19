@@ -1,10 +1,10 @@
-#include "runtime/cpp/generated/compiler/backend_registry_static.h"
+#include "compiler/backend_registry_static.h"
 
 #include <cstdlib>
 #include <filesystem>
 #include <stdexcept>
 
-#include "runtime/cpp/generated/compiler/transpile_cli.h"
+#include "compiler/transpile_cli.h"
 #include "generated/std/json.h"
 
 #if defined(_WIN32)

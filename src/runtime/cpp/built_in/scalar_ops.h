@@ -1,8 +1,8 @@
 #ifndef PYTRA_NATIVE_BUILT_IN_SCALAR_OPS_H
 #define PYTRA_NATIVE_BUILT_IN_SCALAR_OPS_H
 
-#include "runtime/cpp/generated/built_in/scalar_ops.h"
-#include "runtime/cpp/core/py_runtime.h"
+#include "built_in/scalar_ops.h"
+#include "core/py_runtime.h"
 
 // Python 互換の真除算・floor 除算・modulo。
 // py_div: 型未確定の object 境界フォールバック用。算術型確定時は emitter がインライン化。

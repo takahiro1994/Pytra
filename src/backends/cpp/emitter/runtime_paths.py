@@ -110,20 +110,30 @@ def runtime_namespace_for_tail(module_tail: str) -> str:
 
 
 def module_name_to_cpp_include(module_name_norm: str) -> str:
-    """`pytra.std|utils|compiler|built_in` 名を C++ include 形式へ変換する。"""
+    """`pytra.std|utils|compiler|built_in` 名を C++ include 形式へ変換する。
+
+    Returns namespace-relative path (e.g. "built_in/contains.h", "std/pathlib.h")
+    suitable for -I out/cpp or equivalent single include root.
+    """
     module_id = canonical_runtime_module_id(module_name_norm)
     indexed = lookup_target_module_primary_compiler_header("cpp", module_id)
     if indexed != "":
-        if indexed.startswith("src/runtime/cpp/"):
-            return indexed[len("src/runtime/cpp/") :]
-        if indexed.startswith("src/"):
-            return indexed[4:]
-        return indexed
+        # Strip src/runtime/cpp/ prefix, then strip generated/ prefix.
+        rel = indexed
+        if rel.startswith("src/runtime/cpp/"):
+            rel = rel[len("src/runtime/cpp/"):]
+        elif rel.startswith("src/"):
+            rel = rel[4:]
+        # In out/cpp/ layout, generated/ files sit in the same namespace folder
+        # as native files. Strip the "generated/" prefix.
+        if rel.startswith("generated/"):
+            rel = rel[len("generated/"):]
+        return rel
     if module_id.startswith(TOOLCHAIN_COMPILER_PREFIX):
         rel_hdr = module_tail_to_cpp_header_path(
             "compiler/" + module_id[TOOLCHAIN_COMPILER_PREFIX_LEN:]
         )
-        return "runtime/cpp/" + rel_hdr
+        return rel_hdr
     return ""
 
 

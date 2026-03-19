@@ -521,7 +521,7 @@ def build_cpp_header_from_east(
         if exceptions_include not in includes:
             includes.append(exceptions_include)
     if _header_decl_uses_class_type_support(decl_text):
-        runtime_include = '#include "runtime/cpp/core/py_runtime.h"'
+        runtime_include = '#include "core/py_runtime.h"'
         if runtime_include not in includes:
             includes.append(runtime_include)
 
@@ -992,7 +992,7 @@ def _extract_cpp_include_lines(cpp_text: str, output_path: Path) -> list[str]:
                 inc_path = line[q0 + 1 : q1].replace("\\", "/")
                 if inc_path.split("/")[-1] == own_name:
                     continue
-        if line == '#include "runtime/cpp/core/py_runtime.h"':
+        if line == '#include "core/py_runtime.h"':
             continue
         if line in seen:
             continue

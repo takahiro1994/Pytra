@@ -1,8 +1,8 @@
 #ifndef PYTRA_NATIVE_BUILT_IN_LIST_OPS_H
 #define PYTRA_NATIVE_BUILT_IN_LIST_OPS_H
 
-#include "runtime/cpp/core/py_runtime.h"
-#include "runtime/cpp/built_in/scalar_ops.h"
+#include "core/py_runtime.h"
+#include "built_in/scalar_ops.h"
 
 // リスト境界正規化・スライス・インデックスアクセス。
 // py_runtime.h から移動（P6-CPP-LIST-MUT-IR-BYPASS-FIX-01）。

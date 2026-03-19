@@ -1,7 +1,7 @@
-#include "runtime/cpp/core/py_runtime.h"
-#include "runtime/cpp/core/process_runtime.h"
+#include "core/py_runtime.h"
+#include "core/process_runtime.h"
 
-#include "runtime/cpp/generated/std/sys.h"
+#include "std/sys.h"
 
 namespace pytra::std::sys {
 

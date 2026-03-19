@@ -15,9 +15,9 @@
 #include <utility>
 #include <vector>
 
-#include "py_scalar_types.h"
-#include "gc.h"
-#include "io.h"
+#include "core/py_scalar_types.h"
+#include "core/gc.h"
+#include "core/io.h"
 
 using RcObject = pytra::gc::RcObject;
 
@@ -35,10 +35,10 @@ class str;
 template <class T> class list;
 template <class K, class V> class dict;
 
-#include "str.h"
-#include "list.h"
-#include "dict.h"
-#include "set.h"
+#include "core/str.h"
+#include "core/list.h"
+#include "core/dict.h"
+#include "core/set.h"
 
 template <class T>
 struct py_is_rc_list_handle : ::std::false_type {};
