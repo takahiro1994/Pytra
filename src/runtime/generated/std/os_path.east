@@ -26,11 +26,26 @@
       }
     },
     {
-      "kind": "ImportFrom",
+      "kind": "Import",
       "source_span": {
         "lineno": 4,
         "col_offset": 0,
         "end_lineno": 4,
+        "end_col_offset": 14
+      },
+      "names": [
+        {
+          "name": "os.path",
+          "asname": null
+        }
+      ]
+    },
+    {
+      "kind": "ImportFrom",
+      "source_span": {
+        "lineno": 6,
+        "col_offset": 0,
+        "end_lineno": 6,
         "end_col_offset": 28
       },
       "module": "pytra.std",
@@ -48,7 +63,7 @@
         "lineno": 10,
         "col_offset": 0,
         "end_lineno": 11,
-        "end_col_offset": 28
+        "end_col_offset": 29
       },
       "name": "join",
       "original_name": "join",
@@ -79,7 +94,7 @@
             "lineno": 11,
             "col_offset": 4,
             "end_lineno": 11,
-            "end_col_offset": 28
+            "end_col_offset": 29
           },
           "value": {
             "kind": "Call",
@@ -87,37 +102,51 @@
               "lineno": 11,
               "col_offset": 11,
               "end_lineno": 11,
-              "end_col_offset": 28
+              "end_col_offset": 29
             },
             "resolved_type": "unknown",
             "casts": [],
             "borrow_kind": "value",
-            "repr": "__path.join(a, b)",
+            "repr": "os.path.join(a, b)",
             "func": {
               "kind": "Attribute",
               "source_span": {
                 "lineno": 11,
                 "col_offset": 11,
                 "end_lineno": 11,
-                "end_col_offset": 22
+                "end_col_offset": 23
               },
               "resolved_type": "unknown",
               "casts": [],
               "borrow_kind": "value",
-              "repr": "__path.join",
+              "repr": "os.path.join",
               "value": {
-                "kind": "Name",
+                "kind": "Attribute",
                 "source_span": {
                   "lineno": 11,
                   "col_offset": 11,
                   "end_lineno": 11,
-                  "end_col_offset": 17
+                  "end_col_offset": 18
                 },
                 "resolved_type": "unknown",
                 "casts": [],
                 "borrow_kind": "value",
-                "repr": "__path",
-                "id": "__path"
+                "repr": "os.path",
+                "value": {
+                  "kind": "Name",
+                  "source_span": {
+                    "lineno": 11,
+                    "col_offset": 11,
+                    "end_lineno": 11,
+                    "end_col_offset": 13
+                  },
+                  "resolved_type": "unknown",
+                  "casts": [],
+                  "borrow_kind": "value",
+                  "repr": "os",
+                  "id": "os"
+                },
+                "attr": "path"
               },
               "attr": "join"
             },
@@ -126,9 +155,9 @@
                 "kind": "Name",
                 "source_span": {
                   "lineno": 11,
-                  "col_offset": 23,
+                  "col_offset": 24,
                   "end_lineno": 11,
-                  "end_col_offset": 24
+                  "end_col_offset": 25
                 },
                 "resolved_type": "str",
                 "casts": [],
@@ -140,9 +169,9 @@
                 "kind": "Name",
                 "source_span": {
                   "lineno": 11,
-                  "col_offset": 26,
+                  "col_offset": 27,
                   "end_lineno": 11,
-                  "end_col_offset": 27
+                  "end_col_offset": 28
                 },
                 "resolved_type": "str",
                 "casts": [],
@@ -164,20 +193,20 @@
             "lifetime_node_id": "n0",
             "lifetime_defs": [],
             "lifetime_uses": [
-              "__path",
               "a",
-              "b"
+              "b",
+              "os"
             ],
             "lifetime_live_in": [
-              "__path",
               "a",
-              "b"
+              "b",
+              "os"
             ],
             "lifetime_live_out": [],
             "lifetime_last_use_vars": [
-              "__path",
               "a",
-              "b"
+              "b",
+              "os"
             ]
           }
         }
@@ -218,9 +247,9 @@
               "kind": "Return",
               "defs": [],
               "uses": [
-                "__path",
                 "a",
-                "b"
+                "b",
+                "os"
               ],
               "succ": []
             }
@@ -228,32 +257,18 @@
           "def_use": {
             "defs": {},
             "uses": {
-              "__path": [
-                "n0"
-              ],
               "a": [
                 "n0"
               ],
               "b": [
                 "n0"
+              ],
+              "os": [
+                "n0"
               ]
             }
           },
           "variables": {
-            "__path": {
-              "def_nodes": [],
-              "use_nodes": [
-                "n0"
-              ],
-              "live_in_nodes": [
-                "n0"
-              ],
-              "live_out_nodes": [],
-              "last_use_nodes": [
-                "n0"
-              ],
-              "lifetime_class": "escape_or_unknown"
-            },
             "a": {
               "def_nodes": [],
               "use_nodes": [
@@ -269,6 +284,20 @@
               "lifetime_class": "escape_or_unknown"
             },
             "b": {
+              "def_nodes": [],
+              "use_nodes": [
+                "n0"
+              ],
+              "live_in_nodes": [
+                "n0"
+              ],
+              "live_out_nodes": [],
+              "last_use_nodes": [
+                "n0"
+              ],
+              "lifetime_class": "escape_or_unknown"
+            },
+            "os": {
               "def_nodes": [],
               "use_nodes": [
                 "n0"
@@ -301,7 +330,7 @@
         "lineno": 15,
         "col_offset": 0,
         "end_lineno": 16,
-        "end_col_offset": 28
+        "end_col_offset": 29
       },
       "name": "dirname",
       "original_name": "dirname",
@@ -328,7 +357,7 @@
             "lineno": 16,
             "col_offset": 4,
             "end_lineno": 16,
-            "end_col_offset": 28
+            "end_col_offset": 29
           },
           "value": {
             "kind": "Call",
@@ -336,37 +365,51 @@
               "lineno": 16,
               "col_offset": 11,
               "end_lineno": 16,
-              "end_col_offset": 28
+              "end_col_offset": 29
             },
             "resolved_type": "unknown",
             "casts": [],
             "borrow_kind": "value",
-            "repr": "__path.dirname(p)",
+            "repr": "os.path.dirname(p)",
             "func": {
               "kind": "Attribute",
               "source_span": {
                 "lineno": 16,
                 "col_offset": 11,
                 "end_lineno": 16,
-                "end_col_offset": 25
+                "end_col_offset": 26
               },
               "resolved_type": "unknown",
               "casts": [],
               "borrow_kind": "value",
-              "repr": "__path.dirname",
+              "repr": "os.path.dirname",
               "value": {
-                "kind": "Name",
+                "kind": "Attribute",
                 "source_span": {
                   "lineno": 16,
                   "col_offset": 11,
                   "end_lineno": 16,
-                  "end_col_offset": 17
+                  "end_col_offset": 18
                 },
                 "resolved_type": "unknown",
                 "casts": [],
                 "borrow_kind": "value",
-                "repr": "__path",
-                "id": "__path"
+                "repr": "os.path",
+                "value": {
+                  "kind": "Name",
+                  "source_span": {
+                    "lineno": 16,
+                    "col_offset": 11,
+                    "end_lineno": 16,
+                    "end_col_offset": 13
+                  },
+                  "resolved_type": "unknown",
+                  "casts": [],
+                  "borrow_kind": "value",
+                  "repr": "os",
+                  "id": "os"
+                },
+                "attr": "path"
               },
               "attr": "dirname"
             },
@@ -375,9 +418,9 @@
                 "kind": "Name",
                 "source_span": {
                   "lineno": 16,
-                  "col_offset": 26,
+                  "col_offset": 27,
                   "end_lineno": 16,
-                  "end_col_offset": 27
+                  "end_col_offset": 28
                 },
                 "resolved_type": "str",
                 "casts": [],
@@ -399,16 +442,16 @@
             "lifetime_node_id": "n0",
             "lifetime_defs": [],
             "lifetime_uses": [
-              "__path",
+              "os",
               "p"
             ],
             "lifetime_live_in": [
-              "__path",
+              "os",
               "p"
             ],
             "lifetime_live_out": [],
             "lifetime_last_use_vars": [
-              "__path",
+              "os",
               "p"
             ]
           }
@@ -446,7 +489,7 @@
               "kind": "Return",
               "defs": [],
               "uses": [
-                "__path",
+                "os",
                 "p"
               ],
               "succ": []
@@ -455,7 +498,7 @@
           "def_use": {
             "defs": {},
             "uses": {
-              "__path": [
+              "os": [
                 "n0"
               ],
               "p": [
@@ -464,7 +507,7 @@
             }
           },
           "variables": {
-            "__path": {
+            "os": {
               "def_nodes": [],
               "use_nodes": [
                 "n0"
@@ -509,7 +552,7 @@
         "lineno": 20,
         "col_offset": 0,
         "end_lineno": 21,
-        "end_col_offset": 29
+        "end_col_offset": 30
       },
       "name": "basename",
       "original_name": "basename",
@@ -536,7 +579,7 @@
             "lineno": 21,
             "col_offset": 4,
             "end_lineno": 21,
-            "end_col_offset": 29
+            "end_col_offset": 30
           },
           "value": {
             "kind": "Call",
@@ -544,37 +587,51 @@
               "lineno": 21,
               "col_offset": 11,
               "end_lineno": 21,
-              "end_col_offset": 29
+              "end_col_offset": 30
             },
             "resolved_type": "unknown",
             "casts": [],
             "borrow_kind": "value",
-            "repr": "__path.basename(p)",
+            "repr": "os.path.basename(p)",
             "func": {
               "kind": "Attribute",
               "source_span": {
                 "lineno": 21,
                 "col_offset": 11,
                 "end_lineno": 21,
-                "end_col_offset": 26
+                "end_col_offset": 27
               },
               "resolved_type": "unknown",
               "casts": [],
               "borrow_kind": "value",
-              "repr": "__path.basename",
+              "repr": "os.path.basename",
               "value": {
-                "kind": "Name",
+                "kind": "Attribute",
                 "source_span": {
                   "lineno": 21,
                   "col_offset": 11,
                   "end_lineno": 21,
-                  "end_col_offset": 17
+                  "end_col_offset": 18
                 },
                 "resolved_type": "unknown",
                 "casts": [],
                 "borrow_kind": "value",
-                "repr": "__path",
-                "id": "__path"
+                "repr": "os.path",
+                "value": {
+                  "kind": "Name",
+                  "source_span": {
+                    "lineno": 21,
+                    "col_offset": 11,
+                    "end_lineno": 21,
+                    "end_col_offset": 13
+                  },
+                  "resolved_type": "unknown",
+                  "casts": [],
+                  "borrow_kind": "value",
+                  "repr": "os",
+                  "id": "os"
+                },
+                "attr": "path"
               },
               "attr": "basename"
             },
@@ -583,9 +640,9 @@
                 "kind": "Name",
                 "source_span": {
                   "lineno": 21,
-                  "col_offset": 27,
+                  "col_offset": 28,
                   "end_lineno": 21,
-                  "end_col_offset": 28
+                  "end_col_offset": 29
                 },
                 "resolved_type": "str",
                 "casts": [],
@@ -607,16 +664,16 @@
             "lifetime_node_id": "n0",
             "lifetime_defs": [],
             "lifetime_uses": [
-              "__path",
+              "os",
               "p"
             ],
             "lifetime_live_in": [
-              "__path",
+              "os",
               "p"
             ],
             "lifetime_live_out": [],
             "lifetime_last_use_vars": [
-              "__path",
+              "os",
               "p"
             ]
           }
@@ -654,7 +711,7 @@
               "kind": "Return",
               "defs": [],
               "uses": [
-                "__path",
+                "os",
                 "p"
               ],
               "succ": []
@@ -663,7 +720,7 @@
           "def_use": {
             "defs": {},
             "uses": {
-              "__path": [
+              "os": [
                 "n0"
               ],
               "p": [
@@ -672,7 +729,7 @@
             }
           },
           "variables": {
-            "__path": {
+            "os": {
               "def_nodes": [],
               "use_nodes": [
                 "n0"
@@ -717,7 +774,7 @@
         "lineno": 25,
         "col_offset": 0,
         "end_lineno": 26,
-        "end_col_offset": 29
+        "end_col_offset": 30
       },
       "name": "splitext",
       "original_name": "splitext",
@@ -744,7 +801,7 @@
             "lineno": 26,
             "col_offset": 4,
             "end_lineno": 26,
-            "end_col_offset": 29
+            "end_col_offset": 30
           },
           "value": {
             "kind": "Call",
@@ -752,37 +809,51 @@
               "lineno": 26,
               "col_offset": 11,
               "end_lineno": 26,
-              "end_col_offset": 29
+              "end_col_offset": 30
             },
             "resolved_type": "unknown",
             "casts": [],
             "borrow_kind": "value",
-            "repr": "__path.splitext(p)",
+            "repr": "os.path.splitext(p)",
             "func": {
               "kind": "Attribute",
               "source_span": {
                 "lineno": 26,
                 "col_offset": 11,
                 "end_lineno": 26,
-                "end_col_offset": 26
+                "end_col_offset": 27
               },
               "resolved_type": "unknown",
               "casts": [],
               "borrow_kind": "value",
-              "repr": "__path.splitext",
+              "repr": "os.path.splitext",
               "value": {
-                "kind": "Name",
+                "kind": "Attribute",
                 "source_span": {
                   "lineno": 26,
                   "col_offset": 11,
                   "end_lineno": 26,
-                  "end_col_offset": 17
+                  "end_col_offset": 18
                 },
                 "resolved_type": "unknown",
                 "casts": [],
                 "borrow_kind": "value",
-                "repr": "__path",
-                "id": "__path"
+                "repr": "os.path",
+                "value": {
+                  "kind": "Name",
+                  "source_span": {
+                    "lineno": 26,
+                    "col_offset": 11,
+                    "end_lineno": 26,
+                    "end_col_offset": 13
+                  },
+                  "resolved_type": "unknown",
+                  "casts": [],
+                  "borrow_kind": "value",
+                  "repr": "os",
+                  "id": "os"
+                },
+                "attr": "path"
               },
               "attr": "splitext"
             },
@@ -791,9 +862,9 @@
                 "kind": "Name",
                 "source_span": {
                   "lineno": 26,
-                  "col_offset": 27,
+                  "col_offset": 28,
                   "end_lineno": 26,
-                  "end_col_offset": 28
+                  "end_col_offset": 29
                 },
                 "resolved_type": "str",
                 "casts": [],
@@ -815,16 +886,16 @@
             "lifetime_node_id": "n0",
             "lifetime_defs": [],
             "lifetime_uses": [
-              "__path",
+              "os",
               "p"
             ],
             "lifetime_live_in": [
-              "__path",
+              "os",
               "p"
             ],
             "lifetime_live_out": [],
             "lifetime_last_use_vars": [
-              "__path",
+              "os",
               "p"
             ]
           }
@@ -872,7 +943,7 @@
               "kind": "Return",
               "defs": [],
               "uses": [
-                "__path",
+                "os",
                 "p"
               ],
               "succ": []
@@ -881,7 +952,7 @@
           "def_use": {
             "defs": {},
             "uses": {
-              "__path": [
+              "os": [
                 "n0"
               ],
               "p": [
@@ -890,7 +961,7 @@
             }
           },
           "variables": {
-            "__path": {
+            "os": {
               "def_nodes": [],
               "use_nodes": [
                 "n0"
@@ -935,7 +1006,7 @@
         "lineno": 30,
         "col_offset": 0,
         "end_lineno": 31,
-        "end_col_offset": 28
+        "end_col_offset": 29
       },
       "name": "abspath",
       "original_name": "abspath",
@@ -962,7 +1033,7 @@
             "lineno": 31,
             "col_offset": 4,
             "end_lineno": 31,
-            "end_col_offset": 28
+            "end_col_offset": 29
           },
           "value": {
             "kind": "Call",
@@ -970,37 +1041,51 @@
               "lineno": 31,
               "col_offset": 11,
               "end_lineno": 31,
-              "end_col_offset": 28
+              "end_col_offset": 29
             },
             "resolved_type": "unknown",
             "casts": [],
             "borrow_kind": "value",
-            "repr": "__path.abspath(p)",
+            "repr": "os.path.abspath(p)",
             "func": {
               "kind": "Attribute",
               "source_span": {
                 "lineno": 31,
                 "col_offset": 11,
                 "end_lineno": 31,
-                "end_col_offset": 25
+                "end_col_offset": 26
               },
               "resolved_type": "unknown",
               "casts": [],
               "borrow_kind": "value",
-              "repr": "__path.abspath",
+              "repr": "os.path.abspath",
               "value": {
-                "kind": "Name",
+                "kind": "Attribute",
                 "source_span": {
                   "lineno": 31,
                   "col_offset": 11,
                   "end_lineno": 31,
-                  "end_col_offset": 17
+                  "end_col_offset": 18
                 },
                 "resolved_type": "unknown",
                 "casts": [],
                 "borrow_kind": "value",
-                "repr": "__path",
-                "id": "__path"
+                "repr": "os.path",
+                "value": {
+                  "kind": "Name",
+                  "source_span": {
+                    "lineno": 31,
+                    "col_offset": 11,
+                    "end_lineno": 31,
+                    "end_col_offset": 13
+                  },
+                  "resolved_type": "unknown",
+                  "casts": [],
+                  "borrow_kind": "value",
+                  "repr": "os",
+                  "id": "os"
+                },
+                "attr": "path"
               },
               "attr": "abspath"
             },
@@ -1009,9 +1094,9 @@
                 "kind": "Name",
                 "source_span": {
                   "lineno": 31,
-                  "col_offset": 26,
+                  "col_offset": 27,
                   "end_lineno": 31,
-                  "end_col_offset": 27
+                  "end_col_offset": 28
                 },
                 "resolved_type": "str",
                 "casts": [],
@@ -1033,16 +1118,16 @@
             "lifetime_node_id": "n0",
             "lifetime_defs": [],
             "lifetime_uses": [
-              "__path",
+              "os",
               "p"
             ],
             "lifetime_live_in": [
-              "__path",
+              "os",
               "p"
             ],
             "lifetime_live_out": [],
             "lifetime_last_use_vars": [
-              "__path",
+              "os",
               "p"
             ]
           }
@@ -1080,7 +1165,7 @@
               "kind": "Return",
               "defs": [],
               "uses": [
-                "__path",
+                "os",
                 "p"
               ],
               "succ": []
@@ -1089,7 +1174,7 @@
           "def_use": {
             "defs": {},
             "uses": {
-              "__path": [
+              "os": [
                 "n0"
               ],
               "p": [
@@ -1098,7 +1183,7 @@
             }
           },
           "variables": {
-            "__path": {
+            "os": {
               "def_nodes": [],
               "use_nodes": [
                 "n0"
@@ -1143,7 +1228,7 @@
         "lineno": 35,
         "col_offset": 0,
         "end_lineno": 36,
-        "end_col_offset": 27
+        "end_col_offset": 28
       },
       "name": "exists",
       "original_name": "exists",
@@ -1170,7 +1255,7 @@
             "lineno": 36,
             "col_offset": 4,
             "end_lineno": 36,
-            "end_col_offset": 27
+            "end_col_offset": 28
           },
           "value": {
             "kind": "Call",
@@ -1178,37 +1263,51 @@
               "lineno": 36,
               "col_offset": 11,
               "end_lineno": 36,
-              "end_col_offset": 27
+              "end_col_offset": 28
             },
             "resolved_type": "unknown",
             "casts": [],
             "borrow_kind": "value",
-            "repr": "__path.exists(p)",
+            "repr": "os.path.exists(p)",
             "func": {
               "kind": "Attribute",
               "source_span": {
                 "lineno": 36,
                 "col_offset": 11,
                 "end_lineno": 36,
-                "end_col_offset": 24
+                "end_col_offset": 25
               },
               "resolved_type": "unknown",
               "casts": [],
               "borrow_kind": "value",
-              "repr": "__path.exists",
+              "repr": "os.path.exists",
               "value": {
-                "kind": "Name",
+                "kind": "Attribute",
                 "source_span": {
                   "lineno": 36,
                   "col_offset": 11,
                   "end_lineno": 36,
-                  "end_col_offset": 17
+                  "end_col_offset": 18
                 },
                 "resolved_type": "unknown",
                 "casts": [],
                 "borrow_kind": "value",
-                "repr": "__path",
-                "id": "__path"
+                "repr": "os.path",
+                "value": {
+                  "kind": "Name",
+                  "source_span": {
+                    "lineno": 36,
+                    "col_offset": 11,
+                    "end_lineno": 36,
+                    "end_col_offset": 13
+                  },
+                  "resolved_type": "unknown",
+                  "casts": [],
+                  "borrow_kind": "value",
+                  "repr": "os",
+                  "id": "os"
+                },
+                "attr": "path"
               },
               "attr": "exists"
             },
@@ -1217,9 +1316,9 @@
                 "kind": "Name",
                 "source_span": {
                   "lineno": 36,
-                  "col_offset": 25,
+                  "col_offset": 26,
                   "end_lineno": 36,
-                  "end_col_offset": 26
+                  "end_col_offset": 27
                 },
                 "resolved_type": "str",
                 "casts": [],
@@ -1241,16 +1340,16 @@
             "lifetime_node_id": "n0",
             "lifetime_defs": [],
             "lifetime_uses": [
-              "__path",
+              "os",
               "p"
             ],
             "lifetime_live_in": [
-              "__path",
+              "os",
               "p"
             ],
             "lifetime_live_out": [],
             "lifetime_last_use_vars": [
-              "__path",
+              "os",
               "p"
             ]
           }
@@ -1288,7 +1387,7 @@
               "kind": "Return",
               "defs": [],
               "uses": [
-                "__path",
+                "os",
                 "p"
               ],
               "succ": []
@@ -1297,7 +1396,7 @@
           "def_use": {
             "defs": {},
             "uses": {
-              "__path": [
+              "os": [
                 "n0"
               ],
               "p": [
@@ -1306,7 +1405,7 @@
             }
           },
           "variables": {
-            "__path": {
+            "os": {
               "def_nodes": [],
               "use_nodes": [
                 "n0"
@@ -1354,12 +1453,20 @@
       "schema_version": 1,
       "bindings": [
         {
+          "module_id": "os.path",
+          "export_name": "",
+          "local_name": "os",
+          "binding_kind": "module",
+          "source_file": "src/pytra/std/os_path.py",
+          "source_line": 4
+        },
+        {
           "module_id": "pytra.std",
           "export_name": "extern",
           "local_name": "extern",
           "binding_kind": "symbol",
           "source_file": "src/pytra/std/os_path.py",
-          "source_line": 4,
+          "source_line": 6,
           "source_module_id": "pytra.std",
           "source_export_name": "extern",
           "source_binding_kind": "symbol",
@@ -1382,12 +1489,20 @@
     },
     "import_bindings": [
       {
+        "module_id": "os.path",
+        "export_name": "",
+        "local_name": "os",
+        "binding_kind": "module",
+        "source_file": "src/pytra/std/os_path.py",
+        "source_line": 4
+      },
+      {
         "module_id": "pytra.std",
         "export_name": "extern",
         "local_name": "extern",
         "binding_kind": "symbol",
         "source_file": "src/pytra/std/os_path.py",
-        "source_line": 4
+        "source_line": 6
       }
     ],
     "qualified_symbol_refs": [
@@ -1397,7 +1512,9 @@
         "local_name": "extern"
       }
     ],
-    "import_modules": {},
+    "import_modules": {
+      "os": "os.path"
+    },
     "import_symbols": {
       "extern": {
         "module": "pytra.std",

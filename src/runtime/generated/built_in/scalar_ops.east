@@ -28,9 +28,9 @@
     {
       "kind": "ImportFrom",
       "source_span": {
-        "lineno": 6,
+        "lineno": 4,
         "col_offset": 0,
-        "end_lineno": 6,
+        "end_lineno": 4,
         "end_col_offset": 28
       },
       "module": "pytra.std",
@@ -45,10 +45,10 @@
     {
       "kind": "FunctionDef",
       "source_span": {
-        "lineno": 10,
+        "lineno": 8,
         "col_offset": 0,
-        "end_lineno": 11,
-        "end_col_offset": 27
+        "end_lineno": 9,
+        "end_col_offset": 23
       },
       "name": "py_to_int64_base",
       "original_name": "py_to_int64_base",
@@ -76,59 +76,45 @@
         {
           "kind": "Return",
           "source_span": {
-            "lineno": 11,
+            "lineno": 9,
             "col_offset": 4,
-            "end_lineno": 11,
-            "end_col_offset": 27
+            "end_lineno": 9,
+            "end_col_offset": 23
           },
           "value": {
             "kind": "Call",
             "source_span": {
-              "lineno": 11,
+              "lineno": 9,
               "col_offset": 11,
-              "end_lineno": 11,
-              "end_col_offset": 27
+              "end_lineno": 9,
+              "end_col_offset": 23
             },
-            "resolved_type": "unknown",
+            "resolved_type": "int64",
             "casts": [],
             "borrow_kind": "value",
-            "repr": "__b.int(v, base)",
+            "repr": "int(v, base)",
             "func": {
-              "kind": "Attribute",
+              "kind": "Name",
               "source_span": {
-                "lineno": 11,
+                "lineno": 9,
                 "col_offset": 11,
-                "end_lineno": 11,
-                "end_col_offset": 18
+                "end_lineno": 9,
+                "end_col_offset": 14
               },
               "resolved_type": "unknown",
               "casts": [],
               "borrow_kind": "value",
-              "repr": "__b.int",
-              "value": {
-                "kind": "Name",
-                "source_span": {
-                  "lineno": 11,
-                  "col_offset": 11,
-                  "end_lineno": 11,
-                  "end_col_offset": 14
-                },
-                "resolved_type": "unknown",
-                "casts": [],
-                "borrow_kind": "value",
-                "repr": "__b",
-                "id": "__b"
-              },
-              "attr": "int"
+              "repr": "int",
+              "id": "int"
             },
             "args": [
               {
                 "kind": "Name",
                 "source_span": {
-                  "lineno": 11,
-                  "col_offset": 19,
-                  "end_lineno": 11,
-                  "end_col_offset": 20
+                  "lineno": 9,
+                  "col_offset": 15,
+                  "end_lineno": 9,
+                  "end_col_offset": 16
                 },
                 "resolved_type": "str",
                 "casts": [],
@@ -139,10 +125,10 @@
               {
                 "kind": "Name",
                 "source_span": {
-                  "lineno": 11,
-                  "col_offset": 22,
-                  "end_lineno": 11,
-                  "end_col_offset": 26
+                  "lineno": 9,
+                  "col_offset": 18,
+                  "end_lineno": 9,
+                  "end_col_offset": 22
                 },
                 "resolved_type": "int64",
                 "casts": [],
@@ -152,31 +138,36 @@
               }
             ],
             "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "int",
+            "runtime_call": "py_to_int64_base",
+            "runtime_module_id": "pytra.built_in.scalar_ops",
+            "runtime_symbol": "py_to_int64_base",
+            "semantic_tag": "cast.int",
             "type_expr_summary_v1": {
               "schema_version": 1,
-              "kind": "DynamicType",
-              "category": "dynamic",
-              "mirror": "unknown",
-              "dynamic_name": "unknown"
+              "kind": "NamedType",
+              "category": "static",
+              "mirror": "int64"
             }
           },
           "meta": {
             "lifetime_node_id": "n0",
             "lifetime_defs": [],
             "lifetime_uses": [
-              "__b",
               "base",
+              "int",
               "v"
             ],
             "lifetime_live_in": [
-              "__b",
               "base",
+              "int",
               "v"
             ],
             "lifetime_live_out": [],
             "lifetime_last_use_vars": [
-              "__b",
               "base",
+              "int",
               "v"
             ]
           }
@@ -218,8 +209,8 @@
               "kind": "Return",
               "defs": [],
               "uses": [
-                "__b",
                 "base",
+                "int",
                 "v"
               ],
               "succ": []
@@ -228,10 +219,10 @@
           "def_use": {
             "defs": {},
             "uses": {
-              "__b": [
+              "base": [
                 "n0"
               ],
-              "base": [
+              "int": [
                 "n0"
               ],
               "v": [
@@ -240,7 +231,7 @@
             }
           },
           "variables": {
-            "__b": {
+            "base": {
               "def_nodes": [],
               "use_nodes": [
                 "n0"
@@ -254,7 +245,7 @@
               ],
               "lifetime_class": "escape_or_unknown"
             },
-            "base": {
+            "int": {
               "def_nodes": [],
               "use_nodes": [
                 "n0"
@@ -298,10 +289,10 @@
     {
       "kind": "FunctionDef",
       "source_span": {
-        "lineno": 15,
+        "lineno": 13,
         "col_offset": 0,
-        "end_lineno": 16,
-        "end_col_offset": 22
+        "end_lineno": 14,
+        "end_col_offset": 18
       },
       "name": "py_ord",
       "original_name": "py_ord",
@@ -325,59 +316,45 @@
         {
           "kind": "Return",
           "source_span": {
-            "lineno": 16,
+            "lineno": 14,
             "col_offset": 4,
-            "end_lineno": 16,
-            "end_col_offset": 22
+            "end_lineno": 14,
+            "end_col_offset": 18
           },
           "value": {
             "kind": "Call",
             "source_span": {
-              "lineno": 16,
+              "lineno": 14,
               "col_offset": 11,
-              "end_lineno": 16,
-              "end_col_offset": 22
+              "end_lineno": 14,
+              "end_col_offset": 18
             },
             "resolved_type": "unknown",
             "casts": [],
             "borrow_kind": "value",
-            "repr": "__b.ord(ch)",
+            "repr": "ord(ch)",
             "func": {
-              "kind": "Attribute",
+              "kind": "Name",
               "source_span": {
-                "lineno": 16,
+                "lineno": 14,
                 "col_offset": 11,
-                "end_lineno": 16,
-                "end_col_offset": 18
+                "end_lineno": 14,
+                "end_col_offset": 14
               },
               "resolved_type": "unknown",
               "casts": [],
               "borrow_kind": "value",
-              "repr": "__b.ord",
-              "value": {
-                "kind": "Name",
-                "source_span": {
-                  "lineno": 16,
-                  "col_offset": 11,
-                  "end_lineno": 16,
-                  "end_col_offset": 14
-                },
-                "resolved_type": "unknown",
-                "casts": [],
-                "borrow_kind": "value",
-                "repr": "__b",
-                "id": "__b"
-              },
-              "attr": "ord"
+              "repr": "ord",
+              "id": "ord"
             },
             "args": [
               {
                 "kind": "Name",
                 "source_span": {
-                  "lineno": 16,
-                  "col_offset": 19,
-                  "end_lineno": 16,
-                  "end_col_offset": 21
+                  "lineno": 14,
+                  "col_offset": 15,
+                  "end_lineno": 14,
+                  "end_col_offset": 17
                 },
                 "resolved_type": "str",
                 "casts": [],
@@ -387,6 +364,12 @@
               }
             ],
             "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "ord",
+            "runtime_call": "py_ord",
+            "runtime_module_id": "pytra.built_in.scalar_ops",
+            "runtime_symbol": "py_ord",
+            "semantic_tag": "cast.ord",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "DynamicType",
@@ -399,17 +382,17 @@
             "lifetime_node_id": "n0",
             "lifetime_defs": [],
             "lifetime_uses": [
-              "__b",
-              "ch"
+              "ch",
+              "ord"
             ],
             "lifetime_live_in": [
-              "__b",
-              "ch"
+              "ch",
+              "ord"
             ],
             "lifetime_live_out": [],
             "lifetime_last_use_vars": [
-              "__b",
-              "ch"
+              "ch",
+              "ord"
             ]
           }
         }
@@ -446,8 +429,8 @@
               "kind": "Return",
               "defs": [],
               "uses": [
-                "__b",
-                "ch"
+                "ch",
+                "ord"
               ],
               "succ": []
             }
@@ -455,16 +438,16 @@
           "def_use": {
             "defs": {},
             "uses": {
-              "__b": [
+              "ch": [
                 "n0"
               ],
-              "ch": [
+              "ord": [
                 "n0"
               ]
             }
           },
           "variables": {
-            "__b": {
+            "ch": {
               "def_nodes": [],
               "use_nodes": [
                 "n0"
@@ -478,7 +461,7 @@
               ],
               "lifetime_class": "escape_or_unknown"
             },
-            "ch": {
+            "ord": {
               "def_nodes": [],
               "use_nodes": [
                 "n0"
@@ -506,10 +489,10 @@
     {
       "kind": "FunctionDef",
       "source_span": {
-        "lineno": 20,
+        "lineno": 18,
         "col_offset": 0,
-        "end_lineno": 21,
-        "end_col_offset": 29
+        "end_lineno": 19,
+        "end_col_offset": 25
       },
       "name": "py_chr",
       "original_name": "py_chr",
@@ -533,59 +516,45 @@
         {
           "kind": "Return",
           "source_span": {
-            "lineno": 21,
+            "lineno": 19,
             "col_offset": 4,
-            "end_lineno": 21,
-            "end_col_offset": 29
+            "end_lineno": 19,
+            "end_col_offset": 25
           },
           "value": {
             "kind": "Call",
             "source_span": {
-              "lineno": 21,
+              "lineno": 19,
               "col_offset": 11,
-              "end_lineno": 21,
-              "end_col_offset": 29
+              "end_lineno": 19,
+              "end_col_offset": 25
             },
             "resolved_type": "unknown",
             "casts": [],
             "borrow_kind": "value",
-            "repr": "__b.chr(codepoint)",
+            "repr": "chr(codepoint)",
             "func": {
-              "kind": "Attribute",
+              "kind": "Name",
               "source_span": {
-                "lineno": 21,
+                "lineno": 19,
                 "col_offset": 11,
-                "end_lineno": 21,
-                "end_col_offset": 18
+                "end_lineno": 19,
+                "end_col_offset": 14
               },
               "resolved_type": "unknown",
               "casts": [],
               "borrow_kind": "value",
-              "repr": "__b.chr",
-              "value": {
-                "kind": "Name",
-                "source_span": {
-                  "lineno": 21,
-                  "col_offset": 11,
-                  "end_lineno": 21,
-                  "end_col_offset": 14
-                },
-                "resolved_type": "unknown",
-                "casts": [],
-                "borrow_kind": "value",
-                "repr": "__b",
-                "id": "__b"
-              },
-              "attr": "chr"
+              "repr": "chr",
+              "id": "chr"
             },
             "args": [
               {
                 "kind": "Name",
                 "source_span": {
-                  "lineno": 21,
-                  "col_offset": 19,
-                  "end_lineno": 21,
-                  "end_col_offset": 28
+                  "lineno": 19,
+                  "col_offset": 15,
+                  "end_lineno": 19,
+                  "end_col_offset": 24
                 },
                 "resolved_type": "int64",
                 "casts": [],
@@ -595,6 +564,12 @@
               }
             ],
             "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "chr",
+            "runtime_call": "py_chr",
+            "runtime_module_id": "pytra.built_in.scalar_ops",
+            "runtime_symbol": "py_chr",
+            "semantic_tag": "cast.chr",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "DynamicType",
@@ -607,16 +582,16 @@
             "lifetime_node_id": "n0",
             "lifetime_defs": [],
             "lifetime_uses": [
-              "__b",
+              "chr",
               "codepoint"
             ],
             "lifetime_live_in": [
-              "__b",
+              "chr",
               "codepoint"
             ],
             "lifetime_live_out": [],
             "lifetime_last_use_vars": [
-              "__b",
+              "chr",
               "codepoint"
             ]
           }
@@ -654,7 +629,7 @@
               "kind": "Return",
               "defs": [],
               "uses": [
-                "__b",
+                "chr",
                 "codepoint"
               ],
               "succ": []
@@ -663,7 +638,7 @@
           "def_use": {
             "defs": {},
             "uses": {
-              "__b": [
+              "chr": [
                 "n0"
               ],
               "codepoint": [
@@ -672,7 +647,7 @@
             }
           },
           "variables": {
-            "__b": {
+            "chr": {
               "def_nodes": [],
               "use_nodes": [
                 "n0"
@@ -725,7 +700,7 @@
           "local_name": "extern",
           "binding_kind": "symbol",
           "source_file": "src/pytra/built_in/scalar_ops.py",
-          "source_line": 6,
+          "source_line": 4,
           "source_module_id": "pytra.std",
           "source_export_name": "extern",
           "source_binding_kind": "symbol",
@@ -753,7 +728,7 @@
         "local_name": "extern",
         "binding_kind": "symbol",
         "source_file": "src/pytra/built_in/scalar_ops.py",
-        "source_line": 6
+        "source_line": 4
       }
     ],
     "qualified_symbol_refs": [

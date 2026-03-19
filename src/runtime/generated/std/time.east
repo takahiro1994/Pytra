@@ -26,11 +26,26 @@
       }
     },
     {
-      "kind": "ImportFrom",
+      "kind": "Import",
       "source_span": {
         "lineno": 4,
         "col_offset": 0,
         "end_lineno": 4,
+        "end_col_offset": 11
+      },
+      "names": [
+        {
+          "name": "time",
+          "asname": null
+        }
+      ]
+    },
+    {
+      "kind": "ImportFrom",
+      "source_span": {
+        "lineno": 6,
+        "col_offset": 0,
+        "end_lineno": 6,
         "end_col_offset": 28
       },
       "module": "pytra.std",
@@ -48,7 +63,7 @@
         "lineno": 10,
         "col_offset": 0,
         "end_lineno": 11,
-        "end_col_offset": 29
+        "end_col_offset": 30
       },
       "name": "perf_counter",
       "original_name": "perf_counter",
@@ -67,7 +82,7 @@
             "lineno": 11,
             "col_offset": 4,
             "end_lineno": 11,
-            "end_col_offset": 29
+            "end_col_offset": 30
           },
           "value": {
             "kind": "Call",
@@ -75,37 +90,37 @@
               "lineno": 11,
               "col_offset": 11,
               "end_lineno": 11,
-              "end_col_offset": 29
+              "end_col_offset": 30
             },
             "resolved_type": "unknown",
             "casts": [],
             "borrow_kind": "value",
-            "repr": "__t.perf_counter()",
+            "repr": "time.perf_counter()",
             "func": {
               "kind": "Attribute",
               "source_span": {
                 "lineno": 11,
                 "col_offset": 11,
                 "end_lineno": 11,
-                "end_col_offset": 27
+                "end_col_offset": 28
               },
               "resolved_type": "unknown",
               "casts": [],
               "borrow_kind": "value",
-              "repr": "__t.perf_counter",
+              "repr": "time.perf_counter",
               "value": {
                 "kind": "Name",
                 "source_span": {
                   "lineno": 11,
                   "col_offset": 11,
                   "end_lineno": 11,
-                  "end_col_offset": 14
+                  "end_col_offset": 15
                 },
                 "resolved_type": "unknown",
                 "casts": [],
                 "borrow_kind": "value",
-                "repr": "__t",
-                "id": "__t"
+                "repr": "time",
+                "id": "time"
               },
               "attr": "perf_counter"
             },
@@ -123,14 +138,14 @@
             "lifetime_node_id": "n0",
             "lifetime_defs": [],
             "lifetime_uses": [
-              "__t"
+              "time"
             ],
             "lifetime_live_in": [
-              "__t"
+              "time"
             ],
             "lifetime_live_out": [],
             "lifetime_last_use_vars": [
-              "__t"
+              "time"
             ]
           }
         }
@@ -162,7 +177,7 @@
               "kind": "Return",
               "defs": [],
               "uses": [
-                "__t"
+                "time"
               ],
               "succ": []
             }
@@ -170,13 +185,13 @@
           "def_use": {
             "defs": {},
             "uses": {
-              "__t": [
+              "time": [
                 "n0"
               ]
             }
           },
           "variables": {
-            "__t": {
+            "time": {
               "def_nodes": [],
               "use_nodes": [
                 "n0"
@@ -206,12 +221,20 @@
       "schema_version": 1,
       "bindings": [
         {
+          "module_id": "time",
+          "export_name": "",
+          "local_name": "time",
+          "binding_kind": "module",
+          "source_file": "src/pytra/std/time.py",
+          "source_line": 4
+        },
+        {
           "module_id": "pytra.std",
           "export_name": "extern",
           "local_name": "extern",
           "binding_kind": "symbol",
           "source_file": "src/pytra/std/time.py",
-          "source_line": 4,
+          "source_line": 6,
           "source_module_id": "pytra.std",
           "source_export_name": "extern",
           "source_binding_kind": "symbol",
@@ -234,12 +257,20 @@
     },
     "import_bindings": [
       {
+        "module_id": "time",
+        "export_name": "",
+        "local_name": "time",
+        "binding_kind": "module",
+        "source_file": "src/pytra/std/time.py",
+        "source_line": 4
+      },
+      {
         "module_id": "pytra.std",
         "export_name": "extern",
         "local_name": "extern",
         "binding_kind": "symbol",
         "source_file": "src/pytra/std/time.py",
-        "source_line": 4
+        "source_line": 6
       }
     ],
     "qualified_symbol_refs": [
@@ -249,7 +280,9 @@
         "local_name": "extern"
       }
     ],
-    "import_modules": {},
+    "import_modules": {
+      "time": "time"
+    },
     "import_symbols": {
       "extern": {
         "module": "pytra.std",

@@ -26,11 +26,26 @@
       }
     },
     {
-      "kind": "ImportFrom",
+      "kind": "Import",
       "source_span": {
         "lineno": 4,
         "col_offset": 0,
         "end_lineno": 4,
+        "end_col_offset": 10
+      },
+      "names": [
+        {
+          "name": "sys",
+          "asname": null
+        }
+      ]
+    },
+    {
+      "kind": "ImportFrom",
+      "source_span": {
+        "lineno": 6,
+        "col_offset": 0,
+        "end_lineno": 6,
         "end_col_offset": 28
       },
       "module": "pytra.std",
@@ -113,7 +128,7 @@
           "resolved_type": "unknown",
           "casts": [],
           "borrow_kind": "value",
-          "repr": "extern(__s.argv)",
+          "repr": "extern(sys.argv)",
           "func": {
             "kind": "Name",
             "source_span": {
@@ -140,7 +155,7 @@
               "resolved_type": "unknown",
               "casts": [],
               "borrow_kind": "value",
-              "repr": "__s.argv",
+              "repr": "sys.argv",
               "value": {
                 "kind": "Name",
                 "source_span": {
@@ -152,8 +167,8 @@
                 "resolved_type": "unknown",
                 "casts": [],
                 "borrow_kind": "value",
-                "repr": "__s",
-                "id": "__s"
+                "repr": "sys",
+                "id": "sys"
               },
               "attr": "argv"
             }
@@ -173,7 +188,7 @@
           "end_lineno": 8,
           "end_col_offset": 34
         },
-        "repr": "extern(__s.argv)",
+        "repr": "extern(sys.argv)",
         "type_expr_summary_v1": {
           "schema_version": 1,
           "kind": "GenericType",
@@ -277,7 +292,7 @@
           "resolved_type": "unknown",
           "casts": [],
           "borrow_kind": "value",
-          "repr": "extern(__s.path)",
+          "repr": "extern(sys.path)",
           "func": {
             "kind": "Name",
             "source_span": {
@@ -304,7 +319,7 @@
               "resolved_type": "unknown",
               "casts": [],
               "borrow_kind": "value",
-              "repr": "__s.path",
+              "repr": "sys.path",
               "value": {
                 "kind": "Name",
                 "source_span": {
@@ -316,8 +331,8 @@
                 "resolved_type": "unknown",
                 "casts": [],
                 "borrow_kind": "value",
-                "repr": "__s",
-                "id": "__s"
+                "repr": "sys",
+                "id": "sys"
               },
               "attr": "path"
             }
@@ -337,7 +352,7 @@
           "end_lineno": 9,
           "end_col_offset": 34
         },
-        "repr": "extern(__s.path)",
+        "repr": "extern(sys.path)",
         "type_expr_summary_v1": {
           "schema_version": 1,
           "kind": "GenericType",
@@ -406,7 +421,7 @@
         "resolved_type": "unknown",
         "casts": [],
         "borrow_kind": "value",
-        "repr": "extern(__s.stderr)",
+        "repr": "extern(sys.stderr)",
         "func": {
           "kind": "Name",
           "source_span": {
@@ -433,7 +448,7 @@
             "resolved_type": "unknown",
             "casts": [],
             "borrow_kind": "value",
-            "repr": "__s.stderr",
+            "repr": "sys.stderr",
             "value": {
               "kind": "Name",
               "source_span": {
@@ -445,8 +460,8 @@
               "resolved_type": "unknown",
               "casts": [],
               "borrow_kind": "value",
-              "repr": "__s",
-              "id": "__s"
+              "repr": "sys",
+              "id": "sys"
             },
             "attr": "stderr"
           }
@@ -504,7 +519,7 @@
         "resolved_type": "unknown",
         "casts": [],
         "borrow_kind": "value",
-        "repr": "extern(__s.stdout)",
+        "repr": "extern(sys.stdout)",
         "func": {
           "kind": "Name",
           "source_span": {
@@ -531,7 +546,7 @@
             "resolved_type": "unknown",
             "casts": [],
             "borrow_kind": "value",
-            "repr": "__s.stdout",
+            "repr": "sys.stdout",
             "value": {
               "kind": "Name",
               "source_span": {
@@ -543,8 +558,8 @@
               "resolved_type": "unknown",
               "casts": [],
               "borrow_kind": "value",
-              "repr": "__s",
-              "id": "__s"
+              "repr": "sys",
+              "id": "sys"
             },
             "attr": "stdout"
           }
@@ -627,7 +642,7 @@
             "resolved_type": "unknown",
             "casts": [],
             "borrow_kind": "value",
-            "repr": "__s.exit(code)",
+            "repr": "sys.exit(code)",
             "func": {
               "kind": "Attribute",
               "source_span": {
@@ -639,7 +654,7 @@
               "resolved_type": "unknown",
               "casts": [],
               "borrow_kind": "value",
-              "repr": "__s.exit",
+              "repr": "sys.exit",
               "value": {
                 "kind": "Name",
                 "source_span": {
@@ -651,8 +666,8 @@
                 "resolved_type": "unknown",
                 "casts": [],
                 "borrow_kind": "value",
-                "repr": "__s",
-                "id": "__s"
+                "repr": "sys",
+                "id": "sys"
               },
               "attr": "exit"
             },
@@ -685,17 +700,17 @@
             "lifetime_node_id": "n0",
             "lifetime_defs": [],
             "lifetime_uses": [
-              "__s",
-              "code"
+              "code",
+              "sys"
             ],
             "lifetime_live_in": [
-              "__s",
-              "code"
+              "code",
+              "sys"
             ],
             "lifetime_live_out": [],
             "lifetime_last_use_vars": [
-              "__s",
-              "code"
+              "code",
+              "sys"
             ]
           }
         }
@@ -732,8 +747,8 @@
               "kind": "Expr",
               "defs": [],
               "uses": [
-                "__s",
-                "code"
+                "code",
+                "sys"
               ],
               "succ": []
             }
@@ -741,29 +756,15 @@
           "def_use": {
             "defs": {},
             "uses": {
-              "__s": [
+              "code": [
                 "n0"
               ],
-              "code": [
+              "sys": [
                 "n0"
               ]
             }
           },
           "variables": {
-            "__s": {
-              "def_nodes": [],
-              "use_nodes": [
-                "n0"
-              ],
-              "live_in_nodes": [
-                "n0"
-              ],
-              "live_out_nodes": [],
-              "last_use_nodes": [
-                "n0"
-              ],
-              "lifetime_class": "local_non_escape_candidate"
-            },
             "code": {
               "def_nodes": [],
               "use_nodes": [
@@ -777,6 +778,20 @@
                 "n0"
               ],
               "lifetime_class": "escape_or_unknown"
+            },
+            "sys": {
+              "def_nodes": [],
+              "use_nodes": [
+                "n0"
+              ],
+              "live_in_nodes": [
+                "n0"
+              ],
+              "live_out_nodes": [],
+              "last_use_nodes": [
+                "n0"
+              ],
+              "lifetime_class": "local_non_escape_candidate"
             }
           },
           "arg_order": [
@@ -1705,7 +1720,7 @@
             "resolved_type": "unknown",
             "casts": [],
             "borrow_kind": "value",
-            "repr": "__s.stderr.write(text)",
+            "repr": "sys.stderr.write(text)",
             "func": {
               "kind": "Attribute",
               "source_span": {
@@ -1717,7 +1732,7 @@
               "resolved_type": "unknown",
               "casts": [],
               "borrow_kind": "value",
-              "repr": "__s.stderr.write",
+              "repr": "sys.stderr.write",
               "value": {
                 "kind": "Attribute",
                 "source_span": {
@@ -1729,7 +1744,7 @@
                 "resolved_type": "unknown",
                 "casts": [],
                 "borrow_kind": "value",
-                "repr": "__s.stderr",
+                "repr": "sys.stderr",
                 "value": {
                   "kind": "Name",
                   "source_span": {
@@ -1741,8 +1756,8 @@
                   "resolved_type": "unknown",
                   "casts": [],
                   "borrow_kind": "value",
-                  "repr": "__s",
-                  "id": "__s"
+                  "repr": "sys",
+                  "id": "sys"
                 },
                 "attr": "stderr"
               },
@@ -1777,16 +1792,16 @@
             "lifetime_node_id": "n0",
             "lifetime_defs": [],
             "lifetime_uses": [
-              "__s",
+              "sys",
               "text"
             ],
             "lifetime_live_in": [
-              "__s",
+              "sys",
               "text"
             ],
             "lifetime_live_out": [],
             "lifetime_last_use_vars": [
-              "__s",
+              "sys",
               "text"
             ]
           }
@@ -1824,7 +1839,7 @@
               "kind": "Expr",
               "defs": [],
               "uses": [
-                "__s",
+                "sys",
                 "text"
               ],
               "succ": []
@@ -1833,7 +1848,7 @@
           "def_use": {
             "defs": {},
             "uses": {
-              "__s": [
+              "sys": [
                 "n0"
               ],
               "text": [
@@ -1842,7 +1857,7 @@
             }
           },
           "variables": {
-            "__s": {
+            "sys": {
               "def_nodes": [],
               "use_nodes": [
                 "n0"
@@ -1927,7 +1942,7 @@
             "resolved_type": "unknown",
             "casts": [],
             "borrow_kind": "value",
-            "repr": "__s.stdout.write(text)",
+            "repr": "sys.stdout.write(text)",
             "func": {
               "kind": "Attribute",
               "source_span": {
@@ -1939,7 +1954,7 @@
               "resolved_type": "unknown",
               "casts": [],
               "borrow_kind": "value",
-              "repr": "__s.stdout.write",
+              "repr": "sys.stdout.write",
               "value": {
                 "kind": "Attribute",
                 "source_span": {
@@ -1951,7 +1966,7 @@
                 "resolved_type": "unknown",
                 "casts": [],
                 "borrow_kind": "value",
-                "repr": "__s.stdout",
+                "repr": "sys.stdout",
                 "value": {
                   "kind": "Name",
                   "source_span": {
@@ -1963,8 +1978,8 @@
                   "resolved_type": "unknown",
                   "casts": [],
                   "borrow_kind": "value",
-                  "repr": "__s",
-                  "id": "__s"
+                  "repr": "sys",
+                  "id": "sys"
                 },
                 "attr": "stdout"
               },
@@ -1999,16 +2014,16 @@
             "lifetime_node_id": "n0",
             "lifetime_defs": [],
             "lifetime_uses": [
-              "__s",
+              "sys",
               "text"
             ],
             "lifetime_live_in": [
-              "__s",
+              "sys",
               "text"
             ],
             "lifetime_live_out": [],
             "lifetime_last_use_vars": [
-              "__s",
+              "sys",
               "text"
             ]
           }
@@ -2046,7 +2061,7 @@
               "kind": "Expr",
               "defs": [],
               "uses": [
-                "__s",
+                "sys",
                 "text"
               ],
               "succ": []
@@ -2055,7 +2070,7 @@
           "def_use": {
             "defs": {},
             "uses": {
-              "__s": [
+              "sys": [
                 "n0"
               ],
               "text": [
@@ -2064,7 +2079,7 @@
             }
           },
           "variables": {
-            "__s": {
+            "sys": {
               "def_nodes": [],
               "use_nodes": [
                 "n0"
@@ -2112,12 +2127,20 @@
       "schema_version": 1,
       "bindings": [
         {
+          "module_id": "sys",
+          "export_name": "",
+          "local_name": "sys",
+          "binding_kind": "module",
+          "source_file": "src/pytra/std/sys.py",
+          "source_line": 4
+        },
+        {
           "module_id": "pytra.std",
           "export_name": "extern",
           "local_name": "extern",
           "binding_kind": "symbol",
           "source_file": "src/pytra/std/sys.py",
-          "source_line": 4,
+          "source_line": 6,
           "source_module_id": "pytra.std",
           "source_export_name": "extern",
           "source_binding_kind": "symbol",
@@ -2140,12 +2163,20 @@
     },
     "import_bindings": [
       {
+        "module_id": "sys",
+        "export_name": "",
+        "local_name": "sys",
+        "binding_kind": "module",
+        "source_file": "src/pytra/std/sys.py",
+        "source_line": 4
+      },
+      {
         "module_id": "pytra.std",
         "export_name": "extern",
         "local_name": "extern",
         "binding_kind": "symbol",
         "source_file": "src/pytra/std/sys.py",
-        "source_line": 4
+        "source_line": 6
       }
     ],
     "qualified_symbol_refs": [
@@ -2155,7 +2186,9 @@
         "local_name": "extern"
       }
     ],
-    "import_modules": {},
+    "import_modules": {
+      "sys": "sys"
+    },
     "import_symbols": {
       "extern": {
         "module": "pytra.std",
