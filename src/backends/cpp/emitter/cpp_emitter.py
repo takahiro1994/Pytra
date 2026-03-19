@@ -2407,41 +2407,13 @@ class CppEmitter(
         return east_type.lower().replace("[", "_").replace("]", "").replace(",", "_").replace(" ", "") + "_val"
 
     def _emit_tagged_union_struct(self, name: str, non_none: list[str], has_none: bool) -> None:
-        """type X = A | B | ... から C++ tagged struct を生成する。"""
-        tag_entries: list[tuple[str, str, str]] = []  # (tid_expr, cpp_type, field_name)
-        for p in non_none:
-            cpp_t = self._cpp_type_text(p)
-            tid_expr = self._pytra_tid_for_east_type(p)
-            field_name = self._tagged_union_field_name(p)
-            # 再帰参照: 自分自身を含む型は rc<> で包む
-            if name in cpp_t or p == name:
-                if cpp_t.startswith("list<"):
-                    cpp_t = f"rc<{cpp_t}>"
-                elif cpp_t.startswith("dict<"):
-                    cpp_t = f"rc<{cpp_t}>"
-            tag_entries.append((tid_expr, cpp_t, field_name))
-
+        """type X = A | B | ... から C++ typedef を生成する（PyTaggedValue ベース）。"""
         # 登録
         self._tagged_union_types[name] = non_none
         self._tagged_union_has_none[name] = has_none
 
-        # struct 定義を emit
-        self.emit(f"struct {name} {{")
-        self.emit(f"    pytra_type_id tag;")
-        # Fields
-        for _, cpp_t, field_name in tag_entries:
-            self.emit(f"    {cpp_t} {field_name};")
-        self.emit("")
-        # Default constructor
-        default_tid = "PYTRA_TID_NONE" if has_none else tag_entries[0][0]
-        self.emit(f"    {name}() : tag({default_tid}) {{}}")
-        # Per-type constructors
-        for tid_expr, cpp_t, field_name in tag_entries:
-            self.emit(f"    {name}(const {cpp_t}& v) : tag({tid_expr}), {field_name}(v) {{}}")
-        # monostate constructor for compatibility
-        if has_none:
-            self.emit(f"    {name}(::std::monostate) : tag(PYTRA_TID_NONE) {{}}")
-        self.emit(f"}};")
+        # typedef のみ emit（struct 生成は不要）
+        self.emit(f"using {name} = PyTaggedValue;")
         self.emit("")
 
     def _emit_noop_stmt(self, stmt: dict[str, Any]) -> None:

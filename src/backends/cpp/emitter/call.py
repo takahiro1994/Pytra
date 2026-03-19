@@ -210,7 +210,7 @@ class CppCallEmitter:
         return None, raw
 
     def _try_render_tagged_union_cast(self, fn_name: str, arg_nodes: list[Any]) -> str:
-        """cast(T, v) を tagged union のフィールドアクセスに変換する。該当なしは空文字。"""
+        """cast(T, v) を tagged union の py_unbox に変換する。該当なしは空文字。"""
         if fn_name != "cast" or len(arg_nodes) < 2:
             return ""
         value_node = self.any_to_dict_or_empty(arg_nodes[1])
@@ -228,16 +228,14 @@ class CppCallEmitter:
         if type_name == "":
             return ""
         target_t = self.normalize_type_name(type_name)
-        # union メンバから対応するフィールドを見つける
-        field_name_fn = getattr(self, "_tagged_union_field_name", None)
-        if field_name_fn is None:
-            return ""
         non_none_parts = tagged_union_types[union_name]
         for part in non_none_parts:
             part_norm = self.normalize_type_name(part)
             if part_norm == target_t:
                 value_expr = self.render_expr(value_node)
-                return f"{value_expr}.{field_name_fn(part)}"
+                cpp_t = self._cpp_type_text(part)
+                tid_expr = self._pytra_tid_for_east_type(part)
+                return f"py_unbox<{cpp_t}, {tid_expr}>({value_expr}.value)"
         return ""
 
     def _render_builtin_static_cast_call(

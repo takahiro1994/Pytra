@@ -632,11 +632,11 @@ class CppTypeBridgeEmitter:
                     return f"::std::optional<{self._cpp_type_text(non_none[0], pyobj_ref_lists=pyobj_ref_lists)}>"
                 if (not has_none) and len(non_none) == 1:
                     return self._cpp_type_text(non_none[0], pyobj_ref_lists=pyobj_ref_lists)
-                # 一般ユニオン（2型以上）→ tagged struct
+                # 一般ユニオン（2型以上）→ PyTaggedValue typedef
                 inline_structs = getattr(self, "_inline_union_structs", {})
                 if east_type in inline_structs:
                     return inline_structs[east_type]
-                # struct 名を自動生成
+                # typedef 名を自動生成
                 name_parts: list[str] = []
                 for p in non_none:
                     name_parts.append(p.replace("[", "_").replace("]", "").replace(",", "_").replace(" ", ""))
@@ -644,29 +644,14 @@ class CppTypeBridgeEmitter:
                     name_parts.append("None")
                 struct_name = "_Union_" + "_".join(name_parts)
                 inline_structs[east_type] = struct_name
-                # struct 定義を生成
+                # 登録
                 tagged_union_types = getattr(self, "_tagged_union_types", {})
                 tagged_union_has_none = getattr(self, "_tagged_union_has_none", {})
                 tagged_union_types[struct_name] = non_none
                 tagged_union_has_none[struct_name] = has_none
+                # typedef のみ（struct 生成不要）
                 inline_lines = getattr(self, "_inline_union_struct_lines", [])
-                inline_lines.append(f"struct {struct_name} {{")
-                inline_lines.append(f"    pytra_type_id tag;")
-                for p in non_none:
-                    cpp_t = self._cpp_type_text(p, pyobj_ref_lists=pyobj_ref_lists)
-                    field_name = self._tagged_union_field_name(p)
-                    inline_lines.append(f"    {cpp_t} {field_name};")
-                inline_lines.append("")
-                default_tid = "PYTRA_TID_NONE" if has_none else self._pytra_tid_for_east_type(non_none[0])
-                inline_lines.append(f"    {struct_name}() : tag({default_tid}) {{}}")
-                for p in non_none:
-                    cpp_t = self._cpp_type_text(p, pyobj_ref_lists=pyobj_ref_lists)
-                    tid = self._pytra_tid_for_east_type(p)
-                    field_name = self._tagged_union_field_name(p)
-                    inline_lines.append(f"    {struct_name}(const {cpp_t}& v) : tag({tid}), {field_name}(v) {{}}")
-                if has_none:
-                    inline_lines.append(f"    {struct_name}(::std::monostate) : tag(PYTRA_TID_NONE) {{}}")
-                inline_lines.append("};")
+                inline_lines.append(f"using {struct_name} = PyTaggedValue;")
                 inline_lines.append("")
                 return struct_name
         if east_type == "None":
