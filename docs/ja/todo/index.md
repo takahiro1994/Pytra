@@ -47,7 +47,8 @@
 2. [x] [ID: P0-LINKER-RESOLVED-INCLUDES-01-S2] `module.py` の `_collect_import_cpp_includes` を修正。`resolved_dependencies_v1` があれば各モジュール ID を `_module_name_to_cpp_include` で C++ パスに変換するだけにする。
 3. [x] [ID: P0-LINKER-RESOLVED-INCLUDES-01-S3] `runtime_symbol_index.json` の `compiler_headers` を実体パスに修正する（generated のみのモジュール 17 件）。
 4. [ ] [ID: P0-LINKER-RESOLVED-INCLUDES-01-S4] `from pytra.std.pathlib import Path` の最小 repro が `g++` でビルドできることを検証する。
-5. [ ] [ID: P0-LINKER-RESOLVED-INCLUDES-01-S5] `src/runtime/cpp/generated/` と manifest の C++ ターゲット、`cpp_program_to_header` postprocess を撤去する。
+5. [x] [ID: P0-LINKER-RESOLVED-INCLUDES-01-S5] `src/runtime/cpp/generated/` と manifest の C++ ターゲットを撤去する。ビルド生成物はソースツリーに置かない。
+6. [ ] [ID: P0-LINKER-RESOLVED-INCLUDES-01-S6] compile → link → emit パイプラインで runtime `.east` の C++ ヘッダーを `out/` に動的生成し、`-I out/` でビルドが通ることを検証する。
 
 ### P7: selfhost 完全自立化
 
