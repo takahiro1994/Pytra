@@ -67,10 +67,11 @@
 
 文脈: [docs/ja/plans/p0-tagged-union-object-box.md](../plans/p0-tagged-union-object-box.md)
 
-1. [ ] [ID: P0-TAGGED-UNION-OBJECT-BOX-01-S1] C++ emitter の tagged union 生成を `object + type_id` 方式に変更する。`_Union_*` struct 生成を除去。
-2. [ ] [ID: P0-TAGGED-UNION-OBJECT-BOX-01-S2] unbox 時の `isinstance` → `static_cast` emit を実装する。
-3. [ ] [ID: P0-TAGGED-UNION-OBJECT-BOX-01-S3] `pathlib.py` を含む `out/cpp/` g++ ビルドを検証する。
-4. [ ] [ID: P0-TAGGED-UNION-OBJECT-BOX-01-S4] 他バックエンド（Rust, Go 等）への展開を検討する。
+1. [x] [ID: P0-TAGGED-UNION-OBJECT-BOX-01-S1] tagged union 宣言を `using X = PyTaggedValue;` に変更。runtime に `PyBoxed`/`py_box`/`py_unbox`/`PyTaggedValue` 追加。
+2. [ ] [ID: P0-TAGGED-UNION-OBJECT-BOX-01-S2] emitter の cast を変更。POD は `py_unbox<T, TID>(v.value)`、クラスは `static_cast` を emit。
+3. [ ] [ID: P0-TAGGED-UNION-OBJECT-BOX-01-S3] emitter の union 値構築を変更。POD は `py_box`、クラスは `object` upcast を emit。
+4. [ ] [ID: P0-TAGGED-UNION-OBJECT-BOX-01-S4] `pathlib.py` を含む `out/cpp/` g++ ビルドを検証する。
+5. [ ] [ID: P0-TAGGED-UNION-OBJECT-BOX-01-S5] 他バックエンド（Rust, Go 等）への展開を検討する。
 
 #### P0-5: リンカーによる C++ include パス確定
 文脈: [docs/ja/plans/p0-linker-resolved-includes.md](../plans/p0-linker-resolved-includes.md)
