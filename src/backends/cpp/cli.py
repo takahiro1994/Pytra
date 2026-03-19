@@ -310,27 +310,8 @@ AUG_OPS: dict[str, str] = CPP_AUG_OPS
 AUG_BIN: dict[str, str] = CPP_AUG_BIN
 
 
-def cpp_string_lit(s: str) -> str:
-    """Python 文字列を C++ 文字列リテラルへエスケープ変換する。"""
-    out_chars: list[str] = []
-    for ch in s:
-        if ch == "\\":
-            out_chars.append("\\\\")
-        elif ch == "\"":
-            out_chars.append("\\\"")
-        elif ch == "\b":
-            out_chars.append("\\b")
-        elif ch == "\f":
-            out_chars.append("\\f")
-        elif ch == "\n":
-            out_chars.append("\\n")
-        elif ch == "\r":
-            out_chars.append("\\r")
-        elif ch == "\t":
-            out_chars.append("\\t")
-        else:
-            out_chars.append(ch)
-    return "\"" + "".join(out_chars) + "\""
+# cpp_string_lit は CppEmitter._cpp_str_lit() に統合済み。
+# globals 注入経由の呼び出しは廃止。
 
 
 def cpp_char_lit(ch: str) -> str:
