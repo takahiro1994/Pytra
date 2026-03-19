@@ -1,0 +1,74 @@
+# P7: selfhost multi-module transpile 基盤構築
+
+最終更新: 2026-03-19
+
+関連 TODO:
+- `docs/ja/todo/index.md` の `ID: P7-SELFHOST-MULTIMOD-TRANSPILE-01`
+- 親タスク: `ID: P7-SELFHOST-NATIVE-COMPILER-ELIM-01`（S2 の前提）
+
+## 背景
+
+selfhost バイナリの `backend_registry_static.cpp::emit_source_typed` は `python3 src/ir2lang.py` にシェルアウトして C++ コードを生成している。これを除去するには C++ emitter（`CppEmitter` + 全依存モジュール）を C++ に transpile して selfhost バイナリに組み込む必要がある。
+
+現在の selfhost transpile は単一ファイル生成（`py2x-selfhost.py` → `selfhost/py2cpp.cpp`）であり、import 先モジュールの C++ コードは含まれない。P2 で実装した compile → link パイプラインを selfhost ビルド自体に適用し、emitter モジュール群を multi-module transpile → link する仕組みが必要。
+
+## 設計
+
+### パイプライン
+
+```
+# Step 1: 各モジュールを個別に compile
+pytra compile src/py2x-selfhost.py -o work/selfhost/py2x_selfhost.east
+pytra compile src/backends/cpp/emitter/cpp_emitter.py -o work/selfhost/cpp_emitter.east
+pytra compile src/backends/cpp/emitter/class_def.py -o work/selfhost/class_def.east
+...（emitter の全依存モジュール）
+
+# Step 2: link → C++ 出力（multi-file）
+pytra link work/selfhost/*.east --target cpp -o selfhost/cpp/
+
+# Step 3: compile C++ → selfhost バイナリ
+g++ -std=c++20 -O2 -Isrc -Isrc/runtime/cpp selfhost/cpp/src/*.cpp <runtime_sources> -o selfhost/py2cpp.out
+```
+
+### 前提条件
+
+1. emitter モジュール群が selfhost 対象コードの制約を満たすこと:
+   - 動的 import 不使用
+   - `ast` モジュール不使用
+   - Python 標準モジュール直接 import 不使用（`pytra.std.*` 経由）
+2. compile → link パイプラインが multi-module C++ 出力を生成できること（P2 で実装済み）
+3. `pytra link` の multi-file C++ 出力が selfhost ビルドでコンパイルできること
+
+### 主要な課題
+
+- emitter コードが selfhost 制約を満たさない可能性（動的 dispatch、`globals()` 操作、`setattr` 等）
+- emitter の依存モジュール数が多い（`CodeEmitter`, profile loader, optimizer, lower 等）
+- generated C++ headers（`string_ops.h` 等）のビルド環境整備
+
+## 対象
+
+- `tools/build_selfhost.py` — multi-module transpile パイプラインへの拡張
+- `src/py2x-selfhost.py` — `emit_source_typed` シェルアウトを直接 emitter 呼び出しに置換
+- `src/runtime/cpp/compiler/backend_registry_static.cpp` — `emit_source_typed` シェルアウト除去
+- emitter モジュール群（`src/backends/cpp/emitter/*.py`）— selfhost 制約準拠の確認・修正
+
+## 非対象
+
+- 非 C++ バックエンドの selfhost 対応
+- emitter の完全リファクタリング（selfhost 制約違反箇所の最小修正に限定）
+
+## 受け入れ基準
+
+- [ ] selfhost ビルドが emitter を含む multi-module transpile で C++ バイナリを生成できる。
+- [ ] `backend_registry_static.cpp` の `emit_source_typed` がシェルアウトなしで動作する。
+- [ ] selfhost diff mismatches=0。
+
+## 子タスク
+
+- [ ] [ID: P7-SELFHOST-MULTIMOD-TRANSPILE-01-S1] emitter モジュール群の selfhost 制約準拠を監査し、違反箇所を列挙する。
+- [ ] [ID: P7-SELFHOST-MULTIMOD-TRANSPILE-01-S2] `tools/build_selfhost.py` を multi-module transpile パイプライン（compile → link）に拡張する。
+- [ ] [ID: P7-SELFHOST-MULTIMOD-TRANSPILE-01-S3] `py2x-selfhost.py` から `emit_cpp_from_east` を直接呼び出し、`backend_registry_static.cpp` の `emit_source_typed` シェルアウトを除去する。
+
+## 決定ログ
+
+- 2026-03-19: P7-S2 調査の結果、selfhost transpile が単一ファイル生成であり emitter の依存グラフが含まれないことが判明。multi-module transpile 基盤の構築が前提条件として起票。

@@ -6,7 +6,7 @@
   <img alt="Read in English" src="https://img.shields.io/badge/docs-English-2563EB?style=flat-square">
 </a>
 
-最終更新: 2026-03-19（完了タスクを archive 移管）
+最終更新: 2026-03-19（P2/P6 完了→archive 移管、P7 子タスク具体化）
 
 ## 文脈運用ルール
 
@@ -31,24 +31,20 @@
 
 ## 未完了タスク
 
-### P2: compile / link パイプライン分離
-
-#### P2-1: compile / link 2段パイプライン完成
-
-文脈: [docs/ja/plans/p2-compile-link-pipeline.md](../plans/p2-compile-link-pipeline.md)
-
-1. [ ] [ID: P2-COMPILE-LINK-PIPELINE-01] 単一ファイルモードを廃止し全パスを compile → link 経由に統一する。type_id を linker で DFS 確定し、`PYTRA_TID_*` 定数・実行時レジストリを廃止する。
-
-### P6: ランタイム最適化
-
-#### P6-1: Deque をネイティブ型にマッピング
-
-1. [ ] [ID: P6-DEQUE-NATIVE-MAPPING-01] ネイティブ deque を持つバックエンドで、`deque` クラスを list ベース実装ではなく言語ネイティブの deque 型に emit するよう emitter を改良する。
-
 ### P7: selfhost 完全自立化
 
 #### P7-1: native/compiler/ 完全削除
 
 文脈: [docs/ja/plans/p7-selfhost-native-compiler-elim.md](../plans/p7-selfhost-native-compiler-elim.md)
 
-1. [ ] [ID: P7-SELFHOST-NATIVE-COMPILER-ELIM-01] `src/runtime/cpp/compiler/` を完全削除し、selfhost バイナリが compile → link パイプライン経由で動作できるようにする。
+1. [x] [ID: P7-SELFHOST-NATIVE-COMPILER-ELIM-01-S1] selfhost ビルドパイプラインを EAST3 JSON 入力専用に統一し、`transpile_cli.cpp` の `.py` シェルアウトパスを除去する。
+2. [ ] [ID: P7-SELFHOST-NATIVE-COMPILER-ELIM-01-S2] `backends/cpp/cli.py`（emitter）を C++ に transpile 可能にし、`emit_source_typed` のシェルアウトを除去する。→ P7-SELFHOST-MULTIMOD-TRANSPILE-01 が前提。
+3. [ ] [ID: P7-SELFHOST-NATIVE-COMPILER-ELIM-01-S3] シェルアウトがゼロになったことを確認し `src/runtime/cpp/compiler/` を削除、`generated/compiler/` の include を直接 generated C++ に向け直す。
+
+#### P7-2: selfhost multi-module transpile 基盤構築（S2 の前提）
+
+文脈: [docs/ja/plans/p7-selfhost-multimodule-transpile.md](../plans/p7-selfhost-multimodule-transpile.md)
+
+1. [ ] [ID: P7-SELFHOST-MULTIMOD-TRANSPILE-01-S1] emitter モジュール群（`src/backends/cpp/emitter/*.py`）の selfhost 制約準拠を監査し、違反箇所を列挙する。
+2. [ ] [ID: P7-SELFHOST-MULTIMOD-TRANSPILE-01-S2] `tools/build_selfhost.py` を multi-module transpile パイプライン（compile → link）に拡張する。
+3. [ ] [ID: P7-SELFHOST-MULTIMOD-TRANSPILE-01-S3] `py2x-selfhost.py` から `emit_cpp_from_east` を直接呼び出し、`backend_registry_static.cpp` の `emit_source_typed` シェルアウトを除去する。

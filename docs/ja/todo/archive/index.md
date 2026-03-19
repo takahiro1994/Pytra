@@ -4,7 +4,7 @@
   <img alt="Read in English" src="https://img.shields.io/badge/docs-English-2563EB?style=flat-square">
 </a>
 
-最終更新: 2026-03-18
+最終更新: 2026-03-19
 
 ## 運用方針
 
@@ -14,6 +14,10 @@
 - `docs/` 側は `docs/ja/` を正として翻訳を同期します。
 
 ## 完了 plan アーカイブ
+
+- [2026-03-19 / P2-COMPILE-LINK-PIPELINE-01](20260319.md)
+- [2026-03-19 / P6-DEQUE-NATIVE-MAPPING-01](20260319.md)
+- [2026-03-19 / P7-SELFHOST-NATIVE-COMPILER-ELIM-01-S1](20260319.md)
 
 - [2026-03-18 / P5-ANY-ELIM-OBJECT-FREE-01](../plans/archive/20260318-p5-any-elimination-object-free.md)
 
@@ -214,6 +218,8 @@
 - [2026-03-06 / P4-MULTILANG-SH-01](../plans/archive/20260306-p4-multilang-selfhost-full-rollout.md)（ABI 確立後に再投入）
 
 ## 日付別リンク
+
+- [2026-03-19](20260319.md)（3 セクション）
 
 - [2026-03-18](20260318.md)（1 セクション）
 
