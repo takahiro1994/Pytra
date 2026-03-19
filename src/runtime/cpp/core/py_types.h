@@ -13,6 +13,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <utility>
+#include <variant>
 #include <vector>
 
 #include "core/py_scalar_types.h"
@@ -24,7 +25,59 @@ using RcObject = pytra::gc::RcObject;
 template <class T>
 using rc = pytra::gc::RcHandle<T>;
 
-using object = rc<RcObject>;
+// Forward declarations needed by object.
+template <class T, pytra_type_id TID> struct PyBoxed;
+class str;
+
+// object: tagged value = type_id + boxed data.
+// All tagged unions, Any, and dynamic values use this single type.
+struct object {
+    pytra_type_id tag;
+    rc<RcObject> _rc;
+
+    object() : tag(PYTRA_TID_NONE), _rc() {}
+
+    // From rc<RcObject> (backward compat)
+    object(const rc<RcObject>& v) : tag(v ? v->py_type_id() : PYTRA_TID_NONE), _rc(v) {}
+    object(rc<RcObject>&& v) : tag(v ? v->py_type_id() : PYTRA_TID_NONE), _rc(::std::move(v)) {}
+
+    // From raw pointer (adopt)
+    object(RcObject* raw) : tag(raw ? raw->py_type_id() : PYTRA_TID_NONE), _rc(rc<RcObject>::adopt(raw)) {}
+
+    // Implicit box for POD types
+    object(const str& v);   // defined after str is complete
+    object(const char* v);  // defined after str is complete
+    object(int64 v);
+    object(int v);
+    explicit object(float64 v);
+    explicit object(bool v);
+
+    // From rc<T> (class upcast)
+    template <class T, ::std::enable_if_t<::std::is_base_of_v<RcObject, T>, int> = 0>
+    object(const rc<T>& v) : tag(v ? v->py_type_id() : PYTRA_TID_NONE), _rc(v) {}
+
+    // monostate = None
+    object(::std::monostate) : tag(PYTRA_TID_NONE), _rc() {}
+
+    // Backward compat: implicit conversion to rc<RcObject>
+    operator const rc<RcObject>&() const { return _rc; }
+    operator rc<RcObject>&() { return _rc; }
+
+    // rc<RcObject> interface delegation
+    RcObject* get() const { return _rc.get(); }
+    RcObject& operator*() const { return *_rc; }
+    RcObject* operator->() const { return _rc.get(); }
+    explicit operator bool() const { return tag != PYTRA_TID_NONE && _rc.get() != nullptr; }
+
+    // Tagged value API
+    bool is(pytra_type_id expected) const { return tag == expected; }
+
+    template <class T, pytra_type_id TID>
+    const T& unbox() const { return static_cast<PyBoxed<T, TID>*>(_rc.get())->value; }
+
+    template <class T>
+    T* as() const { return static_cast<T*>(_rc.get()); }
+};
 
 template <class T, class... Args>
 static inline rc<T> rc_new(Args&&... args) {

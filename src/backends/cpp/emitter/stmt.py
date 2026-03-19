@@ -290,13 +290,10 @@ class CppStatementEmitter:
             union_name = alias_map.get(val_t_norm, "")
             if union_name == "" and val_t_norm in tagged_union_types:
                 union_name = val_t_norm
-            # For inline unions: val_t contains "|", look up by C++ type text.
+            # Inline union: val_t_norm is "str|int64|..." which is the east_type key.
             if union_name == "" and "|" in val_t_norm:
-                inline_structs = getattr(self, "_inline_union_structs", {})
-                for east_key, struct_name in inline_structs.items():
-                    if struct_name in tagged_union_types:
-                        union_name = struct_name
-                        break
+                if val_t_norm in tagged_union_types:
+                    union_name = val_t_norm
             if union_name in tagged_union_types:
                 ann_norm = self.normalize_type_name(ann_t_str)
                 non_none_parts = tagged_union_types[union_name]
@@ -307,9 +304,9 @@ class CppStatementEmitter:
                         tid_expr = self._pytra_tid_for_east_type(part)
                         _POD = {"str", "int", "int64", "float", "float64", "bool", "uint8", "int8", "int16", "uint16", "int32", "uint32", "uint64", "float32"}
                         if part_norm in _POD:
-                            rendered_val = f"py_unbox<{cpp_t}, {tid_expr}>({rendered_val}.value)"
+                            rendered_val = f"{rendered_val}.unbox<{cpp_t}, {tid_expr}>()"
                         else:
-                            rendered_val = f"(*static_cast<{cpp_t}*>({rendered_val}.value.get()))"
+                            rendered_val = f"(*{rendered_val}.as<{cpp_t}>())"
                         break
         if rendered_val != "" and ann_t_str != "" and self._contains_text(val_t, "|"):
             union_parts = self.split_union(val_t)

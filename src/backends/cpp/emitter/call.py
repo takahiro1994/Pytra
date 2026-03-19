@@ -237,10 +237,10 @@ class CppCallEmitter:
                 tid_expr = self._pytra_tid_for_east_type(part)
                 _POD = {"str", "int", "int64", "float", "float64", "bool", "uint8", "int8", "int16", "uint16", "int32", "uint32", "uint64", "float32"}
                 if part_norm in _POD:
-                    # POD: py_unbox from boxed object
-                    return f"py_unbox<{cpp_t}, {tid_expr}>({value_expr}.value)"
+                    # POD: unbox from object
+                    return f"{value_expr}.unbox<{cpp_t}, {tid_expr}>()"
                 # Class (rc<T>): downcast from object
-                return f"(*static_cast<{cpp_t}*>({value_expr}.value.get()))"
+                return f"(*{value_expr}.as<{cpp_t}>())"
         return ""
 
     def _render_builtin_static_cast_call(

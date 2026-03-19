@@ -2407,13 +2407,13 @@ class CppEmitter(
         return east_type.lower().replace("[", "_").replace("]", "").replace(",", "_").replace(" ", "") + "_val"
 
     def _emit_tagged_union_struct(self, name: str, non_none: list[str], has_none: bool) -> None:
-        """type X = A | B | ... から C++ typedef を生成する（PyTaggedValue ベース）。"""
+        """type X = A | B | ... — object = tagged value なので typedef のみ。"""
         # 登録
         self._tagged_union_types[name] = non_none
         self._tagged_union_has_none[name] = has_none
 
-        # typedef のみ emit（struct 生成は不要）
-        self.emit(f"using {name} = PyTaggedValue;")
+        # object の別名として emit
+        self.emit(f"using {name} = object;")
         self.emit("")
 
     def _emit_noop_stmt(self, stmt: dict[str, Any]) -> None:

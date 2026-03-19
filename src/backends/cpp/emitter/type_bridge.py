@@ -632,28 +632,14 @@ class CppTypeBridgeEmitter:
                     return f"::std::optional<{self._cpp_type_text(non_none[0], pyobj_ref_lists=pyobj_ref_lists)}>"
                 if (not has_none) and len(non_none) == 1:
                     return self._cpp_type_text(non_none[0], pyobj_ref_lists=pyobj_ref_lists)
-                # 一般ユニオン（2型以上）→ PyTaggedValue typedef
-                inline_structs = getattr(self, "_inline_union_structs", {})
-                if east_type in inline_structs:
-                    return inline_structs[east_type]
-                # typedef 名を自動生成
-                name_parts: list[str] = []
-                for p in non_none:
-                    name_parts.append(p.replace("[", "_").replace("]", "").replace(",", "_").replace(" ", ""))
-                if has_none:
-                    name_parts.append("None")
-                struct_name = "_Union_" + "_".join(name_parts)
-                inline_structs[east_type] = struct_name
-                # 登録
+                # 一般ユニオン（2型以上）→ object（tagged value）
+                # Register union info for isinstance/cast.
                 tagged_union_types = getattr(self, "_tagged_union_types", {})
                 tagged_union_has_none = getattr(self, "_tagged_union_has_none", {})
-                tagged_union_types[struct_name] = non_none
-                tagged_union_has_none[struct_name] = has_none
-                # typedef のみ（struct 生成不要）
-                inline_lines = getattr(self, "_inline_union_struct_lines", [])
-                inline_lines.append(f"using {struct_name} = PyTaggedValue;")
-                inline_lines.append("")
-                return struct_name
+                # Use east_type as key for inline union lookup.
+                tagged_union_types[east_type] = non_none
+                tagged_union_has_none[east_type] = has_none
+                return "object"
         if east_type == "None":
             return "void"
         if east_type == "PyFile":
