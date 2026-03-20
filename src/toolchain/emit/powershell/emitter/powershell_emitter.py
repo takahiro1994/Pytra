@@ -483,6 +483,13 @@ def _render_call_expr(expr: dict[str, Any]) -> str:
                 if len(rendered_args) == 0:
                     return owner + "[-1]; " + owner + " = " + owner + "[0..(" + owner + ".Length - 2)]"
                 return owner
+            # Check if this could be a class method call (owner has __type__)
+            raw_attr = _get_str(func_d, "attr")
+            if owner_name == "self" or (owner_name != "" and owner_name not in ("math", "os", "sys", "json", "re", "random", "pathlib", "time")):
+                # Dynamic dispatch: ClassName_method $self args
+                if len(rendered_args) == 0:
+                    return '(& (Get-Command ("{0}_{1}" -f ' + owner + '["__type__"], "' + raw_attr + '")) ' + owner + ')'
+                return '(& (Get-Command ("{0}_{1}" -f ' + owner + '["__type__"], "' + raw_attr + '")) ' + owner + ' ' + " ".join(rendered_args) + ')'
             if len(rendered_args) == 0:
                 return owner + "." + attr + "()"
             return owner + "." + attr + "(" + ", ".join(rendered_args) + ")"
@@ -852,7 +859,15 @@ def _emit_class_def(stmt: dict[str, Any], *, indent: str, ctx: dict[str, Any]) -
     if not has_init:
         lines.append(indent + "function " + name + " {")
         lines.append(indent + "    param($self)")
+        lines.append(indent + '    $self["__type__"] = "' + name + '"')
         lines.append(indent + "}")
+    else:
+        # Inject __type__ into existing constructor
+        # Find the line after param(...) and insert type tag
+        for i_line in range(len(lines)):
+            if lines[i_line].strip().startswith("param("):
+                lines.insert(i_line + 1, indent + '    $self["__type__"] = "' + name + '"')
+                break
 
     return lines
 
