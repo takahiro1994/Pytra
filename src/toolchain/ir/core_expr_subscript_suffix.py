@@ -322,8 +322,29 @@ class _ShExprSubscriptSuffixParserMixin:
         dict[str, Any] | None,
         dict[str, Any],
     ]:
-        """Subscript index tail の `]` close を helper へ寄せる。"""
-        rtok = self._resolve_subscript_index_tail_state()
+        """Subscript index tail の `]` close を helper へ寄せる。
+        `,` が来た場合は残りの型引数を Tuple として束ねる。"""
+        # generic type subscript: dict[str, Any] → Tuple(str, Any) as index
+        tok = self._cur()
+        tok_kind = tok.get("k", "") if isinstance(tok, dict) else ""
+        if tok_kind == ",":
+            elements: list[dict[str, Any]] = [index_expr]
+            while tok_kind == ",":
+                self._eat(",")
+                next_expr = self._parse_ifexp()
+                elements.append(next_expr)
+                tok = self._cur()
+                tok_kind = tok.get("k", "") if isinstance(tok, dict) else ""
+            rtok = self._eat("]")
+            tuple_node: dict[str, Any] = {
+                "kind": "Tuple",
+                "elements": elements,
+                "resolved_type": "unknown",
+                "borrow_kind": "value",
+                "casts": [],
+            }
+            return tuple_node, None, None, rtok
+        rtok = self._eat("]")
         return index_expr, None, None, rtok
 
     def _resolve_subscript_index_tail_state(self) -> dict[str, Any]:
