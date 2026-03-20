@@ -6,7 +6,7 @@
   <img alt="Read in English" src="https://img.shields.io/badge/docs-English-2563EB?style=flat-square">
 </a>
 
-最終更新: 2026-03-20（P7-S4 完了: リンカー wildcard re-export 対応）
+最終更新: 2026-03-21（P1 起票: パイプライン段分離）
 
 ## 文脈運用ルール
 
@@ -127,6 +127,15 @@
 3. [x] [ID: P0-LINKER-RESOLVED-INCLUDES-01-S3] `runtime_symbol_index.json` の `compiler_headers` を実体パスに修正する（generated のみのモジュール 17 件）。
 4. [x] [ID: P0-LINKER-RESOLVED-INCLUDES-01-S4] `from pytra.std.pathlib import Path` の最小 repro が `g++` でビルドできることを検証する。→ P0-5 link 統合で解決。
 5. [x] [ID: P0-LINKER-RESOLVED-INCLUDES-01-S5] `src/runtime/cpp/generated/` と manifest の C++ ターゲットを撤去する。ビルド生成物はソースツリーに置かない。
+
+### P1: パイプライン段分離 — compile / link / emit の独立化
+
+文脈: [docs/ja/plans/p1-pipeline-stage-separation.md](../plans/p1-pipeline-stage-separation.md)
+
+1. [ ] [ID: P1-PIPELINE-STAGE-SEPARATION-01-S1] `east2cpp.py` を新設し、linked EAST JSON → C++ multi-file emit を実装する。
+2. [ ] [ID: P1-PIPELINE-STAGE-SEPARATION-01-S2] `py2x.py` に `--link-only` 出力と `east2cpp.py` 入力を接続する導線を整備する。
+3. [ ] [ID: P1-PIPELINE-STAGE-SEPARATION-01-S3] `pytra-cli.py --build` を east2cpp.py サブプロセス呼び出しに変更する。
+4. [ ] [ID: P1-PIPELINE-STAGE-SEPARATION-01-S4] `build_selfhost.py --multi-module` を 3 段パイプラインに分離し、emit 段階のモジュール数削減を検証する。
 
 ### P7: selfhost 完全自立化
 
