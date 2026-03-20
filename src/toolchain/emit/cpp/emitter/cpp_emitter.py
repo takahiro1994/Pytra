@@ -3182,8 +3182,8 @@ class CppEmitter(CppAnalysisEmitter, CppModuleEmitter, CppClassEmitter, CppTypeB
                         return f"{src}.value()" if self._is_identifier_expr(src) else f"({src}).value()"
                     return args[0]
                 if at in {"Any", "object"}:
-                    return f"object(list<object>({args[0]}))"
-                return f"object(list<object>({args[0]}))"
+                    return f"object(rc_new<list<object>>(list<object>({args[0]})))"
+                return f"object(rc_new<list<object>>(list<object>({args[0]})))"
         t = self.cpp_type(expr.get("resolved_type"))
         if raw == "list" and self._is_pyobj_value_model_list_type(resolved_t):
             t = self._cpp_list_value_model_type_text(resolved_t)
@@ -3949,6 +3949,11 @@ class CppEmitter(CppAnalysisEmitter, CppModuleEmitter, CppClassEmitter, CppTypeB
                 src_t = declared_t
         if self.is_any_like_type(src_t):
             return expr_txt
+        # dict/list/set are RcObject subclasses — need rc_new to wrap into object
+        src_norm = self.normalize_type_name(src_t)
+        if src_norm.startswith("dict[") or src_norm.startswith("list[") or src_norm.startswith("set["):
+            cpp_t = self._cpp_type_text(src_norm)
+            return f"object(rc_new<{cpp_t}>({expr_txt}))"
         return f"object({expr_txt})"
 
     def _box_any_target_value(self, expr_txt: str, source_node: Any) -> str:

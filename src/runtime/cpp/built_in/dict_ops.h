@@ -50,3 +50,19 @@ static inline int64 py_index(const list<T>& v, const T& item) {
 }
 
 #endif  // PYTRA_BUILT_IN_DICT_OPS_H
+
+// py_at for tuple (runtime index → object conversion)
+template <class... Ts>
+static inline object py_at(const ::std::tuple<Ts...>& t, int64 idx) {
+    object result;
+    int64 cur = 0;
+    ::std::apply([&](const auto&... args) {
+        ((cur++ == idx ? (result = object(args), true) : false) || ...);
+    }, t);
+    return result;
+}
+
+template <class... Ts>
+static inline object py_at(const ::std::tuple<Ts...>& t, int idx) {
+    return py_at(t, static_cast<int64>(idx));
+}
