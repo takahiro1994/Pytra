@@ -70,9 +70,10 @@ python3 src/py2x-selfhost.py test/fixtures/core/add.py --target rs -o out/add_se
 python3 src/py2x.py test/fixtures/core/add.py --target rs -o out/add_py2x.rs
 ```
 
-## `ir2lang.py`（EAST3 JSON -> target backend）
+## `east2cpp.py` / `ir2lang.py`（EAST3 JSON -> target backend）
 
-- `ir2lang.py` は frontend（`.py -> EAST3`）を通さず、`EAST3(JSON)` から直接 backend を実行します。
+- `east2cpp.py` は C++ backend の独立エントリポイントです。`link-output.json` を入力として C++ multi-file 出力を生成します。非 C++ backend を import しないため、起動が高速です。
+- `ir2lang.py` は全 backend 対応の汎用エントリポイントです。`EAST3(JSON)` から直接 backend を実行します。
 - backend 単体回帰や、`sample/ir` / `test/ir` の固定IR検証で使います。
 - 入力は `.json` のみ受理し、`east_stage=3` 以外は fail-fast します。
 
@@ -93,29 +94,30 @@ python3 tools/check_ir2lang_smoke.py
 - `--lower-option key=value` / `--optimizer-option key=value` / `--emitter-option key=value` を `ir2lang.py` でも利用できます。
 - `--no-runtime-hook` を外すと、target ごとの runtime 補助ファイル配置も含めて確認できます。
 
-## linked-program の dump / link-only / restart
+## linked-program の dump / link-only / emit
 
-- linked-program の正規 debug 導線は `py2x.py -> eastlink.py -> ir2lang.py` です。
+- linked-program の正規パイプラインは `py2x.py --link-only` → `east2cpp.py`（C++ の場合）です。
 - `py2x.py --dump-east3-dir DIR` は raw `EAST3` 群と `link-input.json` を `DIR` に書き出して終了します。
 - `py2x.py --link-only --output-dir DIR` は backend 生成を行わず、`link-output.json` と linked module 群だけを `DIR` に書き出します。
-- `ir2lang.py` は raw `EAST3(JSON)` に加えて `link-output.json` も受理できます。`py2x.py --from-link-output` はその再開経路の wrapper です。
+- `east2cpp.py` は `link-output.json` を読み込んで C++ multi-file 出力を生成します。
+- `ir2lang.py` は全 backend 対応の汎用経路として引き続き利用できます。
 
 ```bash
 # 1) .py から raw EAST3 群と link-input.json を出力
 python3 src/py2x.py sample/py/18_mini_language_interpreter.py --target cpp \
   --dump-east3-dir out/linked_debug/raw
 
-# 2) linker だけを実行して link-output.json と linked modules を作る
-python3 src/eastlink.py out/linked_debug/raw/link-input.json \
-  --output-dir out/linked_debug/linked
+# 2) compile + link + optimize して linked output を作る
+PYTHONPATH=src python3 src/py2x.py sample/py/18_mini_language_interpreter.py \
+  --target cpp --link-only --output-dir out/linked_debug/linked
 
-# 3) linked output から backend-only 再開
-python3 src/ir2lang.py out/linked_debug/linked/link-output.json --target cpp \
+# 3) linked output から C++ emit（east2cpp.py — C++ backend のみ import）
+PYTHONPATH=src python3 src/east2cpp.py out/linked_debug/linked/link-output.json \
   --output-dir out/linked_debug/cpp
 
-# 4) py2x wrapper で linked output から再開してもよい
-python3 src/py2x.py out/linked_debug/linked/link-output.json --target cpp \
-  --from-link-output --output-dir out/linked_debug/cpp_wrap
+# 4) ir2lang.py で全 backend 対応の汎用経路を使うこともできる
+python3 src/ir2lang.py out/linked_debug/linked/link-output.json --target cpp \
+  --output-dir out/linked_debug/cpp_ir2lang
 ```
 
 補足:

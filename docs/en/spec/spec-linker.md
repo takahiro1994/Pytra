@@ -64,7 +64,7 @@ Recommended flow:
 
 1. `py2x.py` writes raw `EAST3` modules plus `link-input.json`
 2. `eastlink.py` reads `link-input.json` and writes `link-output.json` plus linked modules
-3. `ir2lang.py` reads `link-output.json` and emits target code
+3. `east2cpp.py` (for C++) or `ir2lang.py` (generic) reads `link-output.json` and emits target code
 
 Recommended filenames:
 

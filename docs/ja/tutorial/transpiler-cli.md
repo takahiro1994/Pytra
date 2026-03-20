@@ -1,6 +1,6 @@
 # トランスパイラCLIの使い方
 
-このページは、統合 CLI `./pytra` ではなく `py2x.py` / `ir2lang.py` を直接使いたい場合の手順をまとめたものです。  
+このページは、統合 CLI `./pytra` ではなく `py2x.py` / `east2cpp.py` を直接使いたい場合の手順をまとめたものです。
 まず通常利用は [how-to-use.md](./how-to-use.md) を参照してください。
 
 ## 実行コマンドの前提（OS別）
@@ -34,17 +34,20 @@ Windows では次の読み替えを行ってください。
 ./pytra INPUT.py --target cpp --build --run --output-dir out --exe app.out
 ```
 
-### compile → link パイプライン（py2x.py 直接）
+### compile → link → emit パイプライン（py2x.py + east2cpp.py 直接）
 
-全パスが compile → link を経由します。
+C++ 変換は内部で compile → link → emit の 3 段を経由します。
 
 ```bash
 # 1) single-file 出力（最も簡単）
 PYTHONPATH=src python src/py2x.py INPUT.py --target cpp -o out/main.cpp
 
-# 2) compile + link の 2 段（中間 .east を経由）
-PYTHONPATH=src python src/py2x.py compile INPUT.py -o out/east/main.east
-PYTHONPATH=src python src/py2x.py link out/east/main.east --target cpp -o out/cpp/
+# 2) 3 段パイプライン（中間 .east + linked EAST を経由）
+# Stage 1: compile + link → linked EAST
+PYTHONPATH=src python src/py2x.py INPUT.py --target cpp --link-only --output-dir out/linked/
+
+# Stage 2: linked EAST → C++ multi-file (east2cpp.py は C++ emitter のみ使用)
+PYTHONPATH=src python src/east2cpp.py out/linked/link-output.json --output-dir out/cpp/
 
 # 3) g++ でビルド（single-file の場合）
 g++ -std=c++20 -O2 -I src -I src/runtime/cpp out/main.cpp \
@@ -54,6 +57,10 @@ g++ -std=c++20 -O2 -I src -I src/runtime/cpp out/main.cpp \
   -o out/app.out
 ./out/app.out
 ```
+
+補足:
+- `east2cpp.py` は C++ backend のみを import する独立エントリポイントです。非 C++ backend の依存を含みません。
+- `--link-only` は `link-output.json`（マニフェスト）と linked EAST3 JSON を出力します。
 
 ### ランタイム構成
 
@@ -265,21 +272,25 @@ scala run test/transpile/scala/iterable.scala
 </details>
 
 <details>
-<summary>EAST (Python -> EAST -> C++)</summary>
+<summary>EAST (Python -> EAST -> linked EAST -> C++)</summary>
 
-compile → link パイプラインで `.east` を経由する手順です。
+compile → link → emit パイプラインで `.east` と linked EAST を経由する手順です。
 
 ```bash
 # 1) Python を .east (EAST3 JSON) にコンパイル
 PYTHONPATH=src python src/py2x.py compile sample/py/01_mandelbrot.py -o out/east/01_mandelbrot.east
 
-# 2) .east からターゲット言語へリンク
-PYTHONPATH=src python src/py2x.py link out/east/01_mandelbrot.east --target cpp -o out/cpp/
+# 2) .east を linked EAST にリンク（type_id 解決・最適化を含む）
+PYTHONPATH=src python src/py2x.py sample/py/01_mandelbrot.py --target cpp --link-only --output-dir out/linked/
+
+# 3) linked EAST から C++ を生成
+PYTHONPATH=src python src/east2cpp.py out/linked/link-output.json --output-dir out/cpp/
 ```
 
 補足:
 - `pytra compile` は `.py` → `.east`（EAST3 JSON）を生成します。
-- `pytra link` は `.east` → ターゲット言語を生成します。
-- 単一ファイル変換は `py2x.py INPUT.py --target cpp -o OUT.cpp` でも可能（内部で compile → link を経由）。
+- `--link-only` は compile + link + optimize を実行し、linked EAST を出力します。
+- `east2cpp.py` は linked EAST → C++ multi-file 出力の独立エントリポイントです。
+- 単一ファイル変換は `py2x.py INPUT.py --target cpp -o OUT.cpp` でも可能（内部で compile → link → emit を経由）。
 
 </details>
