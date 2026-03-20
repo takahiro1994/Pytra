@@ -5,7 +5,6 @@ from __future__ import annotations
 from backends.cpp.emitter.cpp_emitter import (
     CppEmitter,
     emit_cpp_from_east,
-    install_py2cpp_runtime_symbols,
 )
 from backends.cpp.emitter.profile_loader import load_cpp_profile
 from typing import Any
@@ -13,7 +12,6 @@ from typing import Any
 __all__ = [
     "CppEmitter",
     "emit_cpp_from_east",
-    "install_py2cpp_runtime_symbols",
     "load_cpp_profile",
     "transpile_to_cpp",
 ]

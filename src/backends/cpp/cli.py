@@ -334,8 +334,6 @@ def cpp_char_lit(ch: str) -> str:
 
 from backends.cpp.emitter import CppEmitter
 from backends.cpp.emitter import emit_cpp_from_east
-from backends.cpp.emitter import install_py2cpp_runtime_symbols
-install_py2cpp_runtime_symbols(globals())
 
 
 def _normalize_link_dispatch_mode(mode: str) -> str:

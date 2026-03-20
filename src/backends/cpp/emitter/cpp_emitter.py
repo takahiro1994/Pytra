@@ -137,43 +137,20 @@ def emit_cpp_from_east(
     return emitter.transpile()
 
 
-def install_py2cpp_runtime_symbols(globals_snapshot: dict[str, Any]) -> None:
-    """Inject py2cpp globals required by `CppEmitter` dynamic globals."""
-    for key, value in globals_snapshot.items():
-        if key.startswith("__"):
-            continue
-        globals()[key] = value
-
-
-def _attach_cpp_emitter_helper_methods(target_cls: type[CodeEmitter]) -> None:
-    """Attach helper handlers directly to CppEmitter to keep single inheritance."""
-    helper_classes = (
-        CppAnalysisEmitter,
-        CppModuleEmitter,
-        CppClassEmitter,
-        CppTypeBridgeEmitter,
-        CppBuiltinRuntimeEmitter,
-        CppCollectionExprEmitter,
-        CppRuntimeExprEmitter,
-        CppCallEmitter,
-        CppStatementEmitter,
-        CppExpressionEmitter,
-        CppBinaryOperatorEmitter,
-        CppTriviaEmitter,
-        CppTemporaryEmitter,
-    )
-    for helper_cls in helper_classes:
-        for attr_name, attr_value in helper_cls.__dict__.items():
-            if attr_name.startswith("__"):
-                continue
-            if not callable(attr_value):
-                continue
-            if attr_name in target_cls.__dict__:
-                continue
-            setattr(target_cls, attr_name, attr_value)
-
-
 class CppEmitter(
+    CppAnalysisEmitter,
+    CppModuleEmitter,
+    CppClassEmitter,
+    CppTypeBridgeEmitter,
+    CppBuiltinRuntimeEmitter,
+    CppCollectionExprEmitter,
+    CppRuntimeExprEmitter,
+    CppCallEmitter,
+    CppStatementEmitter,
+    CppExpressionEmitter,
+    CppBinaryOperatorEmitter,
+    CppTriviaEmitter,
+    CppTemporaryEmitter,
     CodeEmitter,
 ):
     def __init__(
@@ -5045,4 +5022,3 @@ class CppEmitter(
     # type conversion / any-boundary helpers moved to backends.cpp.emitter.type_bridge.CppTypeBridgeEmitter.
 
 
-_attach_cpp_emitter_helper_methods(CppEmitter)
