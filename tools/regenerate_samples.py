@@ -38,6 +38,7 @@ LANG_CONFIGS: dict[str, dict[str, str]] = {
     "ruby": {"out_dir": "sample/ruby", "ext": ".rb"},
     "php": {"out_dir": "sample/php", "ext": ".php"},
     "nim": {"out_dir": "sample/nim", "ext": ".nim"},
+    "powershell": {"out_dir": "sample/powershell", "ext": ".ps1"},
 }
 
 LANG_VERSION_DEPENDENCIES: dict[str, list[str]] = {
@@ -55,6 +56,7 @@ LANG_VERSION_DEPENDENCIES: dict[str, list[str]] = {
     "ruby": ["ruby"],
     "php": ["php"],
     "nim": ["nim"],
+    "powershell": ["powershell", "js"],
 }
 
 SEMVER_PARTS = 3

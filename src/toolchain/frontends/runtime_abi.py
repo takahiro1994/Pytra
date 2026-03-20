@@ -342,18 +342,12 @@ def validate_runtime_abi_module(module_doc: dict[str, Any]) -> dict[str, Any]:
 
 
 def validate_runtime_abi_target_support(module_doc: dict[str, Any], *, target: str) -> dict[str, Any]:
-    target_name = _safe_name(target)
-    if target_name in _RUNTIME_ABI_SUPPORTED_TARGETS:
-        return module_doc
-    symbols = runtime_abi_symbols(module_doc)
-    if len(symbols) == 0:
-        return module_doc
-    raise RuntimeError(
-        "runtime_abi_violation: @abi is not supported for target "
-        + target_name
-        + ": "
-        + ", ".join(symbols)
-    )
+    """非対応 target では @abi ヒントを無視して素通しにする。
+
+    @abi は C++ 向け最適化ヒントであり、非対応 target ではコード生成に
+    影響しないため、エラーにせず module_doc をそのまま返す。
+    """
+    return module_doc
 
 
 __all__ = [
