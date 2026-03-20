@@ -6,7 +6,7 @@
   <img alt="Read in English" src="https://img.shields.io/badge/docs-English-2563EB?style=flat-square">
 </a>
 
-最終更新: 2026-03-21（P1 完了: パイプライン段分離 — east2cpp.py 新設）
+最終更新: 2026-03-21（P0-11 PowerShell 実行 parity 追加、P1 完了: パイプライン段分離）
 
 ## 文脈運用ルール
 
@@ -127,6 +127,17 @@
 3. [x] [ID: P0-LINKER-RESOLVED-INCLUDES-01-S3] `runtime_symbol_index.json` の `compiler_headers` を実体パスに修正する（generated のみのモジュール 17 件）。
 4. [x] [ID: P0-LINKER-RESOLVED-INCLUDES-01-S4] `from pytra.std.pathlib import Path` の最小 repro が `g++` でビルドできることを検証する。→ P0-5 link 統合で解決。
 5. [x] [ID: P0-LINKER-RESOLVED-INCLUDES-01-S5] `src/runtime/cpp/generated/` と manifest の C++ ターゲットを撤去する。ビルド生成物はソースツリーに置かない。
+
+#### P0-11: PowerShell native emitter 実行 parity
+
+文脈: [docs/ja/plans/p0-powershell-native-emitter-execution-parity.md](../plans/p0-powershell-native-emitter-execution-parity.md)
+
+1. [ ] [ID: P0-PS-EXEC-PARITY-01-S1] FunctionDef の `self` パラメータを除外せず `$self` として残す。クラスメソッド呼び出し時に第1引数として渡す。
+2. [ ] [ID: P0-PS-EXEC-PARITY-01-S2] `bytearray`, `bytes`, `enumerate`, `sorted`, `reversed`, `zip` 等を `__pytra_*` ランタイム関数にマッピング。不足 runtime 関数を追加。
+3. [ ] [ID: P0-PS-EXEC-PARITY-01-S3] `math.sqrt` → `[Math]::Sqrt` 等の stdlib Attribute Call を直接 PowerShell 構文に変換。
+4. [ ] [ID: P0-PS-EXEC-PARITY-01-S4] Assign でタプルターゲットが左辺にある場合、一時変数展開を emit する。
+5. [ ] [ID: P0-PS-EXEC-PARITY-01-S5] Call の func がクラス名の場合、コンストラクタ関数呼び出しとして emit する。
+6. [ ] [ID: P0-PS-EXEC-PARITY-01-S6] `test/unit/backends/powershell/test_py2ps_smoke.py` に pwsh 実行テストを追加し、主要 fixture の実行成功を検証する。
 
 ### P1: パイプライン段分離 — compile / link / emit の独立化
 
