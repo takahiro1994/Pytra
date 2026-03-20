@@ -7,9 +7,17 @@ from tools import check_powershell_cs_host_contract as check_mod
 
 
 class CheckPowershellCsHostContractTest(unittest.TestCase):
+    """Retired: C# host profile plan was replaced by native PowerShell backend (2026-03-20).
+
+    These tests verify the frozen contract snapshot and remain to prevent
+    accidental reuse of the old contract module.  The docs-drift check is
+    skipped because the documentation now describes the native backend.
+    """
+
     def test_contract_issues_are_empty(self) -> None:
         self.assertEqual(check_mod._collect_contract_issues(), [])
 
+    @unittest.skip("Retired: docs now describe native PowerShell backend, not C# host profile")
     def test_docs_issues_are_empty(self) -> None:
         self.assertEqual(check_mod._collect_docs_issues(), [])
 
