@@ -49,6 +49,7 @@ _ROOT_BASE_NAMES: set[str] = set(_BUILTIN_TYPE_IDS) | {
     "TypeError",
     "IndexError",
     "KeyError",
+    "TypedDict",
 }
 _USER_TYPE_ID_BASE = 1000
 
