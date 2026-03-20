@@ -72,20 +72,38 @@ Algorithm details belong to other specs (`spec-dev.md`, `spec-east123.md`, `spec
 
 ## 3. Responsibilities Under `src/`
 
-### 3.1 `src/toolchain/frontends/` / `src/toolchain/ir/` / `src/toolchain/compiler/` (3-layer + compat)
+### 3.1 `src/toolchain/` — 4-stage pipeline
 
-- Purpose: separate the input frontend and IR stage processing into `toolchain` sub-packages; `compiler` is being reduced to a compatibility facade.
-- Allowed:
-  - `src/toolchain/frontends/`: input-language frontend (e.g., `transpile_cli.py`, `python_frontend.py`, `east1_build.py`, `signature_registry.py`, `frontend_semantics.py`)
-  - `src/toolchain/ir/`: EAST1/2/3 definitions, lowering, optimizer, pipeline (e.g., `core.py`, `east1.py`, `east2.py`, `east3.py`, `east3_optimizer.py`)
-  - `src/toolchain/compiler/`: compatibility shim / facade (e.g., legacy import route receivers, backend registry)
+Based on the gcc `cc1` / `as` / `ld` analogy, the transpilation pipeline is separated into 4 stages.
+
+```
+src/toolchain/
+  frontends/   ← parse: .py → EAST
+  ir/          ← compile: EAST1 → EAST2 → EAST3
+  link/        ← link: EAST3 modules → linked EAST
+  emit/        ← emit: linked EAST → target source
+    common/    ← CodeEmitter base (language-independent)
+    cpp/       ← C++ backend (emitter, optimizer, lower, profiles)
+    rs/        ← Rust backend
+    cs/        ← C# backend
+    ...        ← all 15 languages
+    cpp.py     ← C++ emit entry point (import-isolated)
+    all.py     ← all-backend generic entry point
+  compiler/    ← compatibility shim / facade (backend registry, etc.)
+```
+
+- `src/toolchain/frontends/`: input-language frontend (e.g., `transpile_cli.py`, `python_frontend.py`, `east1_build.py`, `signature_registry.py`)
+- `src/toolchain/ir/`: EAST1/2/3 definitions, lowering, optimizer, pipeline (e.g., `core.py`, `east1.py`, `east2.py`, `east3.py`, `east3_optimizer.py`)
+- `src/toolchain/link/`: linker and linked program optimizer (e.g., `program_loader.py`, `global_optimizer.py`)
+- `src/toolchain/emit/`: per-target-language emit implementations. Each `<lang>/` has `emitter/`, `optimizer/`, `lower/`, `profiles/`.
+- `src/toolchain/compiler/`: compatibility shim / facade (e.g., legacy import route receivers, backend registry)
 - Not allowed:
   - re-adding to `compiler` any logic that has already been moved to `frontends` / `ir`
-  - target-language-specific final emission branches
 - Dependency direction:
-  - canonical direction is `toolchain.frontends -> toolchain.ir -> backends`
-  - `backends -> toolchain.frontends` is forbidden
-  - `toolchain.compiler -> toolchain.frontends|toolchain.ir` is allowed as a compatibility layer
+  - canonical direction is `toolchain.frontends → toolchain.ir → toolchain.link → toolchain.emit`
+  - `toolchain.emit → toolchain.frontends` is forbidden
+  - `toolchain.compiler → toolchain.frontends|toolchain.ir` is allowed as a compatibility layer
+  - `py2x.py` does NOT import `toolchain.emit` (emit is called as a subprocess via `toolchain.emit.cpp` / `toolchain.emit.all`)
   - as a temporary exception, `toolchain.ir.core` may reference `toolchain.frontends.signature_registry|frontend_semantics` (scheduled for removal in the cycle-elimination task)
 
 #### 3.1.1 Forbidden Old Import Paths (Migration Contract)

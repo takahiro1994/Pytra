@@ -1,7 +1,26 @@
 # トランスパイラCLIの使い方
 
-このページは、統合 CLI `./pytra` ではなく `py2x.py` / `east2cpp.py` を直接使いたい場合の手順をまとめたものです。
+このページは、統合 CLI `./pytra` ではなく `py2x.py` / `toolchain/emit/cpp.py` 等を直接使いたい場合の手順をまとめたものです。
 まず通常利用は [how-to-use.md](./how-to-use.md) を参照してください。
+
+## パイプライン構成
+
+Pytra の変換パイプラインは gcc の `cc1` / `as` / `ld` のアナロジーに基づき、4 段に分離されています。
+
+```
+.py → [frontends] → EAST → [ir] → EAST3 → [link] → linked EAST → [emit] → .cpp/.rs/...
+```
+
+| 段 | 責務 | ディレクトリ | エントリポイント |
+|---|---|---|---|
+| parse | `.py` → EAST | `src/toolchain/frontends/` | `py2x.py compile` |
+| compile | EAST1 → EAST2 → EAST3 | `src/toolchain/ir/` | （parse に統合） |
+| link | EAST3 modules → linked EAST | `src/toolchain/link/` | `py2x.py --link-only` |
+| emit | linked EAST → target source | `src/toolchain/emit/<lang>/` | `toolchain/emit/cpp.py` 等 |
+
+- `py2x.py` は compile + link を担当し、backend（emit）に依存しません。
+- emit は言語ごとに独立したエントリポイント（`toolchain/emit/cpp.py`, `toolchain/emit/rs.py`, ...）で実行します。
+- `./pytra --build` は内部で compile → link → emit → g++ をサブプロセスで連鎖します。
 
 ## 実行コマンドの前提（OS別）
 

@@ -80,20 +80,38 @@
 
 ## 3. `src/` 配下の責務
 
-### 3.1 `src/toolchain/frontends/` / `src/toolchain/ir/` / `src/toolchain/compiler/`（3層 + 互換）
+### 3.1 `src/toolchain/` — パイプライン 4 段構成
 
-- 目的: 入力 frontend と IR 段階処理を `toolchain` 配下へ分離し、`compiler` は互換導線へ縮退する。
-- 置くもの:
-  - `src/toolchain/frontends/`: 入力言語 frontend（例: `transpile_cli.py`, `python_frontend.py`, `east1_build.py`, `signature_registry.py`, `frontend_semantics.py`）
-  - `src/toolchain/ir/`: EAST1/2/3 定義・lower・optimizer・pipeline（例: `core.py`, `east1.py`, `east2.py`, `east3.py`, `east3_optimizer.py`）
-  - `src/toolchain/compiler/`: 互換 shim / facade（例: 旧 import 経路の受け皿、backend registry）
+gcc の `cc1` / `as` / `ld` のアナロジーに基づき、変換パイプラインを 4 段に分離する。
+
+```
+src/toolchain/
+  frontends/   ← parse: .py → EAST
+  ir/          ← compile: EAST1 → EAST2 → EAST3
+  link/        ← link: EAST3 modules → linked EAST
+  emit/        ← emit: linked EAST → target source
+    common/    ← CodeEmitter 基盤（言語非依存）
+    cpp/       ← C++ backend (emitter, optimizer, lower, profiles)
+    rs/        ← Rust backend
+    cs/        ← C# backend
+    ...        ← 全15言語
+    cpp.py     ← C++ emit エントリポイント（import 分離済み）
+    all.py     ← 全 backend 汎用エントリポイント
+  compiler/    ← 互換 shim / facade（backend registry 等）
+```
+
+- `src/toolchain/frontends/`: 入力言語 frontend（例: `transpile_cli.py`, `python_frontend.py`, `east1_build.py`, `signature_registry.py`）
+- `src/toolchain/ir/`: EAST1/2/3 定義・lower・optimizer・pipeline（例: `core.py`, `east1.py`, `east2.py`, `east3.py`, `east3_optimizer.py`）
+- `src/toolchain/link/`: リンカー・linked program optimizer（例: `program_loader.py`, `global_optimizer.py`）
+- `src/toolchain/emit/`: ターゲット言語ごとの emit 実装。各 `<lang>/` 配下に `emitter/`, `optimizer/`, `lower/`, `profiles/` を持つ。
+- `src/toolchain/compiler/`: 互換 shim / facade（例: 旧 import 経路の受け皿、backend registry）
 - 置かないもの:
   - `frontends` / `ir` 側へ移設済みロジックを `compiler` へ戻す新規実装
-  - ターゲット言語固有の最終出力分岐
 - 依存方向:
-  - 正規方向は `toolchain.frontends -> toolchain.ir -> backends`。
-  - `backends -> toolchain.frontends` は禁止。
-  - `toolchain.compiler -> toolchain.frontends|toolchain.ir` は互換層として許可。
+  - 正規方向は `toolchain.frontends → toolchain.ir → toolchain.link → toolchain.emit`。
+  - `toolchain.emit → toolchain.frontends` は禁止。
+  - `toolchain.compiler → toolchain.frontends|toolchain.ir` は互換層として許可。
+  - `py2x.py` は `toolchain.emit` を import しない（emit はサブプロセスで `toolchain.emit.cpp` / `toolchain.emit.all` を呼ぶ）。
   - 暫定例外として、`toolchain.ir.core` から `toolchain.frontends.signature_registry|frontend_semantics` 参照を許容する（循環解消タスクで撤去予定）。
 
 #### 3.1.1 旧 import 経路の禁止ルール（移行規約）
