@@ -467,10 +467,45 @@ def main() -> int:
     validate_ambient_global_target_support(east, target=target)
 
     if target == "cpp":
-        # C++ uses its own emitter directly (transpile_to_cpp reads linker metadata).
+        emitter_raw = _parse_layer_option_items(layer_option_items["emitter"], "--emitter-option")
+
+        if output_dir_txt != "":
+            # Multi-file C++ output: emit all linked modules to output directory.
+            from backends.cpp.emitter.multifile_writer import write_multi_file_cpp
+
+            output_dir = Path(output_dir_txt)
+            module_east_map: dict[str, dict[str, object]] = {}
+            entry_path_resolved = Path("")
+            for mod in optimized_program.modules:
+                if mod.module_id == "":
+                    continue
+                mod_path = Path(mod.source_path) if mod.source_path != "" else Path(mod.module_id + ".py")
+                module_east_map[str(mod_path)] = mod.east_doc
+                if mod.is_entry:
+                    entry_path_resolved = mod_path
+            if entry_path_resolved == Path(""):
+                _fatal("linked C++ entry module not found")
+            _ = write_multi_file_cpp(
+                entry_path_resolved,
+                module_east_map,
+                output_dir,
+                negative_index_mode=emitter_raw.get("negative_index_mode", "const_only"),
+                bounds_check_mode=emitter_raw.get("bounds_check_mode", "off"),
+                floor_div_mode=emitter_raw.get("floor_div_mode", "native"),
+                mod_mode=emitter_raw.get("mod_mode", "native"),
+                int_width="64",
+                str_index_mode="native",
+                str_slice_mode="byte",
+                opt_level="2",
+                top_namespace="",
+                emit_main=True,
+            )
+            print("generated: " + str(output_dir))
+            return 0
+
+        # C++ single-file: uses its own emitter directly.
         from backends.cpp.emitter import transpile_to_cpp
 
-        emitter_raw = _parse_layer_option_items(layer_option_items["emitter"], "--emitter-option")
         output_path = Path(output_text) if output_text != "" else default_output_path(input_path, target)
         cpp_text = transpile_to_cpp(
             east,
