@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Smoke check for ir2lang EAST3(JSON) -> target code path."""
+"""Smoke check for east2x EAST3(JSON) -> target code path."""
 
 from __future__ import annotations
 
@@ -49,7 +49,7 @@ def _normalize_stem(path: Path) -> str:
 
 
 def main() -> int:
-    ap = argparse.ArgumentParser(description="Run ir2lang smoke checks from fixed EAST3 fixtures")
+    ap = argparse.ArgumentParser(description="Run east2x smoke checks from fixed EAST3 fixtures")
     ap.add_argument("--targets", default="cpp,rs,js", help="comma separated targets")
     ap.add_argument(
         "--cases",
@@ -80,7 +80,7 @@ def main() -> int:
             return 2
         case_paths.append(path)
 
-    out_root = ROOT / "out" / "ir2lang_smoke"
+    out_root = ROOT / "out" / "east2x_smoke"
     out_root.mkdir(parents=True, exist_ok=True)
 
     failures: list[str] = []
@@ -94,7 +94,7 @@ def main() -> int:
             out_path.parent.mkdir(parents=True, exist_ok=True)
             cmd = [
                 "python3",
-                "src/ir2lang.py",
+                "src/east2x.py",
                 str(case_path),
                 "--target",
                 target,

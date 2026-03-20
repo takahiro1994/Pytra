@@ -69,7 +69,7 @@ Once this smallest example works, the pages below become much easier to read.
   - `@template`: [Template Specification (Draft)](../spec/spec-template.md)
   - `@extern` / `extern(...)`: [extern.md](./extern.md)
   - `@abi`: [ABI Specification](../spec/spec-abi.md)
-- If you want `py2x.py` / `ir2lang.py` direct-entry workflows, parity checks, or selfhost-related runbooks
+- If you want `py2x.py` / `east2cpp.py` / `east2x.py` direct-entry workflows, parity checks, or selfhost-related runbooks
   - [Usage Guide](../how-to-use.md)
 
 ## Smallest Examples for Pytra-Specific Decorators

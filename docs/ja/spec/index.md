@@ -8,6 +8,7 @@
 `docs/ja/spec/index.md` は仕様全体の入口ページです。詳細は次の3ファイルに分割しています。
 
 - 利用仕様: [利用仕様](./spec-user.md)
+- Python との互換性ガイド: [Python 互換性ガイド](./spec-python-compat.md)
 - 実装仕様: [実装仕様](./spec-dev.md)
 - ランタイム仕様: [ランタイム仕様](./spec-runtime.md)
 - Boxing/Unboxing 仕様: [Boxing/Unboxing 仕様](./spec-boxing.md)
@@ -39,6 +40,8 @@
 
 - ツールの使い方・入力制約・テスト実行方法を確認したい場合:
   - [利用仕様](./spec-user.md)
+- Python との違い・非対応機能を確認したい場合:
+  - [Python 互換性ガイド](./spec-python-compat.md)
 - `import` ルール（`pytra.*` 経由の統一ルール・使える型・モジュール一覧）を確認したい場合:
   - [利用仕様 § Python 入力仕様](./spec-user.md#2-python-入力仕様)
 - 実装方針・モジュール構成・変換仕様を確認したい場合:

@@ -15,7 +15,7 @@ transpile_cli.cpp:
               → EAST3 JSON を /tmp に書き出し → 読み返す
 
 backend_registry_static.cpp:
-  emit_source_typed → python3 src/ir2lang.py ... --target cpp
+  emit_source_typed → python3 src/east2x.py ... --target cpp
                     → 生成 C++ を /tmp に書き出し → 読み返す
 ```
 
@@ -28,7 +28,7 @@ backend_registry_static.cpp:
 | シェルアウト先 | 阻んでいるもの |
 |---|---|
 | `toolchain.frontends.load_east3_document_typed` | Python AST パーサー（`ast.parse` 等）が未 transpile |
-| `src/ir2lang.py --target cpp`（= `backends/cpp/cli.py`） | C++ emitter 本体が C++ に未 transpile |
+| `src/east2x.py --target cpp`（= `backends/cpp/cli.py`） | C++ emitter 本体が C++ に未 transpile |
 
 ### `.json` 入力パスは既にネイティブ動作
 

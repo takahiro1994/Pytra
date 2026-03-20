@@ -39,7 +39,7 @@
 
 - parity / selfhost / local CI を確認したい
   - [dev-operations.md](./dev-operations.md)
-- `py2x.py` / `ir2lang.py` を直接叩きたい
+- `py2x.py` / `east2x.py` を直接叩きたい
   - [transpiler-cli.md](./transpiler-cli.md)
 - `@extern` / `extern(...)` を使いたい
   - [extern.md](./extern.md)

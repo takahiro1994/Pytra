@@ -84,10 +84,10 @@ SUITE_ATTACHMENT_ROWS_V1: Final[tuple[SuiteAttachmentRow, ...]] = (
     },
     {
         "suite_id": "ir_fixture",
-        "bundle_kind": "ir2lang",
-        "bundle_id": "ir2lang_smoke_bundle",
+        "bundle_kind": "east2x",
+        "bundle_id": "east2x_smoke_bundle",
         "status": "attached",
-        "notes": "Backend-only EAST3 fixture smoke owns the ir2lang bundle.",
+        "notes": "Backend-only EAST3 fixture smoke owns the east2x bundle.",
     },
     {
         "suite_id": "integration",

@@ -168,6 +168,7 @@ python -m unittest discover -s test/unit/common -p "test_fixtures_truth.py" -v
 
 ## 7. 関連ドキュメント
 
+- Python との違い・非対応機能の早見表: [Python 互換性ガイド](./spec-python-compat.md)
 - 使い方: [tutorial/how-to-use.md](../tutorial/how-to-use.md)
 - py2cpp 機能対応表（テスト根拠）: [py2cpp サポートマトリクス](../language/cpp/spec-support.md)
 - サンプルコード: [サンプルコード案内](../../sample/README-ja.md)

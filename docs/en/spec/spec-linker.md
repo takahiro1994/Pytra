@@ -64,7 +64,7 @@ Recommended flow:
 
 1. `py2x.py` writes raw `EAST3` modules plus `link-input.json`
 2. `eastlink.py` reads `link-input.json` and writes `link-output.json` plus linked modules
-3. `east2cpp.py` (for C++) or `ir2lang.py` (generic) reads `link-output.json` and emits target code
+3. `east2cpp.py` (for C++) or `east2x.py` (generic) reads `link-output.json` and emits target code
 
 Recommended filenames:
 
@@ -240,7 +240,7 @@ Canonical route:
   - can output raw `EAST3` modules plus `link-input.json`
 - `eastlink.py`
   - reads `link-input.json` and writes `link-output.json` plus linked modules
-- `ir2lang.py`
+- `east2x.py`
   - accepts either a raw single `Module` or `link-output.json`
 
 Minimum behavior rules:
@@ -278,7 +278,7 @@ Fail with an explicit error when:
 - linked modules remain `east_stage=3`
 - global summaries live in `link-output.v1` and `meta.linked_program_v1`
 - backends can emit from linked modules without rebuilding whole-program state
-- restart/debug flow works through `py2x -> eastlink -> ir2lang`
+- restart/debug flow works through `py2x -> eastlink -> east2x`
 
 ## 12. Related
 

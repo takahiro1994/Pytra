@@ -13,7 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 TARGET_PATHS = [
     ROOT / "src" / "toolchain",
     ROOT / "src" / "py2x.py",
-    ROOT / "src" / "ir2lang.py",
+    ROOT / "src" / "east2x.py",
     ROOT / "src" / "runtime" / "cpp" / "native" / "compiler",
 ]
 

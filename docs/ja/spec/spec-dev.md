@@ -140,7 +140,7 @@ linked module(EAST3)
 - 実装同期（2026-03-07）:
   - `backend_registry.py` / `backend_registry_static.py` は backend spec を正規化するとき、`emit_module` と `program_writer` を必ず生やす。
   - `program_writer` 未指定 backend の既定は `backends/common/program_writer.py` の `write_single_file_program(...)` とする。
-  - `ir2lang.py` の single-module 経路は `emit_module -> ProgramArtifact -> ProgramWriter` を通し、旧 `emit_source()` は compatibility wrapper として `ModuleArtifact.text` を返すだけに縮退した。
+  - `east2x.py` の single-module 経路は `emit_module -> ProgramArtifact -> ProgramWriter` を通し、旧 `emit_source()` は compatibility wrapper として `ModuleArtifact.text` を返すだけに縮退した。
 
 互換契約:
 
@@ -585,7 +585,7 @@ migration note:
   - `json.loads()` などの動的データは、将来的に `JsonValue` 系 decode surface で concrete type へ落としてから使う。
   - 実装責務は frontend/lowering 側を正本とし、少なくとも `Call`/built-in rewrite の段階で `object` / `Any` を owner または主要引数に持つ対象呼び出しを reject する。
   - emit 時は fail-fast guard のみ許可し、backend/runtime が object fallback helper を暗黙挿入して救済してはならない。
-- selfhost / host の JSON artifact loader（`py2x.py`, `ir2lang.py`, `toolchain/ir/east_io.py`, `toolchain/link/*`）も同じ decode-first 契約に従う。
+- selfhost / host の JSON artifact loader（`py2x.py`, `east2x.py`, `toolchain/ir/east_io.py`, `toolchain/link/*`）も同じ decode-first 契約に従う。
   - `json.loads()` の戻り値を `dict[str, object]` / `list[object]` と直接みなして手探り decode してはならない。
   - `pytra.std.json` の `loads_obj` / `loads_arr` / `JsonValue.as_*` / `JsonObj.get_*` / `JsonArr.get_*` を正本とする。
   - selfhost v1 は `match` や general-purpose `cast` を前提にしない。JSON module 専用 helper だけで decode する。

@@ -20,7 +20,7 @@ COVERAGE_BUNDLE_ORDER: Final[tuple[str, ...]] = (
     "emit",
     "runtime",
     "import_package",
-    "ir2lang",
+    "east2x",
     "integration",
 )
 
@@ -218,8 +218,8 @@ COVERAGE_BUNDLE_TAXONOMY_V1: Final[tuple[CoverageBundleTaxonomyEntry, ...]] = (
         "notes": "Relative import, package layout, and module-graph coverage.",
     },
     {
-        "bundle_id": "ir2lang",
-        "source_roots": ("test/ir", "tools/check_ir2lang_smoke.py"),
+        "bundle_id": "east2x",
+        "source_roots": ("test/ir", "tools/check_east2x_smoke.py"),
         "suite_ids": ("ir_fixture",),
         "harness_kinds": ("ir_json_emit_compare",),
         "notes": "Frontend-independent EAST3(JSON) to backend smoke coverage.",
@@ -288,7 +288,7 @@ LIVE_SUITE_FAMILY_INVENTORY_V1: Final[tuple[LiveSuiteFamilyEntry, ...]] = (
         "suite_kind": "test_ir",
         "source_roots": ("test/ir",),
         "coverage_role": "direct_matrix_input",
-        "bundle_candidates": ("ir2lang",),
+        "bundle_candidates": ("east2x",),
         "notes": "Frontend-independent IR-to-backend smoke fixtures.",
     },
     {
@@ -400,22 +400,22 @@ COVERAGE_BUNDLES_V1: Final[tuple[CoverageBundleEntry, ...]] = (
         "notes": "Import/package bundle owns relative-import and package-layout smoke.",
     },
     {
-        "bundle_id": "ir2lang_smoke_bundle",
-        "bundle_kind": "ir2lang",
+        "bundle_id": "east2x_smoke_bundle",
+        "bundle_kind": "east2x",
         "suite_kind": "test_ir",
         "harness_kind": "checker_cli",
-        "source_paths": ("test/ir", "tools/check_ir2lang_smoke.py"),
+        "source_paths": ("test/ir", "tools/check_east2x_smoke.py"),
         "evidence_refs": (
             {
                 "relpath": "test/ir/README.md",
                 "needle": "backend-only",
             },
             {
-                "relpath": "tools/check_ir2lang_smoke.py",
-                "needle": 'description="Run ir2lang smoke checks from fixed EAST3 fixtures"',
+                "relpath": "tools/check_east2x_smoke.py",
+                "needle": 'description="Run east2x smoke checks from fixed EAST3 fixtures"',
             },
         ),
-        "notes": "ir2lang bundle owns backend-only EAST3(JSON) smoke coverage.",
+        "notes": "east2x bundle owns backend-only EAST3(JSON) smoke coverage.",
     },
     {
         "bundle_id": "integration_gc_bundle",

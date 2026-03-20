@@ -135,7 +135,7 @@ Default implementations:
 - Implementation-aligned note (2026-03-07):
   - `backend_registry.py` and `backend_registry_static.py` always materialize both `emit_module` and `program_writer` when normalizing backend specs.
   - If a backend does not define `program_writer`, the default is `write_single_file_program(...)` in `backends/common/program_writer.py`.
-  - The single-module path in `ir2lang.py` already goes through `emit_module -> ProgramArtifact -> ProgramWriter`. The old `emit_source()` has been reduced to a compatibility wrapper that only returns `ModuleArtifact.text`.
+  - The single-module path in `east2x.py` already goes through `emit_module -> ProgramArtifact -> ProgramWriter`. The old `emit_source()` has been reduced to a compatibility wrapper that only returns `ModuleArtifact.text`.
 
 Compatibility contract:
 

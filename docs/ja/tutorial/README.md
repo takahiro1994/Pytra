@@ -44,24 +44,27 @@ Rust に変換したいなら target を変えるだけです。
 
 ## 最初に読む順番
 
-1. 実行手順を確認する: [使い方](./how-to-use.md)
-2. 言語仕様の入口を確認する: [仕様書トップ](../spec/index.md)
-3. 型推論の詳細を確認する: [EAST仕様の型推論ルール](../spec/spec-east.md#7-型推論ルール)
-4. `@extern` / `extern(...)` を確認する: [extern.md](./extern.md)
-5. `py2x.py` / `ir2lang.py` を直接使う: [transpiler-cli.md](./transpiler-cli.md)
-6. エラーの見方と詰まりどころを確認する: [troubleshooting.md](./troubleshooting.md)
-7. 高度な変換ルートを確認する: [発展的な使い方](./advanced-usage.md)
-8. parity / selfhost / local CI を確認する: [開発運用ガイド](./dev-operations.md)
+1. Python との違いを確認する: [Python 互換性ガイド](../spec/spec-python-compat.md)
+2. 実行手順を確認する: [使い方](./how-to-use.md)
+3. 言語仕様の入口を確認する: [仕様書トップ](../spec/index.md)
+4. 型推論の詳細を確認する: [EAST仕様の型推論ルール](../spec/spec-east.md#7-型推論ルール)
+5. `@extern` / `extern(...)` を確認する: [extern.md](./extern.md)
+6. `py2x.py` / `east2x.py` を直接使う: [transpiler-cli.md](./transpiler-cli.md)
+7. エラーの見方と詰まりどころを確認する: [troubleshooting.md](./troubleshooting.md)
+8. 高度な変換ルートを確認する: [発展的な使い方](./advanced-usage.md)
+9. parity / selfhost / local CI を確認する: [開発運用ガイド](./dev-operations.md)
 
 ## 読み分け
 
+- Python との違いや、使えない構文を知りたい
+  - [Python 互換性ガイド](../spec/spec-python-compat.md)
 - `.py` を各ターゲット言語へ変換して実行したい
   - [使い方](./how-to-use.md)
 - 型推論の詳細を確認したい
   - [EAST仕様の型推論ルール](../spec/spec-east.md#7-型推論ルール)
 - 仕様の正本を確認したい
   - [仕様書トップ](../spec/index.md)
-- `py2x.py` / `ir2lang.py` を直接使いたい
+- `py2x.py` / `east2x.py` を直接使いたい
   - [transpiler-cli.md](./transpiler-cli.md)
 - エラーカテゴリや詰まりどころを確認したい
   - [troubleshooting.md](./troubleshooting.md)
@@ -142,6 +145,7 @@ def unwrap_or_zero(x: Maybe) -> int:
 
 ## 関連リンク
 
+- Python との互換性ガイド: [spec-python-compat.md](../spec/spec-python-compat.md)
 - 仕様書トップ: [index.md](../spec/index.md)
 - 利用仕様: [spec-user.md](../spec/spec-user.md)
 - オプション仕様: [spec-options.md](../spec/spec-options.md)

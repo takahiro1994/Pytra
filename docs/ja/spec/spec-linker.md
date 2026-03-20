@@ -55,7 +55,7 @@
 - 推奨導線は次のとおり。
   1. `py2x.py` で raw `EAST3` 群と `link-input.json` を出力する。
   2. `eastlink.py` で `link-input.json` を読み、`link-output.json` と linked module 群を出力する。
-  3. `east2cpp.py`（C++ の場合）または `ir2lang.py`（汎用）で `link-output.json` を読んで backend emit する。
+  3. `east2cpp.py`（C++ の場合）または `east2x.py`（汎用）で `link-output.json` を読んで backend emit する。
 
 推奨拡張子 / ファイル名:
 - `*.east1.json`
@@ -298,7 +298,7 @@ synthetic helper module の規則:
   - `link-input.json` を読み、`link-output.json` と linked module 群を出力する。
 - `east2cpp.py`
   - `link-output.json` を受理し、C++ multi-file 出力を生成する。非 C++ backend を import しない独立エントリポイント。
-- `ir2lang.py`
+- `east2x.py`
   - raw 単一 `Module` または `link-output.json` を受理し、全 backend 対応の汎用経路で backend へ渡す。
 
 最小挙動規則:

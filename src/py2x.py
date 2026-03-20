@@ -138,10 +138,10 @@ def _use_linked_program_route(target_hint: str, argv: list[str]) -> bool:
 
 
 
-def _invoke_ir2lang_main(argv: list[str]) -> int:
-    import ir2lang as ir2lang_mod
+def _invoke_east2x_main(argv: list[str]) -> int:
+    import east2x as east2x_mod
 
-    return ir2lang_mod.main(argv)
+    return east2x_mod.main(argv)
 
 
 
@@ -339,18 +339,18 @@ def _link_east_files(argv: list[str]) -> int:
         options={},
     )
 
-    # link-output を書き出し、ir2lang 経由で emit（C++ の場合）
+    # link-output を書き出し、east2x 経由で emit（C++ の場合）
     import tempfile
     with tempfile.TemporaryDirectory() as tmpdir:
         link_output_dir = Path(tmpdir) / "linked"
         link_output_path, linked_paths = write_link_output_bundle(
             link_output_dir, optimize_linked_program(program),
         )
-        # ir2lang に link-output.json を渡して emit
+        # east2x に link-output.json を渡して emit
         forwarded = [str(link_output_path), "--target", target]
         if output_text != "":
             forwarded.extend(["-o", output_text])
-        return _invoke_ir2lang_main(forwarded)
+        return _invoke_east2x_main(forwarded)
 
 
 def main() -> int:
@@ -435,7 +435,7 @@ def main() -> int:
             forwarded.extend(["--optimizer-option", item])
         for item in layer_option_items["emitter"]:
             forwarded.extend(["--emitter-option", item])
-        return _invoke_ir2lang_main(forwarded)
+        return _invoke_east2x_main(forwarded)
     target_lang = target
     program = _build_linked_program_for_input(
         input_path,

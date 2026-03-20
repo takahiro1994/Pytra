@@ -43,7 +43,7 @@ Failure messages from `src/py2x.py --target cpp` are shown in the following cate
 
 - Want to check parity, selfhost, or local CI
   - [Usage Guide](../how-to-use.md)
-- Want to call `py2x.py` / `ir2lang.py` directly
+- Want to call `py2x.py` / `east2x.py` directly
   - [Usage Guide](../how-to-use.md)
 - Want to use `@extern` / `extern(...)`
   - [extern.md](./extern.md)

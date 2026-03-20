@@ -275,12 +275,12 @@ python3 src/py2x.py test/fixtures/core/add.py --target rs -o out/add_py2x.rs
 ```
 
 
-## `east2cpp.py` / `ir2lang.py` (EAST3 JSON -> target backend)
+## `east2cpp.py` / `east2x.py` (EAST3 JSON -> target backend)
 
 - `east2cpp.py` is the standalone C++ backend entry point. It reads `link-output.json` and emits C++ multi-file output without importing non-C++ backends.
-- `ir2lang.py` is the generic all-backend entry point. It runs a backend directly from `EAST3(JSON)` without passing through the frontend (`.py -> EAST3`).
+- `east2x.py` is the generic all-backend entry point. It runs a backend directly from `EAST3(JSON)` without passing through the frontend (`.py -> EAST3`).
 - Use them for backend-only regression checks with fixed IR inputs under `sample/ir` and `test/ir`.
-- `ir2lang.py` accepts `.json` only and fail-fast rejects any input other than `east_stage=3`.
+- `east2x.py` accepts `.json` only and fail-fast rejects any input other than `east_stage=3`.
 
 ```bash
 # 1) Build an EAST3(JSON) fixture from .py
@@ -288,15 +288,15 @@ python3 src/py2x.py sample/py/01_mandelbrot.py --target cpp \
   -o out/seed_01.cpp --dump-east3-after-opt sample/ir/01_mandelbrot.east3.json
 
 # 2) Transpile directly from EAST3(JSON)
-python3 src/ir2lang.py sample/ir/01_mandelbrot.east3.json --target rs \
-  -o out/ir2lang_01.rs --no-runtime-hook
+python3 src/east2x.py sample/ir/01_mandelbrot.east3.json --target rs \
+  -o out/east2x_01.rs --no-runtime-hook
 
 # 3) Backend-only smoke checks for major targets (cpp/rs/js)
-python3 tools/check_ir2lang_smoke.py
+python3 tools/check_east2x_smoke.py
 ```
 
 Notes:
-- `ir2lang.py` supports `--lower-option key=value`, `--optimizer-option key=value`, and `--emitter-option key=value`.
+- `east2x.py` supports `--lower-option key=value`, `--optimizer-option key=value`, and `--emitter-option key=value`.
 - Remove `--no-runtime-hook` when you also want to verify runtime helper copy/emission behavior.
 
 ## linked-program dump / link-only / emit
@@ -305,7 +305,7 @@ Notes:
 - `py2x.py --dump-east3-dir DIR` writes raw `EAST3` documents plus `link-input.json` to `DIR` and stops.
 - `py2x.py --link-only --output-dir DIR` skips backend generation and writes only `link-output.json` plus linked modules to `DIR`.
 - `east2cpp.py` reads `link-output.json` and emits C++ multi-file output.
-- `ir2lang.py` remains available as the generic all-backend path.
+- `east2x.py` remains available as the generic all-backend path.
 
 ```bash
 # 1) Emit raw EAST3 documents and link-input.json from .py
@@ -320,9 +320,9 @@ PYTHONPATH=src python3 src/py2x.py sample/py/18_mini_language_interpreter.py \
 PYTHONPATH=src python3 src/east2cpp.py out/linked_debug/linked/link-output.json \
   --output-dir out/linked_debug/cpp
 
-# 4) Or use ir2lang.py for the generic all-backend path
-python3 src/ir2lang.py out/linked_debug/linked/link-output.json --target cpp \
-  --output-dir out/linked_debug/cpp_ir2lang
+# 4) Or use east2x.py for the generic all-backend path
+python3 src/east2x.py out/linked_debug/linked/link-output.json --target cpp \
+  --output-dir out/linked_debug/cpp_east2x
 ```
 
 Notes:

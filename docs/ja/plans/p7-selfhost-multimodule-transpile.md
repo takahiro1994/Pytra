@@ -8,7 +8,7 @@
 
 ## 背景
 
-selfhost バイナリの `backend_registry_static.cpp::emit_source_typed` は `python3 src/ir2lang.py` にシェルアウトして C++ コードを生成している。これを除去するには C++ emitter（`CppEmitter` + 全依存モジュール）を C++ に transpile して selfhost バイナリに組み込む必要がある。
+selfhost バイナリの `backend_registry_static.cpp::emit_source_typed` は `python3 src/east2x.py` にシェルアウトして C++ コードを生成している。これを除去するには C++ emitter（`CppEmitter` + 全依存モジュール）を C++ に transpile して selfhost バイナリに組み込む必要がある。
 
 現在の selfhost transpile は単一ファイル生成（`py2x-selfhost.py` → `selfhost/py2cpp.cpp`）であり、import 先モジュールの C++ コードは含まれない。P2 で実装した compile → link パイプラインを selfhost ビルド自体に適用し、emitter モジュール群を multi-module transpile → link する仕組みが必要。
 
