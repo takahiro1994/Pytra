@@ -611,7 +611,8 @@ def _pack_global_vararg_callsite(call: dict[str, Any], vararg_table: dict[str, A
     # Check if trailing args are already packed (first element is a List with correct type)
     if len(args) == n_fixed + 1:
         last_any = args[n_fixed]
-        if isinstance(last_any, dict) and last_any.get("kind") == "List":
+        last_d: dict[str, object] = last_any if isinstance(last_any, dict) else {}
+        if isinstance(last_any, dict) and last_d.get("kind") == "List":
             return  # Already packed by per-module pass
     fixed_args = args[:n_fixed]
     vararg_args = args[n_fixed:]

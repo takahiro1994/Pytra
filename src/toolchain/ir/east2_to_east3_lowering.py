@@ -436,8 +436,10 @@ def _make_vararg_list_node(elements: list[Any], elem_type: str, list_type: str) 
         "elements": elements,
     }
     if elements:
-        first_span = elements[0].get("source_span") if isinstance(elements[0], dict) else None
-        last_span = elements[-1].get("source_span") if isinstance(elements[-1], dict) else None
+        first_el: dict[str, object] = elements[0] if isinstance(elements[0], dict) else {}
+        last_el: dict[str, object] = elements[-1] if isinstance(elements[-1], dict) else {}
+        first_span = first_el.get("source_span") if len(first_el) > 0 else None
+        last_span = last_el.get("source_span") if len(last_el) > 0 else None
         if isinstance(first_span, dict) and isinstance(last_span, dict):
             lineno = first_span.get("lineno")
             col_offset = first_span.get("col_offset")
