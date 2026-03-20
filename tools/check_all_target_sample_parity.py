@@ -16,7 +16,7 @@ PARITY_GROUPS: tuple[tuple[str, tuple[str, ...]], ...] = (
     ("cpp", ("cpp",)),
     ("js_ts", ("js", "ts")),
     ("compiled", ("rs", "cs", "go", "java", "kotlin", "swift", "scala")),
-    ("scripting_mixed", ("ruby", "lua", "php", "nim")),
+    ("scripting_mixed", ("ruby", "lua", "php", "nim", "powershell")),
 )
 
 
