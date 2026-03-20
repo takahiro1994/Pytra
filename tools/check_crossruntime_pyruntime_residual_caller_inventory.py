@@ -11,10 +11,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 
 PATH_SYMBOLS = {
-    "src/runtime/cpp/compiler/transpile_cli.cpp": {
         "py_runtime_object_isinstance",
     },
-    "src/runtime/cpp/compiler/backend_registry_static.cpp": {
         "py_runtime_object_isinstance",
     },
     "src/runtime/generated/std/json.cpp": {
@@ -45,8 +43,6 @@ SYMBOL_PATTERNS = {
 
 EXPECTED_BUCKETS = {
     "native_wrapper_object_bridge_residual": {
-        ("py_runtime_object_isinstance", "src/runtime/cpp/compiler/transpile_cli.cpp"),
-        ("py_runtime_object_isinstance", "src/runtime/cpp/compiler/backend_registry_static.cpp"),
     },
     "generated_cpp_shared_type_id_residual": {
         ("py_runtime_value_isinstance", "src/runtime/generated/std/json.cpp"),
@@ -86,10 +82,8 @@ TARGET_END_STATE = {
 }
 
 SOURCE_GUARD_REQUIRED_SUBSTRINGS = {
-    "src/runtime/cpp/compiler/transpile_cli.cpp": {
         "py_runtime_object_isinstance",
     },
-    "src/runtime/cpp/compiler/backend_registry_static.cpp": {
         "py_runtime_object_isinstance",
     },
     "src/runtime/generated/std/json.cpp": {
@@ -114,11 +108,9 @@ SOURCE_GUARD_REQUIRED_SUBSTRINGS = {
 }
 
 SOURCE_GUARD_FORBIDDEN_SUBSTRINGS = {
-    "src/runtime/cpp/compiler/transpile_cli.cpp": {
         "py_runtime_type_id(",
         "py_isinstance(",
     },
-    "src/runtime/cpp/compiler/backend_registry_static.cpp": {
         "py_runtime_type_id(",
         "py_isinstance(",
     },
@@ -180,8 +172,6 @@ REPRESENTATIVE_BUCKET_MANIFEST = {
             "test_native_cpp_typed_boundary_make_object_usage_stays_on_export_seams",
         },
         "source_guard_paths": {
-            "src/runtime/cpp/compiler/transpile_cli.cpp",
-            "src/runtime/cpp/compiler/backend_registry_static.cpp",
         },
     },
     "generated_cpp_shared_type_id_residual": {

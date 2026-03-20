@@ -75,7 +75,7 @@
 
 1. [x] [ID: P7-SELFHOST-NATIVE-COMPILER-ELIM-01-S1] selfhost ビルドパイプラインを EAST3 JSON 入力専用に統一し、`transpile_cli.cpp` の `.py` シェルアウトパスを除去する。
 2. [x] [ID: P7-SELFHOST-NATIVE-COMPILER-ELIM-01-S2] `emit_source_typed` のシェルアウトを除去。→ 生成 C++ emitter (transpile_to_cpp) の直接呼び出しに置換。シェルアウト補助関数を全削除。
-3. [ ] [ID: P7-SELFHOST-NATIVE-COMPILER-ELIM-01-S3] シェルアウトがゼロになったことを確認し `src/runtime/cpp/compiler/` を削除、`generated/compiler/` の include を直接 generated C++ に向け直す。
+3. [x] [ID: P7-SELFHOST-NATIVE-COMPILER-ELIM-01-S3] `src/runtime/cpp/compiler/` を削除。シェルアウトゼロ確認済み。契約インベントリから削除済みファイル参照を除去。
 
 #### P7-2: selfhost multi-module transpile 基盤構築（S2 の前提）
 

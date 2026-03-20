@@ -15,8 +15,8 @@ from pathlib import Path
 
 ROOT = next(p for p in Path(__file__).resolve().parents if (p / "src").exists())
 PY2X = ROOT / "src" / "py2x.py"
-CPP_CLI = ROOT / "src" / "backends" / "cpp" / "cli.py"
-STAGE2_REMOVED_ERROR = "error: --east-stage 2 is removed; py2cpp supports only --east-stage 3."
+CPP_CLI = ROOT / "src" / "toolchain" / "emit" / "cpp" / "cli.py"
+STAGE2_REMOVED_ERROR = "error: --east-stage 2 is no longer supported; use EAST3 (default)."
 STAGE2_COMPAT_WARNING = "warning: --east-stage 2 is compatibility mode; default is 3."
 if str(ROOT / "test" / "unit") not in sys.path:
     sys.path.insert(0, str(ROOT / "test" / "unit"))
@@ -64,15 +64,19 @@ class Py2CppSmokeTest(unittest.TestCase):
     def test_comment_fidelity_preserves_source_comments(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             sample = ROOT / "sample" / "py" / "01_mandelbrot.py"
-            out_cpp = Path(tmpdir) / "sample01.cpp"
+            out_dir = Path(tmpdir) / "out"
             proc = subprocess.run(
-                ["python3", str(PY2X), str(sample), "--target", "cpp", "-o", str(out_cpp)],
+                ["python3", str(PY2X), str(sample), "--target", "cpp", "-o", str(out_dir / "sample01.cpp")],
                 cwd=ROOT,
                 capture_output=True,
                 text=True,
             )
             self.assertEqual(proc.returncode, 0, msg=proc.stderr)
-            cpp = out_cpp.read_text(encoding="utf-8")
+            # py2x now emits a directory structure: src/<module>.cpp, include/, manifest.json
+            src_dir = out_dir / "src"
+            cpp_files = sorted(src_dir.glob("*.cpp")) if src_dir.exists() else []
+            self.assertTrue(len(cpp_files) > 0, f"no .cpp files found under {src_dir}")
+            cpp = cpp_files[0].read_text(encoding="utf-8")
         assert_no_generated_comments(self, cpp)
         assert_sample01_module_comments(self, cpp, prefix="//")
 

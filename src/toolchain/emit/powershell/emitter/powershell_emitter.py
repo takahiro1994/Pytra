@@ -46,7 +46,7 @@ def _safe_ident(name: Any, fallback: str) -> str:
         out = fallback
     if out[0].isdigit():
         out = "_" + out
-    if out in _PS_KEYWORDS:
+    if out in _PS_KEYWORDS or out in _PS_AUTOMATIC_VARS:
         out = out + "_"
     return out
 
@@ -211,9 +211,16 @@ def _render_expr(expr_any: Any) -> str:
         return "(" + (" " + ps_op + " ").join(rendered) + ")"
 
     if kind == "Attribute":
-        value = _render_expr(expr.get("value"))
-        attr = _safe_ident(_get_str(expr, "attr"), "prop")
-        return value + "." + attr
+        value_node = expr.get("value")
+        value = _render_expr(value_node)
+        attr = _get_str(expr, "attr")
+        safe_attr = _safe_ident(attr, "prop")
+        # Instance attribute on self/hashtable -> hashtable key access
+        if isinstance(value_node, dict) and _get_str(value_node, "kind") == "Name":
+            vname = _get_str(value_node, "id")
+            if vname == "self" or vname in _CLASS_NAMES[0]:
+                return value + '["' + attr + '"]'
+        return value + "." + safe_attr
 
     if kind == "Call":
         return _render_call_expr(expr)
@@ -531,6 +538,11 @@ def _emit_stmt(stmt: dict[str, Any], *, indent: str, ctx: dict[str, Any]) -> lis
             t = stmt.get("target")
             if isinstance(t, dict):
                 targets = [t]
+        # Track lambda assignments
+        val_node = stmt.get("value")
+        if isinstance(val_node, dict) and _get_str(val_node, "kind") == "Lambda":
+            if len(targets) == 1 and isinstance(targets[0], dict) and _get_str(targets[0], "kind") == "Name":
+                _LAMBDA_VARS[0].add(_get_str(targets[0], "id"))
         # Tuple unpacking: (a, b) = expr -> temp, then assign each
         if len(targets) == 1 and isinstance(targets[0], dict):
             tk = _get_str(targets[0], "kind")

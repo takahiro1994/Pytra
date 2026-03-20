@@ -55,8 +55,6 @@ EXPECTED_BUCKETS = {
         ("py_runtime_value_isinstance", "src/toolchain/emit/rs/emitter/rs_emitter.py"),
         ("py_runtime_type_id_is_subtype", "src/toolchain/emit/rs/emitter/rs_emitter.py"),
         ("py_runtime_type_id_issubclass", "src/toolchain/emit/rs/emitter/rs_emitter.py"),
-        ("py_runtime_object_isinstance", "src/runtime/cpp/compiler/backend_registry_static.cpp"),
-        ("py_runtime_object_isinstance", "src/runtime/cpp/compiler/transpile_cli.cpp"),
         ("py_runtime_value_type_id", "src/runtime/cs/built_in/py_runtime.cs"),
         ("py_runtime_value_isinstance", "src/runtime/cs/built_in/py_runtime.cs"),
         ("py_runtime_type_id_is_subtype", "src/runtime/cs/built_in/py_runtime.cs"),
