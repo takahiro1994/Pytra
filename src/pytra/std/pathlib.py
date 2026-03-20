@@ -112,6 +112,15 @@ class Path:
         with open(self._value, "w", encoding=encoding) as f:
             return f.write(text)
 
+    def joinpath(self, *parts: str | "Path") -> "Path":
+        result: str = self._value
+        for part in parts:
+            if isinstance(part, Path):
+                result = path.join(result, cast(Path, part)._value)
+            else:
+                result = path.join(result, cast(str, part))
+        return Path(result)
+
     def glob(self, pattern: str) -> list["Path"]:
         paths: list[str] = py_glob.glob(path.join(self._value, pattern))
         out: list[Path] = []

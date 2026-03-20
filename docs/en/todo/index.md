@@ -6,7 +6,7 @@
   <img alt="Read in Japanese" src="https://img.shields.io/badge/docs-日本語-2563EB?style=flat-square">
 </a>
 
-Last updated: 2026-03-18 (Added 5 object-fallback elimination tasks)
+Last updated: 2026-03-21 (Added P4 vararg EAST3 lowering task)
 
 ## Context Operation Rules
 
@@ -30,6 +30,14 @@ Last updated: 2026-03-18 (Added 5 object-fallback elimination tasks)
 - `docs/ja/todo/archive/index.md` keeps only the index, and the history body is stored by date in `docs/ja/todo/archive/YYYYMMDD.md`.
 
 ## Unfinished Tasks
+
+### P4: `*args` Vararg Support — EAST3-Level Desugaring
+
+Context: [docs/ja/plans/p4-vararg-east3-lowering.md](../../ja/plans/p4-vararg-east3-lowering.md)
+
+1. [ ] [ID: P4-VARARG-EAST3-LOWERING-01-S1] Add a post-pass to `east2_to_east3_lowering.py`: transform `vararg_name/type` in FunctionDef to a regular `list[T]` parameter, and pack within-module Call sites.
+2. [ ] [ID: P4-VARARG-EAST3-LOWERING-01-S2] Add `_apply_vararg_callsite_packing_global` to `global_optimizer.py` for cross-module Call site packing.
+3. [ ] [ID: P4-VARARG-EAST3-LOWERING-01-S3] Add `joinpath(*parts: str | Path) -> Path` to `pytra/std/pathlib.py`.
 
 ### P5: py_runtime.h Shrink
 

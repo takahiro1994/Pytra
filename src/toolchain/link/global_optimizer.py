@@ -487,6 +487,179 @@ def _collect_union_class_names(fn_node: dict[str, object], out: set[str]) -> Non
             out.add(stripped)
 
 
+def _collect_global_vararg_table(modules: tuple[LinkedProgramModule, ...]) -> dict[str, dict[str, Any]]:
+    """Build a table of desugared vararg functions across all modules.
+
+    Key = "module_id::fn_name" for top-level functions,
+          "module_id::ClassName.method_name" for class methods,
+          AND the short method/function name for Attribute-based call matching.
+    Value = {"n_fixed": int, "elem_type": str, "list_type": str}.
+    """
+    out: dict[str, Any] = {}
+
+    def _scan_funcdef(fn: dict[str, Any], *, module_id: str, owner_class: str = "") -> None:
+        info_any = fn.get("vararg_desugared_v1")
+        if not isinstance(info_any, dict):
+            return
+        info: dict[str, Any] = info_any
+        fn_name_any = fn.get("name")
+        fn_name = fn_name_any if isinstance(fn_name_any, str) else ""
+        if fn_name.strip() == "":
+            return
+        entry: dict[str, Any] = {
+            "n_fixed": info.get("n_fixed", 0),
+            "elem_type": info.get("elem_type", ""),
+            "list_type": info.get("list_type", "list[unknown]"),
+        }
+        qualified = module_id + "::" + fn_name
+        if owner_class != "":
+            qualified = module_id + "::" + owner_class + "." + fn_name
+        out[qualified] = entry
+        # Also register by short name for attr-based matching
+        if owner_class != "":
+            short_key = owner_class + "." + fn_name
+        else:
+            short_key = fn_name
+        if short_key not in out:
+            out[short_key] = entry
+
+    for module in modules:
+        doc = module.east_doc if isinstance(module.east_doc, dict) else {}
+        body_any = doc.get("body")
+        if not isinstance(body_any, list):
+            continue
+        for stmt in body_any:
+            if not isinstance(stmt, dict):
+                continue
+            kind = stmt.get("kind")
+            if kind == "FunctionDef":
+                _scan_funcdef(stmt, module_id=module.module_id)
+            elif kind == "ClassDef":
+                class_name_any = stmt.get("name")
+                class_name = class_name_any if isinstance(class_name_any, str) else ""
+                class_body_any = stmt.get("body")
+                if isinstance(class_body_any, list):
+                    for method in class_body_any:
+                        if isinstance(method, dict) and method.get("kind") == "FunctionDef":
+                            _scan_funcdef(method, module_id=module.module_id, owner_class=class_name)
+
+    return out
+
+
+def _make_global_vararg_list_node(elements: list[Any], list_type: str) -> dict[str, Any]:
+    return {
+        "kind": "List",
+        "resolved_type": list_type,
+        "borrow_kind": "value",
+        "casts": [],
+        "elements": elements,
+    }
+
+
+def _pack_global_vararg_callsite(call: dict[str, Any], vararg_table: dict[str, Any]) -> None:
+    """Pack trailing args of a Call node if it targets a desugared vararg function."""
+    func_any = call.get("func")
+    if not isinstance(func_any, dict):
+        return
+    func: dict[str, Any] = func_any
+
+    # Determine the lookup key
+    lookup_key = ""
+    func_kind = func.get("kind")
+    if func_kind == "Name":
+        id_any = func.get("id")
+        lookup_key = id_any if isinstance(id_any, str) else ""
+    elif func_kind == "Attribute":
+        attr_any = func.get("attr")
+        attr = attr_any if isinstance(attr_any, str) else ""
+        # Try qualified: resolve via meta non_escape_callsite
+        meta_any = call.get("meta")
+        if isinstance(meta_any, dict):
+            nec_any = meta_any.get("non_escape_callsite")
+            if isinstance(nec_any, dict):
+                callee_any = nec_any.get("callee")
+                callee = callee_any if isinstance(callee_any, str) else ""
+                if callee != "" and callee in vararg_table:
+                    lookup_key = callee
+        if lookup_key == "" and attr != "":
+            # Fallback: try ClassName.method_name or just method_name
+            owner_type_any = func.get("value")
+            if isinstance(owner_type_any, dict):
+                owner_type = owner_type_any.get("resolved_type")
+                if isinstance(owner_type, str) and owner_type.strip() != "":
+                    candidate = owner_type.strip() + "." + attr
+                    if candidate in vararg_table:
+                        lookup_key = candidate
+            if lookup_key == "":
+                lookup_key = attr
+
+    if lookup_key == "" or lookup_key not in vararg_table:
+        return
+
+    info: dict[str, Any] = vararg_table[lookup_key]
+    n_fixed: int = info.get("n_fixed", 0)
+    list_type: str = info.get("list_type", "list[unknown]")
+    args_any = call.get("args")
+    args: list[Any] = args_any if isinstance(args_any, list) else []
+    if len(args) < n_fixed:
+        return
+    if len(args) == n_fixed:
+        # Pass empty list for zero varargs
+        packed = _make_global_vararg_list_node([], list_type)
+        call["args"] = args + [packed]
+        return
+    # Check if trailing args are already packed (first element is a List with correct type)
+    if len(args) == n_fixed + 1:
+        last_any = args[n_fixed]
+        if isinstance(last_any, dict) and last_any.get("kind") == "List":
+            return  # Already packed by per-module pass
+    fixed_args = args[:n_fixed]
+    vararg_args = args[n_fixed:]
+    packed = _make_global_vararg_list_node(vararg_args, list_type)
+    call["args"] = fixed_args + [packed]
+
+
+def _walk_vararg_callsite_packing(node: Any, vararg_table: dict[str, Any]) -> None:
+    """Recursively walk the AST and pack vararg call sites in-place."""
+    if isinstance(node, dict):
+        nd: dict[str, Any] = node
+        if nd.get("kind") == "Call":
+            _pack_global_vararg_callsite(nd, vararg_table)
+        for value in nd.values():
+            _walk_vararg_callsite_packing(value, vararg_table)
+    elif isinstance(node, list):
+        for item in node:
+            _walk_vararg_callsite_packing(item, vararg_table)
+
+
+def _apply_vararg_callsite_packing_global(
+    linked_modules: tuple[LinkedProgramModule, ...],
+) -> tuple[LinkedProgramModule, ...]:
+    """Pack cross-module vararg call sites using desugaring markers from all modules."""
+    vararg_table = _collect_global_vararg_table(linked_modules)
+    if not vararg_table:
+        return linked_modules
+    updated: list[LinkedProgramModule] = []
+    for module in linked_modules:
+        doc_any = deepcopy(module.east_doc)
+        doc = doc_any if isinstance(doc_any, dict) else {}
+        _walk_vararg_callsite_packing(doc, vararg_table)
+        updated.append(
+            LinkedProgramModule(
+                module_id=module.module_id,
+                source_path=module.source_path,
+                is_entry=module.is_entry,
+                east_doc=doc,
+                artifact_path=module.artifact_path,
+                module_kind=module.module_kind,
+                helper_id=module.helper_id,
+                owner_module_id=module.owner_module_id,
+                generated_by=module.generated_by,
+            )
+        )
+    return tuple(updated)
+
+
 def _program_id(program: LinkedProgram) -> str:
     module_ids = [module.module_id for module in sorted(program.modules, key=lambda item: item.module_id)]
     return program.target + ":" + program.dispatch_mode + ":" + ",".join(module_ids)
@@ -537,6 +710,9 @@ def optimize_linked_program(program: LinkedProgram) -> LinkedProgramOptimization
     container_hints: dict[str, object] = {}
     if _is_global_pass_enabled(pass_config, "CppListValueLocalHintPass"):
         linked_modules, container_hints = _materialize_container_hints(linked_modules, target=program.target)
+    # Cross-module vararg call site packing: pack trailing positional args of calls to
+    # desugared vararg functions (marked with vararg_desugared_v1) into List nodes.
+    linked_modules = _apply_vararg_callsite_packing_global(linked_modules)
     # Classes that appear in union type parameters must be ref (gc_managed)
     # because they get boxed into object. Update class_storage_hint accordingly.
     _apply_union_param_ref_promotion(linked_modules)

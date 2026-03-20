@@ -382,6 +382,178 @@ def _lower_call_expr(call: dict[str, Any], *, dispatch_mode: str) -> dict[str, A
     return out
 
 
+def _collect_vararg_table(node: Any, out: dict[str, dict[str, Any]]) -> None:
+    """Walk the AST and collect all typed vararg FunctionDef signatures into *out*.
+
+    Key = function/method short name.
+    Value = {"n_fixed": int, "elem_type": str, "vararg_name": str, "list_type": str}.
+    Both top-level functions and class methods are recorded under their short name.
+    """
+    if isinstance(node, list):
+        nl: list[Any] = node
+        for item in nl:
+            _collect_vararg_table(item, out)
+        return
+    if not isinstance(node, dict):
+        return
+    nd: dict[str, Any] = node
+    kind = nd.get("kind")
+    if kind == "FunctionDef":
+        vararg_name_any = nd.get("vararg_name")
+        vararg_name = vararg_name_any if isinstance(vararg_name_any, str) else ""
+        vararg_type_any = nd.get("vararg_type")
+        vararg_type = vararg_type_any if isinstance(vararg_type_any, str) else ""
+        if vararg_name.strip() != "" and vararg_type.strip() != "":
+            fn_name_any = nd.get("name")
+            fn_name = fn_name_any if isinstance(fn_name_any, str) else ""
+            if fn_name.strip() != "":
+                arg_order_any = nd.get("arg_order")
+                arg_order: list[Any] = arg_order_any if isinstance(arg_order_any, list) else []
+                out[fn_name] = {
+                    "n_fixed": len(arg_order),
+                    "elem_type": vararg_type,
+                    "vararg_name": vararg_name,
+                    "list_type": "list[" + vararg_type + "]",
+                }
+        # recurse into body to catch nested/method FunctionDefs
+        body_any = nd.get("body")
+        _collect_vararg_table(body_any, out)
+    elif kind == "ClassDef":
+        body_any = nd.get("body")
+        _collect_vararg_table(body_any, out)
+    elif kind == "Module":
+        for v in nd.values():
+            _collect_vararg_table(v, out)
+
+
+def _make_vararg_list_node(elements: list[Any], elem_type: str, list_type: str) -> dict[str, Any]:
+    """Build a List AST node packing *elements* into a typed list."""
+    node: dict[str, Any] = {
+        "kind": "List",
+        "resolved_type": list_type,
+        "borrow_kind": "value",
+        "casts": [],
+        "elements": elements,
+    }
+    if elements:
+        first_span = elements[0].get("source_span") if isinstance(elements[0], dict) else None
+        last_span = elements[-1].get("source_span") if isinstance(elements[-1], dict) else None
+        if isinstance(first_span, dict) and isinstance(last_span, dict):
+            lineno = first_span.get("lineno")
+            col_offset = first_span.get("col_offset")
+            end_lineno = last_span.get("end_lineno")
+            end_col_offset = last_span.get("end_col_offset")
+            if isinstance(lineno, int) and isinstance(col_offset, int) and isinstance(end_lineno, int) and isinstance(end_col_offset, int):
+                node["source_span"] = {
+                    "lineno": lineno,
+                    "col_offset": col_offset,
+                    "end_lineno": end_lineno,
+                    "end_col_offset": end_col_offset,
+                }
+    return node
+
+
+def _desugar_vararg_funcdef(nd: dict[str, Any]) -> dict[str, Any]:
+    """Transform a vararg FunctionDef in-place: remove vararg fields, add list param."""
+    vararg_name_any = nd.get("vararg_name")
+    vararg_name = vararg_name_any if isinstance(vararg_name_any, str) else ""
+    vararg_type_any = nd.get("vararg_type")
+    vararg_type = vararg_type_any if isinstance(vararg_type_any, str) else ""
+    if vararg_name.strip() == "" or vararg_type.strip() == "":
+        return nd
+    list_type = "list[" + vararg_type + "]"
+    arg_order_any = nd.get("arg_order")
+    arg_order: list[Any] = arg_order_any if isinstance(arg_order_any, list) else []
+    n_fixed = len(arg_order)
+    arg_types_any = nd.get("arg_types")
+    arg_types: dict[str, Any] = arg_types_any if isinstance(arg_types_any, dict) else {}
+    nd["vararg_desugared_v1"] = {
+        "n_fixed": n_fixed,
+        "elem_type": vararg_type,
+        "vararg_name": vararg_name,
+        "list_type": list_type,
+    }
+    nd["arg_order"] = arg_order + [vararg_name]
+    arg_types[vararg_name] = list_type
+    nd["arg_types"] = arg_types
+    vararg_type_expr_any = nd.get("vararg_type_expr")
+    arg_type_exprs_any = nd.get("arg_type_exprs")
+    if isinstance(arg_type_exprs_any, dict):
+        arg_type_exprs: dict[str, Any] = arg_type_exprs_any
+        if isinstance(vararg_type_expr_any, dict):
+            arg_type_exprs[vararg_name] = {"kind": "GenericType", "base": "list", "args": [vararg_type_expr_any]}
+        else:
+            arg_type_exprs[vararg_name] = {"kind": "GenericType", "base": "list", "args": [{"kind": "NamedType", "name": vararg_type}]}
+    nd.pop("vararg_name", None)
+    nd.pop("vararg_type", None)
+    nd.pop("vararg_type_expr", None)
+    return nd
+
+
+def _pack_vararg_callsite(call: dict[str, Any], vararg_table: dict[str, dict[str, Any]]) -> dict[str, Any]:
+    """Pack trailing positional args of a vararg Call into a List node."""
+    func_any = call.get("func")
+    if not isinstance(func_any, dict):
+        return call
+    func: dict[str, Any] = func_any
+    func_kind = func.get("kind")
+    fn_key = ""
+    if func_kind == "Name":
+        id_any = func.get("id")
+        fn_key = id_any if isinstance(id_any, str) else ""
+    elif func_kind == "Attribute":
+        attr_any = func.get("attr")
+        fn_key = attr_any if isinstance(attr_any, str) else ""
+    if fn_key.strip() == "" or fn_key not in vararg_table:
+        return call
+    info = vararg_table[fn_key]
+    n_fixed: int = info["n_fixed"]
+    elem_type: str = info["elem_type"]
+    list_type: str = info["list_type"]
+    args_any = call.get("args")
+    args: list[Any] = args_any if isinstance(args_any, list) else []
+    if len(args) <= n_fixed:
+        # No trailing varargs — pass empty list
+        if len(args) == n_fixed:
+            packed = _make_vararg_list_node([], elem_type, list_type)
+            call["args"] = args + [packed]
+        return call
+    fixed_args = args[:n_fixed]
+    vararg_args = args[n_fixed:]
+    packed = _make_vararg_list_node(vararg_args, elem_type, list_type)
+    call["args"] = fixed_args + [packed]
+    return call
+
+
+def _apply_vararg_desugaring_walk(node: Any, vararg_table: dict[str, dict[str, Any]]) -> Any:
+    """Recursively walk *node*, desugaring vararg FunctionDefs and packing Call sites."""
+    if isinstance(node, list):
+        nl: list[Any] = node
+        return [_apply_vararg_desugaring_walk(item, vararg_table) for item in nl]
+    if not isinstance(node, dict):
+        return node
+    nd: dict[str, Any] = node
+    kind = nd.get("kind")
+    if kind == "FunctionDef":
+        _desugar_vararg_funcdef(nd)
+        # Recurse into body after desugaring this node
+        body_any = nd.get("body")
+        if isinstance(body_any, list):
+            nd["body"] = _apply_vararg_desugaring_walk(body_any, vararg_table)
+        return nd
+    if kind == "Call":
+        _pack_vararg_callsite(nd, vararg_table)
+        # Recurse into children
+        for key in list(nd.keys()):
+            if key != "kind":
+                nd[key] = _apply_vararg_desugaring_walk(nd[key], vararg_table)
+        return nd
+    out: dict[str, Any] = {}
+    for key in nd:
+        out[key] = _apply_vararg_desugaring_walk(nd[key], vararg_table)
+    return out
+
+
 def _lower_node(node: Any, *, dispatch_mode: str) -> Any:
     if isinstance(node, list):
         out_list: list[Any] = []
@@ -431,6 +603,14 @@ def lower_east2_to_east3(east_module: dict[str, Any], object_dispatch_mode: str 
         return east_module
     if lowered.get("kind") != "Module":
         return lowered
+
+    # Vararg desugaring post-pass: desugar typed *args to list[T] and pack call sites.
+    vararg_table: dict[str, dict[str, Any]] = {}
+    _collect_vararg_table(lowered, vararg_table)
+    if vararg_table:
+        lowered = _apply_vararg_desugaring_walk(lowered, vararg_table)
+        if not isinstance(lowered, dict):
+            return east_module
 
     lowered["east_stage"] = 3
     schema_obj = lowered.get("schema_version")
