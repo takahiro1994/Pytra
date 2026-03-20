@@ -6,35 +6,32 @@ if (Test-Path $pytra_runtime) { . $pytra_runtime }
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
-import { perf_counter } from "./runtime/js/generated/std/time.js"
-import { grayscale_palette } from "./runtime/js/generated/utils/gif.js"
-import { save_gif } from "./runtime/js/generated/utils/gif.js"
+# import: pytra.std.time
 
-# 12: Sample that outputs intermediate states of bubble sort as a GIF.
+# import: pytra.utils.gif
 
 function render {
-    param($values, $w, $h)
-    $frame = ($typeof $w * $h -$eq "number" ? $Array [Math]::Max(0, Math.trunc(Number(($w * h)))).fill(0) : ($Array.isArray(($w * h)) ? ($w * h).slice() : $Array.from(($w * h))))
-    $n = (values).Length
-    $bar_w = $w / $n
-    $__hoisted_cast_1 = $__pytra_float $n
-    $__hoisted_cast_2 = $__pytra_float $h
-    for ($i = 0; $i  -$lt  $n; $i += 1) {
-        $x0 = [Math]::$Truncate Number($i * bar_w)
-        $x1 = [Math]::$Truncate Number(($i + 1 * bar_w))
-        if ($x1  -$le  $x0) {
-            x1 = x0 + 1
+    param()
+    $frame = bytearray ($w * $h)
+    $n = __pytra_len $values
+    $bar_w = ($w / $n)
+    $__hoisted_cast_1 = __pytra_float $n
+    $__hoisted_cast_2 = __pytra_float $h
+    for ($_i = $null; $true; ) {
+        $x0 = __pytra_int ($i * $bar_w)
+        $x1 = __pytra_int (($i + 1) * $bar_w)
+        if (($x1 -le $x0)) {
+            $x1 = ($x0 + 1)
         }
-        $bh = [Math]::$Truncate Number(($values[((($i  -$lt  0) ? ((values).Length + (i)) : (i))] / __hoisted_cast_1) * __hoisted_cast_2))
-        $y = $h - $bh
-        $__start_1 = $y
-        for ($y = $__start_1; $y  -$lt  $h; $y += 1) {
-            for ($x = $x0; $x  -$lt  $x1; $x += 1) {
-                frame[(((y * w + x)  -lt  0) ? ((frame).Length + (y * w + x)) : (y * w + x))] = 255
+        $bh = __pytra_int (($values[$i] / $__hoisted_cast_1) * $__hoisted_cast_2)
+        $y = ($h - $bh)
+        for ($_i = $null; $true; ) {
+            for ($_i = $null; $true; ) {
+                $frame[(($y * $w) + $x)] = 255
             }
         }
     }
-    return ($Array.isArray((frame)) ? (frame).slice() : $Array.from((frame)))
+    return bytes $frame
 }
 
 function run_12_sort_visualizer {
@@ -43,42 +40,36 @@ function run_12_sort_visualizer {
     $h = 180
     $n = 124
     $out_path = "sample/out/12_sort_visualizer.gif"
-
-    $start = $perf_counter
+    $start = perf_counter
     $values = @()
-    for ($i = 0; $i  -$lt  $n; $i += 1) {
-        values.push((i * 37 + 19) % n)
+    for ($_i = $null; $true; ) {
+        $values += @(((($i * 37) + 19) % $n))
     }
-    $frames = @($render $values $w $h)
+    $frames = @(render $values $w $h)
     $frame_stride = 16
-
     $op = 0
-    for ($i = 0; $i  -$lt  $n; $i += 1) {
+    for ($_i = $null; $true; ) {
         $swapped = $false
-        for ($j = 0; $j  -$lt  $n - $i - 1; $j += 1) {
-            if ($values[(((j)  -$lt  0) ? ((values).Length + (j)) : (j))]  -$gt  $values[((($j + 1)  -$lt  0) ? ((values).Length + ($j + 1)) : ($j + 1))]) {
-                $__tmp_2 = @($values[((($j + 1)  -$lt  0) ? ((values).Length + ($j + 1)) : ($j + 1))], $values[(((j)  -$lt  0) ? ((values).Length + (j)) : (j))])
-                values[(((j)  -lt  0) ? ((values).Length + (j)) : (j))] = __tmp_2[0]
-                values[(((j + 1)  -lt  0) ? ((values).Length + (j + 1)) : (j + 1))] = __tmp_2[1]
-                swapped = $true
+        for ($_i = $null; $true; ) {
+            if (($values[$j] -gt $values[($j + 1)])) {
+                @($values[$j], $values[($j + 1)]) = @($values[($j + 1)], $values[$j])
+                $swapped = $true
             }
-            if ($op % $frame_stride -$eq 0) {
-                frames.push(render values w h)
+            if ((($op % $frame_stride) -eq 0)) {
+                $frames += @(render $values $w $h)
             }
-            op += 1
+            $op += 1
         }
-        if (-$not $swapped) {
+        if ((-not $swapped)) {
             break
         }
     }
-    save_gif out_path w h frames grayscale_palette(, 3, 0)
-    $elapsed = $perf_counter - $start
-    __pytra_print "output:" out_path
-    __pytra_print "frames:" (frames).Length
-    __pytra_print "elapsed_sec:" elapsed
+    save_gif $out_path $w $h $frames grayscale_palette
+    $elapsed = (perf_counter - $start)
+    __pytra_print "output:" $out_path
+    __pytra_print "frames:" __pytra_len $frames
+    __pytra_print "elapsed_sec:" $elapsed
 }
-
-run_12_sort_visualizer
 
 if (Get-Command -Name main -ErrorAction SilentlyContinue) {
     main

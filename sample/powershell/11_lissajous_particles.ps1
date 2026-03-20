@@ -6,24 +6,24 @@ if (Test-Path $pytra_runtime) { . $pytra_runtime }
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
-import * as math from "./runtime/js/generated/std/math.js"
-import { perf_counter } from "./runtime/js/generated/std/time.js"
-import { save_gif } from "./runtime/js/generated/utils/gif.js"
+# import: pytra.std
 
-# 11: Sample that outputs Lissajous-motion particles as a GIF.
+# import: pytra.std.time
+
+# import: pytra.utils.gif
 
 function color_palette {
     param()
-    $p = @()
-    for ($i = 0; $i  -$lt  256; $i += 1) {
+    $p = bytearray
+    for ($_i = $null; $true; ) {
         $r = $i
-        $g = $i * 3 % 256
-        $b = 255 - $i
-        p.push(r)
-        p.push(g)
-        p.push(b)
+        $g = (($i * 3) % 256)
+        $b = (255 - $i)
+        $p += @($r)
+        $p += @($g)
+        $p += @($b)
     }
-    return ($Array.isArray((p)) ? (p).slice() : $Array.from((p)))
+    return bytes $p
 }
 
 function run_11_lissajous_particles {
@@ -33,48 +33,42 @@ function run_11_lissajous_particles {
     $frames_n = 360
     $particles = 48
     $out_path = "sample/out/11_lissajous_particles.gif"
-
-    $start = $perf_counter
+    $start = perf_counter
     $frames = @()
-
-    for ($t = 0; $t  -$lt  $frames_n; $t += 1) {
-        $frame = ($typeof $w * $h -$eq "number" ? $Array [Math]::Max(0, Math.trunc(Number(($w * h)))).fill(0) : ($Array.isArray(($w * h)) ? ($w * h).slice() : $Array.from(($w * h))))
-        $__hoisted_cast_1 = $__pytra_float $t
-
-        for ($p = 0; $p  -$lt  $particles; $p += 1) {
-            $phase = $p * 0.261799
-            $x = [Math]::$Truncate Number($w * 0.5 + $w * 0.38 * $math.sin(0.11 * $__hoisted_cast_1 + $phase * 2.0))
-            $y = [Math]::$Truncate Number($h * 0.5 + $h * 0.38 * $math.sin(0.17 * $__hoisted_cast_1 + $phase * 3.0))
-            $color = 30 + $p * 9 % 220
-
-            for ($dy = -2; $dy  -$lt  3; $dy += 1) {
-                for ($dx = -2; $dx  -$lt  3; $dx += 1) {
-                    $xx = $x + $dx
-                    $yy = $y + $dy
-                    if ($xx  -$ge  0 -$and $xx  -$lt  $w -$and $yy  -$ge  0 -$and $yy  -$lt  $h) {
-                        $d2 = $dx * $dx + $dy * $dy
-                        if ($d2  -$le  4) {
-                            $idx = $yy * $w + $xx
-                            $v = $color - $d2 * 20
-                            v = Math.max(0, v)
-                            if ($v  -$gt  $frame[(((idx)  -$lt  0) ? ((frame).Length + (idx)) : (idx))]) {
-                                frame[(((idx)  -lt  0) ? ((frame).Length + (idx)) : (idx))] = v
+    for ($_i = $null; $true; ) {
+        $frame = bytearray ($w * $h)
+        $__hoisted_cast_1 = __pytra_float $t
+        for ($_i = $null; $true; ) {
+            $phase = ($p * 0.261799)
+            $x = __pytra_int (($w * 0.5) + (($w * 0.38) * $math.sin(((0.11 * $__hoisted_cast_1) + ($phase * 2.0)))))
+            $y = __pytra_int (($h * 0.5) + (($h * 0.38) * $math.sin(((0.17 * $__hoisted_cast_1) + ($phase * 3.0)))))
+            $color = (30 + (($p * 9) % 220))
+            for ($_i = $null; $true; ) {
+                for ($_i = $null; $true; ) {
+                    $xx = ($x + $dx)
+                    $yy = ($y + $dy)
+                    if ((($xx -ge 0) -and ($xx -lt $w) -and ($yy -ge 0) -and ($yy -lt $h))) {
+                        $d2 = (($dx * $dx) + ($dy * $dy))
+                        if (($d2 -le 4)) {
+                            $idx = (($yy * $w) + $xx)
+                            $v = ($color - ($d2 * 20))
+                            $v = [Math]::Max(0, $v)
+                            if (($v -gt $frame[$idx])) {
+                                $frame[$idx] = $v
                             }
                         }
                     }
                 }
             }
         }
-        frames.push((Array.isArray((frame)) ? (frame).slice() : Array.from((frame))))
+        $frames += @(bytes $frame)
     }
-    save_gif out_path w h frames color_palette(, 3, 0)
-    $elapsed = $perf_counter - $start
-    __pytra_print "output:" out_path
-    __pytra_print "frames:" frames_n
-    __pytra_print "elapsed_sec:" elapsed
+    save_gif $out_path $w $h $frames color_palette
+    $elapsed = (perf_counter - $start)
+    __pytra_print "output:" $out_path
+    __pytra_print "frames:" $frames_n
+    __pytra_print "elapsed_sec:" $elapsed
 }
-
-run_11_lissajous_particles
 
 if (Get-Command -Name main -ErrorAction SilentlyContinue) {
     main

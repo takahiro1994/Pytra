@@ -6,351 +6,285 @@ if (Test-Path $pytra_runtime) { . $pytra_runtime }
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
-import * as math from "./runtime/js/generated/std/math.js"
-import { perf_counter } from "./runtime/js/generated/std/time.js"
-import { save_gif } from "./runtime/js/generated/utils/gif.js"
+# import: pytra.std
 
-# 16: Sample that ray-traces chaotic rotation of glass sculptures and outputs a GIF.
+# import: pytra.std.time
+
+# import: pytra.utils.gif
 
 function clamp01 {
-    param($v)
-    if ($v  -$lt  0.0) {
+    param()
+    if (($v -lt 0.0)) {
         return 0.0
     }
-    if ($v  -$gt  1.0) {
+    if (($v -gt 1.0)) {
         return 1.0
     }
     return $v
 }
 
 function dot {
-    param($ax, $ay, $az, $bx, $by, $bz)
-    return $ax * $bx + $ay * $by + $az * $bz
+    param()
+    return ((($ax * $bx) + ($ay * $by)) + ($az * $bz))
 }
 
 function length {
-    param($x, $y, $z)
-    return $math.sqrt($x * $x + $y * $y + $z * z)
+    param()
+    return $math.sqrt(((($x * $x) + ($y * $y)) + ($z * $z)))
 }
 
 function normalize {
-    param($x, $y, $z)
-    $l = $length $x $y $z
-    if ($l  -$lt  1$e-9) {
-        return [0.0, 0.0, 0.0]
+    param()
+    $l = length $x $y $z
+    if (($l -lt 1e-09)) {
+        return @(0.0, 0.0, 0.0)
     }
-    return [$x / $l, $y / $l, $z / $l]
+    return @(($x / $l), ($y / $l), ($z / $l))
 }
 
 function reflect {
-    param($ix, $iy, $iz, $nx, $ny, $nz)
-    $d = $dot $ix $iy $iz $nx $ny $nz * 2.0
-    return [$ix - $d * $nx, $iy - $d * $ny, $iz - $d * $nz]
+    param()
+    $d = (dot $ix $iy $iz $nx $ny $nz * 2.0)
+    return @(($ix - ($d * $nx)), ($iy - ($d * $ny)), ($iz - ($d * $nz)))
 }
 
 function refract {
-    param($ix, $iy, $iz, $nx, $ny, $nz, $eta)
-    // Simple IOR-based refraction. Return reflection direction on total internal reflection.
-    $cosi = -$dot $ix $iy $iz $nx $ny $nz
-    $sint2 = $eta * $eta * (1.0 - $cosi * cosi)
-    if ($sint2  -$gt  1.0) {
-        return $reflect $ix $iy $iz $nx $ny $nz
+    param()
+    $cosi = (-dot $ix $iy $iz $nx $ny $nz)
+    $sint2 = (($eta * $eta) * (1.0 - ($cosi * $cosi)))
+    if (($sint2 -gt 1.0)) {
+        return reflect $ix $iy $iz $nx $ny $nz
     }
-    $cost = $math.sqrt(1.0 - sint2)
-    $k = $eta * $cosi - $cost
-    return [$eta * $ix + $k * $nx, $eta * $iy + $k * $ny, $eta * $iz + $k * $nz]
+    $cost = $math.sqrt((1.0 - $sint2))
+    $k = (($eta * $cosi) - $cost)
+    return @((($eta * $ix) + ($k * $nx)), (($eta * $iy) + ($k * $ny)), (($eta * $iz) + ($k * $nz)))
 }
 
 function schlick {
-    param($cos_theta, $f0)
-    $m = 1.0 - $cos_theta
-    return $f0 + (1.0 - f0) * $m * $m * $m * $m * $m
+    param()
+    $m = (1.0 - $cos_theta)
+    return ($f0 + ((1.0 - $f0) * (((($m * $m) * $m) * $m) * $m)))
 }
 
 function sky_color {
-    param($dx, $dy, $dz, $tphase)
-    // Sky gradient + neon band
-    $t = 0.5 * ($dy + 1.0)
-    $r = 0.06 + 0.20 * $t
-    $g = 0.10 + 0.25 * $t
-    $b = 0.16 + 0.45 * $t
-    $band = 0.5 + 0.5 * $math.sin(8.0 * $dx + 6.0 * $dz + tphase)
-    r += 0.08 * band
-    g += 0.05 * band
-    b += 0.12 * band
-    return [$clamp01 $r, $clamp01 $g, $clamp01 $b]
+    param()
+    $t = (0.5 * ($dy + 1.0))
+    $r = (0.06 + (0.2 * $t))
+    $g = (0.1 + (0.25 * $t))
+    $b = (0.16 + (0.45 * $t))
+    $band = (0.5 + (0.5 * $math.sin((((8.0 * $dx) + (6.0 * $dz)) + $tphase))))
+    $r += (0.08 * $band)
+    $g += (0.05 * $band)
+    $b += (0.12 * $band)
+    return @(clamp01 $r, clamp01 $g, clamp01 $b)
 }
 
 function sphere_intersect {
-    param($ox, $oy, $oz, $dx, $dy, $dz, $cx, $cy, $cz, $radius)
-    $lx = $ox - $cx
-    $ly = $oy - $cy
-    $lz = $oz - $cz
-    $b = $lx * $dx + $ly * $dy + $lz * $dz
-    $c = $lx * $lx + $ly * $ly + $lz * $lz - $radius * $radius
-    $h = $b * $b - $c
-    if ($h  -$lt  0.0) {
-        return -1.0
+    param()
+    $lx = ($ox - $cx)
+    $ly = ($oy - $cy)
+    $lz = ($oz - $cz)
+    $b = ((($lx * $dx) + ($ly * $dy)) + ($lz * $dz))
+    $c = (((($lx * $lx) + ($ly * $ly)) + ($lz * $lz)) - ($radius * $radius))
+    $h = (($b * $b) - $c)
+    if (($h -lt 0.0)) {
+        return (-1.0)
     }
-    $s = $math.sqrt(h)
-    $t0 = -$b - $s
-    if ($t0  -$gt  1$e-4) {
+    $s = $math.sqrt($h)
+    $t0 = ((-$b) - $s)
+    if (($t0 -gt 0.0001)) {
         return $t0
     }
-    $t1 = -$b + $s
-    if ($t1  -$gt  1$e-4) {
+    $t1 = ((-$b) + $s)
+    if (($t1 -gt 0.0001)) {
         return $t1
     }
-    return -1.0
+    return (-1.0)
 }
 
 function palette_332 {
     param()
-    // 3-3-2 quantized palette. Lightweight quantization that stays fast after transpilation.
-    $p = ($typeof 256 * 3 -$eq "number" ? $Array [Math]::Max(0, Math.trunc(Number((256 * 3)))).fill(0) : ($Array.isArray((256 * 3)) ? (256 * 3).slice() : $Array.from((256 * 3))))
-    $__hoisted_cast_1 = $__pytra_float 7
-    $__hoisted_cast_2 = $__pytra_float 3
-    for ($i = 0; $i  -$lt  256; $i += 1) {
-        $r = $i  -$gt  -$gt  5 & 7
-        $g = $i  -$gt  -$gt  2 & 7
-        $b = $i & 3
-        p[(((i * 3 + 0)  -lt  0) ? ((p).Length + (i * 3 + 0)) : (i * 3 + 0))] = Math.trunc(__pytra_float 255 * r / __hoisted_cast_1)
-        p[(((i * 3 + 1)  -lt  0) ? ((p).Length + (i * 3 + 1)) : (i * 3 + 1))] = Math.trunc(__pytra_float 255 * g / __hoisted_cast_1)
-        p[(((i * 3 + 2)  -lt  0) ? ((p).Length + (i * 3 + 2)) : (i * 3 + 2))] = Math.trunc(__pytra_float 255 * b / __hoisted_cast_2)
+    $p = bytearray (256 * 3)
+    $__hoisted_cast_1 = __pytra_float 7
+    $__hoisted_cast_2 = __pytra_float 3
+    for ($_i = $null; $true; ) {
+        $r = (($i -shr 5) -band 7)
+        $g = (($i -shr 2) -band 7)
+        $b = ($i -band 3)
+        $p[(($i * 3) + 0)] = __pytra_int ((255 * $r) / $__hoisted_cast_1)
+        $p[(($i * 3) + 1)] = __pytra_int ((255 * $g) / $__hoisted_cast_1)
+        $p[(($i * 3) + 2)] = __pytra_int ((255 * $b) / $__hoisted_cast_2)
     }
-    return ($Array.isArray((p)) ? (p).slice() : $Array.from((p)))
+    return bytes $p
 }
 
 function quantize_332 {
-    param($r, $g, $b)
-    $rr = [Math]::$Truncate Number(clamp01($r * 255.0))
-    $gg = [Math]::$Truncate Number(clamp01($g * 255.0))
-    $bb = [Math]::$Truncate Number(clamp01($b * 255.0))
-    return ($rr  -$gt  -$gt  5  -$lt  -$lt  5) + ($gg  -$gt  -$gt  5  -$lt  -$lt  2) + ($bb  -$gt  -$gt  6)
+    param()
+    $rr = __pytra_int (clamp01 $r * 255.0)
+    $gg = __pytra_int (clamp01 $g * 255.0)
+    $bb = __pytra_int (clamp01 $b * 255.0)
+    return (((($rr -shr 5) -shl 5) + (($gg -shr 5) -shl 2)) + ($bb -shr 6))
 }
 
 function render_frame {
-    param($width, $height, $frame_id, $frames_n)
-    $t = $frame_id / $frames_n
-    $tphase = 2.0 * $math.pi * $t
-
-    // Camera slowly orbits.
+    param()
+    $t = ($frame_id / $frames_n)
+    $tphase = ((2.0 * $math.pi) * $t)
     $cam_r = 3.0
-    $cam_x = $cam_r * $math.cos($tphase * 0.9)
-    $cam_y = 1.1 + 0.25 * $math.sin($tphase * 0.6)
-    $cam_z = $cam_r * $math.sin($tphase * 0.9)
+    $cam_x = ($cam_r * $math.cos(($tphase * 0.9)))
+    $cam_y = (1.1 + (0.25 * $math.sin(($tphase * 0.6))))
+    $cam_z = ($cam_r * $math.sin(($tphase * 0.9)))
     $look_x = 0.0
     $look_y = 0.35
     $look_z = 0.0
-
-    $__tmp_1 = $normalize $look_x - $cam_x $look_y - $cam_y $look_z - $cam_z
-    $fwd_x = $__tmp_1[0]
-    $fwd_y = $__tmp_1[1]
-    $fwd_z = $__tmp_1[2]
-    $__tmp_2 = $normalize $fwd_z 0.0 -$fwd_x
-    $right_x = $__tmp_2[0]
-    $right_y = $__tmp_2[1]
-    $right_z = $__tmp_2[2]
-    $__tmp_3 = $normalize $right_y * $fwd_z - $right_z * $fwd_y $right_z * $fwd_x - $right_x * $fwd_z $right_x * $fwd_y - $right_y * $fwd_x
-    $up_x = $__tmp_3[0]
-    $up_y = $__tmp_3[1]
-    $up_z = $__tmp_3[2]
-
-    // Moving glass sculpture 3 spheres and an emissive sphere.
-    $s0x = 0.9 * $math.cos(1.3 * tphase)
-    $s0y = 0.15 + 0.35 * $math.sin(1.7 * tphase)
-    $s0z = 0.9 * $math.sin(1.3 * tphase)
-    $s1x = 1.2 * $math.cos(1.3 * $tphase + 2.094)
-    $s1y = 0.10 + 0.40 * $math.sin(1.1 * $tphase + 0.8)
-    $s1z = 1.2 * $math.sin(1.3 * $tphase + 2.094)
-    $s2x = 1.0 * $math.cos(1.3 * $tphase + 4.188)
-    $s2y = 0.20 + 0.30 * $math.sin(1.5 * $tphase + 1.9)
-    $s2z = 1.0 * $math.sin(1.3 * $tphase + 4.188)
+    @($fwd_x, $fwd_y, $fwd_z) = normalize ($look_x - $cam_x) ($look_y - $cam_y) ($look_z - $cam_z)
+    @($right_x, $right_y, $right_z) = normalize $fwd_z 0.0 (-$fwd_x)
+    @($up_x, $up_y, $up_z) = normalize (($right_y * $fwd_z) - ($right_z * $fwd_y)) (($right_z * $fwd_x) - ($right_x * $fwd_z)) (($right_x * $fwd_y) - ($right_y * $fwd_x))
+    $s0x = (0.9 * $math.cos((1.3 * $tphase)))
+    $s0y = (0.15 + (0.35 * $math.sin((1.7 * $tphase))))
+    $s0z = (0.9 * $math.sin((1.3 * $tphase)))
+    $s1x = (1.2 * $math.cos(((1.3 * $tphase) + 2.094)))
+    $s1y = (0.1 + (0.4 * $math.sin(((1.1 * $tphase) + 0.8))))
+    $s1z = (1.2 * $math.sin(((1.3 * $tphase) + 2.094)))
+    $s2x = (1.0 * $math.cos(((1.3 * $tphase) + 4.188)))
+    $s2y = (0.2 + (0.3 * $math.sin(((1.5 * $tphase) + 1.9))))
+    $s2z = (1.0 * $math.sin(((1.3 * $tphase) + 4.188)))
     $lr = 0.35
-    $lx = 2.4 * $math.cos($tphase * 1.8)
-    $ly = 1.8 + 0.8 * $math.sin($tphase * 1.2)
-    $lz = 2.4 * $math.sin($tphase * 1.8)
-
-    $frame = ($typeof $width * $height -$eq "number" ? $Array [Math]::Max(0, Math.trunc(Number(($width * height)))).fill(0) : ($Array.isArray(($width * height)) ? ($width * height).slice() : $Array.from(($width * height))))
-    $aspect = $width / $height
+    $lx = (2.4 * $math.cos(($tphase * 1.8)))
+    $ly = (1.8 + (0.8 * $math.sin(($tphase * 1.2))))
+    $lz = (2.4 * $math.sin(($tphase * 1.8)))
+    $frame = bytearray ($width * $height)
+    $aspect = ($width / $height)
     $fov = 1.25
-    $__hoisted_cast_3 = $__pytra_float $height
-    $__hoisted_cast_4 = $__pytra_float $width
-
-    for ($py = 0; $py  -$lt  $height; $py += 1) {
-        $row_base = $py * $width
-        $sy = 1.0 - 2.0 * ($py + 0.5) / $__hoisted_cast_3
-        for ($px = 0; $px  -$lt  $width; $px += 1) {
-            $sx = (2.0 * ($px + 0.5) / $__hoisted_cast_4 - 1.0) * $aspect
-            $rx = $fwd_x + $fov * ($sx * $right_x + $sy * up_x)
-            $ry = $fwd_y + $fov * ($sx * $right_y + $sy * up_y)
-            $rz = $fwd_z + $fov * ($sx * $right_z + $sy * up_z)
-            $__tmp_4 = $normalize $rx $ry $rz
-            $dx = $__tmp_4[0]
-            $dy = $__tmp_4[1]
-            $dz = $__tmp_4[2]
-
-            // Search for the nearest hit.
-            $best_t = 1$e9
+    $__hoisted_cast_3 = __pytra_float $height
+    $__hoisted_cast_4 = __pytra_float $width
+    for ($_i = $null; $true; ) {
+        $row_base = ($py * $width)
+        $sy = (1.0 - ((2.0 * ($py + 0.5)) / $__hoisted_cast_3))
+        for ($_i = $null; $true; ) {
+            $sx = ((((2.0 * ($px + 0.5)) / $__hoisted_cast_4) - 1.0) * $aspect)
+            $rx = ($fwd_x + ($fov * (($sx * $right_x) + ($sy * $up_x))))
+            $ry = ($fwd_y + ($fov * (($sx * $right_y) + ($sy * $up_y))))
+            $rz = ($fwd_z + ($fov * (($sx * $right_z) + ($sy * $up_z))))
+            @($dx, $dy, $dz) = normalize $rx $ry $rz
+            $best_t = 1000000000.0
             $hit_kind = 0
             $r = 0.0
             $g = 0.0
             $b = 0.0
-
-            // Floor plane y=-1.2
-            if ($dy  -$lt  -1$e-6) {
-                $tf = (-1.2 - cam_y) / $dy
-                if ($tf  -$gt  1$e-4 -$and $tf  -$lt  $best_t) {
-                    best_t = tf
-                    hit_kind = 1
+            if (($dy -lt (-1e-06))) {
+                $tf = (((-1.2) - $cam_y) / $dy)
+                if ((($tf -gt 0.0001) -and ($tf -lt $best_t))) {
+                    $best_t = $tf
+                    $hit_kind = 1
                 }
             }
-            $t0 = $sphere_intersect $cam_x $cam_y $cam_z $dx $dy $dz $s0x $s0y $s0z 0.65
-            if ($t0  -$gt  0.0 -$and $t0  -$lt  $best_t) {
-                best_t = t0
-                hit_kind = 2
+            $t0 = sphere_intersect $cam_x $cam_y $cam_z $dx $dy $dz $s0x $s0y $s0z 0.65
+            if ((($t0 -gt 0.0) -and ($t0 -lt $best_t))) {
+                $best_t = $t0
+                $hit_kind = 2
             }
-            $t1 = $sphere_intersect $cam_x $cam_y $cam_z $dx $dy $dz $s1x $s1y $s1z 0.72
-            if ($t1  -$gt  0.0 -$and $t1  -$lt  $best_t) {
-                best_t = t1
-                hit_kind = 3
+            $t1 = sphere_intersect $cam_x $cam_y $cam_z $dx $dy $dz $s1x $s1y $s1z 0.72
+            if ((($t1 -gt 0.0) -and ($t1 -lt $best_t))) {
+                $best_t = $t1
+                $hit_kind = 3
             }
-            $t2 = $sphere_intersect $cam_x $cam_y $cam_z $dx $dy $dz $s2x $s2y $s2z 0.58
-            if ($t2  -$gt  0.0 -$and $t2  -$lt  $best_t) {
-                best_t = t2
-                hit_kind = 4
+            $t2 = sphere_intersect $cam_x $cam_y $cam_z $dx $dy $dz $s2x $s2y $s2z 0.58
+            if ((($t2 -gt 0.0) -and ($t2 -lt $best_t))) {
+                $best_t = $t2
+                $hit_kind = 4
             }
-            if ($hit_kind -$eq 0) {
-                $__tmp_5 = $sky_color $dx $dy $dz $tphase
-                r = __tmp_5[0]
-                g = __tmp_5[1]
-                b = __tmp_5[2]
+            if (($hit_kind -eq 0)) {
+                @($r, $g, $b) = sky_color $dx $dy $dz $tphase
+            } elseif (($hit_kind -eq 1)) {
+                $hx = ($cam_x + ($best_t * $dx))
+                $hz = ($cam_z + ($best_t * $dz))
+                $cx = __pytra_int $math.floor(($hx * 2.0))
+                $cz = __pytra_int $math.floor(($hz * 2.0))
+                $checker = $(if (((($cx + $cz) % 2) -eq 0)) { 0 } else { 1 })
+                $base_r = $(if (($checker -eq 0)) { 0.1 } else { 0.04 })
+                $base_g = $(if (($checker -eq 0)) { 0.11 } else { 0.05 })
+                $base_b = $(if (($checker -eq 0)) { 0.13 } else { 0.08 })
+                $lxv = ($lx - $hx)
+                $lyv = ($ly - (-1.2))
+                $lzv = ($lz - $hz)
+                @($ldx, $ldy, $ldz) = normalize $lxv $lyv $lzv
+                $ndotl = [Math]::Max($ldy, 0.0)
+                $ldist2 = ((($lxv * $lxv) + ($lyv * $lyv)) + ($lzv * $lzv))
+                $glow = (8.0 / (1.0 + $ldist2))
+                $r = (($base_r + (0.8 * $glow)) + (0.2 * $ndotl))
+                $g = (($base_g + (0.5 * $glow)) + (0.18 * $ndotl))
+                $b = (($base_b + (1.0 * $glow)) + (0.24 * $ndotl))
             } else {
-                if ($hit_kind -$eq 1) {
-                    $hx = $cam_x + $best_t * $dx
-                    $hz = $cam_z + $best_t * $dz
-                    $cx = [Math]::$Truncate Number($math.floor($hx * 2.0))
-                    $cz = [Math]::$Truncate Number($math.floor($hz * 2.0))
-                    $checker = (($cx + cz) % 2 -$eq 0 ? 0 : 1)
-                    $base_r = ($checker -$eq 0 ? 0.10 : 0.04)
-                    $base_g = ($checker -$eq 0 ? 0.11 : 0.05)
-                    $base_b = ($checker -$eq 0 ? 0.13 : 0.08)
-                    // Emissive sphere contribution.
-                    $lxv = $lx - $hx
-                    $lyv = $ly - -1.2
-                    $lzv = $lz - $hz
-                    $__tmp_6 = $normalize $lxv $lyv $lzv
-                    $ldx = $__tmp_6[0]
-                    $ldy = $__tmp_6[1]
-                    $ldz = $__tmp_6[2]
-                    $ndotl = [Math]::$Max $ldy 0.0
-                    $ldist2 = $lxv * $lxv + $lyv * $lyv + $lzv * $lzv
-                    $glow = 8.0 / (1.0 + ldist2)
-                    r = base_r + 0.8 * glow + 0.20 * ndotl
-                    g = base_g + 0.5 * glow + 0.18 * ndotl
-                    b = base_b + 1.0 * glow + 0.24 * ndotl
+                $cx = 0.0
+                $cy = 0.0
+                $cz = 0.0
+                $rad = 1.0
+                if (($hit_kind -eq 2)) {
+                    $cx = $s0x
+                    $cy = $s0y
+                    $cz = $s0z
+                    $rad = 0.65
+                } elseif (($hit_kind -eq 3)) {
+                    $cx = $s1x
+                    $cy = $s1y
+                    $cz = $s1z
+                    $rad = 0.72
                 } else {
-                    $cx = 0.0
-                    $cy = 0.0
-                    $cz = 0.0
-                    $rad = 1.0
-                    if ($hit_kind -$eq 2) {
-                        cx = s0x
-                        cy = s0y
-                        cz = s0z
-                        rad = 0.65
-                    } else {
-                        if ($hit_kind -$eq 3) {
-                            cx = s1x
-                            cy = s1y
-                            cz = s1z
-                            rad = 0.72
-                        } else {
-                            cx = s2x
-                            cy = s2y
-                            cz = s2z
-                            rad = 0.58
-                        }
-                    }
-                    $hx = $cam_x + $best_t * $dx
-                    $hy = $cam_y + $best_t * $dy
-                    $hz = $cam_z + $best_t * $dz
-                    $__tmp_7 = normalize ($hx - $cx / $rad, ($hy - cy) / $rad, ($hz - cz) / rad)
-                    $nx = $__tmp_7[0]
-                    $ny = $__tmp_7[1]
-                    $nz = $__tmp_7[2]
-
-                    // Simple glass shading reflection + refraction + light highlights.
-                    $__tmp_8 = $reflect $dx $dy $dz $nx $ny $nz
-                    $rdx = $__tmp_8[0]
-                    $rdy = $__tmp_8[1]
-                    $rdz = $__tmp_8[2]
-                    $__tmp_9 = $refract $dx $dy $dz $nx $ny $nz 1.0 / 1.45
-                    $tdx = $__tmp_9[0]
-                    $tdy = $__tmp_9[1]
-                    $tdz = $__tmp_9[2]
-                    $__tmp_10 = $sky_color $rdx $rdy $rdz $tphase
-                    $sr = $__tmp_10[0]
-                    $sg = $__tmp_10[1]
-                    $sb = $__tmp_10[2]
-                    $__tmp_11 = $sky_color $tdx $tdy $tdz $tphase + 0.8
-                    $tr = $__tmp_11[0]
-                    $tg = $__tmp_11[1]
-                    $tb = $__tmp_11[2]
-                    $cosi = [Math]::$Max -($dx * $nx + $dy * $ny + $dz * $nz, 0.0)
-                    $fr = $schlick $cosi 0.04
-                    r = tr * (1.0 - fr) + sr * fr
-                    g = tg * (1.0 - fr) + sg * fr
-                    b = tb * (1.0 - fr) + sb * fr
-
-                    $lxv = $lx - $hx
-                    $lyv = $ly - $hy
-                    $lzv = $lz - $hz
-                    $__tmp_12 = $normalize $lxv $lyv $lzv
-                    $ldx = $__tmp_12[0]
-                    $ldy = $__tmp_12[1]
-                    $ldz = $__tmp_12[2]
-                    $ndotl = [Math]::$Max $nx * $ldx + $ny * $ldy + $nz * $ldz 0.0
-                    $__tmp_13 = $normalize $ldx - $dx $ldy - $dy $ldz - $dz
-                    $hvx = $__tmp_13[0]
-                    $hvy = $__tmp_13[1]
-                    $hvz = $__tmp_13[2]
-                    $ndoth = [Math]::$Max $nx * $hvx + $ny * $hvy + $nz * $hvz 0.0
-                    $spec = $ndoth * $ndoth
-                    spec = spec * spec
-                    spec = spec * spec
-                    spec = spec * spec
-                    $glow = 10.0 / (1.0 + $lxv * $lxv + $lyv * $lyv + $lzv * lzv)
-                    r += 0.20 * ndotl + 0.80 * spec + 0.45 * glow
-                    g += 0.18 * ndotl + 0.60 * spec + 0.35 * glow
-                    b += 0.26 * ndotl + 1.00 * spec + 0.65 * glow
-
-                    // Slight tint variation per sphere.
-                    if ($hit_kind -$eq 2) {
-                        r *= 0.95
-                        g *= 1.05
-                        b *= 1.10
-                    } else {
-                        if ($hit_kind -$eq 3) {
-                            r *= 1.08
-                            g *= 0.98
-                            b *= 1.04
-                        } else {
-                            r *= 1.02
-                            g *= 1.10
-                            b *= 0.95
-                        }
-                    }
+                    $cx = $s2x
+                    $cy = $s2y
+                    $cz = $s2z
+                    $rad = 0.58
+                }
+                $hx = ($cam_x + ($best_t * $dx))
+                $hy = ($cam_y + ($best_t * $dy))
+                $hz = ($cam_z + ($best_t * $dz))
+                @($nx, $ny, $nz) = normalize (($hx - $cx) / $rad) (($hy - $cy) / $rad) (($hz - $cz) / $rad)
+                @($rdx, $rdy, $rdz) = reflect $dx $dy $dz $nx $ny $nz
+                @($tdx, $tdy, $tdz) = refract $dx $dy $dz $nx $ny $nz (1.0 / 1.45)
+                @($sr, $sg, $sb) = sky_color $rdx $rdy $rdz $tphase
+                @($tr, $tg, $tb) = sky_color $tdx $tdy $tdz ($tphase + 0.8)
+                $cosi = [Math]::Max((-((($dx * $nx) + ($dy * $ny)) + ($dz * $nz))), 0.0)
+                $fr = schlick $cosi 0.04
+                $r = (($tr * (1.0 - $fr)) + ($sr * $fr))
+                $g = (($tg * (1.0 - $fr)) + ($sg * $fr))
+                $b = (($tb * (1.0 - $fr)) + ($sb * $fr))
+                $lxv = ($lx - $hx)
+                $lyv = ($ly - $hy)
+                $lzv = ($lz - $hz)
+                @($ldx, $ldy, $ldz) = normalize $lxv $lyv $lzv
+                $ndotl = [Math]::Max(((($nx * $ldx) + ($ny * $ldy)) + ($nz * $ldz)), 0.0)
+                @($hvx, $hvy, $hvz) = normalize ($ldx - $dx) ($ldy - $dy) ($ldz - $dz)
+                $ndoth = [Math]::Max(((($nx * $hvx) + ($ny * $hvy)) + ($nz * $hvz)), 0.0)
+                $spec = ($ndoth * $ndoth)
+                $spec = ($spec * $spec)
+                $spec = ($spec * $spec)
+                $spec = ($spec * $spec)
+                $glow = (10.0 / (((1.0 + ($lxv * $lxv)) + ($lyv * $lyv)) + ($lzv * $lzv)))
+                $r += (((0.2 * $ndotl) + (0.8 * $spec)) + (0.45 * $glow))
+                $g += (((0.18 * $ndotl) + (0.6 * $spec)) + (0.35 * $glow))
+                $b += (((0.26 * $ndotl) + (1.0 * $spec)) + (0.65 * $glow))
+                if (($hit_kind -eq 2)) {
+                    $r *= 0.95
+                    $g *= 1.05
+                    $b *= 1.1
+                } elseif (($hit_kind -eq 3)) {
+                    $r *= 1.08
+                    $g *= 0.98
+                    $b *= 1.04
+                } else {
+                    $r *= 1.02
+                    $g *= 1.1
+                    $b *= 0.95
                 }
             }
-            // Slightly stronger tone mapping.
-            r = math.sqrt(clamp01 r)
-            g = math.sqrt(clamp01 g)
-            b = math.sqrt(clamp01 b)
-            frame[(((row_base + px)  -lt  0) ? ((frame).Length + (row_base + px)) : (row_base + px))] = quantize_332 r g b
+            $r = $math.sqrt(clamp01 $r)
+            $g = $math.sqrt(clamp01 $g)
+            $b = $math.sqrt(clamp01 $b)
+            $frame[($row_base + $px)] = quantize_332 $r $g $b
         }
     }
-    return ($Array.isArray((frame)) ? (frame).slice() : $Array.from((frame)))
+    return bytes $frame
 }
 
 function run_16_glass_sculpture_chaos {
@@ -359,20 +293,17 @@ function run_16_glass_sculpture_chaos {
     $height = 240
     $frames_n = 72
     $out_path = "sample/out/16_glass_sculpture_chaos.gif"
-
-    $start = $perf_counter
+    $start = perf_counter
     $frames = @()
-    for ($i = 0; $i  -$lt  $frames_n; $i += 1) {
-        frames.push(render_frame width height i frames_n)
+    for ($_i = $null; $true; ) {
+        $frames += @(render_frame $width $height $i $frames_n)
     }
-    save_gif out_path width height frames palette_332(, 6, 0)
-    $elapsed = $perf_counter - $start
-    __pytra_print "output:" out_path
-    __pytra_print "frames:" frames_n
-    __pytra_print "elapsed_sec:" elapsed
+    save_gif $out_path $width $height $frames palette_332
+    $elapsed = (perf_counter - $start)
+    __pytra_print "output:" $out_path
+    __pytra_print "frames:" $frames_n
+    __pytra_print "elapsed_sec:" $elapsed
 }
-
-run_16_glass_sculpture_chaos
 
 if (Get-Command -Name main -ErrorAction SilentlyContinue) {
     main

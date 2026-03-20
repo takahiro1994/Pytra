@@ -6,22 +6,20 @@ if (Test-Path $pytra_runtime) { . $pytra_runtime }
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
-import { perf_counter } from "./runtime/js/generated/std/time.js"
-import { grayscale_palette } from "./runtime/js/generated/utils/gif.js"
-import { save_gif } from "./runtime/js/generated/utils/gif.js"
+# import: pytra.std.time
 
-# 08: Sample that outputs Langton's Ant trajectories as a GIF.
+# import: pytra.utils.gif
 
 function capture {
-    param($grid, $w, $h)
-    $frame = ($typeof $w * $h -$eq "number" ? $Array [Math]::Max(0, Math.trunc(Number(($w * h)))).fill(0) : ($Array.isArray(($w * h)) ? ($w * h).slice() : $Array.from(($w * h))))
-    for ($y = 0; $y  -$lt  $h; $y += 1) {
-        $row_base = $y * $w
-        for ($x = 0; $x  -$lt  $w; $x += 1) {
-            frame[(((row_base + x)  -lt  0) ? ((frame).Length + (row_base + x)) : (row_base + x))] = (grid[(((y)  -lt  0) ? ((grid).Length + (y)) : (y))][(((x)  -lt  0) ? ((grid[(((y)  -lt  0) ? ((grid).Length + (y)) : (y))]).Length + (x)) : (x))] ? 255 : 0)
+    param()
+    $frame = bytearray ($w * $h)
+    for ($_i = $null; $true; ) {
+        $row_base = ($y * $w)
+        for ($_i = $null; $true; ) {
+            $frame[($row_base + $x)] = $(if ($grid[$y][$x]) { 255 } else { 0 })
         }
     }
-    return ($Array.isArray((frame)) ? (frame).slice() : $Array.from((frame)))
+    return bytes $frame
 }
 
 function run_08_langtons_ant {
@@ -29,51 +27,41 @@ function run_08_langtons_ant {
     $w = 420
     $h = 420
     $out_path = "sample/out/08_langtons_ant.gif"
-
-    $start = $perf_counter
-
-    $grid = (() = -$gt  { $let $__out = []; for ($const $_ of (() = -$gt  { $const $__out = []; $const $__start = 0; $const $__stop = $h; $const $__step = 1; if ($__step -$eq 0) { return $__out; } if ($__step  -$gt  0) { for ($let $__i = $__start; $__i  -$lt  $__stop; $__i += __step) { $__out.push(__i); } } else { for ($let $__i = $__start; $__i  -$gt  $__stop; $__i += __step) { $__out.push(__i); } } return $__out; })()) { $__out.push((() = -$gt  { $const $__base = ([0]); $const $__n = [Math]::$Max 0 Math.trunc(Number(w)); $let $__out = []; for ($let $__i = 0; $__i  -$lt  $__n; $__i += 1) { for ($const $__v $of __base) { $__out.push(__v); } } return $__out; })()); } return $__out; })()
-    $x = [Math]::$Floor $w / 2
-    $y = [Math]::$Floor $h / 2
+    $start = perf_counter
+    $grid = $null
+    $x = [Math]::Floor($w / 2)
+    $y = [Math]::Floor($h / 2)
     $d = 0
-
     $steps_total = 600000
     $capture_every = 3000
     $frames = @()
-
-    for ($i = 0; $i  -$lt  $steps_total; $i += 1) {
-        if ($grid[(((y)  -$lt  0) ? ((grid).Length + (y)) : (y))][(((x)  -$lt  0) ? (($grid[(((y)  -$lt  0) ? ((grid).Length + (y)) : (y))]).Length + (x)) : (x))] -$eq 0) {
-            d = (d + 1) % 4
-            grid[(((y)  -lt  0) ? ((grid).Length + (y)) : (y))][(((x)  -lt  0) ? ((grid[(((y)  -lt  0) ? ((grid).Length + (y)) : (y))]).Length + (x)) : (x))] = 1
+    for ($_i = $null; $true; ) {
+        if (($grid[$y][$x] -eq 0)) {
+            $d = (($d + 1) % 4)
+            $grid[$y][$x] = 1
         } else {
-            d = (d + 3) % 4
-            grid[(((y)  -lt  0) ? ((grid).Length + (y)) : (y))][(((x)  -lt  0) ? ((grid[(((y)  -lt  0) ? ((grid).Length + (y)) : (y))]).Length + (x)) : (x))] = 0
+            $d = (($d + 3) % 4)
+            $grid[$y][$x] = 0
         }
-        if ($d -$eq 0) {
-            y = (y - 1 + h) % h
+        if (($d -eq 0)) {
+            $y = ((($y - 1) + $h) % $h)
+        } elseif (($d -eq 1)) {
+            $x = (($x + 1) % $w)
+        } elseif (($d -eq 2)) {
+            $y = (($y + 1) % $h)
         } else {
-            if ($d -$eq 1) {
-                x = (x + 1) % w
-            } else {
-                if ($d -$eq 2) {
-                    y = (y + 1) % h
-                } else {
-                    x = (x - 1 + w) % w
-                }
-            }
+            $x = ((($x - 1) + $w) % $w)
         }
-        if ($i % $capture_every -$eq 0) {
-            frames.push(capture grid w h)
+        if ((($i % $capture_every) -eq 0)) {
+            $frames += @(capture $grid $w $h)
         }
     }
-    save_gif out_path w h frames grayscale_palette(, 5, 0)
-    $elapsed = $perf_counter - $start
-    __pytra_print "output:" out_path
-    __pytra_print "frames:" (frames).Length
-    __pytra_print "elapsed_sec:" elapsed
+    save_gif $out_path $w $h $frames grayscale_palette
+    $elapsed = (perf_counter - $start)
+    __pytra_print "output:" $out_path
+    __pytra_print "frames:" __pytra_len $frames
+    __pytra_print "elapsed_sec:" $elapsed
 }
-
-run_08_langtons_ant
 
 if (Get-Command -Name main -ErrorAction SilentlyContinue) {
     main

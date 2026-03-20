@@ -1,761 +1,715 @@
-"""EAST -> PowerShell transpiler.
+"""EAST3 -> PowerShell native emitter.
 
-This backend emits native PowerShell code via an intermediate JavaScript
-representation.  The JS output is converted line-by-line into PowerShell
-syntax.
+This backend emits native PowerShell code directly from EAST3 IR,
+without going through an intermediate JavaScript representation.
 """
 
 from __future__ import annotations
 
-import re
 from typing import Any
 
-from backends.common.emitter.code_emitter import reject_backend_general_union_type_exprs
-from backends.common.emitter.code_emitter import reject_backend_typed_vararg_signatures
-from backends.js.emitter.js_emitter import transpile_to_js
+from backends.common.emitter.code_emitter import (
+    reject_backend_general_union_type_exprs,
+    reject_backend_typed_vararg_signatures,
+)
 
 
-_MATH_FN_MAP: dict[str, str] = {
-    "abs": "Abs",
-    "floor": "Floor",
-    "ceil": "Ceiling",
-    "round": "Round",
-    "max": "Max",
-    "min": "Min",
-    "sqrt": "Sqrt",
-    "pow": "Pow",
-    "trunc": "Truncate",
+_PS_KEYWORDS = {
+    "begin", "break", "catch", "class", "continue", "data", "do", "dynamicparam",
+    "else", "elseif", "end", "enum", "exit", "filter", "finally", "for",
+    "foreach", "from", "function", "if", "in", "param", "process", "return",
+    "switch", "throw", "trap", "try", "until", "using", "while",
 }
 
-_BUILTIN_FN_MAP: dict[str, str] = {
-    "pow": "__pytra_pow",
-    "bytearray": "__pytra_bytearray",
-    "bytes": "__pytra_bytes",
-    "list": "__pytra_list",
-    "tuple": "__pytra_list",
-    "set": "__pytra_set",
-    "dict": "__pytra_dict",
-    "ord": "__pytra_ord",
-    "chr": "__pytra_chr",
-    "Error": "__pytra_error",
-    "Number": "__pytra_float",
-    "String": "__pytra_str",
-    "Boolean": "__pytra_bool",
-    "str": "__pytra_str",
-    "bool": "__pytra_bool",
-    "int": "__pytra_int",
-    "float": "__pytra_float",
-    "range": "__pytra_range",
-}
-
-_JS_KEYWORD_CALLS: set[str] = {
-    "if",
-    "while",
-    "for",
-    "switch",
-    "catch",
-    "finally",
-    "try",
-    "else",
-    "function",
-    "return",
-    "Error",
-}
-
-_JS_KEEP_IDENTIFIERS: set[str] = {
-    "true",
-    "false",
-    "null",
-    "undefined",
-    "if",
-    "else",
-    "for",
-    "while",
-    "function",
-    "return",
-    "break",
-    "continue",
-    "try",
-    "catch",
-    "finally",
-    "switch",
-    "case",
-    "new",
-    "this",
-    "Math",
-    "console",
-    "print",
-    "Number",
-    "String",
-    "Boolean",
-    "Error",
-    "len",
-    "__pytra_print",
-    "__pytra_len",
-    "main",
+_PS_AUTOMATIC_VARS = {
+    "true", "false", "null", "args", "input", "PSScriptRoot", "PSCommandPath",
+    "Error", "Host", "HOME", "PID", "PROFILE",
 }
 
 
-def _split_top_level(text: str, delimiter: str = ",") -> list[str]:
-    if text.strip() == "":
-        return []
-
-    parts: list[str] = []
-    current: list[str] = []
-    depth_paren = 0
-    depth_brace = 0
-    depth_bracket = 0
-    quote_char = ""
-    escape = False
-
-    for ch in text:
-        if quote_char != "":
-            current.append(ch)
-            if escape:
-                escape = False
-                continue
-            if ch == "\\":
-                escape = True
-                continue
-            if ch == quote_char:
-                quote_char = ""
-            continue
-
-        if ch in {"\"", "'"}:
-            quote_char = ch
-            current.append(ch)
-            continue
-
-        if ch == "(":
-            depth_paren += 1
-        elif ch == ")":
-            if depth_paren > 0:
-                depth_paren -= 1
-        elif ch == "{":
-            depth_brace += 1
-        elif ch == "}":
-            if depth_brace > 0:
-                depth_brace -= 1
-        elif ch == "[":
-            depth_bracket += 1
-        elif ch == "]":
-            if depth_bracket > 0:
-                depth_bracket -= 1
-
-        if (
-            ch == delimiter
-            and depth_paren == 0
-            and depth_brace == 0
-            and depth_bracket == 0
-        ):
-            parts.append("".join(current).strip())
-            current = []
-            continue
-
-        current.append(ch)
-
-    last = "".join(current).strip()
-    if last != "":
-        parts.append(last)
-    return parts
-
-
-def _convert_js_operator_tokens(line: str) -> str:
-    translated = line
-    translated = translated.replace("!==", "-ne")
-    translated = translated.replace("===", "-eq")
-    translated = translated.replace(">=", " -ge ")
-    translated = translated.replace("<=", " -le ")
-    translated = translated.replace("!=", "-ne")
-    translated = translated.replace("==", "-eq")
-    translated = translated.replace(">", " -gt ")
-    translated = translated.replace("<", " -lt ")
-    translated = translated.replace("&&", "-and")
-    translated = translated.replace("||", "-or")
-    translated = re.sub(r"\btrue\b", "$true", translated)
-    translated = re.sub(r"\bfalse\b", "$false", translated)
-    translated = re.sub(r"\bnull\b", "$null", translated)
-    translated = re.sub(r"\bundefined\b", "$null", translated)
-    translated = translated.replace(".length", ".Length")
-    translated = re.sub(r"(?<![=!<>])!(?![=])", "-not ", translated)
-    return translated
-
-
-def _convert_js_stmt_like(line: str) -> str:
-    m_throw = re.match(r"^(\s*)throw\s+new\s+Error\s*\((.*)\)\s*;?$", line)
-    if m_throw is not None:
-        return f"{m_throw.group(1)}throw {m_throw.group(2).rstrip(';').strip()}"
-    return line
-
-
-def _convert_js_function_args(arg_text: str) -> list[str]:
-    parts = _split_top_level(arg_text, ",")
-    if len(parts) == 0:
-        return []
-    out: list[str] = []
-    for part in parts:
-        text = part.strip()
-        if text == "":
-            continue
-        if text == "...":
-            continue
-        if "=" in text:
-            text = text.split("=", 1)[0].strip()
-        if text == "":
-            continue
-        if ":" in text:
-            continue
-        out.append("$" + text)
-    return out
-
-
-def _convert_js_static_calls(line: str) -> str:
-    return re.sub(
-        r"\bMath\.([A-Za-z_][A-Za-z0-9_]*)\s*\((.*)\)",
-        lambda match: (
-            f"[Math]::{_MATH_FN_MAP.get(match.group(1), match.group(1))}({match.group(2)})"
-            if match.group(1) in _MATH_FN_MAP
-            else match.group(0)
-        ),
-        line,
-    )
-
-
-def _convert_js_call(line: str) -> str:
-    # Conservative conversion that only touches simple function calls such as `foo(`.
-    if "(" not in line:
-        return line
-
-    def _build_call(target: str, raw_args: str, sep: str) -> str:
-        args = [arg.strip() for arg in _split_top_level(raw_args, ",")]
-        args = [arg for arg in args if arg != ""]
-        if len(args) == 0:
-            return target
-        return f"{target} " + sep.join(args)
-
-    line = re.sub(
-        r"(?<![\w.])console\.log\s*\((.*)\)",
-        lambda match: _build_call("__pytra_print", match.group(1), " "),
-        line,
-    )
-    return re.sub(
-        r"(?<![\w.])([A-Za-z_][A-Za-z0-9_]*)\s*\((.*?)\)",
-        lambda match: (
-            match.group(0)
-            if match.group(1) in _JS_KEYWORD_CALLS
-            else _build_call("__pytra_print", match.group(2), " ")
-            if match.group(1) == "console" or match.group(1) == "print"
-            else _build_call("__pytra_len", match.group(2), " ")
-            if match.group(1) == "len"
-            else _build_call(_BUILTIN_FN_MAP[match.group(1)], match.group(2), " ")
-            if match.group(1) in _BUILTIN_FN_MAP
-            else _build_call(match.group(1), match.group(2), " ")
-        ),
-        line,
-    )
-
-
-def _convert_js_container_literal(expr: str) -> str:
-    text = expr.strip()
-    if len(text) < 2:
-        return expr
-
-    if text.startswith("[") and text.endswith("]"):
-        inner = text[1:-1].strip()
-        if inner == "":
-            return "@()"
-        elements = _split_top_level(inner, ",")
-        return "@(" + ", ".join(_convert_js_expr(item) for item in elements if item != "") + ")"
-
-    if text.startswith("{") and text.endswith("}"):
-        inner = text[1:-1].strip()
-        if inner == "":
-            return "@{}"
-        pairs = _split_top_level(inner, ",")
-        out_items: list[str] = []
-        for pair in pairs:
-            if ":" not in pair:
-                continue
-            key, raw_value = pair.split(":", 1)
-            key_name = key.strip()
-            if (key_name.startswith("\"") and key_name.endswith("\"")) or (
-                key_name.startswith("'") and key_name.endswith("'")
-            ):
-                key_name = key_name[1:-1]
-            value_text = raw_value.strip()
-            out_items.append(f"{key_name} = {_convert_js_expr(value_text)}")
-        return "@{" + "; ".join(out_items) + "}"
-
-    return expr
-
-
-def _convert_js_compound_assignment(line: str) -> str:
-    converted = line
-    converted = re.sub(
-        r"(?<![\w$])\b([A-Za-z_][A-Za-z0-9_]*)\s*\+\=",
-        lambda m: f"${m.group(1)} +=",
-        converted,
-    )
-    converted = re.sub(
-        r"(?<![\w$])\b([A-Za-z_][A-Za-z0-9_]*)\s*\-=",
-        lambda m: f"${m.group(1)} -=",
-        converted,
-    )
-    converted = re.sub(
-        r"(?<![\w$])\b([A-Za-z_][A-Za-z0-9_]*)\s*\*=",
-        lambda m: f"${m.group(1)} *=",
-        converted,
-    )
-    converted = re.sub(
-        r"(?<![\w$])\b([A-Za-z_][A-Za-z0-9_]*)\s*\/=",
-        lambda m: f"${m.group(1)} /=",
-        converted,
-    )
-    converted = re.sub(
-        r"(?<![\w$])\b([A-Za-z_][A-Za-z0-9_]*)\s*\%=",
-        lambda m: f"${m.group(1)} %=",
-        converted,
-    )
-    return converted
-
-
-def _convert_js_new_calls(expr: str) -> str:
-    return re.sub(
-        r"(?<![\w.])new\s+([A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*)\s*\(",
-        lambda match: match.group(1) + "(",
-        expr,
-    )
-
-
-def _convert_js_identifiers(expr: str) -> str:
-    out: list[str] = []
-    quote_char = ""
-    escape = False
-    i = 0
-    n = len(expr)
-
-    while i < n:
-        ch = expr[i]
-        if quote_char != "":
-            out.append(ch)
-            if escape:
-                escape = False
-                i += 1
-                continue
-            if ch == "\\":
-                escape = True
-            elif ch == quote_char:
-                quote_char = ""
-            i += 1
-            continue
-
-        if ch in {"\"", "'"}:
-            quote_char = ch
-            out.append(ch)
-            i += 1
-            continue
-
-        if re.match(r"[A-Za-z_]", ch):
-            j = i + 1
-            while j < n and re.match(r"[A-Za-z0-9_]", expr[j]):
-                j += 1
-            token = expr[i:j]
-
-            prev_char = expr[i - 1] if i > 0 else ""
-            next_char_idx = j
-            while next_char_idx < n and expr[next_char_idx].isspace():
-                next_char_idx += 1
-            next_char = expr[next_char_idx] if next_char_idx < n else ""
-
-            if (
-                token in _JS_KEEP_IDENTIFIERS
-                or prev_char == "."
-                or prev_char == "$"
-                or next_char == ":"
-                or next_char == "("
-                or next_char == ")"
-                or (next_char_idx < n and expr[next_char_idx - 1:next_char_idx] == ".")
-            ):
-                out.append(token)
-            else:
-                out.append("$" + token)
-            i = j
-            continue
-
-        out.append(ch)
-        i += 1
-
-    return "".join(out)
-
-
-def _convert_js_expr(expr: str) -> str:
-    converted = _convert_js_operator_tokens(expr.strip())
-    converted = _convert_js_static_calls(converted)
-    converted = _convert_js_new_calls(converted)
-    converted = _convert_js_increment_decrement(converted)
-    converted = _convert_js_compound_assignment(converted)
-    converted = _convert_js_container_literal(converted)
-    converted = _convert_js_call(converted)
-    converted = _convert_js_identifiers(converted)
-    return converted
-
-
-def _convert_js_for_loop(raw: str, indent: str) -> str | None:
-    m = re.match(r"^\s*for\s*\((.*)\)\s*\{\s*$", raw)
-    if m is None:
-        return None
-
-    header = m.group(1)
-    parts = _split_top_level(header, ";")
-
-    # Support `for (x in y)` and `for (x of y)` as PowerShell foreach loops.
-    # This is intentionally lightweight and handles common patterns only.
-    if len(parts) == 1:
-        m_foreach = re.match(
-            r"^(?:const|let|var)\s+([A-Za-z_][A-Za-z0-9_]*)\s+(?:in|of)\s+(.+)$",
-            header.strip(),
-        )
-        if m_foreach is not None:
-            target = m_foreach.group(1)
-            iterator = _convert_js_expr(m_foreach.group(2))
-            return f"{indent}foreach (${target} in {iterator}) {{"
-        m_foreach_simple = re.match(
-            r"^([A-Za-z_][A-Za-z0-9_]*)\s+(?:in|of)\s+(.+)$",
-            header.strip(),
-        )
-        if m_foreach_simple is not None:
-            target = m_foreach_simple.group(1)
-            iterator = _convert_js_expr(m_foreach_simple.group(2))
-            return f"{indent}foreach (${target} in {iterator}) {{"
-
-    # Standard `for (init; cond; step)` style.
-    if len(parts) != 3:
-        converted = _convert_js_expr(header)
-        return f"{indent}for ({converted}) {{"
-
-    init = parts[0].strip()
-    cond = parts[1].strip()
-    step = parts[2].strip()
-    if init == "" and cond == "" and step == "":
-        return f"{indent}while ($true) {{"
-
-    init_targets: list[str] = []
-    init_match = re.match(r"^(?:const|let|var)\s+([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.+)$", init)
-    if init_match is not None:
-        init_var = init_match.group(1)
-        init_targets.append(init_var)
-        init_expr = _convert_js_expr(init_match.group(2))
-        init = f"${init_var} = {init_expr}"
-    else:
-        init_assign_match = re.match(
-            r"^([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.+)$",
-            init,
-        )
-        if init_assign_match is not None:
-            init_var = init_assign_match.group(1)
-            init_targets.append(init_var)
-            init_expr = _convert_js_expr(init_assign_match.group(2))
-            init = f"${init_var} = {init_expr}"
+def _safe_ident(name: Any, fallback: str) -> str:
+    if not isinstance(name, str) or name == "":
+        return fallback
+    chars: list[str] = []
+    for ch in name:
+        if ch.isalnum() or ch == "_":
+            chars.append(ch)
         else:
-            init = _convert_js_expr(init)
-
-    cond = _convert_js_expr(cond)
-    step = _convert_js_expr(step)
-    for target in init_targets:
-        token = re.compile(rf"(?<![\w$\.]){re.escape(target)}(?![\w$])")
-        cond = token.sub(f"${target}", cond)
-        step = token.sub(f"${target}", step)
-
-    if cond == "":
-        cond = "$true"
-    if step == "":
-        step = f"${init_targets[0]} += 1" if len(init_targets) > 0 else "break"
-
-    return f"{indent}for ({init}; {cond}; {step}) {{"
-
-
-def _convert_js_switch_head(raw: str, indent: str) -> str | None:
-    m = re.match(r"^\s*switch\s*\((.*)\)\s*\{\s*$", raw)
-    if m is None:
-        return None
-    return f"{indent}switch ({_convert_js_expr(m.group(1).strip())}) {{"
-
-
-def _convert_js_switch_case(raw: str, indent: str) -> str | None:
-    m_case = re.match(r"^(\s*)case\s+(.*):\s*$", raw)
-    if m_case is not None:
-        expr = m_case.group(2).strip()
-        if expr == "":
-            return f"{m_case.group(1)}default {{"
-        return f"{m_case.group(1)}{_convert_js_expr(expr)} {{"
-
-    m_default = re.match(r"^(\s*)default\s*:\s*$", raw)
-    if m_default is not None:
-        return f"{m_default.group(1)}default {{"
-
-    return None
-
-
-def _convert_js_else_clause(raw: str, indent: str) -> str | None:
-    m_else_if = re.match(r"^(\s*)}\s*else\s+if\s*\((.*)\)\s*\{\s*$", raw)
-    if m_else_if is not None:
-        return f"{m_else_if.group(1)}}} elseif ({_convert_js_expr(m_else_if.group(2).strip())}) {{"
-
-    m_else = re.match(r"^(\s*)}\s*else\s*\{\s*$", raw)
-    if m_else is not None:
-        return f"{m_else.group(1)}}} else {{"
-
-    return None
-
-
-def _convert_js_increment_decrement(line: str) -> str:
-    converted = re.sub(
-        r"(?<![\w$])\b([A-Za-z_][A-Za-z0-9_]*)\s*\+\+",
-        lambda m: f"${m.group(1)} += 1",
-        line,
-    )
-    converted = re.sub(
-        r"(?<![\w$])\b([A-Za-z_][A-Za-z0-9_]*)\s*\-\-",
-        lambda m: f"${m.group(1)} -= 1",
-        converted,
-    )
-    converted = re.sub(
-        r"\+\+\s*(?<![\w$])\b([A-Za-z_][A-Za-z0-9_]*)",
-        lambda m: f"${m.group(1)} += 1",
-        converted,
-    )
-    return re.sub(
-        r"--\s*(?<![\w$])\b([A-Za-z_][A-Za-z0-9_]*)",
-        lambda m: f"${m.group(1)} -= 1",
-        converted,
-    )
-
-
-def _convert_js_control_flow_head(raw: str, indent: str) -> str | None:
-    keyword = None
-    trimmed = raw.strip()
-    if trimmed.startswith("if "):
-        keyword = "if"
-    elif trimmed.startswith("if("):
-        keyword = "if"
-    elif trimmed.startswith("while "):
-        keyword = "while"
-    elif trimmed.startswith("while("):
-        keyword = "while"
-
-    if keyword is None:
-        return None
-
-    m = re.match(rf"^(\s*){keyword}\s*\((.*)\)\s*\{{\s*$", raw)
-    if m is None:
-        return None
-
-    condition = _convert_js_expr(m.group(2).strip())
-    if condition == "":
-        condition = "$true"
-    return f"{indent}{keyword} ({condition}) {{"
-
-
-def _convert_js_return(line: str) -> str:
-    m_return = re.match(r"^(\s*)return(?:\s+(.*))?;?$", line)
-    if m_return is None:
-        return line
-    value = (m_return.group(2) or "").strip()
-    if value == "":
-        return f"{m_return.group(1)}return"
-    value_expr = _convert_js_expr(value)
-    return f"{m_return.group(1)}return {value_expr}"
-
-
-def _convert_js_throw(line: str) -> str:
-    m_throw = re.match(r"^(\s*)throw\s+(.*);?$", line)
-    if m_throw is None:
-        return line
-    value = m_throw.group(2).strip()
-    if value == "":
-        return f"{m_throw.group(1)}throw"
-    return f"{m_throw.group(1)}throw {value}"
-
-
-def _convert_js_do_while(line: str) -> str:
-    m_do = re.match(r"^(\s*)\}\s*while\s*\((.*)\)\s*;?$", line)
-    if m_do is None:
-        return line
-    cond = _convert_js_expr(m_do.group(2).strip())
-    if cond == "":
-        cond = "$true"
-    return f"{m_do.group(1)}}} while ({cond})"
-
-
-def _convert_js_catch(line: str) -> tuple[str | None, list[str]]:
-    m = re.match(r"^(\s*)\}\s*catch\s*\(\s*([A-Za-z_][A-Za-z0-9_]*)\s*\)\s*\{\s*$", line)
-    if m is not None:
-        indent = m.group(1)
-        err_name = m.group(2)
-        return f"{indent}}} catch {{", [f"{indent}    ${err_name} = $_"]
-    m2 = re.match(r"^(\s*)\}\s*catch\s*\([^)]*\)\s*\{\s*$", line)
-    if m2 is not None:
-        return f"{m2.group(1)}}} catch {{", []
-    m3 = re.match(r"^(\s*)catch\s*\(\s*([A-Za-z_][A-Za-z0-9_]*)\s*\)\s*\{\s*$", line)
-    if m3 is not None:
-        indent = m3.group(1)
-        err_name = m3.group(2)
-        return f"{indent}catch {{", [f"{indent}    ${err_name} = $_"]
-    m4 = re.match(r"^(\s*)catch\s*\([^)]*\)\s*\{\s*$", line)
-    if m4 is not None:
-        return f"{m4.group(1)}catch {{", []
-    return None, []
-
-
-def _convert_js_to_powerline(raw_lines: list[str]) -> list[str]:
-    out: list[str] = []
-    in_block_comment = False
-    for raw in raw_lines:
-        text = raw.rstrip()
-        if text == "":
-            out.append("")
-            continue
-        if text == "use strict;" or text == "\"use strict\";" or text == "'use strict';":
-            continue
-        if in_block_comment:
-            out.append("#" + text)
-            if "*/" in text:
-                in_block_comment = False
-            continue
-        if text.startswith("//"):
-            out.append("#" + text[2:])
-            continue
-        if text.startswith("/*"):
-            in_block_comment = "*/" not in text
-            out.append("#" + text[2:].replace("*/", "").strip())
-            if "*/" in text:
-                in_block_comment = False
-            continue
-        if "/*" in text and text.endswith("*/"):
-            out.append("#" + text[2:-2].strip())
-            continue
-
-        func_match = re.match(r"^(\s*)function\s+([A-Za-z_][A-Za-z0-9_]*)\s*\((.*?)\)\s*\{\s*$", text)
-        if func_match is not None:
-            indent = func_match.group(1)
-            fn_name = func_match.group(2)
-            args = _convert_js_function_args(func_match.group(3))
-            out.append(f"{indent}function {fn_name} {{")
-            if len(args) > 0:
-                out.append(f"{indent}    param({', '.join(args)})")
-            else:
-                out.append(f"{indent}    param()")
-            continue
-
-        var_match = re.match(r"^(\s*)(?:const|let|var)\s+(.*?)\s*;\s*$", text)
-        if var_match is None:
-            var_match = re.match(r"^(\s*)(?:const|let|var)\s+(.*)\s*$", text)
-        if var_match is not None:
-            indent = var_match.group(1)
-            remainder = var_match.group(2).strip()
-            assignments = _split_top_level(remainder, ",")
-            emitted = False
-            for assignment in assignments:
-                assign_match = re.match(r"^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.+)\s*$", assignment)
-                if assign_match is None:
-                    token_match = re.match(r"^\s*([A-Za-z_][A-Za-z0-9_]*)\s*$", assignment)
-                    if token_match is not None:
-                        out.append(f"{indent}${token_match.group(1)} = $null")
-                        emitted = True
-                    continue
-                var_name = assign_match.group(1)
-                rhs = _convert_js_expr(assign_match.group(2))
-                out.append(f"{indent}${var_name} = {rhs}")
-                emitted = True
-            if emitted:
-                continue
-            only_names = _split_top_level(remainder, ",")
-            all_names: list[str] = []
-            for item in only_names:
-                token = item.strip()
-                if token == "":
-                    continue
-                token_match = re.match(r"^([A-Za-z_][A-Za-z0-9_]*)$", token)
-                if token_match is None:
-                    continue
-                all_names.append(token_match.group(1))
-            if len(all_names) > 0:
-                for var_name in all_names:
-                    out.append(f"{indent}${var_name} = $null")
-                continue
-
-        for_match = re.match(r"^(\s*)", text)
-        indent = for_match.group(0) if for_match is not None else ""
-        converted_for = _convert_js_for_loop(text, indent)
-        if converted_for is not None:
-            out.append(converted_for)
-            continue
-
-        control_match = _convert_js_control_flow_head(text, indent)
-        if control_match is not None:
-            out.append(control_match)
-            continue
-
-        switch_match = _convert_js_switch_head(text, indent)
-        if switch_match is not None:
-            out.append(switch_match)
-            continue
-
-        case_match = _convert_js_switch_case(text, indent)
-        if case_match is not None:
-            out.append(case_match)
-            continue
-
-        else_match = _convert_js_else_clause(text, indent)
-        if else_match is not None:
-            out.append(else_match)
-            continue
-
-        line = text
-        if re.match(r"^\s*return(\s|;|$)", line):
-            line = _convert_js_return(line)
-        line = _convert_js_throw(line)
-        line = _convert_js_do_while(line)
-        converted_catch, catch_prefill = _convert_js_catch(line)
-        if converted_catch is not None:
-            out.append(converted_catch)
-            for item in catch_prefill:
-                out.append(item)
-            continue
-        if line.startswith("console.log("):
-            inner = line[len("console.log(") :]
-            if inner.endswith(");"):
-                inner = inner[:-2]
-            elif inner.endswith(")"):
-                inner = inner[:-1]
-            line = f"__pytra_print {inner.strip()}"
-        elif line.startswith("print("):
-            inner = line[len("print(") :]
-            if inner.endswith(");"):
-                inner = inner[:-2]
-            elif inner.endswith(")"):
-                inner = inner[:-1]
-            line = f"__pytra_print {inner.strip()}"
-        line = re.sub(r"^(\s*)\}\s*finally\s*\{\s*$", r"\1} finally {", line)
-        if line.endswith(";"):
-            line = line[:-1]
-        line = _convert_js_stmt_like(line)
-        line = _convert_js_operator_tokens(line)
-        line = _convert_js_increment_decrement(line)
-        line = line.replace("};", "}")
-        line = _convert_js_call(line)
-        out.append(line)
+            chars.append("_")
+    out = "".join(chars)
+    if out == "":
+        out = fallback
+    if out[0].isdigit():
+        out = "_" + out
+    if out in _PS_KEYWORDS:
+        out = out + "_"
     return out
 
+
+def _ps_string_literal(text: str) -> str:
+    out = text.replace("`", "``")
+    out = out.replace('"', '`"')
+    out = out.replace("$", "`$")
+    out = out.replace("\n", "`n")
+    out = out.replace("\r", "`r")
+    out = out.replace("\t", "`t")
+    out = out.replace("\0", "`0")
+    return '"' + out + '"'
+
+
+def _get_str(d: dict[str, Any], key: str) -> str:
+    v = d.get(key)
+    return v if isinstance(v, str) else ""
+
+
+def _get_list(d: dict[str, Any], key: str) -> list[Any]:
+    v = d.get(key)
+    return v if isinstance(v, list) else []
+
+
+def _get_dict(d: dict[str, Any], key: str) -> dict[str, Any]:
+    v = d.get(key)
+    return v if isinstance(v, dict) else {}
+
+
+# ---------------------------------------------------------------------------
+# Expression rendering
+# ---------------------------------------------------------------------------
+
+_BINOP_MAP: dict[str, str] = {
+    "Add": "+",
+    "Sub": "-",
+    "Mult": "*",
+    "Div": "/",
+    "Mod": "%",
+    "BitAnd": "-band",
+    "BitOr": "-bor",
+    "BitXor": "-bxor",
+    "LShift": "-shl",
+    "RShift": "-shr",
+    "FloorDiv": "/",
+    "Pow": "",
+}
+
+_COMPARE_MAP: dict[str, str] = {
+    "Eq": "-eq",
+    "NotEq": "-ne",
+    "Lt": "-lt",
+    "LtE": "-le",
+    "Gt": "-gt",
+    "GtE": "-ge",
+    "Is": "-eq",
+    "IsNot": "-ne",
+}
+
+_UNARYOP_MAP: dict[str, str] = {
+    "USub": "-",
+    "UAdd": "+",
+    "Not": "-not ",
+    "Invert": "-bnot ",
+}
+
+
+def _render_expr(expr: Any) -> str:
+    if not isinstance(expr, dict):
+        if isinstance(expr, bool):
+            return "$true" if expr else "$false"
+        if isinstance(expr, int):
+            return str(expr)
+        if isinstance(expr, float):
+            return str(expr)
+        if isinstance(expr, str):
+            return _ps_string_literal(expr)
+        return "$null"
+
+    kind = _get_str(expr, "kind")
+
+    if kind == "Name":
+        raw = _get_str(expr, "id")
+        if raw == "True" or raw == "true":
+            return "$true"
+        if raw == "False" or raw == "false":
+            return "$false"
+        if raw == "None" or raw == "null" or raw == "undefined":
+            return "$null"
+        return "$" + _safe_ident(raw, "_v")
+
+    if kind == "Constant":
+        value = expr.get("value")
+        if value is None:
+            return "$null"
+        if isinstance(value, bool):
+            return "$true" if value else "$false"
+        if isinstance(value, int):
+            return str(value)
+        if isinstance(value, float):
+            s = repr(value)
+            if "inf" in s.lower():
+                return "[double]::PositiveInfinity" if value > 0 else "[double]::NegativeInfinity"
+            return s
+        if isinstance(value, str):
+            return _ps_string_literal(value)
+        return "$null"
+
+    if kind == "UnaryOp":
+        op = _get_str(expr, "op")
+        operand = _render_expr(expr.get("operand"))
+        ps_op = _UNARYOP_MAP.get(op, "-")
+        return "(" + ps_op + operand + ")"
+
+    if kind == "BinOp":
+        op = _get_str(expr, "op")
+        left = _render_expr(expr.get("left"))
+        right = _render_expr(expr.get("right"))
+        if op == "Pow":
+            return "[Math]::Pow(" + left + ", " + right + ")"
+        if op == "FloorDiv":
+            return "[Math]::Floor(" + left + " / " + right + ")"
+        ps_op = _BINOP_MAP.get(op, "+")
+        return "(" + left + " " + ps_op + " " + right + ")"
+
+    if kind == "Compare":
+        left = _render_expr(expr.get("left"))
+        ops = _get_list(expr, "ops")
+        comparators = _get_list(expr, "comparators")
+        if len(ops) == 0 or len(comparators) == 0:
+            return "$true"
+        ps_op = _COMPARE_MAP.get(_get_str(ops[0] if isinstance(ops[0], dict) else {}, "kind") if isinstance(ops[0], dict) else str(ops[0]) if isinstance(ops[0], str) else "", "-eq")
+        if isinstance(ops[0], str):
+            ps_op = _COMPARE_MAP.get(ops[0], "-eq")
+        right = _render_expr(comparators[0])
+        if len(ops) == 1:
+            return "(" + left + " " + ps_op + " " + right + ")"
+        parts = ["(" + left + " " + ps_op + " " + right + ")"]
+        i = 1
+        while i < len(ops) and i < len(comparators):
+            prev_right = _render_expr(comparators[i - 1])
+            op_str = ops[i] if isinstance(ops[i], str) else ""
+            next_op = _COMPARE_MAP.get(op_str, "-eq")
+            next_right = _render_expr(comparators[i])
+            parts.append("(" + prev_right + " " + next_op + " " + next_right + ")")
+            i += 1
+        return "(" + " -and ".join(parts) + ")"
+
+    if kind == "BoolOp":
+        op = _get_str(expr, "op")
+        values = _get_list(expr, "values")
+        ps_op = "-and" if op == "And" else "-or"
+        rendered = [_render_expr(v) for v in values]
+        return "(" + (" " + ps_op + " ").join(rendered) + ")"
+
+    if kind == "Attribute":
+        value = _render_expr(expr.get("value"))
+        attr = _safe_ident(_get_str(expr, "attr"), "prop")
+        return value + "." + attr
+
+    if kind == "Call":
+        return _render_call_expr(expr)
+
+    if kind == "List" or kind == "Tuple":
+        elements = _get_list(expr, "elements")
+        if len(elements) == 0:
+            elements = _get_list(expr, "elts")
+        if len(elements) == 0:
+            return "@()"
+        rendered = [_render_expr(e) for e in elements]
+        return "@(" + ", ".join(rendered) + ")"
+
+    if kind == "Dict":
+        keys = _get_list(expr, "keys")
+        vals = _get_list(expr, "values")
+        if len(keys) == 0 and len(vals) == 0:
+            entries = _get_list(expr, "entries")
+            for entry in entries:
+                if isinstance(entry, dict):
+                    k = entry.get("key")
+                    v = entry.get("value")
+                    if k is not None:
+                        keys.append(k)
+                    if v is not None:
+                        vals.append(v)
+        if len(keys) == 0:
+            return "@{}"
+        parts: list[str] = []
+        i = 0
+        while i < len(keys) and i < len(vals):
+            parts.append(_render_expr(keys[i]) + " = " + _render_expr(vals[i]))
+            i += 1
+        return "@{" + "; ".join(parts) + "}"
+
+    if kind == "Subscript":
+        value = _render_expr(expr.get("value"))
+        slice_any = expr.get("slice")
+        if isinstance(slice_any, dict) and _get_str(slice_any, "kind") == "Slice":
+            lower = _render_expr(slice_any.get("lower")) if slice_any.get("lower") is not None else "0"
+            upper = _render_expr(slice_any.get("upper")) if slice_any.get("upper") is not None else (value + ".Length")
+            return value + "[" + lower + "..(" + upper + " - 1)]"
+        index = _render_expr(slice_any)
+        return value + "[" + index + "]"
+
+    if kind == "IfExp":
+        test = _render_expr(expr.get("test"))
+        body = _render_expr(expr.get("body"))
+        orelse = _render_expr(expr.get("orelse"))
+        return "$(if (" + test + ") { " + body + " } else { " + orelse + " })"
+
+    if kind == "JoinedStr" or kind == "FString":
+        parts_list = _get_list(expr, "values")
+        if len(parts_list) == 0:
+            return '""'
+        segments: list[str] = []
+        for part in parts_list:
+            if not isinstance(part, dict):
+                continue
+            pk = _get_str(part, "kind")
+            if pk == "Constant":
+                v = part.get("value")
+                if isinstance(v, str):
+                    escaped = v.replace("`", "``").replace('"', '`"').replace("$", "`$")
+                    segments.append(escaped)
+            elif pk == "FormattedValue":
+                inner = _render_expr(part.get("value"))
+                segments.append("$(" + inner + ")")
+            else:
+                segments.append("$(" + _render_expr(part) + ")")
+        return '"' + "".join(segments) + '"'
+
+    if kind == "IsInstance":
+        return "$true"
+
+    if kind == "ObjLen":
+        return "__pytra_len " + _render_expr(expr.get("value"))
+
+    if kind == "ObjStr":
+        return "__pytra_str " + _render_expr(expr.get("value"))
+
+    if kind == "ObjBool":
+        return "__pytra_bool " + _render_expr(expr.get("value"))
+
+    if kind == "Box":
+        return _render_expr(expr.get("value"))
+
+    if kind == "Unbox":
+        return _render_expr(expr.get("value"))
+
+    if kind == "RangeExpr":
+        start = _render_expr(expr.get("start"))
+        stop = _render_expr(expr.get("stop"))
+        step = expr.get("step")
+        if step is not None:
+            return "__pytra_range " + start + " " + stop + " " + _render_expr(step)
+        return "__pytra_range " + start + " " + stop
+
+    if kind == "Lambda":
+        params = _get_list(expr, "params")
+        body = expr.get("body")
+        ps_params = ", ".join("$" + _safe_ident(_get_str(p, "arg") if isinstance(p, dict) else str(p), "_p") for p in params)
+        return "{ param(" + ps_params + ") " + _render_expr(body) + " }"
+
+    return "$null"
+
+
+def _render_call_expr(expr: dict[str, Any]) -> str:
+    func = expr.get("func")
+    args = _get_list(expr, "args")
+    rendered_args = [_render_expr(a) for a in args]
+
+    if isinstance(func, dict):
+        fk = _get_str(func, "kind")
+
+        if fk == "Name":
+            fn_name = _get_str(func, "id")
+            if fn_name == "print":
+                return "__pytra_print " + " ".join(rendered_args) if len(rendered_args) > 0 else "__pytra_print"
+            if fn_name == "len":
+                return "__pytra_len " + rendered_args[0] if len(rendered_args) > 0 else "__pytra_len"
+            if fn_name == "str":
+                return "__pytra_str " + rendered_args[0] if len(rendered_args) > 0 else "__pytra_str"
+            if fn_name == "int":
+                return "__pytra_int " + rendered_args[0] if len(rendered_args) > 0 else "__pytra_int"
+            if fn_name == "float":
+                return "__pytra_float " + rendered_args[0] if len(rendered_args) > 0 else "__pytra_float"
+            if fn_name == "bool":
+                return "__pytra_bool " + rendered_args[0] if len(rendered_args) > 0 else "__pytra_bool"
+            if fn_name == "range":
+                return "__pytra_range " + " ".join(rendered_args)
+            if fn_name == "ord":
+                return "__pytra_ord " + rendered_args[0] if len(rendered_args) > 0 else "__pytra_ord"
+            if fn_name == "chr":
+                return "__pytra_chr " + rendered_args[0] if len(rendered_args) > 0 else "__pytra_chr"
+            if fn_name == "abs":
+                return "[Math]::Abs(" + rendered_args[0] + ")" if len(rendered_args) > 0 else "[Math]::Abs(0)"
+            if fn_name == "min":
+                return "[Math]::Min(" + ", ".join(rendered_args) + ")" if len(rendered_args) > 0 else "0"
+            if fn_name == "max":
+                return "[Math]::Max(" + ", ".join(rendered_args) + ")" if len(rendered_args) > 0 else "0"
+            if fn_name == "isinstance":
+                return "$true"
+            safe = _safe_ident(fn_name, "_fn")
+            if len(rendered_args) == 0:
+                return safe
+            return safe + " " + " ".join(rendered_args)
+
+        if fk == "Attribute":
+            owner = _render_expr(func.get("value"))
+            attr = _safe_ident(_get_str(func, "attr"), "method")
+            if attr == "append":
+                if len(rendered_args) > 0:
+                    return owner + " += @(" + rendered_args[0] + ")"
+                return owner
+            if attr == "join":
+                if len(rendered_args) > 0:
+                    return "(" + rendered_args[0] + " -join " + owner + ")"
+                return owner
+            if attr == "format":
+                return owner + " -f " + ", ".join(rendered_args) if len(rendered_args) > 0 else owner
+            if attr == "startswith":
+                return owner + ".StartsWith(" + ", ".join(rendered_args) + ")"
+            if attr == "endswith":
+                return owner + ".EndsWith(" + ", ".join(rendered_args) + ")"
+            if attr == "upper":
+                return owner + ".ToUpper()"
+            if attr == "lower":
+                return owner + ".ToLower()"
+            if attr == "strip":
+                return owner + ".Trim()"
+            if attr == "split":
+                if len(rendered_args) > 0:
+                    return owner + ".Split(" + rendered_args[0] + ")"
+                return owner + ".Split()"
+            if attr == "replace":
+                if len(rendered_args) >= 2:
+                    return owner + ".Replace(" + rendered_args[0] + ", " + rendered_args[1] + ")"
+                return owner
+            if attr == "keys":
+                return owner + ".Keys"
+            if attr == "values":
+                return owner + ".Values"
+            if attr == "items":
+                return owner + ".GetEnumerator()"
+            if attr == "get":
+                if len(rendered_args) >= 2:
+                    return "$(if (" + owner + ".ContainsKey(" + rendered_args[0] + ")) { " + owner + "[" + rendered_args[0] + "] } else { " + rendered_args[1] + " })"
+                if len(rendered_args) == 1:
+                    return owner + "[" + rendered_args[0] + "]"
+                return "$null"
+            if attr == "pop":
+                if len(rendered_args) == 0:
+                    return owner + "[-1]; " + owner + " = " + owner + "[0..(" + owner + ".Length - 2)]"
+                return owner
+            if len(rendered_args) == 0:
+                return owner + "." + attr + "()"
+            return owner + "." + attr + "(" + ", ".join(rendered_args) + ")"
+
+    fn_rendered = _render_expr(func)
+    if len(rendered_args) == 0:
+        return fn_rendered
+    return fn_rendered + " " + " ".join(rendered_args)
+
+
+# ---------------------------------------------------------------------------
+# Statement emission
+# ---------------------------------------------------------------------------
+
+def _emit_body(body: list[Any], *, indent: str, ctx: dict[str, Any]) -> list[str]:
+    lines: list[str] = []
+    for stmt in body:
+        if isinstance(stmt, dict):
+            lines.extend(_emit_stmt(stmt, indent=indent, ctx=ctx))
+    if len(lines) == 0:
+        lines.append(indent + "# pass")
+    return lines
+
+
+def _emit_stmt(stmt: dict[str, Any], *, indent: str, ctx: dict[str, Any]) -> list[str]:
+    kind = _get_str(stmt, "kind")
+
+    if kind == "Expr":
+        value = stmt.get("value")
+        if isinstance(value, dict):
+            vk = _get_str(value, "kind")
+            if vk == "Name":
+                raw = _get_str(value, "id")
+                if raw == "break":
+                    return [indent + "break"]
+                if raw == "continue":
+                    return [indent + "continue"]
+                if raw == "pass":
+                    return [indent + "# pass"]
+        return [indent + _render_expr(value)]
+
+    if kind == "Return":
+        value = stmt.get("value")
+        if value is not None:
+            return [indent + "return " + _render_expr(value)]
+        return [indent + "return"]
+
+    if kind == "Assign":
+        targets = _get_list(stmt, "targets")
+        if len(targets) == 0:
+            t = stmt.get("target")
+            if isinstance(t, dict):
+                targets = [t]
+        value = _render_expr(stmt.get("value"))
+        if len(targets) == 0:
+            return [indent + value]
+        target = targets[0]
+        if isinstance(target, dict) and _get_str(target, "kind") == "Attribute":
+            return [indent + _render_expr(target) + " = " + value]
+        if isinstance(target, dict) and _get_str(target, "kind") == "Subscript":
+            owner = _render_expr(target.get("value"))
+            index = _render_expr(target.get("slice"))
+            return [indent + owner + "[" + index + "] = " + value]
+        lhs = _render_expr(target)
+        return [indent + lhs + " = " + value]
+
+    if kind == "AnnAssign":
+        target = stmt.get("target")
+        value = stmt.get("value")
+        if value is None:
+            lhs = _render_expr(target)
+            return [indent + lhs + " = $null"]
+        lhs = _render_expr(target)
+        return [indent + lhs + " = " + _render_expr(value)]
+
+    if kind == "AugAssign":
+        target = _render_expr(stmt.get("target"))
+        op = _get_str(stmt, "op")
+        value = _render_expr(stmt.get("value"))
+        op_map: dict[str, str] = {
+            "Add": "+=", "Sub": "-=", "Mult": "*=", "Div": "/=",
+            "Mod": "%=", "BitAnd": "=", "BitOr": "=", "BitXor": "=",
+            "LShift": "=", "RShift": "=",
+        }
+        ps_op = op_map.get(op, "=")
+        if ps_op == "=" and op in _BINOP_MAP:
+            return [indent + target + " = (" + target + " " + _BINOP_MAP[op] + " " + value + ")"]
+        return [indent + target + " " + ps_op + " " + value]
+
+    if kind == "If":
+        test = _render_expr(stmt.get("test"))
+        body = _get_list(stmt, "body")
+        orelse = _get_list(stmt, "orelse")
+        lines = [indent + "if (" + test + ") {"]
+        lines.extend(_emit_body(body, indent=indent + "    ", ctx=ctx))
+        if len(orelse) > 0:
+            if len(orelse) == 1 and isinstance(orelse[0], dict) and _get_str(orelse[0], "kind") == "If":
+                inner = orelse[0]
+                lines.append(indent + "} elseif (" + _render_expr(inner.get("test")) + ") {")
+                lines.extend(_emit_body(_get_list(inner, "body"), indent=indent + "    ", ctx=ctx))
+                inner_else = _get_list(inner, "orelse")
+                while len(inner_else) == 1 and isinstance(inner_else[0], dict) and _get_str(inner_else[0], "kind") == "If":
+                    inner = inner_else[0]
+                    lines.append(indent + "} elseif (" + _render_expr(inner.get("test")) + ") {")
+                    lines.extend(_emit_body(_get_list(inner, "body"), indent=indent + "    ", ctx=ctx))
+                    inner_else = _get_list(inner, "orelse")
+                if len(inner_else) > 0:
+                    lines.append(indent + "} else {")
+                    lines.extend(_emit_body(inner_else, indent=indent + "    ", ctx=ctx))
+            else:
+                lines.append(indent + "} else {")
+                lines.extend(_emit_body(orelse, indent=indent + "    ", ctx=ctx))
+        lines.append(indent + "}")
+        return lines
+
+    if kind == "While":
+        test = _render_expr(stmt.get("test"))
+        body = _get_list(stmt, "body")
+        lines = [indent + "while (" + test + ") {"]
+        lines.extend(_emit_body(body, indent=indent + "    ", ctx=ctx))
+        lines.append(indent + "}")
+        return lines
+
+    if kind == "ForCore":
+        init = stmt.get("init")
+        test = stmt.get("test")
+        update = stmt.get("update")
+        body = _get_list(stmt, "body")
+        init_str = _render_expr(init.get("value")) if isinstance(init, dict) and init.get("value") is not None else "$null"
+        init_target = _render_expr(init.get("target")) if isinstance(init, dict) else "$_i"
+        test_str = _render_expr(test) if test is not None else "$true"
+        update_str = ""
+        if isinstance(update, dict):
+            uk = _get_str(update, "kind")
+            if uk == "AugAssign":
+                update_str = _render_expr(update.get("target")) + " += " + _render_expr(update.get("value"))
+            else:
+                update_str = _render_expr(update)
+        lines = [indent + "for (" + init_target + " = " + init_str + "; " + test_str + "; " + update_str + ") {"]
+        lines.extend(_emit_body(body, indent=indent + "    ", ctx=ctx))
+        lines.append(indent + "}")
+        return lines
+
+    if kind == "For":
+        target = stmt.get("target")
+        iter_expr = stmt.get("iter")
+        body = _get_list(stmt, "body")
+        target_str = _render_expr(target) if target is not None else "$_item"
+        iter_str = _render_expr(iter_expr) if iter_expr is not None else "@()"
+        lines = [indent + "foreach (" + target_str + " in " + iter_str + ") {"]
+        lines.extend(_emit_body(body, indent=indent + "    ", ctx=ctx))
+        lines.append(indent + "}")
+        return lines
+
+    if kind == "Try":
+        body = _get_list(stmt, "body")
+        handlers = _get_list(stmt, "handlers")
+        finalbody = _get_list(stmt, "finalbody")
+        lines = [indent + "try {"]
+        lines.extend(_emit_body(body, indent=indent + "    ", ctx=ctx))
+        for handler in handlers:
+            if not isinstance(handler, dict):
+                continue
+            handler_name = _get_str(handler, "name")
+            if handler_name != "":
+                lines.append(indent + "} catch {")
+                lines.append(indent + "    $" + _safe_ident(handler_name, "e") + " = $_")
+            else:
+                lines.append(indent + "} catch {")
+            handler_body = _get_list(handler, "body")
+            lines.extend(_emit_body(handler_body, indent=indent + "    ", ctx=ctx))
+        if len(handlers) == 0:
+            lines.append(indent + "} catch {")
+            lines.append(indent + "    # unhandled")
+        if len(finalbody) > 0:
+            lines.append(indent + "} finally {")
+            lines.extend(_emit_body(finalbody, indent=indent + "    ", ctx=ctx))
+        lines.append(indent + "}")
+        return lines
+
+    if kind == "Raise":
+        exc = stmt.get("exc")
+        if exc is not None:
+            return [indent + "throw " + _render_expr(exc)]
+        return [indent + "throw"]
+
+    if kind == "Pass":
+        return [indent + "# pass"]
+
+    if kind == "Break":
+        return [indent + "break"]
+
+    if kind == "Continue":
+        return [indent + "continue"]
+
+    if kind == "Swap":
+        left = _render_expr(stmt.get("left"))
+        right = _render_expr(stmt.get("right"))
+        tmp = "$__swap_tmp"
+        return [
+            indent + tmp + " = " + left,
+            indent + left + " = " + right,
+            indent + right + " = " + tmp,
+        ]
+
+    if kind == "FunctionDef":
+        return _emit_function_def(stmt, indent=indent, ctx=ctx)
+
+    if kind == "ClassDef":
+        return _emit_class_def(stmt, indent=indent, ctx=ctx)
+
+    if kind == "ImportFrom":
+        return [indent + "# import: " + _get_str(stmt, "module")]
+
+    if kind == "Import":
+        return [indent + "# import"]
+
+    return [indent + "# unsupported: " + kind]
+
+
+def _emit_function_def(stmt: dict[str, Any], *, indent: str, ctx: dict[str, Any]) -> list[str]:
+    name = _safe_ident(_get_str(stmt, "name"), "_fn")
+    params = _get_list(stmt, "params")
+    if len(params) == 0:
+        params = _get_list(stmt, "args")
+    body = _get_list(stmt, "body")
+
+    ps_params: list[str] = []
+    for p in params:
+        if isinstance(p, dict):
+            arg_name = _get_str(p, "arg")
+            if arg_name == "" :
+                arg_name = _get_str(p, "name")
+            if arg_name == "self":
+                continue
+            default = p.get("default")
+            if default is not None:
+                ps_params.append("$" + _safe_ident(arg_name, "_p") + " = " + _render_expr(default))
+            else:
+                ps_params.append("$" + _safe_ident(arg_name, "_p"))
+        elif isinstance(p, str):
+            if p == "self":
+                continue
+            ps_params.append("$" + _safe_ident(p, "_p"))
+
+    decorators = _get_list(stmt, "decorator_list")
+    lines: list[str] = []
+    for dec in decorators:
+        if isinstance(dec, dict) and _get_str(dec, "kind") == "Name":
+            dec_name = _get_str(dec, "id")
+            if dec_name != "":
+                lines.append(indent + "# @" + dec_name)
+
+    lines.append(indent + "function " + name + " {")
+    if len(ps_params) > 0:
+        lines.append(indent + "    param(" + ", ".join(ps_params) + ")")
+    else:
+        lines.append(indent + "    param()")
+
+    lines.extend(_emit_body(body, indent=indent + "    ", ctx=ctx))
+    lines.append(indent + "}")
+    return lines
+
+
+def _emit_class_def(stmt: dict[str, Any], *, indent: str, ctx: dict[str, Any]) -> list[str]:
+    name = _safe_ident(_get_str(stmt, "name"), "_Cls")
+    body = _get_list(stmt, "body")
+    lines = [indent + "# class " + name]
+
+    for member in body:
+        if not isinstance(member, dict):
+            continue
+        mk = _get_str(member, "kind")
+        if mk == "FunctionDef":
+            method_name = _get_str(member, "name")
+            if method_name == "__init__":
+                fn_lines = _emit_function_def(member, indent=indent, ctx=ctx)
+                if len(fn_lines) > 0:
+                    fn_lines[0] = fn_lines[0].replace("function __init__", "function " + name, 1)
+                lines.extend(fn_lines)
+            else:
+                fn_lines = _emit_function_def(member, indent=indent, ctx=ctx)
+                if len(fn_lines) > 0:
+                    original_fn_name = "function " + _safe_ident(method_name, "_m")
+                    new_fn_name = "function " + name + "_" + _safe_ident(method_name, "_m")
+                    fn_lines[0] = fn_lines[0].replace(original_fn_name, new_fn_name, 1)
+                lines.extend(fn_lines)
+        elif mk == "AnnAssign" or mk == "Assign":
+            lines.extend(_emit_stmt(member, indent=indent, ctx=ctx))
+        elif mk == "Pass":
+            pass
+
+    return lines
+
+
+# ---------------------------------------------------------------------------
+# Module-level entry point
+# ---------------------------------------------------------------------------
 
 def transpile_to_powershell(east_doc: dict[str, Any]) -> str:
     """EAST ドキュメントを PowerShell コードへ変換する。"""
+    if not isinstance(east_doc, dict) or _get_str(east_doc, "kind") != "Module":
+        raise RuntimeError("powershell native emitter: root kind must be Module")
+
+    body = _get_list(east_doc, "body")
+    if not isinstance(body, list):
+        raise RuntimeError("powershell native emitter: Module.body must be list")
+
     reject_backend_general_union_type_exprs(east_doc, backend_name="PowerShell backend")
     reject_backend_typed_vararg_signatures(east_doc, backend_name="PowerShell backend")
-    js_code = transpile_to_js(east_doc).rstrip()
-    js_lines = js_code.splitlines() if js_code != "" else []
-    ps_lines = _convert_js_to_powerline(js_lines) if len(js_lines) > 0 else ["# <empty input>"]
-    out = [
+
+    ctx: dict[str, Any] = {}
+    lines: list[str] = [
         "#Requires -Version 5.1",
         "",
         "$pytra_runtime = Join-Path $PSScriptRoot \"py_runtime.ps1\"",
@@ -765,9 +719,22 @@ def transpile_to_powershell(east_doc: dict[str, Any]) -> str:
         "$ErrorActionPreference = \"Stop\"",
         "",
     ]
-    out.extend(ps_lines)
-    out.append("")
-    out.append("if (Get-Command -Name main -ErrorAction SilentlyContinue) {")
-    out.append("    main")
-    out.append("}")
-    return "\n".join(out).rstrip() + "\n"
+
+    # Emit module-level leading comments
+    comments = _get_list(east_doc, "leading_comments")
+    for c in comments:
+        if isinstance(c, str):
+            lines.append("# " + c)
+    if len(comments) > 0:
+        lines.append("")
+
+    # Emit body
+    for stmt in body:
+        if isinstance(stmt, dict):
+            lines.extend(_emit_stmt(stmt, indent="", ctx=ctx))
+            lines.append("")
+
+    lines.append("if (Get-Command -Name main -ErrorAction SilentlyContinue) {")
+    lines.append("    main")
+    lines.append("}")
+    return "\n".join(lines).rstrip() + "\n"
