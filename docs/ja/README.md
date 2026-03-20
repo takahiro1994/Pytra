@@ -34,12 +34,15 @@
     <img alt="Julia" src="https://img.shields.io/badge/-Julia-9558B2?style=flat-square&logo=julia&logoColor=white">
     <img alt="Zig" src="https://img.shields.io/badge/-Zig-F7C948?style=flat-square&logo=zig&logoColor=black">
     <br>
-    PowerShell、Dart、Jullia、Zigは対応作業中です。
+    Dart、Jullia、Zigは対応作業中です。
 </div>
 </div>
 
 
 ## 最新ニュース
+
+> **2026-03-20 | v0.15.0 リリース**<br>
+> バージョン 0.15.0 リリース。backendとしてPowerShellをサポートしました。
 
 > **2026-03-18 | v0.14.0 リリース**<br>
 > バージョン 0.14.0 リリース。[再帰的union type](spec/spec-tagged-union.md)をサポートしました。
@@ -47,36 +50,19 @@
 > **2026-03-11 | v0.13.0 リリース**<br>
 > バージョン 0.13.0 リリース。NES(ファミコン)のエミュレーターをPython + SDL3で書きました。[スーパーマリオ3が動きました。](https://x.com/yaneuraou/status/2031612549658202538) 非常に遅いです。これをPytraでC++に変換できるように、現在Pytra側を改良中です。
 
-> **2026-03-10 | v0.12.0 リリース**<br>
-> バージョン 0.12.0 リリース。いま、Runtime整理の大工事中です。
-
-> **2026-03-09 | v0.11.0 リリース**<br>
-> バージョン 0.11.0 リリース、object境界を見直し中です。また、チュートリアルを整備しました。
-
-> **2026-03-08 | v0.10.0 リリース**<br>
-> バージョン 0.10.0 リリース、`@template` を使えるようになりました。現在、各言語の runtime を整備中です。
-
 - 過去ニュース: [docs/ja/news/index.md](news/index.md)
-- backend parity の現行 support state: [language/backend-parity-matrix.md](language/backend-parity-matrix.md)
-- backend test の現行 green state: [language/backend-test-matrix.md](language/backend-test-matrix.md)
 
+## Pytraの特徴
 
-## 特徴
+**🐍 Python → 各言語のネイティブコードへ**
 
-Pytraの特徴
-
-- Pythonから各言語への変換器
-  - C++, C#, Rust, JavaScript, TypeScript, Go, Java, Swift, Kotlin, Ruby, Lua, Scala3, PHP に変換可能。
-  - 元のソースコードに極めて近い形のまま変換
-  - 最初からC++で書くのと同等のコードをPythonで書けることが目標
-
-- シンプルな言語仕様
-  - 基本的にPythonのサブセット
-  - VS Codeなど既存ツールで開発可能
-
-- 高い拡張性
-  - トランスパイラ本体も Python で実装しており、拡張・改造しやすい構成
-  - トランスパイラ自身のソースコードも本トランスパイラで他言語へ変換でき、セルフホスティングが可能
+- 🌐 C++ / Rust / Go / Java / TS ほか多数へ変換
+- 🧩 元コードの構造をほぼそのまま維持
+- ⚡ Pythonで書いても高性能コードを生成
+- ✨ Pythonサブセットでシンプル
+- 🛠 VS Codeなど既存ツールがそのまま使える
+- 🔧 本体もPython製で拡張しやすい
+- 🔁 自己変換できるセルフホスティング対応
 
 ## Python vs Pytra
 

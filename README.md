@@ -33,10 +33,13 @@
     <img alt="Julia" src="https://img.shields.io/badge/-Julia-9558B2?style=flat-square&logo=julia&logoColor=white">
     <img alt="Zig" src="https://img.shields.io/badge/-Zig-F7C948?style=flat-square&logo=zig&logoColor=black">
     <br>
-    PowerShell, Dart, Julia, and Zig are currently in progress.
+    Dart, Julia, and Zig are currently in progress.
 </div>
 
 ## Latest News
+
+> **2026-03-20 | v0.15.0 Released**<br>
+> Version 0.15.0 was released. Added PowerShell as a supported backend.
 
 > **2026-03-18 | v0.14.0 Released**<br>
 > Version 0.14.0 was released. Added support for [recursive union types](docs/ja/spec/spec-tagged-union.md).
@@ -44,35 +47,19 @@
 > **2026-03-11 | v0.13.0 Released**<br>
 > Version 0.13.0 was released. I wrote an NES (Famicom) emulator in Python + SDL3. [Super Mario Bros. 3 is running.](https://x.com/yaneuraou/status/2031612549658202538) It is very slow. I am currently improving Pytra so this can be transpiled to C++ with Pytra.
 
-> **2026-03-10 | v0.12.0 Released**<br>
-> Version 0.12.0 was released. I am currently in the middle of a large runtime reorganization.
-
-> **2026-03-09 | v0.11.0 Released**<br>
-> Version 0.11.0 was released. We are revisiting object boundaries, and the tutorial has been improved.
-
-> **2026-03-08 | v0.10.0 Released**<br>
-> Version 0.10.0 was released. `@template` is now available, and runtime support for each target language is currently being refined.
-
 - Past News: [docs/en/news/index.md](docs/en/news/index.md)
-- Current backend parity status: [docs/en/language/backend-parity-matrix.md](docs/en/language/backend-parity-matrix.md)
-- Current backend test green status: [docs/en/language/backend-test-matrix.md](docs/en/language/backend-test-matrix.md)
 
 ## Features
 
-Pytra's features
+**🐍 Python → Native code in each target language**
 
-- Python to multi-language transpiler
-  - Supports conversion to C++, C#, Rust, JavaScript, TypeScript, Go, Java, Swift, Kotlin, Ruby, Lua, Scala3, and PHP.
-  - Converts code to output in a form extremely close to the original source.
-  - The goal is to write Python code that produces output equivalent to writing directly in C++.
-
-- Simple language model
-  - Basically a subset of Python.
-  - Can be developed with existing tools such as VS Code.
-
-- High extensibility
-  - The transpiler core is implemented in Python, making extension and customization easy.
-  - The transpiler's own source code can be transpiled into other languages by this transpiler, enabling self-hosting.
+- 🌐 Transpiles to C++ / Rust / Go / Java / TS and many more
+- 🧩 Preserves the original code structure almost as-is
+- ⚡ Generates high-performance code from Python
+- ✨ Simple Python subset
+- 🛠 Works with existing tools like VS Code
+- 🔧 Core written in Python — easy to extend
+- 🔁 Self-hosting capable
 
 ## Python vs Pytra
 
