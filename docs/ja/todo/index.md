@@ -142,6 +142,6 @@
 
 文脈: [docs/ja/plans/p7-selfhost-multimodule-transpile.md](../plans/p7-selfhost-multimodule-transpile.md)
 
-1. [ ] [ID: P7-SELFHOST-MULTIMOD-TRANSPILE-01-S1] emitter モジュール群（`src/backends/cpp/emitter/*.py`）の selfhost 制約準拠を監査し、違反箇所を列挙する。
+1. [x] [ID: P7-SELFHOST-MULTIMOD-TRANSPILE-01-S1] emitter モジュール群（`src/backends/cpp/emitter/*.py`）の selfhost 制約準拠を監査し、違反箇所を列挙する。→ 文脈ファイルの決定ログに詳細記録。ブロッカー: 動的 dispatch 4件。
 2. [ ] [ID: P7-SELFHOST-MULTIMOD-TRANSPILE-01-S2] `tools/build_selfhost.py` を multi-module transpile パイプライン（compile → link）に拡張する。
 3. [ ] [ID: P7-SELFHOST-MULTIMOD-TRANSPILE-01-S3] `py2x-selfhost.py` から `emit_cpp_from_east` を直接呼び出し、`backend_registry_static.cpp` の `emit_source_typed` シェルアウトを除去する。

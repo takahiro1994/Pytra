@@ -72,3 +72,11 @@ g++ -std=c++20 -O2 -Isrc -Isrc/runtime/cpp selfhost/cpp/src/*.cpp <runtime_sourc
 ## 決定ログ
 
 - 2026-03-19: P7-S2 調査の結果、selfhost transpile が単一ファイル生成であり emitter の依存グラフが含まれないことが判明。multi-module transpile 基盤の構築が前提条件として起票。
+- 2026-03-20: S1 監査完了。結果:
+  - **#1 動的 import**: 違反なし
+  - **#2 ast モジュール**: 違反なし
+  - **#3 直接 stdlib import**: 4件 (module.py:pathlib, profile_loader.py:pathlib, multifile_writer.py:os, cpp_optimizer.py:re)
+  - **#4 動的 dispatch**: 4件 (cpp_emitter.py:145 globals(), :166-173 __dict__/setattr) — `install_py2cpp_runtime_symbols` と `_attach_cpp_emitter_helper_methods` が翻訳不可能パターン
+  - **#5 continue**: ~170件 — 自動変換可能だが広範囲
+  - **#6 literal set membership**: ~330件 — 自動変換可能だが広範囲
+  - **ブロッカー**: #4 の動的 dispatch 4件。`_attach_cpp_emitter_helper_methods` は mixin パターンで CppEmitter にヘルパーメソッドを動的注入しており、C++ では静的多重継承またはテンプレート CRTP に置換が必要。

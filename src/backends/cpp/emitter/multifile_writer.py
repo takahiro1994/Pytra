@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import os as _os
+from pytra.std import os as _os
 from pytra.std import json
 from pytra.std.pathlib import Path
 from typing import Any
