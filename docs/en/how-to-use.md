@@ -34,16 +34,18 @@ Expected stdout:
 7
 ```
 
-If you want to inspect the generated code first, use multi-file output directory.
+If you want to inspect the generated code first, specify an output directory.
 
 ```bash
 ./pytra add.py --output-dir out/add_case
 ```
 
-If you want Rust instead, use `--target` and `--output`.
+All languages use multi-file output (`--output-dir`) as the canonical path, because the compile → link → emit pipeline produces directory-based output.
+
+For Rust, just add `--target`:
 
 ```bash
-./pytra add.py --target rs --output out/add.rs
+./pytra add.py --target rs --output-dir out/rs_case
 ```
 
 Later sections on this page also use `test/fixtures/...` examples, but the easiest mental model is to keep this `add.py` example as the baseline.
@@ -73,11 +75,11 @@ Root `./pytra` is a unified launcher that calls `python3 src/pytra-cli.py`.
 # Help
 ./pytra --help
 
-# C++ multi-file output (with manifest)
+# Multi-file output (with manifest)
 ./pytra test/fixtures/core/add.py --output-dir out/add_case
 
-# Rust single-file output
-./pytra test/fixtures/core/add.py --target rs --output /tmp/add.rs
+# Rust multi-file output
+./pytra test/fixtures/core/add.py --target rs --output-dir out/rs_case
 
 # Transpile + build + run
 ./pytra test/fixtures/core/add.py --build --output-dir out/add_case --exe add.out --run

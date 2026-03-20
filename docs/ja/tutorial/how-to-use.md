@@ -42,10 +42,10 @@ if __name__ == "__main__":
 ./pytra add.py --output-dir out/add_case
 ```
 
-Rust に変換したいなら `--target` と `--output` を指定します。
+Rust に変換したいなら `--target` を追加するだけです。
 
 ```bash
-./pytra add.py --target rs --output out/add.rs
+./pytra add.py --target rs --output-dir out/rs_case
 ```
 
 このページの後半では `test/fixtures/...` を使ったコマンド例も出てきますが、理解の起点は上の `add.py` を基準にすると楽です。
@@ -58,13 +58,10 @@ Rust に変換したいなら `--target` と `--output` を指定します。
 # ヘルプ
 ./pytra --help
 
-# C++へ multi-file 出力（manifest 付き）
+# C++ multi-file 出力
 ./pytra test/fixtures/core/add.py --output-dir out/add_case
 
-# Rustへ単一ファイル出力
-./pytra test/fixtures/core/add.py --target rs --output /tmp/add.rs
-
-# Rustを out/ 配下へ出力
+# Rust multi-file 出力
 ./pytra test/fixtures/core/add.py --target rs --output-dir out/rs_case
 
 # 変換 + ビルド + 実行
@@ -73,7 +70,7 @@ Rust に変換したいなら `--target` と `--output` を指定します。
 
 補足:
 - `--target` は `cpp` / `rs` / `cs` / `js` / `ts` / `go` / `java` / `kotlin` / `swift` / `ruby` / `lua` / `scala` / `php` / `nim` に対応しています。
-- C++ は常に multi-file 出力（`--output-dir`）です。`--output`（single-file）は非 C++ ターゲットで使います。
+- 全言語で multi-file 出力（`--output-dir`）が正規パスです。compile → link → emit パイプラインを通るため、出力はディレクトリ単位です。
 - `--build` は `--target cpp` のみ対応です（他言語は変換のみ）。
 - `--opt -O3` は build 時の C++ compiler flag です。
 - `--target cpp --codegen-opt 3` は multi-file output 前提です。transpile-only では `--output` は使わず、`--output-dir` を指定してください。

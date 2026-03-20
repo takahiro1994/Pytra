@@ -70,8 +70,8 @@ PYTHONPATH=src python src/toolchain/emit/cpp.py out/linked/link-output.json --ou
 ```
 
 補足:
-- C++ は常に multi-file 出力です。`--output`（single-file）は使えません。`--output-dir` を使ってください。
-- `toolchain/emit/cpp.py` は C++ backend のみを import する独立エントリポイントです。非 C++ backend の依存を含みません。
+- 全言語で multi-file 出力（`--output-dir`）が正規パスです。compile → link → emit パイプラインを通るため、出力は常にディレクトリ単位です。
+- `toolchain/emit/cpp.py` は C++ backend のみを import する独立エントリポイントです。
 - `--link-only` は `link-output.json`（マニフェスト）と linked EAST3 JSON を出力します。
 - `py2x.py` は compile + link のみを担当し、backend（emit）に依存しません。
 
@@ -304,6 +304,6 @@ PYTHONPATH=src python src/toolchain/emit/cpp.py out/linked/link-output.json --ou
 - `pytra compile` は `.py` → `.east`（EAST3 JSON）を生成します。
 - `--link-only` は compile + link + optimize を実行し、linked EAST を出力します。
 - `toolchain/emit/cpp.py` は linked EAST → C++ multi-file 出力の独立エントリポイントです。
-- C++ は常に multi-file 出力です。`--output-dir` を使ってください。
+- 全言語で multi-file 出力（`--output-dir`）が正規パスです。
 
 </details>
