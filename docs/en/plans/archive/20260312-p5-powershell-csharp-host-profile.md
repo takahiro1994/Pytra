@@ -48,6 +48,7 @@ Verification commands:
 
 ## Decision log
 
+- 2026-03-20: **This plan is retired due to a strategy change.** After an experimental direct PowerShell emitter proved that native PowerShell code generation is viable, the `pwsh + py2cs` host profile approach is withdrawn. PowerShell will be implemented as an independent pure target backend instead. The C# host profile contract artifacts (`powershell_cs_host_contract.py`, `check_powershell_cs_host_contract.py`, and related tests) are no longer in use.
 - 2026-03-12: A pure PowerShell backend has poor language fit for bit operations, bytes, classes, and runtime packaging, so this plan is explicitly limited to a PowerShell host for the C# backend.
 - 2026-03-12: This remains low priority and mainly experimental host infrastructure, so it is tracked as `P5`.
 - 2026-03-12: `S1-01` fixes `pwsh / Windows / PowerShell 7 / dotnet-or-csc required / Add-Type optional` as the canonical baseline and routes doc drift through `check_powershell_cs_host_contract.py`.

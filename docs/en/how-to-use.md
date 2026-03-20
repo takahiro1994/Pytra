@@ -95,14 +95,12 @@ Notes:
 - When `--output` is omitted, Rust transpilation writes to `--output-dir/<input-stem>.rs` (for example `out/rs_case/add.rs`).
 - For temporary outputs, prefer consolidating into `out/`, and use `/tmp` only when shared temporary inspection is really needed.
 
-## PowerShell Host Profile (Experimental)
+## PowerShell Backend (Experimental)
 
-Pytra is currently organizing a `pwsh + py2cs` host profile.
-This is not a pure PowerShell target backend.
+PowerShell is implemented as an independent target backend that generates native PowerShell code directly.
+The original plan was a `pwsh + py2cs` host profile (a thin wrapper around the C# backend), but after an experimental direct PowerShell emitter proved viable, the strategy was changed to a pure PowerShell backend.
 
-The current representative priority is `dotnet -> csc -> Add-Type`.
-At the moment, the user-facing lane still stops at `py2cs` transpilation plus manual compile/run afterward.
-`test/unit/backends/cs/test_py2cs_smoke.py` remains a backend-transpile smoke only.
+For details on the retired C# host profile plan, see the [archive](../plans/archive/20260312-p5-powershell-csharp-host-profile.md).
 
 ## C++ max-opt route
 

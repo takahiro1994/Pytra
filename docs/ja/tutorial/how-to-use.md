@@ -86,14 +86,12 @@ Rust に変換したいなら `--target` だけ変えます。
 - Rust 変換は `--output` 未指定時、`--output-dir/<入力stem>.rs` へ出力されます（例: `out/rs_case/add.rs`）。
 - 一時出力は `out/` に集約する運用を推奨し、共有一時確認が必要な場合のみ `/tmp` を使用します。
 
-## PowerShell host profile（実験中）
+## PowerShell backend（実験中）
 
-PowerShell は `pwsh + py2cs` host profile を整理中です。
-PowerShell を target language とする pure backend ではありません。
+PowerShell は独立した target backend として、ネイティブ PowerShell コードを直接生成します。
+当初は `pwsh + py2cs` host profile（C# backend の薄いラッパー）として計画していましたが、実験的に PowerShell emitter を直接実装したところ実用可能と判明したため、純粋な PowerShell backend に方針転換しました。
 
-現時点の representative な優先順は `dotnet -> csc -> Add-Type` です。
-ただし現在の user-facing lane は `py2cs` の transpile と、その後の手動 compile/run に留まります。
-`test/unit/backends/cs/test_py2cs_smoke.py` は backend transpile smoke に留まります。
+旧計画（C# host profile）の詳細は [アーカイブ](../plans/archive/20260312-p5-powershell-csharp-host-profile.md) を参照してください。
 
 ## 最初に確認する制約
 

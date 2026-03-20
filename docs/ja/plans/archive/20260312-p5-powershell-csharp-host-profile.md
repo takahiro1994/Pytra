@@ -48,6 +48,7 @@ representative layout:
 
 ## 決定ログ
 
+- 2026-03-20: **方針変更により本計画は退役。** 実験的に PowerShell emitter を直接実装したところ、ネイティブ PowerShell コード生成が実用可能と判明したため、`pwsh + py2cs` host profile 方針を撤回し、PowerShell を独立した純粋な target backend として実装する方針に転換した。本計画の C# host profile 契約（`powershell_cs_host_contract.py`、`check_powershell_cs_host_contract.py`、関連テスト）は今後使用しない。
 - 2026-03-12: `pure PowerShell backend` は bit 演算、bytes、class、module/runtime packaging の言語相性が悪くコストが高いため、この plan は `PowerShell host for C# backend` に限定する。
 - 2026-03-12: 優先度は低く、実験用 host profile の性格が強いため `P5` とする。
 - 2026-03-12: `S1-01` として `pwsh / Windows / PowerShell 7 / dotnet-or-csc required / Add-Type optional` を canonical baseline に固定し、docs drift は `check_powershell_cs_host_contract.py` で落とす。
