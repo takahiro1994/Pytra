@@ -1,6 +1,6 @@
 # Transpiler CLI Usage
 
-This page covers how to use `py2x.py` / `east2cpp.py` directly, rather than through the unified CLI `./pytra`.
+This page covers how to use `py2x.py` / `toolchain/emit/cpp.py` directly, rather than through the unified CLI `./pytra`.
 For normal usage, see [how-to-use.md](./how-to-use.md) first.
 
 ## Command Prerequisites by OS
@@ -34,7 +34,7 @@ Expand only the section for the language you need.
 ./pytra INPUT.py --target cpp --build --run --output-dir out --exe app.out
 ```
 
-### compile → link → emit Pipeline (py2x.py + east2cpp.py directly)
+### compile → link → emit Pipeline (py2x.py + toolchain/emit/cpp.py directly)
 
 C++ transpilation internally passes through three stages: compile → link → emit.
 
@@ -46,8 +46,8 @@ PYTHONPATH=src python src/py2x.py INPUT.py --target cpp -o out/main.cpp
 # Stage 1: compile + link → linked EAST
 PYTHONPATH=src python src/py2x.py INPUT.py --target cpp --link-only --output-dir out/linked/
 
-# Stage 2: linked EAST → C++ multi-file (east2cpp.py uses C++ emitter only)
-PYTHONPATH=src python src/east2cpp.py out/linked/link-output.json --output-dir out/cpp/
+# Stage 2: linked EAST → C++ multi-file (toolchain/emit/cpp.py uses C++ emitter only)
+PYTHONPATH=src python src/toolchain/emit/cpp.py out/linked/link-output.json --output-dir out/cpp/
 
 # 3) g++ build (for single-file output)
 g++ -std=c++20 -O2 -I src -I src/runtime/cpp out/main.cpp \
@@ -59,7 +59,7 @@ g++ -std=c++20 -O2 -I src -I src/runtime/cpp out/main.cpp \
 ```
 
 Notes:
-- `east2cpp.py` is a standalone entry point that imports only the C++ backend. It does not include non-C++ backend dependencies.
+- `toolchain/emit/cpp.py` is a standalone entry point that imports only the C++ backend. It does not include non-C++ backend dependencies.
 - `--link-only` outputs `link-output.json` (manifest) and linked EAST3 JSON.
 
 ### Runtime Layout
@@ -284,13 +284,13 @@ PYTHONPATH=src python src/py2x.py compile sample/py/01_mandelbrot.py -o out/east
 PYTHONPATH=src python src/py2x.py sample/py/01_mandelbrot.py --target cpp --link-only --output-dir out/linked/
 
 # 3) Generate C++ from linked EAST
-PYTHONPATH=src python src/east2cpp.py out/linked/link-output.json --output-dir out/cpp/
+PYTHONPATH=src python src/toolchain/emit/cpp.py out/linked/link-output.json --output-dir out/cpp/
 ```
 
 Notes:
 - `pytra compile` generates `.py` → `.east` (EAST3 JSON).
 - `--link-only` runs compile + link + optimize and outputs linked EAST.
-- `east2cpp.py` is the standalone entry point for linked EAST → C++ multi-file output.
+- `toolchain/emit/cpp.py` is the standalone entry point for linked EAST → C++ multi-file output.
 - Single-file transpilation is also possible with `py2x.py INPUT.py --target cpp -o OUT.cpp` (it internally runs compile → link → emit).
 
 </details>

@@ -70,10 +70,10 @@ python3 src/py2x-selfhost.py test/fixtures/core/add.py --target rs -o out/add_se
 python3 src/py2x.py test/fixtures/core/add.py --target rs -o out/add_py2x.rs
 ```
 
-## `east2cpp.py` / `east2x.py` (EAST3 JSON → Target Backend)
+## `toolchain/emit/cpp.py` / `toolchain/emit/all.py` (EAST3 JSON → Target Backend)
 
-- `east2cpp.py` is the standalone C++ backend entry point. It reads `link-output.json` and emits C++ multi-file output without importing non-C++ backends, making startup faster.
-- `east2x.py` is the generic all-backend entry point. It runs a backend directly from `EAST3(JSON)`.
+- `toolchain/emit/cpp.py` is the standalone C++ backend entry point. It reads `link-output.json` and emits C++ multi-file output without importing non-C++ backends, making startup faster.
+- `toolchain/emit/all.py` is the generic all-backend entry point. It runs a backend directly from `EAST3(JSON)`.
 - Use them for backend-only regression checks with fixed IR inputs under `sample/ir` / `test/ir`.
 - Both accept `.json` only and fail-fast on any input other than `east_stage=3`.
 
@@ -83,7 +83,7 @@ python3 src/py2x.py sample/py/01_mandelbrot.py --target cpp \
   -o out/seed_01.cpp --dump-east3-after-opt sample/ir/01_mandelbrot.east3.json
 
 # 2) Transpile directly from EAST3(JSON) to a target language
-python3 src/east2x.py sample/ir/01_mandelbrot.east3.json --target rs \
+python3 src/toolchain/emit/all.py sample/ir/01_mandelbrot.east3.json --target rs \
   -o out/east2x_01.rs --no-runtime-hook
 
 # 3) Backend-only smoke checks for major targets (cpp/rs/js)
@@ -91,16 +91,16 @@ python3 tools/check_east2x_smoke.py
 ```
 
 Notes:
-- `--lower-option key=value` / `--optimizer-option key=value` / `--emitter-option key=value` are also available in `east2x.py`.
+- `--lower-option key=value` / `--optimizer-option key=value` / `--emitter-option key=value` are also available in `toolchain/emit/all.py`.
 - Remove `--no-runtime-hook` to also verify runtime helper copy/emission behavior.
 
 ## linked-program dump / link-only / emit
 
-- The canonical linked-program pipeline is `py2x.py --link-only` → `east2cpp.py` (for C++).
+- The canonical linked-program pipeline is `py2x.py --link-only` → `toolchain/emit/cpp.py` (for C++).
 - `py2x.py --dump-east3-dir DIR` writes raw `EAST3` documents plus `link-input.json` to `DIR` and stops.
 - `py2x.py --link-only --output-dir DIR` skips backend generation and writes only `link-output.json` plus linked modules to `DIR`.
-- `east2cpp.py` reads `link-output.json` and emits C++ multi-file output.
-- `east2x.py` remains available as the generic all-backend path.
+- `toolchain/emit/cpp.py` reads `link-output.json` and emits C++ multi-file output.
+- `toolchain/emit/all.py` remains available as the generic all-backend path.
 
 ```bash
 # 1) Emit raw EAST3 documents and link-input.json from .py
@@ -111,12 +111,12 @@ python3 src/py2x.py sample/py/18_mini_language_interpreter.py --target cpp \
 PYTHONPATH=src python3 src/py2x.py sample/py/18_mini_language_interpreter.py \
   --target cpp --link-only --output-dir out/linked_debug/linked
 
-# 3) Emit C++ from linked output (east2cpp.py — C++ backend only)
-PYTHONPATH=src python3 src/east2cpp.py out/linked_debug/linked/link-output.json \
+# 3) Emit C++ from linked output (toolchain/emit/cpp.py — C++ backend only)
+PYTHONPATH=src python3 src/toolchain/emit/cpp.py out/linked_debug/linked/link-output.json \
   --output-dir out/linked_debug/cpp
 
-# 4) Or use east2x.py for the generic all-backend path
-python3 src/east2x.py out/linked_debug/linked/link-output.json --target cpp \
+# 4) Or use toolchain/emit/all.py for the generic all-backend path
+python3 src/toolchain/emit/all.py out/linked_debug/linked/link-output.json --target cpp \
   --output-dir out/linked_debug/cpp_east2x
 ```
 

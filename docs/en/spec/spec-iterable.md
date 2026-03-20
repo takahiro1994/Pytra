@@ -69,10 +69,10 @@
 
 ## 6.1 正規プロトコル
 
-意味論上の正規 API は `iter/next` 形式にする。
+意味論上の正規 API は `PyObj` の `iter/next` メソッドにする。
 
-- `py_iter_or_raise(obj) -> object`  
-- `py_next_or_stop(iter_obj) -> optional<object>`
+- `obj->py_iter_or_raise() -> object`
+- `iter_obj->py_next_or_stop() -> optional<object>`
 
 契約:
 

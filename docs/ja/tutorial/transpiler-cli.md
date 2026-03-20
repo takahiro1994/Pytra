@@ -53,33 +53,27 @@ Windows では次の読み替えを行ってください。
 ./pytra INPUT.py --target cpp --build --run --output-dir out --exe app.out
 ```
 
-### compile → link → emit パイプライン（py2x.py + east2cpp.py 直接）
+### compile → link → emit パイプライン（py2x.py + toolchain/emit/cpp.py 直接）
 
 C++ 変換は内部で compile → link → emit の 3 段を経由します。
 
 ```bash
-# 1) single-file 出力（最も簡単）
-PYTHONPATH=src python src/py2x.py INPUT.py --target cpp -o out/main.cpp
+# 1) multi-file 出力（統合 CLI 経由）
+./pytra INPUT.py --output-dir out/cpp_case
 
-# 2) 3 段パイプライン（中間 .east + linked EAST を経由）
-# Stage 1: compile + link → linked EAST
+# 2) 2 段パイプライン（py2x.py + toolchain/emit/cpp.py を直接使用）
+# Stage 1: compile + link → linked EAST（backend 非依存）
 PYTHONPATH=src python src/py2x.py INPUT.py --target cpp --link-only --output-dir out/linked/
 
-# Stage 2: linked EAST → C++ multi-file (east2cpp.py は C++ emitter のみ使用)
-PYTHONPATH=src python src/east2cpp.py out/linked/link-output.json --output-dir out/cpp/
-
-# 3) g++ でビルド（single-file の場合）
-g++ -std=c++20 -O2 -I src -I src/runtime/cpp out/main.cpp \
-  src/runtime/cpp/core/gc.cpp src/runtime/cpp/core/io.cpp \
-  src/runtime/cpp/std/math.cpp src/runtime/cpp/std/time.cpp \
-  src/runtime/cpp/std/sys.cpp \
-  -o out/app.out
-./out/app.out
+# Stage 2: linked EAST → C++ multi-file（C++ emitter のみ import）
+PYTHONPATH=src python src/toolchain/emit/cpp.py out/linked/link-output.json --output-dir out/cpp/
 ```
 
 補足:
-- `east2cpp.py` は C++ backend のみを import する独立エントリポイントです。非 C++ backend の依存を含みません。
+- C++ は常に multi-file 出力です。`--output`（single-file）は使えません。`--output-dir` を使ってください。
+- `toolchain/emit/cpp.py` は C++ backend のみを import する独立エントリポイントです。非 C++ backend の依存を含みません。
 - `--link-only` は `link-output.json`（マニフェスト）と linked EAST3 JSON を出力します。
+- `py2x.py` は compile + link のみを担当し、backend（emit）に依存しません。
 
 ### ランタイム構成
 
@@ -303,13 +297,13 @@ PYTHONPATH=src python src/py2x.py compile sample/py/01_mandelbrot.py -o out/east
 PYTHONPATH=src python src/py2x.py sample/py/01_mandelbrot.py --target cpp --link-only --output-dir out/linked/
 
 # 3) linked EAST から C++ を生成
-PYTHONPATH=src python src/east2cpp.py out/linked/link-output.json --output-dir out/cpp/
+PYTHONPATH=src python src/toolchain/emit/cpp.py out/linked/link-output.json --output-dir out/cpp/
 ```
 
 補足:
 - `pytra compile` は `.py` → `.east`（EAST3 JSON）を生成します。
 - `--link-only` は compile + link + optimize を実行し、linked EAST を出力します。
-- `east2cpp.py` は linked EAST → C++ multi-file 出力の独立エントリポイントです。
-- 単一ファイル変換は `py2x.py INPUT.py --target cpp -o OUT.cpp` でも可能（内部で compile → link → emit を経由）。
+- `toolchain/emit/cpp.py` は linked EAST → C++ multi-file 出力の独立エントリポイントです。
+- C++ は常に multi-file 出力です。`--output-dir` を使ってください。
 
 </details>

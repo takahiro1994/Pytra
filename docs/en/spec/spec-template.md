@@ -304,7 +304,7 @@ class Box:
 Adopted:
 
 - `TypeVar` remains annotation-only rather than providing template functionality.
-  - moved to: `docs/ja/spec/spec-pylib-modules.md`
+  - moved to: `docs/en/spec/spec-pylib-modules.md`
 
 Pending:
 

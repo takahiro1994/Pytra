@@ -70,10 +70,10 @@ python3 src/py2x-selfhost.py test/fixtures/core/add.py --target rs -o out/add_se
 python3 src/py2x.py test/fixtures/core/add.py --target rs -o out/add_py2x.rs
 ```
 
-## `east2cpp.py` / `east2x.py`（EAST3 JSON -> target backend）
+## `toolchain/emit/cpp.py` / `toolchain/emit/all.py`（EAST3 JSON -> target backend）
 
-- `east2cpp.py` は C++ backend の独立エントリポイントです。`link-output.json` を入力として C++ multi-file 出力を生成します。非 C++ backend を import しないため、起動が高速です。
-- `east2x.py` は全 backend 対応の汎用エントリポイントです。`EAST3(JSON)` から直接 backend を実行します。
+- `toolchain/emit/cpp.py` は C++ backend の独立エントリポイントです。`link-output.json` を入力として C++ multi-file 出力を生成します。非 C++ backend を import しないため、起動が高速です。
+- `toolchain/emit/all.py` は全 backend 対応の汎用エントリポイントです。`EAST3(JSON)` から直接 backend を実行します。
 - backend 単体回帰や、`sample/ir` / `test/ir` の固定IR検証で使います。
 - 入力は `.json` のみ受理し、`east_stage=3` 以外は fail-fast します。
 
@@ -83,7 +83,7 @@ python3 src/py2x.py sample/py/01_mandelbrot.py --target cpp \
   -o out/seed_01.cpp --dump-east3-after-opt sample/ir/01_mandelbrot.east3.json
 
 # 2) EAST3(JSON) から直接ターゲット言語へ変換
-python3 src/east2x.py sample/ir/01_mandelbrot.east3.json --target rs \
+python3 src/toolchain/emit/all.py sample/ir/01_mandelbrot.east3.json --target rs \
   -o out/east2x_01.rs --no-runtime-hook
 
 # 3) 主要 target（cpp/rs/js）の backend-only smoke
@@ -91,16 +91,16 @@ python3 tools/check_east2x_smoke.py
 ```
 
 補足:
-- `--lower-option key=value` / `--optimizer-option key=value` / `--emitter-option key=value` を `east2x.py` でも利用できます。
+- `--lower-option key=value` / `--optimizer-option key=value` / `--emitter-option key=value` を `toolchain/emit/all.py` でも利用できます。
 - `--no-runtime-hook` を外すと、target ごとの runtime 補助ファイル配置も含めて確認できます。
 
 ## linked-program の dump / link-only / emit
 
-- linked-program の正規パイプラインは `py2x.py --link-only` → `east2cpp.py`（C++ の場合）です。
+- linked-program の正規パイプラインは `py2x.py --link-only` → `toolchain/emit/cpp.py`（C++ の場合）です。
 - `py2x.py --dump-east3-dir DIR` は raw `EAST3` 群と `link-input.json` を `DIR` に書き出して終了します。
 - `py2x.py --link-only --output-dir DIR` は backend 生成を行わず、`link-output.json` と linked module 群だけを `DIR` に書き出します。
-- `east2cpp.py` は `link-output.json` を読み込んで C++ multi-file 出力を生成します。
-- `east2x.py` は全 backend 対応の汎用経路として引き続き利用できます。
+- `toolchain/emit/cpp.py` は `link-output.json` を読み込んで C++ multi-file 出力を生成します。
+- `toolchain/emit/all.py` は全 backend 対応の汎用経路として引き続き利用できます。
 
 ```bash
 # 1) .py から raw EAST3 群と link-input.json を出力
@@ -111,12 +111,12 @@ python3 src/py2x.py sample/py/18_mini_language_interpreter.py --target cpp \
 PYTHONPATH=src python3 src/py2x.py sample/py/18_mini_language_interpreter.py \
   --target cpp --link-only --output-dir out/linked_debug/linked
 
-# 3) linked output から C++ emit（east2cpp.py — C++ backend のみ import）
-PYTHONPATH=src python3 src/east2cpp.py out/linked_debug/linked/link-output.json \
+# 3) linked output から C++ emit（toolchain/emit/cpp.py — C++ backend のみ import）
+PYTHONPATH=src python3 src/toolchain/emit/cpp.py out/linked_debug/linked/link-output.json \
   --output-dir out/linked_debug/cpp
 
-# 4) east2x.py で全 backend 対応の汎用経路を使うこともできる
-python3 src/east2x.py out/linked_debug/linked/link-output.json --target cpp \
+# 4) toolchain/emit/all.py で全 backend 対応の汎用経路を使うこともできる
+python3 src/toolchain/emit/all.py out/linked_debug/linked/link-output.json --target cpp \
   --output-dir out/linked_debug/cpp_east2x
 ```
 

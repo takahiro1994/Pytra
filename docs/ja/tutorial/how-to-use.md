@@ -36,13 +36,13 @@ if __name__ == "__main__":
 7
 ```
 
-まず変換結果だけを見たいなら、single-file 出力を使います。
+まず変換結果だけを見たいなら、multi-file 出力ディレクトリを指定します。
 
 ```bash
-./pytra add.py --output out/add.cpp
+./pytra add.py --output-dir out/add_case
 ```
 
-Rust に変換したいなら `--target` だけ変えます。
+Rust に変換したいなら `--target` と `--output` を指定します。
 
 ```bash
 ./pytra add.py --target rs --output out/add.rs
@@ -58,14 +58,11 @@ Rust に変換したいなら `--target` だけ変えます。
 # ヘルプ
 ./pytra --help
 
-# C++へ単一ファイル出力
-./pytra test/fixtures/core/add.py --output /tmp/add.cpp
+# C++へ multi-file 出力（manifest 付き）
+./pytra test/fixtures/core/add.py --output-dir out/add_case
 
 # Rustへ単一ファイル出力
 ./pytra test/fixtures/core/add.py --target rs --output /tmp/add.rs
-
-# C++を複数ファイル出力（manifest付き）
-./pytra test/fixtures/core/add.py --output-dir out/add_case
 
 # Rustを out/ 配下へ出力
 ./pytra test/fixtures/core/add.py --target rs --output-dir out/rs_case
@@ -75,11 +72,10 @@ Rust に変換したいなら `--target` だけ変えます。
 ```
 
 補足:
-- `--target` は `cpp` / `rs` に対応しています。
-- `--build` は `--target cpp` のみ対応です（Rust は変換のみ）。
-- 生成コード最適化レベルは `--codegen-opt {0,1,2,3}` で指定できます。
-- `--target cpp --codegen-opt 3` は C++ 向け max Pytra codegen route です。raw `EAST3` -> linked-program optimizer -> backend restart を内部で通します。
-- `--opt -O3` は build 時の C++ compiler flag であり、`--codegen-opt 3` とは別です。
+- `--target` は `cpp` / `rs` / `cs` / `js` / `ts` / `go` / `java` / `kotlin` / `swift` / `ruby` / `lua` / `scala` / `php` / `nim` に対応しています。
+- C++ は常に multi-file 出力（`--output-dir`）です。`--output`（single-file）は非 C++ ターゲットで使います。
+- `--build` は `--target cpp` のみ対応です（他言語は変換のみ）。
+- `--opt -O3` は build 時の C++ compiler flag です。
 - `--target cpp --codegen-opt 3` は multi-file output 前提です。transpile-only では `--output` は使わず、`--output-dir` を指定してください。
 - `--build` 時の生成物（`src/*.cpp`, `include/*.h`, `.obj/*.o`, 実行ファイル）は `--output-dir` 配下に出力されます（既定: `out/`）。
 - `--exe` は実行ファイル名/出力先です。相対指定（例: `add.out`）は `--output-dir` 配下に生成されます。

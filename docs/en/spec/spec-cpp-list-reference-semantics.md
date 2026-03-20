@@ -21,7 +21,7 @@ This document defines the final ref-first contract for mutable `list` in the C++
 - **optimizer-only value lowering**
   - value lowering allowed only after proof over mutation, aliasing, escape, call graph, and SCC
 - **legacy value model**
-  - rollback/comparison mode enabled by `--cpp-list-model value`
+  - REMOVED. Was once available as a rollback compatibility mode via `--cpp-list-model value`.
 - **alias**
   - sharing the same list object, such as `b = a`
 
@@ -36,7 +36,7 @@ This specification covers:
 - iteration
 - helper/boxing boundaries
 
-It does not redefine the rollback-only legacy mode except as an explicit exception.
+It does not cover `dict`, `set`, or `str` reference model migration (separate task).
 
 ## 4. Canonical Contract
 
@@ -57,7 +57,7 @@ Keeping `list<T>` value helpers is allowed only at ABI boundaries such as:
 
 - argument/return adapters for `@extern`
 - `Any` / `object` boxing and unboxing boundaries
-- narrowly scoped helpers required for rollback compatibility
+- narrowly scoped compatibility helpers at ABI boundaries
 
 Even there, value helpers must not leak back into the backend's main internal path.
 
@@ -87,13 +87,20 @@ Correctness must still hold under ref-first semantics; value lowering is purely 
 - Temporary call results such as `make()[0]` or `for x in make()` must not silently bypass the ref-first contract.
 - If an adapter is required for a temporary handle, insert it explicitly and only at the required boundary.
 
-## 8. Boxing / Dynamic Boundary Contract
+## 8. PyListObj Lifetime / Iter Contract
+
+- `PyListObj::py_iter_or_raise()` returns an iterator referencing the owner list object, not a snapshot of its values.
+- The iterator holds the owner list's lifetime. If the owner reference expires, iteration stops.
+- Elements appended via `py_append` during iteration are reflected in the iteration result as long as they fall within the unvisited range.
+- `py_try_len` and `py_truthy` are evaluated against the current state of the owner list object.
+
+## 9. Boxing / Dynamic Boundary Contract
 
 - Converting typed lists into `object` / `Any` must be treated as a boundary.
 - Boxing/unboxing helpers may construct value forms, but the emitter must not reuse those helpers as the default internal representation path.
 - Crossing into unresolved or dynamically typed paths must fail closed and stay ref-first unless the boundary explicitly requires ABI normalization.
 
-## 9. Fail-Closed Rules
+## 10. Fail-Closed Rules
 
 Treat the following as fail-closed:
 
@@ -105,7 +112,7 @@ Treat the following as fail-closed:
 
 In these cases the backend must keep the list in the ref-first representation.
 
-## 10. Boundary Helpers
+## 11. Boundary Helpers
 
 Helpers such as:
 
@@ -120,22 +127,19 @@ must remain boundary helpers only.
 - Do not reuse them as the default internal representation choice inside the emitter.
 - Designs that widely insert `rc_list_ref(...)` or `list<T>(...)` just for internal calls, returns, or locals are treated as incomplete implementation under this spec.
 
-## 11. Legacy Rollback Contract
+## 12. Legacy Rollback Contract (Removed)
 
-- `--cpp-list-model value` exists only for rollback/comparison.
-- In the legacy value model, `list<T>` behaves as a value type and `b = a` creates a copy.
-- This mode is not the mainline semantic baseline; it is an escape hatch only.
+- `--cpp-list-model value` has been removed. `pyobj` (ref-first) is the only mode.
+- The old legacy value model (`list<T>` as a value type, copy-on-assignment) has been fully deleted.
 
-## 12. Acceptance Criteria
+## 13. Acceptance Criteria
 
 The C++ backend satisfies this specification only if:
 
-- representative aliasing/mutation regressions preserve shared list semantics
-- helper/boxing boundaries are explicit and limited
-- call-returned list paths (`make()[0]`, `make().append(...)`, `for x in make()`) still follow ref-first semantics
-- field storage and typed call boundaries preserve handle semantics
-- `--cpp-list-model value` remains a clearly separated rollback path
+- representative aliasing/mutation fixture cases (`a = b` followed by `append`/`pop`) produce results matching Python
+- `check_py2cpp_transpile` / C++ smoke / sample parity all pass
+- differences remaining during transition are recorded in the decision log of the plan document as "case name + difference detail"
 
-## 13. Future Extension
+## 14. Future Extension
 
-This specification allows future optimizer-driven value lowering, but only as a proven optimization layered on top of ref-first semantics. It does not permit reintroducing value-first internals as the default backend contract.
+This ref-first principle is not `list`-specific; the same approach will eventually be applied to `dict`, `set`, and `bytearray`. However, the concrete contracts and regression criteria in this document are limited to `list`.

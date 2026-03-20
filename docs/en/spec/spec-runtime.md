@@ -38,6 +38,8 @@ Representative layouts:
   - `src/runtime/<lang>/built_in/`
   - `src/runtime/<lang>/std/`
   - `src/runtime/<lang>/utils/`
+- language-independent auto-generated (`.east` intermediate representation):
+  - `src/runtime/generated/{built_in,std,utils}/`
 - current C++ runtime layout:
   - `src/runtime/cpp/generated/{built_in,std,utils,compiler}/`
   - `src/runtime/cpp/native/{built_in,std,utils,compiler}/`
@@ -46,6 +48,8 @@ Representative layouts:
 
 Notes:
 
+- `.east` files are the language-independent EAST3 JSON intermediate representation. They are converted to each target language at link time.
+- For non-C++ languages, `runtime/<lang>/` contains only handwritten language-specific code. The `native/` / `generated/` directory hierarchy does not apply to those targets.
 - `built_in/std/utils` are responsibility buckets derived from SoT and must not be duplicated under `core/`.
 - In C++, those responsibility names are expressed through subdirectories under `generated/native`.
 
@@ -202,6 +206,75 @@ When slimming `py_runtime`, route helpers as follows:
   - build graph and runtime symbol index derive compile sources from direct ownership headers recorded in `public_headers` / `compiler_headers`
   - deciding to move a helper requires more than "it can be written in Python"; it must also preserve stable include surfaces and avoid new ownership/ABI glue
 
+## 0.622 JSON Dynamic Boundary and `JsonValue` Common ADT
+
+Note:
+
+- This section defines the approved next-step target design.
+- As of 2026-03-08, existing code may still have `json.loads()` returning `object`.
+- However, new implementations, new helpers, and new runtime additions must follow this section as the canonical contract.
+
+In Pytra, which assumes static typing, the dynamic nature of JSON must not be spread into general `object` helpers.
+JSON-derived dynamic boundaries are confined to a JSON-specific surface: `JsonValue` / `JsonObj` / `JsonArr`.
+
+Mandatory rules:
+
+- Do not add user-facing dynamic built-in helpers such as `sum(object)`, `zip(object, object)`, `sorted(object)`, or `object`-overloaded `dict.keys/items/values` for the sake of JSON.
+- Do not apply built-in / operator / collection helpers directly to `object` values. User code must decode to a concrete type first.
+- Do not change the semantics of plain assignment to introduce implicit casts for JSON decoding.
+- Do not add handwritten fallback helpers to `native/core/py_runtime.h` because of JSON's dynamic nature.
+
+Common ADT:
+
+- `JsonValue`
+  - `Null`
+  - `Bool`
+  - `Int` (payload type: `int64`)
+  - `Float` (payload type: `float64`)
+  - `Str`
+  - `Obj`
+  - `Arr`
+- `JsonObj` — semantically `dict[str, JsonValue]`
+- `JsonArr` — semantically `list[JsonValue]`
+
+Source surface policy:
+
+- The long-term canonical form for `json.loads(...)` is `JsonValue`, not general `object`.
+- The public module root remains `pytra.std.json`.
+- User code extracts values through the `JsonValue` / `JsonObj` / `JsonArr` decode API.
+
+v1 decode surface (exact API):
+
+- `JsonValue.as_obj() -> JsonObj | None`
+- `JsonValue.as_arr() -> JsonArr | None`
+- `JsonValue.as_str() -> str | None`
+- `JsonValue.as_int() -> int | None`
+- `JsonValue.as_float() -> float | None`
+- `JsonValue.as_bool() -> bool | None`
+- `JsonObj.get(key: str) -> JsonValue | None`
+- `JsonObj.get_obj(key: str) -> JsonObj | None`
+- `JsonObj.get_arr(key: str) -> JsonArr | None`
+- `JsonObj.get_str(key: str) -> str | None`
+- `JsonObj.get_int(key: str) -> int | None`
+- `JsonArr.get(index: int) -> JsonValue | None`
+- `JsonArr.get_obj(index: int) -> JsonObj | None`
+- `JsonArr.get_arr(index: int) -> JsonArr | None`
+- `JsonArr.get_str(index: int) -> str | None`
+- `JsonArr.get_int(index: int) -> int | None`
+- `JsonArr.get_float(index: int) -> float | None`
+- `JsonArr.get_bool(index: int) -> bool | None`
+
+Notes:
+
+- `loads`, `loads_obj`, `loads_arr`, `JsonValue.as_*`, `JsonObj.get_*`, `JsonArr.get_*` are the canonical v1 API names.
+- v1 does not require general-purpose `cast` or `match`; the above helpers are sufficient for decoding.
+- JSON number rule: integers without a decimal point or exponent are `JsonValue.Int(int64)`; numbers with a decimal or exponent are `JsonValue.Float(float64)`; integers outside `int64` range are parse errors; `NaN` / `Infinity` / `-Infinity` are invalid JSON and must not be accepted.
+
+Backend lowering policy:
+
+- `JsonValue` is defined as a target-independent common ADT; each backend lowers it to the target language's natural tagged union / enum / variant.
+- v1 priority implementation order: `C++ -> Rust -> Swift -> Nim`.
+
 ## 0.63 No Special Runtime Generators
 
 - Do not add module-specific runtime generators outside `src/py2x.py` / the unified CLI.
@@ -276,6 +349,13 @@ Canonical checked-in C++ runtime directories:
 
 - `src/runtime/cpp/generated/{built_in,std,utils,core}/`
 - `src/runtime/cpp/native/{built_in,std,utils,core}/`
+
+Regeneration:
+
+- Generate SoT-derived modules for `built_in/std/utils/core` under `generated/` using `--emit-runtime-cpp`:
+  - `python3 src/py2x.py src/pytra/built_in/type_id.py --target cpp --emit-runtime-cpp`
+  - `python3 src/py2x.py src/pytra/std/math.py --target cpp --emit-runtime-cpp`
+  - `python3 src/py2x.py src/pytra/utils/png.py --target cpp --emit-runtime-cpp`
 
 Canonical C++ runtime validation:
 
