@@ -439,7 +439,7 @@ def main(argv: list[str]) -> int:
 
     passthrough_args: list[str] = []
     codegen_opt = args.codegen_opt
-    use_cpp_linked_max_route = profile.target == "cpp" and codegen_opt == 3
+    use_cpp_linked_max_route = profile.target == "cpp"
     if codegen_opt is not None and not use_cpp_linked_max_route:
         passthrough_args.extend([f"-O{codegen_opt}"])
     if args.build:

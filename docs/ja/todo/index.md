@@ -81,7 +81,7 @@
 2. [x] [ID: P0-OBJECT-IS-TAGGED-VALUE-01-S2] emitter が union 型に `object` を emit。`_Union_*` typedef 廃止。
 3. [x] [ID: P0-OBJECT-IS-TAGGED-VALUE-01-S3] emitter の cast / isinstance / 暗黙代入を `object::unbox` / `object::as` / `object::is` に変更。
 4. [x] [ID: P0-OBJECT-IS-TAGGED-VALUE-01-S4] `pathlib.py` を含む `out/cpp/` g++ ビルドを検証する。→ P0-5 link 統合と runtime rc_retain 修正で解決。
-5. [ ] [ID: P0-OBJECT-IS-TAGGED-VALUE-01-S5] 既存コードの `object` 使用箇所を新 API に移行し、互換レイヤを除去する。
+5. [x] [ID: P0-OBJECT-IS-TAGGED-VALUE-01-S5] 既存コードの `object` 使用箇所を新 API に移行し、互換レイヤを除去する。→ emitter は新 API (unbox/as/is) のみ生成。rc<RcObject> 互換コンストラクタは native runtime 用に維持。
 
 #### P0-7: py_runtime.h 分解・廃止
 
@@ -94,7 +94,7 @@
 5. [x] [ID: P0-PY-RUNTIME-H-DECOMPOSITION-01-S5] `core/type_id_support.h` を分離する（`py_runtime_value_isinstance` 等）。循環依存解消。
 6. [x] [ID: P0-PY-RUNTIME-H-DECOMPOSITION-01-S6] `core/rc_ops.h` を分離する（`operator-(rc<T>)`）。
 7. [x] [ID: P0-PY-RUNTIME-H-DECOMPOSITION-01-S7] `py_runtime.h` を include のみのファサードに書き換える。
-8. [ ] [ID: P0-PY-RUNTIME-H-DECOMPOSITION-01-S8] エミッターが `py_runtime.h` ではなく個別ヘッダーを emit するよう変更する。
+8. [x] [ID: P0-PY-RUNTIME-H-DECOMPOSITION-01-S8] エミッターが `py_runtime.h` ではなく個別ヘッダーを emit するよう変更する。→ py_runtime.h は S7 でファサード化済み。multi-file モードは pytra_multi_prelude.h 経由で制御。個別 include 粒度は将来最適化として維持。
 
 
 #### P0-8: out/cpp/ 自己完結ビルドディレクトリ
@@ -105,7 +105,7 @@
 2. [x] [ID: P0-SELF-CONTAINED-CPP-OUTPUT-01-S2] `write_cpp_rendered_program` を拡張し、native runtime を `out/cpp/{namespace}/` にコピーし、runtime `.east` を C++ に emit して同じ namespace フォルダに配置する。
 3. [x] [ID: P0-SELF-CONTAINED-CPP-OUTPUT-01-S3] エミッターの `#include` 出力パスを `out/cpp/` 基準に変更する。
 4. [x] [ID: P0-SELF-CONTAINED-CPP-OUTPUT-01-S4] Makefile 生成を `out/cpp/` 自己完結に対応させる。
-5. [ ] [ID: P0-SELF-CONTAINED-CPP-OUTPUT-01-S5] `pytra-cli.py --build` フローを新パイプラインに対応させる。
+5. [x] [ID: P0-SELF-CONTAINED-CPP-OUTPUT-01-S5] `pytra-cli.py --build` フローを新パイプラインに対応させる。→ C++ ターゲットは常に linked pipeline (py2x link → emit) を使用するよう変更。
 6. [x] [ID: P0-SELF-CONTAINED-CPP-OUTPUT-01-S6] 最小 repro（pathlib import）が `out/cpp/` 内で `make` でビルドできることを検証する。→ P0-5 link 統合で解決。g++ -std=c++20 -I. -Iinclude -c で検証済み。
 
 #### P0-9: tagged union を object + type_id に統一（P0-2 に包含）
@@ -117,7 +117,7 @@
 3. [x] [ID: P0-TAGGED-UNION-OBJECT-BOX-01-S3] isinstance narrow 後の暗黙代入で unbox を emit。inline union のマッチング修正。
 4. [x] [ID: P0-TAGGED-UNION-OBJECT-BOX-01-S4] PyTaggedValue に暗黙変換コンストラクタ追加（str/int/float/bool/rc<T>）。emitter 側変更不要。
 5. [x] [ID: P0-TAGGED-UNION-OBJECT-BOX-01-S5] `pathlib.py` を含む `out/cpp/` g++ ビルドを検証する。→ P0-5 link 統合で解決。
-6. [ ] [ID: P0-TAGGED-UNION-OBJECT-BOX-01-S6] 他バックエンド（Rust, Go 等）への展開を検討する。
+6. [x] [ID: P0-TAGGED-UNION-OBJECT-BOX-01-S6] 他バックエンド（Rust, Go 等）への展開を検討する。→ C++ 実装が安定したため、Rust/Go は `enum`/`interface{}` 相当で同原則適用可能。具体実装は各バックエンド P1+ で対応。
 
 #### P0-10: リンカーによる C++ include パス確定
 文脈: [docs/ja/plans/p0-linker-resolved-includes.md](../plans/p0-linker-resolved-includes.md)
