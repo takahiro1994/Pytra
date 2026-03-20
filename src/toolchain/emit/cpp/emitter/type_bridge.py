@@ -101,33 +101,35 @@ class CppTypeBridgeEmitter:
             details,
         )
 
-    def _is_concrete_type_for_typed_list(self, east_type: str) -> bool:
+    def _is_concrete_type_for_typed_list(self, east_type: str, _depth: int = 0) -> bool:
         """typed list 判定向けに Any/unknown/None を含まない concrete 型か判定する。"""
+        if _depth > 20:
+            return False
         t_norm = self.normalize_type_name(east_type)
         if t_norm in {"", "unknown", "Any", "object", "None"}:
             return False
         if self._contains_text(t_norm, "|"):
             for part in self.split_union(t_norm):
-                if not self._is_concrete_type_for_typed_list(part):
+                if not self._is_concrete_type_for_typed_list(part, _depth + 1):
                     return False
             return True
         list_inner = self.type_generic_args(t_norm, "list")
         if len(list_inner) == 1:
-            return self._is_concrete_type_for_typed_list(list_inner[0])
+            return self._is_concrete_type_for_typed_list(list_inner[0], _depth + 1)
         tuple_inner = self.type_generic_args(t_norm, "tuple")
         if len(tuple_inner) > 0:
             for part in tuple_inner:
-                if not self._is_concrete_type_for_typed_list(part):
+                if not self._is_concrete_type_for_typed_list(part, _depth + 1):
                     return False
             return True
         dict_inner = self.type_generic_args(t_norm, "dict")
         if len(dict_inner) == 2:
-            return self._is_concrete_type_for_typed_list(dict_inner[0]) and self._is_concrete_type_for_typed_list(
-                dict_inner[1]
+            return self._is_concrete_type_for_typed_list(dict_inner[0], _depth + 1) and self._is_concrete_type_for_typed_list(
+                dict_inner[1], _depth + 1
             )
         set_inner = self.type_generic_args(t_norm, "set")
         if len(set_inner) == 1:
-            return self._is_concrete_type_for_typed_list(set_inner[0])
+            return self._is_concrete_type_for_typed_list(set_inner[0], _depth + 1)
         return True
 
     def _is_pyobj_value_model_list_type(self, east_type: str) -> bool:

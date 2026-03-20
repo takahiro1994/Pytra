@@ -13,6 +13,8 @@ from __future__ import annotations
 
 import sys
 
+sys.setrecursionlimit(max(sys.getrecursionlimit(), 10000))
+
 from toolchain.emit.cpp.emitter.multifile_writer import write_multi_file_cpp
 from toolchain.link import load_linked_output_bundle
 from toolchain.link import LinkedProgramModule
