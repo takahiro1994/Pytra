@@ -63,6 +63,7 @@ int main() {
                     "-O2",
                     "-Isrc",
                     "-Isrc/runtime/cpp",
+                    "-Isrc/runtime/generated",
                     str(src),
                     "src/runtime/cpp/core/gc.cpp",
                     "src/runtime/cpp/core/io.cpp",
