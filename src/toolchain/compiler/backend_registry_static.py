@@ -88,7 +88,7 @@ def _runtime_js_shims(output_path: Path) -> None:
     write_js_runtime_shims(output_path.parent)
 
 
-_STATIC_CALLABLES: dict[str, Any] = {
+_STATIC_CALLABLES = {
     "backends.rs.lower:lower_east3_to_rs_ir": lower_east3_to_rs_ir,
     "backends.rs.optimizer:optimize_rs_ir": optimize_rs_ir,
     "backends.rs.emitter.rs_emitter:transpile_to_rust": transpile_to_rust,
