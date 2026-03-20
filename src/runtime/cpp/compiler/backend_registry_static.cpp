@@ -1,73 +1,17 @@
 #include "compiler/backend_registry_static.h"
 
-#include <cstdlib>
-#include <filesystem>
 #include <stdexcept>
 
 #include "compiler/transpile_cli.h"
-#include "generated/std/json.h"
 
-#if defined(_WIN32)
-#include <process.h>
-#define PYTRA_GETPID _getpid
-#else
-#include <unistd.h>
-#define PYTRA_GETPID getpid
-#endif
+// Generated C++ emitter — direct call instead of Python shellout.
+namespace pytra_mod_toolchain__emit__cpp__emitter____init__ {
+str transpile_to_cpp(const dict<str, object>& east_module, const str& negative_index_mode, const str& bounds_check_mode, const str& floor_div_mode, const str& mod_mode, const str& int_width, const str& str_index_mode, const str& str_slice_mode, const str& opt_level, const str& top_namespace, bool emit_main, const object& cpp_opt_level, const str& cpp_opt_pass, const str& dump_cpp_ir_before_opt, const str& dump_cpp_ir_after_opt, const str& dump_cpp_opt_trace);
+}
 
 namespace pytra::compiler::backend_registry_static {
 
 namespace {
-
-::std::string _shell_quote(const ::std::string& raw) {
-    ::std::string out = "'";
-    for (char ch : raw) {
-        if (ch == '\'') {
-            out += "'\\''";
-        } else {
-            out.push_back(ch);
-        }
-    }
-    out.push_back('\'');
-    return out;
-}
-
-pytra::std::pathlib::Path _temp_path(const ::std::string& suffix) {
-    static int64 counter = 0;
-    const auto base = ::std::filesystem::temp_directory_path()
-        / ("pytra_selfhost_" + ::std::to_string(PYTRA_GETPID()) + "_" + ::std::to_string(++counter) + suffix);
-    return pytra::std::pathlib::Path(base.string());
-}
-
-void _remove_if_exists(const pytra::std::pathlib::Path& path) {
-    pytra::std::pathlib::Path path_copy = path;
-    if (path_copy.exists()) {
-        ::std::error_code ec;
-        ::std::filesystem::remove(::std::filesystem::path(py_to_string(path_copy.__str__())), ec);
-    }
-}
-
-str _read_file_or_empty(const pytra::std::pathlib::Path& path) {
-    pytra::std::pathlib::Path path_copy = path;
-    if (!path_copy.exists()) {
-        return "";
-    }
-    return path_copy.read_text();
-}
-
-void _run_host_python_command(const ::std::string& command, const str& error_prefix) {
-    pytra::std::pathlib::Path err_path = _temp_path(".stderr.txt");
-    ::std::string full = "(" + command + ") >" + _shell_quote(py_to_string(err_path.__str__())) + " 2>&1";
-    int rc = ::std::system(full.c_str());
-    if (rc != 0) {
-        str err = _read_file_or_empty(err_path);
-        _remove_if_exists(err_path);
-        throw ::std::runtime_error(
-            py_to_string(error_prefix + ": " + (err == "" ? str("host python command failed") : err))
-        );
-    }
-    _remove_if_exists(err_path);
-}
 
 str _target_extension(const str& target) {
     if (target == "cpp") return ".cpp";
@@ -249,29 +193,18 @@ str emit_source_typed(
     const LayerOptionsCarrier& emitter_options
 ) {
     (void)emitter_options;
+    (void)output_path;
     const str target = spec.carrier.target_lang;
     if (target != "cpp") {
         throw ::std::runtime_error(
             py_to_string("[not_implemented] selfhost backend_registry_static.emit_source only supports cpp: " + target)
         );
     }
-    pytra::std::pathlib::Path ir_path = _temp_path(".east3.json");
-    try {
-        ir_path.write_text(pytra::std::json::_dump_json_dict(ir, true, ::std::nullopt, ",", ":", 0));
-        const ::std::string cmd =
-            "PYTHONPATH=src${PYTHONPATH:+:$PYTHONPATH} python3 src/ir2lang.py "
-            + _shell_quote(py_to_string(ir_path.__str__()))
-            + " --target cpp -o "
-            + _shell_quote(py_to_string(pytra::std::pathlib::Path(output_path).__str__()));
-        _run_host_python_command(cmd, "selfhost direct route failed to emit source");
-        pytra::std::pathlib::Path output_copy = output_path;
-        str out = output_copy.read_text();
-        _remove_if_exists(ir_path);
-        return out;
-    } catch (...) {
-        _remove_if_exists(ir_path);
-        throw;
-    }
+    // Direct C++ emitter call — no Python shellout.
+    return pytra_mod_toolchain__emit__cpp__emitter____init__::transpile_to_cpp(
+        ir, "const_only", "off", "native", "native", "64", "native", "byte", "2", "", true,
+        object(1), "", "", "", ""
+    );
 }
 
 void apply_runtime_hook(
