@@ -7,6 +7,27 @@ from pytra.std import re
 from typing import Any
 
 from toolchain.frontends.frontend_semantics import lookup_builtin_semantic_tag
+
+
+def _find_colon_outside_strings(text: str) -> int:
+    """文字列リテラル外の最初の `:` 位置を返す。見つからなければ -1。"""
+    in_str: str = ""
+    esc: bool = False
+    for i, ch in enumerate(text):
+        if in_str != "":
+            if esc:
+                esc = False
+            elif ch == "\\":
+                esc = True
+            elif ch == in_str:
+                in_str = ""
+            continue
+        if ch == "'" or ch == '"':
+            in_str = ch
+            continue
+        if ch == ":":
+            return i
+    return -1
 from toolchain.ir.core_ast_builders import _sh_make_binop_expr
 from toolchain.ir.core_ast_builders import _sh_make_builtin_listcomp_call_expr
 from toolchain.ir.core_ast_builders import _sh_make_comp_generator
@@ -278,14 +299,15 @@ def _sh_parse_expr_lowered_impl(expr_txt: str, *, ln_no: int, col: int, name_typ
         entries: list[dict[str, Any]] = []
         if inner != "":
             for part in _sh_split_top_commas(inner):
-                if ":" not in part:
+                colon_pos = _find_colon_outside_strings(part)
+                if colon_pos < 0:
                     raise _make_east_build_error(
                         kind="unsupported_syntax",
                         message=f"invalid dict entry in self_hosted parser: {part}",
                         source_span=_sh_span(ln_no, col, col + len(raw)),
                         hint="Use `key: value` form in dict literals.",
                     )
-                ktxt, vtxt = part.split(":", 1)
+                ktxt, vtxt = part[:colon_pos], part[colon_pos + 1:]
                 ktxt = ktxt.strip()
                 vtxt = vtxt.strip()
                 entries.append(
