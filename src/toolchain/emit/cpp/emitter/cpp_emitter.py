@@ -2973,7 +2973,7 @@ class CppEmitter(CppAnalysisEmitter, CppModuleEmitter, CppClassEmitter, CppTypeB
             return f"return {converted_expr}; "
         cpp_t = self._cpp_type_text(eff_t)
         return (
-            f"if (auto __dict_cast = py_object_try_cast<{cpp_t}>({value_expr})) return *__dict_cast; "
+            f"if (auto* __dict_cast = {value_expr}.as_ptr<{cpp_t}>()) return *__dict_cast; "
             f"return {typed_default}; "
         )
 
@@ -3182,8 +3182,8 @@ class CppEmitter(CppAnalysisEmitter, CppModuleEmitter, CppClassEmitter, CppTypeB
                         return f"{src}.value()" if self._is_identifier_expr(src) else f"({src}).value()"
                     return args[0]
                 if at in {"Any", "object"}:
-                    return f"object_new<PyListObj>(list<object>({args[0]}))"
-                return f"object_new<PyListObj>(list<object>({args[0]}))"
+                    return f"object(list<object>({args[0]}))"
+                return f"object(list<object>({args[0]}))"
         t = self.cpp_type(expr.get("resolved_type"))
         if raw == "list" and self._is_pyobj_value_model_list_type(resolved_t):
             t = self._cpp_list_value_model_type_text(resolved_t)

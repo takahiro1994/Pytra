@@ -41,7 +41,8 @@ class CppCallEmitter:
 
     def _render_pyobj_runtime_list_bridge_ref(self, owner_expr: str, ctx: str) -> str:
         """Render the low-level object-list bridge used by pyobj runtime list fallbacks."""
-        return f'obj_to_list_ref_or_raise({owner_expr}, "{ctx}")'
+        _ = ctx
+        return f'(*{owner_expr}.as<list<object>>())'
 
     def _pyobj_runtime_list_bridge_context(self, op: str) -> str:
         """Return the canonical object-list bridge helper label for the given operation."""
@@ -58,8 +59,8 @@ class CppCallEmitter:
         )
 
     def _render_empty_pyobj_runtime_list_object(self) -> str:
-        """Render an empty PyListObj directly instead of routing through generic make_object."""
-        return "object_new<PyListObj>(list<object>{})"
+        """Render an empty list<object> wrapped in object."""
+        return "object(list<object>{})"
 
     def _render_json_decode_call(self, expr_d: dict[str, Any]) -> str:
         lowered_kind = self.any_dict_get_str(expr_d, "lowered_kind", "")
