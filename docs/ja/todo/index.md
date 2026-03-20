@@ -6,7 +6,7 @@
   <img alt="Read in English" src="https://img.shields.io/badge/docs-English-2563EB?style=flat-square">
 </a>
 
-最終更新: 2026-03-21（P1 起票: パイプライン段分離）
+最終更新: 2026-03-21（P1 完了: パイプライン段分離 — east2cpp.py 新設）
 
 ## 文脈運用ルール
 
@@ -132,10 +132,18 @@
 
 文脈: [docs/ja/plans/p1-pipeline-stage-separation.md](../plans/p1-pipeline-stage-separation.md)
 
-1. [ ] [ID: P1-PIPELINE-STAGE-SEPARATION-01-S1] `east2cpp.py` を新設し、linked EAST JSON → C++ multi-file emit を実装する。
-2. [ ] [ID: P1-PIPELINE-STAGE-SEPARATION-01-S2] `py2x.py` に `--link-only` 出力と `east2cpp.py` 入力を接続する導線を整備する。
-3. [ ] [ID: P1-PIPELINE-STAGE-SEPARATION-01-S3] `pytra-cli.py --build` を east2cpp.py サブプロセス呼び出しに変更する。
-4. [ ] [ID: P1-PIPELINE-STAGE-SEPARATION-01-S4] `build_selfhost.py --multi-module` を 3 段パイプラインに分離し、emit 段階のモジュール数削減を検証する。
+1. [x] [ID: P1-PIPELINE-STAGE-SEPARATION-01-S1] `east2cpp.py` を新設し、linked EAST JSON → C++ multi-file emit を実装する。→ 非 C++ backend は import されない。
+2. [x] [ID: P1-PIPELINE-STAGE-SEPARATION-01-S2] `py2x.py --link-only` 出力と `east2cpp.py` 入力の接続。→ 既存の `--link-only` が link-output.json を出力し、east2cpp.py がそれを読む形で動作確認済み。
+3. [x] [ID: P1-PIPELINE-STAGE-SEPARATION-01-S3] `pytra-cli.py --build` を east2cpp.py サブプロセス呼び出しに変更。
+4. [x] [ID: P1-PIPELINE-STAGE-SEPARATION-01-S4] `build_selfhost.py --multi-module` を 3 段パイプラインに分離。→ link-output 生成成功。link-output に非 C++ backend 74 件が含まれるのは py2x-selfhost.py の import グラフの問題（emit 段階では east2cpp.py が解決済み）。
+
+### P4: `*args` vararg サポート — EAST3 レベル脱糖
+
+文脈: [docs/ja/plans/p4-vararg-east3-lowering.md](../plans/p4-vararg-east3-lowering.md)
+
+1. [ ] [ID: P4-VARARG-EAST3-LOWERING-01-S1] `east2_to_east3_lowering.py` に post-pass を追加: FunctionDef の `vararg_name/type` を `list[T]` 通常引数に変換し、モジュール内 Call サイトをパックする。
+2. [ ] [ID: P4-VARARG-EAST3-LOWERING-01-S2] `global_optimizer.py` に `_apply_vararg_callsite_packing_global` を追加: クロスモジュール Call サイトをパックする。
+3. [ ] [ID: P4-VARARG-EAST3-LOWERING-01-S3] `pytra/std/pathlib.py` に `joinpath(*parts: str | Path) -> Path` を追加する。
 
 ### P7: selfhost 完全自立化
 
