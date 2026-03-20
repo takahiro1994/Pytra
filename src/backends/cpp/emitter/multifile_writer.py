@@ -56,8 +56,8 @@ def _runtime_module_bucket_and_stem(path_str: str) -> tuple[str, str]:
 
 def _runtime_module_has_native_cpp(bucket: str, stem: str) -> bool:
     """Check if a runtime module has a native .cpp implementation."""
-    native_cpp = _os.path.join(_RUNTIME_CPP_ROOT_STR, bucket, stem + ".cpp")
-    return _os.path.isfile(native_cpp)
+    native_cpp = Path(_os.path.join(_os.path.join(_RUNTIME_CPP_ROOT_STR, bucket), stem + ".cpp"))
+    return native_cpp.exists()
 
 
 def write_multi_file_cpp(
