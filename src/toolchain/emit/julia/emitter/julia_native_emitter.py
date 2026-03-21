@@ -180,7 +180,7 @@ def _julia_string(text: str) -> str:
     out = out.replace("\t", "\\t")
     out = out.replace("\r", "\\r")
     out = out.replace("\n", "\\n")
-    out = out.replace("\$", "\\\$")
+    out = out.replace("$", "\\$")
     return '"' + out + '"'
 
 
@@ -1302,6 +1302,10 @@ class JuliaNativeEmitter:
                 return "__pytra_contains(" + right + ", " + left + ")"
             if op0 == "NotIn":
                 return "!__pytra_contains(" + right + ", " + left + ")"
+            if op0 == "Is":
+                return "(" + left + " === " + right + ")"
+            if op0 == "IsNot":
+                return "(" + left + " !== " + right + ")"
             return "(" + left + " " + _cmp_symbol(op0) + " " + right + ")"
         if kind == "BoolOp":
             values_any = ed.get("values")

@@ -1,7 +1,8 @@
-"""py2julia (EAST based) smoke tests — transpile + execution."""
+"""py2julia (EAST based) smoke tests — transpile + output parity."""
 
 from __future__ import annotations
 
+import os
 import shutil
 import subprocess
 import sys
@@ -20,6 +21,7 @@ from toolchain.misc.transpile_cli import load_east3_document
 
 RUNTIME_SRC = ROOT / "src" / "runtime" / "julia" / "built_in" / "py_runtime.jl"
 JULIA_BIN = shutil.which("julia") or ""
+PYTHON_BIN = sys.executable or "python3"
 
 
 def load_east(
@@ -56,6 +58,22 @@ def find_fixture_case(stem: str) -> Path:
     return matches[0]
 
 
+def _run_python(fixture_path: Path, timeout: int = 15) -> str:
+    """Run a Python fixture and return its stdout."""
+    env = dict(os.environ)
+    env["PYTHONPATH"] = str(ROOT / "src")
+    cp = subprocess.run(
+        [PYTHON_BIN, str(fixture_path)],
+        capture_output=True,
+        text=True,
+        timeout=timeout,
+        env=env,
+    )
+    if cp.returncode != 0:
+        raise RuntimeError(f"Python fixture failed: {cp.stderr[:300]}")
+    return cp.stdout
+
+
 def _run_julia(source: str, timeout: int = 15) -> subprocess.CompletedProcess[str]:
     """Write source to a temp dir with runtime and run julia."""
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -70,11 +88,10 @@ def _run_julia(source: str, timeout: int = 15) -> subprocess.CompletedProcess[st
         )
 
 
-def _transpile_and_run(fixture_stem: str, timeout: int = 15) -> subprocess.CompletedProcess[str]:
-    """Transpile a fixture to Julia and run it."""
-    east_doc = load_east(find_fixture_case(fixture_stem))
-    source = transpile_to_julia_native(east_doc)
-    return _run_julia(source, timeout=timeout)
+def _normalize_output(text: str) -> str:
+    """Normalize output for comparison: strip trailing whitespace per line."""
+    lines = [line.rstrip() for line in text.strip().splitlines()]
+    return "\n".join(lines)
 
 
 # ── Transpile-only tests ──
@@ -82,8 +99,7 @@ def _transpile_and_run(fixture_stem: str, timeout: int = 15) -> subprocess.Compl
 
 class Py2JuliaSmokeTest(unittest.TestCase):
     def test_julia_runtime_exists(self) -> None:
-        runtime_path = ROOT / "src" / "runtime" / "julia" / "built_in" / "py_runtime.jl"
-        self.assertTrue(runtime_path.exists())
+        self.assertTrue(RUNTIME_SRC.exists())
 
     def test_transpile_simple_add(self) -> None:
         east_doc = load_east(find_fixture_case("add"))
@@ -145,104 +161,126 @@ class Py2JuliaSmokeTest(unittest.TestCase):
         self.assertIn("function", source)
 
 
-# ── Execution tests (require julia binary) ──
+# ── Output parity tests (require julia binary) ──
 
 
 @unittest.skipUnless(JULIA_BIN, "julia not found in PATH")
-class Py2JuliaExecTest(unittest.TestCase):
-    """Transpile fixtures to Julia and verify execution succeeds."""
+class Py2JuliaParityTest(unittest.TestCase):
+    """Transpile fixtures to Julia, run both Python and Julia, compare output."""
 
-    def _assert_runs_ok(self, fixture_stem: str) -> str:
-        cp = _transpile_and_run(fixture_stem)
+    def _assert_parity(self, fixture_stem: str) -> None:
+        fixture_path = find_fixture_case(fixture_stem)
+
+        # Python execution
+        py_out = _run_python(fixture_path)
+
+        # Julia execution
+        east_doc = load_east(fixture_path)
+        source = transpile_to_julia_native(east_doc)
+        jl_cp = _run_julia(source)
         self.assertEqual(
-            cp.returncode, 0,
-            f"{fixture_stem}: julia exited {cp.returncode}\nstderr: {cp.stderr[:500]}",
+            jl_cp.returncode, 0,
+            f"{fixture_stem}: julia exited {jl_cp.returncode}\nstderr: {jl_cp.stderr[:500]}",
         )
-        return cp.stdout
 
-    def test_exec_add(self) -> None:
-        self._assert_runs_ok("add")
+        # Compare output
+        py_norm = _normalize_output(py_out)
+        jl_norm = _normalize_output(jl_cp.stdout)
+        self.assertEqual(
+            py_norm, jl_norm,
+            f"{fixture_stem}: output parity mismatch\n"
+            f"--- Python ---\n{py_norm}\n"
+            f"--- Julia ---\n{jl_norm}",
+        )
 
-    def test_exec_fib(self) -> None:
-        self._assert_runs_ok("fib")
+    # core
+    def test_parity_add(self) -> None:
+        self._assert_parity("add")
 
-    def test_exec_assign(self) -> None:
-        self._assert_runs_ok("assign")
+    def test_parity_fib(self) -> None:
+        self._assert_parity("fib")
 
-    def test_exec_compare(self) -> None:
-        self._assert_runs_ok("compare")
+    def test_parity_assign(self) -> None:
+        self._assert_parity("assign")
 
-    def test_exec_float(self) -> None:
-        self._assert_runs_ok("float")
+    def test_parity_compare(self) -> None:
+        self._assert_parity("compare")
 
-    def test_exec_if_else(self) -> None:
-        self._assert_runs_ok("if_else")
+    def test_parity_float(self) -> None:
+        self._assert_parity("float")
 
-    def test_exec_for_range(self) -> None:
-        self._assert_runs_ok("for_range")
+    def test_parity_dict_literal_entries(self) -> None:
+        self._assert_parity("dict_literal_entries")
 
-    def test_exec_loop(self) -> None:
-        self._assert_runs_ok("loop")
+    def test_parity_lambda_as_arg(self) -> None:
+        self._assert_parity("lambda_as_arg")
 
-    def test_exec_not(self) -> None:
-        self._assert_runs_ok("not")
+    def test_parity_lambda_immediate(self) -> None:
+        self._assert_parity("lambda_immediate")
 
-    def test_exec_lambda_as_arg(self) -> None:
-        self._assert_runs_ok("lambda_as_arg")
+    # control flow
+    def test_parity_if_else(self) -> None:
+        self._assert_parity("if_else")
 
-    def test_exec_lambda_immediate(self) -> None:
-        self._assert_runs_ok("lambda_immediate")
+    def test_parity_for_range(self) -> None:
+        self._assert_parity("for_range")
 
-    def test_exec_comprehension(self) -> None:
-        self._assert_runs_ok("comprehension")
+    def test_parity_loop(self) -> None:
+        self._assert_parity("loop")
 
-    def test_exec_in_membership(self) -> None:
-        self._assert_runs_ok("in_membership")
+    def test_parity_not(self) -> None:
+        self._assert_parity("not")
 
-    def test_exec_negative_index(self) -> None:
-        self._assert_runs_ok("negative_index")
+    def test_parity_ifexp_bool(self) -> None:
+        self._assert_parity("ifexp_bool")
 
-    def test_exec_slice_basic(self) -> None:
-        self._assert_runs_ok("slice_basic")
+    def test_parity_try_raise(self) -> None:
+        self._assert_parity("try_raise")
 
-    def test_exec_dict_literal_entries(self) -> None:
-        self._assert_runs_ok("dict_literal_entries")
+    def test_parity_finally(self) -> None:
+        self._assert_parity("finally")
 
-    def test_exec_string(self) -> None:
-        self._assert_runs_ok("string")
+    # collections
+    def test_parity_comprehension(self) -> None:
+        self._assert_parity("comprehension")
 
-    def test_exec_string_ops(self) -> None:
-        self._assert_runs_ok("string_ops")
+    def test_parity_comprehension_filter(self) -> None:
+        self._assert_parity("comprehension_filter")
 
-    def test_exec_class_body_pass(self) -> None:
-        self._assert_runs_ok("class_body_pass")
+    def test_parity_in_membership(self) -> None:
+        self._assert_parity("in_membership")
 
-    def test_exec_class_instance(self) -> None:
-        self._assert_runs_ok("class_instance")
+    def test_parity_negative_index(self) -> None:
+        self._assert_parity("negative_index")
 
-    def test_exec_class_member(self) -> None:
-        self._assert_runs_ok("class_member")
+    def test_parity_slice_basic(self) -> None:
+        self._assert_parity("slice_basic")
 
-    def test_exec_try_raise(self) -> None:
-        self._assert_runs_ok("try_raise")
+    def test_parity_dict_get_items(self) -> None:
+        self._assert_parity("dict_get_items")
 
-    def test_exec_finally(self) -> None:
-        self._assert_runs_ok("finally")
+    def test_parity_dict_in(self) -> None:
+        self._assert_parity("dict_in")
 
-    def test_exec_ifexp_bool(self) -> None:
-        self._assert_runs_ok("ifexp_bool")
+    def test_parity_list_repeat(self) -> None:
+        self._assert_parity("list_repeat")
 
-    def test_exec_dict_get_items(self) -> None:
-        self._assert_runs_ok("dict_get_items")
+    # strings
+    def test_parity_string(self) -> None:
+        self._assert_parity("string")
 
-    def test_exec_list_repeat(self) -> None:
-        self._assert_runs_ok("list_repeat")
+    def test_parity_string_ops(self) -> None:
+        self._assert_parity("string_ops")
 
-    def test_exec_comprehension_filter(self) -> None:
-        self._assert_runs_ok("comprehension_filter")
+    # classes
+    def test_parity_class_body_pass(self) -> None:
+        self._assert_parity("class_body_pass")
 
-    def test_exec_dict_in(self) -> None:
-        self._assert_runs_ok("dict_in")
+    def test_parity_class_instance(self) -> None:
+        self._assert_parity("class_instance")
+
+    def test_parity_class_member(self) -> None:
+        self._assert_parity("class_member")
 
 
 if __name__ == "__main__":
