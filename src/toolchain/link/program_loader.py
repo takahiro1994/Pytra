@@ -14,7 +14,7 @@ from toolchain.link.program_model import LinkedProgramModule
 from toolchain.link.program_model import LINK_INPUT_SCHEMA
 from toolchain.link.program_validator import validate_raw_east3_doc
 
-_RUNTIME_EAST_ROOT = Path(__file__).resolve().parents[2] / "runtime" / "generated"
+_RUNTIME_EAST_ROOT = Path(__file__).resolve().parents[2] / "runtime" / "east"
 
 _RUNTIME_MODULE_BUCKETS: dict[str, str] = {
     "pytra.built_in.": "built_in",

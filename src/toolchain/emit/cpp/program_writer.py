@@ -21,7 +21,7 @@ from toolchain.json_adapters import dumps_object as _json_dumps_object
 
 _PROJECT_ROOT = Path(__file__).resolve().parents[3]
 _RUNTIME_CPP_ROOT = _PROJECT_ROOT / "src" / "runtime" / "cpp"
-_RUNTIME_EAST_ROOT = _PROJECT_ROOT / "src" / "runtime" / "generated"
+_RUNTIME_EAST_ROOT = _PROJECT_ROOT / "src" / "runtime" / "east"
 
 
 def _copy_native_runtime_to_output(output_root: Path) -> list[str]:

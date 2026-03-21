@@ -39,7 +39,7 @@ Representative layouts:
   - `src/runtime/<lang>/std/`
   - `src/runtime/<lang>/utils/`
 - language-independent auto-generated (`.east` intermediate representation):
-  - `src/runtime/generated/{built_in,std,utils}/`
+  - `src/runtime/east/{built_in,std,utils}/`
 - current C++ runtime layout:
   - `src/runtime/cpp/generated/{built_in,std,utils,compiler}/`
   - `src/runtime/cpp/native/{built_in,std,utils,compiler}/`

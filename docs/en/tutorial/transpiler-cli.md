@@ -69,7 +69,7 @@ Notes:
 - `built_in/` — built-in operations (`base_ops.h`, `contains.h`, `list_ops.h`, etc.)
 - `std/` — standard library support (`math.cpp`, `time.cpp`, `sys.cpp`, etc.)
 
-The Python source of truth for runtime modules lives under `src/pytra/`, and `.east` (EAST3 JSON) files are placed in `src/runtime/generated/`.
+The Python source of truth for runtime modules lives under `src/pytra/`, and `.east` (EAST3 JSON) files are placed in `src/runtime/east/`.
 
 Notes:
 - Importable modules are limited to those under `src/pytra/` and user-authored `.py` modules.

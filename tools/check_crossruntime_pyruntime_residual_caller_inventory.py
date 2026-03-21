@@ -15,10 +15,10 @@ PATH_SYMBOLS = {
     },
         "py_runtime_object_isinstance",
     },
-    "src/runtime/generated/std/json.cpp": {
+    "src/runtime/east/std/json.cpp": {
         "py_runtime_value_isinstance",
     },
-    "src/runtime/generated/built_in/type_id.cpp": {
+    "src/runtime/east/built_in/type_id.cpp": {
         "py_runtime_value_type_id",
         "py_runtime_value_isinstance",
     },
@@ -45,9 +45,9 @@ EXPECTED_BUCKETS = {
     "native_wrapper_object_bridge_residual": {
     },
     "generated_cpp_shared_type_id_residual": {
-        ("py_runtime_value_isinstance", "src/runtime/generated/std/json.cpp"),
-        ("py_runtime_value_type_id", "src/runtime/generated/built_in/type_id.cpp"),
-        ("py_runtime_value_isinstance", "src/runtime/generated/built_in/type_id.cpp"),
+        ("py_runtime_value_isinstance", "src/runtime/east/std/json.cpp"),
+        ("py_runtime_value_type_id", "src/runtime/east/built_in/type_id.cpp"),
+        ("py_runtime_value_isinstance", "src/runtime/east/built_in/type_id.cpp"),
     },
     "rs_runtime_builtin_shared_type_id_residual": {
         ("py_runtime_type_id_is_subtype", "src/runtime/rs/built_in/py_runtime.rs"),
@@ -86,10 +86,10 @@ SOURCE_GUARD_REQUIRED_SUBSTRINGS = {
     },
         "py_runtime_object_isinstance",
     },
-    "src/runtime/generated/std/json.cpp": {
+    "src/runtime/east/std/json.cpp": {
         "py_runtime_value_isinstance",
     },
-    "src/runtime/generated/built_in/type_id.cpp": {
+    "src/runtime/east/built_in/type_id.cpp": {
         "py_runtime_value_type_id",
         "py_runtime_value_isinstance",
     },
@@ -114,10 +114,10 @@ SOURCE_GUARD_FORBIDDEN_SUBSTRINGS = {
         "py_runtime_type_id(",
         "py_isinstance(",
     },
-    "src/runtime/generated/std/json.cpp": {
+    "src/runtime/east/std/json.cpp": {
         "py_runtime_object_isinstance(",
     },
-    "src/runtime/generated/built_in/type_id.cpp": {
+    "src/runtime/east/built_in/type_id.cpp": {
         "py_runtime_object_type_id(",
         "py_runtime_object_isinstance(",
     },
@@ -158,9 +158,9 @@ SMOKE_LANE_REQUIRED_SUBSTRINGS = {
 }
 
 GENERATED_CPP_MUST_REMAIN = {
-    ("py_runtime_value_isinstance", "src/runtime/generated/std/json.cpp"),
-    ("py_runtime_value_type_id", "src/runtime/generated/built_in/type_id.cpp"),
-    ("py_runtime_value_isinstance", "src/runtime/generated/built_in/type_id.cpp"),
+    ("py_runtime_value_isinstance", "src/runtime/east/std/json.cpp"),
+    ("py_runtime_value_type_id", "src/runtime/east/built_in/type_id.cpp"),
+    ("py_runtime_value_isinstance", "src/runtime/east/built_in/type_id.cpp"),
 }
 
 GENERATED_CPP_REDELEGATABLE = set()
@@ -180,8 +180,8 @@ REPRESENTATIVE_BUCKET_MANIFEST = {
             "test_runtime_list_overload_inventory",
         },
         "source_guard_paths": {
-            "src/runtime/generated/std/json.cpp",
-            "src/runtime/generated/built_in/type_id.cpp",
+            "src/runtime/east/std/json.cpp",
+            "src/runtime/east/built_in/type_id.cpp",
         },
     },
     "rs_runtime_builtin_shared_type_id_residual": {

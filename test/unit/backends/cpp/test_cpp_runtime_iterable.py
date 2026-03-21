@@ -15,7 +15,7 @@ PYTRA_TEST_RUN_TIMEOUT_SEC = float(os.environ.get("PYTRA_TEST_RUN_TIMEOUT_SEC", 
 CPP_RUNTIME_SRCS = [
     "src/runtime/cpp/core/gc.cpp",
     "src/runtime/cpp/core/io.cpp",
-    "src/runtime/generated/built_in/string_ops.cpp",
+    "src/runtime/east/built_in/string_ops.cpp",
 ]
 
 
@@ -63,12 +63,12 @@ int main() {
                     "-O2",
                     "-Isrc",
                     "-Isrc/runtime/cpp",
-                    "-Isrc/runtime/generated",
+                    "-Isrc/runtime/east",
                     str(src),
                     "src/runtime/cpp/core/gc.cpp",
                     "src/runtime/cpp/core/io.cpp",
-                    "src/runtime/generated/built_in/string_ops.cpp",
-                    "src/runtime/generated/std/pathlib.cpp",
+                    "src/runtime/east/built_in/string_ops.cpp",
+                    "src/runtime/east/std/pathlib.cpp",
                     "src/runtime/cpp/std/glob.cpp",
                     "src/runtime/cpp/std/os.cpp",
                     "src/runtime/cpp/std/os_path.cpp",
@@ -194,7 +194,7 @@ int main() {
                     "-I",
                     "src/runtime/cpp",
                     "-I",
-                    "src/runtime/generated",
+                    "src/runtime/east",
                     "-I",
                     "src/runtime",
                     str(src),
@@ -253,7 +253,7 @@ int main() {
                     "-I",
                     "src/runtime/cpp",
                     "-I",
-                    "src/runtime/generated",
+                    "src/runtime/east",
                     "-I",
                     "src/runtime",
                     str(src),
@@ -316,7 +316,7 @@ int main() {
                     "-I",
                     "src/runtime/cpp",
                     "-I",
-                    "src/runtime/generated",
+                    "src/runtime/east",
                     "-I",
                     "src/runtime",
                     str(src),
@@ -349,33 +349,33 @@ int main() {
         iter_ops_header = (ROOT / "src/runtime/cpp/built_in/iter_ops.h").read_text(encoding="utf-8")
         sequence_header = (ROOT / "src/runtime/cpp/built_in/sequence.h").read_text(encoding="utf-8")
         contains_header = (ROOT / "src/runtime/cpp/built_in/contains.h").read_text(encoding="utf-8")
-        string_ops_header = (ROOT / "src/runtime/generated/built_in/string_ops.h").read_text(encoding="utf-8")
-        string_ops_cpp = (ROOT / "src/runtime/generated/built_in/string_ops.cpp").read_text(encoding="utf-8")
-        sequence_cpp = (ROOT / "src/runtime/generated/built_in/sequence.cpp").read_text(encoding="utf-8")
-        numeric_ops_header = (ROOT / "src/runtime/generated/built_in/numeric_ops.h").read_text(encoding="utf-8")
-        iter_ops_cpp = (ROOT / "src/runtime/generated/built_in/iter_ops.cpp").read_text(encoding="utf-8")
-        zip_ops_header = (ROOT / "src/runtime/generated/built_in/zip_ops.h").read_text(encoding="utf-8")
-        type_id_cpp = (ROOT / "src/runtime/generated/built_in/type_id.cpp").read_text(encoding="utf-8")
-        argparse_cpp = (ROOT / "src/runtime/generated/std/argparse.cpp").read_text(encoding="utf-8")
-        json_cpp = (ROOT / "src/runtime/generated/std/json.cpp").read_text(encoding="utf-8")
-        pathlib_cpp = (ROOT / "src/runtime/generated/std/pathlib.cpp").read_text(encoding="utf-8")
-        random_cpp = (ROOT / "src/runtime/generated/std/random.cpp").read_text(encoding="utf-8")
-        re_cpp = (ROOT / "src/runtime/generated/std/re.cpp").read_text(encoding="utf-8")
-        gif_cpp = (ROOT / "src/runtime/generated/utils/gif.cpp").read_text(encoding="utf-8")
-        png_cpp = (ROOT / "src/runtime/generated/utils/png.cpp").read_text(encoding="utf-8")
+        string_ops_header = (ROOT / "src/runtime/east/built_in/string_ops.h").read_text(encoding="utf-8")
+        string_ops_cpp = (ROOT / "src/runtime/east/built_in/string_ops.cpp").read_text(encoding="utf-8")
+        sequence_cpp = (ROOT / "src/runtime/east/built_in/sequence.cpp").read_text(encoding="utf-8")
+        numeric_ops_header = (ROOT / "src/runtime/east/built_in/numeric_ops.h").read_text(encoding="utf-8")
+        iter_ops_cpp = (ROOT / "src/runtime/east/built_in/iter_ops.cpp").read_text(encoding="utf-8")
+        zip_ops_header = (ROOT / "src/runtime/east/built_in/zip_ops.h").read_text(encoding="utf-8")
+        type_id_cpp = (ROOT / "src/runtime/east/built_in/type_id.cpp").read_text(encoding="utf-8")
+        argparse_cpp = (ROOT / "src/runtime/east/std/argparse.cpp").read_text(encoding="utf-8")
+        json_cpp = (ROOT / "src/runtime/east/std/json.cpp").read_text(encoding="utf-8")
+        pathlib_cpp = (ROOT / "src/runtime/east/std/pathlib.cpp").read_text(encoding="utf-8")
+        random_cpp = (ROOT / "src/runtime/east/std/random.cpp").read_text(encoding="utf-8")
+        re_cpp = (ROOT / "src/runtime/east/std/re.cpp").read_text(encoding="utf-8")
+        gif_cpp = (ROOT / "src/runtime/east/utils/gif.cpp").read_text(encoding="utf-8")
+        png_cpp = (ROOT / "src/runtime/east/utils/png.cpp").read_text(encoding="utf-8")
 
         self.assertIn("static inline list<str> py_runtime_argv()", process_native)
         self.assertIn("[[noreturn]] static inline void py_runtime_exit(int64 code = 0)", process_native)
         self.assertIn("class py_scope_exit", scope_exit_native)
         self.assertIn("static inline auto py_make_scope_exit(F&& fn)", scope_exit_native)
         self.assertNotIn("virtual bool py_isinstance_of(", gc_header)
-        self.assertNotIn('#include "runtime/generated/built_in/numeric_ops.h"', runtime_header)
-        self.assertNotIn('#include "runtime/generated/built_in/zip_ops.h"', runtime_header)
+        self.assertNotIn('#include "runtime/east/built_in/numeric_ops.h"', runtime_header)
+        self.assertNotIn('#include "runtime/east/built_in/zip_ops.h"', runtime_header)
         self.assertNotIn('#include "runtime/cpp/built_in/contains.h"', runtime_header)
         self.assertNotIn("using PyFile = ", runtime_header)
-        self.assertNotIn('#include "runtime/generated/built_in/predicates.h"', runtime_header)
+        self.assertNotIn('#include "runtime/east/built_in/predicates.h"', runtime_header)
         self.assertNotIn('#include "runtime/cpp/built_in/sequence.h"', runtime_header)
-        self.assertNotIn('#include "runtime/generated/built_in/sequence.h"', runtime_header)
+        self.assertNotIn('#include "runtime/east/built_in/sequence.h"', runtime_header)
         self.assertNotIn('#include "runtime/cpp/built_in/iter_ops.h"', runtime_header)
         self.assertNotIn("#include <cctype>", runtime_header)
         self.assertNotIn("#include <filesystem>", runtime_header)
@@ -684,7 +684,7 @@ int main() {
         self.assertNotIn("return py_is_subtype(actual_type_id, expected_type_id);", type_id_cpp)
         self.assertIn("// P0-contract-shrink label: shared_type_id_contract seam.", runtime_header)
         self.assertIn("// type_id 判定ロジックは generated built_in 層（py_tid_*）を正本とする。", runtime_header)
-        self.assertIn('#include "runtime/generated/built_in/type_id.h"', runtime_header)
+        self.assertIn('#include "runtime/east/built_in/type_id.h"', runtime_header)
         self.assertIn("static inline void py_sync_generated_user_type_registry()", runtime_header)
         self.assertIn("static inline bool py_runtime_type_id_is_subtype(uint32 actual_type_id, uint32 expected_type_id)", runtime_header)
         self.assertIn("static inline bool py_runtime_type_id_issubclass(uint32 actual_type_id, uint32 expected_type_id)", runtime_header)
@@ -712,8 +712,8 @@ int main() {
         self.assertNotIn("static inline void py_clear(list<object>& v", runtime_header)
         self.assertNotIn("static inline void py_reverse(list<object>& v", runtime_header)
         self.assertNotIn("static inline void py_sort(list<object>& v", runtime_header)
-        self.assertFalse((ROOT / "src/runtime/generated/built_in/numeric_ops.cpp").exists())
-        self.assertFalse((ROOT / "src/runtime/generated/built_in/zip_ops.cpp").exists())
+        self.assertFalse((ROOT / "src/runtime/east/built_in/numeric_ops.cpp").exists())
+        self.assertFalse((ROOT / "src/runtime/east/built_in/zip_ops.cpp").exists())
 
 
 if __name__ == "__main__":

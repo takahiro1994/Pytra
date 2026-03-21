@@ -83,7 +83,7 @@ class CheckCppPyRuntimeContractInventoryTest(unittest.TestCase):
         cpp_generated_entries = {
             entry
             for entry in shared
-            if entry[1].startswith("src/runtime/generated/")
+            if entry[1].startswith("src/runtime/east/")
         }
         self.assertTrue(
             all(
@@ -130,12 +130,12 @@ class CheckCppPyRuntimeContractInventoryTest(unittest.TestCase):
 
     def test_shared_runtime_contract_uses_generated_type_id_cpp_value_contracts(self) -> None:
         shared = inventory_mod.EXPECTED_BUCKETS["shared_runtime_contract"]
-        self.assertNotIn(("py_runtime_type_id", "src/runtime/generated/built_in/type_id.cpp"), shared)
-        self.assertNotIn(("py_isinstance", "src/runtime/generated/built_in/type_id.cpp"), shared)
-        self.assertIn(("py_runtime_value_type_id", "src/runtime/generated/built_in/type_id.cpp"), shared)
-        self.assertIn(("py_runtime_value_isinstance", "src/runtime/generated/built_in/type_id.cpp"), shared)
-        self.assertIn(("py_runtime_value_isinstance", "src/runtime/generated/std/json.cpp"), shared)
-        self.assertIn(("py_runtime_value_isinstance", "src/runtime/generated/compiler/transpile_cli.cpp"), shared)
+        self.assertNotIn(("py_runtime_type_id", "src/runtime/east/built_in/type_id.cpp"), shared)
+        self.assertNotIn(("py_isinstance", "src/runtime/east/built_in/type_id.cpp"), shared)
+        self.assertIn(("py_runtime_value_type_id", "src/runtime/east/built_in/type_id.cpp"), shared)
+        self.assertIn(("py_runtime_value_isinstance", "src/runtime/east/built_in/type_id.cpp"), shared)
+        self.assertIn(("py_runtime_value_isinstance", "src/runtime/east/std/json.cpp"), shared)
+        self.assertIn(("py_runtime_value_isinstance", "src/runtime/east/compiler/transpile_cli.cpp"), shared)
         self.assertIn(("py_runtime_value_isinstance", "src/runtime/rs/generated/std/json.rs"), shared)
 
     def test_inventory_scan_ignores_upstream_fallback_inventory_module(self) -> None:

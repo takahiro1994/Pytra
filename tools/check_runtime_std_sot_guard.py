@@ -113,32 +113,32 @@ CPP_HEADER_ONLY_STD_MODULES = {
 }
 
 CPP_STD_HEADER_LOCATIONS: dict[str, str] = {
-    "argparse": "src/runtime/generated/std/argparse.h",
-    "glob": "src/runtime/generated/std/glob.h",
-    "json": "src/runtime/generated/std/json.h",
-    "math": "src/runtime/generated/std/math.h",
-    "os": "src/runtime/generated/std/os.h",
-    "os_path": "src/runtime/generated/std/os_path.h",
-    "pathlib": "src/runtime/generated/std/pathlib.h",
-    "random": "src/runtime/generated/std/random.h",
-    "re": "src/runtime/generated/std/re.h",
-    "sys": "src/runtime/generated/std/sys.h",
-    "time": "src/runtime/generated/std/time.h",
-    "timeit": "src/runtime/generated/std/timeit.h",
+    "argparse": "src/runtime/east/std/argparse.h",
+    "glob": "src/runtime/east/std/glob.h",
+    "json": "src/runtime/east/std/json.h",
+    "math": "src/runtime/east/std/math.h",
+    "os": "src/runtime/east/std/os.h",
+    "os_path": "src/runtime/east/std/os_path.h",
+    "pathlib": "src/runtime/east/std/pathlib.h",
+    "random": "src/runtime/east/std/random.h",
+    "re": "src/runtime/east/std/re.h",
+    "sys": "src/runtime/east/std/sys.h",
+    "time": "src/runtime/east/std/time.h",
+    "timeit": "src/runtime/east/std/timeit.h",
 }
 
 CPP_STD_SOURCE_LOCATIONS: dict[str, str] = {
-    "argparse": "src/runtime/generated/std/argparse.cpp",
-    "glob": "src/runtime/generated/std/glob.cpp",
-    "json": "src/runtime/generated/std/json.cpp",
-    "os": "src/runtime/generated/std/os.cpp",
-    "os_path": "src/runtime/generated/std/os_path.cpp",
-    "pathlib": "src/runtime/generated/std/pathlib.cpp",
-    "random": "src/runtime/generated/std/random.cpp",
-    "re": "src/runtime/generated/std/re.cpp",
-    "sys": "src/runtime/generated/std/sys.cpp",
-    "time": "src/runtime/generated/std/time.cpp",
-    "timeit": "src/runtime/generated/std/timeit.cpp",
+    "argparse": "src/runtime/east/std/argparse.cpp",
+    "glob": "src/runtime/east/std/glob.cpp",
+    "json": "src/runtime/east/std/json.cpp",
+    "os": "src/runtime/east/std/os.cpp",
+    "os_path": "src/runtime/east/std/os_path.cpp",
+    "pathlib": "src/runtime/east/std/pathlib.cpp",
+    "random": "src/runtime/east/std/random.cpp",
+    "re": "src/runtime/east/std/re.cpp",
+    "sys": "src/runtime/east/std/sys.cpp",
+    "time": "src/runtime/east/std/time.cpp",
+    "timeit": "src/runtime/east/std/timeit.cpp",
 }
 
 CPP_GENERATED_UTILS_MODULES = [
@@ -148,15 +148,15 @@ CPP_GENERATED_UTILS_MODULES = [
 ]
 
 CPP_UTILS_HEADER_LOCATIONS: dict[str, str] = {
-    "assertions": "src/runtime/generated/utils/assertions.h",
-    "gif": "src/runtime/generated/utils/gif.h",
-    "png": "src/runtime/generated/utils/png.h",
+    "assertions": "src/runtime/east/utils/assertions.h",
+    "gif": "src/runtime/east/utils/gif.h",
+    "png": "src/runtime/east/utils/png.h",
 }
 
 CPP_UTILS_SOURCE_LOCATIONS: dict[str, str] = {
-    "assertions": "src/runtime/generated/utils/assertions.cpp",
-    "gif": "src/runtime/generated/utils/gif.cpp",
-    "png": "src/runtime/generated/utils/png.cpp",
+    "assertions": "src/runtime/east/utils/assertions.cpp",
+    "gif": "src/runtime/east/utils/gif.cpp",
+    "png": "src/runtime/east/utils/png.cpp",
 }
 
 # module basename -> canonical Python source path.

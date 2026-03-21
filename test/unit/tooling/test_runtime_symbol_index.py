@@ -173,23 +173,23 @@ class RuntimeSymbolIndexTest(unittest.TestCase):
         iter_ops = cpp_modules.get("pytra.built_in.iter_ops")
         self.assertIsInstance(iter_ops, dict)
         self.assertEqual(iter_ops.get("companions"), ["generated", "native"])
-        self.assertEqual(iter_ops.get("public_headers"), ["src/runtime/generated/built_in/iter_ops.h"])
-        self.assertEqual(iter_ops.get("compiler_headers"), ["src/runtime/generated/built_in/iter_ops.h"])
-        self.assertIn("src/runtime/generated/built_in/iter_ops.cpp", iter_ops.get("compile_sources", []))
+        self.assertEqual(iter_ops.get("public_headers"), ["src/runtime/east/built_in/iter_ops.h"])
+        self.assertEqual(iter_ops.get("compiler_headers"), ["src/runtime/east/built_in/iter_ops.h"])
+        self.assertIn("src/runtime/east/built_in/iter_ops.cpp", iter_ops.get("compile_sources", []))
 
         sequence_mod = cpp_modules.get("pytra.built_in.sequence")
         self.assertIsInstance(sequence_mod, dict)
         self.assertEqual(sequence_mod.get("companions"), ["generated", "native"])
         self.assertEqual(
             sequence_mod.get("public_headers"),
-            ["src/runtime/generated/built_in/sequence.h"],
+            ["src/runtime/east/built_in/sequence.h"],
         )
         self.assertEqual(
             sequence_mod.get("compiler_headers"),
-            ["src/runtime/generated/built_in/sequence.h"],
+            ["src/runtime/east/built_in/sequence.h"],
         )
         self.assertIn(
-            "src/runtime/generated/built_in/sequence.cpp",
+            "src/runtime/east/built_in/sequence.cpp",
             sequence_mod.get("compile_sources", []),
         )
 
@@ -198,14 +198,14 @@ class RuntimeSymbolIndexTest(unittest.TestCase):
         self.assertEqual(string_ops.get("companions"), ["generated"])
         self.assertEqual(
             string_ops.get("public_headers"),
-            ["src/runtime/generated/built_in/string_ops.h"],
+            ["src/runtime/east/built_in/string_ops.h"],
         )
         self.assertEqual(
             string_ops.get("compiler_headers"),
-            ["src/runtime/generated/built_in/string_ops.h"],
+            ["src/runtime/east/built_in/string_ops.h"],
         )
         self.assertIn(
-            "src/runtime/generated/built_in/string_ops.cpp",
+            "src/runtime/east/built_in/string_ops.cpp",
             string_ops.get("compile_sources", []),
         )
 
@@ -214,11 +214,11 @@ class RuntimeSymbolIndexTest(unittest.TestCase):
         self.assertEqual(numeric_ops.get("companions"), ["generated"])
         self.assertEqual(
             numeric_ops.get("public_headers"),
-            ["src/runtime/generated/built_in/numeric_ops.h"],
+            ["src/runtime/east/built_in/numeric_ops.h"],
         )
         self.assertEqual(
             numeric_ops.get("compiler_headers"),
-            ["src/runtime/generated/built_in/numeric_ops.h"],
+            ["src/runtime/east/built_in/numeric_ops.h"],
         )
         self.assertEqual(numeric_ops.get("compile_sources"), [])
 
@@ -227,11 +227,11 @@ class RuntimeSymbolIndexTest(unittest.TestCase):
         self.assertEqual(scalar_ops.get("companions"), ["generated", "native"])
         self.assertEqual(
             scalar_ops.get("public_headers"),
-            ["src/runtime/generated/built_in/scalar_ops.h"],
+            ["src/runtime/east/built_in/scalar_ops.h"],
         )
         self.assertEqual(
             scalar_ops.get("compiler_headers"),
-            ["src/runtime/generated/built_in/scalar_ops.h"],
+            ["src/runtime/east/built_in/scalar_ops.h"],
         )
         self.assertEqual(scalar_ops.get("compile_sources"), [])
 
@@ -240,11 +240,11 @@ class RuntimeSymbolIndexTest(unittest.TestCase):
         self.assertEqual(io_ops.get("companions"), ["generated", "native"])
         self.assertEqual(
             io_ops.get("public_headers"),
-            ["src/runtime/generated/built_in/io_ops.h"],
+            ["src/runtime/east/built_in/io_ops.h"],
         )
         self.assertEqual(
             io_ops.get("compiler_headers"),
-            ["src/runtime/generated/built_in/io_ops.h"],
+            ["src/runtime/east/built_in/io_ops.h"],
         )
         self.assertEqual(io_ops.get("compile_sources"), [])
 
@@ -253,28 +253,28 @@ class RuntimeSymbolIndexTest(unittest.TestCase):
         self.assertEqual(zip_ops.get("companions"), ["generated"])
         self.assertEqual(
             zip_ops.get("public_headers"),
-            ["src/runtime/generated/built_in/zip_ops.h"],
+            ["src/runtime/east/built_in/zip_ops.h"],
         )
         self.assertEqual(
             zip_ops.get("compiler_headers"),
-            ["src/runtime/generated/built_in/zip_ops.h"],
+            ["src/runtime/east/built_in/zip_ops.h"],
         )
         self.assertEqual(zip_ops.get("compile_sources"), [])
 
         time_mod = cpp_modules.get("pytra.std.time")
         self.assertIsInstance(time_mod, dict)
         self.assertEqual(time_mod.get("companions"), ["generated", "native"])
-        self.assertEqual(time_mod.get("public_headers"), ["src/runtime/generated/std/time.h"])
-        self.assertEqual(time_mod.get("compiler_headers"), ["src/runtime/generated/std/time.h"])
+        self.assertEqual(time_mod.get("public_headers"), ["src/runtime/east/std/time.h"])
+        self.assertEqual(time_mod.get("compiler_headers"), ["src/runtime/east/std/time.h"])
         self.assertIn("src/runtime/cpp/std/time.cpp", time_mod.get("compile_sources", []))
         self.assertNotIn("src/runtime/cpp/std/time.ext.cpp", time_mod.get("compile_sources", []))
 
         png_mod = cpp_modules.get("pytra.utils.png")
         self.assertIsInstance(png_mod, dict)
         self.assertEqual(png_mod.get("companions"), ["generated"])
-        self.assertEqual(png_mod.get("public_headers"), ["src/runtime/generated/utils/png.h"])
-        self.assertEqual(png_mod.get("compiler_headers"), ["src/runtime/generated/utils/png.h"])
-        self.assertIn("src/runtime/generated/utils/png.cpp", png_mod.get("compile_sources", []))
+        self.assertEqual(png_mod.get("public_headers"), ["src/runtime/east/utils/png.h"])
+        self.assertEqual(png_mod.get("compiler_headers"), ["src/runtime/east/utils/png.h"])
+        self.assertIn("src/runtime/east/utils/png.cpp", png_mod.get("compile_sources", []))
 
         core_dict = cpp_modules.get("pytra.core.dict")
         self.assertIsInstance(core_dict, dict)
@@ -338,31 +338,31 @@ class RuntimeSymbolIndexTest(unittest.TestCase):
     def test_runtime_symbol_index_loader_returns_primary_cpp_header(self) -> None:
         self.assertEqual(
             lookup_target_module_primary_header("cpp", "pytra.std.time"),
-            "src/runtime/generated/std/time.h",
+            "src/runtime/east/std/time.h",
         )
         self.assertEqual(
             lookup_target_module_primary_header("cpp", "pytra.built_in.iter_ops"),
-            "src/runtime/generated/built_in/iter_ops.h",
+            "src/runtime/east/built_in/iter_ops.h",
         )
         self.assertEqual(
             lookup_target_module_primary_header("cpp", "pytra.built_in.numeric_ops"),
-            "src/runtime/generated/built_in/numeric_ops.h",
+            "src/runtime/east/built_in/numeric_ops.h",
         )
         self.assertEqual(
             lookup_target_module_primary_header("cpp", "pytra.built_in.scalar_ops"),
-            "src/runtime/generated/built_in/scalar_ops.h",
+            "src/runtime/east/built_in/scalar_ops.h",
         )
         self.assertEqual(
             lookup_target_module_primary_header("cpp", "pytra.built_in.io_ops"),
-            "src/runtime/generated/built_in/io_ops.h",
+            "src/runtime/east/built_in/io_ops.h",
         )
         self.assertEqual(
             lookup_target_module_primary_header("cpp", "pytra.built_in.zip_ops"),
-            "src/runtime/generated/built_in/zip_ops.h",
+            "src/runtime/east/built_in/zip_ops.h",
         )
         self.assertEqual(
             lookup_target_module_primary_header("cpp", "pytra.utils.png"),
-            "src/runtime/generated/utils/png.h",
+            "src/runtime/east/utils/png.h",
         )
         self.assertEqual(
             lookup_target_module_primary_header("cpp", "pytra.core.dict"),
@@ -372,19 +372,19 @@ class RuntimeSymbolIndexTest(unittest.TestCase):
     def test_runtime_symbol_index_loader_returns_primary_cpp_compiler_header(self) -> None:
         self.assertEqual(
             lookup_target_module_primary_compiler_header("cpp", "pytra.std.time"),
-            "src/runtime/generated/std/time.h",
+            "src/runtime/east/std/time.h",
         )
         self.assertEqual(
             lookup_target_module_primary_compiler_header("cpp", "pytra.built_in.iter_ops"),
-            "src/runtime/generated/built_in/iter_ops.h",
+            "src/runtime/east/built_in/iter_ops.h",
         )
         self.assertEqual(
             lookup_target_module_primary_compiler_header("cpp", "pytra.built_in.numeric_ops"),
-            "src/runtime/generated/built_in/numeric_ops.h",
+            "src/runtime/east/built_in/numeric_ops.h",
         )
         self.assertEqual(
             lookup_target_module_primary_compiler_header("cpp", "pytra.utils.png"),
-            "src/runtime/generated/utils/png.h",
+            "src/runtime/east/utils/png.h",
         )
         self.assertEqual(
             lookup_target_module_primary_compiler_header("cpp", "pytra.core.dict"),
@@ -397,15 +397,15 @@ class RuntimeSymbolIndexTest(unittest.TestCase):
             lookup_target_module_compile_sources("cpp", "pytra.std.time"),
         )
         self.assertIn(
-            "src/runtime/generated/built_in/iter_ops.cpp",
+            "src/runtime/east/built_in/iter_ops.cpp",
             lookup_target_module_compile_sources("cpp", "pytra.built_in.iter_ops"),
         )
         self.assertIn(
-            "src/runtime/generated/built_in/sequence.cpp",
+            "src/runtime/east/built_in/sequence.cpp",
             lookup_target_module_compile_sources("cpp", "pytra.built_in.sequence"),
         )
         self.assertIn(
-            "src/runtime/generated/built_in/string_ops.cpp",
+            "src/runtime/east/built_in/string_ops.cpp",
             lookup_target_module_compile_sources("cpp", "pytra.built_in.string_ops"),
         )
         self.assertEqual(
@@ -434,7 +434,7 @@ class RuntimeSymbolIndexTest(unittest.TestCase):
                 self.assertEqual(load_runtime_symbol_index(), {})
                 clear_runtime_symbol_index_cache()
         self.assertIn(
-            "src/runtime/generated/utils/png.cpp",
+            "src/runtime/east/utils/png.cpp",
             lookup_target_module_compile_sources("cpp", "pytra.utils.png"),
         )
         self.assertIn(
@@ -597,7 +597,7 @@ class RuntimeSymbolIndexTest(unittest.TestCase):
     def test_real_repo_cpp_core_layout_exposes_direct_ownership_lanes(self) -> None:
         self.assertFalse((ROOT / "src/runtime/cpp/core/dict.h").exists())
         self.assertTrue((ROOT / "src/runtime/cpp/core/dict.h").exists())
-        self.assertTrue((ROOT / "src/runtime/generated/core/README.md").exists())
+        self.assertTrue((ROOT / "src/runtime/east/core/README.md").exists())
         self.assertEqual(
             lookup_target_module_primary_header("cpp", "pytra.core.dict"),
             "src/runtime/cpp/core/dict.h",
@@ -643,7 +643,7 @@ class RuntimeSymbolIndexTest(unittest.TestCase):
                 "public_headers": ["src/runtime/cpp/core/dict.h"],
                 "compiler_headers": ["src/runtime/cpp/core/dict.h"],
                 "compile_sources": [
-                    "src/runtime/generated/core/dict.cpp",
+                    "src/runtime/east/core/dict.cpp",
                     "src/runtime/cpp/core/dict.cpp",
                 ],
                 "companions": ["generated", "native"],
@@ -660,22 +660,22 @@ class RuntimeSymbolIndexTest(unittest.TestCase):
             module_id = "pytra.std." + module_tail
             self.assertEqual(
                 lookup_target_module_primary_header("cpp", module_id),
-                f"src/runtime/generated/std/{module_tail}.h",
+                f"src/runtime/east/std/{module_tail}.h",
             )
             self.assertEqual(
                 lookup_target_module_primary_compiler_header("cpp", module_id),
-                f"src/runtime/generated/std/{module_tail}.h",
+                f"src/runtime/east/std/{module_tail}.h",
             )
             self.assertIn(
                 f"src/runtime/cpp/std/{module_tail}.cpp",
                 lookup_target_module_compile_sources("cpp", module_id),
             )
 
-            generated_header = (ROOT / "src/runtime/generated/std" / f"{module_tail}.h").read_text(encoding="utf-8")
+            generated_header = (ROOT / "src/runtime/east/std" / f"{module_tail}.h").read_text(encoding="utf-8")
             native_cpp = (ROOT / "src/runtime/cpp/std" / f"{module_tail}.cpp").read_text(encoding="utf-8")
 
             self.assertIn(marker, generated_header)
-            self.assertIn(f'#include "runtime/generated/std/{module_tail}.h"', native_cpp)
+            self.assertIn(f'#include "runtime/east/std/{module_tail}.h"', native_cpp)
             self.assertFalse((ROOT / "src/runtime/cpp/std" / f"{module_tail}.h").exists())
 
     def test_import_binding_runtime_module_resolution_uses_index(self) -> None:

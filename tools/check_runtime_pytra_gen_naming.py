@@ -83,7 +83,7 @@ def _iter_pytra_gen_files() -> list[Path]:
         if "/pytra-gen/" in rel:
             out.append(p)
             continue
-        if rel.startswith("/src/runtime/generated/"):
+        if rel.startswith("/src/runtime/east/"):
             continue
         if "/generated/" in rel:
             out.append(p)

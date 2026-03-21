@@ -37,7 +37,7 @@ fatal error: built_in/string_ops.h: No such file or directory
 
 ## 決定ログ
 
-- 2026-03-21: `string_ops.h` は `src/runtime/generated/built_in/string_ops.east` から生成される。
+- 2026-03-21: `string_ops.h` は `src/runtime/east/built_in/string_ops.east` から生成される。
   テストが使う `-I src/runtime/cpp` パスに `string_ops.h` が存在しないことが根本原因。
   `src/runtime/cpp/built_in/` に `generated/built_in/string_ops.h` への転送 include（proxy header）を置く、
-  またはテストに `-I src/runtime/generated` を追加する方針で対応する。
+  またはテストに `-I src/runtime/east` を追加する方針で対応する。

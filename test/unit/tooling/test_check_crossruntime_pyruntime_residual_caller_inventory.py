@@ -72,17 +72,17 @@ class CheckCrossRuntimePyRuntimeResidualCallerInventoryTest(unittest.TestCase):
         self.assertEqual(
             inventory_mod.EXPECTED_BUCKETS["generated_cpp_shared_type_id_residual"],
             {
-                ("py_runtime_value_isinstance", "src/runtime/generated/std/json.cpp"),
-                ("py_runtime_value_type_id", "src/runtime/generated/built_in/type_id.cpp"),
-                ("py_runtime_value_isinstance", "src/runtime/generated/built_in/type_id.cpp"),
+                ("py_runtime_value_isinstance", "src/runtime/east/std/json.cpp"),
+                ("py_runtime_value_type_id", "src/runtime/east/built_in/type_id.cpp"),
+                ("py_runtime_value_isinstance", "src/runtime/east/built_in/type_id.cpp"),
             },
         )
         self.assertEqual(
             inventory_mod.GENERATED_CPP_MUST_REMAIN,
             {
-                ("py_runtime_value_isinstance", "src/runtime/generated/std/json.cpp"),
-                ("py_runtime_value_type_id", "src/runtime/generated/built_in/type_id.cpp"),
-                ("py_runtime_value_isinstance", "src/runtime/generated/built_in/type_id.cpp"),
+                ("py_runtime_value_isinstance", "src/runtime/east/std/json.cpp"),
+                ("py_runtime_value_type_id", "src/runtime/east/built_in/type_id.cpp"),
+                ("py_runtime_value_isinstance", "src/runtime/east/built_in/type_id.cpp"),
             },
         )
         self.assertEqual(inventory_mod.GENERATED_CPP_REDELEGATABLE, set())
@@ -145,8 +145,8 @@ class CheckCrossRuntimePyRuntimeResidualCallerInventoryTest(unittest.TestCase):
                         "test_runtime_list_overload_inventory",
                     },
                     "source_guard_paths": {
-                        "src/runtime/generated/std/json.cpp",
-                        "src/runtime/generated/built_in/type_id.cpp",
+                        "src/runtime/east/std/json.cpp",
+                        "src/runtime/east/built_in/type_id.cpp",
                     },
                 },
                 "rs_runtime_builtin_shared_type_id_residual": {

@@ -102,13 +102,17 @@ def _run_one(*, src: Path, out: Path, target: str) -> RunResult:
             raw = (cp.stderr or "").strip() or (cp.stdout or "").strip()
             return RunResult(False, _extract_failure_headline(raw), raw, _extract_user_error_category(raw))
 
-        # Copy entry module output to expected `out` path for quality hooks
+        # Copy emit output to expected `out` location for quality hooks
         out.parent.mkdir(parents=True, exist_ok=True)
         import shutil
-        for f in emit_dir.rglob("*"):
+        first_copied = False
+        for f in sorted(emit_dir.rglob("*")):
             if f.is_file():
-                shutil.copy2(f, out)
-                break
+                if not first_copied:
+                    shutil.copy2(f, out)
+                    first_copied = True
+                else:
+                    shutil.copy2(f, out.parent / f.name)
 
         return RunResult(True, "", "", "")
 

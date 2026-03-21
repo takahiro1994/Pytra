@@ -228,12 +228,9 @@ def _cmp_symbol(op: str) -> str:
     return "=="
 
 
-def _is_compile_time_std_import_symbol(module: str, symbol: str) -> bool:
-    if module == "pytra.std.abi" and symbol in _COMPILETIME_STD_IMPORT_SYMBOLS:
-        return True
-    if module == "pytra.std.template" and symbol in _COMPILETIME_STD_IMPORT_SYMBOLS:
-        return True
-    return False
+def _is_compile_time_std_import_symbol(module_id: str, symbol: str) -> bool:
+    mod = canonical_runtime_module_id(module_id.strip())
+    return mod == "pytra.std" and symbol in _COMPILETIME_STD_IMPORT_SYMBOLS
 
 
 def _runtime_symbol_semantic_tag(runtime_module_id: str, runtime_symbol: str) -> str:
@@ -893,6 +890,11 @@ class JuliaNativeEmitter:
             self._emit_while(stmt)
             return
         if kind == "Pass":
+            return
+        if kind == "TypeAlias":
+            return
+        if kind == "Yield":
+            self._emit_line("# yield (not supported)")
             return
         raise RuntimeError("lang=julia unsupported stmt kind: " + str(kind))
 

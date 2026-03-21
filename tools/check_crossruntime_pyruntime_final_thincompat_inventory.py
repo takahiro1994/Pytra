@@ -12,7 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 TRACKED_PATHS = {
     "src/runtime/cpp/core/py_runtime.h",
-    "src/runtime/generated/std/json.cpp",
+    "src/runtime/east/std/json.cpp",
     "src/runtime/rs/built_in/py_runtime.rs",
     "src/runtime/cs/built_in/py_runtime.cs",
 }

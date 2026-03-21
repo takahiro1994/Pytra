@@ -23,7 +23,7 @@ class GenImageRuntimeFromCanonicalTest(unittest.TestCase):
         all_items = gen_mod.load_manifest_items(ROOT / "tools" / "runtime_generation_manifest.json")
         plan = gen_mod.build_generation_plan(all_items, ["cpp", "php"], ["utils/png"])
         paths = [item.output_rel for item in plan]
-        self.assertIn("src/runtime/generated/utils/png.cpp", paths)
+        self.assertIn("src/runtime/east/utils/png.cpp", paths)
         self.assertIn("src/runtime/php/generated/utils/png.php", paths)
 
     def test_inject_generated_header_for_php_keeps_php_open_tag(self) -> None:

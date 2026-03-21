@@ -29,7 +29,7 @@ module_name_to_cpp_include("pytra.core.dict") == "core/dict.h"
 #include "generated/std/time.h"
 #include "runtime/cpp/core/py_runtime.h"
 #include "generated/utils/png.h"
-#include "runtime/generated/compiler/transpile_cli.h"
+#include "runtime/east/compiler/transpile_cli.h"
 // 新
 #include "std/time.h"
 #include "core/py_runtime.h"

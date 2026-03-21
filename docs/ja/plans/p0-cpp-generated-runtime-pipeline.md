@@ -36,9 +36,9 @@
 
 ### 生成元
 
-`.east` ファイル（EAST3 JSON）は `src/runtime/generated/` に存在する:
-- `src/runtime/generated/built_in/` — string_ops.east, type_id.east, contains.east 等（10 ファイル）
-- `src/runtime/generated/std/` — time.east, sys.east, json.east 等（13 ファイル）
+`.east` ファイル（EAST3 JSON）は `src/runtime/east/` に存在する:
+- `src/runtime/east/built_in/` — string_ops.east, type_id.east, contains.east 等（10 ファイル）
+- `src/runtime/east/std/` — time.east, sys.east, json.east 等（13 ファイル）
 
 ### マニフェストの状態
 

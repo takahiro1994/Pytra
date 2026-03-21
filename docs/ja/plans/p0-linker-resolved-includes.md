@@ -148,7 +148,7 @@ runtime モジュールの C++ ヘッダーは `out/` に動的生成する。`p
 
 ### runtime モジュールの扱い
 
-現在 runtime モジュール（`pytra.built_in.*`, `pytra.std.*`）は `src/runtime/generated/{bucket}/{name}.east` として事前に EAST3 JSON 化されている。これらは:
+現在 runtime モジュール（`pytra.built_in.*`, `pytra.std.*`）は `src/runtime/east/{bucket}/{name}.east` として事前に EAST3 JSON 化されている。これらは:
 
 - **compile 段**: 既に `.east` 化済み（変更なし）
 - **link 段**: ユーザーモジュールと一緒に `LinkedProgram` に含まれる（現在も同様）

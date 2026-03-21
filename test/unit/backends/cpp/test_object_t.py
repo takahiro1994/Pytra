@@ -22,7 +22,7 @@ class ObjectTTest(unittest.TestCase):
             src.write_text(cpp_src, encoding="utf-8")
             compile_cmd = [
                 "g++", "-std=c++20", "-O2",
-                "-I", "src", "-I", "src/runtime/cpp", "-I", "src/runtime/generated",
+                "-I", "src", "-I", "src/runtime/cpp", "-I", "src/runtime/east",
                 str(src),
             ]
             if extra_srcs:

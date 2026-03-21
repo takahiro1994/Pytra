@@ -27,12 +27,12 @@ from toolchain.emit.cpp.emitter.header_builder import build_cpp_header_from_east
 from toolchain.emit.cpp.optimizer import optimize_cpp_ir
 from toolchain.emit.cpp.optimizer import render_cpp_opt_trace
 
-_RUNTIME_EAST_ROOT_STR = str(Path(__file__).resolve().parents[3] / "runtime" / "generated")
+_RUNTIME_EAST_ROOT_STR = str(Path(__file__).resolve().parents[3] / "runtime" / "east")
 _RUNTIME_CPP_ROOT_STR = str(Path(__file__).resolve().parents[3] / "runtime" / "cpp")
 
 
 def _is_runtime_module_path(path_str: str) -> bool:
-    """Check if a module path is under the runtime/generated directory."""
+    """Check if a module path is under the runtime/east directory."""
     try:
         resolved = str(Path(path_str).resolve())
         return resolved.startswith(_RUNTIME_EAST_ROOT_STR)

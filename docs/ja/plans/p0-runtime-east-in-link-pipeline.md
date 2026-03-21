@@ -38,7 +38,7 @@ runtime モジュール: .east ──────────────┤→ 
 
 #### 1. `build_linked_program_from_module_map` に runtime .east を含める
 
-現在リンカーはユーザーモジュールの .east だけを処理する。runtime .east（`src/runtime/generated/built_in/*.east`, `std/*.east`）も `module_map` に追加し、LinkedProgram に含める。
+現在リンカーはユーザーモジュールの .east だけを処理する。runtime .east（`src/runtime/east/built_in/*.east`, `std/*.east`）も `module_map` に追加し、LinkedProgram に含める。
 
 runtime .east はリンカーの `resolved_dependencies_v1` で検出された依存先モジュールだけを含めればよい。全 runtime .east を含める必要はない。
 
@@ -58,7 +58,7 @@ standalone transpile は不要。link パイプラインが全てを処理する
 
 #### 方法 A: link サブコマンドに runtime .east を自動追加
 
-`pytra link user.east --target cpp` を実行すると、リンカーが `resolved_dependencies_v1` に含まれる runtime モジュール（例: `pytra.std.pathlib`）を検出し、対応する `src/runtime/generated/std/pathlib.east` を自動的に LinkedProgram に追加する。
+`pytra link user.east --target cpp` を実行すると、リンカーが `resolved_dependencies_v1` に含まれる runtime モジュール（例: `pytra.std.pathlib`）を検出し、対応する `src/runtime/east/std/pathlib.east` を自動的に LinkedProgram に追加する。
 
 **利点**: ユーザーが runtime .east を明示指定する必要がない。
 **実装**: `build_linked_program_from_module_map` または `_build_linked_program_for_input`（pytra-cli.py）で、依存解決後に runtime .east を追加ロードする。

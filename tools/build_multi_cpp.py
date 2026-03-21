@@ -69,7 +69,7 @@ def main(argv: list[str]) -> int:
         "-I",
         "src/runtime/cpp",
         "-I",
-        "src/runtime/generated",
+        "src/runtime/east",
         "-I",
         str(include_dir_path),
         *module_sources,

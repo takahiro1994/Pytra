@@ -24,9 +24,9 @@ src/runtime/rs/generated/std/collections.rs  ← 自動生成 Rust
 ## 新設計
 
 ```
-src/runtime/generated/std/pathlib.east       ← 言語非依存、自動生成
-src/runtime/generated/std/json.east
-src/runtime/generated/built_in/predicates.east
+src/runtime/east/std/pathlib.east       ← 言語非依存、自動生成
+src/runtime/east/std/json.east
+src/runtime/east/built_in/predicates.east
 src/runtime/cpp/py_runtime.h                 ← 手書き C++ のみ
 src/runtime/cpp/gc.h
 src/runtime/cpp/list.h
@@ -41,7 +41,7 @@ src/runtime/cpp/list.h
 
 ## 対象
 
-- `src/runtime/generated/` — 新設（`.east` ファイル配置）
+- `src/runtime/east/` — 新設（`.east` ファイル配置）
 - `src/runtime/cpp/generated/` — 削除（`.east` に移行）
 - `src/runtime/cpp/native/` — `src/runtime/cpp/` に直接配置に変更
 - `src/runtime/{rs,cs,js,...}/generated/` — 削除（`.east` に移行）
@@ -53,7 +53,7 @@ src/runtime/cpp/list.h
 
 ## 受け入れ基準
 
-- `src/runtime/generated/` に `.east` ファイルが配置されている。
+- `src/runtime/east/` に `.east` ファイルが配置されている。
 - `src/runtime/cpp/` に手書き C++ ヘッダのみが配置されている。
 - 言語ごとの `generated/` ディレクトリが不要になっている。
 - fixture / sample pass。

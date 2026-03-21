@@ -97,10 +97,11 @@ def cmd_emit(argv: list[str]) -> int:
 # ---------- build ----------
 
 def cmd_build(argv: list[str]) -> int:
-    """pytra build INPUT.py --output-dir DIR [--target TARGET] [--exe NAME] [--run]"""
+    """pytra build INPUT.py --output-dir DIR [--target TARGET] [--exe NAME] [--run] [-o FILE]"""
     # Parse args
     input_file = ""
     output_dir = "out"
+    single_output = ""
     target = "cpp"
     exe_name = "app.out"
     do_run = False
@@ -110,6 +111,10 @@ def cmd_build(argv: list[str]) -> int:
         tok = argv[i]
         if tok == "--output-dir" and i + 1 < len(argv):
             output_dir = argv[i + 1]
+            i += 2
+            continue
+        if (tok == "-o" or tok == "--output") and i + 1 < len(argv):
+            single_output = argv[i + 1]
             i += 2
             continue
         if tok == "--target" and i + 1 < len(argv):
@@ -134,6 +139,13 @@ def cmd_build(argv: list[str]) -> int:
 
     if input_file == "":
         _fatal("pytra build: input file is required")
+    # When -o is given, use its parent as output_dir
+    if single_output != "":
+        so_parent = str(Path(single_output).parent)
+        if so_parent != "" and so_parent != ".":
+            output_dir = so_parent
+        else:
+            output_dir = "."
 
     src_dir = _find_src_dir()
     linked_dir = output_dir + "/.pytra_linked"
@@ -157,6 +169,27 @@ def cmd_build(argv: list[str]) -> int:
     rc = cmd_emit(emit_argv)
     if rc != 0:
         return rc
+
+    # If -o was given, rename the entry output file to the requested name
+    if single_output != "":
+        entry_stem = Path(input_file).stem
+        # Find the generated file in output_dir matching the entry stem
+        generated = Path(output_dir) / (entry_stem + "." + target)
+        if not generated.exists():
+            # Try common extensions
+            ext_map: dict[str, str] = {
+                "cpp": "cpp", "rs": "rs", "cs": "cs", "js": "js", "ts": "ts",
+                "go": "go", "java": "java", "swift": "swift", "kotlin": "kt",
+                "scala": "scala", "lua": "lua", "ruby": "rb", "php": "php",
+                "nim": "nim", "powershell": "ps1", "julia": "jl", "dart": "dart",
+                "zig": "zig",
+            }
+            ext = ext_map.get(target, target)
+            generated = Path(output_dir) / (entry_stem + "." + ext)
+        so_path = Path(single_output)
+        so_path.parent.mkdir(parents=True, exist_ok=True)
+        if generated.exists() and str(generated.resolve()) != str(so_path.resolve()):
+            so_path.write_text(generated.read_text(encoding="utf-8"), encoding="utf-8")
 
     # Stage 3: build (C++ only for now)
     if target == "cpp":

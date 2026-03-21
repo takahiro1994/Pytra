@@ -159,8 +159,8 @@ def inc(x: int) -> int:
     def test_emit_runtime_cpp_skips_cpp_for_extern_only_module(self) -> None:
         rel_src = Path("src/pytra/std/__tmp_extern_header_only_test.py")
         src_py = ROOT / rel_src
-        hdr_out = ROOT / "src/runtime/generated/std/__tmp_extern_header_only_test.h"
-        cpp_out = ROOT / "src/runtime/generated/std/__tmp_extern_header_only_test.cpp"
+        hdr_out = ROOT / "src/runtime/east/std/__tmp_extern_header_only_test.h"
+        cpp_out = ROOT / "src/runtime/east/std/__tmp_extern_header_only_test.cpp"
         src = """
 from pytra.std import extern
 
@@ -201,8 +201,8 @@ def sin(x: float) -> float:
 
     def test_emit_runtime_cpp_keeps_template_module_header_only(self) -> None:
         rel_src = Path("src/pytra/built_in/numeric_ops.py")
-        hdr_out = ROOT / "src/runtime/generated/built_in/numeric_ops.h"
-        cpp_out = ROOT / "src/runtime/generated/built_in/numeric_ops.cpp"
+        hdr_out = ROOT / "src/runtime/east/built_in/numeric_ops.h"
+        cpp_out = ROOT / "src/runtime/east/built_in/numeric_ops.cpp"
 
         cp = self._run_subprocess_with_timeout(
             [
@@ -226,8 +226,8 @@ def sin(x: float) -> float:
 
     def test_emit_runtime_cpp_keeps_zip_template_module_header_only(self) -> None:
         rel_src = Path("src/pytra/built_in/zip_ops.py")
-        hdr_out = ROOT / "src/runtime/generated/built_in/zip_ops.h"
-        cpp_out = ROOT / "src/runtime/generated/built_in/zip_ops.cpp"
+        hdr_out = ROOT / "src/runtime/east/built_in/zip_ops.h"
+        cpp_out = ROOT / "src/runtime/east/built_in/zip_ops.cpp"
 
         cp = self._run_subprocess_with_timeout(
             [
@@ -250,8 +250,8 @@ def sin(x: float) -> float:
 
     def test_emit_runtime_cpp_json_header_adds_forward_decls_before_class_blocks(self) -> None:
         rel_src = Path("src/pytra/std/json.py")
-        hdr_out = ROOT / "src/runtime/generated/std/json.h"
-        cpp_out = ROOT / "src/runtime/generated/std/json.cpp"
+        hdr_out = ROOT / "src/runtime/east/std/json.h"
+        cpp_out = ROOT / "src/runtime/east/std/json.cpp"
 
         cp = self._run_subprocess_with_timeout(
             [
@@ -295,7 +295,7 @@ def sin(x: float) -> float:
 
     def test_emit_runtime_cpp_pathlib_uses_std_get_for_tuple_unpack(self) -> None:
         rel_src = Path("src/pytra/std/pathlib.py")
-        cpp_out = ROOT / "src/runtime/generated/std/pathlib.cpp"
+        cpp_out = ROOT / "src/runtime/east/std/pathlib.cpp"
 
         cp = self._run_subprocess_with_timeout(
             [
@@ -3559,7 +3559,7 @@ if __name__ == "__main__":
                     "-I",
                     "src/runtime/cpp",
                     "-I",
-                    "src/runtime/generated",
+                    "src/runtime/east",
                     "-fsyntax-only",
                     str(out_cpp),
                 ],
@@ -4393,7 +4393,7 @@ if __name__ == "__main__":
                     "-I",
                     "src/runtime/cpp",
                     "-I",
-                    "src/runtime/generated",
+                    "src/runtime/east",
                     "-fsyntax-only",
                     str(out_cpp),
                 ],
@@ -4422,7 +4422,7 @@ if __name__ == "__main__":
                     "-I",
                     "src/runtime/cpp",
                     "-I",
-                    "src/runtime/generated",
+                    "src/runtime/east",
                     "-fsyntax-only",
                     str(out_cpp),
                 ],
@@ -4452,7 +4452,7 @@ if __name__ == "__main__":
                     "-I",
                     "src/runtime/cpp",
                     "-I",
-                    "src/runtime/generated",
+                    "src/runtime/east",
                     "-fsyntax-only",
                     str(out_cpp),
                 ],
@@ -4502,7 +4502,7 @@ if __name__ == "__main__":
                         "-I",
                         "src/runtime/cpp",
                     "-I",
-                    "src/runtime/generated",
+                    "src/runtime/east",
                     ],
                     cwd=ROOT,
                     timeout_sec=PYTRA_TEST_COMPILE_TIMEOUT_SEC,
@@ -4552,7 +4552,7 @@ if __name__ == "__main__":
                         "-I",
                         "src/runtime/cpp",
                     "-I",
-                    "src/runtime/generated",
+                    "src/runtime/east",
                     ],
                     cwd=ROOT,
                     timeout_sec=PYTRA_TEST_COMPILE_TIMEOUT_SEC,
@@ -4623,7 +4623,7 @@ if __name__ == "__main__":
                         "-I",
                         "src/runtime/cpp",
                     "-I",
-                    "src/runtime/generated",
+                    "src/runtime/east",
                         "-o",
                         str(object_path),
                     ],

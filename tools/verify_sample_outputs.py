@@ -79,10 +79,10 @@ def runtime_cpp_sources() -> list[str]:
     out: list[str] = []
     seen: set[str] = set()
     for root in (
-        Path("src/runtime/generated/built_in"),
-        Path("src/runtime/generated/std"),
-        Path("src/runtime/generated/utils"),
-        Path("src/runtime/generated/core"),
+        Path("src/runtime/east/built_in"),
+        Path("src/runtime/east/std"),
+        Path("src/runtime/east/utils"),
+        Path("src/runtime/east/core"),
         Path("src/runtime/cpp/built_in"),
         Path("src/runtime/cpp/std"),
         Path("src/runtime/cpp/utils"),

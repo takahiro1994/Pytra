@@ -169,7 +169,7 @@ def _build_cpp_template_header_only_module(cpp_text: str, header_path: Path) -> 
     out_lines.append("#define " + guard)
     out_lines.append("")
     for line in body_lines:
-        if line.startswith('#include "runtime/generated/') and line.endswith('.h"'):
+        if line.startswith('#include "runtime/east/') and line.endswith('.h"'):
             continue
         out_lines.append(line)
     if len(out_lines) > 0 and out_lines[-1] != "":

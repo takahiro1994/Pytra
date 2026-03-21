@@ -82,7 +82,7 @@ PYTHONPATH=src python src/toolchain/emit/cpp.py out/linked/link-output.json --ou
 - `built_in/` — 組み込み操作（`base_ops.h`, `contains.h`, `list_ops.h` 等）
 - `std/` — 標準ライブラリ対応（`math.cpp`, `time.cpp`, `sys.cpp` 等）
 
-runtime モジュールの Python 正本は `src/pytra/` にあり、`.east`（EAST3 JSON）は `src/runtime/generated/` に配置されます。
+runtime モジュールの Python 正本は `src/pytra/` にあり、`.east`（EAST3 JSON）は `src/runtime/east/` に配置されます。
 
 補足:
 - Python 側で import できるのは `src/pytra/` にあるモジュールと、ユーザー自作 `.py` モジュールです。
