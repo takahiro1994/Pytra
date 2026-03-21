@@ -10,6 +10,7 @@ from toolchain.frontends.signature_registry import lookup_stdlib_attribute_type
 from toolchain.frontends.signature_registry import lookup_stdlib_imported_symbol_return_type
 from toolchain.frontends.signature_registry import lookup_stdlib_method_runtime_binding
 from toolchain.frontends.signature_registry import lookup_stdlib_method_runtime_call
+from toolchain.compile.core_parse_context import _SH_ALLOW_OBJECT_RECEIVER
 from toolchain.compile.core_parse_context import _SH_IMPORT_MODULES
 from toolchain.compile.core_parse_context import _SH_IMPORT_SYMBOLS
 from toolchain.compile.core_runtime_call_semantics import _sh_infer_known_name_call_return_type
@@ -142,20 +143,12 @@ class _ShExprResolutionSemanticsMixin:
             semantic_tag = lookup_stdlib_method_semantic_tag(attr_name)
             if runtime_call != "":
                 module_id, runtime_symbol = lookup_stdlib_method_runtime_binding(owner_type, attr_name)
-        noncpp_module_id, noncpp_runtime_call = _sh_lookup_noncpp_attr_runtime_call(
-            owner_expr,
-            attr_name,
-            import_modules=_SH_IMPORT_MODULES,
-            import_symbols=_SH_IMPORT_SYMBOLS,
-        )
         return {
             "resolved_type": attr_t,
             "runtime_call": runtime_call,
             "semantic_tag": semantic_tag,
             "module_id": module_id,
             "runtime_symbol": runtime_symbol,
-            "noncpp_module_id": noncpp_module_id,
-            "noncpp_runtime_call": noncpp_runtime_call,
         }
 
     def _split_generic_types(self, s: str) -> list[str]:
@@ -192,18 +185,28 @@ class _ShExprResolutionSemanticsMixin:
 
     def _is_forbidden_object_receiver_type(self, t: str) -> bool:
         """object レシーバ禁止ルールに該当する型か判定する。"""
+        if _SH_ALLOW_OBJECT_RECEIVER[0]:
+            return False
         s = t.strip()
-        if s in {"object", "Any", "any", "unknown"}:
+        # "unknown" は dict[str, Any].get() 等の未解決型に対する guard (d8926b03e)
+        if s == "object" or s == "Any" or s == "any" or s == "unknown":
             return True
         if "|" in s:
             parts = self._split_union_types(s)
-            return any(p in {"object", "Any", "any"} for p in parts if p != "None")
+            for p in parts:
+                if p == "None":
+                    continue
+                if p == "object" or p == "Any" or p == "any":
+                    return True
+            return False
         return False
 
     def _is_forbidden_dynamic_helper_type(self, t: str) -> bool:
         """decode-first helper に直接渡してはいけない動的型か判定する。"""
+        if _SH_ALLOW_OBJECT_RECEIVER[0]:
+            return False
         s = t.strip()
-        if s in {"object", "Any", "any"}:
+        if s in {"object", "Any", "any", "unknown"}:
             return True
         if "|" in s:
             parts = self._split_union_types(s)

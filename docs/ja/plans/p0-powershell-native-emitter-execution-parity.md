@@ -83,3 +83,4 @@
 - 2026-03-21: ListComp ForEach-Object 実装、enumerate ForCore TupleTarget、dict.items() Key/Value、ネスト ListComp flatten 防止、import aliases/ObjStr/ObjLen/ObjBool 括弧修正。97/131 到達。残り 34 件のうち stdlib 14 件は対象外。非 stdlib 20 件: assert 5、notrec 2、varset 5、other 8。
 - 2026-03-21: multi-generator ListComp ネスト対応。98/131 到達。残り 33 件: stdlib 未実装 14、enum/intflag 4、構文/型問題 8、assert 差分 5、その他 2。初期 13/131 から 98/131 に改善（+85 件、7.5 倍）。
 - 2026-03-21: __type__ をコンストラクタ末尾に移動（super 互換）。transpile 成功 111 件中 93 pass (84%)。目標の実行成功率 80% を超過。上流の toolchain 変更で transpile 失敗が 5→26 件に増加したが、PowerShell emitter 自体の問題ではない。
+- 2026-03-21: _SH_ALLOW_OBJECT_RECEIVER フラグ追加: 動的言語ターゲットで object/Any/unknown レシーバの属性アクセスを許可。transpile 131/131 復帰。reversed() を __pytra_reversed へ修正、DictComp/SetComp 実装、Set リテラル対応、list.index()/set.discard()/set.add() 追加、__pytra_str_slice の配列対応、StaticRangeForPlan の負 step 対応、zip/map/filter ランタイム追加。実行成功率 105/131（80%）到達。

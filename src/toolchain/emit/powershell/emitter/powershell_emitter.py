@@ -267,6 +267,15 @@ def _render_expr(expr_any: Any) -> str:
         rendered = [_render_expr(e) for e in elements]
         return "@(" + ", ".join(rendered) + ")"
 
+    if kind == "Set":
+        elements = _get_list(expr, "elements")
+        if len(elements) == 0:
+            elements = _get_list(expr, "elts")
+        if len(elements) == 0:
+            return "@{}"
+        parts = [_render_expr(e) + " = $true" for e in elements]
+        return "@{" + "; ".join(parts) + "}"
+
     if kind == "ListComp":
         elt = expr.get("elt")
         generators = _get_list(expr, "generators")
@@ -296,10 +305,46 @@ def _render_expr(expr_any: Any) -> str:
         return _build_listcomp_pipe(generators, elt, 0)
 
     if kind == "DictComp":
-        return "@{}"
+        key_expr = expr.get("key")
+        value_expr = expr.get("value")
+        generators = _get_list(expr, "generators")
+        if len(generators) == 0 or key_expr is None or value_expr is None:
+            return "@{}"
+        gen = generators[0]
+        if not isinstance(gen, dict):
+            return "@{}"
+        gen_target = gen.get("target")
+        gen_iter = gen.get("iter")
+        gen_ifs = _get_list(gen, "ifs")
+        tname = "$" + _safe_ident(_get_str(gen_target, "id") if isinstance(gen_target, dict) else "_dc", "_dc")
+        irendered = _render_expr(gen_iter)
+        k_rendered = _render_expr(key_expr)
+        v_rendered = _render_expr(value_expr)
+        body = "$__dc_result[" + k_rendered + "] = " + v_rendered
+        if len(gen_ifs) > 0:
+            cond = " -and ".join(["(" + _render_expr(c) + ")" for c in gen_ifs])
+            body = "if (" + cond + ") { " + body + " }"
+        return "& { $__dc_result = @{}; foreach (" + tname + " in " + irendered + ") { " + body + " }; $__dc_result }"
 
     if kind == "SetComp":
-        return "@{}"
+        elt = expr.get("elt")
+        generators = _get_list(expr, "generators")
+        if len(generators) == 0 or elt is None:
+            return "@{}"
+        gen = generators[0]
+        if not isinstance(gen, dict):
+            return "@{}"
+        gen_target = gen.get("target")
+        gen_iter = gen.get("iter")
+        gen_ifs = _get_list(gen, "ifs")
+        tname = "$" + _safe_ident(_get_str(gen_target, "id") if isinstance(gen_target, dict) else "_sc", "_sc")
+        irendered = _render_expr(gen_iter)
+        e_rendered = _render_expr(elt)
+        body = "$__sc_result[" + e_rendered + "] = $true"
+        if len(gen_ifs) > 0:
+            cond = " -and ".join(["(" + _render_expr(c) + ")" for c in gen_ifs])
+            body = "if (" + cond + ") { " + body + " }"
+        return "& { $__sc_result = @{}; foreach (" + tname + " in " + irendered + ") { " + body + " }; $__sc_result }"
 
     if kind == "Dict":
         keys = _get_list(expr, "keys")
@@ -467,9 +512,21 @@ def _render_call_expr(expr: dict[str, Any]) -> str:
             if fn_name == "sorted":
                 return "(" + rendered_args[0] + " | Sort-Object)" if len(rendered_args) > 0 else "@()"
             if fn_name == "reversed":
-                return "([array]::Reverse(" + rendered_args[0] + "); " + rendered_args[0] + ")" if len(rendered_args) > 0 else "@()"
+                return "(__pytra_reversed " + rendered_args[0] + ")" if len(rendered_args) > 0 else "@()"
             if fn_name == "enumerate":
                 return rendered_args[0] if len(rendered_args) > 0 else "@()"
+            if fn_name == "zip":
+                if len(rendered_args) >= 2:
+                    return "(__pytra_zip " + rendered_args[0] + " " + rendered_args[1] + ")"
+                return "@()"
+            if fn_name == "map":
+                if len(rendered_args) >= 2:
+                    return "(__pytra_map " + rendered_args[0] + " " + rendered_args[1] + ")"
+                return "@()"
+            if fn_name == "filter":
+                if len(rendered_args) >= 2:
+                    return "(__pytra_filter " + rendered_args[0] + " " + rendered_args[1] + ")"
+                return "@()"
             if fn_name == "type":
                 return rendered_args[0] + ".GetType().Name" if len(rendered_args) > 0 else '""'
             if fn_name == "hash":
@@ -605,6 +662,46 @@ def _render_call_expr(expr: dict[str, Any]) -> str:
             if attr == "pop":
                 if len(rendered_args) == 0:
                     return owner + "[-1]; " + owner + " = " + owner + "[0..(" + owner + ".Length - 2)]"
+                return owner
+            if attr == "index":
+                if len(rendered_args) > 0:
+                    return "[array]::IndexOf(" + owner + ", " + rendered_args[0] + ")"
+                return "-1"
+            if attr == "extend":
+                if len(rendered_args) > 0:
+                    return owner + " += @(" + rendered_args[0] + ")"
+                return owner
+            if attr == "insert":
+                if len(rendered_args) >= 2:
+                    return "(" + owner + " = @(" + owner + "[0..([Math]::Max(0, " + rendered_args[0] + " - 1))] + @(" + rendered_args[1] + ") + " + owner + "[" + rendered_args[0] + "..(" + owner + ".Length - 1)]))"
+                return owner
+            if attr == "discard":
+                if len(rendered_args) > 0:
+                    return owner + ".Remove(" + rendered_args[0] + ")"
+                return owner
+            if attr == "add":
+                raw_owner_type = owner_type.lower() if isinstance(owner_type, str) else ""
+                if raw_owner_type.startswith("set[") or raw_owner_type == "set":
+                    if len(rendered_args) > 0:
+                        return owner + "[" + rendered_args[0] + "] = $true"
+                    return owner
+                if len(rendered_args) > 0:
+                    return owner + " += @(" + rendered_args[0] + ")"
+                return owner
+            if attr == "remove":
+                raw_owner_type2 = owner_type.lower() if isinstance(owner_type, str) else ""
+                if raw_owner_type2.startswith("set[") or raw_owner_type2 == "set":
+                    if len(rendered_args) > 0:
+                        return owner + ".Remove(" + rendered_args[0] + ")"
+                    return owner
+                if len(rendered_args) > 0:
+                    return "(__pytra_list_remove " + owner + " " + rendered_args[0] + ")"
+                return owner
+            if attr == "copy":
+                return "@(" + owner + ")"
+            if attr == "update":
+                if len(rendered_args) > 0:
+                    return "foreach ($__k in " + rendered_args[0] + ".Keys) { " + owner + "[$__k] = " + rendered_args[0] + "[$__k] }"
                 return owner
             # Check if this could be a class method call (owner has __type__)
             raw_attr = _get_str(func_d, "attr")
@@ -875,41 +972,46 @@ def _emit_stmt(stmt: dict[str, Any], *, indent: str, ctx: dict[str, Any]) -> lis
             if tp_id != "":
                 loop_var = "$" + _safe_ident(tp_id, "_i")
 
-        # Try normalized_exprs (for_init_expr, for_cond_expr, for_update_expr)
-        init_expr = normalized.get("for_init_expr")
-        cond_expr = normalized.get("for_cond_expr")
-        update_expr = normalized.get("for_update_expr")
-
-        if init_expr is not None or cond_expr is not None:
-            init_str = loop_var + " = " + _render_expr(init_expr) if init_expr is not None else loop_var + " = 0"
-            cond_str = _render_expr(cond_expr) if cond_expr is not None else "$true"
-            if isinstance(update_expr, dict) and _get_str(update_expr, "kind") == "AugAssign":
-                ue_d: dict[str, object] = update_expr
-                update_str = _render_expr(ue_d.get("target")) + " += " + _render_expr(ue_d.get("value"))
-            elif update_expr is not None:
-                update_str = _render_expr(update_expr)
-            else:
-                update_str = loop_var + " += 1"
-            lines = [indent + "for (" + init_str + "; " + cond_str + "; " + update_str + ") {"]
-        elif isinstance(iter_plan, dict):
+        # Try StaticRangeForPlan first (more reliable than normalized_exprs)
+        if isinstance(iter_plan, dict) and _get_str(iter_plan, "kind") == "StaticRangeForPlan":
             ip_d: dict[str, object] = iter_plan
-            ip_kind = _get_str(ip_d, "kind")
-            if ip_kind == "StaticRangeForPlan":
-                start = _render_expr(ip_d.get("start"))
-                stop = _render_expr(ip_d.get("stop"))
-                step = ip_d.get("step")
-                step_val = 1
-                if isinstance(step, dict) and step.get("value") is not None:
+            start = _render_expr(ip_d.get("start"))
+            stop = _render_expr(ip_d.get("stop"))
+            step = ip_d.get("step")
+            step_val = 1
+            if isinstance(step, dict):
+                sk = _get_str(step, "kind")
+                if sk == "Constant" and step.get("value") is not None:
                     sv = step.get("value")
                     step_val = sv if isinstance(sv, int) else 1
-                if step_val >= 0:
-                    lines = [indent + "for (" + loop_var + " = " + start + "; " + loop_var + " -lt " + stop + "; " + loop_var + " += " + str(step_val) + ") {"]
+                elif sk == "UnaryOp" and _get_str(step, "op") == "USub":
+                    operand = step.get("operand")
+                    if isinstance(operand, dict) and operand.get("value") is not None:
+                        ov = operand.get("value")
+                        step_val = -(ov if isinstance(ov, int) else 1)
+            if step_val >= 0:
+                lines = [indent + "for (" + loop_var + " = " + start + "; " + loop_var + " -lt " + stop + "; " + loop_var + " += " + str(step_val) + ") {"]
+            else:
+                lines = [indent + "for (" + loop_var + " = " + start + "; " + loop_var + " -gt " + stop + "; " + loop_var + " += " + str(step_val) + ") {"]
+        else:
+            # Fallback: try normalized_exprs (for_init_expr, for_cond_expr, for_update_expr)
+            init_expr = normalized.get("for_init_expr")
+            cond_expr = normalized.get("for_cond_expr")
+            update_expr = normalized.get("for_update_expr")
+
+            if init_expr is not None or cond_expr is not None:
+                init_str = loop_var + " = " + _render_expr(init_expr) if init_expr is not None else loop_var + " = 0"
+                cond_str = _render_expr(cond_expr) if cond_expr is not None else "$true"
+                if isinstance(update_expr, dict) and _get_str(update_expr, "kind") == "AugAssign":
+                    ue_d: dict[str, object] = update_expr
+                    update_str = _render_expr(ue_d.get("target")) + " += " + _render_expr(ue_d.get("value"))
+                elif update_expr is not None:
+                    update_str = _render_expr(update_expr)
                 else:
-                    lines = [indent + "for (" + loop_var + " = " + start + "; " + loop_var + " -gt " + stop + "; " + loop_var + " += " + str(step_val) + ") {"]
+                    update_str = loop_var + " += 1"
+                lines = [indent + "for (" + init_str + "; " + cond_str + "; " + update_str + ") {"]
             else:
                 lines = [indent + "for (" + loop_var + " = 0; $true; " + loop_var + " += 1) {"]
-        else:
-            lines = [indent + "for (" + loop_var + " = 0; $true; " + loop_var + " += 1) {"]
 
         lines.extend(_emit_body(body, indent=indent + "    ", ctx=ctx))
         lines.append(indent + "}")

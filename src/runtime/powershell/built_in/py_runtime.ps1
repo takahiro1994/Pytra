@@ -255,12 +255,79 @@ function __pytra_not_in {
 function __pytra_str_slice {
     param($s, $start, $stop)
     if ($s -eq $null) { return "" }
+    if ($s -is [array] -or $s -is [System.Collections.IList]) {
+        $len = $s.Length
+        if ($start -lt 0) { $start = [Math]::Max(0, $len + $start) }
+        if ($stop -lt 0) { $stop = [Math]::Max(0, $len + $stop) }
+        if ($stop -gt $len) { $stop = $len }
+        if ($start -ge $stop) { return @() }
+        return @($s[$start..($stop - 1)])
+    }
     $len = $s.Length
     if ($start -lt 0) { $start = [Math]::Max(0, $len + $start) }
     if ($stop -lt 0) { $stop = [Math]::Max(0, $len + $stop) }
     if ($stop -gt $len) { $stop = $len }
     if ($start -ge $stop) { return "" }
     return $s.Substring($start, $stop - $start)
+}
+
+function __pytra_reversed {
+    param([object]$value)
+    if ($value -eq $null) { return @() }
+    if ($value -is [string]) {
+        $chars = $value.ToCharArray()
+        [array]::Reverse($chars)
+        return -join $chars
+    }
+    $copy = @($value)
+    [array]::Reverse($copy)
+    return $copy
+}
+
+function __pytra_zip {
+    param([object]$a, [object]$b)
+    if ($a -eq $null -or $b -eq $null) { return @() }
+    $result = @()
+    $len = [Math]::Min($a.Length, $b.Length)
+    for ($i = 0; $i -lt $len; $i++) {
+        $result += ,@($a[$i], $b[$i])
+    }
+    return $result
+}
+
+function __pytra_map {
+    param([object]$fn, [object]$items)
+    if ($items -eq $null) { return @() }
+    $result = @()
+    foreach ($item in $items) {
+        $result += ,@(& $fn $item)
+    }
+    return $result
+}
+
+function __pytra_filter {
+    param([object]$fn, [object]$items)
+    if ($items -eq $null) { return @() }
+    $result = @()
+    foreach ($item in $items) {
+        if (& $fn $item) {
+            $result += ,@($item)
+        }
+    }
+    return $result
+}
+
+function __pytra_list_remove {
+    param([object]$list, [object]$value)
+    $idx = [array]::IndexOf($list, $value)
+    if ($idx -ge 0) {
+        $result = @()
+        for ($i = 0; $i -lt $list.Length; $i++) {
+            if ($i -ne $idx) { $result += ,@($list[$i]) }
+        }
+        return $result
+    }
+    return $list
 }
 
 function PytraNotImplemented {

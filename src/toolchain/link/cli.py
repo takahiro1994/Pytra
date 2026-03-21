@@ -17,6 +17,11 @@ from toolchain.link import build_linked_program_from_module_map
 from toolchain.link import optimize_linked_program
 from toolchain.link import write_link_output_bundle
 from toolchain.link.program_loader import add_runtime_east_to_module_map
+from toolchain.compile.core_parse_context import _SH_ALLOW_OBJECT_RECEIVER
+
+_DYNAMIC_TARGETS: set[str] = {
+    "powershell", "ruby", "lua", "php", "js", "ts", "julia", "dart",
+}
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -50,6 +55,8 @@ def main(argv: list[str] | None = None) -> int:
         output_dir_text = "out/linked"
 
     input_path = Path(input_text)
+
+    _SH_ALLOW_OBJECT_RECEIVER[0] = target in _DYNAMIC_TARGETS
 
     def _load_for_program(
         module_path: Path,

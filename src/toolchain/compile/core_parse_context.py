@@ -24,6 +24,7 @@ _SH_RUNTIME_ABI_RET_MODES = {"default", "value"}
 _SH_RUNTIME_ABI_MODE_ALIASES = {"value_readonly": "value"}
 _SH_TEMPLATE_SCOPE = "runtime_helper"
 _SH_TEMPLATE_INSTANTIATION_MODE = "linked_implicit"
+_SH_ALLOW_OBJECT_RECEIVER: list[bool] = [False]
 
 
 def _sh_set_parse_context(
