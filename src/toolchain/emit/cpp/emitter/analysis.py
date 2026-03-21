@@ -7,10 +7,14 @@ class CppAnalysisEmitter:
     """Analysis helpers for assignment/type/mutability inference."""
 
     def _strip_rc_wrapper(self, t: str) -> str:
-        """`rc<T>` 形式の型文字列を `T` へ正規化する。"""
+        """`rc<T>` / `Object<T>` 形式の型文字列を `T` へ正規化する。"""
         txt = self.normalize_type_name(t)
         if txt.startswith("rc<") and txt.endswith(">"):
             inner = txt[3:-1].strip()
+            if inner != "":
+                return self.normalize_type_name(inner)
+        if txt.startswith("Object<") and txt.endswith(">"):
+            inner = txt[7:-1].strip()
             if inner != "":
                 return self.normalize_type_name(inner)
         return txt
