@@ -1827,7 +1827,14 @@ class NimNativeEmitter:
                  return f"newSeq[uint8](int({args[0]}))"
             if name == "bytes":
                 if len(args) == 0:
-                    return "@[]"
+                    return "newSeq[uint8]()"
+                # Convert seq[int] → seq[uint8] via mapIt
+                arg0_node = args_nodes[0] if len(args_nodes) > 0 else None
+                arg0_type = ""
+                if isinstance(arg0_node, dict):
+                    arg0_type = arg0_node.get("resolved_type", "")
+                if isinstance(arg0_type, str) and ("int" in arg0_type or arg0_type.startswith("list[")):
+                    return f"{args[0]}.mapIt(uint8(it))"
                 return args[0]
             if name in self.class_names:
                  return f"new{name}({', '.join(args)})"
