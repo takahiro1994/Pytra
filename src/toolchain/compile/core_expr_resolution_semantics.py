@@ -193,7 +193,7 @@ class _ShExprResolutionSemanticsMixin:
     def _is_forbidden_object_receiver_type(self, t: str) -> bool:
         """object レシーバ禁止ルールに該当する型か判定する。"""
         s = t.strip()
-        if s in {"object", "Any", "any"}:
+        if s in {"object", "Any", "any", "unknown"}:
             return True
         if "|" in s:
             parts = self._split_union_types(s)
