@@ -96,6 +96,27 @@ def _has_format_spec_in_doc(doc: Any) -> bool:
     return False
 
 
+def _render_lvalue(expr_any: Any) -> str:
+    """左辺値（代入ターゲット）を render する。__pytra_getattr を使わない。"""
+    if not isinstance(expr_any, dict):
+        return _render_expr(expr_any)
+    kind = _get_str(expr_any, "kind")
+    if kind == "Attribute":
+        value_node = expr_any.get("value")
+        value = _render_expr(value_node)
+        attr = _get_str(expr_any, "attr")
+        if isinstance(value_node, dict):
+            vname = _get_str(value_node, "id") if _get_str(value_node, "kind") == "Name" else ""
+            if vname == "self":
+                return '$self["' + attr + '"]'
+        return value + '["' + attr + '"]'
+    if kind == "Subscript":
+        value = _render_expr(expr_any.get("value"))
+        index = _render_expr(expr_any.get("slice"))
+        return value + "[" + index + "]"
+    return _render_expr(expr_any)
+
+
 _IGNORED_IMPORT_MODULES: set[str] = {
     "typing", "pytra.typing", "dataclasses", "__future__",
     "pytra.utils.assertions",

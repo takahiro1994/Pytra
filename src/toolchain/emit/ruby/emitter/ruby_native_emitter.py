@@ -324,20 +324,31 @@ def _emit_import_stmt(stmt: dict[str, Any], indent: str) -> list[str]:
     names_any = stmt.get("names")
     names = names_any if isinstance(names_any, list) else []
     seen_subdirs: set[str] = set()
+    # "pytra.std.math" -> "math", "pytra.utils" -> use name, "pytra.utils.gif" -> "gif"
+    last_segment = module.rsplit(".", 1)[-1]
     for entry in names:
         if not isinstance(entry, dict):
             continue
         name = entry.get("name")
         if not isinstance(name, str) or name == "":
             continue
-        asname = entry.get("asname")
-        local = asname if isinstance(asname, str) and asname != "" else name
+        local = entry.get("asname")
+        if not isinstance(local, str) or local == "":
+            local = name
         local_ident = _safe_ident(local, "mod")
         if local_ident in _PYTRA_MODULE_IMPORTS[0]:
+            # Module import: from pytra.utils import png -> subdir = "png"
             subdir = _safe_ident(name, "mod")
-            if subdir not in seen_subdirs:
-                lines.append(indent + 'require_relative "' + subdir + '/east"')
-                seen_subdirs.add(subdir)
+        elif last_segment in ("utils", "std", "built_in"):
+            # from pytra.utils import png -> use name
+            subdir = _safe_ident(name, "mod")
+        else:
+            # Symbol import: from pytra.std.math import pi -> "math"
+            # from pytra.utils.gif import save_gif -> "gif"
+            subdir = _safe_ident(last_segment, "mod")
+        if subdir not in seen_subdirs:
+            lines.append(indent + 'require_relative "' + subdir + '/east"')
+            seen_subdirs.add(subdir)
     return lines
 
 

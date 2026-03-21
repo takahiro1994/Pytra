@@ -420,7 +420,12 @@ def _runtime_symbol_alias_line(alias_txt: str, runtime_module_id: str, runtime_s
     if mod == "pytra.std.pathlib" and sym == "Path":
         return "local " + alias_txt + " = Path"
     if mod.startswith("pytra.utils.") and sym != "":
-        return "local " + alias_txt + " = __pytra_" + _safe_ident(sym, sym)
+        # The symbol comes from a linked submodule loaded via dofile.
+        # After dofile the function is global, so alias to it directly.
+        leaf = mod.rsplit(".", 1)[-1]
+        dofile_line = ('dofile((debug.getinfo(1, "S").source:sub(2):match("^(.*[\\\\/])") or "") .. "'
+                       + _safe_ident(leaf, "utils") + '/east.lua")')
+        return dofile_line + "\n" + "local " + alias_txt + " = " + _safe_ident(sym, sym)
     return ""
 
 

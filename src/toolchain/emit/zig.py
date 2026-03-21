@@ -12,7 +12,7 @@ import sys
 from pathlib import Path
 
 from toolchain.emit.zig.emitter import transpile_to_zig_native
-from toolchain.emit.loader import emit_all_modules
+from toolchain.emit.loader import load_linked_modules
 
 _RUNTIME_DIR = Path(__file__).resolve().parents[2] / "runtime" / "zig" / "built_in"
 
@@ -48,10 +48,25 @@ def main() -> int:
         print("error: input link-output.json is required", file=sys.stderr)
         return 1
 
-    rc = emit_all_modules(input_path, output_dir, ".zig", transpile_to_zig_native)
-    if rc == 0:
-        _copy_runtime(output_dir)
-    return rc
+    modules, entry_modules = load_linked_modules(input_path)
+    out = Path(output_dir)
+    out.mkdir(parents=True, exist_ok=True)
+
+    for mod in modules:
+        module_id = mod["module_id"]
+        east_doc = mod["east_doc"]
+        is_entry = mod.get("is_entry", False)
+        rel_path = module_id.replace(".", "/") + ".zig"
+        out_path = out / rel_path
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+
+        is_submodule = not is_entry
+        source = transpile_to_zig_native(east_doc, is_submodule=is_submodule)
+        out_path.write_text(source, encoding="utf-8")
+        print("generated: " + str(out_path))
+
+    _copy_runtime(output_dir)
+    return 0
 
 
 if __name__ == "__main__":
