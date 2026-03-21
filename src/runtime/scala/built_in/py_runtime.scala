@@ -9,8 +9,8 @@ def __pytra_noop(args: Any*): Unit = { }
 // Implicit conversion: Any → Double for arithmetic in dynamically-typed contexts.
 // EAST type inference may produce `unknown` → `Any` for variables whose actual
 // runtime type is numeric.  This conversion lets Scala compile such expressions.
-import scala.language.implicitConversions
-given Conversion[Any, Double] = __pytra_float(_)
+// Note: implicit Any→Double was removed due to StackOverflow risk.
+// Emitter wraps Any-typed arithmetic operands with __pytra_float() instead.
 
 
 def __pytra_path_new(path: Any): String = {

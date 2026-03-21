@@ -836,7 +836,15 @@ def _render_binop_expr(expr: dict[str, Any]) -> str:
         )
 
     sym = _bin_op_symbol(op)
-    return _join_binop_expr(left_expr, right_expr, sym, left_any, right_any, op)
+    # Fallback: if either operand is Any/unknown, wrap with __pytra_float
+    # to ensure Scala can compile the arithmetic expression.
+    fall_left = left_expr
+    fall_right = right_expr
+    if left_type in {"unknown", "object", "any", ""}:
+        fall_left = "__pytra_float(" + left_expr + ")"
+    if right_type in {"unknown", "object", "any", ""}:
+        fall_right = "__pytra_float(" + right_expr + ")"
+    return _join_binop_expr(fall_left, fall_right, sym, left_any, right_any, op)
 
 
 def _compare_op_symbol(op: Any) -> str:
