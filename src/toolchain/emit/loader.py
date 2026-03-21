@@ -1,0 +1,105 @@
+"""Shared loader and multi-module emit helpers for emit entry points.
+
+Handles link-output.json (linked program manifest) loading and
+multi-module emit orchestration.
+"""
+
+from __future__ import annotations
+
+import json
+from pathlib import Path
+from typing import Any, Callable
+
+LINK_OUTPUT_SCHEMA = "pytra.link_output.v1"
+
+
+def load_linked_modules(input_path: str) -> tuple[list[dict[str, Any]], list[str]]:
+    """Load linked modules from a link-output.json.
+
+    Returns (modules, entry_module_ids) where each module is a dict with:
+        - module_id: str
+        - east_doc: dict (the EAST3 document)
+        - source_path: str
+        - is_entry: bool
+    """
+    p = Path(input_path)
+    raw = json.loads(p.read_text(encoding="utf-8"))
+    manifest_dir = p.parent
+
+    schema = raw.get("schema", "")
+    if schema != LINK_OUTPUT_SCHEMA:
+        # Treat as raw EAST3 — wrap in single-module list
+        module_id = raw.get("meta", {}).get("module_id", p.stem)
+        return [{"module_id": module_id, "east_doc": raw, "source_path": str(p), "is_entry": True}], [module_id]
+
+    entry_modules_any = raw.get("entry_modules", [])
+    entry_modules: list[str] = []
+    if isinstance(entry_modules_any, (list, tuple)):
+        for item in entry_modules_any:
+            if isinstance(item, str) and item != "":
+                entry_modules.append(item)
+
+    modules_any = raw.get("modules", [])
+    if not isinstance(modules_any, list):
+        raise RuntimeError("link-output.json: modules must be a list")
+
+    modules: list[dict[str, Any]] = []
+    for item in modules_any:
+        if isinstance(item, dict):
+            module_id = item.get("module_id", "")
+            output = item.get("output", "")
+            source_path = item.get("source_path", "")
+            is_entry = bool(item.get("is_entry", False))
+        else:
+            module_id = getattr(item, "module_id", "")
+            output = getattr(item, "output", "")
+            source_path = getattr(item, "source_path", "")
+            is_entry = bool(getattr(item, "is_entry", False))
+
+        if module_id == "" or output == "":
+            continue
+
+        artifact_path = manifest_dir / output
+        east_doc = json.loads(artifact_path.read_text(encoding="utf-8"))
+        modules.append({
+            "module_id": module_id,
+            "east_doc": east_doc,
+            "source_path": source_path,
+            "is_entry": is_entry,
+        })
+
+    return modules, entry_modules
+
+
+def emit_all_modules(
+    input_path: str,
+    output_dir: str,
+    ext: str,
+    transpile_fn: Callable[[dict[str, Any]], str],
+) -> int:
+    """Load linked modules and emit all of them to output_dir.
+
+    Args:
+        input_path: Path to link-output.json or raw EAST3 JSON.
+        output_dir: Directory to write output files.
+        ext: File extension (e.g. ".rs", ".lua").
+        transpile_fn: Function that takes an EAST3 dict and returns source code string.
+
+    Returns exit code (0 = success).
+    """
+    modules, entry_modules = load_linked_modules(input_path)
+    out = Path(output_dir)
+    out.mkdir(parents=True, exist_ok=True)
+
+    for mod in modules:
+        module_id = mod["module_id"]
+        east_doc = mod["east_doc"]
+        # Use module_id as filename, replacing dots with path separators
+        rel_path = module_id.replace(".", "/") + ext
+        out_path = out / rel_path
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        source = transpile_fn(east_doc)
+        out_path.write_text(source, encoding="utf-8")
+        print("generated: " + str(out_path))
+
+    return 0

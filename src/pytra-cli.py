@@ -152,7 +152,7 @@ def cmd_build(argv: list[str]) -> int:
 
     link_output = linked_dir + "/link-output.json"
 
-    # Stage 2: emit
+    # Stage 2: emit (all languages use --output-dir)
     emit_argv = ["--target", target, link_output, "--output-dir", output_dir]
     rc = cmd_emit(emit_argv)
     if rc != 0:

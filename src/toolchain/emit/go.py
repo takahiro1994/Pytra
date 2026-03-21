@@ -1,32 +1,31 @@
 #!/usr/bin/env python3
-"""Standalone GO backend: EAST3 JSON → GO source.
+"""Go backend: link-output.json → Go multi-file output.
 
 Usage:
-    python3 -m toolchain.emit.go INPUT.json -o out/output.go
+    python3 -m toolchain.emit.go LINK_OUTPUT.json --output-dir out/go/
 """
 
 from __future__ import annotations
 
-import json
 import sys
-from pathlib import Path
 
 from toolchain.emit.go.emitter import transpile_to_go
+from toolchain.emit.loader import emit_all_modules
 
 
 def main() -> int:
     argv = sys.argv[1:]
     if len(argv) == 0 or argv[0] in ("-h", "--help"):
-        print("usage: toolchain.emit.go INPUT.json -o OUTPUT.go")
+        print("usage: toolchain.emit.go LINK_OUTPUT.json --output-dir DIR")
         return 0
 
     input_path = ""
-    output_path = ""
+    output_dir = "out/go"
     i = 0
     while i < len(argv):
         tok = argv[i]
-        if (tok == "-o" or tok == "--output") and i + 1 < len(argv):
-            output_path = argv[i + 1]
+        if tok == "--output-dir" and i + 1 < len(argv):
+            output_dir = argv[i + 1]
             i += 2
             continue
         if not tok.startswith("-") and input_path == "":
@@ -34,17 +33,10 @@ def main() -> int:
         i += 1
 
     if input_path == "":
-        print("error: input file is required", file=sys.stderr)
+        print("error: input link-output.json is required", file=sys.stderr)
         return 1
-    if output_path == "":
-        output_path = Path(input_path).stem + ".go"
 
-    east_doc = json.loads(Path(input_path).read_text(encoding="utf-8"))
-    source = transpile_to_go(east_doc)
-    Path(output_path).parent.mkdir(parents=True, exist_ok=True)
-    Path(output_path).write_text(source, encoding="utf-8")
-    print("generated: " + output_path)
-    return 0
+    return emit_all_modules(input_path, output_dir, ".go", transpile_to_go)
 
 
 if __name__ == "__main__":
