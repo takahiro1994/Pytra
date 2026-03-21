@@ -1100,17 +1100,57 @@ class ZigNativeEmitter:
         raise RuntimeError("lang=zig unsupported stmt kind: " + str(kind))
 
     def _emit_var_decl(self, stmt: dict[str, Any]) -> None:
-        """Emit a hoisted variable declaration (VarDecl node)."""
+        """Emit a hoisted variable declaration (VarDecl node).
+
+        If the variable is captured by a nested for loop (ForCore target_plan),
+        skip the VarDecl to avoid shadow errors in Zig.
+        """
         name_raw = stmt.get("name")
         name = _safe_ident(name_raw, "v") if isinstance(name_raw, str) else "v"
         var_type_any = stmt.get("type")
         var_type = var_type_any.strip() if isinstance(var_type_any, str) else ""
-        zig_ty = self._zig_type(var_type) if var_type != "" else "anytype"
         if var_type != "":
             self._current_type_map()[name] = var_type
         if len(self._local_var_stack) > 0:
             self._current_local_vars().add(name)
+        zig_ty = self._zig_type(var_type) if var_type != "" else "anytype"
         self._emit_line("var " + name + ": " + zig_ty + " = undefined;")
+
+    def _is_for_capture_var(self, name: str) -> bool:
+        """Check if name is used as a for-loop capture variable in current function body."""
+        # Walk the current function's body to find ForCore with matching target
+        if len(self._local_var_stack) == 0:
+            return False
+        # Search east_doc body recursively for ForCore target matching name
+        body = self.east_doc.get("body", [])
+        return self._find_for_capture(body, name)
+
+    def _find_for_capture(self, nodes: Any, name: str) -> bool:
+        if not isinstance(nodes, list):
+            return False
+        for node in nodes:
+            if not isinstance(node, dict):
+                continue
+            kind = node.get("kind", "")
+            if kind == "ForCore":
+                tp = node.get("target_plan")
+                if isinstance(tp, dict) and tp.get("kind") == "NameTarget":
+                    if _safe_ident(tp.get("id"), "") == name:
+                        return True
+                if self._find_for_capture(node.get("body", []), name):
+                    return True
+            elif kind == "FunctionDef":
+                if self._find_for_capture(node.get("body", []), name):
+                    return True
+            elif kind == "While":
+                if self._find_for_capture(node.get("body", []), name):
+                    return True
+            elif kind == "If":
+                if self._find_for_capture(node.get("body", []), name):
+                    return True
+                if self._find_for_capture(node.get("orelse", []), name):
+                    return True
+        return False
 
     def _resolve_arg_zig_type(self, arg_name: str, raw_name: Any, arg_types: dict[str, Any]) -> str:
         """引数の型を EAST3 の arg_types から解決して Zig 型を返す。"""
@@ -1213,9 +1253,16 @@ class ZigNativeEmitter:
                     elif iter_type in {"bytearray", "bytes"}:
                         elem = "u8"
                     iter_expr = "pytra.list_items(" + iter_expr + ", " + elem + ")"
-                self._emit_line("for (" + iter_expr + ") |" + target_name + "| {")
+                capture_name = target_name
+                reassign_after_capture = False
+                if len(self._local_var_stack) > 0 and target_name in self._current_local_vars():
+                    capture_name = "_cap_" + target_name
+                    reassign_after_capture = True
+                self._emit_line("for (" + iter_expr + ") |" + capture_name + "| {")
                 self.indent += 1
-                if len(self._local_var_stack) > 0:
+                if reassign_after_capture:
+                    self._emit_line(target_name + " = " + capture_name + ";")
+                elif len(self._local_var_stack) > 0:
                     self._current_local_vars().add(target_name)
                 self._emit_block(stmt.get("body"))
                 self.indent -= 1
@@ -1238,9 +1285,16 @@ class ZigNativeEmitter:
             elif iter_type in {"bytearray", "bytes"}:
                 elem = "u8"
             iter_expr = "pytra.list_items(" + iter_expr + ", " + elem + ")"
-        self._emit_line("for (" + iter_expr + ") |" + target_name + "| {")
+        capture_name = target_name
+        reassign_after_capture = False
+        if len(self._local_var_stack) > 0 and target_name in self._current_local_vars():
+            capture_name = "_cap_" + target_name
+            reassign_after_capture = True
+        self._emit_line("for (" + iter_expr + ") |" + capture_name + "| {")
         self.indent += 1
-        if len(self._local_var_stack) > 0:
+        if reassign_after_capture:
+            self._emit_line(target_name + " = " + capture_name + ";")
+        elif len(self._local_var_stack) > 0:
             self._current_local_vars().add(target_name)
         self._emit_block(stmt.get("body"))
         self.indent -= 1
