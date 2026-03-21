@@ -1,12 +1,8 @@
 #ifndef PYTRA_CORE_RC_OPS_H
 #define PYTRA_CORE_RC_OPS_H
 
-#include <type_traits>
-#include "core/py_types.h"
-
-template <class T, ::std::enable_if_t<::std::is_arithmetic_v<T>, int> = 0>
-static inline auto operator-(const rc<T>& v) -> decltype(v->__neg__()) {
-    return v->__neg__();
-}
+// Legacy header — rc<T> operator overloads removed.
+// Object<T> replaces rc<T> for all user-defined class management.
+// This empty header is kept for backward compatibility with generated .cpp files.
 
 #endif  // PYTRA_CORE_RC_OPS_H
