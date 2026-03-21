@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""Scala backend: link-output.json → Scala multi-file output.
+"""Scala backend: link-output.json → Scala single-file output.
+
+All linked modules are merged into a single .scala file to avoid
+top-level definition collisions in Scala 3.
 
 Usage:
     python3 -m toolchain.emit.scala LINK_OUTPUT.json --output-dir out/scala/
@@ -7,11 +10,10 @@ Usage:
 
 from __future__ import annotations
 
-import json
 import sys
 from pathlib import Path
 
-from toolchain.emit.scala.emitter import transpile_to_scala_native
+from toolchain.emit.scala.emitter.scala_native_emitter import transpile_to_scala_native
 from toolchain.emit.loader import load_linked_modules
 
 
@@ -42,17 +44,48 @@ def main() -> int:
     out = Path(output_dir)
     out.mkdir(parents=True, exist_ok=True)
 
+    # Collect all module sources: submodules first, then entry module
+    submodule_sources: list[str] = []
+    entry_source = ""
+    entry_stem = ""
+
     for mod in modules:
         module_id = mod["module_id"]
         east_doc = mod["east_doc"]
         is_entry = mod.get("is_entry", False)
-        rel_path = module_id.replace(".", "/") + ".scala"
-        out_path = out / rel_path
-        out_path.parent.mkdir(parents=True, exist_ok=True)
 
-        source = transpile_to_scala_native(east_doc, emit_main=is_entry)
-        out_path.write_text(source, encoding="utf-8")
-        print("generated: " + str(out_path))
+        if is_entry:
+            entry_source = transpile_to_scala_native(east_doc, emit_main=True)
+            entry_stem = module_id
+        else:
+            source = transpile_to_scala_native(east_doc, emit_main=False)
+            submodule_sources.append("// --- module: " + module_id + " ---\n" + source)
+
+    # Merge into single file
+    merged_parts: list[str] = []
+    # Collect unique import lines from all sources
+    all_imports: set[str] = set()
+    all_body_lines: list[str] = []
+
+    for src in submodule_sources + [entry_source]:
+        for line in src.split("\n"):
+            stripped = line.strip()
+            if stripped.startswith("import "):
+                all_imports.add(stripped)
+            else:
+                all_body_lines.append(line)
+
+    merged_parts.extend(sorted(all_imports))
+    merged_parts.append("")
+    merged_parts.extend(all_body_lines)
+
+    merged = "\n".join(merged_parts)
+
+    if entry_stem == "":
+        entry_stem = "main"
+    out_path = out / (entry_stem + ".scala")
+    out_path.write_text(merged, encoding="utf-8")
+    print("generated: " + str(out_path))
 
     return 0
 

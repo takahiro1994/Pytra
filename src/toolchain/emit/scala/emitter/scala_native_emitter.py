@@ -348,7 +348,7 @@ def _scala_type(type_name: Any, *, allow_void: bool) -> str:
     ts2: str = type_name
     if type_name == "None":
         return "Unit" if allow_void else "Any"
-    if type_name in {"int", "int64", "uint8"}:
+    if type_name in {"int", "int32", "int64", "uint8"}:
         return "Long"
     if type_name in {"float", "float64"}:
         return "Double"
@@ -1399,12 +1399,12 @@ def _render_call_expr(expr: dict[str, Any]) -> str:
         if isinstance(owner_any, dict) and owner_any.get("kind") == "Name":
             owner_ident = _safe_ident(owner_any.get("id"), "")
             if owner_ident in _PYTRA_MODULE_IMPORTS[0]:
-                rendered_args = []
+                rendered_args_m: list[str] = []
                 i = 0
                 while i < len(args):
-                    rendered_args.append(_render_expr(args[i]))
+                    rendered_args_m.append(_render_expr(args[i]))
                     i += 1
-                return method + "(" + ", ".join(rendered_args) + ")"
+                return method + "(" + ", ".join(rendered_args_m) + ")"
         owner_expr = _render_expr(owner_any)
         rendered_args: list[str] = []
         i = 0
@@ -2859,7 +2859,7 @@ def _emit_class(cls: dict[str, Any], *, indent: str) -> list[str]:
     return lines
 
 
-def transpile_to_scala_native(east_doc: dict[str, Any], *, emit_main: bool = True) -> str:
+def transpile_to_scala_native(east_doc: dict[str, Any], *, emit_main: bool = True, object_wrapper: str = "") -> str:
     """Emit Scala 3 native source from EAST3 Module."""
     if not isinstance(east_doc, dict):
         raise RuntimeError("scala native emitter: east_doc must be dict")
@@ -3012,4 +3012,25 @@ def transpile_to_scala_native(east_doc: dict[str, Any], *, emit_main: bool = Tru
             if has_case_main:
                 lines.append("    _case_main()")
         lines.append("}")
+    if object_wrapper != "":
+        wrapped: list[str] = []
+        # Keep import lines at top level
+        for line in lines:
+            stripped = line.strip()
+            if stripped.startswith("import "):
+                wrapped.append(line)
+            else:
+                break
+        body_start = len(wrapped)
+        wrapped.append("object " + object_wrapper + " {")
+        i = body_start
+        while i < len(lines):
+            line = lines[i]
+            if line.strip() == "":
+                wrapped.append("")
+            else:
+                wrapped.append("    " + line)
+            i += 1
+        wrapped.append("}")
+        return "\n".join(wrapped)
     return "\n".join(lines)
