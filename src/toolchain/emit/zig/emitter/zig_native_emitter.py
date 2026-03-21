@@ -1938,6 +1938,11 @@ class ZigNativeEmitter:
                     return "&[_]u8{}"
                 if fname == "perf_counter":
                     return "pytra.perf_counter()"
+                if fname == "@\"extern\"" or fname == "extern":
+                    # @extern(value) → value を直接返す
+                    if len(arg_strs) > 0:
+                        return arg_strs[0]
+                    return "0"
                 if fname == "open":
                     if len(arg_strs) > 0:
                         return "pytra.file_open(" + arg_strs[0] + ")"
