@@ -46,7 +46,8 @@ def _safe_ident(name: Any, fallback: str) -> str:
         out = fallback
     if out[0].isdigit():
         out = "_" + out
-    if out in _PS_KEYWORDS or out in _PS_AUTOMATIC_VARS:
+    out_lower = out.lower()
+    if out_lower in _PS_KEYWORDS or any(out_lower == v.lower() for v in _PS_AUTOMATIC_VARS):
         out = out + "_"
     return out
 
