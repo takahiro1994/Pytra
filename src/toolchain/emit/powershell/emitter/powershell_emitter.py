@@ -608,6 +608,13 @@ def _render_call_expr(expr: dict[str, Any]) -> str:
                 return owner + "." + attr + "()"
             return owner + "." + attr + "(" + ", ".join(rendered_args) + ")"
 
+    # Lambda immediate call: { param($x) expr } arg -> & { param($x) expr } arg
+    if isinstance(func, dict) and _get_str(func, "kind") == "Lambda":
+        fn_rendered = _render_expr(func)
+        if len(rendered_args) == 0:
+            return "(& " + fn_rendered + ")"
+        return "(& " + fn_rendered + " " + " ".join(rendered_args) + ")"
+
     fn_rendered = _render_expr(func)
     if len(rendered_args) == 0:
         return fn_rendered
