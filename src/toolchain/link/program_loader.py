@@ -99,6 +99,9 @@ def add_runtime_east_to_module_map(
                                         east_path = _resolve_runtime_east_path(name)
                                         if east_path is not None and str(east_path) not in seen_paths:
                                             new_deps.append((str(east_path), east_path))
+            # Detect implicit format_value dependency from f-string format_spec
+            _scan_format_spec_dep(east_doc, seen_paths, new_deps)
+
         for path_str, east_path in new_deps:
             if path_str in seen_paths:
                 continue
@@ -110,6 +113,35 @@ def add_runtime_east_to_module_map(
             except Exception:
                 pass
     return result
+
+
+def _has_format_spec(node: object) -> bool:
+    """EAST ノードツリーに format_spec を持つ FormattedValue が含まれるか再帰検査する。"""
+    if isinstance(node, dict):
+        if node.get("kind") == "FormattedValue":
+            fs = node.get("format_spec")
+            if isinstance(fs, str) and fs != "":
+                return True
+        for v in node.values():
+            if _has_format_spec(v):
+                return True
+    elif isinstance(node, list):
+        for item in node:
+            if _has_format_spec(item):
+                return True
+    return False
+
+
+def _scan_format_spec_dep(
+    east_doc: dict[str, object],
+    seen_paths: set[str],
+    new_deps: list[tuple[str, Path]],
+) -> None:
+    """f-string format_spec が存在すれば pytra.built_in.format_value を暗黙依存に追加する。"""
+    if _has_format_spec(east_doc):
+        ep = _resolve_runtime_east_path("pytra.built_in.format_value")
+        if ep is not None and str(ep) not in seen_paths:
+            new_deps.append((str(ep), ep))
 
 
 def _load_raw_east3(path: Path) -> dict[str, object]:

@@ -77,6 +77,23 @@ def _get_dict(d: dict[str, Any], key: str) -> dict[str, Any]:
     return v if isinstance(v, dict) else {}
 
 
+def _has_format_spec_in_doc(doc: Any) -> bool:
+    """EAST doc 内に format_spec を持つ FormattedValue があるか検査する。"""
+    if isinstance(doc, dict):
+        if doc.get("kind") == "FormattedValue":
+            fs = doc.get("format_spec")
+            if isinstance(fs, str) and fs != "":
+                return True
+        for v in doc.values():
+            if _has_format_spec_in_doc(v):
+                return True
+    elif isinstance(doc, list):
+        for item in doc:
+            if _has_format_spec_in_doc(item):
+                return True
+    return False
+
+
 _IGNORED_IMPORT_MODULES: set[str] = {
     "typing", "pytra.typing", "dataclasses", "__future__",
     "pytra.utils.assertions",
@@ -444,7 +461,14 @@ def _render_expr(expr_any: Any) -> str:
                     segments.append(escaped)
             elif pk == "FormattedValue":
                 inner = _render_expr(part_d.get("value"))
-                segments.append("$(" + inner + ")")
+                conversion = _get_str(part_d, "conversion")
+                format_spec = _get_str(part_d, "format_spec")
+                if conversion != "" and conversion != "-1":
+                    segments.append("$(py_format_conversion " + inner + " " + _ps_string_literal(conversion) + ")")
+                elif format_spec != "":
+                    segments.append("$(py_format_value " + inner + " " + _ps_string_literal(format_spec) + ")")
+                else:
+                    segments.append("$(" + inner + ")")
             else:
                 segments.append("$(" + _render_expr(part_d) + ")")
         return '"' + "".join(segments) + '"'
@@ -1462,6 +1486,11 @@ def transpile_to_powershell(east_doc: dict[str, Any]) -> str:
         "$ErrorActionPreference = \"Stop\"",
         "",
     ]
+
+    # Detect implicit format_value dependency (f-string format_spec)
+    if _has_format_spec_in_doc(east_doc):
+        lines.append('. (Join-Path $PSScriptRoot "format_value/east.ps1")')
+        lines.append("")
 
     # Emit module-level leading comments
     comments = _get_list(east_doc, "leading_comments")
