@@ -6159,14 +6159,11 @@ def head(xs: tuple[int, ...]) -> int:
         src_py = find_fixture_case("type_alias_pep695")
         east = load_east(src_py)
         cpp = transpile_to_cpp(east)
-        self.assertIn("struct Scalar {", cpp)
-        self.assertIn("pytra_type_id tag;", cpp)
+        # Object<T> mode: type alias emits `using Scalar = object;`
+        self.assertIn("using Scalar = object;", cpp)
         self.assertIn("PYTRA_TID_INT", cpp)
-        self.assertIn("PYTRA_TID_FLOAT", cpp)
         self.assertIn("const Scalar&", cpp)
         self.assertNotIn("::std::variant", cpp)
-        self.assertNotIn("using Scalar", cpp)
-        self.assertNotIn("enum Tag", cpp)
 
 
 if __name__ == "__main__":
