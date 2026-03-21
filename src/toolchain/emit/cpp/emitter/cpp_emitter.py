@@ -2122,30 +2122,6 @@ class CppEmitter(CppAnalysisEmitter, CppModuleEmitter, CppClassEmitter, CppTypeB
             return "object"
         return l
 
-    def _predeclare_if_join_names(self, body_stmts: list[dict[str, Any]], else_stmts: list[dict[str, Any]]) -> None:
-        """if/else 両分岐で代入される名前を外側スコープへ事前宣言する。"""
-        if len(else_stmts) == 0:
-            return
-        body_types = self._collect_assigned_name_types(body_stmts)
-        else_types = self._collect_assigned_name_types(else_stmts)
-        for name, _body_ty in body_types.items():
-            _ = _body_ty
-            if name == "":
-                continue
-            if name not in else_types:
-                continue
-            if self.is_declared(name):
-                continue
-            decl_t = self._merge_decl_types_for_branch_join(body_types[name], else_types[name])
-            decl_t = decl_t if decl_t != "" else "object"
-            cpp_t = self._cpp_type_text(decl_t)
-            fallback_to_object = cpp_t in {"", "auto"}
-            decl_t = "object" if fallback_to_object else decl_t
-            cpp_t = "object" if fallback_to_object else cpp_t
-            self.emit(f"{cpp_t} {name};")
-            self.declare_in_current_scope(name)
-            self.declared_var_types[name] = decl_t
-
     def _can_omit_braces_for_single_stmt(self, stmts: list[dict[str, Any]]) -> bool:
         """単文ブロックで波括弧を省略可能か判定する。"""
         if not self._opt_ge(1):
@@ -2244,6 +2220,7 @@ class CppEmitter(CppAnalysisEmitter, CppModuleEmitter, CppClassEmitter, CppTypeB
             "Import": self._emit_noop_stmt,
             "ImportFrom": self._emit_noop_stmt,
             "TypeAlias": self._emit_type_alias_stmt,
+            "VarDecl": self._emit_var_decl_stmt,
         }
         handler = dispatch.get(kind)
         if not callable(handler):
@@ -2310,6 +2287,22 @@ class CppEmitter(CppAnalysisEmitter, CppModuleEmitter, CppClassEmitter, CppTypeB
         self.emit(open_line)
         self.emit_scoped_stmt_list(stmts, scope_names)
         self.emit_block_close()
+
+    def _emit_var_decl_stmt(self, stmt: dict[str, Any]) -> None:
+        """Emit a hoisted variable declaration (VarDecl node)."""
+        name = self.any_to_str(stmt.get("name"))
+        if name == "":
+            return
+        var_type = self.any_to_str(stmt.get("type"))
+        if var_type == "":
+            var_type = "object"
+        cpp_t = self._cpp_type_text(var_type)
+        if cpp_t in {"", "auto"}:
+            cpp_t = "object"
+            var_type = "object"
+        self.emit(f"{cpp_t} {name};")
+        self.declare_in_current_scope(name)
+        self.declared_var_types[name] = var_type
 
     def _emit_type_alias_stmt(self, stmt: dict[str, Any]) -> None:
         name = self.any_to_str(stmt.get("name"))

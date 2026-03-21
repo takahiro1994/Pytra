@@ -182,7 +182,7 @@ class East3OptimizerTest(unittest.TestCase):
         out_doc, report = optimize_east3_document(
             doc,
             opt_level="1",
-            opt_pass_spec="-NoOpCastCleanupPass,-LiteralCastFoldPass,-IdentityPyToElisionPass,-NumericCastChainReductionPass,-RangeForCanonicalizationPass,-ExpressionNormalizationPass,-EmptyInitShorthandPass,-SafeReserveHintPass,-TypedEnumerateNormalizationPass,-TypedRepeatMaterializationPass,-DictStrKeyNormalizationPass,-TupleTargetDirectExpansionPass,-LifetimeAnalysisPass,-LoopInvariantCastHoistPass,-UnusedLoopVarElisionPass,-LoopInvariantHoistLitePass,-StrengthReductionFloatLoopPass",
+            opt_pass_spec="-NoOpCastCleanupPass,-LiteralCastFoldPass,-IdentityPyToElisionPass,-NumericCastChainReductionPass,-RangeForCanonicalizationPass,-ExpressionNormalizationPass,-EmptyInitShorthandPass,-SafeReserveHintPass,-TypedEnumerateNormalizationPass,-TypedRepeatMaterializationPass,-DictStrKeyNormalizationPass,-TupleTargetDirectExpansionPass,-LifetimeAnalysisPass,-UnusedLoopVarElisionPass,-StrengthReductionFloatLoopPass",
         )
         self.assertIs(out_doc, doc)
         trace = report.get("trace")
@@ -202,9 +202,9 @@ class East3OptimizerTest(unittest.TestCase):
         self.assertNotIn("NonEscapeInterproceduralPass", by_name)
         self.assertNotIn("CppListValueLocalHintPass", by_name)
         self.assertFalse(by_name.get("LifetimeAnalysisPass", True))
-        self.assertFalse(by_name.get("LoopInvariantCastHoistPass", True))
+        self.assertNotIn("LoopInvariantCastHoistPass", by_name)
         self.assertFalse(by_name.get("UnusedLoopVarElisionPass", True))
-        self.assertFalse(by_name.get("LoopInvariantHoistLitePass", True))
+        self.assertNotIn("LoopInvariantHoistLitePass", by_name)
         self.assertFalse(by_name.get("StrengthReductionFloatLoopPass", True))
         trace_text = render_east3_opt_trace(report)
         self.assertIn("NoOpCastCleanupPass", trace_text)
@@ -221,9 +221,9 @@ class East3OptimizerTest(unittest.TestCase):
         self.assertNotIn("NonEscapeInterproceduralPass", trace_text)
         self.assertNotIn("CppListValueLocalHintPass", trace_text)
         self.assertIn("LifetimeAnalysisPass", trace_text)
-        self.assertIn("LoopInvariantCastHoistPass", trace_text)
+        self.assertNotIn("LoopInvariantCastHoistPass", trace_text)
         self.assertIn("UnusedLoopVarElisionPass", trace_text)
-        self.assertIn("LoopInvariantHoistLitePass", trace_text)
+        self.assertNotIn("LoopInvariantHoistLitePass", trace_text)
         self.assertIn("StrengthReductionFloatLoopPass", trace_text)
 
     def test_cpp_list_value_local_hint_pass_marks_safe_empty_typed_list_local(self) -> None:
@@ -1542,20 +1542,18 @@ class East3OptimizerTest(unittest.TestCase):
         self.assertEqual(for_stmt_o1.get("body", [])[1].get("value", {}).get("op"), "Div")
         trace_o1 = report_o1.get("trace", [])
         by_name_o1 = {str(item.get("name", "")): bool(item.get("enabled")) for item in trace_o1 if isinstance(item, dict)}
-        self.assertFalse(by_name_o1.get("LoopInvariantHoistLitePass", True))
+        self.assertNotIn("LoopInvariantHoistLitePass", by_name_o1)
         self.assertFalse(by_name_o1.get("StrengthReductionFloatLoopPass", True))
 
         doc_o2 = _module_doc()
         doc_o2["body"] = [copy.deepcopy(base_for)]
         _, report_o2 = optimize_native(doc_o2, opt_level=2)
         body_o2 = doc_o2.get("body")
-        self.assertEqual(body_o2[0].get("kind"), "Assign")
-        self.assertEqual(body_o2[1].get("kind"), "ForCore")
-        for_stmt_o2 = body_o2[1]
-        self.assertEqual(for_stmt_o2.get("body", [])[0].get("value", {}).get("op"), "Mult")
+        # With hoist passes disabled, first stmt is ForCore (no hoisted Assign)
+        self.assertEqual(body_o2[0].get("kind"), "ForCore")
         trace_o2 = report_o2.get("trace", [])
         by_name_o2 = {str(item.get("name", "")): bool(item.get("enabled")) for item in trace_o2 if isinstance(item, dict)}
-        self.assertTrue(by_name_o2.get("LoopInvariantHoistLitePass", False))
+        self.assertNotIn("LoopInvariantHoistLitePass", by_name_o2)
         self.assertTrue(by_name_o2.get("StrengthReductionFloatLoopPass", False))
 
 

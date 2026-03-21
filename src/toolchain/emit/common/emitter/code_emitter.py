@@ -723,7 +723,13 @@ class CodeEmitter:
         kind: str,
         stmt: dict[str, Any],
     ) -> bool:
-        """文 kind の既定 fallback。基底では未処理。"""
+        """文 kind の既定 fallback。VarDecl はコメントとして出力する。"""
+        if kind == "VarDecl":
+            name = self.any_to_str(stmt.get("name"))
+            var_type = self.any_to_str(stmt.get("type"))
+            if name != "":
+                self.emit("/* VarDecl: " + var_type + " " + name + " */")
+            return True
         return False
 
     def hook_on_stmt_omit_braces(
@@ -2176,6 +2182,20 @@ class CodeEmitter:
         if mapped == "":
             mapped = default_op
         return target, value, mapped
+
+    def _reserved_names(self) -> set[str]:
+        """ターゲット言語の予約語・組み込み名を返す。各 emitter でオーバーライドする。"""
+        return set()
+
+    def _safe_name(self, name: str) -> str:
+        """予約語と衝突する識別子をリネームする。衝突時は末尾に ``_`` を付加する。"""
+        reserved = self._reserved_names()
+        if len(reserved) == 0:
+            return name
+        result = name
+        while result in reserved:
+            result = result + "_"
+        return result
 
     def _is_identifier_expr(self, text: str) -> bool:
         """式文字列が単純な識別子のみかを判定する。"""

@@ -13,7 +13,6 @@ class CppStatementEmitter:
             stmt,
             cond_empty_default="false",
         )
-        self._predeclare_if_join_names(body_stmts, else_stmts)
         omit_default = self._stmt_omit_braces_default("If", stmt, False)
         omit_braces = self.hook_on_stmt_omit_braces("If", stmt, omit_default)
         if omit_braces and len(body_stmts) == 1 and len(else_stmts) <= 1:

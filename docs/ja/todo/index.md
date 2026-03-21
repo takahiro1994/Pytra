@@ -43,6 +43,12 @@
 4. [x] [ID: P0-BLOCK-SCOPE-VAR-HOIST-01-S4] ユニットテストを追加する（if/else, for, while, nested blocks）。
 5. [x] [ID: P0-BLOCK-SCOPE-VAR-HOIST-01-S5] Dart/Zig/Julia emitter が hoist 済み EAST3 で正しく動作することを検証する。
 
+#### P0-20: ループ不変式 hoist 最適化パスの無効化
+
+文脈: [docs/ja/plans/p0-disable-loop-invariant-hoist-passes.md](../plans/p0-disable-loop-invariant-hoist-passes.md)
+
+1. [x] [ID: P0-DISABLE-LOOP-HOIST-01] `__init__.py` の pass 列から 2 パスを除去し、テスト検証する。
+
 #### P0-11: PowerShell native emitter 実行 parity
 
 文脈: [docs/ja/plans/p0-powershell-native-emitter-execution-parity.md](../plans/p0-powershell-native-emitter-execution-parity.md)
@@ -160,6 +166,24 @@
 
 1. [x] [ID: P2-LINKER-SUBMODULE-IMPORT-01] `program_loader.py` の `ImportFrom` 処理で import names のサブモジュール解決を追加する。
 2. [x] [ID: P2-LINKER-SUBMODULE-IMPORT-02] 既存テストのリグレッションがないことを検証する。
+
+### P2: built-in 依存を EAST1 → linker 経由で解決
+
+文脈: [docs/ja/plans/p2-builtin-dependency-via-linker.md](../plans/p2-builtin-dependency-via-linker.md)
+
+1. [x] [ID: P2-BUILTIN-VIA-LINKER-01] EAST1 パーサーに built-in → module 対応テーブルを追加し、`import_bindings` に暗黙依存を記録する。
+2. [x] [ID: P2-BUILTIN-VIA-LINKER-02] linker が `pytra.built_in.*` を link-output manifest に含めることを検証する。
+3. [ ] [ID: P2-BUILTIN-VIA-LINKER-03] 全 emitter（C++ 含む）から `py_runtime.*` / ヘッダーの決め打ちバンドルを除去する（`@extern` 関数の扱い確定後）。
+4. [x] [ID: P2-BUILTIN-VIA-LINKER-04] 既存テストのリグレッションがないことを検証する。
+
+### P2: emitter 予約語回避
+
+文脈: [docs/ja/plans/p2-emitter-reserved-name-escape.md](../plans/p2-emitter-reserved-name-escape.md)
+
+1. [x] [ID: P2-RESERVED-NAME-ESCAPE-01] `CodeEmitter` に `_reserved_names()` / `_safe_name()` を追加する。
+2. [x] [ID: P2-RESERVED-NAME-ESCAPE-02] Julia emitter に予約語リストを追加し、識別子出力で `_safe_name()` を使用する。
+3. [ ] [ID: P2-RESERVED-NAME-ESCAPE-03] 他の主要 emitter（Dart, Zig, C++）にも予約語リストを追加する。
+4. [x] [ID: P2-RESERVED-NAME-ESCAPE-04] テスト検証（sample/16 Julia 通過、リグレッションなし）。
 
 ### P3: pyobj list alias escape 解析を EAST3 パスへ移行
 

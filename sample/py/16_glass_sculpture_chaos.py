@@ -195,9 +195,9 @@ def render_frame(width: int, height: int, frame_id: int, frames_n: int) -> bytes
             elif hit_kind == 1:
                 hx = cam_x + best_t * dx
                 hz = cam_z + best_t * dz
-                cx = int(math.floor(hx * 2.0))
-                cz = int(math.floor(hz * 2.0))
-                checker = 0 if (cx + cz) % 2 == 0 else 1
+                cx_i = int(math.floor(hx * 2.0))
+                cz_i = int(math.floor(hz * 2.0))
+                checker = 0 if (cx_i + cz_i) % 2 == 0 else 1
                 base_r = 0.10 if checker == 0 else 0.04
                 base_g = 0.11 if checker == 0 else 0.05
                 base_b = 0.13 if checker == 0 else 0.08

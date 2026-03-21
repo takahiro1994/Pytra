@@ -10,8 +10,9 @@ from toolchain.compile.east3_opt_passes.expression_normalization_pass import Exp
 from toolchain.compile.east3_opt_passes.identity_py_to_elision_pass import IdentityPyToElisionPass
 from toolchain.compile.east3_opt_passes.lifetime_analysis_pass import LifetimeAnalysisPass
 from toolchain.compile.east3_opt_passes.literal_cast_fold_pass import LiteralCastFoldPass
-from toolchain.compile.east3_opt_passes.loop_invariant_cast_hoist_pass import LoopInvariantCastHoistPass
-from toolchain.compile.east3_opt_passes.loop_invariant_hoist_lite_pass import LoopInvariantHoistLitePass
+# LoopInvariantCastHoistPass / LoopInvariantHoistLitePass are disabled:
+# target language compilers perform the same optimization, and the synthetic
+# variable names (__hoisted_cast_N) break source-code correspondence.
 from toolchain.compile.east3_opt_passes.numeric_cast_chain_reduction_pass import NumericCastChainReductionPass
 from toolchain.compile.east3_opt_passes.noop_cast_cleanup_pass import NoOpCastCleanupPass
 from toolchain.compile.east3_opt_passes.range_for_canonicalization_pass import RangeForCanonicalizationPass
@@ -40,9 +41,7 @@ def build_local_only_passes() -> list[object]:
         DictStrKeyNormalizationPass(),
         TupleTargetDirectExpansionPass(),
         LifetimeAnalysisPass(),
-        LoopInvariantCastHoistPass(),
         UnusedLoopVarElisionPass(),
-        LoopInvariantHoistLitePass(),
         StrengthReductionFloatLoopPass(),
     ]
 

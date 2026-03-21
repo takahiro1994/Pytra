@@ -28,9 +28,10 @@ def load_linked_modules(input_path: str) -> tuple[list[dict[str, Any]], list[str
 
     schema = raw.get("schema", "")
     if schema != LINK_OUTPUT_SCHEMA:
-        # Treat as raw EAST3 — wrap in single-module list
-        module_id = raw.get("meta", {}).get("module_id", p.stem)
-        return [{"module_id": module_id, "east_doc": raw, "source_path": str(p), "is_entry": True}], [module_id]
+        raise RuntimeError(
+            f"link-output manifest required: expected schema={LINK_OUTPUT_SCHEMA!r}, "
+            f"got {schema!r}. Raw EAST3 JSON is not accepted; run the linker first."
+        )
 
     entry_modules_any = raw.get("entry_modules", [])
     entry_modules: list[str] = []

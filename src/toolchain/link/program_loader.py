@@ -77,6 +77,18 @@ def add_runtime_east_to_module_map(
                             east_path = _resolve_runtime_east_path(mod)
                             if east_path is not None and str(east_path) not in seen_paths:
                                 new_deps.append((str(east_path), east_path))
+                            # Also try {module}.{name} for sub-module imports
+                            # e.g. from pytra.utils import png → pytra.utils.png
+                            names = stmt.get("names")
+                            if isinstance(names, list):
+                                for ent in names:
+                                    if isinstance(ent, dict):
+                                        sym = ent.get("name")
+                                        if isinstance(sym, str) and sym != "":
+                                            sub_mod = mod + "." + sym
+                                            sub_path = _resolve_runtime_east_path(sub_mod)
+                                            if sub_path is not None and str(sub_path) not in seen_paths:
+                                                new_deps.append((str(sub_path), sub_path))
                     elif kind == "Import":
                         names = stmt.get("names")
                         if isinstance(names, list):

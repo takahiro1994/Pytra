@@ -246,7 +246,6 @@ def cmd_build(argv: list[str]) -> int:
         # Compiled languages: compile first, then run
         compile_map: dict[str, list[list[str]]] = {
             "rs": [["rustc", "-O", entry_output, "-o", output_dir + "/" + exe_name]],
-            "cs": [["dotnet-script", entry_output]],
             "swift": [["swiftc", entry_output, "-o", output_dir + "/" + exe_name]],
             "kotlin": [["kotlinc", entry_output, "-include-runtime", "-d", output_dir + "/" + entry_stem + ".jar"]],
         }
@@ -255,6 +254,22 @@ def cmd_build(argv: list[str]) -> int:
             "swift": [output_dir + "/" + exe_name],
             "kotlin": ["java", "-cp", output_dir + "/" + entry_stem + ".jar", "pytra_" + entry_stem.replace("-", "_")],
         }
+
+        # C#: collect all .cs in output-dir, compile with mcs, run with mono
+        if target == "cs":
+            cs_exe = output_dir + "/" + entry_stem + "_cs.exe"
+            cs_files: list[str] = []
+            import os as _os
+            for root_dir, dirs, files in _os.walk(output_dir):
+                for f in sorted(files):
+                    if f.endswith(".cs"):
+                        cs_files.append(_os.path.join(root_dir, f))
+            mcs_cmd = ["mcs", "-warn:0", "-out:" + cs_exe] + cs_files
+            result = _run(mcs_cmd)
+            if result.returncode != 0:
+                return result.returncode
+            result = _run(["mono", cs_exe])
+            return result.returncode
 
         if target in compile_map:
             for compile_cmd in compile_map[target]:

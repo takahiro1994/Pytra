@@ -61,7 +61,7 @@ class TargetProfile:
 _TARGET_PROFILES: dict[str, TargetProfile] = {
     "cpp": TargetProfile(target="cpp", extension=".cpp", build_driver="cpp_make", fixed_output_name="", allow_codegen_opt=True, runner_needs=("python", "make", "g++")),
     "rs": TargetProfile(target="rs", extension=".rs", build_driver="noncpp", fixed_output_name="", allow_codegen_opt=False, runner_needs=("python", "rustc")),
-    "cs": TargetProfile(target="cs", extension=".cs", build_driver="noncpp", fixed_output_name="", allow_codegen_opt=False, runner_needs=("python", "mcs", "mono")),
+    "cs": TargetProfile(target="cs", extension=".cs", build_driver="noncpp", fixed_output_name="", allow_codegen_opt=False, runner_needs=("python", "mcs")),
     "js": TargetProfile(target="js", extension=".js", build_driver="noncpp", fixed_output_name="", allow_codegen_opt=False, runner_needs=("python", "node")),
     "ts": TargetProfile(target="ts", extension=".ts", build_driver="noncpp", fixed_output_name="", allow_codegen_opt=False, runner_needs=("python", "node", "npx")),
     "go": TargetProfile(target="go", extension=".go", build_driver="noncpp", fixed_output_name="", allow_codegen_opt=False, runner_needs=("python", "go")),

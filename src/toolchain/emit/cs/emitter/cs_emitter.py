@@ -521,6 +521,10 @@ class CSharpEmitter(CodeEmitter):
             return ""
         if module_name.startswith("pytra."):
             return "Pytra.CsModule"
+        # Bare stdlib module names (time, math, etc.) used in @extern imports
+        # also live under Pytra.CsModule namespace.
+        if "pytra.std." + module_name in _CS_CANONICAL_RUNTIME_OWNER_BY_MODULE:
+            return "Pytra.CsModule"
         return module_name
 
     def _module_alias_target(self, module_id: str, export_name: str, binding_kind: str) -> str:
@@ -1516,7 +1520,8 @@ class CSharpEmitter(CodeEmitter):
             self._emit_class(cls)
             self.emit("")
 
-        self.emit("public static class Program")
+        _class_name = getattr(self, "_class_name", "Program")
+        self.emit("public static class " + _class_name)
         self.emit("{")
         self.indent += 1
 
@@ -1530,12 +1535,14 @@ class CSharpEmitter(CodeEmitter):
             main_body.append(stmt)
         for stmt in main_guard_body:
             main_body.append(stmt)
-        self.emit("public static void Main(string[] args)")
-        self.emit("{")
-        self.indent += 1
-        self.emit_scoped_stmt_list(main_body, {"args"})
-        self.indent -= 1
-        self.emit("}")
+        _emit_main = getattr(self, "_emit_main", True)
+        if _emit_main:
+            self.emit("public static void Main(string[] args)")
+            self.emit("{")
+            self.indent += 1
+            self.emit_scoped_stmt_list(main_body, {"args"})
+            self.indent -= 1
+            self.emit("}")
 
         if self.needs_enumerate_helper:
             self.emit("")
@@ -3303,9 +3310,22 @@ class CSharpEmitter(CodeEmitter):
         )
 
 
-def transpile_to_csharp(east_doc: dict[str, Any]) -> str:
-    """EAST ドキュメントを C# コードへ変換する。"""
+def transpile_to_csharp(
+    east_doc: dict[str, Any],
+    *,
+    emit_main: bool = True,
+    class_name: str = "Program",
+) -> str:
+    """EAST ドキュメントを C# コードへ変換する。
+
+    Args:
+        east_doc: EAST3 ドキュメント。
+        emit_main: False の場合 Main メソッドを生成しない。
+        class_name: 生成するラッパークラスの名前。
+    """
     reject_backend_typed_vararg_signatures(east_doc, backend_name="C# backend")
     reject_backend_homogeneous_tuple_ellipsis_type_exprs(east_doc, backend_name="C# backend")
     emitter = CSharpEmitter(east_doc)
+    emitter._emit_main = emit_main
+    emitter._class_name = class_name
     return emitter.transpile()

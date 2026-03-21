@@ -53,6 +53,32 @@ _JULIA_KEYWORDS = {
     "using",
     "while",
 }
+# Julia Base built-in names that user-defined identifiers must not shadow.
+_JULIA_RESERVED_BUILTINS = {
+    "length", "size", "string", "print", "println", "display",
+    "open", "read", "write", "close", "readline", "readlines",
+    "push!", "pop!", "append!", "insert!", "deleteat!",
+    "sort", "sort!", "reverse", "reverse!", "filter", "map", "reduce",
+    "sum", "prod", "minimum", "maximum", "any", "all",
+    "keys", "values", "pairs", "haskey", "get", "merge",
+    "parse", "tryparse", "repr", "show",
+    "error", "throw", "rethrow",
+    "collect", "enumerate", "zip", "range",
+    "abs", "sign", "div", "rem", "mod",
+    "sqrt", "exp", "log", "sin", "cos", "tan",
+    "floor", "ceil", "round", "trunc",
+    "convert", "promote", "typeof", "isa",
+    "copy", "deepcopy", "hash", "isequal",
+    "iterate", "eltype", "first", "last", "step",
+    "isempty", "isnothing", "ismissing",
+    "fill", "zeros", "ones",
+    "Array", "Vector", "Matrix", "Dict", "Set", "Tuple", "Pair",
+    "Int", "Int8", "Int16", "Int32", "Int64",
+    "UInt", "UInt8", "UInt16", "UInt32", "UInt64",
+    "Float16", "Float32", "Float64",
+    "Bool", "Char", "String", "Symbol",
+    "Nothing", "Missing", "Any",
+}
 _COMPILETIME_STD_IMPORT_SYMBOLS = {"abi", "template", "extern"}
 
 
@@ -75,6 +101,8 @@ def _safe_ident(name: Any, fallback: str = "value") -> str:
         out = "_" + out
     if out in _JULIA_KEYWORDS:
         out = "_" + out
+    while out in _JULIA_RESERVED_BUILTINS:
+        out = out + "_"
     return out
 
 

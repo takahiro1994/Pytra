@@ -1393,6 +1393,27 @@ def convert_source_to_east_self_hosted_impl(source: str, filename: str) -> dict[
             renamed_symbols["main"] = "__pytra_main"
             item["name"] = "__pytra_main"
 
+    # built-in 暗黙依存: body を走査して使用 built-in モジュールを特定し import_bindings に追加
+    from toolchain.compile.core_builtin_module_registry import collect_implicit_builtin_modules
+    implicit_builtin_modules = collect_implicit_builtin_modules(body_items + main_stmts)
+    existing_module_ids: set[str] = set()
+    for binding in import_bindings:
+        mod_id = binding.get("module_id")
+        if isinstance(mod_id, str):
+            existing_module_ids.add(mod_id)
+    for builtin_mod in sorted(implicit_builtin_modules):
+        if builtin_mod not in existing_module_ids:
+            import_bindings.append(
+                _sh_make_import_binding(
+                    module_id=builtin_mod,
+                    export_name="",
+                    local_name=builtin_mod,
+                    binding_kind="implicit_builtin",
+                    source_file=filename,
+                    source_line=0,
+                )
+            )
+
     # 互換メタデータは ImportBinding 正本から導出する。
     import_module_bindings = {}
     import_symbol_bindings = {}

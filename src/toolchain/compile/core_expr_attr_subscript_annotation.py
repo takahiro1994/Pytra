@@ -8,7 +8,6 @@ from typing import Any
 from toolchain.compile.core_ast_builders import _sh_make_attribute_expr
 from toolchain.compile.core_ast_builders import _sh_make_slice_node
 from toolchain.compile.core_ast_builders import _sh_make_subscript_expr
-from toolchain.compile.core_runtime_call_semantics import _sh_annotate_resolved_runtime_expr
 from toolchain.compile.core_runtime_call_semantics import _sh_annotate_runtime_attr_expr
 
 
@@ -90,24 +89,6 @@ class _ShExprAttrSubscriptAnnotationMixin:
         if attr_semantic_tag != "":
             node["semantic_tag"] = attr_semantic_tag
 
-    def _apply_noncpp_attr_expr_annotation(
-        self,
-        *,
-        node: dict[str, Any],
-        attr_name: str,
-        noncpp_module_attr_runtime_call: str,
-        noncpp_module_id: str,
-    ) -> None:
-        """non-C++ attr annotation 適用を helper へ寄せる。"""
-        if noncpp_module_attr_runtime_call != "":
-            _sh_annotate_resolved_runtime_expr(
-                node,
-                runtime_call=noncpp_module_attr_runtime_call,
-                runtime_source="module_attr",
-                module_id=noncpp_module_id,
-                runtime_symbol=attr_name,
-            )
-
     def _apply_attr_expr_annotation(
         self,
         *,
@@ -118,8 +99,6 @@ class _ShExprAttrSubscriptAnnotationMixin:
         attr_semantic_tag: str,
         attr_module_id: str,
         attr_runtime_symbol: str,
-        noncpp_module_attr_runtime_call: str,
-        noncpp_module_id: str,
     ) -> dict[str, Any]:
         """Attribute access node への annotation 適用を helper へ寄せる。"""
         self._apply_runtime_attr_expr_annotation(
@@ -129,12 +108,6 @@ class _ShExprAttrSubscriptAnnotationMixin:
             attr_semantic_tag=attr_semantic_tag,
             attr_module_id=attr_module_id,
             attr_runtime_symbol=attr_runtime_symbol,
-        )
-        self._apply_noncpp_attr_expr_annotation(
-            node=node,
-            attr_name=attr_name,
-            noncpp_module_attr_runtime_call=noncpp_module_attr_runtime_call,
-            noncpp_module_id=noncpp_module_id,
         )
         return node
 
@@ -153,8 +126,6 @@ class _ShExprAttrSubscriptAnnotationMixin:
             attr_semantic_tag,
             attr_module_id,
             attr_runtime_symbol,
-            noncpp_module_attr_runtime_call,
-            noncpp_module_id,
         ) = self._resolve_attr_expr_annotation_state(
             owner_expr=owner_expr,
             attr_name=attr_name,
@@ -175,31 +146,25 @@ class _ShExprAttrSubscriptAnnotationMixin:
             attr_semantic_tag=attr_semantic_tag,
             attr_module_id=attr_module_id,
             attr_runtime_symbol=attr_runtime_symbol,
-            noncpp_module_attr_runtime_call=noncpp_module_attr_runtime_call,
-            noncpp_module_id=noncpp_module_id,
         )
 
     def _resolve_attr_expr_annotation(
         self,
         *,
         attr_meta: dict[str, Any],
-    ) -> tuple[str, str, str, str, str, str, str]:
+    ) -> tuple[str, str, str, str, str]:
         """Attribute access metadata dict の field unpack を helper へ寄せる。"""
         resolved_type = str(attr_meta.get("resolved_type", "unknown"))
         attr_runtime_call = str(attr_meta.get("runtime_call", ""))
         attr_semantic_tag = str(attr_meta.get("semantic_tag", ""))
         attr_module_id = str(attr_meta.get("module_id", ""))
         attr_runtime_symbol = str(attr_meta.get("runtime_symbol", ""))
-        noncpp_module_attr_runtime_call = str(attr_meta.get("noncpp_runtime_call", ""))
-        noncpp_module_id = str(attr_meta.get("noncpp_module_id", ""))
         return (
             resolved_type,
             attr_runtime_call,
             attr_semantic_tag,
             attr_module_id,
             attr_runtime_symbol,
-            noncpp_module_attr_runtime_call,
-            noncpp_module_id,
         )
 
     def _resolve_attr_expr_metadata(
@@ -208,7 +173,7 @@ class _ShExprAttrSubscriptAnnotationMixin:
         owner_expr: dict[str, Any],
         owner_t: str,
         attr_name: str,
-    ) -> tuple[str, str, str, str, str, str, str]:
+    ) -> tuple[str, str, str, str, str]:
         """Attribute access metadata の lookup と unpack を helper へ寄せる。"""
         attr_meta = self._lookup_attr_expr_metadata(owner_expr, owner_t, attr_name)
         return self._resolve_attr_expr_annotation(
@@ -221,34 +186,17 @@ class _ShExprAttrSubscriptAnnotationMixin:
         owner_expr: dict[str, Any],
         attr_name: str,
         source_span: dict[str, int],
-    ) -> tuple[str, str, str, str, str, str, str]:
+    ) -> tuple[str, str, str, str, str]:
         """Attribute access の owner-state と metadata resolve を helper へ寄せる。"""
         owner_t = self._resolve_attr_expr_owner_state(
             owner_expr=owner_expr,
             attr_name=attr_name,
             source_span=source_span,
         )
-        (
-            resolved_type,
-            attr_runtime_call,
-            attr_semantic_tag,
-            attr_module_id,
-            attr_runtime_symbol,
-            noncpp_module_attr_runtime_call,
-            noncpp_module_id,
-        ) = self._resolve_attr_expr_metadata(
+        return self._resolve_attr_expr_metadata(
             owner_expr=owner_expr,
             owner_t=owner_t,
             attr_name=attr_name,
-        )
-        return (
-            resolved_type,
-            attr_runtime_call,
-            attr_semantic_tag,
-            attr_module_id,
-            attr_runtime_symbol,
-            noncpp_module_attr_runtime_call,
-            noncpp_module_id,
         )
 
     def _build_slice_subscript_expr(

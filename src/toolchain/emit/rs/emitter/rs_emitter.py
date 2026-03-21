@@ -19,8 +19,7 @@ from toolchain.frontends.runtime_symbol_index import canonical_runtime_module_id
 _RS_PY_RUNTIME_REEXPORT_STD_MODULES: tuple[str, ...] = tuple(
     entry["module_name"]
     for entry in iter_rs_std_lane_ownership()
-    if entry["native_rel"] == "src/runtime/rs/built_in/py_runtime.rs"
-    and entry["canonical_runtime_symbol"] != ""
+    if entry["canonical_runtime_symbol"] != ""
 )
 
 
@@ -1827,7 +1826,19 @@ class RustEmitter(CodeEmitter):
         module_name = canonical_runtime_module_id(module_id.strip())
         if module_name == "":
             return ""
-        return "crate::" + module_name.replace(".", "::")
+        return "crate::" + self._dotted_to_rust_path(module_name)
+
+    @staticmethod
+    def _dotted_to_rust_path(module_name: str) -> str:
+        """ドット区切りモジュール名を Rust パス (``a::b::c``) に変換する。
+
+        py_runtime.rs が crate 直下に re-export している std モジュールは短縮パスを使う。
+        """
+        if module_name.startswith("pytra.std."):
+            leaf = module_name.split(".")[-1]
+            if leaf in _RS_PY_RUNTIME_REEXPORT_STD_MODULES:
+                return leaf
+        return module_name.replace(".", "::")
 
     def _is_assertions_module(self, module_id: str) -> bool:
         if module_id == "":
@@ -4300,9 +4311,9 @@ class RustEmitter(CodeEmitter):
             if owner_mod != "":
                 if self._is_image_utils_module(owner_mod) and len(merged_args) > 0:
                     call_args = self._apply_image_runtime_ref_args(list(merged_args))
-                    return owner_mod.replace(".", "::") + "::" + attr_raw + "(" + ", ".join(call_args) + ")"
+                    return self._dotted_to_rust_path(owner_mod) + "::" + attr_raw + "(" + ", ".join(call_args) + ")"
                 call_args = self._clone_owned_call_args(merged_args, arg_nodes)
-                return owner_mod.replace(".", "::") + "::" + attr_raw + "(" + ", ".join(call_args) + ")"
+                return self._dotted_to_rust_path(owner_mod) + "::" + attr_raw + "(" + ", ".join(call_args) + ")"
             if attr_raw == "items" and len(merged_args) == 0:
                 return "(" + owner_expr + ").clone().into_iter()"
             if attr_raw == "keys" and len(merged_args) == 0:
@@ -4416,7 +4427,7 @@ class RustEmitter(CodeEmitter):
             owner_mod = self.any_dict_get_str(owner_ctx, "module", "")
             attr_raw = self.any_dict_get_str(expr_d, "attr", "")
             if owner_mod != "":
-                return owner_mod.replace(".", "::") + "::" + attr_raw
+                return self._dotted_to_rust_path(owner_mod) + "::" + attr_raw
             owner_kind = self.any_dict_get_str(owner_node, "kind", "")
             attr = self._safe_name(attr_raw)
             if owner_kind == "Subscript":
