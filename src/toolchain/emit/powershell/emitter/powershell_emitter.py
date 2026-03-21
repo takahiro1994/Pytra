@@ -836,9 +836,17 @@ def _render_call_expr(expr: dict[str, Any]) -> str:
                     return "(" + owner + ".Length - " + owner + ".Replace(" + rendered_args[0] + ", \"\").Length) / " + rendered_args[0] + ".Length"
                 return "0"
             if attr == "isdigit":
-                return "(" + owner + " -match '^[0-9]+$')"
+                return "([char]::IsDigit([string]" + owner + ", 0))"
             if attr == "isalpha":
-                return "(" + owner + " -match '^[a-zA-Z]+$')"
+                return "([char]::IsLetter([string]" + owner + ", 0))"
+            if attr == "isspace":
+                return "([char]::IsWhiteSpace([string]" + owner + ", 0))"
+            if attr == "isupper":
+                return "([char]::IsUpper([string]" + owner + ", 0))"
+            if attr == "islower":
+                return "([char]::IsLower([string]" + owner + ", 0))"
+            if attr == "isalnum":
+                return "([char]::IsLetterOrDigit([string]" + owner + ", 0))"
             if attr == "split":
                 if len(rendered_args) > 0:
                     return owner + ".Split(" + rendered_args[0] + ")"
