@@ -870,7 +870,7 @@ class ZigNativeEmitter:
             iter_expr_node = iter_plan.get("iter_expr")
             if isinstance(iter_expr_node, dict):
                 iter_expr = self._render_expr(iter_expr_node)
-                self._emit_line("for (" + iter_expr + ".items) |" + target_name + "| {")
+                self._emit_line("for (" + iter_expr + ") |" + target_name + "| {")
                 self.indent += 1
                 if len(self._local_var_stack) > 0:
                     self._current_local_vars().add(target_name)
@@ -1300,7 +1300,12 @@ class ZigNativeEmitter:
                 elts_any = ed.get("elements")
             elts = elts_any if isinstance(elts_any, list) else []
             items = [self._render_expr(e) for e in elts]
-            return ".{ " + ", ".join(items) + " }"
+            resolved = self._get_expr_type(ed)
+            if resolved.startswith("list["):
+                inner = resolved[5:-1].strip() if resolved.endswith("]") else ""
+                zig_elem = self._zig_type(inner) if inner != "" else "i64"
+                return "&[_]" + zig_elem + "{ " + ", ".join(items) + " }"
+            return "&.{ " + ", ".join(items) + " }"
         if kind == "Tuple":
             elts_any = ed.get("elts")
             if not isinstance(elts_any, list):
@@ -1623,7 +1628,7 @@ class ZigNativeEmitter:
             elem = t[5:-1].strip()
             if elem == "uint8":
                 return "[]u8"
-            return "std.ArrayList(" + self._zig_type(elem) + ")"
+            return "[]const " + self._zig_type(elem)
         if t.startswith("set[") and t.endswith("]"):
             elem = t[4:-1].strip()
             return "std.AutoHashMap(" + self._zig_type(elem) + ", void)"
@@ -1637,7 +1642,7 @@ class ZigNativeEmitter:
         if t.startswith("tuple[") and t.endswith("]"):
             parts = self._split_generic(t[6:-1])
             if len(parts) == 2 and parts[1].strip() == "...":
-                return "std.ArrayList(" + self._zig_type(parts[0].strip()) + ")"
+                return "[]const " + self._zig_type(parts[0].strip())
             inner_types = [self._zig_type(p.strip()) for p in parts]
             return "struct { " + ", ".join("_" + str(i) + ": " + zt for i, zt in enumerate(inner_types)) + " }"
         # --- クラス名 ---

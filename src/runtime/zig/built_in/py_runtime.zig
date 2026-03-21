@@ -45,6 +45,14 @@ fn printValue(writer: anytype, value: anytype) void {
         .Pointer => |ptr_info| {
             if (ptr_info.size == .Slice and ptr_info.child == u8) {
                 writer.writeAll(value) catch {};
+            } else if (ptr_info.size == .One) {
+                // *const [N:0]u8 (string literal) → coerce to slice
+                const child_info = @typeInfo(ptr_info.child);
+                if (child_info == .Array and child_info.Array.child == u8) {
+                    writer.writeAll(value) catch {};
+                } else {
+                    writer.print("{any}", .{value}) catch {};
+                }
             } else {
                 writer.print("{any}", .{value}) catch {};
             }
