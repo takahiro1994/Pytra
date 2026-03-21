@@ -933,7 +933,7 @@ class CppEmitter(CppAnalysisEmitter, CppModuleEmitter, CppClassEmitter, CppTypeB
                         "assign:pyobj_alias_list_literal",
                     )
                 rendered_items.append(item_txt)
-            return f"{self._list_wrap_fn()}({value_cpp_t}{{{join_str_list(', ', rendered_items)}}})"
+            return f"rc_list_from_value({value_cpp_t}{{{join_str_list(', ', rendered_items)}}})"
         if kind == "ListComp":
             rewritten = rendered_expr
             if rendered_trim.startswith("[&]() -> list<object> {"):
@@ -3965,7 +3965,6 @@ class CppEmitter(CppAnalysisEmitter, CppModuleEmitter, CppClassEmitter, CppTypeB
                 src_t = declared_t
         if self.is_any_like_type(src_t):
             return expr_txt
-        # dict/list/set are RcObject subclasses — need rc_new to wrap into object
         src_norm = self.normalize_type_name(src_t)
         if src_norm.startswith("dict[") or src_norm.startswith("list[") or src_norm.startswith("set["):
             cpp_t = self._cpp_type_text(src_norm)

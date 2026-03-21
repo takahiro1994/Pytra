@@ -119,3 +119,21 @@
 18. [ ] [ID: P0-OBJECT-T-MIGRATION-05-S2] `test_cpp_runtime_type_id.py` の type_id テストが通る。
 19. [ ] [ID: P0-OBJECT-T-MIGRATION-05-S3] selfhost multi-module transpile が動作する。
 20. [ ] [ID: P0-OBJECT-T-MIGRATION-05-S4] sample/py の全 18 ケースが C++ で compile + run できる。
+
+### P1: Julia native backend
+
+文脈: [docs/ja/plans/p1-julia-native-backend.md](../plans/p1-julia-native-backend.md)
+
+1. [ ] [ID: P1-JULIA-NATIVE-01-S1] `src/toolchain/emit/julia/` 配下に emitter パッケージを作成する。
+2. [ ] [ID: P1-JULIA-NATIVE-01-S2] `src/runtime/julia/built_in/py_runtime.jl` を作成する。
+3. [ ] [ID: P1-JULIA-NATIVE-01-S3] smoke テスト作成、`transpiler_versions.json`・`check_py2x_profiles.json`・`docs/ja/language/index.md` を更新する。
+4. [ ] [ID: P1-JULIA-NATIVE-01-S4] smoke テストが通ることを確認する。
+
+### P4: Dart native backend
+
+文脈: [docs/ja/plans/p4-dart-native-backend.md](../plans/p4-dart-native-backend.md)
+
+1. [ ] [ID: P4-DART-NATIVE-01-S1] `src/toolchain/emit/dart/` 配下に emitter パッケージを作成する。
+2. [ ] [ID: P4-DART-NATIVE-01-S2] `src/runtime/dart/built_in/py_runtime.dart` を作成する。
+3. [ ] [ID: P4-DART-NATIVE-01-S3] smoke テスト作成、`transpiler_versions.json`・`check_py2x_profiles.json`・`docs/ja/language/index.md` を更新する。
+4. [ ] [ID: P4-DART-NATIVE-01-S4] smoke テストが通ることを確認する。

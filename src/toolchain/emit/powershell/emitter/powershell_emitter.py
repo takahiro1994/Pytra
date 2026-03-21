@@ -25,6 +25,8 @@ _RENAMED_SYMBOLS: list[dict[str, str]] = [{}]
 _CLASS_NAMES: list[set[str]] = [set()]
 _LAMBDA_VARS: list[set[str]] = [set()]
 _FUNCTION_NAMES: list[set[str]] = [set()]
+# Maps imported name -> PowerShell expression (for from X import Y)
+_IMPORT_ALIASES: list[dict[str, str]] = [{}]
 
 _PS_AUTOMATIC_VARS = {
     "true", "false", "null", "args", "input", "PSScriptRoot", "PSCommandPath",
@@ -377,6 +379,12 @@ def _render_call_expr(expr: dict[str, Any]) -> str:
                 return "[Math]::Max(" + ", ".join(rendered_args) + ")" if len(rendered_args) > 0 else "0"
             if fn_name == "isinstance":
                 return "$true"
+            # Imported function aliases (e.g. from math import sqrt -> [Math]::Sqrt)
+            if fn_name in _IMPORT_ALIASES[0]:
+                ps_func = _IMPORT_ALIASES[0][fn_name]
+                if ps_func.startswith("[Math]::") and not ps_func.endswith("I") and not ps_func.endswith("E"):
+                    return ps_func + "(" + ", ".join(rendered_args) + ")"
+                return ps_func
             if fn_name == "bytearray":
                 return "(__pytra_bytearray " + " ".join(rendered_args) + ")" if len(rendered_args) > 0 else "(__pytra_bytearray 0)"
             if fn_name == "bytes":
@@ -459,6 +467,26 @@ def _render_call_expr(expr: dict[str, Any]) -> str:
                 return owner + ".ToLower()"
             if attr == "strip":
                 return owner + ".Trim()"
+            if attr == "rstrip":
+                return owner + ".TrimEnd()"
+            if attr == "lstrip":
+                return owner + ".TrimStart()"
+            if attr == "find":
+                if len(rendered_args) > 0:
+                    return owner + ".IndexOf(" + rendered_args[0] + ")"
+                return "-1"
+            if attr == "rfind":
+                if len(rendered_args) > 0:
+                    return owner + ".LastIndexOf(" + rendered_args[0] + ")"
+                return "-1"
+            if attr == "count":
+                if len(rendered_args) > 0:
+                    return "(" + owner + ".Length - " + owner + ".Replace(" + rendered_args[0] + ", \"\").Length) / " + rendered_args[0] + ".Length"
+                return "0"
+            if attr == "isdigit":
+                return "(" + owner + " -match '^[0-9]+$')"
+            if attr == "isalpha":
+                return "(" + owner + " -match '^[a-zA-Z]+$')"
             if attr == "split":
                 if len(rendered_args) > 0:
                     return owner + ".Split(" + rendered_args[0] + ")"
@@ -485,7 +513,21 @@ def _render_call_expr(expr: dict[str, Any]) -> str:
                 return owner
             # Check if this could be a class method call (owner has __type__)
             raw_attr = _get_str(func_d, "attr")
-            if owner_name == "self" or (owner_name != "" and owner_name not in ("math", "os", "sys", "json", "re", "random", "pathlib", "time")):
+            _KNOWN_DOTNET_METHODS = {
+                "rstrip", "lstrip", "find", "rfind", "count", "index", "rindex",
+                "center", "ljust", "rjust", "zfill", "encode", "decode",
+                "isdigit", "isalpha", "isalnum", "isupper", "islower", "isspace",
+                "capitalize", "title", "swapcase", "expandtabs",
+                "ToString", "GetType", "GetHashCode", "Equals",
+                "Add", "Remove", "Contains", "ContainsKey", "Clear",
+                "Sort", "Reverse", "CopyTo", "ToArray", "GetEnumerator",
+                "Trim", "TrimStart", "TrimEnd", "StartsWith", "EndsWith",
+                "ToUpper", "ToLower", "Split", "Replace", "Substring",
+                "Insert", "IndexOf", "LastIndexOf",
+            }
+            if raw_attr not in _KNOWN_DOTNET_METHODS and (
+                owner_name == "self" or owner_name in _CLASS_NAMES[0]
+            ):
                 # Dynamic dispatch: ClassName_method $self args
                 if len(rendered_args) == 0:
                     return '(& (Get-Command ("{0}_{1}" -f ' + owner + '["__type__"], "' + raw_attr + '")) ' + owner + ')'
@@ -953,6 +995,32 @@ def transpile_to_powershell(east_doc: dict[str, Any]) -> str:
                 func_names.add(fn)
     _FUNCTION_NAMES[0] = func_names
     _LAMBDA_VARS[0] = set()
+
+    # Collect import aliases (from X import Y -> Y maps to PS expression)
+    import_aliases: dict[str, str] = {}
+    _MATH_FUNCS = {
+        "sqrt": "[Math]::Sqrt", "floor": "[Math]::Floor", "ceil": "[Math]::Ceiling",
+        "sin": "[Math]::Sin", "cos": "[Math]::Cos", "tan": "[Math]::Tan",
+        "asin": "[Math]::Asin", "acos": "[Math]::Acos", "atan": "[Math]::Atan",
+        "atan2": "[Math]::Atan2", "log": "[Math]::Log", "log10": "[Math]::Log10",
+        "exp": "[Math]::Exp", "pow": "[Math]::Pow", "abs": "[Math]::Abs",
+        "round": "[Math]::Round", "trunc": "[Math]::Truncate",
+        "pi": "[Math]::PI", "e": "[Math]::E",
+    }
+    for node in body:
+        if not isinstance(node, dict) or _get_str(node, "kind") != "ImportFrom":
+            continue
+        module = _get_str(node, "module")
+        names = _get_list(node, "names")
+        for entry in names:
+            if not isinstance(entry, dict):
+                continue
+            imported_name = _get_str(entry, "name")
+            alias = _get_str(entry, "asname")
+            local_name = alias if alias != "" else imported_name
+            if module in ("math", "pytra.std.math") and imported_name in _MATH_FUNCS:
+                import_aliases[local_name] = _MATH_FUNCS[imported_name]
+    _IMPORT_ALIASES[0] = import_aliases
 
     ctx: dict[str, Any] = {}
     lines: list[str] = [
