@@ -80,8 +80,22 @@ def _promote_binop_result(left_type: str, right_type: str) -> str:
     return right_promoted
 
 
+def _promote_operand(operand: dict[str, Any], target_type: str) -> None:
+    """Promote an operand's resolved_type in place to *target_type*."""
+    operand["resolved_type"] = target_type
+    # Also update type_expr if present
+    type_expr = operand.get("type_expr")
+    if isinstance(type_expr, dict):
+        operand["type_expr"] = {"kind": "NamedType", "name": target_type}
+
+
 def _apply_integer_promotion(node: Any) -> None:
-    """Recursively walk EAST3 and apply integer promotion rules."""
+    """Recursively walk EAST3 and apply integer promotion rules.
+
+    Promotes small-int OPERANDS to the promoted type so that the
+    arithmetic is performed in the wider type.  This avoids overflow
+    in languages without implicit integer promotion.
+    """
     if isinstance(node, list):
         for item in node:
             _apply_integer_promotion(item)
@@ -91,7 +105,7 @@ def _apply_integer_promotion(node: Any) -> None:
     nd: dict[str, Any] = node
     kind = nd.get("kind")
 
-    # Promote BinOp result types
+    # Promote BinOp: promote operand types and set result type
     if kind == "BinOp":
         op = nd.get("op", "")
         if op in _ARITHMETIC_OPS:
@@ -102,20 +116,27 @@ def _apply_integer_promotion(node: Any) -> None:
 
             promoted = _promote_binop_result(left_type, right_type)
             if promoted != "":
+                # Promote small-int operands in place
+                if isinstance(left, dict) and _needs_promotion(left_type):
+                    _promote_operand(left, promoted)
+                if isinstance(right, dict) and _needs_promotion(right_type):
+                    _promote_operand(right, promoted)
                 current = _normalize_type(nd.get("resolved_type"))
                 if current == "" or current == "unknown" or _needs_promotion(current):
                     nd["resolved_type"] = promoted
 
-    # Promote UnaryOp result types
+    # Promote UnaryOp: promote operand type and set result type
     if kind == "UnaryOp":
         op = nd.get("op", "")
         if op in _UNARY_OPS:
             operand = nd.get("operand")
             operand_type = _normalize_type(operand.get("resolved_type")) if isinstance(operand, dict) else ""
-            if _needs_promotion(operand_type):
+            if _needs_promotion(operand_type) and isinstance(operand, dict):
+                target = _promoted_type(operand_type)
+                _promote_operand(operand, target)
                 current = _normalize_type(nd.get("resolved_type"))
                 if current == "" or current == "unknown" or _needs_promotion(current):
-                    nd["resolved_type"] = _promoted_type(operand_type)
+                    nd["resolved_type"] = target
 
     # Promote ForCore target_plan for bytes/bytearray iteration
     if kind == "ForCore":
@@ -223,6 +244,37 @@ def _apply_narrowing(node: Any) -> None:
             _apply_narrowing(value)
 
 
+def _remove_redundant_unbox(node: Any) -> None:
+    """Remove Unbox nodes where the inner value already has the target type.
+
+    After promotion + narrowing, a BinOp may already produce the same type
+    as the Unbox target, making the Unbox redundant.
+    """
+    if isinstance(node, list):
+        for item in node:
+            _remove_redundant_unbox(item)
+        return
+    if not isinstance(node, dict):
+        return
+    nd: dict[str, Any] = node
+
+    # Check Assign/AnnAssign: if value is Unbox and inner matches target
+    kind = nd.get("kind")
+    if kind in ("Assign", "AnnAssign"):
+        value = nd.get("value")
+        if isinstance(value, dict) and value.get("kind") == "Unbox":
+            inner = value.get("value")
+            if isinstance(inner, dict):
+                unbox_target = _normalize_type(value.get("target"))
+                inner_type = _normalize_type(inner.get("resolved_type"))
+                if unbox_target != "" and unbox_target == inner_type:
+                    nd["value"] = inner
+
+    for v in nd.values():
+        if isinstance(v, (dict, list)):
+            _remove_redundant_unbox(v)
+
+
 def apply_integer_promotion(module: dict[str, Any]) -> dict[str, Any]:
     """Top-level entry: apply integer promotion and narrowing to an EAST3 Module.
 
@@ -230,4 +282,5 @@ def apply_integer_promotion(module: dict[str, Any]) -> dict[str, Any]:
     """
     _apply_integer_promotion(module)
     _apply_narrowing(module)
+    _remove_redundant_unbox(module)
     return module

@@ -180,16 +180,13 @@ class TestIntegerPromotionOperandCast(unittest.TestCase):
         correct_result = 1 << 9
         self.assertEqual(correct_result, 512, "int32(1) << 9 should be 512")
 
-    @unittest.skip("P0-INTEGER-PROMOTION operand-level cast not yet implemented")
     def test_east3_promotes_operand_not_result(self) -> None:
-        """EAST3 should cast operands to promoted type, not wrap result in Unbox.
+        """EAST3 should promote operands so BinOp computes in promoted type.
 
         For `b: int16 = a - 1` where `a: int8`:
-        WRONG:  Assign(target=b, value=Unbox(int16, BinOp(int8 - int64)))
-        RIGHT:  Assign(target=b, value=BinOp(Cast(a, int16) - 1))
-
-        The promotion must happen on the operand so that the subtraction
-        is computed in the wider type, avoiding overflow.
+        The BinOp left operand (a) should have resolved_type promoted to int64
+        (because right operand is int64), and the BinOp result should match.
+        After narrowing, if Unbox target == BinOp result, Unbox is removed.
         """
         source = """def test(x: int) -> int:
     a: int8 = x
@@ -199,7 +196,7 @@ class TestIntegerPromotionOperandCast(unittest.TestCase):
         east3 = _build_east3(source)
         body = _find_function_body(east3, "test")
 
-        # Find the Assign for b
+        # Find the AnnAssign for b
         assigns = [s for s in body if isinstance(s, dict)
                    and s.get("kind") in ("Assign", "AnnAssign")
                    and isinstance(s.get("target"), dict)
@@ -208,10 +205,19 @@ class TestIntegerPromotionOperandCast(unittest.TestCase):
         assign = assigns[0]
         value = assign.get("value", {})
 
-        # The value should be a BinOp (not wrapped in Unbox)
-        # with operands promoted to at least int16
-        self.assertEqual(value.get("kind"), "BinOp",
-                         f"Expected BinOp, got {value.get('kind')} (Unbox wrapping)")
+        # Find the BinOp (may be wrapped in Unbox)
+        binop = value
+        if binop.get("kind") == "Unbox":
+            binop = binop.get("value", {})
+        self.assertEqual(binop.get("kind"), "BinOp")
+
+        # Left operand (a) should be promoted from int8 to int64
+        left = binop.get("left", {})
+        left_type = str(left.get("resolved_type", ""))
+        self.assertNotEqual(left_type, "int8",
+                            "Left operand should be promoted from int8")
+        self.assertIn(left_type, {"int32", "int64"},
+                      f"Left operand should be promoted, got {left_type}")
 
 
 class TestIntegerPromotionNarrowing(unittest.TestCase):

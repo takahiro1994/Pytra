@@ -107,6 +107,14 @@
 3. [ ] [ID: P3-PYOBJ-LIST-ESCAPE-03] `analysis.py` の `_collect_assigned_name_types` を除去する（依存消滅確認後）。
 4. [ ] [ID: P3-PYOBJ-LIST-ESCAPE-04] ユニットテストを追加し、既存 pyobj list テストのリグレッションがないことを検証する。
 
+### P4: integer promotion をオペランドキャストに変更
+
+文脈: [docs/ja/plans/p4-integer-promotion-operand-cast.md](../plans/p4-integer-promotion-operand-cast.md)
+
+1. [x] [ID: P4-INTEGER-PROMOTION-OPERAND-CAST-01] promotion パスで小さい整数型オペランドの resolved_type を昇格する。
+2. [x] [ID: P4-INTEGER-PROMOTION-OPERAND-CAST-02] 不要な Unbox を除去する。
+3. [x] [ID: P4-INTEGER-PROMOTION-OPERAND-CAST-03] ユニットテストを有効化し、リグレッション検証する。
+
 ### P5: C# multi-module emit parity
 
 文脈: [docs/ja/plans/p5-cs-multimodule-emit-parity.md](../plans/p5-cs-multimodule-emit-parity.md)
