@@ -1745,8 +1745,27 @@ def transpile_to_php_native(east_doc: dict[str, Any]) -> str:
         if not isinstance(module_id_any, str):
             continue
         module_id: str = module_id_any
-        # Skip pytra.std.* and pytra.built_in.* (provided by runtime)
-        if module_id.startswith("pytra.std") or module_id.startswith("pytra.built_in"):
+        # Skip pytra.built_in.* (provided by py_runtime.php)
+        if module_id.startswith("pytra.built_in"):
+            continue
+        # pytra.std → sub-module from export_name (e.g. math → math/east.php)
+        # pytra.std.time → time/east.php
+        if module_id == "pytra.std":
+            binding_kind_any2 = binding.get("binding_kind")
+            export_name_any2 = binding.get("export_name")
+            if isinstance(binding_kind_any2, str) and binding_kind_any2 == "symbol" and isinstance(export_name_any2, str) and export_name_any2 != "":
+                require_path = export_name_any2 + "/east.php"
+                if require_path not in required_modules:
+                    required_modules.add(require_path)
+                    lines.append("require_once __DIR__ . '/" + require_path + "';")
+            continue
+        if module_id.startswith("pytra.std."):
+            # e.g. pytra.std.time → time/east.php
+            mod_tail = module_id[len("pytra.std."):]
+            require_path = mod_tail + "/east.php"
+            if require_path not in required_modules:
+                required_modules.add(require_path)
+                lines.append("require_once __DIR__ . '/" + require_path + "';")
             continue
         # pytra.utils.* → sub-module from module_id parts
         binding_kind_any = binding.get("binding_kind")
@@ -1788,7 +1807,7 @@ def transpile_to_php_native(east_doc: dict[str, Any]) -> str:
             _ib_local = _ib_item.get("local_name")
             _ib_mod = _ib_item.get("module_id")
             if isinstance(_ib_kind, str) and isinstance(_ib_local, str) and isinstance(_ib_mod, str):
-                if _ib_kind == "symbol" and not _ib_mod.startswith("pytra.std.") and not _ib_mod.startswith("pytra.built_in."):
+                if _ib_kind == "symbol" and not _ib_mod.startswith("pytra.built_in"):
                     imported_mods.add(_ib_local)
     _IMPORTED_MODULE_NAMES[0] = imported_mods
     functions: list[dict[str, Any]] = []

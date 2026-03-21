@@ -33,6 +33,27 @@ def _copy_runtime(output_dir: str) -> None:
         shutil.copy2(str(src), str(dst))
 
 
+def _overlay_native_std(output_dir: str) -> None:
+    """Overwrite linker-generated std modules with native implementations.
+
+    The linker emits math/east.php and time/east.php from the EAST IR, but
+    their function bodies reference the Python stdlib (e.g. ``$math->sqrt``)
+    which is invalid in PHP.  Native seam files provide correct
+    implementations that delegate to PHP built-in functions.
+    """
+    src_root = Path(__file__).resolve().parents[2] / "runtime" / "php"
+    out = Path(output_dir)
+    overlays = [
+        ("std/math_native.php", "math/east.php"),
+        ("std/time_native.php", "time/east.php"),
+    ]
+    for src_rel, dst_rel in overlays:
+        src = src_root / src_rel
+        dst = out / dst_rel
+        if src.exists() and dst.exists():
+            shutil.copy2(str(src), str(dst))
+
+
 def main() -> int:
     argv = sys.argv[1:]
     if len(argv) == 0 or argv[0] in ("-h", "--help"):
@@ -60,6 +81,7 @@ def main() -> int:
     if rc != 0:
         return rc
     _copy_runtime(output_dir)
+    _overlay_native_std(output_dir)
     return 0
 
 
