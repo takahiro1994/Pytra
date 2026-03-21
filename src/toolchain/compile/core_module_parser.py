@@ -104,6 +104,13 @@ def convert_source_to_east_self_hosted_impl(source: str, filename: str) -> dict[
     )
     source = _sh_strip_utf8_bom(source)
     lines = source.splitlines()
+    # Extract module stem from filename for self-import detection.
+    # e.g. "src/pytra/std/time.py" → "time", "time.py" → "time"
+    _self_module_stem = ""
+    if isinstance(filename, str) and filename != "":
+        _fn_base = filename.rsplit("/", 1)[-1].rsplit("\\", 1)[-1]
+        if _fn_base.endswith(".py"):
+            _self_module_stem = _fn_base[:-3]
     leading_file_comments: list[str] = []
     leading_file_trivia: list[dict[str, Any]] = []
     for ln in lines:
@@ -516,6 +523,10 @@ def convert_source_to_east_self_hosted_impl(source: str, filename: str) -> dict[
                         hint=f"Replace with: from pytra.{mod_name} import ...",
                     )
                 bind_name = as_name_txt if as_name_txt != "" else mod_name.split(".")[0]
+                # Skip self-referencing imports (e.g. `import time` inside time.py).
+                # These reference the Python stdlib for @extern fallback bodies only.
+                if _self_module_stem != "" and mod_name == _self_module_stem:
+                    continue
                 _sh_register_import_module(_SH_IMPORT_MODULES, bind_name, mod_name)
                 if _sh_is_host_only_alias(bind_name):
                     continue

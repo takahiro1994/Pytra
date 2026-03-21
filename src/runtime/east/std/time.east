@@ -26,21 +26,6 @@
       }
     },
     {
-      "kind": "Import",
-      "source_span": {
-        "lineno": 4,
-        "col_offset": 0,
-        "end_lineno": 4,
-        "end_col_offset": 11
-      },
-      "names": [
-        {
-          "name": "time",
-          "asname": null
-        }
-      ]
-    },
-    {
       "kind": "ImportFrom",
       "source_span": {
         "lineno": 6,
@@ -221,14 +206,6 @@
       "schema_version": 1,
       "bindings": [
         {
-          "module_id": "time",
-          "export_name": "",
-          "local_name": "time",
-          "binding_kind": "module",
-          "source_file": "src/pytra/std/time.py",
-          "source_line": 4
-        },
-        {
           "module_id": "pytra.std",
           "export_name": "extern",
           "local_name": "extern",
@@ -257,14 +234,6 @@
     },
     "import_bindings": [
       {
-        "module_id": "time",
-        "export_name": "",
-        "local_name": "time",
-        "binding_kind": "module",
-        "source_file": "src/pytra/std/time.py",
-        "source_line": 4
-      },
-      {
         "module_id": "pytra.std",
         "export_name": "extern",
         "local_name": "extern",
@@ -280,9 +249,7 @@
         "local_name": "extern"
       }
     ],
-    "import_modules": {
-      "time": "time"
-    },
+    "import_modules": {},
     "import_symbols": {
       "extern": {
         "module": "pytra.std",
