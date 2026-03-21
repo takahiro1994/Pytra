@@ -1606,8 +1606,16 @@ class ZigNativeEmitter:
                     return "pytra.make_object(" + fname + ", " + fname + "{})"
                 return fname + "(" + ", ".join(arg_strs) + ")"
             if fkind == "Attribute":
-                obj = self._render_expr(func_any.get("value"))
+                obj_node_for_attr = func_any.get("value")
                 attr = _safe_ident(func_any.get("attr"), "method")
+                # super().method() → BaseClass.method(undefined)
+                if isinstance(obj_node_for_attr, dict) and obj_node_for_attr.get("kind") == "Call":
+                    super_func = obj_node_for_attr.get("func")
+                    if isinstance(super_func, dict) and super_func.get("kind") == "Name" and super_func.get("id") == "super":
+                        base = self._class_base.get(self.current_class_name, "")
+                        if base != "":
+                            return base + "." + attr + "(undefined)"
+                obj = self._render_expr(obj_node_for_attr)
                 if attr == "append":
                     if len(arg_strs) > 0:
                         return obj + ".append(" + arg_strs[0] + ")"
