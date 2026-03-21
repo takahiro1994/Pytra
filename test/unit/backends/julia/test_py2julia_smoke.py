@@ -1,8 +1,11 @@
-"""py2julia (EAST based) smoke tests."""
+"""py2julia (EAST based) smoke tests — transpile + execution."""
 
 from __future__ import annotations
 
+import shutil
+import subprocess
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -14,6 +17,9 @@ if str(ROOT / "src") not in sys.path:
 
 from toolchain.emit.julia.emitter import transpile_to_julia, transpile_to_julia_native
 from toolchain.misc.transpile_cli import load_east3_document
+
+RUNTIME_SRC = ROOT / "src" / "runtime" / "julia" / "built_in" / "py_runtime.jl"
+JULIA_BIN = shutil.which("julia") or ""
 
 
 def load_east(
@@ -48,6 +54,30 @@ def find_fixture_case(stem: str) -> Path:
     if not matches:
         raise FileNotFoundError(f"missing fixture: {stem}")
     return matches[0]
+
+
+def _run_julia(source: str, timeout: int = 15) -> subprocess.CompletedProcess[str]:
+    """Write source to a temp dir with runtime and run julia."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        src_path = Path(tmpdir) / "main.jl"
+        src_path.write_text(source, encoding="utf-8")
+        shutil.copy2(str(RUNTIME_SRC), str(Path(tmpdir) / "py_runtime.jl"))
+        return subprocess.run(
+            [JULIA_BIN, str(src_path)],
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+        )
+
+
+def _transpile_and_run(fixture_stem: str, timeout: int = 15) -> subprocess.CompletedProcess[str]:
+    """Transpile a fixture to Julia and run it."""
+    east_doc = load_east(find_fixture_case(fixture_stem))
+    source = transpile_to_julia_native(east_doc)
+    return _run_julia(source, timeout=timeout)
+
+
+# ── Transpile-only tests ──
 
 
 class Py2JuliaSmokeTest(unittest.TestCase):
@@ -113,6 +143,106 @@ class Py2JuliaSmokeTest(unittest.TestCase):
         source = transpile_to_julia(east_doc)
         self.assertIsInstance(source, str)
         self.assertIn("function", source)
+
+
+# ── Execution tests (require julia binary) ──
+
+
+@unittest.skipUnless(JULIA_BIN, "julia not found in PATH")
+class Py2JuliaExecTest(unittest.TestCase):
+    """Transpile fixtures to Julia and verify execution succeeds."""
+
+    def _assert_runs_ok(self, fixture_stem: str) -> str:
+        cp = _transpile_and_run(fixture_stem)
+        self.assertEqual(
+            cp.returncode, 0,
+            f"{fixture_stem}: julia exited {cp.returncode}\nstderr: {cp.stderr[:500]}",
+        )
+        return cp.stdout
+
+    def test_exec_add(self) -> None:
+        self._assert_runs_ok("add")
+
+    def test_exec_fib(self) -> None:
+        self._assert_runs_ok("fib")
+
+    def test_exec_assign(self) -> None:
+        self._assert_runs_ok("assign")
+
+    def test_exec_compare(self) -> None:
+        self._assert_runs_ok("compare")
+
+    def test_exec_float(self) -> None:
+        self._assert_runs_ok("float")
+
+    def test_exec_if_else(self) -> None:
+        self._assert_runs_ok("if_else")
+
+    def test_exec_for_range(self) -> None:
+        self._assert_runs_ok("for_range")
+
+    def test_exec_loop(self) -> None:
+        self._assert_runs_ok("loop")
+
+    def test_exec_not(self) -> None:
+        self._assert_runs_ok("not")
+
+    def test_exec_lambda_as_arg(self) -> None:
+        self._assert_runs_ok("lambda_as_arg")
+
+    def test_exec_lambda_immediate(self) -> None:
+        self._assert_runs_ok("lambda_immediate")
+
+    def test_exec_comprehension(self) -> None:
+        self._assert_runs_ok("comprehension")
+
+    def test_exec_in_membership(self) -> None:
+        self._assert_runs_ok("in_membership")
+
+    def test_exec_negative_index(self) -> None:
+        self._assert_runs_ok("negative_index")
+
+    def test_exec_slice_basic(self) -> None:
+        self._assert_runs_ok("slice_basic")
+
+    def test_exec_dict_literal_entries(self) -> None:
+        self._assert_runs_ok("dict_literal_entries")
+
+    def test_exec_string(self) -> None:
+        self._assert_runs_ok("string")
+
+    def test_exec_string_ops(self) -> None:
+        self._assert_runs_ok("string_ops")
+
+    def test_exec_class_body_pass(self) -> None:
+        self._assert_runs_ok("class_body_pass")
+
+    def test_exec_class_instance(self) -> None:
+        self._assert_runs_ok("class_instance")
+
+    def test_exec_class_member(self) -> None:
+        self._assert_runs_ok("class_member")
+
+    def test_exec_try_raise(self) -> None:
+        self._assert_runs_ok("try_raise")
+
+    def test_exec_finally(self) -> None:
+        self._assert_runs_ok("finally")
+
+    def test_exec_ifexp_bool(self) -> None:
+        self._assert_runs_ok("ifexp_bool")
+
+    def test_exec_dict_get_items(self) -> None:
+        self._assert_runs_ok("dict_get_items")
+
+    def test_exec_list_repeat(self) -> None:
+        self._assert_runs_ok("list_repeat")
+
+    def test_exec_comprehension_filter(self) -> None:
+        self._assert_runs_ok("comprehension_filter")
+
+    def test_exec_dict_in(self) -> None:
+        self._assert_runs_ok("dict_in")
 
 
 if __name__ == "__main__":
