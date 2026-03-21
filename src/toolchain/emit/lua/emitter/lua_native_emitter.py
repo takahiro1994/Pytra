@@ -390,9 +390,10 @@ def _runtime_module_alias_line(alias_txt: str, runtime_module_id: str) -> str:
         return "local " + alias_txt + " = { loads = pyJsonLoads, dumps = pyJsonDumps }"
     if mod == "pytra.std.pathlib":
         return "local " + alias_txt + " = { Path = Path }"
-    if mod in {"pytra.utils.png", "pytra.utils.gif"}:
+    if mod.startswith("pytra.utils."):
         leaf = _safe_ident(mod.rsplit(".", 1)[-1], "utils")
-        return "local " + alias_txt + " = __pytra_" + leaf + "_module()"
+        return ('dofile((debug.getinfo(1, "S").source:sub(2):match("^(.*[\\\\/])") or "") .. "'
+                + leaf + '/east.lua")')
     return ""
 
 
@@ -464,7 +465,7 @@ def _reject_unsupported_relative_import_forms(body_any: Any) -> None:
 
 
 class LuaNativeEmitter:
-    def __init__(self, east_doc: dict[str, Any]) -> None:
+    def __init__(self, east_doc: dict[str, Any], *, is_submodule: bool = False) -> None:
         if not isinstance(east_doc, dict):
             raise RuntimeError("lang=lua invalid east document: root must be dict")
         ed: dict[str, Any] = east_doc
@@ -479,6 +480,7 @@ class LuaNativeEmitter:
         self.tmp_seq = 0
         self.class_names: set[str] = set()
         self.imported_modules: set[str] = set()
+        self.linked_submodule_imports: set[str] = set()
         self.function_names: set[str] = set()
         self.relative_import_name_aliases: dict[str, str] = {}
         self.loop_continue_labels: list[str] = []
@@ -487,6 +489,7 @@ class LuaNativeEmitter:
         self._local_type_stack: list[dict[str, str]] = []
         self._ref_var_stack: list[set[str]] = []
         self._local_var_stack: list[set[str]] = []
+        self.is_submodule: bool = is_submodule
 
     def _current_type_map(self) -> dict[str, str]:
         if len(self._local_type_stack) == 0:
@@ -708,7 +711,7 @@ class LuaNativeEmitter:
             self._emit_isinstance_helper()
         for stmt in body:
             self._emit_stmt(stmt)
-        if len(main_guard) > 0:
+        if not self.is_submodule and len(main_guard) > 0:
             self.lines.append("")
             for stmt in main_guard:
                 self._emit_stmt(stmt)
@@ -885,6 +888,7 @@ class LuaNativeEmitter:
     def _scan_module_symbols(self, body: list[dict[str, Any]]) -> None:
         self.class_names = set()
         self.imported_modules = set()
+        self.linked_submodule_imports = set()
         self.function_names = set()
         self.relative_import_name_aliases = _collect_relative_import_name_aliases(self.east_doc)
         for stmt in body:
@@ -933,7 +937,12 @@ class LuaNativeEmitter:
                         continue
                     resolved = resolve_import_binding_doc(module_name, symbol, "symbol")
                     if resolved.get("resolved_binding_kind") == "module":
-                        self.imported_modules.add(_safe_ident(alias, "mod"))
+                        alias_ident = _safe_ident(alias, "mod")
+                        runtime_mod = resolved.get("runtime_module_id", "")
+                        if isinstance(runtime_mod, str) and runtime_mod.startswith("pytra.utils."):
+                            self.linked_submodule_imports.add(alias_ident)
+                        else:
+                            self.imported_modules.add(alias_ident)
 
     def _render_name_expr(self, expr_any: dict[str, Any]) -> str:
         ident = _safe_ident(expr_any.get("id"), "value")
@@ -943,8 +952,9 @@ class LuaNativeEmitter:
 
     def _emit_imports(self, body: list[dict[str, Any]]) -> None:
         import_lines: list[str] = []
-        self._emit_line('dofile((debug.getinfo(1, "S").source:sub(2):match("^(.*[\\\\/])") or "") .. "py_runtime.lua")')
-        self._emit_line("")
+        if not self.is_submodule:
+            self._emit_line('dofile((debug.getinfo(1, "S").source:sub(2):match("^(.*[\\\\/])") or "") .. "py_runtime.lua")')
+            self._emit_line("")
         for stmt in body:
             kind = stmt.get("kind")
             if kind == "Import":
@@ -2044,13 +2054,18 @@ class LuaNativeEmitter:
                 return "string.sub(" + owner + ", " + pos + ", " + pos + ")"
             return owner + "[(((" + index + ") < 0) and (#(" + owner + ") + (" + index + ") + 1) or ((" + index + ") + 1))]"
         if kind == "Attribute":
-            owner = self._render_expr(ed.get("value"))
+            value_node = ed.get("value")
+            owner = self._render_expr(value_node)
             attr = _safe_ident(ed.get("attr"), "field")
             semantic_tag_any = ed.get("semantic_tag")
             semantic_tag = semantic_tag_any if isinstance(semantic_tag_any, str) else ""
             runtime_call = self._resolved_runtime_call(expr_any)
             if semantic_tag.startswith("stdlib.") and runtime_call == "":
                 raise RuntimeError("lang=lua unresolved stdlib runtime attribute: " + semantic_tag)
+            if isinstance(value_node, dict) and value_node.get("kind") == "Name":
+                vname = _safe_ident(value_node.get("id"), "")
+                if vname in self.linked_submodule_imports:
+                    return attr
             return owner + "." + attr
         if kind == "IsInstance":
             value = self._render_expr(ed.get("value"))
@@ -2225,6 +2240,8 @@ class LuaNativeEmitter:
             owner_type = self._lookup_expr_type(owner_node)
             if isinstance(owner_node, dict) and owner_node.get("kind") == "Name":
                 owner_name = _safe_ident(owner_node.get("id"), "")
+                if owner_name in self.linked_submodule_imports:
+                    return attr + "(" + ", ".join(rendered_args + kw_values_in_order) + ")"
                 if owner_name in self.imported_modules:
                     return owner + "." + attr + "(" + ", ".join(rendered_args + kw_values_in_order) + ")"
             if attr == "get":
@@ -2334,9 +2351,9 @@ class LuaNativeEmitter:
         return "nil"
 
 
-def transpile_to_lua_native(east_doc: dict[str, Any]) -> str:
+def transpile_to_lua_native(east_doc: dict[str, Any], *, is_submodule: bool = False) -> str:
     """EAST3 ドキュメントを Lua native ソースへ変換する。"""
     reject_backend_typed_vararg_signatures(east_doc, backend_name="Lua backend")
     reject_backend_homogeneous_tuple_ellipsis_type_exprs(east_doc, backend_name="Lua backend")
     body_any = east_doc.get("body") if isinstance(east_doc, dict) else None
-    return LuaNativeEmitter(east_doc).transpile()
+    return LuaNativeEmitter(east_doc, is_submodule=is_submodule).transpile()

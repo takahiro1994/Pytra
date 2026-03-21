@@ -493,10 +493,12 @@ class ZigNativeEmitter:
             self.lines.append("")
         self.lines.append("const std = @import(\"std\");")
         self.lines.append("const pytra = @import(\"py_runtime.zig\");")
-        self.lines.append("")
         body = self._dict_list(self.east_doc.get("body"))
         main_guard = self._dict_list(self.east_doc.get("main_guard_body"))
         self._scan_module_symbols(body)
+        # import 文から @import を生成
+        self._emit_imports(body)
+        self.lines.append("")
         # 静的フィールドをモジュールスコープに emit
         for cls_name, sfields in self._static_fields.items():
             for field_name, field_type, default_val in sfields:
@@ -801,6 +803,52 @@ class ZigNativeEmitter:
                 return current
             current = self._class_base.get(current, "")
         return cls_name
+
+    def _emit_imports(self, body: list[dict[str, Any]]) -> None:
+        """ImportFrom ノードから Zig の @import を生成する。"""
+        emitted: set[str] = set()
+        for stmt in body:
+            kind = stmt.get("kind")
+            if kind != "ImportFrom":
+                continue
+            module_any = stmt.get("module")
+            module_id = module_any if isinstance(module_any, str) else ""
+            names_any = stmt.get("names")
+            names = names_any if isinstance(names_any, list) else []
+            for entry in names:
+                if not isinstance(entry, dict):
+                    continue
+                name = entry.get("name")
+                if not isinstance(name, str) or name == "":
+                    continue
+                asname = entry.get("asname")
+                local = asname if isinstance(asname, str) and asname != "" else name
+                # pytra.std.* の @extern 関数は py_runtime から提供
+                if module_id.startswith("pytra.std."):
+                    continue
+                # pytra.utils.assertions は不要
+                if module_id == "pytra.utils.assertions":
+                    continue
+                # pytra.dataclasses は不要
+                if module_id == "pytra.dataclasses":
+                    continue
+                # pytra.utils のサブモジュール（png, gif 等）
+                if module_id == "pytra.utils" or module_id.startswith("pytra.utils."):
+                    zig_path = name + "/east.zig"
+                    safe_local = _safe_ident(local, "mod")
+                    if safe_local not in emitted:
+                        self._emit_line("const " + safe_local + " = @import(\"" + zig_path + "\");")
+                        emitted.add(safe_local)
+                    continue
+                # 相対 import / その他のモジュール
+                if module_id != "":
+                    # module_id の最後のドット以降をディレクトリ名にする
+                    parts = module_id.split(".")
+                    zig_path = "/".join(parts[-1:]) + "/east.zig"
+                    safe_local = _safe_ident(name, "mod")
+                    if safe_local not in emitted:
+                        self._emit_line("const " + safe_local + " = @import(\"" + zig_path + "\");")
+                        emitted.add(safe_local)
 
     def _emit_stmt(self, stmt: dict[str, Any]) -> None:
         self._emit_leading_trivia(stmt, prefix="// ")
@@ -1539,7 +1587,7 @@ class ZigNativeEmitter:
             body_expr = self._render_expr(ed.get("body"))
             return "struct { fn call(" + ", ".join(a + ": PyObject" for a in arg_names) + ") PyObject { return " + body_expr + "; } }.call"
         if kind == "ListComp" or kind == "SetComp" or kind == "DictComp" or kind == "GeneratorExp":
-            return "pytra.empty_list() // comprehension"
+            return "pytra.empty_list()"
         if kind == "Starred":
             return self._render_expr(ed.get("value"))
         if kind == "Slice":
@@ -1669,8 +1717,26 @@ class ZigNativeEmitter:
                     if len(arg_strs) > 0:
                         return "pytra.bytearray(" + arg_strs[0] + ")"
                     return "pytra.bytearray(0)"
+                if fname == "bytes":
+                    if len(arg_strs) > 0:
+                        return arg_strs[0]
+                    return "&[_]u8{}"
                 if fname == "perf_counter":
                     return "pytra.perf_counter()"
+                if fname == "range":
+                    return "pytra.empty_list()"
+                if fname == "enumerate":
+                    if len(arg_strs) > 0:
+                        return arg_strs[0]
+                    return "pytra.empty_list()"
+                if fname == "sorted":
+                    if len(arg_strs) > 0:
+                        return arg_strs[0]
+                    return "pytra.empty_list()"
+                if fname == "reversed":
+                    if len(arg_strs) > 0:
+                        return arg_strs[0]
+                    return "pytra.empty_list()"
                 if fname == "min":
                     if len(arg_strs) >= 2:
                         return "@min(" + arg_strs[0] + ", " + arg_strs[1] + ")"
@@ -1851,9 +1917,9 @@ class ZigNativeEmitter:
         """正規化済み Python 型名を Zig 型名へ変換する。"""
         t = self._normalize_type(py_type)
         if t == "":
-            return "PyObject"
+            return "pytra.PyObject"
         if t in {"Any", "object", "unknown"}:
-            return "PyObject"
+            return "pytra.PyObject"
         # --- スカラー型 ---
         if t == "bool":
             return "bool"
@@ -1894,7 +1960,7 @@ class ZigNativeEmitter:
                 return "?" + self._zig_type(non_none[0])
             if len(non_none) == 1:
                 return self._zig_type(non_none[0])
-            return "PyObject"
+            return "pytra.PyObject"
         # --- コンテナ型 ---
         if t.startswith("list[") and t.endswith("]"):
             elem = t[5:-1].strip()
@@ -1902,7 +1968,7 @@ class ZigNativeEmitter:
                 return "[]u8"
             return "[]const " + self._zig_type(elem)
         if t.startswith("set[") and t.endswith("]"):
-            return "PyObject"
+            return "pytra.PyObject"
         if t.startswith("dict[") and t.endswith("]"):
             parts = self._split_generic(t[5:-1])
             if len(parts) == 2:
@@ -1922,7 +1988,7 @@ class ZigNativeEmitter:
             if self._has_vtable(t):
                 return "pytra.Obj"
             return "*" + t
-        return "PyObject"
+        return "pytra.PyObject"
 
     def _get_expr_type(self, expr_any: Any) -> str:
         """EAST3 式ノードの resolved_type を正規化して返す。"""

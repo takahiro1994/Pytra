@@ -10,6 +10,7 @@ from toolchain.emit.common.emitter.code_emitter import (
 )
 from toolchain.frontends.runtime_symbol_index import canonical_runtime_module_id
 from toolchain.frontends.runtime_symbol_index import lookup_runtime_symbol_extern_doc
+from toolchain.frontends.runtime_symbol_index import resolve_import_binding_doc
 
 
 _RUBY_KEYWORDS = {
@@ -58,6 +59,7 @@ _CLASS_NAME_MAP: list[dict[str, str]] = [{}]
 _FUNCTION_NAMES: list[set[str]] = [set()]
 _RELATIVE_IMPORT_MODULE_ALIASES: list[dict[str, str]] = [{}]
 _RELATIVE_IMPORT_SYMBOL_ALIASES: list[dict[str, str]] = [{}]
+_PYTRA_MODULE_IMPORTS: list[set[str]] = [set()]
 _INT_TYPES = {"int", "int64"}
 _FLOAT_TYPES = {"float", "float64"}
 _NIL_FREE_DECL_TYPES = {"int", "int64", "float", "float64", "bool", "str"}
@@ -267,6 +269,76 @@ def _collect_relative_import_symbol_aliases(east_doc: dict[str, Any]) -> dict[st
             "ruby native emitter: unsupported relative import form: wildcard import"
         )
     return aliases
+
+
+def _collect_pytra_module_imports(east_doc: dict[str, Any]) -> set[str]:
+    """Collect names imported as modules from pytra.* packages.
+
+    For ``from pytra.utils import png`` the local name ``png`` represents a
+    linked sub-module whose functions live at the top level after
+    ``require_relative``.  We record these names so that attribute access like
+    ``png.write_rgb_png(...)`` can be lowered to a bare ``write_rgb_png(...)``.
+    """
+    result: set[str] = set()
+    body_any = east_doc.get("body")
+    body = body_any if isinstance(body_any, list) else []
+    for stmt in body:
+        if not isinstance(stmt, dict):
+            continue
+        if stmt.get("kind") != "ImportFrom":
+            continue
+        module_any = stmt.get("module")
+        module = module_any if isinstance(module_any, str) else ""
+        if not module.startswith("pytra."):
+            continue
+        level_any = stmt.get("level")
+        level = level_any if isinstance(level_any, int) else 0
+        if level > 0:
+            continue
+        names_any = stmt.get("names")
+        names = names_any if isinstance(names_any, list) else []
+        for entry in names:
+            if not isinstance(entry, dict):
+                continue
+            name = entry.get("name")
+            if not isinstance(name, str) or name == "":
+                continue
+            asname = entry.get("asname")
+            local = asname if isinstance(asname, str) and asname != "" else name
+            resolved = resolve_import_binding_doc(module, name, "symbol")
+            if isinstance(resolved, dict) and resolved.get("resolved_binding_kind") == "module":
+                result.add(_safe_ident(local, "mod"))
+    return result
+
+
+def _emit_import_stmt(stmt: dict[str, Any], indent: str) -> list[str]:
+    """Emit ``require_relative`` lines for pytra.* ImportFrom statements."""
+    kind = stmt.get("kind")
+    if kind != "ImportFrom":
+        return []
+    module_any = stmt.get("module")
+    module = module_any if isinstance(module_any, str) else ""
+    if not module.startswith("pytra."):
+        return []
+    lines: list[str] = []
+    names_any = stmt.get("names")
+    names = names_any if isinstance(names_any, list) else []
+    seen_subdirs: set[str] = set()
+    for entry in names:
+        if not isinstance(entry, dict):
+            continue
+        name = entry.get("name")
+        if not isinstance(name, str) or name == "":
+            continue
+        asname = entry.get("asname")
+        local = asname if isinstance(asname, str) and asname != "" else name
+        local_ident = _safe_ident(local, "mod")
+        if local_ident in _PYTRA_MODULE_IMPORTS[0]:
+            subdir = _safe_ident(name, "mod")
+            if subdir not in seen_subdirs:
+                lines.append(indent + 'require_relative "' + subdir + '/east"')
+                seen_subdirs.add(subdir)
+    return lines
 
 
 def _safe_ident(name: Any, fallback: str) -> str:
@@ -820,6 +892,8 @@ def _render_attribute_expr(expr: dict[str, Any]) -> str:
             module_alias = _RELATIVE_IMPORT_MODULE_ALIASES[0].get(owner_ident, "")
             if module_alias != "":
                 return module_alias + "_" + _safe_ident(expr.get("attr"), "field")
+            if owner_ident in _PYTRA_MODULE_IMPORTS[0]:
+                return _safe_ident(expr.get("attr"), "field")
     value = _render_expr(value_any)
     attr = _safe_ident(expr.get("attr"), "field")
     return value + "." + attr
@@ -1144,6 +1218,13 @@ def _render_call_expr(expr: dict[str, Any]) -> str:
                         rendered_alias_args.append(_render_expr(args[i]))
                         i += 1
                     return module_alias + "_" + attr_name + "(" + ", ".join(rendered_alias_args) + ")"
+                if owner_ident in _PYTRA_MODULE_IMPORTS[0]:
+                    rendered_mod_args: list[str] = []
+                    i = 0
+                    while i < len(args):
+                        rendered_mod_args.append(_render_expr(args[i]))
+                        i += 1
+                    return attr_name + "(" + ", ".join(rendered_mod_args) + ")"
             if isinstance(owner_any, dict) and owner_any.get("kind") == "Call":
                 if _call_name(owner_any) in {"super", "super_"}:
                     rendered_super_args: list[str] = []
@@ -1779,7 +1860,7 @@ def _emit_stmt(stmt: Any, *, indent: str, ctx: dict[str, Any]) -> list[str]:
         return [indent + "next"]
 
     if kind == "Import" or kind == "ImportFrom":
-        return []
+        return _emit_import_stmt(sd, indent)
 
     if kind == "Raise":
         exc_any = sd.get("exc")
@@ -1950,7 +2031,7 @@ def _emit_class(cls: dict[str, Any], *, indent: str) -> list[str]:
     return lines
 
 
-def transpile_to_ruby_native(east_doc: dict[str, Any]) -> str:
+def transpile_to_ruby_native(east_doc: dict[str, Any], *, is_submodule: bool = False) -> str:
     """Emit Ruby native source from EAST3 Module."""
     if not isinstance(east_doc, dict):
         raise RuntimeError("ruby native emitter: east_doc must be dict")
@@ -1985,6 +2066,7 @@ def transpile_to_ruby_native(east_doc: dict[str, Any]) -> str:
     _FUNCTION_NAMES[0] = set()
     _RELATIVE_IMPORT_MODULE_ALIASES[0] = _collect_relative_import_module_aliases(east_doc)
     _RELATIVE_IMPORT_SYMBOL_ALIASES[0] = _collect_relative_import_symbol_aliases(east_doc)
+    _PYTRA_MODULE_IMPORTS[0] = _collect_pytra_module_imports(east_doc)
 
     i = 0
     while i < len(classes):
@@ -2000,7 +2082,16 @@ def transpile_to_ruby_native(east_doc: dict[str, Any]) -> str:
         i += 1
 
     lines: list[str] = []
-    lines.append("require_relative \"py_runtime\"")
+    if not is_submodule:
+        lines.append("require_relative \"py_runtime\"")
+        # Emit require_relative for linked pytra submodules (e.g., png, time)
+        i = 0
+        while i < len(body_any):
+            node = body_any[i]
+            if isinstance(node, dict):
+                import_lines = _emit_import_stmt(node, "")
+                lines.extend(import_lines)
+            i += 1
     lines.append("")
     module_comments = _module_leading_comment_lines(east_doc, "# ")
     if len(module_comments) > 0:
@@ -2027,24 +2118,25 @@ def transpile_to_ruby_native(east_doc: dict[str, Any]) -> str:
         lines.extend(_emit_function(functions[i], indent="", in_class=False))
         i += 1
 
-    lines.append("")
-    lines.append("if __FILE__ == $PROGRAM_NAME")
-    ctx: dict[str, Any] = {"tmp": 0}
-    if len(main_guard) > 0:
-        i = 0
-        while i < len(main_guard):
-            lines.extend(_emit_stmt(main_guard[i], indent="  ", ctx=ctx))
-            i += 1
-    else:
-        has_case_main = False
-        i = 0
-        while i < len(functions):
-            if _safe_ident(functions[i].get("name"), "") == "_case_main":
-                has_case_main = True
-                break
-            i += 1
-        if has_case_main:
-            lines.append("  _case_main()")
-    lines.append("end")
+    if not is_submodule:
+        lines.append("")
+        lines.append("if __FILE__ == $PROGRAM_NAME")
+        ctx: dict[str, Any] = {"tmp": 0}
+        if len(main_guard) > 0:
+            i = 0
+            while i < len(main_guard):
+                lines.extend(_emit_stmt(main_guard[i], indent="  ", ctx=ctx))
+                i += 1
+        else:
+            has_case_main = False
+            i = 0
+            while i < len(functions):
+                if _safe_ident(functions[i].get("name"), "") == "_case_main":
+                    has_case_main = True
+                    break
+                i += 1
+            if has_case_main:
+                lines.append("  _case_main()")
+        lines.append("end")
     lines.append("")
     return "\n".join(lines)

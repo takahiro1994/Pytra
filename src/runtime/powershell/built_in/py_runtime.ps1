@@ -346,6 +346,12 @@ function __pytra_not_in {
     return -not (__pytra_in $item $collection)
 }
 
+function __pytra_list_pop {
+    param([object]$list)
+    if ($list -eq $null -or $list.Length -eq 0) { return $null }
+    return $list[-1]
+}
+
 function __pytra_str_slice {
     param($s, $start, $stop)
     if ($s -eq $null) { return "" }
@@ -422,6 +428,22 @@ function __pytra_list_remove {
         return $result
     }
     return $list
+}
+
+function __pytra_getattr {
+    param([object]$obj, [string]$attr)
+    if ($obj -is [hashtable]) {
+        # Direct key access first
+        if ($obj.ContainsKey($attr)) { return $obj[$attr] }
+        # Try property getter: ClassName_attr($obj)
+        if ($obj.ContainsKey("__type__")) {
+            $getter = $obj["__type__"] + "_" + $attr
+            if (Get-Command $getter -ErrorAction SilentlyContinue) {
+                return (& (Get-Command $getter) $obj)
+            }
+        }
+    }
+    return $null
 }
 
 function __pytra_isinstance {

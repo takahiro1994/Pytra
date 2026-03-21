@@ -3,6 +3,9 @@
 
 const std = @import("std");
 
+/// Fallback type for unresolved Python types (Any/object/unknown).
+pub const PyObject = i64;
+
 /// Print a single value followed by newline, Python-style.
 pub fn print(value: anytype) void {
     const writer = std.io.getStdOut().writer();

@@ -827,7 +827,7 @@ def _render_call_expr(expr: dict[str, Any]) -> str:
                 return "$null"
             if attr == "pop":
                 if len(rendered_args) == 0:
-                    return owner + "[-1]; " + owner + " = " + owner + "[0..(" + owner + ".Length - 2)]"
+                    return "(__pytra_list_pop " + owner + ")"
                 return owner
             if attr == "index":
                 if len(rendered_args) > 0:
@@ -1093,6 +1093,11 @@ def _emit_stmt(stmt: dict[str, Any], *, indent: str, ctx: dict[str, Any]) -> lis
             # String iteration: foreach ($c in $s) doesn't split chars in PS
             if isinstance(iter_expr, dict) and _get_str(iter_expr, "resolved_type") == "str":
                 iter_rendered = iter_rendered + ".ToCharArray()"
+            # Set iteration: foreach ($k in $set) iterates keys, not the hashtable itself
+            if isinstance(iter_expr, dict):
+                rt = _get_str(iter_expr, "resolved_type")
+                if rt.startswith("set[") or rt == "set":
+                    iter_rendered = iter_rendered + ".Keys"
             # Check for enumerate: need index + value unpacking
             is_enumerate = False
             enumerate_start = "0"

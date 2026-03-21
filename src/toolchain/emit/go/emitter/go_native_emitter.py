@@ -2322,7 +2322,10 @@ def _emit_stmt(stmt: Any, *, indent: str, ctx: dict[str, Any]) -> list[str]:
         var_type = _go_type(esd.get("type"), allow_void=False)
         type_map = _type_map(ctx)
         type_map[name] = var_type
-        return [indent + "var " + name + " " + var_type + " = " + _default_return_expr(var_type)]
+        return [
+            indent + "var " + name + " " + var_type + " = " + _default_return_expr(var_type),
+            indent + "_ = " + name,
+        ]
 
     raise RuntimeError("go native emitter: unsupported stmt kind: " + str(kind))
 

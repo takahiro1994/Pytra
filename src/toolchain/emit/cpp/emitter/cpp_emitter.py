@@ -248,6 +248,8 @@ class CppEmitter(CppAnalysisEmitter, CppModuleEmitter, CppClassEmitter, CppTypeB
         # Linker-resolved type_id table (populated when linked program metadata is present).
         self._linker_type_id_table: dict[str, int] = {}
         self._linker_type_id_base_map: dict[str, int] = {}
+        # TypeInfo interval table: fqcn -> {id, entry, exit}
+        self._linker_type_info_table: dict[str, dict[str, int]] = {}
         self._linker_module_id: str = ""
         meta = east_doc.get("meta") if isinstance(east_doc, dict) else None
         if isinstance(meta, dict):
@@ -263,6 +265,11 @@ class CppEmitter(CppAnalysisEmitter, CppModuleEmitter, CppClassEmitter, CppTypeB
                     for k, v in tid_base.items():
                         if isinstance(k, str) and isinstance(v, int):
                             self._linker_type_id_base_map[k] = v
+                ti_table = linked_meta.get("type_info_table_v1")
+                if isinstance(ti_table, dict):
+                    for k, v in ti_table.items():
+                        if isinstance(k, str) and isinstance(v, dict):
+                            self._linker_type_info_table[k] = v
                 mid = linked_meta.get("module_id")
                 if isinstance(mid, str):
                     self._linker_module_id = mid
@@ -282,17 +289,26 @@ class CppEmitter(CppAnalysisEmitter, CppModuleEmitter, CppClassEmitter, CppTypeB
         return -1
 
     def _emit_linker_type_id_init(self) -> None:
-        """Emit py_tid_register_known_class_type calls for all linker-assigned type_ids."""
+        """Emit TypeInfo + g_type_table registration for all linker-assigned type_ids."""
         if len(self._linker_type_id_table) == 0:
             return
-        entries: list[tuple[int, int]] = []
+        has_type_info = len(self._linker_type_info_table) > 0
+        entries: list[tuple[str, int, int]] = []
         for fqcn, tid in sorted(self._linker_type_id_table.items(), key=lambda kv: kv[1]):
             base_tid = self._linker_type_id_base_map.get(fqcn, 8)
-            entries.append((tid, base_tid))
+            entries.append((fqcn, tid, base_tid))
         if len(entries) == 0:
             return
-        for tid, base_tid in entries:
-            self.emit(f"py_tid_register_known_class_type({tid}, {base_tid});")
+        if has_type_info:
+            for fqcn, tid, base_tid in entries:
+                ti = self._linker_type_info_table.get(fqcn, {})
+                entry = ti.get("entry", tid)
+                exit_val = ti.get("exit", tid + 1)
+                class_name = fqcn.rsplit(".", 1)[-1] if "." in fqcn else fqcn
+                self.emit(f"g_type_table[{tid}] = new TypeInfo{{{tid}, {entry}, {exit_val}, &deleter_impl<{class_name}>}};")
+        else:
+            for fqcn, tid, base_tid in entries:
+                self.emit(f"py_tid_register_known_class_type({tid}, {base_tid});")
 
     def resolve_linker_base_type_id(self, class_name: str) -> int:
         """Resolve linker-assigned base type_id for a class. Returns -1 if not found."""

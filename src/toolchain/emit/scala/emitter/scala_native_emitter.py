@@ -10,6 +10,7 @@ from toolchain.emit.common.emitter.code_emitter import (
 )
 from toolchain.frontends.runtime_call_adapters import normalize_rendered_runtime_args
 from toolchain.frontends.runtime_symbol_index import canonical_runtime_module_id
+from toolchain.frontends.runtime_symbol_index import resolve_import_binding_doc
 
 
 _SCALA_KEYWORDS = {
@@ -65,6 +66,7 @@ _FUNCTION_NAMES: list[set[str]] = [set()]
 _CLASS_BASES: list[dict[str, str]] = [{}]
 _CLASS_METHODS: list[dict[str, set[str]]] = [{}]
 _RELATIVE_IMPORT_NAME_ALIASES: dict[str, str] = {}
+_PYTRA_MODULE_IMPORTS: list[set[str]] = [set()]
 
 
 def _method_overrides_base(class_name: str, method_name: str) -> bool:
@@ -206,6 +208,40 @@ def _collect_relative_import_name_aliases(east_doc: dict[str, Any]) -> dict[str,
             "scala native emitter: unsupported relative import form: wildcard import"
         )
     return out
+
+
+def _collect_pytra_module_imports(east_doc: dict[str, Any]) -> set[str]:
+    """Collect names imported as linked sub-modules from pytra.* packages."""
+    result: set[str] = set()
+    body_any = east_doc.get("body")
+    body = body_any if isinstance(body_any, list) else []
+    for stmt in body:
+        if not isinstance(stmt, dict):
+            continue
+        if stmt.get("kind") != "ImportFrom":
+            continue
+        module_any = stmt.get("module")
+        module = module_any if isinstance(module_any, str) else ""
+        if not module.startswith("pytra."):
+            continue
+        level_any = stmt.get("level")
+        level = level_any if isinstance(level_any, int) else 0
+        if level > 0:
+            continue
+        names_any = stmt.get("names")
+        names = names_any if isinstance(names_any, list) else []
+        for entry in names:
+            if not isinstance(entry, dict):
+                continue
+            name = entry.get("name")
+            if not isinstance(name, str) or name == "":
+                continue
+            asname = entry.get("asname")
+            local = asname if isinstance(asname, str) and asname != "" else name
+            resolved = resolve_import_binding_doc(module, name, "symbol")
+            if isinstance(resolved, dict) and resolved.get("resolved_binding_kind") == "module":
+                result.add(_safe_ident(local, "mod"))
+    return result
 
 
 def _arraybuffer_elem_scala_type(py_type_name: str) -> str:
@@ -1061,6 +1097,10 @@ def _render_attribute_expr(expr: dict[str, Any]) -> str:
                 if _uses_math_value_getter(expr):
                     return runtime_symbol + "()"
                 return runtime_symbol
+    if isinstance(value_any, dict) and value_any.get("kind") == "Name":
+        owner_ident = _safe_ident(value_any.get("id"), "")
+        if owner_ident in _PYTRA_MODULE_IMPORTS[0]:
+            return field
     value = _render_expr(value_any)
     return value + "." + field
 
@@ -1356,6 +1396,15 @@ def _render_call_expr(expr: dict[str, Any]) -> str:
                 default_expr = _render_expr(args[1])
             owner_expr = _render_expr(owner_any)
             return "__pytra_as_dict(" + owner_expr + ").getOrElse(__pytra_str(" + key_expr + "), " + default_expr + ")"
+        if isinstance(owner_any, dict) and owner_any.get("kind") == "Name":
+            owner_ident = _safe_ident(owner_any.get("id"), "")
+            if owner_ident in _PYTRA_MODULE_IMPORTS[0]:
+                rendered_args = []
+                i = 0
+                while i < len(args):
+                    rendered_args.append(_render_expr(args[i]))
+                    i += 1
+                return method + "(" + ", ".join(rendered_args) + ")"
         owner_expr = _render_expr(owner_any)
         rendered_args: list[str] = []
         i = 0
@@ -2822,6 +2871,7 @@ def transpile_to_scala_native(east_doc: dict[str, Any], *, emit_main: bool = Tru
         raise RuntimeError("scala native emitter: Module.body must be list")
     _RELATIVE_IMPORT_NAME_ALIASES.clear()
     _RELATIVE_IMPORT_NAME_ALIASES.update(_collect_relative_import_name_aliases(east_doc))
+    _PYTRA_MODULE_IMPORTS[0] = _collect_pytra_module_imports(east_doc)
     reject_backend_typed_vararg_signatures(east_doc, backend_name="Scala backend")
     reject_backend_general_union_type_exprs(east_doc, backend_name="Scala backend")
     reject_backend_homogeneous_tuple_ellipsis_type_exprs(east_doc, backend_name="Scala backend")
