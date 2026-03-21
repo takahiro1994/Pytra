@@ -23,8 +23,9 @@ struct TypeInfo {
 };
 
 // Global type table — populated by linker-generated init code.
-extern TypeInfo* g_type_table[];
-extern uint32_t g_type_table_size;
+// Default weak definition: programs that don't use Object<T> can link without providing these.
+inline TypeInfo* g_type_table[4096] = {};
+inline uint32_t g_type_table_size = 0;
 
 // =============================
 // ControlBlock
@@ -203,6 +204,18 @@ private:
         cb = nullptr;
     }
 };
+
+// Comparison operators for Object<void>
+inline bool operator==(const Object<void>& a, const Object<void>& b) {
+    if (!a && !b) return true;
+    if (!a || !b) return false;
+    // Same ControlBlock = same object
+    return a.cb == b.cb;
+}
+
+inline bool operator!=(const Object<void>& a, const Object<void>& b) {
+    return !(a == b);
+}
 
 // `object` is now an alias for Object<void>
 using object = Object<void>;

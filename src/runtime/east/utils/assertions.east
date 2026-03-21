@@ -30,8 +30,8 @@
       "name": "_eq_any",
       "original_name": "_eq_any",
       "arg_types": {
-        "actual": "str|int64|float64|bool|None",
-        "expected": "str|int64|float64|bool|None"
+        "actual": "object",
+        "expected": "object"
       },
       "arg_order": [
         "actual",
@@ -114,7 +114,7 @@
                         "end_lineno": 7,
                         "end_col_offset": 34
                       },
-                      "resolved_type": "str|int64|float64|bool|None",
+                      "resolved_type": "object",
                       "casts": [],
                       "borrow_kind": "readonly_ref",
                       "repr": "actual",
@@ -169,7 +169,7 @@
                           "end_lineno": 7,
                           "end_col_offset": 60
                         },
-                        "resolved_type": "str|int64|float64|bool|None",
+                        "resolved_type": "object",
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "expected",
@@ -234,7 +234,7 @@
                           "end_lineno": 7,
                           "end_col_offset": 34
                         },
-                        "resolved_type": "str|int64|float64|bool|None",
+                        "resolved_type": "object",
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "actual",
@@ -289,7 +289,7 @@
                             "end_lineno": 7,
                             "end_col_offset": 60
                           },
-                          "resolved_type": "str|int64|float64|bool|None",
+                          "resolved_type": "object",
                           "casts": [],
                           "borrow_kind": "readonly_ref",
                           "repr": "expected",
@@ -357,7 +357,7 @@
                         "end_lineno": 9,
                         "end_col_offset": 21
                       },
-                      "resolved_type": "str|int64|float64|bool|None",
+                      "resolved_type": "object",
                       "casts": [],
                       "borrow_kind": "readonly_ref",
                       "repr": "actual",
@@ -375,7 +375,7 @@
                           "end_lineno": 9,
                           "end_col_offset": 33
                         },
-                        "resolved_type": "str|int64|float64|bool|None",
+                        "resolved_type": "object",
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "expected",
@@ -403,7 +403,7 @@
                           "end_lineno": 9,
                           "end_col_offset": 21
                         },
-                        "resolved_type": "str|int64|float64|bool|None",
+                        "resolved_type": "object",
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "actual",
@@ -421,7 +421,7 @@
                             "end_lineno": 9,
                             "end_col_offset": 33
                           },
-                          "resolved_type": "str|int64|float64|bool|None",
+                          "resolved_type": "object",
                           "casts": [],
                           "borrow_kind": "readonly_ref",
                           "repr": "expected",
@@ -462,56 +462,12 @@
       "yield_value_type": "unknown",
       "arg_type_exprs": {
         "actual": {
-          "kind": "UnionType",
-          "union_mode": "general",
-          "options": [
-            {
-              "kind": "NamedType",
-              "name": "str"
-            },
-            {
-              "kind": "NamedType",
-              "name": "int64"
-            },
-            {
-              "kind": "NamedType",
-              "name": "float64"
-            },
-            {
-              "kind": "NamedType",
-              "name": "bool"
-            },
-            {
-              "kind": "NamedType",
-              "name": "None"
-            }
-          ]
+          "kind": "DynamicType",
+          "name": "object"
         },
         "expected": {
-          "kind": "UnionType",
-          "union_mode": "general",
-          "options": [
-            {
-              "kind": "NamedType",
-              "name": "str"
-            },
-            {
-              "kind": "NamedType",
-              "name": "int64"
-            },
-            {
-              "kind": "NamedType",
-              "name": "float64"
-            },
-            {
-              "kind": "NamedType",
-              "name": "bool"
-            },
-            {
-              "kind": "NamedType",
-              "name": "None"
-            }
-          ]
+          "kind": "DynamicType",
+          "name": "object"
         }
       },
       "return_type_expr": {
@@ -1283,8 +1239,8 @@
       "name": "py_assert_eq",
       "original_name": "py_assert_eq",
       "arg_types": {
-        "actual": "str|int64|float64|bool|None",
-        "expected": "str|int64|float64|bool|None",
+        "actual": "object",
+        "expected": "object",
         "label": "str"
       },
       "arg_order": [
@@ -1297,9 +1253,9 @@
           "kind": "Constant",
           "source_span": {
             "lineno": 22,
-            "col_offset": 114,
+            "col_offset": 64,
             "end_lineno": 22,
-            "end_col_offset": 116
+            "end_col_offset": 66
           },
           "resolved_type": "str",
           "casts": [],
@@ -1382,7 +1338,7 @@
                   "end_lineno": 23,
                   "end_col_offset": 23
                 },
-                "resolved_type": "str|int64|float64|bool|None",
+                "resolved_type": "object",
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "actual",
@@ -1396,7 +1352,7 @@
                   "end_lineno": 23,
                   "end_col_offset": 33
                 },
-                "resolved_type": "str|int64|float64|bool|None",
+                "resolved_type": "object",
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "expected",
@@ -1727,7 +1683,7 @@
                             "end_lineno": 27,
                             "end_col_offset": 49
                           },
-                          "resolved_type": "str|int64|float64|bool|None",
+                          "resolved_type": "object",
                           "casts": [],
                           "borrow_kind": "readonly_ref",
                           "repr": "actual",
@@ -1756,7 +1712,7 @@
                             "end_lineno": 27,
                             "end_col_offset": 70
                           },
-                          "resolved_type": "str|int64|float64|bool|None",
+                          "resolved_type": "object",
                           "casts": [],
                           "borrow_kind": "readonly_ref",
                           "repr": "expected",
@@ -1876,7 +1832,7 @@
                             "end_lineno": 29,
                             "end_col_offset": 40
                           },
-                          "resolved_type": "str|int64|float64|bool|None",
+                          "resolved_type": "object",
                           "casts": [],
                           "borrow_kind": "readonly_ref",
                           "repr": "actual",
@@ -1905,7 +1861,7 @@
                             "end_lineno": 29,
                             "end_col_offset": 61
                           },
-                          "resolved_type": "str|int64|float64|bool|None",
+                          "resolved_type": "object",
                           "casts": [],
                           "borrow_kind": "readonly_ref",
                           "repr": "expected",
@@ -2008,56 +1964,12 @@
       "yield_value_type": "unknown",
       "arg_type_exprs": {
         "actual": {
-          "kind": "UnionType",
-          "union_mode": "general",
-          "options": [
-            {
-              "kind": "NamedType",
-              "name": "str"
-            },
-            {
-              "kind": "NamedType",
-              "name": "int64"
-            },
-            {
-              "kind": "NamedType",
-              "name": "float64"
-            },
-            {
-              "kind": "NamedType",
-              "name": "bool"
-            },
-            {
-              "kind": "NamedType",
-              "name": "None"
-            }
-          ]
+          "kind": "DynamicType",
+          "name": "object"
         },
         "expected": {
-          "kind": "UnionType",
-          "union_mode": "general",
-          "options": [
-            {
-              "kind": "NamedType",
-              "name": "str"
-            },
-            {
-              "kind": "NamedType",
-              "name": "int64"
-            },
-            {
-              "kind": "NamedType",
-              "name": "float64"
-            },
-            {
-              "kind": "NamedType",
-              "name": "bool"
-            },
-            {
-              "kind": "NamedType",
-              "name": "None"
-            }
-          ]
+          "kind": "DynamicType",
+          "name": "object"
         },
         "label": {
           "kind": "NamedType",

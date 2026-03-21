@@ -8,16 +8,19 @@
 #include "core/exceptions.h"
 #include "core/io.h"
 #include "built_in/base_ops.h"
-#include "built_in/string_ops.h"
 #include "core/str_methods.h"
 #include "core/conversions.h"
 #include "built_in/list_ops.h"
 #include "built_in/dict_ops.h"
 #include "built_in/bounds.h"
 #include "core/type_id_support.h"
-#include "built_in/type_id.h"
 #include "core/tagged_value.h"
 #include "core/rc_ops.h"
+
+// NOTE: built_in/string_ops.h と built_in/type_id.h は runtime/east/ から
+// emit パイプラインで生成されるヘッダー。ソースツリーには存在しない。
+// emitter が必要に応じて個別に include を生成する。
+// py_runtime.h からは include しない。
 
 // py_div / py_floordiv / py_mod は built_in/scalar_ops.h へ移動済み。
 

@@ -2,7 +2,7 @@
 from pytra.std import abi
 
 
-def _eq_any(actual: str | int | float | bool | None, expected: str | int | float | bool | None) -> bool:
+def _eq_any(actual: object, expected: object) -> bool:
     try:
         return py_to_string(actual) == py_to_string(expected)
     except NameError:
@@ -19,7 +19,7 @@ def py_assert_true(cond: bool, label: str = "") -> bool:
     return False
 
 
-def py_assert_eq(actual: str | int | float | bool | None, expected: str | int | float | bool | None, label: str = "") -> bool:
+def py_assert_eq(actual: object, expected: object, label: str = "") -> bool:
     ok = _eq_any(actual, expected)
     if ok:
         return True

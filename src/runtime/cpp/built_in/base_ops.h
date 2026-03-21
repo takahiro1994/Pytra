@@ -55,7 +55,7 @@ static inline str py_str_slice(const str& v, int64 lo, int64 up) {
 // py_runtime.h から移動（P6-EAST3-PY-TO-STRING-INLINE-01）。
 // emitter は型確定ケースで ::std::to_string 等にインライン化済み。
 // object 境界の fallback として残す。
-template <class T>
+template <class T, ::std::enable_if_t<!::std::is_same_v<::std::decay_t<T>, object>, int> = 0>
 static inline ::std::string py_to_string(const T& v) {
     ::std::ostringstream oss;
     oss << v;
@@ -64,6 +64,19 @@ static inline ::std::string py_to_string(const T& v) {
 
 static inline ::std::string py_to_string(const ::std::string& v) {
     return v;
+}
+
+static inline ::std::string py_to_string(const object& v) {
+    if (!v) return "";
+    if (v.type_id() == PYTRA_TID_STR)
+        return static_cast<PyBoxedValue<str>*>(v.get())->value;
+    if (v.type_id() == PYTRA_TID_INT)
+        return ::std::to_string(static_cast<PyBoxedValue<int64>*>(v.get())->value);
+    if (v.type_id() == PYTRA_TID_FLOAT)
+        return ::std::to_string(static_cast<PyBoxedValue<float64>*>(v.get())->value);
+    if (v.type_id() == PYTRA_TID_BOOL)
+        return static_cast<PyBoxedValue<bool>*>(v.get())->value ? "True" : "False";
+    return "<object>";
 }
 
 static inline ::std::string py_to_string(const ::std::exception& v) {
@@ -86,11 +99,6 @@ template <class T>
 static inline ::std::string py_to_string(const ::std::optional<T>& v) {
     if (!v.has_value()) return "None";
     return py_to_string(*v);
-}
-
-static inline ::std::string py_to_string(const object& v) {
-    if (!v) return "None";
-    return "<object>";
 }
 
 #endif  // PYTRA_NATIVE_BUILT_IN_BASE_OPS_H

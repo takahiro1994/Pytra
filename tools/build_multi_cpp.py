@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -51,6 +52,19 @@ def main(argv: list[str]) -> int:
     if not manifest_path.exists():
         print(f"error: manifest not found: {manifest_path}", file=sys.stderr)
         return 1
+    def _collect_generated_cpp_sources() -> list[str]:
+        """Collect only the generated .cpp files that are actually #included by module sources."""
+        gen_dir = os.environ.get("PYTRA_GENERATED_CPP_DIR", "out/_test_generated_cpp")
+        gen_path = Path(gen_dir)
+        if not gen_path.exists():
+            return []
+        # Only include assertions.cpp — other generated sources are heavyweight and may have errors.
+        # The full generated source set will be linkable after Object<T> migration completes.
+        assertions_cpp = gen_path / "utils" / "assertions.cpp"
+        if assertions_cpp.exists():
+            return [str(assertions_cpp)]
+        return []
+
     manifest = _load_manifest(manifest_path)
     module_sources = _collect_sources(manifest)
 
@@ -72,8 +86,11 @@ def main(argv: list[str]) -> int:
         "src/runtime/east",
         "-I",
         str(include_dir_path),
+        "-I",
+        os.environ.get("PYTRA_GENERATED_CPP_DIR", "out/_test_generated_cpp"),
         *module_sources,
         *collect_runtime_cpp_sources(module_sources, include_dir_path),
+        *_collect_generated_cpp_sources(),
         "-o",
         args.output,
     ]

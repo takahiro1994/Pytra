@@ -64,6 +64,6 @@ static inline float64 py_to_float64(const object& v) {
     return static_cast<PyBoxedValue<float64>*>(v.get())->value;
 }
 
-// py_to_string for object is handled by the template in base_ops.h.
+// py_to_string for object is in base_ops.h (overload below template).
 
 #endif  // PYTRA_CORE_CONVERSIONS_H

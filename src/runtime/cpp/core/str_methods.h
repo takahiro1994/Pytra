@@ -2,7 +2,7 @@
 #define PYTRA_CORE_STR_METHODS_H
 
 #include "core/py_types.h"
-#include "built_in/string_ops.h"
+#include "built_in/string_ops_fwd.h"
 
 inline list<str> str::split(const str& sep, int64 maxsplit) const {
     return py_split(*this, sep, maxsplit);
