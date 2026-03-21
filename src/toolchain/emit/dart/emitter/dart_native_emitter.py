@@ -518,6 +518,120 @@ class DartNativeEmitter:
         self._local_var_stack: list[set[str]] = []
         self._needs_math_import = False
         self._needs_io_import = False
+        self._class_field_types: dict[str, dict[str, str]] = {}
+        self._function_return_types: dict[str, str] = {}
+
+    # --- type mapping ---
+
+    def _dart_type(self, east_type: Any) -> str:
+        """Map an EAST type string to a Dart type string."""
+        if not isinstance(east_type, str) or east_type == "":
+            return "dynamic"
+        t = east_type.strip()
+        if t in {"Any", "object", "unknown"}:
+            return "dynamic"
+        if t == "int" or t == "int64" or t == "int32" or t == "int16" or t == "int8":
+            return "int"
+        if t == "uint8" or t == "uint16" or t == "uint32" or t == "uint64" or t == "byte":
+            return "int"
+        if t == "float" or t == "float64" or t == "float32":
+            return "double"
+        if t == "bool":
+            return "bool"
+        if t == "str" or t == "string":
+            return "String"
+        if t == "None":
+            return "void"
+        if t in {"bytes", "bytearray"}:
+            return "List<int>"
+        # Optional: T | None
+        if t.find("|") != -1:
+            parts = [p.strip() for p in t.split("|")]
+            non_none = [p for p in parts if p != "None"]
+            has_none = len(non_none) < len(parts)
+            if has_none and len(non_none) == 1:
+                return self._dart_type(non_none[0]) + "?"
+            if not has_none and len(non_none) == 1:
+                return self._dart_type(non_none[0])
+            return "dynamic"
+        # list[T]
+        if t.startswith("list[") and t.endswith("]"):
+            inner = t[5:-1].strip()
+            return "List<" + self._dart_type(inner) + ">"
+        # dict[K, V]
+        if t.startswith("dict[") and t.endswith("]"):
+            inner = t[5:-1]
+            parts = self._split_generic_args(inner)
+            if len(parts) == 2:
+                return "Map<" + self._dart_type(parts[0]) + ", " + self._dart_type(parts[1]) + ">"
+            return "Map<dynamic, dynamic>"
+        # tuple[...] → List<dynamic>
+        if t.startswith("tuple[") and t.endswith("]"):
+            return "List<dynamic>"
+        # set[T]
+        if t.startswith("set[") and t.endswith("]"):
+            inner = t[4:-1].strip()
+            return "Set<" + self._dart_type(inner) + ">"
+        # callable
+        if t.startswith("callable") or t == "callable":
+            return "Function"
+        # User-defined class
+        if t in self.class_names:
+            return t
+        return "dynamic"
+
+    def _split_generic_args(self, inner: str) -> list[str]:
+        """Split 'K, V' respecting nested brackets."""
+        parts: list[str] = []
+        depth = 0
+        current: list[str] = []
+        i = 0
+        while i < len(inner):
+            ch = inner[i]
+            if ch == "[":
+                depth += 1
+                current.append(ch)
+            elif ch == "]":
+                depth -= 1
+                current.append(ch)
+            elif ch == "," and depth == 0:
+                parts.append("".join(current).strip())
+                current = []
+            else:
+                current.append(ch)
+            i += 1
+        if len(current) > 0:
+            parts.append("".join(current).strip())
+        return parts
+
+    def _dart_return_type(self, stmt: dict[str, Any]) -> str:
+        """Get the Dart return type for a function statement."""
+        rt = stmt.get("return_type")
+        if isinstance(rt, str) and rt.strip() != "":
+            return self._dart_type(rt)
+        return "dynamic"
+
+    def _dart_arg_type(self, stmt: dict[str, Any], arg_name: str) -> str:
+        """Get the Dart type for a function argument."""
+        arg_types_any = stmt.get("arg_types")
+        arg_types = arg_types_any if isinstance(arg_types_any, dict) else {}
+        t = arg_types.get(arg_name)
+        if isinstance(t, str) and t.strip() != "":
+            return self._dart_type(t)
+        return "dynamic"
+
+    def _dart_decl_type(self, stmt: dict[str, Any], value_node: Any) -> str:
+        """Get Dart type for a variable declaration from decl_type, annotation, or inference."""
+        decl_type_any = stmt.get("decl_type")
+        if isinstance(decl_type_any, str) and decl_type_any.strip() != "":
+            return self._dart_type(decl_type_any)
+        anno_any = stmt.get("annotation")
+        if isinstance(anno_any, str) and anno_any.strip() != "":
+            return self._dart_type(anno_any)
+        inferred = self._infer_decl_type_from_expr(value_node)
+        if inferred != "":
+            return self._dart_type(inferred)
+        return "var"
 
     def _current_type_map(self) -> dict[str, str]:
         if len(self._local_type_stack) == 0:
@@ -828,14 +942,46 @@ class DartNativeEmitter:
         self.class_names = set()
         self.imported_modules = set()
         self.function_names = set()
+        self._function_return_types = {}
+        self._class_field_types = {}
         self.relative_import_name_aliases = _collect_relative_import_name_aliases(self.east_doc)
         for stmt in body:
             kind = stmt.get("kind")
             if kind == "ClassDef":
-                self.class_names.add(_safe_ident(stmt.get("name"), "Class_"))
+                cls_name = _safe_ident(stmt.get("name"), "Class_")
+                self.class_names.add(cls_name)
+                # Collect field types
+                fields: dict[str, str] = {}
+                cls_body = stmt.get("body")
+                if isinstance(cls_body, list):
+                    for sub in cls_body:
+                        if isinstance(sub, dict) and sub.get("kind") == "AnnAssign":
+                            target_any = sub.get("target")
+                            if isinstance(target_any, dict) and target_any.get("kind") == "Name":
+                                fname = _safe_ident(target_any.get("id"), "field")
+                                ftype = sub.get("annotation")
+                                if not isinstance(ftype, str) or ftype.strip() == "":
+                                    ftype = sub.get("decl_type")
+                                if isinstance(ftype, str) and ftype.strip() != "":
+                                    fields[fname] = ftype.strip()
+                        if isinstance(sub, dict) and sub.get("kind") == "FunctionDef":
+                            fn_name = _safe_ident(sub.get("name"), "fn")
+                            rt = sub.get("return_type")
+                            if isinstance(rt, str) and rt.strip() != "":
+                                self._function_return_types[cls_name + "." + fn_name] = rt.strip()
+                field_types_any = stmt.get("field_types")
+                if isinstance(field_types_any, dict):
+                    for fk, fv in field_types_any.items():
+                        if isinstance(fk, str) and isinstance(fv, str) and fv.strip() != "":
+                            fields[_safe_ident(fk, "field")] = fv.strip()
+                self._class_field_types[cls_name] = fields
                 continue
             if kind == "FunctionDef":
-                self.function_names.add(_safe_ident(stmt.get("name"), "fn"))
+                fn_name = _safe_ident(stmt.get("name"), "fn")
+                self.function_names.add(fn_name)
+                rt = stmt.get("return_type")
+                if isinstance(rt, str) and rt.strip() != "":
+                    self._function_return_types[fn_name] = rt.strip()
                 continue
             if kind == "Import":
                 names_any = stmt.get("names")
@@ -879,6 +1025,8 @@ class DartNativeEmitter:
 
     def _render_name_expr(self, expr_any: dict[str, Any]) -> str:
         ident = _safe_ident(expr_any.get("id"), "value")
+        if ident == "self" and self.current_class_name != "":
+            return "this"
         if ident == "main" and "__pytra_main" in self.function_names and "main" not in self.function_names:
             ident = "__pytra_main"
         return self.relative_import_name_aliases.get(ident, ident)
@@ -1124,19 +1272,20 @@ class DartNativeEmitter:
                         decl_type = anno_s.strip()
                 if decl_type == "":
                     decl_type = self._infer_decl_type_from_expr(value_node)
+                dart_t = self._dart_type(decl_type) if decl_type != "" else "var"
                 if value_node is None and bool(stmt.get("declare")):
                     if decl_type in _NIL_FREE_DECL_TYPES:
                         if decl_type != "":
                             self._current_type_map()[target_name] = decl_type
                         if len(self._local_var_stack) > 0:
                             self._current_local_vars().add(target_name)
-                        self._emit_line("var " + target + ";")
+                        self._emit_line(dart_t + " " + target + ";")
                         return
                 if decl_type != "":
                     self._current_type_map()[target_name] = decl_type
                 if len(self._local_var_stack) > 0:
                     self._current_local_vars().add(target_name)
-                self._emit_line("var " + target + " = " + value + ";")
+                self._emit_line(dart_t + " " + target + " = " + value + ";")
             else:
                 self._emit_line(target + " = " + value + ";")
             return
@@ -1162,7 +1311,8 @@ class DartNativeEmitter:
                         self._current_type_map()[target_name] = decl_type
                     if len(self._local_var_stack) > 0 and target_name not in self._current_local_vars():
                         self._current_local_vars().add(target_name)
-                        self._emit_line("var " + target + " = " + value + ";")
+                        dart_t = self._dart_type(decl_type) if decl_type != "" else "var"
+                        self._emit_line(dart_t + " " + target + " = " + value + ";")
                         return
                 self._emit_line(target + " = " + value + ";")
                 return
@@ -1186,7 +1336,8 @@ class DartNativeEmitter:
                         self._current_type_map()[target_name] = decl_type
                     if len(self._local_var_stack) > 0 and target_name not in self._current_local_vars():
                         self._current_local_vars().add(target_name)
-                        self._emit_line("var " + target + " = " + value + ";")
+                        dart_t = self._dart_type(decl_type) if decl_type != "" else "var"
+                        self._emit_line(dart_t + " " + target + " = " + value + ";")
                         return
                 self._emit_line(target + " = " + value + ";")
                 return
@@ -1302,8 +1453,14 @@ class DartNativeEmitter:
         arg_names: list[str] = []
         for a in args:
             arg_names.append(_safe_ident(a, "arg"))
-        params = ", ".join("dynamic " + n for n in arg_names)
-        self._emit_line("dynamic " + name + "(" + params + ") {")
+        param_parts: list[str] = []
+        for a_raw, a_safe in zip(args, arg_names):
+            raw_name = a_raw if isinstance(a_raw, str) else a_safe
+            at = self._dart_arg_type(stmt, raw_name)
+            param_parts.append(at + " " + a_safe)
+        params = ", ".join(param_parts)
+        ret_type = self._dart_return_type(stmt)
+        self._emit_line(ret_type + " " + name + "(" + params + ") {")
         self.indent += 1
         self._push_function_context(stmt, arg_names, args)
         self._emit_block(stmt.get("body"))
@@ -1337,6 +1494,7 @@ class DartNativeEmitter:
             self._emit_line("class " + cls_name + " {")
         self.indent += 1
         body = self._dict_list(stmt.get("body"))
+        field_types = self._class_field_types.get(cls_name, {})
         # Collect fields for dataclass or from AnnAssign
         fields: list[str] = []
         for sub in body:
@@ -1345,7 +1503,9 @@ class DartNativeEmitter:
                 if isinstance(target_any, dict) and target_any.get("kind") == "Name":
                     field_name = _safe_ident(target_any.get("id"), "field")
                     fields.append(field_name)
-                    self._emit_line("dynamic " + field_name + ";")
+                    ft = field_types.get(field_name, "")
+                    dart_ft = self._dart_type(ft) if ft != "" else "dynamic"
+                    self._emit_line(dart_ft + " " + field_name + ";")
         has_init = False
         for sub in body:
             if sub.get("kind") != "FunctionDef":
@@ -1365,16 +1525,22 @@ class DartNativeEmitter:
         arg_order_any = stmt.get("arg_order")
         arg_order = arg_order_any if isinstance(arg_order_any, list) else []
         args: list[str] = []
+        raw_args: list[str] = []
         for i_idx, arg in enumerate(arg_order):
             arg_name = _safe_ident(arg, "arg")
-            if i_idx == 0 and arg_name == "self_":
+            if i_idx == 0 and (arg_name == "self_" or arg_name == "self"):
                 continue
             args.append(arg_name)
+            raw_args.append(arg if isinstance(arg, str) else arg_name)
         prev_class = self.current_class_name
         prev_base = self.current_class_base_name
         self.current_class_name = cls_name
         self.current_class_base_name = base_name
-        params = ", ".join("dynamic " + n for n in args)
+        param_parts: list[str] = []
+        for a_raw, a_safe in zip(raw_args, args):
+            at = self._dart_arg_type(stmt, a_raw)
+            param_parts.append(at + " " + a_safe)
+        params = ", ".join(param_parts)
         if method_name == "__init__":
             self._emit_line(cls_name + "(" + params + ") {")
             self.indent += 1
@@ -1389,7 +1555,8 @@ class DartNativeEmitter:
             return
         if method_name == "__str__":
             method_name = "toString"
-        self._emit_line("dynamic " + method_name + "(" + params + ") {")
+        ret_type = self._dart_return_type(stmt)
+        self._emit_line(ret_type + " " + method_name + "(" + params + ") {")
         self.indent += 1
         self._push_function_context(stmt, args, arg_order[1:] if len(arg_order) > 0 else arg_order)
         self._emit_block(stmt.get("body"))
