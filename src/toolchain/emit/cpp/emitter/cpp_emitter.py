@@ -3359,7 +3359,9 @@ class CppEmitter(CppAnalysisEmitter, CppModuleEmitter, CppClassEmitter, CppTypeB
             if type_name == "object":
                 return "PYTRA_TID_OBJECT"
             if type_name in self.ref_classes:
-                return f"{type_name}::PYTRA_TYPE_ID"
+                use_object_t = getattr(self, "use_object_t", False)
+                tid_field = "TYPE_ID" if use_object_t else "PYTRA_TYPE_ID"
+                return f"{type_name}::{tid_field}"
             if self.is_declared(type_name):
                 return type_name
             return ""

@@ -298,9 +298,12 @@ class CppRuntimeExprEmitter:
         if union_name == "" and value_t in tagged_union_types:
             union_name = value_t
         if union_name == "" and "|" in value_t:
-            # Inline union: val_t is "str|int64|..." which is the east_type key.
             if value_t in tagged_union_types:
                 union_name = value_t
         if union_name in tagged_union_types:
             return f"({value_expr}).tag == {expected_type_id_expr}"
+        # Object<T> mode: use g_type_table interval check
+        linker_ti = getattr(self, "_linker_type_info_table", {})
+        if len(linker_ti) > 0:
+            return f"({value_expr}).isinstance(g_type_table[{expected_type_id_expr}])"
         return f"py_runtime_value_isinstance({value_expr}, {expected_type_id_expr})"
