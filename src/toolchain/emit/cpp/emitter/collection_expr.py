@@ -56,7 +56,7 @@ class CppCollectionExprEmitter:
                 rv = parts[i] if i < len(parts) else ""
                 boxed_parts.append(self._box_expr_for_any(rv, e))
             items = sep.join(boxed_parts)
-            return f"object(rc_new<list<object>>(list<object>{{{items}}}))"
+            return f"object(make_object<list<object>>(PYTRA_TID_LIST, list<object>{{{items}}}))"
         return f"{t}{{{items}}}"
 
     def _render_expr_kind_tuple(self, expr: Any, expr_d: dict[str, Any]) -> str:

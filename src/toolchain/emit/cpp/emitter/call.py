@@ -60,7 +60,7 @@ class CppCallEmitter:
 
     def _render_empty_pyobj_runtime_list_object(self) -> str:
         """Render an empty list<object> wrapped in object."""
-        return "object(rc_new<list<object>>(list<object>{}))"
+        return "object(make_object<list<object>>(PYTRA_TID_LIST, list<object>{}))"
 
     def _render_json_decode_call(self, expr_d: dict[str, Any]) -> str:
         lowered_kind = self.any_dict_get_str(expr_d, "lowered_kind", "")

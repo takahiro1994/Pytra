@@ -21,7 +21,7 @@ static inline pytra_type_id py_runtime_object_type_id(const object& v) {
     if (!v) {
         return PYTRA_TID_NONE;
     }
-    pytra_type_id out = v->py_type_id();
+    pytra_type_id out = v.type_id();
     if (out == 0) {
         return PYTRA_TID_OBJECT;
     }

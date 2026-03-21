@@ -3,7 +3,8 @@
 
 #include "core/py_types.h"
 
-// PyBoxed<T, TID>: box any value type into an RcObject for object storage.
+// PyBoxed<T, TID>: box any value type into an RcObject for legacy code.
+// New code should use Object<T> + ControlBlock instead.
 template <class T, pytra_type_id TID>
 struct PyBoxed : RcObject {
     T value;
@@ -12,23 +13,16 @@ struct PyBoxed : RcObject {
     pytra_type_id py_type_id() const noexcept override { return TID; }
 };
 
-// py_box / py_unbox: standalone helpers (prefer object::unbox in new code).
+// py_box: create an object from a POD value (legacy helper).
 template <class T, pytra_type_id TID>
 static inline object py_box(const T& v) {
-    return object(static_cast<RcObject*>(new PyBoxed<T, TID>(v)));
+    return object(make_object<PyBoxedValue<T>>(TID, v));
 }
 
+// py_unbox: extract a POD value from an object (legacy helper).
 template <class T, pytra_type_id TID>
 static inline const T& py_unbox(const object& v) {
-    return static_cast<PyBoxed<T, TID>*>(v.get())->value;
+    return static_cast<PyBoxedValue<T>*>(v.get())->value;
 }
-
-// Deferred object POD constructors (str is now complete).
-inline object::object(const str& v) : tag(PYTRA_TID_STR), _rc(static_cast<RcObject*>(new PyBoxed<str, PYTRA_TID_STR>(v))) {}
-inline object::object(const char* v) : tag(PYTRA_TID_STR), _rc(static_cast<RcObject*>(new PyBoxed<str, PYTRA_TID_STR>(str(v)))) {}
-inline object::object(int64 v) : tag(PYTRA_TID_INT), _rc(static_cast<RcObject*>(new PyBoxed<int64, PYTRA_TID_INT>(v))) {}
-inline object::object(int v) : tag(PYTRA_TID_INT), _rc(static_cast<RcObject*>(new PyBoxed<int64, PYTRA_TID_INT>(static_cast<int64>(v)))) {}
-inline object::object(float64 v) : tag(PYTRA_TID_FLOAT), _rc(static_cast<RcObject*>(new PyBoxed<float64, PYTRA_TID_FLOAT>(v))) {}
-inline object::object(bool v) : tag(PYTRA_TID_BOOL), _rc(static_cast<RcObject*>(new PyBoxed<bool, PYTRA_TID_BOOL>(v))) {}
 
 #endif  // PYTRA_CORE_TAGGED_VALUE_H
