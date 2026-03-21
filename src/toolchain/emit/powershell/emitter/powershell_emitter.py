@@ -109,6 +109,9 @@ def _render_lvalue(expr_any: Any) -> str:
             vname = _get_str(value_node, "id") if _get_str(value_node, "kind") == "Name" else ""
             if vname == "self":
                 return '$self["' + attr + '"]'
+            if vname in _CLASS_NAMES[0]:
+                # ClassName.attr = X → $script:attr = X (module-scope class variable)
+                return "$script:" + _safe_ident(attr, "_cv")
         return value + '["' + attr + '"]'
     if kind == "Subscript":
         value = _render_expr(expr_any.get("value"))
@@ -345,8 +348,8 @@ def _render_expr(expr_any: Any) -> str:
                     return "(" + cur_cls + "_" + _safe_ident(attr, "_p") + " $self)"
                 return '$self["' + attr + '"]'
             if vname in _CLASS_NAMES[0]:
-                # ClassName.attr → クラス変数 $attr（モジュールスコープ）
-                return "$" + _safe_ident(attr, "_cv")
+                # ClassName.attr → クラス変数 $script:attr（モジュールスコープ）
+                return "$script:" + _safe_ident(attr, "_cv")
             if vtype in _CLASS_NAMES[0]:
                 # Check if attr is a @property on the resolved type (local class)
                 props = _CLASS_PROPERTIES[0].get(vtype, set())
@@ -988,19 +991,21 @@ def _emit_stmt(stmt: dict[str, Any], *, indent: str, ctx: dict[str, Any]) -> lis
                 if raw == "pass":
                     return [indent + "# pass"]
         rendered = _render_expr(value)
-        # Suppress stdout leak for known side-effect-only calls
+        # Suppress stdout leak for known side-effect-only calls.
+        # Cannot use [void] broadly because it suppresses Write-Output inside called functions.
         if isinstance(value, dict) and _get_str(value, "kind") == "Call":
             func_node = value.get("func")
             if isinstance(func_node, dict):
                 fn = _get_str(func_node, "id")
                 if fn.startswith("py_assert_") or fn in ("makedirs", "mkdir"):
                     return [indent + "[void](" + rendered + ")"]
-                # Attribute call: obj.method() side effects
+                # Attribute call: obj.method() with known side-effect methods
                 if _get_str(func_node, "kind") == "Attribute":
                     attr_name = _get_str(func_node, "attr")
                     if attr_name in ("append", "extend", "insert", "remove", "discard",
                                      "clear", "sort", "reverse", "update", "add",
-                                     "close", "flush", "write"):
+                                     "close", "flush", "write", "inc", "dec",
+                                     "set_argv", "set_path"):
                         return [indent + "[void](" + rendered + ")"]
         return [indent + rendered]
 
