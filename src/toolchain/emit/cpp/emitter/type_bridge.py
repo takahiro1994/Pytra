@@ -260,7 +260,7 @@ class CppTypeBridgeEmitter:
                 or expr_txt.startswith("py_to_float64(")
             ):
                 return expr_txt
-            return f"{t_norm}({expr_txt})"
+            return f"py_to_{t_norm}({expr_txt})"
         if t_norm in {"int8", "uint8", "int16", "uint16", "int32", "uint32", "int64", "uint64"}:
             if t_norm == "int64" and (
                 expr_txt.startswith("int64(")
@@ -269,7 +269,7 @@ class CppTypeBridgeEmitter:
                 or expr_txt.startswith("py_to_int64(")
             ):
                 return expr_txt
-            return f"{t_norm}({expr_txt})"
+            return f"py_to_{t_norm}({expr_txt})"
         if t_norm == "bool":
             return f"py_to<bool>({expr_txt})"
         if t_norm == "str":

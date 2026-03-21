@@ -47,4 +47,23 @@ static inline T py_to(const T& v) {
     return v;
 }
 
+// Conversions from object (= Object<void>) to concrete types.
+static inline int64 py_to_int64(int64 v) { return v; }
+static inline int64 py_to_int64(float64 v) { return static_cast<int64>(v); }
+static inline int64 py_to_int64(const object& v) {
+    if (!v) return 0;
+    return static_cast<PyBoxedValue<int64>*>(v.get())->value;
+}
+
+static inline float64 py_to_float64(float64 v) { return v; }
+static inline float64 py_to_float64(int64 v) { return static_cast<float64>(v); }
+static inline float64 py_to_float64(const object& v) {
+    if (!v) return 0.0;
+    if (v.type_id() == PYTRA_TID_INT)
+        return static_cast<float64>(static_cast<PyBoxedValue<int64>*>(v.get())->value);
+    return static_cast<PyBoxedValue<float64>*>(v.get())->value;
+}
+
+// py_to_string for object is handled by the template in base_ops.h.
+
 #endif  // PYTRA_CORE_CONVERSIONS_H

@@ -130,4 +130,11 @@ static inline void py_list_sort_mut(list<T>& values) {
     ::std::sort(values.begin(), values.end());
 }
 
+// py_list_at_ref for object (= Object<void>): downcast to list<object> and index.
+static inline object py_list_at_ref(const object& values, int64 idx) {
+    auto typed = values.as<list<object>>();
+    if (!typed) throw ::std::runtime_error("py_list_at_ref: object is not a list");
+    return py_list_at_ref(*typed, idx);
+}
+
 #endif  // PYTRA_NATIVE_BUILT_IN_LIST_OPS_H

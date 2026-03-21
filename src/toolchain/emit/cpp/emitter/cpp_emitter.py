@@ -2989,7 +2989,7 @@ class CppEmitter(CppAnalysisEmitter, CppModuleEmitter, CppClassEmitter, CppTypeB
             return f"return {converted_expr}; "
         cpp_t = self._cpp_type_text(eff_t)
         return (
-            f"if (auto* __dict_cast = {value_expr}.as_ptr<{cpp_t}>()) return *__dict_cast; "
+            f"if (auto __dict_cast = {value_expr}.as<{cpp_t}>()) return *__dict_cast; "
             f"return {typed_default}; "
         )
 
