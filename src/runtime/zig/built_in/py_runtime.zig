@@ -105,17 +105,29 @@ pub fn to_str(value: anytype) []const u8 {
     return "<value>";
 }
 
-/// Concatenate two strings (stub).
+/// Concatenate two strings.
 pub fn str_concat(a: []const u8, b: []const u8) []const u8 {
-    _ = a;
-    _ = b;
-    return "<concat>";
+    const alloc = std.heap.page_allocator;
+    const buf = alloc.alloc(u8, a.len + b.len) catch return "";
+    @memcpy(buf[0..a.len], a);
+    @memcpy(buf[a.len..], b);
+    return buf;
 }
 
-/// Join multiple strings (stub).
+/// Join multiple string slices.
 pub fn str_join(parts: anytype) []const u8 {
-    _ = parts;
-    return "<join>";
+    const alloc = std.heap.page_allocator;
+    var total: usize = 0;
+    for (parts) |p| {
+        total += p.len;
+    }
+    const buf = alloc.alloc(u8, total) catch return "";
+    var pos: usize = 0;
+    for (parts) |p| {
+        @memcpy(buf[pos..][0..p.len], p);
+        pos += p.len;
+    }
+    return buf;
 }
 
 /// Create a new empty dict (stub).
