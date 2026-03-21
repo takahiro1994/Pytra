@@ -4760,9 +4760,9 @@ if __name__ == "__main__":
             case34_cpp = work / "case34.cpp"
             transpile(case34_py, case34_cpp)
             case34_txt = case34_cpp.read_text(encoding="utf-8")
-            self.assertIn("struct Tracked : public RcObject {", case34_txt)
-            self.assertIn("rc<Tracked> a = ", case34_txt)
-            self.assertIn("rc_new<Tracked>(\"A\")", case34_txt)
+            self.assertIn("struct Tracked {", case34_txt)
+            self.assertIn("Object<Tracked> a = ", case34_txt)
+            self.assertIn("make_object<Tracked>(", case34_txt)
             self.assertIn("a = b;", case34_txt)
 
     def test_dict_get_items_runtime(self) -> None:
@@ -6016,8 +6016,8 @@ class PadState:
             src_py.write_text(src, encoding="utf-8")
             east = load_east(src_py)
             cpp = transpile_to_cpp(east)
-        self.assertIn("PadState(int64 count = 1, rc<list<int64>> samples = rc_list_from_value(list<int64>{}))", cpp)
-        self.assertIn(": count(count), samples(samples)", cpp)
+        self.assertIn("PadState(int64 py_count = 1, Object<list<int64>> samples = rc_list_from_value(list<int64>{}))", cpp)
+        self.assertIn(": py_count(py_count), samples(samples)", cpp)
 
     def test_dataclass_field_repr_compare_metadata_do_not_leak_into_cpp(self) -> None:
         src = """from pytra.dataclasses import dataclass, field
