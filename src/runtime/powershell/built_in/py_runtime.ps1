@@ -292,6 +292,26 @@ function py_assert_true {
     return $true
 }
 
+function py_assert_eq {
+    param($a, $b, $msg)
+    $sa = (__pytra_str $a)
+    $sb = (__pytra_str $b)
+    if ($sa -ne $sb) {
+        $label = $(if ($msg) { " ($msg)" } else { "" })
+        throw "assertion failed: $sa != $sb$label"
+    }
+    return $true
+}
+
+function py_assert_true {
+    param($value, $msg)
+    if (-not $value) {
+        $label = $(if ($msg) { " ($msg)" } else { "" })
+        throw "assertion failed: expected true$label"
+    }
+    return $true
+}
+
 function py_assert_all {
     param([object[]]$checks)
     foreach ($c in $checks) {

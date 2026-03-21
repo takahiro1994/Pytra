@@ -20,6 +20,7 @@ _PS_KEYWORDS = {
 _RENAMED_SYMBOLS: list[dict[str, str]] = [{}]
 _CLASS_NAMES: list[set[str]] = [set()]
 _CLASS_BASES: list[dict[str, str]] = [{}]
+_CLASS_METHOD_NAMES: list[dict[str, set[str]]] = [{}]
 _LAMBDA_VARS: list[set[str]] = [set()]
 _FUNCTION_NAMES: list[set[str]] = [set()]
 # Maps imported name -> PowerShell expression (for from X import Y)
@@ -981,6 +982,27 @@ def _emit_class_def(stmt: dict[str, Any], *, indent: str, ctx: dict[str, Any]) -
                 lines.insert(i_line + 1, indent + '    $self["__type__"] = "' + name + '"')
                 break
 
+    # Generate inherited method aliases: ChildClass_method -> BaseClass_method
+    base = _get_str(stmt, "base")
+    if base != "":
+        # Collect methods defined in this class
+        own_methods: set[str] = set()
+        for member in body:
+            if isinstance(member, dict) and _get_str(member, "kind") == "FunctionDef":
+                mn = _get_str(member, "name")
+                if mn != "" and mn != "__init__":
+                    own_methods.add(mn)
+        # Collect methods from base class (walk all ClassDefs in module body)
+        base_methods: set[str] = set()
+        for node in _get_list(_get_dict(stmt, "_module_body_ref") if "_module_body_ref" in stmt else {}, "body"):
+            pass  # Can't access module body from here
+        # Fallback: collect from _CLASS_METHOD_NAMES
+        for bm in _CLASS_METHOD_NAMES[0].get(base, set()):
+            if bm not in own_methods:
+                base_fn = _safe_ident(base, "_Base") + "_" + _safe_ident(bm, "_m")
+                child_fn = name + "_" + _safe_ident(bm, "_m")
+                lines.append(indent + "function " + child_fn + " { param([Parameter(ValueFromRemainingArguments=$true)][object[]]$__args) " + base_fn + " @__args }")
+
     return lines
 
 
@@ -1064,6 +1086,18 @@ def transpile_to_powershell(east_doc: dict[str, Any]) -> str:
             if cn != "" and base != "":
                 class_bases[cn] = base
     _CLASS_BASES[0] = class_bases
+    class_method_names: dict[str, set[str]] = {}
+    for node in body:
+        if isinstance(node, dict) and _get_str(node, "kind") == "ClassDef":
+            cn = _get_str(node, "name")
+            methods: set[str] = set()
+            for member in _get_list(node, "body"):
+                if isinstance(member, dict) and _get_str(member, "kind") == "FunctionDef":
+                    mn = _get_str(member, "name")
+                    if mn != "" and mn != "__init__":
+                        methods.add(mn)
+            class_method_names[cn] = methods
+    _CLASS_METHOD_NAMES[0] = class_method_names
 
     # Collect function names
     func_names: set[str] = set()
