@@ -285,10 +285,85 @@ pub fn make_obj_drop(comptime T: type, value: T, vtable: *const anyopaque, drop_
     };
 }
 
-/// Empty list (stub for comprehensions).
-pub fn empty_list() std.ArrayList(i64) {
-    return std.ArrayList(i64).init(std.heap.page_allocator);
+// ─── List (Obj-managed ArrayList) ───
+
+/// Create an empty list as Obj.
+pub fn make_list(comptime T: type) Obj {
+    const alloc = std.heap.page_allocator;
+    const p = alloc.create(std.ArrayList(T)) catch @panic("alloc failed");
+    p.* = std.ArrayList(T).init(alloc);
+    const rc = alloc.create(usize) catch @panic("alloc failed");
+    rc.* = 1;
+    return Obj{ .data = @ptrCast(p), .vtable = @ptrCast(&EMPTY_VT), .rc = rc, .drop_fn = null };
 }
+
+/// Create a list from a slice as Obj.
+pub fn make_list_from(comptime T: type, items: []const T) Obj {
+    const alloc = std.heap.page_allocator;
+    const p = alloc.create(std.ArrayList(T)) catch @panic("alloc failed");
+    p.* = std.ArrayList(T).init(alloc);
+    p.appendSlice(items) catch {};
+    const rc = alloc.create(usize) catch @panic("alloc failed");
+    rc.* = 1;
+    return Obj{ .data = @ptrCast(p), .vtable = @ptrCast(&EMPTY_VT), .rc = rc, .drop_fn = null };
+}
+
+/// Empty list (Obj).
+pub fn empty_list() Obj {
+    return make_list(i64);
+}
+
+/// bytearray(size) — Obj wrapping ArrayList(u8) with zero-fill.
+pub fn bytearray(size: anytype) Obj {
+    const alloc = std.heap.page_allocator;
+    const n: usize = if (@TypeOf(size) == usize) size else @intCast(size);
+    const p = alloc.create(std.ArrayList(u8)) catch @panic("alloc failed");
+    p.* = std.ArrayList(u8).initCapacity(alloc, n) catch std.ArrayList(u8).init(alloc);
+    p.appendNTimes(0, n) catch {};
+    const rc = alloc.create(usize) catch @panic("alloc failed");
+    rc.* = 1;
+    return Obj{ .data = @ptrCast(p), .vtable = @ptrCast(&EMPTY_VT), .rc = rc, .drop_fn = null };
+}
+
+/// Append a value to an Obj-managed list.
+pub fn list_append(obj: Obj, comptime T: type, value: T) void {
+    const p: *std.ArrayList(T) = @ptrCast(@alignCast(obj.data));
+    p.append(value) catch {};
+}
+
+/// Get an element from an Obj-managed list.
+pub fn list_get(obj: Obj, comptime T: type, idx: i64) T {
+    const p: *std.ArrayList(T) = @ptrCast(@alignCast(obj.data));
+    return p.items[@intCast(idx)];
+}
+
+/// Set an element in an Obj-managed list.
+pub fn list_set(obj: Obj, comptime T: type, idx: i64, value: T) void {
+    const p: *std.ArrayList(T) = @ptrCast(@alignCast(obj.data));
+    p.items[@intCast(idx)] = value;
+}
+
+/// Get the length of an Obj-managed list.
+pub fn list_len(obj: Obj, comptime T: type) i64 {
+    const p: *std.ArrayList(T) = @ptrCast(@alignCast(obj.data));
+    return @as(i64, @intCast(p.items.len));
+}
+
+/// Get the items slice of an Obj-managed list (for iteration).
+pub fn list_items(obj: Obj, comptime T: type) []T {
+    const p: *std.ArrayList(T) = @ptrCast(@alignCast(obj.data));
+    return p.items;
+}
+
+/// Append a slice to an Obj-managed list.
+pub fn list_extend(obj: Obj, comptime T: type, src: Obj) void {
+    const dst: *std.ArrayList(T) = @ptrCast(@alignCast(obj.data));
+    const s: *std.ArrayList(T) = @ptrCast(@alignCast(src.data));
+    dst.appendSlice(s.items) catch {};
+}
+
+/// Empty vtable placeholder for containers.
+const EMPTY_VT = struct {};
 
 /// Slice (stub).
 pub fn slice(lower: anytype, upper: anytype) void {
@@ -297,21 +372,9 @@ pub fn slice(lower: anytype, upper: anytype) void {
     return;
 }
 
-/// bytearray(size) — allocate zero-initialized ArrayList(u8).
-pub fn bytearray(size: anytype) std.ArrayList(u8) {
-    const alloc = std.heap.page_allocator;
-    const n: usize = if (@TypeOf(size) == usize) size else @intCast(size);
-    var list = std.ArrayList(u8).initCapacity(alloc, n) catch return std.ArrayList(u8).init(alloc);
-    list.appendNTimes(0, n) catch {};
-    return list;
-}
-
-/// Create an ArrayList from a slice.
-pub fn list_from(comptime T: type, items: []const T) std.ArrayList(T) {
-    const alloc = std.heap.page_allocator;
-    var list = std.ArrayList(T).init(alloc);
-    list.appendSlice(items) catch {};
-    return list;
+/// Legacy list_from (backward compat — returns Obj now).
+pub fn list_from(comptime T: type, items: []const T) Obj {
+    return make_list_from(T, items);
 }
 
 /// time.perf_counter() — seconds since arbitrary epoch.
@@ -331,26 +394,26 @@ pub fn file_open(path: []const u8) PyObject {
 pub fn file_write(handle: PyObject, data: anytype) void {
     const p: *std.fs.File = @ptrFromInt(@as(usize, @intCast(handle)));
     const T = @TypeOf(data);
-    const info = @typeInfo(T);
-    if (info == .Struct) {
-        if (@hasField(T, "items")) {
-            const items = data.items;
-            const ItemT = @TypeOf(items[0]);
-            if (ItemT == u8) {
-                p.writeAll(items) catch {};
-            } else {
-                // ArrayList(i64) etc → convert each element to u8
-                const alloc = std.heap.page_allocator;
-                const buf = alloc.alloc(u8, items.len) catch return;
-                for (items, 0..) |v, i| {
-                    buf[i] = @intCast(v);
-                }
-                p.writeAll(buf) catch {};
-            }
-        }
-    } else if (info == .Pointer) {
+    if (T == Obj) {
+        // Obj wrapping ArrayList — write as bytes
+        file_write_obj(p, data);
+    } else if (@typeInfo(T) == .Pointer) {
         p.writeAll(data) catch {};
     }
+}
+
+fn file_write_obj(p: *std.fs.File, obj: Obj) void {
+    // Interpret as ArrayList(i64) (PNG/GIF data is built as list[int64])
+    // and convert each element to u8 for writing
+    const al: *std.ArrayList(i64) = @ptrCast(@alignCast(obj.data));
+    const items = al.items;
+    if (items.len == 0) return;
+    const alloc = std.heap.page_allocator;
+    const buf = alloc.alloc(u8, items.len) catch return;
+    for (items, 0..) |v, i| {
+        buf[i] = @intCast(v & 0xFF);
+    }
+    p.writeAll(buf) catch {};
 }
 
 pub fn file_close(handle: PyObject) void {

@@ -323,16 +323,6 @@ class ZigNativeEmitter:
                 if isinstance(tp, dict) and tp.get("kind") == "NameTarget":
                     mutated.add(_safe_ident(tp.get("id"), ""))
                 mutated.update(self._scan_mutated_vars(stmt.get("body")))
-            elif kind == "Expr":
-                val = stmt.get("value")
-                if isinstance(val, dict) and val.get("kind") == "Call":
-                    func = val.get("func")
-                    if isinstance(func, dict) and func.get("kind") == "Attribute":
-                        attr_name = func.get("attr")
-                        if attr_name in {"append", "extend", "insert", "pop", "remove", "clear", "sort", "reverse", "put"}:
-                            owner = func.get("value")
-                            if isinstance(owner, dict) and owner.get("kind") == "Name":
-                                mutated.add(_safe_ident(owner.get("id"), ""))
             elif kind == "While":
                 mutated.update(self._scan_mutated_vars(stmt.get("body")))
             elif kind == "Swap":
@@ -1201,7 +1191,12 @@ class ZigNativeEmitter:
                 iter_expr = self._render_expr(iter_expr_node)
                 iter_type = self._get_expr_type(iter_expr_node)
                 if iter_type.startswith("list[") or iter_type in {"bytearray", "bytes"}:
-                    iter_expr = iter_expr + ".items"
+                    elem = "i64"
+                    if iter_type.startswith("list[") and iter_type.endswith("]"):
+                        elem = self._zig_type(iter_type[5:-1].strip())
+                    elif iter_type in {"bytearray", "bytes"}:
+                        elem = "u8"
+                    iter_expr = "pytra.list_items(" + iter_expr + ", " + elem + ")"
                 self._emit_line("for (" + iter_expr + ") |" + target_name + "| {")
                 self.indent += 1
                 if len(self._local_var_stack) > 0:
@@ -1221,7 +1216,12 @@ class ZigNativeEmitter:
         iter_expr = self._render_expr(iter_any)
         iter_type = self._get_expr_type(iter_any) if isinstance(iter_any, dict) else ""
         if iter_type.startswith("list[") or iter_type in {"bytearray", "bytes"}:
-            iter_expr = iter_expr + ".items"
+            elem = "i64"
+            if iter_type.startswith("list[") and iter_type.endswith("]"):
+                elem = self._zig_type(iter_type[5:-1].strip())
+            elif iter_type in {"bytearray", "bytes"}:
+                elem = "u8"
+            iter_expr = "pytra.list_items(" + iter_expr + ", " + elem + ")"
         self._emit_line("for (" + iter_expr + ") |" + target_name + "| {")
         self.indent += 1
         if len(self._local_var_stack) > 0:
@@ -1630,11 +1630,16 @@ class ZigNativeEmitter:
                         if sf_name == attr:
                             return "Module_" + owner + "_" + attr
             obj = self._render_expr(val_node)
-            # ArrayList の .len → .items.len
+            # Obj-managed list の .len → pytra.list_len
             if attr == "len":
                 val_type = self._get_expr_type(val_node) if isinstance(val_node, dict) else ""
                 if val_type.startswith("list[") or val_type in {"bytearray", "bytes"}:
-                    return obj + ".items.len"
+                    elem = "i64"
+                    if val_type.startswith("list[") and val_type.endswith("]"):
+                        elem = self._zig_type(val_type[5:-1].strip())
+                    elif val_type in {"bytearray", "bytes"}:
+                        elem = "u8"
+                    return "pytra.list_len(" + obj + ", " + elem + ")"
             return obj + "." + attr
         if kind == "Subscript":
             value_node = ed.get("value")
@@ -1644,7 +1649,12 @@ class ZigNativeEmitter:
             if obj_type.startswith("dict["):
                 return "(" + obj + ".get(" + idx + ") orelse 0)"
             if obj_type.startswith("list[") or obj_type in {"bytearray", "bytes"}:
-                return obj + ".items[@intCast(" + idx + ")]"
+                elem_type = "i64"
+                if obj_type.startswith("list[") and obj_type.endswith("]"):
+                    elem_type = self._zig_type(obj_type[5:-1].strip())
+                elif obj_type in {"bytearray", "bytes"}:
+                    elem_type = "u8"
+                return "pytra.list_get(" + obj + ", " + elem_type + ", " + idx + ")"
             return obj + "[" + idx + "]"
         if kind == "List":
             elts_any = ed.get("elts")
@@ -1795,7 +1805,12 @@ class ZigNativeEmitter:
                     if len(args) > 0:
                         arg_t = self._get_expr_type(args[0])
                         if arg_t.startswith("list[") or arg_t in {"bytearray", "bytes"}:
-                            return "@as(i64, @intCast(" + arg_strs[0] + ".items.len))"
+                            elem = "i64"
+                            if arg_t.startswith("list[") and arg_t.endswith("]"):
+                                elem = self._zig_type(arg_t[5:-1].strip())
+                            elif arg_t in {"bytearray", "bytes"}:
+                                elem = "u8"
+                            return "pytra.list_len(" + arg_strs[0] + ", " + elem + ")"
                     if len(arg_strs) > 0:
                         return "@as(i64, @intCast(" + arg_strs[0] + ".len))"
                     return "0"
@@ -1899,7 +1914,13 @@ class ZigNativeEmitter:
                         return obj + "." + zig_attr + "(" + ", ".join(arg_strs) + ")"
                 if attr == "append":
                     if len(arg_strs) > 0:
-                        return obj + ".append(@intCast(" + arg_strs[0] + ")) catch {}"
+                        obj_type = self._lookup_expr_type(obj_node_for_attr)
+                        elem_type = "i64"
+                        if obj_type.startswith("list[") and obj_type.endswith("]"):
+                            elem_type = self._zig_type(obj_type[5:-1].strip())
+                        elif obj_type in {"bytearray", "bytes"}:
+                            elem_type = "u8"
+                        return "pytra.list_append(" + obj + ", " + elem_type + ", @intCast(" + arg_strs[0] + "))"
                 if attr == "join":
                     if len(arg_strs) > 0:
                         return "pytra.str_join_sep(" + obj + ", " + arg_strs[0] + ")"
@@ -2067,7 +2088,7 @@ class ZigNativeEmitter:
         if t == "str":
             return "[]const u8"
         if t == "bytes" or t == "bytearray":
-            return "std.ArrayList(u8)"
+            return "pytra.Obj"
         if t == "None":
             return "void"
         # --- Union / Optional ---
@@ -2082,10 +2103,7 @@ class ZigNativeEmitter:
             return "pytra.PyObject"
         # --- コンテナ型 ---
         if t.startswith("list[") and t.endswith("]"):
-            elem = t[5:-1].strip()
-            if elem == "uint8":
-                return "std.ArrayList(u8)"
-            return "std.ArrayList(" + self._zig_type(elem) + ")"
+            return "pytra.Obj"
         if t.startswith("set[") and t.endswith("]"):
             return "pytra.PyObject"
         if t.startswith("dict[") and t.endswith("]"):
@@ -2099,7 +2117,7 @@ class ZigNativeEmitter:
         if t.startswith("tuple[") and t.endswith("]"):
             parts = self._split_generic(t[6:-1])
             if len(parts) == 2 and parts[1].strip() == "...":
-                return "std.ArrayList(" + self._zig_type(parts[0].strip()) + ")"
+                return "pytra.Obj"
             inner_types = [self._zig_type(p.strip()) for p in parts]
             return "struct { " + ", ".join("_" + str(i) + ": " + zt for i, zt in enumerate(inner_types)) + " }"
         # --- クラス名 ---
