@@ -525,8 +525,16 @@ def _render_call_expr(expr: dict[str, Any]) -> str:
                 "ToUpper", "ToLower", "Split", "Replace", "Substring",
                 "Insert", "IndexOf", "LastIndexOf",
             }
-            if raw_attr not in _KNOWN_DOTNET_METHODS and (
-                owner_name == "self" or owner_name in _CLASS_NAMES[0]
+            if raw_attr not in _KNOWN_DOTNET_METHODS and raw_attr not in (
+                "append", "extend", "insert", "pop", "remove", "sort", "reverse",
+                "join", "format", "startswith", "endswith", "upper", "lower",
+                "strip", "rstrip", "lstrip", "split", "replace", "find", "rfind",
+                "keys", "values", "items", "get", "update", "setdefault",
+                "add", "discard", "union", "intersection", "difference",
+                "encode", "decode", "read", "write", "close", "flush",
+            ) and owner_name != "" and owner_name not in (
+                "math", "os", "sys", "json", "re", "random", "pathlib", "time",
+                "collections", "itertools", "functools", "io", "struct",
             ):
                 # Dynamic dispatch: ClassName_method $self args
                 if len(rendered_args) == 0:
