@@ -78,3 +78,4 @@
 - 2026-03-21: 残り 55 件の内訳: assert_fail 19（意味論差分）、not_recog 14、var_unset 12、other 12。
 - 2026-03-21: In/NotIn → -contains、BoolOp Python semantics、callable param lambda、union rejection 除去。78/131 到達。
 - 2026-03-21: 残り 53 件: assert 20、not_recog 10、var_unset 12、other 11。主に意味論差分（comprehension, enumerate, str_slice）と stdlib 未実装（enum, json, pathlib）。
+- 2026-03-21: super 対応、ClassName.attr→$self["attr"] 修正、py_assert_eq 改善、__pytra_in/__pytra_str_slice 追加、builtin 括弧囲み。82/131 到達。残り 49 件: assert 20、notrec 9、varset 11、other 11。
