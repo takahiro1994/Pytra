@@ -94,11 +94,8 @@ def main() -> int:
             out_path.parent.mkdir(parents=True, exist_ok=True)
             cmd = [
                 "python3",
-                "src/toolchain/emit/all.py",
+                f"src/toolchain/emit/{target}.py",
                 str(case_path),
-                "--target",
-                target,
-                "--no-runtime-hook",
                 "-o",
                 str(out_path),
             ]

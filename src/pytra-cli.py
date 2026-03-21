@@ -88,9 +88,7 @@ def cmd_emit(argv: list[str]) -> int:
     src_dir = _find_src_dir()
     emit_script = src_dir + "/toolchain/emit/" + target + ".py"
     if not Path(emit_script).exists():
-        # Fallback to all.py for unknown targets
-        emit_script = src_dir + "/toolchain/emit/all.py"
-        remaining = ["--target", target] + remaining
+        _fatal("pytra emit: unknown target '" + target + "'")
     cmd = [_python(), emit_script] + remaining
     result = _run(cmd)
     return result.returncode
