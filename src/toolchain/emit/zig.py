@@ -15,6 +15,7 @@ from toolchain.emit.zig.emitter import transpile_to_zig_native
 from toolchain.emit.loader import load_linked_modules
 
 _RUNTIME_DIR = Path(__file__).resolve().parents[2] / "runtime" / "zig" / "built_in"
+_STD_RUNTIME_DIR = Path(__file__).resolve().parents[2] / "runtime" / "zig" / "std"
 
 
 def _copy_runtime(output_dir: str) -> None:
@@ -23,6 +24,16 @@ def _copy_runtime(output_dir: str) -> None:
     for f in _RUNTIME_DIR.iterdir():
         if f.is_file():
             shutil.copy2(f, out / f.name)
+    # std native runtime をサブモジュールディレクトリにコピー
+    if _STD_RUNTIME_DIR.exists():
+        for f in _STD_RUNTIME_DIR.iterdir():
+            if f.is_file():
+                # math_native.zig → math/ にコピー
+                stem = f.stem  # e.g. "math_native"
+                mod_name = stem.replace("_native", "")  # e.g. "math"
+                mod_dir = out / mod_name
+                if mod_dir.exists():
+                    shutil.copy2(f, mod_dir / f.name)
 
 
 def main() -> int:

@@ -828,6 +828,13 @@ class ZigNativeEmitter:
                 # pytra.std.* の @extern 関数は py_runtime から提供
                 if module_id.startswith("pytra.std."):
                     continue
+                # from pytra.std import extern → extern は math_native への委譲
+                if module_id == "pytra.std" and name == "extern":
+                    # サブモジュール内から math_native.zig を参照
+                    if "math_native" not in emitted:
+                        self._emit_line("const math_native = @import(\"math_native.zig\");")
+                        emitted.add("math_native")
+                    continue
                 # from pytra.std import math → math/east.zig
                 if module_id == "pytra.std":
                     zig_path = name + "/east.zig"
@@ -1563,6 +1570,8 @@ class ZigNativeEmitter:
             if isinstance(val_node, dict) and val_node.get("kind") == "Name":
                 owner = _safe_ident(val_node.get("id"), "")
                 if owner == "math" and attr in {"pi", "e"}:
+                    if self.is_submodule:
+                        return "math_native." + attr
                     return "std.math." + attr
                 if owner in self._static_fields:
                     for sf_name, _, _ in self._static_fields[owner]:
@@ -1813,21 +1822,13 @@ class ZigNativeEmitter:
                         if base != "":
                             return base + "." + attr + "(undefined)"
                 obj = self._render_expr(obj_node_for_attr)
-                # math.* → std.math.*
+                # math.* → サブモジュール内は math_native.*、メインモジュールはそのまま
                 if isinstance(obj_node_for_attr, dict) and obj_node_for_attr.get("kind") == "Name" and str(obj_node_for_attr.get("id")) == "math":
                     if attr in {"sin", "cos", "tan", "asin", "acos", "atan", "exp", "log", "log2", "log10", "sqrt", "fabs", "floor", "ceil", "round", "fmod", "hypot", "atan2", "pow", "log_"}:
                         zig_attr = attr if attr != "log_" else "log"
-                        if zig_attr == "sqrt" and len(arg_strs) > 0:
-                            return "std.math.sqrt(@as(f64, " + arg_strs[0] + "))"
-                        if zig_attr == "pow" and len(arg_strs) >= 2:
-                            return "std.math.pow(f64, " + arg_strs[0] + ", " + arg_strs[1] + ")"
-                        if zig_attr == "fabs" and len(arg_strs) > 0:
-                            return "@abs(" + arg_strs[0] + ")"
-                        if zig_attr in {"floor", "ceil"} and len(arg_strs) > 0:
-                            return "@" + zig_attr + "(" + arg_strs[0] + ")"
-                        if zig_attr == "atan2" and len(arg_strs) >= 2:
-                            return "std.math.atan2(" + arg_strs[0] + ", " + arg_strs[1] + ")"
-                        return "std.math." + zig_attr + "(" + ", ".join(arg_strs) + ")"
+                        if self.is_submodule:
+                            return "math_native." + zig_attr + "(" + ", ".join(arg_strs) + ")"
+                        return obj + "." + zig_attr + "(" + ", ".join(arg_strs) + ")"
                 if attr == "append":
                     if len(arg_strs) > 0:
                         return obj + ".append(" + arg_strs[0] + ")"
