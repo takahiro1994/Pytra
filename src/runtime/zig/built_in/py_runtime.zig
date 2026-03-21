@@ -138,9 +138,38 @@ pub fn str_join(parts: anytype) []const u8 {
     return buf;
 }
 
-/// Create a new empty dict (stub).
-pub fn new_dict() void {
-    return;
+/// Join string slices with a separator (Python str.join equivalent).
+pub fn str_join_sep(sep: []const u8, parts: []const []const u8) []const u8 {
+    if (parts.len == 0) return "";
+    const alloc = std.heap.page_allocator;
+    var total: usize = 0;
+    for (parts) |p| {
+        total += p.len;
+    }
+    total += sep.len * (parts.len - 1);
+    const buf = alloc.alloc(u8, total) catch return "";
+    var pos: usize = 0;
+    for (parts, 0..) |p, i| {
+        if (i > 0) {
+            @memcpy(buf[pos..][0..sep.len], sep);
+            pos += sep.len;
+        }
+        @memcpy(buf[pos..][0..p.len], p);
+        pos += p.len;
+    }
+    return buf;
+}
+
+/// Create a new empty dict (stub — returns 0 as placeholder).
+pub fn new_dict() i64 {
+    return 0;
+}
+
+/// Dict subscript access (stub — returns 0).
+pub fn dict_get(d: anytype, key: anytype) i64 {
+    _ = d;
+    _ = key;
+    return 0;
 }
 
 /// isinstance check (stub).

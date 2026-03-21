@@ -1291,8 +1291,12 @@ class ZigNativeEmitter:
             obj = self._render_expr(val_node)
             return obj + "." + attr
         if kind == "Subscript":
-            obj = self._render_expr(ed.get("value"))
+            value_node = ed.get("value")
+            obj = self._render_expr(value_node)
             idx = self._render_expr(ed.get("slice"))
+            obj_type = self._get_expr_type(value_node)
+            if obj_type.startswith("dict["):
+                return "pytra.dict_get(" + obj + ", " + idx + ")"
             return obj + "[" + idx + "]"
         if kind == "List":
             elts_any = ed.get("elts")
@@ -1461,6 +1465,10 @@ class ZigNativeEmitter:
                 if attr == "append":
                     if len(arg_strs) > 0:
                         return obj + ".append(" + arg_strs[0] + ")"
+                if attr == "join":
+                    if len(arg_strs) > 0:
+                        return "pytra.str_join_sep(" + obj + ", " + arg_strs[0] + ")"
+                    return "pytra.str_join_sep(" + obj + ", &.{})"
                 if attr == "sqrt":
                     if len(arg_strs) > 0:
                         return "std.math.sqrt(@as(f64, " + arg_strs[0] + "))"
@@ -1470,31 +1478,10 @@ class ZigNativeEmitter:
         return fn_expr + "(" + ", ".join(arg_strs) + ")"
 
     def _render_dict(self, node: dict[str, Any]) -> str:
-        entries_any = node.get("entries")
-        if isinstance(entries_any, list) and len(entries_any) > 0:
-            parts: list[str] = []
-            for entry in entries_any:
-                if isinstance(entry, dict):
-                    k = self._render_expr(entry.get("key"))
-                    v = self._render_expr(entry.get("value"))
-                    parts.append(".{ " + k + ", " + v + " }")
-            if len(parts) == 0:
-                return "pytra.new_dict()"
-            return ".{ " + ", ".join(parts) + " }"
-        keys_any = node.get("keys")
-        values_any = node.get("values")
-        keys = keys_any if isinstance(keys_any, list) else []
-        values = values_any if isinstance(values_any, list) else []
-        if len(keys) == 0:
-            return "pytra.new_dict()"
-        parts2: list[str] = []
-        i = 0
-        while i < len(keys):
-            k = self._render_expr(keys[i])
-            v = self._render_expr(values[i]) if i < len(values) else "null"
-            parts2.append(".{ " + k + ", " + v + " }")
-            i += 1
-        return ".{ " + ", ".join(parts2) + " }"
+        # Dict は現在スタブ実装（i64 プレースホルダ）
+        # entries 内の式は副作用のために評価が必要な場合があるが、
+        # 現時点では全て pytra.new_dict() に委譲する
+        return "pytra.new_dict()"
 
     def _render_joined_str(self, node: dict[str, Any]) -> str:
         values_any = node.get("values")
@@ -1630,15 +1617,9 @@ class ZigNativeEmitter:
                 return "[]u8"
             return "[]const " + self._zig_type(elem)
         if t.startswith("set[") and t.endswith("]"):
-            elem = t[4:-1].strip()
-            return "std.AutoHashMap(" + self._zig_type(elem) + ", void)"
+            return "PyObject"
         if t.startswith("dict[") and t.endswith("]"):
-            parts = self._split_generic(t[5:-1])
-            if len(parts) == 2:
-                key_t = self._zig_type(parts[0].strip())
-                val_t = self._zig_type(parts[1].strip())
-                return "std.AutoHashMap(" + key_t + ", " + val_t + ")"
-            return "std.AutoHashMap([]const u8, PyObject)"
+            return "i64"  # stub: dict は i64 プレースホルダ（pytra.new_dict() が i64 を返す）
         if t.startswith("tuple[") and t.endswith("]"):
             parts = self._split_generic(t[6:-1])
             if len(parts) == 2 and parts[1].strip() == "...":
