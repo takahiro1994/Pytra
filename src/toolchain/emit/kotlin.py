@@ -39,6 +39,12 @@ def _rewrite_extern_delegates(code: str, module_stem: str) -> str:
     return code
 
 
+def _strip_main(code: str) -> str:
+    """Remove fun main() block from generated Kotlin runtime modules."""
+    import re
+    return re.sub(r'\nfun main\(args:\s*Array<String>\)\s*\{[^}]*\}\s*', '\n', code)
+
+
 def _generate_kotlin_runtime(output_dir: str) -> None:
     """Generate Kotlin runtime files from .east sources and copy native .kt files."""
     out = NativePath(output_dir)
@@ -81,6 +87,7 @@ def _generate_kotlin_runtime(output_dir: str) -> None:
                 east_doc = json.loads(east_text)
                 kt_text = transpile_to_kotlin(east_doc)
                 kt_text = _rewrite_extern_delegates(kt_text, stem)
+                kt_text = _strip_main(kt_text)
                 dst_kt.write_text(kt_text, encoding="utf-8")
             except Exception:
                 pass

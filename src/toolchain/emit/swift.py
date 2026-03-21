@@ -39,6 +39,16 @@ def _rewrite_extern_delegates(code: str, module_stem: str) -> str:
     return code
 
 
+def _strip_main(code: str) -> str:
+    """Remove @main struct Main { static func main() { } } from generated Swift runtime modules."""
+    import re
+    # Remove @main annotation
+    code = re.sub(r'@main\n', '', code)
+    # Remove struct Main { static func main() { ... } }
+    code = re.sub(r'struct Main \{[\s\S]*?\n\}\s*$', '', code)
+    return code.rstrip() + "\n"
+
+
 def _generate_swift_runtime(output_dir: str) -> None:
     """Generate Swift runtime files from .east sources and copy native .swift files."""
     out = NativePath(output_dir)
@@ -81,6 +91,7 @@ def _generate_swift_runtime(output_dir: str) -> None:
                 east_doc = json.loads(east_text)
                 swift_text = transpile_to_swift(east_doc)
                 swift_text = _rewrite_extern_delegates(swift_text, stem)
+                swift_text = _strip_main(swift_text)
                 dst_swift.write_text(swift_text, encoding="utf-8")
             except Exception:
                 pass
