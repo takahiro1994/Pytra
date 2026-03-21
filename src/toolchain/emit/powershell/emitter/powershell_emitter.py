@@ -824,13 +824,25 @@ def _emit_stmt(stmt: dict[str, Any], *, indent: str, ctx: dict[str, Any]) -> lis
                     lines.append(indent + "}")
                     return lines
                 else:
-                    # General tuple unpack in foreach
+                    # Check if iterating dict.items() -> use .Key/.Value
+                    is_dict_items = False
+                    if isinstance(iter_expr, dict) and _get_str(iter_expr, "kind") == "Call":
+                        ie_func = iter_expr.get("func")
+                        if isinstance(ie_func, dict) and _get_str(ie_func, "attr") == "items":
+                            is_dict_items = True
+
                     tmp_var = "$__for_item"
                     lines = [indent + "foreach (" + tmp_var + " in " + iter_rendered + ") {"]
-                    for idx_e, elt in enumerate(elements):
-                        if isinstance(elt, dict):
-                            elt_var = "$" + _safe_ident(_get_str(elt, "id"), "_v")
-                            lines.append(indent + "    " + elt_var + " = " + tmp_var + "[" + str(idx_e) + "]")
+                    if is_dict_items and len(elements) == 2:
+                        k_var = "$" + _safe_ident(_get_str(elements[0], "id") if isinstance(elements[0], dict) else "_k", "_k")
+                        v_var = "$" + _safe_ident(_get_str(elements[1], "id") if isinstance(elements[1], dict) else "_v", "_v")
+                        lines.append(indent + "    " + k_var + " = " + tmp_var + ".Key")
+                        lines.append(indent + "    " + v_var + " = " + tmp_var + ".Value")
+                    else:
+                        for idx_e, elt in enumerate(elements):
+                            if isinstance(elt, dict):
+                                elt_var = "$" + _safe_ident(_get_str(elt, "id"), "_v")
+                                lines.append(indent + "    " + elt_var + " = " + tmp_var + "[" + str(idx_e) + "]")
                     lines.extend(_emit_body(body, indent=indent + "    ", ctx=ctx))
                     lines.append(indent + "}")
                     return lines
