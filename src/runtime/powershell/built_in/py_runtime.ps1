@@ -106,6 +106,7 @@ function __pytra_bytes {
 
 function __pytra_ord {
     param([object]$value)
+    if ($value -is [char]) { return [int]$value }
     if ($value -isnot [string] -or $value.Length -eq 0) {
         throw "[PowerShell backend experimental] ord() expected a non-empty string"
     }
