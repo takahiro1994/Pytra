@@ -387,21 +387,21 @@ def _render_call_expr(expr: dict[str, Any]) -> str:
             if fn_name == "print":
                 return "__pytra_print " + " ".join(rendered_args) if len(rendered_args) > 0 else "__pytra_print"
             if fn_name == "len":
-                return "__pytra_len " + rendered_args[0] if len(rendered_args) > 0 else "__pytra_len"
+                return "(__pytra_len " + rendered_args[0] + ")" if len(rendered_args) > 0 else "(__pytra_len)"
             if fn_name == "str":
-                return "__pytra_str " + rendered_args[0] if len(rendered_args) > 0 else "__pytra_str"
+                return "(__pytra_str " + rendered_args[0] + ")" if len(rendered_args) > 0 else "(__pytra_str)"
             if fn_name == "int":
-                return "__pytra_int " + rendered_args[0] if len(rendered_args) > 0 else "__pytra_int"
+                return "(__pytra_int " + rendered_args[0] + ")" if len(rendered_args) > 0 else "(__pytra_int)"
             if fn_name == "float":
-                return "__pytra_float " + rendered_args[0] if len(rendered_args) > 0 else "__pytra_float"
+                return "(__pytra_float " + rendered_args[0] + ")" if len(rendered_args) > 0 else "(__pytra_float)"
             if fn_name == "bool":
-                return "__pytra_bool " + rendered_args[0] if len(rendered_args) > 0 else "__pytra_bool"
+                return "(__pytra_bool " + rendered_args[0] + ")" if len(rendered_args) > 0 else "(__pytra_bool)"
             if fn_name == "range":
-                return "__pytra_range " + " ".join(rendered_args)
+                return "(__pytra_range " + " ".join(rendered_args) + ")"
             if fn_name == "ord":
-                return "__pytra_ord " + rendered_args[0] if len(rendered_args) > 0 else "__pytra_ord"
+                return "(__pytra_ord " + rendered_args[0] + ")" if len(rendered_args) > 0 else "(__pytra_ord)"
             if fn_name == "chr":
-                return "__pytra_chr " + rendered_args[0] if len(rendered_args) > 0 else "__pytra_chr"
+                return "(__pytra_chr " + rendered_args[0] + ")" if len(rendered_args) > 0 else "(__pytra_chr)"
             if fn_name == "abs":
                 return "[Math]::Abs(" + rendered_args[0] + ")" if len(rendered_args) > 0 else "[Math]::Abs(0)"
             if fn_name == "min":
@@ -495,7 +495,8 @@ def _render_call_expr(expr: dict[str, Any]) -> str:
                     "log": "Log", "log10": "Log10", "log2": "Log",
                     "exp": "Exp", "pow": "Pow", "abs": "Abs",
                     "round": "Round", "trunc": "Truncate",
-                    "pi": "PI", "e": "E",
+                    "fabs": "Abs", "copysign": "CopySign",
+                    "pi": "PI", "e": "E", "inf": "PositiveInfinity",
                 }
                 ps_name = _MATH_PS.get(attr, "")
                 if ps_name != "":
