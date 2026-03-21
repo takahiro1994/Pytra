@@ -69,23 +69,12 @@ static inline pytra_type_id py_runtime_value_type_id(const list<T>&) { return PY
 template <class T>
 static inline pytra_type_id py_runtime_value_type_id(const set<T>&) { return PYTRA_TID_SET; }
 
-template <class T>
-static inline pytra_type_id py_runtime_value_type_id(const rc<T>& value) {
-    if (!value) return PYTRA_TID_NONE;
-    pytra_type_id out = value->py_type_id();
-    return out == 0 ? PYTRA_TID_OBJECT : out;
-}
+// Object<T> isinstance is provided by Object<T>::isinstance(TypeInfo*) in object.h.
+// Legacy rc<T>/RcObject specializations removed (Object<T> migration complete).
 
 template <class T>
 static inline bool py_runtime_value_isinstance(const T& value, pytra_type_id expected_type_id) {
     return py_runtime_type_id_is_subtype(py_runtime_value_type_id(value), expected_type_id);
-}
-
-// Specialization for user-defined ref classes that inherit RcObject.
-template <class T, ::std::enable_if_t<::std::is_base_of_v<RcObject, T>, int> = 0>
-static inline bool py_runtime_value_isinstance(const rc<T>& value, pytra_type_id expected_type_id) {
-    if (!value) return expected_type_id == PYTRA_TID_NONE;
-    return py_runtime_type_id_is_subtype(value->py_type_id(), expected_type_id);
 }
 
 #endif  // PYTRA_CORE_TYPE_ID_SUPPORT_H

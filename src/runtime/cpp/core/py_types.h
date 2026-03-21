@@ -20,22 +20,17 @@
 #include "core/gc.h"
 #include "core/io.h"
 
+// Legacy aliases — kept for backward compatibility with generated runtime .cpp
+// TODO: remove once all generated code is regenerated without rc<T>/RcObject
 using RcObject = pytra::gc::RcObject;
-
 template <class T>
 using rc = pytra::gc::RcHandle<T>;
-
-// Forward declarations needed by object.
-template <class T, pytra_type_id TID> struct PyBoxed;
-class str;
-
-// object is defined in core/object.h as Object<void> (type-erased view).
-// Forward declare here; full definition comes via #include "core/object.h" below.
-
 template <class T, class... Args>
 static inline rc<T> rc_new(Args&&... args) {
     return rc<T>::adopt(pytra::gc::rc_new<T>(::std::forward<Args>(args)...));
 }
+
+class str;
 
 class str;
 template <class T> class list;
