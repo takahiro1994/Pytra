@@ -83,7 +83,8 @@
 4. [ ] [ID: P0-REPO-ROOT-IMPORT-FIX-S4] `build_multi_cpp.py` の generated source 自動リンク拡張
 
 進捗:
-- 2026-03-22: conftest extern stripping 修正済み（`_build_cpp_emit_module_without_extern_decls` 適用）。REPO_ROOT 修正は include path 退行のため保留。計画書起票。
+- 2026-03-22: conftest extern stripping 修正済み。runtime_symbol_index.json の utils module パス修正済み。
+- 2026-03-22: REPO_ROOT/call.py の変更はhookにrevertされる。S1 の include path 整合性確保が先決。
 
 #### P0-21: EAST3 で C++ 準拠の integer promotion を実装
 
