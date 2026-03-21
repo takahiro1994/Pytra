@@ -1039,12 +1039,12 @@ def _emit_stmt(stmt: dict[str, Any], *, indent: str, ctx: dict[str, Any]) -> lis
         if isinstance(target, dict):
             target_d: dict[str, object] = target
             if _get_str(target_d, "kind") == "Attribute":
-                return [indent + _render_expr(target_d) + " = " + value]
+                return [indent + _render_lvalue(target_d) + " = " + value]
             if _get_str(target_d, "kind") == "Subscript":
                 owner = _render_expr(target_d.get("value"))
                 index = _render_expr(target_d.get("slice"))
                 return [indent + owner + "[" + index + "] = " + value]
-        lhs = _render_expr(target)
+        lhs = _render_lvalue(target)
         return [indent + lhs + " = " + value]
 
     if kind == "AnnAssign":
@@ -1061,7 +1061,7 @@ def _emit_stmt(stmt: dict[str, Any], *, indent: str, ctx: dict[str, Any]) -> lis
         return [indent + lhs + " = " + _render_expr(value)]
 
     if kind == "AugAssign":
-        target = _render_expr(stmt.get("target"))
+        target = _render_lvalue(stmt.get("target"))
         op = _get_str(stmt, "op")
         value = _render_expr(stmt.get("value"))
         op_map: dict[str, str] = {
