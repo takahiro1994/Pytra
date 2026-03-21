@@ -77,6 +77,20 @@ List<dynamic> pytraSlice(dynamic container, int start, dynamic end_) {
   return [];
 }
 
+// --- string slice (handles negative indices like Python) ---
+String pytraStrSlice(String s, int start, int? end_) {
+  int len = s.length;
+  int s0 = start < 0 ? (len + start) : start;
+  if (s0 < 0) s0 = 0;
+  if (s0 > len) s0 = len;
+  if (end_ == null) return s.substring(s0);
+  int e = end_! < 0 ? len + end_! : end_!;
+  if (e < 0) e = 0;
+  if (e > len) e = len;
+  if (s0 >= e) return '';
+  return s.substring(s0, e);
+}
+
 // --- bytearray/bytes ---
 List<int> pytraBytearray([dynamic arg]) {
   if (arg == null) return <int>[];

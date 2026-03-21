@@ -625,17 +625,28 @@ class DartNativeEmitter:
         return "dynamic"
 
     def _dart_decl_type(self, stmt: dict[str, Any], value_node: Any) -> str:
-        """Get Dart type for a variable declaration from decl_type, annotation, or inference."""
+        """Get Dart type for a variable declaration from decl_type, annotation, or inference.
+
+        Container types (List/Map/Set) use ``var`` to avoid type mismatch
+        with runtime helpers that return ``dynamic``.
+        """
+        raw = ""
         decl_type_any = stmt.get("decl_type")
         if isinstance(decl_type_any, str) and decl_type_any.strip() != "":
-            return self._dart_type(decl_type_any)
-        anno_any = stmt.get("annotation")
-        if isinstance(anno_any, str) and anno_any.strip() != "":
-            return self._dart_type(anno_any)
-        inferred = self._infer_decl_type_from_expr(value_node)
-        if inferred != "":
-            return self._dart_type(inferred)
-        return "var"
+            raw = decl_type_any.strip()
+        if raw == "":
+            anno_any = stmt.get("annotation")
+            if isinstance(anno_any, str) and anno_any.strip() != "":
+                raw = anno_any.strip()
+        if raw == "":
+            raw = self._infer_decl_type_from_expr(value_node)
+        if raw == "":
+            return "var"
+        dart_t = self._dart_type(raw)
+        # Container types → var (runtime helpers return dynamic)
+        if dart_t.startswith("List<") or dart_t.startswith("Map<") or dart_t.startswith("Set<"):
+            return "var"
+        return dart_t
 
     def _current_type_map(self) -> dict[str, str]:
         if len(self._local_type_stack) == 0:
@@ -1276,7 +1287,8 @@ class DartNativeEmitter:
                         decl_type = anno_s.strip()
                 if decl_type == "":
                     decl_type = self._infer_decl_type_from_expr(value_node)
-                dart_t = self._dart_type(decl_type) if decl_type != "" else "var"
+                dart_t_raw = self._dart_type(decl_type) if decl_type != "" else "var"
+                dart_t = "var" if (dart_t_raw.startswith("List<") or dart_t_raw.startswith("Map<") or dart_t_raw.startswith("Set<")) else dart_t_raw
                 if value_node is None and bool(stmt.get("declare")):
                     if decl_type in _NIL_FREE_DECL_TYPES:
                         if decl_type != "":
@@ -1510,6 +1522,7 @@ class DartNativeEmitter:
         field_types = self._class_field_types.get(cls_name, {})
         # Collect fields for dataclass or from AnnAssign
         fields: list[str] = []
+        field_defaults: dict[str, str] = {}
         for sub in body:
             if sub.get("kind") == "AnnAssign":
                 target_any = sub.get("target")
@@ -1519,6 +1532,10 @@ class DartNativeEmitter:
                     ft = field_types.get(field_name, "")
                     dart_ft = self._dart_type(ft) if ft != "" else "dynamic"
                     self._emit_line(dart_ft + " " + field_name + ";")
+                    # Collect default value
+                    value_node = sub.get("value")
+                    if isinstance(value_node, dict):
+                        field_defaults[field_name] = self._render_expr(value_node)
         has_init = False
         for sub in body:
             if sub.get("kind") != "FunctionDef":
@@ -1527,8 +1544,19 @@ class DartNativeEmitter:
                 has_init = True
             self._emit_class_method(cls_name, base_name, sub)
         if not has_init and len(fields) > 0:
-            params = ", ".join("this." + f for f in fields)
-            self._emit_line(cls_name + "(" + params + ");")
+            required_params: list[str] = []
+            optional_params: list[str] = []
+            for f in fields:
+                if f in field_defaults:
+                    optional_params.append("this." + f + " = " + field_defaults[f])
+                else:
+                    required_params.append("this." + f)
+            if len(optional_params) == 0:
+                params = ", ".join(required_params)
+                self._emit_line(cls_name + "(" + params + ");")
+            else:
+                all_params = ", ".join(required_params + ["[" + ", ".join(optional_params) + "]"]) if len(required_params) > 0 else "[" + ", ".join(optional_params) + "]"
+                self._emit_line(cls_name + "(" + all_params + ");")
         self.indent -= 1
         self._emit_line("}")
         self._emit_line("")
@@ -1904,11 +1932,11 @@ class DartNativeEmitter:
                 upper = self._render_expr(upper_node) if isinstance(upper_node, dict) else "null"
                 if owner_type == "str":
                     if upper == "null":
-                        return owner + ".substring(" + lower + ")"
-                    return owner + ".substring(" + lower + ", " + upper + ")"
+                        return "pytraStrSlice(" + owner + ", " + lower + ", null)"
+                    return "pytraStrSlice(" + owner + ", " + lower + ", " + upper + ")"
                 if upper == "null":
-                    return owner + ".sublist(" + lower + ")"
-                return owner + ".sublist(" + lower + ", " + upper + ")"
+                    return "pytraSlice(" + owner + ", " + lower + ", null)"
+                return "pytraSlice(" + owner + ", " + lower + ", " + upper + ")"
             index = self._render_expr(index_node)
             idx_const = self._const_int_literal(index_node)
             if isinstance(idx_const, int):
@@ -2089,7 +2117,8 @@ class DartNativeEmitter:
             return rendered_name + "(" + ", ".join(rendered_args + kw_values_in_order) + ")"
         if isinstance(func_any, dict) and func_any.get("kind") == "Attribute":
             owner_node = func_any.get("value")
-            attr = _safe_ident(func_any.get("attr"), "call")
+            raw_attr = func_any.get("attr") if isinstance(func_any.get("attr"), str) else ""
+            attr = _safe_ident(raw_attr, "call")
             if isinstance(owner_node, dict) and owner_node.get("kind") == "Call":
                 super_func = owner_node.get("func")
                 if isinstance(super_func, dict) and super_func.get("kind") == "Name":
@@ -2184,7 +2213,7 @@ class DartNativeEmitter:
             if attr == "copy":
                 return "List.from(" + owner + ")"
             # Dict methods
-            if attr == "get":
+            if raw_attr == "get":
                 key = rendered_args[0] if len(rendered_args) >= 1 else "null"
                 default = rendered_args[1] if len(rendered_args) >= 2 else "null"
                 return "(" + owner + "[" + key + "] ?? " + default + ")"
