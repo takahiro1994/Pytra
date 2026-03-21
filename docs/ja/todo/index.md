@@ -6,7 +6,7 @@
   <img alt="Read in English" src="https://img.shields.io/badge/docs-English-2563EB?style=flat-square">
 </a>
 
-最終更新: 2026-03-21（P2-REMOVE-NONCPP-RUNTIME-CALL を起票）
+最終更新: 2026-03-21（完了タスクをアーカイブへ移動）
 
 ## 文脈運用ルール
 
@@ -32,69 +32,6 @@
 ## 未完了タスク
 
 ### P0: C++ generated runtime ヘッダー生成パイプライン整備
-
-#### P0-19: ブロックスコープ変数の hoist（最優先）
-
-文脈: [docs/ja/plans/p0-block-scope-variable-hoist.md](../plans/p0-block-scope-variable-hoist.md)
-
-1. [x] [ID: P0-BLOCK-SCOPE-VAR-HOIST-01-S1] if/else ブロック内の変数宣言 hoist を EAST3 lowering に実装する。
-2. [x] [ID: P0-BLOCK-SCOPE-VAR-HOIST-01-S2] for/while ブロック内の変数宣言 hoist を EAST3 lowering に実装する。
-3. [x] [ID: P0-BLOCK-SCOPE-VAR-HOIST-01-S3] C++ emitter の既存 hoist ロジックを EAST3 lowering に移行し、emitter から除去する。
-4. [x] [ID: P0-BLOCK-SCOPE-VAR-HOIST-01-S4] ユニットテストを追加する（if/else, for, while, nested blocks）。
-5. [x] [ID: P0-BLOCK-SCOPE-VAR-HOIST-01-S5] Dart/Zig/Julia emitter が hoist 済み EAST3 で正しく動作することを検証する。
-
-#### P0-20: ループ不変式 hoist 最適化パスの無効化
-
-文脈: [docs/ja/plans/p0-disable-loop-invariant-hoist-passes.md](../plans/p0-disable-loop-invariant-hoist-passes.md)
-
-1. [x] [ID: P0-DISABLE-LOOP-HOIST-01] `__init__.py` の pass 列から 2 パスを除去し、テスト検証する。
-
-#### P0-11: PowerShell native emitter 実行 parity
-
-文脈: [docs/ja/plans/p0-powershell-native-emitter-execution-parity.md](../plans/p0-powershell-native-emitter-execution-parity.md)
-
-1. [x] [ID: P0-PS-EXEC-PARITY-01-S1] FunctionDef の `self` パラメータを除外せず `$self` として残す。クラスメソッド呼び出し時に第1引数として渡す。
-2. [x] [ID: P0-PS-EXEC-PARITY-01-S2] `bytearray`, `bytes`, `enumerate`, `sorted`, `reversed`, `zip` 等を `__pytra_*` ランタイム関数にマッピング。不足 runtime 関数を追加。
-3. [x] [ID: P0-PS-EXEC-PARITY-01-S3] `math.sqrt` → `[Math]::Sqrt` 等の stdlib Attribute Call を直接 PowerShell 構文に変換。
-4. [x] [ID: P0-PS-EXEC-PARITY-01-S4] Assign でタプルターゲットが左辺にある場合、一時変数展開を emit する。
-5. [x] [ID: P0-PS-EXEC-PARITY-01-S5] Call の func がクラス名の場合、コンストラクタ関数呼び出しとして emit する。
-6. [x] [ID: P0-PS-EXEC-PARITY-01-S6] `test/unit/backends/powershell/test_py2ps_smoke.py` に pwsh 実行テスト（26件）を追加し、主要 fixture の実行成功を検証する。
-
-#### P0-12: pytra-cli.py が C++ 固有オプションを転送しない
-
-文脈: [docs/ja/plans/p0-12-py2x-cpp-options-forwarding.md](../plans/p0-12-py2x-cpp-options-forwarding.md)
-
-1. [x] [ID: P0-PY2X-CPP-OPTIONS-01] CLI テスト群を `toolchain/emit/cpp/cli.py` 直接呼び出しに変更する
-
-#### P0-13: テストが旧 src/backends/cpp/cli.py パスを参照
-
-文脈: [docs/ja/plans/p0-13-cli-path-migration.md](../plans/p0-13-cli-path-migration.md)
-
-1. [x] [ID: P0-CLI-PATH-MIGRATION-01] テスト内の旧 cli.py パスを新パスに更新する
-
-#### P0-15: エミッター出力変化によるテストアサーション不一致
-
-文脈: [docs/ja/plans/p0-15-emitter-output-assertions.md](../plans/p0-15-emitter-output-assertions.md)
-
-1. [x] [ID: P0-EMITTER-OUTPUT-ASSERTIONS-01] テストアサーションを新エミッター出力に追従させる
-
-#### P0-16: runtime include パスのテストアサーション不一致
-
-文脈: [docs/ja/plans/p0-16-runtime-include-paths.md](../plans/p0-16-runtime-include-paths.md)
-
-1. [x] [ID: P0-RUNTIME-INCLUDE-PATHS-01] テストアサーションを新インクルードパスに追従させる
-
-#### P0-17: emitter 旧 API 出力の一掃
-
-文脈: [docs/ja/plans/p0-emitter-legacy-api-cleanup.md](../plans/p0-emitter-legacy-api-cleanup.md)
-
-1. [x] [ID: P0-EMITTER-LEGACY-API-CLEANUP-02-S1] emitter の `object_new` / `PyListObj` 生成箇所を `object(...)` / `list<object>` に置換。
-2. [x] [ID: P0-EMITTER-LEGACY-API-CLEANUP-02-S2] emitter の `obj_to_list_ref_or_raise` / `py_object_try_cast` を `object::as<T>()` に置換。
-3. [x] [ID: P0-EMITTER-LEGACY-API-CLEANUP-02-S3] emitter の `py_list_at_ref` / `py_at(tuple)` を新 API に置換。
-4. [x] [ID: P0-EMITTER-LEGACY-API-CLEANUP-02-S4] `pytra::utils` namespace の include パス修正。
-5. [x] [ID: P0-EMITTER-LEGACY-API-CLEANUP-02-S5] テストアサーション（`test_cpp_runtime_type_id.py`）を新 API に追従。
-
-> P0-17 の残存問題（include 順序による SFINAE 失敗、object(rc\<dict\>) 変換不可）は P0-18 (Object\<T\> 移行) で根本解決する。
 
 #### P0-18: Object\<T\> 移行 — ControlBlock + テンプレート view 方式
 
@@ -136,37 +73,6 @@
 19. [ ] [ID: P0-OBJECT-T-MIGRATION-05-S3] selfhost multi-module transpile が動作する。
 20. [ ] [ID: P0-OBJECT-T-MIGRATION-05-S4] sample/py の全 18 ケースが C++ で compile + run できる。
 
-### P1: Julia native backend
-
-文脈: [docs/ja/plans/p1-julia-native-backend.md](../plans/p1-julia-native-backend.md)
-
-1. [x] [ID: P1-JULIA-NATIVE-01-S1] `src/toolchain/emit/julia/` 配下に emitter パッケージを作成する。
-2. [x] [ID: P1-JULIA-NATIVE-01-S2] `src/runtime/julia/built_in/py_runtime.jl` を作成する。
-3. [x] [ID: P1-JULIA-NATIVE-01-S3] smoke テスト作成、`transpiler_versions.json`・`check_py2x_profiles.json`・`docs/ja/language/index.md` を更新する。
-4. [x] [ID: P1-JULIA-NATIVE-01-S4] smoke テストが通ることを確認する。
-
-### P2: EAST1 パーサーから noncpp_runtime_call を除去
-
-文脈: [docs/ja/plans/p2-remove-noncpp-runtime-call-from-east1.md](../plans/p2-remove-noncpp-runtime-call-from-east1.md)
-
-1. [x] [ID: P2-REMOVE-NONCPP-RUNTIME-CALL-01] `core_expr_resolution_semantics.py` から `noncpp_*` フィールド生成を除去する。
-2. [x] [ID: P2-REMOVE-NONCPP-RUNTIME-CALL-02] `core_expr_attr_subscript_annotation.py` から `noncpp_*` 伝播ロジックを除去する。
-3. [x] [ID: P2-REMOVE-NONCPP-RUNTIME-CALL-03] `core_runtime_call_semantics.py` / `core_expr_attr_call_annotation.py` から不要関数を除去する。
-4. [x] [ID: P2-REMOVE-NONCPP-RUNTIME-CALL-04] 既存テストのリグレッションがないことを検証する。
-
-### P2: backend に link-output manifest 入力を必須化
-
-文脈: [docs/ja/plans/p2-require-link-output-manifest.md](../plans/p2-require-link-output-manifest.md)
-
-1. [x] [ID: P2-REQUIRE-LINK-MANIFEST-01] `loader.py` の raw EAST3 フォールバックを除去する。
-
-### P2: linker サブモジュール import 解決
-
-文脈: [docs/ja/plans/p2-linker-submodule-import-resolution.md](../plans/p2-linker-submodule-import-resolution.md)
-
-1. [x] [ID: P2-LINKER-SUBMODULE-IMPORT-01] `program_loader.py` の `ImportFrom` 処理で import names のサブモジュール解決を追加する。
-2. [x] [ID: P2-LINKER-SUBMODULE-IMPORT-02] 既存テストのリグレッションがないことを検証する。
-
 ### P2: built-in 依存を EAST1 → linker 経由で解決
 
 文脈: [docs/ja/plans/p2-builtin-dependency-via-linker.md](../plans/p2-builtin-dependency-via-linker.md)
@@ -176,15 +82,6 @@
 3. [ ] [ID: P2-BUILTIN-VIA-LINKER-03] 全 emitter（C++ 含む）から `py_runtime.*` / ヘッダーの決め打ちバンドルを除去する（`@extern` 関数の扱い確定後）。
 4. [x] [ID: P2-BUILTIN-VIA-LINKER-04] 既存テストのリグレッションがないことを検証する。
 
-### P2: emitter 予約語回避
-
-文脈: [docs/ja/plans/p2-emitter-reserved-name-escape.md](../plans/p2-emitter-reserved-name-escape.md)
-
-1. [x] [ID: P2-RESERVED-NAME-ESCAPE-01] `CodeEmitter` に `_reserved_names()` / `_safe_name()` を追加する。
-2. [x] [ID: P2-RESERVED-NAME-ESCAPE-02] Julia emitter に予約語リストを追加し、識別子出力で `_safe_name()` を使用する。
-3. [x] [ID: P2-RESERVED-NAME-ESCAPE-03] 他の主要 emitter（Dart, Zig, C++）にも予約語リストを追加する。
-4. [x] [ID: P2-RESERVED-NAME-ESCAPE-04] テスト検証（sample/16 Julia 通過、リグレッションなし）。
-
 ### P3: pyobj list alias escape 解析を EAST3 パスへ移行
 
 文脈: [docs/ja/plans/p3-pyobj-list-escape-to-east3.md](../plans/p3-pyobj-list-escape-to-east3.md)
@@ -193,15 +90,6 @@
 2. [ ] [ID: P3-PYOBJ-LIST-ESCAPE-02] C++ emitter を meta 参照に切り替え、`_collect_pyobj_runtime_list_alias_names` を除去する。
 3. [ ] [ID: P3-PYOBJ-LIST-ESCAPE-03] `analysis.py` の `_collect_assigned_name_types` を除去する（依存消滅確認後）。
 4. [ ] [ID: P3-PYOBJ-LIST-ESCAPE-04] ユニットテストを追加し、既存 pyobj list テストのリグレッションがないことを検証する。
-
-### P4: Dart native backend
-
-文脈: [docs/ja/plans/p4-dart-native-backend.md](../plans/p4-dart-native-backend.md)
-
-1. [x] [ID: P4-DART-NATIVE-01-S1] `src/toolchain/emit/dart/` 配下に emitter パッケージを作成する。
-2. [x] [ID: P4-DART-NATIVE-01-S2] `src/runtime/dart/built_in/py_runtime.dart` を作成する。
-3. [x] [ID: P4-DART-NATIVE-01-S3] smoke テスト作成、`transpiler_versions.json`・`check_py2x_profiles.json`・`docs/ja/language/index.md` を更新する。
-4. [x] [ID: P4-DART-NATIVE-01-S4] smoke テストが通ることを確認する。
 
 ### P5: C# multi-module emit parity
 
@@ -213,11 +101,3 @@
 4. [x] [ID: P5-CS-MULTIMODULE-04] `pytra-cli.py` の C# build/run を `mcs` + `mono` 方式に修正する。
 5. [ ] [ID: P5-CS-MULTIMODULE-05] `runtime_parity_check.py --targets cs` で sample/py の全 18 ケースが PASS することを確認する。
 
-### P7: Zig native backend
-
-文脈: [docs/ja/plans/p7-zig-native-backend.md](../plans/p7-zig-native-backend.md)
-
-1. [x] [ID: P7-ZIG-NATIVE-01-S1] `src/toolchain/emit/zig/` 配下に emitter パッケージを作成する。
-2. [x] [ID: P7-ZIG-NATIVE-01-S2] `src/runtime/zig/built_in/py_runtime.zig` を作成する。
-3. [x] [ID: P7-ZIG-NATIVE-01-S3] smoke テスト作成、`transpiler_versions.json`・`check_py2x_profiles.json`・`docs/ja/language/index.md` を更新する。
-4. [x] [ID: P7-ZIG-NATIVE-01-S4] smoke テストが通ることを確認する。
