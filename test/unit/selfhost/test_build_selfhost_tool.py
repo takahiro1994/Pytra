@@ -59,6 +59,7 @@ class BuildSelfhostToolTest(unittest.TestCase):
                 "-O2",
                 "-Isrc",
                 "-Isrc/runtime/cpp",
+                    "-Isrc/runtime/generated",
                 "/tmp/py2cpp.cpp",
                 "/tmp/runtime/a.cpp",
                 "/tmp/runtime/b.cpp",

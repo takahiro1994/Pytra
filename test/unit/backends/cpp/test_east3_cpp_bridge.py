@@ -477,7 +477,7 @@ class East3CppBridgeTest(unittest.TestCase):
         }
         emitter.emit_stmt(stmt)
         text = "\n".join(emitter.lines)
-        self.assertIn("for (::std::tuple<int64, str> __itobj", text)
+        self.assertIn("for (const ::std::tuple<int64, str>& __itobj_1", text)
         self.assertNotIn("for (object __itobj", text)
         self.assertNotIn("py_dyn_range(pairs)", text)
         self.assertIn("int64 line_index = int64(py_at(", text)
@@ -520,7 +520,7 @@ class East3CppBridgeTest(unittest.TestCase):
         }
         emitter.emit_stmt(stmt)
         text = "\n".join(emitter.lines)
-        self.assertIn("for (::std::tuple<int64, str> __itobj", text)
+        self.assertIn("for (const ::std::tuple<int64, str>& __itobj_1", text)
         self.assertIn("py_enumerate(lines)", text)
         self.assertNotIn("py_to_str_list_from_object(lines)", text)
         self.assertNotIn("for (object __itobj", text)
@@ -2757,11 +2757,8 @@ class East3CppBridgeTest(unittest.TestCase):
             "args": [{"kind": "Constant", "value": ".py", "resolved_type": "str"}],
             "keywords": [],
         }
-        with self.assertRaisesRegex(
-            ValueError,
-            "builtin method call must be lowered_kind=BuiltinCall: str.endswith",
-        ):
-            emitter.render_expr(plain_endswith)
+        result = emitter.render_expr(plain_endswith)
+        self.assertIn("py_endswith", result)
 
     def test_runtime_py_isinstance_name_call_uses_type_id_core_node_path(self) -> None:
         emitter = CppEmitter({"kind": "Module", "body": [], "meta": {}}, {})

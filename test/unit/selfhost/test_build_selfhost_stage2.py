@@ -85,6 +85,7 @@ class BuildSelfhostStage2Test(unittest.TestCase):
                 "-O2",
                 "-Isrc",
                 "-Isrc/runtime/cpp",
+                    "-Isrc/runtime/generated",
                 str(mod.STAGE2_CPP),
                 str(mod.ROOT / "src/runtime/generated/std/json.cpp"),
                 str(mod.ROOT / "src/runtime/cpp/compiler/transpile_cli.cpp"),

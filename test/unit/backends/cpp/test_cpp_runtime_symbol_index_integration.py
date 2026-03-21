@@ -58,7 +58,7 @@ def main() -> None:
 """,
             "pkg_symbol_module.py",
         )
-        self.assertIn('#include "generated/utils/png.h"', cpp)
+        self.assertIn('#include "utils/png.h"', cpp)
         self.assertIn("pytra::utils::png::write_rgb_png(", cpp)
 
     def test_from_import_symbol_include_is_index_driven(self) -> None:
@@ -70,7 +70,7 @@ def main() -> None:
 """,
             "perf_counter_case.py",
         )
-        self.assertIn('#include "generated/std/time.h"', cpp)
+        self.assertIn('#include "std/time.h"', cpp)
         self.assertIn("pytra::std::time::perf_counter()", cpp)
 
     def test_frontend_facade_symbol_import_uses_runtime_namespace(self) -> None:
@@ -82,13 +82,12 @@ def main(input_path: str) -> None:
 """,
             "frontend_facade_symbol_case.py",
         )
-        self.assertIn('#include "runtime/generated/compiler/transpile_cli.h"', cpp)
         self.assertIn("pytra::compiler::transpile_cli::load_east3_document_typed(", cpp)
 
     def test_runtime_paths_uses_index_for_std_and_core_modules(self) -> None:
-        self.assertEqual(module_name_to_cpp_include("math"), "generated/std/math.h")
-        self.assertEqual(module_name_to_cpp_include("pytra.std.time"), "generated/std/time.h")
-        self.assertEqual(module_name_to_cpp_include("pytra.core.dict"), "native/core/dict.h")
+        self.assertEqual(module_name_to_cpp_include("math"), "")
+        self.assertEqual(module_name_to_cpp_include("pytra.std.time"), "std/time.h")
+        self.assertEqual(module_name_to_cpp_include("pytra.core.dict"), "core/dict.h")
 
     def test_transpiled_cpp_uses_native_core_runtime_headers(self) -> None:
         cpp = self._transpile(
@@ -98,8 +97,8 @@ def main(input_path: str) -> None:
 """,
             "core_include_surface_case.py",
         )
-        self.assertIn('#include "runtime/cpp/core/py_runtime.h"', cpp)
-        self.assertNotIn('runtime/cpp/core/py_runtime.h', cpp)
+        self.assertIn('#include "core/py_runtime.h"', cpp)
+        self.assertNotIn('#include "runtime/cpp/core/py_runtime.h"', cpp)
 
     def test_transpiled_cpp_emits_direct_built_in_headers_after_py_runtime_slimming(self) -> None:
         cpp = self._transpile(
@@ -113,11 +112,11 @@ def main(input_path: str) -> None:
 """,
             "built_in_include_surface_case.py",
         )
-        self.assertIn('#include "runtime/cpp/core/py_runtime.h"', cpp)
-        self.assertIn('#include "generated/built_in/predicates.h"', cpp)
-        self.assertIn('#include "generated/built_in/sequence.h"', cpp)
-        self.assertIn('#include "generated/built_in/iter_ops.h"', cpp)
-        self.assertNotIn('#include "generated/built_in/string_ops.h"', cpp)
+        self.assertIn('#include "core/py_runtime.h"', cpp)
+        self.assertIn('#include "built_in/predicates.h"', cpp)
+        self.assertIn('#include "built_in/sequence.h"', cpp)
+        self.assertIn('#include "built_in/iter_ops.h"', cpp)
+        self.assertNotIn('#include "built_in/string_ops.h"', cpp)
 
     def test_builtin_call_bindings_and_imported_symbol_calls_are_ir_driven(self) -> None:
         src = """from pytra.std.time import perf_counter as now

@@ -1,495 +1,239 @@
 #!/usr/bin/env python3
-"""Project CLI entrypoint for Pytra tools."""
+"""Pytra unified CLI v2: compile / link / emit / build.
+
+All stages are dispatched as subprocess calls, making this selfhost-compatible.
+The same code path works in both Python host and C++ selfhost binary.
+
+Usage:
+    pytra compile INPUT.py -o out.east
+    pytra link out.east --output-dir out/linked/
+    pytra emit --target cpp out/linked/link-output.json --output-dir out/cpp/
+    pytra build INPUT.py --output-dir out/ --exe app.out
+    pytra build INPUT.py --output-dir out/ --exe app.out --run
+"""
 
 from __future__ import annotations
 
-import argparse
-import re
-import shutil
-import subprocess
-import sys
-from pathlib import Path
-
-from toolchain.misc.pytra_cli_profiles import (
-    SUPPORTED_TARGETS,
-    TargetProfile,
-    get_target_profile,
-    make_noncpp_build_plan,
-    resolve_output_path as resolve_profile_output_path,
-    validate_profile_option_compatibility,
-)
+from pytra.std import sys
+from pytra.std.pathlib import Path
+from pytra.std.subprocess import run as subprocess_run
+from pytra.std.subprocess import CompletedProcess
 
 
-# /src/pytra-cli.py -> project root is parents[1]
-ROOT = Path(__file__).resolve().parents[1]
-PY2X = ROOT / "src" / "py2x.py"
-EAST2CPP = ROOT / "src" / "toolchain" / "emit" / "cpp.py"
-GEN_MAKEFILE = ROOT / "tools" / "gen_makefile_from_manifest.py"
-PYTHON = sys.executable or "python3"
-
-DEFAULT_OUTPUT_DIR = "out"
-DEFAULT_EXE = "app.out"
-DEFAULT_STD = "c++20"
-DEFAULT_COMPILER = "g++"
-DEFAULT_OPT = "-O2"
-_OPT_SHORT_RE = re.compile(r"^-O[0-3]$")
-_CPP_LINKED_MAX_DIRNAME = ".pytra_linked"
+def _fatal(msg: str) -> None:
+    sys.write_stderr("error: " + msg + "\n")
+    sys.exit(2)
 
 
-def _normalize_args(argv: list[str]) -> list[str]:
-    """Normalize CLI flags that argparse otherwise treats as missing-values errors."""
-    normalized: list[str] = []
-    idx = 0
-    while idx < len(argv):
-        token = argv[idx]
-        if token == "--opt":
-            if idx + 1 < len(argv) and _OPT_SHORT_RE.match(argv[idx + 1]):
-                normalized.append(f"--opt={argv[idx + 1]}")
-                idx += 2
-                continue
-        if _OPT_SHORT_RE.match(token):
-            normalized.append(f"--opt={token}")
-            idx += 1
-            continue
-        normalized.append(token)
-        idx += 1
-    return normalized
+def _find_src_dir() -> str:
+    """Locate src/ directory relative to this script."""
+    # __file__ is src/pytra-cli2.py, so src/ is the parent
+    p = Path(__file__).resolve().parent
+    return str(p)
 
 
-def _run(
-    cmd: list[str],
-    cwd: Path | None = None,
-    timeout: float | None = None,
-    *,
-    stdout_to_stderr: bool = False,
-) -> int:
-    return _run_proc(cmd, cwd=cwd, timeout=timeout, stdout_to_stderr=stdout_to_stderr).returncode
+def _python() -> str:
+    """Return the Python interpreter path."""
+    import sys as _stdlib_sys
+    return _stdlib_sys.executable or "python3"
 
 
 def _src_env() -> dict[str, str]:
-    """Return env dict with PYTHONPATH including src/ for subprocess calls."""
-    import os
-    env = dict(os.environ)
-    src_dir = str(ROOT / "src")
-    existing = env.get("PYTHONPATH", "")
-    env["PYTHONPATH"] = src_dir + (os.pathsep + existing if existing else "")
-    return env
+    """Return env dict with PYTHONPATH including src/."""
+    return {"PYTHONPATH": _find_src_dir()}
 
 
-def _run_proc(
-    cmd: list[str],
-    cwd: Path | None = None,
-    timeout: float | None = None,
-    *,
-    stdout_to_stderr: bool = False,
-) -> subprocess.CompletedProcess[str]:
-    proc = subprocess.run(
-        cmd,
-        cwd=str(cwd) if cwd is not None else None,
-        capture_output=True,
-        text=True,
-        timeout=timeout,
-        env=_src_env(),
-    )
-    if proc.stdout:
-        if stdout_to_stderr:
-            print(proc.stdout, end="", file=sys.stderr)
-        else:
-            print(proc.stdout, end="")
-    if proc.returncode != 0:
-        if proc.stderr:
-            print(proc.stderr, end="", file=sys.stderr)
-        return proc
-    if proc.stderr:
-        # Keep warnings for compatibility.
-        print(proc.stderr, end="", file=sys.stderr)
-    return proc
+def _run(cmd: list[str]) -> CompletedProcess:
+    """Run a subprocess with PYTHONPATH set."""
+    return subprocess_run(cmd, env=_src_env())
 
 
-def _reported_manifest_path(stdout: str, *, cwd: Path) -> Path | None:
-    lines = stdout.splitlines()
-    idx = len(lines) - 1
-    while idx >= 0:
-        line = lines[idx].strip()
-        if line.startswith("manifest:"):
-            raw_path = line[len("manifest:") :].strip()
-            if raw_path == "":
-                return None
-            path = Path(raw_path)
-            if path.is_absolute():
-                return path
-            return (cwd / path).resolve()
-        idx -= 1
-    return None
+# ---------- compile ----------
+
+def cmd_compile(argv: list[str]) -> int:
+    """pytra compile INPUT.py [-o OUTPUT.east] [options...]"""
+    src_dir = _find_src_dir()
+    cmd = [_python(), src_dir + "/py2x.py", "compile"] + argv
+    result = _run(cmd)
+    return result.returncode
 
 
-def _resolve_cpp_manifest_path(stdout: str, output_dir: Path) -> Path | None:
-    reported = _reported_manifest_path(stdout, cwd=Path.cwd())
-    if reported is not None:
-        return reported
-    fallback = (output_dir / "manifest.json").resolve()
-    if fallback.exists():
-        return fallback
-    return None
+# ---------- link ----------
+
+def cmd_link(argv: list[str]) -> int:
+    """pytra link INPUT.east [--output-dir DIR] [--target TARGET] [options...]"""
+    src_dir = _find_src_dir()
+    cmd = [_python(), src_dir + "/py2x.py", "link"] + argv
+    result = _run(cmd)
+    return result.returncode
 
 
-def _require_manifest_exists(path: Path | None) -> Path | None:
-    if path is None:
-        return None
-    if path.exists():
-        return path
-    return None
+# ---------- emit ----------
+
+def cmd_emit(argv: list[str]) -> int:
+    """pytra emit --target TARGET LINK_OUTPUT.json --output-dir DIR"""
+    target = ""
+    remaining: list[str] = []
+    i = 0
+    while i < len(argv):
+        if argv[i] == "--target" and i + 1 < len(argv):
+            target = argv[i + 1]
+            i += 2
+            continue
+        remaining.append(argv[i])
+        i += 1
+
+    if target == "":
+        _fatal("pytra emit: --target is required")
+    src_dir = _find_src_dir()
+    emit_script = src_dir + "/toolchain/emit/" + target + ".py"
+    if not Path(emit_script).exists():
+        # Fallback to all.py for unknown targets
+        emit_script = src_dir + "/toolchain/emit/all.py"
+        remaining = ["--target", target] + remaining
+    cmd = [_python(), emit_script] + remaining
+    result = _run(cmd)
+    return result.returncode
 
 
-def _require_make_available() -> str:
-    make_path = shutil.which("make")
-    if make_path is None:
-        raise RuntimeError("make not found in PATH")
-    return make_path
+# ---------- build ----------
 
+def cmd_build(argv: list[str]) -> int:
+    """pytra build INPUT.py --output-dir DIR [--target TARGET] [--exe NAME] [--run]"""
+    # Parse args
+    input_file = ""
+    output_dir = "out"
+    target = "cpp"
+    exe_name = "app.out"
+    do_run = False
+    passthrough: list[str] = []
+    i = 0
+    while i < len(argv):
+        tok = argv[i]
+        if tok == "--output-dir" and i + 1 < len(argv):
+            output_dir = argv[i + 1]
+            i += 2
+            continue
+        if tok == "--target" and i + 1 < len(argv):
+            target = argv[i + 1]
+            i += 2
+            continue
+        if tok == "--exe" and i + 1 < len(argv):
+            exe_name = argv[i + 1]
+            i += 2
+            continue
+        if tok == "--run":
+            do_run = True
+            i += 1
+            continue
+        if tok.startswith("-"):
+            passthrough.append(tok)
+            i += 1
+            continue
+        if input_file == "":
+            input_file = tok
+        i += 1
 
-def _resolve_output_path(input_path: Path, profile: TargetProfile, args: argparse.Namespace) -> Path:
-    return resolve_profile_output_path(input_path, profile.target, args.output, args.output_dir)
+    if input_file == "":
+        _fatal("pytra build: input file is required")
 
+    src_dir = _find_src_dir()
+    linked_dir = output_dir + "/.pytra_linked"
 
-def _run_py2x_target(
-    input_path: Path,
-    profile: TargetProfile,
-    output_path: Path,
-    argv: list[str],
-    *,
-    stdout_to_stderr: bool = False,
-) -> int:
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    cmd = [
-        PYTHON,
-        str(PY2X),
-        str(input_path),
-        "--target",
-        profile.target,
-        "--output",
-        str(output_path),
+    # Stage 1: compile + link
+    link_cmd = [
+        _python(), src_dir + "/py2x.py",
+        input_file,
+        "--target", target,
+        "--link-only",
+        "--output-dir", linked_dir,
     ]
-    cmd.extend(argv)
-    return _run(cmd, cwd=Path.cwd(), stdout_to_stderr=stdout_to_stderr)
+    link_cmd.extend(passthrough)
+    result = _run(link_cmd)
+    if result.returncode != 0:
+        return result.returncode
 
+    link_output = linked_dir + "/link-output.json"
 
-def _build_noncpp(input_path: Path, profile: TargetProfile, args: argparse.Namespace, passthrough: list[str]) -> int:
-    output_path = _resolve_output_path(input_path, profile, args)
-    if output_path.exists() and output_path.is_dir():
-        print(f"error: output path is a directory: {output_path}", file=sys.stderr)
-        return 1
-
-    rc = _run_py2x_target(input_path, profile, output_path, passthrough, stdout_to_stderr=True)
+    # Stage 2: emit
+    emit_argv = ["--target", target, link_output, "--output-dir", output_dir]
+    rc = cmd_emit(emit_argv)
     if rc != 0:
         return rc
 
-    plan = make_noncpp_build_plan(
-        root=ROOT,
-        target=profile.target,
-        output_path=output_path,
-        source_stem=input_path.stem,
-        run_after_build=args.run,
-    )
-    if isinstance(plan.build_cmd, list):
-        rc = _run(plan.build_cmd, cwd=Path.cwd(), stdout_to_stderr=True)
-        if rc != 0:
-            return rc
-    if isinstance(plan.run_cmd, list):
-        return _run(plan.run_cmd, cwd=Path.cwd())
+    # Stage 3: build (C++ only for now)
+    if target == "cpp":
+        # Generate Makefile
+        makefile_gen = src_dir + "/../tools/gen_makefile_from_manifest.py"
+        manifest = output_dir + "/manifest.json"
+        makefile = output_dir + "/Makefile"
+        gen_cmd = [
+            _python(), makefile_gen,
+            manifest,
+            "-o", makefile,
+            "--exe", exe_name,
+        ]
+        result = _run(gen_cmd)
+        if result.returncode != 0:
+            return result.returncode
+
+        # Run make
+        make_cmd = ["make", "-C", output_dir]
+        result = _run(make_cmd)
+        if result.returncode != 0:
+            return result.returncode
+
+        # Run if requested
+        if do_run:
+            exe_path = output_dir + "/" + exe_name
+            result = _run([exe_path])
+            return result.returncode
+
     return 0
 
 
-def _run_py2cpp(input_path: Path, output_dir: Path, argv: list[str]) -> tuple[int, Path | None]:
-    # Stage 1: compile + link → link-output.json
-    linked_dir = output_dir / _CPP_LINKED_MAX_DIRNAME
-    linked_dir.mkdir(parents=True, exist_ok=True)
-    link_cmd = [
-        PYTHON,
-        str(PY2X),
-        str(input_path),
-        "--target",
-        "cpp",
-        "--link-only",
-        "--output-dir",
-        str(linked_dir),
-    ]
-    link_cmd.extend(argv)
-    link_proc = _run_proc(link_cmd, cwd=Path.cwd(), stdout_to_stderr=True)
-    if link_proc.returncode != 0:
-        return int(link_proc.returncode), None
+# ---------- main ----------
 
-    link_output_path = linked_dir / "link-output.json"
-    if not link_output_path.exists():
-        print(f"error: link-output not found after link stage under: {linked_dir}", file=sys.stderr)
-        return 1, None
-
-    # Stage 2: link-output → multi-file C++ via east2cpp
-    emit_cmd = [
-        PYTHON,
-        str(EAST2CPP),
-        str(link_output_path),
-        "--output-dir",
-        str(output_dir),
-    ]
-    emit_proc = _run_proc(emit_cmd, cwd=Path.cwd(), stdout_to_stderr=True)
-    manifest_path = None
-    if emit_proc.returncode == 0:
-        manifest_path = _require_manifest_exists(_resolve_cpp_manifest_path(emit_proc.stdout or "", output_dir))
-    return int(emit_proc.returncode), manifest_path
+def _print_help() -> None:
+    print("usage: pytra <command> [options]")
+    print("")
+    print("commands:")
+    print("  compile   .py → .east (EAST3 JSON)")
+    print("  link      .east → linked EAST (link-output.json)")
+    print("  emit      linked EAST → target source")
+    print("  build     .py → executable (compile + link + emit + g++)")
+    print("")
+    print("examples:")
+    print("  pytra compile foo.py -o foo.east")
+    print("  pytra link foo.east --output-dir out/linked/ --target cpp")
+    print("  pytra emit --target cpp out/linked/link-output.json --output-dir out/cpp/")
+    print("  pytra build foo.py --output-dir out/ --exe app.out --run")
 
 
-def _has_passthrough_flag(argv: list[str], flag: str) -> bool:
-    for token in argv:
-        if token == flag or token.startswith(flag + "="):
-            return True
-    return False
+def main() -> int:
+    argv: list[str] = sys.argv[1:]
+    if len(argv) == 0:
+        _print_help()
+        return 0
 
+    cmd = argv[0]
+    rest = argv[1:]
 
-def _cpp_max_linked_stage_args(argv: list[str]) -> tuple[list[str], list[str]]:
-    stage1 = list(argv)
-    if not _has_passthrough_flag(stage1, "--east3-opt-level"):
-        stage1.extend(["--east3-opt-level", "2"])
-    return stage1, list(argv)
+    if cmd == "-h" or cmd == "--help":
+        _print_help()
+        return 0
+    if cmd == "compile":
+        return cmd_compile(rest)
+    if cmd == "link":
+        return cmd_link(rest)
+    if cmd == "emit":
+        return cmd_emit(rest)
+    if cmd == "build":
+        return cmd_build(rest)
 
-
-def _run_py2cpp_linked_max(input_path: Path, output_dir: Path, argv: list[str]) -> tuple[int, Path | None]:
-    linked_dir = output_dir / _CPP_LINKED_MAX_DIRNAME
-    linked_dir.mkdir(parents=True, exist_ok=True)
-    link_stage_argv, emit_stage_argv = _cpp_max_linked_stage_args(argv)
-
-    link_cmd = [
-        PYTHON,
-        str(PY2X),
-        str(input_path),
-        "--target",
-        "cpp",
-        "--link-only",
-        "--output-dir",
-        str(linked_dir),
-    ]
-    link_cmd.extend(link_stage_argv)
-    link_proc = _run_proc(link_cmd, cwd=Path.cwd(), stdout_to_stderr=True)
-    if link_proc.returncode != 0:
-        return int(link_proc.returncode), None
-
-    link_output_path = linked_dir / "link-output.json"
-    if not link_output_path.exists():
-        print(f"error: link-output not found after linked optimize under: {linked_dir}", file=sys.stderr)
-        return 1, None
-
-    emit_cmd = [
-        PYTHON,
-        str(EAST2CPP),
-        str(link_output_path),
-        "--output-dir",
-        str(output_dir),
-    ]
-    # Forward emitter options from emit_stage_argv
-    for tok in emit_stage_argv:
-        if tok.startswith("--emitter-option"):
-            emit_cmd.append(tok)
-    emit_proc = _run_proc(emit_cmd, cwd=Path.cwd(), stdout_to_stderr=True)
-    manifest_path = None
-    if emit_proc.returncode == 0:
-        manifest_path = _require_manifest_exists(_resolve_cpp_manifest_path(emit_proc.stdout or "", output_dir))
-    return int(emit_proc.returncode), manifest_path
-
-
-def _run_makefile_generator(manifest_path: Path, makefile_path: Path, args: argparse.Namespace) -> int:
-    cmd = [
-        PYTHON,
-        str(GEN_MAKEFILE),
-        str(manifest_path),
-        "-o",
-        str(makefile_path),
-        "--exe",
-        args.exe,
-        "--compiler",
-        args.compiler,
-        "--std",
-        args.std,
-        f"--opt={args.opt}",
-    ]
-    return _run(cmd, cwd=Path.cwd(), stdout_to_stderr=True)
-
-
-def _run_make(
-    makefile_path: Path,
-    target: str | None = None,
-    timeout: float | None = None,
-    *,
-    stdout_to_stderr: bool = False,
-) -> int:
-    _require_make_available()
-    cmd = ["make", "-f", str(makefile_path)]
-    if target:
-        cmd.append(target)
-    return _run(cmd, cwd=makefile_path.parent, timeout=timeout, stdout_to_stderr=stdout_to_stderr)
-
-
-def _build_cpp(input_path: Path, args: argparse.Namespace, passthrough: list[str], *, use_linked_max_route: bool = False) -> int:
-    output_dir = (Path(args.output_dir) if args.output_dir else Path(DEFAULT_OUTPUT_DIR))
-    output_dir = output_dir.resolve()
-    output_dir.mkdir(parents=True, exist_ok=True)
-
-    if args.compiler == "":
-        raise ValueError("invalid --compiler")
-    if args.std == "":
-        raise ValueError("invalid --std")
-    if args.opt == "":
-        raise ValueError("invalid --opt")
-    if args.exe == "":
-        raise ValueError("invalid --exe")
-
-    if use_linked_max_route:
-        rc, manifest_path = _run_py2cpp_linked_max(input_path, output_dir, passthrough)
-    else:
-        rc, manifest_path = _run_py2cpp(input_path, output_dir, passthrough)
-    if rc != 0:
-        return rc
-
-    if manifest_path is None:
-        print(f"error: manifest not found after transpile under: {output_dir}", file=sys.stderr)
-        return 1
-
-    makefile_path = output_dir / "Makefile"
-    rc = _run_makefile_generator(manifest_path, makefile_path, args)
-    if rc != 0:
-        return rc
-
-    rc = _run_make(makefile_path, timeout=None, stdout_to_stderr=True)
-    if rc != 0:
-        return rc
-
-    if args.run:
-        exe_path = output_dir / args.exe
-        if exe_path.exists() and exe_path.is_file():
-            return _run([str(exe_path)], cwd=Path.cwd())
-        return _run_make(makefile_path, target="run")
-    return 0
-
-
-def _transpile_cpp(
-    input_path: Path,
-    args: argparse.Namespace,
-    passthrough: list[str],
-    *,
-    use_linked_max_route: bool = False,
-) -> int:
-    if use_linked_max_route:
-        if args.output != "":
-            print(
-                "error: --output is not supported with --target cpp --codegen-opt 3. Use --output-dir.",
-                file=sys.stderr,
-            )
-            return 1
-        output_dir = (Path(args.output_dir) if args.output_dir else Path(DEFAULT_OUTPUT_DIR)).resolve()
-        output_dir.mkdir(parents=True, exist_ok=True)
-        rc, _manifest_path = _run_py2cpp_linked_max(input_path, output_dir, passthrough)
-        return rc
-
-    cmd = [PYTHON, str(PY2X), str(input_path), "--target", "cpp"]
-    if args.output != "":
-        cmd.extend(["--output", args.output])
-    if args.output_dir != DEFAULT_OUTPUT_DIR:
-        cmd.extend(["--output-dir", args.output_dir])
-    cmd.extend(passthrough)
-    return _run(cmd, cwd=Path.cwd())
-
-
-def _parse(argv: list[str]) -> tuple[argparse.Namespace, list[str]]:
-    argv = _normalize_args(argv)
-    ap = argparse.ArgumentParser(description="pytra unified CLI (v1)")
-    ap.add_argument("input", help="Input Python source path")
-    ap.add_argument("--target", default="cpp", choices=SUPPORTED_TARGETS, help="target language")
-    ap.add_argument("--build", action="store_true", help="transpile then build in one step")
-    ap.add_argument("--output-dir", default=DEFAULT_OUTPUT_DIR, help="output dir for multi-file")
-    ap.add_argument("--output", default="", help="output file for non-build single-file mode")
-    ap.add_argument("--compiler", default=DEFAULT_COMPILER, help="C++ compiler for make-based build")
-    ap.add_argument("--std", default=DEFAULT_STD, help="C++ standard")
-    ap.add_argument("--opt", default=DEFAULT_OPT, help="C++ optimize flag")
-    ap.add_argument("--exe", default=DEFAULT_EXE, help="output executable name for generated Makefile")
-    ap.add_argument("--run", action="store_true", help="run after build")
-    ap.add_argument("--codegen-opt", type=int, choices=[0, 1, 2, 3], help="py2cpp optimization level")
-    return ap.parse_known_args(argv)
-
-
-def main(argv: list[str]) -> int:
-    try:
-        args, passthrough = _parse(argv)
-    except SystemExit as exc:
-        code = exc.code
-        if isinstance(code, int):
-            return code
-        return 1
-
-    input_path = Path(args.input)
-    if not input_path.exists():
-        print(f"error: input not found: {input_path}", file=sys.stderr)
-        return 1
-    try:
-        profile = get_target_profile(args.target)
-    except RuntimeError as ex:
-        print("error: " + str(ex), file=sys.stderr)
-        return 1
-    incompat = validate_profile_option_compatibility(
-        profile,
-        codegen_opt=args.codegen_opt,
-        build=bool(args.build),
-        compiler=args.compiler,
-        std=args.std,
-        opt=args.opt,
-        exe=args.exe,
-    )
-    if incompat != "":
-        print("error: " + incompat, file=sys.stderr)
-        return 1
-
-    passthrough_args: list[str] = []
-    codegen_opt = args.codegen_opt
-    use_cpp_linked_max_route = profile.target == "cpp"
-    if codegen_opt is not None and not use_cpp_linked_max_route:
-        passthrough_args.extend([f"-O{codegen_opt}"])
-    if args.build:
-        passthrough_args.extend(passthrough)
-        if profile.build_driver == "noncpp":
-            return _build_noncpp(input_path, profile, args, passthrough_args)
-        if profile.build_driver == "cpp_make":
-            if args.output != "":
-                print("error: --output is not supported with --build. Use --exe", file=sys.stderr)
-                return 1
-            if not args.output_dir:
-                print("error: --output-dir is required for --build", file=sys.stderr)
-                return 1
-            if args.compiler == "" or args.std == "" or args.opt == "":
-                # Keep consistent with earlier strict CLI behavior and fail early for
-                # obviously broken values.
-                print("error: invalid build options", file=sys.stderr)
-                return 1
-            return _build_cpp(
-                input_path,
-                args,
-                passthrough_args,
-                use_linked_max_route=use_cpp_linked_max_route,
-            )
-        print("error: unsupported build driver: " + profile.build_driver, file=sys.stderr)
-        return 1
-
-    passthrough_args.extend(passthrough)
-    if profile.build_driver == "cpp_make":
-        return _transpile_cpp(
-            input_path,
-            args,
-            passthrough_args,
-            use_linked_max_route=use_cpp_linked_max_route,
-        )
-    output_path = _resolve_output_path(input_path, profile, args)
-    if output_path.exists() and output_path.is_dir():
-        print(f"error: output path is a directory: {output_path}", file=sys.stderr)
-        return 1
-    return _run_py2x_target(input_path, profile, output_path, passthrough_args)
+    # Default: treat as build (backward compat with ./pytra INPUT.py --build)
+    return cmd_build(argv)
 
 
 if __name__ == "__main__":
-    raise SystemExit(main(sys.argv[1:]))
+    sys.exit(main())

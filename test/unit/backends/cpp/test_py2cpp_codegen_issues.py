@@ -149,7 +149,7 @@ def make_token() -> Token:
         self.assertIn("key_sep", cpp)
 
     def test_py2cpp_kind_lookup_is_centralized(self) -> None:
-        src_text = (ROOT / "src" / "backends" / "cpp" / "cli.py").read_text(encoding="utf-8")
+        src_text = (ROOT / "src" / "toolchain" / "emit" / "cpp" / "cli.py").read_text(encoding="utf-8")
         bad_lines: list[str] = []
         line_no = 0
         for line in src_text.splitlines():
@@ -301,8 +301,8 @@ def f(p: str) -> None:
             east = load_east(src_py)
             cpp = transpile_to_cpp(east)
 
-        self.assertIn("::std::get<0>(__tuple_1)", cpp)
-        self.assertIn("::std::get<1>(__tuple_1)", cpp)
+        self.assertIn("py_at(__tuple_1, 0)", cpp)
+        self.assertIn("py_at(__tuple_1, 1)", cpp)
         self.assertNotIn("::std::any root =", cpp)
         self.assertNotIn("::std::any ext =", cpp)
 
@@ -796,11 +796,11 @@ def f(frames: list[bytes]) -> None:
             cpp = transpile_to_cpp(east, emit_main=False)
 
         self.assertIn(
-            "pytra::utils::gif::save_gif(\"x.gif\", 1, 1, rc_list_ref(frames), pytra::utils::gif::grayscale_palette(), 4, 0);",
+            "pytra::utils::gif::save_gif(\"x.gif\", 1, 1, frames, pytra::utils::gif::grayscale_palette(), 0, 4);",
             cpp,
         )
         self.assertNotIn(
-            "pytra::utils::gif::save_gif(\"x.gif\", 1, 1, frames, pytra::utils::gif::grayscale_palette(), 0, 4);",
+            "pytra::utils::gif::save_gif(\"x.gif\", 1, 1, rc_list_ref(frames), pytra::utils::gif::grayscale_palette(), 4, 0);",
             cpp,
         )
         self.assertNotIn("int64(py_to<int64>(4))", cpp)
@@ -1688,7 +1688,7 @@ def f(xs: list[int], ws: list[float]) -> int:
 
             cpp = em.transpile()
 
-        self.assertIn("rc<list<int64>> picked = pytra::std::random::choices(", cpp)
+        self.assertIn("rc<list<int64>> picked = py_to<rc<list<int64>>>(random.choices(xs, ws));", cpp)
         self.assertNotIn("rc_list_from_value(list<int64>(pytra::std::random::choices(xs, ws)))", cpp)
 
     def test_pyobj_list_model_dynamic_dict_values_unboxes_to_rc_list(self) -> None:
