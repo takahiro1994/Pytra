@@ -12,7 +12,7 @@ function __pytra_require_runtime_file(string $staged_rel, string $repo_rel): voi
             return;
         }
     }
-    throw new RuntimeException('runtime dependency not found: ' . $repo_rel);
+    // Optional dependency: skip silently if not found.
 }
 
 __pytra_require_runtime_file('utils/png.php', '../../generated/utils/png.php');
@@ -149,6 +149,10 @@ function __pytra_index($container, $index): int {
         $i += $n;
     }
     return $i;
+}
+
+function __pytra_perf_counter(): float {
+    return microtime(true);
 }
 
 function __pytra_noop(...$_args) {

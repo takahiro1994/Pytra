@@ -1450,6 +1450,8 @@ def _emit_stmt(stmt: Any, *, indent: str, ctx: dict[str, Any]) -> list[str]:
         return [indent + "continue;"]
     if kind == "Pass":
         return [indent + ";"]
+    if kind == "VarDecl":
+        return []
     if kind == "Import" or kind == "ImportFrom":
         return []
     if kind == "Raise":

@@ -7,10 +7,30 @@ Usage:
 
 from __future__ import annotations
 
+import shutil
 import sys
+from pathlib import Path
 
 from toolchain.emit.php.emitter import transpile_to_php_native
 from toolchain.emit.loader import emit_all_modules
+
+
+def _copy_runtime(output_dir: str) -> None:
+    """Copy PHP runtime files into a pytra/ subdirectory of output_dir."""
+    src_root = Path(__file__).resolve().parents[2] / "runtime" / "php"
+    dst_root = Path(output_dir) / "pytra"
+    specs = [
+        ("built_in/py_runtime.php", "py_runtime.php"),
+        ("std/math_native.php", "std/math_native.php"),
+        ("std/time_native.php", "std/time_native.php"),
+    ]
+    for src_rel, dst_rel in specs:
+        src = src_root / src_rel
+        if not src.exists():
+            continue
+        dst = dst_root / dst_rel
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(str(src), str(dst))
 
 
 def main() -> int:
@@ -36,7 +56,11 @@ def main() -> int:
         print("error: input link-output.json is required", file=sys.stderr)
         return 1
 
-    return emit_all_modules(input_path, output_dir, ".php", transpile_to_php_native)
+    rc = emit_all_modules(input_path, output_dir, ".php", transpile_to_php_native)
+    if rc != 0:
+        return rc
+    _copy_runtime(output_dir)
+    return 0
 
 
 if __name__ == "__main__":

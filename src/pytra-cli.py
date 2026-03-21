@@ -232,13 +232,11 @@ def cmd_build(argv: list[str]) -> int:
         runner_map: dict[str, list[str]] = {
             "js": ["node"],
             "ts": ["npx", "-y", "tsx"],
-            "go": ["go", "run"],
-            "java": ["java"],
             "ruby": ["ruby"],
             "lua": ["lua"],
             "php": ["php"],
             "scala": ["scala", "run"],
-            "nim": ["nim", "r"],
+            # nim is handled above with explicit compile + run
             "julia": ["julia"],
             "dart": ["dart", "run"],
             "powershell": ["pwsh", "-File"],
@@ -246,20 +244,19 @@ def cmd_build(argv: list[str]) -> int:
         # Compiled languages: compile first, then run
         compile_map: dict[str, list[list[str]]] = {
             "rs": [["rustc", "-O", entry_output, "-o", output_dir + "/" + exe_name]],
-            "swift": [["swiftc", entry_output, "-o", output_dir + "/" + exe_name]],
-            "kotlin": [["kotlinc", entry_output, "-include-runtime", "-d", output_dir + "/" + entry_stem + ".jar"]],
+            # swift is handled below (needs all .swift files)
         }
         compile_run_map: dict[str, list[str]] = {
             "rs": [output_dir + "/" + exe_name],
-            "swift": [output_dir + "/" + exe_name],
-            "kotlin": ["java", "-cp", output_dir + "/" + entry_stem + ".jar", "pytra_" + entry_stem.replace("-", "_")],
+            # swift is handled below
         }
+
+        import os as _os
 
         # C#: collect all .cs in output-dir, compile with mcs, run with mono
         if target == "cs":
             cs_exe = output_dir + "/" + entry_stem + "_cs.exe"
             cs_files: list[str] = []
-            import os as _os
             for root_dir, dirs, files in _os.walk(output_dir):
                 for f in sorted(files):
                     if f.endswith(".cs"):
@@ -269,6 +266,86 @@ def cmd_build(argv: list[str]) -> int:
             if result.returncode != 0:
                 return result.returncode
             result = _run(["mono", cs_exe])
+            return result.returncode
+
+        # Go: collect all .go in output-dir, go build, then run exe
+        if target == "go":
+            go_exe = output_dir + "/" + exe_name
+            go_files: list[str] = []
+            for f in sorted(_os.listdir(output_dir)):
+                if f.endswith(".go"):
+                    go_files.append(output_dir + "/" + f)
+            build_cmd = ["go", "build", "-o", go_exe] + go_files
+            result = _run(build_cmd)
+            if result.returncode != 0:
+                return result.returncode
+            result = _run([go_exe])
+            return result.returncode
+
+        # Java: javac all .java in output-dir, then java main class
+        if target == "java":
+            java_files: list[str] = []
+            for f in sorted(_os.listdir(output_dir)):
+                if f.endswith(".java"):
+                    java_files.append(output_dir + "/" + f)
+            javac_cmd = ["javac", "-encoding", "UTF-8"] + java_files
+            result = _run(javac_cmd)
+            if result.returncode != 0:
+                return result.returncode
+            result = _run(["java", "-cp", output_dir, "Main"])
+            return result.returncode
+
+        # Swift: swiftc all .swift in output-dir → exe
+        if target == "swift":
+            swift_exe = output_dir + "/" + exe_name
+            swift_files: list[str] = []
+            for f in sorted(_os.listdir(output_dir)):
+                if f.endswith(".swift"):
+                    swift_files.append(output_dir + "/" + f)
+            swiftc_cmd = ["swiftc"] + swift_files + ["-o", swift_exe]
+            result = _run(swiftc_cmd)
+            if result.returncode != 0:
+                return result.returncode
+            result = _run([swift_exe])
+            return result.returncode
+
+        # Nim: nim c all .nim entry, then run exe
+        # Nim requires valid identifiers for module names (no leading digits).
+        # Use `nim c` + explicit -o to avoid the restriction of `nim r`.
+        # Rename entry file if its stem starts with a digit.
+        if target == "nim":
+            nim_exe = output_dir + "/" + exe_name
+            nim_entry = entry_output
+            if not _os.path.exists(nim_entry):
+                alt = output_dir + "/main.nim"
+                if _os.path.exists(alt):
+                    nim_entry = alt
+            # Rename entry file when the stem starts with a digit
+            nim_stem = _os.path.basename(nim_entry)
+            if nim_stem[:1].isdigit():
+                safe_name = "m_" + nim_stem
+                safe_path = output_dir + "/" + safe_name
+                _os.rename(nim_entry, safe_path)
+                nim_entry = safe_path
+            nim_cmd = ["nim", "c", "--hints:off", "-o:" + nim_exe, nim_entry]
+            result = _run(nim_cmd)
+            if result.returncode != 0:
+                return result.returncode
+            result = _run([nim_exe])
+            return result.returncode
+
+        # Kotlin: kotlinc all .kt → jar, then java -cp jar main
+        if target == "kotlin":
+            kt_files: list[str] = []
+            for f in sorted(_os.listdir(output_dir)):
+                if f.endswith(".kt"):
+                    kt_files.append(output_dir + "/" + f)
+            jar_path = output_dir + "/" + entry_stem + ".jar"
+            kotlinc_cmd = ["kotlinc"] + kt_files + ["-include-runtime", "-d", jar_path]
+            result = _run(kotlinc_cmd)
+            if result.returncode != 0:
+                return result.returncode
+            result = _run(["java", "-jar", jar_path])
             return result.returncode
 
         if target in compile_map:

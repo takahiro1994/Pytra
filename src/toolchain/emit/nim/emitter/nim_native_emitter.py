@@ -667,6 +667,8 @@ class NimNativeEmitter:
             self._emit_raise(stmt)
         elif kind == "Try":
             self._emit_try(stmt)
+        elif kind == "VarDecl":
+            self._emit_var_decl(stmt)
         elif kind == "Pass":
             self._emit_line("discard")
         elif kind == "Import":
@@ -1069,6 +1071,23 @@ class NimNativeEmitter:
             return
 
         self._emit_line(f"{target} = {value}")
+
+    def _emit_var_decl(self, stmt: dict[str, Any]) -> None:
+        """Emit a hoisted variable declaration (VarDecl node)."""
+        name_raw = stmt.get("name")
+        name = _safe_ident(name_raw, "v") if isinstance(name_raw, str) else "v"
+        var_type_any = stmt.get("type")
+        var_type = var_type_any.strip() if isinstance(var_type_any, str) else ""
+        nim_t = self._map_type(var_type) if var_type != "" else "auto"
+        if var_type != "":
+            self.var_types[name] = nim_t
+        self.declared_vars.add(name)
+        self.function_level_vars.add(name)
+        default_val = self._default_value_for_type(nim_t)
+        if nim_t != "auto":
+            self._emit_line(f"var {name}: {nim_t} = {default_val}")
+        else:
+            self._emit_line(f"var {name} = {default_val}")
 
     def _emit_swap(self, stmt: dict[str, Any]) -> None:
         left = self._render_expr(stmt.get("left"))

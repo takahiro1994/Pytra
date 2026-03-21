@@ -7,10 +7,29 @@ Usage:
 
 from __future__ import annotations
 
+import shutil
 import sys
+from pathlib import Path
 
 from toolchain.emit.nim.emitter import transpile_to_nim_native
 from toolchain.emit.loader import emit_all_modules
+
+
+def _copy_runtime(output_dir: str) -> None:
+    """Copy Nim runtime files into the output directory."""
+    src_root = Path(__file__).resolve().parents[2] / "runtime" / "nim"
+    out = Path(output_dir)
+    specs = [
+        ("built_in/py_runtime.nim", "py_runtime.nim"),
+        ("generated/utils/image_runtime.nim", "image_runtime.nim"),
+    ]
+    for src_rel, dst_rel in specs:
+        src = src_root / src_rel
+        if not src.exists():
+            continue
+        dst = out / dst_rel
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(str(src), str(dst))
 
 
 def main() -> int:
@@ -36,7 +55,11 @@ def main() -> int:
         print("error: input link-output.json is required", file=sys.stderr)
         return 1
 
-    return emit_all_modules(input_path, output_dir, ".nim", transpile_to_nim_native)
+    rc = emit_all_modules(input_path, output_dir, ".nim", transpile_to_nim_native)
+    if rc != 0:
+        return rc
+    _copy_runtime(output_dir)
+    return 0
 
 
 if __name__ == "__main__":
