@@ -931,7 +931,7 @@ class CppStatementEmitter:
             self.emit(
                 self.syntax_line(
                     "catch_open",
-                    "catch (const ::std::exception& {name}) {{",
+                    "catch (const ::std::exception& {name}) {",
                     {"name": name},
                 )
             )
