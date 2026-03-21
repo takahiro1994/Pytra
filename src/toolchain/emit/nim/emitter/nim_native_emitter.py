@@ -354,7 +354,13 @@ class NimNativeEmitter:
         self.relative_import_name_aliases = _collect_relative_import_name_aliases(east_doc)
 
     def transpile(self) -> str:
-        self.lines.append('include "py_runtime.nim"')
+        # Calculate relative path for sub-modules
+        meta_any = self.east_doc.get("meta")
+        meta = meta_any if isinstance(meta_any, dict) else {}
+        module_id_val = meta.get("module_id", "")
+        module_depth = module_id_val.count(".") if isinstance(module_id_val, str) and module_id_val != "" else 0
+        runtime_prefix = "../" * module_depth
+        self.lines.append(f'include "{runtime_prefix}py_runtime.nim"')
         self.lines.append("")
         self.lines.append('import std/os, std/times, std/tables, std/strutils, std/math, std/sequtils')
 
@@ -371,14 +377,23 @@ class NimNativeEmitter:
             if not isinstance(module_id_any, str):
                 continue
             module_id: str = module_id_any
-            if module_id.startswith("pytra.std.") or module_id.startswith("pytra.built_in."):
+            # Skip pytra standard library modules (provided by runtime)
+            if module_id.startswith("pytra.std") or module_id.startswith("pytra.built_in"):
                 continue
             binding_kind = binding.get("binding_kind", "")
             export_name = binding.get("export_name", "")
             local_name = binding.get("local_name", "")
-            if binding_kind == "symbol" and export_name != "" and module_id.endswith("utils"):
-                # e.g. module_id=pytra.utils, export_name=png → png/east
-                import_path = export_name + "/east"
+            if module_id.startswith("pytra.utils"):
+                # e.g. module_id=pytra.utils.gif, export_name=save_gif → gif/east
+                # or module_id=pytra.utils, export_name=png → png/east
+                parts = module_id.split(".")
+                if len(parts) >= 3:
+                    # pytra.utils.gif → gif/east
+                    import_path = parts[2] + "/east"
+                elif binding_kind == "symbol" and export_name != "":
+                    import_path = export_name + "/east"
+                else:
+                    continue
             else:
                 # e.g. module_id=io_ops.east → io_ops/east
                 import_path = module_id.replace(".", "/")

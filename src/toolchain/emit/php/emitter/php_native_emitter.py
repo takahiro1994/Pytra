@@ -1692,25 +1692,26 @@ def transpile_to_php_native(east_doc: dict[str, Any]) -> str:
             continue
         module_id: str = module_id_any
         # Skip pytra.std.* and pytra.built_in.* (provided by runtime)
-        if module_id.startswith("pytra.std.") or module_id.startswith("pytra.built_in."):
+        if module_id.startswith("pytra.std") or module_id.startswith("pytra.built_in"):
             continue
-        # pytra.utils → sub-module from binding export_name
+        # pytra.utils.* → sub-module from module_id parts
         binding_kind_any = binding.get("binding_kind")
         binding_kind = binding_kind_any if isinstance(binding_kind_any, str) else ""
         export_name_any = binding.get("export_name")
         export_name = export_name_any if isinstance(export_name_any, str) else ""
-        if binding_kind == "symbol" and export_name != "" and module_id.endswith("utils"):
-            # e.g. module_id=pytra.utils, export_name=png → png/east.php
-            require_path = export_name + "/east.php"
+        if module_id.startswith("pytra.utils"):
+            parts = module_id.split(".")
+            if len(parts) >= 3:
+                # pytra.utils.gif → gif/east.php
+                require_path = parts[2] + "/east.php"
+            elif binding_kind == "symbol" and export_name != "":
+                require_path = export_name + "/east.php"
+            else:
+                continue
         else:
             # General: module_id dots → path e.g. io_ops.east → io_ops/east.php
             parts = module_id.split(".")
             require_path = "/".join(parts) + ".php"
-            # Linker output uses module_id as path basis (e.g. "time.east" → "time/east.php")
-            # But simple module_ids like "time" get ".east" appended by linker
-            # Try the east pattern first
-            if len(parts) >= 1:
-                require_path = "/".join(parts[:-1] + [parts[-1]]) + ".php" if len(parts) == 1 else "/".join(parts) + ".php"
         if require_path not in required_modules:
             required_modules.add(require_path)
             lines.append("require_once __DIR__ . '/" + require_path + "';")
