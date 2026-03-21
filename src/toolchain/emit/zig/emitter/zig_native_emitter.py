@@ -269,6 +269,9 @@ class ZigNativeEmitter:
         self._class_base: dict[str, str] = {}
         self._class_methods: dict[str, set[str]] = {}
         self._static_fields: dict[str, list[tuple[str, str, str]]] = {}  # cls -> [(field, type, default)]
+        self._vtable_root: dict[str, str] = {}  # cls -> vtable root class
+        self._vtable_methods: dict[str, list[str]] = {}  # root cls -> [method names]
+        self._class_return_types: dict[str, dict[str, str]] = {}  # cls -> {method: return_type}
         self._local_type_stack: list[dict[str, str]] = []
         self._ref_var_stack: list[set[str]] = []
         self._local_var_stack: list[set[str]] = []
@@ -474,6 +477,8 @@ class ZigNativeEmitter:
         for stmt in body:
             if self._is_top_level_decl(stmt):
                 self._emit_stmt(stmt)
+        # vtable を emit
+        self._emit_vtables()
         # 残りのステートメント + main_guard_body を pub fn main() に入れる
         top_stmts: list[dict[str, Any]] = []
         for stmt in body:
@@ -612,6 +617,113 @@ class ZigNativeEmitter:
                             self._classes_with_init.add(name)
                         elif self._body_mutates_self(sub.get("body")):
                             self._classes_with_mut_method.add(name)
+                # メソッドの戻り値型を記録
+                cls_ret_types: dict[str, str] = {}
+                for sub in cls_body:
+                    if sub.get("kind") == "FunctionDef":
+                        m_name = sub.get("name")
+                        ret = sub.get("return_type")
+                        if isinstance(m_name, str) and isinstance(ret, str):
+                            cls_ret_types[m_name] = ret.strip()
+                self._class_return_types[name] = cls_ret_types
+        # vtable 検出: 継承階層でメソッドが override されている場合
+        for cls_name in self.class_names:
+            base = self._class_base.get(cls_name, "")
+            if base == "":
+                continue
+            own = self._class_methods.get(cls_name, set())
+            # 基底を辿って root を見つける
+            root = base
+            while self._class_base.get(root, "") != "":
+                root = self._class_base[root]
+            # root のメソッドと override を収集
+            if root not in self._vtable_methods:
+                all_methods: list[str] = []
+                seen_m: set[str] = set()
+                # root から全子孫のメソッドを収集
+                for cn in self.class_names:
+                    r = cn
+                    while self._class_base.get(r, "") != "":
+                        r = self._class_base[r]
+                    if r != root:
+                        continue
+                    for m in self._class_methods.get(cn, set()):
+                        if m not in seen_m:
+                            all_methods.append(m)
+                            seen_m.add(m)
+                self._vtable_methods[root] = all_methods
+            self._vtable_root[cls_name] = root
+            self._vtable_root[root] = root
+
+    def _has_vtable(self, cls_name: str) -> bool:
+        return cls_name in self._vtable_root
+
+    def _get_vtable_root(self, cls_name: str) -> str:
+        return self._vtable_root.get(cls_name, cls_name)
+
+    def _emit_vtables(self) -> None:
+        """vtable struct, wrapper 関数, vtable インスタンスを emit する。"""
+        emitted_roots: set[str] = set()
+        for root, methods in self._vtable_methods.items():
+            if root in emitted_roots or len(methods) == 0:
+                continue
+            emitted_roots.add(root)
+            # VTable struct
+            vt_name = root + "VT"
+            self._emit_line("const " + vt_name + " = struct {")
+            self.indent += 1
+            for m in methods:
+                ret_type = self._find_method_return_type(root, m)
+                zig_ret = self._zig_type(ret_type)
+                self._emit_line(m + ": *const fn (*anyopaque) " + zig_ret + ",")
+            self.indent -= 1
+            self._emit_line("};")
+            self._emit_line("")
+            # 階層内の全クラスの wrapper + vtable instance
+            for cls_name in self.class_names:
+                cls_root = self._vtable_root.get(cls_name, "")
+                if cls_root != root:
+                    continue
+                # wrapper 関数と vtable instance
+                for m in methods:
+                    impl_cls = self._find_method_impl(cls_name, m)
+                    ret_type = self._class_return_types.get(impl_cls, {}).get(m, "")
+                    if ret_type == "":
+                        ret_type = self._find_method_return_type(root, m)
+                    zig_ret = self._zig_type(ret_type)
+                    wrapper_name = cls_name + "_" + m + "_wrap"
+                    self._emit_line("fn " + wrapper_name + "(_: *anyopaque) " + zig_ret + " {")
+                    self.indent += 1
+                    self._emit_line("return " + impl_cls + "." + m + "(undefined);")
+                    self.indent -= 1
+                    self._emit_line("}")
+                # vtable instance
+                vt_inst = cls_name + "_vt"
+                field_inits: list[str] = []
+                for m in methods:
+                    field_inits.append("." + m + " = " + cls_name + "_" + m + "_wrap")
+                self._emit_line("const " + vt_inst + " = " + vt_name + "{ " + ", ".join(field_inits) + " };")
+                self._emit_line("")
+
+    def _find_method_return_type(self, root: str, method: str) -> str:
+        """vtable root から全子孫を辿り、method の戻り値型を見つける。"""
+        for cls_name in self.class_names:
+            r = self._vtable_root.get(cls_name, "")
+            if r != root:
+                continue
+            ret = self._class_return_types.get(cls_name, {}).get(method, "")
+            if ret != "":
+                return ret
+        return ""
+
+    def _find_method_impl(self, cls_name: str, method: str) -> str:
+        """cls_name から基底を辿り、method を実装しているクラスを返す。"""
+        current = cls_name
+        while current != "":
+            if method in self._class_methods.get(current, set()):
+                return current
+            current = self._class_base.get(current, "")
+        return cls_name
 
     def _emit_stmt(self, stmt: dict[str, Any]) -> None:
         self._emit_leading_trivia(stmt, prefix="// ")
@@ -1071,9 +1183,11 @@ class ZigNativeEmitter:
             base_method_pairs = self._get_base_methods(cls_name)
             for method_name, origin_cls in base_method_pairs:
                 if method_name not in own_methods:
-                    self._emit_line("pub fn " + method_name + "(self: *const " + cls_name + ") @TypeOf(" + origin_cls + "." + method_name + "(&self._base)) {")
+                    ret_type = self._class_return_types.get(origin_cls, {}).get(method_name, "")
+                    zig_ret = self._zig_type(ret_type)
+                    self._emit_line("pub fn " + method_name + "(_: *const " + cls_name + ") " + zig_ret + " {")
                     self.indent += 1
-                    self._emit_line("return self._base." + method_name + "();")
+                    self._emit_line("return " + origin_cls + "." + method_name + "(undefined);")
                     self.indent -= 1
                     self._emit_line("}")
                     self._emit_line("")
@@ -1447,6 +1561,11 @@ class ZigNativeEmitter:
                         return fn_expr + "()"
                     return "{}"
                 if fname in self.class_names:
+                    if self._has_vtable(fname):
+                        vt_inst = "&" + fname + "_vt"
+                        if fname in self._classes_with_init:
+                            return "pytra.make_obj(" + fname + ", " + fname + ".init(" + ", ".join(arg_strs) + "), @ptrCast(" + vt_inst + "))"
+                        return "pytra.make_obj(" + fname + ", " + fname + "{}, @ptrCast(" + vt_inst + "))"
                     if fname in self._dataclass_names:
                         fields = self._dataclass_fields.get(fname, [])
                         field_inits: list[str] = []
@@ -1473,6 +1592,15 @@ class ZigNativeEmitter:
                     if len(arg_strs) > 0:
                         return "std.math.sqrt(@as(f64, " + arg_strs[0] + "))"
                     return "std.math.sqrt(@as(f64, " + obj + "))"
+                # vtable ディスパッチ: obj の型がクラスかつ vtable あり
+                # ただしメソッド内の self.method() は直接呼び出し
+                obj_node = func_any.get("value")
+                is_self_call = isinstance(obj_node, dict) and obj_node.get("kind") == "Name" and obj_node.get("id") == "self"
+                obj_type = self._lookup_expr_type(obj_node)
+                if obj_type in self.class_names and self._has_vtable(obj_type) and not is_self_call:
+                    root = self._get_vtable_root(obj_type)
+                    vt_name = root + "VT"
+                    return obj + ".vt(" + vt_name + ")." + attr + "(" + obj + ".data)"
                 return obj + "." + attr + "(" + ", ".join(arg_strs) + ")"
         fn_expr = self._render_expr(func_any)
         return fn_expr + "(" + ", ".join(arg_strs) + ")"
@@ -1657,6 +1785,8 @@ class ZigNativeEmitter:
             return "struct { " + ", ".join("_" + str(i) + ": " + zt for i, zt in enumerate(inner_types)) + " }"
         # --- クラス名 ---
         if t in self.class_names:
+            if self._has_vtable(t):
+                return "pytra.Obj"
             return "*" + t
         return "PyObject"
 

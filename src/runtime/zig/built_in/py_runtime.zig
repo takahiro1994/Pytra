@@ -229,6 +229,48 @@ pub fn make_object(comptime T: type, value: T) *T {
     return p;
 }
 
+/// Type-erased object with vtable and reference count (spec-object.md §14).
+pub const Obj = struct {
+    data: *anyopaque,
+    vtable: *const anyopaque,
+    rc: *usize,
+
+    pub fn retain(self: Obj) Obj {
+        self.rc.* += 1;
+        return self;
+    }
+
+    pub fn release(self: Obj) void {
+        if (self.rc.* > 0) {
+            self.rc.* -= 1;
+        }
+    }
+
+    /// Get the vtable cast to a specific VTable type.
+    pub fn vt(self: Obj, comptime VT: type) *const VT {
+        return @ptrCast(@alignCast(self.vtable));
+    }
+
+    /// Get the data pointer cast to a specific type.
+    pub fn as(self: Obj, comptime T: type) *T {
+        return @ptrCast(@alignCast(self.data));
+    }
+};
+
+/// Create a type-erased Obj with vtable.
+pub fn make_obj(comptime T: type, value: T, vtable: *const anyopaque) Obj {
+    const alloc = std.heap.page_allocator;
+    const p = alloc.create(T) catch @panic("alloc failed");
+    p.* = value;
+    const rc = alloc.create(usize) catch @panic("alloc failed");
+    rc.* = 1;
+    return Obj{
+        .data = @ptrCast(p),
+        .vtable = vtable,
+        .rc = rc,
+    };
+}
+
 /// Empty list (stub for comprehensions).
 pub fn empty_list() void {
     return;
