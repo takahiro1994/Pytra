@@ -1594,7 +1594,7 @@ class ZigNativeEmitter:
                 right_type = self._lookup_expr_type(ed.get("right"))
                 if left_type in {"float64", "float32", "float"} or right_type in {"float64", "float32", "float"}:
                     return "(" + left + " / " + right + ")"
-                return "@as(f64, @floatFromInt(" + left + ")) / @as(f64, @floatFromInt(" + right + "))"
+                return "(@as(f64, @floatFromInt(" + left + ")) / @as(f64, @floatFromInt(" + right + ")))"
             if op == "Mod":
                 return "@mod(" + left + ", " + right + ")"
             sym = _binop_symbol(op)
