@@ -335,19 +335,51 @@ class ZigNativeEmitter:
                         if isinstance(h, dict):
                             mutated.update(self._scan_mutated_vars(h.get("body")))
                 mutated.update(self._scan_mutated_vars(stmt.get("finalbody")))
-        # Also mark vars that appear in multiple Assign statements (re-assignment)
-        assign_counts: dict[str, int] = {}
+        # AnnAssign で宣言された変数名を集め、Assign で再代入されるものを mutated に追加
+        declared: set[str] = set()
         for stmt in body:
             kind = stmt.get("kind")
-            if kind in {"Assign", "AnnAssign"}:
+            if kind == "AnnAssign":
+                target = stmt.get("target")
+                if isinstance(target, dict) and target.get("kind") == "Name":
+                    declared.add(_safe_ident(target.get("id"), ""))
+        # 宣言済み変数への再代入をネスト含めて検出
+        self._scan_reassign_to_declared(body, declared, mutated)
+        return mutated
+
+    def _scan_reassign_to_declared(self, body_any: Any, declared: set[str], mutated: set[str]) -> None:
+        """declared に含まれる変数名への Assign/AugAssign をネスト含めて検出する。"""
+        body = self._dict_list(body_any)
+        for stmt in body:
+            kind = stmt.get("kind")
+            if kind == "Assign":
                 target = stmt.get("target")
                 if isinstance(target, dict) and target.get("kind") == "Name":
                     n = _safe_ident(target.get("id"), "")
-                    assign_counts[n] = assign_counts.get(n, 0) + 1
-        for n, count in assign_counts.items():
-            if count >= 2:
-                mutated.add(n)
-        return mutated
+                    if n in declared:
+                        mutated.add(n)
+                targets = stmt.get("targets")
+                if isinstance(targets, list):
+                    for t in targets:
+                        if isinstance(t, dict) and t.get("kind") == "Name":
+                            n = _safe_ident(t.get("id"), "")
+                            if n in declared:
+                                mutated.add(n)
+            elif kind == "AugAssign":
+                target = stmt.get("target")
+                if isinstance(target, dict) and target.get("kind") == "Name":
+                    n = _safe_ident(target.get("id"), "")
+                    if n in declared:
+                        mutated.add(n)
+            elif kind == "If":
+                self._scan_reassign_to_declared(stmt.get("body"), declared, mutated)
+                self._scan_reassign_to_declared(stmt.get("orelse"), declared, mutated)
+            elif kind == "ForCore":
+                self._scan_reassign_to_declared(stmt.get("body"), declared, mutated)
+            elif kind == "While":
+                self._scan_reassign_to_declared(stmt.get("body"), declared, mutated)
+            elif kind == "Try":
+                self._scan_reassign_to_declared(stmt.get("body"), declared, mutated)
 
     def _is_var_mutated(self, name: str) -> bool:
         return name in self._current_mutated_vars()
