@@ -29,62 +29,8 @@ using rc = pytra::gc::RcHandle<T>;
 template <class T, pytra_type_id TID> struct PyBoxed;
 class str;
 
-// object: tagged value = type_id + boxed data.
-// All tagged unions, Any, and dynamic values use this single type.
-struct object {
-    pytra_type_id tag;
-    rc<RcObject> _rc;
-
-    object() : tag(PYTRA_TID_NONE), _rc() {}
-
-    // From rc<RcObject> (backward compat)
-    object(const rc<RcObject>& v) : tag(v ? v->py_type_id() : PYTRA_TID_NONE), _rc(v) {}
-    object(rc<RcObject>&& v) : tag(v ? v->py_type_id() : PYTRA_TID_NONE), _rc(::std::move(v)) {}
-
-    // From raw pointer (adopt)
-    object(RcObject* raw) : tag(raw ? raw->py_type_id() : PYTRA_TID_NONE), _rc(rc<RcObject>::adopt(raw)) {}
-
-    // Implicit box for POD types
-    object(const str& v);   // defined after str is complete
-    object(const char* v);  // defined after str is complete
-    object(int64 v);
-    object(int v);
-    explicit object(float64 v);
-    explicit object(bool v);
-
-    // From rc<T> (class upcast)
-    template <class T, ::std::enable_if_t<::std::is_base_of_v<RcObject, T>, int> = 0>
-    object(const rc<T>& v) : tag(v ? v->py_type_id() : PYTRA_TID_NONE), _rc(v) {}
-
-    // monostate = None
-    object(::std::monostate) : tag(PYTRA_TID_NONE), _rc() {}
-
-    // Backward compat: implicit conversion to rc<RcObject>
-    operator const rc<RcObject>&() const { return _rc; }
-    operator rc<RcObject>&() { return _rc; }
-
-    // rc<RcObject> interface delegation
-    RcObject* get() const { return _rc.get(); }
-    RcObject& operator*() const { return *_rc; }
-    RcObject* operator->() const { return _rc.get(); }
-    explicit operator bool() const { return tag != PYTRA_TID_NONE && _rc.get() != nullptr; }
-
-    // Tagged value API
-    bool is(pytra_type_id expected) const { return tag == expected; }
-
-    template <class T, pytra_type_id TID>
-    const T& unbox() const { return static_cast<PyBoxed<T, TID>*>(_rc.get())->value; }
-
-    template <class T>
-    T* as_ptr() const { return static_cast<T*>(_rc.get()); }
-
-    template <class T>
-    rc<T> as() const {
-        T* raw = static_cast<T*>(_rc.get());
-        if (raw) pytra::gc::incref(reinterpret_cast<RcObject*>(raw));
-        return rc<T>::adopt(raw);
-    }
-};
+// object is defined in core/object.h as Object<void> (type-erased view).
+// Forward declare here; full definition comes via #include "core/object.h" below.
 
 template <class T, class... Args>
 static inline rc<T> rc_new(Args&&... args) {
@@ -152,6 +98,40 @@ static inline list<T> rc_list_copy_value(const Object<list<T>>& values) {
         return list<T>{};
     }
     return *values;
+}
+
+// POD boxing for Object<void> (= object)
+// These create a heap-allocated boxed value wrapped in ControlBlock.
+template<typename T>
+struct PyBoxedValue {
+    T value;
+    PyBoxedValue(T v) : value(::std::move(v)) {}
+};
+
+inline Object<void>::Object(int64 v) : cb(nullptr) {
+    auto* boxed = new PyBoxedValue<int64>(v);
+    cb = new ControlBlock{0, PYTRA_TID_INT, boxed};
+    retain();
+}
+
+inline Object<void>::Object(int v) : Object(static_cast<int64>(v)) {}
+
+inline Object<void>::Object(const char* v) : cb(nullptr) {
+    auto* boxed = new PyBoxedValue<str>(str(v));
+    cb = new ControlBlock{0, PYTRA_TID_STR, boxed};
+    retain();
+}
+
+inline Object<void>::Object(float64 v) : cb(nullptr) {
+    auto* boxed = new PyBoxedValue<float64>(v);
+    cb = new ControlBlock{0, PYTRA_TID_FLOAT, boxed};
+    retain();
+}
+
+inline Object<void>::Object(bool v) : cb(nullptr) {
+    auto* boxed = new PyBoxedValue<bool>(v);
+    cb = new ControlBlock{0, PYTRA_TID_BOOL, boxed};
+    retain();
 }
 
 #endif  // PYTRA_BUILT_IN_PY_TYPES_H

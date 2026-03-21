@@ -137,6 +137,76 @@ private:
 };
 
 // =============================
+// Object<void> — type-erased view (replaces old `object`)
+// =============================
+
+template<>
+struct Object<void> {
+    ControlBlock* cb;
+
+    Object() : cb(nullptr) {}
+
+    Object(ControlBlock* cb_) : cb(cb_) { retain(); }
+
+    // From any Object<T>
+    template<typename T>
+    Object(const Object<T>& other) : cb(other.cb) { retain(); }
+
+    Object(const Object& other) : cb(other.cb) { retain(); }
+    Object(Object&& other) noexcept : cb(other.cb) { other.cb = nullptr; }
+
+    // POD boxing constructors (defined after str/list/dict are complete)
+    Object(int64 v);
+    Object(int v);
+    Object(const char* v);
+    Object(float64 v);
+    Object(bool v);
+
+    ~Object() { release(); }
+
+    Object& operator=(const Object& other) {
+        if (this != &other) { release(); cb = other.cb; retain(); }
+        return *this;
+    }
+    Object& operator=(Object&& other) noexcept {
+        if (this != &other) { release(); cb = other.cb; other.cb = nullptr; }
+        return *this;
+    }
+
+    explicit operator bool() const { return cb != nullptr; }
+    uint32_t type_id() const { return cb ? cb->type_id : 0; }
+    bool is(uint32_t expected) const { return cb && cb->type_id == expected; }
+    bool isinstance(const TypeInfo* base) const {
+        return cb && base->entry <= cb->type_id && cb->type_id < base->exit;
+    }
+
+    // Downcast to typed Object
+    template<typename T>
+    Object<T> as() const {
+        if (!cb) return Object<T>();
+        return Object<T>(cb, static_cast<T*>(cb->base_ptr));
+    }
+
+    // Access base_ptr
+    void* get() const { return cb ? cb->base_ptr : nullptr; }
+
+private:
+    void retain() { if (cb) ++cb->rc; }
+    void release() {
+        if (!cb) return;
+        if (--cb->rc == 0) {
+            auto* ti = g_type_table[cb->type_id];
+            if (ti && ti->deleter) ti->deleter(cb->base_ptr);
+            delete cb;
+        }
+        cb = nullptr;
+    }
+};
+
+// `object` is now an alias for Object<void>
+using object = Object<void>;
+
+// =============================
 // make_object
 // =============================
 
