@@ -81,3 +81,4 @@
 - 2026-03-21: super 対応、ClassName.attr→$self["attr"] 修正、py_assert_eq 改善、__pytra_in/__pytra_str_slice 追加、builtin 括弧囲み。82/131 到達。残り 49 件: assert 20、notrec 9、varset 11、other 11。
 - 2026-03-21: resolved_type ベースクラスインスタンス検出、継承メソッドエイリアス、Math 括弧、lambda 即時呼び出し、BoolOp __pytra_bool ラップ、__pytra_bool 空文字列修正、_safe_ident case-insensitive。86/131 到達。残り 45 件: assert 18、notrec 8、varset 11、other 9。
 - 2026-03-21: ListComp ForEach-Object 実装、enumerate ForCore TupleTarget、dict.items() Key/Value、ネスト ListComp flatten 防止、import aliases/ObjStr/ObjLen/ObjBool 括弧修正。97/131 到達。残り 34 件のうち stdlib 14 件は対象外。非 stdlib 20 件: assert 5、notrec 2、varset 5、other 8。
+- 2026-03-21: multi-generator ListComp ネスト対応。98/131 到達。残り 33 件: stdlib 未実装 14、enum/intflag 4、構文/型問題 8、assert 差分 5、その他 2。初期 13/131 から 98/131 に改善（+85 件、7.5 倍）。
