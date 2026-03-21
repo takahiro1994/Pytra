@@ -28,10 +28,12 @@ class CppCallEmitter:
 
         This re-resolves frontend facade imports through the runtime symbol index so
         single-module transpile paths still reach the canonical runtime namespace.
+        Bare module names (e.g. "math") are normalized to canonical form
+        (e.g. "pytra.std.math") before resolution.
         """
-        target_module = module_name
-        if module_name != "" and symbol_name != "":
-            resolved_module = resolve_import_binding_runtime_module(module_name, symbol_name, "symbol")
+        target_module = self._normalize_runtime_module_name(module_name)
+        if target_module != "" and symbol_name != "":
+            resolved_module = resolve_import_binding_runtime_module(target_module, symbol_name, "symbol")
             if resolved_module != "":
                 target_module = resolved_module
         target_ns = self.module_namespace_map.get(target_module, "")
