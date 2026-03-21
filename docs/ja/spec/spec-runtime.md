@@ -61,108 +61,41 @@ runtime ファイルの ownership 表現:
 - 手書きファイル（`src/runtime/<lang>/`）:
   - 各ターゲット言語固有のランタイムコード。手書き。
 
-意味:
+### 0.6a runtime layout の現行構造
 
-- `.gen.*`
-  - SoT から機械生成したファイル。
-  - 手編集禁止。
-- `.ext.*`
-  - ABI 接着、OS / SDK 呼び出し、`@extern` の受け皿など、言語依存の最小実装。
-  - 手編集可。
-- `generated/`
-  - C++ module runtime の自動生成正本。
-- `native/`
-  - C++ module runtime の target-language-specific companion。
+SoT（Python ソース）から生成される中間表現は `src/runtime/east/` に集約し、各言語固有の手書きランタイムは `src/runtime/<lang>/` に配置する。旧 `generated/` / `native/` のディレクトリ分離は廃止済み。
 
-必須ルール:
+現行 layout:
 
-- `src/runtime/cpp/{built_in,std,utils}` に module runtime の `.h/.cpp` を新規追加してはならない。suffix ベース ownership は legacy-closed とする。
-- 未移行 target では `.gen/.ext` を継続してよい。C++ `core` は plain naming (`core/*.h`, `native/core/*.{h,cpp}`) を正本とする。
-- `*.ext.*` に SoT と同等の本体ロジックを書いてはならない。
-- C++ module runtime の ownership は basename suffix ではなく `generated/native` のディレクトリで判別する。
+- `src/runtime/east/{built_in,std,utils}/` — SoT から生成した `.east` ファイル。手編集禁止。
+- `src/runtime/<lang>/{built_in,std,core,...}/` — 各言語固有の手書きランタイム。
+- `src/runtime/cpp/generated/{built_in,std}/` — C++ のみ残存する `.east` → `.h/.cpp` 生成物（移行中）。
 
-例:
+`@extern` 関数の取り扱い:
 
-- `src/runtime/cpp/generated/std/math.h`
-- `src/runtime/cpp/native/std/math.cpp`
-- `src/runtime/cpp/generated/std/math.h`
-- `src/runtime/cpp/native/core/py_runtime.h`
-
-補足:
-
-- `rc<list<T>>` のような backend 内部 typed handle helper を導入する場合も、配置先は `core/` とする。
-- これは SoT 由来 module runtime ではなく、container / object 表現の低レベル支援層だからである。
-
-### 0.6n C++ 以外の言語の native ファイル命名規則
-
-C++ 以外（C#, Java, Rust, Go, Kotlin, Swift など）の `native/` ファイルは、次の命名規則に従う。
-
-- native ファイル名: `<name>_native.<ext>`
-- native クラス/モジュール名: `<name>_native`（ファイル名とクラス名を一致させる）
-
-理由:
-
-- C++ は `generated/` と `native/` で **同名ファイル**（`math.h` / `math.cpp` など）を使い、ディレクトリだけで ownership を区別できる。これはリンカ/インクルードシステムが同一シンボルを統合するモデルのため成立する。
-- C++ 以外の言語では、`generated/std/os.cs` と `native/std/os.cs` が同一ビルドに含まれるとき、**ファイル名だけでは区別できない**（C# の場合はクラス名の衝突リスクもある）。
-- `_native` suffix をファイル名・クラス名の両方に付けることで、**ファイル名 = クラス名**という各言語の慣習を守りつつ、generated 側との区別を明示する。
-
-例（C#）:
-
-- `src/runtime/cs/generated/std/os.cs` → `public static class os`（generated, SoT 由来）
-- `src/runtime/cs/native/std/os_native.cs` → `public static class os_native`（native, host API 実装）
-
-例（Java が将来対象になる場合）:
-
-- `src/runtime/java/generated/std/os.java` → `class os`
-- `src/runtime/java/native/std/os_native.java` → `class os_native`
+- `@extern` 関数は SoT の Python body を参考実装とし、実際のターゲット言語実装は手書きランタイムで提供する。
+- emitter は `@extern` 関数について、手書きランタイムへの委譲コードを生成する。
+- C++ 以外の言語では、委譲先のクラス/モジュール名に `_native` suffix を付ける（例: `os` → `os_native`）。
 
 必須ルール:
 
-- C++ 以外の `native/std/<name>_native.<ext>` は、対応する `generated/std/<name>.<ext>` から委譲を受ける薄いラッパーとして実装する。
-- `generated/` 側が `native/` 側へ委譲する形（`<name>_native.<method>()` 呼び出し）を正本とし、逆方向の依存を持ってはならない。
-- `native/` 側に SoT と同等の本体ロジックを重複実装してはならない。host API への最小接続コードに限定する。
-- コンパイラの最適化（インライン展開）により委譲コストは実質ゼロになることを前提とし、mix-in や partial class による単一ファイル化は行わない。
+- `.east` ファイルは手編集禁止。`src/pytra/` の Python ソースから再生成する。
+- 手書きランタイムに SoT と同等の本体ロジックを重複実装してはならない。host API への最小接続コードに限定する。
+- `rc<list<T>>` のような backend 内部 typed handle helper は `core/` に配置する。
 
-### 0.60 C++ module runtime の現行 layout
+### 0.6b C++ runtime の現行 layout
 
-`src/runtime/cpp/` の checked-in runtime は、次の ownership layout を正本とする。
+`src/runtime/cpp/` は以下の構造を正本とする。
 
-- `src/runtime/cpp/generated/{built_in,std,utils,core}/`
-- `src/runtime/cpp/native/{built_in,std,utils,core}/`
-
-意味:
-
-- `generated/`
-  - SoT から生成した checked-in runtime artifact。
-- `native/`
-  - hand-written canonical runtime と、C++ 固有 companion / ABI glue。
+- `src/runtime/cpp/core/` — handwritten low-level runtime（object.h, list.h, py_types.h 等）
+- `src/runtime/cpp/built_in/` — handwritten built-in 関数実装（io_ops.h, scalar_ops.h 等）
+- `src/runtime/cpp/std/` — handwritten stdlib 実装（time.h, glob.cpp 等）
+- `src/runtime/cpp/generated/{built_in,std}/` — `.east` → C++ 自動生成物（移行中）
 
 必須ルール:
 
-- checked-in `src/runtime/cpp/{core,pytra}/**` は持たない。安定 SDK include surface が必要なら、source tree ではなく export/package 時に生成する。
-- 生成コード / compiler / test は、`generated/...` または `native/core/...` の direct ownership header を使う。
-- `runtime_symbol_index` では、C++ の `public_headers` と `compiler_headers` を direct ownership header へ揃える。
-- 宣言の正本は原則 `generated/*.h` に置き、`native/*.h` は template / inline helper / ABI glue など本当に必要な場合だけに制限する。
-- `native/` は「何でも手書きで置ける場所」ではなく、C++ 固有 companion に限定する。
-
-補足:
-
-- この layout を確立した移行ログは `docs/ja/plans/archive/20260307-p0-cpp-runtime-layout-generated-native.md` と `docs/ja/plans/archive/20260313-p0-cpp-runtime-packaging-deshim.md` に残す。
-- `src/runtime/cpp/{built_in,std,utils}` の legacy flat/suffix ownership は closed とし、新規追加も再導入も禁止する。
-
-### 0.601 C++ core runtime の ownership split
-
-low-level runtime の責務名 `core` は維持するが、checked-in surface は `generated/core` と `native/core` に限る。
-
-- `src/runtime/cpp/generated/core/`
-  - pure Python SoT から変換できる low-level core artifact
-- `src/runtime/cpp/native/core/`
-  - handwritten low-level runtime 正本
-
-必須ルール:
-
-- low-level handwritten core は `native/core/` にのみ置く。
-- pure helper として閉じる low-level core artifact だけを `generated/core/` に置く。
+- handwritten core は `core/` にのみ置く。
+- `@extern` 関数の C++ 実装は `built_in/` または `std/` に置く。
 - checked-in `runtime/cpp/core/*.h` と `runtime/cpp/pytra/core/*.h` は再導入してはならない。
 - compiler / generated runtime / native companion / backend 出力は `runtime/cpp/native/core/...` を直接 include する。
 - `generated/core` / `generated/built_in` の artifact は、`src/pytra-cli.py --emit-runtime-cpp` の正規導線だけで生成し、module 専用 generator や ad-hoc template を追加してはならない。
