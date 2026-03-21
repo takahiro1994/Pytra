@@ -23,7 +23,6 @@ _CLASS_BASES: list[dict[str, str]] = [{}]
 _CLASS_METHOD_NAMES: list[dict[str, set[str]]] = [{}]
 _LAMBDA_VARS: list[set[str]] = [set()]
 _FUNCTION_NAMES: list[set[str]] = [set()]
-# Maps imported name -> PowerShell expression (for from X import Y)
 _IMPORT_ALIASES: list[dict[str, str]] = [{}]
 
 _PS_AUTOMATIC_VARS = {
@@ -439,8 +438,10 @@ def _render_call_expr(expr: dict[str, Any]) -> str:
             # Imported function aliases (e.g. from math import sqrt -> [Math]::Sqrt)
             if fn_name in _IMPORT_ALIASES[0]:
                 ps_func = _IMPORT_ALIASES[0][fn_name]
-                if ps_func.startswith("[Math]::") and not ps_func.endswith("I") and not ps_func.endswith("E"):
-                    return ps_func + "(" + ", ".join(rendered_args) + ")"
+                if ps_func.startswith("[Math]::"):
+                    if ps_func.endswith("PI") or ps_func.endswith("::E"):
+                        return "(" + ps_func + ")"
+                    return "(" + ps_func + "(" + ", ".join(rendered_args) + "))"
                 return ps_func
             if fn_name == "bytearray":
                 return "(__pytra_bytearray " + " ".join(rendered_args) + ")" if len(rendered_args) > 0 else "(__pytra_bytearray 0)"
