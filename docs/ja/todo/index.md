@@ -142,7 +142,7 @@
 
 文脈: [docs/ja/plans/p7-zig-native-backend.md](../plans/p7-zig-native-backend.md)
 
-1. [ ] [ID: P7-ZIG-NATIVE-01-S1] `src/toolchain/emit/zig/` 配下に emitter パッケージを作成する。
-2. [ ] [ID: P7-ZIG-NATIVE-01-S2] `src/runtime/zig/built_in/py_runtime.zig` を作成する。
-3. [ ] [ID: P7-ZIG-NATIVE-01-S3] smoke テスト作成、`transpiler_versions.json`・`check_py2x_profiles.json`・`docs/ja/language/index.md` を更新する。
-4. [ ] [ID: P7-ZIG-NATIVE-01-S4] smoke テストが通ることを確認する。
+1. [x] [ID: P7-ZIG-NATIVE-01-S1] `src/toolchain/emit/zig/` 配下に emitter パッケージを作成する。
+2. [x] [ID: P7-ZIG-NATIVE-01-S2] `src/runtime/zig/built_in/py_runtime.zig` を作成する。
+3. [x] [ID: P7-ZIG-NATIVE-01-S3] smoke テスト作成、`transpiler_versions.json`・`check_py2x_profiles.json`・`docs/ja/language/index.md` を更新する。
+4. [x] [ID: P7-ZIG-NATIVE-01-S4] smoke テストが通ることを確認する。

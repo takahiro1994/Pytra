@@ -1,0 +1,1087 @@
+"""EAST3 -> Zig native emitter (minimal skeleton)."""
+
+from __future__ import annotations
+
+from typing import Any
+
+from toolchain.emit.common.emitter.code_emitter import (
+    reject_backend_homogeneous_tuple_ellipsis_type_exprs,
+    reject_backend_typed_vararg_signatures,
+)
+
+from toolchain.frontends.runtime_symbol_index import (
+    canonical_runtime_module_id,
+    lookup_runtime_module_symbols,
+    lookup_runtime_symbol_doc,
+    resolve_import_binding_doc,
+)
+
+
+_ZIG_KEYWORDS = {
+    "addrspace", "align", "allowzero", "and", "anyframe", "anytype",
+    "asm", "async", "await", "break", "callconv", "catch", "comptime",
+    "const", "continue", "defer", "else", "enum", "errdefer", "error",
+    "export", "extern", "false", "fn", "for", "if", "inline",
+    "linksection", "noalias", "nosuspend", "null", "opaque", "or",
+    "orelse", "packed", "pub", "resume", "return", "struct", "suspend",
+    "switch", "test", "threadlocal", "true", "try", "undefined",
+    "union", "unreachable", "var", "volatile", "while",
+}
+_NIL_FREE_DECL_TYPES = {"int", "int64", "float", "float64", "bool", "str"}
+_COMPILETIME_STD_IMPORT_SYMBOLS = {"abi", "template", "extern"}
+
+
+def _safe_ident(name: Any, fallback: str = "value") -> str:
+    if not isinstance(name, str) or name == "":
+        return fallback
+    chars: list[str] = []
+    i = 0
+    while i < len(name):
+        ch = name[i]
+        if ch.isalnum() or ch == "_":
+            chars.append(ch)
+        else:
+            chars.append("_")
+        i += 1
+    out = "".join(chars)
+    if out == "":
+        out = fallback
+    if out[0].isdigit():
+        out = "_" + out
+    if out in _ZIG_KEYWORDS:
+        out = "@\"" + out + "\""
+    return out
+
+
+def _relative_import_module_path(module_id: str) -> str:
+    parts = [
+        _safe_ident(part, "module")
+        for part in module_id.lstrip(".").split(".")
+        if part != ""
+    ]
+    return ".".join(parts)
+
+
+def _collect_relative_import_name_aliases(east_doc: dict[str, Any]) -> dict[str, str]:
+    aliases: dict[str, str] = {}
+    body_any = east_doc.get("body")
+    body = body_any if isinstance(body_any, list) else []
+    i = 0
+    while i < len(body):
+        stmt = body[i]
+        if not isinstance(stmt, dict):
+            i += 1
+            continue
+        sd: dict[str, Any] = stmt
+        if sd.get("kind") != "ImportFrom":
+            i += 1
+            continue
+        module_any = sd.get("module")
+        module_id = module_any if isinstance(module_any, str) else ""
+        level_any = sd.get("level")
+        level = level_any if isinstance(level_any, int) else 0
+        if level <= 0 and not module_id.startswith("."):
+            i += 1
+            continue
+        module_path = _relative_import_module_path(module_id)
+        names_any = sd.get("names")
+        names = names_any if isinstance(names_any, list) else []
+        j = 0
+        while j < len(names):
+            ent = names[j]
+            if not isinstance(ent, dict):
+                j += 1
+                continue
+            name_any = ent.get("name")
+            name = name_any if isinstance(name_any, str) else ""
+            if name == "":
+                j += 1
+                continue
+            if name == "*":
+                raise RuntimeError(
+                    "zig native emitter: unsupported relative import form: wildcard import"
+                )
+            asname_any = ent.get("asname")
+            local_name = asname_any if isinstance(asname_any, str) and asname_any != "" else name
+            local_rendered = _safe_ident(local_name, "value")
+            target_name = _safe_ident(name, "value")
+            aliases[local_rendered] = (
+                target_name if module_path == "" else module_path + "." + target_name
+            )
+            j += 1
+        i += 1
+    return aliases
+
+
+def _zig_string(text: str) -> str:
+    out = text.replace("\\", "\\\\")
+    out = out.replace('"', '\\"')
+    out = out.replace("\t", "\\t")
+    out = out.replace("\r", "\\r")
+    out = out.replace("\n", "\\n")
+    return '"' + out + '"'
+
+
+def _binop_symbol(op: str) -> str:
+    if op == "Add":
+        return "+"
+    if op == "Sub":
+        return "-"
+    if op == "Mult":
+        return "*"
+    if op == "Div":
+        return "/"
+    if op == "FloorDiv":
+        return "/@"
+    if op == "Mod":
+        return "%"
+    if op == "Pow":
+        return "**"
+    if op == "LShift":
+        return "<<"
+    if op == "RShift":
+        return ">>"
+    if op == "BitOr":
+        return "|"
+    if op == "BitXor":
+        return "^"
+    if op == "BitAnd":
+        return "&"
+    raise RuntimeError("lang=zig unsupported binop: " + op)
+
+
+def _cmp_symbol(op: str) -> str:
+    if op == "Eq":
+        return "=="
+    if op == "NotEq":
+        return "!="
+    if op == "Lt":
+        return "<"
+    if op == "LtE":
+        return "<="
+    if op == "Gt":
+        return ">"
+    if op == "GtE":
+        return ">="
+    raise RuntimeError("lang=zig unsupported compare op: " + op)
+
+
+def _runtime_module_symbol_names(runtime_module_id: str) -> tuple[str, ...]:
+    symbols = lookup_runtime_module_symbols(runtime_module_id)
+    if symbols is None:
+        return ()
+    return tuple(s.name for s in symbols)
+
+
+def _runtime_symbol_call_adapter_kind(runtime_module_id: str, runtime_symbol: str) -> str:
+    doc = lookup_runtime_symbol_doc(runtime_module_id, runtime_symbol)
+    if doc is None:
+        return ""
+    return doc.call_adapter_kind
+
+
+def _runtime_symbol_semantic_tag(runtime_module_id: str, runtime_symbol: str) -> str:
+    doc = lookup_runtime_symbol_doc(runtime_module_id, runtime_symbol)
+    if doc is None:
+        return ""
+    return doc.semantic_tag
+
+
+def _is_math_runtime_symbol(runtime_module_id: str, runtime_symbol: str) -> bool:
+    tag = _runtime_symbol_semantic_tag(runtime_module_id, runtime_symbol)
+    return tag == "math"
+
+
+def _is_perf_counter_runtime_symbol(runtime_module_id: str, runtime_symbol: str) -> bool:
+    return runtime_symbol == "perf_counter" or runtime_symbol == "perf_counter_ns"
+
+
+def _is_compile_time_std_import_symbol(module_id: str, symbol: str) -> bool:
+    return symbol in _COMPILETIME_STD_IMPORT_SYMBOLS
+
+
+def _pascal_symbol_name(name: str) -> str:
+    parts = name.split("_")
+    out_parts: list[str] = []
+    for part in parts:
+        if part == "":
+            continue
+        out_parts.append(part[0].upper() + part[1:])
+    return "".join(out_parts)
+
+
+def _runtime_symbol_alias_expr(runtime_module_id: str, runtime_symbol: str) -> str:
+    doc = lookup_runtime_symbol_doc(runtime_module_id, runtime_symbol)
+    if doc is None:
+        return "__pytra_" + runtime_symbol
+    adapter = doc.call_adapter_kind
+    if adapter == "direct":
+        return "__pytra_" + runtime_symbol
+    if adapter == "method":
+        return "__pytra_" + runtime_symbol
+    return "__pytra_" + runtime_symbol
+
+
+class ZigNativeEmitter:
+    def __init__(self, east_doc: dict[str, Any]) -> None:
+        if not isinstance(east_doc, dict):
+            raise RuntimeError("lang=zig invalid east document: root must be dict")
+        ed: dict[str, Any] = east_doc
+        kind = ed.get("kind")
+        if kind != "Module":
+            raise RuntimeError("lang=zig invalid root kind: " + str(kind))
+        if ed.get("east_stage") != 3:
+            raise RuntimeError("lang=zig unsupported east_stage: " + str(ed.get("east_stage")))
+        self.east_doc = east_doc
+        self.lines: list[str] = []
+        self.indent = 0
+        self.tmp_seq = 0
+        self.class_names: set[str] = set()
+        self.imported_modules: set[str] = set()
+        self.function_names: set[str] = set()
+        self.relative_import_name_aliases: dict[str, str] = {}
+        self.current_class_name: str = ""
+        self.current_class_base_name: str = ""
+        self._local_type_stack: list[dict[str, str]] = []
+        self._ref_var_stack: list[set[str]] = []
+        self._local_var_stack: list[set[str]] = []
+
+    def _current_type_map(self) -> dict[str, str]:
+        if len(self._local_type_stack) == 0:
+            return {}
+        return self._local_type_stack[-1]
+
+    def _current_ref_vars(self) -> set[str]:
+        if len(self._ref_var_stack) == 0:
+            return set()
+        return self._ref_var_stack[-1]
+
+    def _current_local_vars(self) -> set[str]:
+        if len(self._local_var_stack) == 0:
+            return set()
+        return self._local_var_stack[-1]
+
+    def _push_function_context(self, stmt: dict[str, Any], arg_names: list[str], arg_order: list[Any]) -> None:
+        type_map: dict[str, str] = {}
+        ref_vars: set[str] = set()
+        local_vars: set[str] = set(arg_names)
+        arg_types_any = stmt.get("arg_types")
+        arg_types = arg_types_any if isinstance(arg_types_any, dict) else {}
+        i = 0
+        while i < len(arg_names):
+            safe_name = arg_names[i]
+            raw_name = arg_order[i] if i < len(arg_order) else safe_name
+            arg_type_any = arg_types.get(raw_name)
+            if not isinstance(arg_type_any, str):
+                arg_type_any = arg_types.get(safe_name)
+            arg_type = arg_type_any.strip() if isinstance(arg_type_any, str) else ""
+            if arg_type != "":
+                type_map[safe_name] = arg_type
+            i += 1
+        self._local_type_stack.append(type_map)
+        self._ref_var_stack.append(ref_vars)
+        self._local_var_stack.append(local_vars)
+
+    def _pop_function_context(self) -> None:
+        if len(self._local_type_stack) > 0:
+            self._local_type_stack.pop()
+        if len(self._ref_var_stack) > 0:
+            self._ref_var_stack.pop()
+        if len(self._local_var_stack) > 0:
+            self._local_var_stack.pop()
+
+    def transpile(self) -> str:
+        module_comments = self._module_leading_comment_lines(prefix="// ")
+        if len(module_comments) > 0:
+            self.lines.extend(module_comments)
+            self.lines.append("")
+        self.lines.append("const std = @import(\"std\");")
+        self.lines.append("const pytra = @import(\"py_runtime.zig\");")
+        self.lines.append("")
+        body = self._dict_list(self.east_doc.get("body"))
+        main_guard = self._dict_list(self.east_doc.get("main_guard_body"))
+        self._scan_module_symbols(body)
+        for stmt in body:
+            self._emit_stmt(stmt)
+        if len(main_guard) > 0:
+            self.lines.append("")
+            for stmt in main_guard:
+                self._emit_stmt(stmt)
+        return "\n".join(self.lines).rstrip() + "\n"
+
+    def _dict_list(self, value: Any) -> list[dict[str, Any]]:
+        if not isinstance(value, list):
+            return []
+        out: list[dict[str, Any]] = []
+        for item in value:
+            if isinstance(item, dict):
+                out.append(item)
+        return out
+
+    def _block_has_return_stmt(self, body_any: Any) -> bool:
+        body = self._dict_list(body_any)
+        i = 0
+        while i < len(body):
+            if body[i].get("kind") == "Return":
+                return True
+            i += 1
+        return False
+
+    def _module_leading_comment_lines(self, prefix: str) -> list[str]:
+        trivia = self._dict_list(self.east_doc.get("module_leading_trivia"))
+        out: list[str] = []
+        for item in trivia:
+            kind = item.get("kind")
+            if kind == "comment":
+                text = item.get("text")
+                if isinstance(text, str):
+                    out.append(prefix + text)
+                continue
+            if kind == "blank":
+                count = item.get("count")
+                n = count if isinstance(count, int) and count > 0 else 1
+                i = 0
+                while i < n:
+                    out.append("")
+                    i += 1
+        while len(out) > 0 and out[-1] == "":
+            out.pop()
+        return out
+
+    def _emit_leading_trivia(self, stmt: dict[str, Any], prefix: str) -> None:
+        trivia = self._dict_list(stmt.get("leading_trivia"))
+        for item in trivia:
+            kind = item.get("kind")
+            if kind == "comment":
+                text = item.get("text")
+                if isinstance(text, str):
+                    self._emit_line(prefix + text)
+                continue
+            if kind == "blank":
+                count = item.get("count")
+                n = count if isinstance(count, int) and count > 0 else 1
+                i = 0
+                while i < n:
+                    self._emit_line("")
+                    i += 1
+
+    def _emit_line(self, text: str) -> None:
+        self.lines.append(("    " * self.indent) + text)
+
+    def _emit_block(self, body_any: Any) -> None:
+        body = self._dict_list(body_any)
+        for stmt in body:
+            self._emit_stmt(stmt)
+
+    def _scan_module_symbols(self, body: list[dict[str, Any]]) -> None:
+        for stmt in body:
+            kind = stmt.get("kind")
+            if kind == "FunctionDef":
+                name = _safe_ident(stmt.get("name"), "fn")
+                self.function_names.add(name)
+            if kind == "ClassDef":
+                name = _safe_ident(stmt.get("name"), "Class")
+                self.class_names.add(name)
+
+    def _emit_stmt(self, stmt: dict[str, Any]) -> None:
+        self._emit_leading_trivia(stmt, prefix="// ")
+        kind = stmt.get("kind")
+        if kind in {"Import", "ImportFrom"}:
+            return
+        if kind == "ClassDef":
+            self._emit_class_def(stmt)
+            return
+        if kind == "FunctionDef":
+            self._emit_function_def(stmt)
+            return
+        if kind == "Return":
+            val = self._render_expr(stmt.get("value"))
+            if val == "null":
+                self._emit_line("return;")
+            else:
+                self._emit_line("return " + val + ";")
+            return
+        if kind == "AnnAssign":
+            target_node = stmt.get("target")
+            target = self._render_target(target_node)
+            value_node = stmt.get("value")
+            value = self._render_expr(value_node) if isinstance(value_node, dict) else "undefined"
+            if isinstance(target_node, dict) and target_node.get("kind") == "Name":
+                target_name = _safe_ident(target_node.get("id"), "value")
+                decl_type_any = stmt.get("decl_type")
+                decl_type = decl_type_any.strip() if isinstance(decl_type_any, str) else ""
+                if decl_type == "":
+                    anno_any = stmt.get("annotation")
+                    if isinstance(anno_any, str):
+                        decl_type = anno_any.strip()
+                if decl_type != "":
+                    self._current_type_map()[target_name] = decl_type
+                if len(self._local_var_stack) > 0:
+                    self._current_local_vars().add(target_name)
+                if value_node is None and bool(stmt.get("declare")):
+                    self._emit_line("var " + target + ": " + self._zig_type(decl_type) + " = undefined;")
+                else:
+                    self._emit_line("var " + target + " = " + value + ";")
+            else:
+                self._emit_line(target + " = " + value + ";")
+            return
+        if kind == "Assign":
+            target_any = stmt.get("target")
+            if isinstance(target_any, dict):
+                td2: dict[str, Any] = target_any
+                if td2.get("kind") == "Tuple":
+                    self._emit_tuple_assign(target_any, stmt.get("value"))
+                    return
+                target = self._render_target(target_any)
+                value = self._render_expr(stmt.get("value"))
+                if td2.get("kind") == "Name":
+                    target_name = _safe_ident(td2.get("id"), "value")
+                    if len(self._local_var_stack) > 0 and target_name not in self._current_local_vars():
+                        self._current_local_vars().add(target_name)
+                        self._emit_line("var " + target + " = " + value + ";")
+                        return
+                self._emit_line(target + " = " + value + ";")
+                return
+            targets = stmt.get("targets")
+            if isinstance(targets, list) and len(targets) > 0 and isinstance(targets[0], dict):
+                if targets[0].get("kind") == "Tuple":
+                    self._emit_tuple_assign(targets[0], stmt.get("value"))
+                    return
+                target = self._render_target(targets[0])
+                value = self._render_expr(stmt.get("value"))
+                if targets[0].get("kind") == "Name":
+                    target_name = _safe_ident(targets[0].get("id"), "value")
+                    if len(self._local_var_stack) > 0 and target_name not in self._current_local_vars():
+                        self._current_local_vars().add(target_name)
+                        self._emit_line("var " + target + " = " + value + ";")
+                        return
+                self._emit_line(target + " = " + value + ";")
+                return
+            raise RuntimeError("lang=zig unsupported assign shape")
+        if kind == "AugAssign":
+            target = self._render_target(stmt.get("target"))
+            op = str(stmt.get("op"))
+            value = self._render_expr(stmt.get("value"))
+            aug_op = self._aug_assign_op(op)
+            self._emit_line(target + " " + aug_op + " " + value + ";")
+            return
+        if kind == "Expr":
+            value_any = stmt.get("value")
+            if isinstance(value_any, dict) and value_any.get("kind") == "Constant":
+                if isinstance(value_any.get("value"), str):
+                    return
+            if isinstance(value_any, dict) and value_any.get("kind") == "Name":
+                loop_kw = str(value_any.get("id"))
+                if loop_kw == "break":
+                    self._emit_line("break;")
+                    return
+                if loop_kw == "continue":
+                    self._emit_line("continue;")
+                    return
+            expr_text = self._render_expr(value_any)
+            self._emit_line("_ = " + expr_text + ";")
+            return
+        if kind == "Raise":
+            exc_any = stmt.get("exc")
+            if isinstance(exc_any, dict) and exc_any.get("kind") == "Call":
+                fn_any = exc_any.get("func")
+                if isinstance(fn_any, dict) and fn_any.get("kind") == "Name":
+                    fn_name = _safe_ident(fn_any.get("id"), "")
+                    args_any = exc_any.get("args")
+                    args = args_any if isinstance(args_any, list) else []
+                    if len(args) > 0:
+                        self._emit_line("@panic(" + self._render_expr(args[0]) + ");")
+                        return
+                    self._emit_line("@panic(\"error\");")
+                    return
+            if isinstance(exc_any, dict):
+                self._emit_line("@panic(" + self._render_expr(exc_any) + ");")
+            else:
+                self._emit_line("@panic(\"error\");")
+            return
+        if kind == "Try":
+            body = self._dict_list(stmt.get("body"))
+            for sub in body:
+                self._emit_stmt(sub)
+            return
+        if kind == "If":
+            self._emit_if(stmt)
+            return
+        if kind == "ForCore":
+            self._emit_for_core(stmt)
+            return
+        if kind == "While":
+            self._emit_while(stmt)
+            return
+        if kind == "Pass":
+            self._emit_line("// pass")
+            return
+        if kind == "Swap":
+            self._emit_swap(stmt)
+            return
+        raise RuntimeError("lang=zig unsupported stmt kind: " + str(kind))
+
+    def _emit_function_def(self, stmt: dict[str, Any]) -> None:
+        name = _safe_ident(stmt.get("name"), "fn_")
+        arg_order_any = stmt.get("arg_order")
+        args = arg_order_any if isinstance(arg_order_any, list) else []
+        arg_names: list[str] = []
+        for a in args:
+            arg_names.append(_safe_ident(a, "arg"))
+        arg_strs: list[str] = []
+        arg_types_any = stmt.get("arg_types")
+        arg_types = arg_types_any if isinstance(arg_types_any, dict) else {}
+        for a_name in arg_names:
+            raw_any = arg_types.get(a_name)
+            zig_ty = self._zig_type(raw_any if isinstance(raw_any, str) else "")
+            arg_strs.append(a_name + ": " + zig_ty)
+        ret_type_any = stmt.get("return_type")
+        ret_type = self._zig_type(ret_type_any if isinstance(ret_type_any, str) else "")
+        self._emit_line("fn " + name + "(" + ", ".join(arg_strs) + ") " + ret_type + " {")
+        self.indent += 1
+        self._push_function_context(stmt, arg_names, args)
+        self._emit_block(stmt.get("body"))
+        self._pop_function_context()
+        self.indent -= 1
+        self._emit_line("}")
+        self._emit_line("")
+
+    def _emit_if(self, stmt: dict[str, Any]) -> None:
+        test = self._render_cond_expr(stmt.get("test"))
+        self._emit_line("if (" + test + ") {")
+        self.indent += 1
+        self._emit_block(stmt.get("body"))
+        self.indent -= 1
+        orelse = self._dict_list(stmt.get("orelse"))
+        if len(orelse) > 0:
+            self._emit_line("} else {")
+            self.indent += 1
+            for sub in orelse:
+                self._emit_stmt(sub)
+            self.indent -= 1
+        self._emit_line("}")
+
+    def _emit_for_core(self, stmt: dict[str, Any]) -> None:
+        target_plan = stmt.get("target_plan")
+        iter_plan = stmt.get("iter_plan")
+        target_name = "_"
+        if isinstance(target_plan, dict) and target_plan.get("kind") == "NameTarget":
+            target_name = _safe_ident(target_plan.get("id"), "i")
+        elif isinstance(stmt.get("target"), dict) and stmt["target"].get("kind") == "Name":
+            target_name = _safe_ident(stmt["target"].get("id"), "i")
+        if isinstance(iter_plan, dict) and iter_plan.get("kind") == "StaticRangeForPlan":
+            self._emit_static_range_for(stmt, target_name, iter_plan)
+            return
+        iter_any = stmt.get("iter")
+        if isinstance(iter_any, dict) and iter_any.get("kind") == "Call":
+            func_any = iter_any.get("func")
+            if isinstance(func_any, dict) and func_any.get("kind") == "Name":
+                fname = str(func_any.get("id"))
+                if fname == "range":
+                    self._emit_range_for_from_call(stmt, target_name, iter_any)
+                    return
+        iter_expr = self._render_expr(iter_any)
+        self._emit_line("for (" + iter_expr + ") |" + target_name + "| {")
+        self.indent += 1
+        if len(self._local_var_stack) > 0:
+            self._current_local_vars().add(target_name)
+        self._emit_block(stmt.get("body"))
+        self.indent -= 1
+        self._emit_line("}")
+
+    def _emit_static_range_for(self, stmt: dict[str, Any], target_name: str, plan: dict[str, Any]) -> None:
+        start = self._render_expr(plan.get("start"))
+        stop = self._render_expr(plan.get("stop"))
+        step_any = plan.get("step")
+        step = self._render_expr(step_any) if isinstance(step_any, dict) else "1"
+        self._emit_line("var " + target_name + ": i64 = " + start + ";")
+        self._emit_line("while (" + target_name + " < " + stop + ") : (" + target_name + " += " + step + ") {")
+        self.indent += 1
+        if len(self._local_var_stack) > 0:
+            self._current_local_vars().add(target_name)
+        self._emit_block(stmt.get("body"))
+        self.indent -= 1
+        self._emit_line("}")
+
+    def _emit_range_for_from_call(self, stmt: dict[str, Any], target_name: str, iter_node: dict[str, Any]) -> None:
+        args_any = iter_node.get("args")
+        args = args_any if isinstance(args_any, list) else []
+        if len(args) == 1:
+            end = self._render_expr(args[0])
+            self._emit_line("var " + target_name + ": i64 = 0;")
+            self._emit_line("while (" + target_name + " < " + end + ") : (" + target_name + " += 1) {")
+        elif len(args) == 2:
+            start = self._render_expr(args[0])
+            end = self._render_expr(args[1])
+            self._emit_line("var " + target_name + ": i64 = " + start + ";")
+            self._emit_line("while (" + target_name + " < " + end + ") : (" + target_name + " += 1) {")
+        elif len(args) == 3:
+            start = self._render_expr(args[0])
+            end = self._render_expr(args[1])
+            step = self._render_expr(args[2])
+            self._emit_line("var " + target_name + ": i64 = " + start + ";")
+            self._emit_line("while (" + target_name + " < " + end + ") : (" + target_name + " += " + step + ") {")
+        else:
+            self._emit_line("// unsupported range args count")
+            self._emit_line("while (false) {")
+        self.indent += 1
+        if len(self._local_var_stack) > 0:
+            self._current_local_vars().add(target_name)
+        self._emit_block(stmt.get("body"))
+        self.indent -= 1
+        self._emit_line("}")
+
+    def _emit_while(self, stmt: dict[str, Any]) -> None:
+        test = self._render_cond_expr(stmt.get("test"))
+        self._emit_line("while (" + test + ") {")
+        self.indent += 1
+        self._emit_block(stmt.get("body"))
+        self.indent -= 1
+        self._emit_line("}")
+
+    def _emit_class_def(self, stmt: dict[str, Any]) -> None:
+        cls_name = _safe_ident(stmt.get("name"), "Class")
+        self._emit_line("const " + cls_name + " = struct {")
+        self.indent += 1
+        body = self._dict_list(stmt.get("body"))
+        dataclass_fields: list[str] = []
+        if bool(stmt.get("dataclass")):
+            for sub in body:
+                if sub.get("kind") != "AnnAssign":
+                    continue
+                target_any = sub.get("target")
+                if isinstance(target_any, dict) and target_any.get("kind") == "Name":
+                    field_name = _safe_ident(target_any.get("id"), "field")
+                    decl_type_any = sub.get("decl_type")
+                    decl_type = decl_type_any.strip() if isinstance(decl_type_any, str) else ""
+                    if decl_type == "":
+                        anno_any = sub.get("annotation")
+                        if isinstance(anno_any, str):
+                            decl_type = anno_any.strip()
+                    zig_ty = self._zig_type(decl_type)
+                    self._emit_line(field_name + ": " + zig_ty + ",")
+                    dataclass_fields.append(field_name)
+        for sub in body:
+            if sub.get("kind") == "AnnAssign" and bool(stmt.get("dataclass")):
+                continue
+            if sub.get("kind") == "FunctionDef":
+                self._emit_class_method(cls_name, sub)
+            elif sub.get("kind") == "AnnAssign":
+                target_any = sub.get("target")
+                if isinstance(target_any, dict) and target_any.get("kind") == "Name":
+                    field_name = _safe_ident(target_any.get("id"), "field")
+                    decl_type_any = sub.get("decl_type")
+                    decl_type = decl_type_any.strip() if isinstance(decl_type_any, str) else ""
+                    if decl_type == "":
+                        anno_any = sub.get("annotation")
+                        if isinstance(anno_any, str):
+                            decl_type = anno_any.strip()
+                    zig_ty = self._zig_type(decl_type)
+                    self._emit_line(field_name + ": " + zig_ty + ",")
+        self.indent -= 1
+        self._emit_line("};")
+        self._emit_line("")
+
+    def _emit_class_method(self, cls_name: str, stmt: dict[str, Any]) -> None:
+        method_name = _safe_ident(stmt.get("name"), "method")
+        arg_order_any = stmt.get("arg_order")
+        arg_order = arg_order_any if isinstance(arg_order_any, list) else []
+        args: list[str] = []
+        arg_strs: list[str] = []
+        arg_types_any = stmt.get("arg_types")
+        arg_types = arg_types_any if isinstance(arg_types_any, dict) else {}
+        has_self = False
+        for i, arg in enumerate(arg_order):
+            arg_name = _safe_ident(arg, "arg")
+            if i == 0 and arg_name == "self":
+                has_self = True
+                arg_strs.append("self: *" + cls_name)
+                continue
+            args.append(arg_name)
+            raw_any = arg_types.get(arg)
+            zig_ty = self._zig_type(raw_any if isinstance(raw_any, str) else "")
+            arg_strs.append(arg_name + ": " + zig_ty)
+        prev_class = self.current_class_name
+        self.current_class_name = cls_name
+        ret_type_any = stmt.get("return_type")
+        ret_type = self._zig_type(ret_type_any if isinstance(ret_type_any, str) else "")
+        if method_name == "__init__":
+            self._emit_line("pub fn init(" + ", ".join(arg_strs[1:]) + ") " + cls_name + " {")
+            self.indent += 1
+            self._emit_line("var self: " + cls_name + " = undefined;")
+            self._push_function_context(stmt, args, arg_order[1:] if len(arg_order) > 0 else arg_order)
+            self._emit_block(stmt.get("body"))
+            self._pop_function_context()
+            self._emit_line("return self;")
+            self.indent -= 1
+            self._emit_line("}")
+            self._emit_line("")
+        else:
+            self._emit_line("pub fn " + method_name + "(" + ", ".join(arg_strs) + ") " + ret_type + " {")
+            self.indent += 1
+            self._push_function_context(stmt, args, arg_order[1:] if len(arg_order) > 0 else arg_order)
+            self._emit_block(stmt.get("body"))
+            self._pop_function_context()
+            self.indent -= 1
+            self._emit_line("}")
+            self._emit_line("")
+        self.current_class_name = prev_class
+
+    def _emit_tuple_assign(self, target_any: Any, value_any: Any) -> None:
+        if not isinstance(target_any, dict):
+            return
+        elts_any = target_any.get("elts")
+        elts = elts_any if isinstance(elts_any, list) else []
+        value_expr = self._render_expr(value_any)
+        tmp = "__tmp_" + str(self.tmp_seq)
+        self.tmp_seq += 1
+        self._emit_line("const " + tmp + " = " + value_expr + ";")
+        i = 0
+        while i < len(elts):
+            elt = elts[i]
+            if isinstance(elt, dict):
+                name = self._render_target(elt)
+                if len(self._local_var_stack) > 0 and isinstance(elt, dict) and elt.get("kind") == "Name":
+                    elt_name = _safe_ident(elt.get("id"), "value")
+                    if elt_name not in self._current_local_vars():
+                        self._current_local_vars().add(elt_name)
+                        self._emit_line("var " + name + " = " + tmp + "[" + str(i) + "];")
+                        i += 1
+                        continue
+                self._emit_line(name + " = " + tmp + "[" + str(i) + "];")
+            i += 1
+
+    def _emit_swap(self, stmt: dict[str, Any]) -> None:
+        left = self._render_target(stmt.get("left"))
+        right = self._render_target(stmt.get("right"))
+        tmp = "__swap_tmp_" + str(self.tmp_seq)
+        self.tmp_seq += 1
+        self._emit_line("const " + tmp + " = " + left + ";")
+        self._emit_line(left + " = " + right + ";")
+        self._emit_line(right + " = " + tmp + ";")
+
+    def _render_target(self, node: Any) -> str:
+        if not isinstance(node, dict):
+            return "_"
+        nd: dict[str, Any] = node
+        kind = nd.get("kind")
+        if kind == "Name":
+            return _safe_ident(nd.get("id"), "value")
+        if kind == "Attribute":
+            obj = self._render_expr(nd.get("value"))
+            attr = _safe_ident(nd.get("attr"), "attr")
+            return obj + "." + attr
+        if kind == "Subscript":
+            obj = self._render_expr(nd.get("value"))
+            idx = self._render_expr(nd.get("slice"))
+            return obj + "[" + idx + "]"
+        return "_"
+
+    def _render_cond_expr(self, expr_any: Any) -> str:
+        if not isinstance(expr_any, dict):
+            return "true"
+        ed: dict[str, Any] = expr_any
+        kind = ed.get("kind")
+        if kind == "Constant":
+            v = ed.get("value")
+            if v is True:
+                return "true"
+            if v is False:
+                return "false"
+        if kind == "Call":
+            func_any = ed.get("func")
+            if isinstance(func_any, dict) and func_any.get("kind") == "Name":
+                fname = _safe_ident(func_any.get("id"), "")
+                if fname == "__pytra_truthy":
+                    args_any = ed.get("args")
+                    args = args_any if isinstance(args_any, list) else []
+                    if len(args) > 0:
+                        return "pytra.truthy(" + self._render_expr(args[0]) + ")"
+        return self._render_expr(expr_any)
+
+    def _render_expr(self, expr_any: Any) -> str:
+        if expr_any is None:
+            return "null"
+        if not isinstance(expr_any, dict):
+            return str(expr_any)
+        ed: dict[str, Any] = expr_any
+        kind = ed.get("kind")
+        if kind == "Constant":
+            return self._render_constant(ed)
+        if kind == "Name":
+            name = _safe_ident(ed.get("id"), "value")
+            if name == "True":
+                return "true"
+            if name == "False":
+                return "false"
+            if name == "None":
+                return "null"
+            return name
+        if kind == "BinOp":
+            left = self._render_expr(ed.get("left"))
+            right = self._render_expr(ed.get("right"))
+            op = str(ed.get("op"))
+            if op == "Add":
+                left_type = self._lookup_expr_type(ed.get("left"))
+                right_type = self._lookup_expr_type(ed.get("right"))
+                if left_type == "str" or right_type == "str":
+                    return "pytra.str_concat(" + left + ", " + right + ")"
+            if op == "Pow":
+                return "std.math.pow(f64, " + left + ", " + right + ")"
+            if op == "FloorDiv":
+                return "@divFloor(" + left + ", " + right + ")"
+            sym = _binop_symbol(op)
+            return "(" + left + " " + sym + " " + right + ")"
+        if kind == "UnaryOp":
+            op = str(ed.get("op"))
+            operand = self._render_expr(ed.get("operand"))
+            if op == "USub":
+                return "-" + operand
+            if op == "UAdd":
+                return "+" + operand
+            if op == "Not":
+                return "!" + operand
+            if op == "Invert":
+                return "~" + operand
+            return operand
+        if kind == "Compare":
+            return self._render_compare(ed)
+        if kind == "BoolOp":
+            op = str(ed.get("op"))
+            values_any = ed.get("values")
+            values = values_any if isinstance(values_any, list) else []
+            parts: list[str] = []
+            for v in values:
+                parts.append(self._render_expr(v))
+            joiner = " and " if op == "And" else " or "
+            return "(" + joiner.join(parts) + ")"
+        if kind == "Call":
+            return self._render_call(ed)
+        if kind == "Attribute":
+            obj = self._render_expr(ed.get("value"))
+            attr = _safe_ident(ed.get("attr"), "attr")
+            return obj + "." + attr
+        if kind == "Subscript":
+            obj = self._render_expr(ed.get("value"))
+            idx = self._render_expr(ed.get("slice"))
+            return obj + "[" + idx + "]"
+        if kind == "List":
+            elts_any = ed.get("elts")
+            elts = elts_any if isinstance(elts_any, list) else []
+            items = [self._render_expr(e) for e in elts]
+            return ".{ " + ", ".join(items) + " }"
+        if kind == "Tuple":
+            elts_any = ed.get("elts")
+            elts = elts_any if isinstance(elts_any, list) else []
+            items = [self._render_expr(e) for e in elts]
+            return ".{ " + ", ".join(items) + " }"
+        if kind == "Dict":
+            return self._render_dict(ed)
+        if kind == "JoinedStr":
+            return self._render_joined_str(ed)
+        if kind == "IfExp":
+            test = self._render_cond_expr(ed.get("test"))
+            body_expr = self._render_expr(ed.get("body"))
+            orelse_expr = self._render_expr(ed.get("orelse"))
+            return "if (" + test + ") " + body_expr + " else " + orelse_expr
+        if kind == "FormattedValue":
+            return self._render_expr(ed.get("value"))
+        return "null"
+
+    def _render_constant(self, node: dict[str, Any]) -> str:
+        v = node.get("value")
+        if v is None:
+            return "null"
+        if isinstance(v, bool):
+            return "true" if v else "false"
+        if isinstance(v, int):
+            return str(v)
+        if isinstance(v, float):
+            return str(v)
+        if isinstance(v, str):
+            return _zig_string(v)
+        return str(v)
+
+    def _render_compare(self, node: dict[str, Any]) -> str:
+        left = self._render_expr(node.get("left"))
+        ops_any = node.get("ops")
+        ops = ops_any if isinstance(ops_any, list) else []
+        comparators_any = node.get("comparators")
+        comparators = comparators_any if isinstance(comparators_any, list) else []
+        if len(ops) == 0 or len(comparators) == 0:
+            return left
+        parts: list[str] = []
+        prev = left
+        i = 0
+        while i < len(ops):
+            right = self._render_expr(comparators[i])
+            sym = _cmp_symbol(str(ops[i]))
+            parts.append("(" + prev + " " + sym + " " + right + ")")
+            prev = right
+            i += 1
+        if len(parts) == 1:
+            return parts[0]
+        return "(" + " and ".join(parts) + ")"
+
+    def _render_call(self, node: dict[str, Any]) -> str:
+        func_any = node.get("func")
+        args_any = node.get("args")
+        args = args_any if isinstance(args_any, list) else []
+        arg_strs = [self._render_expr(a) for a in args]
+        if isinstance(func_any, dict):
+            fkind = func_any.get("kind")
+            if fkind == "Name":
+                fname = _safe_ident(func_any.get("id"), "fn_")
+                if fname == "print":
+                    return "pytra.print(" + ", ".join(arg_strs) + ")"
+                if fname == "len":
+                    if len(arg_strs) > 0:
+                        return arg_strs[0] + ".len"
+                    return "0"
+                if fname == "int":
+                    if len(arg_strs) > 0:
+                        return "@as(i64, " + arg_strs[0] + ")"
+                    return "0"
+                if fname == "float":
+                    if len(arg_strs) > 0:
+                        return "@as(f64, " + arg_strs[0] + ")"
+                    return "0.0"
+                if fname == "str":
+                    if len(arg_strs) > 0:
+                        return "pytra.to_str(" + arg_strs[0] + ")"
+                    return "\"\""
+                if fname == "abs":
+                    if len(arg_strs) > 0:
+                        return "std.math.absInt(" + arg_strs[0] + ")"
+                    return "0"
+                if fname == "min":
+                    if len(arg_strs) >= 2:
+                        return "@min(" + arg_strs[0] + ", " + arg_strs[1] + ")"
+                if fname == "max":
+                    if len(arg_strs) >= 2:
+                        return "@max(" + arg_strs[0] + ", " + arg_strs[1] + ")"
+                if fname == "isinstance":
+                    return "pytra.isinstance_check(" + ", ".join(arg_strs) + ")"
+                if fname in self.class_names:
+                    return cls_name_init(fname, arg_strs)
+                return fname + "(" + ", ".join(arg_strs) + ")"
+            if fkind == "Attribute":
+                obj = self._render_expr(func_any.get("value"))
+                attr = _safe_ident(func_any.get("attr"), "method")
+                if attr == "append":
+                    if len(arg_strs) > 0:
+                        return obj + ".append(" + arg_strs[0] + ")"
+                if attr == "sqrt":
+                    if len(arg_strs) > 0:
+                        return "std.math.sqrt(@as(f64, " + arg_strs[0] + "))"
+                    return "std.math.sqrt(@as(f64, " + obj + "))"
+                return obj + "." + attr + "(" + ", ".join(arg_strs) + ")"
+        fn_expr = self._render_expr(func_any)
+        return fn_expr + "(" + ", ".join(arg_strs) + ")"
+
+    def _render_dict(self, node: dict[str, Any]) -> str:
+        keys_any = node.get("keys")
+        values_any = node.get("values")
+        keys = keys_any if isinstance(keys_any, list) else []
+        values = values_any if isinstance(values_any, list) else []
+        if len(keys) == 0:
+            return "pytra.new_dict()"
+        parts: list[str] = []
+        i = 0
+        while i < len(keys):
+            k = self._render_expr(keys[i])
+            v = self._render_expr(values[i]) if i < len(values) else "null"
+            parts.append(".{ " + k + ", " + v + " }")
+            i += 1
+        return ".{ " + ", ".join(parts) + " }"
+
+    def _render_joined_str(self, node: dict[str, Any]) -> str:
+        values_any = node.get("values")
+        values = values_any if isinstance(values_any, list) else []
+        parts: list[str] = []
+        for v in values:
+            if isinstance(v, dict):
+                if v.get("kind") == "Constant" and isinstance(v.get("value"), str):
+                    parts.append(_zig_string(str(v.get("value"))))
+                else:
+                    parts.append("pytra.to_str(" + self._render_expr(v) + ")")
+            else:
+                parts.append(_zig_string(str(v)))
+        if len(parts) == 0:
+            return "\"\""
+        if len(parts) == 1:
+            return parts[0]
+        return "pytra.str_join(&.{ " + ", ".join(parts) + " })"
+
+    def _zig_type(self, py_type: str) -> str:
+        if py_type == "" or py_type == "Any" or py_type == "object":
+            return "anytype"
+        if py_type == "int" or py_type == "int64":
+            return "i64"
+        if py_type == "float" or py_type == "float64":
+            return "f64"
+        if py_type == "bool":
+            return "bool"
+        if py_type == "str":
+            return "[]const u8"
+        if py_type == "None":
+            return "void"
+        if py_type.startswith("list["):
+            return "std.ArrayList(" + self._zig_type(py_type[5:-1].strip()) + ")"
+        if py_type.startswith("dict["):
+            return "anytype"
+        return "anytype"
+
+    def _lookup_expr_type(self, expr_any: Any) -> str:
+        if not isinstance(expr_any, dict):
+            return ""
+        ed: dict[str, Any] = expr_any
+        kind = ed.get("kind")
+        if kind == "Name":
+            name = _safe_ident(ed.get("id"), "value")
+            return self._current_type_map().get(name, "")
+        if kind == "Constant":
+            v = ed.get("value")
+            if isinstance(v, str):
+                return "str"
+            if isinstance(v, int):
+                return "int"
+            if isinstance(v, float):
+                return "float"
+            if isinstance(v, bool):
+                return "bool"
+        return ""
+
+    def _aug_assign_op(self, op: str) -> str:
+        if op == "Add":
+            return "+="
+        if op == "Sub":
+            return "-="
+        if op == "Mult":
+            return "*="
+        if op == "Div":
+            return "/="
+        if op == "Mod":
+            return "%="
+        if op == "BitOr":
+            return "|="
+        if op == "BitXor":
+            return "^="
+        if op == "BitAnd":
+            return "&="
+        if op == "LShift":
+            return "<<="
+        if op == "RShift":
+            return ">>="
+        return "+="
+
+
+def cls_name_init(cls_name: str, arg_strs: list[str]) -> str:
+    return cls_name + ".init(" + ", ".join(arg_strs) + ")"
+
+
+def transpile_to_zig_native(east_doc: dict[str, Any]) -> str:
+    """EAST3 ドキュメントを Zig native ソースへ変換する。"""
+    reject_backend_typed_vararg_signatures(east_doc, backend_name="Zig backend")
+    reject_backend_homogeneous_tuple_ellipsis_type_exprs(east_doc, backend_name="Zig backend")
+    return ZigNativeEmitter(east_doc).transpile()

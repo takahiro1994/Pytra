@@ -17,3 +17,9 @@
 - Julia:
   - native emitter（EAST3 直接生成）: `src/toolchain/emit/julia/`
   - ランタイム: `src/runtime/julia/built_in/py_runtime.jl`
+- Dart:
+  - native emitter（EAST3 直接生成）: `src/toolchain/emit/dart/`
+  - ランタイム: `src/runtime/dart/built_in/py_runtime.dart`
+- Zig:
+  - native emitter（EAST3 直接生成）: `src/toolchain/emit/zig/`
+  - ランタイム: `src/runtime/zig/built_in/py_runtime.zig`
