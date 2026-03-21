@@ -166,7 +166,14 @@ _CPP_RESERVED_BUILTINS: set[str] = {
 }
 
 def load_cpp_identifier_rules(profile: dict[str, Any] = {}) -> tuple[set[str], str]:
-    """識別子リネーム規則を返す。ハードコードの予約語セットを使用する。"""
+    """識別子リネーム規則を返す。プロファイルで上書き可能。"""
+    syntax = profile.get("syntax") if isinstance(profile, dict) else None
+    identifiers = syntax.get("identifiers") if isinstance(syntax, dict) else None
+    if isinstance(identifiers, dict):
+        reserved_list = identifiers.get("reserved_words")
+        prefix = identifiers.get("rename_prefix")
+        if isinstance(reserved_list, list) and isinstance(prefix, str):
+            return set(str(w) for w in reserved_list), prefix
     reserved: set[str] = set(_CPP_KEYWORDS) | set(_CPP_RESERVED_BUILTINS)
     rename_prefix = "py_"
     return reserved, rename_prefix
