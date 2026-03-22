@@ -137,51 +137,26 @@ def _is_extern_value(value: Any) -> bool:
     return False
 
 
-_IGNORED_IMPORT_MODULES: set[str] = {
+_NO_EMIT_IMPORT_MODULES: set[str] = {
     "typing", "pytra.typing", "dataclasses", "__future__",
-    "pytra.utils.assertions", "pytra.std.extern", "pytra.std.abi",
+    "pytra.std.extern", "pytra.std.abi",
 }
 
 
-def _module_to_ps_path(module: str) -> str:
-    """Python モジュール名をリンク済み PS1 の相対パスに変換する。
+def _module_id_to_import_path(module_id: str) -> str:
+    """module_id から import パスを機械的に生成する (spec-emitter-guide.md §3)。
 
-    emit_all_modules が pytra. prefix を strip して配置するので、
-    pytra.std.time → std/time.ps1 に変換する。
-    root_rel_prefix を付加して、サブモジュール間の相対パスを正しく解決する。
+    pytra. prefix を除去し、. を / に置換して .ps1 を付加。
+    root_rel_prefix を付加してサブモジュール間の相対パスを解決。
     """
-    if module == "" or module in _IGNORED_IMPORT_MODULES:
+    if module_id == "":
         return ""
-    if module in ("pytra.std", "pytra", "pytra.utils"):
-        return ""
-    raw = ""
-    # pytra.X → X (strip pytra. prefix, matching emit_all_modules behavior)
-    if module.startswith("pytra."):
-        tail = module[len("pytra."):]
-        if tail != "":
-            raw = tail.replace(".", "/") + ".ps1"
-    if raw == "" and module.startswith("browser"):
-        return ""
-    # bare stdlib name (e.g. "pathlib", "json") → std/X.ps1
-    if raw == "":
-        cur = _CURRENT_MODULE_ID[0]
-        # Self-reference check
-        mod_as_id = module.replace(".", "_")
-        if cur != "" and (cur == "pytra.std." + module or cur.endswith("." + module)):
-            return ""
-        raw = "std/" + module.replace(".", "/") + ".ps1"
-    if raw == "":
-        # Self-reference check for any module
-        cur = _CURRENT_MODULE_ID[0]
-        mod_as_id = module.replace(".", "_")
-        if cur != "" and (cur == mod_as_id + ".east" or cur == mod_as_id):
-            return ""
-        raw = module.replace(".", "/") + ".ps1"
-    # Apply root_rel_prefix for sub-module relative path resolution
+    rel = module_id
+    if rel.startswith("pytra."):
+        rel = rel[len("pytra."):]
+    raw = rel.replace(".", "/") + ".ps1"
     prefix = _ROOT_REL_PREFIX[0]
-    if prefix != "":
-        return prefix + raw
-    return raw
+    return prefix + raw
 
 
 # ---------------------------------------------------------------------------
@@ -1321,32 +1296,23 @@ def _emit_stmt(stmt: dict[str, Any], *, indent: str, ctx: dict[str, Any]) -> lis
 
     if kind == "ImportFrom":
         module = _get_str(stmt, "module")
-        # typing / dataclasses は no-op
-        if module in ("typing", "pytra.typing", "dataclasses", "__future__"):
+        if module in _NO_EMIT_IMPORT_MODULES:
             return [indent + "# import: " + module]
-        # math の from-import は _IMPORT_ALIASES で処理済み
-        if module in ("math", "pytra.std.math"):
-            if module in _IMPORT_ALIASES[0] or any(
-                _get_str(e, "name") in _IMPORT_ALIASES[0]
-                for e in _get_list(stmt, "names") if isinstance(e, dict)
-            ):
-                return [indent + "# import: " + module + " (aliased)"]
-        ps_path = _module_to_ps_path(module)
-        if ps_path != "":
-            return [indent + '. (Join-Path $PSScriptRoot "' + ps_path + '")']
         # from pytra.std import os, glob → dot-source each sub-module
-        if module in ("pytra.std", "pytra.utils"):
+        if module in ("pytra.std", "pytra.utils", "pytra.built_in"):
             sub_lines: list[str] = []
             for entry in _get_list(stmt, "names"):
                 if not isinstance(entry, dict):
                     continue
                 sub_name = _get_str(entry, "name")
-                sub_path = _module_to_ps_path(module + "." + sub_name)
-                if sub_path != "":
-                    sub_lines.append(indent + '. (Join-Path $PSScriptRoot "' + sub_path + '")')
-            if len(sub_lines) > 0:
-                return sub_lines
-        return [indent + "# import: " + module]
+                sub_mod = module + "." + sub_name
+                if sub_mod in _NO_EMIT_IMPORT_MODULES:
+                    continue
+                ps_path = _module_id_to_import_path(sub_mod)
+                sub_lines.append(indent + '. (Join-Path $PSScriptRoot "' + ps_path + '")')
+            return sub_lines if len(sub_lines) > 0 else [indent + "# import: " + module]
+        ps_path = _module_id_to_import_path(module)
+        return [indent + '. (Join-Path $PSScriptRoot "' + ps_path + '")']
 
     if kind == "Import":
         names = _get_list(stmt, "names")
@@ -1355,7 +1321,9 @@ def _emit_stmt(stmt: dict[str, Any], *, indent: str, ctx: dict[str, Any]) -> lis
             if not isinstance(entry, dict):
                 continue
             mod_name = _get_str(entry, "name")
-            ps_path = _module_to_ps_path(mod_name)
+            if mod_name in _NO_EMIT_IMPORT_MODULES:
+                continue
+            ps_path = _module_id_to_import_path(mod_name)
             if ps_path != "":
                 lines.append(indent + '. (Join-Path $PSScriptRoot "' + ps_path + '")')
             else:
@@ -1374,50 +1342,22 @@ def _is_stdlib_passthrough_function(stmt: dict[str, Any]) -> bool:
     $stdlib_module.same_name(args), e.g. return time.perf_counter().
     These should be skipped since py_runtime.ps1 already provides the implementation.
     """
-    # Don't skip class methods — they are ClassName_method, not module-level
-    if _CURRENT_CLASS_NAME[0] != "":
-        return False
-    body = _get_list(stmt, "body")
-    if len(body) != 1:
-        return False
-    s = body[0]
-    if not isinstance(s, dict) or _get_str(s, "kind") != "Return":
-        return False
-    val = s.get("value")
-    if not isinstance(val, dict) or _get_str(val, "kind") != "Call":
-        return False
-    func = val.get("func")
-    if not isinstance(func, dict) or _get_str(func, "kind") != "Attribute":
-        return False
-    owner = func.get("value")
-    if not isinstance(owner, dict):
-        return False
-    func_attr = _get_str(func, "attr")
-    fn_name = _get_str(stmt, "name")
-    # 1-level: time.perf_counter, math.sqrt, os.getcwd etc.
-    if _get_str(owner, "kind") == "Name":
-        owner_name = _get_str(owner, "id")
-        if owner_name in _MODULE_ALIAS_MAP[0] and func_attr == fn_name:
-            return True
-    # 2-level: os.path.join etc. — Attribute chain
-    if _get_str(owner, "kind") == "Attribute":
-        inner_owner = owner.get("value")
-        if isinstance(inner_owner, dict) and _get_str(inner_owner, "kind") == "Name":
-            inner_name = _get_str(inner_owner, "id")
-            if inner_name in _MODULE_ALIAS_MAP[0] and func_attr == fn_name:
-                    return True
-    return False
-
-
 def _emit_function_def(stmt: dict[str, Any], *, indent: str, ctx: dict[str, Any]) -> list[str]:
     name = _safe_ident(_get_str(stmt, "name"), "_fn")
-    # @extern: skip — native seam is dot-sourced and provides the function directly
+    # @extern: generate delegation to _native module (spec-emitter-guide.md §4, §5.1)
     decs = _get_list(stmt, "decorators")
     if "extern" in decs and _CURRENT_CLASS_NAME[0] == "":
-        return [indent + "# @extern " + name + " — provided by native seam"]
-    # Skip stdlib passthrough functions (runtime already provides them)
-    if _is_stdlib_passthrough_function(stmt):
-        return [indent + "# passthrough: " + name]
+        arg_order = _get_list(stmt, "arg_order")
+        ps_params = ["$" + _safe_ident(a, "_p") for a in arg_order if isinstance(a, str)]
+        lines = [indent + "function " + name + " {"]
+        if len(ps_params) > 0:
+            lines.append(indent + "    param(" + ", ".join(ps_params) + ")")
+        else:
+            lines.append(indent + "    param()")
+        call_args = " " + " ".join(ps_params) if len(ps_params) > 0 else ""
+        lines.append(indent + "    return (__native_" + name + call_args + ")")
+        lines.append(indent + "}")
+        return lines
     body = _get_list(stmt, "body")
 
     # EAST3 uses arg_order (list[str]) + arg_defaults (dict[str, Any])
@@ -1751,14 +1691,14 @@ def transpile_to_powershell(east_doc: dict[str, Any]) -> str:
         "",
     ]
 
-    # Dot-source native seam for stdlib modules (spec-runtime.md §0.6a)
+    # Dot-source native seam (spec-emitter-guide.md §5.1)
     # module_id "pytra.std.time" → native seam "std/time_native.ps1"
     cur_mod = _CURRENT_MODULE_ID[0]
-    if cur_mod.startswith("pytra.std.") or cur_mod.startswith("pytra.built_in."):
-        # Strip pytra. prefix and add _native suffix
-        mod_tail = cur_mod[len("pytra."):]  # e.g. "std.time"
-        native_path = mod_tail.replace(".", "/") + "_native.ps1"  # e.g. "std/time_native.ps1"
-        lines.append('. (Join-Path $PSScriptRoot "' + rp + native_path + '")')
+    if cur_mod.startswith("pytra."):
+        mod_tail = cur_mod[len("pytra."):]
+        native_path = rp + mod_tail.replace(".", "/") + "_native.ps1"
+        lines.append('$__native_seam = Join-Path $PSScriptRoot "' + native_path + '"')
+        lines.append('if (Test-Path $__native_seam) { . $__native_seam }')
         lines.append("")
 
     # Detect implicit format_value dependency (f-string format_spec)

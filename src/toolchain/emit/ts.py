@@ -21,7 +21,7 @@ def main() -> int:
         return 0
 
     input_path = ""
-    output_dir = "out/ts"
+    output_dir = "work/tmp/ts"
     i = 0
     while i < len(argv):
         tok = argv[i]

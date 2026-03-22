@@ -5,7 +5,7 @@ All linked modules are merged into a single .scala file to avoid
 top-level definition collisions in Scala 3.
 
 Usage:
-    python3 -m toolchain.emit.scala MANIFEST.json --output-dir out/scala/
+    python3 -m toolchain.emit.scala MANIFEST.json --output-dir work/tmp/scala/
 """
 
 from __future__ import annotations
@@ -14,7 +14,15 @@ import sys
 from pathlib import Path
 
 from toolchain.emit.scala.emitter.scala_native_emitter import transpile_to_scala_native
-from toolchain.emit.loader import copy_native_runtime, load_linked_modules
+from toolchain.emit.loader import emit_all_modules
+
+
+def _transpile_scala(east_doc: dict) -> str:
+    """Wrapper to adapt transpile_to_scala_native to the standard (dict) -> str signature."""
+    meta = east_doc.get("meta", {})
+    emit_ctx = meta.get("emit_context", {}) if isinstance(meta, dict) else {}
+    is_entry = emit_ctx.get("is_entry", False) if isinstance(emit_ctx, dict) else False
+    return transpile_to_scala_native(east_doc, emit_main=is_entry)
 
 
 def main() -> int:
@@ -24,7 +32,7 @@ def main() -> int:
         return 0
 
     input_path = ""
-    output_dir = "out/scala"
+    output_dir = "work/tmp/scala"
     i = 0
     while i < len(argv):
         tok = argv[i]
@@ -40,29 +48,40 @@ def main() -> int:
         print("error: input manifest.json is required", file=sys.stderr)
         return 1
 
-    modules, entry_modules = load_linked_modules(input_path)
-    out = Path(output_dir)
-    out.mkdir(parents=True, exist_ok=True)
+    # Scala merges all modules into a single file (spec §5 exception).
+    # Use emit_all_modules for per-module transpilation, then merge the results.
+    # We collect per-module outputs by using a capturing transpile function.
+    per_module_results: list[tuple[str, str, bool]] = []  # (module_id, source, is_entry)
 
-    # Collect all module sources: submodules first, then entry module
+    def _capture_scala(east_doc: dict) -> str:
+        meta = east_doc.get("meta", {})
+        emit_ctx = meta.get("emit_context", {}) if isinstance(meta, dict) else {}
+        is_entry = emit_ctx.get("is_entry", False) if isinstance(emit_ctx, dict) else False
+        module_id = emit_ctx.get("module_id", "") if isinstance(emit_ctx, dict) else ""
+        source = transpile_to_scala_native(east_doc, emit_main=is_entry)
+        per_module_results.append((module_id, source, is_entry))
+        return source
+
+    # emit_all_modules writes per-module files and copies native runtime
+    rc = emit_all_modules(input_path, output_dir, ".scala", _capture_scala, lang="scala")
+    if rc != 0:
+        return rc
+
+    # Now merge all per-module files into a single .scala file
+    if not per_module_results:
+        return 0
+
     submodule_sources: list[str] = []
     entry_source = ""
     entry_stem = ""
 
-    for mod in modules:
-        module_id = mod["module_id"]
-        east_doc = mod["east_doc"]
-        is_entry = mod.get("is_entry", False)
-
+    for module_id, source, is_entry in per_module_results:
         if is_entry:
-            entry_source = transpile_to_scala_native(east_doc, emit_main=True)
+            entry_source = source
             entry_stem = module_id
         else:
-            source = transpile_to_scala_native(east_doc, emit_main=False)
             submodule_sources.append("// --- module: " + module_id + " ---\n" + source)
 
-    # Merge into single file
-    merged_parts: list[str] = []
     # Collect unique import lines from all sources
     all_imports: set[str] = set()
     all_body_lines: list[str] = []
@@ -75,6 +94,7 @@ def main() -> int:
             else:
                 all_body_lines.append(line)
 
+    merged_parts: list[str] = []
     merged_parts.extend(sorted(all_imports))
     merged_parts.append("")
     merged_parts.extend(all_body_lines)
@@ -83,11 +103,11 @@ def main() -> int:
 
     if entry_stem == "":
         entry_stem = "main"
+    out = Path(output_dir)
     out_path = out / (entry_stem + ".scala")
     out_path.write_text(merged, encoding="utf-8")
-    print("generated: " + str(out_path))
+    print("merged: " + str(out_path))
 
-    copy_native_runtime(output_dir, "scala")
     return 0
 
 

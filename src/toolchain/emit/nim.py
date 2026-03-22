@@ -15,23 +15,6 @@ from toolchain.emit.nim.emitter import transpile_to_nim_native
 from toolchain.emit.loader import emit_all_modules
 
 
-def _copy_runtime(output_dir: str) -> None:
-    """Copy Nim runtime files into the output directory."""
-    src_root = Path(__file__).resolve().parents[2] / "runtime" / "nim"
-    out = Path(output_dir)
-    specs = [
-        ("built_in/py_runtime.nim", "py_runtime.nim"),
-        ("generated/utils/image_runtime.nim", "image_runtime.nim"),
-    ]
-    for src_rel, dst_rel in specs:
-        src = src_root / src_rel
-        if not src.exists():
-            continue
-        dst = out / dst_rel
-        dst.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(str(src), str(dst))
-
-
 def _overlay_native_std(output_dir: str) -> None:
     """Overwrite linker-generated std modules with native implementations.
 
@@ -60,7 +43,7 @@ def main() -> int:
         return 0
 
     input_path = ""
-    output_dir = "out/nim"
+    output_dir = "work/tmp/nim"
     i = 0
     while i < len(argv):
         tok = argv[i]
@@ -79,7 +62,6 @@ def main() -> int:
     rc = emit_all_modules(input_path, output_dir, ".nim", transpile_to_nim_native, lang="nim")
     if rc != 0:
         return rc
-    _copy_runtime(output_dir)
     _overlay_native_std(output_dir)
     return 0
 

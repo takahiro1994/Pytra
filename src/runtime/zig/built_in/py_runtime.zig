@@ -110,10 +110,57 @@ pub fn truthy(value: anytype) bool {
     }
 }
 
-/// Convert a value to string representation (stub).
+/// Convert a value to string representation.
 pub fn to_str(value: anytype) []const u8 {
-    _ = value;
-    return "<value>";
+    const T = @TypeOf(value);
+    const alloc = std.heap.page_allocator;
+    switch (@typeInfo(T)) {
+        .Int, .ComptimeInt => {
+            // Format integer to string
+            var v: i64 = @intCast(value);
+            var neg = false;
+            if (v < 0) {
+                neg = true;
+                v = -v;
+            }
+            var buf: [20]u8 = undefined;
+            var pos: usize = buf.len;
+            if (v == 0) {
+                pos -= 1;
+                buf[pos] = '0';
+            } else {
+                while (v > 0) {
+                    pos -= 1;
+                    buf[pos] = @intCast(@as(u8, @intCast(@mod(v, 10))) + '0');
+                    v = @divFloor(v, 10);
+                }
+            }
+            if (neg) {
+                pos -= 1;
+                buf[pos] = '-';
+            }
+            const len = buf.len - pos;
+            const result = alloc.alloc(u8, len) catch return "?";
+            @memcpy(result, buf[pos..]);
+            return result;
+        },
+        .Float, .ComptimeFloat => {
+            // Simple float formatting
+            const fv: f64 = @floatCast(value);
+            const iv: i64 = @intFromFloat(fv);
+            return to_str(iv);
+        },
+        .Bool => {
+            return if (value) "True" else "False";
+        },
+        .Pointer => |ptr_info| {
+            if (ptr_info.size == .Slice and ptr_info.child == u8) {
+                return value;
+            }
+            return "<object>";
+        },
+        else => return "<object>",
+    }
 }
 
 /// Concatenate two strings.
@@ -185,10 +232,13 @@ pub fn isinstance_check(obj: anytype, typ: anytype) bool {
     return false;
 }
 
-/// Contains check (stub for `in` operator).
+/// Contains check for `in` operator.
 pub fn contains(haystack: anytype, needle: anytype) bool {
-    _ = haystack;
-    _ = needle;
+    const HT = @TypeOf(haystack);
+    // StringHashMap: check if key exists
+    if (@typeInfo(HT) == .Struct and @hasDecl(HT, "contains")) {
+        return haystack.contains(needle);
+    }
     return false;
 }
 

@@ -1,19 +1,18 @@
 #!/usr/bin/env python3
 """Java backend: manifest.json → Java multi-file output.
 
-Usage:
-    python3 -m toolchain.emit.java MANIFEST.json --output-dir out/java/
+Java requires filename == public class name, so entry module is emitted as Main.java.
+This is the only language-specific exception per spec-emitter-guide.md §5.
 """
 
 from __future__ import annotations
 
-import shutil
 import sys
 from pathlib import Path as NativePath
 from typing import Any
 
 from toolchain.emit.java.emitter import transpile_to_java
-from toolchain.emit.loader import copy_native_runtime, load_linked_modules
+from toolchain.emit.loader import load_linked_modules, copy_native_runtime
 
 
 def _emit_java_modules(input_path: str, output_dir: str) -> int:
@@ -31,13 +30,28 @@ def _emit_java_modules(input_path: str, output_dir: str) -> int:
         east_doc: dict[str, Any] = mod["east_doc"]
         is_entry: bool = mod.get("is_entry", False) or module_id in entry_set
 
+        # Inject emit_context
+        meta = east_doc.get("meta")
+        if not isinstance(meta, dict):
+            meta = {}
+            east_doc["meta"] = meta
+        rel_module = module_id
+        if rel_module.startswith("pytra."):
+            rel_module = rel_module[len("pytra."):]
+        rel_path = rel_module.replace(".", "/") + ".java"
+        depth = rel_path.count("/")
+        root_rel_prefix = "../" * depth if depth > 0 else "./"
+        meta["emit_context"] = {
+            "module_id": module_id,
+            "root_rel_prefix": root_rel_prefix,
+            "is_entry": bool(is_entry),
+        }
+
         source = transpile_to_java(east_doc)
 
         if is_entry:
-            # Java requires public class Main → Main.java
             out_path = out / "Main.java"
         else:
-            rel_path = module_id.replace(".", "/") + ".java"
             out_path = out / rel_path
 
         out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -47,8 +61,6 @@ def _emit_java_modules(input_path: str, output_dir: str) -> int:
     return 0
 
 
-
-
 def main() -> int:
     argv = sys.argv[1:]
     if len(argv) == 0 or argv[0] in ("-h", "--help"):
@@ -56,7 +68,7 @@ def main() -> int:
         return 0
 
     input_path = ""
-    output_dir = "out/java"
+    output_dir = "work/tmp/java"
     i = 0
     while i < len(argv):
         tok = argv[i]

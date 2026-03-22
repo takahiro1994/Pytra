@@ -1,6 +1,6 @@
 # glob_native.ps1 — native seam for pytra.std.glob
 
-function glob {
+function __native_glob {
     param($pattern)
     $items = Get-ChildItem -Path $pattern -ErrorAction SilentlyContinue
     if ($items -eq $null) { return @() }

@@ -48,44 +48,6 @@ _FUNCTION_NAMES: list[set[str]] = [set()]
 _CLASS_BASES: list[dict[str, str]] = [{}]
 _CLASS_METHODS: list[dict[str, set[str]]] = [{}]
 _RELATIVE_IMPORT_NAME_ALIASES: dict[str, str] = {}
-_IMPORT_ALIAS_MAP: list[dict[str, str]] = [{}]
-
-# stdlib module → Kotlin expression mapping
-_KT_STDLIB_CALL_MAP: dict[str, dict[str, str]] = {
-    "pytra.std.math": {
-        "sqrt": "kotlin.math.sqrt", "sin": "kotlin.math.sin", "cos": "kotlin.math.cos",
-        "tan": "kotlin.math.tan", "exp": "kotlin.math.exp", "log": "kotlin.math.ln",
-        "log10": "kotlin.math.log10", "fabs": "kotlin.math.abs",
-        "floor": "kotlin.math.floor", "ceil": "kotlin.math.ceil",
-        "pow": "math_native_pow",
-    },
-}
-_KT_STDLIB_ATTR_MAP: dict[str, dict[str, str]] = {
-    "pytra.std.math": {"pi": "kotlin.math.PI", "e": "kotlin.math.E"},
-    "pytra.std.time": {"perf_counter": "__pytra_perf_counter"},
-}
-
-
-def _resolve_stdlib_call(owner_id: str, attr: str) -> str:
-    """Resolve module.attr() to Kotlin stdlib call via import alias map."""
-    module_id = _IMPORT_ALIAS_MAP[0].get(owner_id, "")
-    if module_id == "":
-        return ""
-    mod_map = _KT_STDLIB_CALL_MAP.get(module_id)
-    if mod_map is not None:
-        return mod_map.get(attr, "")
-    return ""
-
-
-def _resolve_stdlib_attr(owner_id: str, attr: str) -> str:
-    """Resolve module.attr to Kotlin stdlib constant via import alias map."""
-    module_id = _IMPORT_ALIAS_MAP[0].get(owner_id, "")
-    if module_id == "":
-        return ""
-    mod_map = _KT_STDLIB_ATTR_MAP.get(module_id)
-    if mod_map is not None:
-        return mod_map.get(attr, "")
-    return ""
 
 
 def _safe_ident(name: Any, fallback: str) -> str:
@@ -857,12 +819,6 @@ def _is_math_constant(expr: dict[str, Any]) -> bool:
 def _render_attribute_expr(expr: dict[str, Any]) -> str:
     value_any = expr.get("value")
     attr = _safe_ident(expr.get("attr"), "field")
-    # Resolve stdlib attribute access via import alias map
-    if isinstance(value_any, dict) and value_any.get("kind") == "Name":
-        owner_id = value_any.get("id", "")
-        stdlib_val = _resolve_stdlib_attr(owner_id, attr)
-        if stdlib_val != "":
-            return stdlib_val
     semantic_tag_any = expr.get("semantic_tag")
     semantic_tag = semantic_tag_any if isinstance(semantic_tag_any, str) else ""
     runtime_call, _ = _resolved_runtime_call(expr)
@@ -1151,21 +1107,7 @@ def _render_call_expr(expr: dict[str, Any]) -> str:
         if isinstance(owner_any, dict) and owner_any.get("kind") == "Name":
             owner_id = owner_any.get("id", "")
             # Resolve stdlib calls via import alias map
-            stdlib_fn = _resolve_stdlib_call(owner_id, attr_name)
-            if stdlib_fn != "":
-                rendered_stdlib_args: list[str] = []
-                si = 0
-                while si < len(args):
-                    rendered_stdlib_args.append(_render_expr(args[si]))
-                    si += 1
-                return stdlib_fn + "(" + ", ".join(rendered_stdlib_args) + ")"
-            if owner_id in {"png", "gif"} and attr_name != "":
-                rendered_utils_args: list[str] = []
-                ui = 0
-                while ui < len(args):
-                    rendered_utils_args.append(_render_expr(args[ui]))
-                    ui += 1
-                return "__pytra_" + attr_name + "(" + ", ".join(rendered_utils_args) + ")"
+            pass  # module.attr calls resolved by linker → EAST3
         if isinstance(owner_any, dict) and owner_any.get("kind") == "Call":
             if _call_name(owner_any) in {"super", "super_"}:
                 rendered_super_args: list[str] = []
@@ -2787,8 +2729,7 @@ def transpile_to_kotlin_native(east_doc: dict[str, Any]) -> str:
     _RELATIVE_IMPORT_NAME_ALIASES.clear()
     _RELATIVE_IMPORT_NAME_ALIASES.update(_collect_relative_import_name_aliases(east_doc))
     meta = east_doc.get("meta") if isinstance(east_doc.get("meta"), dict) else {}
-    from toolchain.emit.common.emitter.code_emitter import build_import_alias_map
-    _IMPORT_ALIAS_MAP[0] = build_import_alias_map(meta)
+    pass  # import alias resolution handled by emit_context
     reject_backend_typed_vararg_signatures(east_doc, backend_name="Kotlin backend")
     reject_backend_general_union_type_exprs(east_doc, backend_name="Kotlin backend")
     reject_backend_homogeneous_tuple_ellipsis_type_exprs(east_doc, backend_name="Kotlin backend")

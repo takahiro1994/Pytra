@@ -339,7 +339,12 @@ class ZigNativeEmitter:
                 if isinstance(target, dict) and target.get("kind") == "Name":
                     mutated.add(_safe_ident(target.get("id"), ""))
             elif kind == "Assign":
-                pass  # Assign 単体では mutated 判定しない（重複カウントで下記判定）
+                # Subscript 代入: dict[key] = val / list[idx] = val → owner は mutated
+                target = stmt.get("target")
+                if isinstance(target, dict) and target.get("kind") == "Subscript":
+                    sub_val = target.get("value")
+                    if isinstance(sub_val, dict) and sub_val.get("kind") == "Name":
+                        mutated.add(_safe_ident(sub_val.get("id"), ""))
             elif kind == "If":
                 mutated.update(self._scan_mutated_vars(stmt.get("body")))
                 mutated.update(self._scan_mutated_vars(stmt.get("orelse")))
@@ -443,6 +448,8 @@ class ZigNativeEmitter:
     def _needs_var_for_type(self, decl_type: str) -> bool:
         """型が mutable メソッドを持つクラスなら var が必要（ポインタ型では不要）。"""
         t = self._normalize_type(decl_type)
+        # dict 型は put で mutation するが、read-only 使用もある
+        # _is_var_mutated で Subscript 代入を検出する方が正確
         # ポインタ型（*ClassName）なら const でもフィールド変更可能
         if t in self.class_names:
             return False
@@ -549,7 +556,7 @@ class ZigNativeEmitter:
             self.lines.extend(module_comments)
             self.lines.append("")
         self.lines.append("const std = @import(\"std\");")
-        rt_path = "../py_runtime.zig" if self.is_submodule else "py_runtime.zig"
+        rt_path = self._root_rel_prefix() + "built_in/py_runtime.zig"
         self.lines.append("const pytra = @import(\"" + rt_path + "\");")
         body = self._dict_list(self.east_doc.get("body"))
         main_guard = self._dict_list(self.east_doc.get("main_guard_body"))
@@ -613,18 +620,31 @@ class ZigNativeEmitter:
         return "\n".join(self.lines).rstrip() + "\n"
 
     def _fixup_unused_obj_vars(self) -> None:
-        """未使用ローカル const/var に _ = var; を挿入する後処理。"""
+        """後処理: 未使用 const に _ = を挿入、未 mutated var を const に降格。"""
         import re
-        # インデント付き const/var 宣言行のみ対象（トップレベル除外）
         decl_re = re.compile(r"^(\s+)(const|var)\s+(\w+)\s*:")
+        # mutation パターン: var_name = / var_name += / var_name -= etc.
+        import re as _re_mut
+        def _is_mutated_after(var_name: str, start: int) -> bool:
+            # var_name に続く代入パターンを行内の任意位置で検出
+            pat = _re_mut.compile(r'\b' + _re_mut.escape(var_name) + r'\s*(\+\=|\-\=|\*\=|/\=|\=(?!\=))')
+            j = start
+            while j < len(self.lines):
+                if pat.search(self.lines[j]):
+                    return True
+                j += 1
+            return False
+
         insertions: list[tuple[int, str]] = []
+        replacements: list[tuple[int, str, str]] = []
         i = 0
         while i < len(self.lines):
             m = decl_re.match(self.lines[i])
             if m is not None:
                 indent = m.group(1)
+                kw = m.group(2)
                 var_name = m.group(3)
-                # 後続行で var_name が使用されているか（宣言行自体と _ = 行を除く）
+                # 後続行で var_name が使用されているか
                 used = False
                 j = i + 1
                 while j < len(self.lines):
@@ -634,8 +654,19 @@ class ZigNativeEmitter:
                         break
                     j += 1
                 if not used:
-                    insertions.append((i + 1, indent + "_ = " + var_name + ";"))
+                    # 未使用 const → _ = を挿入
+                    if kw == "const":
+                        insertions.append((i + 1, indent + "_ = " + var_name + ";"))
+                    else:
+                        # 未使用 var → const に降格 + _ = 挿入
+                        replacements.append((i, "var " + var_name, "const " + var_name))
+                        insertions.append((i + 1, indent + "_ = " + var_name + ";"))
+                elif kw == "var" and not _is_mutated_after(var_name, i + 1):
+                    # 使用されるが mutation されない var → const に降格
+                    replacements.append((i, "var " + var_name, "const " + var_name))
             i += 1
+        for line_idx, old, new in replacements:
+            self.lines[line_idx] = self.lines[line_idx].replace(old, new, 1)
         for idx, line in reversed(insertions):
             self.lines.insert(idx, line)
 
@@ -881,80 +912,91 @@ class ZigNativeEmitter:
             current = self._class_base.get(current, "")
         return cls_name
 
+    def _get_emit_context(self) -> dict[str, Any]:
+        meta = self.east_doc.get("meta")
+        if isinstance(meta, dict):
+            ectx = meta.get("emit_context")
+            if isinstance(ectx, dict):
+                return ectx
+        return {}
+
+    def _root_rel_prefix(self) -> str:
+        rr = self._get_emit_context().get("root_rel_prefix", "./")
+        if rr == "./":
+            return ""
+        return rr
+
+    def _module_id_to_import_path(self, module_id: str) -> str:
+        """module_id から Zig import パスを機械的に生成（spec-emitter-guide §3）。"""
+        rel = module_id
+        if rel.startswith("pytra."):
+            rel = rel[len("pytra."):]
+        return self._root_rel_prefix() + rel.replace(".", "/") + ".zig"
+
     def _emit_imports(self, body: list[dict[str, Any]]) -> None:
-        """ImportFrom ノードから Zig の @import を生成する。"""
+        """ImportFrom ノードから Zig の @import を生成（module_id ベース、ハードコード禁止）。"""
+        from toolchain.emit.common.emitter.code_emitter import build_import_alias_map
         emitted: set[str] = set()
+        # import alias map を構築
+        self._import_alias_map = build_import_alias_map(self.east_doc.get("meta", {}))
+        # body 内の ImportFrom の module フィールドを収集（モジュール判定用）
+        all_import_modules: set[str] = set()
+        for s in body:
+            if isinstance(s, dict) and s.get("kind") == "ImportFrom":
+                m = s.get("module")
+                if isinstance(m, str) and m != "":
+                    all_import_modules.add(m)
         for stmt in body:
             kind = stmt.get("kind")
             if kind != "ImportFrom":
                 continue
             module_any = stmt.get("module")
             module_id = module_any if isinstance(module_any, str) else ""
+            if module_id == "":
+                continue
             names_any = stmt.get("names")
             names = names_any if isinstance(names_any, list) else []
+            # コンパイル時のみの import はスキップ
+            if module_id in _COMPILETIME_STD_IMPORT_SYMBOLS:
+                continue
             for entry in names:
                 if not isinstance(entry, dict):
                     continue
                 name = entry.get("name")
                 if not isinstance(name, str) or name == "":
                     continue
+                # extern/abi/template は special シンボル → スキップ
+                if name in {"extern", "abi", "template"}:
+                    continue
                 asname = entry.get("asname")
                 local = asname if isinstance(asname, str) and asname != "" else name
-                # pytra.std.* の @extern 関数は py_runtime から提供
-                if module_id.startswith("pytra.std."):
-                    continue
-                # from pytra.std import extern/abi → 特殊シンボル（math_native 委譲 or スキップ）
-                if module_id == "pytra.std" and name in {"extern", "abi", "template"}:
-                    # サブモジュール内から math_native.zig を参照
-                    if "math_native" not in emitted:
-                        self._emit_line("const math_native = @import(\"math_native.zig\");")
-                        emitted.add("math_native")
-                    continue
-                # from pytra.std import math → math/east.zig
-                if module_id == "pytra.std":
-                    zig_path = name + "/east.zig"
-                    safe_local = _safe_ident(local, "mod")
-                    if safe_local not in emitted:
-                        self._emit_line("const " + safe_local + " = @import(\"" + zig_path + "\");")
-                        emitted.add(safe_local)
-                    continue
-                # pytra.utils.assertions は不要
-                if module_id == "pytra.utils.assertions":
-                    continue
-                # pytra.dataclasses は不要
-                if module_id == "pytra.dataclasses":
-                    continue
-                # pytra.utils のサブモジュール（png, gif 等）
-                if module_id == "pytra.utils":
-                    # from pytra.utils import png → png/east.zig
-                    zig_path = name + "/east.zig"
-                    safe_local = _safe_ident(local, "mod")
-                    if safe_local not in emitted:
-                        self._emit_line("const " + safe_local + " = @import(\"" + zig_path + "\");")
-                        emitted.add(safe_local)
-                    continue
-                if module_id.startswith("pytra.utils."):
-                    # from pytra.utils.gif import save_gif → gif モジュールを import
-                    mod_leaf = module_id.split(".")[-1]
-                    zig_path = mod_leaf + "/east.zig"
-                    safe_mod = _safe_ident(mod_leaf, "mod")
-                    if safe_mod not in emitted:
-                        self._emit_line("const " + safe_mod + " = @import(\"" + zig_path + "\");")
-                        emitted.add(safe_mod)
-                    # 関数名のエイリアス: const save_gif = gif.save_gif;
+                # import される module_id を決定
+                # "from pytra.std import math" → module_id="pytra.std", name="math"
+                #   → imported module = "pytra.std.math"
+                # "from pytra.utils.gif import save_gif" → module_id="pytra.utils.gif", name="save_gif"
+                #   → imported module = "pytra.utils.gif" (name は関数名)
+                # 区別: name がモジュールか関数かは、module_id + "." + name が別のモジュールとして
+                # 存在するか否かで判断。簡易的に: import_alias_map にあればモジュール扱い。
+                imported_module = module_id + "." + name
+                # name がサブモジュールか関数名かの判定:
+                # "from pytra.std import math" (depth=2) → math はサブモジュール
+                # "from pytra.std.time import perf_counter" (depth=3+) → perf_counter は関数
+                # "from pytra.utils import png" (depth=2) → png はサブモジュール
+                # "from pytra.utils.gif import save_gif" (depth=3+) → save_gif は関数
+                pytra_depth = len(module_id.split(".")) if module_id.startswith("pytra.") else 0
+                is_module_import = pytra_depth == 2  # pytra.std / pytra.utils
+                if not is_module_import:
+                    imported_module = module_id
+                import_path = self._module_id_to_import_path(imported_module)
+                safe_mod = _safe_ident(imported_module.split(".")[-1], "mod")
+                if safe_mod not in emitted:
+                    self._emit_line("const " + safe_mod + " = @import(\"" + import_path + "\");")
+                    emitted.add(safe_mod)
+                # 関数 alias: const save_gif = gif.save_gif;
+                if not is_module_import:
                     safe_local = _safe_ident(local, "fn")
                     if safe_local != safe_mod and safe_local not in emitted:
                         self._emit_line("const " + safe_local + " = " + safe_mod + "." + _safe_ident(name, "fn") + ";")
-                        emitted.add(safe_local)
-                    continue
-                # 相対 import / その他のモジュール
-                if module_id != "":
-                    # module_id の最後のドット以降をディレクトリ名にする
-                    parts = module_id.split(".")
-                    zig_path = "/".join(parts[-1:]) + "/east.zig"
-                    safe_local = _safe_ident(name, "mod")
-                    if safe_local not in emitted:
-                        self._emit_line("const " + safe_local + " = @import(\"" + zig_path + "\");")
                         emitted.add(safe_local)
 
     def _emit_stmt(self, stmt: dict[str, Any]) -> None:
@@ -1005,6 +1047,15 @@ class ZigNativeEmitter:
                 if value_node is None and bool(stmt.get("declare")):
                     self._emit_line("var " + target + ": " + zig_ty + " = undefined;")
                 else:
+                    # 空 dict リテラル: decl_type の値型で初期化
+                    if isinstance(value_node, dict) and value_node.get("kind") == "Dict":
+                        entries = value_node.get("entries")
+                        if (entries is None or (isinstance(entries, list) and len(entries) == 0)):
+                            if decl_type.startswith("dict[") and decl_type.endswith("]"):
+                                parts = self._split_generic(decl_type[5:-1])
+                                if len(parts) == 2:
+                                    val_zig = self._zig_type(parts[1].strip())
+                                    value = "pytra.make_str_dict(" + val_zig + ")"
                     # 型キャスト挿入: i64 変数に f64 値、f64 変数に i64 値
                     val_type = self._get_expr_type(value_node) if isinstance(value_node, dict) else ""
                     _INT_T = {"int64", "int32", "int16", "int8", "uint8", "uint16", "uint32", "uint64"}
@@ -1045,6 +1096,13 @@ class ZigNativeEmitter:
                         if elem in {"u8", "i8", "i16", "u16", "i32", "u32", "i64", "u64"}:
                             val_expr = "@intCast(" + val_expr + ")"
                         self._emit_line("pytra.list_set(" + obj_expr + ", " + elem + ", " + idx_expr + ", " + val_expr + ");")
+                        return
+                    # dict[key] = val → .put(key, val)
+                    if sub_val_type.startswith("dict["):
+                        obj_expr = self._render_expr(sub_val)
+                        idx_expr = self._render_expr(td2.get("slice"))
+                        val_expr = self._render_expr(stmt.get("value"))
+                        self._emit_line(obj_expr + ".put(" + idx_expr + ", " + val_expr + ") catch {};")
                         return
                 target = self._render_target(target_any)
                 value = self._render_expr(stmt.get("value"))
@@ -1340,8 +1398,55 @@ class ZigNativeEmitter:
         py_type = raw_any.strip() if isinstance(raw_any, str) else ""
         return self._zig_type(py_type)
 
+    def _emit_extern_delegation(self, stmt: dict[str, Any], name: str) -> None:
+        """@extern 関数の native 委譲コードを生成（spec-emitter-guide §4/§5.1）。"""
+        # native モジュールパスを emit_context.module_id から生成
+        ectx = self._get_emit_context()
+        module_id = ectx.get("module_id", "")
+        # native ファイルは同じディレクトリの _native サフィックス付きファイル
+        # pytra.std.time → time_native.zig (同ディレクトリ)
+        clean_id = module_id.replace(".east", "")
+        parts = clean_id.split(".")
+        leaf = parts[-1] if len(parts) > 0 else "unknown"
+        native_path = leaf + "_native.zig"
+        # __native import を1度だけ出力
+        if not hasattr(self, "_extern_native_emitted"):
+            self._extern_native_emitted = False
+        if not self._extern_native_emitted:
+            self._emit_line("const __native = @import(\"" + native_path + "\");")
+            self._extern_native_emitted = True
+        # 引数リスト
+        arg_order_any = stmt.get("arg_order")
+        args = arg_order_any if isinstance(arg_order_any, list) else []
+        arg_types_any = stmt.get("arg_types")
+        arg_types = arg_types_any if isinstance(arg_types_any, dict) else {}
+        arg_strs: list[str] = []
+        call_args: list[str] = []
+        for a in args:
+            safe_name = _safe_ident(a, "arg")
+            raw_type = arg_types.get(a)
+            py_t = raw_type.strip() if isinstance(raw_type, str) else ""
+            zig_ty = self._zig_type(py_t)
+            arg_strs.append(safe_name + ": " + zig_ty)
+            call_args.append(safe_name)
+        ret_type_any = stmt.get("return_type")
+        ret_py = ret_type_any.strip() if isinstance(ret_type_any, str) else ""
+        ret_zig = self._zig_type(ret_py) if ret_py != "" else "void"
+        if ret_zig == "pytra.PyObject":
+            ret_zig = "f64"  # extern 関数の戻り値は通常スカラー
+        sig = "pub fn " + name + "(" + ", ".join(arg_strs) + ") " + ret_zig
+        if ret_zig == "void":
+            self._emit_line(sig + " { __native." + name + "(" + ", ".join(call_args) + "); }")
+        else:
+            self._emit_line(sig + " { return __native." + name + "(" + ", ".join(call_args) + "); }")
+
     def _emit_function_def(self, stmt: dict[str, Any]) -> None:
         name = _safe_ident(stmt.get("name"), "fn_")
+        # @extern decorator → native 委譲コードを生成（spec-emitter-guide §4）
+        decorators = stmt.get("decorators")
+        if isinstance(decorators, list) and "extern" in decorators:
+            self._emit_extern_delegation(stmt, name)
+            return
         arg_order_any = stmt.get("arg_order")
         args = arg_order_any if isinstance(arg_order_any, list) else []
         arg_names: list[str] = []
@@ -1731,7 +1836,14 @@ class ZigNativeEmitter:
         arg_types = arg_types_any if isinstance(arg_types_any, dict) else {}
         has_self = False
         self_used = self._body_uses_name(stmt.get("body"), "self")
-        self_mutated = self._body_mutates_self(stmt.get("body"))
+        # EAST3 の mutates_self フラグを優先（call graph 伝播済み）
+        ms_flag = stmt.get("mutates_self")
+        if isinstance(ms_flag, bool):
+            self_mutated = ms_flag
+        else:
+            self_mutated = self._body_mutates_self(stmt.get("body"))
+            if not self_mutated:
+                self_mutated = cls_name in self._classes_with_mut_method
         for i, arg in enumerate(arg_order):
             arg_name = _safe_ident(arg, "arg")
             if i == 0 and arg_name == "self":
@@ -2031,6 +2143,22 @@ class ZigNativeEmitter:
             return self._render_expr(ed.get("value"))
         if kind == "Box":
             return self._render_expr(ed.get("value"))
+        if kind == "ObjStr":
+            inner = self._render_expr(ed.get("value"))
+            return "pytra.to_str(" + inner + ")"
+        if kind == "ObjLen":
+            inner = self._render_expr(ed.get("value"))
+            inner_type = self._lookup_expr_type(ed.get("value"))
+            elem = "i64"
+            if inner_type.startswith("list[") and inner_type.endswith("]"):
+                elem = self._zig_type(inner_type[5:-1].strip())
+            elif inner_type in {"bytearray", "bytes"}:
+                elem = "u8"
+            # ObjLen は Python の len() なので、Obj コンテナ前提で list_len を使う
+            zig_inner_type = self._zig_type(inner_type) if inner_type != "" else ""
+            if inner_type.startswith("list[") or inner_type in {"bytearray", "bytes"} or zig_inner_type == "pytra.Obj" or inner_type in {"", "unknown"}:
+                return "pytra.list_len(" + inner + ", " + elem + ")"
+            return "@as(i64, @intCast(" + inner + ".len))"
         if kind == "Call":
             return self._render_call(ed)
         if kind == "Attribute":
@@ -2049,8 +2177,11 @@ class ZigNativeEmitter:
             obj = self._render_expr(val_node)
             # Obj-managed list の .len → pytra.list_len
             if attr == "len":
-                val_type = self._get_expr_type(val_node) if isinstance(val_node, dict) else ""
-                if val_type.startswith("list[") or val_type in {"bytearray", "bytes"}:
+                val_type = self._lookup_expr_type(val_node) if isinstance(val_node, dict) else ""
+                zig_val_type = self._zig_type(val_type) if val_type != "" else ""
+                # Obj 型（list/dict/unknown のコンテナ）なら list_len を使う
+                is_obj_container = val_type.startswith("list[") or val_type in {"bytearray", "bytes"} or zig_val_type == "pytra.Obj"
+                if is_obj_container:
                     elem = "i64"
                     if val_type.startswith("list[") and val_type.endswith("]"):
                         elem = self._zig_type(val_type[5:-1].strip())
@@ -2061,10 +2192,27 @@ class ZigNativeEmitter:
         if kind == "Subscript":
             value_node = ed.get("value")
             obj = self._render_expr(value_node)
-            idx = self._render_expr(ed.get("slice"))
-            obj_type = self._get_expr_type(value_node)
+            slice_node = ed.get("slice")
+            obj_type = self._lookup_expr_type(value_node)
+            # 文字列スライス: str[start:end]
+            if isinstance(slice_node, dict) and slice_node.get("kind") == "Slice":
+                lower = self._render_expr(slice_node.get("lower")) if slice_node.get("lower") is not None else "0"
+                upper_node = slice_node.get("upper")
+                if upper_node is not None:
+                    upper = self._render_expr(upper_node)
+                else:
+                    upper = "@as(i64, @intCast(" + obj + ".len))"
+                if obj_type == "str":
+                    return "pytra.str_slice(" + obj + ", " + lower + ", " + upper + ")"
+                return obj + "[" + lower + ".." + upper + "]"
+            idx = self._render_expr(slice_node)
             if obj_type.startswith("dict["):
-                return "(" + obj + ".get(" + idx + ") orelse 0)"
+                # dict get with default
+                parts = self._split_generic(obj_type[5:-1])
+                val_zig = "i64"
+                if len(parts) == 2:
+                    val_zig = self._zig_type(parts[1].strip())
+                return "pytra.dict_get_default(" + val_zig + ", " + obj + ", " + idx + ", 0)"
             if obj_type.startswith("list[") or obj_type in {"bytearray", "bytes"}:
                 elem_type = "i64"
                 if obj_type.startswith("list[") and obj_type.endswith("]"):
@@ -2072,7 +2220,10 @@ class ZigNativeEmitter:
                 elif obj_type in {"bytearray", "bytes"}:
                     elem_type = "u8"
                 return "pytra.list_get(" + obj + ", " + elem_type + ", " + idx + ")"
-            return obj + "[" + idx + "]"
+            # 文字列インデックス: str[i]
+            if obj_type == "str":
+                return "pytra.str_index(" + obj + ", " + idx + ")"
+            return obj + "[@intCast(" + idx + ")]"
         if kind == "List":
             elts_any = ed.get("elts")
             if not isinstance(elts_any, list):
@@ -2238,6 +2389,9 @@ class ZigNativeEmitter:
             fkind = func_any.get("kind")
             if fkind == "Name":
                 fname = _safe_ident(func_any.get("id"), "fn_")
+                # Python main → EAST __pytra_main リネーム対応
+                if fname == "main" and "__pytra_main" in self.function_names:
+                    fname = "__pytra_main"
                 if fname == "print":
                     if len(args) == 1 and isinstance(args[0], dict) and args[0].get("kind") == "Call":
                         inner_func = args[0].get("func")
@@ -2275,6 +2429,8 @@ class ZigNativeEmitter:
                         arg_t = self._lookup_expr_type(args[0]) if len(args) > 0 else ""
                         if arg_t == "":
                             arg_t = self._get_expr_type(args[0]) if len(args) > 0 else ""
+                        if arg_t == "str":
+                            return "pytra.str_to_int(" + arg_strs[0] + ")"
                         if arg_t in {"float64", "float32", "float"}:
                             return "@as(i64, @intFromFloat(" + arg_strs[0] + "))"
                         if arg_t in {"int64", "int32", "int16", "int8", "uint8", "uint16", "uint32", "uint64"}:
@@ -2391,6 +2547,21 @@ class ZigNativeEmitter:
                         if self.is_submodule:
                             return "math_native." + zig_attr + "(" + ", ".join(coerced_args) + ")"
                         return obj + "." + zig_attr + "(" + ", ".join(coerced_args) + ")"
+                if attr == "isdigit":
+                    return "pytra.char_isdigit(" + obj + ")"
+                if attr == "isalpha":
+                    return "pytra.char_isalpha(" + obj + ")"
+                if attr == "get":
+                    obj_type = self._lookup_expr_type(obj_node_for_attr)
+                    if obj_type.startswith("dict["):
+                        parts = self._split_generic(obj_type[5:-1])
+                        val_zig = "i64"
+                        if len(parts) == 2:
+                            val_zig = self._zig_type(parts[1].strip())
+                        if len(arg_strs) >= 2:
+                            return "pytra.dict_get_default(" + val_zig + ", " + obj + ", " + arg_strs[0] + ", " + arg_strs[1] + ")"
+                        if len(arg_strs) == 1:
+                            return "pytra.dict_get_default(" + val_zig + ", " + obj + ", " + arg_strs[0] + ", 0)"
                 if attr == "append":
                     if len(arg_strs) > 0:
                         obj_type = self._lookup_expr_type(obj_node_for_attr)

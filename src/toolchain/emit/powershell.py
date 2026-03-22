@@ -20,7 +20,7 @@ def main() -> int:
         return 0
 
     input_path = ""
-    output_dir = "out/powershell"
+    output_dir = "work/tmp/powershell"
     i = 0
     while i < len(argv):
         tok = argv[i]
