@@ -135,8 +135,8 @@ function perf_counter { return (__native_perf_counter) }
 
 Zig:
 ```zig
-const time_native = @import("std/time_native.zig");
-pub fn perf_counter() f64 { return time_native.perf_counter(); }
+const __native = @import("std/time_native.zig");
+pub fn perf_counter() f64 { return __native.perf_counter(); }
 ```
 
 ### extern() 変数（ambient global）の委譲
