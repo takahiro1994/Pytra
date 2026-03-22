@@ -2,7 +2,7 @@
 """Build selfhost transpiler C++ binary end-to-end.
 
 Steps:
-1) transpile src/pytra-cli.py -> selfhost/py2cpp.cpp
+1) transpile src/pytra-cli.py -> work/selfhost/py2cpp.cpp
 2) compile with src/runtime/cpp sources
 """
 
@@ -20,7 +20,7 @@ if str(ROOT / "src") not in sys.path:
 
 from tools.cpp_runtime_deps import collect_runtime_cpp_sources
 
-SELFHOST = ROOT / "selfhost"
+SELFHOST = ROOT / "work" / "selfhost"
 CPP_OUT = SELFHOST / "py2cpp.cpp"
 BIN_OUT = SELFHOST / "py2cpp.out"
 SELFHOST_ENTRY = ROOT / "src" / "pytra-cli.py"

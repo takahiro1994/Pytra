@@ -74,7 +74,7 @@ def main() -> int:
     ap = argparse.ArgumentParser(description="run selfhost transpiler with temporary EAST JSON input")
     ap.add_argument("input", help="Input Python source (.py) or EAST JSON (.json)")
     ap.add_argument("-o", "--output", required=True, help="Output C++ file path")
-    ap.add_argument("--selfhost-bin", default="selfhost/py2cpp.out", help="Selfhost binary path")
+    ap.add_argument("--selfhost-bin", default="work/selfhost/py2cpp.out", help="Selfhost binary path")
     ap.add_argument("--target", default="auto", help="target passed to selfhost binary (auto|\"\"|cpp)")
     args = ap.parse_args()
 

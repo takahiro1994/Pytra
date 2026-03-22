@@ -152,7 +152,7 @@ def _run_east3_contract_tests() -> tuple[bool, str]:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description="compare host(py2x-selfhost) vs selfhost outputs")
-    ap.add_argument("--selfhost-bin", default="selfhost/py2cpp.out")
+    ap.add_argument("--selfhost-bin", default="work/selfhost/py2cpp.out")
     ap.add_argument(
         "--selfhost-target",
         default="auto",

@@ -123,10 +123,10 @@
 
 ## 7. selfhost 運用ノウハウ
 
-- `python3 tools/prepare_selfhost_source.py` を先に実行し、`CodeEmitter` を `selfhost/py2cpp.py` へインライン展開した自己完結ソースを作ってから selfhost 変換を行う。
-- selfhost 検証前に、`selfhost/py2cpp.py` と `selfhost/runtime/cpp/*` は `src` の最新へ同期してよい（必要時は同期を優先）。
-- `#include "runtime/cpp/..."` は `selfhost/` 配下の同名ヘッダが優先解決される。`src/runtime/cpp` だけ更新しても selfhost ビルドは直らないことがある。
-- selfhost のビルドログは `stdout` 側に出ることがあるため、`> selfhost/build.all.log 2>&1` で統合取得する。
+- `python3 tools/prepare_selfhost_source.py` を先に実行し、`CodeEmitter` を `work/selfhost/py2cpp.py` へインライン展開した自己完結ソースを作ってから selfhost 変換を行う。
+- selfhost 検証前に、`work/selfhost/py2cpp.py` と `work/selfhost/runtime/cpp/*` は `src` の最新へ同期してよい（必要時は同期を優先）。
+- `#include "runtime/cpp/..."` は `work/selfhost/` 配下の同名ヘッダが優先解決される。`src/runtime/cpp` だけ更新しても selfhost ビルドは直らないことがある。
+- selfhost のビルドログは `stdout` 側に出ることがあるため、`> work/selfhost/build.all.log 2>&1` で統合取得する。
 - selfhost 対象コードでは、Python 専用表現が生成 C++ に漏れないことを確認する（例: `super().__init__`, Python 風継承表記）。
 - ランタイム変更時は `test/unit/toolchain/emit/cpp/test_py2cpp_features.py` の実行回帰に加え、selfhost の再生成・再コンパイル結果も確認する。
 - selfhost 対象の Python コードでも、標準モジュールの直接 import は禁止し、`src/pytra/std/` の shim のみを使う（例: `pytra.std.json`, `pytra.std.pathlib`, `pytra.std.sys`, `pytra.std.os`, `pytra.std.glob`, `pytra.std.argparse`, `pytra.std.re`）。`typing` だけは注釈専用 no-op import として直接 import を許可する。

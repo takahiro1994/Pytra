@@ -49,8 +49,8 @@ def find_func(line_no: int, ranges: list[tuple[int, int, str]]) -> str:
 
 
 def main() -> int:
-    log_path = Path(sys.argv[1]) if len(sys.argv) > 1 else Path("selfhost/py2cpp.compile.log")
-    cpp_path = Path(sys.argv[2]) if len(sys.argv) > 2 else Path("selfhost/py2cpp.cpp")
+    log_path = Path(sys.argv[1]) if len(sys.argv) > 1 else Path("work/selfhost/py2cpp.compile.log")
+    cpp_path = Path(sys.argv[2]) if len(sys.argv) > 2 else Path("work/selfhost/py2cpp.cpp")
     if not log_path.exists():
         print(f"missing: {log_path}")
         return 1
