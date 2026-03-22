@@ -74,17 +74,17 @@ python3 src/pytra-cli.py test/fixtures/core/add.py --target rs -o out/add_py2x.r
 
 - `toolchain/emit/cpp.py` is the standalone C++ backend entry point. It reads `link-output.json` and emits C++ multi-file output without importing non-C++ backends, making startup faster.
 - `toolchain/emit/all.py` is the generic all-backend entry point. It runs a backend directly from `EAST3(JSON)`.
-- Use them for backend-only regression checks with fixed IR inputs under `sample/ir` / `test/ir`.
+- Use them for backend-only regression checks with fixed IR inputs under `test/ir`.
 - Both accept `.json` only and fail-fast on any input other than `east_stage=3`.
 
 ```bash
 # 1) Build an EAST3(JSON) fixture from .py
 python3 src/pytra-cli.py sample/py/01_mandelbrot.py --target cpp \
-  -o out/seed_01.cpp --dump-east3-after-opt sample/ir/01_mandelbrot.east3.json
+  -o work/tmp/seed_01.cpp --dump-east3-after-opt work/tmp/01_mandelbrot.east3.json
 
 # 2) Transpile directly from EAST3(JSON) to a target language
-python3 src/toolchain/emit/all.py sample/ir/01_mandelbrot.east3.json --target rs \
-  -o out/east2x_01.rs --no-runtime-hook
+python3 src/toolchain/emit/all.py work/tmp/01_mandelbrot.east3.json --target rs \
+  -o work/tmp/east2x_01.rs --no-runtime-hook
 
 # 3) Backend-only smoke checks for major targets (cpp/rs/js)
 python3 tools/check_east2x_smoke.py

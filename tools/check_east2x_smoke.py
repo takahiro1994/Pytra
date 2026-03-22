@@ -11,7 +11,6 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_CASES = [
-    "sample/ir/01_mandelbrot.east3.json",
     "test/ir/core_add.east3.json",
 ]
 EXT_BY_TARGET = {
@@ -80,7 +79,7 @@ def main() -> int:
             return 2
         case_paths.append(path)
 
-    out_root = ROOT / "out" / "east2x_smoke"
+    out_root = ROOT / "work" / "tmp" / "east2x_smoke"
     out_root.mkdir(parents=True, exist_ok=True)
 
     failures: list[str] = []

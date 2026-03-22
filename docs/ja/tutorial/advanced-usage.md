@@ -72,19 +72,19 @@ python3 src/pytra-cli.py test/fixtures/core/add.py --target rs -o out/add_py2x.r
 
 ## `toolchain/emit/cpp.py` / `toolchain/emit/all.py`（EAST3 JSON -> target backend）
 
-- `toolchain/emit/cpp.py` は C++ backend の独立エントリポイントです。`link-output.json` を入力として C++ multi-file 出力を生成します。非 C++ backend を import しないため、起動が高速です。
+- `toolchain/emit/cpp.py` は C++ backend の独立エントリポイントです。`manifest.json` を入力として C++ multi-file 出力を生成します。非 C++ backend を import しないため、起動が高速です。
 - `toolchain/emit/all.py` は全 backend 対応の汎用エントリポイントです。`EAST3(JSON)` から直接 backend を実行します。
-- backend 単体回帰や、`sample/ir` / `test/ir` の固定IR検証で使います。
+- backend 単体回帰や、`test/ir` の固定IR検証で使います。
 - 入力は `.json` のみ受理し、`east_stage=3` 以外は fail-fast します。
 
 ```bash
 # 1) .py から EAST3(JSON) fixture を作成
 python3 src/pytra-cli.py sample/py/01_mandelbrot.py --target cpp \
-  -o out/seed_01.cpp --dump-east3-after-opt sample/ir/01_mandelbrot.east3.json
+  -o work/tmp/seed_01.cpp --dump-east3-after-opt work/tmp/01_mandelbrot.east3.json
 
 # 2) EAST3(JSON) から直接ターゲット言語へ変換
-python3 src/toolchain/emit/all.py sample/ir/01_mandelbrot.east3.json --target rs \
-  -o out/east2x_01.rs --no-runtime-hook
+python3 src/toolchain/emit/all.py work/tmp/01_mandelbrot.east3.json --target rs \
+  -o work/tmp/east2x_01.rs --no-runtime-hook
 
 # 3) 主要 target（cpp/rs/js）の backend-only smoke
 python3 tools/check_east2x_smoke.py
@@ -98,8 +98,8 @@ python3 tools/check_east2x_smoke.py
 
 - linked-program の正規パイプラインは `pytra-cli.py --link-only` → `toolchain/emit/cpp.py`（C++ の場合）です。
 - `pytra-cli.py --dump-east3-dir DIR` は raw `EAST3` 群と `link-input.json` を `DIR` に書き出して終了します。
-- `pytra-cli.py --link-only --output-dir DIR` は backend 生成を行わず、`link-output.json` と linked module 群だけを `DIR` に書き出します。
-- `toolchain/emit/cpp.py` は `link-output.json` を読み込んで C++ multi-file 出力を生成します。
+- `pytra-cli.py --link-only --output-dir DIR` は backend 生成を行わず、`manifest.json` と linked module 群だけを `DIR` に書き出します。
+- `toolchain/emit/cpp.py` は `manifest.json` を読み込んで C++ multi-file 出力を生成します。
 - `toolchain/emit/all.py` は全 backend 対応の汎用経路として引き続き利用できます。
 
 ```bash
@@ -112,11 +112,11 @@ PYTHONPATH=src python3 src/pytra-cli.py sample/py/18_mini_language_interpreter.p
   --target cpp --link-only --output-dir out/linked_debug/linked
 
 # 3) linked output から C++ emit（toolchain/emit/cpp.py — C++ backend のみ import）
-PYTHONPATH=src python3 src/toolchain/emit/cpp.py out/linked_debug/linked/link-output.json \
+PYTHONPATH=src python3 src/toolchain/emit/cpp.py out/linked_debug/linked/manifest.json \
   --output-dir out/linked_debug/cpp
 
 # 4) toolchain/emit/all.py で全 backend 対応の汎用経路を使うこともできる
-python3 src/toolchain/emit/all.py out/linked_debug/linked/link-output.json --target cpp \
+python3 src/toolchain/emit/all.py out/linked_debug/linked/manifest.json --target cpp \
   --output-dir out/linked_debug/cpp_east2x
 ```
 
