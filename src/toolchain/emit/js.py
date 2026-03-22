@@ -2,7 +2,7 @@
 """JS backend: manifest.json → JS multi-file output.
 
 Usage:
-    python3 -m toolchain.emit.js MANIFEST.json --output-dir out/js/
+    python3 -m toolchain.emit.js MANIFEST.json --output-dir emit/js/
 """
 
 from __future__ import annotations
@@ -11,7 +11,6 @@ import sys
 
 from toolchain.emit.js.emitter.js_emitter import transpile_to_js
 from toolchain.emit.loader import emit_all_modules
-from toolchain.misc.js_runtime_shims import write_js_runtime_shims
 
 
 def main() -> int:
@@ -21,7 +20,7 @@ def main() -> int:
         return 0
 
     input_path = ""
-    output_dir = "out/js"
+    output_dir = "work/tmp/js"
     i = 0
     while i < len(argv):
         tok = argv[i]
@@ -37,12 +36,7 @@ def main() -> int:
         print("error: input manifest.json is required", file=sys.stderr)
         return 1
 
-    rc = emit_all_modules(input_path, output_dir, ".js", transpile_to_js)
-    if rc != 0:
-        return rc
-    from pytra.std.pathlib import Path as PytraPath
-    write_js_runtime_shims(PytraPath(output_dir))
-    return 0
+    return emit_all_modules(input_path, output_dir, ".js", transpile_to_js, lang="js")
 
 
 if __name__ == "__main__":

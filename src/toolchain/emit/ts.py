@@ -37,7 +37,7 @@ def main() -> int:
         print("error: input manifest.json is required", file=sys.stderr)
         return 1
 
-    rc = emit_all_modules(input_path, output_dir, ".ts", transpile_to_typescript)
+    rc = emit_all_modules(input_path, output_dir, ".ts", transpile_to_typescript, lang="ts")
     if rc != 0:
         return rc
     from pytra.std.pathlib import Path as PytraPath

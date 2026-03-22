@@ -156,7 +156,7 @@ def main() -> int:
     modules, _ = load_linked_modules(input_path)
     missing_runtime = _collect_missing_runtime_module_ids(modules)
 
-    rc = emit_all_modules(input_path, output_dir, ".jl", transpile_to_julia_native)
+    rc = emit_all_modules(input_path, output_dir, ".jl", transpile_to_julia_native, lang="julia")
     if rc != 0:
         return rc
 

@@ -76,7 +76,7 @@ def main() -> int:
         print("error: input manifest.json is required", file=sys.stderr)
         return 1
 
-    rc = emit_all_modules(input_path, output_dir, ".nim", transpile_to_nim_native)
+    rc = emit_all_modules(input_path, output_dir, ".nim", transpile_to_nim_native, lang="nim")
     if rc != 0:
         return rc
     _copy_runtime(output_dir)

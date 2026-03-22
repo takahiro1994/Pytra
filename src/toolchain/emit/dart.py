@@ -2,35 +2,15 @@
 """Dart backend: manifest.json → Dart multi-file output.
 
 Usage:
-    python3 -m toolchain.emit.dart MANIFEST.json --output-dir out/dart/
+    python3 -m toolchain.emit.dart MANIFEST.json --output-dir emit/dart/
 """
 
 from __future__ import annotations
 
-import shutil
 import sys
-from pathlib import Path
 
 from toolchain.emit.dart.emitter import transpile_to_dart_native
 from toolchain.emit.loader import emit_all_modules
-
-
-def _copy_runtime(output_dir: str) -> None:
-    """Copy py_runtime.dart to each directory containing generated .dart files."""
-    src_dir = Path(__file__).resolve().parent.parent.parent
-    runtime_src = src_dir / "runtime" / "dart" / "built_in" / "py_runtime.dart"
-    if not runtime_src.exists():
-        return
-    out = Path(output_dir)
-    # Copy runtime to all directories containing .dart files
-    dirs_seen: set[str] = set()
-    for dart_file in out.rglob("*.dart"):
-        parent = str(dart_file.parent)
-        if parent not in dirs_seen:
-            dirs_seen.add(parent)
-            dest = dart_file.parent / "py_runtime.dart"
-            if not dest.exists():
-                shutil.copy2(str(runtime_src), str(dest))
 
 
 def main() -> int:
@@ -40,7 +20,7 @@ def main() -> int:
         return 0
 
     input_path = ""
-    output_dir = "out/dart"
+    output_dir = "work/tmp/dart"
     i = 0
     while i < len(argv):
         tok = argv[i]
@@ -56,10 +36,7 @@ def main() -> int:
         print("error: input manifest.json is required", file=sys.stderr)
         return 1
 
-    rc = emit_all_modules(input_path, output_dir, ".dart", transpile_to_dart_native)
-    if rc == 0:
-        _copy_runtime(output_dir)
-    return rc
+    return emit_all_modules(input_path, output_dir, ".dart", transpile_to_dart_native, lang="dart")
 
 
 if __name__ == "__main__":

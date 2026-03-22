@@ -36,7 +36,7 @@ def main() -> int:
         print("error: input manifest.json is required", file=sys.stderr)
         return 1
 
-    return emit_all_modules(input_path, output_dir, ".ps1", transpile_to_powershell_native)
+    return emit_all_modules(input_path, output_dir, ".ps1", transpile_to_powershell_native, lang="powershell")
 
 
 if __name__ == "__main__":

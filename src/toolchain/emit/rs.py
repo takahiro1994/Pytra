@@ -43,7 +43,7 @@ def main() -> int:
         print("error: input manifest.json is required", file=sys.stderr)
         return 1
 
-    rc = emit_all_modules(input_path, output_dir, ".rs", transpile_to_rust)
+    rc = emit_all_modules(input_path, output_dir, ".rs", transpile_to_rust, lang="rs")
     if rc != 0:
         return rc
     # Copy native runtime files from src/runtime/rs/

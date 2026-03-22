@@ -116,7 +116,7 @@ def main() -> int:
         print("error: input manifest.json is required", file=sys.stderr)
         return 1
 
-    rc = emit_all_modules(input_path, output_dir, ".kt", transpile_to_kotlin)
+    rc = emit_all_modules(input_path, output_dir, ".kt", transpile_to_kotlin, lang="kotlin")
     if rc != 0:
         return rc
     _generate_kotlin_runtime(output_dir)

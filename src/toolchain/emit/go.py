@@ -126,7 +126,7 @@ def main() -> int:
         print("error: input manifest.json is required", file=sys.stderr)
         return 1
 
-    rc = emit_all_modules(input_path, output_dir, ".go", transpile_to_go)
+    rc = emit_all_modules(input_path, output_dir, ".go", transpile_to_go, lang="go")
     if rc != 0:
         return rc
     _generate_go_runtime(output_dir)
