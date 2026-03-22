@@ -136,10 +136,12 @@ def module_name_to_cpp_include(module_name_norm: str) -> str:
         return rel_hdr
     # Fallback: generated-only modules (have .east but no native header).
     # Derive include path from module_id: pytra.built_in.X → built_in/X.h
-    # Skip package-level ids (pytra.std, pytra.built_in, pytra.utils) — no header.
+    # Only for actual runtime modules — NOT for symbol names within modules.
+    # e.g. pytra.std.re → std/re.h (OK), pytra.std.re.sub → NO (sub is a function, not a module)
     if module_id.startswith("pytra.") and module_id.count(".") >= 2:
-        tail = module_id[len("pytra."):]
-        return tail.replace(".", "/") + ".h"
+        if runtime_module_exists(module_id):
+            tail = module_id[len("pytra."):]
+            return tail.replace(".", "/") + ".h"
     return ""
 
 
