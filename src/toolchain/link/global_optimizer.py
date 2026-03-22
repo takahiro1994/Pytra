@@ -13,6 +13,7 @@ from toolchain.compile.east3_opt_passes.non_escape_interprocedural_pass import N
 from toolchain.compile.east3_optimizer import PassContext
 from toolchain.compile.east3_optimizer import parse_east3_opt_pass_overrides
 from toolchain.compile.east3_optimizer import resolve_east3_opt_level
+from toolchain.frontends.runtime_symbol_index import canonical_runtime_module_id
 from toolchain.frontends.runtime_abi import validate_runtime_abi_module
 from toolchain.frontends.runtime_abi import validate_runtime_abi_target_support
 from toolchain.frontends.runtime_template import validate_template_module
@@ -269,7 +270,18 @@ def _build_resolved_dependencies(module: LinkedProgramModule) -> list[str]:
             if isinstance(item, dict):
                 mod_id = item.get("module_id")
                 if isinstance(mod_id, str) and mod_id != "":
-                    deps.add(mod_id)
+                    # Normalize bare module names (e.g. "math" → "pytra.std.math")
+                    canonical = canonical_runtime_module_id(mod_id)
+                    deps.add(canonical if canonical != "" else mod_id)
+                    # Sub-module resolution: from pytra.utils import png
+                    # → dependency is pytra.utils.png, not pytra.utils
+                    binding_kind = item.get("binding_kind", "")
+                    export_name = item.get("export_name", "")
+                    if isinstance(export_name, str) and export_name != "":
+                        sub_mod = mod_id + "." + export_name
+                        sub_canonical = canonical_runtime_module_id(sub_mod)
+                        if sub_canonical != "":
+                            deps.add(sub_canonical)
     else:
         # Fallback: scan body for Import / ImportFrom nodes.
         body = doc.get("body")
@@ -285,11 +297,24 @@ def _build_resolved_dependencies(module: LinkedProgramModule) -> list[str]:
                             if isinstance(ent, dict):
                                 name = ent.get("name")
                                 if isinstance(name, str) and name != "":
-                                    deps.add(name)
+                                    canonical = canonical_runtime_module_id(name)
+                                    deps.add(canonical if canonical != "" else name)
                 elif kind == "ImportFrom":
                     mod = stmt.get("module")
                     if isinstance(mod, str) and mod != "":
-                        deps.add(mod)
+                        canonical = canonical_runtime_module_id(mod)
+                        deps.add(canonical if canonical != "" else mod)
+                        # Sub-module names
+                        names = stmt.get("names")
+                        if isinstance(names, list):
+                            for ent in names:
+                                if isinstance(ent, dict):
+                                    sym = ent.get("name")
+                                    if isinstance(sym, str) and sym != "":
+                                        sub = mod + "." + sym
+                                        sub_c = canonical_runtime_module_id(sub)
+                                        if sub_c != "":
+                                            deps.add(sub_c)
 
     # 2. Implicit runtime dependencies from EAST node annotations.
     body = doc.get("body")
