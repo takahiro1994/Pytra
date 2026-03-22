@@ -130,7 +130,7 @@ export function perf_counter() { return __native.perf_counter(); }
 PowerShell:
 ```powershell
 . "$PSScriptRoot/std/time_native.ps1"
-function perf_counter { return (time_native_perf_counter) }
+function perf_counter { return (__native_perf_counter) }
 ```
 
 Zig:
