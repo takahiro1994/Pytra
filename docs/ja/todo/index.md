@@ -146,5 +146,5 @@
 
 進捗:
 - 2026-03-22: 192/107 (64%) → 268/31 (89.3%)。+76テスト改善。残り31件の計画書起票。
-- 2026-03-23: 250/49 → 264/35 → +修正で ~267/~33 見込み。wildcard テスト期待値修正、generated-only モジュール include フォールバック追加、test出力先 work/out/ 移行。
+- 2026-03-23: 250/49 → 269/29。wildcard テスト期待値修正、generated-only モジュール include フォールバック追加、Any is None emit 修正、module_id 正規化テスト更新、scope_exit.h include 追加。S2 pyobj_ref_lists 統一は regression のため revert。
 
