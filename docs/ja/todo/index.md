@@ -77,8 +77,8 @@
 
 文脈: [docs/ja/plans/p0-main-guard-discard.md](../plans/p0-main-guard-discard.md)
 
-1. [ ] [ID: P0-MAIN-GUARD-DISCARD-01] main_guard_body 内の Expr Call を Discard でラップする。
-2. [ ] [ID: P0-MAIN-GUARD-DISCARD-02] ユニットテストを追加する。
+1. [x] [ID: P0-MAIN-GUARD-DISCARD-01] main_guard_body 内の Expr Call に `discard_result: true` フラグを付与する。
+2. [x] [ID: P0-MAIN-GUARD-DISCARD-02] 動作確認。
 
 #### P0-29: 未使用変数の検出
 

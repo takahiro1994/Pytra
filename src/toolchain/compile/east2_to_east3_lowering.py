@@ -7,8 +7,10 @@ from typing import Any
 
 from toolchain.compile.east2_to_east3_block_scope_hoist import hoist_block_scope_variables
 from toolchain.compile.east2_to_east3_default_arg_expansion import expand_default_arguments
+from toolchain.compile.east2_to_east3_enumerate_lowering import lower_enumerate
 from toolchain.compile.east2_to_east3_integer_promotion import apply_integer_promotion
 from toolchain.compile.east2_to_east3_listcomp_lowering import lower_listcomp
+from toolchain.compile.east2_to_east3_main_guard_discard import mark_main_guard_discard
 from toolchain.compile.east2_to_east3_tuple_target_expansion import expand_forcore_tuple_targets
 from toolchain.compile.east2_to_east3_swap_detection import detect_swap_patterns
 from toolchain.compile.east2_to_east3_type_propagation import apply_type_propagation
@@ -636,6 +638,9 @@ def lower_east2_to_east3(east_module: dict[str, Any], object_dispatch_mode: str 
     # single NameTarget with element assignments in body.
     expand_forcore_tuple_targets(lowered)
 
+    # Enumerate lowering: convert for i,v in enumerate(xs) to counter loop.
+    lower_enumerate(lowered)
+
     # Block-scope variable hoist: insert VarDecl nodes before blocks
     # that assign variables used in the enclosing scope.
     hoist_block_scope_variables(lowered)
@@ -654,6 +659,9 @@ def lower_east2_to_east3(east_module: dict[str, Any], object_dispatch_mode: str 
     # Unused variable detection: mark variables that are assigned but
     # never referenced with unused=true.
     detect_unused_variables(lowered)
+
+    # Main guard discard: mark Expr Call in main_guard_body with discard_result.
+    mark_main_guard_discard(lowered)
 
     lowered["east_stage"] = 3
     schema_obj = lowered.get("schema_version")
