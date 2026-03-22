@@ -252,6 +252,30 @@ def _collect_runtime_module_ids_from_node(node: object, out: set[str]) -> None:
             _collect_runtime_module_ids_from_node(item, out)
 
 
+def _normalize_import_binding_module_ids(modules: tuple[LinkedProgramModule, ...]) -> None:
+    """Normalize bare module names in import_bindings to canonical IDs.
+
+    e.g. "math" → "pytra.std.math", "time" → "pytra.std.time"
+    """
+    for module in modules:
+        doc = module.east_doc if isinstance(module.east_doc, dict) else {}
+        meta = doc.get("meta")
+        if not isinstance(meta, dict):
+            continue
+        bindings = meta.get("import_bindings")
+        if not isinstance(bindings, list):
+            continue
+        for item in bindings:
+            if not isinstance(item, dict):
+                continue
+            mod_id = item.get("module_id")
+            if not isinstance(mod_id, str) or mod_id == "":
+                continue
+            canonical = canonical_runtime_module_id(mod_id)
+            if canonical != "" and canonical != mod_id:
+                item["module_id"] = canonical
+
+
 def _build_resolved_dependencies(module: LinkedProgramModule) -> list[str]:
     """Build sorted list of dependency module IDs for a single module.
 
@@ -750,6 +774,8 @@ def optimize_linked_program(program: LinkedProgram) -> LinkedProgramOptimization
     # Classes that appear in union type parameters must be ref (gc_managed)
     # because they get boxed into object. Update class_storage_hint accordingly.
     _apply_union_param_ref_promotion(linked_modules)
+    # Normalize bare module names in import_bindings (math → pytra.std.math).
+    _normalize_import_binding_module_ids(linked_modules)
     # Resolve module attribute types (e.g. math.pi → float64) from export tables.
     resolve_module_attribute_types(linked_modules)
     # Cross-module default argument expansion: collect signatures from all
