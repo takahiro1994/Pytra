@@ -1029,13 +1029,15 @@ def _emit_stmt(stmt: dict[str, Any], *, indent: str, ctx: dict[str, Any]) -> lis
             t = stmt.get("target")
             if isinstance(t, dict):
                 targets = [t]
-        # Skip extern(...) variable assignments (native seam provides these)
+        # extern() variable: generate __native delegation (spec-emitter-guide.md §4)
         val_node = stmt.get("value")
         if _is_extern_value(val_node):
             tname = ""
             if len(targets) == 1 and isinstance(targets[0], dict):
                 tname = _get_str(targets[0], "id")
-            return [indent + "# extern var: " + tname + " (provided by native seam)"]
+            if tname != "":
+                return [indent + "$" + _safe_ident(tname, "_v") + " = $__native_" + _safe_ident(tname, "_v")]
+            return [indent + "# extern var (no target)"]
         # Track lambda assignments
         if isinstance(val_node, dict) and _get_str(val_node, "kind") == "Lambda":
             if len(targets) == 1 and isinstance(targets[0], dict) and _get_str(targets[0], "kind") == "Name":
@@ -1074,10 +1076,12 @@ def _emit_stmt(stmt: dict[str, Any], *, indent: str, ctx: dict[str, Any]) -> lis
         if value is None:
             lhs = _render_expr(target)
             return [indent + lhs + " = $null"]
-        # Skip extern(...) variable assignments (native seam provides these)
+        # extern() variable: generate __native delegation (spec-emitter-guide.md §4)
         if _is_extern_value(value):
             tname = _get_str(target, "id") if isinstance(target, dict) else ""
-            return [indent + "# extern var: " + tname + " (provided by native seam)"]
+            if tname != "":
+                return [indent + "$" + _safe_ident(tname, "_v") + " = $__native_" + _safe_ident(tname, "_v")]
+            return [indent + "# extern var (no target)"]
         # Track lambda assignments
         if isinstance(value, dict) and _get_str(value, "kind") == "Lambda":
             if isinstance(target, dict) and _get_str(target, "kind") == "Name":

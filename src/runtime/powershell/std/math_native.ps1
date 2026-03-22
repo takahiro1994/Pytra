@@ -1,7 +1,7 @@
 # math_native.ps1 — native seam for pytra.std.math
 
-$script:pi = [Math]::PI
-$script:e  = [Math]::E
+$__native_pi = [Math]::PI
+$__native_e  = [Math]::E
 
 function __native_sqrt   { param($x) return [Math]::Sqrt($x) }
 function __native_sin    { param($x) return [Math]::Sin($x) }
