@@ -285,6 +285,13 @@ func __pytra_min(_ a: Int64, _ b: Any?) -> Int64 { return min(a, __pytra_int(b))
 func __pytra_max(_ a: Int64, _ b: Any?) -> Int64 { return max(a, __pytra_int(b)) }
 func __pytra_min(_ a: Any?, _ b: Int64) -> Int64 { return min(__pytra_int(a), b) }
 func __pytra_max(_ a: Any?, _ b: Int64) -> Int64 { return max(__pytra_int(a), b) }
+// Double overloads
+func __pytra_min(_ a: Double, _ b: Double) -> Double { return a < b ? a : b }
+func __pytra_max(_ a: Double, _ b: Double) -> Double { return a > b ? a : b }
+func __pytra_min(_ a: Double, _ b: Any?) -> Double { return min(a, __pytra_float(b)) }
+func __pytra_max(_ a: Double, _ b: Any?) -> Double { return max(a, __pytra_float(b)) }
+func __pytra_min(_ a: Any?, _ b: Double) -> Double { return min(__pytra_float(a), b) }
+func __pytra_max(_ a: Any?, _ b: Double) -> Double { return max(__pytra_float(a), b) }
 
 func pyMathSqrt(_ v: Any?) -> Double { return Foundation.sqrt(__pytra_float(v)) }
 func pyMathSin(_ v: Any?) -> Double { return Foundation.sin(__pytra_float(v)) }
@@ -414,6 +421,21 @@ func __pytra_find(_ v: Any?, _ sub: Any?) -> Int64 {
 
 func __pytra_upper(_ v: Any?) -> String { return __pytra_str(v).uppercased() }
 func __pytra_lower(_ v: Any?) -> String { return __pytra_str(v).lowercased() }
+
+// --- Any arithmetic operators (for untyped variables used in arithmetic) ---
+
+func + (_ a: Any, _ b: Any) -> Double { return __pytra_float(a) + __pytra_float(b) }
+func - (_ a: Any, _ b: Any) -> Double { return __pytra_float(a) - __pytra_float(b) }
+func * (_ a: Any, _ b: Any) -> Double { return __pytra_float(a) * __pytra_float(b) }
+func / (_ a: Any, _ b: Any) -> Double { return __pytra_float(a) / __pytra_float(b) }
+func + (_ a: Double, _ b: Any) -> Double { return a + __pytra_float(b) }
+func - (_ a: Double, _ b: Any) -> Double { return a - __pytra_float(b) }
+func * (_ a: Double, _ b: Any) -> Double { return a * __pytra_float(b) }
+func / (_ a: Double, _ b: Any) -> Double { return a / __pytra_float(b) }
+func + (_ a: Any, _ b: Double) -> Double { return __pytra_float(a) + b }
+func - (_ a: Any, _ b: Double) -> Double { return __pytra_float(a) - b }
+func * (_ a: Any, _ b: Double) -> Double { return __pytra_float(a) * b }
+func / (_ a: Any, _ b: Double) -> Double { return __pytra_float(a) / b }
 
 // --- image stubs (png/gif) ---
 

@@ -51,6 +51,7 @@ _INT_RESOLVED_TYPES = {"int", "int64", "uint8"}
 _FLOAT_RESOLVED_TYPES = {"float", "float64"}
 _RELATIVE_IMPORT_NAME_ALIASES: list[dict[str, str]] = [{}]
 _CURRENT_MODULE_ID: list[str] = [""]
+_CURRENT_EAST_DOC: list[Any] = [{}]
 
 
 def _class_iface_name(class_name: str) -> str:
@@ -826,6 +827,16 @@ def _is_math_constant(expr: dict[str, Any]) -> bool:
 def _render_attribute_expr(expr: dict[str, Any]) -> str:
     value_any = expr.get("value")
     attr = _safe_ident(expr.get("attr"), "field")
+    # Resolve module.attr: if owner is an imported module, call the attr function
+    if isinstance(value_any, dict) and value_any.get("kind") == "Name":
+        owner_id = value_any.get("id", "")
+        from toolchain.emit.common.emitter.code_emitter import build_import_alias_map
+        alias_map = build_import_alias_map(
+            _CURRENT_EAST_DOC[0].get("meta", {}) if isinstance(_CURRENT_EAST_DOC[0], dict) else {}
+        )
+        if owner_id in alias_map and attr != "":
+            # Go flat: module constants are functions → call with ()
+            return attr + "()"
     semantic_tag_any = expr.get("semantic_tag")
     semantic_tag = semantic_tag_any if isinstance(semantic_tag_any, str) else ""
     runtime_call, _ = _resolved_runtime_call(expr)
@@ -1093,8 +1104,19 @@ def _render_call_expr(expr: dict[str, Any]) -> str:
         owner_any = func_any.get("value")
         if isinstance(owner_any, dict) and owner_any.get("kind") == "Name":
             owner_id = owner_any.get("id", "")
-            # Resolve stdlib calls via import alias map: math.sqrt → math.Sqrt
-            pass  # module.attr calls resolved by linker → EAST3
+            # Resolve module.attr calls: if owner is an imported module,
+            # call the function directly (Go flat: all in same package)
+            from toolchain.emit.common.emitter.code_emitter import build_import_alias_map
+            alias_map = build_import_alias_map(
+                _CURRENT_EAST_DOC[0].get("meta", {}) if isinstance(_CURRENT_EAST_DOC[0], dict) else {}
+            )
+            if owner_id in alias_map and attr_name != "":
+                rendered_mod_args: list[str] = []
+                mi = 0
+                while mi < len(args_with_keywords):
+                    rendered_mod_args.append(_render_expr(args_with_keywords[mi]))
+                    mi += 1
+                return attr_name + "(" + ", ".join(rendered_mod_args) + ")"
         if isinstance(owner_any, dict) and owner_any.get("kind") == "Call":
             if _call_name(owner_any) == "super":
                 base_name = _CLASS_BASE_MAP[0].get(_CURRENT_RECEIVER_CLASS[0], "")
@@ -2638,6 +2660,7 @@ def transpile_to_go_native(east_doc: dict[str, Any]) -> str:
     is_entry = bool(emit_ctx.get("is_entry", True))
     module_id = emit_ctx.get("module_id", "") if isinstance(emit_ctx.get("module_id"), str) else ""
     _CURRENT_MODULE_ID[0] = module_id
+    _CURRENT_EAST_DOC[0] = east_doc
     i = 0
     while i < len(classes):
         _CLASS_NAMES[0].add(_safe_ident(classes[i].get("name"), "PytraClass"))

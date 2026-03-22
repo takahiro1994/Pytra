@@ -1138,7 +1138,14 @@ def _render_call_expr(expr: dict[str, Any]) -> str:
     rendered_args = []
     i = 0
     while i < len(args):
-        rendered_args.append(_render_expr(args[i]))
+        arg_node = args[i]
+        rendered = _render_expr(arg_node)
+        # If argument has type 'object'/'unknown', cast to Double to avoid Any → Double errors
+        if isinstance(arg_node, dict):
+            arg_type = arg_node.get("resolved_type", "")
+            if isinstance(arg_type, str) and arg_type in ("object", "unknown", "any"):
+                rendered = "__pytra_float(" + rendered + ")"
+        rendered_args.append(rendered)
         i += 1
     return func_expr + "(" + ", ".join(rendered_args) + ")"
 
