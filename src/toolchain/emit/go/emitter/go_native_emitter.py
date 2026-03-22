@@ -47,7 +47,7 @@ _CLASS_BASE_MAP: list[dict[str, str]] = [{}]
 _CLASS_HAS_DERIVED: list[set[str]] = [set()]
 _CURRENT_RECEIVER_CLASS: list[str] = [""]
 _CURRENT_RECEIVER_VAR: list[str] = ["self"]
-_INT_RESOLVED_TYPES = {"int", "int64", "uint8"}
+_INT_RESOLVED_TYPES = {"int", "int32", "int64", "uint8"}
 _FLOAT_RESOLVED_TYPES = {"float", "float64"}
 _RELATIVE_IMPORT_NAME_ALIASES: list[dict[str, str]] = [{}]
 _CURRENT_MODULE_ID: list[str] = [""]
@@ -326,8 +326,12 @@ def _go_type(type_name: Any, *, allow_void: bool) -> str:
     tn: str = type_name
     if tn == "None":
         return "" if allow_void else "any"
-    if tn in {"int", "int64", "uint8"}:
+    if tn in {"int", "int64"}:
         return "int64"
+    if tn == "int32":
+        return "int32"
+    if tn == "uint8":
+        return "uint8"
     if tn in {"float", "float64"}:
         return "float64"
     if tn == "bool":
@@ -2141,7 +2145,9 @@ def _emit_stmt(stmt: Any, *, indent: str, ctx: dict[str, Any]) -> list[str]:
         value_node = esd.get("value")
 
         if lhs_is_name and lhs not in used_names:
-            return [indent + "_ = " + value]
+            # Don't discard Call results (may be used as Attribute receiver later)
+            if not (isinstance(value_node, dict) and value_node.get("kind") == "Call"):
+                return [indent + "_ = " + value]
 
         if esd.get("declare"):
             if lhs in declared:

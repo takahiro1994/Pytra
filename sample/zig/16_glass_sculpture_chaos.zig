@@ -10,10 +10,10 @@ const save_gif = gif.save_gif;
 // 16: Sample that ray-traces chaotic rotation of glass sculptures and outputs a GIF.
 
 fn clamp01(v: f64) f64 {
-    if ((v < 0.0)) {
+    if (v < 0.0) {
         return 0.0;
     }
-    if ((v > 1.0)) {
+    if (v > 1.0) {
         return 1.0;
     }
     return v;
@@ -29,7 +29,7 @@ fn length(x: f64, y: f64, z: f64) f64 {
 
 fn normalize(x: f64, y: f64, z: f64) Tuple0 {
     const l: f64 = length(x, y, z);
-    if ((l < 1e-09)) {
+    if (l < 1e-09) {
         return .{ ._0 = 0.0, ._1 = 0.0, ._2 = 0.0 };
     }
     return .{ ._0 = (x / l), ._1 = (y / l), ._2 = (z / l) };
@@ -44,7 +44,7 @@ fn refract(ix: f64, iy: f64, iz: f64, nx: f64, ny: f64, nz: f64, eta: f64) Tuple
     // Simple IOR-based refraction. Return reflection direction on total internal reflection.
     const cosi: f64 = -dot(ix, iy, iz, nx, ny, nz);
     const sint2: f64 = ((eta * eta) * (1.0 - (cosi * cosi)));
-    if ((sint2 > 1.0)) {
+    if (sint2 > 1.0) {
         return reflect(ix, iy, iz, nx, ny, nz);
     }
     const cost: f64 = math.sqrt((1.0 - sint2));
@@ -77,16 +77,16 @@ fn sphere_intersect(ox: f64, oy: f64, oz: f64, dx: f64, dy: f64, dz: f64, cx: f6
     const b: f64 = (((lx * dx) + (ly * dy)) + (lz * dz));
     const c: f64 = ((((lx * lx) + (ly * ly)) + (lz * lz)) - (radius * radius));
     const h: f64 = ((b * b) - c);
-    if ((h < 0.0)) {
+    if (h < 0.0) {
         return -1.0;
     }
     const s: f64 = math.sqrt(h);
     const t0: f64 = (-b - s);
-    if ((t0 > 0.0001)) {
+    if (t0 > 0.0001) {
         return t0;
     }
     const t1: f64 = (-b + s);
-    if ((t1 > 0.0001)) {
+    if (t1 > 0.0001) {
         return t1;
     }
     return -1.0;
@@ -183,25 +183,25 @@ fn render_frame(width: i64, height: i64, frame_id: i64, frames_n: i64) pytra.Obj
             var b: f64 = 0.0;
             
             // Floor plane y=-1.2
-            if ((dy < -1e-06)) {
+            if (dy < -1e-06) {
                 const tf: f64 = ((-1.2 - cam_y) / dy);
-                if (((tf > 0.0001) and (tf < best_t))) {
+                if ((tf > 0.0001 and tf < best_t)) {
                     best_t = tf;
                     hit_kind = 1;
                 }
             }
             const t0: f64 = sphere_intersect(cam_x, cam_y, cam_z, dx, dy, dz, s0x, s0y, s0z, 0.65);
-            if (((t0 > 0.0) and (t0 < best_t))) {
+            if ((t0 > 0.0 and t0 < best_t)) {
                 best_t = t0;
                 hit_kind = 2;
             }
             const t1: f64 = sphere_intersect(cam_x, cam_y, cam_z, dx, dy, dz, s1x, s1y, s1z, 0.72);
-            if (((t1 > 0.0) and (t1 < best_t))) {
+            if ((t1 > 0.0 and t1 < best_t)) {
                 best_t = t1;
                 hit_kind = 3;
             }
             const t2: f64 = sphere_intersect(cam_x, cam_y, cam_z, dx, dy, dz, s2x, s2y, s2z, 0.58);
-            if (((t2 > 0.0) and (t2 < best_t))) {
+            if ((t2 > 0.0 and t2 < best_t)) {
                 best_t = t2;
                 hit_kind = 4;
             }
@@ -215,21 +215,21 @@ fn render_frame(width: i64, height: i64, frame_id: i64, frames_n: i64) pytra.Obj
             var lyv: f64 = undefined;
             var lzv: f64 = undefined;
             var ndotl: f64 = undefined;
-            if ((hit_kind == 0)) {
+            if (hit_kind == 0) {
                 const __tmp_4 = sky_color(dx, dy, dz, tphase);
                 r = __tmp_4._0;
                 g = __tmp_4._1;
                 b = __tmp_4._2;
             } else {
-                if ((hit_kind == 1)) {
+                if (hit_kind == 1) {
                     hx = (cam_x + (best_t * dx));
                     hz = (cam_z + (best_t * dz));
                     const cx_i: i64 = @as(i64, @intFromFloat(math.floor((hx * 2.0))));
                     const cz_i: i64 = @as(i64, @intFromFloat(math.floor((hz * 2.0))));
-                    const checker: i64 = if ((@mod((cx_i + cz_i), 2) == 0)) @as(i64, 0) else @as(i64, 1);
-                    const base_r: f64 = if ((checker == 0)) 0.1 else 0.04;
-                    const base_g: f64 = if ((checker == 0)) 0.11 else 0.05;
-                    const base_b: f64 = if ((checker == 0)) 0.13 else 0.08;
+                    const checker: i64 = if (@mod((cx_i + cz_i), 2) == 0) @as(i64, 0) else @as(i64, 1);
+                    const base_r: f64 = if (checker == 0) 0.1 else 0.04;
+                    const base_g: f64 = if (checker == 0) 0.11 else 0.05;
+                    const base_b: f64 = if (checker == 0) 0.13 else 0.08;
                     // Emissive sphere contribution.
                     lxv = (lx - hx);
                     lyv = (ly - -1.2);
@@ -249,13 +249,13 @@ fn render_frame(width: i64, height: i64, frame_id: i64, frames_n: i64) pytra.Obj
                     var cy: f64 = 0.0;
                     var cz: f64 = 0.0;
                     var rad: f64 = 1.0;
-                    if ((hit_kind == 2)) {
+                    if (hit_kind == 2) {
                         cx = s0x;
                         cy = s0y;
                         cz = s0z;
                         rad = 0.65;
                     } else {
-                        if ((hit_kind == 3)) {
+                        if (hit_kind == 3) {
                             cx = s1x;
                             cy = s1y;
                             cz = s1z;
@@ -321,12 +321,12 @@ fn render_frame(width: i64, height: i64, frame_id: i64, frames_n: i64) pytra.Obj
                     b += (((0.26 * ndotl) + (1.0 * spec)) + (0.65 * glow));
                     
                     // Slight tint variation per sphere.
-                    if ((hit_kind == 2)) {
+                    if (hit_kind == 2) {
                         r *= 0.95;
                         g *= 1.05;
                         b *= 1.1;
                     } else {
-                        if ((hit_kind == 3)) {
+                        if (hit_kind == 3) {
                             r *= 1.08;
                             g *= 0.98;
                             b *= 1.04;

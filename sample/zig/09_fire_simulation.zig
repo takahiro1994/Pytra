@@ -15,18 +15,18 @@ fn fire_palette() pytra.Obj {
         var g: i64 = 0;
         var b: i64 = 0;
         if (i < 85) {
-            r = i * 3;
+            r = (i * 3);
             g = 0;
             b = 0;
         } else {
             if (i < 170) {
                 r = 255;
-                g = (i - 85) * 3;
+                g = ((i - 85) * 3);
                 b = 0;
             } else {
                 r = 255;
                 g = 255;
-                b = (i - 170) * 3;
+                b = ((i - 170) * 3);
             }
         }
         pytra.list_append(p, u8, @intCast(r));
@@ -55,36 +55,36 @@ fn run_09_fire_simulation() void {
         var x: i64 = undefined;
         x = 0;
         while (x < w) : (x += 1) {
-            const val: i64 = 170 + (@mod((x * 13 + (t * 17)), 86));
-            pytra.list_set(pytra.list_get(heat, pytra.Obj, h - 1), i64, x, @intCast(val));
+            const val: i64 = (170 + @mod(((x * 13) + (t * 17)), 86));
+            pytra.list_set(pytra.list_get(heat, pytra.Obj, (h - 1)), i64, x, @intCast(val));
         }
         var y: i64 = 1;
         while (y < h) : (y += 1) {
             x = 0;
             while (x < w) : (x += 1) {
                 const a: i64 = pytra.list_get(pytra.list_get(heat, pytra.Obj, y), i64, x);
-                const b: i64 = pytra.list_get(pytra.list_get(heat, pytra.Obj, y), i64, @mod((x - 1 + w), w));
+                const b: i64 = pytra.list_get(pytra.list_get(heat, pytra.Obj, y), i64, @mod(((x - 1) + w), w));
                 const c: i64 = pytra.list_get(pytra.list_get(heat, pytra.Obj, y), i64, @mod((x + 1), w));
                 const d: i64 = pytra.list_get(pytra.list_get(heat, pytra.Obj, @mod((y + 1), h)), i64, x);
-                const v: i64 = @divFloor((a + b + c + d), 4);
-                const cool: i64 = 1 + (@mod((x + y + t), 3));
-                const nv: i64 = v - cool;
-                pytra.list_set(pytra.list_get(heat, pytra.Obj, y - 1), i64, x, @intCast(if (nv > 0) nv else @as(i64, 0)));
+                const v: i64 = @divFloor((((a + b) + c) + d), 4);
+                const cool: i64 = (1 + @mod(((x + y) + t), 3));
+                const nv: i64 = (v - cool);
+                pytra.list_set(pytra.list_get(heat, pytra.Obj, (y - 1)), i64, x, @intCast(if (nv > 0) nv else @as(i64, 0)));
             }
         }
-        const frame: pytra.Obj = pytra.bytearray(w * h);
+        const frame: pytra.Obj = pytra.bytearray((w * h));
         var yy: i64 = 0;
         while (yy < h) : (yy += 1) {
-            const row_base: i64 = yy * w;
+            const row_base: i64 = (yy * w);
             var xx: i64 = 0;
             while (xx < w) : (xx += 1) {
-                pytra.list_set(frame, u8, row_base + xx, @intCast(pytra.list_get(pytra.list_get(heat, pytra.Obj, yy), i64, xx)));
+                pytra.list_set(frame, u8, (row_base + xx), @intCast(pytra.list_get(pytra.list_get(heat, pytra.Obj, yy), i64, xx)));
             }
         }
         pytra.list_append(frames, pytra.Obj, frame);
     }
     save_gif(out_path, w, h, frames, fire_palette(), 4, 0);
-    const elapsed: f64 = pytra.perf_counter() - start;
+    const elapsed: f64 = (pytra.perf_counter() - start);
     pytra.print2("output:", out_path);
     pytra.print2("frames:", steps);
     pytra.print2("elapsed_sec:", elapsed);

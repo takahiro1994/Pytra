@@ -11,9 +11,9 @@ const save_gif = gif.save_gif;
 // 13: Sample that outputs DFS maze-generation progress as a GIF.
 
 fn capture(grid: pytra.Obj, w: i64, h: i64, scale: i64) pytra.Obj {
-    const width: i64 = w * scale;
-    const height: i64 = h * scale;
-    const frame: pytra.Obj = pytra.bytearray(width * height);
+    const width: i64 = (w * scale);
+    const height: i64 = (h * scale);
+    const frame: pytra.Obj = pytra.bytearray((width * height));
     var y: i64 = 0;
     while (y < h) : (y += 1) {
         var x: i64 = 0;
@@ -21,10 +21,10 @@ fn capture(grid: pytra.Obj, w: i64, h: i64, scale: i64) pytra.Obj {
             const v: i64 = if (pytra.list_get(pytra.list_get(grid, pytra.Obj, y), i64, x) == 0) @as(i64, 255) else @as(i64, 40);
             var yy: i64 = 0;
             while (yy < scale) : (yy += 1) {
-                const base: i64 = (y * scale + yy) * width + (x * scale);
+                const base: i64 = ((((y * scale) + yy) * width) + (x * scale));
                 var xx: i64 = 0;
                 while (xx < scale) : (xx += 1) {
-                    pytra.list_set(frame, u8, base + xx, @intCast(v));
+                    pytra.list_set(frame, u8, (base + xx), @intCast(v));
                 }
             }
         }
@@ -65,19 +65,19 @@ fn run_13_maze_generation_steps() void {
             const __tmp_4 = pytra.list_get(dirs, Tuple0, k);
             const dx = __tmp_4._0;
             const dy = __tmp_4._1;
-            nx = x + dx;
-            ny = y + dy;
-            if ((nx >= 1 and nx < cell_w - 1 and ny >= 1 and ny < cell_h - 1 and pytra.list_get(pytra.list_get(grid, pytra.Obj, ny), i64, nx) == 1)) {
+            nx = (x + dx);
+            ny = (y + dy);
+            if ((nx >= 1 and nx < (cell_w - 1) and ny >= 1 and ny < (cell_h - 1) and pytra.list_get(pytra.list_get(grid, pytra.Obj, ny), i64, nx) == 1)) {
                 if (dx == 2) {
-                    pytra.list_append(candidates, Tuple1, .{ ._0 = nx, ._1 = ny, ._2 = x + 1, ._3 = y });
+                    pytra.list_append(candidates, Tuple1, .{ ._0 = nx, ._1 = ny, ._2 = (x + 1), ._3 = y });
                 } else {
                     if (dx == -2) {
-                        pytra.list_append(candidates, Tuple1, .{ ._0 = nx, ._1 = ny, ._2 = x - 1, ._3 = y });
+                        pytra.list_append(candidates, Tuple1, .{ ._0 = nx, ._1 = ny, ._2 = (x - 1), ._3 = y });
                     } else {
                         if (dy == 2) {
-                            pytra.list_append(candidates, Tuple1, .{ ._0 = nx, ._1 = ny, ._2 = x, ._3 = y + 1 });
+                            pytra.list_append(candidates, Tuple1, .{ ._0 = nx, ._1 = ny, ._2 = x, ._3 = (y + 1) });
                         } else {
-                            pytra.list_append(candidates, Tuple1, .{ ._0 = nx, ._1 = ny, ._2 = x, ._3 = y - 1 });
+                            pytra.list_append(candidates, Tuple1, .{ ._0 = nx, ._1 = ny, ._2 = x, ._3 = (y - 1) });
                         }
                     }
                 }
@@ -86,7 +86,7 @@ fn run_13_maze_generation_steps() void {
         if (pytra.list_len(candidates, Tuple1) == 0) {
             _ = pytra.list_pop(stack, Tuple0);
         } else {
-            const sel: Tuple1 = pytra.list_get(candidates, Tuple1, @mod((x * 17 + (y * 29) + (pytra.list_len(stack, Tuple0) * 13)), pytra.list_len(candidates, Tuple1)));
+            const sel: Tuple1 = pytra.list_get(candidates, Tuple1, @mod((((x * 17) + (y * 29)) + (pytra.list_len(stack, Tuple0) * 13)), pytra.list_len(candidates, Tuple1)));
             const __tmp_5 = sel;
             nx = __tmp_5._0;
             ny = __tmp_5._1;
@@ -102,8 +102,8 @@ fn run_13_maze_generation_steps() void {
         step += 1;
     }
     pytra.list_append(frames, pytra.Obj, capture(grid, cell_w, cell_h, scale));
-    save_gif(out_path, cell_w * scale, cell_h * scale, frames, grayscale_palette(), 4, 0);
-    const elapsed: f64 = pytra.perf_counter() - start;
+    save_gif(out_path, (cell_w * scale), (cell_h * scale), frames, grayscale_palette(), 4, 0);
+    const elapsed: f64 = (pytra.perf_counter() - start);
     pytra.print2("output:", out_path);
     pytra.print2("frames:", pytra.list_len(frames, pytra.Obj));
     pytra.print2("elapsed_sec:", elapsed);

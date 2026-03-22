@@ -1348,3 +1348,21 @@ func __pytra_is_list(v any) bool {
 	_, ok := v.([]any)
 	return ok
 }
+
+func __pytra_as_int32(v any) int32 {
+	return int32(__pytra_int(v))
+}
+
+func __pytra_as_uint8(v any) uint8 {
+	return uint8(__pytra_int(v))
+}
+
+func __pytra_as_PyFile(v any) *PyFile {
+	if f, ok := v.(PyFile); ok {
+		return &f
+	}
+	if f, ok := v.(*PyFile); ok {
+		return f
+	}
+	return nil
+}
