@@ -188,6 +188,20 @@
 
 1. [ ] [ID: P5-SWIFT-PARITY-01] `runtime_parity_check.py --targets swift` で sample/py の全 18 ケースが PASS する。
 
+### P7: EAST3 でデフォルト引数を呼び出し側に展開
+
+文脈: [docs/ja/plans/p7-east3-default-arg-expansion.md](../plans/p7-east3-default-arg-expansion.md)
+
+1. [ ] [ID: P7-DEFAULT-ARG-EXPANSION-01] EAST3 lowering で省略されたデフォルト引数を call site に展開する。
+2. [ ] [ID: P7-DEFAULT-ARG-EXPANSION-02] ユニットテストを追加する。
+
+### P7: math.pi 等のモジュール定数の型推論
+
+文脈: [docs/ja/plans/p7-math-pi-type-resolution.md](../plans/p7-math-pi-type-resolution.md)
+
+1. [ ] [ID: P7-MODULE-CONST-TYPE-01] linker でモジュール定数の型を解決し、Attribute ノードの `resolved_type` を更新する。
+2. [ ] [ID: P7-MODULE-CONST-TYPE-02] ユニットテストを追加する。
+
 ### P6: Zig コンテナ型の Obj（rc）管理
 
 文脈: [docs/ja/plans/p6-zig-obj-managed-containers.md](../plans/p6-zig-obj-managed-containers.md)
