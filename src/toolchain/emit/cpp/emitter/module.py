@@ -574,6 +574,9 @@ class CppModuleEmitter:
             if isinstance(user_deps, list):
                 for ud in user_deps:
                     if isinstance(ud, str) and ud != "":
+                        # Skip runtime modules — they are handled by resolved_dependencies_v1
+                        if ud.startswith("pytra."):
+                            continue
                         inc = ud.replace(".", "/") + ".h"
                         if inc not in seen:
                             seen.add(inc)
