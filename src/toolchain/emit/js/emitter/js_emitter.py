@@ -17,8 +17,7 @@ from toolchain.frontends.runtime_symbol_index import canonical_runtime_module_id
 from toolchain.frontends.runtime_symbol_index import resolve_import_binding_doc
 
 _JS_EMITTER_BASE = CodeEmitter
-_JS_OUTPUT_RUNTIME_NATIVE_ROOT = "./runtime/js/native"
-_JS_OUTPUT_RUNTIME_GENERATED_ROOT = "./runtime/js/generated"
+_JS_OUTPUT_RUNTIME_ROOT = "."
 
 
 def _load_json_dict(path: Path) -> dict[str, Any]:
@@ -229,11 +228,11 @@ class JsEmitter(CodeEmitter):
         if module_name.startswith("pytra.std."):
             tail = module_name.removeprefix("pytra.std.")
             if tail != "":
-                return _JS_OUTPUT_RUNTIME_GENERATED_ROOT + "/std/" + tail.replace(".", "/") + ".js"
+                return _JS_OUTPUT_RUNTIME_ROOT + "/std/" + tail.replace(".", "/") + ".js"
         if module_name.startswith("pytra.utils."):
             tail = module_name.removeprefix("pytra.utils.")
             if tail != "":
-                return _JS_OUTPUT_RUNTIME_GENERATED_ROOT + "/utils/" + tail.replace(".", "/") + ".js"
+                return _JS_OUTPUT_RUNTIME_ROOT + "/utils/" + tail.replace(".", "/") + ".js"
         return "./" + module_name.replace(".", "/") + ".js"
 
     def _module_symbol_to_js_path(self, module_id: str, symbol_name: str) -> str:
