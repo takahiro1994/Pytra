@@ -24,11 +24,21 @@ class _ShExprResolutionSemanticsMixin:
         if not (t.startswith("callable[") and t.endswith("]")):
             return "unknown"
         core = t[len("callable[") : -1]
+        # Try "-> RetType" format first
         p = core.rfind("->")
-        if p < 0:
-            return "unknown"
-        out = core[p + 2 :].strip()
-        return out if out != "" else "unknown"
+        if p >= 0:
+            out = core[p + 2 :].strip()
+            return out if out != "" else "unknown"
+        # Try "callable[[ArgTypes],RetType]" format: last comma-separated part
+        # after the closing bracket of the arg list
+        bracket_end = core.rfind("]")
+        if bracket_end >= 0 and bracket_end < len(core) - 1:
+            rest = core[bracket_end + 1 :].strip()
+            if rest.startswith(","):
+                ret = rest[1:].strip()
+                if ret != "":
+                    return ret
+        return "unknown"
 
     def _lookup_method_return(self, cls_name: str, method: str) -> str:
         """クラス継承を辿ってメソッド戻り型を解決する。"""

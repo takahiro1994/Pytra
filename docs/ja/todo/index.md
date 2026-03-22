@@ -97,8 +97,8 @@
 
 文脈: [docs/ja/plans/p0-callable-type-tracking.md](../plans/p0-callable-type-tracking.md)
 
-1. [ ] [ID: P0-CALLABLE-TYPE-TRACKING-01] EAST1 パーサーで `Callable` 型注釈を `resolved_type` に反映する。
-2. [ ] [ID: P0-CALLABLE-TYPE-TRACKING-02] ユニットテストを追加する。
+1. [x] [ID: P0-CALLABLE-TYPE-TRACKING-01] `_callable_return_type` を `callable[[Args],Ret]` 形式に対応させ、Call の resolved_type に反映する。
+2. [x] [ID: P0-CALLABLE-TYPE-TRACKING-02] 動作確認（`fn: Callable[[int], int]` → `fn(x)` の resolved_type=int64）。
 
 #### P0-25: generator の EAST3 ステートマシン lowering
 
