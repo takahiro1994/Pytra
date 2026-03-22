@@ -9,13 +9,13 @@ const save_gif = gif.save_gif;
 // 08: Sample that outputs Langton's Ant trajectories as a GIF.
 
 fn capture(grid: pytra.Obj, w: i64, h: i64) pytra.Obj {
-    const frame: pytra.Obj = pytra.bytearray((w * h));
+    const frame: pytra.Obj = pytra.bytearray(w * h);
     var y: i64 = 0;
     while (y < h) : (y += 1) {
-        const row_base: i64 = (y * w);
+        const row_base: i64 = y * w;
         var x: i64 = 0;
         while (x < w) : (x += 1) {
-            pytra.list_set(frame, u8, (row_base + x), @intCast(if ((pytra.list_get(pytra.list_get(grid, pytra.Obj, y), i64, x) != 0)) @as(i64, 255) else @as(i64, 0)));
+            pytra.list_set(frame, u8, row_base + x, @intCast(if ((pytra.list_get(pytra.list_get(grid, pytra.Obj, y), i64, x) != 0)) @as(i64, 255) else @as(i64, 0)));
         }
     }
     return frame;
@@ -42,32 +42,32 @@ fn run_08_langtons_ant() void {
     
     var i: i64 = 0;
     while (i < steps_total) : (i += 1) {
-        if ((pytra.list_get(pytra.list_get(grid, pytra.Obj, y), i64, x) == 0)) {
+        if (pytra.list_get(pytra.list_get(grid, pytra.Obj, y), i64, x) == 0) {
             d = @mod((d + 1), 4);
             pytra.list_set(pytra.list_get(grid, pytra.Obj, y), i64, x, @intCast(1));
         } else {
             d = @mod((d + 3), 4);
             pytra.list_set(pytra.list_get(grid, pytra.Obj, y), i64, x, @intCast(0));
         }
-        if ((d == 0)) {
-            y = @mod(((y - 1) + h), h);
+        if (d == 0) {
+            y = @mod((y - 1 + h), h);
         } else {
-            if ((d == 1)) {
+            if (d == 1) {
                 x = @mod((x + 1), w);
             } else {
-                if ((d == 2)) {
+                if (d == 2) {
                     y = @mod((y + 1), h);
                 } else {
-                    x = @mod(((x - 1) + w), w);
+                    x = @mod((x - 1 + w), w);
                 }
             }
         }
-        if ((@mod(i, capture_every) == 0)) {
+        if (@mod(i, capture_every) == 0) {
             pytra.list_append(frames, pytra.Obj, capture(grid, w, h));
         }
     }
     save_gif(out_path, w, h, frames, grayscale_palette(), 5, 0);
-    const elapsed: f64 = (pytra.perf_counter() - start);
+    const elapsed: f64 = pytra.perf_counter() - start;
     pytra.print2("output:", out_path);
     pytra.print2("frames:", pytra.list_len(frames, pytra.Obj));
     pytra.print2("elapsed_sec:", elapsed);

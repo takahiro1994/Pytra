@@ -9,36 +9,36 @@ const perf_counter = time.perf_counter;
 // Dependencies are kept minimal (time only) for transpilation compatibility.
 
 fn clamp01(v: f64) f64 {
-    if ((v < 0.0)) {
+    if (v < 0.0) {
         return 0.0;
     }
-    if ((v > 1.0)) {
+    if (v > 1.0) {
         return 1.0;
     }
     return v;
 }
 
 fn hit_sphere(ox: f64, oy: f64, oz: f64, dx: f64, dy: f64, dz: f64, cx: f64, cy: f64, cz: f64, r: f64) f64 {
-    const lx: f64 = (ox - cx);
-    const ly: f64 = (oy - cy);
-    const lz: f64 = (oz - cz);
+    const lx: f64 = ox - cx;
+    const ly: f64 = oy - cy;
+    const lz: f64 = oz - cz;
     
-    const a: f64 = (((dx * dx) + (dy * dy)) + (dz * dz));
-    const b: f64 = (2.0 * (((lx * dx) + (ly * dy)) + (lz * dz)));
-    const c: f64 = ((((lx * lx) + (ly * ly)) + (lz * lz)) - (r * r));
+    const a: f64 = dx * dx + (dy * dy) + (dz * dz);
+    const b: f64 = 2.0 * (lx * dx + (ly * dy) + (lz * dz));
+    const c: f64 = lx * lx + (ly * ly) + (lz * lz) - (r * r);
     
-    const d: f64 = ((b * b) - ((4.0 * a) * c));
-    if ((d < 0.0)) {
+    const d: f64 = b * b - (4.0 * a * c);
+    if (d < 0.0) {
         return -1.0;
     }
     const sd: f64 = math.sqrt(d);
-    const t0: f64 = ((-b - sd) / (2.0 * a));
-    const t1: f64 = ((-b + sd) / (2.0 * a));
+    const t0: f64 = (-b - sd) / (2.0 * a);
+    const t1: f64 = (-b + sd) / (2.0 * a);
     
-    if ((t0 > 0.001)) {
+    if (t0 > 0.001) {
         return t0;
     }
-    if ((t1 > 0.001)) {
+    if (t1 > 0.001) {
         return t1;
     }
     return -1.0;
@@ -69,15 +69,15 @@ fn render(width: i64, height: i64, aa: i64) pytra.Obj {
             while (ay < aa) : (ay += 1) {
                 var ax: i64 = 0;
                 while (ax < aa) : (ax += 1) {
-                    const fy: f64 = ((@as(f64, @floatFromInt(y)) + ((@as(f64, @floatFromInt(ay)) + 0.5) / @as(f64, @floatFromInt(aa)))) / @as(f64, @floatFromInt((height - 1))));
-                    const fx: f64 = ((@as(f64, @floatFromInt(x)) + ((@as(f64, @floatFromInt(ax)) + 0.5) / @as(f64, @floatFromInt(aa)))) / @as(f64, @floatFromInt((width - 1))));
-                    const sy: f64 = (1.0 - (2.0 * fy));
-                    const sx: f64 = (((2.0 * fx) - 1.0) * (@as(f64, @floatFromInt(width)) / @as(f64, @floatFromInt(height))));
+                    const fy: f64 = (@as(f64, @floatFromInt(y)) + ((@as(f64, @floatFromInt(ay)) + 0.5) / @as(f64, @floatFromInt(aa)))) / @as(f64, @floatFromInt((height - 1)));
+                    const fx: f64 = (@as(f64, @floatFromInt(x)) + ((@as(f64, @floatFromInt(ax)) + 0.5) / @as(f64, @floatFromInt(aa)))) / @as(f64, @floatFromInt((width - 1)));
+                    const sy: f64 = 1.0 - (2.0 * fy);
+                    const sx: f64 = (2.0 * fx - 1.0) * (@as(f64, @floatFromInt(width)) / @as(f64, @floatFromInt(height)));
                     
                     var dx: f64 = sx;
                     var dy: f64 = sy;
                     var dz: f64 = 1.0;
-                    const inv_len: f64 = (1.0 / math.sqrt((((dx * dx) + (dy * dy)) + (dz * dz))));
+                    const inv_len: f64 = 1.0 / math.sqrt(dx * dx + (dy * dy) + (dz * dz));
                     dx *= inv_len;
                     dy *= inv_len;
                     dz *= inv_len;
@@ -86,17 +86,17 @@ fn render(width: i64, height: i64, aa: i64) pytra.Obj {
                     var hit_id: i64 = -1;
                     
                     var t: f64 = hit_sphere(ox, oy, oz, dx, dy, dz, -0.8, -0.2, 2.2, 0.8);
-                    if (((t > 0.0) and (t < t_min))) {
+                    if ((t > 0.0 and t < t_min)) {
                         t_min = t;
                         hit_id = 0;
                     }
                     t = hit_sphere(ox, oy, oz, dx, dy, dz, 0.9, 0.1, 2.9, 0.95);
-                    if (((t > 0.0) and (t < t_min))) {
+                    if ((t > 0.0 and t < t_min)) {
                         t_min = t;
                         hit_id = 1;
                     }
                     t = hit_sphere(ox, oy, oz, dx, dy, dz, 0.0, -1001.0, 3.0, 1000.0);
-                    if (((t > 0.0) and (t < t_min))) {
+                    if ((t > 0.0 and t < t_min)) {
                         t_min = t;
                         hit_id = 2;
                     }
@@ -104,49 +104,49 @@ fn render(width: i64, height: i64, aa: i64) pytra.Obj {
                     var g: i64 = 0;
                     var b: i64 = 0;
                     
-                    if ((hit_id >= 0)) {
-                        const px: f64 = (ox + (dx * t_min));
-                        const py: f64 = (oy + (dy * t_min));
-                        const pz: f64 = (oz + (dz * t_min));
+                    if (hit_id >= 0) {
+                        const px: f64 = ox + (dx * t_min);
+                        const py: f64 = oy + (dy * t_min);
+                        const pz: f64 = oz + (dz * t_min);
                         
                         var nx: f64 = 0.0;
                         var ny: f64 = 0.0;
                         var nz: f64 = 0.0;
                         
-                        if ((hit_id == 0)) {
-                            nx = ((px + 0.8) / 0.8);
-                            ny = ((py + 0.2) / 0.8);
-                            nz = ((pz - 2.2) / 0.8);
+                        if (hit_id == 0) {
+                            nx = (px + 0.8) / 0.8;
+                            ny = (py + 0.2) / 0.8;
+                            nz = (pz - 2.2) / 0.8;
                         } else {
-                            if ((hit_id == 1)) {
-                                nx = ((px - 0.9) / 0.95);
-                                ny = ((py - 0.1) / 0.95);
-                                nz = ((pz - 2.9) / 0.95);
+                            if (hit_id == 1) {
+                                nx = (px - 0.9) / 0.95;
+                                ny = (py - 0.1) / 0.95;
+                                nz = (pz - 2.9) / 0.95;
                             } else {
                                 nx = 0.0;
                                 ny = 1.0;
                                 nz = 0.0;
                             }
                         }
-                        var diff: f64 = (((nx * -lx) + (ny * -ly)) + (nz * -lz));
+                        var diff: f64 = nx * -lx + (ny * -ly) + (nz * -lz);
                         diff = clamp01(diff);
                         
                         var base_r: f64 = 0.0;
                         var base_g: f64 = 0.0;
                         var base_b: f64 = 0.0;
                         
-                        if ((hit_id == 0)) {
+                        if (hit_id == 0) {
                             base_r = 0.95;
                             base_g = 0.35;
                             base_b = 0.25;
                         } else {
-                            if ((hit_id == 1)) {
+                            if (hit_id == 1) {
                                 base_r = 0.25;
                                 base_g = 0.55;
                                 base_b = 0.95;
                             } else {
-                                const checker: i64 = (@as(i64, @intFromFloat(((px + 50.0) * 0.8))) + @as(i64, @intFromFloat(((pz + 50.0) * 0.8))));
-                                if ((@mod(checker, 2) == 0)) {
+                                const checker: i64 = @as(i64, @intFromFloat((px + 50.0) * 0.8)) + @as(i64, @intFromFloat((pz + 50.0) * 0.8));
+                                if (@mod(checker, 2) == 0) {
                                     base_r = 0.85;
                                     base_g = 0.85;
                                     base_b = 0.85;
@@ -157,22 +157,22 @@ fn render(width: i64, height: i64, aa: i64) pytra.Obj {
                                 }
                             }
                         }
-                        const shade: f64 = (0.12 + (0.88 * diff));
-                        r = @as(i64, @intFromFloat((255.0 * clamp01((base_r * shade)))));
-                        g = @as(i64, @intFromFloat((255.0 * clamp01((base_g * shade)))));
-                        b = @as(i64, @intFromFloat((255.0 * clamp01((base_b * shade)))));
+                        const shade: f64 = 0.12 + (0.88 * diff);
+                        r = @as(i64, @intFromFloat(255.0 * clamp01(base_r * shade)));
+                        g = @as(i64, @intFromFloat(255.0 * clamp01(base_g * shade)));
+                        b = @as(i64, @intFromFloat(255.0 * clamp01(base_b * shade)));
                     } else {
-                        const tsky: f64 = (0.5 * (dy + 1.0));
-                        r = @as(i64, @intFromFloat((255.0 * (0.65 + (0.2 * tsky)))));
-                        g = @as(i64, @intFromFloat((255.0 * (0.75 + (0.18 * tsky)))));
-                        b = @as(i64, @intFromFloat((255.0 * (0.9 + (0.08 * tsky)))));
+                        const tsky: f64 = 0.5 * (dy + 1.0);
+                        r = @as(i64, @intFromFloat(255.0 * (0.65 + (0.2 * tsky))));
+                        g = @as(i64, @intFromFloat(255.0 * (0.75 + (0.18 * tsky))));
+                        b = @as(i64, @intFromFloat(255.0 * (0.9 + (0.08 * tsky))));
                     }
                     ar += r;
                     ag += g;
                     ab += b;
                 }
             }
-            const samples: i64 = (aa * aa);
+            const samples: i64 = aa * aa;
             pytra.list_append(pixels, u8, @intCast(@divFloor(ar, samples)));
             pytra.list_append(pixels, u8, @intCast(@divFloor(ag, samples)));
             pytra.list_append(pixels, u8, @intCast(@divFloor(ab, samples)));
@@ -190,7 +190,7 @@ fn run_raytrace() void {
     const start: f64 = pytra.perf_counter();
     const pixels: pytra.Obj = render(width, height, aa);
     png.write_rgb_png(out_path, width, height, pixels);
-    const elapsed: f64 = (pytra.perf_counter() - start);
+    const elapsed: f64 = pytra.perf_counter() - start;
     
     pytra.print2("output:", out_path);
     pytra.print("size:");

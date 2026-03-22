@@ -144,6 +144,25 @@ def _zig_string(text: str) -> str:
     return '"' + out + '"'
 
 
+def _binop_precedence(op: str) -> int:
+    """Zig 演算子優先順位（高い値 = 高い優先度）。"""
+    if op in {"Mult", "Div", "FloorDiv", "Mod"}:
+        return 6
+    if op in {"Add", "Sub"}:
+        return 5
+    if op in {"LShift", "RShift"}:
+        return 4
+    if op == "BitAnd":
+        return 3
+    if op == "BitXor":
+        return 2
+    if op == "BitOr":
+        return 1
+    if op == "Pow":
+        return 7
+    return 0
+
+
 def _binop_symbol(op: str) -> str:
     if op == "Add":
         return "+"
@@ -2083,6 +2102,17 @@ class ZigNativeEmitter:
             left = self._render_expr(ed.get("left"))
             right = self._render_expr(ed.get("right"))
             op = str(ed.get("op"))
+            # 子が BinOp なら括弧を付ける（異なる優先度はもちろん、同一優先度でも
+            # 浮動小数点の結合性を Python の EAST ツリー構造と完全一致させる）
+            left_node_for_paren = ed.get("left")
+            right_node_for_paren = ed.get("right")
+            cur_prec = _binop_precedence(op)
+            if isinstance(left_node_for_paren, dict) and left_node_for_paren.get("kind") == "BinOp":
+                child_prec = _binop_precedence(str(left_node_for_paren.get("op")))
+                if child_prec < cur_prec:
+                    left = "(" + left + ")"
+            if isinstance(right_node_for_paren, dict) and right_node_for_paren.get("kind") == "BinOp":
+                right = "(" + right + ")"
             left_type = self._lookup_expr_type(ed.get("left"))
             right_type = self._lookup_expr_type(ed.get("right"))
             # Fallback: check resolved_type if _lookup_expr_type returns empty
@@ -2132,17 +2162,17 @@ class ZigNativeEmitter:
                 left_type = self._lookup_expr_type(ed.get("left"))
                 right_type = self._lookup_expr_type(ed.get("right"))
                 if left_type in {"float64", "float32", "float"} or right_type in {"float64", "float32", "float"}:
-                    return "(" + left + " / " + right + ")"
-                return "(@as(f64, @floatFromInt(" + left + ")) / @as(f64, @floatFromInt(" + right + ")))"
+                    return left + " / " + right
+                return "@as(f64, @floatFromInt(" + left + ")) / @as(f64, @floatFromInt(" + right + "))"
             if op == "Mod":
                 return "@mod(" + left + ", " + right + ")"
             if op in {"LShift", "RShift"}:
                 sym = _binop_symbol(op)
                 # LHS を常に i64 に昇格（EAST3 の型と Zig の実際の型が異なる場合の安全策）
                 left = "@as(i64, " + left + ")"
-                return "(" + left + " " + sym + " @intCast(" + right + "))"
+                return left + " " + sym + " @intCast(" + right + ")"
             sym = _binop_symbol(op)
-            return "(" + left + " " + sym + " " + right + ")"
+            return left + " " + sym + " " + right
         if kind == "UnaryOp":
             op = str(ed.get("op"))
             operand = self._render_expr(ed.get("operand"))
@@ -2395,7 +2425,7 @@ class ZigNativeEmitter:
                         parts.append("!" + eql_call)
                 else:
                     sym = _cmp_symbol(op_str)
-                    parts.append("(" + prev + " " + sym + " " + right + ")")
+                    parts.append(prev + " " + sym + " " + right)
             prev = right
             prev_node = comparators[i]
             i += 1

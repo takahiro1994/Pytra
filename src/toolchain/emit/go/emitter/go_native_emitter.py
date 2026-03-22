@@ -2321,6 +2321,43 @@ def _emit_stmt(stmt: Any, *, indent: str, ctx: dict[str, Any]) -> list[str]:
     if kind == "Import" or kind == "ImportFrom":
         return []
 
+    if kind == "ForRange":
+        target_name = _safe_ident(esd.get("target", {}).get("id") if isinstance(esd.get("target"), dict) else None, "i")
+        start_expr = _render_expr(esd.get("start"))
+        stop_expr = _render_expr(esd.get("stop"))
+        step_any = esd.get("step")
+        step_val = 1
+        if isinstance(step_any, dict) and step_any.get("kind") == "Constant":
+            sv = step_any.get("value")
+            if isinstance(sv, int):
+                step_val = sv
+        type_map = _type_map(ctx)
+        type_map[target_name] = "int64"
+        declared = _declared_set(ctx)
+        declared.add(target_name)
+        if step_val == 1:
+            lines = [indent + "for " + target_name + " := " + start_expr + "; " + target_name + " < " + stop_expr + "; " + target_name + "++ {"]
+        elif step_val == -1:
+            lines = [indent + "for " + target_name + " := " + start_expr + "; " + target_name + " > " + stop_expr + "; " + target_name + "-- {"]
+        else:
+            step_expr = _render_expr(step_any)
+            lines = [indent + "for " + target_name + " := " + start_expr + "; " + target_name + " < " + stop_expr + "; " + target_name + " += " + step_expr + " {"]
+        body_any = esd.get("body")
+        body = body_any if isinstance(body_any, list) else []
+        i = 0
+        while i < len(body):
+            lines.extend(_emit_stmt(body[i], indent=indent + "    ", ctx=ctx))
+            i += 1
+        lines.append(indent + "}")
+        return lines
+
+    if kind == "Swap":
+        lhs = esd.get("lhs")
+        rhs = esd.get("rhs")
+        lhs_expr = _render_expr(lhs)
+        rhs_expr = _render_expr(rhs)
+        return [indent + lhs_expr + ", " + rhs_expr + " = " + rhs_expr + ", " + lhs_expr]
+
     if kind == "Raise":
         exc_any = esd.get("exc")
         if isinstance(exc_any, dict):

@@ -25,7 +25,7 @@ runtime コピー（`py_runtime.swift`）を `swift.py` に追加し、`pytra-cl
 
 ## 受け入れ基準
 
-- [ ] `runtime_parity_check.py --targets swift` で sample/py の全 18 ケースが PASS する。
+- [x] `runtime_parity_check.py --targets swift` で sample/py の全 18 ケースが PASS する。
 
 ## 決定ログ
 
@@ -41,4 +41,5 @@ runtime コピー（`py_runtime.swift`）を `swift.py` に追加し、`pytra-cl
   - `__pytra_dict_get` 未定義
   - `tmp` 変数スコープ問題（sample 12）
 - 2026-03-22: emitter バグ修正ラウンド3。修正: (1) built_in/utils モジュールの emit スキップ（py_runtime.swift に統合済み）、(2) py_runtime.swift に `__pytra_list_repeat`/`__pytra_range`/`__pytra_abs`/`__pytra_enumerate`/`__pytra_reversed`/`__pytra_sorted` 等の関数追加、(3) write_rgb_png/save_gif スタブ追加、(4) `__pytra_dict_get` 追加、(5) Int64 オーバーロード `__pytra_min`/`__pytra_max` 追加、(6) ForRange の stride 引数を `Int(...)` で統一、(7) Swap の `lhs`/`rhs` キーと Subscript 対応、(8) `math_native.swift` の無限再帰修正（`Foundation.sqrt` → 修飾付き呼び出し）、(9) `_MAIN_CALL_ALIAS` バグ修正済み。**17/18 PASS**。
-  残り: sample 16 (glass_sculpture_chaos) — `Any` → `Double` の自動キャスト不足 (36 compile errors)。emitter の型推論改善が必要。tuple アンパッキング結果の `__pytra_float` ラップ、`__pytra_max` の Double オーバーロード追加などが候補。
+  残り: sample 16 (glass_sculpture_chaos) — `Any` → `Double` の自動キャスト不足 (36 compile errors)。
+- 2026-03-23: 修正ラウンド4。(1) ユーザー定義関数のパラメータ型を全て `Any` にし、関数冒頭でキャスト（`__pytra_int`/`__pytra_float`/`__pytra_str` 等）を挿入。`@extern` 関数は元の型を維持。(2) `Any` 型の算術演算子オーバーロード追加（`Any + Any`, `Double + Any` 等）。(3) `__pytra_max`/`__pytra_min` に `Double` オーバーロード追加。**18/18 PASS**。受け入れ基準達成。

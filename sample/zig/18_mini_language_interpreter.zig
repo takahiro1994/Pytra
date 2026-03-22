@@ -37,7 +37,7 @@ fn tokenize(lines: pytra.Obj) pytra.Obj {
         const line_index: i64 = __enum_idx_1;
         var i: i64 = 0;
         const n: i64 = @as(i64, @intCast(source.len));
-        while ((i < n)) {
+        while (i < n) {
             const ch: []const u8 = pytra.str_index(source, i);
             
             if (std.mem.eql(u8, ch, " ")) {
@@ -45,8 +45,8 @@ fn tokenize(lines: pytra.Obj) pytra.Obj {
                 continue;
             }
             const single_tag: i64 = pytra.dict_get_default(i64, single_char_token_tags, ch, 0);
-            if ((single_tag > 0)) {
-                pytra.list_append(tokens, *Token, pytra.make_object(Token, Token{ .kind = pytra.list_get(single_char_token_kinds, []const u8, (single_tag - 1)), .text = ch, .pos = i, .number_value = 0 }));
+            if (single_tag > 0) {
+                pytra.list_append(tokens, *Token, pytra.make_object(Token, Token{ .kind = pytra.list_get(single_char_token_kinds, []const u8, single_tag - 1), .text = ch, .pos = i, .number_value = 0 }));
                 i += 1;
                 continue;
             }
@@ -54,7 +54,7 @@ fn tokenize(lines: pytra.Obj) pytra.Obj {
             var text: []const u8 = undefined;
             if (pytra.char_isdigit(ch)) {
                 start = i;
-                while (((i < n) and pytra.char_isdigit(pytra.str_index(source, i)))) {
+                while ((i < n and pytra.char_isdigit(pytra.str_index(source, i)))) {
                     i += 1;
                 }
                 text = pytra.str_slice(source, start, i);
@@ -63,7 +63,7 @@ fn tokenize(lines: pytra.Obj) pytra.Obj {
             }
             if ((pytra.char_isalpha(ch) or std.mem.eql(u8, ch, "_"))) {
                 start = i;
-                while (((i < n) and ((pytra.char_isalpha(pytra.str_index(source, i)) or std.mem.eql(u8, pytra.str_index(source, i), "_")) or pytra.char_isdigit(pytra.str_index(source, i))))) {
+                while ((i < n and ((pytra.char_isalpha(pytra.str_index(source, i)) or std.mem.eql(u8, pytra.str_index(source, i), "_")) or pytra.char_isdigit(pytra.str_index(source, i))))) {
                     i += 1;
                 }
                 text = pytra.str_slice(source, start, i);
@@ -108,7 +108,7 @@ const Parser = struct {
     }
     
     pub fn previous_token(self: *const Parser) *Token {
-        return pytra.list_get(self.tokens, *Token, (self.pos - 1));
+        return pytra.list_get(self.tokens, *Token, self.pos - 1);
     }
     
     pub fn peek_kind(self: *const Parser) []const u8 {
@@ -140,7 +140,7 @@ const Parser = struct {
     
     pub fn add_expr(self: *Parser, node: *ExprNode) i64 {
         pytra.list_append(self.expr_nodes, *ExprNode, node);
-        return (pytra.list_len(self.expr_nodes, *ExprNode) - 1);
+        return pytra.list_len(self.expr_nodes, *ExprNode) - 1;
     }
     
     pub fn parse_program(self: *Parser) pytra.Obj {
@@ -244,32 +244,32 @@ const Parser = struct {
 fn eval_expr(expr_index: i64, expr_nodes: pytra.Obj, env: std.StringHashMap(i64)) i64 {
     const node: *ExprNode = pytra.list_get(expr_nodes, *ExprNode, expr_index);
     
-    if ((node.kind_tag == 1)) {
+    if (node.kind_tag == 1) {
         return node.value;
     }
-    if ((node.kind_tag == 2)) {
+    if (node.kind_tag == 2) {
         if (!pytra.contains(env, node.name)) {
             @panic(pytra.str_concat("undefined variable: ", node.name));
         }
         return pytra.dict_get_default(i64, env, node.name, 0);
     }
-    if ((node.kind_tag == 4)) {
+    if (node.kind_tag == 4) {
         return -eval_expr(node.left, expr_nodes, env);
     }
-    if ((node.kind_tag == 3)) {
+    if (node.kind_tag == 3) {
         const lhs: i64 = eval_expr(node.left, expr_nodes, env);
         const rhs: i64 = eval_expr(node.right, expr_nodes, env);
-        if ((node.op_tag == 1)) {
-            return (lhs + rhs);
+        if (node.op_tag == 1) {
+            return lhs + rhs;
         }
-        if ((node.op_tag == 2)) {
-            return (lhs - rhs);
+        if (node.op_tag == 2) {
+            return lhs - rhs;
         }
-        if ((node.op_tag == 3)) {
-            return (lhs * rhs);
+        if (node.op_tag == 3) {
+            return lhs * rhs;
         }
-        if ((node.op_tag == 4)) {
-            if ((rhs == 0)) {
+        if (node.op_tag == 4) {
+            if (rhs == 0) {
                 @panic("division by zero");
             }
             return @divFloor(lhs, rhs);
@@ -285,11 +285,11 @@ fn execute(stmts: pytra.Obj, expr_nodes: pytra.Obj, trace: bool) i64 {
     var printed: i64 = 0;
     
     for (pytra.list_items(stmts, *StmtNode)) |stmt| {
-        if ((stmt.kind_tag == 1)) {
+        if (stmt.kind_tag == 1) {
             env.put(stmt.name, eval_expr(stmt.expr_index, expr_nodes, env)) catch {};
             continue;
         }
-        if ((stmt.kind_tag == 2)) {
+        if (stmt.kind_tag == 2) {
             if (!pytra.contains(env, stmt.name)) {
                 @panic(pytra.str_concat("assign to undefined variable: ", stmt.name));
             }
@@ -301,10 +301,10 @@ fn execute(stmts: pytra.Obj, expr_nodes: pytra.Obj, trace: bool) i64 {
             pytra.print(value);
         }
         var norm: i64 = @mod(value, 1000000007);
-        if ((norm < 0)) {
+        if (norm < 0) {
             norm += 1000000007;
         }
-        checksum = @mod(((checksum * 131) + norm), 1000000007);
+        checksum = @mod((checksum * 131 + norm), 1000000007);
         printed += 1;
     }
     if (trace) {
@@ -320,17 +320,17 @@ fn build_benchmark_source(var_count: i64, loops: i64) pytra.Obj {
     // Declare initial variables.
     i = 0;
     while (i < var_count) : (i += 1) {
-        pytra.list_append(lines, []const u8, pytra.str_concat(pytra.str_concat(pytra.str_concat("let v", pytra.to_str(i)), " = "), pytra.to_str((i + 1))));
+        pytra.list_append(lines, []const u8, pytra.str_concat(pytra.str_concat(pytra.str_concat("let v", pytra.to_str(i)), " = "), pytra.to_str(i + 1)));
     }
     // Force evaluation of many arithmetic expressions.
     i = 0;
     while (i < loops) : (i += 1) {
         const x: i64 = @mod(i, var_count);
         const y: i64 = @mod((i + 3), var_count);
-        const c1: i64 = (@mod(i, 7) + 1);
-        const c2: i64 = (@mod(i, 11) + 2);
+        const c1: i64 = @mod(i, 7) + 1;
+        const c2: i64 = @mod(i, 11) + 2;
         pytra.list_append(lines, []const u8, pytra.str_concat(pytra.str_concat(pytra.str_concat(pytra.str_concat(pytra.str_concat(pytra.str_concat(pytra.str_concat(pytra.str_concat(pytra.str_concat("v", pytra.to_str(x)), " = (v"), pytra.to_str(x)), " * "), pytra.to_str(c1)), " + v"), pytra.to_str(y)), " + 10000) / "), pytra.to_str(c2)));
-        if ((@mod(i, 97) == 0)) {
+        if (@mod(i, 97) == 0) {
             pytra.list_append(lines, []const u8, pytra.str_concat("print v", pytra.to_str(x)));
         }
     }
@@ -361,7 +361,7 @@ fn run_benchmark() void {
     const parser: *Parser = pytra.make_object(Parser, Parser.init(tokens));
     const stmts: pytra.Obj = parser.parse_program();
     const checksum: i64 = execute(stmts, parser.expr_nodes, false);
-    const elapsed: f64 = (pytra.perf_counter() - start);
+    const elapsed: f64 = pytra.perf_counter() - start;
     
     pytra.print2("token_count:", pytra.list_len(tokens, *Token));
     pytra.print2("expr_count:", pytra.list_len(parser.expr_nodes, i64));

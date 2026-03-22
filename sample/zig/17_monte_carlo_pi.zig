@@ -16,8 +16,8 @@ fn run_integer_grid_checksum(width: i64, height: i64, seed: i64) i64 {
         var row_sum: i64 = 0;
         var x: i64 = 0;
         while (x < width) : (x += 1) {
-            var v: i64 = @mod((((x * 37) + (y * 73)) + seed), mod_main);
-            v = @mod(((v * 48271) + 1), mod_main);
+            var v: i64 = @mod((x * 37 + (y * 73) + seed), mod_main);
+            v = @mod((v * 48271 + 1), mod_main);
             row_sum += @mod(v, 256);
         }
         acc = @mod((acc + (row_sum * (y + 1))), mod_out);
@@ -34,9 +34,9 @@ fn run_integer_benchmark() void {
     
     const start: f64 = pytra.perf_counter();
     const checksum: i64 = run_integer_grid_checksum(width, height, 123456789);
-    const elapsed: f64 = (pytra.perf_counter() - start);
+    const elapsed: f64 = pytra.perf_counter() - start;
     
-    pytra.print2("pixels:", (width * height));
+    pytra.print2("pixels:", width * height);
     pytra.print2("checksum:", checksum);
     pytra.print2("elapsed_sec:", elapsed);
 }

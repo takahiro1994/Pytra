@@ -177,7 +177,7 @@
 
 文脈: [docs/ja/plans/p5-swift-sample-parity.md](../plans/p5-swift-sample-parity.md)
 
-1. [ ] [ID: P5-SWIFT-PARITY-01] `runtime_parity_check.py --targets swift` で sample/py の全 18 ケースが PASS する。
+1. [x] [ID: P5-SWIFT-PARITY-01] `runtime_parity_check.py --targets swift` で sample/py の全 18 ケースが PASS する。
 
 ### P7: C++ test_py2cpp_features.py テストパス率改善
 
