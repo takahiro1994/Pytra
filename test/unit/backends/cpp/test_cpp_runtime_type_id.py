@@ -119,28 +119,29 @@ int main() {
 #include <cassert>
 #include <iostream>
 
-class ChildObj : public RcObject {
-public:
-    explicit ChildObj(uint32 tid) : RcObject(), tid_(tid) {}
-    uint32 py_type_id() const noexcept override { return tid_; }
-private:
-    uint32 tid_;
+struct BaseObj {
+    int64 val;
+    inline static constexpr uint32_t TYPE_ID = 1400;
+    BaseObj() : val(0) {}
+};
+
+struct ChildObj : public BaseObj {
+    inline static constexpr uint32_t TYPE_ID = 1401;
+    ChildObj() : BaseObj() {}
 };
 
 int main() {
-    _py_reset_type_registry_for_test();
+    g_type_table[1400] = new TypeInfo{1400, 1400, 1402, &deleter_impl<BaseObj>};
+    g_type_table[1401] = new TypeInfo{1401, 1401, 1402, &deleter_impl<ChildObj>};
 
-    int64 base_tid = 1400;
-    int64 child_tid = 1401;
-    assert(py_tid_register_known_class_type(base_tid, PYTRA_TID_OBJECT) == base_tid);
-    assert(py_tid_register_known_class_type(child_tid, base_tid) == child_tid);
-    assert(py_tid_is_subtype(child_tid, base_tid));
-    assert(py_tid_issubclass(child_tid, base_tid));
+    assert(is_subtype(1401, g_type_table[1400]));
 
-    rc<ChildObj> child_obj = rc<ChildObj>::adopt(pytra::gc::rc_new<ChildObj>(static_cast<uint32>(child_tid)));
-    assert(py_tid_runtime_type_id(child_obj) == child_tid);
-    assert(py_tid_isinstance(child_obj, base_tid));
-    assert(py_tid_isinstance(child_obj, child_tid));
+    Object<ChildObj> child_obj = make_object<ChildObj>(ChildObj::TYPE_ID);
+    assert(child_obj.type_id() == 1401);
+
+    Object<BaseObj> base_view = child_obj;
+    assert(base_view.type_id() == 1401);
+    assert(is_subtype(base_view.type_id(), g_type_table[1400]));
 
     std::cout << "generated type_id ok" << std::endl;
     return 0;
@@ -185,51 +186,50 @@ int main() {
             self.assertEqual(run.returncode, 0, msg=run.stderr)
             self.assertIn("generated type_id ok", run.stdout)
 
-    def test_rc_handle_upcast_from_derived_compiles(self) -> None:
+    def test_object_t_upcast_from_derived_compiles(self) -> None:
         cpp_src = r'''
-#include "runtime/cpp/core/gc.h"
+#include "runtime/cpp/core/py_runtime.h"
 
 #include <cassert>
 #include <iostream>
-#include <utility>
 
-class BaseObj : public pytra::gc::RcObject {
-public:
-    BaseObj() : pytra::gc::RcObject() {}
+struct BaseObj {
+    inline static constexpr uint32_t TYPE_ID = 1500;
+    BaseObj() {}
 };
 
-class ChildObj : public BaseObj {
-public:
+struct ChildObj : public BaseObj {
+    inline static constexpr uint32_t TYPE_ID = 1501;
     ChildObj() : BaseObj() {}
 };
 
 int main() {
-    using pytra::gc::RcHandle;
+    g_type_table[1500] = new TypeInfo{1500, 1500, 1502, &deleter_impl<BaseObj>};
+    g_type_table[1501] = new TypeInfo{1501, 1501, 1502, &deleter_impl<ChildObj>};
 
-    RcHandle<ChildObj> child = RcHandle<ChildObj>::adopt(pytra::gc::rc_new<ChildObj>());
-    RcHandle<BaseObj> base_copy = child;
-    assert(base_copy.get() != nullptr);
+    Object<ChildObj> child = make_object<ChildObj>(ChildObj::TYPE_ID);
+    Object<BaseObj> base_copy = child;
+    assert(base_copy);
 
-    RcHandle<BaseObj> base_move = RcHandle<ChildObj>::adopt(pytra::gc::rc_new<ChildObj>());
-    assert(base_move.get() != nullptr);
+    Object<BaseObj> base_move = make_object<ChildObj>(ChildObj::TYPE_ID);
+    assert(base_move);
 
-    RcHandle<BaseObj> assigned;
+    Object<BaseObj> assigned;
     assigned = child;
-    assert(assigned.get() != nullptr);
+    assert(assigned);
 
-    RcHandle<ChildObj> tmp = RcHandle<ChildObj>::adopt(pytra::gc::rc_new<ChildObj>());
-    assigned = std::move(tmp);
-    assert(assigned.get() != nullptr);
-    assert(!tmp);
+    Object<ChildObj> tmp = make_object<ChildObj>(ChildObj::TYPE_ID);
+    assigned = tmp;
+    assert(assigned);
 
-    std::cout << "rc upcast ok" << std::endl;
+    std::cout << "object_t upcast ok" << std::endl;
     return 0;
 }
 '''
         with tempfile.TemporaryDirectory() as tmpdir:
             work = Path(tmpdir)
-            src = work / "rc_upcast.cpp"
-            exe = work / "rc_upcast.out"
+            src = work / "object_t_upcast.cpp"
+            exe = work / "object_t_upcast.out"
             src.write_text(cpp_src, encoding="utf-8")
 
             comp = self._run(
@@ -243,14 +243,16 @@ int main() {
                     "src/runtime/cpp",
                     "-I",
                     "src/runtime/east",
+                    "-I",
+                    _GEN_DIR,
                     str(src),
-                    "src/runtime/cpp/core/gc.cpp",
+                    *CPP_RUNTIME_SRCS,
                     "-o",
                     str(exe),
                 ],
                 cwd=ROOT,
                 timeout_sec=PYTRA_TEST_COMPILE_TIMEOUT_SEC,
-                label="compile rc upcast smoke",
+                label="compile object_t upcast smoke",
             )
             self.assertEqual(comp.returncode, 0, msg=comp.stderr)
 
@@ -261,7 +263,7 @@ int main() {
                 label="run rc upcast smoke",
             )
             self.assertEqual(run.returncode, 0, msg=run.stderr)
-            self.assertIn("rc upcast ok", run.stdout)
+            self.assertIn("object_t upcast ok", run.stdout)
 
 
 if __name__ == "__main__":
