@@ -41,6 +41,7 @@ _CPP_HELPER_MODULE_BY_DIRECT_CALL = {
 }
 _CPP_HELPER_MODULE_BY_RUNTIME_CALL = {
     "zip": "pytra.built_in.zip_ops",
+    "sum": "pytra.built_in.numeric_ops",
     "py_min": "pytra.built_in.numeric_ops",
     "py_max": "pytra.built_in.numeric_ops",
 }
