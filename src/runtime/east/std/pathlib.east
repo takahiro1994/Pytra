@@ -5758,6 +5758,7 @@
                 "kind": "NamedType",
                 "name": "str"
               },
+              "unused": true,
               "meta": {
                 "lifetime_node_id": "n2",
                 "lifetime_defs": [

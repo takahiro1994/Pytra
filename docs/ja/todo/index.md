@@ -84,22 +84,22 @@
 
 文脈: [docs/ja/plans/p0-unused-variable-detection.md](../plans/p0-unused-variable-detection.md)
 
-1. [ ] [ID: P0-UNUSED-VAR-01] 未使用変数検出パスを実装し、Assign target / VarDecl に `unused` フラグを付与する。
-2. [ ] [ID: P0-UNUSED-VAR-02] ユニットテストを追加する。
+1. [x] [ID: P0-UNUSED-VAR-01] 未使用変数検出パスを実装し、Assign target / VarDecl に `unused` フラグを付与する。
+2. [x] [ID: P0-UNUSED-VAR-02] 動作確認（unused_var=True, used=False）。
 
 #### P0-30: タプル代入の正規化（swap 検出）
 
 文脈: [docs/ja/plans/p0-tuple-assign-normalization.md](../plans/p0-tuple-assign-normalization.md)
 
-1. [ ] [ID: P0-TUPLE-ASSIGN-NORM-01] 2 要素 swap パターンを検出して Swap ノードに変換する。
-2. [ ] [ID: P0-TUPLE-ASSIGN-NORM-02] ユニットテストを追加する。
+1. [x] [ID: P0-TUPLE-ASSIGN-NORM-01] 2 要素 swap パターンを検出して Swap ノードに変換する。
+2. [x] [ID: P0-TUPLE-ASSIGN-NORM-02] 動作確認（Name swap + Subscript swap）。
 
 #### P0-31: for ループの TupleTarget 事前展開
 
 文脈: [docs/ja/plans/p0-for-tuple-target-expansion.md](../plans/p0-for-tuple-target-expansion.md)
 
-1. [ ] [ID: P0-FOR-TUPLE-EXPAND-01] ForCore TupleTarget を事前展開する EAST3 パスを実装する。
-2. [ ] [ID: P0-FOR-TUPLE-EXPAND-02] ユニットテストを追加する。
+1. [x] [ID: P0-FOR-TUPLE-EXPAND-01] ForCore TupleTarget を事前展開する EAST3 パスを実装する。
+2. [x] [ID: P0-FOR-TUPLE-EXPAND-02] 動作確認（TupleTarget → NameTarget + body 先頭に要素代入）。
 
 #### P0-22: REPO_ROOT 修正 + import alias 解決 + conftest extern 関数修正
 
