@@ -30,7 +30,7 @@ def load_link_input_doc(path: Path) -> dict[str, object]:
 
 
 def load_link_output_doc(path: Path) -> dict[str, object]:
-    return validate_link_output_doc(_load_json_doc(path, "link-output"))
+    return validate_link_output_doc(_load_json_doc(path, "manifest"))
 
 
 def save_manifest_doc(path: Path, doc: dict[str, Any]) -> None:

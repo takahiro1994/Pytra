@@ -66,13 +66,13 @@ C++ 変換は内部で compile → link → emit の 3 段を経由します。
 PYTHONPATH=src python src/pytra-cli.py INPUT.py --target cpp --link-only --output-dir out/linked/
 
 # Stage 2: linked EAST → C++ multi-file（C++ emitter のみ import）
-PYTHONPATH=src python src/toolchain/emit/cpp.py out/linked/link-output.json --output-dir out/cpp/
+PYTHONPATH=src python src/toolchain/emit/cpp.py out/linked/manifest.json --output-dir out/cpp/
 ```
 
 補足:
 - 全言語で multi-file 出力（`--output-dir`）が正規パスです。compile → link → emit パイプラインを通るため、出力は常にディレクトリ単位です。
 - `toolchain/emit/cpp.py` は C++ backend のみを import する独立エントリポイントです。
-- `--link-only` は `link-output.json`（マニフェスト）と linked EAST3 JSON を出力します。
+- `--link-only` は `manifest.json`（マニフェスト）と linked EAST3 JSON を出力します。
 - `pytra-cli.py` は compile + link のみを担当し、backend（emit）に依存しません。
 
 ### ランタイム構成
@@ -297,7 +297,7 @@ PYTHONPATH=src python src/pytra-cli.py compile sample/py/01_mandelbrot.py -o out
 PYTHONPATH=src python src/pytra-cli.py sample/py/01_mandelbrot.py --target cpp --link-only --output-dir out/linked/
 
 # 3) linked EAST から C++ を生成
-PYTHONPATH=src python src/toolchain/emit/cpp.py out/linked/link-output.json --output-dir out/cpp/
+PYTHONPATH=src python src/toolchain/emit/cpp.py out/linked/manifest.json --output-dir out/cpp/
 ```
 
 補足:

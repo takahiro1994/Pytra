@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""PowerShell backend: link-output.json → PowerShell multi-file output.
+"""PowerShell backend: manifest.json → PowerShell multi-file output.
 
 Usage:
-    python3 -m toolchain.emit.powershell LINK_OUTPUT.json --output-dir out/powershell/
+    python3 -m toolchain.emit.powershell MANIFEST.json --output-dir out/powershell/
 """
 
 from __future__ import annotations
@@ -16,7 +16,7 @@ from toolchain.emit.loader import emit_all_modules
 def main() -> int:
     argv = sys.argv[1:]
     if len(argv) == 0 or argv[0] in ("-h", "--help"):
-        print("usage: toolchain.emit.powershell LINK_OUTPUT.json --output-dir DIR")
+        print("usage: toolchain.emit.powershell MANIFEST.json --output-dir DIR")
         return 0
 
     input_path = ""
@@ -33,7 +33,7 @@ def main() -> int:
         i += 1
 
     if input_path == "":
-        print("error: input link-output.json is required", file=sys.stderr)
+        print("error: input manifest.json is required", file=sys.stderr)
         return 1
 
     return emit_all_modules(input_path, output_dir, ".ps1", transpile_to_powershell_native)

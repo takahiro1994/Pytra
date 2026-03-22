@@ -264,7 +264,7 @@ class Ir2langCliTest(unittest.TestCase):
                         }
                     ],
                 },
-                name="linked/app/main.east3.json",
+                name="east3/app/main.east3.json",
             )
             link_output = self._write_east_json(
                 root,
@@ -291,7 +291,7 @@ class Ir2langCliTest(unittest.TestCase):
                     },
                     "diagnostics": {"warnings": [], "errors": []},
                 },
-                name="link-output.json",
+                name="manifest.json",
             )
             with patch.object(
                 ir2lang_mod,
@@ -574,8 +574,8 @@ class Ir2langCliTest(unittest.TestCase):
             main_src = root / "main.py"
             helper_src.write_text("x = 1\n", encoding="utf-8")
             main_src.write_text("print(1)\n", encoding="utf-8")
-            linked_helper = self._write_linked_east_json(root, "app.helper", name="linked/app/helper.east3.json")
-            linked_main = self._write_linked_east_json(root, "app.main", name="linked/app/main.east3.json")
+            linked_helper = self._write_linked_east_json(root, "app.helper", name="east3/app/helper.east3.json")
+            linked_main = self._write_linked_east_json(root, "app.main", name="east3/app/main.east3.json")
             link_output = self._write_east_json(
                 root,
                 {
@@ -608,7 +608,7 @@ class Ir2langCliTest(unittest.TestCase):
                     },
                     "diagnostics": {"warnings": [], "errors": []},
                 },
-                name="link-output.json",
+                name="manifest.json",
             )
             out_rs = root / "out.rs"
 
@@ -677,8 +677,8 @@ class Ir2langCliTest(unittest.TestCase):
             main_src = root / "main.py"
             helper_src.write_text("x = 1\n", encoding="utf-8")
             main_src.write_text("print(1)\n", encoding="utf-8")
-            linked_helper = self._write_linked_east_json(root, "app.helper", name="linked/app/helper.east3.json")
-            linked_main = self._write_linked_east_json(root, "app.main", name="linked/app/main.east3.json")
+            linked_helper = self._write_linked_east_json(root, "app.helper", name="east3/app/helper.east3.json")
+            linked_main = self._write_linked_east_json(root, "app.main", name="east3/app/main.east3.json")
             link_output = self._write_east_json(
                 root,
                 {
@@ -711,7 +711,7 @@ class Ir2langCliTest(unittest.TestCase):
                     },
                     "diagnostics": {"warnings": [], "errors": []},
                 },
-                name="link-output.json",
+                name="manifest.json",
             )
             out_dir = root / "cpp-out"
             fake_spec = {
@@ -771,9 +771,9 @@ class Ir2langCliTest(unittest.TestCase):
                     },
                     "body": [],
                 },
-                name="linked/__pytra_helper__/cpp/demo.east3.json",
+                name="east3/__pytra_helper__/cpp/demo.east3.json",
             )
-            linked_main = self._write_linked_east_json(root, "app.main", name="linked/app/main.east3.json")
+            linked_main = self._write_linked_east_json(root, "app.main", name="east3/app/main.east3.json")
             link_output = self._write_east_json(
                 root,
                 {
@@ -810,7 +810,7 @@ class Ir2langCliTest(unittest.TestCase):
                     },
                     "diagnostics": {"warnings": [], "errors": []},
                 },
-                name="link-output.json",
+                name="manifest.json",
             )
             out_dir = root / "cpp-out"
             fake_spec = {

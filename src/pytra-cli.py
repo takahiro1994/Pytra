@@ -6,8 +6,8 @@ The same code path works in both Python host and C++ selfhost binary.
 
 Usage:
     pytra compile INPUT.py -o out.east
-    pytra link out.east --output-dir out/linked/
-    pytra emit --target cpp out/linked/link-output.json --output-dir out/cpp/
+    pytra link INPUT.py --output-dir out/ --target cpp
+    pytra emit --target cpp out/manifest.json --output-dir out/emit/
     pytra build INPUT.py --output-dir out/ --exe app.out
     pytra build INPUT.py --output-dir out/ --exe app.out --run
 """
@@ -71,7 +71,7 @@ def cmd_link(argv: list[str]) -> int:
 # ---------- emit ----------
 
 def cmd_emit(argv: list[str]) -> int:
-    """pytra emit --target TARGET LINK_OUTPUT.json --output-dir DIR"""
+    """pytra emit --target TARGET MANIFEST.json --output-dir DIR"""
     target = ""
     remaining: list[str] = []
     i = 0
@@ -150,24 +150,24 @@ def cmd_build(argv: list[str]) -> int:
         output_dir = _tmp_emit_dir_obj.name  # type: ignore[union-attr]
 
     src_dir = _find_src_dir()
-    linked_dir = output_dir + "/.pytra_linked"
+    emit_dir = output_dir + "/emit"
 
-    # Stage 1: compile + link
+    # Stage 1: compile + link (writes manifest.json + east3/ into output_dir)
     link_cmd = [
         _python(), src_dir + "/toolchain/link/cli.py",
         input_file,
         "--target", target,
-        "--output-dir", linked_dir,
+        "--output-dir", output_dir,
     ]
     link_cmd.extend(passthrough)
     result = _run(link_cmd)
     if result.returncode != 0:
         return result.returncode
 
-    link_output = linked_dir + "/link-output.json"
+    link_output = output_dir + "/manifest.json"
 
-    # Stage 2: emit (all languages use --output-dir)
-    emit_argv = ["--target", target, link_output, "--output-dir", output_dir]
+    # Stage 2: emit (writes target source into emit/ subdirectory)
+    emit_argv = ["--target", target, link_output, "--output-dir", emit_dir]
     rc = cmd_emit(emit_argv)
     if rc != 0:
         return rc
@@ -175,8 +175,8 @@ def cmd_build(argv: list[str]) -> int:
     # If -o was given, copy only the transpiled entry file to the requested path
     if single_output != "":
         entry_stem = Path(input_file).stem
-        # Find the generated file in output_dir matching the entry stem
-        generated = Path(output_dir) / (entry_stem + "." + target)
+        # Find the generated file in emit_dir matching the entry stem
+        generated = Path(emit_dir) / (entry_stem + "." + target)
         if not generated.exists():
             # Try common extensions
             ext_map: dict[str, str] = {
@@ -187,13 +187,13 @@ def cmd_build(argv: list[str]) -> int:
                 "zig": "zig",
             }
             ext = ext_map.get(target, target)
-            generated = Path(output_dir) / (entry_stem + "." + ext)
+            generated = Path(emit_dir) / (entry_stem + "." + ext)
         so_path = Path(single_output)
         so_path.parent.mkdir(parents=True, exist_ok=True)
         if generated.exists():
             so_path.write_text(generated.read_text(encoding="utf-8"), encoding="utf-8")
 
-    # Stage 2.5: copy native runtime helpers to output_dir if needed
+    # Stage 2.5: copy native runtime helpers to emit_dir if needed
     # Skip runtime copy when -o is used (single-file output mode) because
     # the output_dir is derived from -o's parent and should not be polluted
     # with runtime files.  Runtime copy is only meaningful when --output-dir
@@ -207,7 +207,7 @@ def cmd_build(argv: list[str]) -> int:
         if target in _runtime_copy_map:
             rt_name = _runtime_copy_map[target]
             rt_src = Path(src_dir) / "runtime" / target / "built_in" / rt_name
-            rt_dst = Path(output_dir) / rt_name
+            rt_dst = Path(emit_dir) / rt_name
             if rt_src.exists() and not rt_dst.exists():
                 rt_dst.write_text(rt_src.read_text(encoding="utf-8"), encoding="utf-8")
 
@@ -217,7 +217,7 @@ def cmd_build(argv: list[str]) -> int:
         if _os_seam.path.isdir(_seam_dir_str):
             for _ns_name in sorted(_os_seam.listdir(_seam_dir_str)):
                 _ns_src_p = Path(_seam_dir_str) / _ns_name
-                _ns_dst_p = Path(output_dir) / _ns_name
+                _ns_dst_p = Path(emit_dir) / _ns_name
                 if _os_seam.path.isfile(str(_ns_src_p)) and not _ns_dst_p.exists():
                     _ns_dst_p.write_text(_ns_src_p.read_text(encoding="utf-8"), encoding="utf-8")
 
@@ -230,13 +230,13 @@ def cmd_build(argv: list[str]) -> int:
         "nim": "nim", "powershell": "ps1", "julia": "jl", "dart": "dart",
     }
     ext = ext_map.get(target, target)
-    entry_output = output_dir + "/" + entry_stem + "." + ext
+    entry_output = emit_dir + "/" + entry_stem + "." + ext
 
     if target == "cpp":
         # C++: Makefile → make → exe
         makefile_gen = src_dir + "/../tools/gen_makefile_from_manifest.py"
-        manifest = output_dir + "/manifest.json"
-        makefile = output_dir + "/Makefile"
+        manifest = emit_dir + "/manifest.json"
+        makefile = emit_dir + "/Makefile"
         gen_cmd = [
             _python(), makefile_gen,
             manifest,
@@ -246,12 +246,12 @@ def cmd_build(argv: list[str]) -> int:
         result = _run(gen_cmd)
         if result.returncode != 0:
             return result.returncode
-        make_cmd = ["make", "-C", output_dir]
+        make_cmd = ["make", "-C", emit_dir]
         result = _run(make_cmd)
         if result.returncode != 0:
             return result.returncode
         if do_run:
-            result = _run([output_dir + "/" + exe_name])
+            result = _run([emit_dir + "/" + exe_name])
             return result.returncode
         return 0
 
@@ -273,21 +273,21 @@ def cmd_build(argv: list[str]) -> int:
         }
         # Compiled languages: compile first, then run
         compile_map: dict[str, list[list[str]]] = {
-            "rs": [["rustc", "-O", entry_output, "-o", output_dir + "/" + exe_name]],
+            "rs": [["rustc", "-O", entry_output, "-o", emit_dir + "/" + exe_name]],
             # swift is handled below (needs all .swift files)
         }
         compile_run_map: dict[str, list[str]] = {
-            "rs": [output_dir + "/" + exe_name],
+            "rs": [emit_dir + "/" + exe_name],
             # swift is handled below
         }
 
         import os as _os
 
-        # C#: collect all .cs in output-dir, compile with mcs, run with mono
+        # C#: collect all .cs in emit_dir, compile with mcs, run with mono
         if target == "cs":
-            cs_exe = output_dir + "/" + entry_stem + "_cs.exe"
+            cs_exe = emit_dir + "/" + entry_stem + "_cs.exe"
             cs_files: list[str] = []
-            for root_dir, dirs, files in _os.walk(output_dir):
+            for root_dir, dirs, files in _os.walk(emit_dir):
                 for f in sorted(files):
                     if f.endswith(".cs"):
                         cs_files.append(_os.path.join(root_dir, f))
@@ -298,13 +298,13 @@ def cmd_build(argv: list[str]) -> int:
             result = _run(["mono", cs_exe])
             return result.returncode
 
-        # Go: collect all .go in output-dir, go build, then run exe
+        # Go: collect all .go in emit_dir, go build, then run exe
         if target == "go":
-            go_exe = output_dir + "/" + exe_name
+            go_exe = emit_dir + "/" + exe_name
             go_files: list[str] = []
-            for f in sorted(_os.listdir(output_dir)):
+            for f in sorted(_os.listdir(emit_dir)):
                 if f.endswith(".go"):
-                    go_files.append(output_dir + "/" + f)
+                    go_files.append(emit_dir + "/" + f)
             build_cmd = ["go", "build", "-o", go_exe] + go_files
             result = _run(build_cmd)
             if result.returncode != 0:
@@ -312,26 +312,26 @@ def cmd_build(argv: list[str]) -> int:
             result = _run([go_exe])
             return result.returncode
 
-        # Java: javac all .java in output-dir, then java main class
+        # Java: javac all .java in emit_dir, then java main class
         if target == "java":
             java_files: list[str] = []
-            for f in sorted(_os.listdir(output_dir)):
+            for f in sorted(_os.listdir(emit_dir)):
                 if f.endswith(".java"):
-                    java_files.append(output_dir + "/" + f)
+                    java_files.append(emit_dir + "/" + f)
             javac_cmd = ["javac", "-encoding", "UTF-8"] + java_files
             result = _run(javac_cmd)
             if result.returncode != 0:
                 return result.returncode
-            result = _run(["java", "-cp", output_dir, "Main"])
+            result = _run(["java", "-cp", emit_dir, "Main"])
             return result.returncode
 
-        # Swift: swiftc all .swift in output-dir → exe
+        # Swift: swiftc all .swift in emit_dir → exe
         if target == "swift":
-            swift_exe = output_dir + "/" + exe_name
+            swift_exe = emit_dir + "/" + exe_name
             swift_files: list[str] = []
-            for f in sorted(_os.listdir(output_dir)):
+            for f in sorted(_os.listdir(emit_dir)):
                 if f.endswith(".swift"):
-                    swift_files.append(output_dir + "/" + f)
+                    swift_files.append(emit_dir + "/" + f)
             swiftc_cmd = ["swiftc"] + swift_files + ["-o", swift_exe]
             result = _run(swiftc_cmd)
             if result.returncode != 0:
@@ -344,17 +344,17 @@ def cmd_build(argv: list[str]) -> int:
         # Use `nim c` + explicit -o to avoid the restriction of `nim r`.
         # Rename entry file if its stem starts with a digit.
         if target == "nim":
-            nim_exe = output_dir + "/" + exe_name
+            nim_exe = emit_dir + "/" + exe_name
             nim_entry = entry_output
             if not _os.path.exists(nim_entry):
-                alt = output_dir + "/main.nim"
+                alt = emit_dir + "/main.nim"
                 if _os.path.exists(alt):
                     nim_entry = alt
             # Rename entry file when the stem starts with a digit
             nim_stem = _os.path.basename(nim_entry)
             if nim_stem[:1].isdigit():
                 safe_name = "m_" + nim_stem
-                safe_path = output_dir + "/" + safe_name
+                safe_path = emit_dir + "/" + safe_name
                 _os.rename(nim_entry, safe_path)
                 nim_entry = safe_path
             nim_cmd = ["nim", "c", "--hints:off", "-o:" + nim_exe, nim_entry]
@@ -367,10 +367,10 @@ def cmd_build(argv: list[str]) -> int:
         # Kotlin: kotlinc all .kt → jar, then java -cp jar main
         if target == "kotlin":
             kt_files: list[str] = []
-            for f in sorted(_os.listdir(output_dir)):
+            for f in sorted(_os.listdir(emit_dir)):
                 if f.endswith(".kt"):
-                    kt_files.append(output_dir + "/" + f)
-            jar_path = output_dir + "/" + entry_stem + ".jar"
+                    kt_files.append(emit_dir + "/" + f)
+            jar_path = emit_dir + "/" + entry_stem + ".jar"
             kotlinc_cmd = ["kotlinc"] + kt_files + ["-include-runtime", "-d", jar_path]
             result = _run(kotlinc_cmd)
             if result.returncode != 0:
@@ -391,7 +391,7 @@ def cmd_build(argv: list[str]) -> int:
         # Scala: collect all .scala files recursively for scala run
         if target == "scala":
             scala_files: list[str] = []
-            for root_dir, dirs, files in _os.walk(output_dir):
+            for root_dir, dirs, files in _os.walk(emit_dir):
                 for f in sorted(files):
                     if f.endswith(".scala"):
                         scala_files.append(_os.path.join(root_dir, f))
@@ -416,14 +416,14 @@ def _print_help() -> None:
     print("")
     print("commands:")
     print("  compile   .py → .east (EAST3 JSON)")
-    print("  link      .east → linked EAST (link-output.json)")
-    print("  emit      linked EAST → target source")
+    print("  link      .py → linked EAST (manifest.json + east3/)")
+    print("  emit      linked EAST → target source (emit/)")
     print("  build     .py → executable (compile + link + emit + g++)")
     print("")
     print("examples:")
     print("  pytra compile foo.py -o foo.east")
-    print("  pytra link foo.east --output-dir out/linked/ --target cpp")
-    print("  pytra emit --target cpp out/linked/link-output.json --output-dir out/cpp/")
+    print("  pytra link foo.py --output-dir out/ --target cpp")
+    print("  pytra emit --target cpp out/manifest.json --output-dir out/emit/")
     print("  pytra build foo.py --output-dir out/ --exe app.out --run")
 
 

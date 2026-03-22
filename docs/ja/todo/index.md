@@ -103,12 +103,15 @@
 
 ### P2: ビルド出力ディレクトリ構造の標準化
 
-文脈: spec-folder.md §2.8
+文脈: [docs/ja/plans/p2-build-output-structure.md](../plans/p2-build-output-structure.md)
 
-1. [ ] [ID: P2-BUILD-OUTPUT-STRUCTURE-01] linker の出力を `east3/` + `manifest.json` に変更する。
-2. [ ] [ID: P2-BUILD-OUTPUT-STRUCTURE-02] emitter の出力を `emit/` に変更する。
-3. [ ] [ID: P2-BUILD-OUTPUT-STRUCTURE-03] `pytra-cli.py` を新構造に対応させる。
-4. [ ] [ID: P2-BUILD-OUTPUT-STRUCTURE-04] 全 backend の動作確認。
+1. [x] [ID: P2-BUILD-OUTPUT-STRUCTURE-01] linker の出力を `east3/` + `manifest.json` に変更する。
+2. [x] [ID: P2-BUILD-OUTPUT-STRUCTURE-02] emitter の出力を `emit/` に変更する。
+3. [x] [ID: P2-BUILD-OUTPUT-STRUCTURE-03] `pytra-cli.py` を新構造に対応させる。
+4. [x] [ID: P2-BUILD-OUTPUT-STRUCTURE-04] 全 backend の動作確認。
+
+進捗:
+- 2026-03-22: S1〜S4 完了。linker/emitter/cli/tools/test/docs を新構造に一括対応。regression なし確認。
 
 #### P0-22: REPO_ROOT 修正 + import alias 解決 + conftest extern 関数修正
 

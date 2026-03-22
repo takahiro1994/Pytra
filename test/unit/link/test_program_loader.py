@@ -195,7 +195,7 @@ class LinkedProgramLoaderTests(unittest.TestCase):
     def test_load_link_output_doc_validates_required_global_keys(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
-            manifest_path = root / "link-output.json"
+            manifest_path = root / "manifest.json"
             save_manifest_doc(
                 manifest_path,
                 {
@@ -230,7 +230,7 @@ class LinkedProgramLoaderTests(unittest.TestCase):
                         {
                             "module_id": "app.main",
                             "input": "raw/app/main.east3.json",
-                            "output": "linked/app/main.east3.json",
+                            "output": "east3/app/main.east3.json",
                             "source_path": "sample/py/main.py",
                             "is_entry": True,
                         }
@@ -265,7 +265,7 @@ class LinkedProgramLoaderTests(unittest.TestCase):
                     {
                         "module_id": "app.main",
                         "input": "raw/app/main.east3.json",
-                        "output": "linked/app/main.east3.json",
+                        "output": "east3/app/main.east3.json",
                         "source_path": "sample/py/main.py",
                         "is_entry": True,
                     }
@@ -311,7 +311,7 @@ class LinkedProgramLoaderTests(unittest.TestCase):
                         {
                             "module_id": "app.main",
                             "input": "raw/app/main.east3.json",
-                            "output": "linked/app/main.east3.json",
+                            "output": "east3/app/main.east3.json",
                             "source_path": "sample/py/main.py",
                             "is_entry": True,
                         }
@@ -339,7 +339,7 @@ class LinkedProgramLoaderTests(unittest.TestCase):
                         {
                             "module_id": "app.main",
                             "input": "raw/app/main.east3.json",
-                            "output": "linked/app/main.east3.json",
+                            "output": "east3/app/main.east3.json",
                             "source_path": "sample/py/main.py",
                             "is_entry": True,
                         }
@@ -383,7 +383,7 @@ class LinkedProgramLoaderTests(unittest.TestCase):
                         {
                             "module_id": "app.main",
                             "input": "raw/app/main.east3.json",
-                            "output": "linked/app/main.east3.json",
+                            "output": "east3/app/main.east3.json",
                             "source_path": "sample/py/main.py",
                             "is_entry": True,
                         }
@@ -419,7 +419,7 @@ class LinkedProgramLoaderTests(unittest.TestCase):
                         {
                             "module_id": "app.main",
                             "input": "raw/app/main.east3.json",
-                            "output": "linked/app/main.east3.json",
+                            "output": "east3/app/main.east3.json",
                             "source_path": "sample/py/main.py",
                             "is_entry": True,
                         }
@@ -454,7 +454,7 @@ class LinkedProgramLoaderTests(unittest.TestCase):
                         {
                             "module_id": "app.main",
                             "input": "raw/app/main.east3.json",
-                            "output": "linked/app/main.east3.json",
+                            "output": "east3/app/main.east3.json",
                             "source_path": "sample/py/main.py",
                             "is_entry": True,
                         }
@@ -482,7 +482,7 @@ class LinkedProgramLoaderTests(unittest.TestCase):
                         {
                             "module_id": "app.main",
                             "input": "raw/app/main.east3.json",
-                            "output": "linked/app/main.east3.json",
+                            "output": "east3/app/main.east3.json",
                             "source_path": "sample/py/main.py",
                             "is_entry": True,
                         }
@@ -512,7 +512,7 @@ class LinkedProgramLoaderTests(unittest.TestCase):
                         {
                             "module_id": "app.main",
                             "input": "raw/app/main.east3.json",
-                            "output": "linked/app/main.east3.json",
+                            "output": "east3/app/main.east3.json",
                             "source_path": "sample/py/main.py",
                             "is_entry": True,
                         }
@@ -540,7 +540,7 @@ class LinkedProgramLoaderTests(unittest.TestCase):
                         {
                             "module_id": "app.main",
                             "input": "raw/app/main.east3.json",
-                            "output": "linked/app/main.east3.json",
+                            "output": "east3/app/main.east3.json",
                             "source_path": "sample/py/main.py",
                             "is_entry": True,
                         }
@@ -568,7 +568,7 @@ class LinkedProgramLoaderTests(unittest.TestCase):
                         {
                             "module_id": "app.main",
                             "input": "raw/app/main.east3.json",
-                            "output": "linked/app/main.east3.json",
+                            "output": "east3/app/main.east3.json",
                             "source_path": "sample/py/main.py",
                             "is_entry": True,
                         }
@@ -587,7 +587,7 @@ class LinkedProgramLoaderTests(unittest.TestCase):
     def test_load_link_output_doc_normalizes_and_sorts_module_entries(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
-            manifest_path = root / "link-output.json"
+            manifest_path = root / "manifest.json"
             save_manifest_doc(
                 manifest_path,
                 {
@@ -599,14 +599,14 @@ class LinkedProgramLoaderTests(unittest.TestCase):
                         {
                             "module_id": "app.main",
                             "input": "raw/app/main.east3.json",
-                            "output": "linked/app/main.east3.json",
+                            "output": "east3/app/main.east3.json",
                             "source_path": "/tmp/main.py",
                             "is_entry": True,
                         },
                         {
                             "module_id": "app.helper",
                             "input": "raw/app/helper.east3.json",
-                            "output": "linked/app/helper.east3.json",
+                            "output": "east3/app/helper.east3.json",
                             "source_path": "/tmp/helper.py",
                             "is_entry": False,
                         },
@@ -635,7 +635,7 @@ class LinkedProgramLoaderTests(unittest.TestCase):
                     {
                         "module_id": "__pytra_helper__.cpp.demo",
                         "input": "generated://cpp.demo",
-                        "output": "linked/__pytra_helper__/cpp/demo.east3.json",
+                        "output": "east3/__pytra_helper__/cpp/demo.east3.json",
                         "source_path": "",
                         "is_entry": False,
                         "module_kind": "helper",
@@ -646,7 +646,7 @@ class LinkedProgramLoaderTests(unittest.TestCase):
                     {
                         "module_id": "app.main",
                         "input": "raw/app/main.east3.json",
-                        "output": "linked/app/main.east3.json",
+                        "output": "east3/app/main.east3.json",
                         "source_path": "sample/py/main.py",
                         "is_entry": True,
                     },
@@ -682,7 +682,7 @@ class LinkedProgramLoaderTests(unittest.TestCase):
                         {
                             "module_id": "__pytra_helper__.cpp.demo",
                             "input": "generated://cpp.demo",
-                            "output": "linked/__pytra_helper__/cpp/demo.east3.json",
+                            "output": "east3/__pytra_helper__/cpp/demo.east3.json",
                             "source_path": "",
                             "is_entry": False,
                             "module_kind": "helper",
@@ -692,7 +692,7 @@ class LinkedProgramLoaderTests(unittest.TestCase):
                         {
                             "module_id": "app.main",
                             "input": "raw/app/main.east3.json",
-                            "output": "linked/app/main.east3.json",
+                            "output": "east3/app/main.east3.json",
                             "source_path": "sample/py/main.py",
                             "is_entry": True,
                         },
@@ -720,7 +720,7 @@ class LinkedProgramLoaderTests(unittest.TestCase):
                         {
                             "module_id": "app.other",
                             "input": "raw/app/other.east3.json",
-                            "output": "linked/app/other.east3.json",
+                            "output": "east3/app/other.east3.json",
                             "source_path": "sample/py/other.py",
                             "is_entry": False,
                         }
@@ -954,7 +954,7 @@ class LinkedProgramLoaderTests(unittest.TestCase):
     def test_load_linked_output_bundle_sorts_modules_and_tracks_artifact_paths(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
-            linked_dir = root / "linked"
+            linked_dir = root / "east3"
             linked_dir.mkdir(parents=True, exist_ok=True)
             helper_path = linked_dir / "app" / "helper.east3.json"
             helper_path.parent.mkdir(parents=True, exist_ok=True)
@@ -987,7 +987,7 @@ class LinkedProgramLoaderTests(unittest.TestCase):
             }
             helper_path.write_text(json.dumps(helper_doc, ensure_ascii=False), encoding="utf-8")
             main_path.write_text(json.dumps(main_doc, ensure_ascii=False), encoding="utf-8")
-            manifest_path = root / "link-output.json"
+            manifest_path = root / "manifest.json"
             save_manifest_doc(
                 manifest_path,
                 {
@@ -999,14 +999,14 @@ class LinkedProgramLoaderTests(unittest.TestCase):
                         {
                             "module_id": "app.main",
                             "input": "raw/app/main.east3.json",
-                            "output": "linked/app/main.east3.json",
+                            "output": "east3/app/main.east3.json",
                             "source_path": str(root / "main.py"),
                             "is_entry": True,
                         },
                         {
                             "module_id": "app.helper",
                             "input": "raw/app/helper.east3.json",
-                            "output": "linked/app/helper.east3.json",
+                            "output": "east3/app/helper.east3.json",
                             "source_path": str(root / "helper.py"),
                             "is_entry": False,
                         },
@@ -1030,10 +1030,10 @@ class LinkedProgramLoaderTests(unittest.TestCase):
     def test_load_linked_output_bundle_preserves_helper_module_fields(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
-            linked_dir = root / "linked" / "__pytra_helper__" / "cpp"
+            linked_dir = root / "east3" / "__pytra_helper__" / "cpp"
             linked_dir.mkdir(parents=True, exist_ok=True)
             helper_path = linked_dir / "demo.east3.json"
-            main_dir = root / "linked" / "app"
+            main_dir = root / "east3" / "app"
             main_dir.mkdir(parents=True, exist_ok=True)
             main_path = main_dir / "main.east3.json"
             helper_doc = _east3_doc()
@@ -1069,7 +1069,7 @@ class LinkedProgramLoaderTests(unittest.TestCase):
             }
             helper_path.write_text(json.dumps(helper_doc, ensure_ascii=False), encoding="utf-8")
             main_path.write_text(json.dumps(main_doc, ensure_ascii=False), encoding="utf-8")
-            manifest_path = root / "link-output.json"
+            manifest_path = root / "manifest.json"
             save_manifest_doc(
                 manifest_path,
                 {
@@ -1081,14 +1081,14 @@ class LinkedProgramLoaderTests(unittest.TestCase):
                         {
                             "module_id": "app.main",
                             "input": "raw/app/main.east3.json",
-                            "output": "linked/app/main.east3.json",
+                            "output": "east3/app/main.east3.json",
                             "source_path": str(root / "main.py"),
                             "is_entry": True,
                         },
                         {
                             "module_id": "__pytra_helper__.cpp.demo",
                             "input": "generated://cpp.demo",
-                            "output": "linked/__pytra_helper__/cpp/demo.east3.json",
+                            "output": "east3/__pytra_helper__/cpp/demo.east3.json",
                             "source_path": "",
                             "is_entry": False,
                             "module_kind": "helper",

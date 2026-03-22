@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""JS backend: link-output.json → JS multi-file output.
+"""JS backend: manifest.json → JS multi-file output.
 
 Usage:
-    python3 -m toolchain.emit.js LINK_OUTPUT.json --output-dir out/js/
+    python3 -m toolchain.emit.js MANIFEST.json --output-dir out/js/
 """
 
 from __future__ import annotations
@@ -17,7 +17,7 @@ from toolchain.misc.js_runtime_shims import write_js_runtime_shims
 def main() -> int:
     argv = sys.argv[1:]
     if len(argv) == 0 or argv[0] in ("-h", "--help"):
-        print("usage: toolchain.emit.js LINK_OUTPUT.json --output-dir DIR")
+        print("usage: toolchain.emit.js MANIFEST.json --output-dir DIR")
         return 0
 
     input_path = ""
@@ -34,7 +34,7 @@ def main() -> int:
         i += 1
 
     if input_path == "":
-        print("error: input link-output.json is required", file=sys.stderr)
+        print("error: input manifest.json is required", file=sys.stderr)
         return 1
 
     rc = emit_all_modules(input_path, output_dir, ".js", transpile_to_js)

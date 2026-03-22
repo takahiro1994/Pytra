@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""pytra link: .py → linked EAST (compile + link + optimize → link-output.json).
+"""pytra link: .py → linked EAST (compile + link + optimize → manifest.json).
 
 Takes a .py entry point, builds the full module graph, links, optimizes,
-and writes link-output.json + linked module files.
+and writes manifest.json + east3/ module files.
 """
 
 from __future__ import annotations
@@ -52,7 +52,7 @@ def main(argv: list[str] | None = None) -> int:
         print("error: input file is required", file=__import__("sys").stderr)
         return 1
     if output_dir_text == "":
-        output_dir_text = "out/linked"
+        output_dir_text = "out"
 
     input_path = Path(input_text)
 

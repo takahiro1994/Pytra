@@ -98,10 +98,10 @@ def main() -> int:
 
     if multi_module:
         multimod_dir = SELFHOST / "cpp"
-        linked_dir = SELFHOST / "linked"
-        link_output = linked_dir / "link-output.json"
-        # Stage 1+2: compile + link (no emitter dependency)
-        run(build_selfhost_multimod_link_cmd(SELFHOST_ENTRY, linked_dir))
+        build_dir = SELFHOST / "build"
+        link_output = build_dir / "manifest.json"
+        # Stage 1+2: compile + link (writes manifest.json + east3/ into build_dir)
+        run(build_selfhost_multimod_link_cmd(SELFHOST_ENTRY, build_dir))
         # Stage 3: emit C++ (only C++ emitter imported)
         run(build_selfhost_multimod_emit_cmd(link_output, multimod_dir))
         print(f"multi-module output: {multimod_dir}")

@@ -74,11 +74,11 @@ class EastlinkCliTest(unittest.TestCase):
             rc = eastlink_mod.main([str(link_input), "--output-dir", str(out_dir)])
 
             self.assertEqual(rc, 0)
-            link_output = json.loads((out_dir / "link-output.json").read_text(encoding="utf-8"))
+            link_output = json.loads((out_dir / "manifest.json").read_text(encoding="utf-8"))
             self.assertEqual(link_output["schema"], "pytra.link_output.v1")
             self.assertEqual([item["module_id"] for item in link_output["modules"]], ["app.helper", "app.main"])
-            self.assertTrue((out_dir / "linked" / "app" / "main.east3.json").exists())
-            main_linked = json.loads((out_dir / "linked" / "app" / "main.east3.json").read_text(encoding="utf-8"))
+            self.assertTrue((out_dir / "east3" / "app" / "main.east3.json").exists())
+            main_linked = json.loads((out_dir / "east3" / "app" / "main.east3.json").read_text(encoding="utf-8"))
             self.assertIn("linked_program_v1", main_linked["meta"])
             self.assertEqual(main_linked["meta"]["linked_program_v1"]["module_id"], "app.main")
 

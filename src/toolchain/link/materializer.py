@@ -134,13 +134,13 @@ def write_link_output_bundle(
 ) -> tuple[Path, list[Path]]:
     output_dir.mkdir(parents=True, exist_ok=True)
     link_output_doc = result.link_output_doc
-    link_output_path = output_dir / "link-output.json"
+    link_output_path = output_dir / "manifest.json"
     save_manifest_doc(link_output_path, link_output_doc)
 
     output_map = _module_output_map(link_output_doc)
     written: list[Path] = []
     for module in result.linked_program.modules:
-        rel_path = output_map.get(module.module_id, _module_rel_path(module.module_id, prefix="linked"))
+        rel_path = output_map.get(module.module_id, _module_rel_path(module.module_id, prefix="east3"))
         output_path = output_dir / rel_path
         save_manifest_doc(output_path, module.east_doc)
         written.append(output_path)
@@ -155,16 +155,16 @@ def load_linked_output_bundle(
     modules_any = manifest_doc.get("modules", [])
     modules: list[LinkedProgramModule] = []
     if not isinstance(modules_any, list):
-        raise RuntimeError("link-output.modules must be a list")
+        raise RuntimeError("manifest.modules must be a list")
     for index, item in enumerate(modules_any):
         module_id = getattr(item, "module_id", "")
         output = getattr(item, "output", "")
         source_path = getattr(item, "source_path", "")
         is_entry = bool(getattr(item, "is_entry", False))
         if not isinstance(module_id, str) or module_id == "":
-            raise RuntimeError("link-output.modules[" + str(index) + "].module_id must be non-empty string")
+            raise RuntimeError("manifest.modules[" + str(index) + "].module_id must be non-empty string")
         if not isinstance(output, str) or output == "":
-            raise RuntimeError("link-output.modules[" + str(index) + "].output must be non-empty string")
+            raise RuntimeError("manifest.modules[" + str(index) + "].output must be non-empty string")
         artifact_path = (manifest_dir / output).resolve()
         east_doc = _load_linked_east3_doc(
             artifact_path,

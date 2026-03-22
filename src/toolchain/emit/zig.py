@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Zig backend: link-output.json → Zig multi-file output.
+"""Zig backend: manifest.json → Zig multi-file output.
 
 Usage:
-    python3 -m toolchain.emit.zig LINK_OUTPUT.json --output-dir out/zig/
+    python3 -m toolchain.emit.zig MANIFEST.json --output-dir out/zig/
 """
 
 from __future__ import annotations
@@ -36,7 +36,7 @@ def _copy_runtime(output_dir: str) -> None:
 def main() -> int:
     argv = sys.argv[1:]
     if len(argv) == 0 or argv[0] in ("-h", "--help"):
-        print("usage: toolchain.emit.zig LINK_OUTPUT.json --output-dir DIR")
+        print("usage: toolchain.emit.zig MANIFEST.json --output-dir DIR")
         return 0
 
     input_path = ""
@@ -53,7 +53,7 @@ def main() -> int:
         i += 1
 
     if input_path == "":
-        print("error: input link-output.json is required", file=sys.stderr)
+        print("error: input manifest.json is required", file=sys.stderr)
         return 1
 
     modules, entry_modules = load_linked_modules(input_path)
@@ -64,7 +64,10 @@ def main() -> int:
         module_id = mod["module_id"]
         east_doc = mod["east_doc"]
         is_entry = mod.get("is_entry", False)
-        rel_path = module_id.replace(".", "/") + ".zig"
+        rel_module = module_id
+        if rel_module.startswith("pytra."):
+            rel_module = rel_module[len("pytra."):]
+        rel_path = rel_module.replace(".", "/") + ".zig"
         out_path = out / rel_path
         out_path.parent.mkdir(parents=True, exist_ok=True)
 

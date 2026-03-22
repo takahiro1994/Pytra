@@ -700,7 +700,7 @@ def _program_id(program: LinkedProgram) -> str:
 
 
 def _linked_output_path(module_id: str) -> str:
-    return "linked/" + module_id.replace(".", "/") + ".east3.json"
+    return "east3/" + module_id.replace(".", "/") + ".east3.json"
 
 
 def _input_label(module: LinkedProgramModule) -> str:

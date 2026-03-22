@@ -76,23 +76,23 @@ def _src_env() -> dict[str, str]:
 def _run_one(*, src: Path, out: Path, target: str) -> RunResult:
     """Transpile a single .py file to target language via compile → link → emit."""
     with tempfile.TemporaryDirectory() as tmpdir:
-        linked_dir = Path(tmpdir) / "linked"
-        emit_dir = Path(tmpdir) / "emit"
+        build_dir = Path(tmpdir) / "build"
+        emit_dir = Path(tmpdir) / "build" / "emit"
         env = _src_env()
 
-        # Stage 1: compile + link
+        # Stage 1: compile + link (writes manifest.json + east3/ into build_dir)
         link_cmd = [
             "python3", str(ROOT / "src" / "toolchain" / "link" / "cli.py"),
-            str(src), "--target", target, "--output-dir", str(linked_dir),
+            str(src), "--target", target, "--output-dir", str(build_dir),
         ]
         cp = subprocess.run(link_cmd, cwd=ROOT, capture_output=True, text=True, env=env)
         if cp.returncode != 0:
             raw = (cp.stderr or "").strip() or (cp.stdout or "").strip()
             return RunResult(False, _extract_failure_headline(raw), raw, _extract_user_error_category(raw))
 
-        link_output = linked_dir / "link-output.json"
+        link_output = build_dir / "manifest.json"
         if not link_output.exists():
-            return RunResult(False, "link-output.json not found after link stage", "", "")
+            return RunResult(False, "manifest.json not found after link stage", "", "")
 
         # Stage 2: emit
         emit_script = str(ROOT / "src" / "toolchain" / "emit" / (target + ".py"))

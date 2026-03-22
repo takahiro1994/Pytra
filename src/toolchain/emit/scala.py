@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Scala backend: link-output.json → Scala single-file output.
+"""Scala backend: manifest.json → Scala single-file output.
 
 All linked modules are merged into a single .scala file to avoid
 top-level definition collisions in Scala 3.
 
 Usage:
-    python3 -m toolchain.emit.scala LINK_OUTPUT.json --output-dir out/scala/
+    python3 -m toolchain.emit.scala MANIFEST.json --output-dir out/scala/
 """
 
 from __future__ import annotations
@@ -20,7 +20,7 @@ from toolchain.emit.loader import load_linked_modules
 def main() -> int:
     argv = sys.argv[1:]
     if len(argv) == 0 or argv[0] in ("-h", "--help"):
-        print("usage: toolchain.emit.scala LINK_OUTPUT.json --output-dir DIR")
+        print("usage: toolchain.emit.scala MANIFEST.json --output-dir DIR")
         return 0
 
     input_path = ""
@@ -37,7 +37,7 @@ def main() -> int:
         i += 1
 
     if input_path == "":
-        print("error: input link-output.json is required", file=sys.stderr)
+        print("error: input manifest.json is required", file=sys.stderr)
         return 1
 
     modules, entry_modules = load_linked_modules(input_path)

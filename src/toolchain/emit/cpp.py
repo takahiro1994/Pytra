@@ -2,11 +2,10 @@
 """Standalone C++ backend: linked EAST → C++ multi-file output.
 
 This is the C++ backend entry point, independent of other language backends.
-It reads a link-output.json (produced by ``pytra link --link-only``) and
-emits C++ source files.
+It reads a manifest.json (produced by ``pytra link``) and emits C++ source files.
 
 Usage:
-    python3 -m toolchain.emit.cpp link-output.json --output-dir out/cpp/
+    python3 -m toolchain.emit.cpp MANIFEST.json --output-dir out/cpp/
 """
 
 from __future__ import annotations
@@ -78,7 +77,7 @@ def _parse_emitter_option(raw: str) -> tuple[str, str]:
 def main() -> int:
     argv = sys.argv[1:]
     if len(argv) == 0 or argv[0] in ("-h", "--help"):
-        print("usage: east2cpp.py LINK_OUTPUT.json --output-dir DIR [--emitter-option key=value ...]")
+        print("usage: east2cpp.py MANIFEST.json --output-dir DIR [--emitter-option key=value ...]")
         return 0
 
     input_path = ""
@@ -104,7 +103,7 @@ def main() -> int:
         i += 1
 
     if input_path == "":
-        print("error: input link-output.json is required", file=sys.stderr)
+        print("error: input manifest.json is required", file=sys.stderr)
         return 1
     if output_dir == "":
         output_dir = "out/cpp"

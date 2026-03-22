@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Go backend: link-output.json → Go multi-file output.
+"""Go backend: manifest.json → Go multi-file output.
 
 Usage:
-    python3 -m toolchain.emit.go LINK_OUTPUT.json --output-dir out/go/
+    python3 -m toolchain.emit.go MANIFEST.json --output-dir out/go/
 """
 
 from __future__ import annotations
@@ -106,7 +106,7 @@ def _generate_go_runtime(output_dir: str) -> None:
 def main() -> int:
     argv = sys.argv[1:]
     if len(argv) == 0 or argv[0] in ("-h", "--help"):
-        print("usage: toolchain.emit.go LINK_OUTPUT.json --output-dir DIR")
+        print("usage: toolchain.emit.go MANIFEST.json --output-dir DIR")
         return 0
 
     input_path = ""
@@ -123,7 +123,7 @@ def main() -> int:
         i += 1
 
     if input_path == "":
-        print("error: input link-output.json is required", file=sys.stderr)
+        print("error: input manifest.json is required", file=sys.stderr)
         return 1
 
     rc = emit_all_modules(input_path, output_dir, ".go", transpile_to_go)

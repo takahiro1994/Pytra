@@ -875,14 +875,14 @@ class Py2xCliTest(unittest.TestCase):
                             rc = py2x_mod.main()
 
             self.assertEqual(rc, 0)
-            self.assertTrue((out_dir / "link-output.json").exists())
-            self.assertTrue((out_dir / "linked" / "app" / "main.east3.json").exists())
-            self.assertTrue((out_dir / "linked" / "app" / "helper.east3.json").exists())
+            self.assertTrue((out_dir / "manifest.json").exists())
+            self.assertTrue((out_dir / "east3" / "app" / "main.east3.json").exists())
+            self.assertTrue((out_dir / "east3" / "app" / "helper.east3.json").exists())
 
     def test_from_link_output_delegates_to_ir2lang_restart_route(self) -> None:
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)
-            link_output = root / "link-output.json"
+            link_output = root / "manifest.json"
             out_dir = root / "out"
             link_output.write_text("{}", encoding="utf-8")
             argv = [

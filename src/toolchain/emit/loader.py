@@ -1,6 +1,6 @@
 """Shared loader and multi-module emit helpers for emit entry points.
 
-Handles link-output.json (linked program manifest) loading and
+Handles manifest.json (linked program manifest) loading and
 multi-module emit orchestration.
 """
 
@@ -14,7 +14,7 @@ LINK_OUTPUT_SCHEMA = "pytra.link_output.v1"
 
 
 def load_linked_modules(input_path: str) -> tuple[list[dict[str, Any]], list[str]]:
-    """Load linked modules from a link-output.json.
+    """Load linked modules from a manifest.json.
 
     Returns (modules, entry_module_ids) where each module is a dict with:
         - module_id: str
@@ -42,7 +42,7 @@ def load_linked_modules(input_path: str) -> tuple[list[dict[str, Any]], list[str
 
     modules_any = raw.get("modules", [])
     if not isinstance(modules_any, list):
-        raise RuntimeError("link-output.json: modules must be a list")
+        raise RuntimeError("manifest.json: modules must be a list")
 
     modules: list[dict[str, Any]] = []
     for item in modules_any:
@@ -86,7 +86,7 @@ def emit_all_modules(
     See spec-runtime.md §0.6c for details.
 
     Args:
-        input_path: Path to link-output.json.
+        input_path: Path to manifest.json.
         output_dir: Directory to write output files.
         ext: File extension (e.g. ".rs", ".lua").
         transpile_fn: Function that takes an EAST3 dict and returns source code string.

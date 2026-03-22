@@ -54,15 +54,15 @@
 - 必要時のみ raw `EAST3` 群と `link-input.v1` / `link-output.v1` を保存する。
 - 推奨導線は次のとおり。
   1. `pytra-cli.py` で raw `EAST3` 群と `link-input.json` を出力する。
-  2. `pytra link` で `link-input.json` を読み、`link-output.json` と linked module 群を出力する。
-  3. `east2cpp.py`（C++ の場合）または `east2x.py`（汎用）で `link-output.json` を読んで backend emit する。
+  2. `pytra link` で `link-input.json` を読み、`manifest.json` と linked module 群を出力する。
+  3. `east2cpp.py`（C++ の場合）または `east2x.py`（汎用）で `manifest.json` を読んで backend emit する。
 
 推奨拡張子 / ファイル名:
 - `*.east1.json`
 - `*.east2.json`
 - `*.east3.json`
 - `link-input.json`
-- `link-output.json`
+- `manifest.json`
 
 ## 5. linker の責務
 
@@ -295,15 +295,15 @@ synthetic helper module の規則:
 - `pytra-cli.py`
   - raw `EAST3` 群と `link-input.json` を出力できる。
 - `pytra link`
-  - `link-input.json` を読み、`link-output.json` と linked module 群を出力する。
+  - `link-input.json` を読み、`manifest.json` と linked module 群を出力する。
 - `east2cpp.py`
-  - `link-output.json` を受理し、C++ multi-file 出力を生成する。非 C++ backend を import しない独立エントリポイント。
+  - `manifest.json` を受理し、C++ multi-file 出力を生成する。非 C++ backend を import しない独立エントリポイント。
 - `east2x.py`
-  - raw 単一 `Module` または `link-output.json` を受理し、全 backend 対応の汎用経路で backend へ渡す。
+  - raw 単一 `Module` または `manifest.json` を受理し、全 backend 対応の汎用経路で backend へ渡す。
 
 最小挙動規則:
 
-1. `--link-only` は backend 生成を行わず、`link-output.json` と linked module 群のみ出力する。
+1. `--link-only` は backend 生成を行わず、`manifest.json` と linked module 群のみ出力する。
 2. `--object-dispatch-mode` は raw `EAST3` 構築前に確定し、linker は整合性検査だけを行う。
 3. debug / restart 経路でも `link-input.v1` / `link-output.v1` を canonical source とする。
 4. global pass は `link-input.v1` / `link-output.v1` が列挙した module 群だけを入力として扱う。`source_path` を辿った追加読込や import 文の再解析で closure を拡張してはならない。

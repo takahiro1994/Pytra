@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""RS backend: link-output.json → RS multi-file output.
+"""RS backend: manifest.json → RS multi-file output.
 
 Usage:
-    python3 -m toolchain.emit.rs LINK_OUTPUT.json --output-dir out/rs/
+    python3 -m toolchain.emit.rs MANIFEST.json --output-dir out/rs/
 """
 
 from __future__ import annotations
@@ -23,7 +23,7 @@ _RS_NATIVE_STD_DIR = _ROOT / "src" / "runtime" / "rs" / "std"
 def main() -> int:
     argv = sys.argv[1:]
     if len(argv) == 0 or argv[0] in ("-h", "--help"):
-        print("usage: toolchain.emit.rs LINK_OUTPUT.json --output-dir DIR")
+        print("usage: toolchain.emit.rs MANIFEST.json --output-dir DIR")
         return 0
 
     input_path = ""
@@ -40,7 +40,7 @@ def main() -> int:
         i += 1
 
     if input_path == "":
-        print("error: input link-output.json is required", file=sys.stderr)
+        print("error: input manifest.json is required", file=sys.stderr)
         return 1
 
     rc = emit_all_modules(input_path, output_dir, ".rs", transpile_to_rust)

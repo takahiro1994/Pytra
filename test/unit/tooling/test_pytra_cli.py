@@ -44,7 +44,7 @@ class PytraCliTest(unittest.TestCase):
                         idx = cmd_list.index("--output-dir")
                         if idx + 1 < len(cmd_list):
                             output_dir = Path(cwd) / Path(cmd_list[idx + 1]) if cwd is not None else Path(cmd_list[idx + 1])
-                    link_output_path = Path(output_dir).resolve() / "link-output.json"
+                    link_output_path = Path(output_dir).resolve() / "manifest.json"
                     link_output_path.parent.mkdir(parents=True, exist_ok=True)
                     link_output_path.write_text(
                         """
