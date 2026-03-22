@@ -23,6 +23,8 @@ from toolchain.link.program_model import LinkedProgramModule
 from toolchain.link.program_validator import validate_link_output_doc
 from toolchain.link.program_validator import validate_raw_east3_doc
 from toolchain.link.module_export_resolver import resolve_module_attribute_types
+from toolchain.compile.east2_to_east3_default_arg_expansion import _collect_function_signatures
+from toolchain.compile.east2_to_east3_default_arg_expansion import _expand_call_defaults
 from toolchain.link.runtime_template_specializer import materialize_runtime_template_specializations
 
 
@@ -725,6 +727,19 @@ def optimize_linked_program(program: LinkedProgram) -> LinkedProgramOptimization
     _apply_union_param_ref_promotion(linked_modules)
     # Resolve module attribute types (e.g. math.pi → float64) from export tables.
     resolve_module_attribute_types(linked_modules)
+    # Cross-module default argument expansion: collect signatures from all
+    # modules and expand call sites with missing default values.
+    global_sigs: dict[str, dict[str, Any]] = {}
+    for mod in linked_modules:
+        doc = mod.east_doc if isinstance(mod.east_doc, dict) else {}
+        mod_sigs = _collect_function_signatures(doc)
+        for name, sig in mod_sigs.items():
+            if name not in global_sigs:
+                global_sigs[name] = sig
+    if len(global_sigs) > 0:
+        for mod in linked_modules:
+            doc = mod.east_doc if isinstance(mod.east_doc, dict) else {}
+            _expand_call_defaults(doc, global_sigs)
 
     type_id_table, type_id_base_map, type_info_table = _build_type_id_table(linked_input_program)
     resolved_deps_by_module = _build_all_resolved_dependencies(linked_input_program)
