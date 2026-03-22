@@ -91,6 +91,35 @@ def _module_id_to_import_path(module_id: str, ext: str, root_rel_prefix: str) ->
     return root_rel_prefix + rel.replace(".", "/") + ext
 ```
 
+### symbol import と module import の区別
+
+`import_bindings` の `binding_kind` には `"module"` と `"symbol"` がある。これらを正しく区別すること。
+
+```python
+from re import sub       # binding_kind="symbol" — re モジュールの sub 関数
+from pytra.utils import png  # binding_kind="symbol" — しかし png はサブモジュール
+import math               # binding_kind="module" — math モジュール全体
+```
+
+**symbol import のインクルード/import パス生成:**
+
+- `from re import sub` → `re` モジュールをインクルード（`std/re.<ext>`）
+- `sub` はモジュール内の関数であり、**サブモジュールではない**
+- `std/re/sub.<ext>` のようにシンボル名をパスに展開してはならない
+
+```
+# 正しい
+from re import sub  → #include "std/re.h"      (C++)
+                    → import { sub } from "./std/re.js"  (JS)
+
+# 間違い
+from re import sub  → #include "std/re/sub.h"  ← sub をサブモジュール扱い
+```
+
+**サブモジュール import の判別:**
+
+`from pytra.utils import png` の `png` がサブモジュールかシンボルかは、linker が `module_id + "." + export_name` で runtime module が存在するか確認して判別済み。`build_import_alias_map` を使えば、emitter は判別ロジックを実装する必要がない。
+
 ### import alias の解決
 
 `from pytra.std import os_path as path` のような alias は `build_import_alias_map` で解決:
