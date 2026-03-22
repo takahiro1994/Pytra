@@ -69,14 +69,19 @@ def main(argv: list[str]) -> int:
             gen_path / "built_in" / "type_id.cpp",
         ]
         # Also include native C++ implementations for extern runtime modules.
-        # Exclude files that conflict with conftest-generated headers.
+        # Only include if the corresponding generated header exists (native .cpp
+        # includes generated .h, so linking without the header causes errors).
         native_exclude = {"glob.cpp"}  # glob.cpp uses Object<list<str>> but conftest header uses rc<list<str>>
         native_cpp_root = Path("src/runtime/cpp")
         for subdir in ["std", "utils"]:
             native_dir = native_cpp_root / subdir
             if native_dir.exists():
                 for cpp_file in sorted(native_dir.glob("*.cpp")):
-                    if cpp_file.name not in native_exclude:
+                    if cpp_file.name in native_exclude:
+                        continue
+                    # Check that the generated header exists
+                    gen_header = gen_path / subdir / cpp_file.with_suffix(".h").name
+                    if gen_header.exists():
                         needed.append(cpp_file)
         return [str(f) for f in needed if f.exists()]
 
