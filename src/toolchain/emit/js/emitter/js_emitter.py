@@ -556,6 +556,8 @@ class JsEmitter(CodeEmitter):
         body = self._dict_stmt_list(module.get("body"))
         main_guard_body = self._dict_stmt_list(module.get("main_guard_body"))
         meta = self.any_to_dict_or_empty(module.get("meta"))
+        emit_ctx = self.any_to_dict_or_empty(meta.get("emit_context"))
+        self._is_submodule = not self.any_to_bool(emit_ctx.get("is_entry")) if len(emit_ctx) > 0 else False
         self.load_import_bindings_from_meta(meta)
         self._collect_ambient_global_aliases(body)
         analysis_body: list[dict[str, Any]] = []
@@ -780,7 +782,8 @@ class JsEmitter(CodeEmitter):
                 scope_names.add(arg_name)
                 if self._is_container_east_type(self.any_to_str(arg_types.get(arg_name))):
                     self.current_ref_vars.add(arg_name)
-            self.emit("function " + fn_name + "(" + ", ".join(args) + ") {")
+            fn_prefix = "export function " if self._is_submodule else "function "
+            self.emit(fn_prefix + fn_name + "(" + ", ".join(args) + ") {")
 
         body = self._dict_stmt_list(fn.get("body"))
         if in_class != "" and fn_name_raw == "__init__" and self.current_class_base_name != "":
