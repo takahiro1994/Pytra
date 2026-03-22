@@ -85,7 +85,7 @@ SoT（Python ソース）から生成される中間表現は `src/runtime/east/
 
 ### 0.6c emit_context — multi-module emit 時のモジュール情報
 
-`emit_all_modules`（`src/toolchain/emit/loader.py`）は、各モジュールの emit 前に EAST3 doc の `meta.emit_context` に以下の情報を設定する:
+`emit_all_modules`（`src/toolchain/emit/loader.py`）は `manifest.json`（旧称 `link-output.json`）を入力とし、`emit/` ディレクトリ（spec-folder.md §2.8 参照）に各モジュールを出力する。各モジュールの emit 前に EAST3 doc の `meta.emit_context` に以下の情報を設定する:
 
 ```json
 {
