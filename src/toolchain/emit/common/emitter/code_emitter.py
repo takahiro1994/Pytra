@@ -3184,7 +3184,7 @@ class CodeEmitter:
         # Keep explicit grouping for multiplication with a division subtree, e.g. a * (b / c).
         if parent_op == "Mult" and child_op in {"Div", "FloorDiv"}:
             return f"({rendered})"
-        if is_right and child_prec == parent_prec and parent_op in {"Sub", "Div", "FloorDiv", "Mod", "LShift", "RShift"}:
+        if is_right and child_prec == parent_prec:
             return f"({rendered})"
         return rendered
 
