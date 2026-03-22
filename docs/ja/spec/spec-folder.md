@@ -71,7 +71,36 @@
 - 置くもの: `work/out/`, `work/selfhost/`, `work/tmp/`, `work/logs/`
 - 置かないもの: 正本データ
 
-### 2.8 `out/`, `selfhost/`, `archive/`（互換運用）
+### 2.8 ビルド出力の標準ディレクトリ構造
+
+`pytra build` や `pytra link` + emitter で生成されるビルド出力は、以下の標準構造に従う。全 backend 共通。
+
+```
+<output_root>/
+├── manifest.json                 # link-output manifest（emitter への入力）
+├── east3/                        # linker 中間生成物（EAST3 JSON）
+│   ├── <entry_module>.json
+│   └── std/time.json
+└── emit/                         # emitter 最終出力（ターゲット言語コード）
+    ├── <entry_module>.<ext>
+    ├── std/time.<ext>            # .east から生成（@extern は _native へ委譲）
+    ├── std/time_native.<ext>     # 手書きランタイム（@extern 実装）
+    └── built_in/py_runtime.<ext> # 手書き built-in ランタイム
+```
+
+| ディレクトリ | 内容 | 生成元 |
+|---|---|---|
+| `manifest.json` | link-output manifest。emitter が読む | linker |
+| `east3/` | EAST3 JSON 中間生成物。manifest が参照する | linker |
+| `emit/` | ターゲット言語の最終出力 | emitter |
+
+命名規則:
+- `manifest.json`（旧称 `link-output.json`）を正本とする。
+- `east3/`（旧称 `linked/`）は linker の中間出力を保持する。
+- `emit/`（旧称 `out/`）は emitter の最終出力を保持する。
+- 各 backend / `pytra-cli.py` はこの構造に従う。独自のディレクトリ名を使ってはならない。
+
+### 2.9 `out/`, `selfhost/`, `archive/`（互換運用）
 
 - 目的: 既存運用の互換維持（段階整理対象）。
 - 置くもの: 既存スクリプトが出力する成果物

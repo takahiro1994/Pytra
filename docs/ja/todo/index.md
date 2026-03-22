@@ -101,6 +101,15 @@
 1. [x] [ID: P0-FOR-TUPLE-EXPAND-01] ForCore TupleTarget を事前展開する EAST3 パスを実装する。
 2. [x] [ID: P0-FOR-TUPLE-EXPAND-02] 動作確認（TupleTarget → NameTarget + body 先頭に要素代入）。
 
+### P2: ビルド出力ディレクトリ構造の標準化
+
+文脈: spec-folder.md §2.8
+
+1. [ ] [ID: P2-BUILD-OUTPUT-STRUCTURE-01] linker の出力を `east3/` + `manifest.json` に変更する。
+2. [ ] [ID: P2-BUILD-OUTPUT-STRUCTURE-02] emitter の出力を `emit/` に変更する。
+3. [ ] [ID: P2-BUILD-OUTPUT-STRUCTURE-03] `pytra-cli.py` を新構造に対応させる。
+4. [ ] [ID: P2-BUILD-OUTPUT-STRUCTURE-04] 全 backend の動作確認。
+
 #### P0-22: REPO_ROOT 修正 + import alias 解決 + conftest extern 関数修正
 
 文脈: [docs/ja/plans/p0-cpp-repo-root-and-import-alias-fix.md](../plans/p0-cpp-repo-root-and-import-alias-fix.md)
