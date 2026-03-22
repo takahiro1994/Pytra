@@ -36,6 +36,30 @@ def _safe_str(v: Any) -> str:
     return ""
 
 
+def _build_listcomp_target_plan(target: Any) -> dict[str, Any]:
+    """Build a ForCore target_plan from a comprehension target node."""
+    if isinstance(target, dict):
+        kind = target.get("kind", "")
+        if kind == "Name":
+            plan: dict[str, Any] = {"kind": "NameTarget", "id": target.get("id", "_")}
+            rt = _safe_str(target.get("resolved_type"))
+            if rt not in ("", "unknown"):
+                plan["target_type"] = rt
+            return plan
+        if kind == "Tuple":
+            elements = target.get("elements") or target.get("elts") or []
+            elem_plans: list[dict[str, Any]] = []
+            if isinstance(elements, list):
+                for elem in elements:
+                    elem_plans.append(_build_listcomp_target_plan(elem))
+            plan = {"kind": "TupleTarget", "elements": elem_plans}
+            rt = _safe_str(target.get("resolved_type"))
+            if rt not in ("", "unknown"):
+                plan["target_type"] = rt
+            return plan
+    return {"kind": "NameTarget", "id": "_"}
+
+
 def _lower_listcomp_in_stmts(stmts: list[Any]) -> list[Any]:
     """Walk statement list and expand ListComp assignments."""
     result: list[Any] = []
@@ -178,25 +202,38 @@ def _expand_listcomp_to_stmts(
                         "orelse": [],
                     }]
 
-        # Build For/ForRange loop
+        # Build ForCore loop (directly generate EAST3 ForCore, not EAST2 For/ForRange,
+        # since ListComp lowering runs after the main For→ForCore pass).
         target = gen.get("target")
         iter_expr = gen.get("iter")
+        target_plan = _build_listcomp_target_plan(target)
         if isinstance(iter_expr, dict) and iter_expr.get("kind") in ("RangeExpr", "ForRange"):
-            # range() → ForRange-style loop
+            # range() → StaticRangeForPlan
             for_stmt: dict[str, Any] = {
-                "kind": "ForRange",
-                "target": copy.deepcopy(target) if target else {"kind": "Name", "id": "_"},
-                "start": copy.deepcopy(iter_expr.get("start", {"kind": "Constant", "value": 0, "resolved_type": "int64"})),
-                "stop": copy.deepcopy(iter_expr.get("stop", iter_expr.get("args", [{}])[0] if isinstance(iter_expr.get("args"), list) and len(iter_expr.get("args", [])) > 0 else {"kind": "Constant", "value": 0})),
-                "step": copy.deepcopy(iter_expr.get("step", {"kind": "Constant", "value": 1, "resolved_type": "int64"})),
+                "kind": "ForCore",
+                "iter_mode": "static_fastpath",
+                "iter_plan": {
+                    "kind": "StaticRangeForPlan",
+                    "start": copy.deepcopy(iter_expr.get("start", {"kind": "Constant", "value": 0, "resolved_type": "int64"})),
+                    "stop": copy.deepcopy(iter_expr.get("stop", iter_expr.get("args", [{}])[0] if isinstance(iter_expr.get("args"), list) and len(iter_expr.get("args", [])) > 0 else {"kind": "Constant", "value": 0})),
+                    "step": copy.deepcopy(iter_expr.get("step", {"kind": "Constant", "value": 1, "resolved_type": "int64"})),
+                },
+                "target_plan": target_plan,
                 "body": body,
                 "orelse": [],
             }
         else:
             for_stmt = {
-                "kind": "For",
-                "target": copy.deepcopy(target) if target else {"kind": "Name", "id": "_"},
-                "iter": copy.deepcopy(iter_expr) if iter_expr else {"kind": "Name", "id": "__empty"},
+                "kind": "ForCore",
+                "iter_mode": "runtime_protocol",
+                "iter_plan": {
+                    "kind": "RuntimeIterForPlan",
+                    "iter_expr": copy.deepcopy(iter_expr) if iter_expr else {"kind": "Name", "id": "__empty"},
+                    "dispatch_mode": "generic",
+                    "init_op": "ObjIterInit",
+                    "next_op": "ObjIterNext",
+                },
+                "target_plan": target_plan,
                 "body": body,
                 "orelse": [],
             }

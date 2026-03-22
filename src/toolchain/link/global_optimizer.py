@@ -351,12 +351,31 @@ def _build_resolved_dependencies(module: LinkedProgramModule) -> list[str]:
     return sorted(deps)
 
 
-def _build_all_resolved_dependencies(program: LinkedProgram) -> dict[str, list[str]]:
-    """Build resolved_dependencies_v1 for all modules in the program."""
-    out: dict[str, list[str]] = {}
+def _build_all_resolved_dependencies(
+    program: LinkedProgram,
+) -> tuple[dict[str, list[str]], dict[str, list[str]]]:
+    """Build resolved_dependencies_v1 and user_module_dependencies_v1 for all modules.
+
+    Returns (resolved_deps_by_module, user_deps_by_module).
+    user_module_dependencies_v1 contains only dependencies on other user modules
+    (not runtime/built_in modules), enabling emitters to generate cross-module
+    includes/imports for multi-file user programs.
+    """
+    # Collect all user module IDs in the program.
+    user_module_ids: set[str] = set()
     for module in program.modules:
-        out[module.module_id] = _build_resolved_dependencies(module)
-    return out
+        if module.module_kind == "user":
+            user_module_ids.add(module.module_id)
+
+    resolved: dict[str, list[str]] = {}
+    user_deps: dict[str, list[str]] = {}
+    for module in program.modules:
+        deps = _build_resolved_dependencies(module)
+        resolved[module.module_id] = deps
+        # Filter to only user module dependencies (exclude self-dependency).
+        u_deps = [d for d in deps if d in user_module_ids and d != module.module_id]
+        user_deps[module.module_id] = u_deps
+    return resolved, user_deps
 
 
 def _iter_module_class_defs(module_doc: dict[str, Any]) -> list[dict[str, Any]]:
@@ -793,7 +812,7 @@ def optimize_linked_program(program: LinkedProgram) -> LinkedProgramOptimization
             _expand_call_defaults(doc, global_sigs)
 
     type_id_table, type_id_base_map, type_info_table = _build_type_id_table(linked_input_program)
-    resolved_deps_by_module = _build_all_resolved_dependencies(linked_input_program)
+    resolved_deps_by_module, user_deps_by_module = _build_all_resolved_dependencies(linked_input_program)
     program_id = _program_id(linked_input_program)
 
     module_entries: list[dict[str, object]] = []
@@ -820,6 +839,7 @@ def optimize_linked_program(program: LinkedProgram) -> LinkedProgramOptimization
             "type_id_base_map_v1": dict(type_id_base_map),
             "type_info_table_v1": dict(type_info_table),
             "resolved_dependencies_v1": resolved_deps_by_module.get(module.module_id, []),
+            "user_module_dependencies_v1": user_deps_by_module.get(module.module_id, []),
             "non_escape_summary": dict(non_escape_summary),
             "container_ownership_hints_v1": module_hints,
         }
