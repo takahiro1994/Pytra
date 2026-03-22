@@ -1020,22 +1020,23 @@ def _emit_stmt(stmt: dict[str, Any], *, indent: str, ctx: dict[str, Any]) -> lis
                 if raw == "pass":
                     return [indent + "# pass"]
         rendered = _render_expr(value)
-        # Suppress stdout leak for known side-effect-only calls.
-        # Cannot use [void] broadly because it suppresses Write-Output inside called functions.
+        # discard_result flag: EAST3 marks Expr(Call) where return value is unused
+        # Exclude print/__pytra_print — their output is intentional
+        if stmt.get("discard_result"):
+            is_print_call = False
+            if isinstance(value, dict) and _get_str(value, "kind") == "Call":
+                fn_node = value.get("func")
+                if isinstance(fn_node, dict) and _get_str(fn_node, "id") in ("print", "__pytra_print"):
+                    is_print_call = True
+            if not is_print_call:
+                return [indent + "[void](" + rendered + ")"]
+        # Fallback: suppress known side-effect-only calls
         if isinstance(value, dict) and _get_str(value, "kind") == "Call":
             func_node = value.get("func")
             if isinstance(func_node, dict):
                 fn = _get_str(func_node, "id")
-                if fn.startswith("py_assert_") or fn in ("makedirs", "mkdir"):
+                if fn.startswith("py_assert_"):
                     return [indent + "[void](" + rendered + ")"]
-                # Attribute call: obj.method() with known side-effect methods
-                if _get_str(func_node, "kind") == "Attribute":
-                    attr_name = _get_str(func_node, "attr")
-                    if attr_name in ("append", "extend", "insert", "remove", "discard",
-                                     "clear", "sort", "reverse", "update", "add",
-                                     "close", "flush", "write", "write_text", "read_text",
-                                     "mkdir", "inc", "dec", "set_argv", "set_path"):
-                        return [indent + "[void](" + rendered + ")"]
         return [indent + rendered]
 
     if kind == "Return":
@@ -1173,102 +1174,7 @@ def _emit_stmt(stmt: dict[str, Any], *, indent: str, ctx: dict[str, Any]) -> lis
                 rt = _get_str(iter_expr, "resolved_type")
                 if rt.startswith("set[") or rt == "set":
                     iter_rendered = iter_rendered + ".Keys"
-            # Check for enumerate: need index + value unpacking
-            is_enumerate = False
-            enumerate_start = "0"
-            if isinstance(iter_expr, dict) and _get_str(iter_expr, "kind") == "Call":
-                call_func = iter_expr.get("func")
-                if isinstance(call_func, dict) and _get_str(call_func, "id") == "enumerate":
-                    is_enumerate = True
-                    enum_args = _get_list(iter_expr, "args")
-                    if len(enum_args) >= 2:
-                        enumerate_start = _render_expr(enum_args[1])
-                    if len(enum_args) >= 1:
-                        iter_rendered = _render_expr(enum_args[0])
-
-            # TupleTarget: unpack into multiple variables
-            if isinstance(target_plan, dict) and _get_str(target_plan, "kind") == "TupleTarget":
-                elements = _get_list(target_plan, "elements")
-                if is_enumerate and len(elements) == 2:
-                    idx_var = "$" + _safe_ident(_get_str(elements[0], "id") if isinstance(elements[0], dict) else "_idx", "_idx")
-                    val_var = "$" + _safe_ident(_get_str(elements[1], "id") if isinstance(elements[1], dict) else "_val", "_val")
-                    lines = [
-                        indent + idx_var + " = " + enumerate_start,
-                        indent + "foreach (" + val_var + " in " + iter_rendered + ") {",
-                    ]
-                    lines.extend(_emit_body(body, indent=indent + "    ", ctx=ctx))
-                    lines.append(indent + "    " + idx_var + " += 1")
-                    lines.append(indent + "}")
-                    return lines
-                else:
-                    # Check if iterating dict.items() -> use .Key/.Value
-                    is_dict_items = False
-                    if isinstance(iter_expr, dict) and _get_str(iter_expr, "kind") == "Call":
-                        ie_func = iter_expr.get("func")
-                        if isinstance(ie_func, dict) and _get_str(ie_func, "attr") == "items":
-                            is_dict_items = True
-
-                    tmp_var = "$__for_item"
-                    lines = [indent + "foreach (" + tmp_var + " in " + iter_rendered + ") {"]
-                    if is_dict_items and len(elements) == 2:
-                        k_var = "$" + _safe_ident(_get_str(elements[0], "id") if isinstance(elements[0], dict) else "_k", "_k")
-                        v_var = "$" + _safe_ident(_get_str(elements[1], "id") if isinstance(elements[1], dict) else "_v", "_v")
-                        lines.append(indent + "    " + k_var + " = " + tmp_var + ".Key")
-                        lines.append(indent + "    " + v_var + " = " + tmp_var + ".Value")
-                    else:
-                        for idx_e, elt in enumerate(elements):
-                            if isinstance(elt, dict):
-                                elt_var = "$" + _safe_ident(_get_str(elt, "id"), "_v")
-                                lines.append(indent + "    " + elt_var + " = " + tmp_var + "[" + str(idx_e) + "]")
-                    lines.extend(_emit_body(body, indent=indent + "    ", ctx=ctx))
-                    lines.append(indent + "}")
-                    return lines
-            else:
-                # NameTarget: check if enumerate with body unpacking
-                if is_enumerate and isinstance(target_plan, dict) and _get_str(target_plan, "kind") == "NameTarget":
-                    tmp_var = "$" + _safe_ident(_get_str(target_plan, "id"), "_tmp")
-                    # Generate index counter + foreach over actual collection
-                    idx_var = "$__enum_idx"
-                    lines = [
-                        indent + idx_var + " = " + enumerate_start,
-                        indent + "foreach (" + tmp_var + " in " + iter_rendered + ") {",
-                    ]
-                    # Body starts with $i = $tmp[0]; $v = $tmp[1]; — replace with index + value
-                    new_body: list[Any] = []
-                    for bs in body:
-                        if isinstance(bs, dict) and _get_str(bs, "kind") == "Assign":
-                            val = bs.get("value")
-                            if isinstance(val, dict) and _get_str(val, "kind") == "Subscript":
-                                sv = val.get("value")
-                                if isinstance(sv, dict) and _get_str(sv, "id") == _get_str(target_plan, "id"):
-                                    sl = val.get("slice")
-                                    if isinstance(sl, dict) and sl.get("value") == 0:
-                                        # $i = $tmp[0] → $i = $__enum_idx
-                                        tgt = bs.get("targets", [bs.get("target")])
-                                        if isinstance(tgt, list) and len(tgt) > 0:
-                                            tgt0 = tgt[0] if isinstance(tgt[0], dict) else tgt
-                                        else:
-                                            tgt0 = tgt
-                                        tname = _get_str(tgt0, "id") if isinstance(tgt0, dict) else ""
-                                        lines.append(indent + "    $" + _safe_ident(tname, "_i") + " = " + idx_var)
-                                        continue
-                                    elif isinstance(sl, dict) and sl.get("value") == 1:
-                                        # $v = $tmp[1] → $v = $__iter_item (foreach var)
-                                        tgt = bs.get("targets", [bs.get("target")])
-                                        if isinstance(tgt, list) and len(tgt) > 0:
-                                            tgt0 = tgt[0] if isinstance(tgt[0], dict) else tgt
-                                        else:
-                                            tgt0 = tgt
-                                        tname = _get_str(tgt0, "id") if isinstance(tgt0, dict) else ""
-                                        lines.append(indent + "    $" + _safe_ident(tname, "_v") + " = " + tmp_var)
-                                        continue
-                        new_body.append(bs)
-                    lines.extend(_emit_body(new_body, indent=indent + "    ", ctx=ctx))
-                    lines.append(indent + "    " + idx_var + " += 1")
-                    lines.append(indent + "}")
-                    return lines
-
-                # Simple foreach with single target
+            # Simple foreach with single target (enumerate/TupleTarget already lowered by EAST3)
                 loop_var = "$_item"
                 if isinstance(target_plan, dict):
                     tp_name = _get_str(target_plan, "id")
@@ -1886,6 +1792,11 @@ def transpile_to_powershell(east_doc: dict[str, Any]) -> str:
             if isinstance(stmt, dict):
                 stmt_d2: dict[str, object] = stmt
                 simplified = _simplify_main_guard_stmt(stmt_d2)
+                # Strip discard_result in main_guard_body:
+                # [void] suppresses Write-Output inside called functions
+                if isinstance(simplified, dict) and simplified.get("discard_result"):
+                    simplified = dict(simplified)
+                    simplified.pop("discard_result", None)
                 emitted = _emit_stmt(simplified, indent="", ctx=ctx)
                 lines.extend(emitted)
         lines.append("")

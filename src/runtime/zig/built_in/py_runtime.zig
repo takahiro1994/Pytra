@@ -355,6 +355,18 @@ pub fn list_items(obj: Obj, comptime T: type) []T {
     return p.items;
 }
 
+/// Pop the last element from an Obj-managed list (Python list.pop()).
+pub fn list_pop(obj: Obj, comptime T: type) T {
+    const p: *std.ArrayList(T) = @ptrCast(@alignCast(obj.data));
+    return p.pop();
+}
+
+/// Remove the last element from an Obj-managed list (void variant for pop without return).
+pub fn list_pop_void(obj: Obj, comptime T: type) void {
+    const p: *std.ArrayList(T) = @ptrCast(@alignCast(obj.data));
+    _ = p.pop();
+}
+
 /// Append a slice to an Obj-managed list.
 pub fn list_extend(obj: Obj, comptime T: type, src: Obj) void {
     const dst: *std.ArrayList(T) = @ptrCast(@alignCast(obj.data));
@@ -377,6 +389,9 @@ pub fn list_from(comptime T: type, items: []const T) Obj {
     return make_list_from(T, items);
 }
 
+/// list_from_any is no longer used; tuple-element lists are expanded to
+/// make_list + list_append sequences by the emitter.
+
 /// time.perf_counter() — seconds since arbitrary epoch.
 pub fn perf_counter() f64 {
     const ns = std.time.nanoTimestamp();
@@ -386,6 +401,13 @@ pub fn perf_counter() f64 {
 /// File handle (wraps std.fs.File as integer handle).
 pub fn file_open(path: []const u8) PyObject {
     const alloc = std.heap.page_allocator;
+    // Ensure parent directories exist (Python open() creates files but expects dirs)
+    if (std.mem.lastIndexOfScalar(u8, path, '/')) |sep| {
+        const dir_path = path[0..sep];
+        if (dir_path.len > 0) {
+            std.fs.cwd().makePath(dir_path) catch {};
+        }
+    }
     const p = alloc.create(std.fs.File) catch @panic("alloc failed");
     p.* = std.fs.cwd().createFile(path, .{}) catch @panic("file open failed");
     return @as(PyObject, @intCast(@intFromPtr(p)));

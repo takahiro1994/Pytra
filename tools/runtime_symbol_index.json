@@ -1486,18 +1486,6 @@
             "src/runtime/cpp/built_in/iter_ops.h"
           ]
         },
-        "pytra.built_in.numeric_ops": {
-          "companions": [
-            "generated"
-          ],
-          "compile_sources": [],
-          "compiler_headers": [
-            "src/runtime/cpp/generated/built_in/numeric_ops.h"
-          ],
-          "public_headers": [
-            "src/runtime/cpp/generated/built_in/numeric_ops.h"
-          ]
-        },
         "pytra.built_in.predicates": {
           "companions": [
             "generated"
@@ -1506,10 +1494,10 @@
             "src/runtime/cpp/built_in/predicates.cpp"
           ],
           "compiler_headers": [
-            "src/runtime/cpp/generated/built_in/predicates.h"
+            "src/runtime/cpp/built_in/predicates.h"
           ],
           "public_headers": [
-            "src/runtime/cpp/generated/built_in/predicates.h"
+            "src/runtime/cpp/built_in/predicates.h"
           ]
         },
         "pytra.built_in.scalar_ops": {
@@ -1548,10 +1536,10 @@
             "src/runtime/cpp/built_in/string_ops.cpp"
           ],
           "compiler_headers": [
-            "src/runtime/cpp/generated/built_in/string_ops.h"
+            "src/runtime/cpp/built_in/string_ops.h"
           ],
           "public_headers": [
-            "src/runtime/cpp/generated/built_in/string_ops.h"
+            "src/runtime/cpp/built_in/string_ops.h"
           ]
         },
         "pytra.built_in.type_id": {
@@ -1562,22 +1550,10 @@
             "src/runtime/cpp/built_in/type_id.cpp"
           ],
           "compiler_headers": [
-            "src/runtime/cpp/generated/built_in/type_id.h"
+            "src/runtime/cpp/built_in/type_id.h"
           ],
           "public_headers": [
-            "src/runtime/cpp/generated/built_in/type_id.h"
-          ]
-        },
-        "pytra.built_in.zip_ops": {
-          "companions": [
-            "generated"
-          ],
-          "compile_sources": [],
-          "compiler_headers": [
-            "src/runtime/cpp/generated/built_in/zip_ops.h"
-          ],
-          "public_headers": [
-            "src/runtime/cpp/generated/built_in/zip_ops.h"
+            "src/runtime/cpp/built_in/type_id.h"
           ]
         },
         "pytra.core.dict": {
@@ -1736,10 +1712,10 @@
             "src/runtime/cpp/std/argparse.cpp"
           ],
           "compiler_headers": [
-            "src/runtime/cpp/generated/std/argparse.h"
+            "src/runtime/cpp/std/argparse.h"
           ],
           "public_headers": [
-            "src/runtime/cpp/generated/std/argparse.h"
+            "src/runtime/cpp/std/argparse.h"
           ]
         },
         "pytra.std.glob": {
@@ -1751,10 +1727,10 @@
             "src/runtime/cpp/std/glob.cpp"
           ],
           "compiler_headers": [
-            "src/runtime/cpp/generated/std/glob.h"
+            "src/runtime/cpp/std/glob.h"
           ],
           "public_headers": [
-            "src/runtime/cpp/generated/std/glob.h"
+            "src/runtime/cpp/std/glob.h"
           ]
         },
         "pytra.std.json": {
@@ -1765,10 +1741,10 @@
             "src/runtime/cpp/std/json.cpp"
           ],
           "compiler_headers": [
-            "src/runtime/cpp/generated/std/json.h"
+            "src/runtime/cpp/std/json.h"
           ],
           "public_headers": [
-            "src/runtime/cpp/generated/std/json.h"
+            "src/runtime/cpp/std/json.h"
           ]
         },
         "pytra.std.math": {
@@ -1780,10 +1756,10 @@
             "src/runtime/cpp/std/math.cpp"
           ],
           "compiler_headers": [
-            "src/runtime/cpp/generated/std/math.h"
+            "src/runtime/cpp/std/math.h"
           ],
           "public_headers": [
-            "src/runtime/cpp/generated/std/math.h"
+            "src/runtime/cpp/std/math.h"
           ]
         },
         "pytra.std.os": {
@@ -1795,10 +1771,10 @@
             "src/runtime/cpp/std/os.cpp"
           ],
           "compiler_headers": [
-            "src/runtime/cpp/generated/std/os.h"
+            "src/runtime/cpp/std/os.h"
           ],
           "public_headers": [
-            "src/runtime/cpp/generated/std/os.h"
+            "src/runtime/cpp/std/os.h"
           ]
         },
         "pytra.std.os_path": {
@@ -1810,10 +1786,10 @@
             "src/runtime/cpp/std/os_path.cpp"
           ],
           "compiler_headers": [
-            "src/runtime/cpp/generated/std/os_path.h"
+            "src/runtime/cpp/std/os_path.h"
           ],
           "public_headers": [
-            "src/runtime/cpp/generated/std/os_path.h"
+            "src/runtime/cpp/std/os_path.h"
           ]
         },
         "pytra.std.pathlib": {
@@ -1824,10 +1800,10 @@
             "src/runtime/cpp/std/pathlib.cpp"
           ],
           "compiler_headers": [
-            "src/runtime/cpp/generated/std/pathlib.h"
+            "src/runtime/cpp/std/pathlib.h"
           ],
           "public_headers": [
-            "src/runtime/cpp/generated/std/pathlib.h"
+            "src/runtime/cpp/std/pathlib.h"
           ]
         },
         "pytra.std.random": {
@@ -1838,10 +1814,10 @@
             "src/runtime/cpp/std/random.cpp"
           ],
           "compiler_headers": [
-            "src/runtime/cpp/generated/std/random.h"
+            "src/runtime/cpp/std/random.h"
           ],
           "public_headers": [
-            "src/runtime/cpp/generated/std/random.h"
+            "src/runtime/cpp/std/random.h"
           ]
         },
         "pytra.std.re": {
@@ -1852,10 +1828,10 @@
             "src/runtime/cpp/std/re.cpp"
           ],
           "compiler_headers": [
-            "src/runtime/cpp/generated/std/re.h"
+            "src/runtime/cpp/std/re.h"
           ],
           "public_headers": [
-            "src/runtime/cpp/generated/std/re.h"
+            "src/runtime/cpp/std/re.h"
           ]
         },
         "pytra.std.sys": {
@@ -1867,10 +1843,10 @@
             "src/runtime/cpp/std/sys.cpp"
           ],
           "compiler_headers": [
-            "src/runtime/cpp/generated/std/sys.h"
+            "src/runtime/cpp/std/sys.h"
           ],
           "public_headers": [
-            "src/runtime/cpp/generated/std/sys.h"
+            "src/runtime/cpp/std/sys.h"
           ]
         },
         "pytra.std.time": {
@@ -1882,10 +1858,10 @@
             "src/runtime/cpp/std/time.cpp"
           ],
           "compiler_headers": [
-            "src/runtime/cpp/generated/std/time.h"
+            "src/runtime/cpp/std/time.h"
           ],
           "public_headers": [
-            "src/runtime/cpp/generated/std/time.h"
+            "src/runtime/cpp/std/time.h"
           ]
         },
         "pytra.std.timeit": {
@@ -1896,10 +1872,10 @@
             "src/runtime/cpp/std/timeit.cpp"
           ],
           "compiler_headers": [
-            "src/runtime/cpp/generated/std/timeit.h"
+            "src/runtime/cpp/std/timeit.h"
           ],
           "public_headers": [
-            "src/runtime/cpp/generated/std/timeit.h"
+            "src/runtime/cpp/std/timeit.h"
           ]
         },
         "pytra.utils.assertions": {
@@ -1907,13 +1883,13 @@
             "generated"
           ],
           "compile_sources": [
-            "src/runtime/cpp/generated/utils/assertions.cpp"
+            "src/runtime/cpp/utils/assertions.cpp"
           ],
           "compiler_headers": [
-            "src/runtime/cpp/generated/utils/assertions.h"
+            "src/runtime/cpp/utils/assertions.h"
           ],
           "public_headers": [
-            "src/runtime/cpp/generated/utils/assertions.h"
+            "src/runtime/cpp/utils/assertions.h"
           ]
         },
         "pytra.utils.gif": {
@@ -1921,13 +1897,13 @@
             "generated"
           ],
           "compile_sources": [
-            "src/runtime/cpp/generated/utils/gif.cpp"
+            "src/runtime/cpp/utils/gif.cpp"
           ],
           "compiler_headers": [
-            "src/runtime/cpp/generated/utils/gif.h"
+            "src/runtime/cpp/utils/gif.h"
           ],
           "public_headers": [
-            "src/runtime/cpp/generated/utils/gif.h"
+            "src/runtime/cpp/utils/gif.h"
           ]
         },
         "pytra.utils.png": {
@@ -1935,13 +1911,13 @@
             "generated"
           ],
           "compile_sources": [
-            "src/runtime/cpp/generated/utils/png.cpp"
+            "src/runtime/cpp/utils/png.cpp"
           ],
           "compiler_headers": [
-            "src/runtime/cpp/generated/utils/png.h"
+            "src/runtime/cpp/utils/png.h"
           ],
           "public_headers": [
-            "src/runtime/cpp/generated/utils/png.h"
+            "src/runtime/cpp/utils/png.h"
           ]
         }
       }

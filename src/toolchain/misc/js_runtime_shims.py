@@ -9,24 +9,30 @@ from pytra.std.pathlib import Path
 
 
 _ROOT = NativePath(__file__).resolve().parents[3]
-_JS_RUNTIME_SRC_ROOT = _ROOT / "sample" / "js" / "runtime" / "js"
-_JS_RUNTIME_STAGE_ROOTS = ("generated", "native")
+_JS_RUNTIME_SRC_ROOT = _ROOT / "src" / "runtime" / "js"
+
+# Maps src/runtime/js/<src_subdir> → <output>/runtime/js/<dst_subdir>
+_JS_RUNTIME_COPY_MAP: tuple[tuple[str, str], ...] = (
+    ("built_in", "native/built_in"),
+    ("std", "native/std"),
+)
 
 
 def write_js_runtime_shims(output_dir: Path) -> None:
-    """Stage the JS runtime bundle expected by JS/TS transpiled imports.
+    """Stage the JS native runtime bundle expected by JS/TS transpiled imports.
 
-    Generated JS/TS imports runtime modules under `./runtime/js/...`.
-    Copy the checked-in generated/native runtime tree into the output bundle so
-    transpiled programs do not direct-load repo-owned files.
+    Copy the native runtime files from src/runtime/js/{built_in,std} into
+    <output_dir>/runtime/js/native/{built_in,std} so transpiled programs
+    can resolve runtime imports locally.
     """
     stage_root = NativePath(str(output_dir)) / "runtime" / "js"
     stage_root.mkdir(parents=True, exist_ok=True)
-    for root_name in _JS_RUNTIME_STAGE_ROOTS:
-        src_root = _JS_RUNTIME_SRC_ROOT / root_name
+    for src_name, dst_name in _JS_RUNTIME_COPY_MAP:
+        src_root = _JS_RUNTIME_SRC_ROOT / src_name
         if not src_root.exists():
-            raise RuntimeError("missing JS runtime stage root: " + str(src_root))
-        dst_root = stage_root / root_name
+            continue
+        dst_root = stage_root / dst_name
         if dst_root.exists():
             shutil.rmtree(dst_root)
+        dst_root.parent.mkdir(parents=True, exist_ok=True)
         shutil.copytree(src_root, dst_root)

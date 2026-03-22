@@ -1446,13 +1446,13 @@ def rewrite_js_std_native_owner_wrapper(js_src: str, helper_name: str) -> str:
             function_symbols.append(symbol_name)
     for symbol_name in value_symbols:
         text = re.sub(
-            rf"let\s+{re.escape(symbol_name)}\s*=\s*extern\(__[A-Za-z_][A-Za-z0-9_]*\.{re.escape(symbol_name)}\);",
+            rf"let\s+{re.escape(symbol_name)}\s*=\s*extern\([A-Za-z_][A-Za-z0-9_]*\.{re.escape(symbol_name)}\);",
             "const " + symbol_name + " = " + native_owner + "." + symbol_name + ";",
             text,
         )
     for symbol_name in function_symbols:
         text = re.sub(
-            rf"return __[A-Za-z_][A-Za-z0-9_]*\.{re.escape(symbol_name)}\(",
+            rf"return [A-Za-z_][A-Za-z0-9_]*\.{re.escape(symbol_name)}\(",
             "return " + native_owner + "." + symbol_name + "(",
             text,
         )
@@ -3793,11 +3793,17 @@ def render_item(item: GenerationItem) -> str:
     return inject_generated_header(generated, item.target, item.source_rel)
 
 
-def generate(plan: list[GenerationItem], *, check: bool, dry_run: bool) -> tuple[int, int]:
+def _resolve_out_path(out_dir: Path, item: GenerationItem) -> Path:
+    """Resolve the output file path: <out_dir>/<target>/generated/<output_rel>."""
+    return out_dir / item.target / "generated" / item.output_rel
+
+
+def generate(plan: list[GenerationItem], *, out_dir: Path, check: bool, dry_run: bool) -> tuple[int, int]:
     updated = 0
     checked = 0
     for item in plan:
-        out_path = ROOT / item.output_rel
+        out_path = _resolve_out_path(out_dir, item)
+        display_rel = str(out_path.relative_to(ROOT)) if str(out_path).startswith(str(ROOT)) else str(out_path)
         rendered = render_item(item)
         if out_path.exists():
             with out_path.open("r", encoding="utf-8", newline="") as handle:
@@ -3807,19 +3813,19 @@ def generate(plan: list[GenerationItem], *, check: bool, dry_run: bool) -> tuple
         changed = (current != rendered)
         checked += 1
         if dry_run:
-            print(item.target + ":" + item.item_id + " -> " + item.output_rel + (" [changed]" if changed else " [same]"))
+            print(item.target + ":" + item.item_id + " -> " + display_rel + (" [changed]" if changed else " [same]"))
             continue
         if check:
             if changed:
-                raise RuntimeError("stale generated runtime: " + item.output_rel)
+                raise RuntimeError("stale generated runtime: " + display_rel)
             continue
         if changed:
             out_path.parent.mkdir(parents=True, exist_ok=True)
             out_path.write_text(rendered, encoding="utf-8")
             updated += 1
-            print("updated: " + item.output_rel)
+            print("updated: " + display_rel)
         else:
-            print("unchanged: " + item.output_rel)
+            print("unchanged: " + display_rel)
     return checked, updated
 
 
@@ -3828,16 +3834,22 @@ def main() -> int:
     parser.add_argument("--manifest", default=str(DEFAULT_MANIFEST), help="runtime manifest path")
     parser.add_argument("--targets", default="all", help="comma separated targets (default: all)")
     parser.add_argument("--items", default="all", help="comma separated item ids (default: all)")
+    parser.add_argument("--out-dir", default=None, help="output root directory (required)")
     parser.add_argument("--check", action="store_true", help="fail when generated output differs")
     parser.add_argument("--dry-run", action="store_true", help="show plan and diff status without writing")
     args = parser.parse_args()
+
+    if args.out_dir is None and not args.dry_run:
+        parser.error("--out-dir is required (generated files are written to <out-dir>/<target>/generated/)")
+
+    out_dir = Path(args.out_dir).resolve() if args.out_dir is not None else ROOT / "out"
 
     manifest_path = Path(args.manifest)
     all_items = load_manifest_items(manifest_path)
     targets = resolve_targets(args.targets, all_items)
     item_ids = resolve_item_ids(args.items, all_items)
     plan = build_generation_plan(all_items, targets, item_ids)
-    checked, updated = generate(plan, check=bool(args.check), dry_run=bool(args.dry_run))
+    checked, updated = generate(plan, out_dir=out_dir, check=bool(args.check), dry_run=bool(args.dry_run))
     print("summary: checked=" + str(checked) + " updated=" + str(updated))
     return 0
 

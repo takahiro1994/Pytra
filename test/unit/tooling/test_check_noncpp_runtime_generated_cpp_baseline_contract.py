@@ -119,14 +119,8 @@ class CheckNonCppRuntimeGeneratedCppBaselineContractTest(unittest.TestCase):
                     "wiring_mode": "repo_runtime_bundle_residual",
                     "runtime_refs": (
                         "src/runtime/cs/built_in/py_runtime.cs",
-                        "src/runtime/cs/generated/std/time.cs",
                         "src/runtime/cs/std/time_native.cs",
-                        "src/runtime/cs/generated/std/math.cs",
                         "src/runtime/cs/std/math_native.cs",
-                        "src/runtime/cs/generated/std/json.cs",
-                        "src/runtime/cs/generated/std/pathlib.cs",
-                        "src/runtime/cs/generated/utils/png.cs",
-                        "src/runtime/cs/generated/utils/gif.cs",
                     ),
                 },
                 {

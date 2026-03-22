@@ -20,10 +20,8 @@ CS_SMOKE_PATH = ROOT / "test" / "unit" / "backends" / "cs" / "test_py2cs_smoke.p
 RS_SMOKE_PATH = ROOT / "test" / "unit" / "backends" / "rs" / "test_py2rs_smoke.py"
 RS_RUNTIME_SCAFFOLD_PATH = ROOT / "src" / "runtime" / "rs" / "native" / "built_in" / "py_runtime.rs"
 BACKEND_REGISTRY_METADATA_PATH = ROOT / "src" / "toolchain" / "compiler" / "backend_registry_metadata.py"
-CS_GENERATED_BUILTIN_ROOT = ROOT / "src" / "runtime" / "cs" / "generated" / "built_in"
 CS_NATIVE_BUILTIN_ROOT = ROOT / "src" / "runtime" / "cs" / "native" / "built_in"
 CS_PYTRA_ROOT = ROOT / "src" / "runtime" / "cs" / "pytra"
-RS_GENERATED_BUILTIN_ROOT = ROOT / "src" / "runtime" / "rs" / "generated" / "built_in"
 RS_NATIVE_BUILTIN_ROOT = ROOT / "src" / "runtime" / "rs" / "native" / "built_in"
 RS_PYTRA_ROOT = ROOT / "src" / "runtime" / "rs" / "pytra"
 
@@ -123,30 +121,6 @@ def _collect_builtin_lane_issues() -> list[str]:
     manifest_text = _manifest_text()
     build_profile_text = _load_text(CS_BUILD_PROFILE_PATH)
 
-    generated_expected = tuple(f"{module}.cs" for module in contract_mod.iter_noncpp_generated_builtin_modules())
-    if _collect_relative_files(CS_GENERATED_BUILTIN_ROOT, ".cs") != generated_expected:
-        issues.append("C# generated built_in module set drifted")
-    if _collect_relative_files(RS_GENERATED_BUILTIN_ROOT, ".rs") != tuple(
-        f"{module}.rs" for module in contract_mod.iter_noncpp_generated_builtin_modules()
-    ):
-        issues.append("Rust generated built_in module set drifted")
-
-    for module in contract_mod.iter_noncpp_generated_builtin_modules():
-        cs_rel = f"src/runtime/cs/generated/built_in/{module}.cs"
-        rs_rel = f"src/runtime/rs/generated/built_in/{module}.rs"
-        for rel_path in (cs_rel, rs_rel):
-            path = ROOT / rel_path
-            if not path.exists():
-                issues.append(f"missing generated built_in module: {rel_path}")
-                continue
-            text = _load_text(path)
-            if "generated-by: tools/gen_runtime_from_manifest.py" not in text:
-                issues.append(f"generated built_in module missing marker: {rel_path}")
-            if f"source: src/pytra/built_in/{module}.py" not in text:
-                issues.append(f"generated built_in module lost source marker: {rel_path}")
-            if rel_path not in manifest_text:
-                issues.append(f"manifest missing generated built_in output: {rel_path}")
-
     if _collect_relative_files(CS_NATIVE_BUILTIN_ROOT, ".cs") != tuple(
         f"{module}.cs" for module in contract_mod.iter_cs_native_builtin_residual_modules()
     ):
@@ -216,13 +190,9 @@ def _collect_csharp_lane_issues() -> list[str]:
         elif generated_state == "blocked":
             if generated_rel != "":
                 issues.append(f"blocked module must not set generated path: {module_name}")
-            if f"src/runtime/cs/generated/std/{module_name}.cs" in manifest_text:
-                issues.append(f"blocked module unexpectedly owns a C# generated std target: {module_name}")
         elif generated_state == "no_runtime_module":
             if generated_rel != "":
                 issues.append(f"no_runtime_module must not set generated path: {module_name}")
-            if f"src/runtime/cs/generated/std/{module_name}.cs" in manifest_text:
-                issues.append(f"no_runtime_module unexpectedly owns a C# generated std target: {module_name}")
         elif generated_state == "canonical_generated":
             if generated_rel == "":
                 issues.append(f"canonical_generated lane missing generated path: {module_name}")
@@ -333,14 +303,7 @@ def _collect_csharp_lane_issues() -> list[str]:
         elif canonical_lane == "no_runtime_module":
             if native_rel != "":
                 issues.append(f"no_runtime_module must not set native path: {module_name}")
-            generated_runtime_rel = f"src/runtime/cs/generated/std/{module_name}.cs"
             native_runtime_rel = f"src/runtime/cs/std/{module_name}.cs"
-            if generated_state == "no_runtime_module":
-                if generated_runtime_rel in build_profile_text or (ROOT / generated_runtime_rel).exists():
-                    issues.append(f"{module_name} unexpectedly owns a generated/std runtime module")
-            else:
-                if generated_runtime_rel in build_profile_text:
-                    issues.append(f"generated compare artifact leaked into C# build profile: {module_name}")
             if native_runtime_rel in build_profile_text or (ROOT / native_runtime_rel).exists():
                 issues.append(f"{module_name} unexpectedly owns a native/std runtime module")
         else:
@@ -414,13 +377,9 @@ def _collect_rust_lane_issues() -> list[str]:
         elif generated_state == "blocked":
             if generated_rel != "":
                 issues.append(f"blocked module must not set generated path: rs:{module_name}")
-            if f"src/runtime/rs/generated/std/{module_name}.rs" in manifest_text:
-                issues.append(f"blocked module unexpectedly owns an rs generated std target: {module_name}")
         elif generated_state == "no_runtime_module":
             if generated_rel != "":
                 issues.append(f"no_runtime_module must not set generated path: rs:{module_name}")
-            if f"src/runtime/rs/generated/std/{module_name}.rs" in manifest_text:
-                issues.append(f"no_runtime_module unexpectedly owns an rs generated std target: {module_name}")
         elif generated_state == "canonical_generated":
             if generated_rel == "":
                 issues.append(f"canonical_generated lane missing generated path: rs:{module_name}")
@@ -485,9 +444,6 @@ def _collect_rust_lane_issues() -> list[str]:
         elif canonical_lane == "no_runtime_module":
             if native_rel != "":
                 issues.append(f"no_runtime_module must not set native path: rs:{module_name}")
-            generated_runtime_rel = f"src/runtime/rs/generated/std/{module_name}.rs"
-            if generated_runtime_rel.replace("src/", "") in backend_registry_text:
-                issues.append(f"{module_name} unexpectedly leaked into the Rust runtime hook")
             native_runtime_rel = f"src/runtime/rs/std/{module_name}.rs"
             if native_runtime_rel.replace("src/", "") in backend_registry_text or (ROOT / native_runtime_rel).exists():
                 issues.append(f"{module_name} unexpectedly owns a native/std Rust runtime module")

@@ -74,17 +74,12 @@ _RUNTIME_HOOK_DESCRIPTORS: dict[str, RuntimeHookDescriptor] = {
             ("runtime/rs/built_in/py_runtime.rs", "py_runtime.rs"),
             ("runtime/rs/std/time_native.rs", "time_native.rs"),
             ("runtime/rs/std/math_native.rs", "math_native.rs"),
-            ("runtime/rs/generated/std/time.rs", "time.rs"),
-            ("runtime/rs/generated/std/math.rs", "math.rs"),
-            ("runtime/rs/generated/utils/image_runtime.rs", "image_runtime.rs"),
         ],
     },
     "go": {
         "kind": "copy_files",
         "files": [
             ("runtime/go/built_in/py_runtime.go", "py_runtime.go"),
-            ("runtime/go/generated/utils/png.go", "png.go"),
-            ("runtime/go/generated/utils/gif.go", "gif.go"),
         ],
     },
     "java": {
@@ -93,56 +88,36 @@ _RUNTIME_HOOK_DESCRIPTORS: dict[str, RuntimeHookDescriptor] = {
             ("runtime/java/built_in/PyRuntime.java", "PyRuntime.java"),
             ("runtime/java/std/math_native.java", "math_native.java"),
             ("runtime/java/std/time_native.java", "time_native.java"),
-            ("runtime/java/generated/utils/assertions.java", "assertions.java"),
-            ("runtime/java/generated/utils/png.java", "png.java"),
-            ("runtime/java/generated/utils/gif.java", "gif.java"),
-            ("runtime/java/generated/std/argparse.java", "argparse.java"),
-            ("runtime/java/generated/std/glob.java", "glob.java"),
-            ("runtime/java/generated/std/os.java", "os.java"),
-            ("runtime/java/generated/std/os_path.java", "os_path.java"),
-            ("runtime/java/generated/std/random.java", "random.java"),
-            ("runtime/java/generated/std/re.java", "re.java"),
-            ("runtime/java/generated/std/sys.java", "sys.java"),
-            ("runtime/java/generated/std/time.java", "time.java"),
-            ("runtime/java/generated/std/timeit.java", "timeit.java"),
-            ("runtime/java/generated/std/json.java", "json.java"),
-            ("runtime/java/generated/std/pathlib.java", "pathlib.java"),
-            ("runtime/java/generated/std/math.java", "math.java"),
         ],
     },
     "kotlin": {
         "kind": "copy_files",
         "files": [
             ("runtime/kotlin/built_in/py_runtime.kt", "py_runtime.kt"),
-            ("runtime/kotlin/generated/utils/image_runtime.kt", "image_runtime.kt"),
         ],
     },
     "swift": {
         "kind": "copy_files",
         "files": [
             ("runtime/swift/built_in/py_runtime.swift", "py_runtime.swift"),
-            ("runtime/swift/generated/utils/image_runtime.swift", "image_runtime.swift"),
         ],
     },
     "ruby": {
         "kind": "copy_files",
         "files": [
             ("runtime/ruby/built_in/py_runtime.rb", "py_runtime.rb"),
-            ("runtime/ruby/generated/utils/image_runtime.rb", "image_runtime.rb"),
         ],
     },
     "lua": {
         "kind": "copy_files",
         "files": [
             ("runtime/lua/built_in/py_runtime.lua", "py_runtime.lua"),
-            ("runtime/lua/generated/utils/image_runtime.lua", "image_runtime.lua"),
         ],
     },
     "scala": {
         "kind": "copy_files",
         "files": [
             ("runtime/scala/built_in/py_runtime.scala", "py_runtime.scala"),
-            ("runtime/scala/generated/utils/image_runtime.scala", "image_runtime.scala"),
         ],
     },
     "php": {
@@ -151,21 +126,15 @@ _RUNTIME_HOOK_DESCRIPTORS: dict[str, RuntimeHookDescriptor] = {
             ("native/built_in/py_runtime.php", "py_runtime.php"),
             ("native/std/math_native.php", "std/math_native.php"),
             ("native/std/time_native.php", "std/time_native.php"),
-            ("generated/std/json.php", "std/json.php"),
-            ("generated/std/math.php", "std/math.php"),
-            ("generated/std/pathlib.php", "std/pathlib.php"),
-            ("generated/std/time.php", "std/time.php"),
-            ("generated/utils/png.php", "utils/png.php"),
-            ("generated/utils/gif.php", "utils/gif.php"),
         ],
     },
     "nim": {
         "kind": "copy_files",
         "files": [
             ("runtime/nim/built_in/py_runtime.nim", "py_runtime.nim"),
-            ("runtime/nim/generated/utils/image_runtime.nim", "image_runtime.nim"),
         ],
     },
+
     "powershell": {
         "kind": "copy_files",
         "files": [

@@ -59,17 +59,10 @@ EXPECTED_BUCKETS = {
         ("py_runtime_value_isinstance", "src/runtime/cs/built_in/py_runtime.cs"),
         ("py_runtime_type_id_is_subtype", "src/runtime/cs/built_in/py_runtime.cs"),
         ("py_runtime_type_id_issubclass", "src/runtime/cs/built_in/py_runtime.cs"),
-        ("py_runtime_value_type_id", "src/runtime/cs/generated/built_in/type_id.cs"),
-        ("py_runtime_value_isinstance", "src/runtime/cs/generated/built_in/type_id.cs"),
-        ("py_runtime_type_id_is_subtype", "src/runtime/cs/generated/built_in/type_id.cs"),
         ("py_runtime_value_type_id", "src/runtime/rs/built_in/py_runtime.rs"),
         ("py_runtime_value_isinstance", "src/runtime/rs/built_in/py_runtime.rs"),
         ("py_runtime_type_id_is_subtype", "src/runtime/rs/built_in/py_runtime.rs"),
         ("py_runtime_type_id_issubclass", "src/runtime/rs/built_in/py_runtime.rs"),
-        ("py_runtime_value_type_id", "src/runtime/rs/generated/built_in/type_id.rs"),
-        ("py_runtime_value_isinstance", "src/runtime/rs/generated/built_in/type_id.rs"),
-        ("py_runtime_type_id_is_subtype", "src/runtime/rs/generated/built_in/type_id.rs"),
-        ("py_runtime_value_isinstance", "src/runtime/rs/generated/std/json.rs"),
     },
 }
 

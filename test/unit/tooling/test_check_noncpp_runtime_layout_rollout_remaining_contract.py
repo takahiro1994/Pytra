@@ -175,44 +175,23 @@ class CheckNonCppRuntimeLayoutRolloutRemainingContractTest(unittest.TestCase):
             {
                 "go": (
                     "runtime/go/built_in/py_runtime.go",
-                    "runtime/go/generated/utils/png.go",
-                    "runtime/go/generated/utils/gif.go",
                 ),
                 "java": (
                     "runtime/java/built_in/PyRuntime.java",
                     "runtime/java/std/math_native.java",
                     "runtime/java/std/time_native.java",
-                    "runtime/java/generated/utils/assertions.java",
-                    "runtime/java/generated/utils/png.java",
-                    "runtime/java/generated/utils/gif.java",
-                    "runtime/java/generated/std/argparse.java",
-                    "runtime/java/generated/std/glob.java",
-                    "runtime/java/generated/std/os.java",
-                    "runtime/java/generated/std/os_path.java",
-                    "runtime/java/generated/std/random.java",
-                    "runtime/java/generated/std/re.java",
-                    "runtime/java/generated/std/sys.java",
-                    "runtime/java/generated/std/time.java",
-                    "runtime/java/generated/std/timeit.java",
-                    "runtime/java/generated/std/json.java",
-                    "runtime/java/generated/std/pathlib.java",
-                    "runtime/java/generated/std/math.java",
                 ),
                 "kotlin": (
                     "runtime/kotlin/built_in/py_runtime.kt",
-                    "runtime/kotlin/generated/utils/image_runtime.kt",
                 ),
                 "scala": (
                     "runtime/scala/built_in/py_runtime.scala",
-                    "runtime/scala/generated/utils/image_runtime.scala",
                 ),
                 "swift": (
                     "runtime/swift/built_in/py_runtime.swift",
-                    "runtime/swift/generated/utils/image_runtime.swift",
                 ),
                 "nim": (
                     "runtime/nim/built_in/py_runtime.nim",
-                    "runtime/nim/generated/utils/image_runtime.nim",
                 ),
             },
         )
@@ -629,123 +608,6 @@ class CheckNonCppRuntimeLayoutRolloutRemainingContractTest(unittest.TestCase):
         }
         self.assertIn(
             {
-                "current_prefix": "src/runtime/go/generated/utils/",
-                "target_prefix": "src/runtime/go/generated/utils/",
-                "ownership": "generated",
-                "rationale": "Go image helpers already live in the canonical generated/utils lane after the Wave A path cutover.",
-            },
-            by_backend["go"],
-        )
-        self.assertIn(
-            {
-                "current_prefix": "src/runtime/go/generated/built_in/",
-                "target_prefix": "src/runtime/go/generated/built_in/",
-                "ownership": "generated",
-                "rationale": "Go live-generated built_in compare artifacts live in generated/built_in for the compile-safe subset after the S4 alignment bundle.",
-            },
-            by_backend["go"],
-        )
-        self.assertIn(
-            {
-                "current_prefix": "src/runtime/go/generated/std/",
-                "target_prefix": "src/runtime/go/generated/std/",
-                "ownership": "generated",
-                "rationale": "Go SoT-generated std compare artifacts now live in generated/std after the cpp-baseline materialization bundle.",
-            },
-            by_backend["go"],
-        )
-        self.assertIn(
-            {
-                "current_prefix": "src/runtime/java/generated/built_in/",
-                "target_prefix": "src/runtime/java/generated/built_in/",
-                "ownership": "generated",
-                "rationale": "Java live-generated built_in compare artifacts live in generated/built_in for the compile-safe subset after the S4 alignment bundle.",
-            },
-            by_backend["java"],
-        )
-        self.assertIn(
-            {
-                "current_prefix": "src/runtime/kotlin/generated/built_in/",
-                "target_prefix": "src/runtime/kotlin/generated/built_in/",
-                "ownership": "generated",
-                "rationale": "Kotlin compile-safe built_in compare artifacts live in generated/built_in after the S4 alignment bundle.",
-            },
-            by_backend["kotlin"],
-        )
-        self.assertIn(
-            {
-                "current_prefix": "src/runtime/kotlin/generated/std/",
-                "target_prefix": "src/runtime/kotlin/generated/std/",
-                "ownership": "generated",
-                "rationale": "Kotlin SoT-generated std compare artifacts now live in generated/std after the cpp-baseline materialization bundle.",
-            },
-            by_backend["kotlin"],
-        )
-        self.assertIn(
-            {
-                "current_prefix": "src/runtime/scala/generated/built_in/",
-                "target_prefix": "src/runtime/scala/generated/built_in/",
-                "ownership": "generated",
-                "rationale": "Scala source-guarded built_in compare artifacts live in generated/built_in after the S4 alignment bundle.",
-            },
-            by_backend["scala"],
-        )
-        self.assertIn(
-            {
-                "current_prefix": "src/runtime/scala/generated/std/",
-                "target_prefix": "src/runtime/scala/generated/std/",
-                "ownership": "generated",
-                "rationale": "Scala SoT-generated std compare artifacts now live in generated/std after the cpp-baseline materialization bundle.",
-            },
-            by_backend["scala"],
-        )
-        self.assertIn(
-            {
-                "current_prefix": "src/runtime/swift/generated/built_in/",
-                "target_prefix": "src/runtime/swift/generated/built_in/",
-                "ownership": "generated",
-                "rationale": "Swift compile-safe built_in compare artifacts live in generated/built_in after the S4 alignment bundle.",
-            },
-            by_backend["swift"],
-        )
-        self.assertIn(
-            {
-                "current_prefix": "src/runtime/swift/generated/std/",
-                "target_prefix": "src/runtime/swift/generated/std/",
-                "ownership": "generated",
-                "rationale": "Swift SoT-generated std compare artifacts now live in generated/std after the cpp-baseline materialization bundle.",
-            },
-            by_backend["swift"],
-        )
-        self.assertIn(
-            {
-                "current_prefix": "src/runtime/nim/generated/built_in/",
-                "target_prefix": "src/runtime/nim/generated/built_in/",
-                "ownership": "generated",
-                "rationale": "Nim compile-safe built_in compare artifacts live in generated/built_in after the S4 alignment bundle.",
-            },
-            by_backend["nim"],
-        )
-        self.assertIn(
-            {
-                "current_prefix": "src/runtime/nim/generated/std/",
-                "target_prefix": "src/runtime/nim/generated/std/",
-                "ownership": "generated",
-                "rationale": "Nim SoT-generated std compare artifacts now live in generated/std after the cpp-baseline materialization bundle.",
-            },
-            by_backend["nim"],
-        )
-        self.assertIn(
-            {
-                "current_prefix": "src/runtime/js/generated/built_in/",
-                "target_prefix": "src/runtime/js/generated/built_in/",
-                "ownership": "generated",
-                "rationale": "JS live-generated built_in compare artifacts live in generated/built_in once the Wave B compare lanes are materialized.",
-            },
-            by_backend["js"],
-        )
-        self.assertIn(
-            {
                 "current_prefix": "src/runtime/js/std/",
                 "target_prefix": "src/runtime/js/std/",
                 "ownership": "native",
@@ -755,57 +617,12 @@ class CheckNonCppRuntimeLayoutRolloutRemainingContractTest(unittest.TestCase):
         )
         self.assertIn(
             {
-                "current_prefix": "src/runtime/js/generated/std/",
-                "target_prefix": "src/runtime/js/generated/std/",
-                "ownership": "generated",
-                "rationale": "JS live-generated std compare artifacts live in generated/std once the Wave B std lanes are materialized.",
-            },
-            by_backend["js"],
-        )
-        self.assertIn(
-            {
-                "current_prefix": "src/runtime/ts/generated/built_in/",
-                "target_prefix": "src/runtime/ts/generated/built_in/",
-                "ownership": "generated",
-                "rationale": "TS live-generated built_in compare artifacts live in generated/built_in once the Wave B compare lanes are materialized.",
-            },
-            by_backend["ts"],
-        )
-        self.assertIn(
-            {
                 "current_prefix": "src/runtime/ts/std/",
                 "target_prefix": "src/runtime/ts/std/",
                 "ownership": "native",
                 "rationale": "TS extern-backed std owner seams now live in native/std while generated/std wrappers stay declaration-only compare artifacts.",
             },
             by_backend["ts"],
-        )
-        self.assertIn(
-            {
-                "current_prefix": "src/runtime/php/generated/utils/",
-                "target_prefix": "src/runtime/php/generated/utils/",
-                "ownership": "generated",
-                "rationale": "PHP image helpers already live in generated/utils after the Wave B path cutover.",
-            },
-            by_backend["php"],
-        )
-        self.assertIn(
-            {
-                "current_prefix": "src/runtime/php/generated/built_in/",
-                "target_prefix": "src/runtime/php/generated/built_in/",
-                "ownership": "generated",
-                "rationale": "PHP live-generated built_in compare artifacts live in generated/built_in once the Wave B compare lanes are materialized.",
-            },
-            by_backend["php"],
-        )
-        self.assertIn(
-            {
-                "current_prefix": "src/runtime/php/generated/std/",
-                "target_prefix": "src/runtime/php/generated/std/",
-                "ownership": "generated",
-                "rationale": "PHP live-generated std compare artifacts live in generated/std once the Wave B std lanes are materialized.",
-            },
-            by_backend["php"],
         )
 
     def test_current_inventory_is_fixed(self) -> None:

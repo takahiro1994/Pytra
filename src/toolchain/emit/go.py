@@ -17,7 +17,7 @@ from toolchain.emit.go.emitter import transpile_to_go
 from toolchain.emit.loader import emit_all_modules
 
 _ROOT = NativePath(__file__).resolve().parents[3]
-_GO_RUNTIME_SRC = _ROOT / "sample" / "go" / "py_runtime.go"
+_GO_RUNTIME_SRC = _ROOT / "src" / "runtime" / "go" / "built_in" / "py_runtime.go"
 _GO_NATIVE_STD_DIR = _ROOT / "src" / "runtime" / "go" / "std"
 _RUNTIME_EAST_ROOT = _ROOT / "src" / "runtime" / "east"
 

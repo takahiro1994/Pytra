@@ -139,13 +139,15 @@ def cmd_build(argv: list[str]) -> int:
 
     if input_file == "":
         _fatal("pytra build: input file is required")
-    # When -o is given, use its parent as output_dir
+
+    # When -o is given, emit into a temporary directory so that runtime files
+    # produced by emitters do not pollute the -o parent.  Only the transpiled
+    # entry file is copied out to the requested path.
+    import tempfile as _tempfile
+    _tmp_emit_dir_obj: object = None  # prevent premature cleanup
     if single_output != "":
-        so_parent = str(Path(single_output).parent)
-        if so_parent != "" and so_parent != ".":
-            output_dir = so_parent
-        else:
-            output_dir = "."
+        _tmp_emit_dir_obj = _tempfile.TemporaryDirectory()
+        output_dir = _tmp_emit_dir_obj.name  # type: ignore[union-attr]
 
     src_dir = _find_src_dir()
     linked_dir = output_dir + "/.pytra_linked"
@@ -170,7 +172,7 @@ def cmd_build(argv: list[str]) -> int:
     if rc != 0:
         return rc
 
-    # If -o was given, rename the entry output file to the requested name
+    # If -o was given, copy only the transpiled entry file to the requested path
     if single_output != "":
         entry_stem = Path(input_file).stem
         # Find the generated file in output_dir matching the entry stem
@@ -188,31 +190,36 @@ def cmd_build(argv: list[str]) -> int:
             generated = Path(output_dir) / (entry_stem + "." + ext)
         so_path = Path(single_output)
         so_path.parent.mkdir(parents=True, exist_ok=True)
-        if generated.exists() and str(generated.resolve()) != str(so_path.resolve()):
+        if generated.exists():
             so_path.write_text(generated.read_text(encoding="utf-8"), encoding="utf-8")
 
     # Stage 2.5: copy native runtime helpers to output_dir if needed
-    _runtime_copy_map: dict[str, str] = {
-        "ruby": "py_runtime.rb",
-        "lua": "py_runtime.lua",
-        "scala": "py_runtime.scala",
-    }
-    if target in _runtime_copy_map:
-        rt_name = _runtime_copy_map[target]
-        rt_src = Path(src_dir) / "runtime" / target / "built_in" / rt_name
-        rt_dst = Path(output_dir) / rt_name
-        if rt_src.exists() and not rt_dst.exists():
-            rt_dst.write_text(rt_src.read_text(encoding="utf-8"), encoding="utf-8")
+    # Skip runtime copy when -o is used (single-file output mode) because
+    # the output_dir is derived from -o's parent and should not be polluted
+    # with runtime files.  Runtime copy is only meaningful when --output-dir
+    # is explicitly given for a full build.
+    if single_output == "":
+        _runtime_copy_map: dict[str, str] = {
+            "ruby": "py_runtime.rb",
+            "lua": "py_runtime.lua",
+            "scala": "py_runtime.scala",
+        }
+        if target in _runtime_copy_map:
+            rt_name = _runtime_copy_map[target]
+            rt_src = Path(src_dir) / "runtime" / target / "built_in" / rt_name
+            rt_dst = Path(output_dir) / rt_name
+            if rt_src.exists() and not rt_dst.exists():
+                rt_dst.write_text(rt_src.read_text(encoding="utf-8"), encoding="utf-8")
 
-    # Stage 2.6: copy native seam files (e.g., math_native, time_native)
-    import os as _os_seam
-    _seam_dir_str = str(Path(src_dir) / "runtime" / target / "std")
-    if _os_seam.path.isdir(_seam_dir_str):
-        for _ns_name in sorted(_os_seam.listdir(_seam_dir_str)):
-            _ns_src_p = Path(_seam_dir_str) / _ns_name
-            _ns_dst_p = Path(output_dir) / _ns_name
-            if _os_seam.path.isfile(str(_ns_src_p)) and not _ns_dst_p.exists():
-                _ns_dst_p.write_text(_ns_src_p.read_text(encoding="utf-8"), encoding="utf-8")
+        # Stage 2.6: copy native seam files (e.g., math_native, time_native)
+        import os as _os_seam
+        _seam_dir_str = str(Path(src_dir) / "runtime" / target / "std")
+        if _os_seam.path.isdir(_seam_dir_str):
+            for _ns_name in sorted(_os_seam.listdir(_seam_dir_str)):
+                _ns_src_p = Path(_seam_dir_str) / _ns_name
+                _ns_dst_p = Path(output_dir) / _ns_name
+                if _os_seam.path.isfile(str(_ns_src_p)) and not _ns_dst_p.exists():
+                    _ns_dst_p.write_text(_ns_src_p.read_text(encoding="utf-8"), encoding="utf-8")
 
     # Stage 3: build + run
     entry_stem = Path(input_file).stem

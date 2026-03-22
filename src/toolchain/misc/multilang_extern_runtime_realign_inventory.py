@@ -64,11 +64,9 @@ MULTILANG_EXTERN_RUNTIME_REALIGN_INVENTORY_V1: Final[tuple[ExternRuntimeRealignE
             "src/runtime/ts/std/math_native.ts",
             "src/runtime/php/std/math_native.php",
         ),
-        "accepted_generated_compare_residual_targets": ("nim",),
+        "accepted_generated_compare_residual_targets": (),
         "emitter_hardcode_needles": (),
-        "generated_drift_needles": (
-            ("src/runtime/nim/generated/std/math.nim", "Python runtime fallback."),
-        ),
+        "generated_drift_needles": (),
         "representative_smoke_needles": (
             (
                 "test/unit/backends/cs/test_py2cs_smoke.py",
@@ -118,11 +116,9 @@ MULTILANG_EXTERN_RUNTIME_REALIGN_INVENTORY_V1: Final[tuple[ExternRuntimeRealignE
             "src/runtime/ts/std/time_native.ts",
             "src/runtime/php/std/time_native.php",
         ),
-        "accepted_generated_compare_residual_targets": ("nim",),
+        "accepted_generated_compare_residual_targets": (),
         "emitter_hardcode_needles": (),
-        "generated_drift_needles": (
-            ("src/runtime/nim/generated/std/time.nim", "Python runtime fallback."),
-        ),
+        "generated_drift_needles": (),
         "representative_smoke_needles": (
             (
                 "test/unit/backends/cs/test_py2cs_smoke.py",
@@ -160,9 +156,7 @@ MULTILANG_EXTERN_RUNTIME_REALIGN_INVENTORY_V1: Final[tuple[ExternRuntimeRealignE
         "noncpp_native_owner_paths": (),
         "accepted_generated_compare_residual_targets": ("rs",),
         "emitter_hardcode_needles": (),
-        "generated_drift_needles": (
-            ("src/runtime/rs/generated/std/os.rs", "Python runtime fallback."),
-        ),
+        "generated_drift_needles": (),
         "representative_smoke_needles": (
             (
                 "test/unit/backends/lua/test_py2lua_smoke.py",
@@ -192,9 +186,7 @@ MULTILANG_EXTERN_RUNTIME_REALIGN_INVENTORY_V1: Final[tuple[ExternRuntimeRealignE
         "noncpp_native_owner_paths": (),
         "accepted_generated_compare_residual_targets": ("rs",),
         "emitter_hardcode_needles": (),
-        "generated_drift_needles": (
-            ("src/runtime/rs/generated/std/os_path.rs", "Python runtime fallback."),
-        ),
+        "generated_drift_needles": (),
         "representative_smoke_needles": (
             (
                 "test/unit/backends/lua/test_py2lua_smoke.py",
@@ -266,9 +258,7 @@ MULTILANG_EXTERN_RUNTIME_REALIGN_INVENTORY_V1: Final[tuple[ExternRuntimeRealignE
         "noncpp_native_owner_paths": ("src/runtime/cs/std/glob_native.cs",),
         "accepted_generated_compare_residual_targets": ("rs",),
         "emitter_hardcode_needles": (),
-        "generated_drift_needles": (
-            ("src/runtime/rs/generated/std/glob.rs", "Python runtime fallback."),
-        ),
+        "generated_drift_needles": (),
         "representative_smoke_needles": (
             (
                 "test/unit/backends/lua/test_py2lua_smoke.py",

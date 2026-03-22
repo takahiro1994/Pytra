@@ -136,7 +136,7 @@ class CheckCppPyRuntimeContractInventoryTest(unittest.TestCase):
         self.assertIn(("py_runtime_value_isinstance", "src/runtime/east/built_in/type_id.cpp"), shared)
         self.assertIn(("py_runtime_value_isinstance", "src/runtime/east/std/json.cpp"), shared)
         self.assertIn(("py_runtime_value_isinstance", "src/runtime/east/compiler/transpile_cli.cpp"), shared)
-        self.assertIn(("py_runtime_value_isinstance", "src/runtime/rs/generated/std/json.rs"), shared)
+        self.assertNotIn(("py_runtime_value_isinstance", "src/runtime/rs/generated/std/json.rs"), shared)
 
     def test_inventory_scan_ignores_upstream_fallback_inventory_module(self) -> None:
         self.assertIn(

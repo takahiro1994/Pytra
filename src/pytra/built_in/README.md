@@ -17,8 +17,8 @@
 ## 生成対象ルール
 
 - `src/pytra/built_in/<name>.py` は
-  `src/runtime/cpp/generated/built_in/<name>.{h,cpp}` へ生成し、C++ compiler はその generated header を直接使う。
-- 他言語も同一方針で `src/runtime/<lang>/built_in/` へ展開する。
+  コンパイル時に `-out` 出力ディレクトリへ `generated/built_in/<name>.{h,cpp}` として生成し、C++ compiler はその generated header を直接使う。
+- 他言語も同一方針で `-out` 出力ディレクトリへ展開する。`src/runtime/` 配下に `generated/` ディレクトリは作成しない。
 - 生成層を厚くし、手書き層は最小ブート処理だけに限定する。
 
 ## テスト運用
