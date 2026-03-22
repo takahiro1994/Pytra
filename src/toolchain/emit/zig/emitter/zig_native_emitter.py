@@ -1670,7 +1670,12 @@ class ZigNativeEmitter:
                     args = args_any if isinstance(args_any, list) else []
                     if len(args) > 0:
                         return "pytra.truthy(" + self._render_expr(args[0]) + ")"
-        return self._render_expr(expr_any)
+        rendered = self._render_expr(expr_any)
+        # i64 の条件式は != 0 で bool に変換
+        expr_type = self._get_expr_type(expr_any) if isinstance(expr_any, dict) else ""
+        if expr_type in {"int64", "int32", "int16", "int8", "uint8", "uint16", "uint32", "uint64"}:
+            return "(" + rendered + " != 0)"
+        return rendered
 
     def _render_expr(self, expr_any: Any) -> str:
         if expr_any is None:
@@ -1724,6 +1729,9 @@ class ZigNativeEmitter:
                 return "(@as(f64, @floatFromInt(" + left + ")) / @as(f64, @floatFromInt(" + right + ")))"
             if op == "Mod":
                 return "@mod(" + left + ", " + right + ")"
+            if op in {"LShift", "RShift"}:
+                sym = _binop_symbol(op)
+                return "(" + left + " " + sym + " @intCast(" + right + "))"
             sym = _binop_symbol(op)
             return "(" + left + " " + sym + " " + right + ")"
         if kind == "UnaryOp":
