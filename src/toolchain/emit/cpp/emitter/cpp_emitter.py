@@ -3791,9 +3791,9 @@ class CppEmitter(CppAnalysisEmitter, CppModuleEmitter, CppClassEmitter, CppTypeB
                     return f"{base}.tag != PYTRA_TID_NONE" if negated else tag_check
                 holds = f"::std::holds_alternative<::std::monostate>({base})"
                 return f"!{holds}" if negated else holds
-        if val_t not in {"", "unknown", "object"}:
+        if val_t not in {"", "unknown", "object", "Any"}:
             return "true" if negated else "false"
-        if val_t == "object":
+        if val_t == "object" or val_t == "Any":
             if negated:
                 return f"bool({base})"
             return f"!{base}" if self._is_identifier_expr(base) else f"!({base})"
