@@ -2003,7 +2003,7 @@ def main() -> None:
             east = load_east(src_py)
             txt = dump_deps_text(east)
         self.assertIn("modules:", txt)
-        self.assertIn("  - math", txt)
+        self.assertIn("  - pytra.std.math", txt)
         self.assertIn("  - pytra.std.json", txt)
         self.assertIn("  - pytra.utils.png", txt)
         self.assertIn("symbols:", txt)
@@ -2502,9 +2502,9 @@ def main() -> None:
                 text=True,
             env=_src_env(),
                 )
-        self.assertNotEqual(proc.returncode, 0)
-        self.assertIn("[input_invalid]", proc.stderr)
-        self.assertIn("kind=duplicate_binding", proc.stderr)
+        # Wildcard-to-wildcard duplicate symbols are allowed in Python semantics
+        # (the second wildcard silently shadows the first). No error expected.
+        self.assertEqual(proc.returncode, 0)
 
     def test_cli_reports_input_invalid_for_unresolved_from_import_star(self) -> None:
         src_main = """from helper import *
