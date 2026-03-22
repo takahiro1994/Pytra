@@ -97,25 +97,42 @@ def _expand_call_defaults(node: Any, sigs: dict[str, dict[str, Any]]) -> None:
                 # Filter out 'self' from param count
                 effective_params = [p for p in arg_order if isinstance(p, str) and p != "self"]
                 n_effective = len(effective_params)
-                # Collect keyword argument names to avoid duplicates
-                kw_names: set[str] = set()
+                # Collect keyword arguments into a map
+                kw_map: dict[str, Any] = {}
                 keywords = nd.get("keywords")
                 if isinstance(keywords, list):
                     for kw in keywords:
                         if isinstance(kw, dict):
                             kw_arg = kw.get("arg")
+                            kw_value = kw.get("value")
                             if isinstance(kw_arg, str) and kw_arg != "":
-                                kw_names.add(kw_arg)
-                if n_args < n_effective and len(arg_defaults) > 0:
-                    # Append missing default values (skip if already in keywords)
+                                kw_map[kw_arg] = kw_value
+                if n_args < n_effective:
+                    # Fill missing positional args from keywords or defaults
                     for i in range(n_args, n_effective):
                         param_name = effective_params[i]
-                        if param_name in kw_names:
-                            continue  # Already provided as keyword arg
-                        if param_name in arg_defaults:
+                        if param_name in kw_map:
+                            # Use keyword argument value
+                            kw_val = kw_map[param_name]
+                            if isinstance(kw_val, dict):
+                                args.append(copy.deepcopy(kw_val))
+                            else:
+                                args.append(kw_val)
+                        elif param_name in arg_defaults:
+                            # Use default value
                             default_node = arg_defaults[param_name]
                             if isinstance(default_node, dict):
                                 args.append(copy.deepcopy(default_node))
+                    # Clear keywords since they've been merged into positional
+                    if isinstance(keywords, list) and len(kw_map) > 0:
+                        remaining_kws: list[Any] = []
+                        for kw in keywords:
+                            if isinstance(kw, dict):
+                                kw_arg = kw.get("arg")
+                                if isinstance(kw_arg, str) and kw_arg in kw_map:
+                                    continue  # Already merged
+                            remaining_kws.append(kw)
+                        nd["keywords"] = remaining_kws
 
     # Recurse into all children
     for value in nd.values():
