@@ -100,6 +100,20 @@
 1. [x] [ID: P0-CALLABLE-TYPE-TRACKING-01] `_callable_return_type` を `callable[[Args],Ret]` 形式に対応させ、Call の resolved_type に反映する。
 2. [x] [ID: P0-CALLABLE-TYPE-TRACKING-02] 動作確認（`fn: Callable[[int], int]` → `fn(x)` の resolved_type=int64）。
 
+#### P0-26: str 型サブスクリプトの結果型推論
+
+文脈: [docs/ja/plans/p0-str-subscript-type.md](../plans/p0-str-subscript-type.md)
+
+1. [ ] [ID: P0-STR-SUBSCRIPT-TYPE-01] str 型サブスクリプトの結果型を `str` に推論する。
+2. [ ] [ID: P0-STR-SUBSCRIPT-TYPE-02] ユニットテストを追加する。
+
+#### P0-27: __truediv__ 演算子の lowering
+
+文脈: [docs/ja/plans/p0-truediv-operator-lowering.md](../plans/p0-truediv-operator-lowering.md)
+
+1. [ ] [ID: P0-TRUEDIV-LOWERING-01] `Path / "child"` を `Path.__truediv__` メソッド呼び出しに lowering する。
+2. [ ] [ID: P0-TRUEDIV-LOWERING-02] ユニットテストを追加する。
+
 #### P0-25: generator の EAST3 ステートマシン lowering
 
 文脈: [docs/ja/plans/p0-generator-statemachine-lowering.md](../plans/p0-generator-statemachine-lowering.md)
