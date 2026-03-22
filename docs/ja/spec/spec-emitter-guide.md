@@ -139,6 +139,63 @@ const time_native = @import("std/time_native.zig");
 pub fn perf_counter() f64 { return time_native.perf_counter(); }
 ```
 
+### extern() 変数（ambient global）の委譲
+
+`@extern` 関数とは別に、`extern()` で宣言される変数（定数）がある:
+
+```python
+# math.py
+pi: float = extern(math.pi)   # extern() 変数宣言
+e: float = extern(math.e)
+```
+
+EAST3 では `AnnAssign` の value が `Call(func=Name("extern"), args=[...])` として表現される。
+
+emitter は `extern()` 変数を見たら、`@extern` 関数と同じく `__native` モジュールへの委譲を生成する:
+
+```zig
+// std/math.zig (generated)
+const __native = @import("math_native.zig");
+pub const pi: f64 = __native.pi;
+pub const e: f64 = __native.e;
+```
+
+```javascript
+// std/math.js (generated)
+import * as __native from "./math_native.js";
+export const pi = __native.pi;
+export const e = __native.e;
+```
+
+対応する native ファイルにはターゲット言語の標準ライブラリの値を手書きで提供する:
+
+```zig
+// std/math_native.zig (hand-written)
+const std = @import("std");
+pub const pi: f64 = std.math.pi;
+pub const e: f64 = std.math.e;
+```
+
+```javascript
+// std/math_native.js (hand-written)
+export const pi = Math.PI;
+export const e = Math.E;
+```
+
+### 検出方法
+
+```python
+# AnnAssign/Assign の value が extern() 呼び出しかチェック
+value = stmt.get("value", {})
+if isinstance(value, dict) and value.get("kind") == "Call":
+    func = value.get("func", {})
+    if isinstance(func, dict) and func.get("id") == "extern":
+        # extern() 変数 → __native への委譲を生成
+        # value.args[0] は Python フォールバック（ターゲット言語では無視）
+```
+
+**禁止**: emitter がターゲット言語の標準ライブラリ定数（`std.math.pi`, `Math.PI` 等）をハードコードしてはならない。定数の値は native ファイルが提供する。
+
 ### native モジュールのパス
 
 `canonical_runtime_module_id` で正規化し、`_native` suffix を付ける:
