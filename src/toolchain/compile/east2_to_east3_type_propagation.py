@@ -236,8 +236,18 @@ def _try_lower_truediv(node: Any) -> dict[str, Any] | None:
 
 
 def _collect_function_callable_types(module: dict[str, Any]) -> dict[str, str]:
-    """Collect {func_name: callable_type} from top-level FunctionDefs."""
+    """Collect {func_name: callable_type} from top-level FunctionDefs.
+
+    Also maps original names for renamed symbols (e.g. main → __pytra_main).
+    """
     out: dict[str, str] = {}
+    # Build reverse rename map: __pytra_main → main
+    renamed = {}
+    rs = module.get("renamed_symbols")
+    if isinstance(rs, dict):
+        for orig, renamed_name in rs.items():
+            if isinstance(orig, str) and isinstance(renamed_name, str):
+                renamed[renamed_name] = orig
     body = module.get("body")
     if not isinstance(body, list):
         return out
@@ -254,9 +264,13 @@ def _collect_function_callable_types(module: dict[str, Any]) -> dict[str, str]:
                 if isinstance(arg_order, list) and isinstance(arg_types, dict):
                     params = [p for p in arg_order if isinstance(p, str) and p != "self"]
                     param_types = [_safe_str(arg_types.get(p)) for p in params]
-                    out[name] = "callable[[" + ",".join(param_types) + "]," + ret + "]"
+                    callable_t = "callable[[" + ",".join(param_types) + "]," + ret + "]"
                 else:
-                    out[name] = "callable[[],"+ret+"]"
+                    callable_t = "callable[[],"+ret+"]"
+                out[name] = callable_t
+                # Also register original name if this was renamed
+                if name in renamed:
+                    out[renamed[name]] = callable_t
         elif kind == "ClassDef":
             cls_body = stmt.get("body")
             if isinstance(cls_body, list):
