@@ -8,6 +8,7 @@ from typing import Any
 from toolchain.compile.east2_to_east3_block_scope_hoist import hoist_block_scope_variables
 from toolchain.compile.east2_to_east3_default_arg_expansion import expand_default_arguments
 from toolchain.compile.east2_to_east3_integer_promotion import apply_integer_promotion
+from toolchain.compile.east2_to_east3_listcomp_lowering import lower_listcomp
 from toolchain.compile.east2_to_east3_tuple_target_expansion import expand_forcore_tuple_targets
 from toolchain.compile.east2_to_east3_swap_detection import detect_swap_patterns
 from toolchain.compile.east2_to_east3_type_propagation import apply_type_propagation
@@ -624,6 +625,9 @@ def lower_east2_to_east3(east_module: dict[str, Any], object_dispatch_mode: str 
 
     # Yield lowering: convert generator functions to list accumulation.
     lower_yield_generators(lowered)
+
+    # ListComp lowering: expand list comprehensions to for-loop + append.
+    lower_listcomp(lowered)
 
     # Default argument expansion: fill in missing default values at call sites.
     expand_default_arguments(lowered)
