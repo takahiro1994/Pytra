@@ -48,6 +48,8 @@ _FUNCTION_NAMES: list[set[str]] = [set()]
 _CLASS_BASES: list[dict[str, str]] = [{}]
 _CLASS_METHODS: list[dict[str, set[str]]] = [{}]
 _RELATIVE_IMPORT_NAME_ALIASES: dict[str, str] = {}
+_CURRENT_MODULE_ID_KT: list[str] = [""]
+_CURRENT_EAST_DOC_KT: list[Any] = [{}]
 
 
 def _safe_ident(name: Any, fallback: str) -> str:
@@ -819,6 +821,15 @@ def _is_math_constant(expr: dict[str, Any]) -> bool:
 def _render_attribute_expr(expr: dict[str, Any]) -> str:
     value_any = expr.get("value")
     attr = _safe_ident(expr.get("attr"), "field")
+    # Resolve module.attr via import alias map
+    if isinstance(value_any, dict) and value_any.get("kind") == "Name":
+        owner_id = value_any.get("id", "")
+        from toolchain.emit.common.emitter.code_emitter import build_import_alias_map
+        _alias_map = build_import_alias_map(
+            _CURRENT_EAST_DOC_KT[0].get("meta", {}) if isinstance(_CURRENT_EAST_DOC_KT[0], dict) else {}
+        )
+        if owner_id in _alias_map and attr != "":
+            return attr + "()"
     semantic_tag_any = expr.get("semantic_tag")
     semantic_tag = semantic_tag_any if isinstance(semantic_tag_any, str) else ""
     runtime_call, _ = _resolved_runtime_call(expr)
@@ -1103,11 +1114,20 @@ def _render_call_expr(expr: dict[str, Any]) -> str:
     if isinstance(func_any, dict) and func_any.get("kind") == "Attribute":
         attr_name = _safe_ident(func_any.get("attr"), "")
         owner_any = func_any.get("value")
-        # Rewrite pytra.utils module calls: png.write_rgb_png → __pytra_write_rgb_png
         if isinstance(owner_any, dict) and owner_any.get("kind") == "Name":
             owner_id = owner_any.get("id", "")
-            # Resolve stdlib calls via import alias map
-            pass  # module.attr calls resolved by linker → EAST3
+            # Resolve module.attr calls via import alias map
+            from toolchain.emit.common.emitter.code_emitter import build_import_alias_map
+            _alias_map = build_import_alias_map(
+                _CURRENT_EAST_DOC_KT[0].get("meta", {}) if isinstance(_CURRENT_EAST_DOC_KT[0], dict) else {}
+            )
+            if owner_id in _alias_map and attr_name != "":
+                rendered_mod_args: list[str] = []
+                mi = 0
+                while mi < len(args):
+                    rendered_mod_args.append(_render_expr(args[mi]))
+                    mi += 1
+                return attr_name + "(" + ", ".join(rendered_mod_args) + ")"
         if isinstance(owner_any, dict) and owner_any.get("kind") == "Call":
             if _call_name(owner_any) in {"super", "super_"}:
                 rendered_super_args: list[str] = []
@@ -2278,6 +2298,27 @@ def _block_guarantees_return(body: list[Any]) -> bool:
 def _emit_function(fn: dict[str, Any], *, indent: str, in_class_name: str | None) -> list[str]:
     name = _safe_ident(fn.get("name"), "func")
     in_class = in_class_name is not None
+
+    # @extern function → generate delegation to _native
+    decorators = fn.get("decorators")
+    if isinstance(decorators, list) and "extern" in decorators and not in_class:
+        return_type = _kotlin_type(fn.get("return_type"), allow_void=True)
+        params = _function_params(fn, drop_self=False)
+        param_names: list[str] = []
+        arg_order = fn.get("arg_order", [])
+        if isinstance(arg_order, list):
+            for a in arg_order:
+                if isinstance(a, str):
+                    param_names.append(_safe_ident(a, "arg"))
+        module_id = _CURRENT_MODULE_ID_KT[0]
+        parts = module_id.split(".")
+        native_prefix = parts[-1] + "_native_" if len(parts) > 0 else "native_"
+        call = native_prefix + name + "(" + ", ".join(param_names) + ")"
+        sig = indent + "fun " + name + "(" + ", ".join(params) + "): " + return_type
+        if return_type == "Unit":
+            return [sig + " {", indent + "    " + call, indent + "}"]
+        return [sig + " {", indent + "    return " + call, indent + "}"]
+
     is_init = in_class and name == "__init__"
 
     return_type = _kotlin_type(fn.get("return_type"), allow_void=True)
@@ -2729,7 +2770,11 @@ def transpile_to_kotlin_native(east_doc: dict[str, Any]) -> str:
     _RELATIVE_IMPORT_NAME_ALIASES.clear()
     _RELATIVE_IMPORT_NAME_ALIASES.update(_collect_relative_import_name_aliases(east_doc))
     meta = east_doc.get("meta") if isinstance(east_doc.get("meta"), dict) else {}
-    pass  # import alias resolution handled by emit_context
+    emit_ctx = meta.get("emit_context", {}) if isinstance(meta.get("emit_context"), dict) else {}
+    is_entry = bool(emit_ctx.get("is_entry", True))
+    module_id = emit_ctx.get("module_id", "") if isinstance(emit_ctx.get("module_id"), str) else ""
+    _CURRENT_MODULE_ID_KT[0] = module_id
+    _CURRENT_EAST_DOC_KT[0] = east_doc
     reject_backend_typed_vararg_signatures(east_doc, backend_name="Kotlin backend")
     reject_backend_general_union_type_exprs(east_doc, backend_name="Kotlin backend")
     reject_backend_homogeneous_tuple_ellipsis_type_exprs(east_doc, backend_name="Kotlin backend")
@@ -2824,6 +2869,11 @@ def transpile_to_kotlin_native(east_doc: dict[str, Any]) -> str:
         lines.append("")
         lines.extend(_emit_function(functions[i], indent="", in_class_name=None))
         i += 1
+
+    if not is_entry:
+        # Sub-module: no main()
+        lines.append("")
+        return "\n".join(lines)
 
     lines.append("")
     lines.append("fun main(args: Array<String>) {")

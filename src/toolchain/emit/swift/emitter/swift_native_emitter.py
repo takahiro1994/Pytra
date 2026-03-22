@@ -1355,7 +1355,7 @@ def _function_param_names(fn: dict[str, Any], *, drop_self: bool) -> list[str]:
     return out
 
 
-def _function_params(fn: dict[str, Any], *, drop_self: bool) -> list[str]:
+def _function_params(fn: dict[str, Any], *, drop_self: bool, use_any: bool = True) -> list[str]:
     arg_types_any = fn.get("arg_types")
     arg_types = arg_types_any if isinstance(arg_types_any, dict) else {}
     names = _function_param_names(fn, drop_self=drop_self)
@@ -1366,9 +1366,8 @@ def _function_params(fn: dict[str, Any], *, drop_self: bool) -> list[str]:
         name = names[i]
         param_name = mutable_param_name(name) if name in reassigned else name
         original_type = _swift_type(arg_types.get(name), allow_void=False)
-        # Use Any for all parameter types to avoid callers needing explicit casts
-        # (VarDecl may declare variables as Any/object that are passed to typed parameters)
-        out.append("_ " + param_name + ": Any")
+        param_type = "Any" if use_any else original_type
+        out.append("_ " + param_name + ": " + param_type)
         i += 1
     return out
 
@@ -2352,7 +2351,7 @@ def _emit_function(
     if "extern" in decorators and receiver_name is None:
         return_type = _swift_type(fn.get("return_type"), allow_void=True)
         drop_self = False
-        params = _function_params(fn, drop_self=drop_self)
+        params = _function_params(fn, drop_self=drop_self, use_any=False)
         param_names = _function_param_names(fn, drop_self=drop_self)
         sig = indent + "func " + name + "(" + ", ".join(params) + ")"
         if return_type != "Void":
