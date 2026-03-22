@@ -1409,10 +1409,15 @@ def _emit_stmt(stmt: dict[str, Any], *, indent: str, ctx: dict[str, Any]) -> lis
 def _is_stdlib_passthrough_function(stmt: dict[str, Any]) -> bool:
     """Return True if this function is a stdlib passthrough (extern wrapper).
 
+    Only applies to module-level functions, not class methods.
+
     Pattern: function body is a single return statement that calls
     $stdlib_module.same_name(args), e.g. return time.perf_counter().
     These should be skipped since py_runtime.ps1 already provides the implementation.
     """
+    # Don't skip class methods — they are ClassName_method, not module-level
+    if _CURRENT_CLASS_NAME[0] != "":
+        return False
     body = _get_list(stmt, "body")
     if len(body) != 1:
         return False
