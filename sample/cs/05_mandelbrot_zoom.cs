@@ -14,7 +14,6 @@ public static class Program
     public static List<byte> render_frame(long width, long height, double center_x, double center_y, double scale, long max_iter)
     {
         List<byte> frame = Pytra.CsModule.py_runtime.py_bytearray(width * height);
-        double __hoisted_cast_1 = System.Convert.ToDouble(max_iter);
         long y = 0;
         for (y = 0; y < height; y += 1) {
             long row_base = y * width;
@@ -25,17 +24,17 @@ public static class Program
                 double zx = 0.0;
                 double zy = 0.0;
                 long i = 0;
-                while (i < max_iter) {
+                while ((i) < (max_iter)) {
                     double zx2 = zx * zx;
                     double zy2 = zy * zy;
-                    if (zx2 + zy2 > 4.0) {
+                    if ((zx2 + zy2) > (4.0)) {
                         break;
                     }
                     zy = 2.0 * zx * zy + cy;
                     zx = zx2 - zy2 + cx;
                     i += 1;
                 }
-                Pytra.CsModule.py_runtime.py_set(frame, row_base + x, Pytra.CsModule.py_runtime.py_int(System.Convert.ToDouble(255.0 * i) / System.Convert.ToDouble(__hoisted_cast_1)));
+                Pytra.CsModule.py_runtime.py_set(frame, row_base + x, Pytra.CsModule.py_runtime.py_int(System.Convert.ToDouble(255.0 * i) / System.Convert.ToDouble(max_iter)));
             }
         }
         return Pytra.CsModule.py_runtime.py_bytes(frame);

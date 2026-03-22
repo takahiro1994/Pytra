@@ -14,10 +14,10 @@ public static class Program
     
     public static double clamp01(double v)
     {
-        if (v < 0.0) {
+        if ((v) < (0.0)) {
             return 0.0;
         }
-        if (v > 1.0) {
+        if ((v) > (1.0)) {
             return 1.0;
         }
         return v;
@@ -30,13 +30,13 @@ public static class Program
     
     public static double length(double x, double y, double z)
     {
-        return Pytra.CsModule.math.sqrt(x * x + y * y + z * z);
+        return math.sqrt(x * x + y * y + z * z);
     }
     
     public static (double, double, double) normalize(double x, double y, double z)
     {
         double l = length(x, y, z);
-        if (l < 1e-9) {
+        if ((l) < (1e-9)) {
             return (0.0, 0.0, 0.0);
         }
         return (System.Convert.ToDouble(x) / System.Convert.ToDouble(l), System.Convert.ToDouble(y) / System.Convert.ToDouble(l), System.Convert.ToDouble(z) / System.Convert.ToDouble(l));
@@ -53,18 +53,18 @@ public static class Program
         // Simple IOR-based refraction. Return reflection direction on total internal reflection.
         double cosi = -dot(ix, iy, iz, nx, ny, nz);
         double sint2 = eta * eta * (1.0 - cosi * cosi);
-        if (sint2 > 1.0) {
+        if ((sint2) > (1.0)) {
             return reflect(ix, iy, iz, nx, ny, nz);
         }
-        var cost = Pytra.CsModule.math.sqrt(1.0 - sint2);
-        var k = eta * cosi - cost;
+        var cost = math.sqrt(1.0 - sint2);
+        double k = eta * cosi - cost;
         return (eta * ix + k * nx, eta * iy + k * ny, eta * iz + k * nz);
     }
     
     public static double schlick(double cos_theta, double f0)
     {
         double m = 1.0 - cos_theta;
-        return f0 + (1.0 - f0) * m * m * m * m * m;
+        return f0 + (1.0 - f0) * (m * m * m * m * m);
     }
     
     public static (double, double, double) sky_color(double dx, double dy, double dz, double tphase)
@@ -74,10 +74,10 @@ public static class Program
         double r = 0.06 + 0.20 * t;
         double g = 0.10 + 0.25 * t;
         double b = 0.16 + 0.45 * t;
-        var band = 0.5 + 0.5 * Pytra.CsModule.math.sin(8.0 * dx + 6.0 * dz + tphase);
-        r += System.Convert.ToDouble(0.08 * band);
-        g += System.Convert.ToDouble(0.05 * band);
-        b += System.Convert.ToDouble(0.12 * band);
+        double band = 0.5 + 0.5 * math.sin(8.0 * dx + 6.0 * dz + tphase);
+        r += 0.08 * band;
+        g += 0.05 * band;
+        b += 0.12 * band;
         return (clamp01(r), clamp01(g), clamp01(b));
     }
     
@@ -89,16 +89,16 @@ public static class Program
         double b = lx * dx + ly * dy + lz * dz;
         double c = lx * lx + ly * ly + lz * lz - radius * radius;
         double h = b * b - c;
-        if (h < 0.0) {
+        if ((h) < (0.0)) {
             return -1.0;
         }
-        var s = Pytra.CsModule.math.sqrt(h);
-        var t0 = -b - s;
-        if (t0 > 1e-4) {
+        var s = math.sqrt(h);
+        double t0 = -b - s;
+        if ((t0) > (1e-4)) {
             return t0;
         }
-        var t1 = -b + s;
-        if (t1 > 1e-4) {
+        double t1 = -b + s;
+        if ((t1) > (1e-4)) {
             return t1;
         }
         return -1.0;
@@ -108,16 +108,14 @@ public static class Program
     {
         // 3-3-2 quantized palette. Lightweight quantization that stays fast after transpilation.
         List<byte> p = Pytra.CsModule.py_runtime.py_bytearray(256 * 3);
-        double __hoisted_cast_1 = System.Convert.ToDouble(7);
-        double __hoisted_cast_2 = System.Convert.ToDouble(3);
         long i = 0;
         for (i = 0; i < 256; i += 1) {
-            long r = i >> 5 & 7;
-            long g = i >> 2 & 7;
+            long r = i >> System.Convert.ToInt32(5) & 7;
+            long g = i >> System.Convert.ToInt32(2) & 7;
             long b = i & 3;
-            Pytra.CsModule.py_runtime.py_set(p, i * 3 + 0, Pytra.CsModule.py_runtime.py_int(System.Convert.ToDouble(255 * r) / System.Convert.ToDouble(__hoisted_cast_1)));
-            Pytra.CsModule.py_runtime.py_set(p, i * 3 + 1, Pytra.CsModule.py_runtime.py_int(System.Convert.ToDouble(255 * g) / System.Convert.ToDouble(__hoisted_cast_1)));
-            Pytra.CsModule.py_runtime.py_set(p, i * 3 + 2, Pytra.CsModule.py_runtime.py_int(System.Convert.ToDouble(255 * b) / System.Convert.ToDouble(__hoisted_cast_2)));
+            Pytra.CsModule.py_runtime.py_set(p, i * 3 + 0, Pytra.CsModule.py_runtime.py_int(System.Convert.ToDouble(255 * r) / System.Convert.ToDouble(7)));
+            Pytra.CsModule.py_runtime.py_set(p, i * 3 + 1, Pytra.CsModule.py_runtime.py_int(System.Convert.ToDouble(255 * g) / System.Convert.ToDouble(7)));
+            Pytra.CsModule.py_runtime.py_set(p, i * 3 + 2, Pytra.CsModule.py_runtime.py_int(System.Convert.ToDouble(255 * b) / System.Convert.ToDouble(3)));
         }
         return Pytra.CsModule.py_runtime.py_bytes(p);
     }
@@ -127,19 +125,19 @@ public static class Program
         long rr = Pytra.CsModule.py_runtime.py_int(clamp01(r) * 255.0);
         long gg = Pytra.CsModule.py_runtime.py_int(clamp01(g) * 255.0);
         long bb = Pytra.CsModule.py_runtime.py_int(clamp01(b) * 255.0);
-        return (rr >> 5 << 5) + (gg >> 5 << 2) + (bb >> 6);
+        return (rr >> System.Convert.ToInt32(5) << System.Convert.ToInt32(5)) + (gg >> System.Convert.ToInt32(5) << System.Convert.ToInt32(2)) + (bb >> System.Convert.ToInt32(6));
     }
     
     public static List<byte> render_frame(long width, long height, long frame_id, long frames_n)
     {
         double t = System.Convert.ToDouble(frame_id) / System.Convert.ToDouble(frames_n);
-        var tphase = 2.0 * Pytra.CsModule.math.pi * t;
+        double tphase = 2.0 * math.pi * t;
         
         // Camera slowly orbits.
         double cam_r = 3.0;
-        var cam_x = cam_r * Pytra.CsModule.math.cos(tphase * 0.9);
-        var cam_y = 1.1 + 0.25 * Pytra.CsModule.math.sin(tphase * 0.6);
-        var cam_z = cam_r * Pytra.CsModule.math.sin(tphase * 0.9);
+        double cam_x = cam_r * math.cos(tphase * 0.9);
+        double cam_y = 1.1 + 0.25 * math.sin(tphase * 0.6);
+        double cam_z = cam_r * math.sin(tphase * 0.9);
         double look_x = 0.0;
         double look_y = 0.35;
         double look_z = 0.0;
@@ -158,36 +156,34 @@ public static class Program
         var up_z = __tmp_3.Item3;
         
         // Moving glass sculpture (3 spheres) and an emissive sphere.
-        var s0x = 0.9 * Pytra.CsModule.math.cos(1.3 * tphase);
-        var s0y = 0.15 + 0.35 * Pytra.CsModule.math.sin(1.7 * tphase);
-        var s0z = 0.9 * Pytra.CsModule.math.sin(1.3 * tphase);
-        var s1x = 1.2 * Pytra.CsModule.math.cos(1.3 * tphase + 2.094);
-        var s1y = 0.10 + 0.40 * Pytra.CsModule.math.sin(1.1 * tphase + 0.8);
-        var s1z = 1.2 * Pytra.CsModule.math.sin(1.3 * tphase + 2.094);
-        var s2x = 1.0 * Pytra.CsModule.math.cos(1.3 * tphase + 4.188);
-        var s2y = 0.20 + 0.30 * Pytra.CsModule.math.sin(1.5 * tphase + 1.9);
-        var s2z = 1.0 * Pytra.CsModule.math.sin(1.3 * tphase + 4.188);
+        double s0x = 0.9 * math.cos(1.3 * tphase);
+        double s0y = 0.15 + 0.35 * math.sin(1.7 * tphase);
+        double s0z = 0.9 * math.sin(1.3 * tphase);
+        double s1x = 1.2 * math.cos(1.3 * tphase + 2.094);
+        double s1y = 0.10 + 0.40 * math.sin(1.1 * tphase + 0.8);
+        double s1z = 1.2 * math.sin(1.3 * tphase + 2.094);
+        double s2x = 1.0 * math.cos(1.3 * tphase + 4.188);
+        double s2y = 0.20 + 0.30 * math.sin(1.5 * tphase + 1.9);
+        double s2z = 1.0 * math.sin(1.3 * tphase + 4.188);
         double lr = 0.35;
-        var lx = 2.4 * Pytra.CsModule.math.cos(tphase * 1.8);
-        var ly = 1.8 + 0.8 * Pytra.CsModule.math.sin(tphase * 1.2);
-        var lz = 2.4 * Pytra.CsModule.math.sin(tphase * 1.8);
+        double lx = 2.4 * math.cos(tphase * 1.8);
+        double ly = 1.8 + 0.8 * math.sin(tphase * 1.2);
+        double lz = 2.4 * math.sin(tphase * 1.8);
         
         List<byte> frame = Pytra.CsModule.py_runtime.py_bytearray(width * height);
         double aspect = System.Convert.ToDouble(width) / System.Convert.ToDouble(height);
         double fov = 1.25;
-        double __hoisted_cast_3 = System.Convert.ToDouble(height);
-        double __hoisted_cast_4 = System.Convert.ToDouble(width);
         
         long py = 0;
         for (py = 0; py < height; py += 1) {
             long row_base = py * width;
-            double sy = 1.0 - System.Convert.ToDouble(2.0 * (py + 0.5)) / System.Convert.ToDouble(__hoisted_cast_3);
+            double sy = 1.0 - System.Convert.ToDouble(2.0 * (py + 0.5)) / System.Convert.ToDouble(height);
             long px = 0;
             for (px = 0; px < width; px += 1) {
-                double sx = (System.Convert.ToDouble(2.0 * (px + 0.5)) / System.Convert.ToDouble(__hoisted_cast_4) - 1.0) * aspect;
-                var rx = fwd_x + fov * (sx * right_x + sy * up_x);
-                var ry = fwd_y + fov * (sx * right_y + sy * up_y);
-                var rz = fwd_z + fov * (sx * right_z + sy * up_z);
+                double sx = (System.Convert.ToDouble(2.0 * (px + 0.5)) / System.Convert.ToDouble(width) - 1.0) * aspect;
+                double rx = fwd_x + fov * (sx * right_x + sy * up_x);
+                double ry = fwd_y + fov * (sx * right_y + sy * up_y);
+                double rz = fwd_z + fov * (sx * right_z + sy * up_z);
                 var __tmp_4 = normalize(rx, ry, rz);
                 var dx = __tmp_4.Item1;
                 var dy = __tmp_4.Item2;
@@ -201,69 +197,79 @@ public static class Program
                 double b = 0.0;
                 
                 // Floor plane y=-1.2
-                if (dy < -1e-6) {
-                    var tf = System.Convert.ToDouble((-1.2 - cam_y)) / System.Convert.ToDouble(dy);
-                    if ((tf > 1e-4) && (tf < best_t)) {
+                if ((dy) < (-1e-6)) {
+                    double tf = System.Convert.ToDouble((-1.2 - cam_y)) / System.Convert.ToDouble(dy);
+                    if (((tf) > (1e-4)) && ((tf) < (best_t))) {
                         best_t = System.Convert.ToDouble(tf);
                         hit_kind = 1;
                     }
                 }
                 double t0 = sphere_intersect(cam_x, cam_y, cam_z, dx, dy, dz, s0x, s0y, s0z, 0.65);
-                if ((t0 > 0.0) && (t0 < best_t)) {
+                if (((t0) > (0.0)) && ((t0) < (best_t))) {
                     best_t = t0;
                     hit_kind = 2;
                 }
                 double t1 = sphere_intersect(cam_x, cam_y, cam_z, dx, dy, dz, s1x, s1y, s1z, 0.72);
-                if ((t1 > 0.0) && (t1 < best_t)) {
+                if (((t1) > (0.0)) && ((t1) < (best_t))) {
                     best_t = t1;
                     hit_kind = 3;
                 }
                 double t2 = sphere_intersect(cam_x, cam_y, cam_z, dx, dy, dz, s2x, s2y, s2z, 0.58);
-                if ((t2 > 0.0) && (t2 < best_t)) {
+                if (((t2) > (0.0)) && ((t2) < (best_t))) {
                     best_t = t2;
                     hit_kind = 4;
                 }
-                if (hit_kind == 0) {
+                /* VarDecl: object glow */
+                /* VarDecl: object hx */
+                /* VarDecl: object hz */
+                /* VarDecl: float64 ldx */
+                /* VarDecl: float64 ldy */
+                /* VarDecl: float64 ldz */
+                /* VarDecl: object lxv */
+                /* VarDecl: object lyv */
+                /* VarDecl: object lzv */
+                /* VarDecl: float64 ndotl */
+                if ((hit_kind) == (0)) {
                     var __tmp_5 = sky_color(dx, dy, dz, tphase);
                     r = __tmp_5.Item1;
                     g = __tmp_5.Item2;
                     b = __tmp_5.Item3;
                 } else {
-                    if (hit_kind == 1) {
-                        var hx = cam_x + best_t * dx;
-                        var hz = cam_z + best_t * dz;
-                        long cx = Pytra.CsModule.py_runtime.py_int(Pytra.CsModule.math.floor(hx * 2.0));
-                        long cz = Pytra.CsModule.py_runtime.py_int(Pytra.CsModule.math.floor(hz * 2.0));
-                        long checker = ((cx + cz) % 2 == 0 ? 0 : 1);
-                        double base_r = (checker == 0 ? 0.10 : 0.04);
-                        double base_g = (checker == 0 ? 0.11 : 0.05);
-                        double base_b = (checker == 0 ? 0.13 : 0.08);
+                    if ((hit_kind) == (1)) {
+                        double hx = cam_x + best_t * dx;
+                        double hz = cam_z + best_t * dz;
+                        long cx_i = Pytra.CsModule.py_runtime.py_int(math.floor(hx * 2.0));
+                        long cz_i = Pytra.CsModule.py_runtime.py_int(math.floor(hz * 2.0));
+                        long checker = (((cx_i + cz_i) % 2) == (0) ? 0 : 1);
+                        double base_r = ((checker) == (0) ? 0.10 : 0.04);
+                        double base_g = ((checker) == (0) ? 0.11 : 0.05);
+                        double base_b = ((checker) == (0) ? 0.13 : 0.08);
                         // Emissive sphere contribution.
                         var lxv = lx - hx;
-                        var lyv = ly - -1.2;
+                        double lyv = ly - -1.2;
                         var lzv = lz - hz;
                         var __tmp_6 = normalize(lxv, lyv, lzv);
                         var ldx = __tmp_6.Item1;
                         var ldy = __tmp_6.Item2;
                         var ldz = __tmp_6.Item3;
-                        var ndotl = System.Math.Max(ldy, 0.0);
+                        double ndotl = System.Math.Max(ldy, 0.0);
                         var ldist2 = lxv * lxv + lyv * lyv + lzv * lzv;
-                        var glow = System.Convert.ToDouble(8.0) / System.Convert.ToDouble((1.0 + ldist2));
-                        r = System.Convert.ToDouble(base_r + 0.8 * glow + 0.20 * ndotl);
-                        g = System.Convert.ToDouble(base_g + 0.5 * glow + 0.18 * ndotl);
-                        b = System.Convert.ToDouble(base_b + 1.0 * glow + 0.24 * ndotl);
+                        double glow = System.Convert.ToDouble(8.0) / System.Convert.ToDouble((1.0 + ldist2));
+                        r = base_r + 0.8 * glow + 0.20 * ndotl;
+                        g = base_g + 0.5 * glow + 0.18 * ndotl;
+                        b = base_b + 1.0 * glow + 0.24 * ndotl;
                     } else {
                         double cx = 0.0;
                         double cy = 0.0;
                         double cz = 0.0;
                         double rad = 1.0;
-                        if (hit_kind == 2) {
+                        if ((hit_kind) == (2)) {
                             cx = System.Convert.ToDouble(s0x);
                             cy = System.Convert.ToDouble(s0y);
                             cz = System.Convert.ToDouble(s0z);
                             rad = 0.65;
                         } else {
-                            if (hit_kind == 3) {
+                            if ((hit_kind) == (3)) {
                                 cx = System.Convert.ToDouble(s1x);
                                 cy = System.Convert.ToDouble(s1y);
                                 cz = System.Convert.ToDouble(s1z);
@@ -275,9 +281,9 @@ public static class Program
                                 rad = 0.58;
                             }
                         }
-                        var hx = cam_x + best_t * dx;
-                        var hy = cam_y + best_t * dy;
-                        var hz = cam_z + best_t * dz;
+                        double hx = cam_x + best_t * dx;
+                        double hy = cam_y + best_t * dy;
+                        double hz = cam_z + best_t * dz;
                         var __tmp_7 = normalize(System.Convert.ToDouble((hx - cx)) / System.Convert.ToDouble(rad), System.Convert.ToDouble((hy - cy)) / System.Convert.ToDouble(rad), System.Convert.ToDouble((hz - cz)) / System.Convert.ToDouble(rad));
                         var nx = __tmp_7.Item1;
                         var ny = __tmp_7.Item2;
@@ -300,11 +306,11 @@ public static class Program
                         var tr = __tmp_11.Item1;
                         var tg = __tmp_11.Item2;
                         var tb = __tmp_11.Item3;
-                        var cosi = System.Math.Max(-(dx * nx + dy * ny + dz * nz), 0.0);
+                        double cosi = System.Math.Max(-(dx * nx + dy * ny + dz * nz), 0.0);
                         double fr = schlick(cosi, 0.04);
-                        r = System.Convert.ToDouble(tr * (1.0 - fr) + sr * fr);
-                        g = System.Convert.ToDouble(tg * (1.0 - fr) + sg * fr);
-                        b = System.Convert.ToDouble(tb * (1.0 - fr) + sb * fr);
+                        r = tr * (1.0 - fr) + sr * fr;
+                        g = tg * (1.0 - fr) + sg * fr;
+                        b = tb * (1.0 - fr) + sb * fr;
                         
                         var lxv = lx - hx;
                         var lyv = ly - hy;
@@ -313,28 +319,28 @@ public static class Program
                         var ldx = __tmp_12.Item1;
                         var ldy = __tmp_12.Item2;
                         var ldz = __tmp_12.Item3;
-                        var ndotl = System.Math.Max(nx * ldx + ny * ldy + nz * ldz, 0.0);
+                        double ndotl = System.Math.Max(nx * ldx + ny * ldy + nz * ldz, 0.0);
                         var __tmp_13 = normalize(ldx - dx, ldy - dy, ldz - dz);
                         var hvx = __tmp_13.Item1;
                         var hvy = __tmp_13.Item2;
                         var hvz = __tmp_13.Item3;
-                        var ndoth = System.Math.Max(nx * hvx + ny * hvy + nz * hvz, 0.0);
-                        var spec = ndoth * ndoth;
+                        double ndoth = System.Math.Max(nx * hvx + ny * hvy + nz * hvz, 0.0);
+                        double spec = ndoth * ndoth;
                         spec = spec * spec;
                         spec = spec * spec;
                         spec = spec * spec;
-                        var glow = System.Convert.ToDouble(10.0) / System.Convert.ToDouble((1.0 + lxv * lxv + lyv * lyv + lzv * lzv));
+                        double glow = System.Convert.ToDouble(10.0) / System.Convert.ToDouble((1.0 + lxv * lxv + lyv * lyv + lzv * lzv));
                         r += 0.20 * ndotl + 0.80 * spec + 0.45 * glow;
                         g += 0.18 * ndotl + 0.60 * spec + 0.35 * glow;
                         b += 0.26 * ndotl + 1.00 * spec + 0.65 * glow;
                         
                         // Slight tint variation per sphere.
-                        if (hit_kind == 2) {
+                        if ((hit_kind) == (2)) {
                             r *= 0.95;
                             g *= 1.05;
                             b *= 1.10;
                         } else {
-                            if (hit_kind == 3) {
+                            if ((hit_kind) == (3)) {
                                 r *= 1.08;
                                 g *= 0.98;
                                 b *= 1.04;
@@ -347,9 +353,9 @@ public static class Program
                     }
                 }
                 // Slightly stronger tone mapping.
-                r = System.Convert.ToDouble(Pytra.CsModule.math.sqrt(clamp01(r)));
-                g = System.Convert.ToDouble(Pytra.CsModule.math.sqrt(clamp01(g)));
-                b = System.Convert.ToDouble(Pytra.CsModule.math.sqrt(clamp01(b)));
+                r = System.Convert.ToDouble(math.sqrt(clamp01(r)));
+                g = System.Convert.ToDouble(math.sqrt(clamp01(g)));
+                b = System.Convert.ToDouble(math.sqrt(clamp01(b)));
                 Pytra.CsModule.py_runtime.py_set(frame, row_base + px, quantize_332(r, g, b));
             }
         }

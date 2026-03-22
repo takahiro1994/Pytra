@@ -16,10 +16,10 @@ public static class Program
     
     public static double clamp01(double v)
     {
-        if (v < 0.0) {
+        if ((v) < (0.0)) {
             return 0.0;
         }
-        if (v > 1.0) {
+        if ((v) > (1.0)) {
             return 1.0;
         }
         return v;
@@ -36,17 +36,17 @@ public static class Program
         double c = lx * lx + ly * ly + lz * lz - r * r;
         
         double d = b * b - 4.0 * a * c;
-        if (d < 0.0) {
+        if ((d) < (0.0)) {
             return -1.0;
         }
-        double sd = System.Convert.ToDouble(Pytra.CsModule.math.sqrt(d));
+        double sd = System.Convert.ToDouble(math.sqrt(d));
         double t0 = System.Convert.ToDouble((-b - sd)) / System.Convert.ToDouble((2.0 * a));
         double t1 = System.Convert.ToDouble((-b + sd)) / System.Convert.ToDouble((2.0 * a));
         
-        if (t0 > 0.001) {
+        if ((t0) > (0.001)) {
             return t0;
         }
-        if (t1 > 0.001) {
+        if ((t1) > (0.001)) {
             return t1;
         }
         return -1.0;
@@ -65,10 +65,6 @@ public static class Program
         double lx = -0.4;
         double ly = 0.8;
         double lz = -0.45;
-        double __hoisted_cast_1 = System.Convert.ToDouble(aa);
-        double __hoisted_cast_2 = System.Convert.ToDouble(height - 1);
-        double __hoisted_cast_3 = System.Convert.ToDouble(width - 1);
-        double __hoisted_cast_4 = System.Convert.ToDouble(height);
         
         long y = 0;
         for (y = 0; y < height; y += 1) {
@@ -82,15 +78,15 @@ public static class Program
                 for (ay = 0; ay < aa; ay += 1) {
                     long ax = 0;
                     for (ax = 0; ax < aa; ax += 1) {
-                        double fy = System.Convert.ToDouble((y + System.Convert.ToDouble((ay + 0.5)) / System.Convert.ToDouble(__hoisted_cast_1))) / System.Convert.ToDouble(__hoisted_cast_2);
-                        double fx = System.Convert.ToDouble((x + System.Convert.ToDouble((ax + 0.5)) / System.Convert.ToDouble(__hoisted_cast_1))) / System.Convert.ToDouble(__hoisted_cast_3);
+                        double fy = System.Convert.ToDouble((y + System.Convert.ToDouble((ay + 0.5)) / System.Convert.ToDouble(aa))) / System.Convert.ToDouble((height - 1));
+                        double fx = System.Convert.ToDouble((x + System.Convert.ToDouble((ax + 0.5)) / System.Convert.ToDouble(aa))) / System.Convert.ToDouble((width - 1));
                         double sy = 1.0 - 2.0 * fy;
-                        double sx = (2.0 * fx - 1.0) * (System.Convert.ToDouble(width) / System.Convert.ToDouble(__hoisted_cast_4));
+                        double sx = (2.0 * fx - 1.0) * (System.Convert.ToDouble(width) / System.Convert.ToDouble(height));
                         
                         double dx = sx;
                         double dy = sy;
                         double dz = 1.0;
-                        double inv_len = System.Convert.ToDouble(System.Convert.ToDouble(1.0) / System.Convert.ToDouble(Pytra.CsModule.math.sqrt(dx * dx + dy * dy + dz * dz)));
+                        double inv_len = System.Convert.ToDouble(1.0) / System.Convert.ToDouble(math.sqrt(dx * dx + dy * dy + dz * dz));
                         dx *= inv_len;
                         dy *= inv_len;
                         dz *= inv_len;
@@ -99,17 +95,17 @@ public static class Program
                         long hit_id = -1;
                         
                         double t = hit_sphere(ox, oy, oz, dx, dy, dz, -0.8, -0.2, 2.2, 0.8);
-                        if ((t > 0.0) && (t < t_min)) {
+                        if (((t) > (0.0)) && ((t) < (t_min))) {
                             t_min = t;
                             hit_id = 0;
                         }
                         t = hit_sphere(ox, oy, oz, dx, dy, dz, 0.9, 0.1, 2.9, 0.95);
-                        if ((t > 0.0) && (t < t_min)) {
+                        if (((t) > (0.0)) && ((t) < (t_min))) {
                             t_min = t;
                             hit_id = 1;
                         }
                         t = hit_sphere(ox, oy, oz, dx, dy, dz, 0.0, -1001.0, 3.0, 1000.0);
-                        if ((t > 0.0) && (t < t_min)) {
+                        if (((t) > (0.0)) && ((t) < (t_min))) {
                             t_min = t;
                             hit_id = 2;
                         }
@@ -117,7 +113,7 @@ public static class Program
                         long g = 0;
                         long b = 0;
                         
-                        if (hit_id >= 0) {
+                        if ((hit_id) >= (0)) {
                             double px = ox + dx * t_min;
                             double py = oy + dy * t_min;
                             double pz = oz + dz * t_min;
@@ -126,12 +122,12 @@ public static class Program
                             double ny = 0.0;
                             double nz = 0.0;
                             
-                            if (hit_id == 0) {
+                            if ((hit_id) == (0)) {
                                 nx = System.Convert.ToDouble((px + 0.8)) / System.Convert.ToDouble(0.8);
                                 ny = System.Convert.ToDouble((py + 0.2)) / System.Convert.ToDouble(0.8);
                                 nz = System.Convert.ToDouble((pz - 2.2)) / System.Convert.ToDouble(0.8);
                             } else {
-                                if (hit_id == 1) {
+                                if ((hit_id) == (1)) {
                                     nx = System.Convert.ToDouble((px - 0.9)) / System.Convert.ToDouble(0.95);
                                     ny = System.Convert.ToDouble((py - 0.1)) / System.Convert.ToDouble(0.95);
                                     nz = System.Convert.ToDouble((pz - 2.9)) / System.Convert.ToDouble(0.95);
@@ -148,18 +144,18 @@ public static class Program
                             double base_g = 0.0;
                             double base_b = 0.0;
                             
-                            if (hit_id == 0) {
+                            if ((hit_id) == (0)) {
                                 base_r = 0.95;
                                 base_g = 0.35;
                                 base_b = 0.25;
                             } else {
-                                if (hit_id == 1) {
+                                if ((hit_id) == (1)) {
                                     base_r = 0.25;
                                     base_g = 0.55;
                                     base_b = 0.95;
                                 } else {
                                     long checker = Pytra.CsModule.py_runtime.py_int((px + 50.0) * 0.8) + Pytra.CsModule.py_runtime.py_int((pz + 50.0) * 0.8);
-                                    if (checker % 2 == 0) {
+                                    if ((checker % 2) == (0)) {
                                         base_r = 0.85;
                                         base_g = 0.85;
                                         base_b = 0.85;
@@ -203,7 +199,7 @@ public static class Program
         
         double start = Pytra.CsModule.time.perf_counter();
         List<byte> pixels = render(width, height, aa);
-        Pytra.CsModule.png_helper.write_rgb_png(out_path, width, height, pixels);
+        png.write_rgb_png(out_path, width, height, pixels);
         double elapsed = Pytra.CsModule.time.perf_counter() - start;
         
         System.Console.WriteLine(string.Join(" ", new object[] { "output:", out_path }));

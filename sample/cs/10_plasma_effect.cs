@@ -32,12 +32,12 @@ public static class Program
                 for (x = 0; x < w; x += 1) {
                     long dx = x - 160;
                     long dy = y - 120;
-                    var v = Pytra.CsModule.math.sin((x + t * 2.0) * 0.045) + Pytra.CsModule.math.sin((y - t * 1.2) * 0.05) + Pytra.CsModule.math.sin((x + y + t * 1.7) * 0.03) + Pytra.CsModule.math.sin(Pytra.CsModule.math.sqrt(dx * dx + dy * dy) * 0.07 - t * 0.18);
+                    var v = math.sin((x + t * 2.0) * 0.045) + math.sin((y - t * 1.2) * 0.05) + math.sin((x + y + t * 1.7) * 0.03) + math.sin(math.sqrt(dx * dx + dy * dy) * 0.07 - t * 0.18);
                     long c = Pytra.CsModule.py_runtime.py_int((v + 4.0) * (System.Convert.ToDouble(255.0) / System.Convert.ToDouble(8.0)));
-                    if (c < 0) {
+                    if ((c) < (0)) {
                         c = 0;
                     }
-                    if (c > 255) {
+                    if ((c) > (255)) {
                         c = 255;
                     }
                     Pytra.CsModule.py_runtime.py_set(frame, row_base + x, c);

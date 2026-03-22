@@ -41,13 +41,12 @@ public static class Program
         long t = 0;
         for (t = 0; t < frames_n; t += 1) {
             List<byte> frame = Pytra.CsModule.py_runtime.py_bytearray(w * h);
-            double __hoisted_cast_1 = System.Convert.ToDouble(t);
             
             long p = 0;
             for (p = 0; p < particles; p += 1) {
                 double phase = p * 0.261799;
-                long x = Pytra.CsModule.py_runtime.py_int(w * 0.5 + w * 0.38 * Pytra.CsModule.math.sin(0.11 * __hoisted_cast_1 + phase * 2.0));
-                long y = Pytra.CsModule.py_runtime.py_int(h * 0.5 + h * 0.38 * Pytra.CsModule.math.sin(0.17 * __hoisted_cast_1 + phase * 3.0));
+                long x = Pytra.CsModule.py_runtime.py_int(w * 0.5 + w * 0.38 * math.sin(0.11 * t + phase * 2.0));
+                long y = Pytra.CsModule.py_runtime.py_int(h * 0.5 + h * 0.38 * math.sin(0.17 * t + phase * 3.0));
                 long color = 30 + p * 9 % 220;
                 
                 long dy = -2;
@@ -56,14 +55,14 @@ public static class Program
                     for (dx = -2; dx < 3; dx += 1) {
                         long xx = x + dx;
                         long yy = y + dy;
-                        if ((xx >= 0) && (xx < w) && (yy >= 0) && (yy < h)) {
+                        if (((xx) >= (0)) && ((xx) < (w)) && ((yy) >= (0)) && ((yy) < (h))) {
                             long d2 = dx * dx + dy * dy;
-                            if (d2 <= 4) {
+                            if ((d2) <= (4)) {
                                 long idx = yy * w + xx;
                                 long v = color - d2 * 20;
-                                v = System.Convert.ToInt64(System.Math.Max(0, v));
-                                if (v > Pytra.CsModule.py_runtime.py_get(frame, idx)) {
-                                    Pytra.CsModule.py_runtime.py_set(frame, idx, System.Convert.ToInt64(v));
+                                v = System.Math.Max(0, v);
+                                if ((v) > (Pytra.CsModule.py_runtime.py_get(frame, idx))) {
+                                    Pytra.CsModule.py_runtime.py_set(frame, idx, v);
                                 }
                             }
                         }

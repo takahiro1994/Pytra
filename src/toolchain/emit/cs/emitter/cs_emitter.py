@@ -2937,18 +2937,18 @@ class CSharpEmitter(CodeEmitter):
         fn_node = self.any_to_dict_or_empty(parts.get("fn"))
         fn_kind = self.any_dict_get_str(fn_node, "kind", "")
         args_raw = self.any_to_list(parts.get("args"))
-        kw_values_raw = self.any_to_list(parts.get("kw_values"))
+        kw_dict = self.any_to_dict_or_empty(parts.get("kw"))
         args: list[str] = []
         i = 0
         while i < len(args_raw):
             args.append(self.any_to_str(args_raw[i]))
             i += 1
-        kw_values: list[str] = []
-        i = 0
-        while i < len(kw_values_raw):
-            kw_values.append(self.any_to_str(kw_values_raw[i]))
-            i += 1
-        args = self.merge_call_kw_values(args, kw_values)
+        # Render keyword arguments as C# named arguments (name: value)
+        kw_named: list[str] = []
+        for kw_key in kw_dict:
+            if isinstance(kw_key, str):
+                kw_named.append(kw_key + ": " + self.any_to_str(kw_dict[kw_key]))
+        args = self.merge_call_kw_values(args, kw_named)
         arg_nodes = self.merge_call_arg_nodes(
             self.any_to_list(parts.get("arg_nodes")),
             self.any_to_list(parts.get("kw_nodes")),

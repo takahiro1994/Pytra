@@ -33,12 +33,12 @@ public static class Program
                 for (x = 0; x < w; x += 1) {
                     long dx = x - 160;
                     long dy = y - 120;
-                    var v = Pytra.CsModule.math.sin((x + t * 1.5) * 0.045) + Pytra.CsModule.math.sin((y - t * 1.2) * 0.04) + Pytra.CsModule.math.sin((x + y) * 0.02 + phase) + Pytra.CsModule.math.sin(Pytra.CsModule.math.sqrt(dx * dx + dy * dy) * 0.08 - phase * 1.3);
+                    var v = math.sin((x + t * 1.5) * 0.045) + math.sin((y - t * 1.2) * 0.04) + math.sin((x + y) * 0.02 + phase) + math.sin(math.sqrt(dx * dx + dy * dy) * 0.08 - phase * 1.3);
                     long c = Pytra.CsModule.py_runtime.py_int((v + 4.0) * (System.Convert.ToDouble(255.0) / System.Convert.ToDouble(8.0)));
-                    if (c < 0) {
+                    if ((c) < (0)) {
                         c = 0;
                     }
-                    if (c > 255) {
+                    if ((c) > (255)) {
                         c = 255;
                     }
                     Pytra.CsModule.py_runtime.py_set(frame, row_base + x, c);
@@ -46,7 +46,7 @@ public static class Program
             }
             frames.Add(Pytra.CsModule.py_runtime.py_bytes(frame));
         }
-        Pytra.CsModule.gif_helper.save_gif(out_path, w, h, frames, Pytra.CsModule.gif_helper.grayscale_palette());
+        Pytra.CsModule.gif_helper.save_gif(out_path, w, h, frames, Pytra.CsModule.gif_helper.grayscale_palette(), 4, 0);
         double elapsed = Pytra.CsModule.time.perf_counter() - start;
         System.Console.WriteLine(string.Join(" ", new object[] { "output:", out_path }));
         System.Console.WriteLine(string.Join(" ", new object[] { "frames:", frames_n }));

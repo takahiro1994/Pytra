@@ -2820,6 +2820,9 @@ def transpile_to_go_native(east_doc: dict[str, Any]) -> str:
         node = body_any[i]
         if isinstance(node, dict) and node.get("kind") == "AnnAssign":
             value = node.get("value")
+            # Unwrap Unbox if present
+            if isinstance(value, dict) and value.get("kind") == "Unbox":
+                value = value.get("value", {})
             if isinstance(value, dict) and value.get("kind") == "Call":
                 func = value.get("func")
                 if isinstance(func, dict) and func.get("id") == "extern":
