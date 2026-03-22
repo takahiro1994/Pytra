@@ -307,6 +307,9 @@ function __pytra_in {
     if ($collection -is [array] -or $collection -is [System.Collections.IList]) {
         return ($collection -contains $item)
     }
+    if ($collection -is [System.Collections.ICollection] -or $collection -is [System.Collections.IEnumerable]) {
+        return (@($collection) -contains $item)
+    }
     return $false
 }
 
