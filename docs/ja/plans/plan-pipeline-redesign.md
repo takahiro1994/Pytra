@@ -259,6 +259,10 @@ class Call:
 - `typing.Any` の import 自体を禁止する（`typing` は注釈専用 no-op として許可するが、`Any` は使わない）。
 - `object` 型も禁止する（Python では `Any` と同義であり、C++ 等に写像できない）。
 - `dict[str, Any]` だけでなく `dict[str, object]` も同様に禁止。
+- JSON シリアライズには `pytra.std.json` を使う（Python 標準 `json` は §5.2 で禁止）。
+- EAST ノードの `to_dict()` 戻り値型は `dict[str, object]` ではなく `pytra.std.json.JsonVal`（`= None | bool | int | float | str | list[JsonVal] | dict[str, JsonVal]`）を使う。
+- `JsonVal` は再帰的 Union 型として EAST ノードの全フィールドをカバーでき、`object` / `Any` が不要になる。
+- シリアライズは `pytra.std.json.dumps(node.to_dict(), indent=2)` で完結する。
 - ノード種別の判定は `isinstance()` で行い、`dict.get("kind")` パターンを使わない。
 - 既存 `toolchain/` との橋渡しで `dict[str, Any]` が必要な場合は、境界の変換関数に限定し `toolchain2/` 内部に漏らさない。
 
