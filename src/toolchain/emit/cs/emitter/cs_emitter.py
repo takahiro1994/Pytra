@@ -571,10 +571,9 @@ class CSharpEmitter(CodeEmitter):
                 return "Pytra.CsModule"
             return ""
         if binding_kind == "symbol":
-            owner = self._resolve_cs_module_owner(module_name)
-            if owner != "" and export_name != "":
-                if len(export_name) > 0 and export_name[0].isupper():
-                    return owner
+            if export_name != "" and len(export_name) > 0 and export_name[0].isupper():
+                # Class import: class lives directly in Pytra.CsModule namespace
+                return "Pytra.CsModule." + export_name
             return ""
         return ""
 
@@ -1518,6 +1517,14 @@ class CSharpEmitter(CodeEmitter):
         if canonical != "":
             parts = canonical.split(".")
             native_class = parts[-1] + "_native"
+        # Check for class_name / member name collision (e.g. class glob { glob(...) })
+        member_names: set[str] = set()
+        for stmt in body:
+            kind = self.any_dict_get_str(stmt, "kind", "")
+            if kind == "FunctionDef":
+                member_names.add(self.any_to_str(stmt.get("name")))
+        if class_name in member_names:
+            class_name = "py_" + class_name
 
         self.emit("using System;")
         self.emit("using System.Collections.Generic;")
@@ -1537,6 +1544,7 @@ class CSharpEmitter(CodeEmitter):
                     fn_name = self.any_to_str(stmt.get("name"))
                     arg_order = self.any_to_str_list(stmt.get("arg_order"))
                     arg_types = self.any_to_dict_or_empty(stmt.get("arg_types"))
+                    arg_defaults = self.any_to_dict_or_empty(stmt.get("arg_defaults"))
                     ret_type = self.any_to_str(stmt.get("return_type"))
                     cs_ret = self._cs_type(ret_type) if ret_type != "" else "object"
                     cs_args: list[str] = []
@@ -1545,7 +1553,12 @@ class CSharpEmitter(CodeEmitter):
                         a_type = self.any_to_str(arg_types.get(a))
                         cs_t = self._cs_type(a_type) if a_type != "" else "object"
                         safe_a = self._safe_name(a)
-                        cs_args.append(cs_t + " " + safe_a)
+                        default_val = arg_defaults.get(a)
+                        if default_val is not None:
+                            cs_default = self.render_expr(default_val)
+                            cs_args.append(cs_t + " " + safe_a + " = " + cs_default)
+                        else:
+                            cs_args.append(cs_t + " " + safe_a)
                         call_args.append(safe_a)
                     sig = "public static " + cs_ret + " " + self._safe_name(fn_name) + "(" + ", ".join(cs_args) + ")"
                     delegate_call = native_class + "." + self._safe_name(fn_name) + "(" + ", ".join(call_args) + ")"
@@ -1639,12 +1652,20 @@ class CSharpEmitter(CodeEmitter):
             if fn_name != "":
                 self.top_function_names.add(fn_name)
 
+        _class_name = getattr(self, "_class_name", "Program")
+        _emit_main = getattr(self, "_emit_main", True)
+
+        # Submodules need namespace Pytra.CsModule to be accessible from entry modules
+        if not _emit_main:
+            self.emit("namespace Pytra.CsModule")
+            self.emit("{")
+            self.indent += 1
+
         for cls in class_stmts:
             self.emit_leading_comments(cls)
             self._emit_class(cls)
             self.emit("")
 
-        _class_name = getattr(self, "_class_name", "Program")
         self.emit("public static class " + _class_name)
         self.emit("{")
         self.indent += 1
@@ -1677,6 +1698,11 @@ class CSharpEmitter(CodeEmitter):
 
         self.indent -= 1
         self.emit("}")
+
+        # Close namespace for submodules
+        if not _emit_main:
+            self.indent -= 1
+            self.emit("}")
 
         return "\n".join(self.lines) + ("\n" if len(self.lines) > 0 else "")
 
@@ -2065,6 +2091,18 @@ class CSharpEmitter(CodeEmitter):
         if self.hook_on_emit_stmt(stmt) is True:
             return
         kind = self.any_dict_get_str(stmt, "kind", "")
+        # §9: VarDecl must be handled before hook_on_emit_stmt_kind fallback (which emits comment)
+        if kind == "VarDecl":
+            var_name = self.any_to_str(stmt.get("name"))
+            if var_name == "":
+                return
+            var_type = self.any_to_str(stmt.get("type"))
+            cs_t = self._cs_type(var_type) if var_type != "" else "object"
+            safe_name = self._safe_name(var_name)
+            self.emit(cs_t + " " + safe_name + ";")
+            self.declare_in_current_scope(var_name)
+            self.declared_var_types[var_name] = var_type if var_type != "" else "object"
+            return
         if self.hook_on_emit_stmt_kind(kind, stmt) is True:
             return
         if kind == "Match":
@@ -2443,16 +2481,18 @@ class CSharpEmitter(CodeEmitter):
             return
 
         if value_obj is not None:
-            self.emit(
-                name
-                + " = "
-                + self._render_assignment_value_with_hint(
-                    value_obj,
-                    self.declared_var_types.get(name_raw, t_east),
-                    target_name_raw=name_raw,
-                )
-                + ";"
+            assigned_value = self._render_assignment_value_with_hint(
+                value_obj,
+                self.declared_var_types.get(name_raw, t_east),
+                target_name_raw=name_raw,
             )
+            # Fallback: if variable was never declared (e.g. ForCore init), add var
+            if not self.is_declared(name_raw):
+                self.declare_in_current_scope(name_raw)
+                self.declared_var_types[name_raw] = self.normalize_type_name(t_east)
+                self.emit("var " + name + " = " + assigned_value + ";")
+            else:
+                self.emit(name + " = " + assigned_value + ";")
 
     def _emit_assign(self, stmt: dict[str, Any]) -> None:
         target = self.primary_assign_target(stmt)
@@ -2483,7 +2523,19 @@ class CSharpEmitter(CodeEmitter):
                 assigned_value = self._render_assignment_value_with_hint(value_obj, hint_t, target_name_raw=name_raw)
             else:
                 assigned_value = self.render_expr(value_obj)
-            self.emit(name + " = " + assigned_value + ";")
+            # Fallback: auto-declare if variable was never declared (e.g. ForCore init)
+            if not self.is_declared(name_raw) and value_obj is not None:
+                t_east = self.get_expr_type(value_obj)
+                t_cs = self._cs_type(t_east)
+                self.declare_in_current_scope(name_raw)
+                if t_east != "":
+                    self.declared_var_types[name_raw] = t_east
+                if t_cs != "" and t_cs != "object" and not t_cs.startswith("("):
+                    self.emit(t_cs + " " + name + " = " + assigned_value + ";")
+                else:
+                    self.emit("var " + name + " = " + assigned_value + ";")
+            else:
+                self.emit(name + " = " + assigned_value + ";")
             return
 
         if target_kind == "Tuple":
@@ -2776,6 +2828,11 @@ class CSharpEmitter(CodeEmitter):
             return "new " + fn_name + "(" + ", ".join(rendered_args) + ")"
         if fn_name_raw == "isinstance":
             return self._render_isinstance_call(rendered_args, arg_nodes)
+        # §12.2: cast(T, value) → (T)value
+        if fn_name_raw == "cast" and len(rendered_args) == 2:
+            resolved = self.any_dict_get_str(expr, "resolved_type", "")
+            cs_t = self._cs_type(resolved) if resolved != "" else rendered_args[0]
+            return "((" + cs_t + ")" + rendered_args[1] + ")"
         if runtime_owner != "" and runtime_symbol != "":
             return runtime_owner + "." + self._safe_name(runtime_symbol) + "(" + ", ".join(rendered_args) + ")"
         imported_owner = self._runtime_module_call_owner(imported_mod)

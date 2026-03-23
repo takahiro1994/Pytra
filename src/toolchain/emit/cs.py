@@ -4,7 +4,7 @@
 from __future__ import annotations
 import sys
 
-from toolchain.emit.cs.emitter.cs_emitter import transpile_to_csharp
+from toolchain.emit.cs.emitter.cs_emitter import transpile_to_csharp, _CS_CANONICAL_RUNTIME_OWNER_BY_MODULE
 from toolchain.emit.loader import emit_all_modules
 
 
@@ -31,15 +31,21 @@ def _transpile_cs(east_doc: dict) -> str:
     if is_entry:
         return transpile_to_csharp(east_doc, emit_main=True, class_name="Program")
 
-    # For extern delegate modules (std/time, std/math, etc.), use the canonical
-    # C# class name that entry modules reference (e.g. "time", "math").
+    # Use canonical C# owner name from _CS_CANONICAL_RUNTIME_OWNER_BY_MODULE
+    # (e.g. "pytra.std.pathlib" → "Pytra.CsModule.py_path" → class_name "py_path").
+    # Falls back to module_id tail for non-registered modules.
     from toolchain.frontends.runtime_symbol_index import canonical_runtime_module_id
     canonical = canonical_runtime_module_id(module_id.replace(".east", ""))
-    if canonical.startswith("pytra."):
-        tail = canonical.split(".")[-1]
+    owner = _CS_CANONICAL_RUNTIME_OWNER_BY_MODULE.get(canonical, "")
+    if isinstance(owner, str) and owner != "":
+        # Extract class name from "Pytra.CsModule.py_path" → "py_path"
+        class_name = owner.rsplit(".", 1)[-1] if "." in owner else owner
+    elif canonical.startswith("pytra."):
+        class_name = canonical.split(".")[-1]
     else:
-        tail = canonical.split(".")[-1] if "." in canonical else canonical
-    class_name = tail if tail != "" else _module_id_to_class_name(module_id)
+        class_name = canonical.split(".")[-1] if "." in canonical else canonical
+    if class_name == "":
+        class_name = _module_id_to_class_name(module_id)
     return transpile_to_csharp(east_doc, emit_main=False, class_name=class_name)
 
 

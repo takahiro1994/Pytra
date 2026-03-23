@@ -10,8 +10,12 @@ namespace Pytra.CsModule
             return Directory.GetCurrentDirectory().Replace('\\', '/');
         }
 
-        public static void mkdir(string p)
+        public static void mkdir(string p, bool exist_ok = false)
         {
+            if (!exist_ok && Directory.Exists(p))
+            {
+                throw new System.IO.IOException("Directory already exists: " + p);
+            }
             Directory.CreateDirectory(p);
         }
 

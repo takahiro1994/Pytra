@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using SysPath = System.IO.Path;
 using System.IO;
 
 namespace Pytra.CsModule
@@ -17,7 +18,7 @@ namespace Pytra.CsModule
                 string directoryPart = separatorPos < 0 ? "." : pattern.Substring(0, separatorPos);
                 string mask = separatorPos < 0 ? pattern : pattern.Substring(separatorPos + 1);
                 bool hasWildcard = mask.Contains("*") || mask.Contains("?");
-                bool rooted = Path.IsPathRooted(directoryPart);
+                bool rooted = SysPath.IsPathRooted(directoryPart);
                 string directoryForSearch = string.IsNullOrEmpty(directoryPart) ? "." : directoryPart;
                 string directoryForOutput =
                     string.IsNullOrEmpty(directoryPart)
@@ -39,15 +40,15 @@ namespace Pytra.CsModule
                 {
                     if (directoryForOutput == ".")
                     {
-                        entries.Add(Path.GetFileName(path));
+                        entries.Add(SysPath.GetFileName(path));
                     }
                     else if (rooted)
                     {
-                        entries.Add(Path.GetFullPath(path).Replace("\\", "/"));
+                        entries.Add(SysPath.GetFullPath(path).Replace("\\", "/"));
                     }
                     else
                     {
-                        entries.Add(directoryForOutput + "/" + Path.GetFileName(path));
+                        entries.Add(directoryForOutput + "/" + SysPath.GetFileName(path));
                     }
                 }
 
@@ -55,15 +56,15 @@ namespace Pytra.CsModule
                 {
                     if (directoryForOutput == ".")
                     {
-                        entries.Add(Path.GetFileName(path));
+                        entries.Add(SysPath.GetFileName(path));
                     }
                     else if (rooted)
                     {
-                        entries.Add(Path.GetFullPath(path).Replace("\\", "/"));
+                        entries.Add(SysPath.GetFullPath(path).Replace("\\", "/"));
                     }
                     else
                     {
-                        entries.Add(directoryForOutput + "/" + Path.GetFileName(path));
+                        entries.Add(directoryForOutput + "/" + SysPath.GetFileName(path));
                     }
                 }
 

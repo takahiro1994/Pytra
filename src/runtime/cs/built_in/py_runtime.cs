@@ -42,7 +42,7 @@ namespace Pytra.CsModule
             _stream = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite);
         }
 
-        public void write(object data)
+        public long write(object data)
         {
             EnsureOpen();
             if (!(_stream is FileStream))
@@ -53,18 +53,18 @@ namespace Pytra.CsModule
             {
                 byte[] arr = listBytes.ToArray();
                 _stream.Write(arr, 0, arr.Length);
-                return;
+                return arr.Length;
             }
             if (data is byte[] bytes)
             {
                 _stream.Write(bytes, 0, bytes.Length);
-                return;
+                return bytes.Length;
             }
             if (data is string text)
             {
                 byte[] utf8 = System.Text.Encoding.UTF8.GetBytes(text);
                 _stream.Write(utf8, 0, utf8.Length);
-                return;
+                return utf8.Length;
             }
             if (data is IEnumerable enumerable)
             {
@@ -75,9 +75,19 @@ namespace Pytra.CsModule
                 }
                 byte[] arr = outv.ToArray();
                 _stream.Write(arr, 0, arr.Length);
-                return;
+                return arr.Length;
             }
             throw new ArgumentException("unsupported write() payload");
+        }
+
+        public string read()
+        {
+            EnsureOpen();
+            _stream.Seek(0, SeekOrigin.Begin);
+            using (var reader = new System.IO.StreamReader(_stream, System.Text.Encoding.UTF8, false, 4096, true))
+            {
+                return reader.ReadToEnd();
+            }
         }
 
         public void close()

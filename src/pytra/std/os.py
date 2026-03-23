@@ -13,7 +13,9 @@ def getcwd() -> str:
 
 
 @extern
-def mkdir(p: str) -> None:
+def mkdir(p: str, exist_ok: bool = False) -> None:
+    if exist_ok and path.exists(p):
+        return
     os.mkdir(p)
 
 
