@@ -367,7 +367,10 @@ class CppModuleEmitter:
         if cpp_name == "":
             return type_name
         storage_hint = self.any_to_str(doc.get("storage_hint"))
-        cpp_t = f"rc<{cpp_name}>" if storage_hint == "ref" else cpp_name
+        if storage_hint == "ref":
+            cpp_t = f"Object<{cpp_name}>" if getattr(self, "use_object_t", False) else f"rc<{cpp_name}>"
+        else:
+            cpp_t = cpp_name
         if self._is_cpp_class_borrow_param_type(type_name, cpp_t):
             return cpp_name
         return cpp_t
@@ -921,6 +924,8 @@ class CppModuleEmitter:
         hint = self.any_to_str(doc.get("storage_hint"))
         if hint == "value":
             return cpp_name
+        if getattr(self, "use_object_t", False):
+            return f"Object<{cpp_name}>"
         return f"rc<{cpp_name}>"
 
     def _resolve_imported_symbol_class_cpp_type(self, symbol_name: str) -> str:

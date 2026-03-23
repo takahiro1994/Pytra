@@ -4273,7 +4273,7 @@ if __name__ == "__main__":
             self.assertTrue('#include "controller.h"' in generated_ppu or '#include "pytra_multi_prelude.h"' in generated_ppu)
             self.assertIn("::BUTTON_A", generated_ppu)
             self.assertIn("make_pad(", generated_ppu)
-            self.assertIn("rc<pytra_mod_controller::Pad>", generated_ppu)
+            self.assertIn("Object<pytra_mod_controller::Pad>", generated_ppu)
             self.assertNotIn("make_pad_fn(", generated_ppu)
             self.assertNotIn("ControllerPad", generated_ppu)
             self.assertNotIn("BUTTON + 2", generated_ppu)
