@@ -88,6 +88,48 @@ def _dict_items(raw: Any) -> list[dict[str, Any]]:
     return out
 
 
+_MUTATING_ATTRS: set[str] = {
+    "append", "extend", "insert", "pop", "clear", "remove",
+    "discard", "add", "update", "setdefault", "sort", "reverse",
+}
+
+
+def _header_collect_mutated_params_simple(body: list[dict[str, Any]], arg_names: list[str]) -> set[str]:
+    """Simple mutation detection: find params that are receivers of mutating method calls."""
+    params = set(arg_names)
+    out: set[str] = set()
+
+    def _scan_stmt(st: Any) -> None:
+        if not isinstance(st, dict):
+            return
+        kind = _normalize_type_name(st.get("kind"))
+        if kind == "Expr":
+            call = st.get("value")
+            if isinstance(call, dict) and _normalize_type_name(call.get("kind")) == "Call":
+                fn = call.get("func")
+                if isinstance(fn, dict) and _normalize_type_name(fn.get("kind")) == "Attribute":
+                    owner = fn.get("value")
+                    if isinstance(owner, dict) and _normalize_type_name(owner.get("kind")) == "Name":
+                        owner_name = _normalize_type_name(owner.get("id"))
+                        attr = _normalize_type_name(fn.get("attr"))
+                        if owner_name in params and attr in _MUTATING_ATTRS:
+                            out.add(owner_name)
+        # Recurse into compound statements
+        for key in ("body", "orelse", "finalbody"):
+            sub = st.get(key)
+            if isinstance(sub, list):
+                for child in sub:
+                    _scan_stmt(child)
+        if kind == "Try":
+            for h in _dict_items(st.get("handlers")):
+                for child in _dict_items(h.get("body")):
+                    _scan_stmt(child)
+
+    for stmt in body:
+        _scan_stmt(stmt)
+    return out
+
+
 class ContainerValueLocalHintPass(East3OptimizerPass):
     """Mark proven-safe list locals for value lowering (all backends)."""
 
@@ -149,7 +191,9 @@ class ContainerValueLocalHintPass(East3OptimizerPass):
         attr = _normalize_type_name(fn.get("attr"))
         return attr == "append" or attr == "extend" or attr == "pop" or attr == "clear" or attr == "reverse" or attr == "sort"
 
-    def _value_list_locals_for_function(self, fn_node: dict[str, Any]) -> set[str]:
+    def _value_list_locals_for_function(self, fn_node: dict[str, Any], fn_mutated_positions: dict[str, set[int]] | None = None) -> set[str]:
+        if fn_mutated_positions is None:
+            fn_mutated_positions = {}
         body = _dict_items(fn_node.get("body"))
         candidates: set[str] = set()
         for stmt in body:
@@ -206,6 +250,13 @@ class ContainerValueLocalHintPass(East3OptimizerPass):
                 callsite = callsite_node if isinstance(callsite_node, dict) else {}
                 args = _dict_items(cd.get("args"))
                 callsite_handled = False
+                # Determine callee's mutated param positions for mutation-based escape
+                callee_fn_node = cd.get("func")
+                callee_fn = callee_fn_node if isinstance(callee_fn_node, dict) else {}
+                callee_name = ""
+                if _normalize_type_name(callee_fn.get("kind")) == "Name":
+                    callee_name = _normalize_type_name(callee_fn.get("id"))
+                callee_mutated_positions = fn_mutated_positions.get(callee_name, set())
                 callee_arg_escape_any = callsite.get("callee_arg_escape")
                 if isinstance(callee_arg_escape_any, list):
                     callsite_handled = True
@@ -214,6 +265,11 @@ class ContainerValueLocalHintPass(East3OptimizerPass):
                         must_escape = True
                         if i < len(callee_arg_escape_any):
                             must_escape = bool(callee_arg_escape_any[i])
+                        # Even if callee_arg_escape says "no escape", if the callee
+                        # mutates this parameter, the variable must stay as ref type
+                        # so that mutations are reflected in the caller.
+                        if not must_escape and i in callee_mutated_positions:
+                            must_escape = True
                         if not must_escape:
                             continue
                         reads2: set[str] = set()
@@ -274,10 +330,31 @@ class ContainerValueLocalHintPass(East3OptimizerPass):
 
     def run(self, east3_doc: dict[str, object], context: PassContext) -> PassResult:
         body = _dict_items(east3_doc.get("body"))
+        # Pre-collect mutation info for all functions in this module.
+        # This is needed so that when analyzing function A which calls function B,
+        # we know which parameters of B are mutated.
+        fn_mutated_positions: dict[str, set[int]] = {}
+        for stmt in body:
+            if _normalize_type_name(stmt.get("kind")) != "FunctionDef":
+                continue
+            fn_name = _normalize_type_name(stmt.get("name"))
+            if fn_name == "":
+                continue
+            fn_body = _dict_items(stmt.get("body"))
+            arg_names: list[str] = []
+            arg_types = stmt.get("arg_types")
+            at = arg_types if isinstance(arg_types, dict) else {}
+            for raw_name in _dict_items(stmt.get("arg_order")):
+                if isinstance(raw_name, str) and raw_name != "" and raw_name in at:
+                    arg_names.append(raw_name)
+            mutated = _header_collect_mutated_params_simple(fn_body, arg_names)
+            fn_mutated_positions[fn_name] = {
+                idx for idx, name in enumerate(arg_names) if name in mutated
+            }
         change_count = 0
         for stmt in body:
             if _normalize_type_name(stmt.get("kind")) != "FunctionDef":
                 continue
-            locals_hint = self._value_list_locals_for_function(stmt)
+            locals_hint = self._value_list_locals_for_function(stmt, fn_mutated_positions)
             change_count += self._set_hint(stmt, locals_hint)
         return PassResult(changed=change_count > 0, change_count=change_count)
