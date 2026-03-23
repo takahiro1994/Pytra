@@ -2961,26 +2961,48 @@ def transpile_to_java_native(east_doc: dict[str, Any], class_name: str = "Main",
             lines.extend(_emit_function(functions[i], indent="    ", in_class=False))
             i += 1
 
-        if is_entry and emit_main:
-            lines.append("")
-            lines.append("    public static void main(String[] args) {")
-            ctx: dict[str, Any] = {"tmp": 0}
-            if len(main_guard) > 0:
-                i = 0
-                while i < len(main_guard):
-                    lines.extend(_emit_stmt(main_guard[i], indent="        ", ctx=ctx))
-                    i += 1
+        if is_entry:
+            if emit_main:
+                lines.append("")
+                lines.append("    public static void main(String[] args) {")
+                ctx: dict[str, Any] = {"tmp": 0}
+                if len(main_guard) > 0:
+                    i = 0
+                    while i < len(main_guard):
+                        lines.extend(_emit_stmt(main_guard[i], indent="        ", ctx=ctx))
+                        i += 1
+                else:
+                    has_case_main = False
+                    i = 0
+                    while i < len(functions):
+                        if functions[i].get("name") == "_case_main":
+                            has_case_main = True
+                            break
+                        i += 1
+                    if has_case_main:
+                        lines.append("        _case_main();")
+                lines.append("    }")
             else:
-                has_case_main = False
-                i = 0
-                while i < len(functions):
-                    if functions[i].get("name") == "_case_main":
-                        has_case_main = True
-                        break
-                    i += 1
-                if has_case_main:
-                    lines.append("        _case_main();")
-            lines.append("    }")
+                # emit_main=False: emit main_guard as _case_main() for Main.java to call
+                lines.append("")
+                lines.append("    public static void _case_main() {")
+                ctx_cm: dict[str, Any] = {"tmp": 0}
+                if len(main_guard) > 0:
+                    i = 0
+                    while i < len(main_guard):
+                        lines.extend(_emit_stmt(main_guard[i], indent="        ", ctx=ctx_cm))
+                        i += 1
+                else:
+                    has_case_main = False
+                    i = 0
+                    while i < len(functions):
+                        if functions[i].get("name") == "_case_main":
+                            has_case_main = True
+                            break
+                        i += 1
+                    if has_case_main:
+                        lines.append("        _case_main();")
+                lines.append("    }")
         lines.append("}")
         lines.append("")
         return "\n".join(lines)

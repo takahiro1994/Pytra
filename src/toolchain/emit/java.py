@@ -35,31 +35,12 @@ def _is_extern_only(source: str) -> bool:
     return True
 
 
-def _generate_main_java(body_class: str, main_guard_stmts: list[Any]) -> str:
+def _generate_main_java(body_class: str) -> str:
     """Generate a thin Main.java that delegates to the body class."""
     lines: list[str] = []
     lines.append("public final class Main {")
     lines.append("    public static void main(String[] args) {")
-    if len(main_guard_stmts) > 0:
-        # main_guard has explicit statements — delegate each call to body_class
-        for stmt in main_guard_stmts:
-            if not isinstance(stmt, dict):
-                continue
-            kind = stmt.get("kind", "")
-            if kind == "Expr":
-                value = stmt.get("value", {})
-                if isinstance(value, dict) and value.get("kind") == "Call":
-                    func = value.get("func", {})
-                    if isinstance(func, dict) and func.get("kind") == "Name":
-                        fname = _safe_ident(func.get("id", ""), "run")
-                        # Rename user main() to avoid Java main(String[]) collision
-                        if fname == "main":
-                            fname = "__pytra_main"
-                        lines.append("        " + body_class + "." + fname + "();")
-                        continue
-    else:
-        # No main_guard — call _case_main on the body class
-        lines.append("        " + body_class + "._case_main();")
+    lines.append("        " + body_class + "._case_main();")
     lines.append("    }")
     lines.append("}")
     lines.append("")
@@ -116,9 +97,7 @@ def _emit_java_modules(input_path: str, output_dir: str) -> int:
             print("generated: " + str(out_path))
 
             # Generate thin Main.java
-            main_guard_any = east_doc.get("main_guard_body")
-            main_guard = main_guard_any if isinstance(main_guard_any, list) else []
-            main_source = _generate_main_java(body_class, main_guard)
+            main_source = _generate_main_java(body_class)
             main_path = out / "Main.java"
             main_path.write_text(main_source, encoding="utf-8")
             print("generated: " + str(main_path))
