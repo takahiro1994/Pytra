@@ -291,8 +291,17 @@ class Call:
 ### 5.7 selfhost 対象外コードの分離
 
 - テストコード（`test/`）、ツール（`tools/`）、CLI のエントリポイント（`pytra-cli2.py`）は selfhost 非対象。
-- これらでは `Any`, Python 標準モジュール, `ast` の使用を許可する。
-- `toolchain2/` 配下のみが selfhost 対象。
+- これらでは `Any`, Python 標準モジュール, `ast`, 動的 import の使用を許可する。
+- **`toolchain2/` 配下のみが selfhost 対象。** `toolchain2/` 以外のファイルから `toolchain2/` の内部モジュールを import するのは自由だが、その逆（`toolchain2/` から `pytra-cli2.py` や `toolchain/` を import すること）は禁止。
+
+判定基準:
+| ファイル | selfhost 対象 | `Any` | 動的 import | Python 標準 |
+|---|---|---|---|---|
+| `src/toolchain2/**/*.py` | **対象** | 禁止 | 禁止 | 禁止 |
+| `src/pytra-cli2.py` | 非対象 | 許可 | 許可 | 許可 |
+| `src/toolchain/**/*.py` | 非対象（旧） | 許可 | 許可 | 許可 |
+| `test/**/*.py` | 非対象 | 許可 | 許可 | 許可 |
+| `tools/**/*.py` | 非対象 | 許可 | 許可 | 許可 |
 
 ## 6. 移行方針: golden file 駆動
 
