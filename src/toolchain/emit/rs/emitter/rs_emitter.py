@@ -4299,17 +4299,18 @@ class RustEmitter(CodeEmitter):
     def _render_return_expr(self, expr: Any) -> str:
         expr_d = self.any_to_dict_or_empty(expr)
         if self.any_dict_get_str(expr_d, "kind", "") == "Call":
-            fn_node = self.any_to_dict_or_empty(expr_d.get("func"))
-            fn_name = self.any_dict_get_str(fn_node, "id", "")
-            args = self.any_to_list(expr_d.get("args"))
-            if fn_name in {"bytes", "bytearray"} and len(args) == 1:
-                arg_node = args[0]
-                arg_t = self.normalize_type_name(self.get_expr_type(arg_node))
-                if arg_t in {"bytes", "bytearray"}:
-                    return self.render_expr(arg_node)
-                # bytes(list[int64]) → Vec<i64> to Vec<u8> conversion
-                inner = self.render_expr(arg_node)
-                return "py_vec_i64_to_u8(&" + inner + ")"
+            # §4: semantic_tag で bytes() コンストラクタを判定（callee name ハードコード回避）
+            semantic_tag = self.any_dict_get_str(expr_d, "semantic_tag", "")
+            if semantic_tag == "ctor.bytes":
+                args = self.any_to_list(expr_d.get("args"))
+                if len(args) == 1:
+                    arg_node = args[0]
+                    arg_t = self.normalize_type_name(self.get_expr_type(arg_node))
+                    if arg_t in {"bytes", "bytearray"}:
+                        return self.render_expr(arg_node)
+                    # bytes(list[int64]) → Vec<i64> to Vec<u8> conversion
+                    inner = self.render_expr(arg_node)
+                    return "py_vec_i64_to_u8(&" + inner + ")"
         return self.render_expr(expr)
 
     def _resolved_runtime_call(self, expr: dict[str, Any]) -> str:
@@ -4344,6 +4345,18 @@ class RustEmitter(CodeEmitter):
     def _render_call(self, expr: dict[str, Any]) -> str:
         semantic_tag = self.any_dict_get_str(expr, "semantic_tag", "")
         runtime_call = self._resolved_runtime_call(expr)
+
+        # ctor.bytes: bytes(list[int64]) → py_vec_i64_to_u8(&expr)
+        if semantic_tag == "ctor.bytes":
+            call_args = self.any_to_list(expr.get("args"))
+            if len(call_args) == 1:
+                arg_node = call_args[0]
+                arg_t = self.normalize_type_name(self.get_expr_type(arg_node))
+                if arg_t in {"bytes", "bytearray"}:
+                    return self.render_expr(arg_node)
+                inner = self.render_expr(arg_node)
+                return "py_vec_i64_to_u8(&" + inner + ")"
+
         if semantic_tag.startswith("stdlib.") and semantic_tag != "stdlib.symbol.Path" and runtime_call == "":
             raise RuntimeError("rust emitter: unresolved stdlib runtime call: " + semantic_tag)
 

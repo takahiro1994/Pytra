@@ -1109,10 +1109,26 @@ pub struct PyFile {
     inner: fs::File,
 }
 
+pub trait PyFileWritable {
+    fn write_to_file(&self, file: &mut fs::File);
+}
+
+impl PyFileWritable for Vec<i64> {
+    fn write_to_file(&self, file: &mut fs::File) {
+        let bytes: Vec<u8> = self.iter().map(|v| (*v & 0xFF) as u8).collect();
+        file.write_all(&bytes).expect("write failed");
+    }
+}
+
+impl PyFileWritable for Vec<u8> {
+    fn write_to_file(&self, file: &mut fs::File) {
+        file.write_all(self).expect("write failed");
+    }
+}
+
 impl PyFile {
-    pub fn write(&mut self, data: Vec<i64>) {
-        let bytes: Vec<u8> = data.iter().map(|v| (*v & 0xFF) as u8).collect();
-        self.inner.write_all(&bytes).expect("write failed");
+    pub fn write<T: PyFileWritable>(&mut self, data: T) {
+        data.write_to_file(&mut self.inner);
     }
 
     pub fn close(self) {
