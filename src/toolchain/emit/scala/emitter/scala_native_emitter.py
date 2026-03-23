@@ -1244,6 +1244,12 @@ def _render_call_via_runtime_call(
             if isinstance(func_any, dict) and func_any.get("kind") == "Attribute":
                 owner_any = func_any.get("value")
         if isinstance(owner_any, dict):
+            # Skip owner injection for imported pytra modules (png, gif, etc.)
+            # whose methods are top-level functions after merge.
+            if owner_any.get("kind") == "Name":
+                oid = _safe_ident(owner_any.get("id"), "")
+                if oid in _PYTRA_MODULE_IMPORTS[0]:
+                    return rendered_args
             return [_render_expr(owner_any)] + rendered_args
         return rendered_args
 
