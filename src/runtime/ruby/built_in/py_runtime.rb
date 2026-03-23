@@ -54,6 +54,7 @@ end
 
 def __pytra_as_list(v)
   return v if v.is_a?(Array)
+  return v.chars if v.is_a?(String)
   return v.to_a if v.respond_to?(:to_a)
   []
 end
@@ -241,4 +242,131 @@ end
 
 def chr(n)
   __pytra_int(n).chr
+end
+
+def __pytra_reversed(v)
+  return __pytra_as_list(v).reverse
+end
+
+# Python dict/str/list method shims via monkey-patching
+class Hash
+  def items
+    self.map { |k, v| [k, v] }
+  end
+  def get(key, default_val = nil)
+    self.key?(key) ? self[key] : default_val
+  end
+  def keys
+    super
+  end
+  def values
+    super
+  end
+  def pop(key, *default_val)
+    if self.key?(key)
+      v = self[key]
+      self.delete(key)
+      return v
+    end
+    return default_val[0] if default_val.length > 0
+    raise KeyError, "key not found: #{key}"
+  end
+  def setdefault(key, default_val = nil)
+    unless self.key?(key)
+      self[key] = default_val
+    end
+    self[key]
+  end
+  def update(other)
+    self.merge!(other)
+  end
+end
+
+class String
+  def startswith(prefix)
+    self.start_with?(prefix)
+  end
+  def endswith(suffix)
+    self.end_with?(suffix)
+  end
+  def strip
+    super
+  end
+  def lstrip
+    super
+  end
+  def rstrip
+    super
+  end
+  def upper
+    self.upcase
+  end
+  def lower
+    self.downcase
+  end
+  def find(sub, start = 0)
+    idx = self[start..].index(sub)
+    idx.nil? ? -1 : idx + start
+  end
+  def rfind(sub)
+    idx = self.rindex(sub)
+    idx.nil? ? -1 : idx
+  end
+  def count(sub)
+    self.scan(sub).length
+  end
+  def zfill(width)
+    s = self
+    w = __pytra_int(width)
+    return s if s.length >= w
+    pad = "0" * (w - s.length)
+    if s.length > 0 && (s[0] == "-" || s[0] == "+")
+      return s[0] + pad + s[1..]
+    end
+    pad + s
+  end
+end
+
+class Array
+  def copy
+    self.dup
+  end
+end
+
+# Python Enum base class
+class Enum
+  attr_reader :name, :value
+  def initialize(name, value)
+    @name = name
+    @value = value
+  end
+  def to_s
+    "#{self.class}.#{@name}"
+  end
+  def ==(other)
+    return @value == other.value if other.is_a?(Enum)
+    @value == other
+  end
+end
+
+class IntEnum < Enum
+  def to_i
+    @value
+  end
+  def <=>(other)
+    return @value <=> other.value if other.is_a?(IntEnum)
+    @value <=> other
+  end
+  include Comparable
+end
+
+class IntFlag < IntEnum
+  def |(other)
+    v = other.is_a?(IntFlag) ? other.value : other
+    IntFlag.new("#{@name}|#{other.is_a?(IntFlag) ? other.name : v}", @value | v)
+  end
+  def &(other)
+    v = other.is_a?(IntFlag) ? other.value : other
+    IntFlag.new("#{@name}&#{other.is_a?(IntFlag) ? other.name : v}", @value & v)
+  end
 end

@@ -986,6 +986,10 @@ def _render_compare_expr(expr: dict[str, Any]) -> str:
         return "__pytra_contains(" + right + ", " + left + ")"
     if op0 == "NotIn":
         return "(!__pytra_contains(" + right + ", " + left + "))"
+    if op0 == "Is":
+        return "(" + left + ".equal?(" + right + "))"
+    if op0 == "IsNot":
+        return "(!(" + left + ".equal?(" + right + ")))"
     symbol = _cmp_symbol(op0)
     return "(" + left + " " + symbol + " " + right + ")"
 
@@ -1003,6 +1007,26 @@ def _render_boolop_expr(expr: dict[str, Any]) -> str:
     op = expr.get("op")
     delim = " && " if op == "And" else " || "
     return "(" + delim.join(rendered) + ")"
+
+
+def _render_lambda_expr(expr: dict[str, Any]) -> str:
+    """Render a Lambda node as a Ruby lambda (Proc)."""
+    args_any = expr.get("args")
+    args = args_any if isinstance(args_any, list) else []
+    body_expr = expr.get("body")
+    params: list[str] = []
+    i = 0
+    while i < len(args):
+        arg = args[i]
+        if isinstance(arg, dict):
+            name = arg.get("arg")
+            if isinstance(name, str) and name != "":
+                params.append(_safe_ident(name, "arg" + str(i)))
+        i += 1
+    body_rendered = _render_expr(body_expr)
+    if len(params) > 0:
+        return "lambda { |" + ", ".join(params) + "| " + body_rendered + " }"
+    return "lambda { " + body_rendered + " }"
 
 
 def _render_subscript_expr(expr: dict[str, Any]) -> str:
@@ -1333,12 +1357,23 @@ def _render_call_expr(expr: dict[str, Any]) -> str:
             i += 1
         return callee_name + ".new(" + ", ".join(rendered_ctor) + ")"
 
-    func = _render_expr(expr.get("func"))
+    func_node = expr.get("func")
+    func = _render_expr(func_node)
     rendered: list[str] = []
     i = 0
     while i < len(args):
         rendered.append(_render_expr(args[i]))
         i += 1
+    # Lambda/callable variables need .call() in Ruby.
+    # Only use .call() when resolved_type explicitly starts with "callable[".
+    is_callable_var = False
+    if isinstance(func_node, dict):
+        ft_any = func_node.get("resolved_type")
+        func_type = ft_any if isinstance(ft_any, str) else ""
+        if func_type.startswith("callable["):
+            is_callable_var = True
+    if is_callable_var:
+        return func + ".call(" + ", ".join(rendered) + ")"
     return func + "(" + ", ".join(rendered) + ")"
 
 
@@ -1387,6 +1422,8 @@ def _render_expr(expr: Any) -> str:
         return _render_isinstance_check(_render_expr(d.get("value")), d.get("expected_type_id"))
     if kind == "Unbox" or kind == "Box":
         return _render_expr(d.get("value"))
+    if kind == "Lambda":
+        return _render_lambda_expr(d)
     return "nil"
 
 
@@ -2016,6 +2053,24 @@ def _emit_function(fn: dict[str, Any], *, indent: str, in_class: bool) -> list[s
     name = _safe_ident(fn.get("name"), "func")
     if in_class and name == "__init__":
         name = "initialize"
+    elif in_class and name == "__str__":
+        name = "to_s"
+    elif in_class and name == "__repr__":
+        name = "inspect"
+    elif in_class and name == "__len__":
+        name = "length"
+    elif in_class and name == "__eq__":
+        name = "=="
+    elif in_class and name == "__ne__":
+        name = "!="
+    elif in_class and name == "__lt__":
+        name = "<"
+    elif in_class and name == "__le__":
+        name = "<="
+    elif in_class and name == "__gt__":
+        name = ">"
+    elif in_class and name == "__ge__":
+        name = ">="
     params = _function_params(fn, drop_self=in_class)
     lines: list[str] = [indent + "def " + name + "(" + ", ".join(params) + ")"]
     body_any = fn.get("body")
