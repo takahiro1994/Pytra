@@ -1,7 +1,8 @@
 """EAST3 swap pattern detection pass.
 
-Detects ``a, b = b, a`` patterns (including Subscript targets) and
-converts them to ``Swap(lhs, rhs)`` nodes.
+Detects ``a, b = b, a`` patterns and converts them:
+- Name-Name swaps become ``Swap(left, right)`` nodes.
+- Subscript-containing swaps are expanded to temporary-variable Assign sequences.
 """
 
 from __future__ import annotations
@@ -30,8 +31,67 @@ def _expr_repr(node: Any) -> str:
     return ""
 
 
+_swap_tmp_counter: list[int] = [0]
+
+
+def _fresh_swap_tmp() -> str:
+    idx = _swap_tmp_counter[0]
+    _swap_tmp_counter[0] = idx + 1
+    return "__swap_tmp_" + str(idx)
+
+
+def _is_name_node(node: Any) -> bool:
+    return isinstance(node, dict) and node.get("kind") == "Name"
+
+
+def _expand_subscript_swap(
+    left: dict[str, Any],
+    right: dict[str, Any],
+    span: dict[str, Any] | None,
+) -> list[dict[str, Any]]:
+    """Expand a swap that involves Subscript targets into Assign statements."""
+    tmp_name = _fresh_swap_tmp()
+    base_span: dict[str, Any] = span if isinstance(span, dict) else {}
+    # tmp = left (read)
+    tmp_target: dict[str, Any] = {"kind": "Name", "id": tmp_name}
+    if base_span:
+        tmp_target["source_span"] = base_span
+    assign_tmp: dict[str, Any] = {
+        "kind": "Assign",
+        "target": tmp_target,
+        "value": left,
+        "declare": True,
+    }
+    if base_span:
+        assign_tmp["source_span"] = base_span
+    # left = right (write)
+    assign_left: dict[str, Any] = {
+        "kind": "Assign",
+        "target": left,
+        "value": right,
+    }
+    if base_span:
+        assign_left["source_span"] = base_span
+    # right = tmp (write)
+    tmp_ref: dict[str, Any] = {"kind": "Name", "id": tmp_name}
+    if base_span:
+        tmp_ref["source_span"] = base_span
+    assign_right: dict[str, Any] = {
+        "kind": "Assign",
+        "target": right,
+        "value": tmp_ref,
+    }
+    if base_span:
+        assign_right["source_span"] = base_span
+    return [assign_tmp, assign_left, assign_right]
+
+
 def _detect_swap_in_stmts(stmts: list[Any]) -> list[Any]:
-    """Walk statement list and replace 2-element swap Assigns with Swap nodes."""
+    """Walk statement list and replace 2-element swap Assigns.
+
+    Name-Name swaps become Swap nodes.
+    Subscript-containing swaps are expanded to temporary-variable Assign sequences.
+    """
     result: list[Any] = []
     for stmt in stmts:
         if not isinstance(stmt, dict):
@@ -54,15 +114,25 @@ def _detect_swap_in_stmts(stmts: list[Any]) -> list[Any]:
                     v0 = _expr_repr(v_elems[0])
                     v1 = _expr_repr(v_elems[1])
                     if t0 != "" and t1 != "" and t0 == v1 and t1 == v0:
-                        swap: dict[str, Any] = {
-                            "kind": "Swap",
-                            "lhs": t_elems[0],
-                            "rhs": t_elems[1],
-                        }
                         span = stmt.get("source_span")
-                        if isinstance(span, dict):
-                            swap["source_span"] = span
-                        result.append(swap)
+                        # Name-Name: emit Swap node
+                        if _is_name_node(t_elems[0]) and _is_name_node(t_elems[1]):
+                            swap: dict[str, Any] = {
+                                "kind": "Swap",
+                                "left": t_elems[0],
+                                "right": t_elems[1],
+                                "lhs": t_elems[0],
+                                "rhs": t_elems[1],
+                            }
+                            if isinstance(span, dict):
+                                swap["source_span"] = span
+                            result.append(swap)
+                            continue
+                        # Subscript or other: expand to Assign sequence
+                        expanded = _expand_subscript_swap(
+                            t_elems[0], t_elems[1], span,
+                        )
+                        result.extend(expanded)
                         continue
 
         # Recurse into nested blocks

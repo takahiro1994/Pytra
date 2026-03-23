@@ -1,19 +1,18 @@
-require_relative "py_runtime"
+require_relative "built_in/py_runtime"
+require_relative "std/time"
+require_relative "utils/png"
 
 
 # 04: Sample that renders an orbit-trap Julia set and writes a PNG image.
 
 def render_orbit_trap_julia(width, height, max_iter, cx, cy)
   pixels = __pytra_bytearray()
-  __hoisted_cast_1 = __pytra_float(height - 1)
-  __hoisted_cast_2 = __pytra_float(width - 1)
-  __hoisted_cast_3 = __pytra_float(max_iter)
   y = 0
   while y < height
-    zy0 = ((-1.3) + (2.6 * __pytra_div(y, __hoisted_cast_1)))
+    zy0 = ((-1.3) + (2.6 * __pytra_div(y, (height - 1))))
     x = 0
     while x < width
-      zx = ((-1.9) + (3.8 * __pytra_div(x, __hoisted_cast_2)))
+      zx = ((-1.9) + (3.8 * __pytra_div(x, (width - 1))))
       zy = zy0
       trap = 1000000000.0
       i = 0
@@ -63,7 +62,7 @@ def render_orbit_trap_julia(width, height, max_iter, cx, cy)
         if trap_scaled < 0.0
           trap_scaled = 0.0
         end
-        t = __pytra_div(i, __hoisted_cast_3)
+        t = __pytra_div(i, max_iter)
         tone = __pytra_int((255.0 * (1.0 - trap_scaled)))
         r = __pytra_int((tone * (0.35 + 0.65 * t)))
         g = __pytra_int((tone * (0.15 + (0.85 * (1.0 - t)))))
@@ -91,10 +90,10 @@ def run_04_orbit_trap_julia()
   height = 1080
   max_iter = 1400
   out_path = "sample/out/04_orbit_trap_julia.png"
-  start = __pytra_perf_counter()
+  start = perf_counter()
   pixels = render_orbit_trap_julia(width, height, max_iter, (-0.7269), 0.1889)
   write_rgb_png(out_path, width, height, pixels)
-  elapsed = __pytra_perf_counter() - start
+  elapsed = perf_counter() - start
   __pytra_print("output:", out_path)
   __pytra_print("size:", width, "x", height)
   __pytra_print("max_iter:", max_iter)

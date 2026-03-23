@@ -1,4 +1,6 @@
-require_relative "py_runtime"
+require_relative "built_in/py_runtime"
+require_relative "std/time"
+require_relative "utils/gif"
 
 
 # 09: Sample that outputs a simple fire effect as a GIF.
@@ -36,8 +38,13 @@ def run_09_fire_simulation()
   h = 260
   steps = 420
   out_path = "sample/out/09_fire_simulation.gif"
-  start = __pytra_perf_counter()
-  heat = __pytra_list_comp_range(0, h, 1) { |__lc_i| ([0] * w) }
+  start = perf_counter()
+  heat = []
+  __loop_0 = 0
+  while __loop_0 < h
+    heat.append(([0] * w))
+    __loop_0 += 1
+  end
   frames = []
   t = 0
   while t < steps
@@ -78,7 +85,7 @@ def run_09_fire_simulation()
     t += 1
   end
   save_gif(out_path, w, h, frames, fire_palette(), 4, 0)
-  elapsed = __pytra_perf_counter() - start
+  elapsed = perf_counter() - start
   __pytra_print("output:", out_path)
   __pytra_print("frames:", steps)
   __pytra_print("elapsed_sec:", elapsed)

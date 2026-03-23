@@ -1,4 +1,6 @@
-require_relative "py_runtime"
+require_relative "built_in/py_runtime"
+require_relative "std/time"
+require_relative "utils/gif"
 
 
 # 07: Sample that outputs Game of Life evolution as a GIF.
@@ -74,8 +76,13 @@ def run_07_game_of_life_loop()
   cell = 4
   steps = 105
   out_path = "sample/out/07_game_of_life_loop.gif"
-  start = __pytra_perf_counter()
-  grid = __pytra_list_comp_range(0, h, 1) { |__lc_i| ([0] * w) }
+  start = perf_counter()
+  grid = []
+  __loop_0 = 0
+  while __loop_0 < h
+    grid.append(([0] * w))
+    __loop_0 += 1
+  end
   y = 0
   while y < h
     x = 0
@@ -92,11 +99,11 @@ def run_07_game_of_life_loop()
   r_pentomino = [[0, 1, 1], [1, 1, 0], [0, 1, 0]]
   lwss = [[0, 1, 1, 1, 1], [1, 0, 0, 0, 1], [0, 0, 0, 0, 1], [1, 0, 0, 1, 0]]
   gy = 8
-  __step_0 = 18
-  while ((__step_0 >= 0 && gy < h - 8) || (__step_0 < 0 && gy > h - 8))
+  __step_1 = 18
+  while ((__step_1 >= 0 && gy < h - 8) || (__step_1 < 0 && gy > h - 8))
     gx = 8
-    __step_1 = 22
-    while ((__step_1 >= 0 && gx < w - 8) || (__step_1 < 0 && gx > w - 8))
+    __step_2 = 22
+    while ((__step_2 >= 0 && gx < w - 8) || (__step_2 < 0 && gx > w - 8))
       kind = ((gx * 7 + gy * 11) % 3)
       if kind == 0
         ph = __pytra_len(glider)
@@ -143,19 +150,19 @@ def run_07_game_of_life_loop()
           end
         end
       end
-      gx += __step_1
+      gx += __step_2
     end
-    gy += __step_0
+    gy += __step_1
   end
   frames = []
-  __loop_2 = 0
-  while __loop_2 < steps
+  __loop_3 = 0
+  while __loop_3 < steps
     frames.append(render(grid, w, h, cell))
     grid = next_state(grid, w, h)
-    __loop_2 += 1
+    __loop_3 += 1
   end
   save_gif(out_path, w * cell, h * cell, frames, grayscale_palette(), 4, 0)
-  elapsed = __pytra_perf_counter() - start
+  elapsed = perf_counter() - start
   __pytra_print("output:", out_path)
   __pytra_print("frames:", steps)
   __pytra_print("elapsed_sec:", elapsed)

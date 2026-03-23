@@ -1,4 +1,6 @@
-require_relative "py_runtime"
+require_relative "built_in/py_runtime"
+require_relative "std/time"
+require_relative "utils/png"
 
 
 # 01: Sample that outputs the Mandelbrot set as a PNG image.
@@ -34,22 +36,19 @@ end
 
 def render_mandelbrot(width, height, max_iter, x_min, x_max, y_min, y_max)
   pixels = __pytra_bytearray()
-  __hoisted_cast_1 = __pytra_float(height - 1)
-  __hoisted_cast_2 = __pytra_float(width - 1)
-  __hoisted_cast_3 = __pytra_float(max_iter)
   y = 0
   while y < height
-    py = (y_min + ((y_max - y_min) * __pytra_div(y, __hoisted_cast_1)))
+    py = (y_min + ((y_max - y_min) * __pytra_div(y, (height - 1))))
     x = 0
     while x < width
-      px = (x_min + ((x_max - x_min) * __pytra_div(x, __hoisted_cast_2)))
+      px = (x_min + ((x_max - x_min) * __pytra_div(x, (width - 1))))
       it = escape_count(px, py, max_iter)
       if it >= max_iter
         r = 0
         g = 0
         b = 0
       else
-        t = __pytra_div(it, __hoisted_cast_3)
+        t = __pytra_div(it, max_iter)
         r = __pytra_int((255.0 * t * t))
         g = __pytra_int(255.0 * t)
         b = __pytra_int((255.0 * (1.0 - t)))
@@ -67,10 +66,10 @@ def run_mandelbrot()
   height = 1200
   max_iter = 1000
   out_path = "sample/out/01_mandelbrot.png"
-  start = __pytra_perf_counter()
+  start = perf_counter()
   pixels = render_mandelbrot(width, height, max_iter, (-2.2), 1.0, (-1.2), 1.2)
   write_rgb_png(out_path, width, height, pixels)
-  elapsed = __pytra_perf_counter() - start
+  elapsed = perf_counter() - start
   __pytra_print("output:", out_path)
   __pytra_print("size:", width, "x", height)
   __pytra_print("max_iter:", max_iter)

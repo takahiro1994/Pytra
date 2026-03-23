@@ -1,7 +1,8 @@
-# Generated std/math.rb delegates host bindings through this native seam.
-# source: src/runtime/cs/std/math_native.cs (reference)
+# Hand-written native seam for pytra.std.math.
+# source: src/pytra/std/math.py
+# generated-by: manual (Ruby native runtime)
 
-module MathNative
+module PytraNative_Std_Math
   def self.pi = Math::PI
   def self.e = Math::E
   def self.sqrt(x) = Math.sqrt(x.to_f)

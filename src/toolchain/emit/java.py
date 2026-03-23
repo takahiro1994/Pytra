@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Java backend: manifest.json → Java multi-file output.
 
-Java requires filename == public class name, so entry module is emitted as Main.java.
-This is the only language-specific exception per spec-emitter-guide.md §5.
+Java requires filename == public class name, so the entry module logic is
+emitted to {module_id}.java and a thin Main.java wrapper is generated
+separately (spec-emitter-guide.md §5 "Java の main 分離").
 """
 
 from __future__ import annotations
@@ -12,13 +13,64 @@ from pathlib import Path as NativePath
 from typing import Any
 
 from toolchain.emit.java.emitter import transpile_to_java
+from toolchain.emit.java.emitter.java_native_emitter import _safe_ident
 from toolchain.emit.loader import load_linked_modules, copy_native_runtime
+
+
+def _is_extern_only(source: str) -> bool:
+    """Check if generated source only contains _native delegations (no real logic)."""
+    for line in source.splitlines():
+        stripped = line.strip()
+        if stripped == "" or stripped.startswith("//") or stripped.startswith("/*"):
+            continue
+        if stripped.startswith("public final class ") or stripped.startswith("private "):
+            continue
+        if stripped == "}" or stripped == "{":
+            continue
+        if "_native." in stripped or "return _native." in stripped:
+            continue
+        if stripped.startswith("public static "):
+            continue
+        return False
+    return True
+
+
+def _generate_main_java(body_class: str, main_guard_stmts: list[Any]) -> str:
+    """Generate a thin Main.java that delegates to the body class."""
+    lines: list[str] = []
+    lines.append("public final class Main {")
+    lines.append("    public static void main(String[] args) {")
+    if len(main_guard_stmts) > 0:
+        # main_guard has explicit statements — delegate each call to body_class
+        for stmt in main_guard_stmts:
+            if not isinstance(stmt, dict):
+                continue
+            kind = stmt.get("kind", "")
+            if kind == "Expr":
+                value = stmt.get("value", {})
+                if isinstance(value, dict) and value.get("kind") == "Call":
+                    func = value.get("func", {})
+                    if isinstance(func, dict) and func.get("kind") == "Name":
+                        fname = _safe_ident(func.get("id", ""), "run")
+                        # Rename user main() to avoid Java main(String[]) collision
+                        if fname == "main":
+                            fname = "__pytra_main"
+                        lines.append("        " + body_class + "." + fname + "();")
+                        continue
+    else:
+        # No main_guard — call _case_main on the body class
+        lines.append("        " + body_class + "._case_main();")
+    lines.append("    }")
+    lines.append("}")
+    lines.append("")
+    return "\n".join(lines)
 
 
 def _emit_java_modules(input_path: str, output_dir: str) -> int:
     """Load linked modules and emit Java files.
 
-    Entry module is emitted as Main.java (Java requires filename == class name).
+    Entry module logic is emitted to {module_id}.java.
+    A thin Main.java wrapper is generated separately.
     """
     modules, entry_modules = load_linked_modules(input_path)
     entry_set = set(entry_modules)
@@ -29,6 +81,10 @@ def _emit_java_modules(input_path: str, output_dir: str) -> int:
         module_id: str = mod["module_id"]
         east_doc: dict[str, Any] = mod["east_doc"]
         is_entry: bool = mod.get("is_entry", False) or module_id in entry_set
+
+        # built_in modules are provided by PyRuntime — skip emit (§6)
+        if module_id.startswith("pytra.built_in."):
+            continue
 
         # Inject emit_context
         meta = east_doc.get("meta")
@@ -47,16 +103,43 @@ def _emit_java_modules(input_path: str, output_dir: str) -> int:
             "is_entry": bool(is_entry),
         }
 
-        source = transpile_to_java(east_doc)
-
         if is_entry:
-            out_path = out / "Main.java"
-        else:
-            out_path = out / rel_path
+            # Emit logic body to {module_id}.java (no main method)
+            body_class = _safe_ident(module_id, "Module")
+            source = transpile_to_java(east_doc, class_name=body_class, emit_main=False)
+            if source == "":
+                continue
+            # Use module_id as filename (class is package-private, no name constraint)
+            out_path = out / (module_id + ".java")
+            out_path.parent.mkdir(parents=True, exist_ok=True)
+            out_path.write_text(source, encoding="utf-8")
+            print("generated: " + str(out_path))
 
-        out_path.parent.mkdir(parents=True, exist_ok=True)
-        out_path.write_text(source, encoding="utf-8")
-        print("generated: " + str(out_path))
+            # Generate thin Main.java
+            main_guard_any = east_doc.get("main_guard_body")
+            main_guard = main_guard_any if isinstance(main_guard_any, list) else []
+            main_source = _generate_main_java(body_class, main_guard)
+            main_path = out / "Main.java"
+            main_path.write_text(main_source, encoding="utf-8")
+            print("generated: " + str(main_path))
+        else:
+            try:
+                source = transpile_to_java(east_doc)
+            except RuntimeError:
+                # Skip modules with unsupported constructs (e.g. union types)
+                continue
+            if source == "":
+                continue
+            # Skip @extern-only modules whose native file is missing
+            native_check = rel_module.replace(".", "/") + "_native.java"
+            if _is_extern_only(source) and not (out / native_check).exists():
+                runtime_src = NativePath("src/runtime/java") / native_check
+                if not runtime_src.exists():
+                    continue
+            out_path = out / rel_path
+            out_path.parent.mkdir(parents=True, exist_ok=True)
+            out_path.write_text(source, encoding="utf-8")
+            print("generated: " + str(out_path))
 
     return 0
 

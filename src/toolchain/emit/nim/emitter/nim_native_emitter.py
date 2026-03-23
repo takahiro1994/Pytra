@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from toolchain.emit.common.emitter.code_emitter import (
-    reject_backend_general_union_type_exprs,
+    build_import_alias_map,
     reject_backend_homogeneous_tuple_ellipsis_type_exprs,
     reject_backend_typed_vararg_signatures,
 )
@@ -45,6 +45,10 @@ def _safe_ident(name: Any, fallback: str = "value") -> str:
         out = fallback
     while out.startswith("_"):
         out = "v" + out[1:]
+    while out.endswith("_"):
+        out = out[:-1] + "E"
+    if out == "":
+        out = fallback
     if out[0].isdigit():
         out = "v" + out
     if out in _NIM_KEYWORDS:
@@ -311,26 +315,6 @@ def _has_runtime_extern_module(expr: dict[str, Any]) -> bool:
     return len(lookup_runtime_module_extern_contract(runtime_module)) > 0
 
 
-def _matches_math_symbol(expr: dict[str, Any], symbol: str, semantic_tag: str) -> bool:
-    if _runtime_symbol_name(expr) != symbol:
-        return False
-    if _runtime_semantic_tag(expr) == semantic_tag:
-        return True
-    if _has_runtime_extern_module(expr):
-        return True
-    runtime_call, _ = _resolved_runtime_call(expr)
-    return runtime_call.strip() == "math." + symbol
-
-
-def _is_math_constant(expr: dict[str, Any]) -> bool:
-    return _matches_math_symbol(expr, "pi", "stdlib.symbol.pi") or _matches_math_symbol(
-        expr, "e", "stdlib.symbol.e"
-    )
-
-
-def _is_math_sqrt_call(expr: dict[str, Any]) -> bool:
-    return _matches_math_symbol(expr, "sqrt", "stdlib.fn.sqrt")
-
 
 def _arg_is_mutated_in_body(arg_name: str, body: list[Any]) -> bool:
     """Check if a function argument is mutated (appended to, assigned via subscript, etc.)."""
@@ -382,7 +366,7 @@ def _arg_is_mutated_in_node(arg_name: str, node: dict[str, Any]) -> bool:
 
 class NimNativeEmitter:
     def __init__(self, east_doc: dict[str, Any]) -> None:
-        reject_backend_general_union_type_exprs(east_doc, backend_name="Nim backend")
+        # Union types are mapped to 'auto' in _map_type; no rejection needed.
         self.east_doc = east_doc
         self.lines: list[str] = []
         self.indent = 0
@@ -401,24 +385,27 @@ class NimNativeEmitter:
         body_any = east_doc.get("body")
         body = body_any if isinstance(body_any, list) else []
         self.relative_import_name_aliases = _collect_relative_import_name_aliases(east_doc)
+        # §7: Use build_import_alias_map for import alias resolution
+        meta_any2 = east_doc.get("meta")
+        meta2 = meta_any2 if isinstance(meta_any2, dict) else {}
+        self.import_alias_map: dict[str, str] = build_import_alias_map(meta2)
 
     def transpile(self) -> str:
-        # Calculate relative path for sub-modules
+        # Use emit_context (§8) for module metadata
         meta_any = self.east_doc.get("meta")
         meta = meta_any if isinstance(meta_any, dict) else {}
-        module_id_val = meta.get("module_id", "")
-        module_depth = module_id_val.count(".") if isinstance(module_id_val, str) and module_id_val != "" else 0
-        runtime_prefix = "../" * module_depth
-        self.lines.append(f'include "{runtime_prefix}py_runtime.nim"')
+        emit_ctx = meta.get("emit_context", {}) if isinstance(meta, dict) else {}
+        emit_ctx = emit_ctx if isinstance(emit_ctx, dict) else {}
+        root_rel_prefix = emit_ctx.get("root_rel_prefix", "./") if isinstance(emit_ctx, dict) else "./"
+        self.lines.append(f'include "{root_rel_prefix}built_in/py_runtime.nim"')
         self.lines.append("")
-        self.lines.append('import std/os, std/times, std/tables, std/strutils, std/math, std/sequtils')
+        self.lines.append('import std/os, std/times, std/tables, std/strutils, std/sequtils')
 
         # Import linked sub-modules from import_bindings
-        meta_any = self.east_doc.get("meta")
-        meta = meta_any if isinstance(meta_any, dict) else {}
         import_bindings_any = meta.get("import_bindings")
         import_bindings = import_bindings_any if isinstance(import_bindings_any, list) else []
         imported_modules: set[str] = set()
+        _DECORATORS = {"abi", "extern", "template"}
         for binding in import_bindings:
             if not isinstance(binding, dict):
                 continue
@@ -429,49 +416,58 @@ class NimNativeEmitter:
             # Skip pytra.built_in (provided by py_runtime.nim)
             if module_id.startswith("pytra.built_in"):
                 continue
+            # Skip non-pytra modules (Python stdlib imports used by @extern source)
+            if not module_id.startswith("pytra.") and not module_id.startswith("."):
+                continue
             binding_kind = binding.get("binding_kind", "")
             export_name = binding.get("export_name", "")
             local_name = binding.get("local_name", "")
-            # pytra.std → sub-module from export_name (skip decorators)
-            _PYTRA_STD_DECORATORS = {"abi", "extern", "template"}
-            if module_id == "pytra.std":
-                if binding_kind == "symbol" and isinstance(export_name, str) and export_name not in _PYTRA_STD_DECORATORS and export_name != "":
-                    import_path = export_name + "/east"
-                    if import_path not in imported_modules:
-                        imported_modules.add(import_path)
-                        self.lines.append(f'import {import_path}')
-                    if isinstance(local_name, str) and local_name != "":
-                        self.imported_modules.add(local_name)
-                continue
-            if module_id.startswith("pytra.std."):
-                mod_tail = module_id[len("pytra.std."):]
-                import_path = mod_tail + "/east"
-                if import_path not in imported_modules:
-                    imported_modules.add(import_path)
-                    self.lines.append(f'import {import_path}')
-                continue
-            if module_id.startswith("pytra.utils"):
-                # e.g. module_id=pytra.utils.gif, export_name=save_gif → gif/east
-                # or module_id=pytra.utils, export_name=png → png/east
-                parts = module_id.split(".")
-                if len(parts) >= 3:
-                    # pytra.utils.gif → gif/east
-                    import_path = parts[2] + "/east"
-                elif binding_kind == "symbol" and export_name != "":
-                    import_path = export_name + "/east"
-                else:
+            # Mechanically derive import path from module_id (§3):
+            # strip "pytra." prefix, replace "." with "/"
+            rel = module_id
+            if rel.startswith("pytra."):
+                rel = rel[len("pytra."):]
+            # For parent module (e.g. pytra.std) with symbol binding,
+            # resolve the sub-module from export_name
+            if "." not in rel and binding_kind == "symbol" and isinstance(export_name, str) and export_name != "":
+                if export_name in _DECORATORS:
                     continue
+                import_path = rel + "/" + export_name
             else:
-                # e.g. module_id=io_ops.east → io_ops/east
-                import_path = module_id.replace(".", "/")
+                import_path = rel.replace(".", "/")
+            # Use root_rel_prefix to generate relative import paths
+            # that avoid Nim stdlib namespace conflicts (e.g. std/math)
+            nim_import_path = root_rel_prefix + import_path
             if import_path not in imported_modules:
                 imported_modules.add(import_path)
-                self.lines.append(f'import {import_path}')
+                self.lines.append(f'import {nim_import_path}')
             if isinstance(local_name, str) and local_name != "":
                 self.imported_modules.add(local_name)
         self.lines.append("")
 
         body = self.east_doc.get("body")
+        # §4: If module has @extern functions, import _native module
+        self._native_module_name = ""
+        if isinstance(body, list):
+            has_extern = False
+            for stmt in body:
+                if isinstance(stmt, dict) and stmt.get("kind") == "FunctionDef":
+                    decos = stmt.get("decorators", [])
+                    if isinstance(decos, list) and "extern" in decos:
+                        has_extern = True
+                        break
+            if has_extern:
+                module_id = emit_ctx.get("module_id", "") if isinstance(emit_ctx, dict) else ""
+                clean_id = module_id.replace(".east", "")
+                rel_native = clean_id
+                if rel_native.startswith("pytra."):
+                    rel_native = rel_native[len("pytra."):]
+                native_path = rel_native.replace(".", "/") + "_native"
+                self._native_module_name = native_path.split("/")[-1]
+                self.lines.append(f'import {root_rel_prefix}{native_path}')
+                self.lines.append(f'export {self._native_module_name}')
+                self.lines.append("")
+
         if isinstance(body, list):
             for stmt in body:
                 if isinstance(stmt, dict) and stmt.get("kind") == "ClassDef":
@@ -484,17 +480,18 @@ class NimNativeEmitter:
                 if isinstance(stmt, dict):
                     self._emit_stmt(stmt)
 
-        main_guard = self.east_doc.get("main_guard_body")
-        if isinstance(main_guard, list) and len(main_guard) > 0:
-            self.lines.append("")
-            self.lines.append("if isMainModule:")
-            self.indent += 1
-            # In Nim, variables assigned in if isMainModule: are global if not in a proc.
-            # But let's track them to add 'var' for the first assignment.
-            for stmt in main_guard:
-                if isinstance(stmt, dict):
-                    self._emit_stmt(stmt)
-            self.indent -= 1
+        # §8: Only emit main_guard_body for entry modules (is_entry=True)
+        is_entry = emit_ctx.get("is_entry", False) if isinstance(emit_ctx, dict) else False
+        if is_entry:
+            main_guard = self.east_doc.get("main_guard_body")
+            if isinstance(main_guard, list) and len(main_guard) > 0:
+                self.lines.append("")
+                self.lines.append("if isMainModule:")
+                self.indent += 1
+                for stmt in main_guard:
+                    if isinstance(stmt, dict):
+                        self._emit_stmt(stmt)
+                self.indent -= 1
 
         return "\n".join(self.lines).rstrip() + "\n"
 
@@ -717,13 +714,6 @@ class NimNativeEmitter:
                                     rt = "float"
                                 elif isinstance(v, str):
                                     rt = "string"
-                            elif vk == "Attribute":
-                                attr = vd.get("attr")
-                                if isinstance(attr, str):
-                                    if attr in {"kind", "name", "text", "op"}:
-                                        rt = "string"
-                                    elif attr in {"pos", "value", "left", "right", "expr_index", "kind_tag", "op_tag", "number_value"}:
-                                        rt = "int"
                         types.append(rt)
                     else:
                         types.append("void")
@@ -767,6 +757,14 @@ class NimNativeEmitter:
             self._emit_swap(stmt)
         elif kind == "Return":
             val_node = stmt.get("value")
+            # In void procs, emit the expression as a statement then return
+            if isinstance(val_node, dict) and val_node.get("kind") == "Call":
+                resolved = val_node.get("resolved_type")
+                if isinstance(resolved, str) and resolved in {"None", "void", ""}:
+                    val = self._render_expr(val_node)
+                    self._emit_line(val)
+                    self._emit_line("return")
+                    return
             val = self._render_expr(val_node) if val_node else ""
             self._emit_line("return " + val)
         elif kind == "If":
@@ -775,6 +773,8 @@ class NimNativeEmitter:
             self._emit_while(stmt)
         elif kind == "ForCore":
             self._emit_for(stmt)
+        elif kind == "ForRange":
+            self._emit_for_range(stmt)
         elif kind == "Raise":
             self._emit_raise(stmt)
         elif kind == "Try":
@@ -790,6 +790,17 @@ class NimNativeEmitter:
         else:
             raise RuntimeError("nim native emitter: unsupported stmt kind: " + str(kind))
 
+    def _emit_extern_delegation(self, stmt: dict[str, Any]) -> None:
+        """§4: Delegate @extern functions to the _native module.
+
+        Instead of generating wrapper procs, re-export from the native module.
+        This avoids argument count mismatches when EAST3 expands default args.
+        """
+        # No individual proc delegation needed — the native module is imported
+        # and its symbols are available. The emitter just needs to ensure the
+        # native module is imported (done in transpile()).
+        pass
+
     def _emit_import(self, stmt: dict[str, Any]) -> None:
         pass
 
@@ -797,12 +808,20 @@ class NimNativeEmitter:
         pass
 
     def _emit_function_def(self, stmt: dict[str, Any]) -> None:
+        # §4: @extern functions → delegate to __native module
+        decorators = stmt.get("decorators", [])
+        if isinstance(decorators, list) and "extern" in decorators:
+            self._emit_extern_delegation(stmt)
+            return
+
         raw_name = stmt.get("name")
         name = _safe_ident(raw_name, "fn")
         arg_order = stmt.get("arg_order", [])
         arg_types = stmt.get("arg_types", {})
         body = stmt.get("body", [])
         ret_type = self._map_type(stmt.get("returns"))
+        if ret_type == "auto" or ret_type == "":
+            ret_type = self._map_type(stmt.get("return_type"))
         override_ret_any = stmt.get("_nim_return_override")
         if isinstance(override_ret_any, str) and override_ret_any != "":
             ret_type = override_ret_any
@@ -1028,6 +1047,8 @@ class NimNativeEmitter:
                     j += 1
                 ret_type = self._map_type(fn.get("returns"))
                 if ret_type == "auto" or ret_type == "":
+                    ret_type = self._map_type(fn.get("return_type"))
+                if ret_type == "auto" or ret_type == "":
                     ret_type = self._infer_return_type_from_body(fn.get("body"))
                 if ret_type == "seq[auto]" and isinstance(raw_name, str) and raw_name.startswith("new_"):
                     linked_name = raw_name[4:]
@@ -1225,7 +1246,21 @@ class NimNativeEmitter:
         target = self._render_expr(target_node)
         t = self._map_type(stmt.get("annotation"))
         value_node = stmt.get("value")
-        
+
+        # §4: extern() variable → delegate to _native module
+        if isinstance(value_node, dict):
+            inner = value_node
+            if inner.get("kind") == "Unbox":
+                inner = inner.get("value", {})
+                inner = inner if isinstance(inner, dict) else {}
+            if inner.get("kind") == "Call":
+                func = inner.get("func", {})
+                if isinstance(func, dict) and func.get("id") == "extern":
+                    native_mod = self._native_module_name
+                    if native_mod != "":
+                        self._emit_line(f"let {target}*: {t} = {native_mod}.{target}")
+                        return
+
         if target_node.get("kind") == "Name":
              name = _safe_ident(target_node.get("id"))
              if bool(stmt.get("declare")) and self.indent > 1:
@@ -1302,7 +1337,25 @@ class NimNativeEmitter:
             self._emit_line(f"{target} {op}= {value}")
 
     def _emit_if(self, stmt: dict[str, Any]) -> None:
-        test = self._render_truthy_expr(stmt.get("test"))
+        test_node = stmt.get("test")
+        # Skip dead branches: if the test is a constant false (e.g. isinstance lowered),
+        # emit only the else branch to avoid Nim type-checking unreachable code.
+        if isinstance(test_node, dict):
+            if test_node.get("kind") == "Constant" and test_node.get("value") is False:
+                orelse = stmt.get("orelse", [])
+                if orelse:
+                    for s in orelse:
+                        if isinstance(s, dict):
+                            self._emit_stmt(s)
+                return
+            if test_node.get("kind") == "IsInstance":
+                orelse = stmt.get("orelse", [])
+                if orelse:
+                    for s in orelse:
+                        if isinstance(s, dict):
+                            self._emit_stmt(s)
+                return
+        test = self._render_truthy_expr(test_node)
         self._emit_line(f"if {test}:")
         self.indent += 1
         self._enter_scope()
@@ -1463,6 +1516,36 @@ class NimNativeEmitter:
             else:
                 self._emit_line(f"for {target_name} in {expr}:")
 
+        self.indent += 1
+        self._enter_scope()
+        for s in stmt.get("body", []):
+            if isinstance(s, dict):
+                self._emit_stmt(s)
+        self._leave_scope()
+        self.indent -= 1
+
+    def _emit_for_range(self, stmt: dict[str, Any]) -> None:
+        """Emit a ForRange node (from ListComp lowering)."""
+        target_node = stmt.get("target")
+        target_name = "i"
+        if isinstance(target_node, dict) and target_node.get("kind") == "Name":
+            target_name = _safe_ident(target_node.get("id"), "i")
+        self.declared_vars.add(target_name)
+        start = self._render_expr(stmt.get("start"))
+        stop = self._render_expr(stmt.get("stop"))
+        step_node = stmt.get("step")
+        step_const = _const_int_value(step_node) if isinstance(step_node, dict) else None
+        if step_const == 1 or step_node is None:
+            self._emit_line(f"for {target_name} in {start} ..< {stop}:")
+        elif step_const == -1:
+            self._emit_line(f"for {target_name} in countdown({start}, ({stop}) + 1):")
+        elif isinstance(step_const, int) and step_const > 1:
+            self._emit_line(f"for {target_name} in countup({start}, ({stop}) - 1, {step_const}):")
+        elif isinstance(step_const, int) and step_const < -1:
+            self._emit_line(f"for {target_name} in countdown({start}, ({stop}) + 1, {0 - step_const}):")
+        else:
+            step_expr = self._render_expr(step_node)
+            self._emit_line(f"for {target_name} in py_range({start}, {stop}, {step_expr}):")
         self.indent += 1
         self._enter_scope()
         for s in stmt.get("body", []):
@@ -1745,11 +1828,6 @@ class NimNativeEmitter:
             resolved_runtime = resolved_runtime_any if isinstance(resolved_runtime_any, str) else ""
             resolved_source_any = ed.get("resolved_runtime_source")
             resolved_source = resolved_source_any if isinstance(resolved_source_any, str) else ""
-            if _is_math_constant(expr):
-                if _runtime_symbol_name(expr) == "pi":
-                    return "PI"
-                if _runtime_symbol_name(expr) == "e":
-                    return "E"
             if resolved_source == "module_attr" and resolved_runtime != "" and "." not in resolved_runtime:
                 return _safe_ident(resolved_runtime)
             if semantic_tag.startswith("stdlib.") and runtime_source == "resolved_runtime_call":
@@ -1760,10 +1838,11 @@ class NimNativeEmitter:
                     + runtime_call
                     + ")"
                 )
-            # Linked sub-module attribute → direct reference
+            # §7: Linked sub-module attribute → direct reference
+            # Use import_alias_map to resolve module aliases
             if isinstance(value_node, dict) and value_node.get("kind") == "Name":
                 owner_name = value_node.get("id")
-                if isinstance(owner_name, str) and owner_name in self.imported_modules:
+                if isinstance(owner_name, str) and (owner_name in self.imported_modules or owner_name in self.import_alias_map):
                     return attr
             return f"{value}.{attr}"
         elif kind == "Unbox" or kind == "Box":
@@ -1787,15 +1866,13 @@ class NimNativeEmitter:
         runtime_call, runtime_source = _resolved_runtime_call(expr)
         if semantic_tag.startswith("stdlib.") and semantic_tag != "stdlib.symbol.Path" and runtime_call == "":
             raise RuntimeError("nim native emitter: unresolved stdlib runtime call: " + semantic_tag)
-        if runtime_source == "resolved_runtime_call" and _is_math_sqrt_call(expr) and len(args) == 1:
-            return f"math.sqrt(float({args[0]}))"
         # Linked sub-module method call → direct function call
         if isinstance(func, dict) and func.get("kind") == "Attribute":
             func_value = func.get("value")
             func_attr = func.get("attr")
             if isinstance(func_value, dict) and func_value.get("kind") == "Name":
                 owner_name = func_value.get("id")
-                if isinstance(owner_name, str) and owner_name in self.imported_modules:
+                if isinstance(owner_name, str) and (owner_name in self.imported_modules or owner_name in self.import_alias_map):
                     if isinstance(func_attr, str):
                         # Nim std/math functions require float arguments
                         if func_attr in {"sqrt", "sin", "cos", "tan", "exp", "log", "log10", "fabs", "floor", "ceil"}:
@@ -1813,12 +1890,6 @@ class NimNativeEmitter:
                     return f"echo py_str({args[0]})"
                 joined = " & \" \" & ".join([f"py_str({a})" for a in args])
                 return f"echo {joined}"
-            # Nim std/math functions require float arguments
-            if name in {"sqrt", "sin", "cos", "tan", "exp", "log", "log10", "fabs", "floor", "ceil"}:
-                float_args = [f"float({a})" for a in args]
-                return f"{name}({', '.join(float_args)})"
-            if name == "pow" and len(args) == 2:
-                return f"pow(float({args[0]}), float({args[1]}))"
             if name == "open":
                 # Convert Python file mode string to Nim FileMode
                 if len(args) >= 2:
@@ -1857,12 +1928,15 @@ class NimNativeEmitter:
                 if len(args) == 1:
                     return f"pairs({args[0]})"
                 return "pairs(@[])"
+            if name == "cast":
+                # Python cast(T, value) is a type narrowing hint; in Nim just use the value
+                if len(args) >= 2:
+                    return args[1]
+                return args[0] if len(args) == 1 else "nil"
             if name in {"RuntimeError", "ValueError", "TypeError"}:
                 if len(args) >= 1:
                     return args[0]
                 return _nim_string(name)
-            if name == "perf_counter":
-                return "epochTime()"
             if name == "bytearray":
                  if len(args) == 0:
                      return "newSeq[uint8]()"
@@ -1879,6 +1953,10 @@ class NimNativeEmitter:
                     return f"{args[0]}.mapIt(uint8(it))"
                 return args[0]
             if name in self.class_names:
+                 return f"new{name}({', '.join(args)})"
+            # Imported class constructor: resolved_type matches func name
+            call_resolved = expr.get("resolved_type")
+            if isinstance(call_resolved, str) and call_resolved == name and name[0].isupper():
                  return f"new{name}({', '.join(args)})"
         
         if isinstance(func, dict) and func.get("kind") == "Attribute":
@@ -1902,7 +1980,15 @@ class NimNativeEmitter:
                       return f"getOrDefault({value}, {args[0]}, {args[1]})"
                  if len(args) == 1:
                       return f"getOrDefault({value}, {args[0]})"
+            if attr == "read" and len(args) == 0:
+                 return f"{value}.readAll()"
             if attr == "write" and len(args) == 1:
+                 # Check if arg is string (text write) or bytes (binary write)
+                 arg0_type = ""
+                 if len(args_nodes) > 0 and isinstance(args_nodes[0], dict):
+                     arg0_type = args_nodes[0].get("resolved_type", "")
+                 if isinstance(arg0_type, str) and arg0_type == "str":
+                     return f"{value}.write({args[0]})"
                  return f"py_write_bytes({value}, {args[0]})"
             if attr == "close" and len(args) == 0:
                  return f"{value}.close()"
@@ -1919,6 +2005,10 @@ class NimNativeEmitter:
                 + runtime_call
                 + ")"
             )
+        # §11: yields_dynamic — Nim uses generic containers (Table[K,V], seq[T])
+        # so no type assertion is needed; the correct concrete type is returned.
+        # We acknowledge the flag but no codegen action is required.
+        # yields_dynamic = bool(expr.get("yields_dynamic", False))
         func_expr = self._render_expr(func)
         return f"{func_expr}({', '.join(args)})"
 

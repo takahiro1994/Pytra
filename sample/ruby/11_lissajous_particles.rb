@@ -1,4 +1,7 @@
-require_relative "py_runtime"
+require_relative "built_in/py_runtime"
+require_relative "std/math"
+require_relative "std/time"
+require_relative "utils/gif"
 
 
 # 11: Sample that outputs Lissajous-motion particles as a GIF.
@@ -22,17 +25,16 @@ def run_11_lissajous_particles()
   frames_n = 360
   particles = 48
   out_path = "sample/out/11_lissajous_particles.gif"
-  start = __pytra_perf_counter()
+  start = perf_counter()
   frames = []
   t = 0
   while t < frames_n
     frame = __pytra_bytearray(w * h)
-    __hoisted_cast_1 = __pytra_float(t)
     p = 0
     while p < particles
       phase = p * 0.261799
-      x = __pytra_int((w * 0.5 + (w * 0.38 * Math.sin((0.11 * __hoisted_cast_1 + phase * 2.0)))))
-      y = __pytra_int((h * 0.5 + (h * 0.38 * Math.sin((0.17 * __hoisted_cast_1 + phase * 3.0)))))
+      x = __pytra_int((w * 0.5 + (w * 0.38 * sin((0.11 * t + phase * 2.0)))))
+      y = __pytra_int((h * 0.5 + (h * 0.38 * sin((0.17 * t + phase * 3.0)))))
       color = (30 + (p * 9 % 220))
       dy = (-2)
       while dy < 3
@@ -61,7 +63,7 @@ def run_11_lissajous_particles()
     t += 1
   end
   save_gif(out_path, w, h, frames, color_palette(), 3, 0)
-  elapsed = __pytra_perf_counter() - start
+  elapsed = perf_counter() - start
   __pytra_print("output:", out_path)
   __pytra_print("frames:", frames_n)
   __pytra_print("elapsed_sec:", elapsed)

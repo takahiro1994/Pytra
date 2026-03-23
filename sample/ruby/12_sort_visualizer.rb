@@ -1,4 +1,6 @@
-require_relative "py_runtime"
+require_relative "built_in/py_runtime"
+require_relative "std/time"
+require_relative "utils/gif"
 
 
 # 12: Sample that outputs intermediate states of bubble sort as a GIF.
@@ -7,8 +9,6 @@ def render(values, w, h)
   frame = __pytra_bytearray(w * h)
   n = __pytra_len(values)
   bar_w = __pytra_div(w, n)
-  __hoisted_cast_1 = __pytra_float(n)
-  __hoisted_cast_2 = __pytra_float(h)
   i = 0
   while i < n
     x0 = __pytra_int(i * bar_w)
@@ -16,7 +16,7 @@ def render(values, w, h)
     if x1 <= x0
       x1 = x0 + 1
     end
-    bh = __pytra_int((__pytra_div(__pytra_get_index(values, i), __hoisted_cast_1) * __hoisted_cast_2))
+    bh = __pytra_int((__pytra_div(__pytra_get_index(values, i), n) * h))
     y = h - bh
     y = y
     while y < h
@@ -37,7 +37,7 @@ def run_12_sort_visualizer()
   h = 180
   n = 124
   out_path = "sample/out/12_sort_visualizer.gif"
-  start = __pytra_perf_counter()
+  start = perf_counter()
   values = []
   i = 0
   while i < n
@@ -53,9 +53,9 @@ def run_12_sort_visualizer()
     j = 0
     while j < (n - i - 1)
       if __pytra_get_index(values, j) > __pytra_get_index(values, j + 1)
-        __tuple_0 = __pytra_as_list([__pytra_get_index(values, j + 1), __pytra_get_index(values, j)])
-        __pytra_set_index(values, j, __tuple_0[0])
-        __pytra_set_index(values, j + 1, __tuple_0[1])
+        __swap_tmp_0 = __pytra_get_index(values, j)
+        __pytra_set_index(values, j, __pytra_get_index(values, j + 1))
+        __pytra_set_index(values, j + 1, __swap_tmp_0)
         swapped = true
       end
       if op % frame_stride == 0
@@ -70,7 +70,7 @@ def run_12_sort_visualizer()
     i += 1
   end
   save_gif(out_path, w, h, frames, grayscale_palette(), 3, 0)
-  elapsed = __pytra_perf_counter() - start
+  elapsed = perf_counter() - start
   __pytra_print("output:", out_path)
   __pytra_print("frames:", __pytra_len(frames))
   __pytra_print("elapsed_sec:", elapsed)

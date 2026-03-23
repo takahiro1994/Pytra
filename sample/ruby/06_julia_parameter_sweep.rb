@@ -1,4 +1,7 @@
-require_relative "py_runtime"
+require_relative "built_in/py_runtime"
+require_relative "std/math"
+require_relative "std/time"
+require_relative "utils/gif"
 
 
 # 06: Sample that sweeps Julia-set parameters and outputs a GIF.
@@ -24,15 +27,13 @@ end
 
 def render_frame(width, height, cr, ci, max_iter, phase)
   frame = __pytra_bytearray(width * height)
-  __hoisted_cast_1 = __pytra_float(height - 1)
-  __hoisted_cast_2 = __pytra_float(width - 1)
   y = 0
   while y < height
     row_base = y * width
-    zy0 = ((-1.2) + (2.4 * __pytra_div(y, __hoisted_cast_1)))
+    zy0 = ((-1.2) + (2.4 * __pytra_div(y, (height - 1))))
     x = 0
     while x < width
-      zx = ((-1.8) + (3.6 * __pytra_div(x, __hoisted_cast_2)))
+      zx = ((-1.8) + (3.6 * __pytra_div(x, (width - 1))))
       zy = zy0
       i = 0
       while i < max_iter
@@ -64,7 +65,7 @@ def run_06_julia_parameter_sweep()
   frames_n = 72
   max_iter = 180
   out_path = "sample/out/06_julia_parameter_sweep.gif"
-  start = __pytra_perf_counter()
+  start = perf_counter()
   frames = []
   center_cr = (-0.745)
   center_ci = 0.186
@@ -72,19 +73,18 @@ def run_06_julia_parameter_sweep()
   radius_ci = 0.1
   start_offset = 20
   phase_offset = 180
-  __hoisted_cast_3 = __pytra_float(frames_n)
   i = 0
   while i < frames_n
-    t = __pytra_div(((i + start_offset) % frames_n), __hoisted_cast_3)
-    angle = (2.0 * Math::PI * t)
-    cr = (center_cr + radius_cr * Math.cos(__pytra_float(angle)))
-    ci = (center_ci + radius_ci * Math.sin(__pytra_float(angle)))
+    t = __pytra_div(((i + start_offset) % frames_n), frames_n)
+    angle = (2.0 * pi * t)
+    cr = (center_cr + radius_cr * cos(angle))
+    ci = (center_ci + radius_ci * sin(angle))
     phase = ((phase_offset + i * 5) % 255)
     frames.append(render_frame(width, height, cr, ci, max_iter, phase))
     i += 1
   end
   save_gif(out_path, width, height, frames, julia_palette(), 8, 0)
-  elapsed = __pytra_perf_counter() - start
+  elapsed = perf_counter() - start
   __pytra_print("output:", out_path)
   __pytra_print("frames:", frames_n)
   __pytra_print("elapsed_sec:", elapsed)

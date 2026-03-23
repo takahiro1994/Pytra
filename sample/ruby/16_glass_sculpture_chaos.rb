@@ -1,4 +1,7 @@
-require_relative "py_runtime"
+require_relative "built_in/py_runtime"
+require_relative "std/math"
+require_relative "std/time"
+require_relative "utils/gif"
 
 
 # 16: Sample that ray-traces chaotic rotation of glass sculptures and outputs a GIF.
@@ -18,7 +21,7 @@ def dot(ax, ay, az, bx, by, bz)
 end
 
 def length(x, y, z)
-  return Math.sqrt(((x * x + y * y) + z * z))
+  return sqrt(((x * x + y * y) + z * z))
 end
 
 def normalize(x, y, z)
@@ -40,7 +43,7 @@ def refract(ix, iy, iz, nx, ny, nz, eta)
   if sint2 > 1.0
     return reflect(ix, iy, iz, nx, ny, nz)
   end
-  cost = Math.sqrt(1.0 - sint2)
+  cost = sqrt(1.0 - sint2)
   k = (eta * cosi - cost)
   return [(eta * ix + k * nx), (eta * iy + k * ny), (eta * iz + k * nz)]
 end
@@ -55,7 +58,7 @@ def sky_color(dx, dy, dz, tphase)
   r = (0.06 + 0.2 * t)
   g = (0.1 + 0.25 * t)
   b = (0.16 + 0.45 * t)
-  band = (0.5 + 0.5 * Math.sin(((8.0 * dx + 6.0 * dz) + tphase)))
+  band = (0.5 + 0.5 * sin(((8.0 * dx + 6.0 * dz) + tphase)))
   r += 0.08 * band
   g += 0.05 * band
   b += 0.12 * band
@@ -72,7 +75,7 @@ def sphere_intersect(ox, oy, oz, dx, dy, dz, cx, cy, cz, radius)
   if h < 0.0
     return (-1.0)
   end
-  s = Math.sqrt(h)
+  s = sqrt(h)
   t0 = ((-b) - s)
   if t0 > 0.0001
     return t0
@@ -86,16 +89,14 @@ end
 
 def palette_332()
   p = __pytra_bytearray(256 * 3)
-  __hoisted_cast_1 = 7.0
-  __hoisted_cast_2 = 3.0
   i = 0
   while i < 256
-    r = (i + 5 + 7)
-    g = (i + 2 + 7)
-    b = i + 3
-    __pytra_set_index(p, (i * 3 + 0), __pytra_int(__pytra_div(255 * r, __hoisted_cast_1)))
-    __pytra_set_index(p, (i * 3 + 1), __pytra_int(__pytra_div(255 * g, __hoisted_cast_1)))
-    __pytra_set_index(p, (i * 3 + 2), __pytra_int(__pytra_div(255 * b, __hoisted_cast_2)))
+    r = (i >> 5 & 7)
+    g = (i >> 2 & 7)
+    b = i & 3
+    __pytra_set_index(p, (i * 3 + 0), __pytra_int((__pytra_float(255 * r) / 7.0)))
+    __pytra_set_index(p, (i * 3 + 1), __pytra_int((__pytra_float(255 * g) / 7.0)))
+    __pytra_set_index(p, (i * 3 + 2), __pytra_int((__pytra_float(255 * b) / 3.0)))
     i += 1
   end
   return __pytra_bytes(p)
@@ -105,16 +106,16 @@ def quantize_332(r, g, b)
   rr = __pytra_int(clamp01(r) * 255.0)
   gg = __pytra_int(clamp01(g) * 255.0)
   bb = __pytra_int(clamp01(b) * 255.0)
-  return (((rr + 5 + 5) + (gg + 5 + 2)) + (bb + 6))
+  return (((rr >> 5 << 5) + (gg >> 5 << 2)) + (bb >> 6))
 end
 
 def render_frame(width, height, frame_id, frames_n)
   t = __pytra_div(frame_id, frames_n)
-  tphase = (2.0 * Math::PI * t)
+  tphase = (2.0 * pi * t)
   cam_r = 3.0
-  cam_x = cam_r * Math.cos(__pytra_float(tphase * 0.9))
-  cam_y = (1.1 + 0.25 * Math.sin(__pytra_float(tphase * 0.6)))
-  cam_z = cam_r * Math.sin(__pytra_float(tphase * 0.9))
+  cam_x = cam_r * cos(tphase * 0.9)
+  cam_y = (1.1 + 0.25 * sin(tphase * 0.6))
+  cam_z = cam_r * sin(tphase * 0.9)
   look_x = 0.0
   look_y = 0.35
   look_z = 0.0
@@ -130,31 +131,29 @@ def render_frame(width, height, frame_id, frames_n)
   up_x = __tuple_2[0]
   up_y = __tuple_2[1]
   up_z = __tuple_2[2]
-  s0x = 0.9 * Math.cos(__pytra_float(1.3 * tphase))
-  s0y = (0.15 + 0.35 * Math.sin(__pytra_float(1.7 * tphase)))
-  s0z = 0.9 * Math.sin(__pytra_float(1.3 * tphase))
-  s1x = 1.2 * Math.cos(__pytra_float((1.3 * tphase + 2.094)))
-  s1y = (0.1 + 0.4 * Math.sin(__pytra_float((1.1 * tphase + 0.8))))
-  s1z = 1.2 * Math.sin(__pytra_float((1.3 * tphase + 2.094)))
-  s2x = 1.0 * Math.cos(__pytra_float((1.3 * tphase + 4.188)))
-  s2y = (0.2 + 0.3 * Math.sin(__pytra_float((1.5 * tphase + 1.9))))
-  s2z = 1.0 * Math.sin(__pytra_float((1.3 * tphase + 4.188)))
+  s0x = 0.9 * cos(1.3 * tphase)
+  s0y = (0.15 + 0.35 * sin(1.7 * tphase))
+  s0z = 0.9 * sin(1.3 * tphase)
+  s1x = 1.2 * cos((1.3 * tphase + 2.094))
+  s1y = (0.1 + 0.4 * sin((1.1 * tphase + 0.8)))
+  s1z = 1.2 * sin((1.3 * tphase + 2.094))
+  s2x = 1.0 * cos((1.3 * tphase + 4.188))
+  s2y = (0.2 + 0.3 * sin((1.5 * tphase + 1.9)))
+  s2z = 1.0 * sin((1.3 * tphase + 4.188))
   lr = 0.35
-  lx = 2.4 * Math.cos(__pytra_float(tphase * 1.8))
-  ly = (1.8 + 0.8 * Math.sin(__pytra_float(tphase * 1.2)))
-  lz = 2.4 * Math.sin(__pytra_float(tphase * 1.8))
+  lx = 2.4 * cos(tphase * 1.8)
+  ly = (1.8 + 0.8 * sin(tphase * 1.2))
+  lz = 2.4 * sin(tphase * 1.8)
   frame = __pytra_bytearray(width * height)
   aspect = __pytra_div(width, height)
   fov = 1.25
-  __hoisted_cast_3 = __pytra_float(height)
-  __hoisted_cast_4 = __pytra_float(width)
   py = 0
   while py < height
     row_base = py * width
-    sy = (1.0 - __pytra_div((2.0 * (py + 0.5)), __hoisted_cast_3))
+    sy = (1.0 - __pytra_div((2.0 * (py + 0.5)), height))
     px = 0
     while px < width
-      sx = ((__pytra_div((2.0 * (px + 0.5)), __hoisted_cast_4) - 1.0) * aspect)
+      sx = ((__pytra_div((2.0 * (px + 0.5)), width) - 1.0) * aspect)
       rx = (fwd_x + (fov * (sx * right_x + sy * up_x)))
       ry = (fwd_y + (fov * (sx * right_y + sy * up_y)))
       rz = (fwd_z + (fov * (sx * right_z + sy * up_z)))
@@ -198,9 +197,9 @@ def render_frame(width, height, frame_id, frames_n)
         if hit_kind == 1
           hx = (cam_x + best_t * dx)
           hz = (cam_z + best_t * dz)
-          cx = __pytra_int((__pytra_float(hx * 2.0)).floor)
-          cz = __pytra_int((__pytra_float(hz * 2.0)).floor)
-          checker = ((((cx + cz) % 2) == 0) ? 0 : 1)
+          cx_i = __pytra_int(floor(hx * 2.0))
+          cz_i = __pytra_int(floor(hz * 2.0))
+          checker = ((((cx_i + cz_i) % 2) == 0) ? 0 : 1)
           base_r = ((checker == 0) ? 0.1 : 0.04)
           base_g = ((checker == 0) ? 0.11 : 0.05)
           base_b = ((checker == 0) ? 0.13 : 0.08)
@@ -306,9 +305,9 @@ def render_frame(width, height, frame_id, frames_n)
           end
         end
       end
-      r = Math.sqrt(clamp01(r))
-      g = Math.sqrt(clamp01(g))
-      b = Math.sqrt(clamp01(b))
+      r = sqrt(clamp01(r))
+      g = sqrt(clamp01(g))
+      b = sqrt(clamp01(b))
       __pytra_set_index(frame, row_base + px, quantize_332(r, g, b))
       px += 1
     end
@@ -322,7 +321,7 @@ def run_16_glass_sculpture_chaos()
   height = 240
   frames_n = 72
   out_path = "sample/out/16_glass_sculpture_chaos.gif"
-  start = __pytra_perf_counter()
+  start = perf_counter()
   frames = []
   i = 0
   while i < frames_n
@@ -330,7 +329,7 @@ def run_16_glass_sculpture_chaos()
     i += 1
   end
   save_gif(out_path, width, height, frames, palette_332(), 6, 0)
-  elapsed = __pytra_perf_counter() - start
+  elapsed = perf_counter() - start
   __pytra_print("output:", out_path)
   __pytra_print("frames:", frames_n)
   __pytra_print("elapsed_sec:", elapsed)

@@ -1,4 +1,7 @@
-require_relative "py_runtime"
+require_relative "built_in/py_runtime"
+require_relative "std/math"
+require_relative "utils/png"
+require_relative "std/time"
 
 
 # 02: Sample that runs a mini sphere-only ray tracer and outputs a PNG image.
@@ -25,7 +28,7 @@ def hit_sphere(ox, oy, oz, dx, dy, dz, cx, cy, cz, r)
   if d < 0.0
     return (-1.0)
   end
-  sd = Math.sqrt(d)
+  sd = sqrt(d)
   t0 = __pytra_div(((-b) - sd), (2.0 * a))
   t1 = __pytra_div(((-b) + sd), (2.0 * a))
   if t0 > 0.001
@@ -45,10 +48,6 @@ def render(width, height, aa)
   lx = (-0.4)
   ly = 0.8
   lz = (-0.45)
-  __hoisted_cast_1 = __pytra_float(aa)
-  __hoisted_cast_2 = __pytra_float(height - 1)
-  __hoisted_cast_3 = __pytra_float(width - 1)
-  __hoisted_cast_4 = __pytra_float(height)
   y = 0
   while y < height
     x = 0
@@ -60,14 +59,14 @@ def render(width, height, aa)
       while ay < aa
         ax = 0
         while ax < aa
-          fy = __pytra_div((y + __pytra_div((ay + 0.5), __hoisted_cast_1)), __hoisted_cast_2)
-          fx = __pytra_div((x + __pytra_div((ax + 0.5), __hoisted_cast_1)), __hoisted_cast_3)
+          fy = __pytra_div((y + __pytra_div((ay + 0.5), aa)), (height - 1))
+          fx = __pytra_div((x + __pytra_div((ax + 0.5), aa)), (width - 1))
           sy = (1.0 - 2.0 * fy)
-          sx = ((2.0 * fx - 1.0) * __pytra_div(width, __hoisted_cast_4))
+          sx = ((2.0 * fx - 1.0) * __pytra_div(width, height))
           dx = sx
           dy = sy
           dz = 1.0
-          inv_len = __pytra_div(1.0, Math.sqrt(((dx * dx + dy * dy) + dz * dz)))
+          inv_len = __pytra_div(1.0, sqrt(((dx * dx + dy * dy) + dz * dz)))
           dx *= inv_len
           dy *= inv_len
           dz *= inv_len
@@ -173,10 +172,10 @@ def run_raytrace()
   height = 900
   aa = 2
   out_path = "sample/out/02_raytrace_spheres.png"
-  start = __pytra_perf_counter()
+  start = perf_counter()
   pixels = render(width, height, aa)
   write_rgb_png(out_path, width, height, pixels)
-  elapsed = __pytra_perf_counter() - start
+  elapsed = perf_counter() - start
   __pytra_print("output:", out_path)
   __pytra_print("size:", width, "x", height)
   __pytra_print("elapsed_sec:", elapsed)

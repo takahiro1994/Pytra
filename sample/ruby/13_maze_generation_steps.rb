@@ -1,4 +1,6 @@
-require_relative "py_runtime"
+require_relative "built_in/py_runtime"
+require_relative "std/time"
+require_relative "utils/gif"
 
 
 # 13: Sample that outputs DFS maze-generation progress as a GIF.
@@ -35,23 +37,28 @@ def run_13_maze_generation_steps()
   scale = 5
   capture_every = 20
   out_path = "sample/out/13_maze_generation_steps.gif"
-  start = __pytra_perf_counter()
-  grid = __pytra_list_comp_range(0, cell_h, 1) { |__lc_i| ([1] * cell_w) }
+  start = perf_counter()
+  grid = []
+  __loop_0 = 0
+  while __loop_0 < cell_h
+    grid.append(([1] * cell_w))
+    __loop_0 += 1
+  end
   stack = [[1, 1]]
   __pytra_set_index(__pytra_get_index(grid, 1), 1, 0)
   dirs = [[2, 0], [(-2), 0], [0, 2], [0, (-2)]]
   frames = []
   step = 0
   while __pytra_truthy(stack)
-    __tuple_0 = __pytra_as_list(__pytra_get_index(stack, (-1)))
-    x = __tuple_0[0]
-    y = __tuple_0[1]
+    __tuple_1 = __pytra_as_list(__pytra_get_index(stack, (-1)))
+    x = __tuple_1[0]
+    y = __tuple_1[1]
     candidates = []
     k = 0
     while k < 4
-      __tuple_1 = __pytra_as_list(__pytra_get_index(dirs, k))
-      dx = __tuple_1[0]
-      dy = __tuple_1[1]
+      __tuple_2 = __pytra_as_list(__pytra_get_index(dirs, k))
+      dx = __tuple_2[0]
+      dy = __tuple_2[1]
       nx = x + dx
       ny = y + dy
       if (nx >= 1) && (nx < cell_w - 1) && (ny >= 1) && (ny < cell_h - 1) && (__pytra_get_index(__pytra_get_index(grid, ny), nx) == 1)
@@ -75,11 +82,11 @@ def run_13_maze_generation_steps()
       stack.pop()
     else
       sel = __pytra_get_index(candidates, (((x * 17 + y * 29) + __pytra_len(stack) * 13) % __pytra_len(candidates)))
-      __tuple_2 = __pytra_as_list(sel)
-      nx = __tuple_2[0]
-      ny = __tuple_2[1]
-      wx = __tuple_2[2]
-      wy = __tuple_2[3]
+      __tuple_3 = __pytra_as_list(sel)
+      nx = __tuple_3[0]
+      ny = __tuple_3[1]
+      wx = __tuple_3[2]
+      wy = __tuple_3[3]
       __pytra_set_index(__pytra_get_index(grid, wy), wx, 0)
       __pytra_set_index(__pytra_get_index(grid, ny), nx, 0)
       stack.append([nx, ny])
@@ -91,7 +98,7 @@ def run_13_maze_generation_steps()
   end
   frames.append(capture(grid, cell_w, cell_h, scale))
   save_gif(out_path, cell_w * scale, cell_h * scale, frames, grayscale_palette(), 4, 0)
-  elapsed = __pytra_perf_counter() - start
+  elapsed = perf_counter() - start
   __pytra_print("output:", out_path)
   __pytra_print("frames:", __pytra_len(frames))
   __pytra_print("elapsed_sec:", elapsed)

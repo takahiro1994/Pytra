@@ -16,6 +16,10 @@ from toolchain.emit.loader import emit_all_modules
 def _transpile_ruby(east_doc: dict) -> str:
     meta = east_doc.get("meta", {})
     emit_ctx = meta.get("emit_context", {}) if isinstance(meta, dict) else {}
+    module_id = emit_ctx.get("module_id", "") if isinstance(emit_ctx, dict) else ""
+    # built_in modules are provided by py_runtime; skip emit (§6)
+    if module_id.startswith("pytra.built_in."):
+        return ""
     is_entry = emit_ctx.get("is_entry", False) if isinstance(emit_ctx, dict) else False
     return transpile_to_ruby_native(east_doc, is_submodule=not is_entry)
 

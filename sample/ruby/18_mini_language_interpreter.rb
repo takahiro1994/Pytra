@@ -1,4 +1,6 @@
-require_relative "py_runtime"
+require_relative "built_in/py_runtime"
+require_relative "std/pathlib"
+require_relative "std/time"
 
 
 class Token
@@ -46,7 +48,7 @@ class Parser
   end
 
   def initialize(tokens)
-    self.tokens = tokens
+    self.tokens = __pytra_as_list(tokens).dup
     self.pos = 0
     self.expr_nodes = self.new_expr_nodes()
   end
@@ -187,14 +189,12 @@ class Parser
 end
 
 def tokenize(lines)
-  single_char_token_tags = {}
+  single_char_token_tags = { "+" => 1, "-" => 2, "*" => 3, "/" => 4, "(" => 5, ")" => 6, "=" => 7 }
   single_char_token_kinds = ["PLUS", "MINUS", "STAR", "SLASH", "LPAREN", "RPAREN", "EQUAL"]
   tokens = []
-  __iter_0 = __pytra_as_list(__pytra_enumerate(lines))
-  for __it_1 in __iter_0
-    __tuple_2 = __pytra_as_list(__it_1)
-    line_index = __tuple_2[0]
-    source = __tuple_2[1]
+  __enum_idx_1 = 0
+  for source in __pytra_as_list(lines)
+    line_index = __enum_idx_1
     i = 0
     n = __pytra_len(source)
     while i < n
@@ -209,18 +209,18 @@ def tokenize(lines)
         i += 1
         next
       end
-      if __pytra_truthy(__pytra_isdigit(ch))
+      if __pytra_isdigit(ch)
         start = i
-        while (i < n) && __pytra_truthy(__pytra_isdigit(__pytra_get_index(source, i)))
+        while (i < n) && __pytra_isdigit(__pytra_get_index(source, i))
           i += 1
         end
         text = __pytra_slice(source, start, i)
         tokens.append(Token.new("NUMBER", text, start, __pytra_int(text)))
         next
       end
-      if __pytra_truthy(__pytra_isalpha(ch)) || (ch == "_")
+      if __pytra_isalpha(ch) || (ch == "_")
         start = i
-        while (i < n) && ((__pytra_truthy(__pytra_isalpha(__pytra_get_index(source, i))) || (__pytra_get_index(source, i) == "_")) || __pytra_truthy(__pytra_isdigit(__pytra_get_index(source, i))))
+        while (i < n) && ((__pytra_isalpha(__pytra_get_index(source, i)) || (__pytra_get_index(source, i) == "_")) || __pytra_isdigit(__pytra_get_index(source, i)))
           i += 1
         end
         text = __pytra_slice(source, start, i)
@@ -238,6 +238,7 @@ def tokenize(lines)
       raise RuntimeError, __pytra_str((((("tokenize error at line=" + __pytra_str(line_index) + " pos=") + __pytra_str(i)) + " ch=") + ch))
     end
     tokens.append(Token.new("NEWLINE", "", n, 0))
+    __enum_idx_1 += 1
   end
   tokens.append(Token.new("EOF", "", __pytra_len(lines), 0))
   return tokens
@@ -347,13 +348,17 @@ def run_demo()
 end
 
 def run_benchmark()
+  out_path = "sample/out/18_mini_language_interpreter.txt"
   source_lines = build_benchmark_source(32, 120000)
-  start = __pytra_perf_counter()
+  start = perf_counter()
   tokens = tokenize(source_lines)
   parser = Parser.new(tokens)
   stmts = parser.parse_program()
   checksum = execute(stmts, parser.expr_nodes, false)
-  elapsed = __pytra_perf_counter() - start
+  elapsed = perf_counter() - start
+  result = ((((((("token_count:" + __pytra_str(__pytra_len(tokens)) + "\nexpr_count:") + __pytra_str(__pytra_len(parser.expr_nodes))) + "\nstmt_count:") + __pytra_str(__pytra_len(stmts))) + "\nchecksum:") + __pytra_str(checksum)) + "\n")
+  p = Path.new(out_path)
+  p.write_text(result, "utf-8")
   __pytra_print("token_count:", __pytra_len(tokens))
   __pytra_print("expr_count:", __pytra_len(parser.expr_nodes))
   __pytra_print("stmt_count:", __pytra_len(stmts))

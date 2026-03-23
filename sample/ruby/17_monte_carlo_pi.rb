@@ -1,4 +1,6 @@
-require_relative "py_runtime"
+require_relative "built_in/py_runtime"
+require_relative "std/pathlib"
+require_relative "std/time"
 
 
 # 17: Sample that scans a large grid using integer arithmetic only and computes a checksum.
@@ -27,9 +29,13 @@ end
 def run_integer_benchmark()
   width = 7600
   height = 5000
-  start = __pytra_perf_counter()
+  out_path = "sample/out/17_monte_carlo_pi.txt"
+  start = perf_counter()
   checksum = run_integer_grid_checksum(width, height, 123456789)
-  elapsed = __pytra_perf_counter() - start
+  elapsed = perf_counter() - start
+  result = ((("pixels:" + __pytra_str(width * height) + "\nchecksum:") + __pytra_str(checksum)) + "\n")
+  p = Path.new(out_path)
+  p.write_text(result, "utf-8")
   __pytra_print("pixels:", width * height)
   __pytra_print("checksum:", checksum)
   __pytra_print("elapsed_sec:", elapsed)

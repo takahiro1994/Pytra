@@ -781,6 +781,32 @@ _RELATIVE_IMPORT_NAME_ALIASES: dict[str, str] = {}
 _IMPORT_ALIAS_MAP: list[dict[str, str]] = [{}]
 _CURRENT_MODULE_ID_JAVA: list[str] = [""]
 
+
+def _is_extern_call(value_node: Any) -> bool:
+    """Check if a value node is an extern() call (possibly wrapped in Unbox)."""
+    if not isinstance(value_node, dict):
+        return False
+    node = value_node
+    if node.get("kind") == "Unbox":
+        inner = node.get("value")
+        if isinstance(inner, dict):
+            node = inner
+    if node.get("kind") != "Call":
+        return False
+    func = node.get("func")
+    if isinstance(func, dict) and func.get("id") == "extern":
+        return True
+    return False
+
+
+
+def _extern_native_class() -> str:
+    """Return the native class name for the current module."""
+    module_id = _CURRENT_MODULE_ID_JAVA[0]
+    parts = module_id.split(".")
+    return parts[-1] + "_native" if len(parts) > 0 else "native"
+
+
 # stdlib module → Java class mapping for module.attr calls
 _JAVA_STDLIB_CLASS_MAP: dict[str, str] = {
     "pytra.std.math": "math",
@@ -1647,10 +1673,30 @@ def _target_name(target: Any) -> str:
 
 
 def _emit_swap(stmt: dict[str, Any], *, indent: str, ctx: dict[str, Any]) -> list[str]:
-    left = _target_name(stmt.get("left"))
-    right = _target_name(stmt.get("right"))
+    left_node = stmt.get("left")
+    right_node = stmt.get("right")
+    # Subscript swap: values[i], values[j] = values[j], values[i]
+    if (isinstance(left_node, dict) and left_node.get("kind") == "Subscript"
+            and isinstance(right_node, dict) and right_node.get("kind") == "Subscript"):
+        owner_l = _render_expr(left_node.get("value"))
+        idx_l = _normalize_index_expr(owner_l, _render_expr(left_node.get("slice")))
+        owner_r = _render_expr(right_node.get("value"))
+        idx_r = _normalize_index_expr(owner_r, _render_expr(right_node.get("slice")))
+        tmp = _fresh_tmp(ctx, "swap")
+        tmp_type = _infer_java_type_from_expr_node(left_node, _type_map(ctx))
+        if tmp_type == "void":
+            tmp_type = "Object"
+        get_l = owner_l + ".get((int)(" + idx_l + "))"
+        get_r = owner_r + ".get((int)(" + idx_r + "))"
+        return [
+            indent + tmp_type + " " + tmp + " = " + get_l + ";",
+            indent + owner_l + ".set((int)(" + idx_l + "), " + get_r + ");",
+            indent + owner_r + ".set((int)(" + idx_r + "), " + tmp + ");",
+        ]
+    left = _target_name(left_node)
+    right = _target_name(right_node)
     tmp = _fresh_tmp(ctx, "swap")
-    tmp_type = _infer_java_type_from_expr_node(stmt.get("left"), _type_map(ctx))
+    tmp_type = _infer_java_type_from_expr_node(left_node, _type_map(ctx))
     if tmp_type == "void":
         tmp_type = "Object"
     return [
@@ -1843,12 +1889,25 @@ def _emit_for_runtime_iter(
 
     if target_plan.get("kind") == "NameTarget":
         target_name = _safe_ident(target_plan.get("id"), "item")
-        target_type = _java_type(target_plan.get("target_type"), allow_void=False)
+        raw_target_type = target_plan.get("target_type")
+        # enumerate expansion: target_type is tuple[int64, T] but iter is list[T]
+        if isinstance(raw_target_type, str) and raw_target_type.startswith("tuple["):
+            iter_resolved = iter_expr_any.get("resolved_type") if isinstance(iter_expr_any, dict) else ""
+            elem_parts = _split_type_args(iter_resolved, "list") if isinstance(iter_resolved, str) else []
+            if len(elem_parts) == 1:
+                target_type = _java_type(elem_parts[0], allow_void=False)
+            else:
+                target_type = _java_type(raw_target_type, allow_void=False)
+        else:
+            target_type = _java_type(raw_target_type, allow_void=False)
         if target_type == "void":
             target_type = "Object"
         base = iter_tmp + ".get((int)(" + idx_tmp + "))"
         rhs = _cast_from_object(base, target_type)
-        lines.append(indent + "    " + target_type + " " + target_name + " = " + rhs + ";")
+        if target_name in body_declared:
+            lines.append(indent + "    " + target_name + " = " + rhs + ";")
+        else:
+            lines.append(indent + "    " + target_type + " " + target_name + " = " + rhs + ";")
         body_declared.add(target_name)
         if target_type != "Object":
             body_types[target_name] = target_type
@@ -2402,6 +2461,17 @@ def _emit_stmt(stmt: Any, *, indent: str, ctx: dict[str, Any]) -> list[str]:
             declared.add(lhs)
             type_map[lhs] = decl_type
             return [indent + decl_type + " " + lhs + " = " + value + ";"]
+        if lhs not in declared:
+            decl_type = _java_type(sd2.get("decl_type"), allow_void=False)
+            if decl_type == "Object":
+                inferred = _infer_java_type_from_expr_node(value_expr, type_map)
+                if inferred != "Object":
+                    decl_type = inferred
+            if decl_type == "void":
+                decl_type = "Object"
+            declared.add(lhs)
+            type_map[lhs] = decl_type
+            return [indent + decl_type + " " + lhs + " = " + value + ";"]
         mapped_decl_any = type_map.get(lhs)
         mapped_decl = mapped_decl_any if isinstance(mapped_decl_any, str) else ""
         typed_ctor = _typed_empty_ctor(value_expr, mapped_decl)
@@ -2517,8 +2587,8 @@ def _emit_stmt(stmt: Any, *, indent: str, ctx: dict[str, Any]) -> list[str]:
         name = _safe_ident(sd2.get("name"), "v")
         var_type = _java_type(sd2.get("type"), allow_void=False)
         type_map = _type_map(ctx)
-        type_map[name] = var_type
         declared = _declared_set(ctx)
+        type_map[name] = var_type
         declared.add(name)
         return [indent + var_type + " " + name + " = " + _default_return_expr(var_type) + ";"]
 
@@ -2585,6 +2655,9 @@ def _emit_function_in_class(
     class_name: str | None,
 ) -> list[str]:
     name = _safe_ident(fn.get("name"), "func")
+    # Rename user-defined main() to avoid collision with Java's main(String[])
+    if name == "main" and not in_class:
+        name = "__pytra_main"
     return_type = _java_type(fn.get("return_type"), allow_void=True)
     is_static_method = not in_class
     is_constructor = False
@@ -2740,7 +2813,7 @@ def _emit_class(cls: dict[str, Any], *, indent: str) -> list[str]:
     return lines
 
 
-def transpile_to_java_native(east_doc: dict[str, Any], class_name: str = "Main") -> str:
+def transpile_to_java_native(east_doc: dict[str, Any], class_name: str = "Main", emit_main: bool = True) -> str:
     """Emit Java native source from EAST3 Module."""
     if not isinstance(east_doc, dict):
         raise RuntimeError("java native emitter: east_doc must be dict")
@@ -2810,7 +2883,8 @@ def transpile_to_java_native(east_doc: dict[str, Any], class_name: str = "Main")
             i += 1
 
         lines: list[str] = []
-        lines.append("public final class " + main_class + " {")
+        access = "public " if emit_main or not is_entry else ""
+        lines.append(access + "final class " + main_class + " {")
         lines.append("    private " + main_class + "() {")
         lines.append("    }")
         lines.append("")
@@ -2842,6 +2916,13 @@ def transpile_to_java_native(east_doc: dict[str, Any], class_name: str = "Main")
                     if field_type == "void":
                         field_type = "Object"
                     field_expr = nd.get("value")
+                    # extern() variable → delegate to __native class
+                    if _is_extern_call(field_expr):
+                        native_cls = _extern_native_class()
+                        lines.append("    public static " + field_type + " " + field_name + " = " + native_cls + "." + field_name + ";")
+                        module_static_field_names.add(field_name)
+                        i += 1
+                        continue
                     field_value = _render_expr(field_expr)
                     typed_ctor = _typed_empty_ctor(field_expr, field_type)
                     if isinstance(typed_ctor, str):
@@ -2880,7 +2961,7 @@ def transpile_to_java_native(east_doc: dict[str, Any], class_name: str = "Main")
             lines.extend(_emit_function(functions[i], indent="    ", in_class=False))
             i += 1
 
-        if is_entry:
+        if is_entry and emit_main:
             lines.append("")
             lines.append("    public static void main(String[] args) {")
             ctx: dict[str, Any] = {"tmp": 0}

@@ -122,7 +122,18 @@ def _expand_listcomp_assign(
 
     # Use the target name directly if possible, otherwise use a temp
     comp_name = target_name if target_name != "" else _next_comp_name()
-    stmts = _expand_listcomp_to_stmts(listcomp, comp_name)
+
+    # Propagate annotation type from AnnAssign if ListComp has unknown type
+    annotation_type = ""
+    if assign_stmt.get("kind") == "AnnAssign":
+        ann = assign_stmt.get("annotation")
+        if isinstance(ann, str) and ann != "" and "unknown" not in ann:
+            annotation_type = ann
+        elif isinstance(ann, dict):
+            ann_str = _safe_str(ann.get("resolved_type"))
+            if ann_str != "" and "unknown" not in ann_str:
+                annotation_type = ann_str
+    stmts = _expand_listcomp_to_stmts(listcomp, comp_name, annotation_type)
 
     # If we used a temp name, add final assignment
     if comp_name != target_name and target_name != "":
@@ -137,11 +148,15 @@ def _expand_listcomp_assign(
 def _expand_listcomp_to_stmts(
     listcomp: dict[str, Any],
     result_name: str,
+    annotation_type: str = "",
 ) -> list[dict[str, Any]]:
     """Expand a ListComp node into a list of statements."""
     resolved_type = _safe_str(listcomp.get("resolved_type"))
-    if resolved_type in ("", "unknown"):
-        resolved_type = "list[object]"
+    if resolved_type in ("", "unknown") or "unknown" in resolved_type:
+        if annotation_type != "":
+            resolved_type = annotation_type
+        elif resolved_type in ("", "unknown"):
+            resolved_type = "list[object]"
 
     # 1. Initialize empty list
     init: dict[str, Any] = {

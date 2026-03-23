@@ -24,6 +24,10 @@ def _transpile_cs(east_doc: dict) -> str:
     is_entry = emit_ctx.get("is_entry", False) if isinstance(emit_ctx, dict) else False
     module_id = emit_ctx.get("module_id", "") if isinstance(emit_ctx, dict) else ""
 
+    # §6: built_in モジュールは py_runtime が提供するため emit 不要
+    if module_id.startswith("pytra.built_in."):
+        return ""
+
     if is_entry:
         return transpile_to_csharp(east_doc, emit_main=True, class_name="Program")
     else:

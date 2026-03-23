@@ -18,10 +18,11 @@ def transpile_to_java(
     east_doc: dict[str, Any],
     js_entry_path: str = "Main.js",
     class_name: str = "Main",
+    emit_main: bool = True,
 ) -> str:
     """互換 API: native emitter へ委譲する。"""
     _ = js_entry_path
-    return transpile_to_java_native(east_doc, class_name=class_name)
+    return transpile_to_java_native(east_doc, class_name=class_name, emit_main=emit_main)
 
 
 __all__ = ["load_java_profile", "transpile_to_java", "transpile_to_java_native"]

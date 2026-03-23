@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 from toolchain.emit.common.emitter.code_emitter import (
+    build_import_alias_map,
     reject_backend_homogeneous_tuple_ellipsis_type_exprs,
     reject_backend_typed_vararg_signatures,
 )
@@ -60,6 +61,8 @@ _FUNCTION_NAMES: list[set[str]] = [set()]
 _RELATIVE_IMPORT_MODULE_ALIASES: list[dict[str, str]] = [{}]
 _RELATIVE_IMPORT_SYMBOL_ALIASES: list[dict[str, str]] = [{}]
 _PYTRA_MODULE_IMPORTS: list[set[str]] = [set()]
+_NATIVE_MOD_NAME: list[str] = [""]
+_IMPORT_ALIAS_MAP: list[dict[str, str]] = [{}]
 _INT_TYPES = {"int", "int64"}
 _FLOAT_TYPES = {"float", "float64"}
 _NIL_FREE_DECL_TYPES = {"int", "int64", "float", "float64", "bool", "str"}
@@ -311,44 +314,51 @@ def _collect_pytra_module_imports(east_doc: dict[str, Any]) -> set[str]:
     return result
 
 
-def _emit_import_stmt(stmt: dict[str, Any], indent: str) -> list[str]:
-    """Emit ``require_relative`` lines for pytra.* ImportFrom statements."""
-    kind = stmt.get("kind")
-    if kind != "ImportFrom":
-        return []
-    module_any = stmt.get("module")
-    module = module_any if isinstance(module_any, str) else ""
-    if not module.startswith("pytra."):
-        return []
+def _module_id_to_require_path(module_id: str) -> str:
+    """Convert a pytra module_id to a require_relative path (§3)."""
+    rel = module_id
+    if rel.startswith("pytra."):
+        rel = rel[len("pytra."):]
+    return rel.replace(".", "/")
+
+
+def _emit_import_stmts(east_doc: dict[str, Any], indent: str) -> list[str]:
+    """Emit ``require_relative`` lines using import_bindings metadata (§3, §7).
+
+    For each import binding, determines the module to require from:
+    - For submodule imports (local name in _PYTRA_MODULE_IMPORTS):
+      module_id + "." + export_name → require_relative path
+    - For symbol imports: module_id → require_relative path
+    """
+    meta = east_doc.get("meta")
+    meta_dict = meta if isinstance(meta, dict) else {}
+    bindings_any = meta_dict.get("import_bindings")
+    bindings = bindings_any if isinstance(bindings_any, list) else []
     lines: list[str] = []
-    names_any = stmt.get("names")
-    names = names_any if isinstance(names_any, list) else []
-    seen_subdirs: set[str] = set()
-    # "pytra.std.math" -> "math", "pytra.utils" -> use name, "pytra.utils.gif" -> "gif"
-    last_segment = module.rsplit(".", 1)[-1]
-    for entry in names:
-        if not isinstance(entry, dict):
+    seen_paths: set[str] = set()
+    for binding in bindings:
+        if not isinstance(binding, dict):
             continue
-        name = entry.get("name")
-        if not isinstance(name, str) or name == "":
+        module_id = binding.get("module_id", "")
+        export_name = binding.get("export_name", "")
+        local_name = binding.get("local_name", "")
+        if not isinstance(module_id, str) or module_id == "":
             continue
-        local = entry.get("asname")
-        if not isinstance(local, str) or local == "":
-            local = name
-        local_ident = _safe_ident(local, "mod")
+        if not module_id.startswith("pytra."):
+            continue
+        # Determine the target module to require.
+        # If local_name is a submodule (identified by _collect_pytra_module_imports),
+        # the file is at module_id + "." + export_name.
+        # Otherwise it's a symbol import and the file is at module_id.
+        local_ident = _safe_ident(local_name, "")
         if local_ident in _PYTRA_MODULE_IMPORTS[0]:
-            # Module import: from pytra.utils import png -> subdir = "png"
-            subdir = _safe_ident(name, "mod")
-        elif last_segment in ("utils", "std", "built_in"):
-            # from pytra.utils import png -> use name
-            subdir = _safe_ident(name, "mod")
+            target_module = module_id + "." + export_name
         else:
-            # Symbol import: from pytra.std.math import pi -> "math"
-            # from pytra.utils.gif import save_gif -> "gif"
-            subdir = _safe_ident(last_segment, "mod")
-        if subdir not in seen_subdirs:
-            lines.append(indent + 'require_relative "' + subdir + '/east"')
-            seen_subdirs.add(subdir)
+            target_module = module_id
+        req_path = _module_id_to_require_path(target_module)
+        if req_path not in seen_paths:
+            lines.append(indent + 'require_relative "' + req_path + '"')
+            seen_paths.add(req_path)
     return lines
 
 
@@ -889,10 +899,19 @@ def _render_attribute_expr(expr: dict[str, Any]) -> str:
         return _render_expr(expr.get("value")) + ".name"
     if runtime_call == "path_stem":
         return _render_expr(expr.get("value")) + ".stem"
+    adapter_kind_any_attr = expr.get("runtime_call_adapter_kind")
+    adapter_kind_attr = adapter_kind_any_attr if isinstance(adapter_kind_any_attr, str) else ""
+    is_extern_delegate_attr = adapter_kind_attr == "extern_delegate"
     runtime_symbol = _resolved_runtime_symbol(runtime_call, runtime_source)
+    if is_extern_delegate_attr and runtime_call != "":
+        dot = runtime_call.find(".")
+        if dot >= 0:
+            runtime_symbol = runtime_call[dot + 1:].strip()
+        else:
+            runtime_symbol = runtime_call.strip()
     if runtime_symbol != "":
         if _uses_zero_arg_runtime_value_getter(expr):
-            return runtime_symbol + "()"
+            return runtime_symbol
         return runtime_symbol
 
     value_any = expr.get("value")
@@ -1110,7 +1129,20 @@ def _render_call_expr(expr: dict[str, Any]) -> str:
             return "Path.new(\"\")"
         return "Path.new(" + ", ".join(rendered_path_args) + ")"
 
+    # Use runtime_call_adapter_kind to decide naming convention (S1).
+    # "extern_delegate" → bare function name (std/utils modules provide via __native delegation)
+    # "builtin" → __pytra_ prefix (py_runtime provides)
+    adapter_kind_any = expr.get("runtime_call_adapter_kind")
+    adapter_kind = adapter_kind_any if isinstance(adapter_kind_any, str) else ""
+    is_extern_delegate = adapter_kind == "extern_delegate"
     runtime_symbol = _resolved_runtime_symbol(runtime_call, runtime_source)
+    if is_extern_delegate and runtime_call != "":
+        # std module: use bare function name (e.g. perf_counter, sqrt)
+        dot = runtime_call.find(".")
+        if dot >= 0:
+            runtime_symbol = runtime_call[dot + 1:].strip()
+        else:
+            runtime_symbol = runtime_call.strip()
     if runtime_symbol != "":
         rendered_runtime_args = _render_positional_call_args(args)
         kw_runtime = _render_keyword_call_args(expr)
@@ -1175,6 +1207,27 @@ def _render_call_expr(expr: dict[str, Any]) -> str:
         if len(args) == 0:
             return "false"
         return _render_bool_cast(args[0])
+    if callee_name == "cast":
+        # cast(type, value) — type assertion / conversion
+        if len(args) >= 2:
+            type_arg = args[0]
+            val_arg = args[1]
+            type_name = ""
+            if isinstance(type_arg, dict) and type_arg.get("kind") == "Name":
+                type_name = _safe_ident(type_arg.get("id"), "")
+            if type_name == "str":
+                return "__pytra_str(" + _render_expr(val_arg) + ")"
+            if type_name == "int":
+                return _render_int_cast(val_arg)
+            if type_name == "float":
+                return _render_float_cast(val_arg)
+            if type_name == "bool":
+                return _render_bool_cast(val_arg)
+            # Class cast — Ruby is dynamically typed, just return value
+            return _render_expr(val_arg)
+        if len(args) == 1:
+            return _render_expr(args[0])
+        return "nil"
     if callee_name == "str":
         if len(args) == 0:
             return '""'
@@ -1714,6 +1767,8 @@ def _emit_stmt_list(stmts: list[Any], *, indent: str, ctx: dict[str, Any]) -> li
 
 
 def _emit_swap(stmt: Any, *, indent: str, ctx: dict[str, Any]) -> list[str]:
+    """Emit Name-to-Name swap.  Swap left/right are always Name nodes
+    (Subscript swaps are lowered to Assign sequences by EAST3)."""
     if not isinstance(stmt, dict):
         raise RuntimeError("ruby native emitter: unsupported Swap")
     sd2: dict[str, Any] = stmt
@@ -1871,7 +1926,7 @@ def _emit_stmt(stmt: Any, *, indent: str, ctx: dict[str, Any]) -> list[str]:
         return [indent + "next"]
 
     if kind == "Import" or kind == "ImportFrom":
-        return _emit_import_stmt(sd, indent)
+        return []  # require_relative is emitted at module top level
 
     if kind == "Raise":
         exc_any = sd.get("exc")
@@ -1929,7 +1984,35 @@ def _function_params(fn: dict[str, Any], *, drop_self: bool) -> list[str]:
     return out
 
 
+def _is_extern_function(fn: dict[str, Any]) -> bool:
+    """Check if function has @extern decorator."""
+    decorators = fn.get("decorators", [])
+    if isinstance(decorators, list) and "extern" in decorators:
+        return True
+    return False
+
+
+def _emit_extern_delegation(fn: dict[str, Any], *, indent: str) -> list[str]:
+    """Generate __native delegation code for an @extern function."""
+    name = _safe_ident(fn.get("name"), "func")
+    native_mod = _NATIVE_MOD_NAME[0]
+    if native_mod == "":
+        native_mod = "__native"
+    params = _function_params(fn, drop_self=False)
+    call_args = ", ".join(params)
+    if len(params) > 0:
+        lines = [indent + "def " + name + "(" + ", ".join(params) + ")"]
+        lines.append(indent + "  " + native_mod + "." + name + "(" + call_args + ")")
+    else:
+        lines = [indent + "def " + name]
+        lines.append(indent + "  " + native_mod + "." + name)
+    lines.append(indent + "end")
+    return lines
+
+
 def _emit_function(fn: dict[str, Any], *, indent: str, in_class: bool) -> list[str]:
+    if _is_extern_function(fn) and not in_class:
+        return _emit_extern_delegation(fn, indent=indent)
     name = _safe_ident(fn.get("name"), "func")
     if in_class and name == "__init__":
         name = "initialize"
@@ -2092,22 +2175,102 @@ def transpile_to_ruby_native(east_doc: dict[str, Any], *, is_submodule: bool = F
         _FUNCTION_NAMES[0].add(_safe_ident(functions[i].get("name"), "func"))
         i += 1
 
-    lines: list[str] = []
-    if not is_submodule:
-        lines.append("require_relative \"py_runtime\"")
-        # Emit require_relative for linked pytra submodules (e.g., png, time)
+    # Detect whether this module has @extern functions or extern() variables
+    has_extern = False
+    i = 0
+    while i < len(functions):
+        if _is_extern_function(functions[i]):
+            has_extern = True
+            break
+        i += 1
+    if not has_extern:
         i = 0
         while i < len(body_any):
             node = body_any[i]
-            if isinstance(node, dict):
-                import_lines = _emit_import_stmt(node, "")
-                lines.extend(import_lines)
+            if isinstance(node, dict) and node.get("kind") in ("AnnAssign", "Assign"):
+                val = node.get("value")
+                # Unwrap Unbox if present (EAST3 lowering wraps extern() in Unbox)
+                if isinstance(val, dict) and val.get("kind") == "Unbox":
+                    val = val.get("value", {})
+                if isinstance(val, dict) and val.get("kind") == "Call":
+                    func_node = val.get("func")
+                    if isinstance(func_node, dict) and func_node.get("id") == "extern":
+                        has_extern = True
+                        break
             i += 1
+
+    # Compute __native require path from emit_context
+    native_require = ""
+    if has_extern and is_submodule:
+        meta = east_doc.get("meta")
+        emit_ctx = meta.get("emit_context", {}) if isinstance(meta, dict) else {}
+        module_id = emit_ctx.get("module_id", "") if isinstance(emit_ctx, dict) else ""
+        if module_id != "":
+            clean_id = module_id.replace(".east", "")
+            canonical = canonical_runtime_module_id(clean_id)
+            parts = canonical.split(".")
+            if len(parts) > 1 and parts[0] == "pytra":
+                native_basename = parts[-1] + "_native"
+                native_require = native_basename
+
+    # Build import alias map (§7) and store for use during emit
+    meta = east_doc.get("meta")
+    meta_dict = meta if isinstance(meta, dict) else {}
+    _IMPORT_ALIAS_MAP[0] = build_import_alias_map(meta_dict)
+
+    lines: list[str] = []
+    if not is_submodule:
+        lines.append("require_relative \"built_in/py_runtime\"")
+        # Emit require_relative for linked pytra submodules using alias map (§7)
+        lines.extend(_emit_import_stmts(east_doc, ""))
+    native_mod_name = ""
+    if native_require != "":
+        lines.append("require_relative \"" + native_require + "\"")
+        # Determine the native module constant name from module_id
+        # e.g. pytra.std.time -> PytraNative_Std_Time
+        meta = east_doc.get("meta")
+        emit_ctx = meta.get("emit_context", {}) if isinstance(meta, dict) else {}
+        module_id = emit_ctx.get("module_id", "") if isinstance(emit_ctx, dict) else ""
+        clean_id = module_id.replace(".east", "")
+        canonical = canonical_runtime_module_id(clean_id)
+        if canonical.startswith("pytra."):
+            tail = canonical[len("pytra."):]
+        else:
+            tail = canonical
+        # Convert dot-separated path to Ruby constant: std.time -> Std_Time
+        native_parts = tail.split(".")
+        capitalized = [p[0:1].upper() + p[1:] if len(p) > 0 else "" for p in native_parts]
+        native_mod_name = "PytraNative_" + "_".join(capitalized)
+    _NATIVE_MOD_NAME[0] = native_mod_name
     lines.append("")
     module_comments = _module_leading_comment_lines(east_doc, "# ")
     if len(module_comments) > 0:
         lines.extend(module_comments)
         lines.append("")
+
+    # Emit extern() variable delegations
+    if has_extern and is_submodule:
+        i = 0
+        while i < len(body_any):
+            node = body_any[i]
+            if isinstance(node, dict) and node.get("kind") in ("AnnAssign", "Assign"):
+                val = node.get("value")
+                # Unwrap Unbox if present
+                if isinstance(val, dict) and val.get("kind") == "Unbox":
+                    val = val.get("value", {})
+                if isinstance(val, dict) and val.get("kind") == "Call":
+                    func_node = val.get("func")
+                    if isinstance(func_node, dict) and func_node.get("id") == "extern":
+                        target = node.get("target")
+                        var_name = ""
+                        if isinstance(target, dict) and target.get("kind") == "Name":
+                            var_name = _safe_ident(target.get("id"), "")
+                        if var_name != "":
+                            native_ref = native_mod_name if native_mod_name != "" else "__native"
+                            lines.append("def " + var_name)
+                            lines.append("  " + native_ref + "." + var_name)
+                            lines.append("end")
+            i += 1
 
     i = 0
     while i < len(classes):

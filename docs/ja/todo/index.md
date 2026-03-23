@@ -78,14 +78,58 @@
 
 文脈: [docs/ja/plans/p0-cpp-repo-root-and-import-alias-fix.md](../plans/p0-cpp-repo-root-and-import-alias-fix.md)
 
-1. [ ] [ID: P0-REPO-ROOT-IMPORT-FIX-S1] include path 生成の整合性確保（`_module_name_to_cpp_include` が `-I` フラグで解決可能なパスを生成することを保証）
+1. [x] [ID: P0-REPO-ROOT-IMPORT-FIX-S1] include path 生成の整合性確保（`_module_name_to_cpp_include` が `-I` フラグで解決可能なパスを生成することを保証）
 2. [x] [ID: P0-REPO-ROOT-IMPORT-FIX-S2] `REPO_ROOT` を `parents[5]` に修正する（S1 完了後）
 3. [x] [ID: P0-REPO-ROOT-IMPORT-FIX-S3] `_resolve_imported_symbol_cpp_target` で bare module name を正規化（`math` → `pytra.std.math`）
-4. [ ] [ID: P0-REPO-ROOT-IMPORT-FIX-S4] `build_multi_cpp.py` の generated source 自動リンク拡張
+4. [x] [ID: P0-REPO-ROOT-IMPORT-FIX-S4] `build_multi_cpp.py` の generated source 自動リンク拡張
 
 進捗:
 - 2026-03-22: conftest extern stripping 修正済み。runtime_symbol_index.json の utils module パス修正済み。
 - 2026-03-22: REPO_ROOT parents[5] + call.py normalize コミット済み。S2,S3 完了。テスト 234 passed (78%)。
+- 2026-03-23: S1 完了。user module include を CppEmitter から除去し multifile_writer に一元化。`_includes_from_resolved_dependencies` の `user_module_dependencies_v1` → `#include "helper.h"` 生成を停止。bare_parent_relative_import 等 3 テスト修正。
+- 2026-03-23: S4 完了。`build_multi_cpp.py` の `_collect_generated_cpp_sources` をハードコードリストから include 追跡ベースの自動リンクに変更。モジュールソースと include ヘッダーから `#include` を走査し、参照された generated `.cpp` のみをリンク。multi-file テスト 18/22 pass（残 4 件は P0-18 Object<T> 既存バグ）。
+
+#### P0-23: Rust backend コンテナ参照セマンティクス導入
+
+文脈: [docs/ja/plans/p0-rs-container-ref-semantics.md](../plans/p0-rs-container-ref-semantics.md)
+仕様: [docs/ja/spec/spec-emitter-guide.md §10](../spec/spec-emitter-guide.md#10-コンテナ参照セマンティクス要件)
+
+**フェーズ 1: runtime に PyList\<T\> 追加**
+
+1. [x] [ID: P0-RS-CONTAINER-REF-S1] `py_runtime.rs` に `PyList<T>` (`Rc<RefCell<Vec<T>>>`) + メソッド群を実装する。
+
+**フェーズ 2: emitter の list 型マッピング変更**
+
+2. [ ] [ID: P0-RS-CONTAINER-REF-S2] emitter の `list[T]` 型を `PyList<T>` で生成するように変更する（リテラル・宣言・append・添字・len・for ループ）。
+
+**フェーズ 3: §10.5 ヒント対応**
+
+3. [ ] [ID: P0-RS-CONTAINER-REF-S3] `container_value_locals_v1` ヒントを読み取り、ヒントありの変数は `Vec<T>` 値型に縮退する。
+
+**フェーズ 4: テスト・検証**
+
+4. [ ] [ID: P0-RS-CONTAINER-REF-S4] 既存 5 pass ケース（01-04 PNG + 17 テキスト）がリグレッションしないことを検証する。
+
+### P1: Dart emitter デッドコード除去
+
+文脈: [docs/ja/plans/p1-dart-dead-code-removal.md](../plans/p1-dart-dead-code-removal.md)
+
+1. [x] [ID: P1-DART-DEAD-CODE-S1] 旧方式のハードコード関数群（`_runtime_symbol_alias_expr` 等 14 関数）を削除する。
+2. [x] [ID: P1-DART-DEAD-CODE-S2] sample/py 全 18 ケースが Dart でバイナリ一致することを検証する。
+
+進捗:
+- 2026-03-23: S1-S2 完了。14 関数 + 未使用 import 削除。18/18 PASS。
+
+### P1: Dart emitter ランタイムヘルパー重複排除
+
+文脈: [docs/ja/plans/p1-dart-runtime-helper-dedup.md](../plans/p1-dart-runtime-helper-dedup.md)
+
+1. [x] [ID: P1-DART-HELPER-DEDUP-S1] `__pytraPrintRepr` 等のヘルパーを `py_runtime.dart` に集約する。
+2. [x] [ID: P1-DART-HELPER-DEDUP-S2] emitter のインライン生成メソッド（`_emit_print_helper` 等）を除去する。
+3. [x] [ID: P1-DART-HELPER-DEDUP-S3] sample/py 全 18 ケースが Dart でバイナリ一致することを検証する。
+
+進捗:
+- 2026-03-23: S1-S3 完了。`__pytra` prefix → `pytra` prefix（Dart `_` private 制約）。hand-written `std/pathlib.dart` 追加。`cast()` → `as` キャスト生成。18/18 PASS。
 
 ### P2: built-in 依存を EAST1 → linker 経由で解決
 
@@ -139,6 +183,74 @@
 進捗:
 - 2026-03-23: S1 tuple target の name_types 更新を `core_stmt_parser.py` に追加。S3 `_SH_IMPORT_SYMBOLS` チェックを `core_expr_attr_call_annotation.py` に追加。全 sample で VarDecl object/unknown と Assign unknown decl_type がゼロに。S2 は S1+S3 で自動解決。
 
+### P2: cast() の resolved_type 修正 + list.pop() の generic 解決
+
+1. [x] [ID: P2-CAST-POP-FIX-S1] `cast(T, value)` の Call.resolved_type に第 1 引数の型名を設定する
+2. [x] [ID: P2-CAST-POP-FIX-S2] `list[T].pop()` の戻り値型を要素型 `T` に解決する
+
+進捗:
+- 2026-03-23: S1 完了。`_sh_infer_known_name_call_return_type` に `cast` 分岐追加。`cast(Path, value)` → `Path`、`cast(str, value)` → `str`。
+- 2026-03-23: S2 完了。`_lookup_builtin_method_return` の `list` セクションに generic 解決追加。`list[int].pop()` → `int64`、`list[str].pop()` → `str`。
+
+### P2: runtime_call_adapter_kind 拡充 + extern_var_v1 実装
+
+1. [x] [ID: P2-ADAPTER-EXTERN-S1] `runtime_call_adapter_kind` を `runtime_module_id` の group から自動導出する（built_in → "builtin"、std/utils → "extern_delegate"）
+2. [x] [ID: P2-ADAPTER-EXTERN-S2] `extern_var_v1` の型注釈制約を緩和し `extern(expr)` フォールバック値もサポートする
+
+進捗:
+- 2026-03-23: S1 完了。`_set_runtime_binding_fields` に group ベースの adapter_kind 自動導出を追加。`perf_counter` → `extern_delegate`、`py_print` → `builtin` 等が自動設定。
+- 2026-03-23: S2 完了。`core_extern_semantics.py` の `annotation` 制約（Any/object のみ）を除去し、`extern(math.pi)` のような非 Constant 引数もサポート。`pi: float = extern(math.pi)` → `extern_var_v1` が付与されるように。
+
+### P2: verify_sample_outputs.py を除去し runtime_parity_check.py に統一する
+
+文脈: emitter guide §13（parity check の正本ツール）
+
+1. [x] [ID: P2-REMOVE-VERIFY-SAMPLE-S1] `regenerate_samples.py` の `--verify-cpp-on-diff` を `runtime_parity_check.py --targets cpp` に置換
+2. [x] [ID: P2-REMOVE-VERIFY-SAMPLE-S2] `verify_sample_outputs.py` を削除し、docs の参照を更新
+
+進捗:
+- 2026-03-23: S1-S2 完了。`verify_sample_outputs.py` を削除。`regenerate_samples.py` / `run_regen_on_version_bump.py` / `spec-tools.md` / `spec-emitter-guide.md` / `sample/README.md` / `sample/README-ja.md` を更新。
+
+### P2: C++ multi-file emit の runtime east パス解決修正
+
+1. [x] [ID: P2-CPP-RUNTIME-EAST-PATH-S1] `multifile_writer.py` の `_RUNTIME_EAST_ROOT_STR` / `_RUNTIME_CPP_ROOT_STR` の parents index を修正 + `gen_makefile_from_manifest.py` のパス解決を絶対パス化
+
+進捗:
+- 2026-03-23: `multifile_writer.py` の `parents[3]` → `parents[4]` 修正で runtime east モジュールが正しいラベル（`built_in/io_ops` 等）で emit されるように。`gen_makefile_from_manifest.py` のソースパス・include パス・obj パスを絶対パスに resolve し、`make -C emit/` 実行時のパス不一致を解消。@extern モジュールの欠落 .cpp をスキップ。
+- 2026-03-23: `program_writer.py` の `_PROJECT_ROOT` パス修正（`parents[3] / "src" / "runtime"` → `parents[3] / "runtime"`）で canonical generated ヘッダー（`generated/std/pathlib.h` 等）が正しくコピーされるように。runtime `.east` 再 transpile による `.tag` エラー解消。
+
+### P2: EAST3 型推論バグ修正（Nim 担当報告 4 件）
+
+1. [x] [ID: P2-NIM-EAST-FIX-S1] Swap left/right 空ノード修正（sample 12）— P2-SWAP-NAME-ONLY で解決済み
+2. [x] [ID: P2-NIM-EAST-FIX-S2] returns vs return_type 不整合修正（sample 18）
+3. [x] [ID: P2-NIM-EAST-FIX-S3] VarDecl name=None 不正ノード防止（sample 07）— 防御ガード追加 + 先行修正で解消済み
+4. [x] [ID: P2-NIM-EAST-FIX-S4] list[unknown] 空リスト初期化の型を後続 Assign から遡及解決（sample 07, 08, 09, 13）— 先行の型推論修正（P2-EAST-TYPE-FIX）で解消済み
+
+進捗:
+- 2026-03-23: S1 P2-SWAP-NAME-ONLY で解決済み。S2 type propagation に FunctionDef.returns 同期を追加。S3 VarDecl 生成に空名ガード追加。S4 先行修正で全 sample の list[unknown] がゼロに。
+
+### P2: runtime_parity_check.py の fixture 全言語対応
+
+1. [x] [ID: P2-FIXTURE-PARITY-S1] fixture の自動列挙（`--all-samples --case-root fixture`）と negative test（`ng_*`）のスキップ
+2. [x] [ID: P2-FIXTURE-PARITY-S2] emitter guide に fixture parity check の使い方を追記
+
+進捗:
+- 2026-03-23: S1 完了。`collect_fixture_case_stems()` を追加し `--all-samples --case-root fixture` で 131 fixture を自動列挙。`ng_*` は除外。S2 完了。emitter guide §13 に fixture parity の使い方とチェックリスト項目を追加。
+
+### P3: Nim emitter spec-emitter-guide 準拠改善
+
+文脈: [docs/ja/plans/p3-nim-emitter-spec-compliance.md](../plans/p3-nim-emitter-spec-compliance.md)
+仕様: [docs/ja/spec/spec-emitter-guide.md](../spec/spec-emitter-guide.md)
+
+1. [x] [ID: P3-NIM-SPEC-S1] `build_import_alias_map` を利用する（§7）
+2. [ ] [ID: P3-NIM-SPEC-S2] コンテナ参照セマンティクス導入（§10）— `ref seq[T]` ラッパー + `container_value_locals_v1` ヒント対応
+3. [x] [ID: P3-NIM-SPEC-S3] `yields_dynamic: true` の明示処理を追加する（§11）
+4. [ ] [ID: P3-NIM-SPEC-S4] `runtime_parity_check.py` に Nim toolchain を登録し全 18 sample PASS を達成する（§13）
+
+進捗:
+- 2026-03-23: 起票。§1/§2/§3/§4/§5.1/§6/§8/§9/§12 は修正済み。emitter パイプライン経由で 12/18 sample がバイナリ一致（残 6 件は EAST3 型推論不足）。
+- 2026-03-23: S1 完了（`build_import_alias_map` 導入）、S3 完了（`yields_dynamic` 明示対応）。残 S2（コンテナ ref）、S4（parity tool）。
+
 ### P3: pyobj list alias escape 解析を EAST3 パスへ移行
 
 文脈: [docs/ja/plans/p3-pyobj-list-escape-to-east3.md](../plans/p3-pyobj-list-escape-to-east3.md)
@@ -166,6 +278,28 @@
 
 1. [ ] [ID: P5-KOTLIN-PARITY-01] `runtime_parity_check.py --targets kotlin` で sample/py の全 18 ケースが PASS する。
 
+
+### P5: Callable 型サポート（func ノードの型付与 + 高階関数型推論）
+
+文脈: [docs/ja/plans/p5-callable-type-support.md](../plans/p5-callable-type-support.md)
+
+**フェーズ 1: 既知関数の func.resolved_type 設定**
+
+1. [ ] [ID: P5-CALLABLE-TYPE-S1] builtin 関数（`len`, `str`, `print` 等）の func ノードに `callable[戻り値型]` を設定する
+2. [ ] [ID: P5-CALLABLE-TYPE-S2] stdlib 関数（`math.sqrt`, `perf_counter` 等）の func ノードに `callable[戻り値型]` を設定する
+3. [ ] [ID: P5-CALLABLE-TYPE-S3] user-defined 関数の func ノードに `fn_return_types` から `callable[戻り値型]` を設定する
+
+**フェーズ 2: TypeExpr への CallableType 追加**
+
+4. [ ] [ID: P5-CALLABLE-TYPE-S4] `spec-east.md` §6.3 に `CallableType` kind を追加する
+5. [ ] [ID: P5-CALLABLE-TYPE-S5] `type_expr.py` に `CallableType` のパース・正規化を実装する
+6. [ ] [ID: P5-CALLABLE-TYPE-S6] フェーズ 1 の `callable[ret]` 簡易形を `CallableType` に置換する
+
+**フェーズ 3: 高階関数の型推論**
+
+7. [ ] [ID: P5-CALLABLE-TYPE-S7] `Callable[[T1, T2], R]` 型注釈のパースを実装する
+8. [ ] [ID: P5-CALLABLE-TYPE-S8] callable 型変数の間接呼び出し `f(x)` で `Call.resolved_type` を `CallableType.return_type` から導出する
+9. [ ] [ID: P5-CALLABLE-TYPE-S9] 高階関数パターンのテスト fixture を追加する
 
 ### P7: C++ test_py2cpp_features.py テストパス率改善
 

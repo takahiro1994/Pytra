@@ -1,7 +1,8 @@
-# Generated std/time.rb delegates host bindings through this native seam.
-# source: src/runtime/cs/std/time_native.cs (reference)
+# Hand-written native seam for pytra.std.time.
+# source: src/pytra/std/time.py
+# generated-by: manual (Ruby native runtime)
 
-module TimeNative
+module PytraNative_Std_Time
   def self.perf_counter
     Process.clock_gettime(Process::CLOCK_MONOTONIC)
   end

@@ -1,4 +1,6 @@
-require_relative "py_runtime"
+require_relative "built_in/py_runtime"
+require_relative "std/time"
+require_relative "utils/gif"
 
 
 # 08: Sample that outputs Langton's Ant trajectories as a GIF.
@@ -22,8 +24,13 @@ def run_08_langtons_ant()
   w = 420
   h = 420
   out_path = "sample/out/08_langtons_ant.gif"
-  start = __pytra_perf_counter()
-  grid = __pytra_list_comp_range(0, h, 1) { |__lc_i| ([0] * w) }
+  start = perf_counter()
+  grid = []
+  __loop_0 = 0
+  while __loop_0 < h
+    grid.append(([0] * w))
+    __loop_0 += 1
+  end
   x = w / 2
   y = h / 2
   d = 0
@@ -58,7 +65,7 @@ def run_08_langtons_ant()
     i += 1
   end
   save_gif(out_path, w, h, frames, grayscale_palette(), 5, 0)
-  elapsed = __pytra_perf_counter() - start
+  elapsed = perf_counter() - start
   __pytra_print("output:", out_path)
   __pytra_print("frames:", __pytra_len(frames))
   __pytra_print("elapsed_sec:", elapsed)

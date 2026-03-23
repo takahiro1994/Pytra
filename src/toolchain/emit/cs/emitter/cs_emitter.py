@@ -530,6 +530,32 @@ class CSharpEmitter(CodeEmitter):
             return "Pytra.CsModule"
         return module_name
 
+    def _resolve_cs_module_owner(self, module_name: str) -> str:
+        """module_id (canonical 形式) から C# の owner クラス名を統一的に解決する。
+
+        解決順: (1) _CS_CANONICAL_RUNTIME_OWNER_BY_MODULE (std, data-driven)
+                (2) pytra.utils.* → Pytra.CsModule.<tail>_helper (manifest 命名規則)
+                (3) pytra.core.*  → Pytra.CsModule.<tail>
+        built_in は py_runtime が提供するため空文字を返す。
+        """
+        # (1) Data-driven std mapping
+        owner = _CS_CANONICAL_RUNTIME_OWNER_BY_MODULE.get(module_name, "")
+        if isinstance(owner, str) and owner != "":
+            return owner
+        # (2)(3) Mechanical derivation from module_id structure
+        if not module_name.startswith("pytra."):
+            return ""
+        rel = module_name[len("pytra."):]
+        parts = rel.split(".")
+        if len(parts) < 2:
+            return ""
+        bucket = parts[0]
+        tail = parts[-1]
+        if bucket == "utils":
+            return "Pytra.CsModule." + tail + "_helper"
+        # built_in / core → empty (handled by py_runtime via profile runtime_calls)
+        return ""
+
     def _module_alias_target(self, module_id: str, export_name: str, binding_kind: str) -> str:
         """既知モジュール import を C# alias 先へ解決する。"""
         module_name = canonical_runtime_module_id(module_id.strip())
@@ -537,17 +563,18 @@ class CSharpEmitter(CodeEmitter):
             extern_owner = self._extern_runtime_module_owner(module_name)
             if extern_owner != "":
                 return extern_owner
-            if module_name == "pytra.utils":
+            owner = self._resolve_cs_module_owner(module_name)
+            if owner != "":
+                return owner
+            # pytra.utils (parent package) → namespace only
+            if module_name.startswith("pytra.") and len(module_name.split(".")) == 2:
                 return "Pytra.CsModule"
-            if module_name == "pytra.utils.png":
-                return "Pytra.CsModule.png_helper"
-            if module_name == "pytra.utils.gif":
-                return "Pytra.CsModule.gif_helper"
             return ""
         if binding_kind == "symbol":
-            if module_name == "pytra.std.pathlib" and export_name != "":
+            owner = self._resolve_cs_module_owner(module_name)
+            if owner != "" and export_name != "":
                 if len(export_name) > 0 and export_name[0].isupper():
-                    return "Pytra.CsModule.py_path"
+                    return owner
             return ""
         return ""
 
@@ -567,11 +594,7 @@ class CSharpEmitter(CodeEmitter):
         extern_owner = self._extern_runtime_module_owner(module_name)
         if extern_owner != "":
             return extern_owner
-        if module_name == "pytra.utils.png":
-            return "Pytra.CsModule.png_helper"
-        if module_name == "pytra.utils.gif":
-            return "Pytra.CsModule.gif_helper"
-        return ""
+        return self._resolve_cs_module_owner(module_name)
 
     def _walk_node_names(self, node: Any, out_names: set[str]) -> None:
         """ノード配下の Name.id を収集する（Import/ImportFrom 自身は除外）。"""
@@ -2075,6 +2098,7 @@ class CSharpEmitter(CodeEmitter):
         self.emit("}")
 
     def _emit_swap(self, stmt: dict[str, Any]) -> None:
+        # §9.1: Swap ノードの left/right は常に Name（Subscript swap は EAST3 で展開済み）
         left = self.render_expr(stmt.get("left"))
         right = self.render_expr(stmt.get("right"))
         tmp_name = self.next_tmp("__swap")
@@ -2627,7 +2651,16 @@ class CSharpEmitter(CodeEmitter):
         fn_name = self._safe_name(fn_name_raw)
         runtime_module_id = self.any_dict_get_str(expr, "runtime_module_id", "")
         runtime_symbol = self.any_dict_get_str(expr, "runtime_symbol", "")
-        runtime_owner = self._runtime_module_call_owner(runtime_module_id)
+        adapter_kind = self.any_dict_get_str(expr, "runtime_call_adapter_kind", "")
+        # §1: use runtime_call_adapter_kind to determine call owner
+        if adapter_kind == "extern_delegate":
+            runtime_owner = self._resolve_cs_module_owner(
+                canonical_runtime_module_id(runtime_module_id)
+            )
+        elif adapter_kind == "builtin":
+            runtime_owner = ""  # builtin → handled by runtime_call profile below
+        else:
+            runtime_owner = self._runtime_module_call_owner(runtime_module_id)
         if fn_name_raw == "main" and "__pytra_main" in self.top_function_names and "main" not in self.top_function_names:
             fn_name = "__pytra_main"
         imported_sym = self._resolve_imported_symbol(fn_name_raw)
@@ -2635,7 +2668,11 @@ class CSharpEmitter(CodeEmitter):
         imported_name = self.any_dict_get_str(imported_sym, "name", "")
         if fn_name_raw in self.class_names:
             return "new " + self._safe_name(fn_name_raw) + "(" + ", ".join(rendered_args) + ")"
-        if imported_mod == "pytra.std.pathlib" and imported_name == "Path":
+        # Constructor call for imported class (e.g. Path from pytra.std.pathlib)
+        imported_owner = self._resolve_cs_module_owner(imported_mod)
+        if imported_owner == "" and imported_mod != "":
+            imported_owner = self._runtime_module_call_owner(imported_mod)
+        if imported_owner != "" and imported_name != "" and len(imported_name) > 0 and imported_name[0].isupper():
             if len(rendered_args) == 0:
                 return "new " + fn_name + "(\"\")"
             return "new " + fn_name + "(" + ", ".join(rendered_args) + ")"

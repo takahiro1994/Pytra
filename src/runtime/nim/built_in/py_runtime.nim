@@ -3,7 +3,6 @@ import std/os
 import std/times
 import std/tables
 import std/strutils
-import std/math
 
 proc py_perf_counter*(): float =
   epochTime()
@@ -85,4 +84,5 @@ proc py_write_bytes*(f: File, data: seq[int]) =
       buf[i] = uint8(data[i] and 0xFF)
     discard f.writeBuffer(unsafeAddr buf[0], buf.len)
 
-include "image_runtime.nim"
+# Image functions (write_rgb_png, save_gif, grayscale_palette) are provided
+# by emitter-generated utils/png.nim and utils/gif.nim modules (§6).
