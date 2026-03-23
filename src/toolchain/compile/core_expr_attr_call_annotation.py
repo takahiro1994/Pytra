@@ -8,7 +8,7 @@ from typing import Any
 from toolchain.frontends.signature_registry import lookup_stdlib_method_return_type
 from toolchain.compile.core_entrypoints import _make_east_build_error
 from toolchain.compile.core_parse_context import _SH_IMPORT_MODULES, _SH_IMPORT_SYMBOLS, _SH_CLASS_BASE
-from toolchain.compile.core_runtime_call_semantics import _sh_annotate_runtime_method_call_expr
+from toolchain.compile.core_runtime_call_semantics import _sh_annotate_runtime_method_call_expr, _sh_annotate_noncpp_attr_call_expr
 
 
 class _ShExprAttrCallAnnotationMixin:
@@ -177,6 +177,16 @@ class _ShExprAttrCallAnnotationMixin:
         attr: str,
     ) -> dict[str, Any]:
         """Attribute callee annotation の適用を helper へ寄せる。"""
+        # import module 属性呼び出し（math.sin 等）は noncpp 経路で runtime annotation を付与
+        if self._is_import_module_attr_call(owner_expr):
+            _sh_annotate_noncpp_attr_call_expr(
+                payload,
+                owner_expr=owner_expr,
+                attr_name=attr,
+                import_modules=_SH_IMPORT_MODULES,
+                import_symbols=_SH_IMPORT_SYMBOLS,
+            )
+            return payload
         self._apply_runtime_method_call_expr_annotation(
             payload=payload,
             owner_expr=owner_expr,
@@ -184,3 +194,12 @@ class _ShExprAttrCallAnnotationMixin:
             attr=attr,
         )
         return payload
+
+    def _is_import_module_attr_call(self, owner_expr: dict[str, Any] | None) -> bool:
+        """owner が import module 名かどうかを判定する。"""
+        if not isinstance(owner_expr, dict):
+            return False
+        if owner_expr.get("kind") != "Name":
+            return False
+        owner_id = str(owner_expr.get("id", ""))
+        return owner_id in _SH_IMPORT_MODULES or owner_id in _SH_IMPORT_SYMBOLS

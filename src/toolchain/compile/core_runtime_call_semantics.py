@@ -289,6 +289,8 @@ def _sh_annotate_noncpp_attr_call_expr(
     if runtime_call == "":
         return payload
     binding_semantic_tag = lookup_runtime_binding_semantic_tag(runtime_owner, attr_name)
+    if binding_semantic_tag == "":
+        binding_semantic_tag = lookup_stdlib_method_semantic_tag(attr_name)
     _sh_annotate_resolved_runtime_expr(
         payload,
         runtime_call=runtime_call,

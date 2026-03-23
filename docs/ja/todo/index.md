@@ -89,6 +89,16 @@
 - 2026-03-23: S1 完了。user module include を CppEmitter から除去し multifile_writer に一元化。`_includes_from_resolved_dependencies` の `user_module_dependencies_v1` → `#include "helper.h"` 生成を停止。bare_parent_relative_import 等 3 テスト修正。
 - 2026-03-23: S4 完了。`build_multi_cpp.py` の `_collect_generated_cpp_sources` をハードコードリストから include 追跡ベースの自動リンクに変更。モジュールソースと include ヘッダーから `#include` を走査し、参照された generated `.cpp` のみをリンク。multi-file テスト 18/22 pass（残 4 件は P0-18 Object<T> 既存バグ）。
 
+#### P0-24: import モジュール属性呼び出し（math.* 等）の EAST3 runtime annotation 付与
+
+文脈: [docs/ja/plans/p0-math-stdlib-runtime-annotation.md](../plans/p0-math-stdlib-runtime-annotation.md)
+
+1. [x] [ID: P0-MATH-STDLIB-ANNOTATION-S1] `_apply_attr_call_expr_annotation` で owner が import module の場合に `_sh_annotate_noncpp_attr_call_expr` を呼ぶ配線を追加する
+2. [x] [ID: P0-MATH-STDLIB-ANNOTATION-S2] テスト追加 + 既存テストのリグレッションがないことを検証する
+
+進捗:
+- 2026-03-24: S1 完了。`_apply_attr_call_expr_annotation` に import module 判定を追加し、`_sh_annotate_noncpp_attr_call_expr` への配線を接続。`_sh_annotate_noncpp_attr_call_expr` 内で `lookup_runtime_binding_semantic_tag` が空の場合に `lookup_stdlib_method_semantic_tag` へのフォールバックを追加。math.sqrt(int) で `runtime_module_id=pytra.std.math`, `runtime_symbol=sqrt`, `semantic_tag=stdlib.method.sqrt`, `casts=[int64→float64]` が正しく設定されることを確認。全 18 sample の EAST3 生成 OK。C++ transpile は既存ベースラインと同一（4 OK / 14 FAIL = GIF リンク・Object<T> 既知バグ）。
+
 #### P0-23: Rust backend コンテナ参照セマンティクス導入
 
 文脈: [docs/ja/plans/p0-rs-container-ref-semantics.md](../plans/p0-rs-container-ref-semantics.md)
