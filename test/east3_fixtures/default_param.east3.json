@@ -1,0 +1,421 @@
+{
+  "kind": "Module",
+  "body": [
+    {
+      "kind": "FunctionDef",
+      "name": "greet",
+      "original_name": "greet",
+      "arg_types": {
+        "name": "str",
+        "greeting": "str"
+      },
+      "arg_order": [
+        "name",
+        "greeting"
+      ],
+      "arg_defaults": {
+        "greeting": {
+          "kind": "Constant",
+          "resolved_type": "str",
+          "value": "Hello"
+        }
+      },
+      "arg_index": {
+        "name": 0,
+        "greeting": 1
+      },
+      "return_type": "str",
+      "arg_usage": {
+        "name": "readonly",
+        "greeting": "readonly"
+      },
+      "renamed_symbols": {},
+      "docstring": null,
+      "body": [
+        {
+          "kind": "Return",
+          "value": {
+            "kind": "BinOp",
+            "resolved_type": "str",
+            "left": {
+              "kind": "BinOp",
+              "resolved_type": "str",
+              "left": {
+                "kind": "Name",
+                "resolved_type": "str",
+                "id": "greeting"
+              },
+              "op": "Add",
+              "right": {
+                "kind": "Constant",
+                "resolved_type": "str",
+                "value": " "
+              }
+            },
+            "op": "Add",
+            "right": {
+              "kind": "Name",
+              "resolved_type": "str",
+              "id": "name"
+            }
+          }
+        }
+      ],
+      "is_generator": 0,
+      "yield_value_type": "unknown",
+      "arg_type_exprs": {
+        "name": {
+          "kind": "NamedType",
+          "name": "str"
+        },
+        "greeting": {
+          "kind": "NamedType",
+          "name": "str"
+        }
+      },
+      "return_type_expr": {
+        "kind": "NamedType",
+        "name": "str"
+      },
+      "leading_comments": [],
+      "returns": "str"
+    },
+    {
+      "kind": "FunctionDef",
+      "name": "add",
+      "original_name": "add",
+      "arg_types": {
+        "a": "int64",
+        "b": "int64"
+      },
+      "arg_order": [
+        "a",
+        "b"
+      ],
+      "arg_defaults": {
+        "b": {
+          "kind": "Constant",
+          "resolved_type": "int64",
+          "value": 10
+        }
+      },
+      "arg_index": {
+        "a": 0,
+        "b": 1
+      },
+      "return_type": "int64",
+      "arg_usage": {
+        "a": "readonly",
+        "b": "readonly"
+      },
+      "renamed_symbols": {},
+      "docstring": null,
+      "body": [
+        {
+          "kind": "Return",
+          "value": {
+            "kind": "BinOp",
+            "resolved_type": "int64",
+            "left": {
+              "kind": "Name",
+              "resolved_type": "int64",
+              "id": "a"
+            },
+            "op": "Add",
+            "right": {
+              "kind": "Name",
+              "resolved_type": "int64",
+              "id": "b"
+            }
+          }
+        }
+      ],
+      "is_generator": 0,
+      "yield_value_type": "unknown",
+      "arg_type_exprs": {
+        "a": {
+          "kind": "NamedType",
+          "name": "int64"
+        },
+        "b": {
+          "kind": "NamedType",
+          "name": "int64"
+        }
+      },
+      "return_type_expr": {
+        "kind": "NamedType",
+        "name": "int64"
+      },
+      "leading_comments": [],
+      "returns": "int64"
+    }
+  ],
+  "main_guard_body": [
+    {
+      "kind": "Expr",
+      "value": {
+        "kind": "Call",
+        "resolved_type": "None",
+        "func": {
+          "kind": "Name",
+          "resolved_type": "unknown",
+          "id": "print"
+        },
+        "args": [
+          {
+            "kind": "Call",
+            "resolved_type": "str",
+            "func": {
+              "kind": "Name",
+              "resolved_type": "unknown",
+              "id": "greet"
+            },
+            "args": [
+              {
+                "kind": "Constant",
+                "resolved_type": "str",
+                "value": "world"
+              },
+              {
+                "kind": "Constant",
+                "resolved_type": "str",
+                "value": "Hello"
+              }
+            ],
+            "keywords": [],
+            "type_expr_summary_v1": {
+              "schema_version": 1,
+              "kind": "NamedType",
+              "category": "static",
+              "mirror": "str"
+            }
+          }
+        ],
+        "keywords": [],
+        "lowered_kind": "BuiltinCall",
+        "builtin_name": "print",
+        "runtime_call": "py_print",
+        "runtime_module_id": "pytra.built_in.io_ops",
+        "runtime_symbol": "py_print",
+        "runtime_call_adapter_kind": "builtin",
+        "semantic_tag": "core.print",
+        "type_expr_summary_v1": {
+          "schema_version": 1,
+          "kind": "NamedType",
+          "category": "static",
+          "mirror": "None"
+        }
+      },
+      "discard_result": true
+    },
+    {
+      "kind": "Expr",
+      "value": {
+        "kind": "Call",
+        "resolved_type": "None",
+        "func": {
+          "kind": "Name",
+          "resolved_type": "unknown",
+          "id": "print"
+        },
+        "args": [
+          {
+            "kind": "Call",
+            "resolved_type": "str",
+            "func": {
+              "kind": "Name",
+              "resolved_type": "unknown",
+              "id": "greet"
+            },
+            "args": [
+              {
+                "kind": "Constant",
+                "resolved_type": "str",
+                "value": "world"
+              },
+              {
+                "kind": "Constant",
+                "resolved_type": "str",
+                "value": "Hi"
+              }
+            ],
+            "keywords": [],
+            "type_expr_summary_v1": {
+              "schema_version": 1,
+              "kind": "NamedType",
+              "category": "static",
+              "mirror": "str"
+            }
+          }
+        ],
+        "keywords": [],
+        "lowered_kind": "BuiltinCall",
+        "builtin_name": "print",
+        "runtime_call": "py_print",
+        "runtime_module_id": "pytra.built_in.io_ops",
+        "runtime_symbol": "py_print",
+        "runtime_call_adapter_kind": "builtin",
+        "semantic_tag": "core.print",
+        "type_expr_summary_v1": {
+          "schema_version": 1,
+          "kind": "NamedType",
+          "category": "static",
+          "mirror": "None"
+        }
+      },
+      "discard_result": true
+    },
+    {
+      "kind": "Expr",
+      "value": {
+        "kind": "Call",
+        "resolved_type": "None",
+        "func": {
+          "kind": "Name",
+          "resolved_type": "unknown",
+          "id": "print"
+        },
+        "args": [
+          {
+            "kind": "Call",
+            "resolved_type": "int64",
+            "func": {
+              "kind": "Name",
+              "resolved_type": "unknown",
+              "id": "add"
+            },
+            "args": [
+              {
+                "kind": "Constant",
+                "resolved_type": "int64",
+                "value": 5
+              },
+              {
+                "kind": "Constant",
+                "resolved_type": "int64",
+                "value": 10
+              }
+            ],
+            "keywords": [],
+            "type_expr_summary_v1": {
+              "schema_version": 1,
+              "kind": "NamedType",
+              "category": "static",
+              "mirror": "int64"
+            }
+          }
+        ],
+        "keywords": [],
+        "lowered_kind": "BuiltinCall",
+        "builtin_name": "print",
+        "runtime_call": "py_print",
+        "runtime_module_id": "pytra.built_in.io_ops",
+        "runtime_symbol": "py_print",
+        "runtime_call_adapter_kind": "builtin",
+        "semantic_tag": "core.print",
+        "type_expr_summary_v1": {
+          "schema_version": 1,
+          "kind": "NamedType",
+          "category": "static",
+          "mirror": "None"
+        }
+      },
+      "discard_result": true
+    },
+    {
+      "kind": "Expr",
+      "value": {
+        "kind": "Call",
+        "resolved_type": "None",
+        "func": {
+          "kind": "Name",
+          "resolved_type": "unknown",
+          "id": "print"
+        },
+        "args": [
+          {
+            "kind": "Call",
+            "resolved_type": "int64",
+            "func": {
+              "kind": "Name",
+              "resolved_type": "unknown",
+              "id": "add"
+            },
+            "args": [
+              {
+                "kind": "Constant",
+                "resolved_type": "int64",
+                "value": 5
+              },
+              {
+                "kind": "Constant",
+                "resolved_type": "int64",
+                "value": 20
+              }
+            ],
+            "keywords": [],
+            "type_expr_summary_v1": {
+              "schema_version": 1,
+              "kind": "NamedType",
+              "category": "static",
+              "mirror": "int64"
+            }
+          }
+        ],
+        "keywords": [],
+        "lowered_kind": "BuiltinCall",
+        "builtin_name": "print",
+        "runtime_call": "py_print",
+        "runtime_module_id": "pytra.built_in.io_ops",
+        "runtime_symbol": "py_print",
+        "runtime_call_adapter_kind": "builtin",
+        "semantic_tag": "core.print",
+        "type_expr_summary_v1": {
+          "schema_version": 1,
+          "kind": "NamedType",
+          "category": "static",
+          "mirror": "None"
+        }
+      },
+      "discard_result": true
+    }
+  ],
+  "renamed_symbols": {},
+  "meta": {
+    "parser_backend": "self_hosted",
+    "import_resolution": {
+      "schema_version": 1,
+      "bindings": [
+        {
+          "module_id": "pytra.built_in.io_ops",
+          "export_name": "",
+          "local_name": "pytra.built_in.io_ops",
+          "binding_kind": "implicit_builtin",
+          "source_file": "/workspace/Pytra/test/fixtures/core/default_param.py",
+          "source_line": 0,
+          "source_module_id": "pytra.built_in.io_ops",
+          "source_binding_kind": "implicit_builtin",
+          "runtime_module_id": "pytra.built_in.io_ops",
+          "runtime_group": "built_in"
+        }
+      ],
+      "qualified_refs": []
+    },
+    "import_bindings": [
+      {
+        "module_id": "pytra.built_in.io_ops",
+        "export_name": "",
+        "local_name": "pytra.built_in.io_ops",
+        "binding_kind": "implicit_builtin",
+        "source_file": "/workspace/Pytra/test/fixtures/core/default_param.py",
+        "source_line": 0
+      }
+    ],
+    "qualified_symbol_refs": [],
+    "import_modules": {},
+    "import_symbols": {},
+    "dispatch_mode": "native"
+  },
+  "east_stage": 3,
+  "schema_version": 1
+}

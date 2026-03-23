@@ -1,0 +1,396 @@
+{
+  "kind": "Module",
+  "body": [
+    {
+      "kind": "ImportFrom",
+      "module": "pytra.utils.assertions",
+      "names": [
+        {
+          "name": "py_assert_stdout",
+          "asname": null
+        }
+      ],
+      "level": 0
+    },
+    {
+      "kind": "FunctionDef",
+      "name": "swap_sum_18",
+      "original_name": "swap_sum_18",
+      "arg_types": {
+        "a": "int64",
+        "b": "int64"
+      },
+      "arg_order": [
+        "a",
+        "b"
+      ],
+      "arg_defaults": {},
+      "arg_index": {
+        "a": 0,
+        "b": 1
+      },
+      "return_type": "int64",
+      "arg_usage": {
+        "a": "readonly",
+        "b": "readonly"
+      },
+      "renamed_symbols": {},
+      "docstring": null,
+      "body": [
+        {
+          "kind": "AnnAssign",
+          "target": {
+            "kind": "Name",
+            "resolved_type": "int64",
+            "id": "x",
+            "type_expr": {
+              "kind": "NamedType",
+              "name": "int64"
+            }
+          },
+          "annotation": "int64",
+          "declare": true,
+          "decl_type": "int64",
+          "annotation_type_expr": {
+            "kind": "NamedType",
+            "name": "int64"
+          },
+          "decl_type_expr": {
+            "kind": "NamedType",
+            "name": "int64"
+          },
+          "value": {
+            "kind": "Name",
+            "resolved_type": "int64",
+            "id": "a"
+          },
+          "type_expr_summary_v1": {
+            "schema_version": 1,
+            "kind": "NamedType",
+            "category": "static",
+            "mirror": "int64"
+          }
+        },
+        {
+          "kind": "AnnAssign",
+          "target": {
+            "kind": "Name",
+            "resolved_type": "int64",
+            "id": "y",
+            "type_expr": {
+              "kind": "NamedType",
+              "name": "int64"
+            }
+          },
+          "annotation": "int64",
+          "declare": true,
+          "decl_type": "int64",
+          "annotation_type_expr": {
+            "kind": "NamedType",
+            "name": "int64"
+          },
+          "decl_type_expr": {
+            "kind": "NamedType",
+            "name": "int64"
+          },
+          "value": {
+            "kind": "Name",
+            "resolved_type": "int64",
+            "id": "b"
+          },
+          "type_expr_summary_v1": {
+            "schema_version": 1,
+            "kind": "NamedType",
+            "category": "static",
+            "mirror": "int64"
+          }
+        },
+        {
+          "kind": "Swap",
+          "left": {
+            "kind": "Name",
+            "resolved_type": "int64",
+            "id": "x"
+          },
+          "right": {
+            "kind": "Name",
+            "resolved_type": "int64",
+            "id": "y"
+          }
+        },
+        {
+          "kind": "Return",
+          "value": {
+            "kind": "BinOp",
+            "resolved_type": "int64",
+            "left": {
+              "kind": "Name",
+              "resolved_type": "int64",
+              "id": "x"
+            },
+            "op": "Add",
+            "right": {
+              "kind": "Name",
+              "resolved_type": "int64",
+              "id": "y"
+            }
+          }
+        }
+      ],
+      "is_generator": 0,
+      "yield_value_type": "unknown",
+      "arg_type_exprs": {
+        "a": {
+          "kind": "NamedType",
+          "name": "int64"
+        },
+        "b": {
+          "kind": "NamedType",
+          "name": "int64"
+        }
+      },
+      "return_type_expr": {
+        "kind": "NamedType",
+        "name": "int64"
+      },
+      "leading_comments": [
+        "This file contains test/implementation code for `test/fixtures/tuple_assign.py`.",
+        "Reader-facing comments are added to make roles easier to understand.",
+        "When modifying this file, always verify consistency with existing specs and test results."
+      ],
+      "returns": "int64"
+    },
+    {
+      "kind": "FunctionDef",
+      "name": "_case_main",
+      "original_name": "_case_main",
+      "arg_types": {},
+      "arg_order": [],
+      "arg_defaults": {},
+      "arg_index": {},
+      "return_type": "None",
+      "arg_usage": {},
+      "renamed_symbols": {},
+      "docstring": null,
+      "body": [
+        {
+          "kind": "Expr",
+          "value": {
+            "kind": "Call",
+            "resolved_type": "None",
+            "func": {
+              "kind": "Name",
+              "resolved_type": "unknown",
+              "id": "print"
+            },
+            "args": [
+              {
+                "kind": "Call",
+                "resolved_type": "int64",
+                "func": {
+                  "kind": "Name",
+                  "resolved_type": "unknown",
+                  "id": "swap_sum_18"
+                },
+                "args": [
+                  {
+                    "kind": "Constant",
+                    "resolved_type": "int64",
+                    "value": 10
+                  },
+                  {
+                    "kind": "Constant",
+                    "resolved_type": "int64",
+                    "value": 20
+                  }
+                ],
+                "keywords": [],
+                "type_expr_summary_v1": {
+                  "schema_version": 1,
+                  "kind": "NamedType",
+                  "category": "static",
+                  "mirror": "int64"
+                }
+              }
+            ],
+            "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "print",
+            "runtime_call": "py_print",
+            "runtime_module_id": "pytra.built_in.io_ops",
+            "runtime_symbol": "py_print",
+            "runtime_call_adapter_kind": "builtin",
+            "semantic_tag": "core.print",
+            "type_expr_summary_v1": {
+              "schema_version": 1,
+              "kind": "NamedType",
+              "category": "static",
+              "mirror": "None"
+            }
+          }
+        }
+      ],
+      "is_generator": 0,
+      "yield_value_type": "unknown",
+      "arg_type_exprs": {},
+      "return_type_expr": {
+        "kind": "NamedType",
+        "name": "None"
+      },
+      "leading_comments": [],
+      "returns": "None"
+    }
+  ],
+  "main_guard_body": [
+    {
+      "kind": "Expr",
+      "value": {
+        "kind": "Call",
+        "resolved_type": "None",
+        "func": {
+          "kind": "Name",
+          "resolved_type": "unknown",
+          "id": "print"
+        },
+        "args": [
+          {
+            "kind": "Call",
+            "resolved_type": "unknown",
+            "func": {
+              "kind": "Name",
+              "resolved_type": "unknown",
+              "id": "py_assert_stdout"
+            },
+            "args": [
+              {
+                "kind": "List",
+                "resolved_type": "list[str]",
+                "elements": [
+                  {
+                    "kind": "Constant",
+                    "resolved_type": "str",
+                    "value": "30"
+                  }
+                ]
+              },
+              {
+                "kind": "Name",
+                "resolved_type": "callable[[],None]",
+                "id": "_case_main"
+              }
+            ],
+            "keywords": [],
+            "resolved_runtime_call": "py_assert_stdout",
+            "resolved_runtime_source": "import_symbol",
+            "runtime_module_id": "pytra.utils.assertions",
+            "runtime_symbol": "py_assert_stdout",
+            "runtime_call_adapter_kind": "extern_delegate",
+            "type_expr_summary_v1": {
+              "schema_version": 1,
+              "kind": "DynamicType",
+              "category": "dynamic",
+              "mirror": "unknown",
+              "dynamic_name": "unknown"
+            }
+          }
+        ],
+        "keywords": [],
+        "lowered_kind": "BuiltinCall",
+        "builtin_name": "print",
+        "runtime_call": "py_print",
+        "runtime_module_id": "pytra.built_in.io_ops",
+        "runtime_symbol": "py_print",
+        "runtime_call_adapter_kind": "builtin",
+        "semantic_tag": "core.print",
+        "type_expr_summary_v1": {
+          "schema_version": 1,
+          "kind": "NamedType",
+          "category": "static",
+          "mirror": "None"
+        }
+      },
+      "discard_result": true
+    }
+  ],
+  "renamed_symbols": {},
+  "meta": {
+    "parser_backend": "self_hosted",
+    "import_resolution": {
+      "schema_version": 1,
+      "bindings": [
+        {
+          "module_id": "pytra.utils.assertions",
+          "export_name": "py_assert_stdout",
+          "local_name": "py_assert_stdout",
+          "binding_kind": "symbol",
+          "source_file": "/workspace/Pytra/test/fixtures/core/tuple_assign.py",
+          "source_line": 6,
+          "source_module_id": "pytra.utils.assertions",
+          "source_export_name": "py_assert_stdout",
+          "source_binding_kind": "symbol",
+          "runtime_module_id": "pytra.utils.assertions",
+          "runtime_group": "utils",
+          "resolved_binding_kind": "symbol",
+          "runtime_symbol": "py_assert_stdout",
+          "runtime_symbol_kind": "function",
+          "runtime_symbol_dispatch": "function",
+          "runtime_semantic_tag": "stdlib.fn.py_assert_stdout"
+        },
+        {
+          "module_id": "pytra.built_in.io_ops",
+          "export_name": "",
+          "local_name": "pytra.built_in.io_ops",
+          "binding_kind": "implicit_builtin",
+          "source_file": "/workspace/Pytra/test/fixtures/core/tuple_assign.py",
+          "source_line": 0,
+          "source_module_id": "pytra.built_in.io_ops",
+          "source_binding_kind": "implicit_builtin",
+          "runtime_module_id": "pytra.built_in.io_ops",
+          "runtime_group": "built_in"
+        }
+      ],
+      "qualified_refs": [
+        {
+          "module_id": "pytra.utils.assertions",
+          "symbol": "py_assert_stdout",
+          "local_name": "py_assert_stdout"
+        }
+      ]
+    },
+    "import_bindings": [
+      {
+        "module_id": "pytra.utils.assertions",
+        "export_name": "py_assert_stdout",
+        "local_name": "py_assert_stdout",
+        "binding_kind": "symbol",
+        "source_file": "/workspace/Pytra/test/fixtures/core/tuple_assign.py",
+        "source_line": 6
+      },
+      {
+        "module_id": "pytra.built_in.io_ops",
+        "export_name": "",
+        "local_name": "pytra.built_in.io_ops",
+        "binding_kind": "implicit_builtin",
+        "source_file": "/workspace/Pytra/test/fixtures/core/tuple_assign.py",
+        "source_line": 0
+      }
+    ],
+    "qualified_symbol_refs": [
+      {
+        "module_id": "pytra.utils.assertions",
+        "symbol": "py_assert_stdout",
+        "local_name": "py_assert_stdout"
+      }
+    ],
+    "import_modules": {},
+    "import_symbols": {
+      "py_assert_stdout": {
+        "module": "pytra.utils.assertions",
+        "name": "py_assert_stdout"
+      }
+    },
+    "dispatch_mode": "native"
+  },
+  "east_stage": 3,
+  "schema_version": 1
+}

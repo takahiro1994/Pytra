@@ -1,0 +1,670 @@
+{
+  "kind": "Module",
+  "body": [
+    {
+      "kind": "FunctionDef",
+      "name": "run_case",
+      "original_name": "run_case",
+      "arg_types": {},
+      "arg_order": [],
+      "arg_defaults": {},
+      "arg_index": {},
+      "return_type": "None",
+      "arg_usage": {},
+      "renamed_symbols": {},
+      "docstring": null,
+      "body": [
+        {
+          "kind": "AnnAssign",
+          "target": {
+            "kind": "Name",
+            "resolved_type": "dict[str,int64]",
+            "id": "d",
+            "type_expr": {
+              "kind": "GenericType",
+              "base": "dict",
+              "args": [
+                {
+                  "kind": "NamedType",
+                  "name": "str"
+                },
+                {
+                  "kind": "NamedType",
+                  "name": "int64"
+                }
+              ]
+            }
+          },
+          "annotation": "dict[str,int64]",
+          "declare": true,
+          "decl_type": "dict[str,int64]",
+          "annotation_type_expr": {
+            "kind": "GenericType",
+            "base": "dict",
+            "args": [
+              {
+                "kind": "NamedType",
+                "name": "str"
+              },
+              {
+                "kind": "NamedType",
+                "name": "int64"
+              }
+            ]
+          },
+          "decl_type_expr": {
+            "kind": "GenericType",
+            "base": "dict",
+            "args": [
+              {
+                "kind": "NamedType",
+                "name": "str"
+              },
+              {
+                "kind": "NamedType",
+                "name": "int64"
+              }
+            ]
+          },
+          "value": {
+            "kind": "Dict",
+            "resolved_type": "dict[str,int64]",
+            "entries": [
+              {
+                "key": {
+                  "kind": "Constant",
+                  "resolved_type": "str",
+                  "value": "a"
+                },
+                "value": {
+                  "kind": "Constant",
+                  "resolved_type": "int64",
+                  "value": 1
+                }
+              },
+              {
+                "key": {
+                  "kind": "Constant",
+                  "resolved_type": "str",
+                  "value": "b"
+                },
+                "value": {
+                  "kind": "Constant",
+                  "resolved_type": "int64",
+                  "value": 2
+                }
+              }
+            ]
+          },
+          "type_expr_summary_v1": {
+            "schema_version": 1,
+            "kind": "GenericType",
+            "category": "static",
+            "mirror": "dict[str,int64]"
+          }
+        },
+        {
+          "kind": "AnnAssign",
+          "target": {
+            "kind": "Name",
+            "resolved_type": "bool",
+            "id": "ok_get_default",
+            "type_expr": {
+              "kind": "NamedType",
+              "name": "bool"
+            }
+          },
+          "annotation": "bool",
+          "declare": true,
+          "decl_type": "bool",
+          "annotation_type_expr": {
+            "kind": "NamedType",
+            "name": "bool"
+          },
+          "decl_type_expr": {
+            "kind": "NamedType",
+            "name": "bool"
+          },
+          "value": {
+            "kind": "Compare",
+            "resolved_type": "bool",
+            "left": {
+              "kind": "Call",
+              "resolved_type": "int64",
+              "func": {
+                "kind": "Attribute",
+                "resolved_type": "unknown",
+                "value": {
+                  "kind": "Name",
+                  "resolved_type": "dict[str,int64]",
+                  "id": "d"
+                },
+                "attr": "get"
+              },
+              "args": [
+                {
+                  "kind": "Constant",
+                  "resolved_type": "str",
+                  "value": "x"
+                },
+                {
+                  "kind": "Constant",
+                  "resolved_type": "int64",
+                  "value": 99
+                }
+              ],
+              "keywords": [],
+              "semantic_tag": "container.dict.get",
+              "lowered_kind": "BuiltinCall",
+              "builtin_name": "get",
+              "runtime_call": "dict.get",
+              "runtime_module_id": "pytra.core.dict",
+              "runtime_symbol": "dict.get",
+              "runtime_call_adapter_kind": "builtin",
+              "runtime_owner": {
+                "kind": "Name",
+                "resolved_type": "dict[str,int64]",
+                "id": "d"
+              },
+              "yields_dynamic": true,
+              "type_expr_summary_v1": {
+                "schema_version": 1,
+                "kind": "NamedType",
+                "category": "static",
+                "mirror": "int64"
+              }
+            },
+            "ops": [
+              "Eq"
+            ],
+            "comparators": [
+              {
+                "kind": "Constant",
+                "resolved_type": "int64",
+                "value": 99
+              }
+            ]
+          },
+          "type_expr_summary_v1": {
+            "schema_version": 1,
+            "kind": "NamedType",
+            "category": "static",
+            "mirror": "bool"
+          }
+        },
+        {
+          "kind": "AnnAssign",
+          "target": {
+            "kind": "Name",
+            "resolved_type": "bool",
+            "id": "ok_get_exist",
+            "type_expr": {
+              "kind": "NamedType",
+              "name": "bool"
+            }
+          },
+          "annotation": "bool",
+          "declare": true,
+          "decl_type": "bool",
+          "annotation_type_expr": {
+            "kind": "NamedType",
+            "name": "bool"
+          },
+          "decl_type_expr": {
+            "kind": "NamedType",
+            "name": "bool"
+          },
+          "value": {
+            "kind": "Compare",
+            "resolved_type": "bool",
+            "left": {
+              "kind": "Call",
+              "resolved_type": "int64",
+              "func": {
+                "kind": "Attribute",
+                "resolved_type": "unknown",
+                "value": {
+                  "kind": "Name",
+                  "resolved_type": "dict[str,int64]",
+                  "id": "d"
+                },
+                "attr": "get"
+              },
+              "args": [
+                {
+                  "kind": "Constant",
+                  "resolved_type": "str",
+                  "value": "a"
+                },
+                {
+                  "kind": "Constant",
+                  "resolved_type": "int64",
+                  "value": 0
+                }
+              ],
+              "keywords": [],
+              "semantic_tag": "container.dict.get",
+              "lowered_kind": "BuiltinCall",
+              "builtin_name": "get",
+              "runtime_call": "dict.get",
+              "runtime_module_id": "pytra.core.dict",
+              "runtime_symbol": "dict.get",
+              "runtime_call_adapter_kind": "builtin",
+              "runtime_owner": {
+                "kind": "Name",
+                "resolved_type": "dict[str,int64]",
+                "id": "d"
+              },
+              "yields_dynamic": true,
+              "type_expr_summary_v1": {
+                "schema_version": 1,
+                "kind": "NamedType",
+                "category": "static",
+                "mirror": "int64"
+              }
+            },
+            "ops": [
+              "Eq"
+            ],
+            "comparators": [
+              {
+                "kind": "Constant",
+                "resolved_type": "int64",
+                "value": 1
+              }
+            ]
+          },
+          "type_expr_summary_v1": {
+            "schema_version": 1,
+            "kind": "NamedType",
+            "category": "static",
+            "mirror": "bool"
+          }
+        },
+        {
+          "kind": "AnnAssign",
+          "target": {
+            "kind": "Name",
+            "resolved_type": "list[str]",
+            "id": "ks",
+            "type_expr": {
+              "kind": "GenericType",
+              "base": "list",
+              "args": [
+                {
+                  "kind": "NamedType",
+                  "name": "str"
+                }
+              ]
+            }
+          },
+          "annotation": "list[str]",
+          "declare": true,
+          "decl_type": "list[str]",
+          "annotation_type_expr": {
+            "kind": "GenericType",
+            "base": "list",
+            "args": [
+              {
+                "kind": "NamedType",
+                "name": "str"
+              }
+            ]
+          },
+          "decl_type_expr": {
+            "kind": "GenericType",
+            "base": "list",
+            "args": [
+              {
+                "kind": "NamedType",
+                "name": "str"
+              }
+            ]
+          },
+          "value": {
+            "kind": "Call",
+            "resolved_type": "list[str]",
+            "func": {
+              "kind": "Attribute",
+              "resolved_type": "unknown",
+              "value": {
+                "kind": "Name",
+                "resolved_type": "dict[str,int64]",
+                "id": "d"
+              },
+              "attr": "keys"
+            },
+            "args": [],
+            "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "keys",
+            "runtime_call": "dict.keys",
+            "runtime_module_id": "pytra.core.dict",
+            "runtime_symbol": "dict.keys",
+            "runtime_call_adapter_kind": "builtin",
+            "semantic_tag": "stdlib.method.keys",
+            "runtime_owner": {
+              "kind": "Name",
+              "resolved_type": "dict[str,int64]",
+              "id": "d"
+            },
+            "type_expr_summary_v1": {
+              "schema_version": 1,
+              "kind": "GenericType",
+              "category": "static",
+              "mirror": "list[str]"
+            }
+          },
+          "type_expr_summary_v1": {
+            "schema_version": 1,
+            "kind": "GenericType",
+            "category": "static",
+            "mirror": "list[str]"
+          }
+        },
+        {
+          "kind": "AnnAssign",
+          "target": {
+            "kind": "Name",
+            "resolved_type": "list[int64]",
+            "id": "vs",
+            "type_expr": {
+              "kind": "GenericType",
+              "base": "list",
+              "args": [
+                {
+                  "kind": "NamedType",
+                  "name": "int64"
+                }
+              ]
+            }
+          },
+          "annotation": "list[int64]",
+          "declare": true,
+          "decl_type": "list[int64]",
+          "annotation_type_expr": {
+            "kind": "GenericType",
+            "base": "list",
+            "args": [
+              {
+                "kind": "NamedType",
+                "name": "int64"
+              }
+            ]
+          },
+          "decl_type_expr": {
+            "kind": "GenericType",
+            "base": "list",
+            "args": [
+              {
+                "kind": "NamedType",
+                "name": "int64"
+              }
+            ]
+          },
+          "value": {
+            "kind": "Call",
+            "resolved_type": "list[int64]",
+            "func": {
+              "kind": "Attribute",
+              "resolved_type": "unknown",
+              "value": {
+                "kind": "Name",
+                "resolved_type": "dict[str,int64]",
+                "id": "d"
+              },
+              "attr": "values"
+            },
+            "args": [],
+            "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "values",
+            "runtime_call": "dict.values",
+            "runtime_module_id": "pytra.core.dict",
+            "runtime_symbol": "dict.values",
+            "runtime_call_adapter_kind": "builtin",
+            "semantic_tag": "stdlib.method.values",
+            "runtime_owner": {
+              "kind": "Name",
+              "resolved_type": "dict[str,int64]",
+              "id": "d"
+            },
+            "type_expr_summary_v1": {
+              "schema_version": 1,
+              "kind": "GenericType",
+              "category": "static",
+              "mirror": "list[int64]"
+            }
+          },
+          "type_expr_summary_v1": {
+            "schema_version": 1,
+            "kind": "GenericType",
+            "category": "static",
+            "mirror": "list[int64]"
+          }
+        },
+        {
+          "kind": "AnnAssign",
+          "target": {
+            "kind": "Name",
+            "resolved_type": "bool",
+            "id": "has_a",
+            "type_expr": {
+              "kind": "NamedType",
+              "name": "bool"
+            }
+          },
+          "annotation": "bool",
+          "declare": true,
+          "decl_type": "bool",
+          "annotation_type_expr": {
+            "kind": "NamedType",
+            "name": "bool"
+          },
+          "decl_type_expr": {
+            "kind": "NamedType",
+            "name": "bool"
+          },
+          "value": {
+            "kind": "Compare",
+            "resolved_type": "bool",
+            "left": {
+              "kind": "Constant",
+              "resolved_type": "str",
+              "value": "a"
+            },
+            "ops": [
+              "In"
+            ],
+            "comparators": [
+              {
+                "kind": "Name",
+                "resolved_type": "list[str]",
+                "id": "ks"
+              }
+            ]
+          },
+          "type_expr_summary_v1": {
+            "schema_version": 1,
+            "kind": "NamedType",
+            "category": "static",
+            "mirror": "bool"
+          }
+        },
+        {
+          "kind": "AnnAssign",
+          "target": {
+            "kind": "Name",
+            "resolved_type": "bool",
+            "id": "has_2",
+            "type_expr": {
+              "kind": "NamedType",
+              "name": "bool"
+            }
+          },
+          "annotation": "bool",
+          "declare": true,
+          "decl_type": "bool",
+          "annotation_type_expr": {
+            "kind": "NamedType",
+            "name": "bool"
+          },
+          "decl_type_expr": {
+            "kind": "NamedType",
+            "name": "bool"
+          },
+          "value": {
+            "kind": "Compare",
+            "resolved_type": "bool",
+            "left": {
+              "kind": "Constant",
+              "resolved_type": "int64",
+              "value": 2
+            },
+            "ops": [
+              "In"
+            ],
+            "comparators": [
+              {
+                "kind": "Name",
+                "resolved_type": "list[int64]",
+                "id": "vs"
+              }
+            ]
+          },
+          "type_expr_summary_v1": {
+            "schema_version": 1,
+            "kind": "NamedType",
+            "category": "static",
+            "mirror": "bool"
+          }
+        },
+        {
+          "kind": "Expr",
+          "value": {
+            "kind": "Call",
+            "resolved_type": "None",
+            "func": {
+              "kind": "Name",
+              "resolved_type": "unknown",
+              "id": "print"
+            },
+            "args": [
+              {
+                "kind": "BoolOp",
+                "resolved_type": "bool",
+                "op": "And",
+                "values": [
+                  {
+                    "kind": "Name",
+                    "resolved_type": "bool",
+                    "id": "ok_get_default"
+                  },
+                  {
+                    "kind": "Name",
+                    "resolved_type": "bool",
+                    "id": "ok_get_exist"
+                  },
+                  {
+                    "kind": "Name",
+                    "resolved_type": "bool",
+                    "id": "has_a"
+                  },
+                  {
+                    "kind": "Name",
+                    "resolved_type": "bool",
+                    "id": "has_2"
+                  }
+                ]
+              }
+            ],
+            "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "print",
+            "runtime_call": "py_print",
+            "runtime_module_id": "pytra.built_in.io_ops",
+            "runtime_symbol": "py_print",
+            "runtime_call_adapter_kind": "builtin",
+            "semantic_tag": "core.print",
+            "type_expr_summary_v1": {
+              "schema_version": 1,
+              "kind": "NamedType",
+              "category": "static",
+              "mirror": "None"
+            }
+          }
+        }
+      ],
+      "is_generator": 0,
+      "yield_value_type": "unknown",
+      "arg_type_exprs": {},
+      "return_type_expr": {
+        "kind": "NamedType",
+        "name": "None"
+      },
+      "leading_comments": [],
+      "returns": "None"
+    }
+  ],
+  "main_guard_body": [
+    {
+      "kind": "Expr",
+      "value": {
+        "kind": "Call",
+        "resolved_type": "None",
+        "func": {
+          "kind": "Name",
+          "resolved_type": "unknown",
+          "id": "run_case"
+        },
+        "args": [],
+        "keywords": [],
+        "type_expr_summary_v1": {
+          "schema_version": 1,
+          "kind": "NamedType",
+          "category": "static",
+          "mirror": "None"
+        }
+      },
+      "discard_result": true
+    }
+  ],
+  "renamed_symbols": {},
+  "meta": {
+    "parser_backend": "self_hosted",
+    "import_resolution": {
+      "schema_version": 1,
+      "bindings": [
+        {
+          "module_id": "pytra.built_in.io_ops",
+          "export_name": "",
+          "local_name": "pytra.built_in.io_ops",
+          "binding_kind": "implicit_builtin",
+          "source_file": "/workspace/Pytra/test/fixtures/collections/dict_wrapper_methods.py",
+          "source_line": 0,
+          "source_module_id": "pytra.built_in.io_ops",
+          "source_binding_kind": "implicit_builtin",
+          "runtime_module_id": "pytra.built_in.io_ops",
+          "runtime_group": "built_in"
+        }
+      ],
+      "qualified_refs": []
+    },
+    "import_bindings": [
+      {
+        "module_id": "pytra.built_in.io_ops",
+        "export_name": "",
+        "local_name": "pytra.built_in.io_ops",
+        "binding_kind": "implicit_builtin",
+        "source_file": "/workspace/Pytra/test/fixtures/collections/dict_wrapper_methods.py",
+        "source_line": 0
+      }
+    ],
+    "qualified_symbol_refs": [],
+    "import_modules": {},
+    "import_symbols": {},
+    "dispatch_mode": "native"
+  },
+  "east_stage": 3,
+  "schema_version": 1
+}
