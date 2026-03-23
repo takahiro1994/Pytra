@@ -24,6 +24,9 @@ __pycache__/
 /from_import_symbols.png
 
 /AGENTS.md
+/app
+/app.o
+/*.out
 
 # Deprecated generated runtime directory (must not be used)
 src/runtime/cpp/generated/
