@@ -305,6 +305,24 @@ class Call:
 3. **テスト**: 自前実装の出力が golden file と一致するか検証する
 4. **完了**: 一致したらその段は完成
 
+### 6.1 golden file 生成の一元化
+
+golden file の生成は `pytra-cli2 -golden` コマンドに一元化する。各 agent が独自スクリプトを作ることを禁止する。
+
+```bash
+# 各段の golden file 一括生成（現行 toolchain/ を使用）
+pytra-cli2 -golden --stage=east1 --from=python -o test/east1/py/
+pytra-cli2 -golden --stage=east2 --from=python -o test/east2/py/
+pytra-cli2 -golden --stage=east3 -o test/east3/
+pytra-cli2 -golden --stage=east3-opt -o test/east3-opt/
+pytra-cli2 -golden --stage=emit --target=cpp -o test/emit/cpp/
+```
+
+- `pytra-cli2.py` は selfhost 非対象（§5.7）なので、内部で現行 `toolchain/` を呼んでよい
+- 入力は `sample/py/*.py`（全 sample を自動列挙）
+- 出力先を `-o` で指定。省略時はデフォルトの `test/<stage>/` に出力
+- `toolchain2/` の自前実装が完成したら、`-golden` は不要になる（テスト自体が回帰テストに移行）
+
 例（parse 段）:
 
 ```bash

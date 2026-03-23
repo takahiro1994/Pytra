@@ -141,6 +141,15 @@ def cmd_emit(args: list[str]) -> int:
 
 
 # ---------------------------------------------------------------------------
+# golden: 現行 toolchain/ を使って golden file を生成 (§6.1)
+# ---------------------------------------------------------------------------
+
+def cmd_golden(args: list[str]) -> int:
+    print("error: -golden is not yet implemented", file=sys.stderr)
+    return 1
+
+
+# ---------------------------------------------------------------------------
 # build: .py → target (一括実行, 未実装)
 # ---------------------------------------------------------------------------
 
@@ -159,6 +168,7 @@ _COMMANDS = {
     "-compile": cmd_compile,
     "-optimize": cmd_optimize,
     "-emit": cmd_emit,
+    "-golden": cmd_golden,
     "-build": cmd_build,
 }
 
@@ -174,6 +184,7 @@ def main() -> int:
         print("  -compile    *.east2 → *.east3       (core lowering)")
         print("  -optimize   *.east3 → *.east3       (whole-program optimization)")
         print("  -emit       *.east3 → target         (code generation)")
+        print("  -golden     generate golden files     (uses current toolchain/)")
         print("  -build      .py → target             (all-in-one)")
         return 0
 
