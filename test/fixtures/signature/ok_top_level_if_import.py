@@ -1,7 +1,12 @@
 # self_hosted parser: top-level if with import in block.
 
-x: int = 1
-if x > 0:
-    import math
-    x = x + 1
 
+def run_top_level_if() -> int:
+    x: int = 1
+    if x > 0:
+        x = x + 1
+    return x
+
+
+if __name__ == "__main__":
+    print(run_top_level_if())
