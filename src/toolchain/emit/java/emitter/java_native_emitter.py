@@ -1206,7 +1206,7 @@ def _render_call_expr(expr: dict[str, Any]) -> str:
         if len(args) == 0:
             return "false"
         return "PyRuntime.__pytra_truthy(" + _render_expr(args[0]) + ")"
-    if callee_name == "str":
+    if callee_name == "str" or callee_name == "py_to_string":
         if len(args) == 0:
             return '""'
         return "String.valueOf(" + _render_expr(args[0]) + ")"
@@ -1257,7 +1257,10 @@ def _render_call_expr(expr: dict[str, Any]) -> str:
         if len(args) == 0:
             return "System.out.println()"
         if len(args) == 1:
-            return "System.out.println(" + _render_expr(args[0]) + ")"
+            arg_expr = _render_expr(args[0])
+            if arg_expr == "null":
+                return 'System.out.println((String) null)'
+            return "System.out.println(" + arg_expr + ")"
         rendered: list[str] = []
         i = 0
         while i < len(args):
