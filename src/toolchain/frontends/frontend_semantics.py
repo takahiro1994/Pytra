@@ -33,6 +33,7 @@ _BUILTIN_SEMANTIC_TAGS: dict[str, str] = {
     "NotImplementedError": "error.raise_ctor",
     "isinstance": "type.isinstance",
     "issubclass": "type.issubclass",
+    "cast": "cast.typed",
 }
 
 _RUNTIME_BINDING_SEMANTIC_TAGS: dict[tuple[str, str], str] = {

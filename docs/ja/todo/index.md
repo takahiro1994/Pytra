@@ -195,8 +195,12 @@
 
 ### P2: cast() に semantic_tag 追加 + 非 pytra import_bindings フィルタ
 
-1. [ ] [ID: P2-CAST-SEMTAG-S1] cast() の Call ノードに `semantic_tag: "cast.typed"` を設定し、emitter が callee_name ハードコードなしで判定できるようにする
-2. [ ] [ID: P2-HOST-IMPORT-FILTER-S1] @extern モジュール内の Python stdlib import を import_bindings から除外またはフラグ付与する
+1. [x] [ID: P2-CAST-SEMTAG-S1] cast() の Call ノードに `semantic_tag: "cast.typed"` を設定し、emitter が callee_name ハードコードなしで判定できるようにする
+2. [x] [ID: P2-HOST-IMPORT-FILTER-S1] 非 pytra import_bindings に `host_only: true` フラグを付与する
+
+進捗:
+- 2026-03-23: S1 完了。`_BUILTIN_SEMANTIC_TAGS` に `cast` 追加、`_resolve_builtin_named_call_kind` と `_apply_builtin_named_call_dispatch` に cast ハンドラ追加。
+- 2026-03-23: S2 完了。`_is_host_only_module` で非 pytra module_id を判定し `host_only: true` を import_binding に付与。emitter は `host_only` をチェックしてスキップ可能。
 
 ### P2: runtime_call_adapter_kind 拡充 + extern_var_v1 実装
 

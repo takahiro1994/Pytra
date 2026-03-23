@@ -335,6 +335,8 @@ class _ShExprNamedCallAnnotationMixin:
             return "collection_ctor"
         if fn_name in {"isinstance", "issubclass"}:
             return "type_predicate"
+        if fn_name == "cast":
+            return "cast"
         return ""
 
     def _resolve_builtin_named_call_dispatch(
@@ -638,6 +640,10 @@ class _ShExprNamedCallAnnotationMixin:
                 fn_name=fn_name,
                 semantic_tag=semantic_tag,
             )
+        if dispatch_kind == "cast":
+            if semantic_tag != "":
+                payload["semantic_tag"] = semantic_tag
+            return payload
         return None
 
     def _apply_stdlib_function_named_call_annotation(

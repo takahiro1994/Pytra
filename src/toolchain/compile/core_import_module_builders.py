@@ -14,6 +14,16 @@ def _sh_make_import_alias(name: str, asname: str | None = None) -> dict[str, str
     }
 
 
+def _is_host_only_module(module_id: str) -> bool:
+    """Non-pytra module IDs are host-only (Python runtime only, not transpiled)."""
+    mid = module_id.strip()
+    if mid == "" or mid.startswith("pytra."):
+        return False
+    if mid == "typing" or mid == "dataclasses" or mid == "__future__":
+        return False
+    return True
+
+
 def _sh_make_import_binding(
     *,
     module_id: str,
@@ -24,7 +34,7 @@ def _sh_make_import_binding(
     source_line: int,
 ) -> dict[str, Any]:
     """import metadata carrier を構築する。"""
-    return {
+    out: dict[str, Any] = {
         "module_id": module_id,
         "export_name": export_name,
         "local_name": local_name,
@@ -32,6 +42,9 @@ def _sh_make_import_binding(
         "source_file": source_file,
         "source_line": source_line,
     }
+    if _is_host_only_module(module_id):
+        out["host_only"] = True
+    return out
 
 
 def _sh_make_import_symbol_binding(module: str, name: str) -> dict[str, str]:
