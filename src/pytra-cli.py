@@ -256,13 +256,24 @@ def cmd_build(argv: list[str]) -> int:
         import os as _os
 
         # C#: collect all .cs in emit_dir, compile with mcs, run with mono
+        # utils/*.cs in emit_dir are emitter output (wrong class names);
+        # replace with generated runtime from src/runtime/cs/generated/utils/.
         if target == "cs":
             cs_exe = emit_dir + "/" + entry_stem + "_cs.exe"
             cs_files: list[str] = []
             for root_dir, dirs, files in _os.walk(emit_dir):
                 for f in sorted(files):
                     if f.endswith(".cs"):
+                        rel = _os.path.relpath(_os.path.join(root_dir, f), emit_dir)
+                        if rel.startswith("utils/") or rel.startswith("utils\\"):
+                            continue
                         cs_files.append(_os.path.join(root_dir, f))
+            gen_utils = _find_src_dir() + "/runtime/cs/generated/utils"
+            if _os.path.isdir(gen_utils):
+                for root_dir, dirs, files in _os.walk(gen_utils):
+                    for f in sorted(files):
+                        if f.endswith(".cs") and f != "assertions.cs":
+                            cs_files.append(_os.path.join(root_dir, f))
             mcs_cmd = ["mcs", "-warn:0", "-out:" + cs_exe] + cs_files
             result = _run(mcs_cmd)
             if result.returncode != 0:

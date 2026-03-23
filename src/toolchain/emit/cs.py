@@ -30,9 +30,17 @@ def _transpile_cs(east_doc: dict) -> str:
 
     if is_entry:
         return transpile_to_csharp(east_doc, emit_main=True, class_name="Program")
+
+    # For extern delegate modules (std/time, std/math, etc.), use the canonical
+    # C# class name that entry modules reference (e.g. "time", "math").
+    from toolchain.frontends.runtime_symbol_index import canonical_runtime_module_id
+    canonical = canonical_runtime_module_id(module_id.replace(".east", ""))
+    if canonical.startswith("pytra."):
+        tail = canonical.split(".")[-1]
     else:
-        class_name = _module_id_to_class_name(module_id)
-        return transpile_to_csharp(east_doc, emit_main=False, class_name=class_name)
+        tail = canonical.split(".")[-1] if "." in canonical else canonical
+    class_name = tail if tail != "" else _module_id_to_class_name(module_id)
+    return transpile_to_csharp(east_doc, emit_main=False, class_name=class_name)
 
 
 def main() -> int:

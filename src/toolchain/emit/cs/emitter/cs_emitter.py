@@ -1484,6 +1484,98 @@ class CSharpEmitter(CodeEmitter):
                     stack.append(child)
         return False
 
+    def _is_extern_delegate_module(self, body: list[dict[str, Any]]) -> bool:
+        """body 内の全 FunctionDef が @extern であれば True。"""
+        has_func = False
+        for stmt in body:
+            kind = self.any_dict_get_str(stmt, "kind", "")
+            if kind == "FunctionDef":
+                has_func = True
+                decs = stmt.get("decorators")
+                if not isinstance(decs, list) or "extern" not in decs:
+                    return False
+            elif kind in ("Assign", "AnnAssign"):
+                # extern() 変数も許容
+                extern_meta = self.any_to_dict_or_empty(
+                    self.any_to_dict_or_empty(stmt.get("meta")).get("extern_var_v1")
+                )
+                if len(extern_meta) == 0:
+                    # Non-extern top-level statement → not a pure extern module
+                    pass
+        return has_func
+
+    def _emit_extern_delegate_module(
+        self, body: list[dict[str, Any]], meta: dict[str, Any], class_name: str,
+    ) -> str:
+        """§4: @extern 関数と extern() 変数を _native モジュールへ委譲する C# コードを生成する。"""
+        self.lines: list[str] = []
+        emit_ctx = self.any_to_dict_or_empty(meta.get("emit_context"))
+        module_id = self.any_dict_get_str(emit_ctx, "module_id", "")
+        clean_id = module_id.replace(".east", "") if module_id.endswith(".east") else module_id
+        canonical = canonical_runtime_module_id(clean_id) if clean_id != "" else ""
+        # Derive native class name: pytra.std.time → time_native
+        native_class = ""
+        if canonical != "":
+            parts = canonical.split(".")
+            native_class = parts[-1] + "_native"
+
+        self.emit("using System;")
+        self.emit("using System.Collections.Generic;")
+        self.emit("")
+        self.emit("namespace Pytra.CsModule")
+        self.emit("{")
+        self.indent += 1
+        self.emit("public static class " + class_name)
+        self.emit("{")
+        self.indent += 1
+
+        for stmt in body:
+            kind = self.any_dict_get_str(stmt, "kind", "")
+            if kind == "FunctionDef":
+                decs = stmt.get("decorators")
+                if isinstance(decs, list) and "extern" in decs:
+                    fn_name = self.any_to_str(stmt.get("name"))
+                    arg_order = self.any_to_str_list(stmt.get("arg_order"))
+                    arg_types = self.any_to_dict_or_empty(stmt.get("arg_types"))
+                    ret_type = self.any_to_str(stmt.get("return_type"))
+                    cs_ret = self._cs_type(ret_type) if ret_type != "" else "object"
+                    cs_args: list[str] = []
+                    call_args: list[str] = []
+                    for a in arg_order:
+                        a_type = self.any_to_str(arg_types.get(a))
+                        cs_t = self._cs_type(a_type) if a_type != "" else "object"
+                        safe_a = self._safe_name(a)
+                        cs_args.append(cs_t + " " + safe_a)
+                        call_args.append(safe_a)
+                    sig = "public static " + cs_ret + " " + self._safe_name(fn_name) + "(" + ", ".join(cs_args) + ")"
+                    delegate_call = native_class + "." + self._safe_name(fn_name) + "(" + ", ".join(call_args) + ")"
+                    if cs_ret == "void":
+                        self.emit(sig + " { " + delegate_call + "; }")
+                    else:
+                        self.emit(sig + " { return " + delegate_call + "; }")
+            elif kind in ("Assign", "AnnAssign"):
+                extern_meta = self.any_to_dict_or_empty(
+                    self.any_to_dict_or_empty(stmt.get("meta")).get("extern_var_v1")
+                )
+                if len(extern_meta) > 0:
+                    symbol = self.any_dict_get_str(extern_meta, "symbol", "")
+                    if symbol != "":
+                        target = stmt.get("target")
+                        if isinstance(target, dict):
+                            var_name = self.any_to_str(target.get("id"))
+                        else:
+                            var_name = symbol
+                        ann = self.any_to_str(stmt.get("annotation"))
+                        cs_t = self._cs_type(ann) if ann != "" else "object"
+                        safe_name = self._safe_name(var_name) if var_name != "" else self._safe_name(symbol)
+                        self.emit("public static " + cs_t + " " + safe_name + " { get { return " + native_class + "." + self._safe_name(symbol) + "; } }")
+
+        self.indent -= 1
+        self.emit("}")
+        self.indent -= 1
+        self.emit("}")
+        return "\n".join(self.lines) + "\n"
+
     def transpile(self) -> str:
         """モジュール全体を C# ソースへ変換する。"""
         self.lines: list[str] = []
@@ -1497,6 +1589,12 @@ class CSharpEmitter(CodeEmitter):
         body = self._dict_stmt_list(module.get("body"))
         main_guard_body = self._dict_stmt_list(module.get("main_guard_body"))
         meta = self.any_to_dict_or_empty(module.get("meta"))
+
+        # §4: @extern 委譲モジュールは専用パスで生成
+        if self._is_extern_delegate_module(body):
+            _class_name = getattr(self, "_class_name", "Program")
+            return self._emit_extern_delegate_module(body, meta, _class_name)
+
         self.load_import_bindings_from_meta(meta)
         self.emit_module_leading_trivia()
 

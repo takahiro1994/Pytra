@@ -9,8 +9,8 @@ namespace Pytra.CsModule
         private static readonly List<string> _argv = new List<string>();
         private static readonly List<string> _path = new List<string>();
 
-        public static List<string> argv { get { return _argv; } }
-        public static List<string> path { get { return _path; } }
+        public static List<string> get_argv() { return _argv; }
+        public static List<string> get_path() { return _path; }
 
         public static void exit(long code)
         {
