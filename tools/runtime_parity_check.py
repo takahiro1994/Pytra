@@ -257,8 +257,10 @@ def build_targets(
     case_src = case_path.as_posix()
     opt_arg = "--east3-opt-level " + shlex.quote(str(east3_opt_level))
 
+    _pid = str(os.getpid())
+
     def _output_dir_for_target(target: str) -> str:
-        return f"work/transpile/{target}/{case_stem}"
+        return f"work/transpile/{target}/{case_stem}_{_pid}"
 
     def _pytra_cmd(target: str, out_dir: str, *, build: bool, run: bool) -> str:
         parts: list[str] = [
