@@ -321,7 +321,7 @@ def check_case(
         print(f"[ERROR] missing case: {case_stem}")
         _record("-", "case_missing", "missing case")
         return 1
-    work = ROOT / "work" / "transpile" / "parity" / case_stem
+    work = ROOT / "work" / "transpile" / "parity" / (case_stem + "_" + str(os.getpid()))
     if work.exists():
         shutil.rmtree(work)
     work.mkdir(parents=True, exist_ok=True)
