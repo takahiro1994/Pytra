@@ -4655,6 +4655,19 @@ class RustEmitter(CodeEmitter):
         expr_d = self.any_to_dict_or_empty(expr)
         if len(expr_d) == 0:
             return "()"
+        # Apply casts (e.g. numeric_promotion int64→float64) from EAST3 type propagation
+        casts = self._dict_stmt_list(expr_d.get("casts"))
+        if len(casts) > 0:
+            result = self._render_expr_inner(expr_d)
+            for cast_info in casts:
+                on = self.any_to_str(cast_info.get("on"))
+                to_t = self.any_to_str(cast_info.get("to"))
+                if on == "body" and to_t != "":
+                    result = self.apply_cast(result, to_t)
+            return result
+        return self._render_expr_inner(expr_d)
+
+    def _render_expr_inner(self, expr_d: dict) -> str:
         kind = self.any_dict_get_str(expr_d, "kind", "")
 
         hook_specific = self.hook_on_render_expr_kind_specific(kind, expr_d)
@@ -4668,7 +4681,7 @@ class RustEmitter(CodeEmitter):
             name = self.any_dict_get_str(expr_d, "id", "_")
             return self._safe_name(name)
         if kind == "Constant":
-            tag, non_str = self.render_constant_non_string_common(expr, expr_d, "()", "()")
+            tag, non_str = self.render_constant_non_string_common(expr_d, expr_d, "()", "()")
             if tag == "1":
                 return non_str
             val = self.any_to_str(expr_d.get("value"))
