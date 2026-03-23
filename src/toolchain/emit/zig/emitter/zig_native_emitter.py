@@ -3006,6 +3006,9 @@ class ZigNativeEmitter:
             if self._has_vtable(t):
                 return "pytra.Obj"
             return "*" + t
+        # Imported class: known via import_alias_map → *ClassName
+        if hasattr(self, "_import_alias_map") and t in self._import_alias_map:
+            return "*" + t
         return "pytra.PyObject"
 
     def _get_expr_type(self, expr_any: Any) -> str:
