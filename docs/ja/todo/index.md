@@ -107,6 +107,38 @@
 
 前提: P0-18（Object\<T\> 移行）完了後に着手。
 
+### P2: ContainerValueLocalHintPass 汎化（全 backend 共通化）
+
+文脈: [docs/ja/plans/p2-container-value-local-hint-generalize.md](../plans/p2-container-value-local-hint-generalize.md)
+
+1. [x] [ID: P2-CONTAINER-HINT-GENERALIZE-S1] `CppListValueLocalHintPass` を `ContainerValueLocalHintPass` に汎化（target_lang ガード除去、ヒントキー統一）
+2. [x] [ID: P2-CONTAINER-HINT-GENERALIZE-S2] linker `_materialize_container_hints` の target フィルタ除去 + ヒントキー汎化
+3. [x] [ID: P2-CONTAINER-HINT-GENERALIZE-S3] テスト追加（非 C++ target でヒント populated 確認）+ C++ 回帰なし確認
+
+進捗:
+- 2026-03-23: S1-S3 完了。ContainerValueLocalHintPass が全 target で実行される。旧名 CppListValueLocalHintPass / cpp_value_list_locals_v1 は除去済み。
+
+### P2: Swap ノードを Name 限定に制約し、Subscript swap を Assign 展開する
+
+文脈: [docs/ja/plans/p2-swap-name-only-contract.md](../plans/p2-swap-name-only-contract.md)
+
+1. [x] [ID: P2-SWAP-NAME-ONLY-S1] swap 検出で Subscript を含むケースを一時変数付き Assign 列に展開する
+2. [x] [ID: P2-SWAP-NAME-ONLY-S2] テスト追加（Name swap → Swap ノード、Subscript swap → Assign 展開）
+
+進捗:
+- 2026-03-23: S1-S2 完了。Name-Name swap は Swap ノード、Subscript 含む swap は 3 文の Assign 列に展開。7 テスト追加。
+
+### P2: EAST 型推論改善（tuple target / VarDecl / math.* / decl_type）
+
+文脈: [docs/ja/plans/p2-east-type-inference-fixes.md](../plans/p2-east-type-inference-fixes.md)
+
+1. [x] [ID: P2-EAST-TYPE-FIX-S1] Assign の tuple target で value の resolved_type から要素型を抽出し name_types に登録する
+2. [x] [ID: P2-EAST-TYPE-FIX-S2] VarDecl type に value.resolved_type fallback を追加する（S1 で自動解決、追加修正不要）
+3. [x] [ID: P2-EAST-TYPE-FIX-S3] math.* の resolved_type が unknown になるケースを修正する（`from pytra.std import math` スタイルの import_symbols チェック追加）
+
+進捗:
+- 2026-03-23: S1 tuple target の name_types 更新を `core_stmt_parser.py` に追加。S3 `_SH_IMPORT_SYMBOLS` チェックを `core_expr_attr_call_annotation.py` に追加。全 sample で VarDecl object/unknown と Assign unknown decl_type がゼロに。S2 は S1+S3 で自動解決。
+
 ### P3: pyobj list alias escape 解析を EAST3 パスへ移行
 
 文脈: [docs/ja/plans/p3-pyobj-list-escape-to-east3.md](../plans/p3-pyobj-list-escape-to-east3.md)
@@ -146,5 +178,5 @@
 
 進捗:
 - 2026-03-22: 192/107 (64%) → 268/31 (89.3%)。+76テスト改善。残り31件の計画書起票。
-- 2026-03-23: 250/49 → 275/23 (91.7%)。wildcard テスト期待値修正、generated-only モジュール include フォールバック追加、Any is None emit 修正、module_id 正規化テスト更新、scope_exit.h include 追加、user_module_dependencies pytra.* skip、py_to_bool object unbox 対応。S2 pyobj_ref_lists 統一は regression のため revert。
+- 2026-03-23: 250/49 → 283/17 (94.3%)。+33テスト改善。主な修正: wildcard テスト期待値、generated-only include フォールバック、Any is None emit、module_id 正規化、scope_exit.h include、user_module_dependencies pytra.* skip、py_to_bool object unbox、imported class Object<T> 統一、enumerate TupleTarget 型修正、テスト期待値多数更新。
 
