@@ -70,7 +70,7 @@ _TARGET_PROFILES: dict[str, TargetProfile] = {
     "java": TargetProfile(target="java", extension=".java", build_driver="noncpp", fixed_output_name="Main.java", allow_codegen_opt=False, runner_needs=("python", "javac", "java")),
     "swift": TargetProfile(target="swift", extension=".swift", build_driver="noncpp", fixed_output_name="", allow_codegen_opt=False, runner_needs=("python", "swiftc")),
     "kotlin": TargetProfile(target="kotlin", extension=".kt", build_driver="noncpp", fixed_output_name="", allow_codegen_opt=False, runner_needs=("python", "kotlinc", "java")),
-    "scala": TargetProfile(target="scala", extension=".scala", build_driver="noncpp", fixed_output_name="", allow_codegen_opt=False, runner_needs=("python", "scala")),
+    "scala": TargetProfile(target="scala", extension=".scala", build_driver="noncpp", fixed_output_name="", allow_codegen_opt=False, runner_needs=("python", "scala-cli")),
     "lua": TargetProfile(target="lua", extension=".lua", build_driver="noncpp", fixed_output_name="", allow_codegen_opt=False, runner_needs=("python", "lua")),
     "ruby": TargetProfile(target="ruby", extension=".rb", build_driver="noncpp", fixed_output_name="", allow_codegen_opt=False, runner_needs=("python", "ruby")),
     "php": TargetProfile(target="php", extension=".php", build_driver="noncpp", fixed_output_name="", allow_codegen_opt=False, runner_needs=("python", "php")),
@@ -167,28 +167,26 @@ def make_noncpp_build_plan(
         return NonCppBuildPlan(build_cmd=build_cmd, run_cmd=run_cmd)
 
     if target == "cs":
+        emit_dir = out_dir / "emit" if (out_dir / "emit").is_dir() else out_dir
         exe_path = out_dir / f"{stem}_cs.exe"
-        build_cmd = [
-            "mcs",
-            "-warn:0",
-            f"-out:{exe_path}",
-            str(output_path),
-            str(root / "src/runtime/cs/built_in/py_runtime.cs"),
-            str(root / "src/runtime/cs/generated/std/time.cs"),
-            str(root / "src/runtime/cs/std/time_native.cs"),
-            str(root / "src/runtime/cs/generated/std/math.cs"),
-            str(root / "src/runtime/cs/std/math_native.cs"),
-            str(root / "src/runtime/cs/generated/std/os.cs"),
-            str(root / "src/runtime/cs/std/os_native.cs"),
-            str(root / "src/runtime/cs/generated/std/os_path.cs"),
-            str(root / "src/runtime/cs/std/os_path_native.cs"),
-            str(root / "src/runtime/cs/generated/std/sys.cs"),
-            str(root / "src/runtime/cs/std/sys_native.cs"),
-            str(root / "src/runtime/cs/generated/std/json.cs"),
-            str(root / "src/runtime/cs/generated/std/pathlib.cs"),
-            str(root / "src/runtime/cs/generated/utils/png.cs"),
-            str(root / "src/runtime/cs/generated/utils/gif.cs"),
-        ]
+        # Collect all .cs files from emit directory.
+        # Override utils/*.cs with generated runtime versions (post-processed helper classes).
+        gen_dir = root / "src" / "runtime" / "cs" / "generated"
+        cs_files: list[str] = []
+        skip_dirs = {"utils"}  # utils are replaced by generated runtime
+        for cs_file in sorted(emit_dir.rglob("*.cs")):
+            rel_parts = cs_file.relative_to(emit_dir).parts
+            if len(rel_parts) > 0 and rel_parts[0] in skip_dirs:
+                continue
+            cs_files.append(str(cs_file))
+        # Add generated utils (png_helper, gif_helper, etc.)
+        if gen_dir.is_dir():
+            for cs_file in sorted(gen_dir.rglob("*.cs")):
+                rel = cs_file.relative_to(gen_dir)
+                # Only add utils/ (built_in/ generated files may conflict with py_runtime)
+                if str(rel).startswith("utils/") and cs_file.name != "assertions.cs":
+                    cs_files.append(str(cs_file))
+        build_cmd = ["mcs", "-warn:0", f"-out:{exe_path}"] + cs_files
         run_cmd = ["mono", str(exe_path)] if run_after_build else None
         return NonCppBuildPlan(build_cmd=build_cmd, run_cmd=run_cmd)
 
@@ -249,17 +247,19 @@ def make_noncpp_build_plan(
         return NonCppBuildPlan(build_cmd=build_cmd, run_cmd=run_cmd)
 
     if target == "scala":
-        run_cmd = (
-            [
-                "scala",
-                "run",
-                str(out_dir / "py_runtime.scala"),
-                str(out_dir / "image_runtime.scala"),
-                str(output_path),
-            ]
-            if run_after_build
-            else None
-        )
+        if run_after_build:
+            # Scala merges all modules into a single file.
+            # Run: merged entry + built_in/py_runtime + std/*_native files.
+            scala_files: list[str] = [str(output_path)]
+            rt_file = out_dir / "built_in" / "py_runtime.scala"
+            if rt_file.exists():
+                scala_files.append(str(rt_file))
+            import glob as _glob
+            for native_f in sorted(_glob.glob(str(out_dir / "std" / "*_native.scala"))):
+                scala_files.append(native_f)
+            run_cmd = ["scala-cli", "run"] + scala_files
+        else:
+            run_cmd = None
         return NonCppBuildPlan(build_cmd=None, run_cmd=run_cmd)
 
     if target == "nim":

@@ -901,7 +901,7 @@ def _render_attribute_expr(expr: dict[str, Any]) -> str:
         return _render_expr(expr.get("value")) + ".stem"
     adapter_kind_any_attr = expr.get("runtime_call_adapter_kind")
     adapter_kind_attr = adapter_kind_any_attr if isinstance(adapter_kind_any_attr, str) else ""
-    is_extern_delegate_attr = adapter_kind_attr == "extern_delegate"
+    is_extern_delegate_attr = adapter_kind_attr != "" and adapter_kind_attr != "builtin"
     runtime_symbol = _resolved_runtime_symbol(runtime_call, runtime_source)
     if is_extern_delegate_attr and runtime_call != "":
         dot = runtime_call.find(".")
@@ -1130,11 +1130,11 @@ def _render_call_expr(expr: dict[str, Any]) -> str:
         return "Path.new(" + ", ".join(rendered_path_args) + ")"
 
     # Use runtime_call_adapter_kind to decide naming convention (S1).
-    # "extern_delegate" → bare function name (std/utils modules provide via __native delegation)
     # "builtin" → __pytra_ prefix (py_runtime provides)
+    # anything else (extern_delegate, math.float_args, etc.) → bare function name
     adapter_kind_any = expr.get("runtime_call_adapter_kind")
     adapter_kind = adapter_kind_any if isinstance(adapter_kind_any, str) else ""
-    is_extern_delegate = adapter_kind == "extern_delegate"
+    is_extern_delegate = adapter_kind != "" and adapter_kind != "builtin"
     runtime_symbol = _resolved_runtime_symbol(runtime_call, runtime_source)
     if is_extern_delegate and runtime_call != "":
         # std module: use bare function name (e.g. perf_counter, sqrt)

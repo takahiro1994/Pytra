@@ -41,6 +41,8 @@ end
 
 def __pytra_str(v)
   return "" if v.nil?
+  return "True" if v == true
+  return "False" if v == false
   v.to_s
 end
 

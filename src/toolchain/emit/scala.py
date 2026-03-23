@@ -108,6 +108,24 @@ def main() -> int:
     out_path.write_text(merged, encoding="utf-8")
     print("merged: " + str(out_path))
 
+    # Remove per-module files that were merged into the single output.
+    # Keep built_in/ and std/*_native.scala (hand-written runtime).
+    for module_id, _source, _is_entry in per_module_results:
+        if module_id.startswith("pytra."):
+            rel = module_id[len("pytra."):]
+        else:
+            rel = module_id
+        mod_file = out / (rel.replace(".", "/") + ".scala")
+        if mod_file.exists() and mod_file != out_path:
+            mod_file.unlink()
+    # Clean up empty subdirectories left after removal
+    for sub in sorted(out.rglob("*"), reverse=True):
+        if sub.is_dir() and sub != out:
+            try:
+                sub.rmdir()  # only removes if empty
+            except OSError:
+                pass
+
     return 0
 
 

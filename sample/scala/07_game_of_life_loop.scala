@@ -1,7 +1,176 @@
+import java.nio.file.{Files, Paths}
 import scala.collection.mutable
 import scala.util.boundary, boundary.break
-import scala.math.*
-import java.nio.file.{Files, Paths}
+
+// --- module: pytra.std.time ---
+
+
+def perf_counter(): Double = {
+    return time_native.perf_counter()
+}
+// --- module: pytra.utils.gif ---
+
+
+def _gif_append_list(dst: mutable.ArrayBuffer[Long], src: mutable.ArrayBuffer[Long]): Unit = {
+    var i: Long = 0L
+    var n: Long = __pytra_len(src)
+    while (i < n) {
+        dst.append(__pytra_int(__pytra_get_index(src, i)))
+        i += 1L
+    }
+}
+
+def _gif_u16le(v: Long): mutable.ArrayBuffer[Long] = {
+    return __pytra_as_list(mutable.ArrayBuffer[Long](v & 255L, (v >> 8L & 255L))).asInstanceOf[mutable.ArrayBuffer[Long]]
+}
+
+def _lzw_encode(data: mutable.ArrayBuffer[Long], min_code_size: Long): mutable.ArrayBuffer[Long] = {
+    if (__pytra_len(data) == 0L) {
+        var empty: mutable.ArrayBuffer[Long] = __pytra_as_list(mutable.ArrayBuffer[Long]()).asInstanceOf[mutable.ArrayBuffer[Long]]
+        return __pytra_bytes(empty)
+    }
+    var clear_code: Long = 1L << min_code_size
+    var end_code: Long = clear_code + 1L
+    var code_size: Long = min_code_size + 1L
+    var out: mutable.ArrayBuffer[Long] = __pytra_as_list(mutable.ArrayBuffer[Long]()).asInstanceOf[mutable.ArrayBuffer[Long]]
+    var bit_buffer: Long = 0L
+    var bit_count: Long = 0L
+    bit_buffer += clear_code << bit_count
+    bit_count += code_size
+    while (bit_count >= 8L) {
+        out.append(bit_buffer & 255L)
+        bit_buffer = bit_buffer >> 8L
+        bit_count -= 8L
+    }
+    code_size = min_code_size + 1L
+    val __iter_0 = __pytra_as_list(data)
+    var __i_1: Long = 0L
+    while (__i_1 < __iter_0.size.toLong) {
+        val v: Long = __pytra_int(__iter_0(__i_1.toInt))
+        bit_buffer += v << bit_count
+        bit_count += code_size
+        while (bit_count >= 8L) {
+            out.append(bit_buffer & 255L)
+            bit_buffer = bit_buffer >> 8L
+            bit_count -= 8L
+        }
+        bit_buffer += clear_code << bit_count
+        bit_count += code_size
+        while (bit_count >= 8L) {
+            out.append(bit_buffer & 255L)
+            bit_buffer = bit_buffer >> 8L
+            bit_count -= 8L
+        }
+        code_size = min_code_size + 1L
+        __i_1 += 1L
+    }
+    bit_buffer += end_code << bit_count
+    bit_count += code_size
+    while (bit_count >= 8L) {
+        out.append(bit_buffer & 255L)
+        bit_buffer = bit_buffer >> 8L
+        bit_count -= 8L
+    }
+    if (bit_count > 0L) {
+        out.append(bit_buffer & 255L)
+    }
+    return __pytra_bytes(out)
+}
+
+def grayscale_palette(): mutable.ArrayBuffer[Long] = {
+    var p: mutable.ArrayBuffer[Long] = __pytra_as_list(mutable.ArrayBuffer[Long]()).asInstanceOf[mutable.ArrayBuffer[Long]]
+    var i: Long = 0L
+    while (i < 256L) {
+        p.append(i)
+        p.append(i)
+        p.append(i)
+        i += 1L
+    }
+    return __pytra_bytes(p)
+}
+
+def save_gif(path: String, width: Long, height: Long, frames: mutable.ArrayBuffer[Any], palette: mutable.ArrayBuffer[Long], delay_cs: Long, loop: Long): Unit = {
+    if (__pytra_len(palette) != 256L * 3L) {
+        throw new RuntimeException(__pytra_str("palette must be 256*3 bytes"))
+    }
+    var frame_lists: mutable.ArrayBuffer[Any] = __pytra_as_list(mutable.ArrayBuffer[Any]())
+    var fr_list: mutable.ArrayBuffer[Long] = mutable.ArrayBuffer[Long]()
+    var v: Long = 0L
+    val __iter_0 = __pytra_as_list(frames)
+    var __i_1: Long = 0L
+    while (__i_1 < __iter_0.size.toLong) {
+        val fr: mutable.ArrayBuffer[Long] = __pytra_as_list(__iter_0(__i_1.toInt)).asInstanceOf[mutable.ArrayBuffer[Long]]
+        fr_list = __pytra_as_list(mutable.ArrayBuffer[Long]()).asInstanceOf[mutable.ArrayBuffer[Long]]
+        val __iter_2 = __pytra_as_list(fr)
+        var __i_3: Long = 0L
+        while (__i_3 < __iter_2.size.toLong) {
+            val v: Long = __pytra_int(__iter_2(__i_3.toInt))
+            fr_list.append(v)
+            __i_3 += 1L
+        }
+        if (__pytra_len(fr_list) != width * height) {
+            throw new RuntimeException(__pytra_str("frame size mismatch"))
+        }
+        frame_lists.append(fr_list)
+        __i_1 += 1L
+    }
+    var palette_list: mutable.ArrayBuffer[Long] = __pytra_as_list(mutable.ArrayBuffer[Long]()).asInstanceOf[mutable.ArrayBuffer[Long]]
+    val __iter_4 = __pytra_as_list(palette)
+    var __i_5: Long = 0L
+    while (__i_5 < __iter_4.size.toLong) {
+        val v: Long = __pytra_int(__iter_4(__i_5.toInt))
+        palette_list.append(v)
+        __i_5 += 1L
+    }
+    var out: mutable.ArrayBuffer[Long] = __pytra_as_list(mutable.ArrayBuffer[Long]()).asInstanceOf[mutable.ArrayBuffer[Long]]
+    _gif_append_list(out, mutable.ArrayBuffer[Long](71L, 73L, 70L, 56L, 57L, 97L))
+    _gif_append_list(out, _gif_u16le(width))
+    _gif_append_list(out, _gif_u16le(height))
+    out.append(247L)
+    out.append(0L)
+    out.append(0L)
+    _gif_append_list(out, palette_list)
+    _gif_append_list(out, mutable.ArrayBuffer[Long](33L, 255L, 11L, 78L, 69L, 84L, 83L, 67L, 65L, 80L, 69L, 50L, 46L, 48L, 3L, 1L))
+    _gif_append_list(out, _gif_u16le(loop))
+    out.append(0L)
+    val __iter_6 = __pytra_as_list(frame_lists)
+    var __i_7: Long = 0L
+    while (__i_7 < __iter_6.size.toLong) {
+        val fr_list: mutable.ArrayBuffer[Long] = __pytra_as_list(__iter_6(__i_7.toInt)).asInstanceOf[mutable.ArrayBuffer[Long]]
+        _gif_append_list(out, mutable.ArrayBuffer[Long](33L, 249L, 4L, 0L))
+        _gif_append_list(out, _gif_u16le(delay_cs))
+        _gif_append_list(out, mutable.ArrayBuffer[Long](0L, 0L))
+        out.append(44L)
+        _gif_append_list(out, _gif_u16le(0L))
+        _gif_append_list(out, _gif_u16le(0L))
+        _gif_append_list(out, _gif_u16le(width))
+        _gif_append_list(out, _gif_u16le(height))
+        out.append(0L)
+        out.append(8L)
+        var compressed: mutable.ArrayBuffer[Long] = _lzw_encode(__pytra_bytes(fr_list), 8L)
+        var pos: Long = 0L
+        while (pos < __pytra_len(compressed)) {
+            var remain: Long = __pytra_len(compressed) - pos
+            var chunk_len: Long = __pytra_int(__pytra_ifexp((remain > 255L), 255L, remain))
+            out.append(chunk_len)
+            var i: Long = 0L
+            while (i < chunk_len) {
+                out.append(__pytra_int(__pytra_get_index(compressed, pos + i)))
+                i += 1L
+            }
+            pos += chunk_len
+        }
+        out.append(0L)
+        __i_7 += 1L
+    }
+    out.append(59L)
+    var f: PyFile = open(path, "wb")
+    try {
+        f.write(__pytra_bytes(out))
+    } finally {
+        f.close()
+    }
+}
 
 
 // 07: Sample that outputs Game of Life evolution as a GIF.
@@ -10,7 +179,7 @@ def next_state(grid: mutable.ArrayBuffer[Any], w: Long, h: Long): mutable.ArrayB
     var nxt: mutable.ArrayBuffer[Any] = __pytra_as_list(mutable.ArrayBuffer[Any]())
     var y: Long = 0L
     while (y < h) {
-        var row: mutable.ArrayBuffer[Long] = __pytra_as_list(mutable.ArrayBuffer[Any]()).asInstanceOf[mutable.ArrayBuffer[Long]]
+        var row: mutable.ArrayBuffer[Long] = __pytra_as_list(mutable.ArrayBuffer[Long]()).asInstanceOf[mutable.ArrayBuffer[Long]]
         var x: Long = 0L
         while (x < w) {
             var cnt: Long = 0L
@@ -78,7 +247,12 @@ def run_07_game_of_life_loop(): Unit = {
     var steps: Long = 105L
     var out_path: String = "sample/out/07_game_of_life_loop.gif"
     var start: Double = __pytra_perf_counter()
-    var grid: mutable.ArrayBuffer[Any] = __pytra_as_list({ val __out = mutable.ArrayBuffer[Any](); val __step = __pytra_int(1L); var i = __pytra_int(0L); while ((__step >= 0L && i < __pytra_int(h)) || (__step < 0L && i > __pytra_int(h))) { __out.append(__pytra_list_repeat(0L, w)); i += __step }; __out })
+    var grid: mutable.ArrayBuffer[Any] = __pytra_as_list(mutable.ArrayBuffer[Any]())
+    var i: Long = 0L
+    while (i < h) {
+        grid.append(__pytra_list_repeat(0L, w))
+        i += 1L
+    }
     var y: Long = 0L
     while (y < h) {
         var x: Long = 0L
@@ -95,18 +269,22 @@ def run_07_game_of_life_loop(): Unit = {
     var r_pentomino: mutable.ArrayBuffer[Any] = __pytra_as_list(mutable.ArrayBuffer[Any](mutable.ArrayBuffer[Long](0L, 1L, 1L), mutable.ArrayBuffer[Long](1L, 1L, 0L), mutable.ArrayBuffer[Long](0L, 1L, 0L)))
     var lwss: mutable.ArrayBuffer[Any] = __pytra_as_list(mutable.ArrayBuffer[Any](mutable.ArrayBuffer[Long](0L, 1L, 1L, 1L, 1L), mutable.ArrayBuffer[Long](1L, 0L, 0L, 0L, 1L), mutable.ArrayBuffer[Long](0L, 0L, 0L, 0L, 1L), mutable.ArrayBuffer[Long](1L, 0L, 0L, 1L, 0L)))
     var gy: Long = 8L
-    val __step_2 = 18L
-    while ((__step_2 >= 0L && gy < h - 8L) || (__step_2 < 0L && gy > h - 8L)) {
+    val __step_3 = 18L
+    while ((__step_3 >= 0L && gy < h - 8L) || (__step_3 < 0L && gy > h - 8L)) {
         var gx: Long = 8L
-        val __step_3 = 22L
-        while ((__step_3 >= 0L && gx < w - 8L) || (__step_3 < 0L && gx > w - 8L)) {
+        val __step_4 = 22L
+        while ((__step_4 >= 0L && gx < w - 8L) || (__step_4 < 0L && gx > w - 8L)) {
             var kind: Long = (((gx * 7L + gy * 11L)) % 3L)
+            var ph: Long = 0L
+            var pw: Long = 0L
+            var px: Long = 0L
+            var py: Long = 0L
             if (kind == 0L) {
-                var ph: Long = __pytra_len(glider)
-                var py: Long = 0L
+                ph = __pytra_len(glider)
+                py = 0L
                 while (py < ph) {
-                    var pw: Long = __pytra_len(__pytra_as_list(__pytra_get_index(glider, py)).asInstanceOf[mutable.ArrayBuffer[Long]])
-                    var px: Long = 0L
+                    pw = __pytra_len(__pytra_as_list(__pytra_get_index(glider, py)).asInstanceOf[mutable.ArrayBuffer[Long]])
+                    px = 0L
                     while (px < pw) {
                         if (__pytra_int(__pytra_get_index(__pytra_as_list(__pytra_get_index(glider, py)).asInstanceOf[mutable.ArrayBuffer[Long]], px)) == 1L) {
                             __pytra_set_index(__pytra_as_list(__pytra_get_index(grid, ((gy + py) % h))).asInstanceOf[mutable.ArrayBuffer[Long]], ((gx + px) % w), 1L)
@@ -117,11 +295,11 @@ def run_07_game_of_life_loop(): Unit = {
                 }
             } else {
                 if (kind == 1L) {
-                    var ph: Long = __pytra_len(r_pentomino)
-                    var py: Long = 0L
+                    ph = __pytra_len(r_pentomino)
+                    py = 0L
                     while (py < ph) {
-                        var pw: Long = __pytra_len(__pytra_as_list(__pytra_get_index(r_pentomino, py)).asInstanceOf[mutable.ArrayBuffer[Long]])
-                        var px: Long = 0L
+                        pw = __pytra_len(__pytra_as_list(__pytra_get_index(r_pentomino, py)).asInstanceOf[mutable.ArrayBuffer[Long]])
+                        px = 0L
                         while (px < pw) {
                             if (__pytra_int(__pytra_get_index(__pytra_as_list(__pytra_get_index(r_pentomino, py)).asInstanceOf[mutable.ArrayBuffer[Long]], px)) == 1L) {
                                 __pytra_set_index(__pytra_as_list(__pytra_get_index(grid, ((gy + py) % h))).asInstanceOf[mutable.ArrayBuffer[Long]], ((gx + px) % w), 1L)
@@ -131,11 +309,11 @@ def run_07_game_of_life_loop(): Unit = {
                         py += 1L
                     }
                 } else {
-                    var ph: Long = __pytra_len(lwss)
-                    var py: Long = 0L
+                    ph = __pytra_len(lwss)
+                    py = 0L
                     while (py < ph) {
-                        var pw: Long = __pytra_len(__pytra_as_list(__pytra_get_index(lwss, py)).asInstanceOf[mutable.ArrayBuffer[Long]])
-                        var px: Long = 0L
+                        pw = __pytra_len(__pytra_as_list(__pytra_get_index(lwss, py)).asInstanceOf[mutable.ArrayBuffer[Long]])
+                        px = 0L
                         while (px < pw) {
                             if (__pytra_int(__pytra_get_index(__pytra_as_list(__pytra_get_index(lwss, py)).asInstanceOf[mutable.ArrayBuffer[Long]], px)) == 1L) {
                                 __pytra_set_index(__pytra_as_list(__pytra_get_index(grid, ((gy + py) % h))).asInstanceOf[mutable.ArrayBuffer[Long]], ((gx + px) % w), 1L)
@@ -146,18 +324,18 @@ def run_07_game_of_life_loop(): Unit = {
                     }
                 }
             }
-            gx += __step_3
+            gx += __step_4
         }
-        gy += __step_2
+        gy += __step_3
     }
     var frames: mutable.ArrayBuffer[Any] = __pytra_as_list(mutable.ArrayBuffer[Any]())
-    var i: Long = 0L
+    i = 0L
     while (i < steps) {
         frames.append(render(grid, w, h, cell))
         grid = next_state(grid, w, h)
         i += 1L
     }
-    __pytra_save_gif(out_path, w * cell, h * cell, frames, __pytra_grayscale_palette())
+    save_gif(out_path, w * cell, h * cell, frames, grayscale_palette(), 4L, 0L)
     var elapsed: Double = __pytra_perf_counter() - start
     __pytra_print("output:", out_path)
     __pytra_print("frames:", steps)
@@ -165,5 +343,5 @@ def run_07_game_of_life_loop(): Unit = {
 }
 
 def main(args: Array[String]): Unit = {
-    run_07_game_of_life_loop()
+    val _ = run_07_game_of_life_loop()
 }

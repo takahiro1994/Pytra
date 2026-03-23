@@ -1,6 +1,5 @@
 import scala.collection.mutable
 import scala.util.boundary, boundary.break
-import scala.math.*
 import java.nio.file.{Files, Paths}
 
 
@@ -30,14 +29,18 @@ def run_integer_grid_checksum(width: Long, height: Long, seed: Long): Long = {
 def run_integer_benchmark(): Unit = {
     var width: Long = 7600L
     var height: Long = 5000L
+    var out_path: String = "sample/out/17_monte_carlo_pi.txt"
     var start: Double = __pytra_perf_counter()
     var checksum: Long = run_integer_grid_checksum(width, height, 123456789L)
     var elapsed: Double = __pytra_perf_counter() - start
+    var result: String = (__pytra_str(__pytra_str(__pytra_str(__pytra_str("pixels:") + __pytra_str(width * height)) + __pytra_str("\nchecksum:")) + __pytra_str(checksum)) + __pytra_str("\n"))
+    var p: String = __pytra_path_new(out_path)
+    __pytra_path_write_text(p, result, "utf-8")
     __pytra_print("pixels:", width * height)
     __pytra_print("checksum:", checksum)
     __pytra_print("elapsed_sec:", elapsed)
 }
 
 def main(args: Array[String]): Unit = {
-    run_integer_benchmark()
+    val _ = run_integer_benchmark()
 }

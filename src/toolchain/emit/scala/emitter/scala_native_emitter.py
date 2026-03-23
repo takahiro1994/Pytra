@@ -2369,10 +2369,49 @@ def _emit_stmt(stmt: Any, *, indent: str, ctx: dict[str, Any]) -> list[str]:
                     args = args_any if isinstance(args_any, list) else []
                     if len(args) == 0:
                         return [indent + owner + " = __pytra_pop_last(__pytra_as_list(" + owner + "))"]
+        # discard_result: suppress return value (spec §9)
+        if bool(sd3.get("discard_result")):
+            return [indent + "val _ = " + _render_expr(value_any)]
         return [indent + _render_expr(value_any)]
 
     if kind == "AnnAssign":
         target_any = sd3.get("target")
+        # extern() variable → delegate to _native object (spec §4)
+        # Preferred: meta.extern_var_v1; Fallback: value node extern() call
+        _is_extern_var = False
+        _extern_owner = ""
+        meta_any = sd3.get("meta")
+        if isinstance(meta_any, dict):
+            extern_v1 = meta_any.get("extern_var_v1")
+            if isinstance(extern_v1, dict):
+                _is_extern_var = True
+        if not _is_extern_var:
+            # Fallback: check value for extern() call (may be Unbox-wrapped)
+            _v = sd3.get("value")
+            if isinstance(_v, dict):
+                _vn = _v
+                if _vn.get("kind") == "Unbox":
+                    _inner = _vn.get("value")
+                    if isinstance(_inner, dict):
+                        _vn = _inner
+                if _vn.get("kind") == "Call":
+                    _fn = _vn.get("func")
+                    if isinstance(_fn, dict) and _fn.get("id") == "extern":
+                        _is_extern_var = True
+                        # Extract owner from arg0 (e.g. math.pi → owner=math)
+                        _args = _vn.get("args", [])
+                        if len(_args) > 0 and isinstance(_args[0], dict):
+                            _arg0 = _args[0]
+                            if _arg0.get("kind") == "Attribute":
+                                _owner_node = _arg0.get("value", {})
+                                if isinstance(_owner_node, dict) and _owner_node.get("kind") == "Name":
+                                    _extern_owner = _safe_ident(_owner_node.get("id"), "") + "_native"
+        if _is_extern_var:
+            var_name = _target_name(target_any)
+            if _extern_owner == "":
+                _extern_owner = "math_native"  # fallback default
+            return [indent + "val " + var_name + " = " + _extern_owner + "." + var_name]
+
         if isinstance(target_any, dict) and target_any.get("kind") == "Attribute":
             return [indent + _render_attribute_expr(target_any) + " = " + _render_expr(sd3.get("value"))]
 
@@ -2694,8 +2733,13 @@ def _emit_stmt(stmt: Any, *, indent: str, ctx: dict[str, Any]) -> list[str]:
         return [indent + "throw new RuntimeException(__pytra_str(" + _render_expr(exc_any) + "))"]
 
     if kind == "VarDecl":
+        # unused: true → skip declaration (spec §9)
+        if bool(sd3.get("unused")):
+            return []
         name = _safe_ident(sd3.get("name"), "v")
         var_type = _scala_type(sd3.get("type"), allow_void=False)
+        declared = _declared_set(ctx)
+        declared.add(name)
         type_map = _type_map(ctx)
         type_map[name] = var_type
         return [indent + "var " + name + ": " + var_type + " = " + _default_return_expr(var_type)]
