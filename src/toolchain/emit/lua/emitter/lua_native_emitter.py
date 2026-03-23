@@ -198,9 +198,9 @@ def _binop_symbol(op: str) -> str:
 
 
 def _cmp_symbol(op: str) -> str:
-    if op == "Eq":
+    if op == "Eq" or op == "Is":
         return "=="
-    if op == "NotEq":
+    if op == "NotEq" or op == "IsNot":
         return "~="
     if op == "Lt":
         return "<"
@@ -1802,7 +1802,19 @@ class LuaNativeEmitter:
             iter_name = target_name
             if tuple_target:
                 iter_name = self._next_tmp_name("__it")
-            self._emit_line("for _, " + iter_name + " in ipairs(" + iter_expr + ") do")
+            # Check if iterating over a string (use character iteration)
+            iter_expr_node = id.get("iter_expr")
+            iter_resolved = iter_expr_node.get("resolved_type", "") if isinstance(iter_expr_node, dict) else ""
+            is_str_iter = iter_resolved == "str"
+            if is_str_iter:
+                str_tmp = self._next_tmp_name("__str")
+                self._emit_line("local " + str_tmp + " = " + iter_expr)
+                self._emit_line("for __ci = 1, #" + str_tmp + " do")
+                self.indent += 1
+                self._emit_line("local " + iter_name + " = string.sub(" + str_tmp + ", __ci, __ci)")
+                self.indent -= 1
+            else:
+                self._emit_line("for _, " + iter_name + " in ipairs(" + iter_expr + ") do")
             self.indent += 1
             if tuple_target and isinstance(target_plan, dict):
                 direct_names_any = target_plan.get("direct_unpack_names")
@@ -1984,11 +1996,39 @@ class LuaNativeEmitter:
             if len(values) == 0:
                 return "false"
             op = str(ed.get("op"))
-            delim = " and " if op == "And" else " or "
-            out: list[str] = []
+            # Python and/or uses truthiness (0, "", [], {} are falsy).
+            # Lua only treats nil/false as falsy. Use helper for value-selecting and/or.
+            resolved = ed.get("resolved_type")
+            is_bool_context = isinstance(resolved, str) and resolved == "bool"
+            if is_bool_context:
+                # Bool context: Lua and/or works correctly
+                delim = " and " if op == "And" else " or "
+                out: list[str] = []
+                for v in values:
+                    out.append(self._render_expr(v))
+                return "(" + delim.join(out) + ")"
+            # Value-selecting context: need Python truthiness
+            rendered: list[str] = []
             for v in values:
-                out.append(self._render_expr(v))
-            return "(" + delim.join(out) + ")"
+                rendered.append(self._render_expr(v))
+            if op == "Or":
+                # a or b → (function() local __v = a; if __pytra_truthy(__v) then return __v end; return b end)()
+                result = rendered[-1]
+                i = len(rendered) - 2
+                while i >= 0:
+                    result = ("(function() local __v = " + rendered[i]
+                              + "; if __pytra_truthy(__v) then return __v end; return " + result + " end)()")
+                    i -= 1
+                return result
+            else:
+                # a and b → (function() local __v = a; if not __pytra_truthy(__v) then return __v end; return b end)()
+                result = rendered[-1]
+                i = len(rendered) - 2
+                while i >= 0:
+                    result = ("(function() local __v = " + rendered[i]
+                              + "; if not __pytra_truthy(__v) then return __v end; return " + result + " end)()")
+                    i -= 1
+                return result
         if kind == "Call":
             return self._render_call(expr_any)
         if kind == "Lambda":

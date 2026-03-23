@@ -1168,6 +1168,12 @@ func __pytra_float(v any) float64 {
 	}
 }
 
+// py_to_string is the bare-name alias used by transpiled code (e.g. assertions).
+func py_to_string(v any) string { return pyToString(v) }
+
+// __pytra_as_Any is identity — Go's any already holds all types.
+func __pytra_as_Any(v any) any { return v }
+
 func __pytra_str(v any) string {
 	if v == nil {
 		return ""

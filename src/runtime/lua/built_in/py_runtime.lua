@@ -179,11 +179,18 @@ end
 function __pytra_contains(container, value)
     local t = type(container)
     if t == "table" then
-        if container[value] ~= nil then return true end
-        for i = 1, #container do
-            if container[i] == value then return true end
+        -- For sequence tables (array), only linear-scan;
+        -- for dict tables, check key existence.
+        local n = #container
+        if n > 0 then
+            -- Sequence: linear scan only (avoid index/key collision)
+            for i = 1, n do
+                if container[i] == value then return true end
+            end
+            return false
         end
-        return false
+        -- Dict: key lookup
+        return container[value] ~= nil
     end
     if t == "string" then
         if type(value) ~= "string" then value = tostring(value) end
@@ -695,4 +702,14 @@ function ord(ch)
 end
 function chr(n)
     return string.char(n % 256)
+end
+
+function __pytra_noop() end
+
+function reversed(t)
+    local out = {}
+    for i = #t, 1, -1 do
+        out[#out + 1] = t[i]
+    end
+    return out
 end
