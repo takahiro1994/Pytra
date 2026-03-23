@@ -21,7 +21,16 @@ proc py_float*(v: auto): float =
     float(v)
 
 proc py_str*(v: auto): string =
-  $v
+  when v is bool:
+    if v: "True" else: "False"
+  else:
+    $v
+
+proc py_to_string*(v: auto): string =
+  when v is bool:
+    if v: "True" else: "False"
+  else:
+    $v
 
 proc py_isdigit*(v: char): bool =
   v.isDigit()
