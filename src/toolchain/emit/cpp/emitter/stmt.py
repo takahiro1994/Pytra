@@ -1913,6 +1913,11 @@ class CppStatementEmitter:
                 if target_type in {"", "unknown"}:
                     target_type = iter_item_t if typed_iter else "object"
                     target_is_loop_value_list = target_type.startswith("list[") and target_type.endswith("]")
+                # Post-enumerate expansion: target_plan may still have tuple type
+                # but the actual iter yields single items, not tuples.
+                if target_type.startswith("tuple[") and typed_iter and not iter_item_t.startswith("tuple[") and iter_item_t not in {"", "unknown"}:
+                    target_type = iter_item_t
+                    target_is_loop_value_list = target_type.startswith("list[") and target_type.endswith("]")
                 if self.is_any_like_type(target_type):
                     _, next_tmp = self._emit_runtime_iter_loop_open(iter_txt, {target_id})
                     self.emit(f"object {target_id} = *{next_tmp};")
