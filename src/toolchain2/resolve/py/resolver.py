@@ -668,7 +668,7 @@ def _resolve_imported_call(
     has_runtime_entry: bool = len(sym_doc) > 0
 
     if has_runtime_entry:
-        # Qualify with short module name for stdlib
+        # Use import_symbol annotation
         short_mod: str = module_id
         if short_mod.startswith("pytra.std."):
             short_mod = short_mod[len("pytra.std."):]
@@ -682,11 +682,9 @@ def _resolve_imported_call(
         expr["resolved_runtime_source"] = "import_symbol"
         expr["runtime_module_id"] = runtime_module
         expr["runtime_symbol"] = export_name
-
-        # Adapter kind
+        grp: str = ctx.lookup_runtime_module_group(runtime_module)
         adapter: str = ctx.lookup_adapter_kind(runtime_module, export_name)
         if adapter == "":
-            grp: str = ctx.lookup_runtime_module_group(runtime_module)
             if grp == "built_in":
                 adapter = "builtin"
             else:
