@@ -1965,8 +1965,10 @@ def _parse_block_lines(
             expr_col = _find_expr_col(ctx, expr_text, abs_ln, indent + 7)
             expr = _parse_expr_text(ctx, expr_text, abs_ln, expr_col, name_types)
             span = make_span(abs_ln, indent, abs_ln, indent + len(s_clean))
-            stmt: Stmt = Return(source_span=span, value=expr)
-            stmts.append(stmt)
+            ret_stmt = Return(source_span=span, value=expr)
+            if len(pending_trivia) > 0:
+                ret_stmt.leading_trivia = list(pending_trivia)
+            stmts.append(ret_stmt)
             i += 1
             pending_trivia = []
             pending_comments = []

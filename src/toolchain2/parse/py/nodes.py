@@ -651,13 +651,17 @@ class Swap:
 class Return:
     source_span: SourceSpan
     value: Expr
+    leading_trivia: Optional[list[TriviaNode]] = None
 
     def to_jv(self) -> dict[str, JsonVal]:
-        return {
+        d: dict[str, JsonVal] = {
             "kind": "Return",
             "source_span": self.source_span.to_jv(),
             "value": expr_to_jv(self.value),
         }
+        if self.leading_trivia is not None:
+            d["leading_trivia"] = [t.to_jv() for t in self.leading_trivia]
+        return d
 
 
 @dataclass
