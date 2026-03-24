@@ -719,22 +719,22 @@ class ExprParser:
             call.semantic_tag = sem_tag
             # Register implicit builtin module
             self.ctx.implicit_builtin_modules[rt_mod] = True
-        # Import symbol calls (e.g., perf_counter, Path)
-        if func_name in self.ctx.import_symbols:
+        # Import symbol calls (e.g., perf_counter, Path, py_assert_stdout)
+        if func_name in self.ctx.import_symbols and call.builtin_name is None:
             sym_info = self.ctx.import_symbols[func_name]
             mod_id = sym_info.get("module", "")
             if mod_id != "":
                 call.runtime_module_id = mod_id
                 call.runtime_symbol = func_name
-                call.runtime_call_adapter_kind = "import_symbol"
-                # Resolve semantic tag
+                call.runtime_call_adapter_kind = "extern_delegate"
+                call.resolved_runtime_call = func_name
+                call.resolved_runtime_source = "import_symbol"
+                # Resolve semantic tag for known modules
                 if "pytra.std." in mod_id:
                     call.semantic_tag = "stdlib.fn." + func_name
-                    call.resolved_runtime_call = func_name
                     call.resolved_runtime_source = mod_id
                 elif mod_id == "pathlib":
                     call.semantic_tag = "stdlib.symbol.Path"
-                    call.runtime_call_adapter_kind = "import_symbol"
 
     def _parse_primary(self) -> Expr:
         """基本式: リテラル、名前、括弧、リスト、タプル、辞書。"""
@@ -864,7 +864,12 @@ class ExprParser:
             elements.append(self.parse_expr())
         self.expect("OP", "]")
         end_tok = self.tokens[self.pos - 1]
-        base = self._base(open_tok.start, end_tok.end, "unknown", "value")
+        # Infer list element type from first element
+        elem_type = "unknown"
+        if len(elements) > 0:
+            elem_type = _get_resolved_type(elements[0])
+        list_type = "list[" + elem_type + "]" if elem_type != "unknown" else "list[unknown]"
+        base = self._base(open_tok.start, end_tok.end, list_type, "value")
         return ListExpr(base=base, elements=elements)
 
     def _parse_listcomp_tail(self, open_tok: Token, elt: Expr) -> ListComp:
@@ -2045,6 +2050,15 @@ def _build_meta(ctx: ParseContext) -> dict[str, JsonVal]:
         elif "pytra.std." in mod_id:
             rb["runtime_module_id"] = mod_id
             rb["runtime_group"] = "std"
+            rb["resolved_binding_kind"] = binding.get("binding_kind", "")
+            export = str(binding.get("export_name", ""))
+            rb["runtime_symbol"] = export
+            rb["runtime_symbol_kind"] = "function"
+            rb["runtime_symbol_dispatch"] = "function"
+            rb["runtime_semantic_tag"] = "stdlib.fn." + export
+        elif "pytra.utils." in mod_id:
+            rb["runtime_module_id"] = mod_id
+            rb["runtime_group"] = "utils"
             rb["resolved_binding_kind"] = binding.get("binding_kind", "")
             export = str(binding.get("export_name", ""))
             rb["runtime_symbol"] = export

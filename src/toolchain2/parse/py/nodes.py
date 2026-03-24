@@ -313,6 +313,10 @@ class Call:
             d["builtin_name"] = self.builtin_name
         if self.runtime_call is not None:
             d["runtime_call"] = self.runtime_call
+        if self.resolved_runtime_call is not None:
+            d["resolved_runtime_call"] = self.resolved_runtime_call
+        if self.resolved_runtime_source is not None:
+            d["resolved_runtime_source"] = self.resolved_runtime_source
         if self.runtime_module_id is not None:
             d["runtime_module_id"] = self.runtime_module_id
         if self.runtime_symbol is not None:
@@ -323,10 +327,6 @@ class Call:
             d["semantic_tag"] = self.semantic_tag
         if self.runtime_owner is not None:
             d["runtime_owner"] = expr_to_jv(self.runtime_owner)
-        if self.resolved_runtime_call is not None:
-            d["resolved_runtime_call"] = self.resolved_runtime_call
-        if self.resolved_runtime_source is not None:
-            d["resolved_runtime_source"] = self.resolved_runtime_source
         if self.yields_dynamic is not None:
             d["yields_dynamic"] = self.yields_dynamic
         if self.iter_element_type is not None:
