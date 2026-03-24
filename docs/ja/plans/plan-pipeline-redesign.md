@@ -603,14 +603,14 @@ AGENT-B（resolve）が型解決を始めるために、built-in 宣言ファイ
 - built-in 宣言（builtins.py, containers.py）の EAST1 golden を test/builtin/east1/py/ に配置済み。
 - AGENT-B が strip 済み EAST1 を入力にして、既存 EAST2 golden と一致する resolve を実装する。
 
-### 2026-03-25: [ID: P0-RESOLVE-S1] resolve 本格実装 — 36/132 fixture pass
+### 2026-03-25: [ID: P0-RESOLVE-S1] resolve 本格実装 — 45/132 fixture pass
 
 - `toolchain2/resolve/py/` を全面再実装。4 モジュール構成:
   - `type_norm.py`: 型名正規化 (int→int64 等)、TypeExpr 構築
   - `builtin_registry.py`: builtins.py.east1/containers.py.east1 からシグネチャ抽出、runtime binding テーブル
   - `resolver.py`: 全式 resolved_type 確定、borrow_kind 判定、builtin→py_* 変換、ForRange 変換、import 解決
   - `normalize_order.py`: golden file 一致のためのフィールド順序正規化
-- 36/132 fixture pass (27.3%)。カテゴリ別: core 8/22, control 6/10, strings 5/12, collections 5/20, oop 5/16, signature 3/13, stdlib 1/14, imports 1/7, typing 2/18
+- 45/132 fixture pass (34.1%)。構造バリデーション: 132/132 PASS, resolved_type: 99.8%
 - extern_v2 正本化完了: ハードコードテーブル全除去、builtins/containers/stdlib の meta.extern_v2 から runtime 情報直接取得
 - 通過パターン: 基本型推論、関数呼び出し、比較演算、ForRange 変換、文字列操作、ブール演算、
   OOP self.field 型推論 (field_types 参照)、container method (append/split/join 等)、
