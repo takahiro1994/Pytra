@@ -9,6 +9,7 @@ spec: docs/ja/spec/spec-builtin-functions.md
 
 from pytra.std import extern
 from pytra.std.template import template
+from pytra.types import Obj
 
 
 # ---------------------------------------------------------------------------

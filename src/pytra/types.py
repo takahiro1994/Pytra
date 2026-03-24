@@ -14,3 +14,9 @@ int64 = int
 uint64 = int
 float32 = float
 float64 = float
+
+# Type categories for built-in function declarations.
+# Python runtime: POD is a tuple for isinstance(), Obj is object.
+# Transpiler: recognizes these as type categories natively.
+POD = (type(None), bool, int, float, str)
+Obj = object
