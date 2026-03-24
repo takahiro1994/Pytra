@@ -19,29 +19,23 @@ from pytra.std import re
 from toolchain2.parse.py.source_span import SourceSpan, NULL_SPAN, make_span
 from toolchain2.parse.py.nodes import (
     JsonVal,
-    # Type expressions
-    NamedType, GenericType, TypeExpr,
     # Trivia
     TriviaBlank, TriviaComment, TriviaNode,
     # Import
     ImportAlias,
     # Semantic
-    Cast, Keyword, Comprehension, DictEntry,
+    Keyword, Comprehension, DictEntry,
     # Expressions
     ExprBase, Name, Constant, BinOp, UnaryOp, BoolOp, Compare,
     Call, Attribute, Subscript, SliceExpr, IfExp, ListExpr, TupleExpr,
-    DictExpr, ListComp, RangeExpr, LambdaExpr, Expr, expr_to_jv,
+    DictExpr, ListComp, LambdaExpr, Expr, expr_to_jv,
     # Statements
     Import, ImportFrom, AnnAssign, Assign, AugAssign, ExprStmt, Swap, Return, Raise, Pass, Try, ExceptHandler,
-    If, ForRange, For, While, FunctionDef, ClassDef, Stmt,
+    If, For, While, FunctionDef, ClassDef, Stmt,
     # Module
     Module,
 )
-from toolchain2.parse.py.type_resolver import (
-    default_type_aliases,
-    resolve_type_annotation,
-    annotation_to_type_expr,
-)
+# type_resolver は EAST1 では不要 (型正規化は resolve の責務)
 
 
 # ---------------------------------------------------------------------------
@@ -53,16 +47,11 @@ class ParseContext:
     """パーサーの状態。全て関数引数で渡す。"""
     filename: str
     lines: list[str]
-    type_aliases: dict[str, str]
-    fn_returns: dict[str, str]
-    class_method_returns: dict[str, dict[str, str]]
-    class_bases: dict[str, Optional[str]]
+    fn_returns: dict[str, str]  # 関数名 → 戻り値型注釈 (ソースのまま)
+    class_names: dict[str, bool]  # 定義されたクラス名
     import_symbols: dict[str, dict[str, str]]
     import_modules: dict[str, str]
     import_bindings: list[dict[str, JsonVal]]
-    qualified_symbol_refs: list[dict[str, JsonVal]]
-    implicit_builtin_modules: dict[str, bool]  # set の代替
-    class_names: dict[str, bool]  # set の代替: 定義されたクラス名
 
 
 # ---------------------------------------------------------------------------
@@ -89,16 +78,6 @@ def _strip_inline_comment(line: str) -> str:
         elif ch == "#" and not in_single and not in_double:
             return line[:i].rstrip()
     return line
-
-
-def _resolve_type(ann: str, ctx: ParseContext) -> str:
-    """型注釈を正規化する。"""
-    return resolve_type_annotation(ann, ctx.type_aliases)
-
-
-def _make_type_expr(ann: str, ctx: ParseContext) -> TypeExpr:
-    """型注釈を TypeExpr に変換する。"""
-    return annotation_to_type_expr(ann, ctx.type_aliases)
 
 
 def _is_identifier(s: str) -> bool:
@@ -182,44 +161,6 @@ def _parse_main_guard(s: str) -> bool:
     """'if __name__ == "__main__":' を検出する。"""
     m = re.match(r"^if\s+__name__\s*==\s*[\"']__main__[\"']\s*:\s*$", s)
     return m is not None
-
-
-def _extract_element_type(container_type: str) -> str:
-    """コンテナ型から要素型を抽出する。list[int64] → int64, dict[str,int64] → str。"""
-    if container_type.startswith("list[") and container_type.endswith("]"):
-        return container_type[5:-1]
-    if container_type.startswith("set[") and container_type.endswith("]"):
-        return container_type[4:-1]
-    if container_type.startswith("tuple[") and container_type.endswith("]"):
-        inner = container_type[6:-1]
-        # tuple の最初の要素型
-        parts = inner.split(",")
-        if len(parts) > 0:
-            return parts[0].strip()
-    if container_type.startswith("dict[") and container_type.endswith("]"):
-        inner = container_type[5:-1]
-        parts = inner.split(",")
-        if len(parts) >= 2:
-            return parts[1].strip()  # value type
-        if len(parts) == 1:
-            return parts[0].strip()
-    if container_type == "str":
-        return "str"
-    return "unknown"
-
-
-def _infer_range_mode(step: Expr) -> str:
-    """ForRange の range_mode を step から推論する (golden 準拠)。
-
-    Constant(1) → ascending, Constant(-1) → descending, それ以外 → dynamic。
-    UnaryOp(USub, Constant(1)) は Constant(-1) ではないので dynamic になる。
-    """
-    if isinstance(step, Constant) and isinstance(step.value, int):
-        if step.value == 1:
-            return "ascending"
-        if step.value == -1:
-            return "descending"
-    return "dynamic"
 
 
 def _parse_range_call(s: str) -> Optional[str]:
@@ -423,13 +364,10 @@ class ExprParser:
             self.line_col_offset + local_end,
         )
 
-    def _base(self, local_start: int, local_end: int, resolved_type: str, borrow_kind: str) -> ExprBase:
+    def _base(self, local_start: int, local_end: int) -> ExprBase:
         """ExprBase を生成する。start/end は式テキスト内のローカル位置。"""
         return ExprBase(
             source_span=self._span(local_start, local_end),
-            resolved_type=resolved_type,
-            casts=[],
-            borrow_kind=borrow_kind,
             repr_text=self.source_text[local_start:local_end],
         )
 
@@ -484,9 +422,8 @@ class ExprParser:
         self.expect("OP", ":")
         body = self._parse_ternary()
         end = self._child_local_end(body)
-        ret_type = _get_resolved_type(body)
-        base = self._base(start, end, "unknown", "value")
-        return LambdaExpr(base=base, args=params, arg_types=arg_types, body=body, return_type=ret_type)
+        base = self._base(start, end)
+        return LambdaExpr(base=base, args=params, arg_types=arg_types, body=body, return_type="unknown")
 
     def _parse_ternary(self) -> Expr:
         """a if cond else b"""
@@ -499,8 +436,7 @@ class ExprParser:
             # IfExp span: body の開始から orelse の終了まで
             start = self._child_local_start(body)
             end = self._child_local_end(orelse)
-            res_type = _get_resolved_type(body)
-            base = self._base(start, end, res_type, "value")
+            base = self._base(start, end)
             return IfExp(base=base, test=test, body=body, orelse=orelse)
         return body
 
@@ -511,7 +447,7 @@ class ExprParser:
             right = self._parse_and()
             start = self._child_local_start(left)
             end = self._child_local_end(right)
-            base = self._base(start, end, "bool", "value")
+            base = self._base(start, end)
             left = BoolOp(base=base, op="Or", values=[left, right])
         return left
 
@@ -522,7 +458,7 @@ class ExprParser:
             right = self._parse_not()
             start = self._child_local_start(left)
             end = self._child_local_end(right)
-            base = self._base(start, end, "bool", "value")
+            base = self._base(start, end)
             left = BoolOp(base=base, op="And", values=[left, right])
         return left
 
@@ -531,7 +467,7 @@ class ExprParser:
             tok = self.advance()
             operand = self._parse_not()
             end = self._child_local_end(operand)
-            base = self._base(tok.start, end, "bool", "value")
+            base = self._base(tok.start, end)
             return UnaryOp(base=base, op="Not", operand=operand)
         return self._parse_compare()
 
@@ -582,7 +518,7 @@ class ExprParser:
         if len(ops) > 0:
             start = self._child_local_start(left)
             end = self._child_local_end(comparators[-1])
-            base = self._base(start, end, "bool", "value")
+            base = self._base(start, end)
             return Compare(base=base, left=left, ops=ops, comparators=comparators)
         return left
 
@@ -593,7 +529,7 @@ class ExprParser:
             right = self._parse_bitxor()
             start = self._child_local_start(left)
             end = self._child_local_end(right)
-            base = self._base(start, end, "int64", "value")
+            base = self._base(start, end)
             left = BinOp(base=base, left=left, op="BitOr", right=right)
         return left
 
@@ -604,7 +540,7 @@ class ExprParser:
             right = self._parse_bitand()
             start = self._child_local_start(left)
             end = self._child_local_end(right)
-            base = self._base(start, end, "int64", "value")
+            base = self._base(start, end)
             left = BinOp(base=base, left=left, op="BitXor", right=right)
         return left
 
@@ -615,7 +551,7 @@ class ExprParser:
             right = self._parse_shift()
             start = self._child_local_start(left)
             end = self._child_local_end(right)
-            base = self._base(start, end, "int64", "value")
+            base = self._base(start, end)
             left = BinOp(base=base, left=left, op="BitAnd", right=right)
         return left
 
@@ -627,7 +563,7 @@ class ExprParser:
             op_name = "LShift" if op_tok.value == "<<" else "RShift"
             start = self._child_local_start(left)
             end = self._child_local_end(right)
-            base = self._base(start, end, "int64", "value")
+            base = self._base(start, end)
             left = BinOp(base=base, left=left, op=op_name, right=right)
         return left
 
@@ -639,11 +575,7 @@ class ExprParser:
             op_name = "Add" if op_tok.value == "+" else "Sub"
             start = self._child_local_start(left)
             end = self._child_local_end(right)
-            left_type = _get_resolved_type(left)
-            right_type = _get_resolved_type(right)
-            res_type = _binop_result_type(left_type, right_type, op_name)
-            base = self._base(start, end, res_type, "value")
-            base.casts = _compute_binop_casts(left_type, right_type, op_name)
+            base = self._base(start, end)
             left = BinOp(base=base, left=left, op=op_name, right=right)
         return left
 
@@ -656,13 +588,8 @@ class ExprParser:
             op_name = op_map.get(op_tok.value, op_tok.value)
             start = self._child_local_start(left)
             end = self._child_local_end(right)
-            left_type = _get_resolved_type(left)
-            right_type = _get_resolved_type(right)
-            res_type = _binop_result_type(left_type, right_type, op_name)
-            base = self._base(start, end, res_type, "value")
+            base = self._base(start, end)
             # Numeric promotion casts
-            casts = _compute_binop_casts(left_type, right_type, op_name)
-            base.casts = casts
             left = BinOp(base=base, left=left, op=op_name, right=right)
         return left
 
@@ -672,21 +599,19 @@ class ExprParser:
             self.advance()
             operand = self._parse_unary()
             end = self._child_local_end(operand)
-            res_type = _get_resolved_type(operand)
-            base = self._base(tok.start, end, res_type, "value")
+            base = self._base(tok.start, end)
             return UnaryOp(base=base, op="USub", operand=operand)
         if tok.value == "+" and tok.kind == "OP":
             self.advance()
             operand = self._parse_unary()
             end = self._child_local_end(operand)
-            res_type = _get_resolved_type(operand)
-            base = self._base(tok.start, end, res_type, "value")
+            base = self._base(tok.start, end)
             return UnaryOp(base=base, op="UAdd", operand=operand)
         if tok.value == "~" and tok.kind == "OP":
             self.advance()
             operand = self._parse_unary()
             end = self._child_local_end(operand)
-            base = self._base(tok.start, end, "int64", "value")
+            base = self._base(tok.start, end)
             return UnaryOp(base=base, op="Invert", operand=operand)
         return self._parse_power()
 
@@ -697,7 +622,7 @@ class ExprParser:
             right = self._parse_unary()  # right-associative
             start = self._child_local_start(left)
             end = self._child_local_end(right)
-            base = self._base(start, end, "float64", "value")
+            base = self._base(start, end)
             left = BinOp(base=base, left=left, op="Pow", right=right)
         return left
 
@@ -710,17 +635,14 @@ class ExprParser:
                 self.advance()
                 attr_tok = self.advance()
                 end = attr_tok.end
-                base = self._base(self._child_local_start(expr), end, "unknown", "value")
+                base = self._base(self._child_local_start(expr), end)
                 expr = Attribute(base=base, value=expr, attr=attr_tok.value)
             elif tok.value == "[":
                 self.advance()
                 index = self._parse_subscript_index()
                 self.expect("OP", "]")
                 end_tok = self.tokens[self.pos - 1]
-                # Subscript 型推論: container[index] → element type
-                container_type = _get_resolved_type(expr)
-                sub_type = _extract_element_type(container_type) if not isinstance(index, SliceExpr) else container_type
-                base = self._base(self._child_local_start(expr), end_tok.end, sub_type, "value")
+                base = self._base(self._child_local_start(expr), end_tok.end)
                 sub = Subscript(base=base, value=expr, slice_expr=index)
                 # Slice の場合、lower/upper/lowered_kind を Subscript に直接設定
                 if isinstance(index, SliceExpr):
@@ -768,7 +690,7 @@ class ExprParser:
                             gens.append(Comprehension(target=target, iter_expr=iter_expr, ifs=ifs, is_async=False))
                         # Wrap as ListComp (generator)
                         gen_base = ExprBase(source_span=arg_expr.base.source_span if hasattr(arg_expr, 'base') else NULL_SPAN,
-                                          resolved_type="unknown", casts=[], borrow_kind="value", repr_text="")
+                                          repr_text="")
                         arg_expr = ListComp(base=gen_base, elt=arg_expr, generators=gens)
                     args.append(arg_expr)
                 if self.peek().value != ",":
@@ -781,233 +703,9 @@ class ExprParser:
         # Resolve call type
         func_name = _get_func_name(func)
         # Attribute call (Class.method / obj.method): fn_returns を使わない
-        if isinstance(func, Attribute):
-            res_type = self._resolve_call_type_method(func_name, func, args)
-        else:
-            res_type = self._resolve_call_type(func_name, args)
-        # Method call: owner type から戻り値型を推論
-        if isinstance(func, Attribute) and res_type == "unknown":
-            owner_type = _get_resolved_type(func.value)
-            owner_base = owner_type.split("[")[0] if "[" in owner_type else owner_type
-            if func_name == "pop" and owner_base in ("list", "deque"):
-                res_type = _extract_element_type(owner_type)
-            elif func_name == "get" and owner_base == "dict":
-                res_type = _extract_element_type(owner_type)  # value type
-        base = self._base(start, end, res_type, "value")
+        base = self._base(start, end)
         call = Call(base=base, func=func, args=args, keywords=keywords)
-        # Annotate builtin calls
-        self._annotate_call(call, func_name)
         return call
-
-    def _resolve_call_type_method(self, method_name: str, func: Attribute, args: list[Expr]) -> str:
-        """Attribute call (obj.method / Class.method) の戻り値型を推論。"""
-        # obj.method() の場合: owner がクラスインスタンスなら fn_returns を参照
-        owner_type = _get_resolved_type(func.value)
-        owner_base = owner_type.split("[")[0] if "[" in owner_type else owner_type
-        if owner_base in self.ctx.class_names or (isinstance(func.value, Name) and func.value.id == "self"):
-            if method_name in self.ctx.fn_returns:
-                return _resolve_type(self.ctx.fn_returns[method_name], self.ctx)
-        # Method return types (builtin types only)
-        if method_name == "append" or method_name == "extend" or method_name == "insert" or method_name == "clear" or method_name == "sort" or method_name == "reverse":
-            return "None"
-        if method_name == "pop":
-            return "unknown"
-        if method_name == "get":
-            return "unknown"
-        if method_name == "join":
-            return "str"
-        if method_name == "split" or method_name == "strip" or method_name == "lstrip" or method_name == "rstrip" or method_name == "lower" or method_name == "upper" or method_name == "replace":
-            return "str"
-        if method_name == "find" or method_name == "index" or method_name == "count":
-            return "int64"
-        if method_name == "startswith" or method_name == "endswith":
-            return "bool"
-        if method_name == "write_text" or method_name == "write_rgb_png" or method_name == "save":
-            return "None"
-        if method_name == "read_text":
-            return "str"
-        if method_name == "keys" or method_name == "values" or method_name == "items":
-            return "unknown"
-        return "unknown"
-
-    def _resolve_call_type(self, func_name: str, args: list[Expr]) -> str:
-        """関数呼び出しの戻り値型を推論する。"""
-        if func_name in self.ctx.fn_returns:
-            return _resolve_type(self.ctx.fn_returns[func_name], self.ctx)
-        if func_name == "int":
-            return "int64"
-        if func_name == "float":
-            return "float64"
-        if func_name == "str":
-            return "str"
-        if func_name == "bool":
-            return "bool"
-        if func_name == "len":
-            return "int64"
-        if func_name == "abs":
-            if len(args) > 0:
-                return _get_resolved_type(args[0])
-            return "int64"
-        if func_name == "min" or func_name == "max":
-            if len(args) > 0:
-                return _get_resolved_type(args[0])
-            return "unknown"
-        if func_name == "range":
-            return "range"
-        if func_name == "print":
-            return "None"
-        if func_name == "perf_counter":
-            return "float64"
-        if func_name == "Path":
-            return "Path"
-        if func_name == "ord":
-            return "int64"
-        if func_name == "chr":
-            return "str"
-        if func_name == "isinstance":
-            return "bool"
-        if func_name == "enumerate":
-            return "unknown"
-        if func_name == "reversed":
-            return "unknown"
-        if func_name == "sorted":
-            return "unknown"
-        if func_name == "zip":
-            return "unknown"
-        # Class constructor: ClassName() → ClassName
-        if func_name in self.ctx.class_names:
-            return func_name
-        # Method return types
-        if func_name == "append" or func_name == "extend" or func_name == "insert" or func_name == "clear" or func_name == "sort" or func_name == "reverse":
-            return "None"
-        if func_name == "pop":
-            return "unknown"
-        if func_name == "get":
-            return "unknown"
-        if func_name == "keys" or func_name == "values" or func_name == "items":
-            return "unknown"
-        if func_name == "join":
-            return "str"
-        if func_name == "split" or func_name == "strip" or func_name == "lstrip" or func_name == "rstrip" or func_name == "lower" or func_name == "upper" or func_name == "replace":
-            return "str"
-        if func_name == "find" or func_name == "index" or func_name == "count":
-            return "int64"
-        if func_name == "startswith" or func_name == "endswith":
-            return "bool"
-        if func_name == "write_text" or func_name == "write_rgb_png" or func_name == "save":
-            return "None"
-        if func_name == "read_text":
-            return "str"
-        return "unknown"
-
-    def _annotate_call(self, call: Call, func_name: str) -> None:
-        """組み込み関数呼び出しにセマンティック情報を付与する。"""
-        # Golden 準拠: print は pytra.built_in.io_ops、他は pytra.core.py_runtime
-        # (runtime_call, module_id, runtime_symbol, semantic_tag)
-        _DEFAULT_RT_MOD = "pytra.core.py_runtime"
-        builtin_map: dict[str, tuple[str, str, str, str]] = {
-            "print": ("py_print", "pytra.built_in.io_ops", "py_print", "core.print"),
-            "len": ("py_len", _DEFAULT_RT_MOD, "len", "core.len"),
-            "abs": ("py_abs", _DEFAULT_RT_MOD, "abs", "core.abs"),
-            "min": ("py_min", _DEFAULT_RT_MOD, "min", "core.min"),
-            "max": ("py_max", _DEFAULT_RT_MOD, "max", "core.max"),
-            "int": ("py_to_string", _DEFAULT_RT_MOD, "int", "cast.int"),
-            "float": ("py_to_string", _DEFAULT_RT_MOD, "float", "cast.float"),
-            "str": ("py_to_string", _DEFAULT_RT_MOD, "str", "cast.str"),
-            "bool": ("py_to_string", _DEFAULT_RT_MOD, "bool", "cast.bool"),
-            "ord": ("py_ord", _DEFAULT_RT_MOD, "ord", "core.ord"),
-            "chr": ("py_chr", _DEFAULT_RT_MOD, "chr", "core.chr"),
-            "isinstance": ("py_isinstance", _DEFAULT_RT_MOD, "isinstance", "core.isinstance"),
-            "range": ("py_range", _DEFAULT_RT_MOD, "range", "core.range"),
-        }
-        if func_name in builtin_map:
-            rt_call, rt_mod, rt_sym, sem_tag = builtin_map[func_name]
-            call.builtin_name = func_name
-            call.lowered_kind = "BuiltinCall"
-            call.runtime_call = rt_call
-            call.runtime_module_id = rt_mod
-            call.runtime_symbol = rt_sym
-            call.runtime_call_adapter_kind = "builtin"
-            call.semantic_tag = sem_tag
-            # Register implicit builtin module from semantic_tag
-            _SEM_TAG_TO_BUILTIN: dict[str, str] = {
-                "core.print": "pytra.built_in.io_ops",
-                "core.len": "pytra.built_in.sequence",
-                "core.abs": "pytra.built_in.numeric_ops",
-                "core.min": "pytra.built_in.numeric_ops",
-                "core.max": "pytra.built_in.numeric_ops",
-                "cast.str": "pytra.built_in.scalar_ops",
-                "cast.int": "pytra.built_in.scalar_ops",
-                "cast.float": "pytra.built_in.scalar_ops",
-                "cast.bool": "pytra.built_in.scalar_ops",
-                "core.ord": "pytra.built_in.scalar_ops",
-                "core.chr": "pytra.built_in.scalar_ops",
-                "core.isinstance": "pytra.built_in.predicates",
-                "core.range": "pytra.built_in.sequence",
-            }
-            # perf_counter: builtin_map に含まれない特殊ケース
-            if func_name == "perf_counter" and func_name in self.ctx.import_symbols:
-                call.lowered_kind = "BuiltinCall"
-                call.builtin_name = func_name
-                sym_info_pc = self.ctx.import_symbols[func_name]
-                pc_mod = sym_info_pc.get("module", "")
-                call.runtime_call = func_name
-                call.runtime_module_id = pc_mod
-                call.runtime_symbol = func_name
-                call.runtime_call_adapter_kind = "extern_delegate"
-                call.semantic_tag = "stdlib.fn." + func_name
-            builtin_mod = _SEM_TAG_TO_BUILTIN.get(sem_tag, "")
-            if builtin_mod != "":
-                self.ctx.implicit_builtin_modules[builtin_mod] = True
-        # Import symbol calls — only pytra.utils.* gets runtime info
-        # pytra.std.* symbols are plain calls (no runtime info in golden)
-        if func_name in self.ctx.import_symbols and call.builtin_name is None:
-            sym_info = self.ctx.import_symbols[func_name]
-            mod_id = sym_info.get("module", "")
-            if mod_id != "" and "pytra.utils." in mod_id:
-                call.runtime_module_id = mod_id
-                call.runtime_symbol = func_name
-                call.runtime_call_adapter_kind = "extern_delegate"
-                call.resolved_runtime_call = func_name
-                call.resolved_runtime_source = "import_symbol"
-        # Method call: obj.method(...) → semantic_tag, runtime_owner
-        # 組み込み型 (list, dict, str, set, Path) のメソッドのみアノテーション
-        if isinstance(call.func, Attribute):
-            attr = call.func
-            method_name = attr.attr
-            owner_type = _get_resolved_type(attr.value)
-            owner_base = owner_type.split("[")[0] if "[" in owner_type else owner_type
-            _BUILTIN_OWNER_TYPES = {"list", "dict", "str", "set", "Path", "bytearray", "bytes", "deque"}
-            if owner_base in _BUILTIN_OWNER_TYPES:
-                call.semantic_tag = "stdlib.method." + method_name
-                call.lowered_kind = "BuiltinCall"
-                call.builtin_name = method_name
-                call.runtime_owner = attr.value
-                if owner_base == "list":
-                    call.runtime_call = "list." + method_name
-                    call.runtime_module_id = "pytra.core.list"
-                    call.runtime_symbol = "list." + method_name
-                    call.runtime_call_adapter_kind = "builtin"
-                    # list.pop は container.list.pop + yields_dynamic
-                    if method_name == "pop":
-                        call.semantic_tag = "container.list.pop"
-                        call.yields_dynamic = True
-                elif owner_base == "dict":
-                    call.runtime_call = "dict." + method_name
-                    call.runtime_module_id = "pytra.core.dict"
-                    call.runtime_symbol = "dict." + method_name
-                    call.runtime_call_adapter_kind = "builtin"
-                    call.semantic_tag = "container.dict." + method_name
-                elif owner_base == "str":
-                    call.runtime_call = "py_" + method_name
-                    call.runtime_module_id = "pytra.built_in.string_ops"
-                    call.runtime_symbol = "str." + method_name
-                    call.runtime_call_adapter_kind = "builtin"
-                elif owner_base == "set":
-                    call.runtime_call = "set." + method_name
-                    call.runtime_module_id = "pytra.core.set"
-                    call.runtime_symbol = "set." + method_name
-                    call.runtime_call_adapter_kind = "builtin"
 
     def _parse_primary(self) -> Expr:
         """基本式: リテラル、名前、括弧、リスト、タプル、辞書。"""
@@ -1025,14 +723,14 @@ class ExprParser:
                 val = int(value_str, 8)
             else:
                 val = int(value_str)
-            base = self._base(tok.start, tok.end, "int64", "value")
+            base = self._base(tok.start, tok.end)
             return Constant(base=base, value=val)
 
         # Float literal
         if tok.kind == "FLOAT":
             self.advance()
             val_f = float(tok.value.replace("_", ""))
-            base = self._base(tok.start, tok.end, "float64", "value")
+            base = self._base(tok.start, tok.end)
             return Constant(base=base, value=val_f)
 
         # String literal
@@ -1067,22 +765,22 @@ class ExprParser:
             res_type = "str"
             if prefix_end > 0 and raw[0] in "bB":
                 res_type = "bytes"
-            base = self._base(tok.start, tok.end, res_type, "value")
+            base = self._base(tok.start, tok.end)
             return Constant(base=base, value=val_s)
 
         # Name / keyword literals
         if tok.kind == "NAME":
             if tok.value == "True":
                 self.advance()
-                base = self._base(tok.start, tok.end, "bool", "value")
+                base = self._base(tok.start, tok.end)
                 return Constant(base=base, value=True)
             if tok.value == "False":
                 self.advance()
-                base = self._base(tok.start, tok.end, "bool", "value")
+                base = self._base(tok.start, tok.end)
                 return Constant(base=base, value=False)
             if tok.value == "None":
                 self.advance()
-                base = self._base(tok.start, tok.end, "None", "value")
+                base = self._base(tok.start, tok.end)
                 return Constant(base=base, value=None)  # type: ignore
             self.advance()
             # Look up type from context
@@ -1090,7 +788,7 @@ class ExprParser:
             # RHS reference: readonly_ref, no type_expr
             # (LHS targets are created separately via _make_name_expr)
             borrow = "readonly_ref" if resolved != "unknown" else "value"
-            base = self._base(tok.start, tok.end, resolved, borrow)
+            base = self._base(tok.start, tok.end)
             name = Name(base=base, id=tok.value)
             # RHS names do NOT get type_expr (only LHS declaration targets do)
             return name
@@ -1101,7 +799,7 @@ class ExprParser:
             if self.peek().value == ")":
                 self.advance()
                 # Empty tuple
-                base = self._base(tok.start, self.tokens[self.pos - 1].end, "tuple[]", "value")
+                base = self._base(tok.start, self.tokens[self.pos - 1].end)
                 return TupleExpr(base=base, elements=[])
             first = self.parse_expr()
             if self.peek().value == "for":
@@ -1120,7 +818,7 @@ class ExprParser:
                     gens.append(Comprehension(target=target, iter_expr=iter_expr, ifs=ifs, is_async=False))
                 self.expect("OP", ")")
                 end_tok = self.tokens[self.pos - 1]
-                base = self._base(tok.start, end_tok.end, "unknown", "value")
+                base = self._base(tok.start, end_tok.end)
                 return ListComp(base=base, elt=first, generators=gens)
             if self.peek().value == ",":
                 # Tuple
@@ -1133,18 +831,13 @@ class ExprParser:
                 self.expect("OP", ")")
                 end_tok = self.tokens[self.pos - 1]
                 # Tuple 型推論: tuple[elem_type1,elem_type2,...]
-                elem_types = [_get_resolved_type(e) for e in elements]
-                if all(t != "unknown" for t in elem_types):
-                    tuple_type = "tuple[" + ", ".join(elem_types) + "]"
-                else:
-                    tuple_type = "unknown"
-                base = self._base(tok.start, end_tok.end, tuple_type, "value")
+                base = self._base(tok.start, end_tok.end)
                 return TupleExpr(base=base, elements=elements)
             close_tok = self.expect("OP", ")")
             # 括弧付き式: span を括弧を含めた範囲に拡張
             paren_start = tok.start
             paren_end = close_tok.end
-            if isinstance(first, (Name, Constant, BinOp, UnaryOp, BoolOp, Compare, Call, Attribute, Subscript, IfExp, ListExpr, TupleExpr, DictExpr, ListComp, RangeExpr)):
+            if isinstance(first, (Name, Constant, BinOp, UnaryOp, BoolOp, Compare, Call, Attribute, Subscript, IfExp, ListExpr, TupleExpr, DictExpr, ListComp)):
                 first.base.source_span = self._span(paren_start, paren_end)
                 first.base.repr_text = self.source_text[paren_start:paren_end]
             return first
@@ -1163,7 +856,7 @@ class ExprParser:
         open_tok = self.advance()  # [
         if self.peek().value == "]":
             close_tok = self.advance()
-            base = self._base(open_tok.start, close_tok.end, "list[unknown]", "value")
+            base = self._base(open_tok.start, close_tok.end)
             return ListExpr(base=base, elements=[])
         first = self.parse_expr()
         # Check for list comprehension
@@ -1178,12 +871,7 @@ class ExprParser:
             elements.append(self.parse_expr())
         self.expect("OP", "]")
         end_tok = self.tokens[self.pos - 1]
-        # Infer list element type from first element
-        elem_type = "unknown"
-        if len(elements) > 0:
-            elem_type = _get_resolved_type(elements[0])
-        list_type = "list[" + elem_type + "]" if elem_type != "unknown" else "list[unknown]"
-        base = self._base(open_tok.start, end_tok.end, list_type, "value")
+        base = self._base(open_tok.start, end_tok.end)
         return ListExpr(base=base, elements=elements)
 
     def _parse_listcomp_tail(self, open_tok: Token, elt: Expr) -> ListComp:
@@ -1195,13 +883,7 @@ class ExprParser:
             self.expect("NAME", "in")
             # iter_expr は 'if', 'for', ']' で止める
             iter_expr = self._parse_comp_iter()
-            # target 自体は unknown/value のまま (golden 準拠)
-            # ただし elt の型推論のために iter 元の要素型を記録
-            iter_type = _get_resolved_type(iter_expr)
-            comp_elem_type = _extract_element_type(iter_type)
-            if isinstance(target, Name) and comp_elem_type != "unknown":
-                # elt が target と同じ名前なら型を設定 (後で)
-                self.name_types[target.id] = comp_elem_type
+            # EAST1: 型推論しない
             ifs: list[Expr] = []
             while self.peek().value == "if":
                 self.advance()
@@ -1209,14 +891,7 @@ class ExprParser:
             gens.append(Comprehension(target=target, iter_expr=iter_expr, ifs=ifs, is_async=False))
         self.expect("OP", "]")
         end_tok = self.tokens[self.pos - 1]
-        # Re-resolve elt type from name_types (generator が型情報を設定した後)
-        elt_type = _get_resolved_type(elt)
-        if elt_type == "unknown" and isinstance(elt, Name) and elt.id in self.name_types:
-            elt_type = self.name_types[elt.id]
-            elt.base.resolved_type = elt_type
-            elt.base.borrow_kind = "readonly_ref"
-        comp_type = "list[" + elt_type + "]" if elt_type != "unknown" else "unknown"
-        base = self._base(open_tok.start, end_tok.end, comp_type, "value")
+        base = self._base(open_tok.start, end_tok.end)
         return ListComp(base=base, elt=elt, generators=gens)
 
     def _parse_comp_target(self) -> Expr:
@@ -1224,7 +899,7 @@ class ExprParser:
         tok = self.peek()
         if tok.kind == "NAME" and tok.value != "in":
             self.advance()
-            base = self._base(tok.start, tok.end, "unknown", "value")
+            base = self._base(tok.start, tok.end)
             first = Name(base=base, id=tok.value)
             # Check for tuple target: x, y
             if self.peek().value == ",":
@@ -1234,9 +909,9 @@ class ExprParser:
                     if self.peek().value == "in":
                         break
                     next_tok = self.advance()
-                    nbase = self._base(next_tok.start, next_tok.end, "unknown", "value")
+                    nbase = self._base(next_tok.start, next_tok.end)
                     elements.append(Name(base=nbase, id=next_tok.value))
-                tbase = self._base(tok.start, self.tokens[self.pos - 1].end, "unknown", "value")
+                tbase = self._base(tok.start, self.tokens[self.pos - 1].end)
                 return TupleExpr(base=tbase, elements=elements)
             return first
         return self.parse_expr()
@@ -1276,7 +951,7 @@ class ExprParser:
         open_tok = self.advance()  # {
         if self.peek().value == "}":
             close_tok = self.advance()
-            base = self._base(open_tok.start, close_tok.end, "dict[unknown, unknown]", "value")
+            base = self._base(open_tok.start, close_tok.end)
             return DictExpr(base=base, keys=[], dict_values=[])
         first = self.parse_expr()
         # Dict comprehension: {k: v for ...}
@@ -1290,7 +965,7 @@ class ExprParser:
                     self.advance()
                 self.expect("OP", "}")
                 end_tok = self.tokens[self.pos - 1]
-                base = self._base(open_tok.start, end_tok.end, "unknown", "value")
+                base = self._base(open_tok.start, end_tok.end)
                 return DictExpr(base=base, keys=[first], dict_values=[first_val], entries=[DictEntry(key=first, value=first_val)])
             # Regular dict
             keys: list[Expr] = [first]
@@ -1309,10 +984,7 @@ class ExprParser:
             self.expect("OP", "}")
             end_tok = self.tokens[self.pos - 1]
             # Infer dict type from first key/value
-            key_type = _get_resolved_type(keys[0]) if len(keys) > 0 else "unknown"
-            val_type = _get_resolved_type(values[0]) if len(values) > 0 else "unknown"
-            dict_type = "dict[" + key_type + "," + val_type + "]" if key_type != "unknown" and val_type != "unknown" else "unknown"
-            base = self._base(open_tok.start, end_tok.end, dict_type, "value")
+            base = self._base(open_tok.start, end_tok.end)
             return DictExpr(base=base, keys=keys, dict_values=values, entries=entries)
         # Set literal or set comprehension
         if self.peek().value == "for":
@@ -1321,7 +993,7 @@ class ExprParser:
                 self.advance()
             self.expect("OP", "}")
             end_tok = self.tokens[self.pos - 1]
-            base = self._base(open_tok.start, end_tok.end, "unknown", "value")
+            base = self._base(open_tok.start, end_tok.end)
             return ListExpr(base=base, elements=[first])  # TODO: SetExpr
         # Set literal: {a, b, c}
         elements: list[Expr] = [first]
@@ -1332,21 +1004,13 @@ class ExprParser:
             elements.append(self.parse_expr())
         self.expect("OP", "}")
         end_tok = self.tokens[self.pos - 1]
-        base = self._base(open_tok.start, end_tok.end, "unknown", "value")
+        base = self._base(open_tok.start, end_tok.end)
         return ListExpr(base=base, elements=elements)  # TODO: SetExpr
 
 
 # ---------------------------------------------------------------------------
 # Expression helpers
 # ---------------------------------------------------------------------------
-
-def _get_resolved_type(e: Expr) -> str:
-    if isinstance(e, (Name, Constant, BinOp, UnaryOp, BoolOp, Compare, Call, Attribute, Subscript, IfExp, ListExpr, TupleExpr, DictExpr, ListComp, RangeExpr)):
-        return e.base.resolved_type
-    if isinstance(e, SliceExpr):
-        return "slice"
-    return "unknown"
-
 
 # ローカル位置追跡: ExprParser 内で _base() に渡す local_start/local_end を
 # 子ノードから取得するためのユーティリティ。
@@ -1355,7 +1019,7 @@ def _get_resolved_type(e: Expr) -> str:
 
 def _expr_col(e: Expr) -> int:
     """式ノードの source_span.col (絶対位置)。"""
-    if isinstance(e, (Name, Constant, BinOp, UnaryOp, BoolOp, Compare, Call, Attribute, Subscript, IfExp, ListExpr, TupleExpr, DictExpr, ListComp, RangeExpr)):
+    if isinstance(e, (Name, Constant, BinOp, UnaryOp, BoolOp, Compare, Call, Attribute, Subscript, IfExp, ListExpr, TupleExpr, DictExpr, ListComp)):
         sp = e.base.source_span
         if sp.col is not None:
             return sp.col
@@ -1364,7 +1028,7 @@ def _expr_col(e: Expr) -> int:
 
 def _expr_end_col(e: Expr) -> int:
     """式ノードの source_span.end_col (絶対位置)。"""
-    if isinstance(e, (Name, Constant, BinOp, UnaryOp, BoolOp, Compare, Call, Attribute, Subscript, IfExp, ListExpr, TupleExpr, DictExpr, ListComp, RangeExpr)):
+    if isinstance(e, (Name, Constant, BinOp, UnaryOp, BoolOp, Compare, Call, Attribute, Subscript, IfExp, ListExpr, TupleExpr, DictExpr, ListComp)):
         sp = e.base.source_span
         if sp.end_col is not None:
             return sp.end_col
@@ -1379,64 +1043,7 @@ def _get_func_name(func: Expr) -> str:
     return ""
 
 
-def _compute_binop_casts(left_type: str, right_type: str, op: str) -> list[Cast]:
-    """二項演算の数値プロモーションキャストを計算する。"""
-    casts: list[Cast] = []
-    # Div: int64/int64 → float64 (両辺をプロモーション)
-    if op == "Div":
-        if left_type == "int64":
-            casts.append(Cast(operand="left", from_type="int64", to_type="float64", reason="numeric_promotion"))
-        if right_type == "int64":
-            casts.append(Cast(operand="right", from_type="int64", to_type="float64", reason="numeric_promotion"))
-    # Pow: int64 → float64
-    elif op == "Pow":
-        if left_type == "int64":
-            casts.append(Cast(operand="left", from_type="int64", to_type="float64", reason="numeric_promotion"))
-        if right_type == "int64":
-            casts.append(Cast(operand="right", from_type="int64", to_type="float64", reason="numeric_promotion"))
-    # Mixed int64/float64: promote int64 side
-    elif left_type == "int64" and right_type == "float64":
-        casts.append(Cast(operand="left", from_type="int64", to_type="float64", reason="numeric_promotion"))
-    elif left_type == "float64" and right_type == "int64":
-        casts.append(Cast(operand="right", from_type="int64", to_type="float64", reason="numeric_promotion"))
-    return casts
-
-
 _KNOWN_NUMERIC_TYPES = {"int64", "float64", "bool"}
-
-
-def _is_known_numeric(t: str) -> bool:
-    return t in _KNOWN_NUMERIC_TYPES
-
-
-def _binop_result_type(left_type: str, right_type: str, op: str) -> str:
-    """二項演算の結果型を推論する。"""
-    if op == "Div":
-        if _is_known_numeric(left_type) and _is_known_numeric(right_type):
-            return "float64"
-        return "unknown"
-    if op == "Pow":
-        if _is_known_numeric(left_type) and _is_known_numeric(right_type):
-            return "float64"
-        return "unknown"
-    if op == "Add" and (left_type == "str" or right_type == "str"):
-        return "str"
-    if left_type == "float64" or right_type == "float64":
-        if _is_known_numeric(left_type) and _is_known_numeric(right_type):
-            return "float64"
-    if left_type == "int64" and _is_known_numeric(right_type):
-        return "int64"
-    if right_type == "int64" and _is_known_numeric(left_type):
-        return "int64"
-    if left_type == "unknown" or right_type == "unknown":
-        return "unknown"
-    # Both same known type
-    if left_type == right_type and _is_known_numeric(left_type):
-        return left_type
-    # Non-standard type → unknown
-    if not _is_known_numeric(left_type) or not _is_known_numeric(right_type):
-        return "unknown"
-    return left_type
 
 
 def _unescape_string(s: str) -> str:
@@ -1484,16 +1091,11 @@ def parse_python_source(source: str, filename: str) -> Module:
     ctx = ParseContext(
         filename=filename,
         lines=lines,
-        type_aliases=default_type_aliases(),
         fn_returns={},
-        class_method_returns={},
-        class_bases={},
+        class_names={},
         import_symbols={},
         import_modules={},
         import_bindings=[],
-        qualified_symbol_refs=[],
-        implicit_builtin_modules={},
-        class_names={},
     )
 
     # Phase 1: Pre-scan
@@ -1565,7 +1167,7 @@ def _prescan(ctx: ParseContext, lines: list[str]) -> None:
         fn_name, _, ret_ann = _parse_def_header(s)
         if fn_name != "":
             if ret_ann != "":
-                ctx.fn_returns[fn_name] = _resolve_type(ret_ann, ctx)
+                ctx.fn_returns[fn_name] = ret_ann
             else:
                 # 戻り値注釈なし → None がデフォルト
                 ctx.fn_returns[fn_name] = "None"
@@ -1682,11 +1284,6 @@ def _parse_module_body(
                 if mod == "pathlib" or mod == "os" or mod == "sys":
                     binding["host_only"] = True
                 ctx.import_bindings.append(binding)
-                ctx.qualified_symbol_refs.append({
-                    "module_id": mod,
-                    "symbol": alias.name,
-                    "local_name": local,
-                })
             ln_no += 1
             # import 後の空行は trivia に蓄積しない
             skip_next_blanks = True
@@ -1819,7 +1416,7 @@ def _parse_function_def(
 
     # Parse signature via pytra.std.re
     _, args_text, return_ann = _parse_def_header(header)
-    return_type = _resolve_type(return_ann, ctx) if return_ann != "" else "None"
+    return_type = return_ann if return_ann != "" else "None"
 
     # Parse arguments
     arg_order: list[str] = []
@@ -1854,7 +1451,7 @@ def _parse_function_def(
                 colon_pos = param.find(":")
                 pname = param[:colon_pos].strip()
                 ptype_ann = param[colon_pos + 1:].strip()
-                ptype = _resolve_type(ptype_ann, ctx)
+                ptype = ptype_ann
             else:
                 pname = param
                 ptype = "unknown"
@@ -1866,8 +1463,6 @@ def _parse_function_def(
                 default_col = _find_expr_col(ctx, default_part, start_ln + 1, 0)
                 default_expr = _parse_expr_text(ctx, default_part, start_ln + 1, default_col, name_types_empty)
                 arg_defaults[pname] = expr_to_jv(default_expr)
-            if ptype != "unknown":
-                arg_type_exprs[pname] = _make_type_expr(ptype, ctx).to_jv()
             idx += 1
 
     # Collect body
@@ -1877,8 +1472,6 @@ def _parse_function_def(
     name_types: dict[str, str] = dict(arg_types)
     body_stmts = _parse_block_lines(ctx, block_lines, name_types, fn_name)
 
-    # Compute arg_usage
-    arg_usage = _compute_arg_usage(arg_order, body_stmts)
 
     # Extract docstring
     docstring = _extract_docstring(block_lines)
@@ -1904,7 +1497,6 @@ def _parse_function_def(
         arg_defaults=arg_defaults,
         arg_index=arg_index,
         return_type=return_type,
-        arg_usage=arg_usage,
         renamed_symbols={},
         docstring=docstring,
         body=body_stmts,
@@ -1918,9 +1510,6 @@ def _parse_function_def(
         fd.decorators = []
     else:
         # トップレベル関数
-        if len(arg_type_exprs) > 0 or len(arg_order) == 0:
-            fd.arg_type_exprs = arg_type_exprs
-        fd.return_type_expr = _make_type_expr(return_type, ctx)
         fd.leading_comments = list(comments)
         fd.leading_trivia = list(trivia)
 
@@ -1970,7 +1559,7 @@ def _parse_class_def(
         body=body_stmts,
         dataclass_flag=is_dataclass,
         field_types=field_types,
-        class_storage_hint=_infer_class_storage_hint(is_dataclass, base_name, field_types, body_stmts),
+        class_storage_hint="value",
     )
     # ClassDef: 最初の body item は常に出力、2番目以降は trivia がある場合のみ
     if force_leading or len(comments) > 0 or len(trivia) > 0:
@@ -2071,26 +1660,6 @@ def _parse_try_stmt(
         orelse=orelse,
         finalbody=finalbody,
     ), next_i
-
-
-def _infer_class_storage_hint(is_dataclass: bool, base: Optional[str], field_types: dict[str, str], body: list[Stmt]) -> str:
-    """class_storage_hint を推論する (golden 準拠)。"""
-    # base がある → ref
-    if base is not None and base != "":
-        return "ref"
-    # __init__ メソッドがある → ref (instance state がある)
-    has_init = False
-    for stmt in body:
-        if isinstance(stmt, FunctionDef) and stmt.name == "__init__":
-            has_init = True
-    if has_init:
-        return "ref"
-    # dataclass → ref
-    if is_dataclass:
-        return "ref"
-    # class-level AnnAssign (static field) のみ → value
-    # instance field は __init__ 内の self.x = ... で検出
-    return "value"
 
 
 def _merge_logical_lines(lines: list[str]) -> list[str]:
@@ -2334,20 +1903,19 @@ def _parse_block_lines(
         # Annotated assignment: x: Type = value
         var_name, type_ann, value_text = _parse_ann_assign(s_clean)
         if var_name != "":
-            resolved = _resolve_type(type_ann, ctx)
+            resolved = type_ann
             name_types[var_name] = resolved
-            target = _make_name_expr(var_name, resolved, abs_ln, indent, ctx)
+            target = _make_name_expr(var_name, abs_ln, indent, ctx)
             value = _parse_expr_text(ctx, value_text, abs_ln, _find_expr_col(ctx, value_text, abs_ln, indent + s_clean.index("=") + 2), name_types)
-            type_expr_node = _make_type_expr(resolved, ctx)
             span = make_span(abs_ln, indent, abs_ln, indent + len(s_clean))
             ann_stmt = AnnAssign(
                 source_span=span,
                 target=target,
                 annotation=resolved,
-                annotation_type_expr=type_expr_node,
+                
                 value=value,
-                decl_type=resolved,
-                decl_type_expr=type_expr_node,
+                
+                
                 declare=True,
             )
             if len(pending_trivia) > 0:
@@ -2367,19 +1935,18 @@ def _parse_block_lines(
             ann_type = re.strip_group(ann_only, 2)
             # Ensure it's not a dict/slice by checking no '=' follows
             if "=" not in ann_type:
-                resolved = _resolve_type(ann_type, ctx)
+                resolved = ann_type
                 name_types[ann_var] = resolved
-                target = _make_name_expr(ann_var, resolved, abs_ln, indent, ctx)
-                type_expr_node = _make_type_expr(resolved, ctx)
+                target = _make_name_expr(ann_var, abs_ln, indent, ctx)
                 span = make_span(abs_ln, indent, abs_ln, indent + len(s_clean))
                 ann_stmt = AnnAssign(
                     source_span=span,
                     target=target,
                     annotation=resolved,
-                    annotation_type_expr=type_expr_node,
+                    
                     value=None,
-                    decl_type=resolved,
-                    decl_type_expr=type_expr_node,
+                    
+                    
                     declare=True,
                 )
                 if len(pending_trivia) > 0:
@@ -2409,7 +1976,7 @@ def _parse_block_lines(
                 target=target,
                 op=op_map.get(op_text, op_text),
                 value=value,
-                decl_type=_get_resolved_type(target) if _get_resolved_type(target) != "unknown" else None,
+                
                 declare=False,
             )
             stmts.append(aug_stmt)
@@ -2433,10 +2000,10 @@ def _parse_block_lines(
                     # Swap detected
                     left_type = name_types.get(swap_left_name, "unknown")
                     right_type = name_types.get(swap_right_name, "unknown")
-                    left = _make_name_expr(swap_left_name, left_type, abs_ln, indent, ctx)
+                    left = _make_name_expr(swap_left_name, abs_ln, indent, ctx)
                     left.base.borrow_kind = "value"
                     left.type_expr = None
-                    right = _make_name_expr(swap_right_name, right_type, abs_ln, indent, ctx)
+                    right = _make_name_expr(swap_right_name, abs_ln, indent, ctx)
                     right.base.borrow_kind = "value"
                     right.type_expr = None
                     span = make_span(abs_ln, indent, abs_ln, indent + len(s_clean))
@@ -2454,17 +2021,15 @@ def _parse_block_lines(
                 target = _parse_expr_text(ctx, target_text, abs_ln, _find_expr_col(ctx, target_text, abs_ln, indent), name_types)
                 value = _parse_expr_text(ctx, value_text, abs_ln, _find_expr_col(ctx, value_text, abs_ln, indent + len(target_text) + 3), name_types)
                 # Infer type from value
-                val_type = _get_resolved_type(value)
                 # declare: True if this is a simple Name target (not subscript/attr)
                 is_declare = isinstance(target, Name)
-                if isinstance(target, Name) and val_type != "unknown":
-                    name_types[target.id] = val_type
+                
                 span = make_span(abs_ln, indent, abs_ln, indent + len(s_clean))
                 assign_stmt = Assign(
                     source_span=span,
                     target=target,
                     value=value,
-                    decl_type=val_type if val_type != "unknown" else None,
+                    
                     declare=is_declare,
                     declare_init=True if is_declare else None,
                 )
@@ -2545,21 +2110,13 @@ def _parse_expr_text(
     return parser.parse_expr()
 
 
-def _make_name_expr(name: str, resolved_type: str, line: int, col: int, ctx: ParseContext) -> Name:
+def _make_name_expr(name: str, line: int, col: int, ctx: ParseContext) -> Name:
     """Name ノードを生成する。"""
     # golden 準拠: 元の行テキスト内で名前の位置を検索
     actual_col = _find_expr_col(ctx, name, line, col)
     span = make_span(line, actual_col, line, actual_col + len(name))
-    base = ExprBase(
-        source_span=span,
-        resolved_type=resolved_type,
-        casts=[],
-        borrow_kind="value",
-        repr_text=name,
-    )
+    base = ExprBase(source_span=span, repr_text=name)
     name_node = Name(base=base, id=name)
-    if resolved_type != "unknown":
-        name_node.type_expr = _make_type_expr(resolved_type, ctx)
     return name_node
 
 
@@ -2590,19 +2147,6 @@ def _parse_for_stmt(
         dummy = _parse_expr_text(ctx, "None", abs_ln, indent, name_types)
         return ExprStmt(source_span=span, value=dummy), start_i + 1
 
-    # Check if it's range() — must determine BEFORE body parsing to set name_types
-    range_args_text = _parse_range_call(iter_text)
-    if range_args_text is not None:
-        name_types[target_name] = "int64"
-    else:
-        # Non-range for: infer element type from iterable BEFORE body parsing
-        iter_name = iter_text.strip()
-        if iter_name in name_types:
-            container_type = name_types[iter_name]
-            elem = _extract_element_type(container_type)
-            if elem != "unknown":
-                name_types[target_name] = elem
-
     # Collect body
     sub_lines, end_i = _collect_sub_block(block_lines, start_i + 1, indent)
     body_stmts = _parse_block_lines(ctx, sub_lines, name_types, "for")
@@ -2617,84 +2161,15 @@ def _parse_for_stmt(
                 end_col = len(bl.rstrip())
                 break
 
-    # ForRange span: col=0 (always), end from body
     span = make_span(abs_ln, 0, end_ln, end_col)
 
-    if range_args_text is not None:
-        range_args = _split_type_args_outer(range_args_text)
-        # ForRange target: resolved_type="unknown" (型は target_type で別途指定)
-        target = _make_name_expr(target_name, "unknown", abs_ln, indent + 4, ctx)
-        # target は type_expr を持たない
-        target.type_expr = None
-        start_expr: Expr
-        stop_expr: Expr
-        step_expr: Expr
-        # range(...) 内の引数位置を計算
-        # 行テキスト: "    for y in range(height):"
-        # iter_text: "range(height)"
-        # range_args_text: "height"
-        # range( の開始位置を行内で探す
-        line_text = block_lines[start_i] if start_i < len(block_lines) else ""
-        range_pos = line_text.find("range(")
-        range_inner_col = range_pos + 6 if range_pos >= 0 else indent
-        # range のキーワード位置 (暗黙 start=0/step=1 のスパンに使う)
-        range_kw_span = make_span(abs_ln, range_pos if range_pos >= 0 else indent, abs_ln, range_inner_col - 1 if range_pos >= 0 else indent + 5)
-        if len(range_args) == 1:
-            start_expr = Constant(base=ExprBase(source_span=range_kw_span, resolved_type="int64", casts=[], borrow_kind="value", repr_text="0"), value=0)
-            stop_expr = _parse_expr_text(ctx, range_args[0].strip(), abs_ln, range_inner_col, name_types)
-            step_expr = Constant(base=ExprBase(source_span=range_kw_span, resolved_type="int64", casts=[], borrow_kind="value", repr_text="1"), value=1)
-        elif len(range_args) == 2:
-            start_expr = _parse_expr_text(ctx, range_args[0].strip(), abs_ln, range_inner_col, name_types)
-            comma1 = range_inner_col + len(range_args[0]) + 2  # ", "
-            stop_expr = _parse_expr_text(ctx, range_args[1].strip(), abs_ln, comma1, name_types)
-            step_expr = Constant(base=ExprBase(source_span=range_kw_span, resolved_type="int64", casts=[], borrow_kind="value", repr_text="1"), value=1)
-        else:
-            start_expr = _parse_expr_text(ctx, range_args[0].strip(), abs_ln, range_inner_col, name_types)
-            comma1 = range_inner_col + len(range_args[0]) + 2
-            stop_expr = _parse_expr_text(ctx, range_args[1].strip(), abs_ln, comma1, name_types)
-            comma2 = comma1 + len(range_args[1]) + 2
-            step_expr = _parse_expr_text(ctx, range_args[2].strip(), abs_ln, comma2, name_types)
-
-        fr = ForRange(
-            source_span=span,
-            target=target,
-            target_type="int64",
-            start=start_expr,
-            stop=stop_expr,
-            step=step_expr,
-            body=body_stmts,
-            orelse=[],
-            range_mode=_infer_range_mode(step_expr),
-        )
-        if len(trivia) > 0:
-            fr.leading_trivia = list(trivia)
-        if len(comments) > 0:
-            fr.leading_comments = list(comments)
-        return fr, end_i
-
-    # General for loop — infer element type from iterable
+    # EAST1: range() は変換しない。全て For ノード。
     iter_expr = _parse_expr_text(ctx, iter_text, abs_ln, _find_expr_col(ctx, iter_text, abs_ln, indent), name_types)
-    iter_source_type = _get_resolved_type(iter_expr)
-    elem_type = _extract_element_type(iter_source_type)
-    if elem_type != "unknown":
-        name_types[target_name] = elem_type
-    target_type = elem_type
-    target = _make_name_expr(target_name, elem_type, abs_ln, indent + 4, ctx)
-    # For target には type_expr を付けない (ForRange と同様)
-    target.type_expr = None
-    # iter Name に iterable 情報を付加
-    if isinstance(iter_expr, Name) and iter_source_type != "unknown":
-        iter_expr.iterable_trait = "yes"
-        iter_expr.iter_protocol = "static_range"
-        iter_expr.iter_element_type = elem_type
+    target = _make_name_expr(target_name, abs_ln, indent + 4, ctx)
     for_stmt = For(
         source_span=span,
         target=target,
-        target_type=target_type,
         iter_expr=iter_expr,
-        iter_element_type=elem_type,
-        iter_mode="static_fastpath" if elem_type != "unknown" else "iter",
-        iter_source_type=iter_source_type,
         body=body_stmts,
         orelse=[],
     )
@@ -2864,155 +2339,27 @@ def _collect_sub_block(block_lines: list[str], start_i: int, parent_indent: int)
 # Arg usage analysis
 # ---------------------------------------------------------------------------
 
-def _compute_arg_usage(arg_order: list[str], body: list[Stmt]) -> dict[str, str]:
-    """引数の使用状況を解析する。"""
-    reassigned: set[str] = set()
-    _collect_reassigned(body, reassigned)
-    usage: dict[str, str] = {}
-    for arg in arg_order:
-        if arg in reassigned:
-            usage[arg] = "reassigned"
-        else:
-            usage[arg] = "readonly"
-    return usage
-
-
-def _collect_reassigned(stmts: list[Stmt], out: set[str]) -> None:
-    """再代入されている変数名を収集する。"""
-    for s in stmts:
-        if isinstance(s, Assign):
-            if isinstance(s.target, Name):
-                out.add(s.target.id)
-        elif isinstance(s, AugAssign):
-            if isinstance(s.target, Name):
-                out.add(s.target.id)
-        elif isinstance(s, AnnAssign):
-            if isinstance(s.target, Name):
-                out.add(s.target.id)
-        elif isinstance(s, Swap):
-            if isinstance(s.left, Name):
-                out.add(s.left.id)
-            if isinstance(s.right, Name):
-                out.add(s.right.id)
-        elif isinstance(s, If):
-            _collect_reassigned(s.body, out)
-            _collect_reassigned(s.orelse, out)
-        elif isinstance(s, ForRange):
-            out.add(s.target.id) if isinstance(s.target, Name) else None
-            _collect_reassigned(s.body, out)
-        elif isinstance(s, For):
-            if isinstance(s.target, Name):
-                out.add(s.target.id)
-            _collect_reassigned(s.body, out)
-        elif isinstance(s, While):
-            _collect_reassigned(s.body, out)
-        elif isinstance(s, Try):
-            _collect_reassigned(s.body, out)
-            for h in s.handlers:
-                _collect_reassigned(h.body, out)
-            _collect_reassigned(s.finalbody, out)
-
-
 # ---------------------------------------------------------------------------
 # Postprocessing + meta building
 # ---------------------------------------------------------------------------
 
 def _postprocess(ctx: ParseContext, body_items: list[Stmt], renamed_symbols: dict[str, str]) -> None:
-    """Phase 3: 後処理（main リネーム、暗黙 builtin import 追加等）。"""
+    """Phase 3: 後処理（main リネーム）。"""
     # Rename main → __pytra_main
     for stmt in body_items:
         if isinstance(stmt, FunctionDef) and stmt.name == "main":
             renamed_symbols["main"] = "__pytra_main"
             stmt.name = "__pytra_main"
 
-    # Add implicit builtin module bindings
-    for mod_id in sorted(ctx.implicit_builtin_modules.keys()):
-        ctx.import_bindings.append({
-            "module_id": mod_id,
-            "export_name": "",
-            "local_name": mod_id,
-            "binding_kind": "implicit_builtin",
-            "source_file": ctx.filename,
-            "source_line": 0,
-        })
-
 
 def _build_meta(ctx: ParseContext) -> dict[str, JsonVal]:
-    """Module.meta を構築する。"""
-    # Build import_resolution
-    resolution_bindings: list[dict[str, JsonVal]] = []
-    for binding in ctx.import_bindings:
-        rb: dict[str, JsonVal] = dict(binding)
-        # Add resolution fields
-        mod_id = str(binding.get("module_id", ""))
-        binding_kind = str(binding.get("binding_kind", ""))
-        rb["source_module_id"] = mod_id
-        # implicit_builtin は source_export_name を持たない
-        if binding_kind != "implicit_builtin":
-            rb["source_export_name"] = binding.get("export_name", "")
-        rb["source_binding_kind"] = binding_kind
-        # Resolve runtime module
-        if mod_id == "pathlib":
-            rb["runtime_module_id"] = "pytra.std.pathlib"
-            rb["runtime_group"] = "std"
-            rb["resolved_binding_kind"] = "symbol"
-            export = str(binding.get("export_name", ""))
-            rb["runtime_symbol"] = export
-            rb["runtime_symbol_kind"] = "class"
-            rb["runtime_symbol_dispatch"] = "ctor"
-            rb["runtime_semantic_tag"] = "stdlib.symbol." + export
-        elif "pytra.std." in mod_id:
-            rb["runtime_module_id"] = mod_id
-            rb["runtime_group"] = "std"
-            rb["resolved_binding_kind"] = binding.get("binding_kind", "")
-            export = str(binding.get("export_name", ""))
-            rb["runtime_symbol"] = export
-            rb["runtime_symbol_kind"] = "function"
-            rb["runtime_symbol_dispatch"] = "function"
-            rb["runtime_semantic_tag"] = "stdlib.fn." + export
-        elif "pytra.utils." in mod_id:
-            rb["runtime_module_id"] = mod_id
-            rb["runtime_group"] = "utils"
-            rb["resolved_binding_kind"] = binding.get("binding_kind", "")
-            export = str(binding.get("export_name", ""))
-            rb["runtime_symbol"] = export
-            rb["runtime_symbol_kind"] = "function"
-            rb["runtime_symbol_dispatch"] = "function"
-            rb["runtime_semantic_tag"] = "stdlib.fn." + export
-        elif "pytra.built_in." in mod_id:
-            rb["runtime_module_id"] = mod_id
-            rb["runtime_group"] = "built_in"
-        elif mod_id in ("math", "os", "sys", "glob", "re", "argparse", "subprocess", "time", "timeit", "collections", "json", "random"):
-            # Python stdlib module → pytra.std.<mod>
-            rb["runtime_module_id"] = "pytra.std." + mod_id
-            rb["runtime_group"] = "std"
-            if binding_kind == "module":
-                rb["resolved_binding_kind"] = "module"
-            elif binding_kind == "symbol":
-                rb["resolved_binding_kind"] = "symbol"
-                export = str(binding.get("export_name", ""))
-                rb["runtime_symbol"] = export
-                rb["runtime_symbol_kind"] = "function"
-                rb["runtime_symbol_dispatch"] = "function"
-                rb["runtime_semantic_tag"] = "stdlib.fn." + export
-        resolution_bindings.append(rb)
-
-    import_resolution: dict[str, JsonVal] = {
-        "schema_version": 1,
-        "bindings": resolution_bindings,
-        "qualified_refs": list(ctx.qualified_symbol_refs),
-    }
-
-    # import_symbols as dict
+    """Module.meta を構築する (EAST1: 構文情報のみ、runtime 解決なし)。"""
     import_symbols_jv: dict[str, JsonVal] = {}
     for local, info in ctx.import_symbols.items():
         import_symbols_jv[local] = dict(info)
 
     meta: dict[str, JsonVal] = {
-        "parser_backend": "self_hosted",
-        "import_resolution": import_resolution,
         "import_bindings": list(ctx.import_bindings),
-        "qualified_symbol_refs": list(ctx.qualified_symbol_refs),
         "import_modules": dict(ctx.import_modules),
         "import_symbols": import_symbols_jv,
     }
