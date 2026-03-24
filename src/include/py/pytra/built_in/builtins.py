@@ -2,107 +2,101 @@
 """Python built-in 関数の宣言。
 
 resolve がシグネチャを参照して型解決する。emit 対象外。
-body は ... (Ellipsis) — Pylance がスタブとして認識する。
 
 spec: docs/ja/spec/spec-builtin-functions.md
 """
 
-from pytra.std import extern
-from pytra.std.template import template
+from pytra.std import extern_fn, template
 from pytra.types import Obj
 
 
 # ---------------------------------------------------------------------------
 # §3.1 dunder 委譲型
-# resolve は引数の具象型に該当の dunder があるか型チェックし、
-# py_len 等のノードに変換する。
 # ---------------------------------------------------------------------------
 
-@extern
+@extern_fn(module="pytra.core.py_runtime", symbol="len", tag="core.len")
 def len(x: Obj) -> int: ...
 
-@extern
+@extern_fn(module="pytra.core.py_runtime", symbol="str", tag="cast.str")
 def str(x: Obj) -> str: ...
 
-@extern
+@extern_fn(module="pytra.core.py_runtime", symbol="bool", tag="cast.bool")
 def bool(x: Obj) -> bool: ...
 
-@extern
+@extern_fn(module="pytra.core.py_runtime", symbol="int", tag="cast.int")
 def int(x: Obj) -> int: ...
 
-@extern
+@extern_fn(module="pytra.core.py_runtime", symbol="float", tag="cast.float")
 def float(x: Obj) -> float: ...
 
-@extern
+@extern_fn(module="pytra.core.py_runtime", symbol="repr", tag="cast.repr")
 def repr(x: Obj) -> str: ...
 
 
 # ---------------------------------------------------------------------------
 # §3.2 スタンドアロン型
-# 各言語の runtime が実装する関数。
 # ---------------------------------------------------------------------------
 
-@extern
+@extern_fn(module="pytra.built_in.io_ops", symbol="py_print", tag="core.print")
 def print(*args: Obj) -> None: ...
 
-@extern
+@extern_fn(module="pytra.core.py_runtime", symbol="isinstance", tag="type.isinstance")
 def isinstance(x: Obj, t: type) -> bool: ...
 
-@extern
+@extern_fn(module="pytra.core.py_runtime", symbol="issubclass", tag="type.issubclass")
 def issubclass(cls: type, parent: type) -> bool: ...
 
-@extern
+@extern_fn(module="pytra.core.py_runtime", symbol="py_round", tag="math.round")
 def round(x: float, ndigits: int = 0) -> int: ...
 
-@extern
+@extern_fn(module="pytra.core.py_runtime", symbol="py_abs", tag="math.abs")
 def abs(x: int) -> int: ...
 
-@extern
+@extern_fn(module="pytra.built_in.scalar_ops", symbol="py_ord", tag="cast.ord")
 def ord(c: str) -> int: ...
 
-@extern
+@extern_fn(module="pytra.built_in.scalar_ops", symbol="py_chr", tag="cast.chr")
 def chr(i: int) -> str: ...
 
 
 # ---------------------------------------------------------------------------
 # §3.3 ジェネリック型
-# resolve が callsite の具象型から T を解決する。
 # ---------------------------------------------------------------------------
 
 @template("T")
-@extern
+@extern_fn(module="pytra.built_in.numeric_ops", symbol="py_min", tag="math.min")
 def min(*args: T) -> T: ...
 
 @template("T")
-@extern
+@extern_fn(module="pytra.built_in.numeric_ops", symbol="py_max", tag="math.max")
 def max(*args: T) -> T: ...
 
 @template("T")
-@extern
+@extern_fn(module="pytra.built_in.iter_ops", symbol="py_sorted", tag="iter.sorted")
 def sorted(x: list[T]) -> list[T]: ...
 
 @template("T")
-@extern
+@extern_fn(module="pytra.built_in.iter_ops", symbol="py_reversed_object", tag="iter.reversed")
 def reversed(x: list[T]) -> list[T]: ...
 
 @template("T")
-@extern
+@extern_fn(module="pytra.built_in.iter_ops", symbol="py_enumerate_object", tag="iter.enumerate")
 def enumerate(x: list[T], start: int = 0) -> list[tuple[int, T]]: ...
 
 @template("T", "U")
-@extern
+@extern_fn(module="pytra.built_in.zip_ops", symbol="zip", tag="iter.zip")
 def zip(a: list[T], b: list[U]) -> list[tuple[T, U]]: ...
 
 
 # ---------------------------------------------------------------------------
-# §3.4 range（resolve で ForRange / RangeExpr に変換）
+# §3.4 range
 # ---------------------------------------------------------------------------
 
-@extern
+@extern_fn(module="pytra.built_in.sequence", symbol="py_range", tag="iter.range")
 def range(stop: int) -> list[int]: ...
 
-@extern
+@extern_fn(module="pytra.built_in.sequence", symbol="py_range", tag="iter.range")
 def range(start: int, stop: int) -> list[int]: ...
 
-@extern
+@extern_fn(module="pytra.built_in.sequence", symbol="py_range", tag="iter.range")
 def range(start: int, stop: int, step: int) -> list[int]: ...
