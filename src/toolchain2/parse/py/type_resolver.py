@@ -8,6 +8,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Optional, Union
 
+from toolchain2.common.types import split_generic_types
 from toolchain2.parse.py.nodes import NamedType, GenericType, TypeExpr
 
 
@@ -46,7 +47,7 @@ def resolve_type_annotation(
         base_resolved = _resolve_base_type(base, type_aliases)
 
         # inner の分割と再帰解決
-        args = _split_type_args(inner)
+        args = split_generic_types(inner)
         resolved_args = [resolve_type_annotation(a, type_aliases) for a in args]
 
         # カンマ後の空白なし (golden file 準拠)
@@ -93,26 +94,7 @@ def _resolve_base_type(base: str, type_aliases: dict[str, str]) -> str:
     return base
 
 
-def _split_type_args(inner: str) -> list[str]:
-    """型引数をカンマで分割する（ネストしたブラケットを考慮）。"""
-    args: list[str] = []
-    depth = 0
-    current = ""
-    for ch in inner:
-        if ch == "[":
-            depth += 1
-            current += ch
-        elif ch == "]":
-            depth -= 1
-            current += ch
-        elif ch == "," and depth == 0:
-            args.append(current.strip())
-            current = ""
-        else:
-            current += ch
-    if current.strip() != "":
-        args.append(current.strip())
-    return args
+# split_generic_types は toolchain2.common.types から import 済み
 
 
 def annotation_to_type_expr(
@@ -131,7 +113,7 @@ def _parse_type_expr(text: str) -> TypeExpr:
     if bracket_pos > 0 and text.endswith("]"):
         base = text[:bracket_pos].strip()
         inner = text[bracket_pos + 1 : -1].strip()
-        args = _split_type_args(inner)
+        args = split_generic_types(inner)
         return GenericType(
             base=base,
             args=[_parse_type_expr(a) for a in args],
