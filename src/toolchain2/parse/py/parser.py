@@ -1465,10 +1465,12 @@ def _parse_function_def(
     fn_name: str,
     trivia: list[TriviaNode],
     comments: list[str],
+    class_name: str = "",
 ) -> tuple[FunctionDef, int]:
     """関数定義をパースする。"""
     header_line = lines[start_ln]
     header = _strip_inline_comment(header_line.strip())
+    header_indent = len(header_line) - len(header_line.lstrip(" "))
 
     # Parse signature via pytra.std.re
     _, args_text, return_ann = _parse_def_header(header)
@@ -1486,7 +1488,15 @@ def _parse_function_def(
         idx = 0
         for param in _split_type_args_outer(args_text):
             param = param.strip()
-            if param == "" or param == "self" or param == "*":
+            if param == "" or param == "*":
+                continue
+            # self パラメータ: クラスメソッドなら class_name を型として追加
+            if param == "self":
+                if class_name != "":
+                    arg_order.append("self")
+                    arg_types["self"] = class_name
+                    arg_index["self"] = idx
+                    idx += 1
                 continue
             # Handle default values
             default_part = ""
@@ -1538,7 +1548,7 @@ def _parse_function_def(
                 end_col = len(bl.rstrip())
                 break
 
-    span = make_span(start_ln + 1, 0, end_lineno, end_col)
+    span = make_span(start_ln + 1, header_indent, end_lineno, end_col)
 
     fd = FunctionDef(
         source_span=span,
@@ -1557,14 +1567,17 @@ def _parse_function_def(
         yield_value_type="unknown",
     )
 
-    # Optional fields
-    if len(arg_type_exprs) > 0 or len(arg_order) == 0:
-        fd.arg_type_exprs = arg_type_exprs
-    # return_type_expr は常に出力
-    fd.return_type_expr = _make_type_expr(return_type, ctx)
-    # FunctionDef は常に leading_comments/leading_trivia を出力（空でも）
-    fd.leading_comments = list(comments)
-    fd.leading_trivia = list(trivia)
+    # Optional fields: クラスメソッドとトップレベル関数で異なる
+    if class_name != "":
+        # クラスメソッド: decorators のみ出力。arg_type_exprs/return_type_expr/leading は出力しない
+        fd.decorators = []
+    else:
+        # トップレベル関数
+        if len(arg_type_exprs) > 0 or len(arg_order) == 0:
+            fd.arg_type_exprs = arg_type_exprs
+        fd.return_type_expr = _make_type_expr(return_type, ctx)
+        fd.leading_comments = list(comments)
+        fd.leading_trivia = list(trivia)
 
     return fd, end_ln
 
@@ -1589,17 +1602,8 @@ def _parse_class_def(
             if isinstance(stmt.target, Name):
                 field_types[stmt.target.id] = stmt.annotation
 
-    # ClassDef span: end は本体最終非空行の次の行
-    end_lineno = start_ln + 1
-    end_col = 0
-    if len(block_lines) > 0:
-        for bl in reversed(block_lines):
-            if bl.strip() != "":
-                end_lineno = _find_abs_line(lines, bl, start_ln) + 1
-                end_col = 0
-                break
-
-    span = make_span(start_ln + 1, 0, end_lineno, end_col)
+    # ClassDef span: end_lineno = _collect_block が返した end_ln (次のトップレベル行の前)
+    span = make_span(start_ln + 1, 0, end_ln, 0)
 
     cd = ClassDef(
         source_span=span,
@@ -1811,7 +1815,9 @@ def _parse_block_lines(
         # def ...: (nested function / class method)
         fn_name_block = _parse_def_name(s_clean)
         if fn_name_block != "":
-            fn_stmt, i = _parse_function_def(ctx, ctx.lines, abs_ln - 1, fn_name_block, pending_trivia, pending_comments)
+            # scope_label がクラス名ならクラスメソッドとして self の型を設定
+            block_class_name = scope_label if scope_label in ctx.class_names else ""
+            fn_stmt, i = _parse_function_def(ctx, ctx.lines, abs_ln - 1, fn_name_block, pending_trivia, pending_comments, class_name=block_class_name)
             stmts.append(fn_stmt)
             # Skip the block lines that were consumed
             while i < total:
