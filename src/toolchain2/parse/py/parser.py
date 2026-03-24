@@ -887,8 +887,8 @@ class ExprParser:
                     call.runtime_call_adapter_kind = "builtin"
                     call.semantic_tag = "container.dict." + method_name
                 elif owner_base == "str":
-                    call.runtime_call = "str." + method_name
-                    call.runtime_module_id = "pytra.core.str"
+                    call.runtime_call = "py_" + method_name
+                    call.runtime_module_id = "pytra.built_in.string_ops"
                     call.runtime_symbol = "str." + method_name
                     call.runtime_call_adapter_kind = "builtin"
                 elif owner_base == "set":
