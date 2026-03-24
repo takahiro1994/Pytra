@@ -721,7 +721,13 @@ class ExprParser:
                 container_type = _get_resolved_type(expr)
                 sub_type = _extract_element_type(container_type) if not isinstance(index, SliceExpr) else container_type
                 base = self._base(self._child_local_start(expr), end_tok.end, sub_type, "value")
-                expr = Subscript(base=base, value=expr, slice_expr=index)
+                sub = Subscript(base=base, value=expr, slice_expr=index)
+                # Slice の場合、lower/upper/lowered_kind を Subscript に直接設定
+                if isinstance(index, SliceExpr):
+                    sub.lowered_kind = "SliceAccess"
+                    sub.lower = index.lower
+                    sub.upper = index.upper
+                expr = sub
             elif tok.value == "(":
                 expr = self._parse_call(expr)
             else:
