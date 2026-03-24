@@ -1630,10 +1630,16 @@ def _resolve_class_def(stmt: dict[str, JsonVal], ctx: ResolveContext) -> None:
         base_val = stmt.get("base")
         has_base: bool = base_val is not None and isinstance(base_val, str) and base_val != ""
         is_dataclass: bool = stmt.get("dataclass") is True
-        ft = stmt.get("field_types")
-        has_fields: bool = isinstance(ft, dict) and len(ft) > 0
-        # Classes with base, @dataclass, or mutable fields use "ref"
-        stmt["class_storage_hint"] = "ref" if (has_base or is_dataclass or has_fields) else "value"
+        # Check for __init__ method
+        has_init: bool = False
+        cls_body = stmt.get("body")
+        if isinstance(cls_body, list):
+            for item in cls_body:
+                if isinstance(item, dict) and item.get("kind") == "FunctionDef" and item.get("name") == "__init__":
+                    has_init = True
+                    break
+        # base, __init__, or @dataclass → "ref", otherwise "value"
+        stmt["class_storage_hint"] = "ref" if (has_base or has_init or is_dataclass) else "value"
 
     # Normalize field_types
     ft_raw = stmt.get("field_types")
