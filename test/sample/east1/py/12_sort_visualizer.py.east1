@@ -2210,14 +2210,14 @@
                   },
                   "body": [
                     {
-                      "kind": "Expr",
+                      "kind": "Assign",
                       "source_span": {
                         "lineno": 44,
                         "col": 16,
                         "end_lineno": 44,
                         "end_col": 67
                       },
-                      "value": {
+                      "target": {
                         "kind": "Subscript",
                         "source_span": {
                           "lineno": 44,
@@ -2254,7 +2254,72 @@
                           "repr": "j",
                           "id": "j"
                         }
-                      }
+                      },
+                      "value": {
+                        "kind": "Subscript",
+                        "source_span": {
+                          "lineno": 44,
+                          "col": 43,
+                          "end_lineno": 44,
+                          "end_col": 56
+                        },
+                        "casts": [],
+                        "borrow_kind": "value",
+                        "repr": "values[j + 1]",
+                        "value": {
+                          "kind": "Name",
+                          "source_span": {
+                            "lineno": 44,
+                            "col": 43,
+                            "end_lineno": 44,
+                            "end_col": 49
+                          },
+                          "casts": [],
+                          "borrow_kind": "value",
+                          "repr": "values",
+                          "id": "values"
+                        },
+                        "slice": {
+                          "kind": "BinOp",
+                          "source_span": {
+                            "lineno": 44,
+                            "col": 50,
+                            "end_lineno": 44,
+                            "end_col": 55
+                          },
+                          "casts": [],
+                          "borrow_kind": "value",
+                          "repr": "j + 1",
+                          "left": {
+                            "kind": "Name",
+                            "source_span": {
+                              "lineno": 44,
+                              "col": 50,
+                              "end_lineno": 44,
+                              "end_col": 51
+                            },
+                            "casts": [],
+                            "borrow_kind": "value",
+                            "repr": "j",
+                            "id": "j"
+                          },
+                          "op": "Add",
+                          "right": {
+                            "kind": "Constant",
+                            "source_span": {
+                              "lineno": 44,
+                              "col": 54,
+                              "end_lineno": 44,
+                              "end_col": 55
+                            },
+                            "casts": [],
+                            "borrow_kind": "value",
+                            "repr": "1",
+                            "value": 1
+                          }
+                        }
+                      },
+                      "declare": true
                     },
                     {
                       "kind": "Assign",

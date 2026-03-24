@@ -3415,14 +3415,14 @@
                   },
                   "body": [
                     {
-                      "kind": "Expr",
+                      "kind": "Assign",
                       "source_span": {
                         "lineno": 61,
                         "col": 16,
                         "end_lineno": 61,
                         "end_col": 30
                       },
-                      "value": {
+                      "target": {
                         "kind": "Subscript",
                         "source_span": {
                           "lineno": 61,
@@ -3484,7 +3484,21 @@
                           "repr": "x",
                           "id": "x"
                         }
-                      }
+                      },
+                      "value": {
+                        "kind": "Constant",
+                        "source_span": {
+                          "lineno": 61,
+                          "col": 29,
+                          "end_lineno": 61,
+                          "end_col": 30
+                        },
+                        "casts": [],
+                        "borrow_kind": "value",
+                        "repr": "1",
+                        "value": 1
+                      },
+                      "declare": true
                     }
                   ],
                   "orelse": []
@@ -5058,14 +5072,14 @@
                               },
                               "body": [
                                 {
-                                  "kind": "Expr",
+                                  "kind": "Assign",
                                   "source_span": {
                                     "lineno": 90,
                                     "col": 28,
                                     "end_lineno": 90,
                                     "end_col": 66
                                   },
-                                  "value": {
+                                  "target": {
                                     "kind": "Subscript",
                                     "source_span": {
                                       "lineno": 90,
@@ -5231,7 +5245,21 @@
                                         "id": "w"
                                       }
                                     }
-                                  }
+                                  },
+                                  "value": {
+                                    "kind": "Constant",
+                                    "source_span": {
+                                      "lineno": 90,
+                                      "col": 65,
+                                      "end_lineno": 90,
+                                      "end_col": 66
+                                    },
+                                    "casts": [],
+                                    "borrow_kind": "value",
+                                    "repr": "1",
+                                    "value": 1
+                                  },
+                                  "declare": true
                                 }
                               ],
                               "orelse": []
@@ -5678,14 +5706,14 @@
                                   },
                                   "body": [
                                     {
-                                      "kind": "Expr",
+                                      "kind": "Assign",
                                       "source_span": {
                                         "lineno": 90,
                                         "col": 28,
                                         "end_lineno": 90,
                                         "end_col": 66
                                       },
-                                      "value": {
+                                      "target": {
                                         "kind": "Subscript",
                                         "source_span": {
                                           "lineno": 90,
@@ -5851,7 +5879,21 @@
                                             "id": "w"
                                           }
                                         }
-                                      }
+                                      },
+                                      "value": {
+                                        "kind": "Constant",
+                                        "source_span": {
+                                          "lineno": 90,
+                                          "col": 65,
+                                          "end_lineno": 90,
+                                          "end_col": 66
+                                        },
+                                        "casts": [],
+                                        "borrow_kind": "value",
+                                        "repr": "1",
+                                        "value": 1
+                                      },
+                                      "declare": true
                                     }
                                   ],
                                   "orelse": []
@@ -6246,14 +6288,14 @@
                                   },
                                   "body": [
                                     {
-                                      "kind": "Expr",
+                                      "kind": "Assign",
                                       "source_span": {
                                         "lineno": 90,
                                         "col": 28,
                                         "end_lineno": 90,
                                         "end_col": 66
                                       },
-                                      "value": {
+                                      "target": {
                                         "kind": "Subscript",
                                         "source_span": {
                                           "lineno": 90,
@@ -6419,7 +6461,21 @@
                                             "id": "w"
                                           }
                                         }
-                                      }
+                                      },
+                                      "value": {
+                                        "kind": "Constant",
+                                        "source_span": {
+                                          "lineno": 90,
+                                          "col": 65,
+                                          "end_lineno": 90,
+                                          "end_col": 66
+                                        },
+                                        "casts": [],
+                                        "borrow_kind": "value",
+                                        "repr": "1",
+                                        "value": 1
+                                      },
+                                      "declare": true
                                     }
                                   ],
                                   "orelse": []

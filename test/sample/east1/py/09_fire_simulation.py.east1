@@ -1803,14 +1803,14 @@
                   "declare": true
                 },
                 {
-                  "kind": "Expr",
+                  "kind": "Assign",
                   "source_span": {
                     "lineno": 45,
                     "col": 12,
                     "end_lineno": 45,
                     "end_col": 32
                   },
-                  "value": {
+                  "target": {
                     "kind": "Subscript",
                     "source_span": {
                       "lineno": 45,
@@ -1898,7 +1898,21 @@
                       "repr": "x",
                       "id": "x"
                     }
-                  }
+                  },
+                  "value": {
+                    "kind": "Name",
+                    "source_span": {
+                      "lineno": 45,
+                      "col": 29,
+                      "end_lineno": 45,
+                      "end_col": 32
+                    },
+                    "casts": [],
+                    "borrow_kind": "value",
+                    "repr": "val",
+                    "id": "val"
+                  },
+                  "declare": true
                 }
               ],
               "orelse": []
@@ -2911,14 +2925,14 @@
                       "declare": true
                     },
                     {
-                      "kind": "Expr",
+                      "kind": "Assign",
                       "source_span": {
                         "lineno": 56,
                         "col": 16,
                         "end_lineno": 56,
                         "end_col": 52
                       },
-                      "value": {
+                      "target": {
                         "kind": "Subscript",
                         "source_span": {
                           "lineno": 56,
@@ -3006,7 +3020,89 @@
                           "repr": "x",
                           "id": "x"
                         }
-                      }
+                      },
+                      "value": {
+                        "kind": "IfExp",
+                        "source_span": {
+                          "lineno": 56,
+                          "col": 33,
+                          "end_lineno": 56,
+                          "end_col": 52
+                        },
+                        "casts": [],
+                        "borrow_kind": "value",
+                        "repr": "nv if nv > 0 else 0",
+                        "test": {
+                          "kind": "Compare",
+                          "source_span": {
+                            "lineno": 56,
+                            "col": 39,
+                            "end_lineno": 56,
+                            "end_col": 45
+                          },
+                          "casts": [],
+                          "borrow_kind": "value",
+                          "repr": "nv > 0",
+                          "left": {
+                            "kind": "Name",
+                            "source_span": {
+                              "lineno": 56,
+                              "col": 39,
+                              "end_lineno": 56,
+                              "end_col": 41
+                            },
+                            "casts": [],
+                            "borrow_kind": "value",
+                            "repr": "nv",
+                            "id": "nv"
+                          },
+                          "ops": [
+                            "Gt"
+                          ],
+                          "comparators": [
+                            {
+                              "kind": "Constant",
+                              "source_span": {
+                                "lineno": 56,
+                                "col": 44,
+                                "end_lineno": 56,
+                                "end_col": 45
+                              },
+                              "casts": [],
+                              "borrow_kind": "value",
+                              "repr": "0",
+                              "value": 0
+                            }
+                          ]
+                        },
+                        "body": {
+                          "kind": "Name",
+                          "source_span": {
+                            "lineno": 56,
+                            "col": 33,
+                            "end_lineno": 56,
+                            "end_col": 35
+                          },
+                          "casts": [],
+                          "borrow_kind": "value",
+                          "repr": "nv",
+                          "id": "nv"
+                        },
+                        "orelse": {
+                          "kind": "Constant",
+                          "source_span": {
+                            "lineno": 56,
+                            "col": 51,
+                            "end_lineno": 56,
+                            "end_col": 52
+                          },
+                          "casts": [],
+                          "borrow_kind": "value",
+                          "repr": "0",
+                          "value": 0
+                        }
+                      },
+                      "declare": true
                     }
                   ],
                   "orelse": []

@@ -36,14 +36,10 @@ def _parse_one(input_path: Path, output_path: Path | None, pretty: bool) -> int:
         print("error: file not found: " + str(input_path))
         return 1
 
-    # TODO: toolchain2/parse/py/ の自前パーサーに切り替える。
-    # 暫定で toolchain/ を使用（selfhost 移行完了まで）。
-    from toolchain.compile.core_entrypoints import convert_path
-    from toolchain.compile.east1 import normalize_east1_root_document
+    from toolchain2.parse.py.parse_python import parse_python_file
 
     try:
-        raw_east = convert_path(input_path, parser_backend="self_hosted")
-        east1_doc = normalize_east1_root_document(raw_east)
+        east1_doc = parse_python_file(str(input_path))
     except Exception as e:
         print("error: parse failed: " + str(input_path) + ": " + str(e))
         return 1

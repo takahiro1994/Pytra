@@ -1468,14 +1468,14 @@
                   "declare": true
                 },
                 {
-                  "kind": "Expr",
+                  "kind": "Assign",
                   "source_span": {
                     "lineno": 36,
                     "col": 12,
                     "end_lineno": 36,
                     "end_col": 26
                   },
-                  "value": {
+                  "target": {
                     "kind": "Subscript",
                     "source_span": {
                       "lineno": 36,
@@ -1537,7 +1537,21 @@
                       "repr": "x",
                       "id": "x"
                     }
-                  }
+                  },
+                  "value": {
+                    "kind": "Constant",
+                    "source_span": {
+                      "lineno": 36,
+                      "col": 25,
+                      "end_lineno": 36,
+                      "end_col": 26
+                    },
+                    "casts": [],
+                    "borrow_kind": "value",
+                    "repr": "1",
+                    "value": 1
+                  },
+                  "declare": true
                 }
               ],
               "orelse": [
@@ -1630,14 +1644,14 @@
                   "declare": true
                 },
                 {
-                  "kind": "Expr",
+                  "kind": "Assign",
                   "source_span": {
                     "lineno": 39,
                     "col": 12,
                     "end_lineno": 39,
                     "end_col": 26
                   },
-                  "value": {
+                  "target": {
                     "kind": "Subscript",
                     "source_span": {
                       "lineno": 39,
@@ -1699,7 +1713,21 @@
                       "repr": "x",
                       "id": "x"
                     }
-                  }
+                  },
+                  "value": {
+                    "kind": "Constant",
+                    "source_span": {
+                      "lineno": 39,
+                      "col": 25,
+                      "end_lineno": 39,
+                      "end_col": 26
+                    },
+                    "casts": [],
+                    "borrow_kind": "value",
+                    "repr": "0",
+                    "value": 0
+                  },
+                  "declare": true
                 }
               ]
             },

@@ -1522,14 +1522,14 @@
           "declare": true
         },
         {
-          "kind": "Expr",
+          "kind": "Assign",
           "source_span": {
             "lineno": 33,
             "col": 4,
             "end_lineno": 33,
             "end_col": 18
           },
-          "value": {
+          "target": {
             "kind": "Subscript",
             "source_span": {
               "lineno": 33,
@@ -1591,7 +1591,21 @@
               "repr": "1",
               "value": 1
             }
-          }
+          },
+          "value": {
+            "kind": "Constant",
+            "source_span": {
+              "lineno": 33,
+              "col": 17,
+              "end_lineno": 33,
+              "end_col": 18
+            },
+            "casts": [],
+            "borrow_kind": "value",
+            "repr": "0",
+            "value": 0
+          },
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -3921,14 +3935,14 @@
                   "declare": false
                 },
                 {
-                  "kind": "Expr",
+                  "kind": "Assign",
                   "source_span": {
                     "lineno": 61,
                     "col": 12,
                     "end_lineno": 61,
                     "end_col": 28
                   },
-                  "value": {
+                  "target": {
                     "kind": "Subscript",
                     "source_span": {
                       "lineno": 61,
@@ -3990,17 +4004,31 @@
                       "repr": "wx",
                       "id": "wx"
                     }
-                  }
+                  },
+                  "value": {
+                    "kind": "Constant",
+                    "source_span": {
+                      "lineno": 61,
+                      "col": 27,
+                      "end_lineno": 61,
+                      "end_col": 28
+                    },
+                    "casts": [],
+                    "borrow_kind": "value",
+                    "repr": "0",
+                    "value": 0
+                  },
+                  "declare": true
                 },
                 {
-                  "kind": "Expr",
+                  "kind": "Assign",
                   "source_span": {
                     "lineno": 62,
                     "col": 12,
                     "end_lineno": 62,
                     "end_col": 28
                   },
-                  "value": {
+                  "target": {
                     "kind": "Subscript",
                     "source_span": {
                       "lineno": 62,
@@ -4062,7 +4090,21 @@
                       "repr": "nx",
                       "id": "nx"
                     }
-                  }
+                  },
+                  "value": {
+                    "kind": "Constant",
+                    "source_span": {
+                      "lineno": 62,
+                      "col": 27,
+                      "end_lineno": 62,
+                      "end_col": 28
+                    },
+                    "casts": [],
+                    "borrow_kind": "value",
+                    "repr": "0",
+                    "value": 0
+                  },
+                  "declare": true
                 },
                 {
                   "kind": "Expr",
