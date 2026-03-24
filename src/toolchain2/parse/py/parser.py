@@ -1147,8 +1147,10 @@ def _prescan(ctx: ParseContext, lines: list[str]) -> None:
                     name = split[0].strip()
                     asname = split[1].strip()
                 local = asname if asname != "" else name
-                ctx.import_symbols[local] = {"module": mod, "name": name}
-            # Type alias from typing
+                # __future__, typing, dataclasses は import_symbols に登録しない
+                if mod != "__future__" and mod != "typing" and mod != "dataclasses":
+                    ctx.import_symbols[local] = {"module": mod, "name": name}
+            # Type alias from typing (prescan 用)
             if mod == "typing":
                 for part in names_text.split(","):
                     name = part.strip()
