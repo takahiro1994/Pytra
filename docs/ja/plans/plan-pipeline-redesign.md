@@ -487,18 +487,19 @@ diff test/east1/py/01_mandelbrot.py.east1 work/tmp/01_mandelbrot.py.east1
 
 ### 2026-03-24: [ID: P0-PARSE-S1] fixture golden 一致 進捗
 
-- fixture 132件中: exact_match=35, parse_err=3, diff=94
+- fixture 132件中: exact_match=41, parse_err=0 (全件パース成功), diff=91, 合計diff行=7879
 - 完了した修正: キー順序、trivia/leading_comments、main リネーム、ClassDef 構造、
   ForRange target/span、numeric promotion casts、listcomp/slice/decorator 構文対応、
   set リテラル、論理行マージ、import symbol runtime 情報、OOP self パラメータ、
   method call semantic_tag/runtime_owner、container 要素型推論、tuple/dict 型推論、
-  arg_defaults、Swap ノード、module-level docstring、lambda/generator/*args 構文。
+  arg_defaults、Swap ノード、module-level docstring、lambda/generator/*args 構文、
+  Try/Except/Finally, Lambda ノード, string prefix (r/b/f), generator in call,
+  class_storage_hint 推論, @dataclass 認識, base class パース, Import 文,
+  annotation-only AnnAssign, decorator 蓄積, yields_dynamic, raw string,
+  AugAssign decl_type null, ClassDef leading 条件, stdlib module resolution。
 - pytra.std.re / pytra.std.json / pytra.std.pathlib を使用 (§5.2 準拠)。
-- parse_err: 0件 (全132件パース成功)
-- diff: 95件 (主にセマンティクス・span・OOP の差分)
-- 追加実装: Try/Except/Finally, Lambda ノード, string prefix (r/b/f),
-  generator in call, class_storage_hint 推論, @dataclass 認識, base class パース
-- diff 残 113件: 主にセマンティクス差分 (import symbol runtime 解決の詳細、OOP 型推論)。
+- 残り diff 91件の主要原因: span 計算 (listcomp内部等), セマンティクス (runtime info詳細),
+  OOP (__init__フィールド, 継承), lambda callable 型。
 
 ### 2026-03-24: [ID: P0-RESOLVE-S1/S2/S3] resolve 実装完了
 
