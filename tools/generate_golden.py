@@ -5,10 +5,10 @@ pytra-cli2.py (selfhost 対象) とは分離された開発支援ツール。
 toolchain/ に依存するため selfhost 非対象。
 
 使い方:
-  python3 tools/generate_golden.py --stage=east1 --from=python [-o test/east1/py/]
-  python3 tools/generate_golden.py --stage=east2 --from=python [-o test/east2/py/]
-  python3 tools/generate_golden.py --stage=east3 [-o test/east3/]
-  python3 tools/generate_golden.py --stage=east3-opt [-o test/east3-opt/]
+  python3 tools/generate_golden.py --stage=east1 --from=python [-o test/sample/east1/py/]
+  python3 tools/generate_golden.py --stage=east2 --from=python [-o test/sample/east2/]
+  python3 tools/generate_golden.py --stage=east3 [-o test/sample/east3/]
+  python3 tools/generate_golden.py --stage=east3-opt [-o test/sample/east3-opt/]
 
 設計文書: docs/ja/plans/plan-pipeline-redesign.md §6.1
 """
@@ -22,10 +22,10 @@ from pathlib import Path
 _GOLDEN_STAGES = ("east1", "east2", "east3", "east3-opt")
 
 _GOLDEN_DEFAULT_OUTPUT: dict[str, str] = {
-    "east1": "test/east1/py",
-    "east2": "test/east2/py",
-    "east3": "test/east3",
-    "east3-opt": "test/east3-opt",
+    "east1": "test/sample/east1/py",
+    "east2": "test/sample/east2",
+    "east3": "test/sample/east3",
+    "east3-opt": "test/sample/east3-opt",
 }
 
 _GOLDEN_SAMPLE_DIR = "sample/py"
@@ -132,10 +132,10 @@ def main() -> int:
             print("stages: " + ", ".join(_GOLDEN_STAGES))
             print()
             print("examples:")
-            print("  generate_golden.py --stage=east1 --from=python -o test/east1/py/")
-            print("  generate_golden.py --stage=east2 --from=python -o test/east2/py/")
-            print("  generate_golden.py --stage=east3 -o test/east3/")
-            print("  generate_golden.py --stage=east3-opt -o test/east3-opt/")
+            print("  generate_golden.py --stage=east1 --from=python -o test/sample/east1/py/")
+            print("  generate_golden.py --stage=east2 --from=python -o test/sample/east2/")
+            print("  generate_golden.py --stage=east3 -o test/sample/east3/")
+            print("  generate_golden.py --stage=east3-opt -o test/sample/east3-opt/")
             return 0
         i += 1
 
