@@ -78,15 +78,13 @@
 2. [x] [ID: P0-OPTIMIZE-S2] sample 18 件の .east3 が golden と一致する — 完了
 3. [x] [ID: P0-OPTIMIZE-S3] `pytra-cli2 -optimize` を実装する — 完了
 
-### P0-EMIT: east3 → target (Agent E 以降)
+### P0-EMIT: east3 → target（暫定: 現行 toolchain/emit/ を利用）
 
-作業ディレクトリ: `toolchain2/emit/cpp/` 等
-入力: `test/fixture/east3-opt/*.east3`, `test/sample/east3-opt/*.east3`
-正解: fixture は `test/fixture/emit/*.txt`、sample は `sample/golden/manifest.json`
+`pytra-cli2 -emit` は暫定で現行 `toolchain/emit/` を呼ぶ。
+`toolchain2/` の新規 emitter は P1-EMIT で実装する。
 
-1. [ ] [ID: P0-EMIT-S1] C++ emit を実装し、fixture の parity テストが通る
-2. [ ] [ID: P0-EMIT-S2] sample 18 件の parity テストが通る
-3. [ ] [ID: P0-EMIT-S3] `pytra-cli2 -emit --target=cpp` を実装する
+1. [ ] [ID: P0-EMIT-S1] `pytra-cli2 -emit --target=cpp` を暫定実装（現行 toolchain/emit/ への橋渡し）
+2. [ ] [ID: P0-EMIT-S2] fixture + sample の parity テストが通る
 
 ### P0-BUILD: 一括実行
 
@@ -99,6 +97,20 @@ parser 等を修正するたびに golden file を手動で全段再生成する
 
 1. [ ] [ID: P0-REGEN-S1] `tools/regenerate_golden.py` を実装: `pytra-cli2` の全段（parse→resolve→compile→optimize）を fixture 132 件 + sample 18 件に実行し、golden を上書き更新する
 2. [ ] [ID: P0-REGEN-S2] golden 更新後に emit parity テスト（Python 実行結果との一致）を自動実行し、end-to-end の正しさを検証する
+
+### P1-EMIT: toolchain2/emit/ に新規 emitter を実装
+
+現行 `toolchain/emit/` は selfhost 非対応（Any/object 多用、toolchain 内部依存多数）のため、
+`toolchain2/emit/` にゼロから書き直す。入力は `.east3` の JSON のみ。
+完成後に `toolchain/` を完全に除去できる。
+
+作業ディレクトリ: `toolchain2/emit/cpp/` 等
+コーディング規約: plan §5（Any/object 禁止、pytra.std のみ、selfhost 対象）
+
+1. [ ] [ID: P1-EMIT-CPP-S1] C++ emitter を `toolchain2/emit/cpp/` に新規実装し、fixture parity が通る
+2. [ ] [ID: P1-EMIT-CPP-S2] sample 18 件の parity テストが通る
+3. [ ] [ID: P1-EMIT-CPP-S3] `pytra-cli2 -emit --target=cpp` を toolchain2 emitter に切り替える
+4. [ ] [ID: P1-EMIT-CPP-S4] `toolchain/` への依存をゼロにし、`toolchain/` を除去する
 
 注: 旧 TODO は [2026-03-24 アーカイブ](archive/20260324.md) に移動済み。
 
