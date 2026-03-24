@@ -243,17 +243,40 @@ class set:
 
 ## 5. resolve での型解決フロー
 
-1. `built_in.py` を parse して EAST1 を得る
+1. `built_in.py` / `containers.py` を parse して EAST1 を得る
 2. EAST1 の `FunctionDef` / `ClassDef` からシグネチャを抽出
 3. ユーザーコードの `len(x)` を見たとき:
-   - `len` の宣言から戻り値型 `int` を取得
-   - 引数 `x` の型が `list[int64]` なら、`x.__len__()` の戻り値型 `int` を確認
-4. `x.append(v)` を見たとき:
+   - 引数 `x` の型がコンテナ型の宣言で `__len__` を持つか確認（型チェック）
+   - 持っていなければ `semantic_conflict` で拒否
+   - 戻り値型 `int` を解決
+   - **ノードを `py_len(x)` に変換**（`len` は EAST2 に残さない）
+4. 同様に `str(x)` → `py_str(x)`, `bool(x)` → `py_bool(x)` 等に変換
+5. `x.append(v)` を見たとき:
    - `x` の型 `list[int64]` から `list` の `append` メソッドを検索
    - シグネチャから戻り値型 `None` を取得
-5. resolve が dunder 委譲を展開するかどうかは実装次第
-   - 型解決の観点では、`len(x) -> int` と知っていれば十分
-   - dunder 展開は emitter の責務としてもよい
+   - メソッド呼び出しはそのまま残す（`py_` prefix にしない）
+6. dunder メソッド（`__len__` 等）はノード変換には使わない。型チェック（「この型に `__len__` があるか」）にのみ使用する
+
+### 5.1 built-in → py_ 変換テーブル
+
+| Python built-in | EAST2 ノード | 戻り値型 |
+|---|---|---|
+| `len(x)` | `py_len(x)` | `int` |
+| `str(x)` | `py_str(x)` | `str` |
+| `bool(x)` | `py_bool(x)` | `bool` |
+| `int(x)` | `py_int(x)` | `int` |
+| `float(x)` | `py_float(x)` | `float` |
+| `repr(x)` | `py_repr(x)` | `str` |
+| `print(...)` | `py_print(...)` | `None` |
+| `abs(x)` | `py_abs(x)` | 引数型 |
+| `ord(c)` | `py_ord(c)` | `int` |
+| `chr(i)` | `py_chr(i)` | `str` |
+| `isinstance(x, t)` | `py_isinstance(x, t)` | `bool` |
+
+`py_` prefix により:
+- frontend の言語に依存しない一意な識別子になる
+- 将来の Ruby/Kotlin 等の frontend からも同じ `py_len` に変換される
+- emitter は `py_len` を各言語の runtime に写像するだけ
 
 ## 6. emitter での dunder 写像
 
@@ -304,7 +327,7 @@ print([ObjBox(1), "hello", ObjBox(3.14)])  # POD を boxing
 - ~~ジェネリック型パラメータ `T` の表現~~ → `@template` をクラスにも適用。
 - ~~`print` の可変長引数 `*args` の扱い~~ → `*args: T` を `args: list[T]` に resolve が変換。
 - ~~`range` のオーバーロード~~ → resolve が `start/stop/step` に正規化し `ForRange` / `RangeExpr` に変換。emitter には届かない。
-- dunder 展開のタイミング（resolve で展開するか、emitter に任せるか）
+- ~~dunder 展開のタイミング~~ → resolve が `len(x)` → `py_len(x)` 等のノードに変換。dunder 展開はしない（型チェックのみ）。emitter は `py_len` を各言語 runtime に写像。
 - `min`/`max` の引数が 2 個以上の場合（可変長か、2 引数固定か）
 - `int(x, base=16)` のような base 引数付き変換の扱い
 - コンテナ型の宣言が `src/pytra/built_in/` にあるべきか、`src/pytra/std/` にあるべきか
