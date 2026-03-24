@@ -1332,6 +1332,16 @@ def _resolve_stmt(stmt: dict[str, JsonVal], ctx: ResolveContext) -> None:
             exc_name = exc_type.get("id")
             if isinstance(exc_name, str):
                 exc_type["resolved_type"] = exc_name
+    elif kind == "Swap":
+        # Swap: resolve left/right but keep borrow_kind as "value"
+        left = stmt.get("left")
+        right = stmt.get("right")
+        if isinstance(left, dict):
+            _resolve_expr(left, ctx)
+            left["borrow_kind"] = "value"
+        if isinstance(right, dict):
+            _resolve_expr(right, ctx)
+            right["borrow_kind"] = "value"
     elif kind == "Break" or kind == "Continue" or kind == "Pass":
         pass
     elif kind == "Delete":
@@ -1564,7 +1574,8 @@ def _resolve_assign(stmt: dict[str, JsonVal], ctx: ResolveContext) -> None:
         vt = _resolve_expr(value, ctx)
 
     # Resolve target(s) and add decl_type
-    # Assign target Name nodes get resolved_type = "unknown" (they're declarations)
+    # If variable already exists in scope → readonly_ref + resolved type
+    # If new variable → value + "unknown"
     targets = stmt.get("targets")
     if isinstance(targets, list):
         for t in targets:
@@ -1572,8 +1583,14 @@ def _resolve_assign(stmt: dict[str, JsonVal], ctx: ResolveContext) -> None:
                 if t.get("kind") == "Name":
                     name_val = t.get("id")
                     if isinstance(name_val, str):
+                        existing: str = ctx.scope.lookup(name_val)
+                        if existing != "unknown":
+                            # Re-assignment: keep resolved type
+                            t["resolved_type"] = existing
+                            t["borrow_kind"] = "readonly_ref"
+                        else:
+                            t["resolved_type"] = "unknown"
                         ctx.scope.define(name_val, vt)
-                        t["resolved_type"] = "unknown"
                 elif t.get("kind") == "Tuple":
                     _resolve_expr(t, ctx)
                     # Define tuple element variables
@@ -1594,8 +1611,13 @@ def _resolve_assign(stmt: dict[str, JsonVal], ctx: ResolveContext) -> None:
             if target.get("kind") == "Name":
                 name_val2 = target.get("id")
                 if isinstance(name_val2, str):
+                    existing2: str = ctx.scope.lookup(name_val2)
+                    if existing2 != "unknown":
+                        target["resolved_type"] = existing2
+                        target["borrow_kind"] = "readonly_ref"
+                    else:
+                        target["resolved_type"] = "unknown"
                     ctx.scope.define(name_val2, vt)
-                    target["resolved_type"] = "unknown"
             else:
                 _resolve_expr(target, ctx)
 
