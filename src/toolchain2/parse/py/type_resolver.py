@@ -20,7 +20,6 @@ _DEFAULT_TYPE_ALIASES: dict[str, str] = {
     "bytes": "bytes",
     "None": "None",
     "NoneType": "None",
-    "object": "object",
 }
 
 

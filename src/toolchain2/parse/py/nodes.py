@@ -11,13 +11,9 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Optional, Union
 
-from toolchain2.parse.py.source_span import SourceSpan, NULL_SPAN
+from pytra.std.json import JsonVal
 
-# JsonVal は pytra.std.json で定義されているが、toolchain2 からは
-# 型注釈としてのみ使う。実体は再帰的 Union:
-#   None | bool | int | float | str | list[JsonVal] | dict[str, JsonVal]
-# ここではシリアライズ用に同等の型エイリアスを定義する。
-JsonVal = Union[None, bool, int, float, str, list["JsonVal"], dict[str, "JsonVal"]]
+from toolchain2.parse.py.source_span import SourceSpan, NULL_SPAN
 
 
 # ---------------------------------------------------------------------------

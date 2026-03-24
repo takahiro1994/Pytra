@@ -6,10 +6,9 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Optional, Union
+from typing import Optional
 
-# JsonVal 互換型 (pytra.std.json と同じ定義)
-JsonVal = Union[None, bool, int, float, str, list["JsonVal"], dict[str, "JsonVal"]]
+from pytra.std.json import JsonVal
 
 
 @dataclass
