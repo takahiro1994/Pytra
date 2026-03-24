@@ -1717,6 +1717,7 @@ def _parse_block_lines(
     stmts: list[Stmt] = []
     i = 0
     total = len(block_lines)
+    last_abs_ln = 0  # hint for _find_abs_line
     pending_trivia: list[TriviaNode] = []
     pending_comments: list[str] = []
 
@@ -1755,7 +1756,8 @@ def _parse_block_lines(
             continue
 
         # Calculate absolute line number
-        abs_ln = _find_abs_line(ctx.lines, ln, 0)
+        abs_ln = _find_abs_line(ctx.lines, ln, last_abs_ln)
+        last_abs_ln = abs_ln
 
         # return statement
         if s_clean.startswith("return "):
@@ -1802,6 +1804,25 @@ def _parse_block_lines(
         if s_clean.startswith("while "):
             while_stmt, i = _parse_while_stmt(ctx, block_lines, i, base_indent, name_types, pending_trivia, pending_comments)
             stmts.append(while_stmt)
+            pending_trivia = []
+            pending_comments = []
+            continue
+
+        # def ...: (nested function / class method)
+        fn_name_block = _parse_def_name(s_clean)
+        if fn_name_block != "":
+            fn_stmt, i = _parse_function_def(ctx, ctx.lines, abs_ln - 1, fn_name_block, pending_trivia, pending_comments)
+            stmts.append(fn_stmt)
+            # Skip the block lines that were consumed
+            while i < total:
+                bl_check = block_lines[i].strip()
+                if bl_check == "" or bl_check.startswith("#"):
+                    i += 1
+                    continue
+                bl_indent = len(block_lines[i]) - len(block_lines[i].lstrip(" "))
+                if bl_indent <= base_indent:
+                    break
+                i += 1
             pending_trivia = []
             pending_comments = []
             continue
@@ -1946,9 +1967,15 @@ def _parse_block_lines(
 
 
 def _find_abs_line(all_lines: list[str], target_line: str, hint: int) -> int:
-    """ブロック行の絶対行番号を探す。"""
+    """ブロック行の絶対行番号を探す。hint 以降で最初に一致する行を返す。"""
     stripped = target_line.rstrip()
-    for i in range(len(all_lines)):
+    # hint 以降を先に探す
+    start = max(0, hint)
+    for i in range(start, len(all_lines)):
+        if all_lines[i].rstrip() == stripped:
+            return i + 1
+    # hint 以前にフォールバック
+    for i in range(0, start):
         if all_lines[i].rstrip() == stripped:
             return i + 1
     return hint + 1
