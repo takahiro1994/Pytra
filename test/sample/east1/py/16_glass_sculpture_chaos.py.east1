@@ -5147,7 +5147,6 @@
             "repr": "i",
             "id": "i"
           },
-          "target_type": "int",
           "start": {
             "kind": "Constant",
             "source_span": {
@@ -10255,7 +10254,6 @@
             "repr": "py",
             "id": "py"
           },
-          "target_type": "int",
           "start": {
             "kind": "Constant",
             "source_span": {
@@ -10522,7 +10520,6 @@
                 "repr": "px",
                 "id": "px"
               },
-              "target_type": "int",
               "start": {
                 "kind": "Constant",
                 "source_span": {
@@ -21192,7 +21189,6 @@
             "repr": "i",
             "id": "i"
           },
-          "target_type": "int",
           "start": {
             "kind": "Constant",
             "source_span": {

@@ -209,10 +209,6 @@
               }
             ]
           },
-          "target_type": "tuple[int, int]",
-          "iter_mode": "static_fastpath",
-          "iter_source_type": "list[tuple[int64, int64]]",
-          "iter_element_type": "tuple[int, int]",
           "iter": {
             "kind": "Call",
             "source_span": {
@@ -252,10 +248,7 @@
                 "id": "values"
               }
             ],
-            "keywords": [],
-            "iterable_trait": "yes",
-            "iter_protocol": "static_range",
-            "iter_element_type": "tuple[int, int]"
+            "keywords": []
           },
           "body": [
             {
@@ -446,10 +439,6 @@
               }
             ]
           },
-          "target_type": "tuple[int, int]",
-          "iter_mode": "static_fastpath",
-          "iter_source_type": "list[tuple[int64, int64]]",
-          "iter_element_type": "tuple[int, int]",
           "iter": {
             "kind": "Call",
             "source_span": {
@@ -489,10 +478,7 @@
                 "id": "values"
               }
             ],
-            "keywords": [],
-            "iterable_trait": "yes",
-            "iter_protocol": "static_range",
-            "iter_element_type": "tuple[int, int]"
+            "keywords": []
           },
           "body": [
             {
@@ -657,10 +643,6 @@
               }
             ]
           },
-          "target_type": "tuple[int, int]",
-          "iter_mode": "static_fastpath",
-          "iter_source_type": "list[tuple[int64, int64]]",
-          "iter_element_type": "tuple[int, int]",
           "iter": {
             "kind": "Call",
             "source_span": {
@@ -713,10 +695,7 @@
                 "value": 1
               }
             ],
-            "keywords": [],
-            "iterable_trait": "yes",
-            "iter_protocol": "static_range",
-            "iter_element_type": "tuple[int, int]"
+            "keywords": []
           },
           "body": [
             {
@@ -843,10 +822,6 @@
             "repr": "pair",
             "id": "pair"
           },
-          "target_type": "tuple[int, int]",
-          "iter_mode": "static_fastpath",
-          "iter_source_type": "list[tuple[int64, int64]]",
-          "iter_element_type": "tuple[int, int]",
           "iter": {
             "kind": "Call",
             "source_span": {
@@ -899,10 +874,7 @@
                 "value": 5
               }
             ],
-            "keywords": [],
-            "iterable_trait": "yes",
-            "iter_protocol": "static_range",
-            "iter_element_type": "tuple[int, int]"
+            "keywords": []
           },
           "body": [
             {

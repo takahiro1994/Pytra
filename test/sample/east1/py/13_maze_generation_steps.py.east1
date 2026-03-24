@@ -317,7 +317,6 @@
             "repr": "y",
             "id": "y"
           },
-          "target_type": "int",
           "start": {
             "kind": "Constant",
             "source_span": {
@@ -380,7 +379,6 @@
                 "repr": "x",
                 "id": "x"
               },
-              "target_type": "int",
               "start": {
                 "kind": "Constant",
                 "source_span": {
@@ -598,7 +596,6 @@
                     "repr": "yy",
                     "id": "yy"
                   },
-                  "target_type": "int",
                   "start": {
                     "kind": "Constant",
                     "source_span": {
@@ -828,7 +825,6 @@
                         "repr": "xx",
                         "id": "xx"
                       },
-                      "target_type": "int",
                       "start": {
                         "kind": "Constant",
                         "source_span": {
@@ -2116,7 +2112,6 @@
                 "repr": "k",
                 "id": "k"
               },
-              "target_type": "int",
               "start": {
                 "kind": "Constant",
                 "source_span": {

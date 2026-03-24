@@ -209,10 +209,6 @@
               }
             ]
           },
-          "target_type": "tuple[int, int]",
-          "iter_mode": "static_fastpath",
-          "iter_source_type": "list[tuple[int64, int64]]",
-          "iter_element_type": "tuple[int, int]",
           "iter": {
             "kind": "Call",
             "source_span": {
@@ -252,10 +248,7 @@
                 "id": "values"
               }
             ],
-            "keywords": [],
-            "iterable_trait": "yes",
-            "iter_protocol": "static_range",
-            "iter_element_type": "tuple[int, int]"
+            "keywords": []
           },
           "body": [
             {
@@ -382,10 +375,6 @@
             "repr": "v",
             "id": "v"
           },
-          "target_type": "unknown",
-          "iter_mode": "static_fastpath",
-          "iter_source_type": "unknown",
-          "iter_element_type": "unknown",
           "iter": {
             "kind": "Call",
             "source_span": {
@@ -425,10 +414,7 @@
                 "id": "values"
               }
             ],
-            "keywords": [],
-            "iterable_trait": "unknown",
-            "iter_protocol": "static_range",
-            "iter_element_type": "unknown"
+            "keywords": []
           },
           "body": [
             {

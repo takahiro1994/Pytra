@@ -44,6 +44,12 @@ _EXPR_REMOVE_FIELDS: set[str] = {
     "yields_dynamic",
     "noncpp_module_id",
     "noncpp_runtime_call",
+    "iterable_trait",
+    "iter_protocol",
+    "iter_element_type",
+    "iter_mode",
+    "iter_source_type",
+    "target_type",
 }
 
 # FunctionDef から除去

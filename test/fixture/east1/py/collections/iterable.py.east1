@@ -184,10 +184,6 @@
             "repr": "v",
             "id": "v"
           },
-          "target_type": "int",
-          "iter_mode": "static_fastpath",
-          "iter_source_type": "list[int64]",
-          "iter_element_type": "int",
           "iter": {
             "kind": "Name",
             "source_span": {
@@ -199,10 +195,7 @@
             "casts": [],
             "borrow_kind": "value",
             "repr": "l",
-            "id": "l",
-            "iterable_trait": "yes",
-            "iter_protocol": "static_range",
-            "iter_element_type": "int"
+            "id": "l"
           },
           "body": [
             {

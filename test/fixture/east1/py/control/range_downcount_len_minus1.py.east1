@@ -90,7 +90,6 @@
             "repr": "i",
             "id": "i"
           },
-          "target_type": "int",
           "start": {
             "kind": "BinOp",
             "source_span": {

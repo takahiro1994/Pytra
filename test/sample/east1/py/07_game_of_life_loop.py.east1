@@ -134,7 +134,6 @@
             "repr": "y",
             "id": "y"
           },
-          "target_type": "int",
           "start": {
             "kind": "Constant",
             "source_span": {
@@ -234,7 +233,6 @@
                 "repr": "x",
                 "id": "x"
               },
-              "target_type": "int",
               "start": {
                 "kind": "Constant",
                 "source_span": {
@@ -334,7 +332,6 @@
                     "repr": "dy",
                     "id": "dy"
                   },
-                  "target_type": "int",
                   "start": {
                     "kind": "UnaryOp",
                     "source_span": {
@@ -410,7 +407,6 @@
                         "repr": "dx",
                         "id": "dx"
                       },
-                      "target_type": "int",
                       "start": {
                         "kind": "UnaryOp",
                         "source_span": {
@@ -1894,7 +1890,6 @@
             "repr": "y",
             "id": "y"
           },
-          "target_type": "int",
           "start": {
             "kind": "Constant",
             "source_span": {
@@ -1957,7 +1952,6 @@
                 "repr": "x",
                 "id": "x"
               },
-              "target_type": "int",
               "start": {
                 "kind": "Constant",
                 "source_span": {
@@ -2145,7 +2139,6 @@
                     "repr": "yy",
                     "id": "yy"
                   },
-                  "target_type": "int",
                   "start": {
                     "kind": "Constant",
                     "source_span": {
@@ -2375,7 +2368,6 @@
                         "repr": "xx",
                         "id": "xx"
                       },
-                      "target_type": "int",
                       "start": {
                         "kind": "Constant",
                         "source_span": {
@@ -3014,7 +3006,6 @@
             "repr": "y",
             "id": "y"
           },
-          "target_type": "int",
           "start": {
             "kind": "Constant",
             "source_span": {
@@ -3077,7 +3068,6 @@
                 "repr": "x",
                 "id": "x"
               },
-              "target_type": "int",
               "start": {
                 "kind": "Constant",
                 "source_span": {
@@ -4360,7 +4350,6 @@
             "repr": "gy",
             "id": "gy"
           },
-          "target_type": "int",
           "start": {
             "kind": "Constant",
             "source_span": {
@@ -4449,7 +4438,6 @@
                 "repr": "gx",
                 "id": "gx"
               },
-              "target_type": "int",
               "start": {
                 "kind": "Constant",
                 "source_span": {
@@ -4796,7 +4784,6 @@
                         "repr": "py",
                         "id": "py"
                       },
-                      "target_type": "int",
                       "start": {
                         "kind": "Constant",
                         "source_span": {
@@ -4949,7 +4936,6 @@
                             "repr": "px",
                             "id": "px"
                           },
-                          "target_type": "int",
                           "start": {
                             "kind": "Constant",
                             "source_span": {
@@ -5433,7 +5419,6 @@
                             "repr": "py",
                             "id": "py"
                           },
-                          "target_type": "int",
                           "start": {
                             "kind": "Constant",
                             "source_span": {
@@ -5586,7 +5571,6 @@
                                 "repr": "px",
                                 "id": "px"
                               },
-                              "target_type": "int",
                               "start": {
                                 "kind": "Constant",
                                 "source_span": {
@@ -6018,7 +6002,6 @@
                             "repr": "py",
                             "id": "py"
                           },
-                          "target_type": "int",
                           "start": {
                             "kind": "Constant",
                             "source_span": {
@@ -6171,7 +6154,6 @@
                                 "repr": "px",
                                 "id": "px"
                               },
-                              "target_type": "int",
                               "start": {
                                 "kind": "Constant",
                                 "source_span": {
@@ -6589,7 +6571,6 @@
             "repr": "_",
             "id": "_"
           },
-          "target_type": "int",
           "start": {
             "kind": "Constant",
             "source_span": {

@@ -99,10 +99,6 @@
             "repr": "state",
             "id": "state"
           },
-          "target_type": "ControllerState",
-          "iter_mode": "static_fastpath",
-          "iter_source_type": "list[ControllerState]",
-          "iter_element_type": "ControllerState",
           "iter": {
             "kind": "Name",
             "source_span": {
@@ -114,10 +110,7 @@
             "casts": [],
             "borrow_kind": "value",
             "repr": "states",
-            "id": "states",
-            "iterable_trait": "yes",
-            "iter_protocol": "static_range",
-            "iter_element_type": "ControllerState"
+            "id": "states"
           },
           "body": [
             {

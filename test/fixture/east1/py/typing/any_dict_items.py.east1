@@ -394,10 +394,6 @@
               }
             ]
           },
-          "target_type": "tuple[str, Any]",
-          "iter_mode": "static_fastpath",
-          "iter_source_type": "list[tuple[str, Any]]",
-          "iter_element_type": "tuple[str, Any]",
           "iter": {
             "kind": "Call",
             "source_span": {
@@ -449,10 +445,7 @@
               "borrow_kind": "value",
               "repr": "meta",
               "id": "meta"
-            },
-            "iterable_trait": "yes",
-            "iter_protocol": "static_range",
-            "iter_element_type": "tuple[str, Any]"
+            }
           },
           "body": [
             {

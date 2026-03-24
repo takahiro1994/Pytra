@@ -986,10 +986,6 @@
               }
             ]
           },
-          "target_type": "tuple[int, str]",
-          "iter_mode": "static_fastpath",
-          "iter_source_type": "list[tuple[int64, str]]",
-          "iter_element_type": "tuple[int, str]",
           "iter": {
             "kind": "Call",
             "source_span": {
@@ -1029,10 +1025,7 @@
                 "id": "lines"
               }
             ],
-            "keywords": [],
-            "iterable_trait": "yes",
-            "iter_protocol": "static_range",
-            "iter_element_type": "tuple[int, str]"
+            "keywords": []
           },
           "body": [
             {
@@ -12420,10 +12413,6 @@
             "repr": "stmt",
             "id": "stmt"
           },
-          "target_type": "StmtNode",
-          "iter_mode": "static_fastpath",
-          "iter_source_type": "list[StmtNode]",
-          "iter_element_type": "StmtNode",
           "iter": {
             "kind": "Name",
             "source_span": {
@@ -12435,10 +12424,7 @@
             "casts": [],
             "borrow_kind": "value",
             "repr": "stmts",
-            "id": "stmts",
-            "iterable_trait": "yes",
-            "iter_protocol": "static_range",
-            "iter_element_type": "StmtNode"
+            "id": "stmts"
           },
           "body": [
             {
@@ -13772,7 +13758,6 @@
             "repr": "i",
             "id": "i"
           },
-          "target_type": "int",
           "start": {
             "kind": "Constant",
             "source_span": {
@@ -14087,7 +14072,6 @@
             "repr": "i",
             "id": "i"
           },
-          "target_type": "int",
           "start": {
             "kind": "Constant",
             "source_span": {

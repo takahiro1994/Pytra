@@ -158,10 +158,6 @@
             "repr": "c",
             "id": "c"
           },
-          "target_type": "str",
-          "iter_mode": "static_fastpath",
-          "iter_source_type": "str",
-          "iter_element_type": "str",
           "iter": {
             "kind": "Name",
             "source_span": {
@@ -173,10 +169,7 @@
             "casts": [],
             "borrow_kind": "value",
             "repr": "s",
-            "id": "s",
-            "iterable_trait": "yes",
-            "iter_protocol": "static_range",
-            "iter_element_type": "str"
+            "id": "s"
           },
           "body": [
             {
