@@ -52,6 +52,7 @@ class ParseContext:
     import_symbols: dict[str, dict[str, str]]
     import_modules: dict[str, str]
     import_bindings: list[dict[str, JsonVal]]
+    qualified_refs: list[dict[str, JsonVal]]
 
 
 # ---------------------------------------------------------------------------
@@ -1096,6 +1097,7 @@ def parse_python_source(source: str, filename: str) -> Module:
         import_symbols={},
         import_modules={},
         import_bindings=[],
+        qualified_refs=[],
     )
 
     # Phase 1: Pre-scan
@@ -1111,7 +1113,7 @@ def parse_python_source(source: str, filename: str) -> Module:
     _postprocess(ctx, body_items, renamed_symbols)
 
     # Build meta
-    meta = _build_meta(ctx)
+    meta = _build_meta(ctx, ctx.qualified_refs)
 
     return Module(
         source_path=filename,
@@ -1284,6 +1286,11 @@ def _parse_module_body(
                 if mod == "pathlib" or mod == "os" or mod == "sys":
                     binding["host_only"] = True
                 ctx.import_bindings.append(binding)
+                ctx.qualified_refs.append({
+                    "module_id": mod,
+                    "symbol": alias.name,
+                    "local_name": local,
+                })
             ln_no += 1
             # import 後の空行は trivia に蓄積しない
             skip_next_blanks = True
@@ -2352,14 +2359,21 @@ def _postprocess(ctx: ParseContext, body_items: list[Stmt], renamed_symbols: dic
             stmt.name = "__pytra_main"
 
 
-def _build_meta(ctx: ParseContext) -> dict[str, JsonVal]:
+def _build_meta(ctx: ParseContext, qualified_refs: list[dict[str, JsonVal]]) -> dict[str, JsonVal]:
     """Module.meta を構築する (EAST1: 構文情報のみ、runtime 解決なし)。"""
     import_symbols_jv: dict[str, JsonVal] = {}
     for local, info in ctx.import_symbols.items():
         import_symbols_jv[local] = dict(info)
 
+    import_resolution: dict[str, JsonVal] = {
+        "bindings": list(ctx.import_bindings),
+        "qualified_refs": list(qualified_refs),
+    }
+
     meta: dict[str, JsonVal] = {
+        "import_resolution": import_resolution,
         "import_bindings": list(ctx.import_bindings),
+        "qualified_symbol_refs": list(qualified_refs),
         "import_modules": dict(ctx.import_modules),
         "import_symbols": import_symbols_jv,
     }
