@@ -431,10 +431,11 @@ class ExprParser:
             test = self._parse_or()
             self.expect("NAME", "else")
             orelse = self._parse_ternary()
-            # IfExp
-            start = 0
-            end = len(self.source_text)
-            base = self._base(start, end, body.base.resolved_type if isinstance(body, (Name, Constant, BinOp, UnaryOp, Call, Attribute, Subscript)) else "unknown", "value")
+            # IfExp span: body の開始から orelse の終了まで
+            start = self._child_local_start(body)
+            end = self._child_local_end(orelse)
+            res_type = _get_resolved_type(body)
+            base = self._base(start, end, res_type, "value")
             return IfExp(base=base, test=test, body=body, orelse=orelse)
         return body
 
@@ -1954,12 +1955,16 @@ def _find_abs_line(all_lines: list[str], target_line: str, hint: int) -> int:
 
 
 def _find_expr_col(ctx: ParseContext, expr_text: str, abs_ln: int, fallback: int) -> int:
-    """元の行テキスト内で式テキストの位置を検索する (golden 準拠)。"""
-    if abs_ln >= 1 and abs_ln <= len(ctx.lines):
-        line_text = ctx.lines[abs_ln - 1]
-        pos = line_text.find(expr_text)
-        if pos >= 0:
-            return pos
+    """元の行テキスト内で式テキストの位置を検索する (golden 準拠)。
+
+    現行パーサーは ln_txt.find(expr_txt) で最初の出現を使う。
+    """
+    if expr_text == "" or abs_ln < 1 or abs_ln > len(ctx.lines):
+        return fallback
+    line_text = ctx.lines[abs_ln - 1]
+    pos = line_text.find(expr_text)
+    if pos >= 0:
+        return pos
     return fallback
 
 
