@@ -1279,7 +1279,7 @@ def _parse_function_def(
         idx = 0
         for param in _split_type_args_outer(args_text):
             param = param.strip()
-            if param == "" or param == "self":
+            if param == "" or param == "self" or param == "*":
                 continue
             # Handle default values
             default_part = ""
@@ -1350,9 +1350,9 @@ def _parse_function_def(
         fd.arg_type_exprs = arg_type_exprs
     if return_ann != "":
         fd.return_type_expr = _make_type_expr(return_type, ctx)
-    if len(trivia) > 0 or len(comments) > 0:
-        fd.leading_trivia = list(trivia) if len(trivia) > 0 else []
-        fd.leading_comments = list(comments) if len(comments) > 0 else []
+    # FunctionDef は常に leading_comments/leading_trivia を出力（空でも）
+    fd.leading_comments = list(comments)
+    fd.leading_trivia = list(trivia)
 
     return fd, end_ln
 
