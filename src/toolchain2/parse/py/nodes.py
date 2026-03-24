@@ -836,15 +836,15 @@ class ClassDef:
             "name": self.name,
             "original_name": self.original_name,
             "base": self.base,
-            "body": [stmt_to_jv(s) for s in self.body],
             "dataclass": self.dataclass_flag,
             "field_types": dict(self.field_types),
+            "body": [stmt_to_jv(s) for s in self.body],
             "class_storage_hint": self.class_storage_hint,
         }
-        if self.leading_trivia is not None:
-            d["leading_trivia"] = [t.to_jv() for t in self.leading_trivia]
         if self.leading_comments is not None:
             d["leading_comments"] = list(self.leading_comments)
+        if self.leading_trivia is not None:
+            d["leading_trivia"] = [t.to_jv() for t in self.leading_trivia]
         return d
 
 

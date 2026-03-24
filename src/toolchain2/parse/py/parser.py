@@ -1129,7 +1129,8 @@ def parse_python_source(source: str, filename: str) -> Module:
     _parse_module_body(ctx, lines, body_items, main_guard_body)
 
     # Phase 3: Post-processing
-    _postprocess(ctx, body_items)
+    renamed_symbols: dict[str, str] = {}
+    _postprocess(ctx, body_items, renamed_symbols)
 
     # Build meta
     meta = _build_meta(ctx)
@@ -1140,7 +1141,7 @@ def parse_python_source(source: str, filename: str) -> Module:
         body=body_items,
         main_guard_body=main_guard_body,
         meta=meta,
-        renamed_symbols={},
+        renamed_symbols=renamed_symbols,
         east_stage=1,
     )
 
@@ -1446,8 +1447,8 @@ def _parse_function_def(
     # Optional fields
     if len(arg_type_exprs) > 0 or len(arg_order) == 0:
         fd.arg_type_exprs = arg_type_exprs
-    if return_ann != "":
-        fd.return_type_expr = _make_type_expr(return_type, ctx)
+    # return_type_expr は常に出力
+    fd.return_type_expr = _make_type_expr(return_type, ctx)
     # FunctionDef は常に leading_comments/leading_trivia を出力（空でも）
     fd.leading_comments = list(comments)
     fd.leading_trivia = list(trivia)
@@ -1475,14 +1476,15 @@ def _parse_class_def(
             if isinstance(stmt.target, Name):
                 field_types[stmt.target.id] = stmt.annotation
 
-    end_lineno = end_ln
+    # ClassDef span: end は本体最終非空行の次の行
+    end_lineno = start_ln + 1
     end_col = 0
     if len(block_lines) > 0:
         for bl in reversed(block_lines):
             if bl.strip() != "":
-                end_col = len(bl.rstrip())
+                end_lineno = _find_abs_line(lines, bl, start_ln) + 1
+                end_col = 0
                 break
-        end_lineno = start_ln + len(block_lines)
 
     span = make_span(start_ln + 1, 0, end_lineno, end_col)
 
@@ -1496,9 +1498,9 @@ def _parse_class_def(
         field_types=field_types,
         class_storage_hint="value",
     )
-    if len(trivia) > 0 or len(comments) > 0:
-        cd.leading_trivia = list(trivia) if len(trivia) > 0 else []
-        cd.leading_comments = list(comments) if len(comments) > 0 else []
+    # ClassDef は常に leading_comments/leading_trivia を出力
+    cd.leading_comments = list(comments)
+    cd.leading_trivia = list(trivia)
 
     return cd, end_ln
 
@@ -2171,8 +2173,14 @@ def _collect_reassigned(stmts: list[Stmt], out: set[str]) -> None:
 # Postprocessing + meta building
 # ---------------------------------------------------------------------------
 
-def _postprocess(ctx: ParseContext, body_items: list[Stmt]) -> None:
-    """Phase 3: 後処理（暗黙 builtin import 追加等）。"""
+def _postprocess(ctx: ParseContext, body_items: list[Stmt], renamed_symbols: dict[str, str]) -> None:
+    """Phase 3: 後処理（main リネーム、暗黙 builtin import 追加等）。"""
+    # Rename main → __pytra_main
+    for stmt in body_items:
+        if isinstance(stmt, FunctionDef) and stmt.name == "main":
+            renamed_symbols["main"] = "__pytra_main"
+            stmt.name = "__pytra_main"
+
     # Add implicit builtin module bindings
     for mod_id in sorted(ctx.implicit_builtin_modules.keys()):
         ctx.import_bindings.append({
