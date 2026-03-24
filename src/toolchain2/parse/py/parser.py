@@ -1148,7 +1148,13 @@ class ExprParser:
             self.expect("NAME", "in")
             # iter_expr は 'if', 'for', ']' で止める
             iter_expr = self._parse_comp_iter()
-            # Comprehension target: golden では型推論しない (unknown/value のまま)
+            # target 自体は unknown/value のまま (golden 準拠)
+            # ただし elt の型推論のために iter 元の要素型を記録
+            iter_type = _get_resolved_type(iter_expr)
+            comp_elem_type = _extract_element_type(iter_type)
+            if isinstance(target, Name) and comp_elem_type != "unknown":
+                # elt が target と同じ名前なら型を設定 (後で)
+                self.name_types[target.id] = comp_elem_type
             ifs: list[Expr] = []
             while self.peek().value == "if":
                 self.advance()
@@ -1156,8 +1162,12 @@ class ExprParser:
             gens.append(Comprehension(target=target, iter_expr=iter_expr, ifs=ifs, is_async=False))
         self.expect("OP", "]")
         end_tok = self.tokens[self.pos - 1]
-        # ListComp resolved_type: list[elt_type] (elt が推論済みの場合のみ)
+        # Re-resolve elt type from name_types (generator が型情報を設定した後)
         elt_type = _get_resolved_type(elt)
+        if elt_type == "unknown" and isinstance(elt, Name) and elt.id in self.name_types:
+            elt_type = self.name_types[elt.id]
+            elt.base.resolved_type = elt_type
+            elt.base.borrow_kind = "readonly_ref"
         comp_type = "list[" + elt_type + "]" if elt_type != "unknown" else "unknown"
         base = self._base(open_tok.start, end_tok.end, comp_type, "value")
         return ListComp(base=base, elt=elt, generators=gens)
@@ -2138,6 +2148,7 @@ def _parse_block_lines(
     last_abs_ln = 0  # hint for _find_abs_line
     pending_trivia: list[TriviaNode] = []
     pending_comments: list[str] = []
+    pending_decorators: list[str] = []
 
     # Determine block base indent
     base_indent = 0
@@ -2166,10 +2177,14 @@ def _parse_block_lines(
 
         s_clean = _strip_inline_comment(s)
 
-        # Decorator: @name
+        # Decorator: @name — accumulate for next def
         if s_clean.startswith("@"):
-            # Accumulate decorator, will be attached to next def/class
-            # For now just skip (decorator info tracked separately)
+            deco_name = s_clean[1:].strip()
+            # Strip arguments: @dataclass(frozen=True) → dataclass
+            paren = deco_name.find("(")
+            if paren >= 0:
+                deco_name = deco_name[:paren].strip()
+            pending_decorators.append(deco_name)
             i += 1
             continue
 
@@ -2242,6 +2257,10 @@ def _parse_block_lines(
             # scope_label がクラス名ならクラスメソッドとして self の型を設定
             block_class_name = scope_label if scope_label in ctx.class_names else ""
             fn_stmt, fn_end_ln = _parse_function_def(ctx, ctx.lines, abs_ln - 1, fn_name_block, pending_trivia, pending_comments, class_name=block_class_name, parent_indent=indent)
+            # Attach decorators
+            if len(pending_decorators) > 0:
+                fn_stmt.decorators = list(pending_decorators)
+                pending_decorators = []
             stmts.append(fn_stmt)
             # Skip block_lines that were consumed by _parse_function_def
             # fn_end_ln is 0-based file line index. Advance i past those lines.
