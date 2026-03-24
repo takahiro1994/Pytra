@@ -100,8 +100,7 @@
             "repr": "\"out/import_pytra_runtime_png.png\"",
             "value": "out/import_pytra_runtime_png.png"
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -322,8 +321,7 @@
             ],
             "keywords": []
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Expr",
@@ -606,20 +604,7 @@
                 "keywords": []
               }
             ],
-            "keywords": [],
-            "runtime_owner": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 17,
-                "col": 4,
-                "end_lineno": 17,
-                "end_col": 11
-              },
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "results",
-              "id": "results"
-            }
+            "keywords": []
           }
         },
         {
@@ -723,20 +708,7 @@
                 "keywords": []
               }
             ],
-            "keywords": [],
-            "runtime_owner": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 18,
-                "col": 4,
-                "end_lineno": 18,
-                "end_col": 11
-              },
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "results",
-              "id": "results"
-            }
+            "keywords": []
           }
         },
         {

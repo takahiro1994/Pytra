@@ -50,6 +50,10 @@ _EXPR_REMOVE_FIELDS: set[str] = {
     "iter_mode",
     "iter_source_type",
     "target_type",
+    "runtime_owner",
+    "declare_init",
+    "class_storage_hint",
+    "host_only",
 }
 
 # FunctionDef から除去
@@ -138,6 +142,7 @@ _BINDING_REMOVE_FIELDS: set[str] = {
     "runtime_module_id",
     "runtime_symbol",
     "resolved_binding_kind",
+    "host_only",
 }
 
 

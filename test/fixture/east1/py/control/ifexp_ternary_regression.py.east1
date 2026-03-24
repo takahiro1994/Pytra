@@ -1039,8 +1039,7 @@
             ],
             "keywords": []
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Expr",
@@ -1217,8 +1216,7 @@
             ],
             "keywords": []
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Expr",

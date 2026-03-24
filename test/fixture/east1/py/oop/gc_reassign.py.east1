@@ -115,8 +115,7 @@
                 "repr": "name",
                 "id": "name"
               },
-              "declare": true,
-              "declare_init": true
+              "declare": true
             }
           ],
           "is_generator": 0,
@@ -229,7 +228,6 @@
           "decorators": []
         }
       ],
-      "class_storage_hint": "ref",
       "leading_comments": [
         "This file contains test/implementation code for `test/fixtures/gc_reassign.py`.",
         "Verify that reassignment `a = b` destroys the object whose reference was dropped.",
@@ -358,8 +356,7 @@
             ],
             "keywords": []
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -423,8 +420,7 @@
             ],
             "keywords": []
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Expr",
@@ -510,8 +506,7 @@
             "repr": "b",
             "id": "b"
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Expr",

@@ -109,8 +109,7 @@
               "id": "n"
             }
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "AugAssign",

@@ -175,8 +175,7 @@
                   "value": 1
                 }
               },
-              "declare": true,
-              "declare_init": true
+              "declare": true
             }
           ],
           "orelse": []

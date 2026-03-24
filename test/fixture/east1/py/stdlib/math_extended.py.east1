@@ -325,20 +325,7 @@
                 "keywords": []
               }
             ],
-            "keywords": [],
-            "runtime_owner": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 8,
-                "col": 4,
-                "end_lineno": 8,
-                "end_col": 10
-              },
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "checks",
-              "id": "checks"
-            }
+            "keywords": []
           }
         },
         {
@@ -634,20 +621,7 @@
                 "keywords": []
               }
             ],
-            "keywords": [],
-            "runtime_owner": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 9,
-                "col": 4,
-                "end_lineno": 9,
-                "end_col": 10
-              },
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "checks",
-              "id": "checks"
-            }
+            "keywords": []
           }
         },
         {
@@ -833,20 +807,7 @@
                 "keywords": []
               }
             ],
-            "keywords": [],
-            "runtime_owner": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 10,
-                "col": 4,
-                "end_lineno": 10,
-                "end_col": 10
-              },
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "checks",
-              "id": "checks"
-            }
+            "keywords": []
           }
         },
         {
@@ -1071,20 +1032,7 @@
                 "keywords": []
               }
             ],
-            "keywords": [],
-            "runtime_owner": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 11,
-                "col": 4,
-                "end_lineno": 11,
-                "end_col": 10
-              },
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "checks",
-              "id": "checks"
-            }
+            "keywords": []
           }
         },
         {
@@ -1270,20 +1218,7 @@
                 "keywords": []
               }
             ],
-            "keywords": [],
-            "runtime_owner": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 12,
-                "col": 4,
-                "end_lineno": 12,
-                "end_col": 10
-              },
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "checks",
-              "id": "checks"
-            }
+            "keywords": []
           }
         },
         {
@@ -1482,20 +1417,7 @@
                 "keywords": []
               }
             ],
-            "keywords": [],
-            "runtime_owner": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 13,
-                "col": 4,
-                "end_lineno": 13,
-                "end_col": 10
-              },
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "checks",
-              "id": "checks"
-            }
+            "keywords": []
           }
         },
         {
@@ -1660,8 +1582,7 @@
           "local_name": "math",
           "binding_kind": "module",
           "source_file": "test/fixture/source/py/stdlib/math_extended.py",
-          "source_line": 3,
-          "host_only": true
+          "source_line": 3
         }
       ],
       "qualified_refs": [
@@ -1700,8 +1621,7 @@
         "local_name": "math",
         "binding_kind": "module",
         "source_file": "test/fixture/source/py/stdlib/math_extended.py",
-        "source_line": 3,
-        "host_only": true
+        "source_line": 3
       }
     ],
     "qualified_symbol_refs": [

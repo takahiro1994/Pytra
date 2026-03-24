@@ -275,20 +275,7 @@
                 "keywords": []
               }
             ],
-            "keywords": [],
-            "runtime_owner": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 9,
-                "col": 4,
-                "end_lineno": 9,
-                "end_col": 11
-              },
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "results",
-              "id": "results"
-            }
+            "keywords": []
           }
         },
         {
@@ -461,20 +448,7 @@
                 "keywords": []
               }
             ],
-            "keywords": [],
-            "runtime_owner": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 10,
-                "col": 4,
-                "end_lineno": 10,
-                "end_col": 11
-              },
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "results",
-              "id": "results"
-            }
+            "keywords": []
           }
         },
         {

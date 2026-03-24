@@ -49,7 +49,6 @@
           }
         }
       ],
-      "class_storage_hint": "value",
       "leading_comments": [
         "This file contains test/implementation code for `test/fixtures/oop/is_instance.py`.",
         "Reader-facing comments are added to make roles easier to understand.",
@@ -101,8 +100,7 @@
             "end_col": 8
           }
         }
-      ],
-      "class_storage_hint": "ref"
+      ]
     },
     {
       "kind": "ClassDef",
@@ -127,8 +125,7 @@
             "end_col": 8
           }
         }
-      ],
-      "class_storage_hint": "ref"
+      ]
     },
     {
       "kind": "FunctionDef",
@@ -196,8 +193,7 @@
             "args": [],
             "keywords": []
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -247,8 +243,7 @@
             "args": [],
             "keywords": []
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Expr",

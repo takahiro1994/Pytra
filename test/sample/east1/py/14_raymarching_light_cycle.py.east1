@@ -125,8 +125,7 @@
             "args": [],
             "keywords": []
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "ForRange",
@@ -345,8 +344,7 @@
                 ],
                 "keywords": []
               },
-              "declare": true,
-              "declare_init": true
+              "declare": true
             },
             {
               "kind": "Assign",
@@ -503,8 +501,7 @@
                 ],
                 "keywords": []
               },
-              "declare": true,
-              "declare_init": true
+              "declare": true
             },
             {
               "kind": "Assign",
@@ -635,8 +632,7 @@
                 ],
                 "keywords": []
               },
-              "declare": true,
-              "declare_init": true
+              "declare": true
             },
             {
               "kind": "Expr",
@@ -990,8 +986,7 @@
               "value": 0.45
             }
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -1053,8 +1048,7 @@
               "value": 0.2
             }
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -1116,8 +1110,7 @@
               "value": 0.35
             }
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -1179,8 +1172,7 @@
               "value": 0.15
             }
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -1335,8 +1327,7 @@
             ],
             "keywords": []
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -1491,8 +1482,7 @@
             ],
             "keywords": []
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -1766,8 +1756,7 @@
               "keywords": []
             }
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -1830,7 +1819,6 @@
             }
           },
           "declare": true,
-          "declare_init": true,
           "leading_trivia": [
             {
               "kind": "blank",
@@ -1898,8 +1886,7 @@
               "id": "light_y"
             }
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -2054,8 +2041,7 @@
             ],
             "keywords": []
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -2195,8 +2181,7 @@
               }
             }
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -2339,7 +2324,6 @@
             "keywords": []
           },
           "declare": true,
-          "declare_init": true,
           "leading_trivia": [
             {
               "kind": "blank",
@@ -2509,8 +2493,7 @@
             "repr": "320",
             "value": 320
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -2546,8 +2529,7 @@
             "repr": "240",
             "value": 240
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -2583,8 +2565,7 @@
             "repr": "84",
             "value": 84
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -2620,8 +2601,7 @@
             "repr": "\"sample/out/14_raymarching_light_cycle.gif\"",
             "value": "sample/out/14_raymarching_light_cycle.gif"
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -2672,7 +2652,6 @@
             "keywords": []
           },
           "declare": true,
-          "declare_init": true,
           "leading_trivia": [
             {
               "kind": "blank",
@@ -2867,8 +2846,7 @@
                 ],
                 "keywords": []
               },
-              "declare": true,
-              "declare_init": true
+              "declare": true
             },
             {
               "kind": "Assign",
@@ -2995,8 +2973,7 @@
                   "value": 2.0
                 }
               },
-              "declare": true,
-              "declare_init": true
+              "declare": true
             },
             {
               "kind": "Assign",
@@ -3099,8 +3076,7 @@
                   "keywords": []
                 }
               },
-              "declare": true,
-              "declare_init": true
+              "declare": true
             },
             {
               "kind": "Assign",
@@ -3229,8 +3205,7 @@
                   "keywords": []
                 }
               },
-              "declare": true,
-              "declare_init": true
+              "declare": true
             },
             {
               "kind": "ForRange",
@@ -3354,8 +3329,7 @@
                       "id": "w"
                     }
                   },
-                  "declare": true,
-                  "declare_init": true
+                  "declare": true
                 },
                 {
                   "kind": "Assign",
@@ -3495,8 +3469,7 @@
                       "value": 1.0
                     }
                   },
-                  "declare": true,
-                  "declare_init": true
+                  "declare": true
                 },
                 {
                   "kind": "ForRange",
@@ -3698,8 +3671,7 @@
                           "value": 1.0
                         }
                       },
-                      "declare": true,
-                      "declare_init": true
+                      "declare": true
                     },
                     {
                       "kind": "Assign",
@@ -3853,8 +3825,7 @@
                         ],
                         "keywords": []
                       },
-                      "declare": true,
-                      "declare_init": true
+                      "declare": true
                     }
                   ],
                   "orelse": []
@@ -3956,20 +3927,7 @@
                     "keywords": []
                   }
                 ],
-                "keywords": [],
-                "runtime_owner": {
-                  "kind": "Name",
-                  "source_span": {
-                    "lineno": 61,
-                    "col": 8,
-                    "end_lineno": 61,
-                    "end_col": 14
-                  },
-                  "casts": [],
-                  "borrow_kind": "value",
-                  "repr": "frames",
-                  "id": "frames"
-                }
+                "keywords": []
               }
             }
           ],
@@ -4204,8 +4162,7 @@
               "id": "start"
             }
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Expr",

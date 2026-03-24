@@ -217,20 +217,7 @@
                 "id": "items"
               }
             ],
-            "keywords": [],
-            "runtime_owner": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 9,
-                "col": 11,
-                "end_lineno": 9,
-                "end_col": 14
-              },
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "sep",
-              "id": "sep"
-            }
+            "keywords": []
           }
         }
       ],

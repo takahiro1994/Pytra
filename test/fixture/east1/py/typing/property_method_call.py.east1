@@ -119,8 +119,7 @@
                 "repr": "mapper_value",
                 "id": "mapper_value"
               },
-              "declare": true,
-              "declare_init": true
+              "declare": true
             }
           ],
           "is_generator": 0,
@@ -380,7 +379,6 @@
           "decorators": []
         }
       ],
-      "class_storage_hint": "ref",
       "leading_comments": [
         "This file contains test/implementation code for `test/fixtures/typing/property_method_call.py`."
       ],
@@ -642,20 +640,7 @@
                 "keywords": []
               }
             ],
-            "keywords": [],
-            "runtime_owner": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 24,
-                "col": 4,
-                "end_lineno": 24,
-                "end_col": 10
-              },
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "checks",
-              "id": "checks"
-            }
+            "keywords": []
           }
         },
         {
@@ -799,20 +784,7 @@
                 "keywords": []
               }
             ],
-            "keywords": [],
-            "runtime_owner": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 25,
-                "col": 4,
-                "end_lineno": 25,
-                "end_col": 10
-              },
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "checks",
-              "id": "checks"
-            }
+            "keywords": []
           }
         },
         {
@@ -956,20 +928,7 @@
                 "keywords": []
               }
             ],
-            "keywords": [],
-            "runtime_owner": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 26,
-                "col": 4,
-                "end_lineno": 26,
-                "end_col": 10
-              },
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "checks",
-              "id": "checks"
-            }
+            "keywords": []
           }
         },
         {

@@ -74,7 +74,6 @@
           "decorators": []
         }
       ],
-      "class_storage_hint": "value",
       "leading_comments": [],
       "leading_trivia": []
     },
@@ -143,8 +142,7 @@
           "yield_value_type": "unknown",
           "decorators": []
         }
-      ],
-      "class_storage_hint": "ref"
+      ]
     }
   ],
   "main_guard_body": [

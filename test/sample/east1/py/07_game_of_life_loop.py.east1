@@ -308,8 +308,7 @@
                     "repr": "0",
                     "value": 0
                   },
-                  "declare": true,
-                  "declare_init": true
+                  "declare": true
                 },
                 {
                   "kind": "ForRange",
@@ -683,8 +682,7 @@
                                   "id": "w"
                                 }
                               },
-                              "declare": true,
-                              "declare_init": true
+                              "declare": true
                             },
                             {
                               "kind": "Assign",
@@ -798,8 +796,7 @@
                                   "id": "h"
                                 }
                               },
-                              "declare": true,
-                              "declare_init": true
+                              "declare": true
                             },
                             {
                               "kind": "AugAssign",
@@ -981,8 +978,7 @@
                       "id": "x"
                     }
                   },
-                  "declare": true,
-                  "declare_init": true
+                  "declare": true
                 },
                 {
                   "kind": "If",
@@ -1212,20 +1208,7 @@
                             "value": 1
                           }
                         ],
-                        "keywords": [],
-                        "runtime_owner": {
-                          "kind": "Name",
-                          "source_span": {
-                            "lineno": 22,
-                            "col": 16,
-                            "end_lineno": 22,
-                            "end_col": 19
-                          },
-                          "casts": [],
-                          "borrow_kind": "value",
-                          "repr": "row",
-                          "id": "row"
-                        }
+                        "keywords": []
                       }
                     }
                   ],
@@ -1400,20 +1383,7 @@
                                 "value": 1
                               }
                             ],
-                            "keywords": [],
-                            "runtime_owner": {
-                              "kind": "Name",
-                              "source_span": {
-                                "lineno": 24,
-                                "col": 16,
-                                "end_lineno": 24,
-                                "end_col": 19
-                              },
-                              "casts": [],
-                              "borrow_kind": "value",
-                              "repr": "row",
-                              "id": "row"
-                            }
+                            "keywords": []
                           }
                         }
                       ],
@@ -1478,20 +1448,7 @@
                                 "value": 0
                               }
                             ],
-                            "keywords": [],
-                            "runtime_owner": {
-                              "kind": "Name",
-                              "source_span": {
-                                "lineno": 26,
-                                "col": 16,
-                                "end_lineno": 26,
-                                "end_col": 19
-                              },
-                              "casts": [],
-                              "borrow_kind": "value",
-                              "repr": "row",
-                              "id": "row"
-                            }
+                            "keywords": []
                           }
                         }
                       ]
@@ -1561,20 +1518,7 @@
                     "id": "row"
                   }
                 ],
-                "keywords": [],
-                "runtime_owner": {
-                  "kind": "Name",
-                  "source_span": {
-                    "lineno": 27,
-                    "col": 8,
-                    "end_lineno": 27,
-                    "end_col": 11
-                  },
-                  "casts": [],
-                  "borrow_kind": "value",
-                  "repr": "nxt",
-                  "id": "nxt"
-                }
+                "keywords": []
               }
             }
           ],
@@ -1712,8 +1656,7 @@
               "id": "cell"
             }
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -1775,8 +1718,7 @@
               "id": "cell"
             }
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -1866,8 +1808,7 @@
             ],
             "keywords": []
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "ForRange",
@@ -2115,8 +2056,7 @@
                       "value": 0
                     }
                   },
-                  "declare": true,
-                  "declare_init": true
+                  "declare": true
                 },
                 {
                   "kind": "ForRange",
@@ -2344,8 +2284,7 @@
                           }
                         }
                       },
-                      "declare": true,
-                      "declare_init": true
+                      "declare": true
                     },
                     {
                       "kind": "ForRange",
@@ -2494,8 +2433,7 @@
                             "repr": "v",
                             "id": "v"
                           },
-                          "declare": true,
-                          "declare_init": true
+                          "declare": true
                         }
                       ],
                       "orelse": []
@@ -2617,8 +2555,7 @@
             "repr": "144",
             "value": 144
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -2654,8 +2591,7 @@
             "repr": "108",
             "value": 108
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -2691,8 +2627,7 @@
             "repr": "4",
             "value": 4
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -2728,8 +2663,7 @@
             "repr": "105",
             "value": 105
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -2765,8 +2699,7 @@
             "repr": "\"sample/out/07_game_of_life_loop.gif\"",
             "value": "sample/out/07_game_of_life_loop.gif"
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -2817,7 +2750,6 @@
             "keywords": []
           },
           "declare": true,
-          "declare_init": true,
           "leading_trivia": [
             {
               "kind": "blank",
@@ -3403,8 +3335,7 @@
                       "value": 97
                     }
                   },
-                  "declare": true,
-                  "declare_init": true
+                  "declare": true
                 },
                 {
                   "kind": "If",
@@ -3542,8 +3473,7 @@
                         "repr": "1",
                         "value": 1
                       },
-                      "declare": true,
-                      "declare_init": true
+                      "declare": true
                     }
                   ],
                   "orelse": []
@@ -3767,7 +3697,6 @@
             ]
           },
           "declare": true,
-          "declare_init": true,
           "leading_trivia": [
             {
               "kind": "comment",
@@ -3972,8 +3901,7 @@
               }
             ]
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -4326,8 +4254,7 @@
               }
             ]
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "ForRange",
@@ -4643,8 +4570,7 @@
                       "value": 3
                     }
                   },
-                  "declare": true,
-                  "declare_init": true
+                  "declare": true
                 },
                 {
                   "kind": "If",
@@ -4760,8 +4686,7 @@
                         ],
                         "keywords": []
                       },
-                      "declare": true,
-                      "declare_init": true
+                      "declare": true
                     },
                     {
                       "kind": "ForRange",
@@ -4912,8 +4837,7 @@
                             ],
                             "keywords": []
                           },
-                          "declare": true,
-                          "declare_init": true
+                          "declare": true
                         },
                         {
                           "kind": "ForRange",
@@ -5267,8 +5191,7 @@
                                     "repr": "1",
                                     "value": 1
                                   },
-                                  "declare": true,
-                                  "declare_init": true
+                                  "declare": true
                                 }
                               ],
                               "orelse": []
@@ -5395,8 +5318,7 @@
                             ],
                             "keywords": []
                           },
-                          "declare": true,
-                          "declare_init": true
+                          "declare": true
                         },
                         {
                           "kind": "ForRange",
@@ -5547,8 +5469,7 @@
                                 ],
                                 "keywords": []
                               },
-                              "declare": true,
-                              "declare_init": true
+                              "declare": true
                             },
                             {
                               "kind": "ForRange",
@@ -5902,8 +5823,7 @@
                                         "repr": "1",
                                         "value": 1
                                       },
-                                      "declare": true,
-                                      "declare_init": true
+                                      "declare": true
                                     }
                                   ],
                                   "orelse": []
@@ -5978,8 +5898,7 @@
                             ],
                             "keywords": []
                           },
-                          "declare": true,
-                          "declare_init": true
+                          "declare": true
                         },
                         {
                           "kind": "ForRange",
@@ -6130,8 +6049,7 @@
                                 ],
                                 "keywords": []
                               },
-                              "declare": true,
-                              "declare_init": true
+                              "declare": true
                             },
                             {
                               "kind": "ForRange",
@@ -6485,8 +6403,7 @@
                                         "repr": "1",
                                         "value": 1
                                       },
-                                      "declare": true,
-                                      "declare_init": true
+                                      "declare": true
                                     }
                                   ],
                                   "orelse": []
@@ -6739,20 +6656,7 @@
                     "keywords": []
                   }
                 ],
-                "keywords": [],
-                "runtime_owner": {
-                  "kind": "Name",
-                  "source_span": {
-                    "lineno": 108,
-                    "col": 8,
-                    "end_lineno": 108,
-                    "end_col": 14
-                  },
-                  "casts": [],
-                  "borrow_kind": "value",
-                  "repr": "frames",
-                  "id": "frames"
-                }
+                "keywords": []
               }
             },
             {
@@ -6843,8 +6747,7 @@
                 ],
                 "keywords": []
               },
-              "declare": true,
-              "declare_init": true
+              "declare": true
             }
           ],
           "orelse": []
@@ -7124,8 +7027,7 @@
               "id": "start"
             }
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Expr",

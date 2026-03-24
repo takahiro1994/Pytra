@@ -324,20 +324,7 @@
                 }
               }
             ],
-            "keywords": [],
-            "runtime_owner": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 14,
-                "col": 4,
-                "end_lineno": 14,
-                "end_col": 10
-              },
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "values",
-              "id": "values"
-            }
+            "keywords": []
           }
         },
         {
@@ -425,20 +412,7 @@
                 }
               }
             ],
-            "keywords": [],
-            "runtime_owner": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 15,
-                "col": 4,
-                "end_lineno": 15,
-                "end_col": 10
-              },
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "values",
-              "id": "values"
-            }
+            "keywords": []
           }
         },
         {
@@ -709,20 +683,7 @@
                 "values": []
               }
             ],
-            "keywords": [],
-            "runtime_owner": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 19,
-                "col": 29,
-                "end_lineno": 19,
-                "end_col": 36
-              },
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "payload",
-              "id": "payload"
-            }
+            "keywords": []
           },
           "declare": true,
           "leading_trivia": [
@@ -855,20 +816,7 @@
               "attr": "items"
             },
             "args": [],
-            "keywords": [],
-            "runtime_owner": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 21,
-                "col": 17,
-                "end_lineno": 21,
-                "end_col": 23
-              },
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "nested",
-              "id": "nested"
-            }
+            "keywords": []
           },
           "body": [
             {
@@ -1062,20 +1010,7 @@
                 "keywords": []
               }
             ],
-            "keywords": [],
-            "runtime_owner": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 25,
-                "col": 4,
-                "end_lineno": 25,
-                "end_col": 10
-              },
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "checks",
-              "id": "checks"
-            }
+            "keywords": []
           }
         },
         {
@@ -1192,20 +1127,7 @@
                 "keywords": []
               }
             ],
-            "keywords": [],
-            "runtime_owner": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 26,
-                "col": 4,
-                "end_lineno": 26,
-                "end_col": 10
-              },
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "checks",
-              "id": "checks"
-            }
+            "keywords": []
           }
         },
         {
@@ -1322,20 +1244,7 @@
                 "keywords": []
               }
             ],
-            "keywords": [],
-            "runtime_owner": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 27,
-                "col": 4,
-                "end_lineno": 27,
-                "end_col": 10
-              },
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "checks",
-              "id": "checks"
-            }
+            "keywords": []
           }
         },
         {
@@ -1505,20 +1414,7 @@
                 "keywords": []
               }
             ],
-            "keywords": [],
-            "runtime_owner": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 28,
-                "col": 4,
-                "end_lineno": 28,
-                "end_col": 10
-              },
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "checks",
-              "id": "checks"
-            }
+            "keywords": []
           }
         },
         {

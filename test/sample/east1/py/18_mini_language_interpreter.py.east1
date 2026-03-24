@@ -162,7 +162,6 @@
           "declare": true
         }
       ],
-      "class_storage_hint": "value",
       "leading_comments": [],
       "leading_trivia": []
     },
@@ -389,8 +388,7 @@
           "value": null,
           "declare": true
         }
-      ],
-      "class_storage_hint": "value"
+      ]
     },
     {
       "kind": "ClassDef",
@@ -511,8 +509,7 @@
           "value": null,
           "declare": true
         }
-      ],
-      "class_storage_hint": "value"
+      ]
     },
     {
       "kind": "FunctionDef",
@@ -1451,20 +1448,7 @@
                         "value": 0
                       }
                     ],
-                    "keywords": [],
-                    "runtime_owner": {
-                      "kind": "Name",
-                      "source_span": {
-                        "lineno": 66,
-                        "col": 30,
-                        "end_lineno": 66,
-                        "end_col": 52
-                      },
-                      "casts": [],
-                      "borrow_kind": "value",
-                      "repr": "single_char_token_tags",
-                      "id": "single_char_token_tags"
-                    }
+                    "keywords": []
                   },
                   "declare": true
                 },
@@ -1698,20 +1682,7 @@
                             "keywords": []
                           }
                         ],
-                        "keywords": [],
-                        "runtime_owner": {
-                          "kind": "Name",
-                          "source_span": {
-                            "lineno": 68,
-                            "col": 16,
-                            "end_lineno": 68,
-                            "end_col": 22
-                          },
-                          "casts": [],
-                          "borrow_kind": "value",
-                          "repr": "tokens",
-                          "id": "tokens"
-                        }
+                        "keywords": []
                       }
                     },
                     {
@@ -1822,20 +1793,7 @@
                       "attr": "isdigit"
                     },
                     "args": [],
-                    "keywords": [],
-                    "runtime_owner": {
-                      "kind": "Name",
-                      "source_span": {
-                        "lineno": 72,
-                        "col": 15,
-                        "end_lineno": 72,
-                        "end_col": 17
-                      },
-                      "casts": [],
-                      "borrow_kind": "value",
-                      "repr": "ch",
-                      "id": "ch"
-                    }
+                    "keywords": []
                   },
                   "body": [
                     {
@@ -2002,45 +1960,7 @@
                               "attr": "isdigit"
                             },
                             "args": [],
-                            "keywords": [],
-                            "runtime_owner": {
-                              "kind": "Subscript",
-                              "source_span": {
-                                "lineno": 74,
-                                "col": 32,
-                                "end_lineno": 74,
-                                "end_col": 41
-                              },
-                              "casts": [],
-                              "borrow_kind": "value",
-                              "repr": "source[i]",
-                              "value": {
-                                "kind": "Name",
-                                "source_span": {
-                                  "lineno": 74,
-                                  "col": 32,
-                                  "end_lineno": 74,
-                                  "end_col": 38
-                                },
-                                "casts": [],
-                                "borrow_kind": "value",
-                                "repr": "source",
-                                "id": "source"
-                              },
-                              "slice": {
-                                "kind": "Name",
-                                "source_span": {
-                                  "lineno": 74,
-                                  "col": 39,
-                                  "end_lineno": 74,
-                                  "end_col": 40
-                                },
-                                "casts": [],
-                                "borrow_kind": "value",
-                                "repr": "i",
-                                "id": "i"
-                              }
-                            }
+                            "keywords": []
                           }
                         ]
                       },
@@ -2345,20 +2265,7 @@
                             "keywords": []
                           }
                         ],
-                        "keywords": [],
-                        "runtime_owner": {
-                          "kind": "Name",
-                          "source_span": {
-                            "lineno": 77,
-                            "col": 16,
-                            "end_lineno": 77,
-                            "end_col": 22
-                          },
-                          "casts": [],
-                          "borrow_kind": "value",
-                          "repr": "tokens",
-                          "id": "tokens"
-                        }
+                        "keywords": []
                       }
                     },
                     {
@@ -2445,20 +2352,7 @@
                           "attr": "isalpha"
                         },
                         "args": [],
-                        "keywords": [],
-                        "runtime_owner": {
-                          "kind": "Name",
-                          "source_span": {
-                            "lineno": 80,
-                            "col": 15,
-                            "end_lineno": 80,
-                            "end_col": 17
-                          },
-                          "casts": [],
-                          "borrow_kind": "value",
-                          "repr": "ch",
-                          "id": "ch"
-                        }
+                        "keywords": []
                       },
                       {
                         "kind": "Compare",
@@ -2540,8 +2434,7 @@
                         "repr": "i",
                         "id": "i"
                       },
-                      "declare": true,
-                      "declare_init": true
+                      "declare": true
                     },
                     {
                       "kind": "While",
@@ -2696,45 +2589,7 @@
                                       "attr": "isalpha"
                                     },
                                     "args": [],
-                                    "keywords": [],
-                                    "runtime_owner": {
-                                      "kind": "Subscript",
-                                      "source_span": {
-                                        "lineno": 82,
-                                        "col": 34,
-                                        "end_lineno": 82,
-                                        "end_col": 43
-                                      },
-                                      "casts": [],
-                                      "borrow_kind": "value",
-                                      "repr": "source[i]",
-                                      "value": {
-                                        "kind": "Name",
-                                        "source_span": {
-                                          "lineno": 82,
-                                          "col": 34,
-                                          "end_lineno": 82,
-                                          "end_col": 40
-                                        },
-                                        "casts": [],
-                                        "borrow_kind": "value",
-                                        "repr": "source",
-                                        "id": "source"
-                                      },
-                                      "slice": {
-                                        "kind": "Name",
-                                        "source_span": {
-                                          "lineno": 82,
-                                          "col": 41,
-                                          "end_lineno": 82,
-                                          "end_col": 42
-                                        },
-                                        "casts": [],
-                                        "borrow_kind": "value",
-                                        "repr": "i",
-                                        "id": "i"
-                                      }
-                                    }
+                                    "keywords": []
                                   },
                                   {
                                     "kind": "Compare",
@@ -2869,45 +2724,7 @@
                                   "attr": "isdigit"
                                 },
                                 "args": [],
-                                "keywords": [],
-                                "runtime_owner": {
-                                  "kind": "Subscript",
-                                  "source_span": {
-                                    "lineno": 82,
-                                    "col": 78,
-                                    "end_lineno": 82,
-                                    "end_col": 87
-                                  },
-                                  "casts": [],
-                                  "borrow_kind": "value",
-                                  "repr": "source[i]",
-                                  "value": {
-                                    "kind": "Name",
-                                    "source_span": {
-                                      "lineno": 82,
-                                      "col": 78,
-                                      "end_lineno": 82,
-                                      "end_col": 84
-                                    },
-                                    "casts": [],
-                                    "borrow_kind": "value",
-                                    "repr": "source",
-                                    "id": "source"
-                                  },
-                                  "slice": {
-                                    "kind": "Name",
-                                    "source_span": {
-                                      "lineno": 82,
-                                      "col": 85,
-                                      "end_lineno": 82,
-                                      "end_col": 86
-                                    },
-                                    "casts": [],
-                                    "borrow_kind": "value",
-                                    "repr": "i",
-                                    "id": "i"
-                                  }
-                                }
+                                "keywords": []
                               }
                             ]
                           }
@@ -3056,8 +2873,7 @@
                           "id": "i"
                         }
                       },
-                      "declare": true,
-                      "declare_init": true
+                      "declare": true
                     },
                     {
                       "kind": "If",
@@ -3238,20 +3054,7 @@
                                 "keywords": []
                               }
                             ],
-                            "keywords": [],
-                            "runtime_owner": {
-                              "kind": "Name",
-                              "source_span": {
-                                "lineno": 86,
-                                "col": 20,
-                                "end_lineno": 86,
-                                "end_col": 26
-                              },
-                              "casts": [],
-                              "borrow_kind": "value",
-                              "repr": "tokens",
-                              "id": "tokens"
-                            }
+                            "keywords": []
                           }
                         }
                       ],
@@ -3435,20 +3238,7 @@
                                     "keywords": []
                                   }
                                 ],
-                                "keywords": [],
-                                "runtime_owner": {
-                                  "kind": "Name",
-                                  "source_span": {
-                                    "lineno": 88,
-                                    "col": 20,
-                                    "end_lineno": 88,
-                                    "end_col": 26
-                                  },
-                                  "casts": [],
-                                  "borrow_kind": "value",
-                                  "repr": "tokens",
-                                  "id": "tokens"
-                                }
+                                "keywords": []
                               }
                             }
                           ],
@@ -3580,20 +3370,7 @@
                                     "keywords": []
                                   }
                                 ],
-                                "keywords": [],
-                                "runtime_owner": {
-                                  "kind": "Name",
-                                  "source_span": {
-                                    "lineno": 90,
-                                    "col": 20,
-                                    "end_lineno": 90,
-                                    "end_col": 26
-                                  },
-                                  "casts": [],
-                                  "borrow_kind": "value",
-                                  "repr": "tokens",
-                                  "id": "tokens"
-                                }
+                                "keywords": []
                               }
                             }
                           ]
@@ -3992,20 +3769,7 @@
                     "keywords": []
                   }
                 ],
-                "keywords": [],
-                "runtime_owner": {
-                  "kind": "Name",
-                  "source_span": {
-                    "lineno": 95,
-                    "col": 8,
-                    "end_lineno": 95,
-                    "end_col": 14
-                  },
-                  "casts": [],
-                  "borrow_kind": "value",
-                  "repr": "tokens",
-                  "id": "tokens"
-                }
+                "keywords": []
               }
             }
           ],
@@ -4166,20 +3930,7 @@
                 "keywords": []
               }
             ],
-            "keywords": [],
-            "runtime_owner": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 97,
-                "col": 4,
-                "end_lineno": 97,
-                "end_col": 10
-              },
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "tokens",
-              "id": "tokens"
-            }
+            "keywords": []
           }
         },
         {
@@ -5692,33 +5443,7 @@
                     "id": "node"
                   }
                 ],
-                "keywords": [],
-                "runtime_owner": {
-                  "kind": "Attribute",
-                  "source_span": {
-                    "lineno": 137,
-                    "col": 8,
-                    "end_lineno": 137,
-                    "end_col": 23
-                  },
-                  "casts": [],
-                  "borrow_kind": "value",
-                  "repr": "self.expr_nodes",
-                  "value": {
-                    "kind": "Name",
-                    "source_span": {
-                      "lineno": 137,
-                      "col": 8,
-                      "end_lineno": 137,
-                      "end_col": 12
-                    },
-                    "casts": [],
-                    "borrow_kind": "value",
-                    "repr": "self",
-                    "id": "self"
-                  },
-                  "attr": "expr_nodes"
-                }
+                "keywords": []
               }
             },
             {
@@ -6128,20 +5853,7 @@
                         "id": "stmt"
                       }
                     ],
-                    "keywords": [],
-                    "runtime_owner": {
-                      "kind": "Name",
-                      "source_span": {
-                        "lineno": 145,
-                        "col": 12,
-                        "end_lineno": 145,
-                        "end_col": 17
-                      },
-                      "casts": [],
-                      "borrow_kind": "value",
-                      "repr": "stmts",
-                      "id": "stmts"
-                    }
+                    "keywords": []
                   }
                 },
                 {
@@ -7660,8 +7372,7 @@
                         ],
                         "keywords": []
                       },
-                      "declare": true,
-                      "declare_init": true
+                      "declare": true
                     },
                     {
                       "kind": "Expr",
@@ -7812,8 +7523,7 @@
                         "args": [],
                         "keywords": []
                       },
-                      "declare": true,
-                      "declare_init": true
+                      "declare": true
                     },
                     {
                       "kind": "Assign",
@@ -8009,8 +7719,7 @@
                         ],
                         "keywords": []
                       },
-                      "declare": true,
-                      "declare_init": true
+                      "declare": true
                     },
                     {
                       "kind": "Expr",
@@ -8520,8 +8229,7 @@
                         ],
                         "keywords": []
                       },
-                      "declare": true,
-                      "declare_init": true
+                      "declare": true
                     },
                     {
                       "kind": "Expr",
@@ -8672,8 +8380,7 @@
                         "args": [],
                         "keywords": []
                       },
-                      "declare": true,
-                      "declare_init": true
+                      "declare": true
                     },
                     {
                       "kind": "Assign",
@@ -8869,8 +8576,7 @@
                         ],
                         "keywords": []
                       },
-                      "declare": true,
-                      "declare_init": true
+                      "declare": true
                     },
                     {
                       "kind": "Expr",
@@ -10354,8 +10060,7 @@
                 "args": [],
                 "keywords": []
               },
-              "declare": true,
-              "declare_init": true
+              "declare": true
             },
             {
               "kind": "Raise",
@@ -10545,8 +10250,7 @@
           "yield_value_type": "unknown",
           "decorators": []
         }
-      ],
-      "class_storage_hint": "ref"
+      ]
     },
     {
       "kind": "FunctionDef",
@@ -12631,8 +12335,7 @@
                     ],
                     "keywords": []
                   },
-                  "declare": true,
-                  "declare_init": true
+                  "declare": true
                 },
                 {
                   "kind": "Expr",
@@ -13034,8 +12737,7 @@
                     ],
                     "keywords": []
                   },
-                  "declare": true,
-                  "declare_init": true
+                  "declare": true
                 },
                 {
                   "kind": "Expr",
@@ -13508,8 +13210,7 @@
                   "value": 1000000007
                 }
               },
-              "declare": true,
-              "declare_init": true
+              "declare": true
             },
             {
               "kind": "AugAssign",
@@ -14019,20 +13720,7 @@
                     }
                   }
                 ],
-                "keywords": [],
-                "runtime_owner": {
-                  "kind": "Name",
-                  "source_span": {
-                    "lineno": 288,
-                    "col": 8,
-                    "end_lineno": 288,
-                    "end_col": 13
-                  },
-                  "casts": [],
-                  "borrow_kind": "value",
-                  "repr": "lines",
-                  "id": "lines"
-                }
+                "keywords": []
               }
             }
           ],
@@ -14877,20 +14565,7 @@
                     }
                   }
                 ],
-                "keywords": [],
-                "runtime_owner": {
-                  "kind": "Name",
-                  "source_span": {
-                    "lineno": 296,
-                    "col": 8,
-                    "end_lineno": 296,
-                    "end_col": 13
-                  },
-                  "casts": [],
-                  "borrow_kind": "value",
-                  "repr": "lines",
-                  "id": "lines"
-                }
+                "keywords": []
               }
             },
             {
@@ -15085,20 +14760,7 @@
                         }
                       }
                     ],
-                    "keywords": [],
-                    "runtime_owner": {
-                      "kind": "Name",
-                      "source_span": {
-                        "lineno": 300,
-                        "col": 12,
-                        "end_lineno": 300,
-                        "end_col": 17
-                      },
-                      "casts": [],
-                      "borrow_kind": "value",
-                      "repr": "lines",
-                      "id": "lines"
-                    }
+                    "keywords": []
                   }
                 }
               ],
@@ -15176,20 +14838,7 @@
                 "value": "print (v0 + v1 + v2 + v3)"
               }
             ],
-            "keywords": [],
-            "runtime_owner": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 303,
-                "col": 4,
-                "end_lineno": 303,
-                "end_col": 9
-              },
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "lines",
-              "id": "lines"
-            }
+            "keywords": []
           },
           "leading_trivia": [
             {
@@ -15344,20 +14993,7 @@
                 "value": "let a = 10"
               }
             ],
-            "keywords": [],
-            "runtime_owner": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 309,
-                "col": 4,
-                "end_lineno": 309,
-                "end_col": 14
-              },
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "demo_lines",
-              "id": "demo_lines"
-            }
+            "keywords": []
           }
         },
         {
@@ -15420,20 +15056,7 @@
                 "value": "let b = 3"
               }
             ],
-            "keywords": [],
-            "runtime_owner": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 310,
-                "col": 4,
-                "end_lineno": 310,
-                "end_col": 14
-              },
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "demo_lines",
-              "id": "demo_lines"
-            }
+            "keywords": []
           }
         },
         {
@@ -15496,20 +15119,7 @@
                 "value": "a = (a + b) * 2"
               }
             ],
-            "keywords": [],
-            "runtime_owner": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 311,
-                "col": 4,
-                "end_lineno": 311,
-                "end_col": 14
-              },
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "demo_lines",
-              "id": "demo_lines"
-            }
+            "keywords": []
           }
         },
         {
@@ -15572,20 +15182,7 @@
                 "value": "print a"
               }
             ],
-            "keywords": [],
-            "runtime_owner": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 312,
-                "col": 4,
-                "end_lineno": 312,
-                "end_col": 14
-              },
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "demo_lines",
-              "id": "demo_lines"
-            }
+            "keywords": []
           }
         },
         {
@@ -15648,20 +15245,7 @@
                 "value": "print a / b"
               }
             ],
-            "keywords": [],
-            "runtime_owner": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 313,
-                "col": 4,
-                "end_lineno": 313,
-                "end_col": 14
-              },
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "demo_lines",
-              "id": "demo_lines"
-            }
+            "keywords": []
           }
         },
         {
@@ -17181,20 +16765,7 @@
                 "id": "result"
               }
             ],
-            "keywords": [],
-            "runtime_owner": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 334,
-                "col": 4,
-                "end_lineno": 334,
-                "end_col": 5
-              },
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "p",
-              "id": "p"
-            }
+            "keywords": []
           }
         },
         {
@@ -17768,8 +17339,7 @@
           "local_name": "Path",
           "binding_kind": "symbol",
           "source_file": "sample/py/18_mini_language_interpreter.py",
-          "source_line": 1,
-          "host_only": true
+          "source_line": 1
         },
         {
           "module_id": "pytra.std.time",
@@ -17800,8 +17370,7 @@
         "local_name": "Path",
         "binding_kind": "symbol",
         "source_file": "sample/py/18_mini_language_interpreter.py",
-        "source_line": 1,
-        "host_only": true
+        "source_line": 1
       },
       {
         "module_id": "pytra.std.time",

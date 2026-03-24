@@ -218,20 +218,7 @@
                   "value": 99
                 }
               ],
-              "keywords": [],
-              "runtime_owner": {
-                "kind": "Name",
-                "source_span": {
-                  "lineno": 4,
-                  "col": 27,
-                  "end_lineno": 4,
-                  "end_col": 28
-                },
-                "casts": [],
-                "borrow_kind": "value",
-                "repr": "d",
-                "id": "d"
-              }
+              "keywords": []
             },
             "ops": [
               "Eq"
@@ -358,20 +345,7 @@
                   "value": 0
                 }
               ],
-              "keywords": [],
-              "runtime_owner": {
-                "kind": "Name",
-                "source_span": {
-                  "lineno": 5,
-                  "col": 25,
-                  "end_lineno": 5,
-                  "end_col": 26
-                },
-                "casts": [],
-                "borrow_kind": "value",
-                "repr": "d",
-                "id": "d"
-              }
+              "keywords": []
             },
             "ops": [
               "Eq"
@@ -454,20 +428,7 @@
               "attr": "keys"
             },
             "args": [],
-            "keywords": [],
-            "runtime_owner": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 7,
-                "col": 20,
-                "end_lineno": 7,
-                "end_col": 21
-              },
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "d",
-              "id": "d"
-            }
+            "keywords": []
           },
           "declare": true,
           "leading_trivia": [
@@ -537,20 +498,7 @@
               "attr": "values"
             },
             "args": [],
-            "keywords": [],
-            "runtime_owner": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 8,
-                "col": 20,
-                "end_lineno": 8,
-                "end_col": 21
-              },
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "d",
-              "id": "d"
-            }
+            "keywords": []
           },
           "declare": true
         },

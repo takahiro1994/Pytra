@@ -77,7 +77,6 @@
           "decorators": []
         }
       ],
-      "class_storage_hint": "value",
       "leading_comments": [
         "self_hosted parser signature test: class inline method `def ...: return ...` is accepted."
       ],

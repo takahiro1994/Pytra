@@ -77,8 +77,7 @@
             "repr": "1",
             "value": 1
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -114,11 +113,9 @@
             "repr": "2",
             "value": 2
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         }
       ],
-      "class_storage_hint": "value",
       "leading_comments": [],
       "leading_trivia": []
     },
@@ -170,8 +167,7 @@
             "repr": "0",
             "value": 0
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -207,11 +203,9 @@
             "repr": "1",
             "value": 1
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         }
-      ],
-      "class_storage_hint": "value"
+      ]
     },
     {
       "kind": "ClassDef",
@@ -261,8 +255,7 @@
             "repr": "1",
             "value": 1
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -298,8 +291,7 @@
             "repr": "2",
             "value": 2
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -335,11 +327,9 @@
             "repr": "4",
             "value": 4
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         }
-      ],
-      "class_storage_hint": "value"
+      ]
     },
     {
       "kind": "FunctionDef",
@@ -566,20 +556,7 @@
                 "keywords": []
               }
             ],
-            "keywords": [],
-            "runtime_owner": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 23,
-                "col": 4,
-                "end_lineno": 23,
-                "end_col": 10
-              },
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "checks",
-              "id": "checks"
-            }
+            "keywords": []
           }
         },
         {
@@ -752,20 +729,7 @@
                 "keywords": []
               }
             ],
-            "keywords": [],
-            "runtime_owner": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 24,
-                "col": 4,
-                "end_lineno": 24,
-                "end_col": 10
-              },
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "checks",
-              "id": "checks"
-            }
+            "keywords": []
           }
         },
         {
@@ -925,20 +889,7 @@
                 "keywords": []
               }
             ],
-            "keywords": [],
-            "runtime_owner": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 25,
-                "col": 4,
-                "end_lineno": 25,
-                "end_col": 10
-              },
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "checks",
-              "id": "checks"
-            }
+            "keywords": []
           }
         },
         {
@@ -1096,20 +1047,7 @@
                 "keywords": []
               }
             ],
-            "keywords": [],
-            "runtime_owner": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 26,
-                "col": 4,
-                "end_lineno": 26,
-                "end_col": 10
-              },
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "checks",
-              "id": "checks"
-            }
+            "keywords": []
           }
         },
         {
@@ -1343,20 +1281,7 @@
                 "keywords": []
               }
             ],
-            "keywords": [],
-            "runtime_owner": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 28,
-                "col": 4,
-                "end_lineno": 28,
-                "end_col": 10
-              },
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "checks",
-              "id": "checks"
-            }
+            "keywords": []
           }
         },
         {
@@ -1540,20 +1465,7 @@
                 "keywords": []
               }
             ],
-            "keywords": [],
-            "runtime_owner": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 29,
-                "col": 4,
-                "end_lineno": 29,
-                "end_col": 10
-              },
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "checks",
-              "id": "checks"
-            }
+            "keywords": []
           }
         },
         {
@@ -1737,20 +1649,7 @@
                 "keywords": []
               }
             ],
-            "keywords": [],
-            "runtime_owner": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 30,
-                "col": 4,
-                "end_lineno": 30,
-                "end_col": 10
-              },
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "checks",
-              "id": "checks"
-            }
+            "keywords": []
           }
         },
         {

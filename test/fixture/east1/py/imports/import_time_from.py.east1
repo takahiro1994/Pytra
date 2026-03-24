@@ -398,8 +398,7 @@
           "local_name": "perf_counter",
           "binding_kind": "symbol",
           "source_file": "test/fixture/source/py/imports/import_time_from.py",
-          "source_line": 3,
-          "host_only": true
+          "source_line": 3
         },
         {
           "module_id": "pytra.utils.assertions",
@@ -430,8 +429,7 @@
         "local_name": "perf_counter",
         "binding_kind": "symbol",
         "source_file": "test/fixture/source/py/imports/import_time_from.py",
-        "source_line": 3,
-        "host_only": true
+        "source_line": 3
       },
       {
         "module_id": "pytra.utils.assertions",

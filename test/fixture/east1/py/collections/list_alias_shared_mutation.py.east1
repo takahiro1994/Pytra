@@ -124,8 +124,7 @@
             "repr": "a",
             "id": "a"
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Expr",
@@ -187,20 +186,7 @@
                 "value": 3
               }
             ],
-            "keywords": [],
-            "runtime_owner": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 8,
-                "col": 4,
-                "end_lineno": 8,
-                "end_col": 5
-              },
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "b",
-              "id": "b"
-            }
+            "keywords": []
           }
         },
         {
@@ -295,8 +281,7 @@
               }
             ]
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Expr",
@@ -344,20 +329,7 @@
               "attr": "pop"
             },
             "args": [],
-            "keywords": [],
-            "runtime_owner": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 10,
-                "col": 4,
-                "end_lineno": 10,
-                "end_col": 5
-              },
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "b",
-              "id": "b"
-            }
+            "keywords": []
           }
         },
         {
@@ -452,8 +424,7 @@
               }
             ]
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Return",

@@ -91,7 +91,6 @@
           "decorators": []
         }
       ],
-      "class_storage_hint": "value",
       "leading_comments": [
         "Test candidate for value-type optimization (no instance state)."
       ],
@@ -176,8 +175,7 @@
             "args": [],
             "keywords": []
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -213,8 +211,7 @@
             "repr": "t",
             "id": "t"
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Expr",

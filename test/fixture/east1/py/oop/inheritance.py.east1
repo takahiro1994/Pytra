@@ -91,7 +91,6 @@
           "decorators": []
         }
       ],
-      "class_storage_hint": "value",
       "leading_comments": [
         "This file contains test/implementation code for `test/fixtures/inheritance.py`.",
         "Reader-facing comments are added to make roles easier to understand.",
@@ -238,8 +237,7 @@
           "yield_value_type": "unknown",
           "decorators": []
         }
-      ],
-      "class_storage_hint": "ref"
+      ]
     },
     {
       "kind": "FunctionDef",

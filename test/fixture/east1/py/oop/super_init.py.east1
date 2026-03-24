@@ -121,7 +121,6 @@
           "decorators": []
         }
       ],
-      "class_storage_hint": "ref",
       "leading_comments": [],
       "leading_trivia": []
     },
@@ -345,8 +344,7 @@
           "yield_value_type": "unknown",
           "decorators": []
         }
-      ],
-      "class_storage_hint": "ref"
+      ]
     },
     {
       "kind": "FunctionDef",

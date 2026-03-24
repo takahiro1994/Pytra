@@ -125,8 +125,7 @@
             "args": [],
             "keywords": []
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "ForRange",
@@ -224,8 +223,7 @@
                 "repr": "i",
                 "id": "i"
               },
-              "declare": true,
-              "declare_init": true
+              "declare": true
             },
             {
               "kind": "Assign",
@@ -313,8 +311,7 @@
                   "value": 256
                 }
               },
-              "declare": true,
-              "declare_init": true
+              "declare": true
             },
             {
               "kind": "Assign",
@@ -376,8 +373,7 @@
                   "id": "i"
                 }
               },
-              "declare": true,
-              "declare_init": true
+              "declare": true
             },
             {
               "kind": "Expr",
@@ -690,8 +686,7 @@
             "repr": "320",
             "value": 320
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -727,8 +722,7 @@
             "repr": "240",
             "value": 240
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -764,8 +758,7 @@
             "repr": "360",
             "value": 360
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -801,8 +794,7 @@
             "repr": "48",
             "value": 48
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -838,8 +830,7 @@
             "repr": "\"sample/out/11_lissajous_particles.gif\"",
             "value": "sample/out/11_lissajous_particles.gif"
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -890,7 +881,6 @@
             "keywords": []
           },
           "declare": true,
-          "declare_init": true,
           "leading_trivia": [
             {
               "kind": "blank",
@@ -1085,8 +1075,7 @@
                 ],
                 "keywords": []
               },
-              "declare": true,
-              "declare_init": true
+              "declare": true
             },
             {
               "kind": "ForRange",
@@ -1210,8 +1199,7 @@
                       "value": 0.261799
                     }
                   },
-                  "declare": true,
-                  "declare_init": true
+                  "declare": true
                 },
                 {
                   "kind": "Assign",
@@ -1498,8 +1486,7 @@
                     ],
                     "keywords": []
                   },
-                  "declare": true,
-                  "declare_init": true
+                  "declare": true
                 },
                 {
                   "kind": "Assign",
@@ -1786,8 +1773,7 @@
                     ],
                     "keywords": []
                   },
-                  "declare": true,
-                  "declare_init": true
+                  "declare": true
                 },
                 {
                   "kind": "Assign",
@@ -1901,8 +1887,7 @@
                       }
                     }
                   },
-                  "declare": true,
-                  "declare_init": true
+                  "declare": true
                 },
                 {
                   "kind": "ForRange",
@@ -2114,8 +2099,7 @@
                               "id": "dx"
                             }
                           },
-                          "declare": true,
-                          "declare_init": true
+                          "declare": true
                         },
                         {
                           "kind": "Assign",
@@ -2177,8 +2161,7 @@
                               "id": "dy"
                             }
                           },
-                          "declare": true,
-                          "declare_init": true
+                          "declare": true
                         },
                         {
                           "kind": "If",
@@ -2488,8 +2471,7 @@
                                   }
                                 }
                               },
-                              "declare": true,
-                              "declare_init": true
+                              "declare": true
                             },
                             {
                               "kind": "If",
@@ -2629,8 +2611,7 @@
                                       "id": "xx"
                                     }
                                   },
-                                  "declare": true,
-                                  "declare_init": true
+                                  "declare": true
                                 },
                                 {
                                   "kind": "Assign",
@@ -2718,8 +2699,7 @@
                                       }
                                     }
                                   },
-                                  "declare": true,
-                                  "declare_init": true
+                                  "declare": true
                                 },
                                 {
                                   "kind": "Assign",
@@ -2796,8 +2776,7 @@
                                     ],
                                     "keywords": []
                                   },
-                                  "declare": true,
-                                  "declare_init": true
+                                  "declare": true
                                 },
                                 {
                                   "kind": "If",
@@ -2935,8 +2914,7 @@
                                         "repr": "v",
                                         "id": "v"
                                       },
-                                      "declare": true,
-                                      "declare_init": true
+                                      "declare": true
                                     }
                                   ],
                                   "orelse": []
@@ -3056,20 +3034,7 @@
                     "keywords": []
                   }
                 ],
-                "keywords": [],
-                "runtime_owner": {
-                  "kind": "Name",
-                  "source_span": {
-                    "lineno": 53,
-                    "col": 8,
-                    "end_lineno": 53,
-                    "end_col": 14
-                  },
-                  "casts": [],
-                  "borrow_kind": "value",
-                  "repr": "frames",
-                  "id": "frames"
-                }
+                "keywords": []
               }
             }
           ],
@@ -3304,8 +3269,7 @@
               "id": "start"
             }
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Expr",

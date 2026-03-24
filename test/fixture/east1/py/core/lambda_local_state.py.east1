@@ -164,8 +164,7 @@
             },
             "return_type": "unknown"
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -352,20 +351,7 @@
                 "keywords": []
               }
             ],
-            "keywords": [],
-            "runtime_owner": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 10,
-                "col": 4,
-                "end_lineno": 10,
-                "end_col": 10
-              },
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "checks",
-              "id": "checks"
-            }
+            "keywords": []
           }
         },
         {
@@ -510,20 +496,7 @@
                 "keywords": []
               }
             ],
-            "keywords": [],
-            "runtime_owner": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 11,
-                "col": 4,
-                "end_lineno": 11,
-                "end_col": 10
-              },
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "checks",
-              "id": "checks"
-            }
+            "keywords": []
           }
         },
         {

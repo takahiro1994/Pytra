@@ -173,8 +173,7 @@
             ],
             "keywords": []
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "ForRange",
@@ -298,8 +297,7 @@
                   "id": "width"
                 }
               },
-              "declare": true,
-              "declare_init": true
+              "declare": true
             },
             {
               "kind": "Assign",
@@ -439,8 +437,7 @@
                   }
                 }
               },
-              "declare": true,
-              "declare_init": true
+              "declare": true
             },
             {
               "kind": "ForRange",
@@ -642,8 +639,7 @@
                       }
                     }
                   },
-                  "declare": true,
-                  "declare_init": true
+                  "declare": true
                 },
                 {
                   "kind": "Assign",
@@ -679,8 +675,7 @@
                     "repr": "0.0",
                     "value": 0.0
                   },
-                  "declare": true,
-                  "declare_init": true
+                  "declare": true
                 },
                 {
                   "kind": "Assign",
@@ -716,8 +711,7 @@
                     "repr": "0.0",
                     "value": 0.0
                   },
-                  "declare": true,
-                  "declare_init": true
+                  "declare": true
                 },
                 {
                   "kind": "Assign",
@@ -753,8 +747,7 @@
                     "repr": "0",
                     "value": 0
                   },
-                  "declare": true,
-                  "declare_init": true
+                  "declare": true
                 },
                 {
                   "kind": "While",
@@ -868,8 +861,7 @@
                           "id": "zx"
                         }
                       },
-                      "declare": true,
-                      "declare_init": true
+                      "declare": true
                     },
                     {
                       "kind": "Assign",
@@ -931,8 +923,7 @@
                           "id": "zy"
                         }
                       },
-                      "declare": true,
-                      "declare_init": true
+                      "declare": true
                     },
                     {
                       "kind": "If",
@@ -1149,8 +1140,7 @@
                           "id": "cy"
                         }
                       },
-                      "declare": true,
-                      "declare_init": true
+                      "declare": true
                     },
                     {
                       "kind": "Assign",
@@ -1238,8 +1228,7 @@
                           "id": "cx"
                         }
                       },
-                      "declare": true,
-                      "declare_init": true
+                      "declare": true
                     },
                     {
                       "kind": "AugAssign",
@@ -1446,8 +1435,7 @@
                     ],
                     "keywords": []
                   },
-                  "declare": true,
-                  "declare_init": true
+                  "declare": true
                 }
               ],
               "orelse": []
@@ -1574,8 +1562,7 @@
             "repr": "320",
             "value": 320
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -1611,8 +1598,7 @@
             "repr": "240",
             "value": 240
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -1648,8 +1634,7 @@
             "repr": "48",
             "value": 48
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -1685,8 +1670,7 @@
             "repr": "110",
             "value": 110
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -1735,8 +1719,7 @@
               "value": 0.743643887037151
             }
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -1772,8 +1755,7 @@
             "repr": "0.13182590420533",
             "value": 0.13182590420533
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -1835,8 +1817,7 @@
               "id": "width"
             }
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -1872,8 +1853,7 @@
             "repr": "0.93",
             "value": 0.93
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -1909,8 +1889,7 @@
             "repr": "\"sample/out/05_mandelbrot_zoom.gif\"",
             "value": "sample/out/05_mandelbrot_zoom.gif"
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -1961,7 +1940,6 @@
             "keywords": []
           },
           "declare": true,
-          "declare_init": true,
           "leading_trivia": [
             {
               "kind": "blank",
@@ -2040,8 +2018,7 @@
             "repr": "base_scale",
             "id": "base_scale"
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "ForRange",
@@ -2258,20 +2235,7 @@
                     "keywords": []
                   }
                 ],
-                "keywords": [],
-                "runtime_owner": {
-                  "kind": "Name",
-                  "source_span": {
-                    "lineno": 45,
-                    "col": 8,
-                    "end_lineno": 45,
-                    "end_col": 14
-                  },
-                  "casts": [],
-                  "borrow_kind": "value",
-                  "repr": "frames",
-                  "id": "frames"
-                }
+                "keywords": []
               }
             },
             {
@@ -2537,8 +2501,7 @@
               "id": "start"
             }
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Expr",

@@ -70,11 +70,9 @@
               }
             ]
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         }
       ],
-      "class_storage_hint": "value",
       "leading_comments": [],
       "leading_trivia": []
     },

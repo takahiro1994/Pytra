@@ -218,20 +218,7 @@
                     "value": 0
                   }
                 ],
-                "keywords": [],
-                "runtime_owner": {
-                  "kind": "Name",
-                  "source_span": {
-                    "lineno": 6,
-                    "col": 10,
-                    "end_lineno": 6,
-                    "end_col": 20
-                  },
-                  "casts": [],
-                  "borrow_kind": "value",
-                  "repr": "token_tags",
-                  "id": "token_tags"
-                }
+                "keywords": []
               }
             ],
             "keywords": []

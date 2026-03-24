@@ -50,7 +50,6 @@
           "declare": true
         }
       ],
-      "class_storage_hint": "value",
       "leading_comments": [],
       "leading_trivia": []
     },
@@ -214,8 +213,7 @@
                   }
                 ]
               },
-              "declare": true,
-              "declare_init": true
+              "declare": true
             }
           ],
           "orelse": []
@@ -475,8 +473,7 @@
         "repr": "False",
         "value": false
       },
-      "declare": true,
-      "declare_init": true
+      "declare": true
     },
     {
       "kind": "AnnAssign",
@@ -576,8 +573,7 @@
         "repr": "True",
         "value": true
       },
-      "declare": true,
-      "declare_init": true
+      "declare": true
     },
     {
       "kind": "AnnAssign",
@@ -677,8 +673,7 @@
         "repr": "False",
         "value": false
       },
-      "declare": true,
-      "declare_init": true
+      "declare": true
     },
     {
       "kind": "Expr",

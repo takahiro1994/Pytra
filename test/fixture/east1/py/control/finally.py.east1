@@ -205,8 +205,7 @@
                 "repr": "10",
                 "value": 10
               },
-              "declare": true,
-              "declare_init": true
+              "declare": true
             }
           ],
           "handlers": [
@@ -261,8 +260,7 @@
                     "repr": "20",
                     "value": 20
                   },
-                  "declare": true,
-                  "declare_init": true
+                  "declare": true
                 }
               ]
             }

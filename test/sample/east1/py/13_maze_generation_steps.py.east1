@@ -139,8 +139,7 @@
               "id": "scale"
             }
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -202,8 +201,7 @@
               "id": "scale"
             }
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -293,8 +291,7 @@
             ],
             "keywords": []
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "ForRange",
@@ -572,8 +569,7 @@
                       "value": 40
                     }
                   },
-                  "declare": true,
-                  "declare_init": true
+                  "declare": true
                 },
                 {
                   "kind": "ForRange",
@@ -801,8 +797,7 @@
                           }
                         }
                       },
-                      "declare": true,
-                      "declare_init": true
+                      "declare": true
                     },
                     {
                       "kind": "ForRange",
@@ -951,8 +946,7 @@
                             "repr": "v",
                             "id": "v"
                           },
-                          "declare": true,
-                          "declare_init": true
+                          "declare": true
                         }
                       ],
                       "orelse": []
@@ -1086,7 +1080,6 @@
             "value": 89
           },
           "declare": true,
-          "declare_init": true,
           "leading_trivia": [
             {
               "kind": "comment",
@@ -1131,8 +1124,7 @@
             "repr": "67",
             "value": 67
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -1168,8 +1160,7 @@
             "repr": "5",
             "value": 5
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -1205,8 +1196,7 @@
             "repr": "20",
             "value": 20
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -1242,8 +1232,7 @@
             "repr": "\"sample/out/13_maze_generation_steps.gif\"",
             "value": "sample/out/13_maze_generation_steps.gif"
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -1294,7 +1283,6 @@
             "keywords": []
           },
           "declare": true,
-          "declare_init": true,
           "leading_trivia": [
             {
               "kind": "blank",
@@ -1624,8 +1612,7 @@
             "repr": "0",
             "value": 0
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -1928,8 +1915,7 @@
             "repr": "0",
             "value": 0
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "While",
@@ -2301,8 +2287,7 @@
                       "id": "dx"
                     }
                   },
-                  "declare": true,
-                  "declare_init": true
+                  "declare": true
                 },
                 {
                   "kind": "Assign",
@@ -2364,8 +2349,7 @@
                       "id": "dy"
                     }
                   },
-                  "declare": true,
-                  "declare_init": true
+                  "declare": true
                 },
                 {
                   "kind": "If",
@@ -2899,20 +2883,7 @@
                                 ]
                               }
                             ],
-                            "keywords": [],
-                            "runtime_owner": {
-                              "kind": "Name",
-                              "source_span": {
-                                "lineno": 48,
-                                "col": 20,
-                                "end_lineno": 48,
-                                "end_col": 30
-                              },
-                              "casts": [],
-                              "borrow_kind": "value",
-                              "repr": "candidates",
-                              "id": "candidates"
-                            }
+                            "keywords": []
                           }
                         }
                       ],
@@ -3121,20 +3092,7 @@
                                     ]
                                   }
                                 ],
-                                "keywords": [],
-                                "runtime_owner": {
-                                  "kind": "Name",
-                                  "source_span": {
-                                    "lineno": 50,
-                                    "col": 20,
-                                    "end_lineno": 50,
-                                    "end_col": 30
-                                  },
-                                  "casts": [],
-                                  "borrow_kind": "value",
-                                  "repr": "candidates",
-                                  "id": "candidates"
-                                }
+                                "keywords": []
                               }
                             }
                           ],
@@ -3330,20 +3288,7 @@
                                         ]
                                       }
                                     ],
-                                    "keywords": [],
-                                    "runtime_owner": {
-                                      "kind": "Name",
-                                      "source_span": {
-                                        "lineno": 52,
-                                        "col": 20,
-                                        "end_lineno": 52,
-                                        "end_col": 30
-                                      },
-                                      "casts": [],
-                                      "borrow_kind": "value",
-                                      "repr": "candidates",
-                                      "id": "candidates"
-                                    }
+                                    "keywords": []
                                   }
                                 }
                               ],
@@ -3487,20 +3432,7 @@
                                         ]
                                       }
                                     ],
-                                    "keywords": [],
-                                    "runtime_owner": {
-                                      "kind": "Name",
-                                      "source_span": {
-                                        "lineno": 54,
-                                        "col": 20,
-                                        "end_lineno": 54,
-                                        "end_col": 30
-                                      },
-                                      "casts": [],
-                                      "borrow_kind": "value",
-                                      "repr": "candidates",
-                                      "id": "candidates"
-                                    }
+                                    "keywords": []
                                   }
                                 }
                               ]
@@ -3641,20 +3573,7 @@
                       "attr": "pop"
                     },
                     "args": [],
-                    "keywords": [],
-                    "runtime_owner": {
-                      "kind": "Name",
-                      "source_span": {
-                        "lineno": 57,
-                        "col": 12,
-                        "end_lineno": 57,
-                        "end_col": 17
-                      },
-                      "casts": [],
-                      "borrow_kind": "value",
-                      "repr": "stack",
-                      "id": "stack"
-                    }
+                    "keywords": []
                   }
                 }
               ],
@@ -3930,8 +3849,7 @@
                       }
                     }
                   },
-                  "declare": true,
-                  "declare_init": true
+                  "declare": true
                 },
                 {
                   "kind": "Assign",
@@ -4020,8 +3938,7 @@
                     "repr": "sel",
                     "id": "sel"
                   },
-                  "declare": true,
-                  "declare_init": true
+                  "declare": true
                 },
                 {
                   "kind": "Assign",
@@ -4107,8 +4024,7 @@
                     "repr": "0",
                     "value": 0
                   },
-                  "declare": true,
-                  "declare_init": true
+                  "declare": true
                 },
                 {
                   "kind": "Assign",
@@ -4194,8 +4110,7 @@
                     "repr": "0",
                     "value": 0
                   },
-                  "declare": true,
-                  "declare_init": true
+                  "declare": true
                 },
                 {
                   "kind": "Expr",
@@ -4284,20 +4199,7 @@
                         ]
                       }
                     ],
-                    "keywords": [],
-                    "runtime_owner": {
-                      "kind": "Name",
-                      "source_span": {
-                        "lineno": 63,
-                        "col": 12,
-                        "end_lineno": 63,
-                        "end_col": 17
-                      },
-                      "casts": [],
-                      "borrow_kind": "value",
-                      "repr": "stack",
-                      "id": "stack"
-                    }
+                    "keywords": []
                   }
                 }
               ]
@@ -4507,20 +4409,7 @@
                         "keywords": []
                       }
                     ],
-                    "keywords": [],
-                    "runtime_owner": {
-                      "kind": "Name",
-                      "source_span": {
-                        "lineno": 66,
-                        "col": 12,
-                        "end_lineno": 66,
-                        "end_col": 18
-                      },
-                      "casts": [],
-                      "borrow_kind": "value",
-                      "repr": "frames",
-                      "id": "frames"
-                    }
+                    "keywords": []
                   }
                 }
               ],
@@ -4699,20 +4588,7 @@
                 "keywords": []
               }
             ],
-            "keywords": [],
-            "runtime_owner": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 69,
-                "col": 4,
-                "end_lineno": 69,
-                "end_col": 10
-              },
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "frames",
-              "id": "frames"
-            }
+            "keywords": []
           }
         },
         {
@@ -4990,8 +4866,7 @@
               "id": "start"
             }
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Expr",

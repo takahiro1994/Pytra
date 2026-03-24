@@ -155,8 +155,7 @@
             },
             "return_type": "unknown"
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Expr",

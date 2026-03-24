@@ -115,8 +115,7 @@
                 "repr": "seed",
                 "id": "seed"
               },
-              "declare": true,
-              "declare_init": true
+              "declare": true
             }
           ],
           "is_generator": 0,
@@ -238,7 +237,6 @@
           "decorators": []
         }
       ],
-      "class_storage_hint": "ref",
       "leading_comments": [
         "This file contains test/implementation code for `test/fixtures/class_instance.py`.",
         "Reader-facing comments are added to make roles easier to understand.",

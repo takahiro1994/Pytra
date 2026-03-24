@@ -191,8 +191,7 @@
             "repr": "\"out/from_import_symbols.png\"",
             "value": "out/from_import_symbols.png"
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -374,8 +373,7 @@
             ],
             "keywords": []
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Expr",
@@ -724,20 +722,7 @@
                 "keywords": []
               }
             ],
-            "keywords": [],
-            "runtime_owner": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 16,
-                "col": 4,
-                "end_lineno": 16,
-                "end_col": 11
-              },
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "results",
-              "id": "results"
-            }
+            "keywords": []
           }
         },
         {
@@ -910,20 +895,7 @@
                 "keywords": []
               }
             ],
-            "keywords": [],
-            "runtime_owner": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 17,
-                "col": 4,
-                "end_lineno": 17,
-                "end_col": 11
-              },
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "results",
-              "id": "results"
-            }
+            "keywords": []
           }
         },
         {
@@ -1057,20 +1029,7 @@
                 "keywords": []
               }
             ],
-            "keywords": [],
-            "runtime_owner": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 18,
-                "col": 4,
-                "end_lineno": 18,
-                "end_col": 11
-              },
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "results",
-              "id": "results"
-            }
+            "keywords": []
           }
         },
         {
@@ -1215,20 +1174,7 @@
                 "keywords": []
               }
             ],
-            "keywords": [],
-            "runtime_owner": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 19,
-                "col": 4,
-                "end_lineno": 19,
-                "end_col": 11
-              },
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "results",
-              "id": "results"
-            }
+            "keywords": []
           }
         },
         {
@@ -1437,8 +1383,7 @@
           "local_name": "floor",
           "binding_kind": "symbol",
           "source_file": "test/fixture/source/py/imports/from_import_symbols.py",
-          "source_line": 3,
-          "host_only": true
+          "source_line": 3
         },
         {
           "module_id": "math",
@@ -1446,8 +1391,7 @@
           "local_name": "msqrt",
           "binding_kind": "symbol",
           "source_file": "test/fixture/source/py/imports/from_import_symbols.py",
-          "source_line": 3,
-          "host_only": true
+          "source_line": 3
         },
         {
           "module_id": "pytra.utils.assertions",
@@ -1487,8 +1431,7 @@
           "local_name": "perf_counter",
           "binding_kind": "symbol",
           "source_file": "test/fixture/source/py/imports/from_import_symbols.py",
-          "source_line": 6,
-          "host_only": true
+          "source_line": 6
         }
       ],
       "qualified_refs": [
@@ -1536,8 +1479,7 @@
         "local_name": "floor",
         "binding_kind": "symbol",
         "source_file": "test/fixture/source/py/imports/from_import_symbols.py",
-        "source_line": 3,
-        "host_only": true
+        "source_line": 3
       },
       {
         "module_id": "math",
@@ -1545,8 +1487,7 @@
         "local_name": "msqrt",
         "binding_kind": "symbol",
         "source_file": "test/fixture/source/py/imports/from_import_symbols.py",
-        "source_line": 3,
-        "host_only": true
+        "source_line": 3
       },
       {
         "module_id": "pytra.utils.assertions",
@@ -1586,8 +1527,7 @@
         "local_name": "perf_counter",
         "binding_kind": "symbol",
         "source_file": "test/fixture/source/py/imports/from_import_symbols.py",
-        "source_line": 6,
-        "host_only": true
+        "source_line": 6
       }
     ],
     "qualified_symbol_refs": [

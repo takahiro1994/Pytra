@@ -160,8 +160,7 @@
             "repr": "0",
             "value": 0
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "For",

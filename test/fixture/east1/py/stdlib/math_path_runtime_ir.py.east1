@@ -120,8 +120,7 @@
             ],
             "keywords": []
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -168,23 +167,9 @@
               "repr": "p",
               "id": "p"
             },
-            "attr": "parent",
-            "runtime_owner": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 7,
-                "col": 8,
-                "end_lineno": 7,
-                "end_col": 9
-              },
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "p",
-              "id": "p"
-            }
+            "attr": "parent"
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -231,23 +216,9 @@
               "repr": "p",
               "id": "p"
             },
-            "attr": "name",
-            "runtime_owner": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 8,
-                "col": 8,
-                "end_lineno": 8,
-                "end_col": 9
-              },
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "p",
-              "id": "p"
-            }
+            "attr": "name"
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -294,23 +265,9 @@
               "repr": "p",
               "id": "p"
             },
-            "attr": "stem",
-            "runtime_owner": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 9,
-                "col": 8,
-                "end_lineno": 9,
-                "end_col": 9
-              },
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "p",
-              "id": "p"
-            }
+            "attr": "stem"
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -400,8 +357,7 @@
             ],
             "keywords": []
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Expr",
@@ -569,8 +525,7 @@
           "local_name": "Path",
           "binding_kind": "symbol",
           "source_file": "test/fixture/source/py/stdlib/math_path_runtime_ir.py",
-          "source_line": 1,
-          "host_only": true
+          "source_line": 1
         },
         {
           "module_id": "math",
@@ -578,8 +533,7 @@
           "local_name": "math",
           "binding_kind": "module",
           "source_file": "test/fixture/source/py/stdlib/math_path_runtime_ir.py",
-          "source_line": 2,
-          "host_only": true
+          "source_line": 2
         }
       ],
       "qualified_refs": [
@@ -597,8 +551,7 @@
         "local_name": "Path",
         "binding_kind": "symbol",
         "source_file": "test/fixture/source/py/stdlib/math_path_runtime_ir.py",
-        "source_line": 1,
-        "host_only": true
+        "source_line": 1
       },
       {
         "module_id": "math",
@@ -606,8 +559,7 @@
         "local_name": "math",
         "binding_kind": "module",
         "source_file": "test/fixture/source/py/stdlib/math_path_runtime_ir.py",
-        "source_line": 2,
-        "host_only": true
+        "source_line": 2
       }
     ],
     "qualified_symbol_refs": [

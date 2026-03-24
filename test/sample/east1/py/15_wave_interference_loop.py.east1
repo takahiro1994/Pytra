@@ -115,8 +115,7 @@
             "repr": "320",
             "value": 320
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -152,8 +151,7 @@
             "repr": "240",
             "value": 240
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -189,8 +187,7 @@
             "repr": "96",
             "value": 96
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -226,8 +223,7 @@
             "repr": "\"sample/out/15_wave_interference_loop.gif\"",
             "value": "sample/out/15_wave_interference_loop.gif"
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -278,7 +274,6 @@
             "keywords": []
           },
           "declare": true,
-          "declare_init": true,
           "leading_trivia": [
             {
               "kind": "blank",
@@ -473,8 +468,7 @@
                 ],
                 "keywords": []
               },
-              "declare": true,
-              "declare_init": true
+              "declare": true
             },
             {
               "kind": "Assign",
@@ -536,8 +530,7 @@
                   "value": 0.12
                 }
               },
-              "declare": true,
-              "declare_init": true
+              "declare": true
             },
             {
               "kind": "ForRange",
@@ -661,8 +654,7 @@
                       "id": "w"
                     }
                   },
-                  "declare": true,
-                  "declare_init": true
+                  "declare": true
                 },
                 {
                   "kind": "ForRange",
@@ -786,8 +778,7 @@
                           "value": 160
                         }
                       },
-                      "declare": true,
-                      "declare_init": true
+                      "declare": true
                     },
                     {
                       "kind": "Assign",
@@ -849,8 +840,7 @@
                           "value": 120
                         }
                       },
-                      "declare": true,
-                      "declare_init": true
+                      "declare": true
                     },
                     {
                       "kind": "Assign",
@@ -1559,8 +1549,7 @@
                           "keywords": []
                         }
                       },
-                      "declare": true,
-                      "declare_init": true
+                      "declare": true
                     },
                     {
                       "kind": "Assign",
@@ -1702,8 +1691,7 @@
                         ],
                         "keywords": []
                       },
-                      "declare": true,
-                      "declare_init": true
+                      "declare": true
                     },
                     {
                       "kind": "If",
@@ -1791,8 +1779,7 @@
                             "repr": "0",
                             "value": 0
                           },
-                          "declare": true,
-                          "declare_init": true
+                          "declare": true
                         }
                       ],
                       "orelse": []
@@ -1883,8 +1870,7 @@
                             "repr": "255",
                             "value": 255
                           },
-                          "declare": true,
-                          "declare_init": true
+                          "declare": true
                         }
                       ],
                       "orelse": []
@@ -1974,8 +1960,7 @@
                         "repr": "c",
                         "id": "c"
                       },
-                      "declare": true,
-                      "declare_init": true
+                      "declare": true
                     }
                   ],
                   "orelse": []
@@ -2071,20 +2056,7 @@
                     "keywords": []
                   }
                 ],
-                "keywords": [],
-                "runtime_owner": {
-                  "kind": "Name",
-                  "source_span": {
-                    "lineno": 38,
-                    "col": 8,
-                    "end_lineno": 38,
-                    "end_col": 14
-                  },
-                  "casts": [],
-                  "borrow_kind": "value",
-                  "repr": "frames",
-                  "id": "frames"
-                }
+                "keywords": []
               }
             }
           ],
@@ -2319,8 +2291,7 @@
               "id": "start"
             }
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Expr",

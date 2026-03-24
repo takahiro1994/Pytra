@@ -866,8 +866,7 @@
                               "id": "ax"
                             }
                           },
-                          "declare": true,
-                          "declare_init": true
+                          "declare": true
                         }
                       ],
                       "orelse": []
@@ -1008,8 +1007,7 @@
                               "id": "ay"
                             }
                           },
-                          "declare": true,
-                          "declare_init": true
+                          "declare": true
                         }
                       ],
                       "orelse": []
@@ -1176,8 +1174,7 @@
                               "id": "dxy"
                             }
                           },
-                          "declare": true,
-                          "declare_init": true
+                          "declare": true
                         }
                       ],
                       "orelse": []
@@ -1268,8 +1265,7 @@
                             "repr": "ax",
                             "id": "ax"
                           },
-                          "declare": true,
-                          "declare_init": true
+                          "declare": true
                         }
                       ],
                       "orelse": []
@@ -1360,8 +1356,7 @@
                             "repr": "ay",
                             "id": "ay"
                           },
-                          "declare": true,
-                          "declare_init": true
+                          "declare": true
                         }
                       ],
                       "orelse": []
@@ -1452,8 +1447,7 @@
                             "repr": "dxy",
                             "id": "dxy"
                           },
-                          "declare": true,
-                          "declare_init": true
+                          "declare": true
                         }
                       ],
                       "orelse": []
@@ -1799,8 +1793,7 @@
                           "id": "cy"
                         }
                       },
-                      "declare": true,
-                      "declare_init": true
+                      "declare": true
                     },
                     {
                       "kind": "Assign",
@@ -1888,8 +1881,7 @@
                           "id": "cx"
                         }
                       },
-                      "declare": true,
-                      "declare_init": true
+                      "declare": true
                     },
                     {
                       "kind": "AugAssign",
@@ -2128,8 +2120,7 @@
                         "repr": "0",
                         "value": 0
                       },
-                      "declare": true,
-                      "declare_init": true
+                      "declare": true
                     },
                     {
                       "kind": "Assign",
@@ -2165,8 +2156,7 @@
                         "repr": "0",
                         "value": 0
                       },
-                      "declare": true,
-                      "declare_init": true
+                      "declare": true
                     },
                     {
                       "kind": "Assign",
@@ -2202,8 +2192,7 @@
                         "repr": "0",
                         "value": 0
                       },
-                      "declare": true,
-                      "declare_init": true
+                      "declare": true
                     }
                   ],
                   "orelse": [
@@ -2356,8 +2345,7 @@
                             "repr": "1.0",
                             "value": 1.0
                           },
-                          "declare": true,
-                          "declare_init": true
+                          "declare": true
                         }
                       ],
                       "orelse": []
@@ -2448,8 +2436,7 @@
                             "repr": "0.0",
                             "value": 0.0
                           },
-                          "declare": true,
-                          "declare_init": true
+                          "declare": true
                         }
                       ],
                       "orelse": []
@@ -2774,8 +2761,7 @@
                         ],
                         "keywords": []
                       },
-                      "declare": true,
-                      "declare_init": true
+                      "declare": true
                     },
                     {
                       "kind": "Assign",
@@ -2943,8 +2929,7 @@
                         ],
                         "keywords": []
                       },
-                      "declare": true,
-                      "declare_init": true
+                      "declare": true
                     },
                     {
                       "kind": "Assign",
@@ -3086,8 +3071,7 @@
                         ],
                         "keywords": []
                       },
-                      "declare": true,
-                      "declare_init": true
+                      "declare": true
                     },
                     {
                       "kind": "If",
@@ -3175,8 +3159,7 @@
                             "repr": "255",
                             "value": 255
                           },
-                          "declare": true,
-                          "declare_init": true
+                          "declare": true
                         }
                       ],
                       "orelse": []
@@ -3267,8 +3250,7 @@
                             "repr": "255",
                             "value": 255
                           },
-                          "declare": true,
-                          "declare_init": true
+                          "declare": true
                         }
                       ],
                       "orelse": []
@@ -3359,8 +3341,7 @@
                             "repr": "255",
                             "value": 255
                           },
-                          "declare": true,
-                          "declare_init": true
+                          "declare": true
                         }
                       ],
                       "orelse": []

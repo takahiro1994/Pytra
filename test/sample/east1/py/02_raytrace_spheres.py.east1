@@ -2769,8 +2769,7 @@
                               }
                             }
                           },
-                          "declare": true,
-                          "declare_init": true
+                          "declare": true
                         },
                         {
                           "kind": "Assign",
@@ -2936,8 +2935,7 @@
                               }
                             }
                           },
-                          "declare": true,
-                          "declare_init": true
+                          "declare": true
                         },
                         {
                           "kind": "AnnAssign",
@@ -4082,8 +4080,7 @@
                                 "repr": "t",
                                 "id": "t"
                               },
-                              "declare": true,
-                              "declare_init": true
+                              "declare": true
                             },
                             {
                               "kind": "Assign",
@@ -4119,8 +4116,7 @@
                                 "repr": "0",
                                 "value": 0
                               },
-                              "declare": true,
-                              "declare_init": true
+                              "declare": true
                             }
                           ],
                           "orelse": []
@@ -4304,8 +4300,7 @@
                             ],
                             "keywords": []
                           },
-                          "declare": true,
-                          "declare_init": true
+                          "declare": true
                         },
                         {
                           "kind": "If",
@@ -4451,8 +4446,7 @@
                                 "repr": "t",
                                 "id": "t"
                               },
-                              "declare": true,
-                              "declare_init": true
+                              "declare": true
                             },
                             {
                               "kind": "Assign",
@@ -4488,8 +4482,7 @@
                                 "repr": "1",
                                 "value": 1
                               },
-                              "declare": true,
-                              "declare_init": true
+                              "declare": true
                             }
                           ],
                           "orelse": []
@@ -4686,8 +4679,7 @@
                             ],
                             "keywords": []
                           },
-                          "declare": true,
-                          "declare_init": true
+                          "declare": true
                         },
                         {
                           "kind": "If",
@@ -4833,8 +4825,7 @@
                                 "repr": "t",
                                 "id": "t"
                               },
-                              "declare": true,
-                              "declare_init": true
+                              "declare": true
                             },
                             {
                               "kind": "Assign",
@@ -4870,8 +4861,7 @@
                                 "repr": "2",
                                 "value": 2
                               },
-                              "declare": true,
-                              "declare_init": true
+                              "declare": true
                             }
                           ],
                           "orelse": []
@@ -5561,8 +5551,7 @@
                                       "value": 0.8
                                     }
                                   },
-                                  "declare": true,
-                                  "declare_init": true
+                                  "declare": true
                                 },
                                 {
                                   "kind": "Assign",
@@ -5650,8 +5639,7 @@
                                       "value": 0.8
                                     }
                                   },
-                                  "declare": true,
-                                  "declare_init": true
+                                  "declare": true
                                 },
                                 {
                                   "kind": "Assign",
@@ -5739,8 +5727,7 @@
                                       "value": 0.8
                                     }
                                   },
-                                  "declare": true,
-                                  "declare_init": true
+                                  "declare": true
                                 }
                               ],
                               "orelse": [
@@ -5882,8 +5869,7 @@
                                           "value": 0.95
                                         }
                                       },
-                                      "declare": true,
-                                      "declare_init": true
+                                      "declare": true
                                     },
                                     {
                                       "kind": "Assign",
@@ -5971,8 +5957,7 @@
                                           "value": 0.95
                                         }
                                       },
-                                      "declare": true,
-                                      "declare_init": true
+                                      "declare": true
                                     },
                                     {
                                       "kind": "Assign",
@@ -6060,8 +6045,7 @@
                                           "value": 0.95
                                         }
                                       },
-                                      "declare": true,
-                                      "declare_init": true
+                                      "declare": true
                                     }
                                   ],
                                   "orelse": [
@@ -6099,8 +6083,7 @@
                                         "repr": "0.0",
                                         "value": 0.0
                                       },
-                                      "declare": true,
-                                      "declare_init": true
+                                      "declare": true
                                     },
                                     {
                                       "kind": "Assign",
@@ -6136,8 +6119,7 @@
                                         "repr": "1.0",
                                         "value": 1.0
                                       },
-                                      "declare": true,
-                                      "declare_init": true
+                                      "declare": true
                                     },
                                     {
                                       "kind": "Assign",
@@ -6173,8 +6155,7 @@
                                         "repr": "0.0",
                                         "value": 0.0
                                       },
-                                      "declare": true,
-                                      "declare_init": true
+                                      "declare": true
                                     }
                                   ]
                                 }
@@ -6454,8 +6435,7 @@
                                 ],
                                 "keywords": []
                               },
-                              "declare": true,
-                              "declare_init": true
+                              "declare": true
                             },
                             {
                               "kind": "AnnAssign",
@@ -6660,8 +6640,7 @@
                                     "repr": "0.95",
                                     "value": 0.95
                                   },
-                                  "declare": true,
-                                  "declare_init": true
+                                  "declare": true
                                 },
                                 {
                                   "kind": "Assign",
@@ -6697,8 +6676,7 @@
                                     "repr": "0.35",
                                     "value": 0.35
                                   },
-                                  "declare": true,
-                                  "declare_init": true
+                                  "declare": true
                                 },
                                 {
                                   "kind": "Assign",
@@ -6734,8 +6712,7 @@
                                     "repr": "0.25",
                                     "value": 0.25
                                   },
-                                  "declare": true,
-                                  "declare_init": true
+                                  "declare": true
                                 }
                               ],
                               "orelse": [
@@ -6825,8 +6802,7 @@
                                         "repr": "0.25",
                                         "value": 0.25
                                       },
-                                      "declare": true,
-                                      "declare_init": true
+                                      "declare": true
                                     },
                                     {
                                       "kind": "Assign",
@@ -6862,8 +6838,7 @@
                                         "repr": "0.55",
                                         "value": 0.55
                                       },
-                                      "declare": true,
-                                      "declare_init": true
+                                      "declare": true
                                     },
                                     {
                                       "kind": "Assign",
@@ -6899,8 +6874,7 @@
                                         "repr": "0.95",
                                         "value": 0.95
                                       },
-                                      "declare": true,
-                                      "declare_init": true
+                                      "declare": true
                                     }
                                   ],
                                   "orelse": [
@@ -7239,8 +7213,7 @@
                                             "repr": "0.85",
                                             "value": 0.85
                                           },
-                                          "declare": true,
-                                          "declare_init": true
+                                          "declare": true
                                         },
                                         {
                                           "kind": "Assign",
@@ -7276,8 +7249,7 @@
                                             "repr": "0.85",
                                             "value": 0.85
                                           },
-                                          "declare": true,
-                                          "declare_init": true
+                                          "declare": true
                                         },
                                         {
                                           "kind": "Assign",
@@ -7313,8 +7285,7 @@
                                             "repr": "0.85",
                                             "value": 0.85
                                           },
-                                          "declare": true,
-                                          "declare_init": true
+                                          "declare": true
                                         }
                                       ],
                                       "orelse": [
@@ -7352,8 +7323,7 @@
                                             "repr": "0.2",
                                             "value": 0.2
                                           },
-                                          "declare": true,
-                                          "declare_init": true
+                                          "declare": true
                                         },
                                         {
                                           "kind": "Assign",
@@ -7389,8 +7359,7 @@
                                             "repr": "0.2",
                                             "value": 0.2
                                           },
-                                          "declare": true,
-                                          "declare_init": true
+                                          "declare": true
                                         },
                                         {
                                           "kind": "Assign",
@@ -7426,8 +7395,7 @@
                                             "repr": "0.2",
                                             "value": 0.2
                                           },
-                                          "declare": true,
-                                          "declare_init": true
+                                          "declare": true
                                         }
                                       ]
                                     }
@@ -7672,8 +7640,7 @@
                                 ],
                                 "keywords": []
                               },
-                              "declare": true,
-                              "declare_init": true
+                              "declare": true
                             },
                             {
                               "kind": "Assign",
@@ -7817,8 +7784,7 @@
                                 ],
                                 "keywords": []
                               },
-                              "declare": true,
-                              "declare_init": true
+                              "declare": true
                             },
                             {
                               "kind": "Assign",
@@ -7962,8 +7928,7 @@
                                 ],
                                 "keywords": []
                               },
-                              "declare": true,
-                              "declare_init": true
+                              "declare": true
                             }
                           ],
                           "orelse": [
@@ -8196,8 +8161,7 @@
                                 ],
                                 "keywords": []
                               },
-                              "declare": true,
-                              "declare_init": true
+                              "declare": true
                             },
                             {
                               "kind": "Assign",
@@ -8339,8 +8303,7 @@
                                 ],
                                 "keywords": []
                               },
-                              "declare": true,
-                              "declare_init": true
+                              "declare": true
                             },
                             {
                               "kind": "Assign",
@@ -8482,8 +8445,7 @@
                                 ],
                                 "keywords": []
                               },
-                              "declare": true,
-                              "declare_init": true
+                              "declare": true
                             }
                           ],
                           "leading_trivia": [
@@ -8676,8 +8638,7 @@
                       "id": "aa"
                     }
                   },
-                  "declare": true,
-                  "declare_init": true
+                  "declare": true
                 },
                 {
                   "kind": "Expr",

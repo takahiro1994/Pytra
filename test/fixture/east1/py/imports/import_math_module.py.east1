@@ -286,20 +286,7 @@
                 "keywords": []
               }
             ],
-            "keywords": [],
-            "runtime_owner": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 10,
-                "col": 4,
-                "end_lineno": 10,
-                "end_col": 11
-              },
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "results",
-              "id": "results"
-            }
+            "keywords": []
           }
         },
         {
@@ -485,20 +472,7 @@
                 "keywords": []
               }
             ],
-            "keywords": [],
-            "runtime_owner": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 11,
-                "col": 4,
-                "end_lineno": 11,
-                "end_col": 11
-              },
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "results",
-              "id": "results"
-            }
+            "keywords": []
           }
         },
         {
@@ -686,20 +660,7 @@
                 "keywords": []
               }
             ],
-            "keywords": [],
-            "runtime_owner": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 12,
-                "col": 4,
-                "end_lineno": 12,
-                "end_col": 11
-              },
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "results",
-              "id": "results"
-            }
+            "keywords": []
           }
         },
         {
@@ -908,8 +869,7 @@
           "local_name": "math",
           "binding_kind": "module",
           "source_file": "test/fixture/source/py/imports/import_math_module.py",
-          "source_line": 3,
-          "host_only": true
+          "source_line": 3
         },
         {
           "module_id": "pytra.utils.assertions",
@@ -961,8 +921,7 @@
         "local_name": "math",
         "binding_kind": "module",
         "source_file": "test/fixture/source/py/imports/import_math_module.py",
-        "source_line": 3,
-        "host_only": true
+        "source_line": 3
       },
       {
         "module_id": "pytra.utils.assertions",

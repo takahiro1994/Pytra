@@ -115,8 +115,7 @@
                 "repr": "v",
                 "id": "v"
               },
-              "declare": true,
-              "declare_init": true
+              "declare": true
             }
           ],
           "is_generator": 0,
@@ -124,7 +123,6 @@
           "decorators": []
         }
       ],
-      "class_storage_hint": "ref",
       "leading_comments": [
         "Test for sharing the same instance.",
         "If reference semantics break, values in a and b diverge."
@@ -308,8 +306,7 @@
             ],
             "keywords": []
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -345,8 +342,7 @@
             "repr": "a",
             "id": "a"
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Expr",

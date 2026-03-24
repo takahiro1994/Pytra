@@ -235,8 +235,7 @@
                   "id": "x"
                 }
               },
-              "declare": true,
-              "declare_init": true
+              "declare": true
             }
           ],
           "orelse": []

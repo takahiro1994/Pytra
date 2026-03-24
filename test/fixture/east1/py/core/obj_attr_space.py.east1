@@ -104,7 +104,6 @@
           "decorators": []
         }
       ],
-      "class_storage_hint": "ref",
       "leading_comments": [],
       "leading_trivia": []
     },

@@ -148,8 +148,7 @@
             ],
             "keywords": []
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -302,8 +301,7 @@
             "repr": "True",
             "value": true
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -451,8 +449,7 @@
               }
             ]
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -546,8 +543,7 @@
               }
             ]
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -641,8 +637,7 @@
               }
             ]
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -790,8 +785,7 @@
               }
             ]
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -910,7 +904,6 @@
             ]
           },
           "declare": true,
-          "declare_init": true,
           "leading_trivia": [
             {
               "kind": "comment",
@@ -1082,8 +1075,7 @@
               }
             ]
           },
-          "declare": true,
-          "declare_init": true
+          "declare": true
         },
         {
           "kind": "Expr",

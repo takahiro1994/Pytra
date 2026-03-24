@@ -123,7 +123,6 @@
           "decorators": []
         }
       ],
-      "class_storage_hint": "value",
       "leading_comments": [
         "This file contains test/implementation code for `test/fixtures/class.py`.",
         "Reader-facing comments are added to make roles easier to understand.",

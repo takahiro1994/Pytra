@@ -119,8 +119,7 @@
                 "repr": "x",
                 "id": "x"
               },
-              "declare": true,
-              "declare_init": true
+              "declare": true
             },
             {
               "kind": "Assign",
@@ -169,8 +168,7 @@
                 "repr": "y",
                 "id": "y"
               },
-              "declare": true,
-              "declare_init": true
+              "declare": true
             }
           ],
           "is_generator": 0,
@@ -281,7 +279,6 @@
           "decorators": []
         }
       ],
-      "class_storage_hint": "ref",
       "leading_comments": [
         "This file contains test/implementation code for `test/fixtures/instance_member.py`.",
         "Reader-facing comments are added to make roles easier to understand.",
