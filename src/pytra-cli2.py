@@ -191,12 +191,100 @@ def cmd_resolve(args: list[str]) -> int:
 
 
 # ---------------------------------------------------------------------------
-# compile: *.east2 → *.east3 (未実装)
+# compile: *.east2 → *.east3
 # ---------------------------------------------------------------------------
 
+def _default_east3_output_path(input_path: Path) -> Path:
+    """a.east2 → a.east3 (同一ディレクトリ)"""
+    name = input_path.name
+    if name.endswith(".east2"):
+        name = name[:-6] + ".east3"
+    else:
+        name = name + ".east3"
+    return input_path.parent / name
+
+
+def _compile_one(input_path: Path, output_path: Path | None, pretty: bool) -> int:
+    """1 ファイルを compile して .east3 を生成する。"""
+    if not input_path.exists():
+        print("error: file not found: " + str(input_path))
+        return 1
+
+    from toolchain2.compile.lower import lower_east2_to_east3
+
+    try:
+        east2_text = input_path.read_text(encoding="utf-8")
+        east2_doc = json.loads(east2_text).raw
+        if not isinstance(east2_doc, dict):
+            print("error: invalid east2 document: " + str(input_path))
+            return 1
+    except Exception as e:
+        print("error: failed to read east2: " + str(input_path) + ": " + str(e))
+        return 1
+
+    try:
+        east3_doc = lower_east2_to_east3(east2_doc)
+    except Exception as e:
+        print("error: compile failed: " + str(input_path) + ": " + str(e))
+        return 1
+
+    if output_path is None:
+        output_path = _default_east3_output_path(input_path)
+
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    indent = 2 if pretty else None
+    output_path.write_text(
+        json.dumps(east3_doc, ensure_ascii=False, indent=indent) + "\n",
+        encoding="utf-8",
+    )
+    print("compiled: " + str(output_path))
+    return 0
+
+
 def cmd_compile(args: list[str]) -> int:
-    print("error: -compile is not yet implemented")
-    return 1
+    """compile サブコマンド: *.east2 → *.east3"""
+    inputs: list[str] = []
+    output_text = ""
+    pretty = False
+
+    i = 0
+    while i < len(args):
+        tok = args[i]
+        if tok == "-o" or tok == "--output":
+            if i + 1 >= len(args):
+                print("error: missing value for " + tok)
+                return 1
+            output_text = args[i + 1]
+            i += 2
+            continue
+        if tok == "--pretty":
+            pretty = True
+            i += 1
+            continue
+        if tok == "-h" or tok == "--help":
+            print("usage: pytra-cli2 -compile INPUT.east2 [-o OUTPUT.east3] [--pretty]")
+            print("       pytra-cli2 -compile INPUT1.east2 INPUT2.east2 ...  (multiple files)")
+            return 0
+        if not tok.startswith("-"):
+            inputs.append(tok)
+        i += 1
+
+    if len(inputs) == 0:
+        print("error: at least one input file is required")
+        return 1
+
+    if output_text != "" and len(inputs) > 1:
+        print("error: -o cannot be used with multiple input files")
+        return 1
+
+    exit_code = 0
+    for inp in inputs:
+        input_path = Path(inp)
+        out = Path(output_text) if output_text != "" else None
+        rc = _compile_one(input_path, out, pretty)
+        if rc != 0:
+            exit_code = rc
+    return exit_code
 
 
 # ---------------------------------------------------------------------------

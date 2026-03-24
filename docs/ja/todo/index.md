@@ -64,9 +64,9 @@
 入力: `test/fixture/east2/*.east2`, `test/sample/east2/*.east2`
 正解: `test/fixture/east3/`, `test/sample/east3/`
 
-1. [ ] [ID: P0-COMPILE-S1] core lowering を実装し、fixture 132 件の .east3 が golden と一致する
-2. [ ] [ID: P0-COMPILE-S2] sample 18 件の .east3 が golden と一致する
-3. [ ] [ID: P0-COMPILE-S3] `pytra-cli2 -compile` を実装する
+1. [x] [ID: P0-COMPILE-S1] core lowering を実装し、fixture 132 件の .east3 が golden と一致する — 完了（132/132 pass）
+2. [x] [ID: P0-COMPILE-S2] sample 18 件の .east3 が golden と一致する — 完了（18/18 pass）
+3. [x] [ID: P0-COMPILE-S3] `pytra-cli2 -compile` を実装する — 完了
 
 ### P0-OPTIMIZE: east3 最適化 (Agent D)
 

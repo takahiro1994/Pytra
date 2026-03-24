@@ -468,6 +468,15 @@ diff test/east1/py/01_mandelbrot.py.east1 work/tmp/01_mandelbrot.py.east1
 - toolchain/ への依存ゼロ。§5 コーディング規約 (Any/object 禁止、pytra.std.* のみ) を遵守。
 - 将来の cross-module 型解決・import graph ソート・構文正規化は、golden file が変更された段階で追加実装する。
 
+### 2026-03-24: [ID: P0-COMPILE-S1/S2/S3] compile (east2→east3) 実装完了
+
+- `toolchain2/compile/` に east2→east3 core lowering を実装。
+- ファイル構成: `jv.py` (JsonVal ヘルパー)、`source_span.py` (span 正規化)、`type_summary.py` (型要約・nominal ADT)、`lower.py` (メイン lowering + 全ノード変換)、`passes.py` (17 のポスト lowering パス)。
+- toolchain/ の全 17 パスを toolchain2/ へ移植: source_span rename, For/ForRange→ForCore, type_expr_summary_v1, isinstance/issubclass lowering, nominal ADT metadata, call metadata, vararg desugaring, yield lowering, listcomp lowering, default arg expansion, tuple target expansion, enumerate lowering, block scope hoist, integer promotion, type propagation, yields_dynamic, swap detection, mutates_self, unused var detection, main guard discard。
+- fixture 132 件・sample 18 件の全 150 件が golden と完全一致を確認。
+- `pytra-cli2 -compile` サブコマンドを実装。
+- toolchain/ への依存ゼロ。§5 コーディング規約 (Any/object 禁止、JsonVal ベース) を遵守。
+
 ## 7. 未決事項
 
 - `--from=python` 以外の frontend が現実的に必要になる時期
