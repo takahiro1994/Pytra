@@ -212,7 +212,7 @@
               "repr": "True",
               "value": true
             },
-            "return_type": "bool"
+            "return_type": "unknown"
           },
           "declare": true
         },
@@ -298,7 +298,7 @@
                 }
               ]
             },
-            "return_type": "bool"
+            "return_type": "unknown"
           },
           "declare": true
         },

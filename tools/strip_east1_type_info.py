@@ -240,9 +240,14 @@ def strip_node(node: object) -> object:
                 result["arg_types"] = val
             continue
 
-        # return_type: 正規化済み型をソース型に戻す
-        if key == "return_type" and isinstance(val, str) and kind == "FunctionDef":
-            result["return_type"] = _denormalize_type(val)
+        # return_type: FunctionDef はソース型に戻す、Lambda は "unknown" にリセット
+        if key == "return_type" and isinstance(val, str):
+            if kind == "Lambda":
+                result["return_type"] = "unknown"
+            elif kind == "FunctionDef":
+                result["return_type"] = _denormalize_type(val)
+            else:
+                result["return_type"] = _denormalize_type(val)
             continue
 
         # decl_type: 除去（resolve で付与）

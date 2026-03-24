@@ -167,7 +167,7 @@
                 "value": "non-pos"
               }
             },
-            "return_type": "str"
+            "return_type": "unknown"
           },
           "declare": true
         },
