@@ -307,26 +307,26 @@ class Call:
         d["func"] = expr_to_jv(self.func)
         d["args"] = [expr_to_jv(a) for a in self.args]
         d["keywords"] = [kw.to_jv() for kw in self.keywords]
-        if self.builtin_name is not None:
-            d["builtin_name"] = self.builtin_name
         if self.lowered_kind is not None:
             d["lowered_kind"] = self.lowered_kind
+        if self.builtin_name is not None:
+            d["builtin_name"] = self.builtin_name
         if self.runtime_call is not None:
             d["runtime_call"] = self.runtime_call
-        if self.runtime_call_adapter_kind is not None:
-            d["runtime_call_adapter_kind"] = self.runtime_call_adapter_kind
         if self.runtime_module_id is not None:
             d["runtime_module_id"] = self.runtime_module_id
         if self.runtime_symbol is not None:
             d["runtime_symbol"] = self.runtime_symbol
+        if self.runtime_call_adapter_kind is not None:
+            d["runtime_call_adapter_kind"] = self.runtime_call_adapter_kind
         if self.semantic_tag is not None:
             d["semantic_tag"] = self.semantic_tag
+        if self.runtime_owner is not None:
+            d["runtime_owner"] = expr_to_jv(self.runtime_owner)
         if self.resolved_runtime_call is not None:
             d["resolved_runtime_call"] = self.resolved_runtime_call
         if self.resolved_runtime_source is not None:
             d["resolved_runtime_source"] = self.resolved_runtime_source
-        if self.runtime_owner is not None:
-            d["runtime_owner"] = expr_to_jv(self.runtime_owner)
         if self.yields_dynamic is not None:
             d["yields_dynamic"] = self.yields_dynamic
         if self.iter_element_type is not None:
@@ -565,8 +565,8 @@ class Assign:
             "source_span": self.source_span.to_jv(),
             "target": expr_to_jv(self.target),
             "value": expr_to_jv(self.value),
-            "decl_type": self.decl_type,
             "declare": self.declare,
+            "decl_type": self.decl_type,
         }
         if self.declare_init is not None:
             d["declare_init"] = self.declare_init
@@ -704,9 +704,9 @@ class ForRange:
             "start": expr_to_jv(self.start),
             "stop": expr_to_jv(self.stop),
             "step": expr_to_jv(self.step),
+            "range_mode": self.range_mode,
             "body": [stmt_to_jv(s) for s in self.body],
             "orelse": [stmt_to_jv(s) for s in self.orelse],
-            "range_mode": self.range_mode,
         }
         if self.leading_trivia is not None:
             d["leading_trivia"] = [t.to_jv() for t in self.leading_trivia]
