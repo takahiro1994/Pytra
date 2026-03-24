@@ -1137,8 +1137,8 @@ def _prescan(ctx: ParseContext, lines: list[str]) -> None:
                     name = split[0].strip()
                     asname = split[1].strip()
                 local = asname if asname != "" else name
-                # __future__, typing, dataclasses は import_symbols に登録しない
-                if mod != "__future__" and mod != "typing" and mod != "dataclasses":
+                # __future__, typing, dataclasses (+ pytra.typing, pytra.dataclasses) は import_symbols に登録しない
+                if mod not in ("__future__", "typing", "dataclasses", "pytra.typing", "pytra.dataclasses", "pytra.enum"):
                     ctx.import_symbols[local] = {"module": mod, "name": name}
             # Type alias from typing (prescan 用)
             if mod == "typing":
@@ -1254,8 +1254,8 @@ def _parse_module_body(
                     name = split[0].strip()
                     asname = split[1].strip()
                 aliases.append(ImportAlias(name=name, asname=asname))
-            # Skip typing / __future__ / dataclasses imports
-            if mod == "typing" or mod == "__future__" or mod == "dataclasses":
+            # Skip typing / __future__ / dataclasses imports (+ pytra.typing, pytra.dataclasses)
+            if mod in ("typing", "__future__", "dataclasses", "pytra.typing", "pytra.dataclasses", "pytra.enum"):
                 ln_no += 1
                 skip_next_blanks = True
                 continue
