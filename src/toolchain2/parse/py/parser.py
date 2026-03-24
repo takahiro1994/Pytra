@@ -122,8 +122,8 @@ def _parse_extern_kwargs(text: str) -> Optional[dict[str, str]]:
 
 
 def _parse_extern_v2_decorator(s: str) -> Optional[dict[str, str]]:
-    """@extern_fn(...) or @extern_class(...) からキーワード引数を抽出。"""
-    for prefix in ("@extern_fn(", "@extern_class("):
+    """@extern_fn/extern_method/extern_class(...) からキーワード引数を抽出。"""
+    for prefix in ("@extern_fn(", "@extern_method(", "@extern_class("):
         if s.startswith(prefix) and s.endswith(")"):
             inner = s[len(prefix):-1]
             return _parse_extern_kwargs(inner)
@@ -2024,6 +2024,7 @@ def _parse_block_lines(
     pending_trivia: list[TriviaNode] = []
     pending_comments: list[str] = []
     pending_decorators: list[str] = []
+    pending_block_extern_v2: Optional[dict[str, str]] = None
 
     # Determine block base indent
     base_indent = 0
@@ -2055,6 +2056,10 @@ def _parse_block_lines(
         # Decorator: @name — accumulate for next def
         if s_clean.startswith("@"):
             deco_name = s_clean[1:].strip()
+            # Check for v2 extern decorator (extern_fn/extern_method/extern_class)
+            block_extern_v2 = _parse_extern_v2_decorator(s_clean)
+            if block_extern_v2 is not None:
+                pending_block_extern_v2 = block_extern_v2
             # Strip arguments: @dataclass(frozen=True) → dataclass
             paren = deco_name.find("(")
             if paren >= 0:
@@ -2149,6 +2154,12 @@ def _parse_block_lines(
             if len(pending_decorators) > 0:
                 fn_stmt.decorators = list(pending_decorators)
                 pending_decorators = []
+            # Attach v2 extern metadata
+            if pending_block_extern_v2 is not None:
+                ev2 = dict(pending_block_extern_v2)
+                ev2["kind"] = "method"
+                fn_stmt.node_meta = {"extern_v2": ev2}
+                pending_block_extern_v2 = None
             stmts.append(fn_stmt)
             # Skip block_lines that were consumed by _parse_function_def
             # fn_end_ln is 0-based file line index. Advance i past those lines.

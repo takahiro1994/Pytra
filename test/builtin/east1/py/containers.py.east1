@@ -33,17 +33,17 @@
     {
       "kind": "Expr",
       "source_span": {
-        "lineno": 10,
+        "lineno": 9,
         "col": 0,
-        "end_lineno": 10,
+        "end_lineno": 9,
         "end_col": 3
       },
       "value": {
         "kind": "Constant",
         "source_span": {
-          "lineno": 10,
+          "lineno": 9,
           "col": 0,
-          "end_lineno": 10,
+          "end_lineno": 9,
           "end_col": 3
         },
         "casts": [],
@@ -55,15 +55,23 @@
     {
       "kind": "ImportFrom",
       "source_span": {
-        "lineno": 12,
+        "lineno": 11,
         "col": 0,
-        "end_lineno": 12,
-        "end_col": 39
+        "end_lineno": 11,
+        "end_col": 59
       },
-      "module": "pytra.std.template",
+      "module": "pytra.std",
       "names": [
         {
           "name": "template",
+          "asname": null
+        },
+        {
+          "name": "extern_class",
+          "asname": null
+        },
+        {
+          "name": "extern_method",
           "asname": null
         }
       ],
@@ -72,9 +80,9 @@
     {
       "kind": "ClassDef",
       "source_span": {
-        "lineno": 22,
+        "lineno": 19,
         "col": 0,
-        "end_lineno": 29,
+        "end_lineno": 26,
         "end_col": 0
       },
       "name": "Iterable",
@@ -86,17 +94,17 @@
         {
           "kind": "Expr",
           "source_span": {
-            "lineno": 23,
+            "lineno": 20,
             "col": 4,
-            "end_lineno": 23,
+            "end_lineno": 20,
             "end_col": 7
           },
           "value": {
             "kind": "Constant",
             "source_span": {
-              "lineno": 23,
+              "lineno": 20,
               "col": 4,
-              "end_lineno": 23,
+              "end_lineno": 20,
               "end_col": 7
             },
             "casts": [],
@@ -109,8 +117,6 @@
       "leading_comments": [
         "---------------------------------------------------------------------------",
         "Iterable[T] — for ループの __iter__ 戻り値型",
-        "resolve は Iterable[T] の T を要素型として解決する。",
-        "Iterator[T]（__next__ 付き）は将来追加予定。",
         "---------------------------------------------------------------------------"
       ],
       "leading_trivia": [
@@ -128,14 +134,6 @@
         },
         {
           "kind": "comment",
-          "text": "resolve は Iterable[T] の T を要素型として解決する。"
-        },
-        {
-          "kind": "comment",
-          "text": "Iterator[T]（__next__ 付き）は将来追加予定。"
-        },
-        {
-          "kind": "comment",
           "text": "---------------------------------------------------------------------------"
         }
       ]
@@ -143,9 +141,9 @@
     {
       "kind": "ClassDef",
       "source_span": {
-        "lineno": 31,
+        "lineno": 29,
         "col": 0,
-        "end_lineno": 52,
+        "end_lineno": 79,
         "end_col": 0
       },
       "name": "list",
@@ -157,9 +155,9 @@
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 32,
+            "lineno": 31,
             "col": 4,
-            "end_lineno": 32,
+            "end_lineno": 31,
             "end_col": 0
           },
           "name": "__len__",
@@ -180,14 +178,24 @@
           "body": [],
           "is_generator": 0,
           "yield_value_type": "unknown",
-          "decorators": []
+          "decorators": [
+            "extern_method"
+          ],
+          "meta": {
+            "extern_v2": {
+              "module": "pytra.core.list",
+              "symbol": "list.__len__",
+              "tag": "dunder.len",
+              "kind": "method"
+            }
+          }
         },
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 33,
+            "lineno": 34,
             "col": 4,
-            "end_lineno": 33,
+            "end_lineno": 34,
             "end_col": 0
           },
           "name": "__str__",
@@ -208,14 +216,24 @@
           "body": [],
           "is_generator": 0,
           "yield_value_type": "unknown",
-          "decorators": []
+          "decorators": [
+            "extern_method"
+          ],
+          "meta": {
+            "extern_v2": {
+              "module": "pytra.core.list",
+              "symbol": "list.__str__",
+              "tag": "dunder.str",
+              "kind": "method"
+            }
+          }
         },
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 34,
+            "lineno": 37,
             "col": 4,
-            "end_lineno": 34,
+            "end_lineno": 37,
             "end_col": 0
           },
           "name": "__bool__",
@@ -236,14 +254,24 @@
           "body": [],
           "is_generator": 0,
           "yield_value_type": "unknown",
-          "decorators": []
+          "decorators": [
+            "extern_method"
+          ],
+          "meta": {
+            "extern_v2": {
+              "module": "pytra.core.list",
+              "symbol": "list.__bool__",
+              "tag": "dunder.bool",
+              "kind": "method"
+            }
+          }
         },
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 35,
+            "lineno": 40,
             "col": 4,
-            "end_lineno": 35,
+            "end_lineno": 40,
             "end_col": 0
           },
           "name": "__iter__",
@@ -264,14 +292,24 @@
           "body": [],
           "is_generator": 0,
           "yield_value_type": "unknown",
-          "decorators": []
+          "decorators": [
+            "extern_method"
+          ],
+          "meta": {
+            "extern_v2": {
+              "module": "pytra.core.list",
+              "symbol": "list.__iter__",
+              "tag": "dunder.iter",
+              "kind": "method"
+            }
+          }
         },
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 36,
+            "lineno": 43,
             "col": 4,
-            "end_lineno": 36,
+            "end_lineno": 43,
             "end_col": 0
           },
           "name": "append",
@@ -295,14 +333,24 @@
           "body": [],
           "is_generator": 0,
           "yield_value_type": "unknown",
-          "decorators": []
+          "decorators": [
+            "extern_method"
+          ],
+          "meta": {
+            "extern_v2": {
+              "module": "pytra.core.list",
+              "symbol": "list.append",
+              "tag": "stdlib.method.append",
+              "kind": "method"
+            }
+          }
         },
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 37,
+            "lineno": 46,
             "col": 4,
-            "end_lineno": 37,
+            "end_lineno": 46,
             "end_col": 0
           },
           "name": "extend",
@@ -326,14 +374,24 @@
           "body": [],
           "is_generator": 0,
           "yield_value_type": "unknown",
-          "decorators": []
+          "decorators": [
+            "extern_method"
+          ],
+          "meta": {
+            "extern_v2": {
+              "module": "pytra.core.list",
+              "symbol": "list.extend",
+              "tag": "stdlib.method.extend",
+              "kind": "method"
+            }
+          }
         },
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 38,
+            "lineno": 49,
             "col": 4,
-            "end_lineno": 38,
+            "end_lineno": 49,
             "end_col": 0
           },
           "name": "pop",
@@ -350,9 +408,9 @@
             "index": {
               "kind": "UnaryOp",
               "source_span": {
-                "lineno": 38,
+                "lineno": 49,
                 "col": 31,
-                "end_lineno": 38,
+                "end_lineno": 49,
                 "end_col": 33
               },
               "casts": [],
@@ -362,9 +420,9 @@
               "operand": {
                 "kind": "Constant",
                 "source_span": {
-                  "lineno": 38,
+                  "lineno": 49,
                   "col": 32,
-                  "end_lineno": 38,
+                  "end_lineno": 49,
                   "end_col": 33
                 },
                 "casts": [],
@@ -384,14 +442,24 @@
           "body": [],
           "is_generator": 0,
           "yield_value_type": "unknown",
-          "decorators": []
+          "decorators": [
+            "extern_method"
+          ],
+          "meta": {
+            "extern_v2": {
+              "module": "pytra.core.list",
+              "symbol": "list.pop",
+              "tag": "stdlib.method.pop",
+              "kind": "method"
+            }
+          }
         },
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 39,
+            "lineno": 52,
             "col": 4,
-            "end_lineno": 39,
+            "end_lineno": 52,
             "end_col": 0
           },
           "name": "insert",
@@ -418,14 +486,24 @@
           "body": [],
           "is_generator": 0,
           "yield_value_type": "unknown",
-          "decorators": []
+          "decorators": [
+            "extern_method"
+          ],
+          "meta": {
+            "extern_v2": {
+              "module": "pytra.core.list",
+              "symbol": "list.insert",
+              "tag": "stdlib.method.insert",
+              "kind": "method"
+            }
+          }
         },
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 40,
+            "lineno": 55,
             "col": 4,
-            "end_lineno": 40,
+            "end_lineno": 55,
             "end_col": 0
           },
           "name": "remove",
@@ -449,14 +527,24 @@
           "body": [],
           "is_generator": 0,
           "yield_value_type": "unknown",
-          "decorators": []
+          "decorators": [
+            "extern_method"
+          ],
+          "meta": {
+            "extern_v2": {
+              "module": "pytra.core.list",
+              "symbol": "list.remove",
+              "tag": "stdlib.method.remove",
+              "kind": "method"
+            }
+          }
         },
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 41,
+            "lineno": 58,
             "col": 4,
-            "end_lineno": 41,
+            "end_lineno": 58,
             "end_col": 0
           },
           "name": "clear",
@@ -477,14 +565,24 @@
           "body": [],
           "is_generator": 0,
           "yield_value_type": "unknown",
-          "decorators": []
+          "decorators": [
+            "extern_method"
+          ],
+          "meta": {
+            "extern_v2": {
+              "module": "pytra.core.list",
+              "symbol": "list.clear",
+              "tag": "stdlib.method.clear",
+              "kind": "method"
+            }
+          }
         },
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 42,
+            "lineno": 61,
             "col": 4,
-            "end_lineno": 42,
+            "end_lineno": 61,
             "end_col": 0
           },
           "name": "reverse",
@@ -505,14 +603,24 @@
           "body": [],
           "is_generator": 0,
           "yield_value_type": "unknown",
-          "decorators": []
+          "decorators": [
+            "extern_method"
+          ],
+          "meta": {
+            "extern_v2": {
+              "module": "pytra.core.list",
+              "symbol": "list.reverse",
+              "tag": "stdlib.method.reverse",
+              "kind": "method"
+            }
+          }
         },
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 43,
+            "lineno": 64,
             "col": 4,
-            "end_lineno": 43,
+            "end_lineno": 64,
             "end_col": 0
           },
           "name": "sort",
@@ -533,14 +641,24 @@
           "body": [],
           "is_generator": 0,
           "yield_value_type": "unknown",
-          "decorators": []
+          "decorators": [
+            "extern_method"
+          ],
+          "meta": {
+            "extern_v2": {
+              "module": "pytra.core.list",
+              "symbol": "list.sort",
+              "tag": "stdlib.method.sort",
+              "kind": "method"
+            }
+          }
         },
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 44,
+            "lineno": 67,
             "col": 4,
-            "end_lineno": 44,
+            "end_lineno": 67,
             "end_col": 0
           },
           "name": "copy",
@@ -561,14 +679,24 @@
           "body": [],
           "is_generator": 0,
           "yield_value_type": "unknown",
-          "decorators": []
+          "decorators": [
+            "extern_method"
+          ],
+          "meta": {
+            "extern_v2": {
+              "module": "pytra.core.list",
+              "symbol": "list.copy",
+              "tag": "stdlib.method.copy",
+              "kind": "method"
+            }
+          }
         },
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 45,
+            "lineno": 70,
             "col": 4,
-            "end_lineno": 45,
+            "end_lineno": 70,
             "end_col": 0
           },
           "name": "index",
@@ -592,14 +720,24 @@
           "body": [],
           "is_generator": 0,
           "yield_value_type": "unknown",
-          "decorators": []
+          "decorators": [
+            "extern_method"
+          ],
+          "meta": {
+            "extern_v2": {
+              "module": "pytra.core.list",
+              "symbol": "list.index",
+              "tag": "stdlib.method.index",
+              "kind": "method"
+            }
+          }
         },
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 46,
+            "lineno": 73,
             "col": 4,
-            "end_lineno": 46,
+            "end_lineno": 73,
             "end_col": 0
           },
           "name": "count",
@@ -623,16 +761,33 @@
           "body": [],
           "is_generator": 0,
           "yield_value_type": "unknown",
-          "decorators": []
+          "decorators": [
+            "extern_method"
+          ],
+          "meta": {
+            "extern_v2": {
+              "module": "pytra.core.list",
+              "symbol": "list.count",
+              "tag": "stdlib.method.count",
+              "kind": "method"
+            }
+          }
         }
-      ]
+      ],
+      "meta": {
+        "extern_v2": {
+          "module": "pytra.core.list",
+          "symbol": "list",
+          "tag": "container.list"
+        }
+      }
     },
     {
       "kind": "ClassDef",
       "source_span": {
-        "lineno": 53,
+        "lineno": 81,
         "col": 0,
-        "end_lineno": 83,
+        "end_lineno": 158,
         "end_col": 0
       },
       "name": "str",
@@ -644,9 +799,9 @@
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 54,
+            "lineno": 83,
             "col": 4,
-            "end_lineno": 54,
+            "end_lineno": 83,
             "end_col": 0
           },
           "name": "__len__",
@@ -667,14 +822,24 @@
           "body": [],
           "is_generator": 0,
           "yield_value_type": "unknown",
-          "decorators": []
+          "decorators": [
+            "extern_method"
+          ],
+          "meta": {
+            "extern_v2": {
+              "module": "pytra.core.str",
+              "symbol": "str.__len__",
+              "tag": "dunder.len",
+              "kind": "method"
+            }
+          }
         },
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 55,
+            "lineno": 86,
             "col": 4,
-            "end_lineno": 55,
+            "end_lineno": 86,
             "end_col": 0
           },
           "name": "__str__",
@@ -695,14 +860,24 @@
           "body": [],
           "is_generator": 0,
           "yield_value_type": "unknown",
-          "decorators": []
+          "decorators": [
+            "extern_method"
+          ],
+          "meta": {
+            "extern_v2": {
+              "module": "pytra.core.str",
+              "symbol": "str.__str__",
+              "tag": "dunder.str",
+              "kind": "method"
+            }
+          }
         },
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 56,
+            "lineno": 89,
             "col": 4,
-            "end_lineno": 56,
+            "end_lineno": 89,
             "end_col": 0
           },
           "name": "__bool__",
@@ -723,14 +898,24 @@
           "body": [],
           "is_generator": 0,
           "yield_value_type": "unknown",
-          "decorators": []
+          "decorators": [
+            "extern_method"
+          ],
+          "meta": {
+            "extern_v2": {
+              "module": "pytra.core.str",
+              "symbol": "str.__bool__",
+              "tag": "dunder.bool",
+              "kind": "method"
+            }
+          }
         },
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 57,
+            "lineno": 92,
             "col": 4,
-            "end_lineno": 57,
+            "end_lineno": 92,
             "end_col": 0
           },
           "name": "__int__",
@@ -751,14 +936,24 @@
           "body": [],
           "is_generator": 0,
           "yield_value_type": "unknown",
-          "decorators": []
+          "decorators": [
+            "extern_method"
+          ],
+          "meta": {
+            "extern_v2": {
+              "module": "pytra.core.str",
+              "symbol": "str.__int__",
+              "tag": "dunder.int",
+              "kind": "method"
+            }
+          }
         },
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 58,
+            "lineno": 95,
             "col": 4,
-            "end_lineno": 58,
+            "end_lineno": 95,
             "end_col": 0
           },
           "name": "__float__",
@@ -779,14 +974,24 @@
           "body": [],
           "is_generator": 0,
           "yield_value_type": "unknown",
-          "decorators": []
+          "decorators": [
+            "extern_method"
+          ],
+          "meta": {
+            "extern_v2": {
+              "module": "pytra.core.str",
+              "symbol": "str.__float__",
+              "tag": "dunder.float",
+              "kind": "method"
+            }
+          }
         },
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 59,
+            "lineno": 98,
             "col": 4,
-            "end_lineno": 59,
+            "end_lineno": 98,
             "end_col": 0
           },
           "name": "upper",
@@ -807,14 +1012,24 @@
           "body": [],
           "is_generator": 0,
           "yield_value_type": "unknown",
-          "decorators": []
+          "decorators": [
+            "extern_method"
+          ],
+          "meta": {
+            "extern_v2": {
+              "module": "pytra.core.str",
+              "symbol": "str.upper",
+              "tag": "stdlib.method.upper",
+              "kind": "method"
+            }
+          }
         },
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 60,
+            "lineno": 101,
             "col": 4,
-            "end_lineno": 60,
+            "end_lineno": 101,
             "end_col": 0
           },
           "name": "lower",
@@ -835,14 +1050,24 @@
           "body": [],
           "is_generator": 0,
           "yield_value_type": "unknown",
-          "decorators": []
+          "decorators": [
+            "extern_method"
+          ],
+          "meta": {
+            "extern_v2": {
+              "module": "pytra.core.str",
+              "symbol": "str.lower",
+              "tag": "stdlib.method.lower",
+              "kind": "method"
+            }
+          }
         },
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 61,
+            "lineno": 104,
             "col": 4,
-            "end_lineno": 61,
+            "end_lineno": 104,
             "end_col": 0
           },
           "name": "strip",
@@ -863,14 +1088,24 @@
           "body": [],
           "is_generator": 0,
           "yield_value_type": "unknown",
-          "decorators": []
+          "decorators": [
+            "extern_method"
+          ],
+          "meta": {
+            "extern_v2": {
+              "module": "pytra.core.str",
+              "symbol": "str.strip",
+              "tag": "stdlib.method.strip",
+              "kind": "method"
+            }
+          }
         },
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 62,
+            "lineno": 107,
             "col": 4,
-            "end_lineno": 62,
+            "end_lineno": 107,
             "end_col": 0
           },
           "name": "lstrip",
@@ -891,14 +1126,24 @@
           "body": [],
           "is_generator": 0,
           "yield_value_type": "unknown",
-          "decorators": []
+          "decorators": [
+            "extern_method"
+          ],
+          "meta": {
+            "extern_v2": {
+              "module": "pytra.core.str",
+              "symbol": "str.lstrip",
+              "tag": "stdlib.method.lstrip",
+              "kind": "method"
+            }
+          }
         },
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 63,
+            "lineno": 110,
             "col": 4,
-            "end_lineno": 63,
+            "end_lineno": 110,
             "end_col": 0
           },
           "name": "rstrip",
@@ -919,14 +1164,24 @@
           "body": [],
           "is_generator": 0,
           "yield_value_type": "unknown",
-          "decorators": []
+          "decorators": [
+            "extern_method"
+          ],
+          "meta": {
+            "extern_v2": {
+              "module": "pytra.core.str",
+              "symbol": "str.rstrip",
+              "tag": "stdlib.method.rstrip",
+              "kind": "method"
+            }
+          }
         },
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 64,
+            "lineno": 113,
             "col": 4,
-            "end_lineno": 64,
+            "end_lineno": 113,
             "end_col": 0
           },
           "name": "split",
@@ -943,9 +1198,9 @@
             "sep": {
               "kind": "Constant",
               "source_span": {
-                "lineno": 64,
+                "lineno": 113,
                 "col": 31,
-                "end_lineno": 64,
+                "end_lineno": 113,
                 "end_col": 34
               },
               "casts": [],
@@ -964,14 +1219,24 @@
           "body": [],
           "is_generator": 0,
           "yield_value_type": "unknown",
-          "decorators": []
+          "decorators": [
+            "extern_method"
+          ],
+          "meta": {
+            "extern_v2": {
+              "module": "pytra.core.str",
+              "symbol": "str.split",
+              "tag": "stdlib.method.split",
+              "kind": "method"
+            }
+          }
         },
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 65,
+            "lineno": 116,
             "col": 4,
-            "end_lineno": 65,
+            "end_lineno": 116,
             "end_col": 0
           },
           "name": "join",
@@ -995,14 +1260,24 @@
           "body": [],
           "is_generator": 0,
           "yield_value_type": "unknown",
-          "decorators": []
+          "decorators": [
+            "extern_method"
+          ],
+          "meta": {
+            "extern_v2": {
+              "module": "pytra.core.str",
+              "symbol": "str.join",
+              "tag": "stdlib.method.join",
+              "kind": "method"
+            }
+          }
         },
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 66,
+            "lineno": 119,
             "col": 4,
-            "end_lineno": 66,
+            "end_lineno": 119,
             "end_col": 0
           },
           "name": "startswith",
@@ -1026,14 +1301,24 @@
           "body": [],
           "is_generator": 0,
           "yield_value_type": "unknown",
-          "decorators": []
+          "decorators": [
+            "extern_method"
+          ],
+          "meta": {
+            "extern_v2": {
+              "module": "pytra.core.str",
+              "symbol": "str.startswith",
+              "tag": "stdlib.method.startswith",
+              "kind": "method"
+            }
+          }
         },
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 67,
+            "lineno": 122,
             "col": 4,
-            "end_lineno": 67,
+            "end_lineno": 122,
             "end_col": 0
           },
           "name": "endswith",
@@ -1057,14 +1342,24 @@
           "body": [],
           "is_generator": 0,
           "yield_value_type": "unknown",
-          "decorators": []
+          "decorators": [
+            "extern_method"
+          ],
+          "meta": {
+            "extern_v2": {
+              "module": "pytra.core.str",
+              "symbol": "str.endswith",
+              "tag": "stdlib.method.endswith",
+              "kind": "method"
+            }
+          }
         },
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 68,
+            "lineno": 125,
             "col": 4,
-            "end_lineno": 68,
+            "end_lineno": 125,
             "end_col": 0
           },
           "name": "find",
@@ -1088,14 +1383,24 @@
           "body": [],
           "is_generator": 0,
           "yield_value_type": "unknown",
-          "decorators": []
+          "decorators": [
+            "extern_method"
+          ],
+          "meta": {
+            "extern_v2": {
+              "module": "pytra.core.str",
+              "symbol": "str.find",
+              "tag": "stdlib.method.find",
+              "kind": "method"
+            }
+          }
         },
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 69,
+            "lineno": 128,
             "col": 4,
-            "end_lineno": 69,
+            "end_lineno": 128,
             "end_col": 0
           },
           "name": "rfind",
@@ -1119,14 +1424,24 @@
           "body": [],
           "is_generator": 0,
           "yield_value_type": "unknown",
-          "decorators": []
+          "decorators": [
+            "extern_method"
+          ],
+          "meta": {
+            "extern_v2": {
+              "module": "pytra.core.str",
+              "symbol": "str.rfind",
+              "tag": "stdlib.method.rfind",
+              "kind": "method"
+            }
+          }
         },
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 70,
+            "lineno": 131,
             "col": 4,
-            "end_lineno": 70,
+            "end_lineno": 131,
             "end_col": 0
           },
           "name": "replace",
@@ -1153,14 +1468,24 @@
           "body": [],
           "is_generator": 0,
           "yield_value_type": "unknown",
-          "decorators": []
+          "decorators": [
+            "extern_method"
+          ],
+          "meta": {
+            "extern_v2": {
+              "module": "pytra.core.str",
+              "symbol": "str.replace",
+              "tag": "stdlib.method.replace",
+              "kind": "method"
+            }
+          }
         },
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 71,
+            "lineno": 134,
             "col": 4,
-            "end_lineno": 71,
+            "end_lineno": 134,
             "end_col": 0
           },
           "name": "isdigit",
@@ -1181,14 +1506,24 @@
           "body": [],
           "is_generator": 0,
           "yield_value_type": "unknown",
-          "decorators": []
+          "decorators": [
+            "extern_method"
+          ],
+          "meta": {
+            "extern_v2": {
+              "module": "pytra.core.str",
+              "symbol": "str.isdigit",
+              "tag": "stdlib.method.isdigit",
+              "kind": "method"
+            }
+          }
         },
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 72,
+            "lineno": 137,
             "col": 4,
-            "end_lineno": 72,
+            "end_lineno": 137,
             "end_col": 0
           },
           "name": "isalpha",
@@ -1209,14 +1544,24 @@
           "body": [],
           "is_generator": 0,
           "yield_value_type": "unknown",
-          "decorators": []
+          "decorators": [
+            "extern_method"
+          ],
+          "meta": {
+            "extern_v2": {
+              "module": "pytra.core.str",
+              "symbol": "str.isalpha",
+              "tag": "stdlib.method.isalpha",
+              "kind": "method"
+            }
+          }
         },
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 73,
+            "lineno": 140,
             "col": 4,
-            "end_lineno": 73,
+            "end_lineno": 140,
             "end_col": 0
           },
           "name": "isalnum",
@@ -1237,14 +1582,24 @@
           "body": [],
           "is_generator": 0,
           "yield_value_type": "unknown",
-          "decorators": []
+          "decorators": [
+            "extern_method"
+          ],
+          "meta": {
+            "extern_v2": {
+              "module": "pytra.core.str",
+              "symbol": "str.isalnum",
+              "tag": "stdlib.method.isalnum",
+              "kind": "method"
+            }
+          }
         },
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 74,
+            "lineno": 143,
             "col": 4,
-            "end_lineno": 74,
+            "end_lineno": 143,
             "end_col": 0
           },
           "name": "isupper",
@@ -1265,14 +1620,24 @@
           "body": [],
           "is_generator": 0,
           "yield_value_type": "unknown",
-          "decorators": []
+          "decorators": [
+            "extern_method"
+          ],
+          "meta": {
+            "extern_v2": {
+              "module": "pytra.core.str",
+              "symbol": "str.isupper",
+              "tag": "stdlib.method.isupper",
+              "kind": "method"
+            }
+          }
         },
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 75,
+            "lineno": 146,
             "col": 4,
-            "end_lineno": 75,
+            "end_lineno": 146,
             "end_col": 0
           },
           "name": "islower",
@@ -1293,14 +1658,24 @@
           "body": [],
           "is_generator": 0,
           "yield_value_type": "unknown",
-          "decorators": []
+          "decorators": [
+            "extern_method"
+          ],
+          "meta": {
+            "extern_v2": {
+              "module": "pytra.core.str",
+              "symbol": "str.islower",
+              "tag": "stdlib.method.islower",
+              "kind": "method"
+            }
+          }
         },
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 76,
+            "lineno": 149,
             "col": 4,
-            "end_lineno": 76,
+            "end_lineno": 149,
             "end_col": 0
           },
           "name": "zfill",
@@ -1324,14 +1699,24 @@
           "body": [],
           "is_generator": 0,
           "yield_value_type": "unknown",
-          "decorators": []
+          "decorators": [
+            "extern_method"
+          ],
+          "meta": {
+            "extern_v2": {
+              "module": "pytra.core.str",
+              "symbol": "str.zfill",
+              "tag": "stdlib.method.zfill",
+              "kind": "method"
+            }
+          }
         },
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 77,
+            "lineno": 152,
             "col": 4,
-            "end_lineno": 77,
+            "end_lineno": 152,
             "end_col": 0
           },
           "name": "count",
@@ -1355,16 +1740,33 @@
           "body": [],
           "is_generator": 0,
           "yield_value_type": "unknown",
-          "decorators": []
+          "decorators": [
+            "extern_method"
+          ],
+          "meta": {
+            "extern_v2": {
+              "module": "pytra.core.str",
+              "symbol": "str.count",
+              "tag": "stdlib.method.count",
+              "kind": "method"
+            }
+          }
         }
-      ]
+      ],
+      "meta": {
+        "extern_v2": {
+          "module": "pytra.core.str",
+          "symbol": "str",
+          "tag": "container.str"
+        }
+      }
     },
     {
       "kind": "ClassDef",
       "source_span": {
-        "lineno": 85,
+        "lineno": 161,
         "col": 0,
-        "end_lineno": 102,
+        "end_lineno": 199,
         "end_col": 0
       },
       "name": "dict",
@@ -1376,9 +1778,9 @@
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 86,
+            "lineno": 163,
             "col": 4,
-            "end_lineno": 86,
+            "end_lineno": 163,
             "end_col": 0
           },
           "name": "__len__",
@@ -1399,14 +1801,24 @@
           "body": [],
           "is_generator": 0,
           "yield_value_type": "unknown",
-          "decorators": []
+          "decorators": [
+            "extern_method"
+          ],
+          "meta": {
+            "extern_v2": {
+              "module": "pytra.core.dict",
+              "symbol": "dict.__len__",
+              "tag": "dunder.len",
+              "kind": "method"
+            }
+          }
         },
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 87,
+            "lineno": 166,
             "col": 4,
-            "end_lineno": 87,
+            "end_lineno": 166,
             "end_col": 0
           },
           "name": "__str__",
@@ -1427,14 +1839,24 @@
           "body": [],
           "is_generator": 0,
           "yield_value_type": "unknown",
-          "decorators": []
+          "decorators": [
+            "extern_method"
+          ],
+          "meta": {
+            "extern_v2": {
+              "module": "pytra.core.dict",
+              "symbol": "dict.__str__",
+              "tag": "dunder.str",
+              "kind": "method"
+            }
+          }
         },
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 88,
+            "lineno": 169,
             "col": 4,
-            "end_lineno": 88,
+            "end_lineno": 169,
             "end_col": 0
           },
           "name": "__bool__",
@@ -1455,14 +1877,24 @@
           "body": [],
           "is_generator": 0,
           "yield_value_type": "unknown",
-          "decorators": []
+          "decorators": [
+            "extern_method"
+          ],
+          "meta": {
+            "extern_v2": {
+              "module": "pytra.core.dict",
+              "symbol": "dict.__bool__",
+              "tag": "dunder.bool",
+              "kind": "method"
+            }
+          }
         },
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 89,
+            "lineno": 172,
             "col": 4,
-            "end_lineno": 89,
+            "end_lineno": 172,
             "end_col": 0
           },
           "name": "keys",
@@ -1483,14 +1915,24 @@
           "body": [],
           "is_generator": 0,
           "yield_value_type": "unknown",
-          "decorators": []
+          "decorators": [
+            "extern_method"
+          ],
+          "meta": {
+            "extern_v2": {
+              "module": "pytra.core.dict",
+              "symbol": "dict.keys",
+              "tag": "stdlib.method.keys",
+              "kind": "method"
+            }
+          }
         },
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 90,
+            "lineno": 175,
             "col": 4,
-            "end_lineno": 90,
+            "end_lineno": 175,
             "end_col": 0
           },
           "name": "values",
@@ -1511,14 +1953,24 @@
           "body": [],
           "is_generator": 0,
           "yield_value_type": "unknown",
-          "decorators": []
+          "decorators": [
+            "extern_method"
+          ],
+          "meta": {
+            "extern_v2": {
+              "module": "pytra.core.dict",
+              "symbol": "dict.values",
+              "tag": "stdlib.method.values",
+              "kind": "method"
+            }
+          }
         },
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 91,
+            "lineno": 178,
             "col": 4,
-            "end_lineno": 91,
+            "end_lineno": 178,
             "end_col": 0
           },
           "name": "items",
@@ -1539,14 +1991,24 @@
           "body": [],
           "is_generator": 0,
           "yield_value_type": "unknown",
-          "decorators": []
+          "decorators": [
+            "extern_method"
+          ],
+          "meta": {
+            "extern_v2": {
+              "module": "pytra.core.dict",
+              "symbol": "dict.items",
+              "tag": "stdlib.method.items",
+              "kind": "method"
+            }
+          }
         },
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 92,
+            "lineno": 181,
             "col": 4,
-            "end_lineno": 92,
+            "end_lineno": 181,
             "end_col": 0
           },
           "name": "get",
@@ -1565,9 +2027,9 @@
             "default": {
               "kind": "Constant",
               "source_span": {
-                "lineno": 92,
+                "lineno": 181,
                 "col": 39,
-                "end_lineno": 92,
+                "end_lineno": 181,
                 "end_col": 43
               },
               "casts": [],
@@ -1587,14 +2049,24 @@
           "body": [],
           "is_generator": 0,
           "yield_value_type": "unknown",
-          "decorators": []
+          "decorators": [
+            "extern_method"
+          ],
+          "meta": {
+            "extern_v2": {
+              "module": "pytra.core.dict",
+              "symbol": "dict.get",
+              "tag": "stdlib.method.get",
+              "kind": "method"
+            }
+          }
         },
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 93,
+            "lineno": 184,
             "col": 4,
-            "end_lineno": 93,
+            "end_lineno": 184,
             "end_col": 0
           },
           "name": "pop",
@@ -1618,14 +2090,24 @@
           "body": [],
           "is_generator": 0,
           "yield_value_type": "unknown",
-          "decorators": []
+          "decorators": [
+            "extern_method"
+          ],
+          "meta": {
+            "extern_v2": {
+              "module": "pytra.core.dict",
+              "symbol": "dict.pop",
+              "tag": "stdlib.method.pop",
+              "kind": "method"
+            }
+          }
         },
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 94,
+            "lineno": 187,
             "col": 4,
-            "end_lineno": 94,
+            "end_lineno": 187,
             "end_col": 0
           },
           "name": "setdefault",
@@ -1644,9 +2126,9 @@
             "default": {
               "kind": "Constant",
               "source_span": {
-                "lineno": 94,
+                "lineno": 187,
                 "col": 46,
-                "end_lineno": 94,
+                "end_lineno": 187,
                 "end_col": 50
               },
               "casts": [],
@@ -1666,14 +2148,24 @@
           "body": [],
           "is_generator": 0,
           "yield_value_type": "unknown",
-          "decorators": []
+          "decorators": [
+            "extern_method"
+          ],
+          "meta": {
+            "extern_v2": {
+              "module": "pytra.core.dict",
+              "symbol": "dict.setdefault",
+              "tag": "stdlib.method.setdefault",
+              "kind": "method"
+            }
+          }
         },
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 95,
+            "lineno": 190,
             "col": 4,
-            "end_lineno": 95,
+            "end_lineno": 190,
             "end_col": 0
           },
           "name": "clear",
@@ -1694,14 +2186,24 @@
           "body": [],
           "is_generator": 0,
           "yield_value_type": "unknown",
-          "decorators": []
+          "decorators": [
+            "extern_method"
+          ],
+          "meta": {
+            "extern_v2": {
+              "module": "pytra.core.dict",
+              "symbol": "dict.clear",
+              "tag": "stdlib.method.clear",
+              "kind": "method"
+            }
+          }
         },
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 96,
+            "lineno": 193,
             "col": 4,
-            "end_lineno": 96,
+            "end_lineno": 193,
             "end_col": 0
           },
           "name": "update",
@@ -1725,16 +2227,33 @@
           "body": [],
           "is_generator": 0,
           "yield_value_type": "unknown",
-          "decorators": []
+          "decorators": [
+            "extern_method"
+          ],
+          "meta": {
+            "extern_v2": {
+              "module": "pytra.core.dict",
+              "symbol": "dict.update",
+              "tag": "stdlib.method.update",
+              "kind": "method"
+            }
+          }
         }
-      ]
+      ],
+      "meta": {
+        "extern_v2": {
+          "module": "pytra.core.dict",
+          "symbol": "dict",
+          "tag": "container.dict"
+        }
+      }
     },
     {
       "kind": "ClassDef",
       "source_span": {
-        "lineno": 104,
+        "lineno": 202,
         "col": 0,
-        "end_lineno": 117,
+        "end_lineno": 228,
         "end_col": 0
       },
       "name": "set",
@@ -1746,9 +2265,9 @@
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 105,
+            "lineno": 204,
             "col": 4,
-            "end_lineno": 105,
+            "end_lineno": 204,
             "end_col": 0
           },
           "name": "__len__",
@@ -1769,14 +2288,24 @@
           "body": [],
           "is_generator": 0,
           "yield_value_type": "unknown",
-          "decorators": []
+          "decorators": [
+            "extern_method"
+          ],
+          "meta": {
+            "extern_v2": {
+              "module": "pytra.core.set",
+              "symbol": "set.__len__",
+              "tag": "dunder.len",
+              "kind": "method"
+            }
+          }
         },
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 106,
+            "lineno": 207,
             "col": 4,
-            "end_lineno": 106,
+            "end_lineno": 207,
             "end_col": 0
           },
           "name": "__str__",
@@ -1797,14 +2326,24 @@
           "body": [],
           "is_generator": 0,
           "yield_value_type": "unknown",
-          "decorators": []
+          "decorators": [
+            "extern_method"
+          ],
+          "meta": {
+            "extern_v2": {
+              "module": "pytra.core.set",
+              "symbol": "set.__str__",
+              "tag": "dunder.str",
+              "kind": "method"
+            }
+          }
         },
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 107,
+            "lineno": 210,
             "col": 4,
-            "end_lineno": 107,
+            "end_lineno": 210,
             "end_col": 0
           },
           "name": "__bool__",
@@ -1825,14 +2364,24 @@
           "body": [],
           "is_generator": 0,
           "yield_value_type": "unknown",
-          "decorators": []
+          "decorators": [
+            "extern_method"
+          ],
+          "meta": {
+            "extern_v2": {
+              "module": "pytra.core.set",
+              "symbol": "set.__bool__",
+              "tag": "dunder.bool",
+              "kind": "method"
+            }
+          }
         },
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 108,
+            "lineno": 213,
             "col": 4,
-            "end_lineno": 108,
+            "end_lineno": 213,
             "end_col": 0
           },
           "name": "add",
@@ -1856,14 +2405,24 @@
           "body": [],
           "is_generator": 0,
           "yield_value_type": "unknown",
-          "decorators": []
+          "decorators": [
+            "extern_method"
+          ],
+          "meta": {
+            "extern_v2": {
+              "module": "pytra.core.set",
+              "symbol": "set.add",
+              "tag": "stdlib.method.add",
+              "kind": "method"
+            }
+          }
         },
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 109,
+            "lineno": 216,
             "col": 4,
-            "end_lineno": 109,
+            "end_lineno": 216,
             "end_col": 0
           },
           "name": "discard",
@@ -1887,14 +2446,24 @@
           "body": [],
           "is_generator": 0,
           "yield_value_type": "unknown",
-          "decorators": []
+          "decorators": [
+            "extern_method"
+          ],
+          "meta": {
+            "extern_v2": {
+              "module": "pytra.core.set",
+              "symbol": "set.discard",
+              "tag": "stdlib.method.discard",
+              "kind": "method"
+            }
+          }
         },
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 110,
+            "lineno": 219,
             "col": 4,
-            "end_lineno": 110,
+            "end_lineno": 219,
             "end_col": 0
           },
           "name": "remove",
@@ -1918,14 +2487,24 @@
           "body": [],
           "is_generator": 0,
           "yield_value_type": "unknown",
-          "decorators": []
+          "decorators": [
+            "extern_method"
+          ],
+          "meta": {
+            "extern_v2": {
+              "module": "pytra.core.set",
+              "symbol": "set.remove",
+              "tag": "stdlib.method.remove",
+              "kind": "method"
+            }
+          }
         },
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 111,
+            "lineno": 222,
             "col": 4,
-            "end_lineno": 111,
+            "end_lineno": 222,
             "end_col": 0
           },
           "name": "clear",
@@ -1946,16 +2525,33 @@
           "body": [],
           "is_generator": 0,
           "yield_value_type": "unknown",
-          "decorators": []
+          "decorators": [
+            "extern_method"
+          ],
+          "meta": {
+            "extern_v2": {
+              "module": "pytra.core.set",
+              "symbol": "set.clear",
+              "tag": "stdlib.method.clear",
+              "kind": "method"
+            }
+          }
         }
-      ]
+      ],
+      "meta": {
+        "extern_v2": {
+          "module": "pytra.core.set",
+          "symbol": "set",
+          "tag": "container.set"
+        }
+      }
     },
     {
       "kind": "ClassDef",
       "source_span": {
-        "lineno": 118,
+        "lineno": 230,
         "col": 0,
-        "end_lineno": 121,
+        "end_lineno": 238,
         "end_col": 0
       },
       "name": "tuple",
@@ -1967,9 +2563,9 @@
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 119,
+            "lineno": 232,
             "col": 4,
-            "end_lineno": 119,
+            "end_lineno": 232,
             "end_col": 0
           },
           "name": "__len__",
@@ -1990,14 +2586,24 @@
           "body": [],
           "is_generator": 0,
           "yield_value_type": "unknown",
-          "decorators": []
+          "decorators": [
+            "extern_method"
+          ],
+          "meta": {
+            "extern_v2": {
+              "module": "pytra.core.tuple",
+              "symbol": "tuple.__len__",
+              "tag": "dunder.len",
+              "kind": "method"
+            }
+          }
         },
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 120,
+            "lineno": 235,
             "col": 4,
-            "end_lineno": 120,
+            "end_lineno": 235,
             "end_col": 0
           },
           "name": "__str__",
@@ -2018,14 +2624,24 @@
           "body": [],
           "is_generator": 0,
           "yield_value_type": "unknown",
-          "decorators": []
+          "decorators": [
+            "extern_method"
+          ],
+          "meta": {
+            "extern_v2": {
+              "module": "pytra.core.tuple",
+              "symbol": "tuple.__str__",
+              "tag": "dunder.str",
+              "kind": "method"
+            }
+          }
         },
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 121,
+            "lineno": 238,
             "col": 4,
-            "end_lineno": 121,
+            "end_lineno": 238,
             "end_col": 0
           },
           "name": "__bool__",
@@ -2046,9 +2662,26 @@
           "body": [],
           "is_generator": 0,
           "yield_value_type": "unknown",
-          "decorators": []
+          "decorators": [
+            "extern_method"
+          ],
+          "meta": {
+            "extern_v2": {
+              "module": "pytra.core.tuple",
+              "symbol": "tuple.__bool__",
+              "tag": "dunder.bool",
+              "kind": "method"
+            }
+          }
         }
-      ]
+      ],
+      "meta": {
+        "extern_v2": {
+          "module": "pytra.core.tuple",
+          "symbol": "tuple",
+          "tag": "container.tuple"
+        }
+      }
     }
   ],
   "main_guard_body": [],
@@ -2057,44 +2690,104 @@
     "import_resolution": {
       "bindings": [
         {
-          "module_id": "pytra.std.template",
+          "module_id": "pytra.std",
           "export_name": "template",
           "local_name": "template",
           "binding_kind": "symbol",
           "source_file": "src/include/py/pytra/built_in/containers.py",
-          "source_line": 12
+          "source_line": 11
+        },
+        {
+          "module_id": "pytra.std",
+          "export_name": "extern_class",
+          "local_name": "extern_class",
+          "binding_kind": "symbol",
+          "source_file": "src/include/py/pytra/built_in/containers.py",
+          "source_line": 11
+        },
+        {
+          "module_id": "pytra.std",
+          "export_name": "extern_method",
+          "local_name": "extern_method",
+          "binding_kind": "symbol",
+          "source_file": "src/include/py/pytra/built_in/containers.py",
+          "source_line": 11
         }
       ],
       "qualified_refs": [
         {
-          "module_id": "pytra.std.template",
+          "module_id": "pytra.std",
           "symbol": "template",
           "local_name": "template"
+        },
+        {
+          "module_id": "pytra.std",
+          "symbol": "extern_class",
+          "local_name": "extern_class"
+        },
+        {
+          "module_id": "pytra.std",
+          "symbol": "extern_method",
+          "local_name": "extern_method"
         }
       ]
     },
     "import_bindings": [
       {
-        "module_id": "pytra.std.template",
+        "module_id": "pytra.std",
         "export_name": "template",
         "local_name": "template",
         "binding_kind": "symbol",
         "source_file": "src/include/py/pytra/built_in/containers.py",
-        "source_line": 12
+        "source_line": 11
+      },
+      {
+        "module_id": "pytra.std",
+        "export_name": "extern_class",
+        "local_name": "extern_class",
+        "binding_kind": "symbol",
+        "source_file": "src/include/py/pytra/built_in/containers.py",
+        "source_line": 11
+      },
+      {
+        "module_id": "pytra.std",
+        "export_name": "extern_method",
+        "local_name": "extern_method",
+        "binding_kind": "symbol",
+        "source_file": "src/include/py/pytra/built_in/containers.py",
+        "source_line": 11
       }
     ],
     "qualified_symbol_refs": [
       {
-        "module_id": "pytra.std.template",
+        "module_id": "pytra.std",
         "symbol": "template",
         "local_name": "template"
+      },
+      {
+        "module_id": "pytra.std",
+        "symbol": "extern_class",
+        "local_name": "extern_class"
+      },
+      {
+        "module_id": "pytra.std",
+        "symbol": "extern_method",
+        "local_name": "extern_method"
       }
     ],
     "import_modules": {},
     "import_symbols": {
       "template": {
-        "module": "pytra.std.template",
+        "module": "pytra.std",
         "name": "template"
+      },
+      "extern_class": {
+        "module": "pytra.std",
+        "name": "extern_class"
+      },
+      "extern_method": {
+        "module": "pytra.std",
+        "name": "extern_method"
       }
     }
   },
