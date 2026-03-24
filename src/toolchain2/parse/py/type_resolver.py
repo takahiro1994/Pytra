@@ -50,7 +50,8 @@ def resolve_type_annotation(
         args = _split_type_args(inner)
         resolved_args = [resolve_type_annotation(a, type_aliases) for a in args]
 
-        return base_resolved + "[" + ", ".join(resolved_args) + "]"
+        # カンマ後の空白なし (golden file 準拠)
+        return base_resolved + "[" + ",".join(resolved_args) + "]"
 
     # 単純型
     return _resolve_simple_type(ann, type_aliases)
