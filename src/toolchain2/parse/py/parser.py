@@ -184,6 +184,28 @@ def _parse_main_guard(s: str) -> bool:
     return m is not None
 
 
+def _extract_element_type(container_type: str) -> str:
+    """コンテナ型から要素型を抽出する。list[int64] → int64, dict[str,int64] → str。"""
+    if container_type.startswith("list[") and container_type.endswith("]"):
+        return container_type[5:-1]
+    if container_type.startswith("set[") and container_type.endswith("]"):
+        return container_type[4:-1]
+    if container_type.startswith("tuple[") and container_type.endswith("]"):
+        inner = container_type[6:-1]
+        # tuple の最初の要素型
+        parts = inner.split(",")
+        if len(parts) > 0:
+            return parts[0].strip()
+    if container_type.startswith("dict[") and container_type.endswith("]"):
+        inner = container_type[5:-1]
+        parts = inner.split(",")
+        if len(parts) > 0:
+            return parts[0].strip()
+    if container_type == "str":
+        return "str"
+    return "unknown"
+
+
 def _infer_range_mode(step: Expr) -> str:
     """ForRange の range_mode を step から推論する (golden 準拠)。
 
@@ -629,7 +651,10 @@ class ExprParser:
                 index = self._parse_subscript_index()
                 self.expect("OP", "]")
                 end_tok = self.tokens[self.pos - 1]
-                base = self._base(self._child_local_start(expr), end_tok.end, "unknown", "value")
+                # Subscript 型推論: container[index] → element type
+                container_type = _get_resolved_type(expr)
+                sub_type = _extract_element_type(container_type) if not isinstance(index, SliceExpr) else container_type
+                base = self._base(self._child_local_start(expr), end_tok.end, sub_type, "value")
                 expr = Subscript(base=base, value=expr, slice_expr=index)
             elif tok.value == "(":
                 expr = self._parse_call(expr)
@@ -2022,17 +2047,29 @@ def _parse_for_stmt(
             fr.leading_comments = list(comments)
         return fr, end_i
 
-    # General for loop
-    iter_expr = _parse_expr_text(ctx, iter_text, abs_ln, indent, name_types)
-    target = _make_name_expr(target_name, "unknown", abs_ln, indent + 4, ctx)
+    # General for loop — infer element type from iterable
+    iter_expr = _parse_expr_text(ctx, iter_text, abs_ln, _find_expr_col(ctx, iter_text, abs_ln, indent), name_types)
+    iter_source_type = _get_resolved_type(iter_expr)
+    elem_type = _extract_element_type(iter_source_type)
+    if elem_type != "unknown":
+        name_types[target_name] = elem_type
+    target_type = elem_type
+    target = _make_name_expr(target_name, elem_type, abs_ln, indent + 4, ctx)
+    # For target には type_expr を付けない (ForRange と同様)
+    target.type_expr = None
+    # iter Name に iterable 情報を付加
+    if isinstance(iter_expr, Name) and iter_source_type != "unknown":
+        iter_expr.iterable_trait = "yes"
+        iter_expr.iter_protocol = "static_range"
+        iter_expr.iter_element_type = elem_type
     for_stmt = For(
         source_span=span,
         target=target,
-        target_type="unknown",
+        target_type=target_type,
         iter_expr=iter_expr,
-        iter_element_type="unknown",
-        iter_mode="iter",
-        iter_source_type="unknown",
+        iter_element_type=elem_type,
+        iter_mode="static_fastpath" if elem_type != "unknown" else "iter",
+        iter_source_type=iter_source_type,
         body=body_stmts,
         orelse=[],
     )
