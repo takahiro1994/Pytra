@@ -21,12 +21,36 @@ function __pytra_print(...$args): void {
             continue;
         }
         if (is_array($arg)) {
-            $parts[] = json_encode($arg, JSON_UNESCAPED_UNICODE);
+            $parts[] = __pytra_repr_array($arg);
             continue;
         }
         $parts[] = (string)$arg;
     }
     echo implode(" ", $parts) . PHP_EOL;
+}
+
+function __pytra_repr_value($v): string {
+    if (is_bool($v)) { return $v ? "True" : "False"; }
+    if ($v === null) { return "None"; }
+    if (is_int($v)) { return (string)$v; }
+    if (is_float($v)) {
+        if (floor($v) == $v && !is_infinite($v) && abs($v) < 1e15) {
+            return number_format($v, 1, '.', '');
+        }
+        return (string)$v;
+    }
+    if (is_string($v)) { return "'" . $v . "'"; }
+    if (is_array($v)) { return __pytra_repr_array($v); }
+    return (string)$v;
+}
+
+function __pytra_repr_array($v): string {
+    if (!is_array($v) || count($v) === 0) { return "[]"; }
+    $items = [];
+    foreach ($v as $item) {
+        $items[] = __pytra_repr_value($item);
+    }
+    return "[" . implode(", ", $items) . "]";
 }
 
 function __pytra_len($v): int {

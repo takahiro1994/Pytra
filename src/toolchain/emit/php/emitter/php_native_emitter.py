@@ -726,6 +726,13 @@ def _render_call_expr(expr: dict[str, Any]) -> str:
     semantic_tag_any = expr.get("semantic_tag")
     semantic_tag = semantic_tag_any if isinstance(semantic_tag_any, str) else ""
 
+    if semantic_tag == "cast.typed" or _call_name(expr) == "cast":
+        # cast(Type, value) — type narrowing no-op in dynamically typed PHP
+        if len(args) >= 2:
+            return _render_expr(args[1])
+        if len(args) == 1:
+            return _render_expr(args[0])
+        return "null"
     if semantic_tag == "stdlib.symbol.Path":
         if len(args) == 0:
             return "new Path(\"\")"
@@ -779,13 +786,6 @@ def _render_call_expr(expr: dict[str, Any]) -> str:
 
     if callee_name.startswith("py_assert_"):
         return "true"
-    if callee_name == "cast":
-        # cast(Type, value) is a type narrowing no-op in dynamically typed PHP
-        if len(args) >= 2:
-            return _render_expr(args[1])
-        if len(args) == 1:
-            return _render_expr(args[0])
-        return "null"
     if callee_name == "print":
         rendered: list[str] = []
         i = 0
@@ -1697,6 +1697,13 @@ def _emit_class(cls: dict[str, Any], *, indent: str) -> list[str]:
         extends = " extends " + _safe_ident(base_any, "Object")
     lines: list[str] = [indent + "class " + class_name + extends + " {"]
 
+    # Declare properties from field_types (EAST3 ClassDef.field_types)
+    field_types_any = cls.get("field_types")
+    if isinstance(field_types_any, dict) and len(field_types_any) > 0:
+        for ft_name in field_types_any:
+            lines.append(indent + "    public $" + _safe_ident(ft_name, "field") + ";")
+        lines.append("")
+
     body_any = cls.get("body")
     body = body_any if isinstance(body_any, list) else []
     dataclass_fields: list[str] = []
@@ -1738,7 +1745,8 @@ def _emit_class(cls: dict[str, Any], *, indent: str) -> list[str]:
                     val_node = target_any2.get("value")
                     if isinstance(val_node, dict) and val_node.get("kind") == "Name" and val_node.get("id") == "self":
                         prop_name = target_any2.get("attr")
-                        if isinstance(prop_name, str) and prop_name not in init_props and prop_name not in dataclass_fields:
+                        _ft_keys = set(field_types_any.keys()) if isinstance(field_types_any, dict) else set()
+                        if isinstance(prop_name, str) and prop_name not in init_props and prop_name not in dataclass_fields and prop_name not in _ft_keys:
                             init_props.append(prop_name)
             # Recurse into control flow blocks
             for block_key in ("body", "orelse", "handlers", "finalbody"):
@@ -1904,6 +1912,9 @@ def transpile_to_php_native(east_doc: dict[str, Any]) -> str:
         if not isinstance(bind_module_id_any, str):
             continue
         bind_module_id: str = bind_module_id_any
+        # Skip host-only imports (Python stdlib like os.path, handled by native files)
+        if binding.get("host_only"):
+            continue
         # Skip built_in modules (provided by py_runtime.php) — spec §6
         if ".built_in." in bind_module_id or bind_module_id.endswith(".built_in"):
             continue
