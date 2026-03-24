@@ -590,6 +590,19 @@ AGENT-B（resolve）が型解決を始めるために、built-in 宣言ファイ
 - golden を `test/builtin/east1/py/` に配置
 - AGENT-B が resolve に着手可能
 
+### 2026-03-25: [ID: P0-PARSE-S3] pytra-cli2 -parse を toolchain2 パーサーに切り替え
+
+- `pytra-cli2 -parse` が toolchain/ ではなく toolchain2/parse/py/ を使うように切り替え。
+- pytra.std.re のパターン追加（dotted/subscript/tuple assigns）。
+- shim 版 re のバグ（二重 subscript 非対応）を発見。pytra.std.re は正しく動作。
+- golden を pytra-cli2 出力で再生成。fixture 132 + sample 18 = 150 件全件一致。
+
+### 2026-03-25: P0-RESOLVE 本格着手の準備完了
+
+- P0-PARSE S1〜S4 全完了。EAST1 golden は spec-east1 準拠（型情報除去済み）。
+- built-in 宣言（builtins.py, containers.py）の EAST1 golden を test/builtin/east1/py/ に配置済み。
+- AGENT-B が strip 済み EAST1 を入力にして、既存 EAST2 golden と一致する resolve を実装する。
+
 ## 7. toolchain2/ → toolchain/ 置換手順
 
 全段（parse→resolve→compile→optimize）の golden 一致が確認できた時点で、以下の手順で置換する。
