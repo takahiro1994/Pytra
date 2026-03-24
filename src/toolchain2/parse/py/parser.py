@@ -826,7 +826,9 @@ class ExprParser:
             call.runtime_call_adapter_kind = "builtin"
             call.semantic_tag = sem_tag
             # Register implicit builtin module
-            self.ctx.implicit_builtin_modules[rt_mod] = True
+            # pytra.core.py_runtime は implicit_builtin に登録しない (golden 準拠)
+            if rt_mod != _DEFAULT_RT_MOD:
+                self.ctx.implicit_builtin_modules[rt_mod] = True
         # Import symbol calls (e.g., perf_counter, Path, py_assert_stdout)
         if func_name in self.ctx.import_symbols and call.builtin_name is None:
             sym_info = self.ctx.import_symbols[func_name]
@@ -1433,6 +1435,7 @@ def _parse_module_body(
     pending_comments: list[str] = []
     leading_file_trivia_done = False
     pending_dataclass = False
+    after_last_import = False  # import 直後の空行を蓄積しないためのフラグ
 
     while ln_no < total:
         ln = lines[ln_no]
@@ -1441,8 +1444,8 @@ def _parse_module_body(
 
         # Blank line
         if s == "":
-            # ファイル冒頭コメントが既に蓄積されている場合、空行も trivia に蓄積
-            if len(pending_comments) > 0 or leading_file_trivia_done:
+            # ファイル冒頭コメントが既に蓄積 + import 直後でない場合のみ蓄積
+            if (len(pending_comments) > 0 or leading_file_trivia_done) and not after_last_import:
                 pending_trivia.append(TriviaBlank(count=1))
             ln_no += 1
             continue
@@ -1527,8 +1530,12 @@ def _parse_module_body(
                     "local_name": local,
                 })
             ln_no += 1
-            # import は leading_trivia を消費しない（次の非import文に渡す）
+            # import 後の空行は trivia に蓄積しない
+            after_last_import = True
             continue
+
+        # 非import文に到達
+        after_last_import = False
 
         # Main guard: if __name__ == "__main__":
         if _parse_main_guard(s_clean):
