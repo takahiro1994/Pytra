@@ -86,6 +86,7 @@ def _expand_forcore_tuple_target(node: Any) -> None:
                         },
                         "value": _make_subscript(tmp_name, i, elem_type),
                         "decl_type": elem_type if elem_type != "" else "unknown",
+                        "declare": True,
                     }
                     elem_assigns.append(assign)
 

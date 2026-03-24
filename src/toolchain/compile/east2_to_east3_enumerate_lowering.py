@@ -139,6 +139,7 @@ def _try_lower_enumerate_forcore(stmt: dict[str, Any]) -> list[dict[str, Any]] |
         "target": {"kind": "Name", "id": counter_name, "resolved_type": "int64"},
         "value": {"kind": "Constant", "value": start_val, "resolved_type": "int64"},
         "decl_type": "int64",
+        "declare": True,
     }
 
     # 2. Build for loop over iterable (without enumerate)
@@ -190,6 +191,7 @@ def _try_lower_enumerate_forcore(stmt: dict[str, Any]) -> list[dict[str, Any]] |
         "target": {"kind": "Name", "id": idx_name, "resolved_type": "int64"},
         "value": {"kind": "Name", "id": counter_name, "resolved_type": "int64"},
         "decl_type": "int64",
+        "declare": True,
     }
     increment: dict[str, Any] = {
         "kind": "AugAssign",
