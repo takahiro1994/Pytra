@@ -87,15 +87,7 @@
             "repr": "a",
             "id": "a"
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "int64"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "int64"
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -132,15 +124,7 @@
             "repr": "b",
             "id": "b"
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "int64"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "int64"
-          }
+          "declare": true
         },
         {
           "kind": "Swap",

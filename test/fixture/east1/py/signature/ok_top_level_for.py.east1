@@ -101,27 +101,7 @@
               }
             ]
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "GenericType",
-            "base": "list",
-            "args": [
-              {
-                "kind": "NamedType",
-                "name": "int64"
-              }
-            ]
-          },
-          "decl_type_expr": {
-            "kind": "GenericType",
-            "base": "list",
-            "args": [
-              {
-                "kind": "NamedType",
-                "name": "int64"
-              }
-            ]
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -158,15 +138,7 @@
             "repr": "0",
             "value": 0
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "int64"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "int64"
-          }
+          "declare": true
         },
         {
           "kind": "For",

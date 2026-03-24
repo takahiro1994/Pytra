@@ -61,15 +61,7 @@
             "repr": "\"ABC\"",
             "value": "ABC"
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "str"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "str"
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -106,15 +98,7 @@
             "repr": "\"\"",
             "value": ""
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "str"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "str"
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -151,15 +135,7 @@
             "repr": "0",
             "value": 0
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "int64"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "int64"
-          }
+          "declare": true
         },
         {
           "kind": "For",

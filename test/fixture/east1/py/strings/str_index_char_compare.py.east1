@@ -61,15 +61,7 @@
             "repr": "\"ABC\"",
             "value": "ABC"
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "str"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "str"
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -106,15 +98,7 @@
             "repr": "1",
             "value": 1
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "int64"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "int64"
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -176,15 +160,7 @@
               "id": "i"
             }
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "uint8"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "uint8"
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -276,15 +252,7 @@
               }
             ]
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "bool"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "bool"
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -376,15 +344,7 @@
               }
             ]
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "bool"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "bool"
-          }
+          "declare": true
         },
         {
           "kind": "Expr",

@@ -308,15 +308,7 @@
             "args": [],
             "keywords": []
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "Dog"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "Dog"
-          }
+          "declare": true
         },
         {
           "kind": "Expr",

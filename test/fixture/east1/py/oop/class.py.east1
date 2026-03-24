@@ -219,15 +219,7 @@
             "args": [],
             "keywords": []
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "Multiplier"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "Multiplier"
-          }
+          "declare": true
         },
         {
           "kind": "Expr",

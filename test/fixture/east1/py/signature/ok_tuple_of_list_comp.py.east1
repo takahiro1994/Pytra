@@ -61,15 +61,7 @@
             "repr": "2",
             "value": 2
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "int64"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "int64"
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -189,39 +181,7 @@
               }
             ]
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "GenericType",
-            "base": "list",
-            "args": [
-              {
-                "kind": "GenericType",
-                "base": "list",
-                "args": [
-                  {
-                    "kind": "NamedType",
-                    "name": "int64"
-                  }
-                ]
-              }
-            ]
-          },
-          "decl_type_expr": {
-            "kind": "GenericType",
-            "base": "list",
-            "args": [
-              {
-                "kind": "GenericType",
-                "base": "list",
-                "args": [
-                  {
-                    "kind": "NamedType",
-                    "name": "int64"
-                  }
-                ]
-              }
-            ]
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -341,39 +301,7 @@
               }
             ]
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "GenericType",
-            "base": "list",
-            "args": [
-              {
-                "kind": "GenericType",
-                "base": "list",
-                "args": [
-                  {
-                    "kind": "NamedType",
-                    "name": "int64"
-                  }
-                ]
-              }
-            ]
-          },
-          "decl_type_expr": {
-            "kind": "GenericType",
-            "base": "list",
-            "args": [
-              {
-                "kind": "GenericType",
-                "base": "list",
-                "args": [
-                  {
-                    "kind": "NamedType",
-                    "name": "int64"
-                  }
-                ]
-              }
-            ]
-          }
+          "declare": true
         },
         {
           "kind": "Expr",

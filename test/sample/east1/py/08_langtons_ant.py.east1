@@ -950,38 +950,6 @@
             ]
           },
           "declare": true,
-          "annotation_type_expr": {
-            "kind": "GenericType",
-            "base": "list",
-            "args": [
-              {
-                "kind": "GenericType",
-                "base": "list",
-                "args": [
-                  {
-                    "kind": "NamedType",
-                    "name": "int64"
-                  }
-                ]
-              }
-            ]
-          },
-          "decl_type_expr": {
-            "kind": "GenericType",
-            "base": "list",
-            "args": [
-              {
-                "kind": "GenericType",
-                "base": "list",
-                "args": [
-                  {
-                    "kind": "NamedType",
-                    "name": "int64"
-                  }
-                ]
-              }
-            ]
-          },
           "leading_trivia": [
             {
               "kind": "blank",
@@ -1267,27 +1235,7 @@
             "repr": "[]",
             "elements": []
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "GenericType",
-            "base": "list",
-            "args": [
-              {
-                "kind": "NamedType",
-                "name": "bytes"
-              }
-            ]
-          },
-          "decl_type_expr": {
-            "kind": "GenericType",
-            "base": "list",
-            "args": [
-              {
-                "kind": "NamedType",
-                "name": "bytes"
-              }
-            ]
-          }
+          "declare": true
         },
         {
           "kind": "ForRange",

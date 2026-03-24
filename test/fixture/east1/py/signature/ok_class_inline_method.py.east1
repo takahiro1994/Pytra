@@ -147,15 +147,7 @@
         "args": [],
         "keywords": []
       },
-      "declare": true,
-      "annotation_type_expr": {
-        "kind": "NamedType",
-        "name": "Value"
-      },
-      "decl_type_expr": {
-        "kind": "NamedType",
-        "name": "Value"
-      }
+      "declare": true
     },
     {
       "kind": "Expr",

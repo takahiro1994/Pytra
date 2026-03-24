@@ -459,27 +459,7 @@
         ],
         "keywords": []
       },
-      "declare": true,
-      "annotation_type_expr": {
-        "kind": "GenericType",
-        "base": "list",
-        "args": [
-          {
-            "kind": "NamedType",
-            "name": "float64"
-          }
-        ]
-      },
-      "decl_type_expr": {
-        "kind": "GenericType",
-        "base": "list",
-        "args": [
-          {
-            "kind": "NamedType",
-            "name": "float64"
-          }
-        ]
-      }
+      "declare": true
     },
     {
       "kind": "Expr",

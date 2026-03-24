@@ -393,15 +393,7 @@
               "id": "cx"
             }
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "float64"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "float64"
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -464,15 +456,7 @@
               "id": "cy"
             }
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "float64"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "float64"
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -535,15 +519,7 @@
               "id": "cz"
             }
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "float64"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "float64"
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -711,14 +687,6 @@
             }
           },
           "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "float64"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "float64"
-          },
           "leading_trivia": [
             {
               "kind": "blank",
@@ -917,15 +885,7 @@
               }
             }
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "float64"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "float64"
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -1144,15 +1104,7 @@
               }
             }
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "float64"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "float64"
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -1294,14 +1246,6 @@
             }
           },
           "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "float64"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "float64"
-          },
           "leading_trivia": [
             {
               "kind": "blank",
@@ -1475,15 +1419,7 @@
             ],
             "keywords": []
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "float64"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "float64"
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -1611,15 +1547,7 @@
               }
             }
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "float64"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "float64"
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -1747,15 +1675,7 @@
               }
             }
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "float64"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "float64"
-          }
+          "declare": true
         },
         {
           "kind": "If",
@@ -2037,15 +1957,7 @@
             "args": [],
             "keywords": []
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "bytearray"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "bytearray"
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -2083,14 +1995,6 @@
             "value": 0.0
           },
           "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "float64"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "float64"
-          },
           "leading_trivia": [
             {
               "kind": "blank",
@@ -2140,15 +2044,7 @@
             "repr": "0.0",
             "value": 0.0
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "float64"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "float64"
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -2198,15 +2094,7 @@
               "value": 3.0
             }
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "float64"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "float64"
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -2257,14 +2145,6 @@
             }
           },
           "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "float64"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "float64"
-          },
           "leading_trivia": [
             {
               "kind": "blank",
@@ -2314,15 +2194,7 @@
             "repr": "0.8",
             "value": 0.8
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "float64"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "float64"
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -2372,15 +2244,7 @@
               "value": 0.45
             }
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "float64"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "float64"
-          }
+          "declare": true
         },
         {
           "kind": "ForRange",
@@ -2543,15 +2407,7 @@
                     "repr": "0",
                     "value": 0
                   },
-                  "declare": true,
-                  "annotation_type_expr": {
-                    "kind": "NamedType",
-                    "name": "int64"
-                  },
-                  "decl_type_expr": {
-                    "kind": "NamedType",
-                    "name": "int64"
-                  }
+                  "declare": true
                 },
                 {
                   "kind": "AnnAssign",
@@ -2588,15 +2444,7 @@
                     "repr": "0",
                     "value": 0
                   },
-                  "declare": true,
-                  "annotation_type_expr": {
-                    "kind": "NamedType",
-                    "name": "int64"
-                  },
-                  "decl_type_expr": {
-                    "kind": "NamedType",
-                    "name": "int64"
-                  }
+                  "declare": true
                 },
                 {
                   "kind": "AnnAssign",
@@ -2633,15 +2481,7 @@
                     "repr": "0",
                     "value": 0
                   },
-                  "declare": true,
-                  "annotation_type_expr": {
-                    "kind": "NamedType",
-                    "name": "int64"
-                  },
-                  "decl_type_expr": {
-                    "kind": "NamedType",
-                    "name": "int64"
-                  }
+                  "declare": true
                 },
                 {
                   "kind": "ForRange",
@@ -3190,15 +3030,7 @@
                               }
                             }
                           },
-                          "declare": true,
-                          "annotation_type_expr": {
-                            "kind": "NamedType",
-                            "name": "float64"
-                          },
-                          "decl_type_expr": {
-                            "kind": "NamedType",
-                            "name": "float64"
-                          }
+                          "declare": true
                         },
                         {
                           "kind": "AnnAssign",
@@ -3339,15 +3171,7 @@
                               }
                             }
                           },
-                          "declare": true,
-                          "annotation_type_expr": {
-                            "kind": "NamedType",
-                            "name": "float64"
-                          },
-                          "decl_type_expr": {
-                            "kind": "NamedType",
-                            "name": "float64"
-                          }
+                          "declare": true
                         },
                         {
                           "kind": "AnnAssign",
@@ -3385,14 +3209,6 @@
                             "id": "sx"
                           },
                           "declare": true,
-                          "annotation_type_expr": {
-                            "kind": "NamedType",
-                            "name": "float64"
-                          },
-                          "decl_type_expr": {
-                            "kind": "NamedType",
-                            "name": "float64"
-                          },
                           "leading_trivia": [
                             {
                               "kind": "blank",
@@ -3435,15 +3251,7 @@
                             "repr": "sy",
                             "id": "sy"
                           },
-                          "declare": true,
-                          "annotation_type_expr": {
-                            "kind": "NamedType",
-                            "name": "float64"
-                          },
-                          "decl_type_expr": {
-                            "kind": "NamedType",
-                            "name": "float64"
-                          }
+                          "declare": true
                         },
                         {
                           "kind": "AnnAssign",
@@ -3480,15 +3288,7 @@
                             "repr": "1.0",
                             "value": 1.0
                           },
-                          "declare": true,
-                          "annotation_type_expr": {
-                            "kind": "NamedType",
-                            "name": "float64"
-                          },
-                          "decl_type_expr": {
-                            "kind": "NamedType",
-                            "name": "float64"
-                          }
+                          "declare": true
                         },
                         {
                           "kind": "AnnAssign",
@@ -3722,15 +3522,7 @@
                               "keywords": []
                             }
                           },
-                          "declare": true,
-                          "annotation_type_expr": {
-                            "kind": "NamedType",
-                            "name": "float64"
-                          },
-                          "decl_type_expr": {
-                            "kind": "NamedType",
-                            "name": "float64"
-                          }
+                          "declare": true
                         },
                         {
                           "kind": "AugAssign",
@@ -3879,14 +3671,6 @@
                             "value": 1e+30
                           },
                           "declare": true,
-                          "annotation_type_expr": {
-                            "kind": "NamedType",
-                            "name": "float64"
-                          },
-                          "decl_type_expr": {
-                            "kind": "NamedType",
-                            "name": "float64"
-                          },
                           "leading_trivia": [
                             {
                               "kind": "blank",
@@ -3942,15 +3726,7 @@
                               "value": 1
                             }
                           },
-                          "declare": true,
-                          "annotation_type_expr": {
-                            "kind": "NamedType",
-                            "name": "int64"
-                          },
-                          "decl_type_expr": {
-                            "kind": "NamedType",
-                            "name": "int64"
-                          }
+                          "declare": true
                         },
                         {
                           "kind": "AnnAssign",
@@ -4159,14 +3935,6 @@
                             "keywords": []
                           },
                           "declare": true,
-                          "annotation_type_expr": {
-                            "kind": "NamedType",
-                            "name": "float64"
-                          },
-                          "decl_type_expr": {
-                            "kind": "NamedType",
-                            "name": "float64"
-                          },
                           "leading_trivia": [
                             {
                               "kind": "blank",
@@ -5147,15 +4915,7 @@
                             "repr": "0",
                             "value": 0
                           },
-                          "declare": true,
-                          "annotation_type_expr": {
-                            "kind": "NamedType",
-                            "name": "int64"
-                          },
-                          "decl_type_expr": {
-                            "kind": "NamedType",
-                            "name": "int64"
-                          }
+                          "declare": true
                         },
                         {
                           "kind": "AnnAssign",
@@ -5192,15 +4952,7 @@
                             "repr": "0",
                             "value": 0
                           },
-                          "declare": true,
-                          "annotation_type_expr": {
-                            "kind": "NamedType",
-                            "name": "int64"
-                          },
-                          "decl_type_expr": {
-                            "kind": "NamedType",
-                            "name": "int64"
-                          }
+                          "declare": true
                         },
                         {
                           "kind": "AnnAssign",
@@ -5237,15 +4989,7 @@
                             "repr": "0",
                             "value": 0
                           },
-                          "declare": true,
-                          "annotation_type_expr": {
-                            "kind": "NamedType",
-                            "name": "int64"
-                          },
-                          "decl_type_expr": {
-                            "kind": "NamedType",
-                            "name": "int64"
-                          }
+                          "declare": true
                         },
                         {
                           "kind": "If",
@@ -5386,15 +5130,7 @@
                                   }
                                 }
                               },
-                              "declare": true,
-                              "annotation_type_expr": {
-                                "kind": "NamedType",
-                                "name": "float64"
-                              },
-                              "decl_type_expr": {
-                                "kind": "NamedType",
-                                "name": "float64"
-                              }
+                              "declare": true
                             },
                             {
                               "kind": "AnnAssign",
@@ -5483,15 +5219,7 @@
                                   }
                                 }
                               },
-                              "declare": true,
-                              "annotation_type_expr": {
-                                "kind": "NamedType",
-                                "name": "float64"
-                              },
-                              "decl_type_expr": {
-                                "kind": "NamedType",
-                                "name": "float64"
-                              }
+                              "declare": true
                             },
                             {
                               "kind": "AnnAssign",
@@ -5580,15 +5308,7 @@
                                   }
                                 }
                               },
-                              "declare": true,
-                              "annotation_type_expr": {
-                                "kind": "NamedType",
-                                "name": "float64"
-                              },
-                              "decl_type_expr": {
-                                "kind": "NamedType",
-                                "name": "float64"
-                              }
+                              "declare": true
                             },
                             {
                               "kind": "AnnAssign",
@@ -5626,14 +5346,6 @@
                                 "value": 0.0
                               },
                               "declare": true,
-                              "annotation_type_expr": {
-                                "kind": "NamedType",
-                                "name": "float64"
-                              },
-                              "decl_type_expr": {
-                                "kind": "NamedType",
-                                "name": "float64"
-                              },
                               "leading_trivia": [
                                 {
                                   "kind": "blank",
@@ -5676,15 +5388,7 @@
                                 "repr": "0.0",
                                 "value": 0.0
                               },
-                              "declare": true,
-                              "annotation_type_expr": {
-                                "kind": "NamedType",
-                                "name": "float64"
-                              },
-                              "decl_type_expr": {
-                                "kind": "NamedType",
-                                "name": "float64"
-                              }
+                              "declare": true
                             },
                             {
                               "kind": "AnnAssign",
@@ -5721,15 +5425,7 @@
                                 "repr": "0.0",
                                 "value": 0.0
                               },
-                              "declare": true,
-                              "annotation_type_expr": {
-                                "kind": "NamedType",
-                                "name": "float64"
-                              },
-                              "decl_type_expr": {
-                                "kind": "NamedType",
-                                "name": "float64"
-                              }
+                              "declare": true
                             },
                             {
                               "kind": "If",
@@ -6698,15 +6394,7 @@
                                   }
                                 }
                               },
-                              "declare": true,
-                              "annotation_type_expr": {
-                                "kind": "NamedType",
-                                "name": "float64"
-                              },
-                              "decl_type_expr": {
-                                "kind": "NamedType",
-                                "name": "float64"
-                              }
+                              "declare": true
                             },
                             {
                               "kind": "Assign",
@@ -6809,14 +6497,6 @@
                                 "value": 0.0
                               },
                               "declare": true,
-                              "annotation_type_expr": {
-                                "kind": "NamedType",
-                                "name": "float64"
-                              },
-                              "decl_type_expr": {
-                                "kind": "NamedType",
-                                "name": "float64"
-                              },
                               "leading_trivia": [
                                 {
                                   "kind": "blank",
@@ -6859,15 +6539,7 @@
                                 "repr": "0.0",
                                 "value": 0.0
                               },
-                              "declare": true,
-                              "annotation_type_expr": {
-                                "kind": "NamedType",
-                                "name": "float64"
-                              },
-                              "decl_type_expr": {
-                                "kind": "NamedType",
-                                "name": "float64"
-                              }
+                              "declare": true
                             },
                             {
                               "kind": "AnnAssign",
@@ -6904,15 +6576,7 @@
                                 "repr": "0.0",
                                 "value": 0.0
                               },
-                              "declare": true,
-                              "annotation_type_expr": {
-                                "kind": "NamedType",
-                                "name": "float64"
-                              },
-                              "decl_type_expr": {
-                                "kind": "NamedType",
-                                "name": "float64"
-                              }
+                              "declare": true
                             },
                             {
                               "kind": "If",
@@ -7465,15 +7129,7 @@
                                           "keywords": []
                                         }
                                       },
-                                      "declare": true,
-                                      "annotation_type_expr": {
-                                        "kind": "NamedType",
-                                        "name": "int64"
-                                      },
-                                      "decl_type_expr": {
-                                        "kind": "NamedType",
-                                        "name": "int64"
-                                      }
+                                      "declare": true
                                     },
                                     {
                                       "kind": "If",
@@ -7876,15 +7532,7 @@
                                   }
                                 }
                               },
-                              "declare": true,
-                              "annotation_type_expr": {
-                                "kind": "NamedType",
-                                "name": "float64"
-                              },
-                              "decl_type_expr": {
-                                "kind": "NamedType",
-                                "name": "float64"
-                              }
+                              "declare": true
                             },
                             {
                               "kind": "Assign",
@@ -8410,15 +8058,7 @@
                                   }
                                 }
                               },
-                              "declare": true,
-                              "annotation_type_expr": {
-                                "kind": "NamedType",
-                                "name": "float64"
-                              },
-                              "decl_type_expr": {
-                                "kind": "NamedType",
-                                "name": "float64"
-                              }
+                              "declare": true
                             },
                             {
                               "kind": "Assign",
@@ -9403,15 +9043,7 @@
             "repr": "1600",
             "value": 1600
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "int64"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "int64"
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -9448,15 +9080,7 @@
             "repr": "900",
             "value": 900
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "int64"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "int64"
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -9493,15 +9117,7 @@
             "repr": "2",
             "value": 2
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "int64"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "int64"
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -9538,15 +9154,7 @@
             "repr": "\"sample/out/02_raytrace_spheres.png\"",
             "value": "sample/out/02_raytrace_spheres.png"
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "str"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "str"
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -9598,14 +9206,6 @@
             "keywords": []
           },
           "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "float64"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "float64"
-          },
           "leading_trivia": [
             {
               "kind": "blank",
@@ -9702,15 +9302,7 @@
             ],
             "keywords": []
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "bytearray"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "bytearray"
-          }
+          "declare": true
         },
         {
           "kind": "Expr",
@@ -9889,15 +9481,7 @@
               "id": "start"
             }
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "float64"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "float64"
-          }
+          "declare": true
         },
         {
           "kind": "Expr",

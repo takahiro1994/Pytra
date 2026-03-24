@@ -82,15 +82,7 @@
             "repr": "\"Pytra\"",
             "value": "Pytra"
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "str"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "str"
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -127,15 +119,7 @@
             "repr": "7",
             "value": 7
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "int64"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "int64"
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -172,15 +156,7 @@
             "repr": "5",
             "value": 5
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "int64"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "int64"
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -272,15 +248,7 @@
               }
             ]
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "str"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "str"
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -382,15 +350,7 @@
               }
             ]
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "str"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "str"
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -455,15 +415,7 @@
               }
             ]
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "str"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "str"
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -623,15 +575,7 @@
               }
             ]
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "str"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "str"
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -668,27 +612,7 @@
             "repr": "[]",
             "elements": []
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "GenericType",
-            "base": "list",
-            "args": [
-              {
-                "kind": "NamedType",
-                "name": "bool"
-              }
-            ]
-          },
-          "decl_type_expr": {
-            "kind": "GenericType",
-            "base": "list",
-            "args": [
-              {
-                "kind": "NamedType",
-                "name": "bool"
-              }
-            ]
-          }
+          "declare": true
         },
         {
           "kind": "Expr",

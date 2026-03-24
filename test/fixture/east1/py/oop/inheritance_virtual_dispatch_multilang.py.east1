@@ -534,15 +534,7 @@
             "args": [],
             "keywords": []
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "Animal"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "Animal"
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -593,15 +585,7 @@
             "args": [],
             "keywords": []
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "Dog"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "Dog"
-          }
+          "declare": true
         },
         {
           "kind": "Expr",

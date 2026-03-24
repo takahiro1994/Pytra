@@ -196,35 +196,7 @@
               }
             ]
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "GenericType",
-            "base": "dict",
-            "args": [
-              {
-                "kind": "NamedType",
-                "name": "str"
-              },
-              {
-                "kind": "DynamicType",
-                "name": "Any"
-              }
-            ]
-          },
-          "decl_type_expr": {
-            "kind": "GenericType",
-            "base": "dict",
-            "args": [
-              {
-                "kind": "NamedType",
-                "name": "str"
-              },
-              {
-                "kind": "DynamicType",
-                "name": "Any"
-              }
-            ]
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -262,14 +234,6 @@
             "value": 0
           },
           "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "int64"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "int64"
-          },
           "leading_trivia": [
             {
               "kind": "blank",
@@ -380,35 +344,7 @@
               "id": "root"
             }
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "GenericType",
-            "base": "dict",
-            "args": [
-              {
-                "kind": "NamedType",
-                "name": "str"
-              },
-              {
-                "kind": "DynamicType",
-                "name": "Any"
-              }
-            ]
-          },
-          "decl_type_expr": {
-            "kind": "GenericType",
-            "base": "dict",
-            "args": [
-              {
-                "kind": "NamedType",
-                "name": "str"
-              },
-              {
-                "kind": "DynamicType",
-                "name": "Any"
-              }
-            ]
-          }
+          "declare": true
         },
         {
           "kind": "For",
@@ -594,27 +530,7 @@
             "repr": "[]",
             "elements": []
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "GenericType",
-            "base": "list",
-            "args": [
-              {
-                "kind": "NamedType",
-                "name": "bool"
-              }
-            ]
-          },
-          "decl_type_expr": {
-            "kind": "GenericType",
-            "base": "list",
-            "args": [
-              {
-                "kind": "NamedType",
-                "name": "bool"
-              }
-            ]
-          }
+          "declare": true
         },
         {
           "kind": "Expr",

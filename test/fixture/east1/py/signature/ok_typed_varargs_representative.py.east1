@@ -47,15 +47,7 @@
           },
           "annotation": "bool",
           "value": null,
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "bool"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "bool"
-          }
+          "declare": true
         }
       ],
       "class_storage_hint": "value",
@@ -240,10 +232,6 @@
       "yield_value_type": "unknown",
       "vararg_name": "states",
       "vararg_type": "ControllerState",
-      "vararg_type_expr": {
-        "kind": "NamedType",
-        "name": "ControllerState"
-      },
       "leading_comments": [],
       "leading_trivia": []
     },
@@ -445,15 +433,7 @@
         "args": [],
         "keywords": []
       },
-      "declare": true,
-      "annotation_type_expr": {
-        "kind": "NamedType",
-        "name": "ControllerState"
-      },
-      "decl_type_expr": {
-        "kind": "NamedType",
-        "name": "ControllerState"
-      }
+      "declare": true
     },
     {
       "kind": "Assign",
@@ -554,15 +534,7 @@
         "args": [],
         "keywords": []
       },
-      "declare": true,
-      "annotation_type_expr": {
-        "kind": "NamedType",
-        "name": "ControllerState"
-      },
-      "decl_type_expr": {
-        "kind": "NamedType",
-        "name": "ControllerState"
-      }
+      "declare": true
     },
     {
       "kind": "Assign",
@@ -663,15 +635,7 @@
         "args": [],
         "keywords": []
       },
-      "declare": true,
-      "annotation_type_expr": {
-        "kind": "NamedType",
-        "name": "ControllerState"
-      },
-      "decl_type_expr": {
-        "kind": "NamedType",
-        "name": "ControllerState"
-      }
+      "declare": true
     },
     {
       "kind": "Assign",

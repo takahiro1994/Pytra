@@ -88,27 +88,7 @@
               }
             ]
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "GenericType",
-            "base": "set",
-            "args": [
-              {
-                "kind": "NamedType",
-                "name": "int64"
-              }
-            ]
-          },
-          "decl_type_expr": {
-            "kind": "GenericType",
-            "base": "set",
-            "args": [
-              {
-                "kind": "NamedType",
-                "name": "int64"
-              }
-            ]
-          }
+          "declare": true
         },
         {
           "kind": "Expr",
@@ -356,14 +336,6 @@
             ]
           },
           "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "bool"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "bool"
-          },
           "leading_trivia": [
             {
               "kind": "blank",
@@ -436,15 +408,7 @@
               }
             ]
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "bool"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "bool"
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -524,15 +488,7 @@
               ]
             }
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "bool"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "bool"
-          }
+          "declare": true
         },
         {
           "kind": "Expr",

@@ -79,14 +79,6 @@
             "value": 1
           },
           "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "int8"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "int8"
-          },
           "leading_trivia": [
             {
               "kind": "blank",

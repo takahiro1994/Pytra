@@ -96,15 +96,7 @@
                 "repr": "7",
                 "value": 7
               },
-              "declare": true,
-              "annotation_type_expr": {
-                "kind": "NamedType",
-                "name": "int64"
-              },
-              "decl_type_expr": {
-                "kind": "NamedType",
-                "name": "int64"
-              }
+              "declare": true
             }
           ],
           "is_generator": 0,
@@ -183,15 +175,7 @@
             "args": [],
             "keywords": []
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "Obj"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "Obj"
-          }
+          "declare": true
         },
         {
           "kind": "Expr",

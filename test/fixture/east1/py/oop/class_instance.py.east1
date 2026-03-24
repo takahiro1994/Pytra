@@ -348,15 +348,7 @@
             ],
             "keywords": []
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "Box100"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "Box100"
-          }
+          "declare": true
         },
         {
           "kind": "Expr",

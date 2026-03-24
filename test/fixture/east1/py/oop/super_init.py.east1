@@ -113,15 +113,7 @@
                 "repr": "1",
                 "value": 1
               },
-              "declare": true,
-              "annotation_type_expr": {
-                "kind": "NamedType",
-                "name": "int64"
-              },
-              "decl_type_expr": {
-                "kind": "NamedType",
-                "name": "int64"
-              }
+              "declare": true
             }
           ],
           "is_generator": 0,
@@ -423,15 +415,7 @@
             "args": [],
             "keywords": []
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "Child"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "Child"
-          }
+          "declare": true
         },
         {
           "kind": "Expr",
@@ -567,15 +551,7 @@
         "args": [],
         "keywords": []
       },
-      "declare": true,
-      "annotation_type_expr": {
-        "kind": "NamedType",
-        "name": "Child"
-      },
-      "decl_type_expr": {
-        "kind": "NamedType",
-        "name": "Child"
-      }
+      "declare": true
     },
     {
       "kind": "Expr",

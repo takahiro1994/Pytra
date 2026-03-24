@@ -1464,39 +1464,7 @@
               }
             ]
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "GenericType",
-            "base": "list",
-            "args": [
-              {
-                "kind": "GenericType",
-                "base": "list",
-                "args": [
-                  {
-                    "kind": "NamedType",
-                    "name": "int64"
-                  }
-                ]
-              }
-            ]
-          },
-          "decl_type_expr": {
-            "kind": "GenericType",
-            "base": "list",
-            "args": [
-              {
-                "kind": "GenericType",
-                "base": "list",
-                "args": [
-                  {
-                    "kind": "NamedType",
-                    "name": "int64"
-                  }
-                ]
-              }
-            ]
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -1574,47 +1542,7 @@
               }
             ]
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "GenericType",
-            "base": "list",
-            "args": [
-              {
-                "kind": "GenericType",
-                "base": "tuple",
-                "args": [
-                  {
-                    "kind": "NamedType",
-                    "name": "int64"
-                  },
-                  {
-                    "kind": "NamedType",
-                    "name": "int64"
-                  }
-                ]
-              }
-            ]
-          },
-          "decl_type_expr": {
-            "kind": "GenericType",
-            "base": "list",
-            "args": [
-              {
-                "kind": "GenericType",
-                "base": "tuple",
-                "args": [
-                  {
-                    "kind": "NamedType",
-                    "name": "int64"
-                  },
-                  {
-                    "kind": "NamedType",
-                    "name": "int64"
-                  }
-                ]
-              }
-            ]
-          }
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -1926,46 +1854,6 @@
             ]
           },
           "declare": true,
-          "annotation_type_expr": {
-            "kind": "GenericType",
-            "base": "list",
-            "args": [
-              {
-                "kind": "GenericType",
-                "base": "tuple",
-                "args": [
-                  {
-                    "kind": "NamedType",
-                    "name": "int64"
-                  },
-                  {
-                    "kind": "NamedType",
-                    "name": "int64"
-                  }
-                ]
-              }
-            ]
-          },
-          "decl_type_expr": {
-            "kind": "GenericType",
-            "base": "list",
-            "args": [
-              {
-                "kind": "GenericType",
-                "base": "tuple",
-                "args": [
-                  {
-                    "kind": "NamedType",
-                    "name": "int64"
-                  },
-                  {
-                    "kind": "NamedType",
-                    "name": "int64"
-                  }
-                ]
-              }
-            ]
-          },
           "leading_trivia": [
             {
               "kind": "blank",
@@ -2008,27 +1896,7 @@
             "repr": "[]",
             "elements": []
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "GenericType",
-            "base": "list",
-            "args": [
-              {
-                "kind": "NamedType",
-                "name": "bytes"
-              }
-            ]
-          },
-          "decl_type_expr": {
-            "kind": "GenericType",
-            "base": "list",
-            "args": [
-              {
-                "kind": "NamedType",
-                "name": "bytes"
-              }
-            ]
-          }
+          "declare": true
         },
         {
           "kind": "Assign",
@@ -2225,63 +2093,7 @@
                 "repr": "[]",
                 "elements": []
               },
-              "declare": true,
-              "annotation_type_expr": {
-                "kind": "GenericType",
-                "base": "list",
-                "args": [
-                  {
-                    "kind": "GenericType",
-                    "base": "tuple",
-                    "args": [
-                      {
-                        "kind": "NamedType",
-                        "name": "int64"
-                      },
-                      {
-                        "kind": "NamedType",
-                        "name": "int64"
-                      },
-                      {
-                        "kind": "NamedType",
-                        "name": "int64"
-                      },
-                      {
-                        "kind": "NamedType",
-                        "name": "int64"
-                      }
-                    ]
-                  }
-                ]
-              },
-              "decl_type_expr": {
-                "kind": "GenericType",
-                "base": "list",
-                "args": [
-                  {
-                    "kind": "GenericType",
-                    "base": "tuple",
-                    "args": [
-                      {
-                        "kind": "NamedType",
-                        "name": "int64"
-                      },
-                      {
-                        "kind": "NamedType",
-                        "name": "int64"
-                      },
-                      {
-                        "kind": "NamedType",
-                        "name": "int64"
-                      },
-                      {
-                        "kind": "NamedType",
-                        "name": "int64"
-                      }
-                    ]
-                  }
-                ]
-              }
+              "declare": true
             },
             {
               "kind": "ForRange",

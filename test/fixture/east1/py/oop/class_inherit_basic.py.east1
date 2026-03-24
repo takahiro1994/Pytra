@@ -197,15 +197,7 @@
         "args": [],
         "keywords": []
       },
-      "declare": true,
-      "annotation_type_expr": {
-        "kind": "NamedType",
-        "name": "Base"
-      },
-      "decl_type_expr": {
-        "kind": "NamedType",
-        "name": "Base"
-      }
+      "declare": true
     },
     {
       "kind": "AnnAssign",
@@ -256,15 +248,7 @@
         "args": [],
         "keywords": []
       },
-      "declare": true,
-      "annotation_type_expr": {
-        "kind": "NamedType",
-        "name": "Child"
-      },
-      "decl_type_expr": {
-        "kind": "NamedType",
-        "name": "Child"
-      }
+      "declare": true
     },
     {
       "kind": "Expr",

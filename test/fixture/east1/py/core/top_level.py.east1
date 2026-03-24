@@ -163,15 +163,7 @@
         "repr": "7",
         "value": 7
       },
-      "declare": true,
-      "annotation_type_expr": {
-        "kind": "NamedType",
-        "name": "int64"
-      },
-      "decl_type_expr": {
-        "kind": "NamedType",
-        "name": "int64"
-      }
+      "declare": true
     },
     {
       "kind": "FunctionDef",

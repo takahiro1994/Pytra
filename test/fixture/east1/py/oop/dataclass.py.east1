@@ -65,15 +65,7 @@
           },
           "annotation": "int64",
           "value": null,
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "int64"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "int64"
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -110,15 +102,7 @@
             "repr": "10",
             "value": 10
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "int64"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "int64"
-          }
+          "declare": true
         },
         {
           "kind": "FunctionDef",
@@ -334,15 +318,7 @@
             ],
             "keywords": []
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "Point99"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "Point99"
-          }
+          "declare": true
         },
         {
           "kind": "Expr",

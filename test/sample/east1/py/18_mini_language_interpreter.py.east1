@@ -84,15 +84,7 @@
           },
           "annotation": "str",
           "value": null,
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "str"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "str"
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -117,15 +109,7 @@
           },
           "annotation": "str",
           "value": null,
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "str"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "str"
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -150,15 +134,7 @@
           },
           "annotation": "int64",
           "value": null,
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "int64"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "int64"
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -183,15 +159,7 @@
           },
           "annotation": "int64",
           "value": null,
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "int64"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "int64"
-          }
+          "declare": true
         }
       ],
       "class_storage_hint": "value",
@@ -244,15 +212,7 @@
           },
           "annotation": "str",
           "value": null,
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "str"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "str"
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -277,15 +237,7 @@
           },
           "annotation": "int64",
           "value": null,
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "int64"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "int64"
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -310,15 +262,7 @@
           },
           "annotation": "str",
           "value": null,
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "str"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "str"
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -343,15 +287,7 @@
           },
           "annotation": "str",
           "value": null,
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "str"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "str"
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -376,15 +312,7 @@
           },
           "annotation": "int64",
           "value": null,
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "int64"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "int64"
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -409,15 +337,7 @@
           },
           "annotation": "int64",
           "value": null,
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "int64"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "int64"
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -442,15 +362,7 @@
           },
           "annotation": "int64",
           "value": null,
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "int64"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "int64"
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -475,15 +387,7 @@
           },
           "annotation": "int64",
           "value": null,
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "int64"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "int64"
-          }
+          "declare": true
         }
       ],
       "class_storage_hint": "value"
@@ -530,15 +434,7 @@
           },
           "annotation": "str",
           "value": null,
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "str"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "str"
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -563,15 +459,7 @@
           },
           "annotation": "str",
           "value": null,
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "str"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "str"
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -596,15 +484,7 @@
           },
           "annotation": "int64",
           "value": null,
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "int64"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "int64"
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -629,15 +509,7 @@
           },
           "annotation": "int64",
           "value": null,
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "int64"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "int64"
-          }
+          "declare": true
         }
       ],
       "class_storage_hint": "value"
@@ -898,35 +770,7 @@
               }
             ]
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "GenericType",
-            "base": "dict",
-            "args": [
-              {
-                "kind": "NamedType",
-                "name": "str"
-              },
-              {
-                "kind": "NamedType",
-                "name": "int64"
-              }
-            ]
-          },
-          "decl_type_expr": {
-            "kind": "GenericType",
-            "base": "dict",
-            "args": [
-              {
-                "kind": "NamedType",
-                "name": "str"
-              },
-              {
-                "kind": "NamedType",
-                "name": "int64"
-              }
-            ]
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -1055,27 +899,7 @@
               }
             ]
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "GenericType",
-            "base": "list",
-            "args": [
-              {
-                "kind": "NamedType",
-                "name": "str"
-              }
-            ]
-          },
-          "decl_type_expr": {
-            "kind": "GenericType",
-            "base": "list",
-            "args": [
-              {
-                "kind": "NamedType",
-                "name": "str"
-              }
-            ]
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -1112,27 +936,7 @@
             "repr": "[]",
             "elements": []
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "GenericType",
-            "base": "list",
-            "args": [
-              {
-                "kind": "NamedType",
-                "name": "Token"
-              }
-            ]
-          },
-          "decl_type_expr": {
-            "kind": "GenericType",
-            "base": "list",
-            "args": [
-              {
-                "kind": "NamedType",
-                "name": "Token"
-              }
-            ]
-          }
+          "declare": true
         },
         {
           "kind": "For",
@@ -1266,15 +1070,7 @@
                 "repr": "0",
                 "value": 0
               },
-              "declare": true,
-              "annotation_type_expr": {
-                "kind": "NamedType",
-                "name": "int64"
-              },
-              "decl_type_expr": {
-                "kind": "NamedType",
-                "name": "int64"
-              }
+              "declare": true
             },
             {
               "kind": "AnnAssign",
@@ -1339,15 +1135,7 @@
                 ],
                 "keywords": []
               },
-              "declare": true,
-              "annotation_type_expr": {
-                "kind": "NamedType",
-                "name": "int64"
-              },
-              "decl_type_expr": {
-                "kind": "NamedType",
-                "name": "int64"
-              }
+              "declare": true
             },
             {
               "kind": "While",
@@ -1461,15 +1249,7 @@
                       "id": "i"
                     }
                   },
-                  "declare": true,
-                  "annotation_type_expr": {
-                    "kind": "NamedType",
-                    "name": "str"
-                  },
-                  "decl_type_expr": {
-                    "kind": "NamedType",
-                    "name": "str"
-                  }
+                  "declare": true
                 },
                 {
                   "kind": "If",
@@ -1693,15 +1473,7 @@
                       "id": "single_char_token_tags"
                     }
                   },
-                  "declare": true,
-                  "annotation_type_expr": {
-                    "kind": "NamedType",
-                    "name": "int64"
-                  },
-                  "decl_type_expr": {
-                    "kind": "NamedType",
-                    "name": "int64"
-                  }
+                  "declare": true
                 },
                 {
                   "kind": "If",
@@ -2108,15 +1880,7 @@
                         "repr": "i",
                         "id": "i"
                       },
-                      "declare": true,
-                      "annotation_type_expr": {
-                        "kind": "NamedType",
-                        "name": "int64"
-                      },
-                      "decl_type_expr": {
-                        "kind": "NamedType",
-                        "name": "int64"
-                      }
+                      "declare": true
                     },
                     {
                       "kind": "While",
@@ -2431,15 +2195,7 @@
                           "id": "i"
                         }
                       },
-                      "declare": true,
-                      "annotation_type_expr": {
-                        "kind": "NamedType",
-                        "name": "str"
-                      },
-                      "decl_type_expr": {
-                        "kind": "NamedType",
-                        "name": "str"
-                      }
+                      "declare": true
                     },
                     {
                       "kind": "Expr",
@@ -4605,27 +4361,7 @@
                 "repr": "tokens",
                 "id": "tokens"
               },
-              "declare": true,
-              "annotation_type_expr": {
-                "kind": "GenericType",
-                "base": "list",
-                "args": [
-                  {
-                    "kind": "NamedType",
-                    "name": "Token"
-                  }
-                ]
-              },
-              "decl_type_expr": {
-                "kind": "GenericType",
-                "base": "list",
-                "args": [
-                  {
-                    "kind": "NamedType",
-                    "name": "Token"
-                  }
-                ]
-              }
+              "declare": true
             },
             {
               "kind": "AnnAssign",
@@ -4675,15 +4411,7 @@
                 "repr": "0",
                 "value": 0
               },
-              "declare": true,
-              "annotation_type_expr": {
-                "kind": "NamedType",
-                "name": "int64"
-              },
-              "decl_type_expr": {
-                "kind": "NamedType",
-                "name": "int64"
-              }
+              "declare": true
             },
             {
               "kind": "AnnAssign",
@@ -4760,27 +4488,7 @@
                 "args": [],
                 "keywords": []
               },
-              "declare": true,
-              "annotation_type_expr": {
-                "kind": "GenericType",
-                "base": "list",
-                "args": [
-                  {
-                    "kind": "NamedType",
-                    "name": "ExprNode"
-                  }
-                ]
-              },
-              "decl_type_expr": {
-                "kind": "GenericType",
-                "base": "list",
-                "args": [
-                  {
-                    "kind": "NamedType",
-                    "name": "ExprNode"
-                  }
-                ]
-              }
+              "declare": true
             }
           ],
           "is_generator": 0,
@@ -5405,15 +5113,7 @@
                 "args": [],
                 "keywords": []
               },
-              "declare": true,
-              "annotation_type_expr": {
-                "kind": "NamedType",
-                "name": "Token"
-              },
-              "decl_type_expr": {
-                "kind": "NamedType",
-                "name": "Token"
-              }
+              "declare": true
             },
             {
               "kind": "If",
@@ -6181,27 +5881,7 @@
                 "repr": "[]",
                 "elements": []
               },
-              "declare": true,
-              "annotation_type_expr": {
-                "kind": "GenericType",
-                "base": "list",
-                "args": [
-                  {
-                    "kind": "NamedType",
-                    "name": "StmtNode"
-                  }
-                ]
-              },
-              "decl_type_expr": {
-                "kind": "GenericType",
-                "base": "list",
-                "args": [
-                  {
-                    "kind": "NamedType",
-                    "name": "StmtNode"
-                  }
-                ]
-              }
+              "declare": true
             },
             {
               "kind": "Expr",
@@ -6393,15 +6073,7 @@
                     "args": [],
                     "keywords": []
                   },
-                  "declare": true,
-                  "annotation_type_expr": {
-                    "kind": "NamedType",
-                    "name": "StmtNode"
-                  },
-                  "decl_type_expr": {
-                    "kind": "NamedType",
-                    "name": "StmtNode"
-                  }
+                  "declare": true
                 },
                 {
                   "kind": "Expr",
@@ -6734,15 +6406,7 @@
                     },
                     "attr": "text"
                   },
-                  "declare": true,
-                  "annotation_type_expr": {
-                    "kind": "NamedType",
-                    "name": "str"
-                  },
-                  "decl_type_expr": {
-                    "kind": "NamedType",
-                    "name": "str"
-                  }
+                  "declare": true
                 },
                 {
                   "kind": "Expr",
@@ -6869,15 +6533,7 @@
                     "args": [],
                     "keywords": []
                   },
-                  "declare": true,
-                  "annotation_type_expr": {
-                    "kind": "NamedType",
-                    "name": "int64"
-                  },
-                  "decl_type_expr": {
-                    "kind": "NamedType",
-                    "name": "int64"
-                  }
+                  "declare": true
                 },
                 {
                   "kind": "Return",
@@ -7096,15 +6752,7 @@
                     "args": [],
                     "keywords": []
                   },
-                  "declare": true,
-                  "annotation_type_expr": {
-                    "kind": "NamedType",
-                    "name": "int64"
-                  },
-                  "decl_type_expr": {
-                    "kind": "NamedType",
-                    "name": "int64"
-                  }
+                  "declare": true
                 },
                 {
                   "kind": "Return",
@@ -7287,15 +6935,7 @@
                 },
                 "attr": "text"
               },
-              "declare": true,
-              "annotation_type_expr": {
-                "kind": "NamedType",
-                "name": "str"
-              },
-              "decl_type_expr": {
-                "kind": "NamedType",
-                "name": "str"
-              }
+              "declare": true
             },
             {
               "kind": "Expr",
@@ -7422,15 +7062,7 @@
                 "args": [],
                 "keywords": []
               },
-              "declare": true,
-              "annotation_type_expr": {
-                "kind": "NamedType",
-                "name": "int64"
-              },
-              "decl_type_expr": {
-                "kind": "NamedType",
-                "name": "int64"
-              }
+              "declare": true
             },
             {
               "kind": "Return",
@@ -7690,15 +7322,7 @@
                 "args": [],
                 "keywords": []
               },
-              "declare": true,
-              "annotation_type_expr": {
-                "kind": "NamedType",
-                "name": "int64"
-              },
-              "decl_type_expr": {
-                "kind": "NamedType",
-                "name": "int64"
-              }
+              "declare": true
             },
             {
               "kind": "While",
@@ -7847,15 +7471,7 @@
                         "args": [],
                         "keywords": []
                       },
-                      "declare": true,
-                      "annotation_type_expr": {
-                        "kind": "NamedType",
-                        "name": "int64"
-                      },
-                      "decl_type_expr": {
-                        "kind": "NamedType",
-                        "name": "int64"
-                      }
+                      "declare": true
                     },
                     {
                       "kind": "Assign",
@@ -8566,15 +8182,7 @@
                 "args": [],
                 "keywords": []
               },
-              "declare": true,
-              "annotation_type_expr": {
-                "kind": "NamedType",
-                "name": "int64"
-              },
-              "decl_type_expr": {
-                "kind": "NamedType",
-                "name": "int64"
-              }
+              "declare": true
             },
             {
               "kind": "While",
@@ -8723,15 +8331,7 @@
                         "args": [],
                         "keywords": []
                       },
-                      "declare": true,
-                      "annotation_type_expr": {
-                        "kind": "NamedType",
-                        "name": "int64"
-                      },
-                      "decl_type_expr": {
-                        "kind": "NamedType",
-                        "name": "int64"
-                      }
+                      "declare": true
                     },
                     {
                       "kind": "Assign",
@@ -9505,15 +9105,7 @@
                     "args": [],
                     "keywords": []
                   },
-                  "declare": true,
-                  "annotation_type_expr": {
-                    "kind": "NamedType",
-                    "name": "int64"
-                  },
-                  "decl_type_expr": {
-                    "kind": "NamedType",
-                    "name": "int64"
-                  }
+                  "declare": true
                 },
                 {
                   "kind": "Return",
@@ -9916,15 +9508,7 @@
                     "args": [],
                     "keywords": []
                   },
-                  "declare": true,
-                  "annotation_type_expr": {
-                    "kind": "NamedType",
-                    "name": "Token"
-                  },
-                  "decl_type_expr": {
-                    "kind": "NamedType",
-                    "name": "Token"
-                  }
+                  "declare": true
                 },
                 {
                   "kind": "Return",
@@ -10275,15 +9859,7 @@
                     "args": [],
                     "keywords": []
                   },
-                  "declare": true,
-                  "annotation_type_expr": {
-                    "kind": "NamedType",
-                    "name": "Token"
-                  },
-                  "decl_type_expr": {
-                    "kind": "NamedType",
-                    "name": "Token"
-                  }
+                  "declare": true
                 },
                 {
                   "kind": "Return",
@@ -10634,15 +10210,7 @@
                     "args": [],
                     "keywords": []
                   },
-                  "declare": true,
-                  "annotation_type_expr": {
-                    "kind": "NamedType",
-                    "name": "int64"
-                  },
-                  "decl_type_expr": {
-                    "kind": "NamedType",
-                    "name": "int64"
-                  }
+                  "declare": true
                 },
                 {
                   "kind": "Expr",
@@ -11077,15 +10645,7 @@
               "id": "expr_index"
             }
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "ExprNode"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "ExprNode"
-          }
+          "declare": true
         },
         {
           "kind": "If",
@@ -11832,15 +11392,7 @@
                 ],
                 "keywords": []
               },
-              "declare": true,
-              "annotation_type_expr": {
-                "kind": "NamedType",
-                "name": "int64"
-              },
-              "decl_type_expr": {
-                "kind": "NamedType",
-                "name": "int64"
-              }
+              "declare": true
             },
             {
               "kind": "AnnAssign",
@@ -11944,15 +11496,7 @@
                 ],
                 "keywords": []
               },
-              "declare": true,
-              "annotation_type_expr": {
-                "kind": "NamedType",
-                "name": "int64"
-              },
-              "decl_type_expr": {
-                "kind": "NamedType",
-                "name": "int64"
-              }
+              "declare": true
             },
             {
               "kind": "If",
@@ -12779,35 +12323,7 @@
             "keys": [],
             "values": []
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "GenericType",
-            "base": "dict",
-            "args": [
-              {
-                "kind": "NamedType",
-                "name": "str"
-              },
-              {
-                "kind": "NamedType",
-                "name": "int64"
-              }
-            ]
-          },
-          "decl_type_expr": {
-            "kind": "GenericType",
-            "base": "dict",
-            "args": [
-              {
-                "kind": "NamedType",
-                "name": "str"
-              },
-              {
-                "kind": "NamedType",
-                "name": "int64"
-              }
-            ]
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -12844,15 +12360,7 @@
             "repr": "0",
             "value": 0
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "int64"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "int64"
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -12889,15 +12397,7 @@
             "repr": "0",
             "value": 0
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "int64"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "int64"
-          }
+          "declare": true
         },
         {
           "kind": "For",
@@ -13678,15 +13178,7 @@
                 ],
                 "keywords": []
               },
-              "declare": true,
-              "annotation_type_expr": {
-                "kind": "NamedType",
-                "name": "int64"
-              },
-              "decl_type_expr": {
-                "kind": "NamedType",
-                "name": "int64"
-              }
+              "declare": true
             },
             {
               "kind": "If",
@@ -13824,15 +13316,7 @@
                   "value": 1000000007
                 }
               },
-              "declare": true,
-              "annotation_type_expr": {
-                "kind": "NamedType",
-                "name": "int64"
-              },
-              "decl_type_expr": {
-                "kind": "NamedType",
-                "name": "int64"
-              }
+              "declare": true
             },
             {
               "kind": "If",
@@ -14265,27 +13749,7 @@
             "repr": "[]",
             "elements": []
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "GenericType",
-            "base": "list",
-            "args": [
-              {
-                "kind": "NamedType",
-                "name": "str"
-              }
-            ]
-          },
-          "decl_type_expr": {
-            "kind": "GenericType",
-            "base": "list",
-            "args": [
-              {
-                "kind": "NamedType",
-                "name": "str"
-              }
-            ]
-          }
+          "declare": true
         },
         {
           "kind": "ForRange",
@@ -14726,15 +14190,7 @@
                   "id": "var_count"
                 }
               },
-              "declare": true,
-              "annotation_type_expr": {
-                "kind": "NamedType",
-                "name": "int64"
-              },
-              "decl_type_expr": {
-                "kind": "NamedType",
-                "name": "int64"
-              }
+              "declare": true
             },
             {
               "kind": "AnnAssign",
@@ -14823,15 +14279,7 @@
                   "id": "var_count"
                 }
               },
-              "declare": true,
-              "annotation_type_expr": {
-                "kind": "NamedType",
-                "name": "int64"
-              },
-              "decl_type_expr": {
-                "kind": "NamedType",
-                "name": "int64"
-              }
+              "declare": true
             },
             {
               "kind": "AnnAssign",
@@ -14920,15 +14368,7 @@
                   "value": 1
                 }
               },
-              "declare": true,
-              "annotation_type_expr": {
-                "kind": "NamedType",
-                "name": "int64"
-              },
-              "decl_type_expr": {
-                "kind": "NamedType",
-                "name": "int64"
-              }
+              "declare": true
             },
             {
               "kind": "AnnAssign",
@@ -15017,15 +14457,7 @@
                   "value": 2
                 }
               },
-              "declare": true,
-              "annotation_type_expr": {
-                "kind": "NamedType",
-                "name": "int64"
-              },
-              "decl_type_expr": {
-                "kind": "NamedType",
-                "name": "int64"
-              }
+              "declare": true
             },
             {
               "kind": "Expr",
@@ -15866,27 +15298,7 @@
             "repr": "[]",
             "elements": []
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "GenericType",
-            "base": "list",
-            "args": [
-              {
-                "kind": "NamedType",
-                "name": "str"
-              }
-            ]
-          },
-          "decl_type_expr": {
-            "kind": "GenericType",
-            "base": "list",
-            "args": [
-              {
-                "kind": "NamedType",
-                "name": "str"
-              }
-            ]
-          }
+          "declare": true
         },
         {
           "kind": "Expr",
@@ -16332,26 +15744,6 @@
             "keywords": []
           },
           "declare": true,
-          "annotation_type_expr": {
-            "kind": "GenericType",
-            "base": "list",
-            "args": [
-              {
-                "kind": "NamedType",
-                "name": "Token"
-              }
-            ]
-          },
-          "decl_type_expr": {
-            "kind": "GenericType",
-            "base": "list",
-            "args": [
-              {
-                "kind": "NamedType",
-                "name": "Token"
-              }
-            ]
-          },
           "leading_trivia": [
             {
               "kind": "blank",
@@ -16422,15 +15814,7 @@
             ],
             "keywords": []
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "Parser"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "Parser"
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -16494,27 +15878,7 @@
             "args": [],
             "keywords": []
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "GenericType",
-            "base": "list",
-            "args": [
-              {
-                "kind": "NamedType",
-                "name": "StmtNode"
-              }
-            ]
-          },
-          "decl_type_expr": {
-            "kind": "GenericType",
-            "base": "list",
-            "args": [
-              {
-                "kind": "NamedType",
-                "name": "StmtNode"
-              }
-            ]
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -16618,15 +15982,7 @@
             ],
             "keywords": []
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "int64"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "int64"
-          }
+          "declare": true
         },
         {
           "kind": "Expr",
@@ -16750,15 +16106,7 @@
             "repr": "\"sample/out/18_mini_language_interpreter.txt\"",
             "value": "sample/out/18_mini_language_interpreter.txt"
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "str"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "str"
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -16836,27 +16184,7 @@
             ],
             "keywords": []
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "GenericType",
-            "base": "list",
-            "args": [
-              {
-                "kind": "NamedType",
-                "name": "str"
-              }
-            ]
-          },
-          "decl_type_expr": {
-            "kind": "GenericType",
-            "base": "list",
-            "args": [
-              {
-                "kind": "NamedType",
-                "name": "str"
-              }
-            ]
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -16907,15 +16235,7 @@
             "args": [],
             "keywords": []
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "float64"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "float64"
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -16980,27 +16300,7 @@
             ],
             "keywords": []
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "GenericType",
-            "base": "list",
-            "args": [
-              {
-                "kind": "NamedType",
-                "name": "Token"
-              }
-            ]
-          },
-          "decl_type_expr": {
-            "kind": "GenericType",
-            "base": "list",
-            "args": [
-              {
-                "kind": "NamedType",
-                "name": "Token"
-              }
-            ]
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -17065,15 +16365,7 @@
             ],
             "keywords": []
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "Parser"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "Parser"
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -17137,27 +16429,7 @@
             "args": [],
             "keywords": []
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "GenericType",
-            "base": "list",
-            "args": [
-              {
-                "kind": "NamedType",
-                "name": "StmtNode"
-              }
-            ]
-          },
-          "decl_type_expr": {
-            "kind": "GenericType",
-            "base": "list",
-            "args": [
-              {
-                "kind": "NamedType",
-                "name": "StmtNode"
-              }
-            ]
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -17261,15 +16533,7 @@
             ],
             "keywords": []
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "int64"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "int64"
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -17346,15 +16610,7 @@
               "id": "start"
             }
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "float64"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "float64"
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -17809,14 +17065,6 @@
             }
           },
           "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "str"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "str"
-          },
           "leading_trivia": [
             {
               "kind": "blank",
@@ -17887,15 +17135,7 @@
             ],
             "keywords": []
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "Path"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "Path"
-          }
+          "declare": true
         },
         {
           "kind": "Expr",

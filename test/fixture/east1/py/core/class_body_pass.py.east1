@@ -103,15 +103,7 @@
             "args": [],
             "keywords": []
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "Marker"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "Marker"
-          }
+          "declare": true
         },
         {
           "kind": "Expr",

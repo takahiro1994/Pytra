@@ -127,15 +127,7 @@
             ],
             "keywords": []
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "ArgumentParser"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "ArgumentParser"
-          }
+          "declare": true
         },
         {
           "kind": "Expr",
@@ -647,35 +639,7 @@
             ],
             "keywords": []
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "GenericType",
-            "base": "dict",
-            "args": [
-              {
-                "kind": "NamedType",
-                "name": "str"
-              },
-              {
-                "kind": "DynamicType",
-                "name": "object"
-              }
-            ]
-          },
-          "decl_type_expr": {
-            "kind": "GenericType",
-            "base": "dict",
-            "args": [
-              {
-                "kind": "NamedType",
-                "name": "str"
-              },
-              {
-                "kind": "DynamicType",
-                "name": "object"
-              }
-            ]
-          }
+          "declare": true
         },
         {
           "kind": "AnnAssign",
@@ -712,27 +676,7 @@
             "repr": "[]",
             "elements": []
           },
-          "declare": true,
-          "annotation_type_expr": {
-            "kind": "GenericType",
-            "base": "list",
-            "args": [
-              {
-                "kind": "NamedType",
-                "name": "bool"
-              }
-            ]
-          },
-          "decl_type_expr": {
-            "kind": "GenericType",
-            "base": "list",
-            "args": [
-              {
-                "kind": "NamedType",
-                "name": "bool"
-              }
-            ]
-          }
+          "declare": true
         },
         {
           "kind": "Expr",
