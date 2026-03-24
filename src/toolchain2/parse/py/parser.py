@@ -911,7 +911,13 @@ class ExprParser:
                 end_tok = self.tokens[self.pos - 1]
                 base = self._base(tok.start, end_tok.end, "unknown", "value")
                 return TupleExpr(base=base, elements=elements)
-            self.expect("OP", ")")
+            close_tok = self.expect("OP", ")")
+            # 括弧付き式: span を括弧を含めた範囲に拡張
+            paren_start = tok.start
+            paren_end = close_tok.end
+            if isinstance(first, (Name, Constant, BinOp, UnaryOp, BoolOp, Compare, Call, Attribute, Subscript, IfExp, ListExpr, TupleExpr, DictExpr, ListComp, RangeExpr)):
+                first.base.source_span = self._span(paren_start, paren_end)
+                first.base.repr_text = self.source_text[paren_start:paren_end]
             return first
 
         # List literal or comprehension
