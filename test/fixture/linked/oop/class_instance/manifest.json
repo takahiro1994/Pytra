@@ -1,0 +1,96 @@
+{
+  "schema": "pytra.link_output.v1",
+  "target": "cpp",
+  "dispatch_mode": "native",
+  "entry_modules": [
+    "class_instance"
+  ],
+  "modules": [
+    {
+      "module_id": "class_instance",
+      "input": "test/fixture/source/py/oop/class_instance.py",
+      "output": "east3/class_instance.east3.json",
+      "source_path": "test/fixture/source/py/oop/class_instance.py",
+      "is_entry": true,
+      "module_kind": "user"
+    },
+    {
+      "module_id": "pytra.built_in.io_ops",
+      "input": "/workspace/Pytra/src/pytra/built_in/io_ops.py",
+      "output": "east3/pytra/built_in/io_ops.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/built_in/io_ops.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    },
+    {
+      "module_id": "pytra.utils.assertions",
+      "input": "/workspace/Pytra/src/pytra/utils/assertions.py",
+      "output": "east3/pytra/utils/assertions.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/utils/assertions.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    }
+  ],
+  "global": {
+    "type_id_table": {
+      "class_instance.Box100": 1000
+    },
+    "type_id_base_map": {
+      "class_instance.Box100": 8
+    },
+    "call_graph": {
+      "class_instance::Box100.__init__": [],
+      "class_instance::Box100.next": [],
+      "class_instance::__main__": [
+        "pytra.utils.assertions::py_assert_stdout"
+      ],
+      "class_instance::_case_main": [],
+      "pytra.built_in.io_ops::py_print": [],
+      "pytra.utils.assertions::_eq_any": [],
+      "pytra.utils.assertions::py_assert_all": [],
+      "pytra.utils.assertions::py_assert_eq": [
+        "pytra.utils.assertions::_eq_any"
+      ],
+      "pytra.utils.assertions::py_assert_stdout": [],
+      "pytra.utils.assertions::py_assert_true": []
+    },
+    "sccs": [
+      [
+        "class_instance::Box100.__init__"
+      ],
+      [
+        "class_instance::Box100.next"
+      ],
+      [
+        "pytra.utils.assertions::py_assert_stdout"
+      ],
+      [
+        "class_instance::__main__"
+      ],
+      [
+        "class_instance::_case_main"
+      ],
+      [
+        "pytra.built_in.io_ops::py_print"
+      ],
+      [
+        "pytra.utils.assertions::_eq_any"
+      ],
+      [
+        "pytra.utils.assertions::py_assert_all"
+      ],
+      [
+        "pytra.utils.assertions::py_assert_eq"
+      ],
+      [
+        "pytra.utils.assertions::py_assert_true"
+      ]
+    ],
+    "non_escape_summary": {},
+    "container_ownership_hints_v1": {}
+  },
+  "diagnostics": {
+    "warnings": [],
+    "errors": []
+  }
+}

@@ -1,0 +1,261 @@
+{
+  "schema": "pytra.link_output.v1",
+  "target": "cpp",
+  "dispatch_mode": "native",
+  "entry_modules": [
+    "ok_fstring_format_spec"
+  ],
+  "modules": [
+    {
+      "module_id": "ok_fstring_format_spec",
+      "input": "test/fixture/source/py/signature/ok_fstring_format_spec.py",
+      "output": "east3/ok_fstring_format_spec.east3.json",
+      "source_path": "test/fixture/source/py/signature/ok_fstring_format_spec.py",
+      "is_entry": true,
+      "module_kind": "user"
+    },
+    {
+      "module_id": "pytra.built_in.format_value",
+      "input": "/workspace/Pytra/src/pytra/built_in/format_value.py",
+      "output": "east3/pytra/built_in/format_value.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/built_in/format_value.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    },
+    {
+      "module_id": "pytra.built_in.io_ops",
+      "input": "/workspace/Pytra/src/pytra/built_in/io_ops.py",
+      "output": "east3/pytra/built_in/io_ops.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/built_in/io_ops.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    },
+    {
+      "module_id": "pytra.built_in.scalar_ops",
+      "input": "/workspace/Pytra/src/pytra/built_in/scalar_ops.py",
+      "output": "east3/pytra/built_in/scalar_ops.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/built_in/scalar_ops.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    },
+    {
+      "module_id": "pytra.built_in.sequence",
+      "input": "/workspace/Pytra/src/pytra/built_in/sequence.py",
+      "output": "east3/pytra/built_in/sequence.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/built_in/sequence.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    }
+  ],
+  "global": {
+    "type_id_table": {},
+    "type_id_base_map": {},
+    "call_graph": {
+      "ok_fstring_format_spec::__main__": [
+        "ok_fstring_format_spec::fmt"
+      ],
+      "ok_fstring_format_spec::fmt": [],
+      "pytra.built_in.format_value::_apply_align": [
+        "pytra.built_in.format_value::_spec_align",
+        "pytra.built_in.format_value::_spec_fill",
+        "pytra.built_in.format_value::_spec_type",
+        "pytra.built_in.format_value::_spec_width",
+        "pytra.built_in.format_value::_str_to_int"
+      ],
+      "pytra.built_in.format_value::_apply_sign": [],
+      "pytra.built_in.format_value::_float_exp": [
+        "pytra.built_in.format_value::_float_fixed",
+        "pytra.built_in.format_value::_int_to_str"
+      ],
+      "pytra.built_in.format_value::_float_fixed": [
+        "pytra.built_in.format_value::_int_to_str"
+      ],
+      "pytra.built_in.format_value::_float_general": [
+        "pytra.built_in.format_value::_float_exp",
+        "pytra.built_in.format_value::_float_fixed"
+      ],
+      "pytra.built_in.format_value::_float_to_str": [],
+      "pytra.built_in.format_value::_format_core": [
+        "pytra.built_in.format_value::_format_float",
+        "pytra.built_in.format_value::_format_int",
+        "pytra.built_in.format_value::_spec_grouping",
+        "pytra.built_in.format_value::_spec_precision",
+        "pytra.built_in.format_value::_spec_sign",
+        "pytra.built_in.format_value::_spec_type",
+        "pytra.built_in.format_value::_str_to_int",
+        "pytra.built_in.format_value::_to_str"
+      ],
+      "pytra.built_in.format_value::_format_float": [
+        "pytra.built_in.format_value::_apply_sign",
+        "pytra.built_in.format_value::_float_exp",
+        "pytra.built_in.format_value::_float_fixed",
+        "pytra.built_in.format_value::_float_general",
+        "pytra.built_in.format_value::_insert_grouping",
+        "pytra.built_in.format_value::_str_to_int"
+      ],
+      "pytra.built_in.format_value::_format_int": [
+        "pytra.built_in.format_value::_apply_sign",
+        "pytra.built_in.format_value::_format_float",
+        "pytra.built_in.format_value::_insert_grouping",
+        "pytra.built_in.format_value::_int_to_bin",
+        "pytra.built_in.format_value::_int_to_hex",
+        "pytra.built_in.format_value::_int_to_oct",
+        "pytra.built_in.format_value::_int_to_str"
+      ],
+      "pytra.built_in.format_value::_insert_grouping": [],
+      "pytra.built_in.format_value::_int_to_bin": [],
+      "pytra.built_in.format_value::_int_to_hex": [],
+      "pytra.built_in.format_value::_int_to_oct": [
+        "pytra.built_in.format_value::_int_to_str"
+      ],
+      "pytra.built_in.format_value::_int_to_str": [
+        "pytra.built_in.format_value::_int_to_str"
+      ],
+      "pytra.built_in.format_value::_parse_format_spec": [],
+      "pytra.built_in.format_value::_repr_value": [
+        "pytra.built_in.format_value::_to_str"
+      ],
+      "pytra.built_in.format_value::_spec_align": [],
+      "pytra.built_in.format_value::_spec_fill": [],
+      "pytra.built_in.format_value::_spec_grouping": [],
+      "pytra.built_in.format_value::_spec_precision": [],
+      "pytra.built_in.format_value::_spec_sign": [],
+      "pytra.built_in.format_value::_spec_type": [],
+      "pytra.built_in.format_value::_spec_width": [],
+      "pytra.built_in.format_value::_str_to_int": [],
+      "pytra.built_in.format_value::_to_str": [
+        "pytra.built_in.format_value::_float_to_str",
+        "pytra.built_in.format_value::_int_to_str"
+      ],
+      "pytra.built_in.format_value::py_format_conversion": [
+        "pytra.built_in.format_value::_repr_value",
+        "pytra.built_in.format_value::_to_str"
+      ],
+      "pytra.built_in.format_value::py_format_value": [
+        "pytra.built_in.format_value::_apply_align",
+        "pytra.built_in.format_value::_format_core",
+        "pytra.built_in.format_value::_parse_format_spec",
+        "pytra.built_in.format_value::_to_str"
+      ],
+      "pytra.built_in.io_ops::py_print": [],
+      "pytra.built_in.scalar_ops::py_chr": [],
+      "pytra.built_in.scalar_ops::py_ord": [],
+      "pytra.built_in.scalar_ops::py_to_int64_base": [],
+      "pytra.built_in.sequence::py_range": [],
+      "pytra.built_in.sequence::py_repeat": []
+    },
+    "sccs": [
+      [
+        "ok_fstring_format_spec::fmt"
+      ],
+      [
+        "ok_fstring_format_spec::__main__"
+      ],
+      [
+        "pytra.built_in.format_value::_spec_align"
+      ],
+      [
+        "pytra.built_in.format_value::_spec_fill"
+      ],
+      [
+        "pytra.built_in.format_value::_spec_type"
+      ],
+      [
+        "pytra.built_in.format_value::_spec_width"
+      ],
+      [
+        "pytra.built_in.format_value::_str_to_int"
+      ],
+      [
+        "pytra.built_in.format_value::_apply_align"
+      ],
+      [
+        "pytra.built_in.format_value::_apply_sign"
+      ],
+      [
+        "pytra.built_in.format_value::_int_to_str"
+      ],
+      [
+        "pytra.built_in.format_value::_float_fixed"
+      ],
+      [
+        "pytra.built_in.format_value::_float_exp"
+      ],
+      [
+        "pytra.built_in.format_value::_float_general"
+      ],
+      [
+        "pytra.built_in.format_value::_float_to_str"
+      ],
+      [
+        "pytra.built_in.format_value::_insert_grouping"
+      ],
+      [
+        "pytra.built_in.format_value::_format_float"
+      ],
+      [
+        "pytra.built_in.format_value::_int_to_bin"
+      ],
+      [
+        "pytra.built_in.format_value::_int_to_hex"
+      ],
+      [
+        "pytra.built_in.format_value::_int_to_oct"
+      ],
+      [
+        "pytra.built_in.format_value::_format_int"
+      ],
+      [
+        "pytra.built_in.format_value::_spec_grouping"
+      ],
+      [
+        "pytra.built_in.format_value::_spec_precision"
+      ],
+      [
+        "pytra.built_in.format_value::_spec_sign"
+      ],
+      [
+        "pytra.built_in.format_value::_to_str"
+      ],
+      [
+        "pytra.built_in.format_value::_format_core"
+      ],
+      [
+        "pytra.built_in.format_value::_parse_format_spec"
+      ],
+      [
+        "pytra.built_in.format_value::_repr_value"
+      ],
+      [
+        "pytra.built_in.format_value::py_format_conversion"
+      ],
+      [
+        "pytra.built_in.format_value::py_format_value"
+      ],
+      [
+        "pytra.built_in.io_ops::py_print"
+      ],
+      [
+        "pytra.built_in.scalar_ops::py_chr"
+      ],
+      [
+        "pytra.built_in.scalar_ops::py_ord"
+      ],
+      [
+        "pytra.built_in.scalar_ops::py_to_int64_base"
+      ],
+      [
+        "pytra.built_in.sequence::py_range"
+      ],
+      [
+        "pytra.built_in.sequence::py_repeat"
+      ]
+    ],
+    "non_escape_summary": {},
+    "container_ownership_hints_v1": {}
+  },
+  "diagnostics": {
+    "warnings": [],
+    "errors": []
+  }
+}

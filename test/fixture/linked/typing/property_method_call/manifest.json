@@ -1,0 +1,107 @@
+{
+  "schema": "pytra.link_output.v1",
+  "target": "cpp",
+  "dispatch_mode": "native",
+  "entry_modules": [
+    "property_method_call"
+  ],
+  "modules": [
+    {
+      "module_id": "property_method_call",
+      "input": "test/fixture/source/py/typing/property_method_call.py",
+      "output": "east3/property_method_call.east3.json",
+      "source_path": "test/fixture/source/py/typing/property_method_call.py",
+      "is_entry": true,
+      "module_kind": "user"
+    },
+    {
+      "module_id": "pytra.built_in.io_ops",
+      "input": "/workspace/Pytra/src/pytra/built_in/io_ops.py",
+      "output": "east3/pytra/built_in/io_ops.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/built_in/io_ops.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    },
+    {
+      "module_id": "pytra.utils.assertions",
+      "input": "/workspace/Pytra/src/pytra/utils/assertions.py",
+      "output": "east3/pytra/utils/assertions.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/utils/assertions.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    }
+  ],
+  "global": {
+    "type_id_table": {
+      "property_method_call.MapperHolder": 1000
+    },
+    "type_id_base_map": {
+      "property_method_call.MapperHolder": 8
+    },
+    "call_graph": {
+      "property_method_call::MapperHolder.__init__": [],
+      "property_method_call::MapperHolder.is_mmc3": [],
+      "property_method_call::MapperHolder.mapper": [],
+      "property_method_call::MapperHolder.mapper_text": [],
+      "property_method_call::__main__": [
+        "property_method_call::run_property_method_call"
+      ],
+      "property_method_call::run_property_method_call": [
+        "pytra.utils.assertions::py_assert_all",
+        "pytra.utils.assertions::py_assert_eq"
+      ],
+      "pytra.built_in.io_ops::py_print": [],
+      "pytra.utils.assertions::_eq_any": [],
+      "pytra.utils.assertions::py_assert_all": [],
+      "pytra.utils.assertions::py_assert_eq": [
+        "pytra.utils.assertions::_eq_any"
+      ],
+      "pytra.utils.assertions::py_assert_stdout": [],
+      "pytra.utils.assertions::py_assert_true": []
+    },
+    "sccs": [
+      [
+        "property_method_call::MapperHolder.__init__"
+      ],
+      [
+        "property_method_call::MapperHolder.is_mmc3"
+      ],
+      [
+        "property_method_call::MapperHolder.mapper"
+      ],
+      [
+        "property_method_call::MapperHolder.mapper_text"
+      ],
+      [
+        "pytra.utils.assertions::py_assert_all"
+      ],
+      [
+        "pytra.utils.assertions::_eq_any"
+      ],
+      [
+        "pytra.utils.assertions::py_assert_eq"
+      ],
+      [
+        "property_method_call::run_property_method_call"
+      ],
+      [
+        "property_method_call::__main__"
+      ],
+      [
+        "pytra.built_in.io_ops::py_print"
+      ],
+      [
+        "pytra.utils.assertions::py_assert_stdout"
+      ],
+      [
+        "pytra.utils.assertions::py_assert_true"
+      ]
+    ],
+    "non_escape_summary": {},
+    "container_ownership_hints_v1": {}
+  },
+  "diagnostics": {
+    "warnings": [],
+    "errors": []
+  }
+}

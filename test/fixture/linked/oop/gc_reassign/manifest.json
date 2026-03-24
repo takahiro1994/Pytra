@@ -1,0 +1,102 @@
+{
+  "schema": "pytra.link_output.v1",
+  "target": "cpp",
+  "dispatch_mode": "native",
+  "entry_modules": [
+    "gc_reassign"
+  ],
+  "modules": [
+    {
+      "module_id": "gc_reassign",
+      "input": "test/fixture/source/py/oop/gc_reassign.py",
+      "output": "east3/gc_reassign.east3.json",
+      "source_path": "test/fixture/source/py/oop/gc_reassign.py",
+      "is_entry": true,
+      "module_kind": "user"
+    },
+    {
+      "module_id": "pytra.built_in.io_ops",
+      "input": "/workspace/Pytra/src/pytra/built_in/io_ops.py",
+      "output": "east3/pytra/built_in/io_ops.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/built_in/io_ops.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    },
+    {
+      "module_id": "pytra.utils.assertions",
+      "input": "/workspace/Pytra/src/pytra/utils/assertions.py",
+      "output": "east3/pytra/utils/assertions.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/utils/assertions.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    }
+  ],
+  "global": {
+    "type_id_table": {
+      "gc_reassign.Tracked": 1000
+    },
+    "type_id_base_map": {
+      "gc_reassign.Tracked": 8
+    },
+    "call_graph": {
+      "gc_reassign::Tracked.__del__": [],
+      "gc_reassign::Tracked.__init__": [],
+      "gc_reassign::__main__": [
+        "pytra.utils.assertions::py_assert_stdout"
+      ],
+      "gc_reassign::_case_main": [
+        "gc_reassign::run_gc_reassign"
+      ],
+      "gc_reassign::run_gc_reassign": [],
+      "pytra.built_in.io_ops::py_print": [],
+      "pytra.utils.assertions::_eq_any": [],
+      "pytra.utils.assertions::py_assert_all": [],
+      "pytra.utils.assertions::py_assert_eq": [
+        "pytra.utils.assertions::_eq_any"
+      ],
+      "pytra.utils.assertions::py_assert_stdout": [],
+      "pytra.utils.assertions::py_assert_true": []
+    },
+    "sccs": [
+      [
+        "gc_reassign::Tracked.__del__"
+      ],
+      [
+        "gc_reassign::Tracked.__init__"
+      ],
+      [
+        "pytra.utils.assertions::py_assert_stdout"
+      ],
+      [
+        "gc_reassign::__main__"
+      ],
+      [
+        "gc_reassign::run_gc_reassign"
+      ],
+      [
+        "gc_reassign::_case_main"
+      ],
+      [
+        "pytra.built_in.io_ops::py_print"
+      ],
+      [
+        "pytra.utils.assertions::_eq_any"
+      ],
+      [
+        "pytra.utils.assertions::py_assert_all"
+      ],
+      [
+        "pytra.utils.assertions::py_assert_eq"
+      ],
+      [
+        "pytra.utils.assertions::py_assert_true"
+      ]
+    ],
+    "non_escape_summary": {},
+    "container_ownership_hints_v1": {}
+  },
+  "diagnostics": {
+    "warnings": [],
+    "errors": []
+  }
+}

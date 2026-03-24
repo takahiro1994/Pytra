@@ -31,6 +31,7 @@ FIXTURE_GOLDEN = {
     "east2": Path("test/fixture/east2"),
     "east3": Path("test/fixture/east3"),
     "east3-opt": Path("test/fixture/east3-opt"),
+    "linked": Path("test/fixture/linked"),
 }
 
 SAMPLE_GOLDEN = {
@@ -38,6 +39,7 @@ SAMPLE_GOLDEN = {
     "east2": Path("test/sample/east2"),
     "east3": Path("test/sample/east3"),
     "east3-opt": Path("test/sample/east3-opt"),
+    "linked": Path("test/sample/linked"),
 }
 
 
@@ -92,6 +94,30 @@ def _regen_stage(
             ok += 1
 
     print(f"  {label}: {ok} ok, {fail} failed")
+    return ok, fail
+
+
+def _regen_linked_stage(
+    label: str,
+    sources: list[tuple[Path, str]],
+    east3_opt_dir: Path,
+    linked_dir: Path,
+) -> tuple[int, int]:
+    """linked 段の golden を再生成する。各ファイルを個別に link する。"""
+    ok = 0
+    fail = 0
+    for _src_path, rel_stem in sources:
+        in_path = east3_opt_dir / (rel_stem + ".east3")
+        out_dir = linked_dir / rel_stem
+
+        result = _run_cli2(["-link", str(in_path), "-o", str(out_dir)])
+        if result.returncode != 0:
+            print(f"  FAIL: {rel_stem}: {result.stderr.strip()[:100]}", file=sys.stderr)
+            fail += 1
+        else:
+            ok += 1
+
+    print(f"  {label} linked: {ok} ok, {fail} failed")
     return ok, fail
 
 
@@ -164,6 +190,13 @@ def regenerate(case_root: str) -> int:
             cli_cmd="-optimize",
             input_ext=".east3",
             output_ext=".east3",
+        )
+        total_ok += ok
+        total_fail += fail
+
+        # Stage 5: link (.east3 → manifest.json + linked east3)
+        ok, fail = _regen_linked_stage(
+            name, sources, golden_dirs["east3-opt"], golden_dirs["linked"],
         )
         total_ok += ok
         total_fail += fail

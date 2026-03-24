@@ -1,0 +1,54 @@
+{
+  "schema": "pytra.link_output.v1",
+  "target": "cpp",
+  "dispatch_mode": "native",
+  "entry_modules": [
+    "ok_top_level_for"
+  ],
+  "modules": [
+    {
+      "module_id": "ok_top_level_for",
+      "input": "test/fixture/source/py/signature/ok_top_level_for.py",
+      "output": "east3/ok_top_level_for.east3.json",
+      "source_path": "test/fixture/source/py/signature/ok_top_level_for.py",
+      "is_entry": true,
+      "module_kind": "user"
+    },
+    {
+      "module_id": "pytra.built_in.io_ops",
+      "input": "/workspace/Pytra/src/pytra/built_in/io_ops.py",
+      "output": "east3/pytra/built_in/io_ops.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/built_in/io_ops.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    }
+  ],
+  "global": {
+    "type_id_table": {},
+    "type_id_base_map": {},
+    "call_graph": {
+      "ok_top_level_for::__main__": [
+        "ok_top_level_for::run_top_level_for"
+      ],
+      "ok_top_level_for::run_top_level_for": [],
+      "pytra.built_in.io_ops::py_print": []
+    },
+    "sccs": [
+      [
+        "ok_top_level_for::run_top_level_for"
+      ],
+      [
+        "ok_top_level_for::__main__"
+      ],
+      [
+        "pytra.built_in.io_ops::py_print"
+      ]
+    ],
+    "non_escape_summary": {},
+    "container_ownership_hints_v1": {}
+  },
+  "diagnostics": {
+    "warnings": [],
+    "errors": []
+  }
+}

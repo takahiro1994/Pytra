@@ -1,0 +1,193 @@
+{
+  "schema": "pytra.link_output.v1",
+  "target": "cpp",
+  "dispatch_mode": "native",
+  "entry_modules": [
+    "re_extended"
+  ],
+  "modules": [
+    {
+      "module_id": "pytra.built_in.io_ops",
+      "input": "/workspace/Pytra/src/pytra/built_in/io_ops.py",
+      "output": "east3/pytra/built_in/io_ops.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/built_in/io_ops.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    },
+    {
+      "module_id": "pytra.built_in.sequence",
+      "input": "/workspace/Pytra/src/pytra/built_in/sequence.py",
+      "output": "east3/pytra/built_in/sequence.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/built_in/sequence.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    },
+    {
+      "module_id": "pytra.std.re",
+      "input": "/workspace/Pytra/src/pytra/std/re.py",
+      "output": "east3/pytra/std/re.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/std/re.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    },
+    {
+      "module_id": "pytra.utils.assertions",
+      "input": "/workspace/Pytra/src/pytra/utils/assertions.py",
+      "output": "east3/pytra/utils/assertions.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/utils/assertions.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    },
+    {
+      "module_id": "re_extended",
+      "input": "test/fixture/source/py/stdlib/re_extended.py",
+      "output": "east3/re_extended.east3.json",
+      "source_path": "test/fixture/source/py/stdlib/re_extended.py",
+      "is_entry": true,
+      "module_kind": "user"
+    }
+  ],
+  "global": {
+    "type_id_table": {
+      "pytra.std.re.Match": 1000,
+      "pytra.std.re.Pattern": 1001
+    },
+    "type_id_base_map": {
+      "pytra.std.re.Match": 8,
+      "pytra.std.re.Pattern": 8
+    },
+    "call_graph": {
+      "pytra.built_in.io_ops::py_print": [],
+      "pytra.built_in.sequence::py_range": [],
+      "pytra.built_in.sequence::py_repeat": [],
+      "pytra.std.re::Match.__init__": [],
+      "pytra.std.re::Match.group": [],
+      "pytra.std.re::Pattern.__init__": [],
+      "pytra.std.re::Pattern.match": [
+        "pytra.std.re::match"
+      ],
+      "pytra.std.re::_is_alnum_or_underscore": [],
+      "pytra.std.re::_is_dotted_ident": [
+        "pytra.std.re::_is_ident"
+      ],
+      "pytra.std.re::_is_ident": [],
+      "pytra.std.re::_is_space_ch": [],
+      "pytra.std.re::_skip_spaces": [
+        "pytra.std.re::_is_space_ch"
+      ],
+      "pytra.std.re::_strip_suffix_colon": [],
+      "pytra.std.re::compile": [],
+      "pytra.std.re::group": [],
+      "pytra.std.re::match": [
+        "pytra.std.re::_is_alnum_or_underscore",
+        "pytra.std.re::_is_dotted_ident",
+        "pytra.std.re::_is_ident",
+        "pytra.std.re::_is_space_ch",
+        "pytra.std.re::_skip_spaces",
+        "pytra.std.re::_strip_suffix_colon"
+      ],
+      "pytra.std.re::strip_group": [
+        "pytra.std.re::group"
+      ],
+      "pytra.std.re::sub": [],
+      "pytra.utils.assertions::_eq_any": [],
+      "pytra.utils.assertions::py_assert_all": [],
+      "pytra.utils.assertions::py_assert_eq": [
+        "pytra.utils.assertions::_eq_any"
+      ],
+      "pytra.utils.assertions::py_assert_stdout": [],
+      "pytra.utils.assertions::py_assert_true": [],
+      "re_extended::__main__": [
+        "re_extended::run_re_extended"
+      ],
+      "re_extended::run_re_extended": [
+        "pytra.std.re::sub",
+        "pytra.utils.assertions::py_assert_all",
+        "pytra.utils.assertions::py_assert_eq"
+      ]
+    },
+    "sccs": [
+      [
+        "pytra.built_in.io_ops::py_print"
+      ],
+      [
+        "pytra.built_in.sequence::py_range"
+      ],
+      [
+        "pytra.built_in.sequence::py_repeat"
+      ],
+      [
+        "pytra.std.re::Match.__init__"
+      ],
+      [
+        "pytra.std.re::Match.group"
+      ],
+      [
+        "pytra.std.re::Pattern.__init__"
+      ],
+      [
+        "pytra.std.re::_is_alnum_or_underscore"
+      ],
+      [
+        "pytra.std.re::_is_ident"
+      ],
+      [
+        "pytra.std.re::_is_dotted_ident"
+      ],
+      [
+        "pytra.std.re::_is_space_ch"
+      ],
+      [
+        "pytra.std.re::_skip_spaces"
+      ],
+      [
+        "pytra.std.re::_strip_suffix_colon"
+      ],
+      [
+        "pytra.std.re::match"
+      ],
+      [
+        "pytra.std.re::Pattern.match"
+      ],
+      [
+        "pytra.std.re::compile"
+      ],
+      [
+        "pytra.std.re::group"
+      ],
+      [
+        "pytra.std.re::strip_group"
+      ],
+      [
+        "pytra.std.re::sub"
+      ],
+      [
+        "pytra.utils.assertions::_eq_any"
+      ],
+      [
+        "pytra.utils.assertions::py_assert_all"
+      ],
+      [
+        "pytra.utils.assertions::py_assert_eq"
+      ],
+      [
+        "pytra.utils.assertions::py_assert_stdout"
+      ],
+      [
+        "pytra.utils.assertions::py_assert_true"
+      ],
+      [
+        "re_extended::run_re_extended"
+      ],
+      [
+        "re_extended::__main__"
+      ]
+    ],
+    "non_escape_summary": {},
+    "container_ownership_hints_v1": {}
+  },
+  "diagnostics": {
+    "warnings": [],
+    "errors": []
+  }
+}

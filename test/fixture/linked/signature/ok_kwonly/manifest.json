@@ -1,0 +1,54 @@
+{
+  "schema": "pytra.link_output.v1",
+  "target": "cpp",
+  "dispatch_mode": "native",
+  "entry_modules": [
+    "ok_kwonly"
+  ],
+  "modules": [
+    {
+      "module_id": "ok_kwonly",
+      "input": "test/fixture/source/py/signature/ok_kwonly.py",
+      "output": "east3/ok_kwonly.east3.json",
+      "source_path": "test/fixture/source/py/signature/ok_kwonly.py",
+      "is_entry": true,
+      "module_kind": "user"
+    },
+    {
+      "module_id": "pytra.built_in.io_ops",
+      "input": "/workspace/Pytra/src/pytra/built_in/io_ops.py",
+      "output": "east3/pytra/built_in/io_ops.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/built_in/io_ops.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    }
+  ],
+  "global": {
+    "type_id_table": {},
+    "type_id_base_map": {},
+    "call_graph": {
+      "ok_kwonly::__main__": [
+        "ok_kwonly::add"
+      ],
+      "ok_kwonly::add": [],
+      "pytra.built_in.io_ops::py_print": []
+    },
+    "sccs": [
+      [
+        "ok_kwonly::add"
+      ],
+      [
+        "ok_kwonly::__main__"
+      ],
+      [
+        "pytra.built_in.io_ops::py_print"
+      ]
+    ],
+    "non_escape_summary": {},
+    "container_ownership_hints_v1": {}
+  },
+  "diagnostics": {
+    "warnings": [],
+    "errors": []
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "schema": "pytra.link_output.v1",
+  "target": "cpp",
+  "dispatch_mode": "native",
+  "entry_modules": [
+    "dict_literal_entries"
+  ],
+  "modules": [
+    {
+      "module_id": "dict_literal_entries",
+      "input": "test/fixture/source/py/core/dict_literal_entries.py",
+      "output": "east3/dict_literal_entries.east3.json",
+      "source_path": "test/fixture/source/py/core/dict_literal_entries.py",
+      "is_entry": true,
+      "module_kind": "user"
+    },
+    {
+      "module_id": "pytra.built_in.io_ops",
+      "input": "/workspace/Pytra/src/pytra/built_in/io_ops.py",
+      "output": "east3/pytra/built_in/io_ops.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/built_in/io_ops.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    }
+  ],
+  "global": {
+    "type_id_table": {},
+    "type_id_base_map": {},
+    "call_graph": {
+      "dict_literal_entries::__main__": [
+        "dict_literal_entries::_case_main"
+      ],
+      "dict_literal_entries::_case_main": [],
+      "pytra.built_in.io_ops::py_print": []
+    },
+    "sccs": [
+      [
+        "dict_literal_entries::_case_main"
+      ],
+      [
+        "dict_literal_entries::__main__"
+      ],
+      [
+        "pytra.built_in.io_ops::py_print"
+      ]
+    ],
+    "non_escape_summary": {},
+    "container_ownership_hints_v1": {}
+  },
+  "diagnostics": {
+    "warnings": [],
+    "errors": []
+  }
+}

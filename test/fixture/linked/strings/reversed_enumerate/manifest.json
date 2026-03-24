@@ -1,0 +1,103 @@
+{
+  "schema": "pytra.link_output.v1",
+  "target": "cpp",
+  "dispatch_mode": "native",
+  "entry_modules": [
+    "reversed_enumerate"
+  ],
+  "modules": [
+    {
+      "module_id": "pytra.built_in.io_ops",
+      "input": "/workspace/Pytra/src/pytra/built_in/io_ops.py",
+      "output": "east3/pytra/built_in/io_ops.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/built_in/io_ops.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    },
+    {
+      "module_id": "pytra.built_in.iter_ops",
+      "input": "/workspace/Pytra/src/pytra/built_in/iter_ops.py",
+      "output": "east3/pytra/built_in/iter_ops.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/built_in/iter_ops.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    },
+    {
+      "module_id": "pytra.utils.assertions",
+      "input": "/workspace/Pytra/src/pytra/utils/assertions.py",
+      "output": "east3/pytra/utils/assertions.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/utils/assertions.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    },
+    {
+      "module_id": "reversed_enumerate",
+      "input": "test/fixture/source/py/strings/reversed_enumerate.py",
+      "output": "east3/reversed_enumerate.east3.json",
+      "source_path": "test/fixture/source/py/strings/reversed_enumerate.py",
+      "is_entry": true,
+      "module_kind": "user"
+    }
+  ],
+  "global": {
+    "type_id_table": {},
+    "type_id_base_map": {},
+    "call_graph": {
+      "pytra.built_in.io_ops::py_print": [],
+      "pytra.built_in.iter_ops::py_enumerate_object": [],
+      "pytra.built_in.iter_ops::py_reversed_object": [],
+      "pytra.utils.assertions::_eq_any": [],
+      "pytra.utils.assertions::py_assert_all": [],
+      "pytra.utils.assertions::py_assert_eq": [
+        "pytra.utils.assertions::_eq_any"
+      ],
+      "pytra.utils.assertions::py_assert_stdout": [],
+      "pytra.utils.assertions::py_assert_true": [],
+      "reversed_enumerate::__main__": [
+        "reversed_enumerate::run_reversed_enumerate"
+      ],
+      "reversed_enumerate::run_reversed_enumerate": [
+        "pytra.utils.assertions::py_assert_all",
+        "pytra.utils.assertions::py_assert_eq"
+      ]
+    },
+    "sccs": [
+      [
+        "pytra.built_in.io_ops::py_print"
+      ],
+      [
+        "pytra.built_in.iter_ops::py_enumerate_object"
+      ],
+      [
+        "pytra.built_in.iter_ops::py_reversed_object"
+      ],
+      [
+        "pytra.utils.assertions::_eq_any"
+      ],
+      [
+        "pytra.utils.assertions::py_assert_all"
+      ],
+      [
+        "pytra.utils.assertions::py_assert_eq"
+      ],
+      [
+        "pytra.utils.assertions::py_assert_stdout"
+      ],
+      [
+        "pytra.utils.assertions::py_assert_true"
+      ],
+      [
+        "reversed_enumerate::run_reversed_enumerate"
+      ],
+      [
+        "reversed_enumerate::__main__"
+      ]
+    ],
+    "non_escape_summary": {},
+    "container_ownership_hints_v1": {}
+  },
+  "diagnostics": {
+    "warnings": [],
+    "errors": []
+  }
+}

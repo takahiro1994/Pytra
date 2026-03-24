@@ -1,0 +1,118 @@
+{
+  "schema": "pytra.link_output.v1",
+  "target": "cpp",
+  "dispatch_mode": "native",
+  "entry_modules": [
+    "os_glob_extended"
+  ],
+  "modules": [
+    {
+      "module_id": "os_glob_extended",
+      "input": "test/fixture/source/py/stdlib/os_glob_extended.py",
+      "output": "east3/os_glob_extended.east3.json",
+      "source_path": "test/fixture/source/py/stdlib/os_glob_extended.py",
+      "is_entry": true,
+      "module_kind": "user"
+    },
+    {
+      "module_id": "pytra.built_in.io_ops",
+      "input": "/workspace/Pytra/src/pytra/built_in/io_ops.py",
+      "output": "east3/pytra/built_in/io_ops.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/built_in/io_ops.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    },
+    {
+      "module_id": "pytra.std.glob",
+      "input": "/workspace/Pytra/src/pytra/std/glob.py",
+      "output": "east3/pytra/std/glob.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/std/glob.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    },
+    {
+      "module_id": "pytra.std.os",
+      "input": "src/pytra/std/os.py",
+      "output": "east3/pytra/std/os.east3.json",
+      "source_path": "src/pytra/std/os.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    },
+    {
+      "module_id": "pytra.std.os_path",
+      "input": "/workspace/Pytra/src/pytra/std/os_path.py",
+      "output": "east3/pytra/std/os_path.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/std/os_path.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    }
+  ],
+  "global": {
+    "type_id_table": {},
+    "type_id_base_map": {},
+    "call_graph": {
+      "os_glob_extended::__main__": [
+        "os_glob_extended::run_case"
+      ],
+      "os_glob_extended::run_case": [],
+      "pytra.built_in.io_ops::py_print": [],
+      "pytra.std.glob::glob": [],
+      "pytra.std.os::getcwd": [],
+      "pytra.std.os::makedirs": [],
+      "pytra.std.os::mkdir": [],
+      "pytra.std.os_path::abspath": [],
+      "pytra.std.os_path::basename": [],
+      "pytra.std.os_path::dirname": [],
+      "pytra.std.os_path::exists": [],
+      "pytra.std.os_path::join": [],
+      "pytra.std.os_path::splitext": []
+    },
+    "sccs": [
+      [
+        "os_glob_extended::run_case"
+      ],
+      [
+        "os_glob_extended::__main__"
+      ],
+      [
+        "pytra.built_in.io_ops::py_print"
+      ],
+      [
+        "pytra.std.glob::glob"
+      ],
+      [
+        "pytra.std.os::getcwd"
+      ],
+      [
+        "pytra.std.os::makedirs"
+      ],
+      [
+        "pytra.std.os::mkdir"
+      ],
+      [
+        "pytra.std.os_path::abspath"
+      ],
+      [
+        "pytra.std.os_path::basename"
+      ],
+      [
+        "pytra.std.os_path::dirname"
+      ],
+      [
+        "pytra.std.os_path::exists"
+      ],
+      [
+        "pytra.std.os_path::join"
+      ],
+      [
+        "pytra.std.os_path::splitext"
+      ]
+    ],
+    "non_escape_summary": {},
+    "container_ownership_hints_v1": {}
+  },
+  "diagnostics": {
+    "warnings": [],
+    "errors": []
+  }
+}

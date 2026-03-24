@@ -1,0 +1,91 @@
+{
+  "schema": "pytra.link_output.v1",
+  "target": "cpp",
+  "dispatch_mode": "native",
+  "entry_modules": [
+    "intenum_basic"
+  ],
+  "modules": [
+    {
+      "module_id": "intenum_basic",
+      "input": "test/fixture/source/py/typing/intenum_basic.py",
+      "output": "east3/intenum_basic.east3.json",
+      "source_path": "test/fixture/source/py/typing/intenum_basic.py",
+      "is_entry": true,
+      "module_kind": "user"
+    },
+    {
+      "module_id": "pytra.built_in.io_ops",
+      "input": "/workspace/Pytra/src/pytra/built_in/io_ops.py",
+      "output": "east3/pytra/built_in/io_ops.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/built_in/io_ops.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    },
+    {
+      "module_id": "pytra.utils.assertions",
+      "input": "/workspace/Pytra/src/pytra/utils/assertions.py",
+      "output": "east3/pytra/utils/assertions.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/utils/assertions.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    }
+  ],
+  "global": {
+    "type_id_table": {
+      "intenum_basic.Status": 1000
+    },
+    "type_id_base_map": {
+      "intenum_basic.Status": 8
+    },
+    "call_graph": {
+      "intenum_basic::__main__": [
+        "intenum_basic::run_intenum_basic"
+      ],
+      "intenum_basic::run_intenum_basic": [
+        "pytra.utils.assertions::py_assert_all",
+        "pytra.utils.assertions::py_assert_eq"
+      ],
+      "pytra.built_in.io_ops::py_print": [],
+      "pytra.utils.assertions::_eq_any": [],
+      "pytra.utils.assertions::py_assert_all": [],
+      "pytra.utils.assertions::py_assert_eq": [
+        "pytra.utils.assertions::_eq_any"
+      ],
+      "pytra.utils.assertions::py_assert_stdout": [],
+      "pytra.utils.assertions::py_assert_true": []
+    },
+    "sccs": [
+      [
+        "pytra.utils.assertions::py_assert_all"
+      ],
+      [
+        "pytra.utils.assertions::_eq_any"
+      ],
+      [
+        "pytra.utils.assertions::py_assert_eq"
+      ],
+      [
+        "intenum_basic::run_intenum_basic"
+      ],
+      [
+        "intenum_basic::__main__"
+      ],
+      [
+        "pytra.built_in.io_ops::py_print"
+      ],
+      [
+        "pytra.utils.assertions::py_assert_stdout"
+      ],
+      [
+        "pytra.utils.assertions::py_assert_true"
+      ]
+    ],
+    "non_escape_summary": {},
+    "container_ownership_hints_v1": {}
+  },
+  "diagnostics": {
+    "warnings": [],
+    "errors": []
+  }
+}

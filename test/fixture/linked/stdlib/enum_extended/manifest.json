@@ -1,0 +1,95 @@
+{
+  "schema": "pytra.link_output.v1",
+  "target": "cpp",
+  "dispatch_mode": "native",
+  "entry_modules": [
+    "enum_extended"
+  ],
+  "modules": [
+    {
+      "module_id": "enum_extended",
+      "input": "test/fixture/source/py/stdlib/enum_extended.py",
+      "output": "east3/enum_extended.east3.json",
+      "source_path": "test/fixture/source/py/stdlib/enum_extended.py",
+      "is_entry": true,
+      "module_kind": "user"
+    },
+    {
+      "module_id": "pytra.built_in.io_ops",
+      "input": "/workspace/Pytra/src/pytra/built_in/io_ops.py",
+      "output": "east3/pytra/built_in/io_ops.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/built_in/io_ops.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    },
+    {
+      "module_id": "pytra.utils.assertions",
+      "input": "/workspace/Pytra/src/pytra/utils/assertions.py",
+      "output": "east3/pytra/utils/assertions.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/utils/assertions.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    }
+  ],
+  "global": {
+    "type_id_table": {
+      "enum_extended.Color": 1000,
+      "enum_extended.Perm": 1001,
+      "enum_extended.Status": 1002
+    },
+    "type_id_base_map": {
+      "enum_extended.Color": 8,
+      "enum_extended.Perm": 8,
+      "enum_extended.Status": 8
+    },
+    "call_graph": {
+      "enum_extended::__main__": [
+        "enum_extended::run_enum_extended"
+      ],
+      "enum_extended::run_enum_extended": [
+        "pytra.utils.assertions::py_assert_all",
+        "pytra.utils.assertions::py_assert_eq"
+      ],
+      "pytra.built_in.io_ops::py_print": [],
+      "pytra.utils.assertions::_eq_any": [],
+      "pytra.utils.assertions::py_assert_all": [],
+      "pytra.utils.assertions::py_assert_eq": [
+        "pytra.utils.assertions::_eq_any"
+      ],
+      "pytra.utils.assertions::py_assert_stdout": [],
+      "pytra.utils.assertions::py_assert_true": []
+    },
+    "sccs": [
+      [
+        "pytra.utils.assertions::py_assert_all"
+      ],
+      [
+        "pytra.utils.assertions::_eq_any"
+      ],
+      [
+        "pytra.utils.assertions::py_assert_eq"
+      ],
+      [
+        "enum_extended::run_enum_extended"
+      ],
+      [
+        "enum_extended::__main__"
+      ],
+      [
+        "pytra.built_in.io_ops::py_print"
+      ],
+      [
+        "pytra.utils.assertions::py_assert_stdout"
+      ],
+      [
+        "pytra.utils.assertions::py_assert_true"
+      ]
+    ],
+    "non_escape_summary": {},
+    "container_ownership_hints_v1": {}
+  },
+  "diagnostics": {
+    "warnings": [],
+    "errors": []
+  }
+}

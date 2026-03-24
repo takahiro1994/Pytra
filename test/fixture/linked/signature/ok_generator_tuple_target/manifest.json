@@ -1,0 +1,84 @@
+{
+  "schema": "pytra.link_output.v1",
+  "target": "cpp",
+  "dispatch_mode": "native",
+  "entry_modules": [
+    "ok_generator_tuple_target"
+  ],
+  "modules": [
+    {
+      "module_id": "ok_generator_tuple_target",
+      "input": "test/fixture/source/py/signature/ok_generator_tuple_target.py",
+      "output": "east3/ok_generator_tuple_target.east3.json",
+      "source_path": "test/fixture/source/py/signature/ok_generator_tuple_target.py",
+      "is_entry": true,
+      "module_kind": "user"
+    },
+    {
+      "module_id": "pytra.built_in.io_ops",
+      "input": "/workspace/Pytra/src/pytra/built_in/io_ops.py",
+      "output": "east3/pytra/built_in/io_ops.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/built_in/io_ops.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    },
+    {
+      "module_id": "pytra.built_in.sequence",
+      "input": "/workspace/Pytra/src/pytra/built_in/sequence.py",
+      "output": "east3/pytra/built_in/sequence.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/built_in/sequence.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    },
+    {
+      "module_id": "pytra.built_in.zip_ops",
+      "input": "/workspace/Pytra/src/pytra/built_in/zip_ops.py",
+      "output": "east3/pytra/built_in/zip_ops.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/built_in/zip_ops.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    }
+  ],
+  "global": {
+    "type_id_table": {},
+    "type_id_base_map": {},
+    "call_graph": {
+      "ok_generator_tuple_target::__main__": [
+        "ok_generator_tuple_target::linear"
+      ],
+      "ok_generator_tuple_target::linear": [
+        "pytra.built_in.zip_ops::zip"
+      ],
+      "pytra.built_in.io_ops::py_print": [],
+      "pytra.built_in.sequence::py_range": [],
+      "pytra.built_in.sequence::py_repeat": [],
+      "pytra.built_in.zip_ops::zip": []
+    },
+    "sccs": [
+      [
+        "pytra.built_in.zip_ops::zip"
+      ],
+      [
+        "ok_generator_tuple_target::linear"
+      ],
+      [
+        "ok_generator_tuple_target::__main__"
+      ],
+      [
+        "pytra.built_in.io_ops::py_print"
+      ],
+      [
+        "pytra.built_in.sequence::py_range"
+      ],
+      [
+        "pytra.built_in.sequence::py_repeat"
+      ]
+    ],
+    "non_escape_summary": {},
+    "container_ownership_hints_v1": {}
+  },
+  "diagnostics": {
+    "warnings": [],
+    "errors": []
+  }
+}

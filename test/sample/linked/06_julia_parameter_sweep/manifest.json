@@ -1,0 +1,199 @@
+{
+  "schema": "pytra.link_output.v1",
+  "target": "cpp",
+  "dispatch_mode": "native",
+  "entry_modules": [
+    "06_julia_parameter_sweep"
+  ],
+  "modules": [
+    {
+      "module_id": "06_julia_parameter_sweep",
+      "input": "sample/py/06_julia_parameter_sweep.py",
+      "output": "east3/06_julia_parameter_sweep.east3.json",
+      "source_path": "sample/py/06_julia_parameter_sweep.py",
+      "is_entry": true,
+      "module_kind": "user"
+    },
+    {
+      "module_id": "pytra.built_in.io_ops",
+      "input": "/workspace/Pytra/src/pytra/built_in/io_ops.py",
+      "output": "east3/pytra/built_in/io_ops.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/built_in/io_ops.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    },
+    {
+      "module_id": "pytra.built_in.scalar_ops",
+      "input": "/workspace/Pytra/src/pytra/built_in/scalar_ops.py",
+      "output": "east3/pytra/built_in/scalar_ops.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/built_in/scalar_ops.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    },
+    {
+      "module_id": "pytra.built_in.sequence",
+      "input": "/workspace/Pytra/src/pytra/built_in/sequence.py",
+      "output": "east3/pytra/built_in/sequence.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/built_in/sequence.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    },
+    {
+      "module_id": "pytra.std.math",
+      "input": "/workspace/Pytra/src/pytra/std/math.py",
+      "output": "east3/pytra/std/math.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/std/math.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    },
+    {
+      "module_id": "pytra.std.time",
+      "input": "/workspace/Pytra/src/pytra/std/time.py",
+      "output": "east3/pytra/std/time.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/std/time.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    },
+    {
+      "module_id": "pytra.utils.gif",
+      "input": "/workspace/Pytra/src/pytra/utils/gif.py",
+      "output": "east3/pytra/utils/gif.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/utils/gif.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    }
+  ],
+  "global": {
+    "type_id_table": {},
+    "type_id_base_map": {},
+    "call_graph": {
+      "06_julia_parameter_sweep::__main__": [
+        "06_julia_parameter_sweep::run_06_julia_parameter_sweep"
+      ],
+      "06_julia_parameter_sweep::julia_palette": [],
+      "06_julia_parameter_sweep::render_frame": [],
+      "06_julia_parameter_sweep::run_06_julia_parameter_sweep": [
+        "06_julia_parameter_sweep::julia_palette",
+        "06_julia_parameter_sweep::render_frame",
+        "pytra.std.time::perf_counter",
+        "pytra.utils.gif::save_gif"
+      ],
+      "pytra.built_in.io_ops::py_print": [],
+      "pytra.built_in.scalar_ops::py_chr": [],
+      "pytra.built_in.scalar_ops::py_ord": [],
+      "pytra.built_in.scalar_ops::py_to_int64_base": [],
+      "pytra.built_in.sequence::py_range": [],
+      "pytra.built_in.sequence::py_repeat": [],
+      "pytra.std.math::ceil": [],
+      "pytra.std.math::cos": [],
+      "pytra.std.math::exp": [],
+      "pytra.std.math::fabs": [],
+      "pytra.std.math::floor": [],
+      "pytra.std.math::log": [],
+      "pytra.std.math::log10": [],
+      "pytra.std.math::pow": [],
+      "pytra.std.math::sin": [],
+      "pytra.std.math::sqrt": [],
+      "pytra.std.math::tan": [],
+      "pytra.std.time::perf_counter": [],
+      "pytra.utils.gif::_gif_append_list": [],
+      "pytra.utils.gif::_gif_u16le": [],
+      "pytra.utils.gif::_lzw_encode": [],
+      "pytra.utils.gif::grayscale_palette": [],
+      "pytra.utils.gif::save_gif": [
+        "pytra.utils.gif::_gif_append_list",
+        "pytra.utils.gif::_gif_u16le",
+        "pytra.utils.gif::_lzw_encode"
+      ]
+    },
+    "sccs": [
+      [
+        "06_julia_parameter_sweep::julia_palette"
+      ],
+      [
+        "06_julia_parameter_sweep::render_frame"
+      ],
+      [
+        "pytra.std.time::perf_counter"
+      ],
+      [
+        "pytra.utils.gif::_gif_append_list"
+      ],
+      [
+        "pytra.utils.gif::_gif_u16le"
+      ],
+      [
+        "pytra.utils.gif::_lzw_encode"
+      ],
+      [
+        "pytra.utils.gif::save_gif"
+      ],
+      [
+        "06_julia_parameter_sweep::run_06_julia_parameter_sweep"
+      ],
+      [
+        "06_julia_parameter_sweep::__main__"
+      ],
+      [
+        "pytra.built_in.io_ops::py_print"
+      ],
+      [
+        "pytra.built_in.scalar_ops::py_chr"
+      ],
+      [
+        "pytra.built_in.scalar_ops::py_ord"
+      ],
+      [
+        "pytra.built_in.scalar_ops::py_to_int64_base"
+      ],
+      [
+        "pytra.built_in.sequence::py_range"
+      ],
+      [
+        "pytra.built_in.sequence::py_repeat"
+      ],
+      [
+        "pytra.std.math::ceil"
+      ],
+      [
+        "pytra.std.math::cos"
+      ],
+      [
+        "pytra.std.math::exp"
+      ],
+      [
+        "pytra.std.math::fabs"
+      ],
+      [
+        "pytra.std.math::floor"
+      ],
+      [
+        "pytra.std.math::log"
+      ],
+      [
+        "pytra.std.math::log10"
+      ],
+      [
+        "pytra.std.math::pow"
+      ],
+      [
+        "pytra.std.math::sin"
+      ],
+      [
+        "pytra.std.math::sqrt"
+      ],
+      [
+        "pytra.std.math::tan"
+      ],
+      [
+        "pytra.utils.gif::grayscale_palette"
+      ]
+    ],
+    "non_escape_summary": {},
+    "container_ownership_hints_v1": {}
+  },
+  "diagnostics": {
+    "warnings": [],
+    "errors": []
+  }
+}

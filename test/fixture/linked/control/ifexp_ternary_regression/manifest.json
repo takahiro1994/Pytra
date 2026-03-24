@@ -1,0 +1,111 @@
+{
+  "schema": "pytra.link_output.v1",
+  "target": "cpp",
+  "dispatch_mode": "native",
+  "entry_modules": [
+    "ifexp_ternary_regression"
+  ],
+  "modules": [
+    {
+      "module_id": "ifexp_ternary_regression",
+      "input": "test/fixture/source/py/control/ifexp_ternary_regression.py",
+      "output": "east3/ifexp_ternary_regression.east3.json",
+      "source_path": "test/fixture/source/py/control/ifexp_ternary_regression.py",
+      "is_entry": true,
+      "module_kind": "user"
+    },
+    {
+      "module_id": "pytra.built_in.io_ops",
+      "input": "/workspace/Pytra/src/pytra/built_in/io_ops.py",
+      "output": "east3/pytra/built_in/io_ops.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/built_in/io_ops.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    },
+    {
+      "module_id": "pytra.utils.assertions",
+      "input": "/workspace/Pytra/src/pytra/utils/assertions.py",
+      "output": "east3/pytra/utils/assertions.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/utils/assertions.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    }
+  ],
+  "global": {
+    "type_id_table": {},
+    "type_id_base_map": {},
+    "call_graph": {
+      "ifexp_ternary_regression::__main__": [
+        "pytra.utils.assertions::py_assert_stdout"
+      ],
+      "ifexp_ternary_regression::_case_main": [
+        "ifexp_ternary_regression::make_dict",
+        "ifexp_ternary_regression::make_list",
+        "ifexp_ternary_regression::pass_arg",
+        "ifexp_ternary_regression::pick"
+      ],
+      "ifexp_ternary_regression::make_dict": [],
+      "ifexp_ternary_regression::make_list": [],
+      "ifexp_ternary_regression::pass_arg": [
+        "ifexp_ternary_regression::passthrough"
+      ],
+      "ifexp_ternary_regression::passthrough": [],
+      "ifexp_ternary_regression::pick": [],
+      "pytra.built_in.io_ops::py_print": [],
+      "pytra.utils.assertions::_eq_any": [],
+      "pytra.utils.assertions::py_assert_all": [],
+      "pytra.utils.assertions::py_assert_eq": [
+        "pytra.utils.assertions::_eq_any"
+      ],
+      "pytra.utils.assertions::py_assert_stdout": [],
+      "pytra.utils.assertions::py_assert_true": []
+    },
+    "sccs": [
+      [
+        "pytra.utils.assertions::py_assert_stdout"
+      ],
+      [
+        "ifexp_ternary_regression::__main__"
+      ],
+      [
+        "ifexp_ternary_regression::make_dict"
+      ],
+      [
+        "ifexp_ternary_regression::make_list"
+      ],
+      [
+        "ifexp_ternary_regression::passthrough"
+      ],
+      [
+        "ifexp_ternary_regression::pass_arg"
+      ],
+      [
+        "ifexp_ternary_regression::pick"
+      ],
+      [
+        "ifexp_ternary_regression::_case_main"
+      ],
+      [
+        "pytra.built_in.io_ops::py_print"
+      ],
+      [
+        "pytra.utils.assertions::_eq_any"
+      ],
+      [
+        "pytra.utils.assertions::py_assert_all"
+      ],
+      [
+        "pytra.utils.assertions::py_assert_eq"
+      ],
+      [
+        "pytra.utils.assertions::py_assert_true"
+      ]
+    ],
+    "non_escape_summary": {},
+    "container_ownership_hints_v1": {}
+  },
+  "diagnostics": {
+    "warnings": [],
+    "errors": []
+  }
+}

@@ -1,0 +1,115 @@
+{
+  "schema": "pytra.link_output.v1",
+  "target": "cpp",
+  "dispatch_mode": "native",
+  "entry_modules": [
+    "inheritance_virtual_dispatch_multilang"
+  ],
+  "modules": [
+    {
+      "module_id": "inheritance_virtual_dispatch_multilang",
+      "input": "test/fixture/source/py/oop/inheritance_virtual_dispatch_multilang.py",
+      "output": "east3/inheritance_virtual_dispatch_multilang.east3.json",
+      "source_path": "test/fixture/source/py/oop/inheritance_virtual_dispatch_multilang.py",
+      "is_entry": true,
+      "module_kind": "user"
+    },
+    {
+      "module_id": "pytra.built_in.io_ops",
+      "input": "/workspace/Pytra/src/pytra/built_in/io_ops.py",
+      "output": "east3/pytra/built_in/io_ops.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/built_in/io_ops.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    },
+    {
+      "module_id": "pytra.utils.assertions",
+      "input": "/workspace/Pytra/src/pytra/utils/assertions.py",
+      "output": "east3/pytra/utils/assertions.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/utils/assertions.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    }
+  ],
+  "global": {
+    "type_id_table": {
+      "inheritance_virtual_dispatch_multilang.Animal": 1000,
+      "inheritance_virtual_dispatch_multilang.Dog": 1001,
+      "inheritance_virtual_dispatch_multilang.LoudDog": 1002
+    },
+    "type_id_base_map": {
+      "inheritance_virtual_dispatch_multilang.Animal": 8,
+      "inheritance_virtual_dispatch_multilang.Dog": 1000,
+      "inheritance_virtual_dispatch_multilang.LoudDog": 1001
+    },
+    "call_graph": {
+      "inheritance_virtual_dispatch_multilang::Animal.speak": [],
+      "inheritance_virtual_dispatch_multilang::Dog.speak": [],
+      "inheritance_virtual_dispatch_multilang::LoudDog.speak": [],
+      "inheritance_virtual_dispatch_multilang::__main__": [
+        "pytra.utils.assertions::py_assert_stdout"
+      ],
+      "inheritance_virtual_dispatch_multilang::_case_main": [
+        "inheritance_virtual_dispatch_multilang::call_via_animal",
+        "inheritance_virtual_dispatch_multilang::call_via_dog"
+      ],
+      "inheritance_virtual_dispatch_multilang::call_via_animal": [],
+      "inheritance_virtual_dispatch_multilang::call_via_dog": [],
+      "pytra.built_in.io_ops::py_print": [],
+      "pytra.utils.assertions::_eq_any": [],
+      "pytra.utils.assertions::py_assert_all": [],
+      "pytra.utils.assertions::py_assert_eq": [
+        "pytra.utils.assertions::_eq_any"
+      ],
+      "pytra.utils.assertions::py_assert_stdout": [],
+      "pytra.utils.assertions::py_assert_true": []
+    },
+    "sccs": [
+      [
+        "inheritance_virtual_dispatch_multilang::Animal.speak"
+      ],
+      [
+        "inheritance_virtual_dispatch_multilang::Dog.speak"
+      ],
+      [
+        "inheritance_virtual_dispatch_multilang::LoudDog.speak"
+      ],
+      [
+        "pytra.utils.assertions::py_assert_stdout"
+      ],
+      [
+        "inheritance_virtual_dispatch_multilang::__main__"
+      ],
+      [
+        "inheritance_virtual_dispatch_multilang::call_via_animal"
+      ],
+      [
+        "inheritance_virtual_dispatch_multilang::call_via_dog"
+      ],
+      [
+        "inheritance_virtual_dispatch_multilang::_case_main"
+      ],
+      [
+        "pytra.built_in.io_ops::py_print"
+      ],
+      [
+        "pytra.utils.assertions::_eq_any"
+      ],
+      [
+        "pytra.utils.assertions::py_assert_all"
+      ],
+      [
+        "pytra.utils.assertions::py_assert_eq"
+      ],
+      [
+        "pytra.utils.assertions::py_assert_true"
+      ]
+    ],
+    "non_escape_summary": {},
+    "container_ownership_hints_v1": {}
+  },
+  "diagnostics": {
+    "warnings": [],
+    "errors": []
+  }
+}

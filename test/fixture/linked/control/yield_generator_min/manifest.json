@@ -1,0 +1,58 @@
+{
+  "schema": "pytra.link_output.v1",
+  "target": "cpp",
+  "dispatch_mode": "native",
+  "entry_modules": [
+    "yield_generator_min"
+  ],
+  "modules": [
+    {
+      "module_id": "pytra.built_in.io_ops",
+      "input": "/workspace/Pytra/src/pytra/built_in/io_ops.py",
+      "output": "east3/pytra/built_in/io_ops.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/built_in/io_ops.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    },
+    {
+      "module_id": "yield_generator_min",
+      "input": "test/fixture/source/py/control/yield_generator_min.py",
+      "output": "east3/yield_generator_min.east3.json",
+      "source_path": "test/fixture/source/py/control/yield_generator_min.py",
+      "is_entry": true,
+      "module_kind": "user"
+    }
+  ],
+  "global": {
+    "type_id_table": {},
+    "type_id_base_map": {},
+    "call_graph": {
+      "pytra.built_in.io_ops::py_print": [],
+      "yield_generator_min::__main__": [],
+      "yield_generator_min::__pytra_main": [
+        "yield_generator_min::gen"
+      ],
+      "yield_generator_min::gen": []
+    },
+    "sccs": [
+      [
+        "pytra.built_in.io_ops::py_print"
+      ],
+      [
+        "yield_generator_min::__main__"
+      ],
+      [
+        "yield_generator_min::gen"
+      ],
+      [
+        "yield_generator_min::__pytra_main"
+      ]
+    ],
+    "non_escape_summary": {},
+    "container_ownership_hints_v1": {}
+  },
+  "diagnostics": {
+    "warnings": [],
+    "errors": []
+  }
+}

@@ -8,6 +8,7 @@
   -resolve    *.py.east1 → *.east2    型解決 + 正規化 (言語固有→言語非依存)
   -compile    *.east2 → *.east3       core lowering (言語非依存)
   -optimize   *.east3 → *.east3       whole-program 最適化
+  -link       *.east3 → manifest.json multi-module 結合
   -emit       *.east3 → *.cpp 等      target コード生成
   -build      .py → target            一括実行
 
@@ -378,6 +379,105 @@ def cmd_optimize(args: list[str]) -> int:
 
 
 # ---------------------------------------------------------------------------
+# link: *.east3 → manifest.json + linked east3 群
+# ---------------------------------------------------------------------------
+
+def _write_link_output(result: LinkResult, output_dir: Path, pretty: bool) -> int:
+    """Write manifest.json and linked east3 files to output_dir."""
+    output_dir.mkdir(parents=True, exist_ok=True)
+    indent = 2 if pretty else None
+
+    # Write manifest.json
+    manifest_path = output_dir / "manifest.json"
+    manifest_path.write_text(
+        json.dumps(result.manifest, ensure_ascii=False, indent=indent) + "\n",
+        encoding="utf-8",
+    )
+
+    # Write linked east3 files
+    for module in result.linked_modules:
+        rel_path = module.module_id.replace(".", "/") + ".east3.json"
+        out_path = output_dir / "east3" / rel_path
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        out_path.write_text(
+            json.dumps(module.east_doc, ensure_ascii=False, indent=indent) + "\n",
+            encoding="utf-8",
+        )
+
+    print("linked: " + str(manifest_path) + " (" + str(len(result.linked_modules)) + " modules)")
+    return 0
+
+
+def cmd_link(args: list[str]) -> int:
+    """link サブコマンド: *.east3 → manifest.json + linked east3 群"""
+    inputs: list[str] = []
+    output_text = ""
+    target = "cpp"
+    dispatch_mode = "native"
+    pretty = True  # default to pretty for linked output
+
+    i = 0
+    while i < len(args):
+        tok = args[i]
+        if tok == "-o" or tok == "--output":
+            if i + 1 >= len(args):
+                print("error: missing value for " + tok)
+                return 1
+            output_text = args[i + 1]
+            i += 2
+            continue
+        if tok == "--target":
+            if i + 1 >= len(args):
+                print("error: missing value for --target")
+                return 1
+            target = args[i + 1]
+            i += 2
+            continue
+        if tok == "--dispatch-mode":
+            if i + 1 >= len(args):
+                print("error: missing value for --dispatch-mode")
+                return 1
+            dispatch_mode = args[i + 1]
+            i += 2
+            continue
+        if tok == "--pretty":
+            pretty = True
+            i += 1
+            continue
+        if tok == "--compact":
+            pretty = False
+            i += 1
+            continue
+        if tok == "-h" or tok == "--help":
+            print("usage: pytra-cli2 -link INPUT1.east3 [INPUT2.east3 ...] [-o OUTPUT_DIR] [--target TARGET] [--dispatch-mode MODE]")
+            return 0
+        if not tok.startswith("-"):
+            inputs.append(tok)
+        i += 1
+
+    if len(inputs) == 0:
+        print("error: at least one input file is required")
+        return 1
+
+    from toolchain2.link.linker import link_modules as _link_modules
+    from toolchain2.link.linker import LinkResult as _LinkResult
+
+    try:
+        result = _link_modules(inputs, target=target, dispatch_mode=dispatch_mode)
+    except Exception as e:
+        print("error: link failed: " + str(e))
+        return 1
+
+    if output_text == "":
+        # Default: output to work/tmp/linked/
+        output_dir = Path("work/tmp/linked")
+    else:
+        output_dir = Path(output_text)
+
+    return _write_link_output(result, output_dir, pretty)
+
+
+# ---------------------------------------------------------------------------
 # emit: *.east3 → target (未実装)
 # ---------------------------------------------------------------------------
 
@@ -404,6 +504,7 @@ _COMMANDS = {
     "-resolve": cmd_resolve,
     "-compile": cmd_compile,
     "-optimize": cmd_optimize,
+    "-link": cmd_link,
     "-emit": cmd_emit,
     "-build": cmd_build,
 }
@@ -419,6 +520,7 @@ def main() -> int:
         print("  -resolve    *.py.east1 -> *.east2    (type resolve + normalize)")
         print("  -compile    *.east2 -> *.east3       (core lowering)")
         print("  -optimize   *.east3 -> *.east3       (whole-program optimization)")
+        print("  -link       *.east3 -> manifest.json  (multi-module linking)")
         print("  -emit       *.east3 -> target         (code generation)")
         print("  -build      .py -> target             (all-in-one)")
         print("")

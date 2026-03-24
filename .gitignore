@@ -28,6 +28,10 @@ __pycache__/
 /app.o
 /*.out
 
+# Linked golden east3 files (regenerable from manifest.json + east3-opt inputs)
+test/fixture/linked/*/east3/
+test/sample/linked/*/east3/
+
 # Deprecated generated runtime directory (must not be used)
 src/runtime/cpp/generated/
 

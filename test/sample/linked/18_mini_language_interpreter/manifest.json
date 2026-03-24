@@ -1,0 +1,383 @@
+{
+  "schema": "pytra.link_output.v1",
+  "target": "cpp",
+  "dispatch_mode": "native",
+  "entry_modules": [
+    "18_mini_language_interpreter"
+  ],
+  "modules": [
+    {
+      "module_id": "18_mini_language_interpreter",
+      "input": "sample/py/18_mini_language_interpreter.py",
+      "output": "east3/18_mini_language_interpreter.east3.json",
+      "source_path": "sample/py/18_mini_language_interpreter.py",
+      "is_entry": true,
+      "module_kind": "user"
+    },
+    {
+      "module_id": "pytra.built_in.io_ops",
+      "input": "/workspace/Pytra/src/pytra/built_in/io_ops.py",
+      "output": "east3/pytra/built_in/io_ops.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/built_in/io_ops.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    },
+    {
+      "module_id": "pytra.built_in.iter_ops",
+      "input": "/workspace/Pytra/src/pytra/built_in/iter_ops.py",
+      "output": "east3/pytra/built_in/iter_ops.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/built_in/iter_ops.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    },
+    {
+      "module_id": "pytra.built_in.scalar_ops",
+      "input": "/workspace/Pytra/src/pytra/built_in/scalar_ops.py",
+      "output": "east3/pytra/built_in/scalar_ops.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/built_in/scalar_ops.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    },
+    {
+      "module_id": "pytra.built_in.sequence",
+      "input": "/workspace/Pytra/src/pytra/built_in/sequence.py",
+      "output": "east3/pytra/built_in/sequence.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/built_in/sequence.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    },
+    {
+      "module_id": "pytra.std.glob",
+      "input": "/workspace/Pytra/src/pytra/std/glob.py",
+      "output": "east3/pytra/std/glob.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/std/glob.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    },
+    {
+      "module_id": "pytra.std.os",
+      "input": "src/pytra/std/os.py",
+      "output": "east3/pytra/std/os.east3.json",
+      "source_path": "src/pytra/std/os.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    },
+    {
+      "module_id": "pytra.std.os_path",
+      "input": "/workspace/Pytra/src/pytra/std/os_path.py",
+      "output": "east3/pytra/std/os_path.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/std/os_path.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    },
+    {
+      "module_id": "pytra.std.pathlib",
+      "input": "/workspace/Pytra/src/pytra/std/pathlib.py",
+      "output": "east3/pytra/std/pathlib.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/std/pathlib.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    },
+    {
+      "module_id": "pytra.std.time",
+      "input": "/workspace/Pytra/src/pytra/std/time.py",
+      "output": "east3/pytra/std/time.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/std/time.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    }
+  ],
+  "global": {
+    "type_id_table": {
+      "18_mini_language_interpreter.ExprNode": 1000,
+      "18_mini_language_interpreter.Parser": 1001,
+      "18_mini_language_interpreter.StmtNode": 1002,
+      "18_mini_language_interpreter.Token": 1003,
+      "pytra.std.pathlib.Path": 1004
+    },
+    "type_id_base_map": {
+      "18_mini_language_interpreter.ExprNode": 8,
+      "18_mini_language_interpreter.Parser": 8,
+      "18_mini_language_interpreter.StmtNode": 8,
+      "18_mini_language_interpreter.Token": 8,
+      "pytra.std.pathlib.Path": 8
+    },
+    "call_graph": {
+      "18_mini_language_interpreter::Parser.__init__": [],
+      "18_mini_language_interpreter::Parser.add_expr": [],
+      "18_mini_language_interpreter::Parser.current_token": [],
+      "18_mini_language_interpreter::Parser.expect": [],
+      "18_mini_language_interpreter::Parser.match": [],
+      "18_mini_language_interpreter::Parser.new_expr_nodes": [],
+      "18_mini_language_interpreter::Parser.parse_add": [],
+      "18_mini_language_interpreter::Parser.parse_expr": [],
+      "18_mini_language_interpreter::Parser.parse_mul": [],
+      "18_mini_language_interpreter::Parser.parse_primary": [],
+      "18_mini_language_interpreter::Parser.parse_program": [],
+      "18_mini_language_interpreter::Parser.parse_stmt": [],
+      "18_mini_language_interpreter::Parser.parse_unary": [],
+      "18_mini_language_interpreter::Parser.peek_kind": [],
+      "18_mini_language_interpreter::Parser.previous_token": [],
+      "18_mini_language_interpreter::Parser.skip_newlines": [],
+      "18_mini_language_interpreter::__main__": [],
+      "18_mini_language_interpreter::__pytra_main": [
+        "18_mini_language_interpreter::run_benchmark",
+        "18_mini_language_interpreter::run_demo"
+      ],
+      "18_mini_language_interpreter::build_benchmark_source": [],
+      "18_mini_language_interpreter::eval_expr": [
+        "18_mini_language_interpreter::eval_expr"
+      ],
+      "18_mini_language_interpreter::execute": [
+        "18_mini_language_interpreter::eval_expr"
+      ],
+      "18_mini_language_interpreter::run_benchmark": [
+        "18_mini_language_interpreter::build_benchmark_source",
+        "18_mini_language_interpreter::execute",
+        "18_mini_language_interpreter::tokenize",
+        "pytra.std.time::perf_counter"
+      ],
+      "18_mini_language_interpreter::run_demo": [
+        "18_mini_language_interpreter::execute",
+        "18_mini_language_interpreter::tokenize"
+      ],
+      "18_mini_language_interpreter::tokenize": [],
+      "pytra.built_in.io_ops::py_print": [],
+      "pytra.built_in.iter_ops::py_enumerate_object": [],
+      "pytra.built_in.iter_ops::py_reversed_object": [],
+      "pytra.built_in.scalar_ops::py_chr": [],
+      "pytra.built_in.scalar_ops::py_ord": [],
+      "pytra.built_in.scalar_ops::py_to_int64_base": [],
+      "pytra.built_in.sequence::py_range": [],
+      "pytra.built_in.sequence::py_repeat": [],
+      "pytra.std.glob::glob": [],
+      "pytra.std.os::getcwd": [],
+      "pytra.std.os::makedirs": [],
+      "pytra.std.os::mkdir": [],
+      "pytra.std.os_path::abspath": [],
+      "pytra.std.os_path::basename": [],
+      "pytra.std.os_path::dirname": [],
+      "pytra.std.os_path::exists": [],
+      "pytra.std.os_path::join": [],
+      "pytra.std.os_path::splitext": [],
+      "pytra.std.pathlib::Path.__fspath__": [],
+      "pytra.std.pathlib::Path.__init__": [],
+      "pytra.std.pathlib::Path.__repr__": [],
+      "pytra.std.pathlib::Path.__str__": [],
+      "pytra.std.pathlib::Path.__truediv__": [],
+      "pytra.std.pathlib::Path.cwd": [],
+      "pytra.std.pathlib::Path.exists": [],
+      "pytra.std.pathlib::Path.glob": [],
+      "pytra.std.pathlib::Path.joinpath": [],
+      "pytra.std.pathlib::Path.mkdir": [],
+      "pytra.std.pathlib::Path.name": [],
+      "pytra.std.pathlib::Path.parent": [],
+      "pytra.std.pathlib::Path.parents": [],
+      "pytra.std.pathlib::Path.read_text": [],
+      "pytra.std.pathlib::Path.relative_to": [],
+      "pytra.std.pathlib::Path.resolve": [],
+      "pytra.std.pathlib::Path.stem": [],
+      "pytra.std.pathlib::Path.suffix": [],
+      "pytra.std.pathlib::Path.with_suffix": [],
+      "pytra.std.pathlib::Path.write_text": [],
+      "pytra.std.time::perf_counter": []
+    },
+    "sccs": [
+      [
+        "18_mini_language_interpreter::Parser.__init__"
+      ],
+      [
+        "18_mini_language_interpreter::Parser.add_expr"
+      ],
+      [
+        "18_mini_language_interpreter::Parser.current_token"
+      ],
+      [
+        "18_mini_language_interpreter::Parser.expect"
+      ],
+      [
+        "18_mini_language_interpreter::Parser.match"
+      ],
+      [
+        "18_mini_language_interpreter::Parser.new_expr_nodes"
+      ],
+      [
+        "18_mini_language_interpreter::Parser.parse_add"
+      ],
+      [
+        "18_mini_language_interpreter::Parser.parse_expr"
+      ],
+      [
+        "18_mini_language_interpreter::Parser.parse_mul"
+      ],
+      [
+        "18_mini_language_interpreter::Parser.parse_primary"
+      ],
+      [
+        "18_mini_language_interpreter::Parser.parse_program"
+      ],
+      [
+        "18_mini_language_interpreter::Parser.parse_stmt"
+      ],
+      [
+        "18_mini_language_interpreter::Parser.parse_unary"
+      ],
+      [
+        "18_mini_language_interpreter::Parser.peek_kind"
+      ],
+      [
+        "18_mini_language_interpreter::Parser.previous_token"
+      ],
+      [
+        "18_mini_language_interpreter::Parser.skip_newlines"
+      ],
+      [
+        "18_mini_language_interpreter::__main__"
+      ],
+      [
+        "18_mini_language_interpreter::build_benchmark_source"
+      ],
+      [
+        "18_mini_language_interpreter::eval_expr"
+      ],
+      [
+        "18_mini_language_interpreter::execute"
+      ],
+      [
+        "18_mini_language_interpreter::tokenize"
+      ],
+      [
+        "pytra.std.time::perf_counter"
+      ],
+      [
+        "18_mini_language_interpreter::run_benchmark"
+      ],
+      [
+        "18_mini_language_interpreter::run_demo"
+      ],
+      [
+        "18_mini_language_interpreter::__pytra_main"
+      ],
+      [
+        "pytra.built_in.io_ops::py_print"
+      ],
+      [
+        "pytra.built_in.iter_ops::py_enumerate_object"
+      ],
+      [
+        "pytra.built_in.iter_ops::py_reversed_object"
+      ],
+      [
+        "pytra.built_in.scalar_ops::py_chr"
+      ],
+      [
+        "pytra.built_in.scalar_ops::py_ord"
+      ],
+      [
+        "pytra.built_in.scalar_ops::py_to_int64_base"
+      ],
+      [
+        "pytra.built_in.sequence::py_range"
+      ],
+      [
+        "pytra.built_in.sequence::py_repeat"
+      ],
+      [
+        "pytra.std.glob::glob"
+      ],
+      [
+        "pytra.std.os::getcwd"
+      ],
+      [
+        "pytra.std.os::makedirs"
+      ],
+      [
+        "pytra.std.os::mkdir"
+      ],
+      [
+        "pytra.std.os_path::abspath"
+      ],
+      [
+        "pytra.std.os_path::basename"
+      ],
+      [
+        "pytra.std.os_path::dirname"
+      ],
+      [
+        "pytra.std.os_path::exists"
+      ],
+      [
+        "pytra.std.os_path::join"
+      ],
+      [
+        "pytra.std.os_path::splitext"
+      ],
+      [
+        "pytra.std.pathlib::Path.__fspath__"
+      ],
+      [
+        "pytra.std.pathlib::Path.__init__"
+      ],
+      [
+        "pytra.std.pathlib::Path.__repr__"
+      ],
+      [
+        "pytra.std.pathlib::Path.__str__"
+      ],
+      [
+        "pytra.std.pathlib::Path.__truediv__"
+      ],
+      [
+        "pytra.std.pathlib::Path.cwd"
+      ],
+      [
+        "pytra.std.pathlib::Path.exists"
+      ],
+      [
+        "pytra.std.pathlib::Path.glob"
+      ],
+      [
+        "pytra.std.pathlib::Path.joinpath"
+      ],
+      [
+        "pytra.std.pathlib::Path.mkdir"
+      ],
+      [
+        "pytra.std.pathlib::Path.name"
+      ],
+      [
+        "pytra.std.pathlib::Path.parent"
+      ],
+      [
+        "pytra.std.pathlib::Path.parents"
+      ],
+      [
+        "pytra.std.pathlib::Path.read_text"
+      ],
+      [
+        "pytra.std.pathlib::Path.relative_to"
+      ],
+      [
+        "pytra.std.pathlib::Path.resolve"
+      ],
+      [
+        "pytra.std.pathlib::Path.stem"
+      ],
+      [
+        "pytra.std.pathlib::Path.suffix"
+      ],
+      [
+        "pytra.std.pathlib::Path.with_suffix"
+      ],
+      [
+        "pytra.std.pathlib::Path.write_text"
+      ]
+    ],
+    "non_escape_summary": {},
+    "container_ownership_hints_v1": {}
+  },
+  "diagnostics": {
+    "warnings": [],
+    "errors": []
+  }
+}

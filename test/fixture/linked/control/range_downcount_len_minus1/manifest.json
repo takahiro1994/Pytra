@@ -1,0 +1,60 @@
+{
+  "schema": "pytra.link_output.v1",
+  "target": "cpp",
+  "dispatch_mode": "native",
+  "entry_modules": [
+    "range_downcount_len_minus1"
+  ],
+  "modules": [
+    {
+      "module_id": "pytra.built_in.io_ops",
+      "input": "/workspace/Pytra/src/pytra/built_in/io_ops.py",
+      "output": "east3/pytra/built_in/io_ops.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/built_in/io_ops.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    },
+    {
+      "module_id": "range_downcount_len_minus1",
+      "input": "test/fixture/source/py/control/range_downcount_len_minus1.py",
+      "output": "east3/range_downcount_len_minus1.east3.json",
+      "source_path": "test/fixture/source/py/control/range_downcount_len_minus1.py",
+      "is_entry": true,
+      "module_kind": "user"
+    }
+  ],
+  "global": {
+    "type_id_table": {},
+    "type_id_base_map": {},
+    "call_graph": {
+      "pytra.built_in.io_ops::py_print": [],
+      "range_downcount_len_minus1::__main__": [
+        "range_downcount_len_minus1::_case_main"
+      ],
+      "range_downcount_len_minus1::_case_main": [
+        "range_downcount_len_minus1::sum_rev"
+      ],
+      "range_downcount_len_minus1::sum_rev": []
+    },
+    "sccs": [
+      [
+        "pytra.built_in.io_ops::py_print"
+      ],
+      [
+        "range_downcount_len_minus1::sum_rev"
+      ],
+      [
+        "range_downcount_len_minus1::_case_main"
+      ],
+      [
+        "range_downcount_len_minus1::__main__"
+      ]
+    ],
+    "non_escape_summary": {},
+    "container_ownership_hints_v1": {}
+  },
+  "diagnostics": {
+    "warnings": [],
+    "errors": []
+  }
+}

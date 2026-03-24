@@ -1,0 +1,60 @@
+{
+  "schema": "pytra.link_output.v1",
+  "target": "cpp",
+  "dispatch_mode": "native",
+  "entry_modules": [
+    "isinstance_tuple_check"
+  ],
+  "modules": [
+    {
+      "module_id": "isinstance_tuple_check",
+      "input": "test/fixture/source/py/typing/isinstance_tuple_check.py",
+      "output": "east3/isinstance_tuple_check.east3.json",
+      "source_path": "test/fixture/source/py/typing/isinstance_tuple_check.py",
+      "is_entry": true,
+      "module_kind": "user"
+    },
+    {
+      "module_id": "pytra.built_in.io_ops",
+      "input": "/workspace/Pytra/src/pytra/built_in/io_ops.py",
+      "output": "east3/pytra/built_in/io_ops.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/built_in/io_ops.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    }
+  ],
+  "global": {
+    "type_id_table": {
+      "isinstance_tuple_check.Cat": 1000,
+      "isinstance_tuple_check.Dog": 1001
+    },
+    "type_id_base_map": {
+      "isinstance_tuple_check.Cat": 8,
+      "isinstance_tuple_check.Dog": 8
+    },
+    "call_graph": {
+      "isinstance_tuple_check::__main__": [
+        "isinstance_tuple_check::is_pet"
+      ],
+      "isinstance_tuple_check::is_pet": [],
+      "pytra.built_in.io_ops::py_print": []
+    },
+    "sccs": [
+      [
+        "isinstance_tuple_check::is_pet"
+      ],
+      [
+        "isinstance_tuple_check::__main__"
+      ],
+      [
+        "pytra.built_in.io_ops::py_print"
+      ]
+    ],
+    "non_escape_summary": {},
+    "container_ownership_hints_v1": {}
+  },
+  "diagnostics": {
+    "warnings": [],
+    "errors": []
+  }
+}

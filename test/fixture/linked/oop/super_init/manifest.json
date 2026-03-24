@@ -1,0 +1,102 @@
+{
+  "schema": "pytra.link_output.v1",
+  "target": "cpp",
+  "dispatch_mode": "native",
+  "entry_modules": [
+    "super_init"
+  ],
+  "modules": [
+    {
+      "module_id": "pytra.built_in.io_ops",
+      "input": "/workspace/Pytra/src/pytra/built_in/io_ops.py",
+      "output": "east3/pytra/built_in/io_ops.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/built_in/io_ops.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    },
+    {
+      "module_id": "pytra.utils.assertions",
+      "input": "/workspace/Pytra/src/pytra/utils/assertions.py",
+      "output": "east3/pytra/utils/assertions.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/utils/assertions.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    },
+    {
+      "module_id": "super_init",
+      "input": "test/fixture/source/py/oop/super_init.py",
+      "output": "east3/super_init.east3.json",
+      "source_path": "test/fixture/source/py/oop/super_init.py",
+      "is_entry": true,
+      "module_kind": "user"
+    }
+  ],
+  "global": {
+    "type_id_table": {
+      "super_init.Base": 1000,
+      "super_init.Child": 1001
+    },
+    "type_id_base_map": {
+      "super_init.Base": 8,
+      "super_init.Child": 1000
+    },
+    "call_graph": {
+      "pytra.built_in.io_ops::py_print": [],
+      "pytra.utils.assertions::_eq_any": [],
+      "pytra.utils.assertions::py_assert_all": [],
+      "pytra.utils.assertions::py_assert_eq": [
+        "pytra.utils.assertions::_eq_any"
+      ],
+      "pytra.utils.assertions::py_assert_stdout": [],
+      "pytra.utils.assertions::py_assert_true": [],
+      "super_init::Base.__init__": [],
+      "super_init::Child.__init__": [],
+      "super_init::Child.get_value": [],
+      "super_init::__main__": [
+        "pytra.utils.assertions::py_assert_eq"
+      ],
+      "super_init::_case_main": []
+    },
+    "sccs": [
+      [
+        "pytra.built_in.io_ops::py_print"
+      ],
+      [
+        "pytra.utils.assertions::_eq_any"
+      ],
+      [
+        "pytra.utils.assertions::py_assert_all"
+      ],
+      [
+        "pytra.utils.assertions::py_assert_eq"
+      ],
+      [
+        "pytra.utils.assertions::py_assert_stdout"
+      ],
+      [
+        "pytra.utils.assertions::py_assert_true"
+      ],
+      [
+        "super_init::Base.__init__"
+      ],
+      [
+        "super_init::Child.__init__"
+      ],
+      [
+        "super_init::Child.get_value"
+      ],
+      [
+        "super_init::__main__"
+      ],
+      [
+        "super_init::_case_main"
+      ]
+    ],
+    "non_escape_summary": {},
+    "container_ownership_hints_v1": {}
+  },
+  "diagnostics": {
+    "warnings": [],
+    "errors": []
+  }
+}

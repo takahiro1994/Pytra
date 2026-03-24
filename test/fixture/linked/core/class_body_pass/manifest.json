@@ -1,0 +1,56 @@
+{
+  "schema": "pytra.link_output.v1",
+  "target": "cpp",
+  "dispatch_mode": "native",
+  "entry_modules": [
+    "class_body_pass"
+  ],
+  "modules": [
+    {
+      "module_id": "class_body_pass",
+      "input": "test/fixture/source/py/core/class_body_pass.py",
+      "output": "east3/class_body_pass.east3.json",
+      "source_path": "test/fixture/source/py/core/class_body_pass.py",
+      "is_entry": true,
+      "module_kind": "user"
+    },
+    {
+      "module_id": "pytra.built_in.io_ops",
+      "input": "/workspace/Pytra/src/pytra/built_in/io_ops.py",
+      "output": "east3/pytra/built_in/io_ops.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/built_in/io_ops.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    }
+  ],
+  "global": {
+    "type_id_table": {
+      "class_body_pass.Marker": 1000
+    },
+    "type_id_base_map": {
+      "class_body_pass.Marker": 8
+    },
+    "call_graph": {
+      "class_body_pass::__main__": [],
+      "class_body_pass::__pytra_main": [],
+      "pytra.built_in.io_ops::py_print": []
+    },
+    "sccs": [
+      [
+        "class_body_pass::__main__"
+      ],
+      [
+        "class_body_pass::__pytra_main"
+      ],
+      [
+        "pytra.built_in.io_ops::py_print"
+      ]
+    ],
+    "non_escape_summary": {},
+    "container_ownership_hints_v1": {}
+  },
+  "diagnostics": {
+    "warnings": [],
+    "errors": []
+  }
+}

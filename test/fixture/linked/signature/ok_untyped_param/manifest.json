@@ -1,0 +1,54 @@
+{
+  "schema": "pytra.link_output.v1",
+  "target": "cpp",
+  "dispatch_mode": "native",
+  "entry_modules": [
+    "ok_untyped_param"
+  ],
+  "modules": [
+    {
+      "module_id": "ok_untyped_param",
+      "input": "test/fixture/source/py/signature/ok_untyped_param.py",
+      "output": "east3/ok_untyped_param.east3.json",
+      "source_path": "test/fixture/source/py/signature/ok_untyped_param.py",
+      "is_entry": true,
+      "module_kind": "user"
+    },
+    {
+      "module_id": "pytra.built_in.io_ops",
+      "input": "/workspace/Pytra/src/pytra/built_in/io_ops.py",
+      "output": "east3/pytra/built_in/io_ops.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/built_in/io_ops.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    }
+  ],
+  "global": {
+    "type_id_table": {},
+    "type_id_base_map": {},
+    "call_graph": {
+      "ok_untyped_param::__main__": [
+        "ok_untyped_param::twice"
+      ],
+      "ok_untyped_param::twice": [],
+      "pytra.built_in.io_ops::py_print": []
+    },
+    "sccs": [
+      [
+        "ok_untyped_param::twice"
+      ],
+      [
+        "ok_untyped_param::__main__"
+      ],
+      [
+        "pytra.built_in.io_ops::py_print"
+      ]
+    ],
+    "non_escape_summary": {},
+    "container_ownership_hints_v1": {}
+  },
+  "diagnostics": {
+    "warnings": [],
+    "errors": []
+  }
+}

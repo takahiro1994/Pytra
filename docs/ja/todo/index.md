@@ -163,9 +163,9 @@ EAST1 の `meta.extern_v2` を正本にすること。
 参考実装: 現行 `src/toolchain/link/` のコードをロジック参照元として使ってよい（import はしない）。
 理解したロジックを toolchain2 の設計（dataclass、common/、§5 規約）で書き直すこと。
 
-1. [ ] [ID: P0-LINK-S1] linker を実装し、fixture の linked output が golden と一致する
-2. [ ] [ID: P0-LINK-S2] sample 18 件の linked output が golden と一致する
-3. [ ] [ID: P0-LINK-S3] `pytra-cli2 -link` を実装する
+1. [x] [ID: P0-LINK-S1] linker を実装し、fixture の linked output が golden と一致する — 完了（132/132 pass）
+2. [x] [ID: P0-LINK-S2] sample 18 件の linked output が golden と一致する — 完了（18/18 pass）
+3. [x] [ID: P0-LINK-S3] `pytra-cli2 -link` を実装する — 完了
 
 ### P0-EMIT: linked → target（暫定: 現行 toolchain/emit/ を利用）
 

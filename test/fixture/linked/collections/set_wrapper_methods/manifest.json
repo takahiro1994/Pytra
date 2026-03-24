@@ -1,0 +1,54 @@
+{
+  "schema": "pytra.link_output.v1",
+  "target": "cpp",
+  "dispatch_mode": "native",
+  "entry_modules": [
+    "set_wrapper_methods"
+  ],
+  "modules": [
+    {
+      "module_id": "pytra.built_in.io_ops",
+      "input": "/workspace/Pytra/src/pytra/built_in/io_ops.py",
+      "output": "east3/pytra/built_in/io_ops.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/built_in/io_ops.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    },
+    {
+      "module_id": "set_wrapper_methods",
+      "input": "test/fixture/source/py/collections/set_wrapper_methods.py",
+      "output": "east3/set_wrapper_methods.east3.json",
+      "source_path": "test/fixture/source/py/collections/set_wrapper_methods.py",
+      "is_entry": true,
+      "module_kind": "user"
+    }
+  ],
+  "global": {
+    "type_id_table": {},
+    "type_id_base_map": {},
+    "call_graph": {
+      "pytra.built_in.io_ops::py_print": [],
+      "set_wrapper_methods::__main__": [
+        "set_wrapper_methods::run_case"
+      ],
+      "set_wrapper_methods::run_case": []
+    },
+    "sccs": [
+      [
+        "pytra.built_in.io_ops::py_print"
+      ],
+      [
+        "set_wrapper_methods::run_case"
+      ],
+      [
+        "set_wrapper_methods::__main__"
+      ]
+    ],
+    "non_escape_summary": {},
+    "container_ownership_hints_v1": {}
+  },
+  "diagnostics": {
+    "warnings": [],
+    "errors": []
+  }
+}

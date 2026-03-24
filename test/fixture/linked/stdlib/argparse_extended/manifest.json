@@ -1,0 +1,171 @@
+{
+  "schema": "pytra.link_output.v1",
+  "target": "cpp",
+  "dispatch_mode": "native",
+  "entry_modules": [
+    "argparse_extended"
+  ],
+  "modules": [
+    {
+      "module_id": "argparse_extended",
+      "input": "test/fixture/source/py/stdlib/argparse_extended.py",
+      "output": "east3/argparse_extended.east3.json",
+      "source_path": "test/fixture/source/py/stdlib/argparse_extended.py",
+      "is_entry": true,
+      "module_kind": "user"
+    },
+    {
+      "module_id": "pytra.built_in.io_ops",
+      "input": "/workspace/Pytra/src/pytra/built_in/io_ops.py",
+      "output": "east3/pytra/built_in/io_ops.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/built_in/io_ops.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    },
+    {
+      "module_id": "pytra.built_in.sequence",
+      "input": "/workspace/Pytra/src/pytra/built_in/sequence.py",
+      "output": "east3/pytra/built_in/sequence.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/built_in/sequence.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    },
+    {
+      "module_id": "pytra.std.argparse",
+      "input": "/workspace/Pytra/src/pytra/std/argparse.py",
+      "output": "east3/pytra/std/argparse.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/std/argparse.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    },
+    {
+      "module_id": "pytra.std.sys",
+      "input": "/workspace/Pytra/src/pytra/std/sys.py",
+      "output": "east3/pytra/std/sys.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/std/sys.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    },
+    {
+      "module_id": "pytra.utils.assertions",
+      "input": "/workspace/Pytra/src/pytra/utils/assertions.py",
+      "output": "east3/pytra/utils/assertions.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/utils/assertions.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    }
+  ],
+  "global": {
+    "type_id_table": {
+      "pytra.std.argparse.ArgumentParser": 1000,
+      "pytra.std.argparse.Namespace": 1001,
+      "pytra.std.argparse._ArgSpec": 1002
+    },
+    "type_id_base_map": {
+      "pytra.std.argparse.ArgumentParser": 8,
+      "pytra.std.argparse.Namespace": 8,
+      "pytra.std.argparse._ArgSpec": 8
+    },
+    "call_graph": {
+      "argparse_extended::__main__": [
+        "argparse_extended::run_argparse_extended"
+      ],
+      "argparse_extended::run_argparse_extended": [
+        "pytra.utils.assertions::py_assert_all",
+        "pytra.utils.assertions::py_assert_eq"
+      ],
+      "pytra.built_in.io_ops::py_print": [],
+      "pytra.built_in.sequence::py_range": [],
+      "pytra.built_in.sequence::py_repeat": [],
+      "pytra.std.argparse::ArgumentParser.__init__": [],
+      "pytra.std.argparse::ArgumentParser._fail": [],
+      "pytra.std.argparse::ArgumentParser.add_argument": [],
+      "pytra.std.argparse::ArgumentParser.parse_args": [],
+      "pytra.std.argparse::Namespace.__init__": [],
+      "pytra.std.argparse::_ArgSpec.__init__": [],
+      "pytra.std.sys::exit": [],
+      "pytra.std.sys::set_argv": [],
+      "pytra.std.sys::set_path": [],
+      "pytra.std.sys::write_stderr": [],
+      "pytra.std.sys::write_stdout": [],
+      "pytra.utils.assertions::_eq_any": [],
+      "pytra.utils.assertions::py_assert_all": [],
+      "pytra.utils.assertions::py_assert_eq": [
+        "pytra.utils.assertions::_eq_any"
+      ],
+      "pytra.utils.assertions::py_assert_stdout": [],
+      "pytra.utils.assertions::py_assert_true": []
+    },
+    "sccs": [
+      [
+        "pytra.utils.assertions::py_assert_all"
+      ],
+      [
+        "pytra.utils.assertions::_eq_any"
+      ],
+      [
+        "pytra.utils.assertions::py_assert_eq"
+      ],
+      [
+        "argparse_extended::run_argparse_extended"
+      ],
+      [
+        "argparse_extended::__main__"
+      ],
+      [
+        "pytra.built_in.io_ops::py_print"
+      ],
+      [
+        "pytra.built_in.sequence::py_range"
+      ],
+      [
+        "pytra.built_in.sequence::py_repeat"
+      ],
+      [
+        "pytra.std.argparse::ArgumentParser.__init__"
+      ],
+      [
+        "pytra.std.argparse::ArgumentParser._fail"
+      ],
+      [
+        "pytra.std.argparse::ArgumentParser.add_argument"
+      ],
+      [
+        "pytra.std.argparse::ArgumentParser.parse_args"
+      ],
+      [
+        "pytra.std.argparse::Namespace.__init__"
+      ],
+      [
+        "pytra.std.argparse::_ArgSpec.__init__"
+      ],
+      [
+        "pytra.std.sys::exit"
+      ],
+      [
+        "pytra.std.sys::set_argv"
+      ],
+      [
+        "pytra.std.sys::set_path"
+      ],
+      [
+        "pytra.std.sys::write_stderr"
+      ],
+      [
+        "pytra.std.sys::write_stdout"
+      ],
+      [
+        "pytra.utils.assertions::py_assert_stdout"
+      ],
+      [
+        "pytra.utils.assertions::py_assert_true"
+      ]
+    ],
+    "non_escape_summary": {},
+    "container_ownership_hints_v1": {}
+  },
+  "diagnostics": {
+    "warnings": [],
+    "errors": []
+  }
+}

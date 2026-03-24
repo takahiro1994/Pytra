@@ -1,0 +1,59 @@
+{
+  "schema": "pytra.link_output.v1",
+  "target": "cpp",
+  "dispatch_mode": "native",
+  "entry_modules": [
+    "default_param"
+  ],
+  "modules": [
+    {
+      "module_id": "default_param",
+      "input": "test/fixture/source/py/core/default_param.py",
+      "output": "east3/default_param.east3.json",
+      "source_path": "test/fixture/source/py/core/default_param.py",
+      "is_entry": true,
+      "module_kind": "user"
+    },
+    {
+      "module_id": "pytra.built_in.io_ops",
+      "input": "/workspace/Pytra/src/pytra/built_in/io_ops.py",
+      "output": "east3/pytra/built_in/io_ops.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/built_in/io_ops.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    }
+  ],
+  "global": {
+    "type_id_table": {},
+    "type_id_base_map": {},
+    "call_graph": {
+      "default_param::__main__": [
+        "default_param::add",
+        "default_param::greet"
+      ],
+      "default_param::add": [],
+      "default_param::greet": [],
+      "pytra.built_in.io_ops::py_print": []
+    },
+    "sccs": [
+      [
+        "default_param::add"
+      ],
+      [
+        "default_param::greet"
+      ],
+      [
+        "default_param::__main__"
+      ],
+      [
+        "pytra.built_in.io_ops::py_print"
+      ]
+    ],
+    "non_escape_summary": {},
+    "container_ownership_hints_v1": {}
+  },
+  "diagnostics": {
+    "warnings": [],
+    "errors": []
+  }
+}
