@@ -101,9 +101,9 @@
                   "kind": "Name",
                   "source_span": {
                     "lineno": 8,
-                    "col": 25,
+                    "col": 31,
                     "end_lineno": 8,
-                    "end_col": 26
+                    "end_col": 32
                   },
                   "casts": [],
                   "borrow_kind": "value",

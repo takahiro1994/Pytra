@@ -77,11 +77,11 @@
                 "lineno": 8,
                 "col": 11,
                 "end_lineno": 8,
-                "end_col": 65
+                "end_col": 46
               },
               "casts": [],
               "borrow_kind": "value",
-              "repr": "f\"{name}:22:{count}\" + f\"{count*2}\" + f\"{name}-{name}\"",
+              "repr": "f\"{name}:22:{count}\" + f\"{count*2}\"",
               "left": {
                 "kind": "JoinedStr",
                 "source_span": {

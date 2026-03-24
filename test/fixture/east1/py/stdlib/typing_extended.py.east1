@@ -974,34 +974,34 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "{\"a\": 1}",
-                        "keys": [
+                        "entries": [
                           {
-                            "kind": "Constant",
-                            "source_span": {
-                              "lineno": 27,
-                              "col": 41,
-                              "end_lineno": 27,
-                              "end_col": 44
+                            "key": {
+                              "kind": "Constant",
+                              "source_span": {
+                                "lineno": 27,
+                                "col": 41,
+                                "end_lineno": 27,
+                                "end_col": 44
+                              },
+                              "casts": [],
+                              "borrow_kind": "value",
+                              "repr": "\"a\"",
+                              "value": "a"
                             },
-                            "casts": [],
-                            "borrow_kind": "value",
-                            "repr": "\"a\"",
-                            "value": "a"
-                          }
-                        ],
-                        "values": [
-                          {
-                            "kind": "Constant",
-                            "source_span": {
-                              "lineno": 27,
-                              "col": 46,
-                              "end_lineno": 27,
-                              "end_col": 47
-                            },
-                            "casts": [],
-                            "borrow_kind": "value",
-                            "repr": "1",
-                            "value": 1
+                            "value": {
+                              "kind": "Constant",
+                              "source_span": {
+                                "lineno": 27,
+                                "col": 46,
+                                "end_lineno": 27,
+                                "end_col": 47
+                              },
+                              "casts": [],
+                              "borrow_kind": "value",
+                              "repr": "1",
+                              "value": 1
+                            }
                           }
                         ]
                       },

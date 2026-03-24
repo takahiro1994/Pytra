@@ -54,17 +54,17 @@
         {
           "kind": "AnnAssign",
           "source_span": {
-            "lineno": 8,
+            "lineno": 7,
             "col": 4,
-            "end_lineno": 12,
-            "end_col": 5
+            "end_lineno": 7,
+            "end_col": 66
           },
           "target": {
             "kind": "Name",
             "source_span": {
-              "lineno": 8,
+              "lineno": 7,
               "col": 4,
-              "end_lineno": 8,
+              "end_lineno": 7,
               "end_col": 11
             },
             "casts": [],
@@ -76,9 +76,9 @@
           "value": {
             "kind": "Dict",
             "source_span": {
-              "lineno": 8,
+              "lineno": 7,
               "col": 30,
-              "end_lineno": 8,
+              "end_lineno": 7,
               "end_col": 66
             },
             "casts": [],
@@ -89,9 +89,9 @@
                 "key": {
                   "kind": "Constant",
                   "source_span": {
-                    "lineno": 8,
+                    "lineno": 7,
                     "col": 32,
-                    "end_lineno": 8,
+                    "end_lineno": 7,
                     "end_col": 35
                   },
                   "casts": [],
@@ -102,9 +102,9 @@
                 "value": {
                   "kind": "Constant",
                   "source_span": {
-                    "lineno": 8,
+                    "lineno": 7,
                     "col": 37,
-                    "end_lineno": 8,
+                    "end_lineno": 7,
                     "end_col": 38
                   },
                   "casts": [],
@@ -117,9 +117,9 @@
                 "key": {
                   "kind": "Constant",
                   "source_span": {
-                    "lineno": 8,
+                    "lineno": 7,
                     "col": 40,
-                    "end_lineno": 8,
+                    "end_lineno": 7,
                     "end_col": 43
                   },
                   "casts": [],
@@ -130,9 +130,9 @@
                 "value": {
                   "kind": "Constant",
                   "source_span": {
-                    "lineno": 8,
+                    "lineno": 7,
                     "col": 45,
-                    "end_lineno": 8,
+                    "end_lineno": 7,
                     "end_col": 48
                   },
                   "casts": [],
@@ -145,9 +145,9 @@
                 "key": {
                   "kind": "Constant",
                   "source_span": {
-                    "lineno": 8,
+                    "lineno": 7,
                     "col": 50,
-                    "end_lineno": 8,
+                    "end_lineno": 7,
                     "end_col": 53
                   },
                   "casts": [],
@@ -158,9 +158,9 @@
                 "value": {
                   "kind": "Dict",
                   "source_span": {
-                    "lineno": 8,
+                    "lineno": 7,
                     "col": 55,
-                    "end_lineno": 8,
+                    "end_lineno": 7,
                     "end_col": 63
                   },
                   "casts": [],
@@ -171,9 +171,9 @@
                       "key": {
                         "kind": "Constant",
                         "source_span": {
-                          "lineno": 8,
+                          "lineno": 7,
                           "col": 56,
-                          "end_lineno": 8,
+                          "end_lineno": 7,
                           "end_col": 59
                         },
                         "casts": [],
@@ -184,9 +184,9 @@
                       "value": {
                         "kind": "Constant",
                         "source_span": {
-                          "lineno": 8,
+                          "lineno": 7,
                           "col": 61,
-                          "end_lineno": 8,
+                          "end_lineno": 7,
                           "end_col": 62
                         },
                         "casts": [],
@@ -735,8 +735,8 @@
           "source_span": {
             "lineno": 21,
             "col": 0,
-            "end_lineno": 23,
-            "end_col": 0
+            "end_lineno": 22,
+            "end_col": 18
           },
           "target": {
             "kind": "Tuple",

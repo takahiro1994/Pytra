@@ -107,8 +107,8 @@
           "source_span": {
             "lineno": 9,
             "col": 4,
-            "end_lineno": 14,
-            "end_col": 6
+            "end_lineno": 9,
+            "end_col": 75
           },
           "target": {
             "kind": "Name",

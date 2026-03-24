@@ -503,17 +503,17 @@
     {
       "kind": "AnnAssign",
       "source_span": {
-        "lineno": 24,
+        "lineno": 19,
         "col": 4,
-        "end_lineno": 24,
+        "end_lineno": 19,
         "end_col": 22
       },
       "target": {
         "kind": "Name",
         "source_span": {
-          "lineno": 24,
+          "lineno": 19,
           "col": 4,
-          "end_lineno": 24,
+          "end_lineno": 19,
           "end_col": 5
         },
         "casts": [],
@@ -525,9 +525,9 @@
       "value": {
         "kind": "Call",
         "source_span": {
-          "lineno": 24,
+          "lineno": 19,
           "col": 15,
-          "end_lineno": 24,
+          "end_lineno": 19,
           "end_col": 22
         },
         "casts": [],
@@ -536,9 +536,9 @@
         "func": {
           "kind": "Name",
           "source_span": {
-            "lineno": 24,
+            "lineno": 19,
             "col": 15,
-            "end_lineno": 24,
+            "end_lineno": 19,
             "end_col": 20
           },
           "casts": [],

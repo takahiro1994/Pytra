@@ -302,9 +302,9 @@
                   "kind": "Constant",
                   "source_span": {
                     "lineno": 10,
-                    "col": 33,
+                    "col": 37,
                     "end_lineno": 10,
-                    "end_col": 34
+                    "end_col": 38
                   },
                   "casts": [],
                   "borrow_kind": "value",

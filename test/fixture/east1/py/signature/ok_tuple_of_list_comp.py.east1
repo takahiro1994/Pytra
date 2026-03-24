@@ -125,7 +125,7 @@
                   "id": "_"
                 },
                 "iter": {
-                  "kind": "RangeExpr",
+                  "kind": "Call",
                   "source_span": {
                     "lineno": 6,
                     "col": 41,
@@ -135,46 +135,35 @@
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "range(n_layer)",
-                  "start": {
-                    "kind": "Constant",
-                    "source_span": {
-                      "lineno": 6,
-                      "col": 28,
-                      "end_lineno": 6,
-                      "end_col": 28
-                    },
-                    "casts": [],
-                    "borrow_kind": "value",
-                    "repr": "0",
-                    "value": 0
-                  },
-                  "stop": {
+                  "func": {
                     "kind": "Name",
                     "source_span": {
                       "lineno": 6,
-                      "col": 47,
+                      "col": 41,
                       "end_lineno": 6,
-                      "end_col": 54
+                      "end_col": 46
                     },
                     "casts": [],
                     "borrow_kind": "value",
-                    "repr": "n_layer",
-                    "id": "n_layer"
+                    "repr": "range",
+                    "id": "range"
                   },
-                  "step": {
-                    "kind": "Constant",
-                    "source_span": {
-                      "lineno": 6,
-                      "col": 28,
-                      "end_lineno": 6,
-                      "end_col": 28
-                    },
-                    "casts": [],
-                    "borrow_kind": "value",
-                    "repr": "1",
-                    "value": 1
-                  },
-                  "range_mode": "ascending"
+                  "args": [
+                    {
+                      "kind": "Name",
+                      "source_span": {
+                        "lineno": 6,
+                        "col": 47,
+                        "end_lineno": 6,
+                        "end_col": 54
+                      },
+                      "casts": [],
+                      "borrow_kind": "value",
+                      "repr": "n_layer",
+                      "id": "n_layer"
+                    }
+                  ],
+                  "keywords": []
                 },
                 "ifs": [],
                 "is_async": false
@@ -245,7 +234,7 @@
                   "id": "_"
                 },
                 "iter": {
-                  "kind": "RangeExpr",
+                  "kind": "Call",
                   "source_span": {
                     "lineno": 7,
                     "col": 43,
@@ -255,46 +244,35 @@
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "range(n_layer)",
-                  "start": {
-                    "kind": "Constant",
-                    "source_span": {
-                      "lineno": 7,
-                      "col": 30,
-                      "end_lineno": 7,
-                      "end_col": 30
-                    },
-                    "casts": [],
-                    "borrow_kind": "value",
-                    "repr": "0",
-                    "value": 0
-                  },
-                  "stop": {
+                  "func": {
                     "kind": "Name",
                     "source_span": {
                       "lineno": 7,
-                      "col": 49,
+                      "col": 43,
                       "end_lineno": 7,
-                      "end_col": 56
+                      "end_col": 48
                     },
                     "casts": [],
                     "borrow_kind": "value",
-                    "repr": "n_layer",
-                    "id": "n_layer"
+                    "repr": "range",
+                    "id": "range"
                   },
-                  "step": {
-                    "kind": "Constant",
-                    "source_span": {
-                      "lineno": 7,
-                      "col": 30,
-                      "end_lineno": 7,
-                      "end_col": 30
-                    },
-                    "casts": [],
-                    "borrow_kind": "value",
-                    "repr": "1",
-                    "value": 1
-                  },
-                  "range_mode": "ascending"
+                  "args": [
+                    {
+                      "kind": "Name",
+                      "source_span": {
+                        "lineno": 7,
+                        "col": 49,
+                        "end_lineno": 7,
+                        "end_col": 56
+                      },
+                      "casts": [],
+                      "borrow_kind": "value",
+                      "repr": "n_layer",
+                      "id": "n_layer"
+                    }
+                  ],
+                  "keywords": []
                 },
                 "ifs": [],
                 "is_async": false

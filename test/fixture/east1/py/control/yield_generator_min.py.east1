@@ -73,7 +73,7 @@
           "kind": "While",
           "source_span": {
             "lineno": 3,
-            "col": 0,
+            "col": 4,
             "end_lineno": 5,
             "end_col": 14
           },

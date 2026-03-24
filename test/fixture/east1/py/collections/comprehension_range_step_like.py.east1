@@ -228,9 +228,9 @@
                   "kind": "Name",
                   "source_span": {
                     "lineno": 7,
-                    "col": 26,
+                    "col": 36,
                     "end_lineno": 7,
-                    "end_col": 27
+                    "end_col": 37
                   },
                   "casts": [],
                   "borrow_kind": "value",

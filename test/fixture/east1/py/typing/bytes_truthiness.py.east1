@@ -167,8 +167,8 @@
           "kind": "While",
           "source_span": {
             "lineno": 13,
-            "col": 0,
-            "end_lineno": 14,
+            "col": 4,
+            "end_lineno": 8,
             "end_col": 19
           },
           "test": {
@@ -188,17 +188,17 @@
             {
               "kind": "Return",
               "source_span": {
-                "lineno": 14,
+                "lineno": 8,
                 "col": 8,
-                "end_lineno": 14,
+                "end_lineno": 8,
                 "end_col": 19
               },
               "value": {
                 "kind": "Constant",
                 "source_span": {
-                  "lineno": 14,
+                  "lineno": 8,
                   "col": 15,
-                  "end_lineno": 14,
+                  "end_lineno": 8,
                   "end_col": 19
                 },
                 "casts": [],

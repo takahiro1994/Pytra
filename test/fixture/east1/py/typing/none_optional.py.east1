@@ -53,7 +53,7 @@
       "arg_index": {
         "flag": 0
       },
-      "return_type": "int64 | None",
+      "return_type": "int | None",
       "renamed_symbols": {},
       "docstring": null,
       "body": [
@@ -186,7 +186,7 @@
             "repr": "a",
             "id": "a"
           },
-          "annotation": "int64 | None",
+          "annotation": "int | None",
           "value": {
             "kind": "Call",
             "source_span": {
@@ -251,7 +251,7 @@
             "repr": "b",
             "id": "b"
           },
-          "annotation": "int64 | None",
+          "annotation": "int | None",
           "value": {
             "kind": "Call",
             "source_span": {
@@ -382,7 +382,7 @@
             "repr": "g1",
             "id": "g1"
           },
-          "annotation": "int64 | None",
+          "annotation": "int | None",
           "value": {
             "kind": "Call",
             "source_span": {
@@ -460,7 +460,7 @@
             "repr": "g2",
             "id": "g2"
           },
-          "annotation": "int64 | None",
+          "annotation": "int | None",
           "value": {
             "kind": "Call",
             "source_span": {

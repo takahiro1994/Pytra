@@ -137,7 +137,12 @@
       "is_generator": 0,
       "yield_value_type": "unknown",
       "leading_comments": [],
-      "leading_trivia": []
+      "leading_trivia": [
+        {
+          "kind": "blank",
+          "count": 1
+        }
+      ]
     },
     {
       "kind": "FunctionDef",
