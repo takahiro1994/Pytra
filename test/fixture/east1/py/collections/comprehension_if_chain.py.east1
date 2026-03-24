@@ -225,7 +225,7 @@
                 "end_col": 26
               },
               "casts": [],
-              "borrow_kind": "readonly_ref",
+              "borrow_kind": "value",
               "repr": "x",
               "id": "x"
             },
@@ -253,7 +253,7 @@
                     "end_col": 38
                   },
                   "casts": [],
-                  "borrow_kind": "readonly_ref",
+                  "borrow_kind": "value",
                   "repr": "xs",
                   "id": "xs"
                 },
@@ -291,7 +291,7 @@
                             "end_col": 43
                           },
                           "casts": [],
-                          "borrow_kind": "readonly_ref",
+                          "borrow_kind": "value",
                           "repr": "x",
                           "id": "x"
                         },
@@ -334,7 +334,7 @@
                             "end_col": 53
                           },
                           "casts": [],
-                          "borrow_kind": "readonly_ref",
+                          "borrow_kind": "value",
                           "repr": "x",
                           "id": "x"
                         },
@@ -388,7 +388,7 @@
                               "end_col": 63
                             },
                             "casts": [],
-                            "borrow_kind": "readonly_ref",
+                            "borrow_kind": "value",
                             "repr": "x",
                             "id": "x"
                           },
@@ -557,7 +557,7 @@
                   "end_col": 10
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "checks",
                 "id": "checks"
               },
@@ -623,7 +623,7 @@
                           "end_col": 41
                         },
                         "casts": [],
-                        "borrow_kind": "readonly_ref",
+                        "borrow_kind": "value",
                         "repr": "picked",
                         "id": "picked"
                       }
@@ -670,7 +670,7 @@
                 "end_col": 10
               },
               "casts": [],
-              "borrow_kind": "readonly_ref",
+              "borrow_kind": "value",
               "repr": "checks",
               "id": "checks"
             }
@@ -715,7 +715,7 @@
                   "end_col": 10
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "checks",
                 "id": "checks"
               },
@@ -767,7 +767,7 @@
                         "end_col": 37
                       },
                       "casts": [],
-                      "borrow_kind": "readonly_ref",
+                      "borrow_kind": "value",
                       "repr": "picked",
                       "id": "picked"
                     },
@@ -825,7 +825,7 @@
                 "end_col": 10
               },
               "casts": [],
-              "borrow_kind": "readonly_ref",
+              "borrow_kind": "value",
               "repr": "checks",
               "id": "checks"
             }
@@ -870,7 +870,7 @@
                   "end_col": 10
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "checks",
                 "id": "checks"
               },
@@ -922,7 +922,7 @@
                         "end_col": 37
                       },
                       "casts": [],
-                      "borrow_kind": "readonly_ref",
+                      "borrow_kind": "value",
                       "repr": "picked",
                       "id": "picked"
                     },
@@ -980,7 +980,7 @@
                 "end_col": 10
               },
               "casts": [],
-              "borrow_kind": "readonly_ref",
+              "borrow_kind": "value",
               "repr": "checks",
               "id": "checks"
             }
@@ -1028,7 +1028,7 @@
                   "end_col": 31
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "checks",
                 "id": "checks"
               },

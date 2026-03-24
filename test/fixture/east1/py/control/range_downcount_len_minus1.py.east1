@@ -144,7 +144,7 @@
                     "end_col": 25
                   },
                   "casts": [],
-                  "borrow_kind": "readonly_ref",
+                  "borrow_kind": "value",
                   "repr": "xs",
                   "id": "xs"
                 }
@@ -237,7 +237,7 @@
                   "end_col": 13
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "total",
                 "id": "total"
               },
@@ -262,7 +262,7 @@
                     "end_col": 19
                   },
                   "casts": [],
-                  "borrow_kind": "readonly_ref",
+                  "borrow_kind": "value",
                   "repr": "xs",
                   "id": "xs"
                 },
@@ -275,7 +275,7 @@
                     "end_col": 21
                   },
                   "casts": [],
-                  "borrow_kind": "readonly_ref",
+                  "borrow_kind": "value",
                   "repr": "i",
                   "id": "i"
                 }
@@ -302,7 +302,7 @@
               "end_col": 16
             },
             "casts": [],
-            "borrow_kind": "readonly_ref",
+            "borrow_kind": "value",
             "repr": "total",
             "id": "total"
           }

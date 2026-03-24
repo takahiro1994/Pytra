@@ -158,7 +158,7 @@
                 "end_col": 16
               },
               "casts": [],
-              "borrow_kind": "readonly_ref",
+              "borrow_kind": "value",
               "repr": "s",
               "id": "s"
             },
@@ -171,7 +171,7 @@
                 "end_col": 18
               },
               "casts": [],
-              "borrow_kind": "readonly_ref",
+              "borrow_kind": "value",
               "repr": "i",
               "id": "i"
             }
@@ -239,7 +239,7 @@
                   "end_col": 16
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "s",
                 "id": "s"
               },
@@ -252,7 +252,7 @@
                   "end_col": 18
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "i",
                 "id": "i"
               }
@@ -339,7 +339,7 @@
                   "end_col": 17
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "s",
                 "id": "s"
               },
@@ -441,7 +441,7 @@
                       "end_col": 12
                     },
                     "casts": [],
-                    "borrow_kind": "readonly_ref",
+                    "borrow_kind": "value",
                     "repr": "ok",
                     "id": "ok"
                   },
@@ -454,7 +454,7 @@
                       "end_col": 20
                     },
                     "casts": [],
-                    "borrow_kind": "readonly_ref",
+                    "borrow_kind": "value",
                     "repr": "ok2",
                     "id": "ok2"
                   },
@@ -478,7 +478,7 @@
                         "end_col": 27
                       },
                       "casts": [],
-                      "borrow_kind": "readonly_ref",
+                      "borrow_kind": "value",
                       "repr": "ch",
                       "id": "ch"
                     },

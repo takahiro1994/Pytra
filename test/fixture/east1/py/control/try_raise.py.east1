@@ -75,7 +75,7 @@
                   "end_col": 15
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "flag",
                 "id": "flag"
               },

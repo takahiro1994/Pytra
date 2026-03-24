@@ -60,7 +60,7 @@
                 "end_col": 13
               },
               "casts": [],
-              "borrow_kind": "readonly_ref",
+              "borrow_kind": "value",
               "repr": "cb",
               "id": "cb"
             },

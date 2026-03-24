@@ -330,7 +330,7 @@
                   "end_col": 11
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "b",
                 "id": "b"
               },
@@ -407,7 +407,7 @@
                   "end_col": 11
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "c",
                 "id": "c"
               },
@@ -487,7 +487,7 @@
                   "end_col": 22
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "c",
                 "id": "c"
               },

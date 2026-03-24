@@ -105,7 +105,7 @@
                     "end_col": 13
                   },
                   "casts": [],
-                  "borrow_kind": "readonly_ref",
+                  "borrow_kind": "value",
                   "repr": "r",
                   "id": "r"
                 },
@@ -145,7 +145,7 @@
                     "end_col": 25
                   },
                   "casts": [],
-                  "borrow_kind": "readonly_ref",
+                  "borrow_kind": "value",
                   "repr": "g",
                   "id": "g"
                 },
@@ -175,7 +175,7 @@
                 "end_col": 35
               },
               "casts": [],
-              "borrow_kind": "readonly_ref",
+              "borrow_kind": "value",
               "repr": "b",
               "id": "b"
             }
@@ -385,7 +385,7 @@
                     "end_col": 30
                   },
                   "casts": [],
-                  "borrow_kind": "readonly_ref",
+                  "borrow_kind": "value",
                   "repr": "rgb",
                   "id": "rgb"
                 }
@@ -457,7 +457,7 @@
                     "end_col": 33
                   },
                   "casts": [],
-                  "borrow_kind": "readonly_ref",
+                  "borrow_kind": "value",
                   "repr": "packed",
                   "id": "packed"
                 },
@@ -536,7 +536,7 @@
                           "end_col": 56
                         },
                         "casts": [],
-                        "borrow_kind": "readonly_ref",
+                        "borrow_kind": "value",
                         "repr": "rgb",
                         "id": "rgb"
                       }
@@ -557,7 +557,7 @@
                       "end_col": 67
                     },
                     "casts": [],
-                    "borrow_kind": "readonly_ref",
+                    "borrow_kind": "value",
                     "repr": "packed",
                     "id": "packed"
                   }
@@ -629,7 +629,7 @@
                   "end_col": 31
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "checks",
                 "id": "checks"
               },

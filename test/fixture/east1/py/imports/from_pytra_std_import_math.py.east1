@@ -164,7 +164,7 @@
                   "end_col": 11
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "results",
                 "id": "results"
               },
@@ -305,7 +305,7 @@
                 "end_col": 11
               },
               "casts": [],
-              "borrow_kind": "readonly_ref",
+              "borrow_kind": "value",
               "repr": "results",
               "id": "results"
             }
@@ -350,7 +350,7 @@
                   "end_col": 11
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "results",
                 "id": "results"
               },
@@ -491,7 +491,7 @@
                 "end_col": 11
               },
               "casts": [],
-              "borrow_kind": "readonly_ref",
+              "borrow_kind": "value",
               "repr": "results",
               "id": "results"
             }
@@ -564,7 +564,7 @@
                       "end_col": 31
                     },
                     "casts": [],
-                    "borrow_kind": "readonly_ref",
+                    "borrow_kind": "value",
                     "repr": "results",
                     "id": "results"
                   },

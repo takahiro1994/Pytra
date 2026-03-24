@@ -253,7 +253,7 @@
                 "end_col": 30
               },
               "casts": [],
-              "borrow_kind": "readonly_ref",
+              "borrow_kind": "value",
               "repr": "nums",
               "id": "nums"
             },
@@ -384,7 +384,7 @@
                 "end_col": 24
               },
               "casts": [],
-              "borrow_kind": "readonly_ref",
+              "borrow_kind": "value",
               "repr": "text",
               "id": "text"
             },
@@ -508,7 +508,7 @@
                     "end_col": 18
                   },
                   "casts": [],
-                  "borrow_kind": "readonly_ref",
+                  "borrow_kind": "value",
                   "repr": "mid_nums",
                   "id": "mid_nums"
                 },
@@ -589,7 +589,7 @@
                     "end_col": 18
                   },
                   "casts": [],
-                  "borrow_kind": "readonly_ref",
+                  "borrow_kind": "value",
                   "repr": "mid_nums",
                   "id": "mid_nums"
                 },
@@ -653,7 +653,7 @@
                   "end_col": 18
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "mid_text",
                 "id": "mid_text"
               }

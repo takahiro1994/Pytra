@@ -380,7 +380,7 @@
                   "end_col": 30
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "out_path",
                 "id": "out_path"
               },
@@ -419,7 +419,7 @@
                   "end_col": 44
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "pixels",
                 "id": "pixels"
               }
@@ -523,7 +523,7 @@
                   "end_col": 11
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "results",
                 "id": "results"
               },
@@ -589,7 +589,7 @@
                           "end_col": 42
                         },
                         "casts": [],
-                        "borrow_kind": "readonly_ref",
+                        "borrow_kind": "value",
                         "repr": "pixels",
                         "id": "pixels"
                       }
@@ -636,7 +636,7 @@
                 "end_col": 11
               },
               "casts": [],
-              "borrow_kind": "readonly_ref",
+              "borrow_kind": "value",
               "repr": "results",
               "id": "results"
             }
@@ -681,7 +681,7 @@
                   "end_col": 11
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "results",
                 "id": "results"
               },
@@ -753,7 +753,7 @@
                 "end_col": 11
               },
               "casts": [],
-              "borrow_kind": "readonly_ref",
+              "borrow_kind": "value",
               "repr": "results",
               "id": "results"
             }
@@ -826,7 +826,7 @@
                       "end_col": 31
                     },
                     "casts": [],
-                    "borrow_kind": "readonly_ref",
+                    "borrow_kind": "value",
                     "repr": "results",
                     "id": "results"
                   },

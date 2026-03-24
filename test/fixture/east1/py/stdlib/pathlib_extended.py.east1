@@ -168,7 +168,7 @@
                   "end_col": 8
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "root",
                 "id": "root"
               },
@@ -218,7 +218,7 @@
                 "end_col": 8
               },
               "casts": [],
-              "borrow_kind": "readonly_ref",
+              "borrow_kind": "value",
               "repr": "root",
               "id": "root"
             }
@@ -265,7 +265,7 @@
                 "end_col": 16
               },
               "casts": [],
-              "borrow_kind": "readonly_ref",
+              "borrow_kind": "value",
               "repr": "root",
               "id": "root"
             },
@@ -332,7 +332,7 @@
                   "end_col": 9
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "child",
                 "id": "child"
               },
@@ -363,7 +363,7 @@
                 "end_col": 9
               },
               "casts": [],
-              "borrow_kind": "readonly_ref",
+              "borrow_kind": "value",
               "repr": "child",
               "id": "child"
             }
@@ -471,7 +471,7 @@
                   "end_col": 10
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "checks",
                 "id": "checks"
               },
@@ -534,7 +534,7 @@
                           "end_col": 36
                         },
                         "casts": [],
-                        "borrow_kind": "readonly_ref",
+                        "borrow_kind": "value",
                         "repr": "child",
                         "id": "child"
                       },
@@ -551,7 +551,7 @@
                         "end_col": 36
                       },
                       "casts": [],
-                      "borrow_kind": "readonly_ref",
+                      "borrow_kind": "value",
                       "repr": "child",
                       "id": "child"
                     }
@@ -596,7 +596,7 @@
                 "end_col": 10
               },
               "casts": [],
-              "borrow_kind": "readonly_ref",
+              "borrow_kind": "value",
               "repr": "checks",
               "id": "checks"
             }
@@ -641,7 +641,7 @@
                   "end_col": 10
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "checks",
                 "id": "checks"
               },
@@ -693,7 +693,7 @@
                         "end_col": 36
                       },
                       "casts": [],
-                      "borrow_kind": "readonly_ref",
+                      "borrow_kind": "value",
                       "repr": "child",
                       "id": "child"
                     },
@@ -707,7 +707,7 @@
                         "end_col": 36
                       },
                       "casts": [],
-                      "borrow_kind": "readonly_ref",
+                      "borrow_kind": "value",
                       "repr": "child",
                       "id": "child"
                     }
@@ -752,7 +752,7 @@
                 "end_col": 10
               },
               "casts": [],
-              "borrow_kind": "readonly_ref",
+              "borrow_kind": "value",
               "repr": "checks",
               "id": "checks"
             }
@@ -797,7 +797,7 @@
                   "end_col": 10
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "checks",
                 "id": "checks"
               },
@@ -849,7 +849,7 @@
                         "end_col": 36
                       },
                       "casts": [],
-                      "borrow_kind": "readonly_ref",
+                      "borrow_kind": "value",
                       "repr": "child",
                       "id": "child"
                     },
@@ -863,7 +863,7 @@
                         "end_col": 36
                       },
                       "casts": [],
-                      "borrow_kind": "readonly_ref",
+                      "borrow_kind": "value",
                       "repr": "child",
                       "id": "child"
                     }
@@ -908,7 +908,7 @@
                 "end_col": 10
               },
               "casts": [],
-              "borrow_kind": "readonly_ref",
+              "borrow_kind": "value",
               "repr": "checks",
               "id": "checks"
             }
@@ -953,7 +953,7 @@
                   "end_col": 10
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "checks",
                 "id": "checks"
               },
@@ -1038,7 +1038,7 @@
                               "end_col": 37
                             },
                             "casts": [],
-                            "borrow_kind": "readonly_ref",
+                            "borrow_kind": "value",
                             "repr": "child",
                             "id": "child"
                           },
@@ -1052,7 +1052,7 @@
                               "end_col": 37
                             },
                             "casts": [],
-                            "borrow_kind": "readonly_ref",
+                            "borrow_kind": "value",
                             "repr": "child",
                             "id": "child"
                           }
@@ -1107,7 +1107,7 @@
                             "end_col": 37
                           },
                           "casts": [],
-                          "borrow_kind": "readonly_ref",
+                          "borrow_kind": "value",
                           "repr": "child",
                           "id": "child"
                         },
@@ -1121,7 +1121,7 @@
                             "end_col": 37
                           },
                           "casts": [],
-                          "borrow_kind": "readonly_ref",
+                          "borrow_kind": "value",
                           "repr": "child",
                           "id": "child"
                         }
@@ -1182,7 +1182,7 @@
                 "end_col": 10
               },
               "casts": [],
-              "borrow_kind": "readonly_ref",
+              "borrow_kind": "value",
               "repr": "checks",
               "id": "checks"
             }
@@ -1227,7 +1227,7 @@
                   "end_col": 10
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "checks",
                 "id": "checks"
               },
@@ -1290,7 +1290,7 @@
                           "end_col": 36
                         },
                         "casts": [],
-                        "borrow_kind": "readonly_ref",
+                        "borrow_kind": "value",
                         "repr": "child",
                         "id": "child"
                       },
@@ -1307,7 +1307,7 @@
                         "end_col": 36
                       },
                       "casts": [],
-                      "borrow_kind": "readonly_ref",
+                      "borrow_kind": "value",
                       "repr": "child",
                       "id": "child"
                     }
@@ -1352,7 +1352,7 @@
                 "end_col": 10
               },
               "casts": [],
-              "borrow_kind": "readonly_ref",
+              "borrow_kind": "value",
               "repr": "checks",
               "id": "checks"
             }
@@ -1400,7 +1400,7 @@
                   "end_col": 31
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "checks",
                 "id": "checks"
               },

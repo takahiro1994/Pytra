@@ -275,7 +275,7 @@
                   "end_col": 32
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "values",
                 "id": "values"
               }
@@ -303,7 +303,7 @@
                   "end_col": 16
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "weighted",
                 "id": "weighted"
               },
@@ -328,7 +328,7 @@
                     "end_col": 21
                   },
                   "casts": [],
-                  "borrow_kind": "readonly_ref",
+                  "borrow_kind": "value",
                   "repr": "i",
                   "id": "i"
                 },
@@ -342,7 +342,7 @@
                     "end_col": 25
                   },
                   "casts": [],
-                  "borrow_kind": "readonly_ref",
+                  "borrow_kind": "value",
                   "repr": "v",
                   "id": "v"
                 }
@@ -471,7 +471,7 @@
                   "end_col": 9
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "i",
                 "id": "i"
               },
@@ -484,7 +484,7 @@
                   "end_col": 12
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "v",
                 "id": "v"
               }
@@ -528,7 +528,7 @@
                   "end_col": 32
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "values",
                 "id": "values"
               }
@@ -556,7 +556,7 @@
                   "end_col": 15
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "idx_sum",
                 "id": "idx_sum"
               },
@@ -570,7 +570,7 @@
                   "end_col": 9
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "i",
                 "id": "i"
               },
@@ -593,7 +593,7 @@
                   "end_col": 17
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "value_sum",
                 "id": "value_sum"
               },
@@ -607,7 +607,7 @@
                   "end_col": 9
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "v",
                 "id": "v"
               },
@@ -690,7 +690,7 @@
                   "end_col": 9
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "i",
                 "id": "i"
               },
@@ -703,7 +703,7 @@
                   "end_col": 12
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "v",
                 "id": "v"
               }
@@ -747,7 +747,7 @@
                   "end_col": 32
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "values",
                 "id": "values"
               },
@@ -788,7 +788,7 @@
                   "end_col": 22
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "start_weighted",
                 "id": "start_weighted"
               },
@@ -813,7 +813,7 @@
                     "end_col": 27
                   },
                   "casts": [],
-                  "borrow_kind": "readonly_ref",
+                  "borrow_kind": "value",
                   "repr": "i",
                   "id": "i"
                 },
@@ -827,7 +827,7 @@
                     "end_col": 31
                   },
                   "casts": [],
-                  "borrow_kind": "readonly_ref",
+                  "borrow_kind": "value",
                   "repr": "v",
                   "id": "v"
                 }
@@ -941,7 +941,7 @@
                   "end_col": 32
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "values",
                 "id": "values"
               },
@@ -995,7 +995,7 @@
                   "end_col": 16
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "pair",
                 "id": "pair"
               },
@@ -1019,7 +1019,7 @@
                   "end_col": 18
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "pair_count",
                 "id": "pair_count"
               },
@@ -1138,7 +1138,7 @@
                   "end_col": 10
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "checks",
                 "id": "checks"
               },
@@ -1179,7 +1179,7 @@
                       "end_col": 39
                     },
                     "casts": [],
-                    "borrow_kind": "readonly_ref",
+                    "borrow_kind": "value",
                     "repr": "weighted",
                     "id": "weighted"
                   },
@@ -1223,7 +1223,7 @@
                 "end_col": 10
               },
               "casts": [],
-              "borrow_kind": "readonly_ref",
+              "borrow_kind": "value",
               "repr": "checks",
               "id": "checks"
             }
@@ -1268,7 +1268,7 @@
                   "end_col": 10
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "checks",
                 "id": "checks"
               },
@@ -1309,7 +1309,7 @@
                       "end_col": 38
                     },
                     "casts": [],
-                    "borrow_kind": "readonly_ref",
+                    "borrow_kind": "value",
                     "repr": "idx_sum",
                     "id": "idx_sum"
                   },
@@ -1353,7 +1353,7 @@
                 "end_col": 10
               },
               "casts": [],
-              "borrow_kind": "readonly_ref",
+              "borrow_kind": "value",
               "repr": "checks",
               "id": "checks"
             }
@@ -1398,7 +1398,7 @@
                   "end_col": 10
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "checks",
                 "id": "checks"
               },
@@ -1439,7 +1439,7 @@
                       "end_col": 40
                     },
                     "casts": [],
-                    "borrow_kind": "readonly_ref",
+                    "borrow_kind": "value",
                     "repr": "value_sum",
                     "id": "value_sum"
                   },
@@ -1483,7 +1483,7 @@
                 "end_col": 10
               },
               "casts": [],
-              "borrow_kind": "readonly_ref",
+              "borrow_kind": "value",
               "repr": "checks",
               "id": "checks"
             }
@@ -1528,7 +1528,7 @@
                   "end_col": 10
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "checks",
                 "id": "checks"
               },
@@ -1569,7 +1569,7 @@
                       "end_col": 45
                     },
                     "casts": [],
-                    "borrow_kind": "readonly_ref",
+                    "borrow_kind": "value",
                     "repr": "start_weighted",
                     "id": "start_weighted"
                   },
@@ -1613,7 +1613,7 @@
                 "end_col": 10
               },
               "casts": [],
-              "borrow_kind": "readonly_ref",
+              "borrow_kind": "value",
               "repr": "checks",
               "id": "checks"
             }
@@ -1658,7 +1658,7 @@
                   "end_col": 10
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "checks",
                 "id": "checks"
               },
@@ -1699,7 +1699,7 @@
                       "end_col": 41
                     },
                     "casts": [],
-                    "borrow_kind": "readonly_ref",
+                    "borrow_kind": "value",
                     "repr": "pair_count",
                     "id": "pair_count"
                   },
@@ -1743,7 +1743,7 @@
                 "end_col": 10
               },
               "casts": [],
-              "borrow_kind": "readonly_ref",
+              "borrow_kind": "value",
               "repr": "checks",
               "id": "checks"
             }
@@ -1791,7 +1791,7 @@
                   "end_col": 31
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "checks",
                 "id": "checks"
               },

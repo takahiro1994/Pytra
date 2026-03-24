@@ -147,7 +147,7 @@
                     "end_col": 57
                   },
                   "casts": [],
-                  "borrow_kind": "readonly_ref",
+                  "borrow_kind": "value",
                   "repr": "std",
                   "id": "std"
                 }
@@ -211,7 +211,7 @@
                     "end_col": 16
                   },
                   "casts": [],
-                  "borrow_kind": "readonly_ref",
+                  "borrow_kind": "value",
                   "repr": "matrix",
                   "id": "matrix"
                 },
@@ -302,7 +302,7 @@
                     "end_col": 16
                   },
                   "casts": [],
-                  "borrow_kind": "readonly_ref",
+                  "borrow_kind": "value",
                   "repr": "matrix",
                   "id": "matrix"
                 },

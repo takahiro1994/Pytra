@@ -256,7 +256,7 @@
                         "end_col": 28
                       },
                       "casts": [],
-                      "borrow_kind": "readonly_ref",
+                      "borrow_kind": "value",
                       "repr": "end",
                       "id": "end"
                     },
@@ -273,7 +273,7 @@
                           "end_col": 37
                         },
                         "casts": [],
-                        "borrow_kind": "readonly_ref",
+                        "borrow_kind": "value",
                         "repr": "start",
                         "id": "start"
                       }

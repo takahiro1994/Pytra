@@ -317,7 +317,7 @@
                       "end_col": 24
                     },
                     "casts": [],
-                    "borrow_kind": "readonly_ref",
+                    "borrow_kind": "value",
                     "repr": "cat",
                     "id": "cat"
                   },
@@ -408,7 +408,7 @@
                       "end_col": 24
                     },
                     "casts": [],
-                    "borrow_kind": "readonly_ref",
+                    "borrow_kind": "value",
                     "repr": "cat",
                     "id": "cat"
                   },
@@ -499,7 +499,7 @@
                       "end_col": 24
                     },
                     "casts": [],
-                    "borrow_kind": "readonly_ref",
+                    "borrow_kind": "value",
                     "repr": "dog",
                     "id": "dog"
                   },
@@ -590,7 +590,7 @@
                       "end_col": 24
                     },
                     "casts": [],
-                    "borrow_kind": "readonly_ref",
+                    "borrow_kind": "value",
                     "repr": "dog",
                     "id": "dog"
                   },

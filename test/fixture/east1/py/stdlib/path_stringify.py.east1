@@ -104,7 +104,7 @@
                   "end_col": 19
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "raw",
                 "id": "raw"
               }
@@ -156,7 +156,7 @@
                   "end_col": 19
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "path",
                 "id": "path"
               }

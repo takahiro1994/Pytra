@@ -136,7 +136,7 @@
                 "end_col": 25
               },
               "casts": [],
-              "borrow_kind": "readonly_ref",
+              "borrow_kind": "value",
               "repr": "prefix",
               "id": "prefix"
             },
@@ -150,7 +150,7 @@
                 "end_col": 32
               },
               "casts": [],
-              "borrow_kind": "readonly_ref",
+              "borrow_kind": "value",
               "repr": "name",
               "id": "name"
             }
@@ -193,7 +193,7 @@
                 "end_col": 18
               },
               "casts": [],
-              "borrow_kind": "readonly_ref",
+              "borrow_kind": "value",
               "repr": "message",
               "id": "message"
             },

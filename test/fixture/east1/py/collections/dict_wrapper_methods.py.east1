@@ -212,7 +212,7 @@
                     "end_col": 28
                   },
                   "casts": [],
-                  "borrow_kind": "readonly_ref",
+                  "borrow_kind": "value",
                   "repr": "d",
                   "id": "d"
                 },
@@ -256,7 +256,7 @@
                   "end_col": 28
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "d",
                 "id": "d"
               }
@@ -360,7 +360,7 @@
                     "end_col": 26
                   },
                   "casts": [],
-                  "borrow_kind": "readonly_ref",
+                  "borrow_kind": "value",
                   "repr": "d",
                   "id": "d"
                 },
@@ -404,7 +404,7 @@
                   "end_col": 26
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "d",
                 "id": "d"
               }
@@ -491,7 +491,7 @@
                   "end_col": 21
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "d",
                 "id": "d"
               },
@@ -508,7 +508,7 @@
                 "end_col": 21
               },
               "casts": [],
-              "borrow_kind": "readonly_ref",
+              "borrow_kind": "value",
               "repr": "d",
               "id": "d"
             }
@@ -594,7 +594,7 @@
                   "end_col": 21
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "d",
                 "id": "d"
               },
@@ -611,7 +611,7 @@
                 "end_col": 21
               },
               "casts": [],
-              "borrow_kind": "readonly_ref",
+              "borrow_kind": "value",
               "repr": "d",
               "id": "d"
             }
@@ -697,7 +697,7 @@
                   "end_col": 27
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "ks",
                 "id": "ks"
               }
@@ -778,7 +778,7 @@
                   "end_col": 25
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "vs",
                 "id": "vs"
               }
@@ -849,7 +849,7 @@
                       "end_col": 24
                     },
                     "casts": [],
-                    "borrow_kind": "readonly_ref",
+                    "borrow_kind": "value",
                     "repr": "ok_get_default",
                     "id": "ok_get_default"
                   },
@@ -862,7 +862,7 @@
                       "end_col": 41
                     },
                     "casts": [],
-                    "borrow_kind": "readonly_ref",
+                    "borrow_kind": "value",
                     "repr": "ok_get_exist",
                     "id": "ok_get_exist"
                   },
@@ -875,7 +875,7 @@
                       "end_col": 51
                     },
                     "casts": [],
-                    "borrow_kind": "readonly_ref",
+                    "borrow_kind": "value",
                     "repr": "has_a",
                     "id": "has_a"
                   },
@@ -888,7 +888,7 @@
                       "end_col": 61
                     },
                     "casts": [],
-                    "borrow_kind": "readonly_ref",
+                    "borrow_kind": "value",
                     "repr": "has_2",
                     "id": "has_2"
                   }

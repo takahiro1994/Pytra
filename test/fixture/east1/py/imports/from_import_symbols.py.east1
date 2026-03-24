@@ -427,7 +427,7 @@
                   "end_col": 26
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "out_path",
                 "id": "out_path"
               },
@@ -466,7 +466,7 @@
                   "end_col": 40
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "pixels",
                 "id": "pixels"
               }
@@ -629,7 +629,7 @@
                   "end_col": 11
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "results",
                 "id": "results"
               },
@@ -770,7 +770,7 @@
                 "end_col": 11
               },
               "casts": [],
-              "borrow_kind": "readonly_ref",
+              "borrow_kind": "value",
               "repr": "results",
               "id": "results"
             }
@@ -815,7 +815,7 @@
                   "end_col": 11
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "results",
                 "id": "results"
               },
@@ -956,7 +956,7 @@
                 "end_col": 11
               },
               "casts": [],
-              "borrow_kind": "readonly_ref",
+              "borrow_kind": "value",
               "repr": "results",
               "id": "results"
             }
@@ -1001,7 +1001,7 @@
                   "end_col": 11
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "results",
                 "id": "results"
               },
@@ -1053,7 +1053,7 @@
                         "end_col": 36
                       },
                       "casts": [],
-                      "borrow_kind": "readonly_ref",
+                      "borrow_kind": "value",
                       "repr": "t1",
                       "id": "t1"
                     },
@@ -1070,7 +1070,7 @@
                           "end_col": 42
                         },
                         "casts": [],
-                        "borrow_kind": "readonly_ref",
+                        "borrow_kind": "value",
                         "repr": "t0",
                         "id": "t0"
                       }
@@ -1103,7 +1103,7 @@
                 "end_col": 11
               },
               "casts": [],
-              "borrow_kind": "readonly_ref",
+              "borrow_kind": "value",
               "repr": "results",
               "id": "results"
             }
@@ -1148,7 +1148,7 @@
                   "end_col": 11
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "results",
                 "id": "results"
               },
@@ -1214,7 +1214,7 @@
                           "end_col": 42
                         },
                         "casts": [],
-                        "borrow_kind": "readonly_ref",
+                        "borrow_kind": "value",
                         "repr": "pixels",
                         "id": "pixels"
                       }
@@ -1261,7 +1261,7 @@
                 "end_col": 11
               },
               "casts": [],
-              "borrow_kind": "readonly_ref",
+              "borrow_kind": "value",
               "repr": "results",
               "id": "results"
             }
@@ -1334,7 +1334,7 @@
                       "end_col": 31
                     },
                     "casts": [],
-                    "borrow_kind": "readonly_ref",
+                    "borrow_kind": "value",
                     "repr": "results",
                     "id": "results"
                   },

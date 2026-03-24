@@ -133,6 +133,11 @@ def strip_node(node: object) -> object:
             result["casts"] = []
             continue
 
+        # borrow_kind は全て "value" に統一（resolve の責務）
+        if key == "borrow_kind":
+            result["borrow_kind"] = "value"
+            continue
+
         # arg_types: 正規化済み型をソース型に戻す（list or dict）
         if key == "arg_types":
             if isinstance(val, list):

@@ -91,7 +91,7 @@
                 "end_col": 27
               },
               "casts": [],
-              "borrow_kind": "readonly_ref",
+              "borrow_kind": "value",
               "repr": "flag",
               "id": "flag"
             },
@@ -160,7 +160,7 @@
                 "end_col": 24
               },
               "casts": [],
-              "borrow_kind": "readonly_ref",
+              "borrow_kind": "value",
               "repr": "flag",
               "id": "flag"
             },
@@ -173,7 +173,7 @@
                 "end_col": 16
               },
               "casts": [],
-              "borrow_kind": "readonly_ref",
+              "borrow_kind": "value",
               "repr": "value",
               "id": "value"
             },
@@ -197,7 +197,7 @@
                   "end_col": 36
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "value",
                 "id": "value"
               },
@@ -290,7 +290,7 @@
               "end_col": 12
             },
             "casts": [],
-            "borrow_kind": "readonly_ref",
+            "borrow_kind": "value",
             "repr": "x",
             "id": "x"
           }
@@ -378,7 +378,7 @@
                     "end_col": 33
                   },
                   "casts": [],
-                  "borrow_kind": "readonly_ref",
+                  "borrow_kind": "value",
                   "repr": "flag",
                   "id": "flag"
                 },
@@ -483,7 +483,7 @@
                     "end_col": 21
                   },
                   "casts": [],
-                  "borrow_kind": "readonly_ref",
+                  "borrow_kind": "value",
                   "repr": "flag",
                   "id": "flag"
                 },
@@ -614,7 +614,7 @@
                       "end_col": 27
                     },
                     "casts": [],
-                    "borrow_kind": "readonly_ref",
+                    "borrow_kind": "value",
                     "repr": "flag",
                     "id": "flag"
                   },
@@ -1103,7 +1103,7 @@
                     "end_col": 12
                   },
                   "casts": [],
-                  "borrow_kind": "readonly_ref",
+                  "borrow_kind": "value",
                   "repr": "xs",
                   "id": "xs"
                 },
@@ -1141,7 +1141,7 @@
                     "end_col": 19
                   },
                   "casts": [],
-                  "borrow_kind": "readonly_ref",
+                  "borrow_kind": "value",
                   "repr": "xs",
                   "id": "xs"
                 },
@@ -1281,7 +1281,7 @@
                     "end_col": 11
                   },
                   "casts": [],
-                  "borrow_kind": "readonly_ref",
+                  "borrow_kind": "value",
                   "repr": "d",
                   "id": "d"
                 },

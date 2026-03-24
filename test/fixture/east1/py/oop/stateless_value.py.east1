@@ -209,7 +209,7 @@
               "end_col": 9
             },
             "casts": [],
-            "borrow_kind": "readonly_ref",
+            "borrow_kind": "value",
             "repr": "t",
             "id": "t"
           },
@@ -280,7 +280,7 @@
                       "end_col": 11
                     },
                     "casts": [],
-                    "borrow_kind": "readonly_ref",
+                    "borrow_kind": "value",
                     "repr": "t",
                     "id": "t"
                   },
@@ -357,7 +357,7 @@
                       "end_col": 11
                     },
                     "casts": [],
-                    "borrow_kind": "readonly_ref",
+                    "borrow_kind": "value",
                     "repr": "u",
                     "id": "u"
                   },

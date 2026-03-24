@@ -164,7 +164,7 @@
                         "end_col": 18
                       },
                       "casts": [],
-                      "borrow_kind": "readonly_ref",
+                      "borrow_kind": "value",
                       "repr": "fps",
                       "id": "fps"
                     },
@@ -391,7 +391,7 @@
                         "end_col": 20
                       },
                       "casts": [],
-                      "borrow_kind": "readonly_ref",
+                      "borrow_kind": "value",
                       "repr": "step",
                       "id": "step"
                     },
@@ -419,7 +419,7 @@
                         "end_col": 37
                       },
                       "casts": [],
-                      "borrow_kind": "readonly_ref",
+                      "borrow_kind": "value",
                       "repr": "num_steps",
                       "id": "num_steps"
                     },
@@ -447,7 +447,7 @@
                         "end_col": 54
                       },
                       "casts": [],
-                      "borrow_kind": "readonly_ref",
+                      "borrow_kind": "value",
                       "repr": "loss",
                       "id": "loss"
                     },
@@ -584,7 +584,7 @@
                         "end_col": 20
                       },
                       "casts": [],
-                      "borrow_kind": "readonly_ref",
+                      "borrow_kind": "value",
                       "repr": "value",
                       "id": "value"
                     },
@@ -612,7 +612,7 @@
                         "end_col": 36
                       },
                       "casts": [],
-                      "borrow_kind": "readonly_ref",
+                      "borrow_kind": "value",
                       "repr": "value",
                       "id": "value"
                     },
@@ -749,7 +749,7 @@
                         "end_col": 16
                       },
                       "casts": [],
-                      "borrow_kind": "readonly_ref",
+                      "borrow_kind": "value",
                       "repr": "big",
                       "id": "big"
                     },
@@ -886,7 +886,7 @@
                         "end_col": 22
                       },
                       "casts": [],
-                      "borrow_kind": "readonly_ref",
+                      "borrow_kind": "value",
                       "repr": "ratio",
                       "id": "ratio"
                     },
@@ -1023,7 +1023,7 @@
                         "end_col": 15
                       },
                       "casts": [],
-                      "borrow_kind": "readonly_ref",
+                      "borrow_kind": "value",
                       "repr": "tag",
                       "id": "tag"
                     },
@@ -1171,7 +1171,7 @@
                         "end_col": 20
                       },
                       "casts": [],
-                      "borrow_kind": "readonly_ref",
+                      "borrow_kind": "value",
                       "repr": "code",
                       "id": "code"
                     },
@@ -1355,7 +1355,7 @@
                         "end_col": 14
                       },
                       "casts": [],
-                      "borrow_kind": "readonly_ref",
+                      "borrow_kind": "value",
                       "repr": "pos",
                       "id": "pos"
                     },
@@ -1383,7 +1383,7 @@
                         "end_col": 23
                       },
                       "casts": [],
-                      "borrow_kind": "readonly_ref",
+                      "borrow_kind": "value",
                       "repr": "neg",
                       "id": "neg"
                     },
@@ -1632,7 +1632,7 @@
                   "end_col": 35
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "expected",
                 "id": "expected"
               },

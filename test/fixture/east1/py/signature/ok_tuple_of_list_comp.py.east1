@@ -165,7 +165,7 @@
                       "end_col": 54
                     },
                     "casts": [],
-                    "borrow_kind": "readonly_ref",
+                    "borrow_kind": "value",
                     "repr": "n_layer",
                     "id": "n_layer"
                   },
@@ -317,7 +317,7 @@
                       "end_col": 56
                     },
                     "casts": [],
-                    "borrow_kind": "readonly_ref",
+                    "borrow_kind": "value",
                     "repr": "n_layer",
                     "id": "n_layer"
                   },
@@ -442,7 +442,7 @@
                       "end_col": 18
                     },
                     "casts": [],
-                    "borrow_kind": "readonly_ref",
+                    "borrow_kind": "value",
                     "repr": "keys",
                     "id": "keys"
                   }
@@ -483,7 +483,7 @@
                       "end_col": 31
                     },
                     "casts": [],
-                    "borrow_kind": "readonly_ref",
+                    "borrow_kind": "value",
                     "repr": "values",
                     "id": "values"
                   }

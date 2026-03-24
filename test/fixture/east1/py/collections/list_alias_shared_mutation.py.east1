@@ -140,7 +140,7 @@
               "end_col": 9
             },
             "casts": [],
-            "borrow_kind": "readonly_ref",
+            "borrow_kind": "value",
             "repr": "a",
             "id": "a"
           },
@@ -186,7 +186,7 @@
                   "end_col": 5
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "b",
                 "id": "b"
               },
@@ -217,7 +217,7 @@
                 "end_col": 5
               },
               "casts": [],
-              "borrow_kind": "readonly_ref",
+              "borrow_kind": "value",
               "repr": "b",
               "id": "b"
             }
@@ -289,7 +289,7 @@
                     "end_col": 27
                   },
                   "casts": [],
-                  "borrow_kind": "readonly_ref",
+                  "borrow_kind": "value",
                   "repr": "a",
                   "id": "a"
                 }
@@ -357,7 +357,7 @@
                   "end_col": 5
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "b",
                 "id": "b"
               },
@@ -374,7 +374,7 @@
                 "end_col": 5
               },
               "casts": [],
-              "borrow_kind": "readonly_ref",
+              "borrow_kind": "value",
               "repr": "b",
               "id": "b"
             }
@@ -446,7 +446,7 @@
                     "end_col": 24
                   },
                   "casts": [],
-                  "borrow_kind": "readonly_ref",
+                  "borrow_kind": "value",
                   "repr": "a",
                   "id": "a"
                 }
@@ -505,7 +505,7 @@
                   "end_col": 26
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "ok_after_append",
                 "id": "ok_after_append"
               },
@@ -518,7 +518,7 @@
                   "end_col": 43
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "ok_after_pop",
                 "id": "ok_after_pop"
               }

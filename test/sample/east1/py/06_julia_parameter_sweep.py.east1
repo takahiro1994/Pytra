@@ -205,7 +205,7 @@
                 "end_col": 11
               },
               "casts": [],
-              "borrow_kind": "readonly_ref",
+              "borrow_kind": "value",
               "repr": "palette",
               "id": "palette"
             },
@@ -267,7 +267,7 @@
                 "end_col": 11
               },
               "casts": [],
-              "borrow_kind": "readonly_ref",
+              "borrow_kind": "value",
               "repr": "palette",
               "id": "palette"
             },
@@ -329,7 +329,7 @@
                 "end_col": 11
               },
               "casts": [],
-              "borrow_kind": "readonly_ref",
+              "borrow_kind": "value",
               "repr": "palette",
               "id": "palette"
             },
@@ -478,7 +478,7 @@
                       "end_col": 14
                     },
                     "casts": [],
-                    "borrow_kind": "readonly_ref",
+                    "borrow_kind": "value",
                     "repr": "i",
                     "id": "i"
                   },
@@ -678,7 +678,7 @@
                                   "end_col": 39
                                 },
                                 "casts": [],
-                                "borrow_kind": "readonly_ref",
+                                "borrow_kind": "value",
                                 "repr": "t",
                                 "id": "t"
                               }
@@ -694,7 +694,7 @@
                               "end_col": 44
                             },
                             "casts": [],
-                            "borrow_kind": "readonly_ref",
+                            "borrow_kind": "value",
                             "repr": "t",
                             "id": "t"
                           }
@@ -709,7 +709,7 @@
                             "end_col": 48
                           },
                           "casts": [],
-                          "borrow_kind": "readonly_ref",
+                          "borrow_kind": "value",
                           "repr": "t",
                           "id": "t"
                         }
@@ -724,7 +724,7 @@
                           "end_col": 52
                         },
                         "casts": [],
-                        "borrow_kind": "readonly_ref",
+                        "borrow_kind": "value",
                         "repr": "t",
                         "id": "t"
                       }
@@ -899,7 +899,7 @@
                                   "end_col": 40
                                 },
                                 "casts": [],
-                                "borrow_kind": "readonly_ref",
+                                "borrow_kind": "value",
                                 "repr": "t",
                                 "id": "t"
                               }
@@ -940,7 +940,7 @@
                                 "end_col": 52
                               },
                               "casts": [],
-                              "borrow_kind": "readonly_ref",
+                              "borrow_kind": "value",
                               "repr": "t",
                               "id": "t"
                             }
@@ -956,7 +956,7 @@
                             "end_col": 57
                           },
                           "casts": [],
-                          "borrow_kind": "readonly_ref",
+                          "borrow_kind": "value",
                           "repr": "t",
                           "id": "t"
                         }
@@ -971,7 +971,7 @@
                           "end_col": 61
                         },
                         "casts": [],
-                        "borrow_kind": "readonly_ref",
+                        "borrow_kind": "value",
                         "repr": "t",
                         "id": "t"
                       }
@@ -1146,7 +1146,7 @@
                                   "end_col": 39
                                 },
                                 "casts": [],
-                                "borrow_kind": "readonly_ref",
+                                "borrow_kind": "value",
                                 "repr": "t",
                                 "id": "t"
                               }
@@ -1187,7 +1187,7 @@
                                 "end_col": 51
                               },
                               "casts": [],
-                              "borrow_kind": "readonly_ref",
+                              "borrow_kind": "value",
                               "repr": "t",
                               "id": "t"
                             }
@@ -1228,7 +1228,7 @@
                               "end_col": 63
                             },
                             "casts": [],
-                            "borrow_kind": "readonly_ref",
+                            "borrow_kind": "value",
                             "repr": "t",
                             "id": "t"
                           }
@@ -1244,7 +1244,7 @@
                           "end_col": 68
                         },
                         "casts": [],
-                        "borrow_kind": "readonly_ref",
+                        "borrow_kind": "value",
                         "repr": "t",
                         "id": "t"
                       }
@@ -1284,7 +1284,7 @@
                     "end_col": 15
                   },
                   "casts": [],
-                  "borrow_kind": "readonly_ref",
+                  "borrow_kind": "value",
                   "repr": "palette",
                   "id": "palette"
                 },
@@ -1319,7 +1319,7 @@
                         "end_col": 17
                       },
                       "casts": [],
-                      "borrow_kind": "readonly_ref",
+                      "borrow_kind": "value",
                       "repr": "i",
                       "id": "i"
                     },
@@ -1363,7 +1363,7 @@
                   "end_col": 30
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "r",
                 "id": "r"
               },
@@ -1398,7 +1398,7 @@
                     "end_col": 15
                   },
                   "casts": [],
-                  "borrow_kind": "readonly_ref",
+                  "borrow_kind": "value",
                   "repr": "palette",
                   "id": "palette"
                 },
@@ -1433,7 +1433,7 @@
                         "end_col": 17
                       },
                       "casts": [],
-                      "borrow_kind": "readonly_ref",
+                      "borrow_kind": "value",
                       "repr": "i",
                       "id": "i"
                     },
@@ -1477,7 +1477,7 @@
                   "end_col": 30
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "g",
                 "id": "g"
               },
@@ -1512,7 +1512,7 @@
                     "end_col": 15
                   },
                   "casts": [],
-                  "borrow_kind": "readonly_ref",
+                  "borrow_kind": "value",
                   "repr": "palette",
                   "id": "palette"
                 },
@@ -1547,7 +1547,7 @@
                         "end_col": 17
                       },
                       "casts": [],
-                      "borrow_kind": "readonly_ref",
+                      "borrow_kind": "value",
                       "repr": "i",
                       "id": "i"
                     },
@@ -1591,7 +1591,7 @@
                   "end_col": 30
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "b",
                 "id": "b"
               },
@@ -1643,7 +1643,7 @@
                   "end_col": 24
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "palette",
                 "id": "palette"
               }
@@ -1773,7 +1773,7 @@
                     "end_col": 27
                   },
                   "casts": [],
-                  "borrow_kind": "readonly_ref",
+                  "borrow_kind": "value",
                   "repr": "width",
                   "id": "width"
                 },
@@ -1787,7 +1787,7 @@
                     "end_col": 36
                   },
                   "casts": [],
-                  "borrow_kind": "readonly_ref",
+                  "borrow_kind": "value",
                   "repr": "height",
                   "id": "height"
                 }
@@ -1842,7 +1842,7 @@
               "end_col": 25
             },
             "casts": [],
-            "borrow_kind": "readonly_ref",
+            "borrow_kind": "value",
             "repr": "height",
             "id": "height"
           },
@@ -1902,7 +1902,7 @@
                     "end_col": 20
                   },
                   "casts": [],
-                  "borrow_kind": "readonly_ref",
+                  "borrow_kind": "value",
                   "repr": "y",
                   "id": "y"
                 },
@@ -1916,7 +1916,7 @@
                     "end_col": 28
                   },
                   "casts": [],
-                  "borrow_kind": "readonly_ref",
+                  "borrow_kind": "value",
                   "repr": "width",
                   "id": "width"
                 }
@@ -2028,7 +2028,7 @@
                         "end_col": 29
                       },
                       "casts": [],
-                      "borrow_kind": "readonly_ref",
+                      "borrow_kind": "value",
                       "repr": "y",
                       "id": "y"
                     },
@@ -2053,7 +2053,7 @@
                           "end_col": 39
                         },
                         "casts": [],
-                        "borrow_kind": "readonly_ref",
+                        "borrow_kind": "value",
                         "repr": "height",
                         "id": "height"
                       },
@@ -2122,7 +2122,7 @@
                   "end_col": 28
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "width",
                 "id": "width"
               },
@@ -2245,7 +2245,7 @@
                             "end_col": 32
                           },
                           "casts": [],
-                          "borrow_kind": "readonly_ref",
+                          "borrow_kind": "value",
                           "repr": "x",
                           "id": "x"
                         },
@@ -2270,7 +2270,7 @@
                               "end_col": 41
                             },
                             "casts": [],
-                            "borrow_kind": "readonly_ref",
+                            "borrow_kind": "value",
                             "repr": "width",
                             "id": "width"
                           },
@@ -2325,7 +2325,7 @@
                       "end_col": 20
                     },
                     "casts": [],
-                    "borrow_kind": "readonly_ref",
+                    "borrow_kind": "value",
                     "repr": "zy0",
                     "id": "zy0"
                   },
@@ -2397,7 +2397,7 @@
                         "end_col": 19
                       },
                       "casts": [],
-                      "borrow_kind": "readonly_ref",
+                      "borrow_kind": "value",
                       "repr": "i",
                       "id": "i"
                     },
@@ -2414,7 +2414,7 @@
                           "end_col": 30
                         },
                         "casts": [],
-                        "borrow_kind": "readonly_ref",
+                        "borrow_kind": "value",
                         "repr": "max_iter",
                         "id": "max_iter"
                       }
@@ -2462,7 +2462,7 @@
                             "end_col": 24
                           },
                           "casts": [],
-                          "borrow_kind": "readonly_ref",
+                          "borrow_kind": "value",
                           "repr": "zx",
                           "id": "zx"
                         },
@@ -2476,7 +2476,7 @@
                             "end_col": 29
                           },
                           "casts": [],
-                          "borrow_kind": "readonly_ref",
+                          "borrow_kind": "value",
                           "repr": "zx",
                           "id": "zx"
                         }
@@ -2525,7 +2525,7 @@
                             "end_col": 24
                           },
                           "casts": [],
-                          "borrow_kind": "readonly_ref",
+                          "borrow_kind": "value",
                           "repr": "zy",
                           "id": "zy"
                         },
@@ -2539,7 +2539,7 @@
                             "end_col": 29
                           },
                           "casts": [],
-                          "borrow_kind": "readonly_ref",
+                          "borrow_kind": "value",
                           "repr": "zy",
                           "id": "zy"
                         }
@@ -2586,7 +2586,7 @@
                               "end_col": 22
                             },
                             "casts": [],
-                            "borrow_kind": "readonly_ref",
+                            "borrow_kind": "value",
                             "repr": "zx2",
                             "id": "zx2"
                           },
@@ -2600,7 +2600,7 @@
                               "end_col": 28
                             },
                             "casts": [],
-                            "borrow_kind": "readonly_ref",
+                            "borrow_kind": "value",
                             "repr": "zy2",
                             "id": "zy2"
                           }
@@ -2667,7 +2667,7 @@
                           "end_col": 18
                         },
                         "casts": [],
-                        "borrow_kind": "readonly_ref",
+                        "borrow_kind": "value",
                         "repr": "zy",
                         "id": "zy"
                       },
@@ -2727,7 +2727,7 @@
                                 "end_col": 29
                               },
                               "casts": [],
-                              "borrow_kind": "readonly_ref",
+                              "borrow_kind": "value",
                               "repr": "zx",
                               "id": "zx"
                             }
@@ -2742,7 +2742,7 @@
                               "end_col": 34
                             },
                             "casts": [],
-                            "borrow_kind": "readonly_ref",
+                            "borrow_kind": "value",
                             "repr": "zy",
                             "id": "zy"
                           }
@@ -2757,7 +2757,7 @@
                             "end_col": 39
                           },
                           "casts": [],
-                          "borrow_kind": "readonly_ref",
+                          "borrow_kind": "value",
                           "repr": "ci",
                           "id": "ci"
                         }
@@ -2782,7 +2782,7 @@
                           "end_col": 18
                         },
                         "casts": [],
-                        "borrow_kind": "readonly_ref",
+                        "borrow_kind": "value",
                         "repr": "zx",
                         "id": "zx"
                       },
@@ -2817,7 +2817,7 @@
                               "end_col": 24
                             },
                             "casts": [],
-                            "borrow_kind": "readonly_ref",
+                            "borrow_kind": "value",
                             "repr": "zx2",
                             "id": "zx2"
                           },
@@ -2831,7 +2831,7 @@
                               "end_col": 30
                             },
                             "casts": [],
-                            "borrow_kind": "readonly_ref",
+                            "borrow_kind": "value",
                             "repr": "zy2",
                             "id": "zy2"
                           }
@@ -2846,7 +2846,7 @@
                             "end_col": 35
                           },
                           "casts": [],
-                          "borrow_kind": "readonly_ref",
+                          "borrow_kind": "value",
                           "repr": "cr",
                           "id": "cr"
                         }
@@ -2871,7 +2871,7 @@
                           "end_col": 17
                         },
                         "casts": [],
-                        "borrow_kind": "readonly_ref",
+                        "borrow_kind": "value",
                         "repr": "i",
                         "id": "i"
                       },
@@ -2922,7 +2922,7 @@
                         "end_col": 16
                       },
                       "casts": [],
-                      "borrow_kind": "readonly_ref",
+                      "borrow_kind": "value",
                       "repr": "i",
                       "id": "i"
                     },
@@ -2939,7 +2939,7 @@
                           "end_col": 28
                         },
                         "casts": [],
-                        "borrow_kind": "readonly_ref",
+                        "borrow_kind": "value",
                         "repr": "max_iter",
                         "id": "max_iter"
                       }
@@ -2974,7 +2974,7 @@
                             "end_col": 21
                           },
                           "casts": [],
-                          "borrow_kind": "readonly_ref",
+                          "borrow_kind": "value",
                           "repr": "frame",
                           "id": "frame"
                         },
@@ -2998,7 +2998,7 @@
                               "end_col": 30
                             },
                             "casts": [],
-                            "borrow_kind": "readonly_ref",
+                            "borrow_kind": "value",
                             "repr": "row_base",
                             "id": "row_base"
                           },
@@ -3012,7 +3012,7 @@
                               "end_col": 34
                             },
                             "casts": [],
-                            "borrow_kind": "readonly_ref",
+                            "borrow_kind": "value",
                             "repr": "x",
                             "id": "x"
                           }
@@ -3135,7 +3135,7 @@
                                     "end_col": 38
                                   },
                                   "casts": [],
-                                  "borrow_kind": "readonly_ref",
+                                  "borrow_kind": "value",
                                   "repr": "i",
                                   "id": "i"
                                 },
@@ -3164,7 +3164,7 @@
                                   "end_col": 57
                                 },
                                 "casts": [],
-                                "borrow_kind": "readonly_ref",
+                                "borrow_kind": "value",
                                 "repr": "max_iter",
                                 "id": "max_iter"
                               }
@@ -3179,7 +3179,7 @@
                                 "end_col": 65
                               },
                               "casts": [],
-                              "borrow_kind": "readonly_ref",
+                              "borrow_kind": "value",
                               "repr": "phase",
                               "id": "phase"
                             }
@@ -3240,7 +3240,7 @@
                             "end_col": 21
                           },
                           "casts": [],
-                          "borrow_kind": "readonly_ref",
+                          "borrow_kind": "value",
                           "repr": "frame",
                           "id": "frame"
                         },
@@ -3264,7 +3264,7 @@
                               "end_col": 30
                             },
                             "casts": [],
-                            "borrow_kind": "readonly_ref",
+                            "borrow_kind": "value",
                             "repr": "row_base",
                             "id": "row_base"
                           },
@@ -3278,7 +3278,7 @@
                               "end_col": 34
                             },
                             "casts": [],
-                            "borrow_kind": "readonly_ref",
+                            "borrow_kind": "value",
                             "repr": "x",
                             "id": "x"
                           }
@@ -3293,7 +3293,7 @@
                           "end_col": 49
                         },
                         "casts": [],
-                        "borrow_kind": "readonly_ref",
+                        "borrow_kind": "value",
                         "repr": "color_index",
                         "id": "color_index"
                       },
@@ -3350,7 +3350,7 @@
                   "end_col": 22
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "frame",
                 "id": "frame"
               }
@@ -3983,7 +3983,7 @@
               "end_col": 27
             },
             "casts": [],
-            "borrow_kind": "readonly_ref",
+            "borrow_kind": "value",
             "repr": "frames_n",
             "id": "frames_n"
           },
@@ -4065,7 +4065,7 @@
                         "end_col": 15
                       },
                       "casts": [],
-                      "borrow_kind": "readonly_ref",
+                      "borrow_kind": "value",
                       "repr": "i",
                       "id": "i"
                     },
@@ -4079,7 +4079,7 @@
                         "end_col": 30
                       },
                       "casts": [],
-                      "borrow_kind": "readonly_ref",
+                      "borrow_kind": "value",
                       "repr": "start_offset",
                       "id": "start_offset"
                     }
@@ -4094,7 +4094,7 @@
                       "end_col": 42
                     },
                     "casts": [],
-                    "borrow_kind": "readonly_ref",
+                    "borrow_kind": "value",
                     "repr": "frames_n",
                     "id": "frames_n"
                   }
@@ -4109,7 +4109,7 @@
                     "end_col": 54
                   },
                   "casts": [],
-                  "borrow_kind": "readonly_ref",
+                  "borrow_kind": "value",
                   "repr": "frames_n",
                   "id": "frames_n"
                 }
@@ -4211,7 +4211,7 @@
                     "end_col": 33
                   },
                   "casts": [],
-                  "borrow_kind": "readonly_ref",
+                  "borrow_kind": "value",
                   "repr": "t",
                   "id": "t"
                 }
@@ -4260,7 +4260,7 @@
                     "end_col": 22
                   },
                   "casts": [],
-                  "borrow_kind": "readonly_ref",
+                  "borrow_kind": "value",
                   "repr": "center_cr",
                   "id": "center_cr"
                 },
@@ -4285,7 +4285,7 @@
                       "end_col": 34
                     },
                     "casts": [],
-                    "borrow_kind": "readonly_ref",
+                    "borrow_kind": "value",
                     "repr": "radius_cr",
                     "id": "radius_cr"
                   },
@@ -4390,7 +4390,7 @@
                     "end_col": 22
                   },
                   "casts": [],
-                  "borrow_kind": "readonly_ref",
+                  "borrow_kind": "value",
                   "repr": "center_ci",
                   "id": "center_ci"
                 },
@@ -4415,7 +4415,7 @@
                       "end_col": 34
                     },
                     "casts": [],
-                    "borrow_kind": "readonly_ref",
+                    "borrow_kind": "value",
                     "repr": "radius_ci",
                     "id": "radius_ci"
                   },
@@ -4531,7 +4531,7 @@
                       "end_col": 29
                     },
                     "casts": [],
-                    "borrow_kind": "readonly_ref",
+                    "borrow_kind": "value",
                     "repr": "phase_offset",
                     "id": "phase_offset"
                   },
@@ -4556,7 +4556,7 @@
                         "end_col": 33
                       },
                       "casts": [],
-                      "borrow_kind": "readonly_ref",
+                      "borrow_kind": "value",
                       "repr": "i",
                       "id": "i"
                     },
@@ -4633,7 +4633,7 @@
                       "end_col": 14
                     },
                     "casts": [],
-                    "borrow_kind": "readonly_ref",
+                    "borrow_kind": "value",
                     "repr": "frames",
                     "id": "frames"
                   },
@@ -4674,7 +4674,7 @@
                           "end_col": 40
                         },
                         "casts": [],
-                        "borrow_kind": "readonly_ref",
+                        "borrow_kind": "value",
                         "repr": "width",
                         "id": "width"
                       },
@@ -4687,7 +4687,7 @@
                           "end_col": 48
                         },
                         "casts": [],
-                        "borrow_kind": "readonly_ref",
+                        "borrow_kind": "value",
                         "repr": "height",
                         "id": "height"
                       },
@@ -4700,7 +4700,7 @@
                           "end_col": 52
                         },
                         "casts": [],
-                        "borrow_kind": "readonly_ref",
+                        "borrow_kind": "value",
                         "repr": "cr",
                         "id": "cr"
                       },
@@ -4713,7 +4713,7 @@
                           "end_col": 56
                         },
                         "casts": [],
-                        "borrow_kind": "readonly_ref",
+                        "borrow_kind": "value",
                         "repr": "ci",
                         "id": "ci"
                       },
@@ -4726,7 +4726,7 @@
                           "end_col": 66
                         },
                         "casts": [],
-                        "borrow_kind": "readonly_ref",
+                        "borrow_kind": "value",
                         "repr": "max_iter",
                         "id": "max_iter"
                       },
@@ -4739,7 +4739,7 @@
                           "end_col": 73
                         },
                         "casts": [],
-                        "borrow_kind": "readonly_ref",
+                        "borrow_kind": "value",
                         "repr": "phase",
                         "id": "phase"
                       }
@@ -4757,7 +4757,7 @@
                     "end_col": 14
                   },
                   "casts": [],
-                  "borrow_kind": "readonly_ref",
+                  "borrow_kind": "value",
                   "repr": "frames",
                   "id": "frames"
                 }
@@ -4808,7 +4808,7 @@
                   "end_col": 21
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "out_path",
                 "id": "out_path"
               },
@@ -4821,7 +4821,7 @@
                   "end_col": 28
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "width",
                 "id": "width"
               },
@@ -4834,7 +4834,7 @@
                   "end_col": 36
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "height",
                 "id": "height"
               },
@@ -4847,7 +4847,7 @@
                   "end_col": 44
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "frames",
                 "id": "frames"
               },
@@ -4984,7 +4984,7 @@
                 "end_col": 36
               },
               "casts": [],
-              "borrow_kind": "readonly_ref",
+              "borrow_kind": "value",
               "repr": "start",
               "id": "start"
             }
@@ -5047,7 +5047,7 @@
                   "end_col": 29
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "out_path",
                 "id": "out_path"
               }
@@ -5110,7 +5110,7 @@
                   "end_col": 29
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "frames_n",
                 "id": "frames_n"
               }
@@ -5173,7 +5173,7 @@
                   "end_col": 33
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "elapsed",
                 "id": "elapsed"
               }

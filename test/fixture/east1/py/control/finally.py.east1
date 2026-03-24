@@ -120,7 +120,7 @@
                   "end_col": 15
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "flag",
                 "id": "flag"
               },
@@ -196,7 +196,7 @@
                   "end_col": 13
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "value",
                 "id": "value"
               },
@@ -252,7 +252,7 @@
                       "end_col": 13
                     },
                     "casts": [],
-                    "borrow_kind": "readonly_ref",
+                    "borrow_kind": "value",
                     "repr": "value",
                     "id": "value"
                   },
@@ -294,7 +294,7 @@
                   "end_col": 13
                 },
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "value",
                 "id": "value"
               },
@@ -333,7 +333,7 @@
               "end_col": 16
             },
             "casts": [],
-            "borrow_kind": "readonly_ref",
+            "borrow_kind": "value",
             "repr": "value",
             "id": "value"
           }
