@@ -603,6 +603,19 @@ AGENT-B（resolve）が型解決を始めるために、built-in 宣言ファイ
 - built-in 宣言（builtins.py, containers.py）の EAST1 golden を test/builtin/east1/py/ に配置済み。
 - AGENT-B が strip 済み EAST1 を入力にして、既存 EAST2 golden と一致する resolve を実装する。
 
+### 2026-03-25: [ID: P0-RESOLVE-S1] resolve 本格実装着手 — 27/132 fixture pass
+
+- `toolchain2/resolve/py/` を全面再実装。4 モジュール構成:
+  - `type_norm.py`: 型名正規化 (int→int64 等)、TypeExpr 構築
+  - `builtin_registry.py`: builtins.py.east1/containers.py.east1 からシグネチャ抽出、runtime binding テーブル
+  - `resolver.py`: 全式 resolved_type 確定、borrow_kind 判定、builtin→py_* 変換、ForRange 変換、import 解決
+  - `normalize_order.py`: golden file 一致のためのフィールド順序正規化
+- 27/132 fixture pass (20.5%)。カテゴリ別: core 9/22, control 5/10, strings 6/12, collections 2/20, signature 2/13
+- 通過パターン: 基本型推論、関数呼び出し、比較演算、ForRange 変換、文字列操作、ブール演算
+- 残課題: OOP (0/16) class メソッド self 型/arg_type_exprs null 制御、stdlib (0/14) import binding host_only/adapter_kind、
+  typing (2/18) DynamicType/bytes/bytearray、collections (2/20) comprehension source_span/container method 検出精度、
+  f-string/lambda/decorator の型推論、import resolution binding 詳細フィールド
+
 ## 7. toolchain2/ → toolchain/ 置換手順
 
 全段（parse→resolve→compile→optimize）の golden 一致が確認できた時点で、以下の手順で置換する。
