@@ -49,6 +49,21 @@
 3. [x] [ID: P0-PARSE-S3] `pytra-cli2 -parse` を toolchain2 の自前パーサーに切り替える — 完了
 4. [x] [ID: P0-PARSE-S4] builtins.py / containers.py の新構文に対応し、golden を `test/builtin/east1/py/` に配置する — 完了
 5. [x] [ID: P0-PARSE-S5] v2 extern (`extern_fn` / `extern_var` / `extern_class`) の構文に対応し、include/ の golden を再生成する — 完了
+6. [ ] [ID: P0-PARSE-S6] `extern_method` の構文に対応し、containers.py の golden を再生成する
+
+P0-PARSE-S6 の詳細:
+
+containers.py に `@extern_method(module=..., symbol=..., tag=...)` を追加済み。
+パーサーを `extern_method` decorator に対応させ、EAST1 の FunctionDef.meta.extern_v2 に格納する。
+
+対応が必要な構文:
+- `@extern_method(module="...", symbol="...", tag="...")` — クラス内メソッド decorator
+- EAST1 の `FunctionDef.meta.extern_v2: {kind: "method", module, symbol, tag}` に格納
+
+完了条件:
+- `src/include/py/pytra/built_in/containers.py` が parse 成功し、全メソッドに extern_v2 が付与される
+- golden を `test/builtin/east1/py/` に再生成
+- AGENT-B が resolve で container メソッドの runtime 情報を `meta.extern_v2` から取得可能
 
 P0-PARSE-S5 の詳細:
 
