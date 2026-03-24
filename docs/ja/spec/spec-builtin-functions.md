@@ -158,9 +158,14 @@ resolve は引数の数から `start/stop/step` を正規化し、`for x in rang
 
 ## 4. コンテナ型の dunder メソッド宣言
 
+クラスレベルの `@template` で型パラメータを宣言する。resolve は変数の具象型（`list[int64]` 等）から `T` を束縛し、メソッドの戻り値型を解決する。
+
+引数の型は exact match を要求する。`list[int16].extend(list[int8])` のような暗黙の型変換は行わず、`semantic_conflict` で拒否する。
+
 ### 4.1 list
 
 ```python
+@template("T")
 class list:
     def __len__(self) -> int: pass
     def __str__(self) -> str: pass
@@ -204,6 +209,7 @@ class str:
 ### 4.3 dict
 
 ```python
+@template("K", "V")
 class dict:
     def __len__(self) -> int: pass
     def __str__(self) -> str: pass
@@ -221,6 +227,7 @@ class dict:
 ### 4.4 set
 
 ```python
+@template("T")
 class set:
     def __len__(self) -> int: pass
     def __str__(self) -> str: pass
