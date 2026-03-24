@@ -62,6 +62,7 @@ class ParseContext:
     import_bindings: list[dict[str, JsonVal]]
     qualified_symbol_refs: list[dict[str, JsonVal]]
     implicit_builtin_modules: dict[str, bool]  # set の代替
+    class_names: dict[str, bool]  # set の代替: 定義されたクラス名
 
 
 # ---------------------------------------------------------------------------
@@ -697,6 +698,9 @@ class ExprParser:
             return "unknown"
         if func_name == "zip":
             return "unknown"
+        # Class constructor: ClassName() → ClassName
+        if func_name in self.ctx.class_names:
+            return func_name
         return "unknown"
 
     def _annotate_call(self, call: Call, func_name: str) -> None:
@@ -1149,6 +1153,7 @@ def parse_python_source(source: str, filename: str) -> Module:
         import_bindings=[],
         qualified_symbol_refs=[],
         implicit_builtin_modules={},
+        class_names={},
     )
 
     # Phase 1: Pre-scan
@@ -1221,6 +1226,12 @@ def _prescan(ctx: ParseContext, lines: list[str]) -> None:
         if fn_name != "":
             if ret_ann != "":
                 ctx.fn_returns[fn_name] = _resolve_type(ret_ann, ctx)
+            continue
+
+        # class Name:
+        cls_name = _parse_class_name(s)
+        if cls_name != "":
+            ctx.class_names[cls_name] = True
             continue
 
 
@@ -1877,7 +1888,9 @@ def _parse_expr_text(
 
 def _make_name_expr(name: str, resolved_type: str, line: int, col: int, ctx: ParseContext) -> Name:
     """Name ノードを生成する。"""
-    span = make_span(line, col, line, col + len(name))
+    # golden 準拠: 元の行テキスト内で名前の位置を検索
+    actual_col = _find_expr_col(ctx, name, line, col)
+    span = make_span(line, actual_col, line, actual_col + len(name))
     base = ExprBase(
         source_span=span,
         resolved_type=resolved_type,
