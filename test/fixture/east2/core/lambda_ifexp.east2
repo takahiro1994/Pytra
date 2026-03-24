@@ -78,7 +78,6 @@
               "end_lineno": 6,
               "end_col": 52
             },
-            "resolved_type": "callable[unknown->str]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "lambda x: \"pos\" if x > 0 else \"non-pos\"",
@@ -177,10 +176,11 @@
                 "value": "non-pos"
               }
             },
-            "return_type": "str"
+            "return_type": "unknown",
+            "resolved_type": "callable[unknown]"
           },
           "declare": true,
-          "decl_type": "callable[unknown->str]",
+          "decl_type": "callable[unknown]",
           "declare_init": true
         },
         {
@@ -343,7 +343,7 @@
                       "end_lineno": 9,
                       "end_col": 40
                     },
-                    "resolved_type": "str",
+                    "resolved_type": "unknown",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "choose(2)",
@@ -355,9 +355,9 @@
                         "end_lineno": 9,
                         "end_col": 37
                       },
-                      "resolved_type": "callable[unknown->str]",
+                      "resolved_type": "unknown",
                       "casts": [],
-                      "borrow_kind": "readonly_ref",
+                      "borrow_kind": "value",
                       "repr": "choose",
                       "id": "choose"
                     },
@@ -524,7 +524,7 @@
                       "end_lineno": 10,
                       "end_col": 40
                     },
-                    "resolved_type": "str",
+                    "resolved_type": "unknown",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "choose(0)",
@@ -536,9 +536,9 @@
                         "end_lineno": 10,
                         "end_col": 37
                       },
-                      "resolved_type": "callable[unknown->str]",
+                      "resolved_type": "unknown",
                       "casts": [],
-                      "borrow_kind": "readonly_ref",
+                      "borrow_kind": "value",
                       "repr": "choose",
                       "id": "choose"
                     },
@@ -705,7 +705,7 @@
                       "end_lineno": 11,
                       "end_col": 41
                     },
-                    "resolved_type": "str",
+                    "resolved_type": "unknown",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "choose(-7)",
@@ -717,9 +717,9 @@
                         "end_lineno": 11,
                         "end_col": 37
                       },
-                      "resolved_type": "callable[unknown->str]",
+                      "resolved_type": "unknown",
                       "casts": [],
-                      "borrow_kind": "readonly_ref",
+                      "borrow_kind": "value",
                       "repr": "choose",
                       "id": "choose"
                     },

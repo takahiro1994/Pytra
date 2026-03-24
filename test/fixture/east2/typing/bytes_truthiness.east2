@@ -186,8 +186,8 @@
           "kind": "While",
           "source_span": {
             "lineno": 13,
-            "col": 0,
-            "end_lineno": 14,
+            "col": 4,
+            "end_lineno": 8,
             "end_col": 19
           },
           "test": {
@@ -208,17 +208,17 @@
             {
               "kind": "Return",
               "source_span": {
-                "lineno": 14,
+                "lineno": 8,
                 "col": 8,
-                "end_lineno": 14,
+                "end_lineno": 8,
                 "end_col": 19
               },
               "value": {
                 "kind": "Constant",
                 "source_span": {
-                  "lineno": 14,
+                  "lineno": 8,
                   "col": 15,
-                  "end_lineno": 14,
+                  "end_lineno": 8,
                   "end_col": 19
                 },
                 "resolved_type": "bool",
@@ -431,7 +431,7 @@
               "end_lineno": 23,
               "end_col": 26
             },
-            "resolved_type": "bytes",
+            "resolved_type": "unknown",
             "casts": [],
             "borrow_kind": "value",
             "repr": "bytes()",
@@ -450,14 +450,7 @@
               "id": "bytes"
             },
             "args": [],
-            "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "bytes",
-            "runtime_call": "bytes_ctor",
-            "runtime_module_id": "pytra.core.py_runtime",
-            "runtime_symbol": "bytes",
-            "runtime_call_adapter_kind": "builtin",
-            "semantic_tag": "ctor.bytes"
+            "keywords": []
           },
           "declare": true,
           "decl_type": "bytes",
@@ -505,7 +498,7 @@
               "end_lineno": 24,
               "end_col": 36
             },
-            "resolved_type": "bytes",
+            "resolved_type": "unknown",
             "casts": [],
             "borrow_kind": "value",
             "repr": "bytes([1, 2, 3])",
@@ -582,14 +575,7 @@
                 ]
               }
             ],
-            "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "bytes",
-            "runtime_call": "bytes_ctor",
-            "runtime_module_id": "pytra.core.py_runtime",
-            "runtime_symbol": "bytes",
-            "runtime_call_adapter_kind": "builtin",
-            "semantic_tag": "ctor.bytes"
+            "keywords": []
           },
           "declare": true,
           "decl_type": "bytes",

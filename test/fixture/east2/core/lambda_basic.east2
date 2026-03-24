@@ -130,7 +130,6 @@
               "end_lineno": 8,
               "end_col": 33
             },
-            "resolved_type": "callable[unknown->unknown]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "lambda x: x + base",
@@ -150,7 +149,7 @@
                 "end_lineno": 8,
                 "end_col": 33
               },
-              "resolved_type": "unknown",
+              "resolved_type": "int64",
               "casts": [],
               "borrow_kind": "value",
               "repr": "x + base",
@@ -184,10 +183,11 @@
                 "id": "base"
               }
             },
-            "return_type": "unknown"
+            "return_type": "unknown",
+            "resolved_type": "callable[unknown]"
           },
           "declare": true,
-          "decl_type": "callable[unknown->unknown]",
+          "decl_type": "callable[unknown]",
           "declare_init": true
         },
         {
@@ -220,7 +220,6 @@
               "end_lineno": 9,
               "end_col": 30
             },
-            "resolved_type": "callable[->bool]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "lambda: True",
@@ -239,10 +238,11 @@
               "repr": "True",
               "value": true
             },
-            "return_type": "bool"
+            "return_type": "unknown",
+            "resolved_type": "callable[unknown]"
           },
           "declare": true,
-          "decl_type": "callable[->bool]",
+          "decl_type": "callable[unknown]",
           "declare_init": true
         },
         {
@@ -275,7 +275,6 @@
               "end_lineno": 10,
               "end_col": 33
             },
-            "resolved_type": "callable[unknown->bool]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "lambda x: x > 0",
@@ -333,10 +332,11 @@
                 }
               ]
             },
-            "return_type": "bool"
+            "return_type": "unknown",
+            "resolved_type": "callable[unknown]"
           },
           "declare": true,
-          "decl_type": "callable[unknown->bool]",
+          "decl_type": "callable[unknown]",
           "declare_init": true
         },
         {
@@ -386,9 +386,9 @@
                 "end_lineno": 12,
                 "end_col": 21
               },
-              "resolved_type": "callable[unknown->unknown]",
+              "resolved_type": "unknown",
               "casts": [],
-              "borrow_kind": "readonly_ref",
+              "borrow_kind": "value",
               "repr": "add_base",
               "id": "add_base"
             },
@@ -474,9 +474,9 @@
                 "end_lineno": 13,
                 "end_col": 21
               },
-              "resolved_type": "callable[unknown->unknown]",
+              "resolved_type": "unknown",
               "casts": [],
-              "borrow_kind": "readonly_ref",
+              "borrow_kind": "value",
               "repr": "add_base",
               "id": "add_base"
             },
@@ -558,7 +558,7 @@
               "end_lineno": 14,
               "end_col": 29
             },
-            "resolved_type": "bool",
+            "resolved_type": "unknown",
             "casts": [],
             "borrow_kind": "value",
             "repr": "is_positive(3)",
@@ -570,9 +570,9 @@
                 "end_lineno": 14,
                 "end_col": 26
               },
-              "resolved_type": "callable[unknown->bool]",
+              "resolved_type": "unknown",
               "casts": [],
-              "borrow_kind": "readonly_ref",
+              "borrow_kind": "value",
               "repr": "is_positive",
               "id": "is_positive"
             },
@@ -640,7 +640,7 @@
               "end_lineno": 15,
               "end_col": 30
             },
-            "resolved_type": "bool",
+            "resolved_type": "unknown",
             "casts": [],
             "borrow_kind": "value",
             "repr": "is_positive(-1)",
@@ -652,9 +652,9 @@
                 "end_lineno": 15,
                 "end_col": 26
               },
-              "resolved_type": "callable[unknown->bool]",
+              "resolved_type": "unknown",
               "casts": [],
-              "borrow_kind": "readonly_ref",
+              "borrow_kind": "value",
               "repr": "is_positive",
               "id": "is_positive"
             },
@@ -1163,7 +1163,7 @@
                       "end_lineno": 20,
                       "end_col": 44
                     },
-                    "resolved_type": "bool",
+                    "resolved_type": "unknown",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "always_true()",
@@ -1175,9 +1175,9 @@
                         "end_lineno": 20,
                         "end_col": 42
                       },
-                      "resolved_type": "callable[->bool]",
+                      "resolved_type": "unknown",
                       "casts": [],
-                      "borrow_kind": "readonly_ref",
+                      "borrow_kind": "value",
                       "repr": "always_true",
                       "id": "always_true"
                     },

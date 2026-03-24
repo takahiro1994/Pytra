@@ -199,7 +199,7 @@
               "end_lineno": 12,
               "end_col": 7
             },
-            "resolved_type": "unknown",
+            "resolved_type": "int64",
             "casts": [],
             "borrow_kind": "value",
             "repr": "x.v",
@@ -478,7 +478,7 @@
                   "end_lineno": 19,
                   "end_col": 13
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "int64",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "a.v",
@@ -552,7 +552,7 @@
                   "end_lineno": 20,
                   "end_col": 13
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "int64",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "b.v",

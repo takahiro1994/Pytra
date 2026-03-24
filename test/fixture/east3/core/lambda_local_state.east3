@@ -116,14 +116,14 @@
               "end_lineno": 7,
               "end_col_offset": 9
             },
-            "resolved_type": "callable[unknown->unknown]",
+            "resolved_type": "callable[unknown]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "scale",
             "id": "scale"
           },
           "declare": true,
-          "decl_type": "callable[unknown->unknown]",
+          "decl_type": "callable[unknown]",
           "declare_init": true,
           "value": {
             "kind": "Lambda",
@@ -133,7 +133,6 @@
               "end_lineno": 7,
               "end_col_offset": 32
             },
-            "resolved_type": "callable[unknown->unknown]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "lambda x: x * factor",
@@ -187,13 +186,14 @@
                 "id": "factor"
               }
             },
-            "return_type": "unknown"
+            "return_type": "unknown",
+            "resolved_type": "callable[unknown]"
           },
           "type_expr_summary_v1": {
             "schema_version": 1,
             "kind": "GenericType",
             "category": "static",
-            "mirror": "callable[unknown->unknown]"
+            "mirror": "callable[unknown]"
           }
         },
         {
@@ -374,9 +374,9 @@
                         "end_lineno": 10,
                         "end_col_offset": 36
                       },
-                      "resolved_type": "callable[unknown->unknown]",
+                      "resolved_type": "unknown",
                       "casts": [],
-                      "borrow_kind": "readonly_ref",
+                      "borrow_kind": "value",
                       "repr": "scale",
                       "id": "scale"
                     },
@@ -575,9 +575,9 @@
                         "end_lineno": 11,
                         "end_col_offset": 36
                       },
-                      "resolved_type": "callable[unknown->unknown]",
+                      "resolved_type": "unknown",
                       "casts": [],
-                      "borrow_kind": "readonly_ref",
+                      "borrow_kind": "value",
                       "repr": "scale",
                       "id": "scale"
                     },

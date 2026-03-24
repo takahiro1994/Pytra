@@ -130,7 +130,6 @@
               "end_lineno": 7,
               "end_col": 32
             },
-            "resolved_type": "callable[unknown->unknown]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "lambda x: x * factor",
@@ -150,7 +149,7 @@
                 "end_lineno": 7,
                 "end_col": 32
               },
-              "resolved_type": "unknown",
+              "resolved_type": "int64",
               "casts": [],
               "borrow_kind": "value",
               "repr": "x * factor",
@@ -184,10 +183,11 @@
                 "id": "factor"
               }
             },
-            "return_type": "unknown"
+            "return_type": "unknown",
+            "resolved_type": "callable[unknown]"
           },
           "declare": true,
-          "decl_type": "callable[unknown->unknown]",
+          "decl_type": "callable[unknown]",
           "declare_init": true
         },
         {
@@ -362,9 +362,9 @@
                         "end_lineno": 10,
                         "end_col": 36
                       },
-                      "resolved_type": "callable[unknown->unknown]",
+                      "resolved_type": "unknown",
                       "casts": [],
-                      "borrow_kind": "readonly_ref",
+                      "borrow_kind": "value",
                       "repr": "scale",
                       "id": "scale"
                     },
@@ -543,9 +543,9 @@
                         "end_lineno": 11,
                         "end_col": 36
                       },
-                      "resolved_type": "callable[unknown->unknown]",
+                      "resolved_type": "unknown",
                       "casts": [],
-                      "borrow_kind": "readonly_ref",
+                      "borrow_kind": "value",
                       "repr": "scale",
                       "id": "scale"
                     },

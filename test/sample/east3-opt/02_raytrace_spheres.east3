@@ -3981,8 +3981,8 @@
           "source_span": {
             "lineno": 28,
             "col_offset": 4,
-            "end_lineno": 30,
-            "end_col_offset": 0
+            "end_lineno": 29,
+            "end_col_offset": 19
           },
           "test": {
             "kind": "Compare",
@@ -4184,73 +4184,105 @@
             "name": "float64"
           },
           "value": {
-            "kind": "Call",
+            "kind": "Unbox",
+            "resolved_type": "float64",
+            "borrow_kind": "value",
+            "casts": [],
+            "value": {
+              "kind": "Call",
+              "source_span": {
+                "lineno": 31,
+                "col_offset": 16,
+                "end_lineno": 31,
+                "end_col_offset": 28
+              },
+              "resolved_type": "unknown",
+              "casts": [],
+              "borrow_kind": "value",
+              "repr": "math.sqrt(d)",
+              "func": {
+                "kind": "Attribute",
+                "source_span": {
+                  "lineno": 31,
+                  "col_offset": 16,
+                  "end_lineno": 31,
+                  "end_col_offset": 25
+                },
+                "resolved_type": "unknown",
+                "casts": [],
+                "borrow_kind": "value",
+                "repr": "math.sqrt",
+                "value": {
+                  "kind": "Name",
+                  "source_span": {
+                    "lineno": 31,
+                    "col_offset": 16,
+                    "end_lineno": 31,
+                    "end_col_offset": 20
+                  },
+                  "resolved_type": "unknown",
+                  "casts": [],
+                  "borrow_kind": "value",
+                  "repr": "math",
+                  "id": "math"
+                },
+                "attr": "sqrt"
+              },
+              "args": [
+                {
+                  "kind": "Name",
+                  "source_span": {
+                    "lineno": 31,
+                    "col_offset": 26,
+                    "end_lineno": 31,
+                    "end_col_offset": 27
+                  },
+                  "resolved_type": "float64",
+                  "casts": [],
+                  "borrow_kind": "readonly_ref",
+                  "repr": "d",
+                  "id": "d"
+                }
+              ],
+              "keywords": [],
+              "type_expr_summary_v1": {
+                "schema_version": 1,
+                "kind": "DynamicType",
+                "category": "dynamic",
+                "mirror": "unknown",
+                "dynamic_name": "unknown"
+              }
+            },
             "source_span": {
               "lineno": 31,
               "col_offset": 16,
               "end_lineno": 31,
               "end_col_offset": 28
             },
-            "resolved_type": "float64",
-            "casts": [],
-            "borrow_kind": "value",
             "repr": "math.sqrt(d)",
-            "func": {
-              "kind": "Attribute",
-              "source_span": {
-                "lineno": 31,
-                "col_offset": 16,
-                "end_lineno": 31,
-                "end_col_offset": 25
-              },
-              "resolved_type": "unknown",
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "math.sqrt",
-              "value": {
-                "kind": "Name",
-                "source_span": {
-                  "lineno": 31,
-                  "col_offset": 16,
-                  "end_lineno": 31,
-                  "end_col_offset": 20
-                },
-                "resolved_type": "unknown",
-                "casts": [],
-                "borrow_kind": "value",
-                "repr": "math",
-                "id": "math"
-              },
-              "attr": "sqrt"
-            },
-            "args": [
-              {
-                "kind": "Name",
-                "source_span": {
-                  "lineno": 31,
-                  "col_offset": 26,
-                  "end_lineno": 31,
-                  "end_col_offset": 27
-                },
-                "resolved_type": "float64",
-                "casts": [],
-                "borrow_kind": "readonly_ref",
-                "repr": "d",
-                "id": "d"
-              }
-            ],
-            "keywords": [],
-            "resolved_runtime_call": "math.sqrt",
-            "resolved_runtime_source": "module_attr",
-            "runtime_module_id": "pytra.std.math",
-            "runtime_symbol": "sqrt",
-            "runtime_call_adapter_kind": "math.float_args",
-            "semantic_tag": "stdlib.method.sqrt",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",
               "category": "static",
               "mirror": "float64"
+            },
+            "target": "float64",
+            "on_fail": "raise",
+            "bridge_lane_v1": {
+              "schema_version": 1,
+              "target": {
+                "kind": "NamedType",
+                "category": "static",
+                "mirror": "float64"
+              },
+              "target_category": "static",
+              "value": {
+                "kind": "DynamicType",
+                "category": "dynamic",
+                "mirror": "unknown",
+                "dynamic_name": "unknown"
+              },
+              "value_category": "dynamic"
             }
           },
           "type_expr_summary_v1": {
@@ -6421,45 +6453,76 @@
             "name": "bytearray"
           },
           "value": {
-            "kind": "Call",
+            "kind": "Unbox",
+            "resolved_type": "bytearray",
+            "borrow_kind": "value",
+            "casts": [],
+            "value": {
+              "kind": "Call",
+              "source_span": {
+                "lineno": 43,
+                "col_offset": 24,
+                "end_lineno": 43,
+                "end_col_offset": 35
+              },
+              "resolved_type": "unknown",
+              "casts": [],
+              "borrow_kind": "value",
+              "repr": "bytearray()",
+              "func": {
+                "kind": "Name",
+                "source_span": {
+                  "lineno": 43,
+                  "col_offset": 24,
+                  "end_lineno": 43,
+                  "end_col_offset": 33
+                },
+                "resolved_type": "unknown",
+                "casts": [],
+                "borrow_kind": "value",
+                "repr": "bytearray",
+                "id": "bytearray"
+              },
+              "args": [],
+              "keywords": [],
+              "type_expr_summary_v1": {
+                "schema_version": 1,
+                "kind": "DynamicType",
+                "category": "dynamic",
+                "mirror": "unknown",
+                "dynamic_name": "unknown"
+              }
+            },
             "source_span": {
               "lineno": 43,
               "col_offset": 24,
               "end_lineno": 43,
               "end_col_offset": 35
             },
-            "resolved_type": "bytearray",
-            "casts": [],
-            "borrow_kind": "value",
             "repr": "bytearray()",
-            "func": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 43,
-                "col_offset": 24,
-                "end_lineno": 43,
-                "end_col_offset": 33
-              },
-              "resolved_type": "unknown",
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "bytearray",
-              "id": "bytearray"
-            },
-            "args": [],
-            "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "bytearray",
-            "runtime_call": "bytearray_ctor",
-            "runtime_module_id": "pytra.core.py_runtime",
-            "runtime_symbol": "bytearray",
-            "runtime_call_adapter_kind": "builtin",
-            "semantic_tag": "ctor.bytearray",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",
               "category": "static",
               "mirror": "bytearray"
+            },
+            "target": "bytearray",
+            "on_fail": "raise",
+            "bridge_lane_v1": {
+              "schema_version": 1,
+              "target": {
+                "kind": "NamedType",
+                "category": "static",
+                "mirror": "bytearray"
+              },
+              "target_category": "static",
+              "value": {
+                "kind": "DynamicType",
+                "category": "dynamic",
+                "mirror": "unknown",
+                "dynamic_name": "unknown"
+              },
+              "value_category": "dynamic"
             }
           },
           "type_expr_summary_v1": {
@@ -10437,7 +10500,7 @@
                                 "end_lineno": 71,
                                 "end_col_offset": 81
                               },
-                              "resolved_type": "float64",
+                              "resolved_type": "unknown",
                               "casts": [],
                               "borrow_kind": "value",
                               "repr": "math.sqrt(dx * dx + dy * dy + dz * dz)",
@@ -11009,17 +11072,12 @@
                                 }
                               ],
                               "keywords": [],
-                              "resolved_runtime_call": "math.sqrt",
-                              "resolved_runtime_source": "module_attr",
-                              "runtime_module_id": "pytra.std.math",
-                              "runtime_symbol": "sqrt",
-                              "runtime_call_adapter_kind": "math.float_args",
-                              "semantic_tag": "stdlib.method.sqrt",
                               "type_expr_summary_v1": {
                                 "schema_version": 1,
-                                "kind": "NamedType",
-                                "category": "static",
-                                "mirror": "float64"
+                                "kind": "DynamicType",
+                                "category": "dynamic",
+                                "mirror": "unknown",
+                                "dynamic_name": "unknown"
                               }
                             },
                             "normalized_expr_version": "east3_expr_v1",
@@ -11058,7 +11116,7 @@
                                   "end_lineno": 71,
                                   "end_col_offset": 81
                                 },
-                                "resolved_type": "float64",
+                                "resolved_type": "unknown",
                                 "casts": [],
                                 "borrow_kind": "value",
                                 "repr": "math.sqrt(dx * dx + dy * dy + dz * dz)",
@@ -11247,17 +11305,12 @@
                                   }
                                 ],
                                 "keywords": [],
-                                "resolved_runtime_call": "math.sqrt",
-                                "resolved_runtime_source": "module_attr",
-                                "runtime_module_id": "pytra.std.math",
-                                "runtime_symbol": "sqrt",
-                                "runtime_call_adapter_kind": "math.float_args",
-                                "semantic_tag": "stdlib.method.sqrt",
                                 "type_expr_summary_v1": {
                                   "schema_version": 1,
-                                  "kind": "NamedType",
-                                  "category": "static",
-                                  "mirror": "float64"
+                                  "kind": "DynamicType",
+                                  "category": "dynamic",
+                                  "mirror": "unknown",
+                                  "dynamic_name": "unknown"
                                 }
                               }
                             }
@@ -12247,8 +12300,8 @@
                           "source_span": {
                             "lineno": 80,
                             "col_offset": 20,
-                            "end_lineno": 83,
-                            "end_col_offset": 0
+                            "end_lineno": 82,
+                            "end_col_offset": 34
                           },
                           "test": {
                             "kind": "BoolOp",
@@ -13020,17 +13073,17 @@
                         {
                           "kind": "If",
                           "source_span": {
-                            "lineno": 85,
+                            "lineno": 80,
                             "col_offset": 20,
-                            "end_lineno": 88,
-                            "end_col_offset": 0
+                            "end_lineno": 87,
+                            "end_col_offset": 34
                           },
                           "test": {
                             "kind": "BoolOp",
                             "source_span": {
-                              "lineno": 85,
+                              "lineno": 80,
                               "col_offset": 23,
-                              "end_lineno": 85,
+                              "end_lineno": 80,
                               "end_col_offset": 44
                             },
                             "resolved_type": "bool",
@@ -13042,9 +13095,9 @@
                               {
                                 "kind": "Compare",
                                 "source_span": {
-                                  "lineno": 85,
+                                  "lineno": 80,
                                   "col_offset": 23,
-                                  "end_lineno": 85,
+                                  "end_lineno": 80,
                                   "end_col_offset": 30
                                 },
                                 "resolved_type": "bool",
@@ -13054,9 +13107,9 @@
                                 "left": {
                                   "kind": "Name",
                                   "source_span": {
-                                    "lineno": 85,
+                                    "lineno": 80,
                                     "col_offset": 23,
-                                    "end_lineno": 85,
+                                    "end_lineno": 80,
                                     "end_col_offset": 24
                                   },
                                   "resolved_type": "float64",
@@ -13072,9 +13125,9 @@
                                   {
                                     "kind": "Constant",
                                     "source_span": {
-                                      "lineno": 85,
+                                      "lineno": 80,
                                       "col_offset": 27,
-                                      "end_lineno": 85,
+                                      "end_lineno": 80,
                                       "end_col_offset": 30
                                     },
                                     "resolved_type": "float64",
@@ -13088,9 +13141,9 @@
                                 "normalized_expr": {
                                   "kind": "Compare",
                                   "source_span": {
-                                    "lineno": 85,
+                                    "lineno": 80,
                                     "col_offset": 23,
-                                    "end_lineno": 85,
+                                    "end_lineno": 80,
                                     "end_col_offset": 30
                                   },
                                   "resolved_type": "bool",
@@ -13100,9 +13153,9 @@
                                   "left": {
                                     "kind": "Name",
                                     "source_span": {
-                                      "lineno": 85,
+                                      "lineno": 80,
                                       "col_offset": 23,
-                                      "end_lineno": 85,
+                                      "end_lineno": 80,
                                       "end_col_offset": 24
                                     },
                                     "resolved_type": "float64",
@@ -13118,9 +13171,9 @@
                                     {
                                       "kind": "Constant",
                                       "source_span": {
-                                        "lineno": 85,
+                                        "lineno": 80,
                                         "col_offset": 27,
-                                        "end_lineno": 85,
+                                        "end_lineno": 80,
                                         "end_col_offset": 30
                                       },
                                       "resolved_type": "float64",
@@ -13135,9 +13188,9 @@
                               {
                                 "kind": "Compare",
                                 "source_span": {
-                                  "lineno": 85,
+                                  "lineno": 80,
                                   "col_offset": 35,
-                                  "end_lineno": 85,
+                                  "end_lineno": 80,
                                   "end_col_offset": 44
                                 },
                                 "resolved_type": "bool",
@@ -13147,9 +13200,9 @@
                                 "left": {
                                   "kind": "Name",
                                   "source_span": {
-                                    "lineno": 85,
+                                    "lineno": 80,
                                     "col_offset": 35,
-                                    "end_lineno": 85,
+                                    "end_lineno": 80,
                                     "end_col_offset": 36
                                   },
                                   "resolved_type": "float64",
@@ -13165,9 +13218,9 @@
                                   {
                                     "kind": "Name",
                                     "source_span": {
-                                      "lineno": 85,
+                                      "lineno": 80,
                                       "col_offset": 39,
-                                      "end_lineno": 85,
+                                      "end_lineno": 80,
                                       "end_col_offset": 44
                                     },
                                     "resolved_type": "float64",
@@ -13181,9 +13234,9 @@
                                 "normalized_expr": {
                                   "kind": "Compare",
                                   "source_span": {
-                                    "lineno": 85,
+                                    "lineno": 80,
                                     "col_offset": 35,
-                                    "end_lineno": 85,
+                                    "end_lineno": 80,
                                     "end_col_offset": 44
                                   },
                                   "resolved_type": "bool",
@@ -13193,9 +13246,9 @@
                                   "left": {
                                     "kind": "Name",
                                     "source_span": {
-                                      "lineno": 85,
+                                      "lineno": 80,
                                       "col_offset": 35,
-                                      "end_lineno": 85,
+                                      "end_lineno": 80,
                                       "end_col_offset": 36
                                     },
                                     "resolved_type": "float64",
@@ -13211,9 +13264,9 @@
                                     {
                                       "kind": "Name",
                                       "source_span": {
-                                        "lineno": 85,
+                                        "lineno": 80,
                                         "col_offset": 39,
-                                        "end_lineno": 85,
+                                        "end_lineno": 80,
                                         "end_col_offset": 44
                                       },
                                       "resolved_type": "float64",
@@ -13231,17 +13284,17 @@
                             {
                               "kind": "Assign",
                               "source_span": {
-                                "lineno": 86,
+                                "lineno": 81,
                                 "col_offset": 24,
-                                "end_lineno": 86,
+                                "end_lineno": 81,
                                 "end_col_offset": 33
                               },
                               "target": {
                                 "kind": "Name",
                                 "source_span": {
-                                  "lineno": 86,
+                                  "lineno": 81,
                                   "col_offset": 24,
-                                  "end_lineno": 86,
+                                  "end_lineno": 81,
                                   "end_col_offset": 29
                                 },
                                 "resolved_type": "float64",
@@ -13256,9 +13309,9 @@
                               "value": {
                                 "kind": "Name",
                                 "source_span": {
-                                  "lineno": 86,
+                                  "lineno": 81,
                                   "col_offset": 24,
-                                  "end_lineno": 86,
+                                  "end_lineno": 81,
                                   "end_col_offset": 25
                                 },
                                 "resolved_type": "float64",
@@ -13809,17 +13862,17 @@
                         {
                           "kind": "If",
                           "source_span": {
-                            "lineno": 90,
+                            "lineno": 80,
                             "col_offset": 20,
-                            "end_lineno": 93,
-                            "end_col_offset": 0
+                            "end_lineno": 92,
+                            "end_col_offset": 34
                           },
                           "test": {
                             "kind": "BoolOp",
                             "source_span": {
-                              "lineno": 90,
+                              "lineno": 80,
                               "col_offset": 23,
-                              "end_lineno": 90,
+                              "end_lineno": 80,
                               "end_col_offset": 44
                             },
                             "resolved_type": "bool",
@@ -13831,9 +13884,9 @@
                               {
                                 "kind": "Compare",
                                 "source_span": {
-                                  "lineno": 90,
+                                  "lineno": 80,
                                   "col_offset": 23,
-                                  "end_lineno": 90,
+                                  "end_lineno": 80,
                                   "end_col_offset": 30
                                 },
                                 "resolved_type": "bool",
@@ -13843,9 +13896,9 @@
                                 "left": {
                                   "kind": "Name",
                                   "source_span": {
-                                    "lineno": 90,
+                                    "lineno": 80,
                                     "col_offset": 23,
-                                    "end_lineno": 90,
+                                    "end_lineno": 80,
                                     "end_col_offset": 24
                                   },
                                   "resolved_type": "float64",
@@ -13861,9 +13914,9 @@
                                   {
                                     "kind": "Constant",
                                     "source_span": {
-                                      "lineno": 90,
+                                      "lineno": 80,
                                       "col_offset": 27,
-                                      "end_lineno": 90,
+                                      "end_lineno": 80,
                                       "end_col_offset": 30
                                     },
                                     "resolved_type": "float64",
@@ -13877,9 +13930,9 @@
                                 "normalized_expr": {
                                   "kind": "Compare",
                                   "source_span": {
-                                    "lineno": 90,
+                                    "lineno": 80,
                                     "col_offset": 23,
-                                    "end_lineno": 90,
+                                    "end_lineno": 80,
                                     "end_col_offset": 30
                                   },
                                   "resolved_type": "bool",
@@ -13889,9 +13942,9 @@
                                   "left": {
                                     "kind": "Name",
                                     "source_span": {
-                                      "lineno": 90,
+                                      "lineno": 80,
                                       "col_offset": 23,
-                                      "end_lineno": 90,
+                                      "end_lineno": 80,
                                       "end_col_offset": 24
                                     },
                                     "resolved_type": "float64",
@@ -13907,9 +13960,9 @@
                                     {
                                       "kind": "Constant",
                                       "source_span": {
-                                        "lineno": 90,
+                                        "lineno": 80,
                                         "col_offset": 27,
-                                        "end_lineno": 90,
+                                        "end_lineno": 80,
                                         "end_col_offset": 30
                                       },
                                       "resolved_type": "float64",
@@ -13924,9 +13977,9 @@
                               {
                                 "kind": "Compare",
                                 "source_span": {
-                                  "lineno": 90,
+                                  "lineno": 80,
                                   "col_offset": 35,
-                                  "end_lineno": 90,
+                                  "end_lineno": 80,
                                   "end_col_offset": 44
                                 },
                                 "resolved_type": "bool",
@@ -13936,9 +13989,9 @@
                                 "left": {
                                   "kind": "Name",
                                   "source_span": {
-                                    "lineno": 90,
+                                    "lineno": 80,
                                     "col_offset": 35,
-                                    "end_lineno": 90,
+                                    "end_lineno": 80,
                                     "end_col_offset": 36
                                   },
                                   "resolved_type": "float64",
@@ -13954,9 +14007,9 @@
                                   {
                                     "kind": "Name",
                                     "source_span": {
-                                      "lineno": 90,
+                                      "lineno": 80,
                                       "col_offset": 39,
-                                      "end_lineno": 90,
+                                      "end_lineno": 80,
                                       "end_col_offset": 44
                                     },
                                     "resolved_type": "float64",
@@ -13970,9 +14023,9 @@
                                 "normalized_expr": {
                                   "kind": "Compare",
                                   "source_span": {
-                                    "lineno": 90,
+                                    "lineno": 80,
                                     "col_offset": 35,
-                                    "end_lineno": 90,
+                                    "end_lineno": 80,
                                     "end_col_offset": 44
                                   },
                                   "resolved_type": "bool",
@@ -13982,9 +14035,9 @@
                                   "left": {
                                     "kind": "Name",
                                     "source_span": {
-                                      "lineno": 90,
+                                      "lineno": 80,
                                       "col_offset": 35,
-                                      "end_lineno": 90,
+                                      "end_lineno": 80,
                                       "end_col_offset": 36
                                     },
                                     "resolved_type": "float64",
@@ -14000,9 +14053,9 @@
                                     {
                                       "kind": "Name",
                                       "source_span": {
-                                        "lineno": 90,
+                                        "lineno": 80,
                                         "col_offset": 39,
-                                        "end_lineno": 90,
+                                        "end_lineno": 80,
                                         "end_col_offset": 44
                                       },
                                       "resolved_type": "float64",
@@ -14020,17 +14073,17 @@
                             {
                               "kind": "Assign",
                               "source_span": {
-                                "lineno": 91,
+                                "lineno": 81,
                                 "col_offset": 24,
-                                "end_lineno": 91,
+                                "end_lineno": 81,
                                 "end_col_offset": 33
                               },
                               "target": {
                                 "kind": "Name",
                                 "source_span": {
-                                  "lineno": 91,
+                                  "lineno": 81,
                                   "col_offset": 24,
-                                  "end_lineno": 91,
+                                  "end_lineno": 81,
                                   "end_col_offset": 29
                                 },
                                 "resolved_type": "float64",
@@ -14045,9 +14098,9 @@
                               "value": {
                                 "kind": "Name",
                                 "source_span": {
-                                  "lineno": 91,
+                                  "lineno": 81,
                                   "col_offset": 24,
-                                  "end_lineno": 91,
+                                  "end_lineno": 81,
                                   "end_col_offset": 25
                                 },
                                 "resolved_type": "float64",
@@ -14667,8 +14720,8 @@
                           "source_span": {
                             "lineno": 98,
                             "col_offset": 20,
-                            "end_lineno": 155,
-                            "end_col_offset": 0
+                            "end_lineno": 154,
+                            "end_col_offset": 61
                           },
                           "test": {
                             "kind": "Compare",
@@ -16017,8 +16070,8 @@
                               "source_span": {
                                 "lineno": 107,
                                 "col_offset": 24,
-                                "end_lineno": 119,
-                                "end_col_offset": 0
+                                "end_lineno": 111,
+                                "end_col_offset": 41
                               },
                               "test": {
                                 "kind": "Compare",
@@ -16963,8 +17016,8 @@
                                   "source_span": {
                                     "lineno": 111,
                                     "col_offset": 24,
-                                    "end_lineno": 119,
-                                    "end_col_offset": 0
+                                    "end_lineno": 111,
+                                    "end_col_offset": 41
                                   },
                                   "test": {
                                     "kind": "Compare",
@@ -19671,17 +19724,17 @@
                             {
                               "kind": "If",
                               "source_span": {
-                                "lineno": 127,
+                                "lineno": 107,
                                 "col_offset": 24,
-                                "end_lineno": 145,
-                                "end_col_offset": 0
+                                "end_lineno": 111,
+                                "end_col_offset": 41
                               },
                               "test": {
                                 "kind": "Compare",
                                 "source_span": {
-                                  "lineno": 127,
+                                  "lineno": 107,
                                   "col_offset": 27,
-                                  "end_lineno": 127,
+                                  "end_lineno": 107,
                                   "end_col_offset": 38
                                 },
                                 "resolved_type": "bool",
@@ -19691,9 +19744,9 @@
                                 "left": {
                                   "kind": "Name",
                                   "source_span": {
-                                    "lineno": 127,
+                                    "lineno": 107,
                                     "col_offset": 27,
-                                    "end_lineno": 127,
+                                    "end_lineno": 107,
                                     "end_col_offset": 33
                                   },
                                   "resolved_type": "int64",
@@ -19709,9 +19762,9 @@
                                   {
                                     "kind": "Constant",
                                     "source_span": {
-                                      "lineno": 127,
+                                      "lineno": 107,
                                       "col_offset": 37,
-                                      "end_lineno": 127,
+                                      "end_lineno": 107,
                                       "end_col_offset": 38
                                     },
                                     "resolved_type": "int64",
@@ -19725,9 +19778,9 @@
                                 "normalized_expr": {
                                   "kind": "Compare",
                                   "source_span": {
-                                    "lineno": 127,
+                                    "lineno": 107,
                                     "col_offset": 27,
-                                    "end_lineno": 127,
+                                    "end_lineno": 107,
                                     "end_col_offset": 38
                                   },
                                   "resolved_type": "bool",
@@ -19737,9 +19790,9 @@
                                   "left": {
                                     "kind": "Name",
                                     "source_span": {
-                                      "lineno": 127,
+                                      "lineno": 107,
                                       "col_offset": 27,
-                                      "end_lineno": 127,
+                                      "end_lineno": 107,
                                       "end_col_offset": 33
                                     },
                                     "resolved_type": "int64",
@@ -19755,9 +19808,9 @@
                                     {
                                       "kind": "Constant",
                                       "source_span": {
-                                        "lineno": 127,
+                                        "lineno": 107,
                                         "col_offset": 37,
-                                        "end_lineno": 127,
+                                        "end_lineno": 107,
                                         "end_col_offset": 38
                                       },
                                       "resolved_type": "int64",
@@ -20084,17 +20137,17 @@
                                 {
                                   "kind": "If",
                                   "source_span": {
-                                    "lineno": 131,
+                                    "lineno": 111,
                                     "col_offset": 24,
-                                    "end_lineno": 145,
-                                    "end_col_offset": 0
+                                    "end_lineno": 111,
+                                    "end_col_offset": 41
                                   },
                                   "test": {
                                     "kind": "Compare",
                                     "source_span": {
-                                      "lineno": 131,
+                                      "lineno": 111,
                                       "col_offset": 29,
-                                      "end_lineno": 131,
+                                      "end_lineno": 111,
                                       "end_col_offset": 40
                                     },
                                     "resolved_type": "bool",
@@ -20104,9 +20157,9 @@
                                     "left": {
                                       "kind": "Name",
                                       "source_span": {
-                                        "lineno": 131,
+                                        "lineno": 111,
                                         "col_offset": 29,
-                                        "end_lineno": 131,
+                                        "end_lineno": 111,
                                         "end_col_offset": 35
                                       },
                                       "resolved_type": "int64",
@@ -20122,9 +20175,9 @@
                                       {
                                         "kind": "Constant",
                                         "source_span": {
-                                          "lineno": 131,
+                                          "lineno": 111,
                                           "col_offset": 39,
-                                          "end_lineno": 131,
+                                          "end_lineno": 111,
                                           "end_col_offset": 40
                                         },
                                         "resolved_type": "int64",
@@ -20138,9 +20191,9 @@
                                     "normalized_expr": {
                                       "kind": "Compare",
                                       "source_span": {
-                                        "lineno": 131,
+                                        "lineno": 111,
                                         "col_offset": 29,
-                                        "end_lineno": 131,
+                                        "end_lineno": 111,
                                         "end_col_offset": 40
                                       },
                                       "resolved_type": "bool",
@@ -20150,9 +20203,9 @@
                                       "left": {
                                         "kind": "Name",
                                         "source_span": {
-                                          "lineno": 131,
+                                          "lineno": 111,
                                           "col_offset": 29,
-                                          "end_lineno": 131,
+                                          "end_lineno": 111,
                                           "end_col_offset": 35
                                         },
                                         "resolved_type": "int64",
@@ -20168,9 +20221,9 @@
                                         {
                                           "kind": "Constant",
                                           "source_span": {
-                                            "lineno": 131,
+                                            "lineno": 111,
                                             "col_offset": 39,
-                                            "end_lineno": 131,
+                                            "end_lineno": 111,
                                             "end_col_offset": 40
                                           },
                                           "resolved_type": "int64",
@@ -20758,7 +20811,7 @@
                                           "keywords": [],
                                           "lowered_kind": "BuiltinCall",
                                           "builtin_name": "int",
-                                          "runtime_call": "static_cast",
+                                          "runtime_call": "int",
                                           "runtime_module_id": "pytra.core.py_runtime",
                                           "runtime_symbol": "int",
                                           "runtime_call_adapter_kind": "builtin",
@@ -20986,7 +21039,7 @@
                                           "keywords": [],
                                           "lowered_kind": "BuiltinCall",
                                           "builtin_name": "int",
-                                          "runtime_call": "static_cast",
+                                          "runtime_call": "int",
                                           "runtime_module_id": "pytra.core.py_runtime",
                                           "runtime_symbol": "int",
                                           "runtime_call_adapter_kind": "builtin",
@@ -21112,7 +21165,7 @@
                                             "keywords": [],
                                             "lowered_kind": "BuiltinCall",
                                             "builtin_name": "int",
-                                            "runtime_call": "static_cast",
+                                            "runtime_call": "int",
                                             "runtime_module_id": "pytra.core.py_runtime",
                                             "runtime_symbol": "int",
                                             "runtime_call_adapter_kind": "builtin",
@@ -21226,7 +21279,7 @@
                                             "keywords": [],
                                             "lowered_kind": "BuiltinCall",
                                             "builtin_name": "int",
-                                            "runtime_call": "static_cast",
+                                            "runtime_call": "int",
                                             "runtime_module_id": "pytra.core.py_runtime",
                                             "runtime_symbol": "int",
                                             "runtime_call_adapter_kind": "builtin",
@@ -22926,7 +22979,7 @@
                                 "keywords": [],
                                 "lowered_kind": "BuiltinCall",
                                 "builtin_name": "int",
-                                "runtime_call": "static_cast",
+                                "runtime_call": "int",
                                 "runtime_module_id": "pytra.core.py_runtime",
                                 "runtime_symbol": "int",
                                 "runtime_call_adapter_kind": "builtin",
@@ -23324,7 +23377,7 @@
                                 "keywords": [],
                                 "lowered_kind": "BuiltinCall",
                                 "builtin_name": "int",
-                                "runtime_call": "static_cast",
+                                "runtime_call": "int",
                                 "runtime_module_id": "pytra.core.py_runtime",
                                 "runtime_symbol": "int",
                                 "runtime_call_adapter_kind": "builtin",
@@ -23722,7 +23775,7 @@
                                 "keywords": [],
                                 "lowered_kind": "BuiltinCall",
                                 "builtin_name": "int",
-                                "runtime_call": "static_cast",
+                                "runtime_call": "int",
                                 "runtime_module_id": "pytra.core.py_runtime",
                                 "runtime_symbol": "int",
                                 "runtime_call_adapter_kind": "builtin",
@@ -24463,7 +24516,7 @@
                                 "keywords": [],
                                 "lowered_kind": "BuiltinCall",
                                 "builtin_name": "int",
-                                "runtime_call": "static_cast",
+                                "runtime_call": "int",
                                 "runtime_module_id": "pytra.core.py_runtime",
                                 "runtime_symbol": "int",
                                 "runtime_call_adapter_kind": "builtin",
@@ -24907,7 +24960,7 @@
                                 "keywords": [],
                                 "lowered_kind": "BuiltinCall",
                                 "builtin_name": "int",
-                                "runtime_call": "static_cast",
+                                "runtime_call": "int",
                                 "runtime_module_id": "pytra.core.py_runtime",
                                 "runtime_symbol": "int",
                                 "runtime_call_adapter_kind": "builtin",
@@ -25353,7 +25406,7 @@
                                 "keywords": [],
                                 "lowered_kind": "BuiltinCall",
                                 "builtin_name": "int",
-                                "runtime_call": "static_cast",
+                                "runtime_call": "int",
                                 "runtime_module_id": "pytra.core.py_runtime",
                                 "runtime_symbol": "int",
                                 "runtime_call_adapter_kind": "builtin",
@@ -25928,8 +25981,8 @@
                   "source_span": {
                     "lineno": 61,
                     "col_offset": 0,
-                    "end_lineno": 159,
-                    "end_col_offset": 0
+                    "end_lineno": 158,
+                    "end_col_offset": 27
                   },
                   "leading_trivia": [
                     {
@@ -26878,8 +26931,8 @@
           "source_span": {
             "lineno": 55,
             "col_offset": 0,
-            "end_lineno": 164,
-            "end_col_offset": 0
+            "end_lineno": 163,
+            "end_col_offset": 40
           },
           "leading_trivia": [
             {
@@ -34310,13 +34363,11 @@
             },
             "args": [],
             "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "perf_counter",
-            "runtime_call": "perf_counter",
+            "resolved_runtime_call": "time.perf_counter",
+            "resolved_runtime_source": "import_symbol",
             "runtime_module_id": "pytra.std.time",
             "runtime_symbol": "perf_counter",
             "runtime_call_adapter_kind": "extern_delegate",
-            "semantic_tag": "stdlib.fn.perf_counter",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",
@@ -34628,12 +34679,6 @@
               }
             ],
             "keywords": [],
-            "resolved_runtime_call": "write_rgb_png",
-            "resolved_runtime_source": "module_attr",
-            "runtime_module_id": "pytra.utils.png",
-            "runtime_symbol": "write_rgb_png",
-            "runtime_call_adapter_kind": "extern_delegate",
-            "semantic_tag": "stdlib.method.write_rgb_png",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "DynamicType",
@@ -34753,13 +34798,11 @@
               },
               "args": [],
               "keywords": [],
-              "lowered_kind": "BuiltinCall",
-              "builtin_name": "perf_counter",
-              "runtime_call": "perf_counter",
+              "resolved_runtime_call": "time.perf_counter",
+              "resolved_runtime_source": "import_symbol",
               "runtime_module_id": "pytra.std.time",
               "runtime_symbol": "perf_counter",
               "runtime_call_adapter_kind": "extern_delegate",
-              "semantic_tag": "stdlib.fn.perf_counter",
               "type_expr_summary_v1": {
                 "schema_version": 1,
                 "kind": "NamedType",
@@ -34823,13 +34866,11 @@
                 },
                 "args": [],
                 "keywords": [],
-                "lowered_kind": "BuiltinCall",
-                "builtin_name": "perf_counter",
-                "runtime_call": "perf_counter",
+                "resolved_runtime_call": "time.perf_counter",
+                "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.std.time",
                 "runtime_symbol": "perf_counter",
                 "runtime_call_adapter_kind": "extern_delegate",
-                "semantic_tag": "stdlib.fn.perf_counter",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -35837,9 +35878,8 @@
           "source_module_id": "pytra.std",
           "source_export_name": "math",
           "source_binding_kind": "symbol",
-          "runtime_module_id": "pytra.std.math",
-          "runtime_group": "std",
-          "resolved_binding_kind": "module"
+          "runtime_module_id": "pytra.std",
+          "runtime_group": "std"
         },
         {
           "module_id": "pytra.utils",
@@ -35851,9 +35891,8 @@
           "source_module_id": "pytra.utils",
           "source_export_name": "png",
           "source_binding_kind": "symbol",
-          "runtime_module_id": "pytra.utils.png",
-          "runtime_group": "utils",
-          "resolved_binding_kind": "module"
+          "runtime_module_id": "pytra.utils",
+          "runtime_group": "utils"
         },
         {
           "module_id": "pytra.std.time",
@@ -35886,16 +35925,16 @@
           "runtime_group": "built_in"
         },
         {
-          "module_id": "pytra.built_in.scalar_ops",
+          "module_id": "pytra.core.py_runtime",
           "export_name": "",
-          "local_name": "pytra.built_in.scalar_ops",
+          "local_name": "pytra.core.py_runtime",
           "binding_kind": "implicit_builtin",
           "source_file": "sample/py/02_raytrace_spheres.py",
           "source_line": 0,
-          "source_module_id": "pytra.built_in.scalar_ops",
+          "source_module_id": "pytra.core.py_runtime",
           "source_binding_kind": "implicit_builtin",
-          "runtime_module_id": "pytra.built_in.scalar_ops",
-          "runtime_group": "built_in"
+          "runtime_module_id": "pytra.core.py_runtime",
+          "runtime_group": "core"
         }
       ],
       "qualified_refs": [
@@ -35950,9 +35989,9 @@
         "source_line": 0
       },
       {
-        "module_id": "pytra.built_in.scalar_ops",
+        "module_id": "pytra.core.py_runtime",
         "export_name": "",
-        "local_name": "pytra.built_in.scalar_ops",
+        "local_name": "pytra.core.py_runtime",
         "binding_kind": "implicit_builtin",
         "source_file": "sample/py/02_raytrace_spheres.py",
         "source_line": 0

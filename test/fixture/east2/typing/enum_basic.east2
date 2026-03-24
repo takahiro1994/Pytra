@@ -59,7 +59,7 @@
               "end_lineno": 6,
               "end_col": 7
             },
-            "resolved_type": "int64",
+            "resolved_type": "unknown",
             "casts": [],
             "borrow_kind": "value",
             "repr": "RED",
@@ -99,7 +99,7 @@
               "end_lineno": 7,
               "end_col": 8
             },
-            "resolved_type": "int64",
+            "resolved_type": "unknown",
             "casts": [],
             "borrow_kind": "value",
             "repr": "BLUE",

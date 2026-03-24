@@ -278,7 +278,7 @@
               "end_lineno": 12,
               "end_col_offset": 7
             },
-            "resolved_type": "unknown",
+            "resolved_type": "int64",
             "casts": [],
             "borrow_kind": "value",
             "repr": "x.v",
@@ -317,10 +317,9 @@
           },
           "type_expr_summary_v1": {
             "schema_version": 1,
-            "kind": "DynamicType",
-            "category": "dynamic",
-            "mirror": "unknown",
-            "dynamic_name": "unknown"
+            "kind": "NamedType",
+            "category": "static",
+            "mirror": "int64"
           },
           "meta": {
             "lifetime_node_id": "n0",
@@ -721,7 +720,7 @@
                   "end_lineno": 19,
                   "end_col_offset": 13
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "int64",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "a.v",
@@ -821,7 +820,7 @@
                   "end_lineno": 20,
                   "end_col_offset": 13
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "int64",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "b.v",

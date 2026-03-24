@@ -95,7 +95,7 @@
               "end_lineno": 7,
               "end_col": 52
             },
-            "resolved_type": "Path",
+            "resolved_type": "unknown",
             "casts": [],
             "borrow_kind": "value",
             "repr": "Path(\"work/transpile/obj/pathlib_case32\")",
@@ -130,16 +130,13 @@
               }
             ],
             "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "Path",
-            "runtime_call": "Path",
+            "resolved_runtime_call": "pathlib.Path",
+            "resolved_runtime_source": "import_symbol",
             "runtime_module_id": "pytra.std.pathlib",
             "runtime_symbol": "Path",
-            "runtime_call_adapter_kind": "extern_delegate",
-            "semantic_tag": "stdlib.symbol.Path"
+            "runtime_call_adapter_kind": "extern_delegate"
           },
           "declare": true,
-          "decl_type": "Path",
           "declare_init": true
         },
         {
@@ -158,7 +155,7 @@
               "end_lineno": 8,
               "end_col": 43
             },
-            "resolved_type": "None",
+            "resolved_type": "unknown",
             "casts": [],
             "borrow_kind": "value",
             "repr": "root.mkdir(parents=True, exist_ok=True)",
@@ -182,9 +179,9 @@
                   "end_lineno": 8,
                   "end_col": 8
                 },
-                "resolved_type": "Path",
+                "resolved_type": "unknown",
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "root",
                 "id": "root"
               },
@@ -226,28 +223,7 @@
                   "value": true
                 }
               }
-            ],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "mkdir",
-            "runtime_call": "std::filesystem::create_directories",
-            "runtime_module_id": "pytra.std.pathlib",
-            "runtime_symbol": "Path.mkdir",
-            "runtime_call_adapter_kind": "extern_delegate",
-            "semantic_tag": "stdlib.method.mkdir",
-            "runtime_owner": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 8,
-                "col": 4,
-                "end_lineno": 8,
-                "end_col": 8
-              },
-              "resolved_type": "Path",
-              "casts": [],
-              "borrow_kind": "readonly_ref",
-              "repr": "root",
-              "id": "root"
-            }
+            ]
           }
         },
         {
@@ -280,7 +256,7 @@
               "end_lineno": 10,
               "end_col": 31
             },
-            "resolved_type": "Path",
+            "resolved_type": "str",
             "casts": [],
             "borrow_kind": "value",
             "repr": "root / \"values.txt\"",
@@ -292,9 +268,9 @@
                 "end_lineno": 10,
                 "end_col": 16
               },
-              "resolved_type": "Path",
+              "resolved_type": "unknown",
               "casts": [],
-              "borrow_kind": "readonly_ref",
+              "borrow_kind": "value",
               "repr": "root",
               "id": "root"
             },
@@ -315,7 +291,7 @@
             }
           },
           "declare": true,
-          "decl_type": "Path",
+          "decl_type": "str",
           "declare_init": true,
           "leading_trivia": [
             {
@@ -340,7 +316,7 @@
               "end_lineno": 11,
               "end_col": 26
             },
-            "resolved_type": "int64",
+            "resolved_type": "unknown",
             "casts": [],
             "borrow_kind": "value",
             "repr": "child.write_text(\"42\")",
@@ -364,7 +340,7 @@
                   "end_lineno": 11,
                   "end_col": 9
                 },
-                "resolved_type": "Path",
+                "resolved_type": "str",
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "child",
@@ -388,28 +364,7 @@
                 "value": "42"
               }
             ],
-            "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "write_text",
-            "runtime_call": "py_write_text",
-            "runtime_module_id": "pytra.std.pathlib",
-            "runtime_symbol": "Path.write_text",
-            "runtime_call_adapter_kind": "extern_delegate",
-            "semantic_tag": "stdlib.method.write_text",
-            "runtime_owner": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 11,
-                "col": 4,
-                "end_lineno": 11,
-                "end_col": 9
-              },
-              "resolved_type": "Path",
-              "casts": [],
-              "borrow_kind": "readonly_ref",
-              "repr": "child",
-              "id": "child"
-            }
+            "keywords": []
           }
         },
         {
@@ -572,7 +527,7 @@
                       "end_lineno": 14,
                       "end_col": 45
                     },
-                    "resolved_type": "bool",
+                    "resolved_type": "unknown",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "child.exists()",
@@ -596,7 +551,7 @@
                           "end_lineno": 14,
                           "end_col": 36
                         },
-                        "resolved_type": "Path",
+                        "resolved_type": "str",
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "child",
@@ -605,28 +560,7 @@
                       "attr": "exists"
                     },
                     "args": [],
-                    "keywords": [],
-                    "lowered_kind": "BuiltinCall",
-                    "builtin_name": "exists",
-                    "runtime_call": "std::filesystem::exists",
-                    "runtime_module_id": "pytra.std.pathlib",
-                    "runtime_symbol": "Path.exists",
-                    "runtime_call_adapter_kind": "extern_delegate",
-                    "semantic_tag": "stdlib.method.exists",
-                    "runtime_owner": {
-                      "kind": "Name",
-                      "source_span": {
-                        "lineno": 14,
-                        "col": 31,
-                        "end_lineno": 14,
-                        "end_col": 36
-                      },
-                      "resolved_type": "Path",
-                      "casts": [],
-                      "borrow_kind": "readonly_ref",
-                      "repr": "child",
-                      "id": "child"
-                    }
+                    "keywords": []
                   },
                   {
                     "kind": "Constant",
@@ -773,7 +707,7 @@
                       "end_lineno": 15,
                       "end_col": 41
                     },
-                    "resolved_type": "str",
+                    "resolved_type": "unknown",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "child.name",
@@ -785,33 +719,13 @@
                         "end_lineno": 15,
                         "end_col": 36
                       },
-                      "resolved_type": "Path",
+                      "resolved_type": "str",
                       "casts": [],
                       "borrow_kind": "readonly_ref",
                       "repr": "child",
                       "id": "child"
                     },
-                    "attr": "name",
-                    "lowered_kind": "BuiltinAttr",
-                    "runtime_call": "path_name",
-                    "runtime_module_id": "pytra.std.pathlib",
-                    "runtime_symbol": "Path.name",
-                    "runtime_call_adapter_kind": "extern_delegate",
-                    "semantic_tag": "stdlib.method.name",
-                    "runtime_owner": {
-                      "kind": "Name",
-                      "source_span": {
-                        "lineno": 15,
-                        "col": 31,
-                        "end_lineno": 15,
-                        "end_col": 36
-                      },
-                      "resolved_type": "Path",
-                      "casts": [],
-                      "borrow_kind": "readonly_ref",
-                      "repr": "child",
-                      "id": "child"
-                    }
+                    "attr": "name"
                   },
                   {
                     "kind": "Constant",
@@ -958,7 +872,7 @@
                       "end_lineno": 16,
                       "end_col": 41
                     },
-                    "resolved_type": "str",
+                    "resolved_type": "unknown",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "child.stem",
@@ -970,33 +884,13 @@
                         "end_lineno": 16,
                         "end_col": 36
                       },
-                      "resolved_type": "Path",
+                      "resolved_type": "str",
                       "casts": [],
                       "borrow_kind": "readonly_ref",
                       "repr": "child",
                       "id": "child"
                     },
-                    "attr": "stem",
-                    "lowered_kind": "BuiltinAttr",
-                    "runtime_call": "path_stem",
-                    "runtime_module_id": "pytra.std.pathlib",
-                    "runtime_symbol": "Path.stem",
-                    "runtime_call_adapter_kind": "extern_delegate",
-                    "semantic_tag": "stdlib.method.stem",
-                    "runtime_owner": {
-                      "kind": "Name",
-                      "source_span": {
-                        "lineno": 16,
-                        "col": 31,
-                        "end_lineno": 16,
-                        "end_col": 36
-                      },
-                      "resolved_type": "Path",
-                      "casts": [],
-                      "borrow_kind": "readonly_ref",
-                      "repr": "child",
-                      "id": "child"
-                    }
+                    "attr": "stem"
                   },
                   {
                     "kind": "Constant",
@@ -1143,7 +1037,7 @@
                       "end_lineno": 17,
                       "end_col": 69
                     },
-                    "resolved_type": "bool",
+                    "resolved_type": "unknown",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "(child.parent / \"values.txt\").exists()",
@@ -1167,7 +1061,7 @@
                           "end_lineno": 17,
                           "end_col": 60
                         },
-                        "resolved_type": "Path",
+                        "resolved_type": "str",
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "(child.parent / \"values.txt\")",
@@ -1179,7 +1073,7 @@
                             "end_lineno": 17,
                             "end_col": 44
                           },
-                          "resolved_type": "Path",
+                          "resolved_type": "unknown",
                           "casts": [],
                           "borrow_kind": "value",
                           "repr": "child.parent",
@@ -1191,33 +1085,13 @@
                               "end_lineno": 17,
                               "end_col": 37
                             },
-                            "resolved_type": "Path",
+                            "resolved_type": "str",
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "child",
                             "id": "child"
                           },
-                          "attr": "parent",
-                          "lowered_kind": "BuiltinAttr",
-                          "runtime_call": "path_parent",
-                          "runtime_module_id": "pytra.std.pathlib",
-                          "runtime_symbol": "Path.parent",
-                          "runtime_call_adapter_kind": "extern_delegate",
-                          "semantic_tag": "stdlib.method.parent",
-                          "runtime_owner": {
-                            "kind": "Name",
-                            "source_span": {
-                              "lineno": 17,
-                              "col": 32,
-                              "end_lineno": 17,
-                              "end_col": 37
-                            },
-                            "resolved_type": "Path",
-                            "casts": [],
-                            "borrow_kind": "readonly_ref",
-                            "repr": "child",
-                            "id": "child"
-                          }
+                          "attr": "parent"
                         },
                         "op": "Div",
                         "right": {
@@ -1238,90 +1112,7 @@
                       "attr": "exists"
                     },
                     "args": [],
-                    "keywords": [],
-                    "lowered_kind": "BuiltinCall",
-                    "builtin_name": "exists",
-                    "runtime_call": "std::filesystem::exists",
-                    "runtime_module_id": "pytra.std.pathlib",
-                    "runtime_symbol": "Path.exists",
-                    "runtime_call_adapter_kind": "extern_delegate",
-                    "semantic_tag": "stdlib.method.exists",
-                    "runtime_owner": {
-                      "kind": "BinOp",
-                      "source_span": {
-                        "lineno": 17,
-                        "col": 31,
-                        "end_lineno": 17,
-                        "end_col": 60
-                      },
-                      "resolved_type": "Path",
-                      "casts": [],
-                      "borrow_kind": "value",
-                      "repr": "(child.parent / \"values.txt\")",
-                      "left": {
-                        "kind": "Attribute",
-                        "source_span": {
-                          "lineno": 17,
-                          "col": 32,
-                          "end_lineno": 17,
-                          "end_col": 44
-                        },
-                        "resolved_type": "Path",
-                        "casts": [],
-                        "borrow_kind": "value",
-                        "repr": "child.parent",
-                        "value": {
-                          "kind": "Name",
-                          "source_span": {
-                            "lineno": 17,
-                            "col": 32,
-                            "end_lineno": 17,
-                            "end_col": 37
-                          },
-                          "resolved_type": "Path",
-                          "casts": [],
-                          "borrow_kind": "readonly_ref",
-                          "repr": "child",
-                          "id": "child"
-                        },
-                        "attr": "parent",
-                        "lowered_kind": "BuiltinAttr",
-                        "runtime_call": "path_parent",
-                        "runtime_module_id": "pytra.std.pathlib",
-                        "runtime_symbol": "Path.parent",
-                        "runtime_call_adapter_kind": "extern_delegate",
-                        "semantic_tag": "stdlib.method.parent",
-                        "runtime_owner": {
-                          "kind": "Name",
-                          "source_span": {
-                            "lineno": 17,
-                            "col": 32,
-                            "end_lineno": 17,
-                            "end_col": 37
-                          },
-                          "resolved_type": "Path",
-                          "casts": [],
-                          "borrow_kind": "readonly_ref",
-                          "repr": "child",
-                          "id": "child"
-                        }
-                      },
-                      "op": "Div",
-                      "right": {
-                        "kind": "Constant",
-                        "source_span": {
-                          "lineno": 17,
-                          "col": 47,
-                          "end_lineno": 17,
-                          "end_col": 59
-                        },
-                        "resolved_type": "str",
-                        "casts": [],
-                        "borrow_kind": "value",
-                        "repr": "\"values.txt\"",
-                        "value": "values.txt"
-                      }
-                    }
+                    "keywords": []
                   },
                   {
                     "kind": "Constant",
@@ -1468,7 +1259,7 @@
                       "end_lineno": 18,
                       "end_col": 48
                     },
-                    "resolved_type": "str",
+                    "resolved_type": "unknown",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "child.read_text()",
@@ -1492,7 +1283,7 @@
                           "end_lineno": 18,
                           "end_col": 36
                         },
-                        "resolved_type": "Path",
+                        "resolved_type": "str",
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "child",
@@ -1501,28 +1292,7 @@
                       "attr": "read_text"
                     },
                     "args": [],
-                    "keywords": [],
-                    "lowered_kind": "BuiltinCall",
-                    "builtin_name": "read_text",
-                    "runtime_call": "py_read_text",
-                    "runtime_module_id": "pytra.std.pathlib",
-                    "runtime_symbol": "Path.read_text",
-                    "runtime_call_adapter_kind": "extern_delegate",
-                    "semantic_tag": "stdlib.method.read_text",
-                    "runtime_owner": {
-                      "kind": "Name",
-                      "source_span": {
-                        "lineno": 18,
-                        "col": 31,
-                        "end_lineno": 18,
-                        "end_col": 36
-                      },
-                      "resolved_type": "Path",
-                      "casts": [],
-                      "borrow_kind": "readonly_ref",
-                      "repr": "child",
-                      "id": "child"
-                    }
+                    "keywords": []
                   },
                   {
                     "kind": "Constant",
@@ -1795,7 +1565,6 @@
           "binding_kind": "symbol",
           "source_file": "test/fixture/source/py/stdlib/pathlib_extended.py",
           "source_line": 3,
-          "host_only": true,
           "source_module_id": "pathlib",
           "source_export_name": "Path",
           "source_binding_kind": "symbol",
@@ -1861,8 +1630,7 @@
         "local_name": "Path",
         "binding_kind": "symbol",
         "source_file": "test/fixture/source/py/stdlib/pathlib_extended.py",
-        "source_line": 3,
-        "host_only": true
+        "source_line": 3
       },
       {
         "module_id": "pytra.built_in.io_ops",

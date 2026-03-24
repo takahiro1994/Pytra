@@ -238,7 +238,7 @@
                     "end_lineno": 14,
                     "end_col_offset": 27
                   },
-                  "resolved_type": "str",
+                  "resolved_type": "unknown",
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "self.sound()",
@@ -274,9 +274,10 @@
                   "keywords": [],
                   "type_expr_summary_v1": {
                     "schema_version": 1,
-                    "kind": "NamedType",
-                    "category": "static",
-                    "mirror": "str"
+                    "kind": "DynamicType",
+                    "category": "dynamic",
+                    "mirror": "unknown",
+                    "dynamic_name": "unknown"
                   }
                 },
                 "op": "Add",
@@ -315,7 +316,7 @@
                       "end_lineno": 14,
                       "end_col_offset": 27
                     },
-                    "resolved_type": "str",
+                    "resolved_type": "unknown",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "self.sound()",
@@ -351,9 +352,10 @@
                     "keywords": [],
                     "type_expr_summary_v1": {
                       "schema_version": 1,
-                      "kind": "NamedType",
-                      "category": "static",
-                      "mirror": "str"
+                      "kind": "DynamicType",
+                      "category": "dynamic",
+                      "mirror": "unknown",
+                      "dynamic_name": "unknown"
                     }
                   },
                   "op": "Add",

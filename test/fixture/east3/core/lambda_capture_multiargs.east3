@@ -116,14 +116,14 @@
               "end_lineno": 7,
               "end_col_offset": 7
             },
-            "resolved_type": "callable[unknown,unknown->unknown]",
+            "resolved_type": "callable[unknown]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "mix",
             "id": "mix"
           },
           "declare": true,
-          "decl_type": "callable[unknown,unknown->unknown]",
+          "decl_type": "callable[unknown]",
           "declare_init": true,
           "value": {
             "kind": "Lambda",
@@ -133,7 +133,6 @@
               "end_lineno": 7,
               "end_col_offset": 35
             },
-            "resolved_type": "callable[unknown,unknown->unknown]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "lambda a, b: a + b + base",
@@ -221,13 +220,14 @@
                 "id": "base"
               }
             },
-            "return_type": "unknown"
+            "return_type": "unknown",
+            "resolved_type": "callable[unknown]"
           },
           "type_expr_summary_v1": {
             "schema_version": 1,
             "kind": "GenericType",
             "category": "static",
-            "mirror": "callable[unknown,unknown->unknown]"
+            "mirror": "callable[unknown]"
           }
         },
         {
@@ -408,9 +408,9 @@
                         "end_lineno": 10,
                         "end_col_offset": 34
                       },
-                      "resolved_type": "callable[unknown,unknown->unknown]",
+                      "resolved_type": "unknown",
                       "casts": [],
-                      "borrow_kind": "readonly_ref",
+                      "borrow_kind": "value",
                       "repr": "mix",
                       "id": "mix"
                     },
@@ -623,9 +623,9 @@
                         "end_lineno": 11,
                         "end_col_offset": 34
                       },
-                      "resolved_type": "callable[unknown,unknown->unknown]",
+                      "resolved_type": "unknown",
                       "casts": [],
-                      "borrow_kind": "readonly_ref",
+                      "borrow_kind": "value",
                       "repr": "mix",
                       "id": "mix"
                     },

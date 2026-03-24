@@ -239,7 +239,7 @@
                   "end_lineno": 18,
                   "end_col": 40
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "str",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "\"loud-\" + super().speak()",

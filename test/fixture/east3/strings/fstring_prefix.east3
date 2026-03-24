@@ -261,7 +261,6 @@
               "end_lineno": 9,
               "end_col_offset": 35
             },
-            "resolved_type": "str",
             "casts": [],
             "borrow_kind": "value",
             "repr": "f\"name={name}, x={x}\"",
@@ -293,7 +292,8 @@
                   "borrow_kind": "readonly_ref",
                   "repr": "name",
                   "id": "name"
-                }
+                },
+                "resolved_type": "str"
               },
               {
                 "kind": "Constant",
@@ -322,9 +322,11 @@
                   "borrow_kind": "readonly_ref",
                   "repr": "x",
                   "id": "x"
-                }
+                },
+                "resolved_type": "str"
               }
-            ]
+            ],
+            "resolved_type": "str"
           },
           "type_expr_summary_v1": {
             "schema_version": 1,
@@ -378,7 +380,6 @@
               "end_lineno": 10,
               "end_col_offset": 36
             },
-            "resolved_type": "str",
             "casts": [],
             "borrow_kind": "value",
             "repr": "f\"{{escaped}}:{x + y}\"",
@@ -450,9 +451,11 @@
                     "repr": "y",
                     "id": "y"
                   }
-                }
+                },
+                "resolved_type": "str"
               }
-            ]
+            ],
+            "resolved_type": "str"
           },
           "type_expr_summary_v1": {
             "schema_version": 1,
@@ -506,7 +509,6 @@
               "end_lineno": 11,
               "end_col_offset": 35
             },
-            "resolved_type": "str",
             "casts": [],
             "borrow_kind": "value",
             "repr": "rf\"raw\\\\path\\\\{name}\"",
@@ -538,9 +540,11 @@
                   "borrow_kind": "readonly_ref",
                   "repr": "name",
                   "id": "name"
-                }
+                },
+                "resolved_type": "str"
               }
-            ]
+            ],
+            "resolved_type": "str"
           },
           "type_expr_summary_v1": {
             "schema_version": 1,
@@ -594,7 +598,6 @@
               "end_lineno": 12,
               "end_col_offset": 53
             },
-            "resolved_type": "str",
             "casts": [],
             "borrow_kind": "value",
             "repr": "f\"mix:{name}:{'ok' if x > y else 'ng'}\"",
@@ -626,7 +629,8 @@
                   "borrow_kind": "readonly_ref",
                   "repr": "name",
                   "id": "name"
-                }
+                },
+                "resolved_type": "str"
               },
               {
                 "kind": "Constant",
@@ -729,9 +733,11 @@
                     "value": "ng"
                   },
                   "yields_dynamic": true
-                }
+                },
+                "resolved_type": "str"
               }
-            ]
+            ],
+            "resolved_type": "str"
           },
           "type_expr_summary_v1": {
             "schema_version": 1,

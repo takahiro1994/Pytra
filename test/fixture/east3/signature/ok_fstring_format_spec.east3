@@ -53,7 +53,6 @@
               "end_lineno": 2,
               "end_col_offset": 65
             },
-            "resolved_type": "str",
             "casts": [],
             "borrow_kind": "value",
             "repr": "f\"step {step+1:4d} / {num_steps:4d} | loss {loss:.4f}\"",
@@ -114,7 +113,8 @@
                     "value": 1
                   }
                 },
-                "format_spec": "4d"
+                "format_spec": "4d",
+                "resolved_type": "str"
               },
               {
                 "kind": "Constant",
@@ -144,7 +144,8 @@
                   "repr": "num_steps",
                   "id": "num_steps"
                 },
-                "format_spec": "4d"
+                "format_spec": "4d",
+                "resolved_type": "str"
               },
               {
                 "kind": "Constant",
@@ -174,9 +175,11 @@
                   "repr": "loss",
                   "id": "loss"
                 },
-                "format_spec": ".4f"
+                "format_spec": ".4f",
+                "resolved_type": "str"
               }
-            ]
+            ],
+            "resolved_type": "str"
           }
         }
       ],

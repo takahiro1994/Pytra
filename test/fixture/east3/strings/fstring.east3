@@ -76,12 +76,12 @@
                 "lineno": 8,
                 "col_offset": 11,
                 "end_lineno": 8,
-                "end_col_offset": 65
+                "end_col_offset": 46
               },
               "resolved_type": "str",
               "casts": [],
               "borrow_kind": "value",
-              "repr": "f\"{name}:22:{count}\" + f\"{count*2}\" + f\"{name}-{name}\"",
+              "repr": "f\"{name}:22:{count}\" + f\"{count*2}\"",
               "left": {
                 "kind": "JoinedStr",
                 "source_span": {
@@ -90,7 +90,6 @@
                   "end_lineno": 8,
                   "end_col_offset": 31
                 },
-                "resolved_type": "str",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "f\"{name}:22:{count}\"",
@@ -110,7 +109,8 @@
                       "borrow_kind": "readonly_ref",
                       "repr": "name",
                       "id": "name"
-                    }
+                    },
+                    "resolved_type": "str"
                   },
                   {
                     "kind": "Constant",
@@ -139,9 +139,11 @@
                       "borrow_kind": "readonly_ref",
                       "repr": "count",
                       "id": "count"
-                    }
+                    },
+                    "resolved_type": "str"
                   }
-                ]
+                ],
+                "resolved_type": "str"
               },
               "op": "Add",
               "right": {
@@ -152,7 +154,6 @@
                   "end_lineno": 8,
                   "end_col_offset": 46
                 },
-                "resolved_type": "str",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "f\"{count*2}\"",
@@ -200,9 +201,11 @@
                         "repr": "2",
                         "value": 2
                       }
-                    }
+                    },
+                    "resolved_type": "str"
                   }
-                ]
+                ],
+                "resolved_type": "str"
               }
             },
             "op": "Add",
@@ -214,7 +217,6 @@
                 "end_lineno": 8,
                 "end_col_offset": 65
               },
-              "resolved_type": "str",
               "casts": [],
               "borrow_kind": "value",
               "repr": "f\"{name}-{name}\"",
@@ -234,7 +236,8 @@
                     "borrow_kind": "readonly_ref",
                     "repr": "name",
                     "id": "name"
-                  }
+                  },
+                  "resolved_type": "str"
                 },
                 {
                   "kind": "Constant",
@@ -263,9 +266,11 @@
                     "borrow_kind": "readonly_ref",
                     "repr": "name",
                     "id": "name"
-                  }
+                  },
+                  "resolved_type": "str"
                 }
-              ]
+              ],
+              "resolved_type": "str"
             }
           }
         }

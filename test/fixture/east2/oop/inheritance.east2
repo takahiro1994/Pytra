@@ -193,7 +193,7 @@
                     "end_lineno": 14,
                     "end_col": 27
                   },
-                  "resolved_type": "str",
+                  "resolved_type": "unknown",
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "self.sound()",

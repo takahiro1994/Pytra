@@ -567,13 +567,13 @@
               }
             ],
             "keywords": [],
-            "semantic_tag": "container.dict.get",
             "lowered_kind": "BuiltinCall",
             "builtin_name": "get",
             "runtime_call": "dict.get",
             "runtime_module_id": "pytra.core.dict",
             "runtime_symbol": "dict.get",
             "runtime_call_adapter_kind": "builtin",
+            "semantic_tag": "stdlib.method.get",
             "runtime_owner": {
               "kind": "Name",
               "source_span": {
@@ -694,13 +694,13 @@
               }
             ],
             "keywords": [],
-            "semantic_tag": "container.dict.get",
             "lowered_kind": "BuiltinCall",
             "builtin_name": "get",
             "runtime_call": "dict.get",
             "runtime_module_id": "pytra.core.dict",
             "runtime_symbol": "dict.get",
             "runtime_call_adapter_kind": "builtin",
+            "semantic_tag": "stdlib.method.get",
             "runtime_owner": {
               "kind": "Name",
               "source_span": {

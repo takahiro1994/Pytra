@@ -99,7 +99,7 @@
                     "end_lineno": 5,
                     "end_col": 19
                   },
-                  "resolved_type": "unknown",
+                  "resolved_type": "float64",
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "sqrt(9.0)",

@@ -41,8 +41,7 @@
         "end_lineno": 3,
         "end_col": 25
       },
-      "name": "Scalar",
-      "type_expr": "int64|float64"
+      "name": "Scalar"
     },
     {
       "kind": "FunctionDef",
@@ -105,7 +104,7 @@
                   "end_lineno": 7,
                   "end_col": 25
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "isinstance(a, int)",
@@ -155,8 +154,8 @@
                 ],
                 "keywords": [],
                 "lowered_kind": "TypePredicateCall",
-                "builtin_name": "isinstance",
-                "semantic_tag": "type.isinstance"
+                "semantic_tag": "type.isinstance",
+                "predicate_kind": "isinstance"
               },
               {
                 "kind": "Call",
@@ -166,7 +165,7 @@
                   "end_lineno": 7,
                   "end_col": 48
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "isinstance(b, int)",
@@ -216,8 +215,8 @@
                 ],
                 "keywords": [],
                 "lowered_kind": "TypePredicateCall",
-                "builtin_name": "isinstance",
-                "semantic_tag": "type.isinstance"
+                "semantic_tag": "type.isinstance",
+                "predicate_kind": "isinstance"
               }
             ]
           },
@@ -238,7 +237,7 @@
                   "end_lineno": 8,
                   "end_col": 20
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "Scalar",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "a + b",
@@ -317,7 +316,16 @@
         "name": "int64"
       },
       "leading_comments": [],
-      "leading_trivia": []
+      "leading_trivia": [
+        {
+          "kind": "blank",
+          "count": 1
+        },
+        {
+          "kind": "blank",
+          "count": 1
+        }
+      ]
     },
     {
       "kind": "FunctionDef",

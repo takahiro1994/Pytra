@@ -148,7 +148,6 @@
                   "end_lineno": 7,
                   "end_col": 27
                 },
-                "resolved_type": "str",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "f\"FPS {fps:5.1f}\"",
@@ -181,9 +180,11 @@
                       "repr": "fps",
                       "id": "fps"
                     },
-                    "format_spec": "5.1f"
+                    "format_spec": "5.1f",
+                    "resolved_type": "str"
                   }
-                ]
+                ],
+                "resolved_type": "str"
               }
             ],
             "keywords": [],
@@ -408,7 +409,6 @@
                   "end_lineno": 13,
                   "end_col": 62
                 },
-                "resolved_type": "str",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "f\"step {step:4d} / {num_steps:4d} | loss {loss:.4f}\"",
@@ -441,7 +441,8 @@
                       "repr": "step",
                       "id": "step"
                     },
-                    "format_spec": "4d"
+                    "format_spec": "4d",
+                    "resolved_type": "str"
                   },
                   {
                     "kind": "Constant",
@@ -471,7 +472,8 @@
                       "repr": "num_steps",
                       "id": "num_steps"
                     },
-                    "format_spec": "4d"
+                    "format_spec": "4d",
+                    "resolved_type": "str"
                   },
                   {
                     "kind": "Constant",
@@ -501,9 +503,11 @@
                       "repr": "loss",
                       "id": "loss"
                     },
-                    "format_spec": ".4f"
+                    "format_spec": ".4f",
+                    "resolved_type": "str"
                   }
-                ]
+                ],
+                "resolved_type": "str"
               }
             ],
             "keywords": [],
@@ -624,7 +628,6 @@
                   "end_lineno": 17,
                   "end_col": 44
                 },
-                "resolved_type": "str",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "f\"hex={value:02x} HEX={value:02X}\"",
@@ -657,7 +660,8 @@
                       "repr": "value",
                       "id": "value"
                     },
-                    "format_spec": "02x"
+                    "format_spec": "02x",
+                    "resolved_type": "str"
                   },
                   {
                     "kind": "Constant",
@@ -687,9 +691,11 @@
                       "repr": "value",
                       "id": "value"
                     },
-                    "format_spec": "02X"
+                    "format_spec": "02X",
+                    "resolved_type": "str"
                   }
-                ]
+                ],
+                "resolved_type": "str"
               }
             ],
             "keywords": [],
@@ -810,7 +816,6 @@
                   "end_lineno": 21,
                   "end_col": 23
                 },
-                "resolved_type": "str",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "f\"n={big:,d}\"",
@@ -843,9 +848,11 @@
                       "repr": "big",
                       "id": "big"
                     },
-                    "format_spec": ",d"
+                    "format_spec": ",d",
+                    "resolved_type": "str"
                   }
-                ]
+                ],
+                "resolved_type": "str"
               }
             ],
             "keywords": [],
@@ -966,7 +973,6 @@
                   "end_lineno": 25,
                   "end_col": 30
                 },
-                "resolved_type": "str",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "f\"ratio={ratio:.1%}\"",
@@ -999,9 +1005,11 @@
                       "repr": "ratio",
                       "id": "ratio"
                     },
-                    "format_spec": ".1%"
+                    "format_spec": ".1%",
+                    "resolved_type": "str"
                   }
-                ]
+                ],
+                "resolved_type": "str"
               }
             ],
             "keywords": [],
@@ -1122,7 +1130,6 @@
                   "end_lineno": 29,
                   "end_col": 24
                 },
-                "resolved_type": "str",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "f\"[{tag:<6s}]\"",
@@ -1155,7 +1162,8 @@
                       "repr": "tag",
                       "id": "tag"
                     },
-                    "format_spec": "<6s"
+                    "format_spec": "<6s",
+                    "resolved_type": "str"
                   },
                   {
                     "kind": "Constant",
@@ -1169,7 +1177,8 @@
                     "repr": "]",
                     "value": "]"
                   }
-                ]
+                ],
+                "resolved_type": "str"
               }
             ],
             "keywords": [],
@@ -1290,7 +1299,6 @@
                   "end_lineno": 33,
                   "end_col": 28
                 },
-                "resolved_type": "str",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "f\"code={code:06d}\"",
@@ -1323,9 +1331,11 @@
                       "repr": "code",
                       "id": "code"
                     },
-                    "format_spec": "06d"
+                    "format_spec": "06d",
+                    "resolved_type": "str"
                   }
-                ]
+                ],
+                "resolved_type": "str"
               }
             ],
             "keywords": [],
@@ -1512,7 +1522,6 @@
                   "end_lineno": 38,
                   "end_col": 30
                 },
-                "resolved_type": "str",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "f\"{pos:+d} {neg:+d}\"",
@@ -1533,7 +1542,8 @@
                       "repr": "pos",
                       "id": "pos"
                     },
-                    "format_spec": "+d"
+                    "format_spec": "+d",
+                    "resolved_type": "str"
                   },
                   {
                     "kind": "Constant",
@@ -1563,9 +1573,11 @@
                       "repr": "neg",
                       "id": "neg"
                     },
-                    "format_spec": "+d"
+                    "format_spec": "+d",
+                    "resolved_type": "str"
                   }
-                ]
+                ],
+                "resolved_type": "str"
               }
             ],
             "keywords": [],
@@ -1594,17 +1606,17 @@
     {
       "kind": "AnnAssign",
       "source_span": {
-        "lineno": 42,
+        "lineno": 1,
         "col": 4,
-        "end_lineno": 51,
-        "end_col": 5
+        "end_lineno": 1,
+        "end_col": 159
       },
       "target": {
         "kind": "Name",
         "source_span": {
-          "lineno": 42,
+          "lineno": 1,
           "col": 4,
-          "end_lineno": 42,
+          "end_lineno": 1,
           "end_col": 12
         },
         "resolved_type": "list[str]",
@@ -1627,9 +1639,9 @@
       "value": {
         "kind": "List",
         "source_span": {
-          "lineno": 42,
+          "lineno": 1,
           "col": 26,
-          "end_lineno": 42,
+          "end_lineno": 1,
           "end_col": 159
         },
         "resolved_type": "list[str]",
@@ -1640,9 +1652,9 @@
           {
             "kind": "Constant",
             "source_span": {
-              "lineno": 42,
+              "lineno": 1,
               "col": 28,
-              "end_lineno": 42,
+              "end_lineno": 1,
               "end_col": 39
             },
             "resolved_type": "str",
@@ -1654,9 +1666,9 @@
           {
             "kind": "Constant",
             "source_span": {
-              "lineno": 42,
+              "lineno": 1,
               "col": 41,
-              "end_lineno": 42,
+              "end_lineno": 1,
               "end_col": 73
             },
             "resolved_type": "str",
@@ -1668,9 +1680,9 @@
           {
             "kind": "Constant",
             "source_span": {
-              "lineno": 42,
+              "lineno": 1,
               "col": 75,
-              "end_lineno": 42,
+              "end_lineno": 1,
               "end_col": 90
             },
             "resolved_type": "str",
@@ -1682,9 +1694,9 @@
           {
             "kind": "Constant",
             "source_span": {
-              "lineno": 42,
+              "lineno": 1,
               "col": 92,
-              "end_lineno": 42,
+              "end_lineno": 1,
               "end_col": 105
             },
             "resolved_type": "str",
@@ -1696,9 +1708,9 @@
           {
             "kind": "Constant",
             "source_span": {
-              "lineno": 42,
+              "lineno": 1,
               "col": 107,
-              "end_lineno": 42,
+              "end_lineno": 1,
               "end_col": 120
             },
             "resolved_type": "str",
@@ -1710,9 +1722,9 @@
           {
             "kind": "Constant",
             "source_span": {
-              "lineno": 42,
+              "lineno": 1,
               "col": 122,
-              "end_lineno": 42,
+              "end_lineno": 1,
               "end_col": 132
             },
             "resolved_type": "str",
@@ -1724,9 +1736,9 @@
           {
             "kind": "Constant",
             "source_span": {
-              "lineno": 42,
+              "lineno": 1,
               "col": 134,
-              "end_lineno": 42,
+              "end_lineno": 1,
               "end_col": 147
             },
             "resolved_type": "str",
@@ -1738,9 +1750,9 @@
           {
             "kind": "Constant",
             "source_span": {
-              "lineno": 42,
+              "lineno": 1,
               "col": 149,
-              "end_lineno": 42,
+              "end_lineno": 1,
               "end_col": 156
             },
             "resolved_type": "str",

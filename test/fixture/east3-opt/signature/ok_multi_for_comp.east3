@@ -266,7 +266,8 @@
           },
           "target_plan": {
             "kind": "NameTarget",
-            "id": "row"
+            "id": "row",
+            "target_type": "list[int64]"
           },
           "body": [
             {
@@ -278,13 +279,13 @@
                   "kind": "Name",
                   "source_span": {
                     "lineno": 6,
-                    "col_offset": 29,
+                    "col_offset": 50,
                     "end_lineno": 6,
-                    "end_col_offset": 32
+                    "end_col_offset": 53
                   },
-                  "resolved_type": "list[int64]",
+                  "resolved_type": "unknown",
                   "casts": [],
-                  "borrow_kind": "readonly_ref",
+                  "borrow_kind": "value",
                   "repr": "row",
                   "id": "row"
                 },
@@ -319,9 +320,9 @@
                           "end_lineno": 6,
                           "end_col_offset": 24
                         },
-                        "resolved_type": "int64",
+                        "resolved_type": "unknown",
                         "casts": [],
-                        "borrow_kind": "readonly_ref",
+                        "borrow_kind": "value",
                         "repr": "x",
                         "id": "x"
                       }

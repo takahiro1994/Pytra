@@ -37,14 +37,14 @@
               "end_lineno": 5,
               "end_col_offset": 10
             },
-            "resolved_type": "callable[unknown,unknown,float64->unknown]",
+            "resolved_type": "callable[unknown]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "matrix",
             "id": "matrix"
           },
           "declare": true,
-          "decl_type": "callable[unknown,unknown,float64->unknown]",
+          "decl_type": "callable[unknown]",
           "declare_init": true,
           "value": {
             "kind": "Lambda",
@@ -54,7 +54,6 @@
               "end_lineno": 5,
               "end_col_offset": 57
             },
-            "resolved_type": "callable[unknown,unknown,float64->unknown]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "lambda nout, nin, std=0.08: nout + nin * std",
@@ -75,7 +74,6 @@
                 "kind": "arg",
                 "arg": "std",
                 "annotation": null,
-                "resolved_type": "float64",
                 "default": {
                   "kind": "Constant",
                   "source_span": {
@@ -84,12 +82,12 @@
                     "end_lineno": 5,
                     "end_col_offset": 39
                   },
-                  "resolved_type": "float64",
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "0.08",
                   "value": 0.08
-                }
+                },
+                "resolved_type": "unknown"
               }
             ],
             "body": {
@@ -100,7 +98,7 @@
                 "end_lineno": 5,
                 "end_col_offset": 57
               },
-              "resolved_type": "float64",
+              "resolved_type": "unknown",
               "casts": [],
               "borrow_kind": "value",
               "repr": "nout + nin * std",
@@ -127,7 +125,7 @@
                   "end_lineno": 5,
                   "end_col_offset": 57
                 },
-                "resolved_type": "float64",
+                "resolved_type": "unknown",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "nin * std",
@@ -154,9 +152,9 @@
                     "end_lineno": 5,
                     "end_col_offset": 57
                   },
-                  "resolved_type": "float64",
+                  "resolved_type": "unknown",
                   "casts": [],
-                  "borrow_kind": "readonly_ref",
+                  "borrow_kind": "value",
                   "repr": "std",
                   "id": "std"
                 },
@@ -169,7 +167,7 @@
                     "end_lineno": 5,
                     "end_col_offset": 57
                   },
-                  "resolved_type": "float64",
+                  "resolved_type": "unknown",
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "nin * std",
@@ -196,9 +194,9 @@
                       "end_lineno": 5,
                       "end_col_offset": 57
                     },
-                    "resolved_type": "float64",
+                    "resolved_type": "unknown",
                     "casts": [],
-                    "borrow_kind": "readonly_ref",
+                    "borrow_kind": "value",
                     "repr": "std",
                     "id": "std"
                   }
@@ -213,7 +211,7 @@
                   "end_lineno": 5,
                   "end_col_offset": 57
                 },
-                "resolved_type": "float64",
+                "resolved_type": "unknown",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "nout + nin * std",
@@ -240,7 +238,7 @@
                     "end_lineno": 5,
                     "end_col_offset": 57
                   },
-                  "resolved_type": "float64",
+                  "resolved_type": "unknown",
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "nin * std",
@@ -267,22 +265,23 @@
                       "end_lineno": 5,
                       "end_col_offset": 57
                     },
-                    "resolved_type": "float64",
+                    "resolved_type": "unknown",
                     "casts": [],
-                    "borrow_kind": "readonly_ref",
+                    "borrow_kind": "value",
                     "repr": "std",
                     "id": "std"
                   }
                 }
               }
             },
-            "return_type": "unknown"
+            "return_type": "unknown",
+            "resolved_type": "callable[unknown]"
           },
           "type_expr_summary_v1": {
             "schema_version": 1,
             "kind": "GenericType",
             "category": "static",
-            "mirror": "callable[unknown,unknown,float64->unknown]"
+            "mirror": "callable[unknown]"
           },
           "meta": {
             "lifetime_node_id": "n2",
@@ -366,9 +365,9 @@
                     "end_lineno": 6,
                     "end_col_offset": 16
                   },
-                  "resolved_type": "callable[unknown,unknown,float64->unknown]",
+                  "resolved_type": "unknown",
                   "casts": [],
-                  "borrow_kind": "readonly_ref",
+                  "borrow_kind": "value",
                   "repr": "matrix",
                   "id": "matrix"
                 },
@@ -500,9 +499,9 @@
                     "end_lineno": 7,
                     "end_col_offset": 16
                   },
-                  "resolved_type": "callable[unknown,unknown,float64->unknown]",
+                  "resolved_type": "unknown",
                   "casts": [],
-                  "borrow_kind": "readonly_ref",
+                  "borrow_kind": "value",
                   "repr": "matrix",
                   "id": "matrix"
                 },

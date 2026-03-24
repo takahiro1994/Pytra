@@ -108,7 +108,7 @@
           "kind": "Try",
           "source_span": {
             "lineno": 9,
-            "col": 0,
+            "col": 4,
             "end_lineno": 16,
             "end_col": 18
           },

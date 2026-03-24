@@ -302,7 +302,7 @@
                   "end_lineno": 21,
                   "end_col": 30
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "isinstance(cat, Dog)",
@@ -352,8 +352,8 @@
                 ],
                 "keywords": [],
                 "lowered_kind": "TypePredicateCall",
-                "builtin_name": "isinstance",
-                "semantic_tag": "type.isinstance"
+                "semantic_tag": "type.isinstance",
+                "predicate_kind": "isinstance"
               }
             ],
             "keywords": [],
@@ -409,7 +409,7 @@
                   "end_lineno": 22,
                   "end_col": 33
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "isinstance(cat, Animal)",
@@ -459,8 +459,8 @@
                 ],
                 "keywords": [],
                 "lowered_kind": "TypePredicateCall",
-                "builtin_name": "isinstance",
-                "semantic_tag": "type.isinstance"
+                "semantic_tag": "type.isinstance",
+                "predicate_kind": "isinstance"
               }
             ],
             "keywords": [],
@@ -516,7 +516,7 @@
                   "end_lineno": 23,
                   "end_col": 30
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "isinstance(dog, Cat)",
@@ -566,8 +566,8 @@
                 ],
                 "keywords": [],
                 "lowered_kind": "TypePredicateCall",
-                "builtin_name": "isinstance",
-                "semantic_tag": "type.isinstance"
+                "semantic_tag": "type.isinstance",
+                "predicate_kind": "isinstance"
               }
             ],
             "keywords": [],
@@ -623,7 +623,7 @@
                   "end_lineno": 24,
                   "end_col": 33
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "isinstance(dog, Animal)",
@@ -673,8 +673,8 @@
                 ],
                 "keywords": [],
                 "lowered_kind": "TypePredicateCall",
-                "builtin_name": "isinstance",
-                "semantic_tag": "type.isinstance"
+                "semantic_tag": "type.isinstance",
+                "predicate_kind": "isinstance"
               }
             ],
             "keywords": [],

@@ -103,14 +103,14 @@
                 "end_lineno": 6,
                 "end_col_offset": 23
               },
-              "resolved_type": "list[ControllerState]",
+              "resolved_type": "unknown",
               "casts": [],
-              "borrow_kind": "readonly_ref",
+              "borrow_kind": "value",
               "repr": "states",
               "id": "states",
               "iterable_trait": "yes",
               "iter_protocol": "static_range",
-              "iter_element_type": "ControllerState"
+              "iter_element_type": "unknown"
             },
             "dispatch_mode": "native",
             "init_op": "ObjIterInit",
@@ -118,8 +118,7 @@
           },
           "target_plan": {
             "kind": "NameTarget",
-            "id": "state",
-            "target_type": "ControllerState"
+            "id": "state"
           },
           "body": [
             {
@@ -183,7 +182,7 @@
                       "end_lineno": 7,
                       "end_col_offset": 39
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "bool",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "target.pressed",
@@ -223,9 +222,9 @@
                         "end_lineno": 7,
                         "end_col_offset": 48
                       },
-                      "resolved_type": "ControllerState",
+                      "resolved_type": "unknown",
                       "casts": [],
-                      "borrow_kind": "readonly_ref",
+                      "borrow_kind": "value",
                       "repr": "state",
                       "id": "state"
                     },
@@ -428,7 +427,7 @@
               "end_lineno": 16,
               "end_col_offset": 25
             },
-            "resolved_type": "unknown",
+            "resolved_type": "bool",
             "casts": [],
             "borrow_kind": "value",
             "repr": "target.pressed",

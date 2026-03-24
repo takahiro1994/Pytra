@@ -1,0 +1,205 @@
+#!/usr/bin/env python3
+"""toolchain2 パイプラインで golden file を全段再生成する。
+
+parse → resolve → compile → optimize の全段を toolchain2 で実行し、
+各段の出力で golden を上書きする。
+
+使い方:
+  python3 tools/regenerate_golden.py --case-root=fixture
+  python3 tools/regenerate_golden.py --case-root=sample
+  python3 tools/regenerate_golden.py --case-root=all       (fixture + sample)
+
+設計文書: docs/ja/plans/plan-pipeline-redesign.md §6
+"""
+
+from __future__ import annotations
+
+import sys
+import json
+import subprocess
+from pathlib import Path
+
+PYTRA_CLI2 = "src/pytra-cli2.py"
+
+# --- Source / golden paths ---
+
+FIXTURE_SOURCE_DIR = Path("test/fixture/source/py")
+SAMPLE_SOURCE_DIR = Path("sample/py")
+
+FIXTURE_GOLDEN = {
+    "east1": Path("test/fixture/east1/py"),
+    "east2": Path("test/fixture/east2"),
+    "east3": Path("test/fixture/east3"),
+    "east3-opt": Path("test/fixture/east3-opt"),
+}
+
+SAMPLE_GOLDEN = {
+    "east1": Path("test/sample/east1/py"),
+    "east2": Path("test/sample/east2"),
+    "east3": Path("test/sample/east3"),
+    "east3-opt": Path("test/sample/east3-opt"),
+}
+
+
+def _run_cli2(args: list[str]) -> subprocess.CompletedProcess[str]:
+    cmd = [sys.executable, PYTRA_CLI2] + args
+    env_path = "src"
+    import os
+    env = os.environ.copy()
+    env["PYTHONPATH"] = env_path + ":" + env.get("PYTHONPATH", "")
+    return subprocess.run(cmd, capture_output=True, text=True, env=env, timeout=60)
+
+
+def _collect_sources(source_dir: Path) -> list[tuple[Path, str]]:
+    """ソースファイルを収集し、(path, relative_stem) のリストを返す。"""
+    sources: list[tuple[Path, str]] = []
+    for py_file in sorted(source_dir.rglob("*.py")):
+        if py_file.stem.startswith("ng_"):
+            continue
+        rel = py_file.relative_to(source_dir)
+        stem = str(rel.with_suffix(""))
+        sources.append((py_file, stem))
+    return sources
+
+
+def _regen_stage(
+    label: str,
+    sources: list[tuple[Path, str]],
+    stage: str,
+    input_dir: Path,
+    output_dir: Path,
+    cli_cmd: str,
+    input_ext: str,
+    output_ext: str,
+) -> tuple[int, int]:
+    """1 段の golden を再生成する。"""
+    ok = 0
+    fail = 0
+    for src_path, rel_stem in sources:
+        if stage == "east1":
+            in_path = src_path
+        else:
+            in_path = input_dir / (rel_stem + input_ext)
+
+        out_path = output_dir / (rel_stem + output_ext)
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+
+        result = _run_cli2([cli_cmd, str(in_path), "-o", str(out_path), "--pretty"])
+        if result.returncode != 0:
+            print(f"  FAIL: {rel_stem}: {result.stderr.strip()[:100]}", file=sys.stderr)
+            fail += 1
+        else:
+            ok += 1
+
+    print(f"  {label}: {ok} ok, {fail} failed")
+    return ok, fail
+
+
+def regenerate(case_root: str) -> int:
+    """指定した case-root の golden を全段再生成する。"""
+    configs: list[tuple[str, Path, dict[str, Path]]] = []
+
+    if case_root in ("fixture", "all"):
+        configs.append(("fixture", FIXTURE_SOURCE_DIR, FIXTURE_GOLDEN))
+    if case_root in ("sample", "all"):
+        configs.append(("sample", SAMPLE_SOURCE_DIR, SAMPLE_GOLDEN))
+
+    if len(configs) == 0:
+        print(f"error: unknown case-root: {case_root}", file=sys.stderr)
+        return 1
+
+    total_ok = 0
+    total_fail = 0
+
+    for name, source_dir, golden_dirs in configs:
+        print(f"\n=== {name} ===")
+        sources = _collect_sources(source_dir)
+        if len(sources) == 0:
+            print(f"  no sources found in {source_dir}", file=sys.stderr)
+            continue
+
+        print(f"  sources: {len(sources)} files")
+
+        # Stage 1: parse (.py → .py.east1)
+        ok, fail = _regen_stage(
+            "east1", sources, "east1",
+            input_dir=Path(""),  # not used for east1
+            output_dir=golden_dirs["east1"],
+            cli_cmd="-parse",
+            input_ext="",  # not used for east1
+            output_ext=".py.east1",
+        )
+        total_ok += ok
+        total_fail += fail
+
+        # Stage 2: resolve (.py.east1 → .east2)
+        ok, fail = _regen_stage(
+            "east2", sources, "east2",
+            input_dir=golden_dirs["east1"],
+            output_dir=golden_dirs["east2"],
+            cli_cmd="-resolve",
+            input_ext=".py.east1",
+            output_ext=".east2",
+        )
+        total_ok += ok
+        total_fail += fail
+
+        # Stage 3: compile (.east2 → .east3)
+        ok, fail = _regen_stage(
+            "east3", sources, "east3",
+            input_dir=golden_dirs["east2"],
+            output_dir=golden_dirs["east3"],
+            cli_cmd="-compile",
+            input_ext=".east2",
+            output_ext=".east3",
+        )
+        total_ok += ok
+        total_fail += fail
+
+        # Stage 4: optimize (.east3 → .east3)
+        ok, fail = _regen_stage(
+            "east3-opt", sources, "east3-opt",
+            input_dir=golden_dirs["east3"],
+            output_dir=golden_dirs["east3-opt"],
+            cli_cmd="-optimize",
+            input_ext=".east3",
+            output_ext=".east3",
+        )
+        total_ok += ok
+        total_fail += fail
+
+    print(f"\ntotal: {total_ok} ok, {total_fail} failed")
+    return 0 if total_fail == 0 else 1
+
+
+def main() -> int:
+    case_root = "all"
+
+    i = 0
+    args = sys.argv[1:]
+    while i < len(args):
+        tok = args[i]
+        if tok == "--case-root":
+            if i + 1 >= len(args):
+                print(f"error: missing value for {tok}", file=sys.stderr)
+                return 1
+            case_root = args[i + 1]
+            i += 2
+            continue
+        if tok.startswith("--case-root="):
+            case_root = tok[len("--case-root="):]
+            i += 1
+            continue
+        if tok == "-h" or tok == "--help":
+            print("usage: regenerate_golden.py [--case-root=fixture|sample|all]")
+            print()
+            print("Regenerates golden files using toolchain2 pipeline (parse→resolve→compile→optimize).")
+            print("Default: --case-root=all")
+            return 0
+        i += 1
+
+    return regenerate(case_root)
+
+
+if __name__ == "__main__":
+    sys.exit(main())

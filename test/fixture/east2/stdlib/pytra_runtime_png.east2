@@ -112,8 +112,8 @@
           "source_span": {
             "lineno": 9,
             "col": 4,
-            "end_lineno": 14,
-            "end_col": 6
+            "end_lineno": 9,
+            "end_col": 75
           },
           "target": {
             "kind": "Name",
@@ -137,7 +137,7 @@
               "end_lineno": 9,
               "end_col": 75
             },
-            "resolved_type": "bytearray",
+            "resolved_type": "unknown",
             "casts": [],
             "borrow_kind": "value",
             "repr": "bytearray([ 255, 0, 0, 0, 255, 0, 0, 0, 255, 255, 255, 255, ])",
@@ -340,17 +340,9 @@
                 ]
               }
             ],
-            "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "bytearray",
-            "runtime_call": "bytearray_ctor",
-            "runtime_module_id": "pytra.core.py_runtime",
-            "runtime_symbol": "bytearray",
-            "runtime_call_adapter_kind": "builtin",
-            "semantic_tag": "ctor.bytearray"
+            "keywords": []
           },
           "declare": true,
-          "decl_type": "bytearray",
           "declare_init": true
         },
         {
@@ -452,19 +444,18 @@
                   "end_lineno": 15,
                   "end_col": 44
                 },
-                "resolved_type": "bytearray",
+                "resolved_type": "unknown",
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "pixels",
                 "id": "pixels"
               }
             ],
             "keywords": [],
-            "resolved_runtime_call": "write_rgb_png",
+            "resolved_runtime_call": "png.write_rgb_png",
             "resolved_runtime_source": "module_attr",
             "runtime_module_id": "pytra.utils.png",
             "runtime_symbol": "write_rgb_png",
-            "runtime_call_adapter_kind": "extern_delegate",
             "semantic_tag": "stdlib.method.write_rgb_png"
           }
         },
@@ -649,9 +640,9 @@
                           "end_lineno": 17,
                           "end_col": 42
                         },
-                        "resolved_type": "bytearray",
+                        "resolved_type": "unknown",
                         "casts": [],
-                        "borrow_kind": "readonly_ref",
+                        "borrow_kind": "value",
                         "repr": "pixels",
                         "id": "pixels"
                       }
@@ -659,7 +650,7 @@
                     "keywords": [],
                     "lowered_kind": "BuiltinCall",
                     "builtin_name": "len",
-                    "runtime_call": "py_len",
+                    "runtime_call": "len",
                     "runtime_module_id": "pytra.core.py_runtime",
                     "runtime_symbol": "len",
                     "runtime_call_adapter_kind": "builtin",
@@ -1106,10 +1097,12 @@
           "source_file": "test/fixture/source/py/stdlib/pytra_runtime_png.py",
           "source_line": 3,
           "source_module_id": "pytra.utils.png",
+          "source_export_name": "",
           "source_binding_kind": "module",
           "runtime_module_id": "pytra.utils.png",
           "runtime_group": "utils",
-          "resolved_binding_kind": "module"
+          "resolved_binding_kind": "module",
+          "host_only": true
         },
         {
           "module_id": "pytra.utils.assertions",
@@ -1178,16 +1171,16 @@
           "runtime_group": "built_in"
         },
         {
-          "module_id": "pytra.built_in.sequence",
+          "module_id": "pytra.core.py_runtime",
           "export_name": "",
-          "local_name": "pytra.built_in.sequence",
+          "local_name": "pytra.core.py_runtime",
           "binding_kind": "implicit_builtin",
           "source_file": "test/fixture/source/py/stdlib/pytra_runtime_png.py",
           "source_line": 0,
-          "source_module_id": "pytra.built_in.sequence",
+          "source_module_id": "pytra.core.py_runtime",
           "source_binding_kind": "implicit_builtin",
-          "runtime_module_id": "pytra.built_in.sequence",
-          "runtime_group": "built_in"
+          "runtime_module_id": "pytra.core.py_runtime",
+          "runtime_group": "core"
         }
       ],
       "qualified_refs": [
@@ -1215,7 +1208,8 @@
         "local_name": "png",
         "binding_kind": "module",
         "source_file": "test/fixture/source/py/stdlib/pytra_runtime_png.py",
-        "source_line": 3
+        "source_line": 3,
+        "host_only": true
       },
       {
         "module_id": "pytra.utils.assertions",
@@ -1250,9 +1244,9 @@
         "source_line": 0
       },
       {
-        "module_id": "pytra.built_in.sequence",
+        "module_id": "pytra.core.py_runtime",
         "export_name": "",
-        "local_name": "pytra.built_in.sequence",
+        "local_name": "pytra.core.py_runtime",
         "binding_kind": "implicit_builtin",
         "source_file": "test/fixture/source/py/stdlib/pytra_runtime_png.py",
         "source_line": 0

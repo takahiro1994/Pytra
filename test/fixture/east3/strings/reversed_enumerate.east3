@@ -464,7 +464,7 @@
                 "end_lineno": 11,
                 "end_col_offset": 29
               },
-              "resolved_type": "unknown",
+              "resolved_type": "list[int64]",
               "casts": [],
               "borrow_kind": "value",
               "repr": "reversed(values)",
@@ -501,20 +501,19 @@
               "keywords": [],
               "lowered_kind": "BuiltinCall",
               "builtin_name": "reversed",
-              "runtime_call": "py_reversed",
+              "runtime_call": "py_reversed_object",
               "runtime_module_id": "pytra.built_in.iter_ops",
-              "runtime_symbol": "reversed",
+              "runtime_symbol": "py_reversed_object",
               "runtime_call_adapter_kind": "builtin",
               "semantic_tag": "iter.reversed",
-              "iterable_trait": "unknown",
+              "iterable_trait": "yes",
               "iter_protocol": "static_range",
-              "iter_element_type": "unknown",
+              "iter_element_type": "int64",
               "type_expr_summary_v1": {
                 "schema_version": 1,
-                "kind": "DynamicType",
-                "category": "dynamic",
-                "mirror": "unknown",
-                "dynamic_name": "unknown"
+                "kind": "GenericType",
+                "category": "static",
+                "mirror": "list[int64]"
               }
             },
             "dispatch_mode": "native",
@@ -523,7 +522,8 @@
           },
           "target_plan": {
             "kind": "NameTarget",
-            "id": "v"
+            "id": "v",
+            "target_type": "int64"
           },
           "body": [
             {

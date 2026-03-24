@@ -56,7 +56,7 @@
           "kind": "Try",
           "source_span": {
             "lineno": 8,
-            "col": 0,
+            "col": 4,
             "end_lineno": 15,
             "end_col": 12
           },
@@ -223,7 +223,7 @@
               "kind": "Pass",
               "source_span": {
                 "lineno": 15,
-                "col": 8,
+                "col": 0,
                 "end_lineno": 15,
                 "end_col": 12
               }

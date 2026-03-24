@@ -58,14 +58,14 @@
               "end_lineno": 6,
               "end_col_offset": 10
             },
-            "resolved_type": "callable[unknown->str]",
+            "resolved_type": "callable[unknown]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "choose",
             "id": "choose"
           },
           "declare": true,
-          "decl_type": "callable[unknown->str]",
+          "decl_type": "callable[unknown]",
           "declare_init": true,
           "value": {
             "kind": "Lambda",
@@ -75,7 +75,6 @@
               "end_lineno": 6,
               "end_col_offset": 52
             },
-            "resolved_type": "callable[unknown->str]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "lambda x: \"pos\" if x > 0 else \"non-pos\"",
@@ -222,13 +221,14 @@
               },
               "yields_dynamic": true
             },
-            "return_type": "str"
+            "return_type": "unknown",
+            "resolved_type": "callable[unknown]"
           },
           "type_expr_summary_v1": {
             "schema_version": 1,
             "kind": "GenericType",
             "category": "static",
-            "mirror": "callable[unknown->str]"
+            "mirror": "callable[unknown]"
           },
           "meta": {
             "lifetime_node_id": "n5",
@@ -443,7 +443,7 @@
                       "end_lineno": 9,
                       "end_col_offset": 40
                     },
-                    "resolved_type": "str",
+                    "resolved_type": "unknown",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "choose(2)",
@@ -455,9 +455,9 @@
                         "end_lineno": 9,
                         "end_col_offset": 37
                       },
-                      "resolved_type": "callable[unknown->str]",
+                      "resolved_type": "unknown",
                       "casts": [],
-                      "borrow_kind": "readonly_ref",
+                      "borrow_kind": "value",
                       "repr": "choose",
                       "id": "choose"
                     },
@@ -480,9 +480,10 @@
                     "keywords": [],
                     "type_expr_summary_v1": {
                       "schema_version": 1,
-                      "kind": "NamedType",
-                      "category": "static",
-                      "mirror": "str"
+                      "kind": "DynamicType",
+                      "category": "dynamic",
+                      "mirror": "unknown",
+                      "dynamic_name": "unknown"
                     }
                   },
                   {
@@ -665,7 +666,7 @@
                       "end_lineno": 10,
                       "end_col_offset": 40
                     },
-                    "resolved_type": "str",
+                    "resolved_type": "unknown",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "choose(0)",
@@ -677,9 +678,9 @@
                         "end_lineno": 10,
                         "end_col_offset": 37
                       },
-                      "resolved_type": "callable[unknown->str]",
+                      "resolved_type": "unknown",
                       "casts": [],
-                      "borrow_kind": "readonly_ref",
+                      "borrow_kind": "value",
                       "repr": "choose",
                       "id": "choose"
                     },
@@ -702,9 +703,10 @@
                     "keywords": [],
                     "type_expr_summary_v1": {
                       "schema_version": 1,
-                      "kind": "NamedType",
-                      "category": "static",
-                      "mirror": "str"
+                      "kind": "DynamicType",
+                      "category": "dynamic",
+                      "mirror": "unknown",
+                      "dynamic_name": "unknown"
                     }
                   },
                   {
@@ -887,7 +889,7 @@
                       "end_lineno": 11,
                       "end_col_offset": 41
                     },
-                    "resolved_type": "str",
+                    "resolved_type": "unknown",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "choose(-7)",
@@ -899,9 +901,9 @@
                         "end_lineno": 11,
                         "end_col_offset": 37
                       },
-                      "resolved_type": "callable[unknown->str]",
+                      "resolved_type": "unknown",
                       "casts": [],
-                      "borrow_kind": "readonly_ref",
+                      "borrow_kind": "value",
                       "repr": "choose",
                       "id": "choose"
                     },
@@ -938,9 +940,10 @@
                     "keywords": [],
                     "type_expr_summary_v1": {
                       "schema_version": 1,
-                      "kind": "NamedType",
-                      "category": "static",
-                      "mirror": "str"
+                      "kind": "DynamicType",
+                      "category": "dynamic",
+                      "mirror": "unknown",
+                      "dynamic_name": "unknown"
                     }
                   },
                   {

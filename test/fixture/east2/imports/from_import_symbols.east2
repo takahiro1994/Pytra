@@ -162,13 +162,11 @@
             },
             "args": [],
             "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "perf_counter",
-            "runtime_call": "perf_counter",
+            "resolved_runtime_call": "time.perf_counter",
+            "resolved_runtime_source": "import_symbol",
             "runtime_module_id": "pytra.std.time",
             "runtime_symbol": "perf_counter",
-            "runtime_call_adapter_kind": "extern_delegate",
-            "semantic_tag": "stdlib.fn.perf_counter"
+            "runtime_call_adapter_kind": "extern_delegate"
           },
           "declare": true,
           "decl_type": "float64",
@@ -251,7 +249,7 @@
               "end_lineno": 12,
               "end_col": 61
             },
-            "resolved_type": "bytearray",
+            "resolved_type": "unknown",
             "casts": [],
             "borrow_kind": "value",
             "repr": "bytearray([0, 0, 0, 255, 255, 255, 32, 64, 128])",
@@ -412,17 +410,9 @@
                 ]
               }
             ],
-            "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "bytearray",
-            "runtime_call": "bytearray_ctor",
-            "runtime_module_id": "pytra.core.py_runtime",
-            "runtime_symbol": "bytearray",
-            "runtime_call_adapter_kind": "builtin",
-            "semantic_tag": "ctor.bytearray"
+            "keywords": []
           },
           "declare": true,
-          "decl_type": "bytearray",
           "declare_init": true
         },
         {
@@ -510,9 +500,9 @@
                   "end_lineno": 13,
                   "end_col": 40
                 },
-                "resolved_type": "bytearray",
+                "resolved_type": "unknown",
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "pixels",
                 "id": "pixels"
               }
@@ -580,13 +570,11 @@
             },
             "args": [],
             "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "perf_counter",
-            "runtime_call": "perf_counter",
+            "resolved_runtime_call": "time.perf_counter",
+            "resolved_runtime_source": "import_symbol",
             "runtime_module_id": "pytra.std.time",
             "runtime_symbol": "perf_counter",
-            "runtime_call_adapter_kind": "extern_delegate",
-            "semantic_tag": "stdlib.fn.perf_counter"
+            "runtime_call_adapter_kind": "extern_delegate"
           },
           "declare": true,
           "decl_type": "float64",
@@ -780,7 +768,7 @@
                           "end_lineno": 16,
                           "end_col": 47
                         },
-                        "resolved_type": "unknown",
+                        "resolved_type": "float64",
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "msqrt(81.0)",
@@ -817,7 +805,7 @@
                         "keywords": [],
                         "resolved_runtime_call": "math.sqrt",
                         "resolved_runtime_source": "import_symbol",
-                        "runtime_module_id": "math",
+                        "runtime_module_id": "pytra.std.math",
                         "runtime_symbol": "sqrt",
                         "runtime_call_adapter_kind": "math.float_args"
                       }
@@ -825,7 +813,7 @@
                     "keywords": [],
                     "lowered_kind": "BuiltinCall",
                     "builtin_name": "int",
-                    "runtime_call": "static_cast",
+                    "runtime_call": "int",
                     "runtime_module_id": "pytra.core.py_runtime",
                     "runtime_symbol": "int",
                     "runtime_call_adapter_kind": "builtin",
@@ -1003,7 +991,7 @@
                           "end_lineno": 17,
                           "end_col": 46
                         },
-                        "resolved_type": "unknown",
+                        "resolved_type": "float64",
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "floor(3.9)",
@@ -1040,7 +1028,7 @@
                         "keywords": [],
                         "resolved_runtime_call": "math.floor",
                         "resolved_runtime_source": "import_symbol",
-                        "runtime_module_id": "math",
+                        "runtime_module_id": "pytra.std.math",
                         "runtime_symbol": "floor",
                         "runtime_call_adapter_kind": "math.float_args"
                       }
@@ -1048,7 +1036,7 @@
                     "keywords": [],
                     "lowered_kind": "BuiltinCall",
                     "builtin_name": "int",
-                    "runtime_call": "static_cast",
+                    "runtime_call": "int",
                     "runtime_module_id": "pytra.core.py_runtime",
                     "runtime_symbol": "int",
                     "runtime_call_adapter_kind": "builtin",
@@ -1395,9 +1383,9 @@
                           "end_lineno": 19,
                           "end_col": 42
                         },
-                        "resolved_type": "bytearray",
+                        "resolved_type": "unknown",
                         "casts": [],
-                        "borrow_kind": "readonly_ref",
+                        "borrow_kind": "value",
                         "repr": "pixels",
                         "id": "pixels"
                       }
@@ -1405,7 +1393,7 @@
                     "keywords": [],
                     "lowered_kind": "BuiltinCall",
                     "builtin_name": "len",
-                    "runtime_call": "py_len",
+                    "runtime_call": "len",
                     "runtime_module_id": "pytra.core.py_runtime",
                     "runtime_symbol": "len",
                     "runtime_call_adapter_kind": "builtin",
@@ -1714,7 +1702,6 @@
           "binding_kind": "symbol",
           "source_file": "test/fixture/source/py/imports/from_import_symbols.py",
           "source_line": 3,
-          "host_only": true,
           "source_module_id": "math",
           "source_export_name": "floor",
           "source_binding_kind": "symbol",
@@ -1734,7 +1721,6 @@
           "binding_kind": "symbol",
           "source_file": "test/fixture/source/py/imports/from_import_symbols.py",
           "source_line": 3,
-          "host_only": true,
           "source_module_id": "math",
           "source_export_name": "sqrt",
           "source_binding_kind": "symbol",
@@ -1826,7 +1812,6 @@
           "binding_kind": "symbol",
           "source_file": "test/fixture/source/py/imports/from_import_symbols.py",
           "source_line": 6,
-          "host_only": true,
           "source_module_id": "time",
           "source_export_name": "perf_counter",
           "source_binding_kind": "symbol",
@@ -1851,28 +1836,16 @@
           "runtime_group": "built_in"
         },
         {
-          "module_id": "pytra.built_in.scalar_ops",
+          "module_id": "pytra.core.py_runtime",
           "export_name": "",
-          "local_name": "pytra.built_in.scalar_ops",
+          "local_name": "pytra.core.py_runtime",
           "binding_kind": "implicit_builtin",
           "source_file": "test/fixture/source/py/imports/from_import_symbols.py",
           "source_line": 0,
-          "source_module_id": "pytra.built_in.scalar_ops",
+          "source_module_id": "pytra.core.py_runtime",
           "source_binding_kind": "implicit_builtin",
-          "runtime_module_id": "pytra.built_in.scalar_ops",
-          "runtime_group": "built_in"
-        },
-        {
-          "module_id": "pytra.built_in.sequence",
-          "export_name": "",
-          "local_name": "pytra.built_in.sequence",
-          "binding_kind": "implicit_builtin",
-          "source_file": "test/fixture/source/py/imports/from_import_symbols.py",
-          "source_line": 0,
-          "source_module_id": "pytra.built_in.sequence",
-          "source_binding_kind": "implicit_builtin",
-          "runtime_module_id": "pytra.built_in.sequence",
-          "runtime_group": "built_in"
+          "runtime_module_id": "pytra.core.py_runtime",
+          "runtime_group": "core"
         }
       ],
       "qualified_refs": [
@@ -1920,8 +1893,7 @@
         "local_name": "floor",
         "binding_kind": "symbol",
         "source_file": "test/fixture/source/py/imports/from_import_symbols.py",
-        "source_line": 3,
-        "host_only": true
+        "source_line": 3
       },
       {
         "module_id": "math",
@@ -1929,8 +1901,7 @@
         "local_name": "msqrt",
         "binding_kind": "symbol",
         "source_file": "test/fixture/source/py/imports/from_import_symbols.py",
-        "source_line": 3,
-        "host_only": true
+        "source_line": 3
       },
       {
         "module_id": "pytra.utils.assertions",
@@ -1970,8 +1941,7 @@
         "local_name": "perf_counter",
         "binding_kind": "symbol",
         "source_file": "test/fixture/source/py/imports/from_import_symbols.py",
-        "source_line": 6,
-        "host_only": true
+        "source_line": 6
       },
       {
         "module_id": "pytra.built_in.io_ops",
@@ -1982,17 +1952,9 @@
         "source_line": 0
       },
       {
-        "module_id": "pytra.built_in.scalar_ops",
+        "module_id": "pytra.core.py_runtime",
         "export_name": "",
-        "local_name": "pytra.built_in.scalar_ops",
-        "binding_kind": "implicit_builtin",
-        "source_file": "test/fixture/source/py/imports/from_import_symbols.py",
-        "source_line": 0
-      },
-      {
-        "module_id": "pytra.built_in.sequence",
-        "export_name": "",
-        "local_name": "pytra.built_in.sequence",
+        "local_name": "pytra.core.py_runtime",
         "binding_kind": "implicit_builtin",
         "source_file": "test/fixture/source/py/imports/from_import_symbols.py",
         "source_line": 0

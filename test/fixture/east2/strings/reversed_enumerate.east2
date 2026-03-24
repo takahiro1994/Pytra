@@ -264,10 +264,10 @@
               }
             ]
           },
-          "target_type": "tuple[int64, int64]",
+          "target_type": "tuple[int64,int64]",
           "iter_mode": "static_fastpath",
-          "iter_source_type": "list[tuple[int64, int64]]",
-          "iter_element_type": "tuple[int64, int64]",
+          "iter_source_type": "list[tuple[int64,int64]]",
+          "iter_element_type": "tuple[int64,int64]",
           "iter": {
             "kind": "Call",
             "source_span": {
@@ -276,7 +276,7 @@
               "end_lineno": 8,
               "end_col": 33
             },
-            "resolved_type": "list[tuple[int64, int64]]",
+            "resolved_type": "list[tuple[int64,int64]]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "enumerate(values)",
@@ -313,14 +313,14 @@
             "keywords": [],
             "lowered_kind": "BuiltinCall",
             "builtin_name": "enumerate",
-            "runtime_call": "py_enumerate",
+            "runtime_call": "py_enumerate_object",
             "runtime_module_id": "pytra.built_in.iter_ops",
-            "runtime_symbol": "enumerate",
+            "runtime_symbol": "py_enumerate_object",
             "runtime_call_adapter_kind": "builtin",
             "semantic_tag": "iter.enumerate",
             "iterable_trait": "yes",
             "iter_protocol": "static_range",
-            "iter_element_type": "tuple[int64, int64]"
+            "iter_element_type": "tuple[int64,int64]"
           },
           "body": [
             {
@@ -482,14 +482,14 @@
             },
             "resolved_type": "int64",
             "casts": [],
-            "borrow_kind": "readonly_ref",
+            "borrow_kind": "value",
             "repr": "v",
             "id": "v"
           },
-          "target_type": "unknown",
+          "target_type": "int64",
           "iter_mode": "static_fastpath",
-          "iter_source_type": "unknown",
-          "iter_element_type": "unknown",
+          "iter_source_type": "list[int64]",
+          "iter_element_type": "int64",
           "iter": {
             "kind": "Call",
             "source_span": {
@@ -498,7 +498,7 @@
               "end_lineno": 11,
               "end_col": 29
             },
-            "resolved_type": "unknown",
+            "resolved_type": "list[int64]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "reversed(values)",
@@ -535,14 +535,14 @@
             "keywords": [],
             "lowered_kind": "BuiltinCall",
             "builtin_name": "reversed",
-            "runtime_call": "py_reversed",
+            "runtime_call": "py_reversed_object",
             "runtime_module_id": "pytra.built_in.iter_ops",
-            "runtime_symbol": "reversed",
+            "runtime_symbol": "py_reversed_object",
             "runtime_call_adapter_kind": "builtin",
             "semantic_tag": "iter.reversed",
-            "iterable_trait": "unknown",
+            "iterable_trait": "yes",
             "iter_protocol": "static_range",
-            "iter_element_type": "unknown"
+            "iter_element_type": "int64"
           },
           "body": [
             {

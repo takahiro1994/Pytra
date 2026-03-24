@@ -218,8 +218,8 @@
           "source_span": {
             "lineno": 7,
             "col": 0,
-            "end_lineno": 9,
-            "end_col": 0
+            "end_lineno": 8,
+            "end_col": 25
           },
           "target": {
             "kind": "Tuple",
@@ -264,10 +264,10 @@
               }
             ]
           },
-          "target_type": "tuple[int64, int64]",
+          "target_type": "tuple[int64,int64]",
           "iter_mode": "static_fastpath",
-          "iter_source_type": "list[tuple[int64, int64]]",
-          "iter_element_type": "tuple[int64, int64]",
+          "iter_source_type": "list[tuple[int64,int64]]",
+          "iter_element_type": "tuple[int64,int64]",
           "iter": {
             "kind": "Call",
             "source_span": {
@@ -276,7 +276,7 @@
               "end_lineno": 7,
               "end_col": 33
             },
-            "resolved_type": "list[tuple[int64, int64]]",
+            "resolved_type": "list[tuple[int64,int64]]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "enumerate(values)",
@@ -313,14 +313,14 @@
             "keywords": [],
             "lowered_kind": "BuiltinCall",
             "builtin_name": "enumerate",
-            "runtime_call": "py_enumerate",
+            "runtime_call": "py_enumerate_object",
             "runtime_module_id": "pytra.built_in.iter_ops",
-            "runtime_symbol": "enumerate",
+            "runtime_symbol": "py_enumerate_object",
             "runtime_call_adapter_kind": "builtin",
             "semantic_tag": "iter.enumerate",
             "iterable_trait": "yes",
             "iter_protocol": "static_range",
-            "iter_element_type": "tuple[int64, int64]"
+            "iter_element_type": "tuple[int64,int64]"
           },
           "body": [
             {
@@ -501,17 +501,17 @@
         {
           "kind": "For",
           "source_span": {
-            "lineno": 12,
+            "lineno": 7,
             "col": 0,
-            "end_lineno": 15,
-            "end_col": 0
+            "end_lineno": 14,
+            "end_col": 22
           },
           "target": {
             "kind": "Tuple",
             "source_span": {
-              "lineno": 12,
+              "lineno": 7,
               "col": 8,
-              "end_lineno": 12,
+              "end_lineno": 7,
               "end_col": 12
             },
             "resolved_type": "tuple[int64,int64]",
@@ -522,55 +522,55 @@
               {
                 "kind": "Name",
                 "source_span": {
-                  "lineno": 12,
+                  "lineno": 7,
                   "col": 8,
-                  "end_lineno": 12,
+                  "end_lineno": 7,
                   "end_col": 9
                 },
                 "resolved_type": "int64",
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "i",
                 "id": "i"
               },
               {
                 "kind": "Name",
                 "source_span": {
-                  "lineno": 12,
+                  "lineno": 7,
                   "col": 11,
-                  "end_lineno": 12,
+                  "end_lineno": 7,
                   "end_col": 12
                 },
                 "resolved_type": "int64",
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "v",
                 "id": "v"
               }
             ]
           },
-          "target_type": "tuple[int64, int64]",
+          "target_type": "tuple[int64,int64]",
           "iter_mode": "static_fastpath",
-          "iter_source_type": "list[tuple[int64, int64]]",
-          "iter_element_type": "tuple[int64, int64]",
+          "iter_source_type": "list[tuple[int64,int64]]",
+          "iter_element_type": "tuple[int64,int64]",
           "iter": {
             "kind": "Call",
             "source_span": {
-              "lineno": 12,
+              "lineno": 7,
               "col": 16,
-              "end_lineno": 12,
+              "end_lineno": 7,
               "end_col": 33
             },
-            "resolved_type": "list[tuple[int64, int64]]",
+            "resolved_type": "list[tuple[int64,int64]]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "enumerate(values)",
             "func": {
               "kind": "Name",
               "source_span": {
-                "lineno": 12,
+                "lineno": 7,
                 "col": 16,
-                "end_lineno": 12,
+                "end_lineno": 7,
                 "end_col": 25
               },
               "resolved_type": "unknown",
@@ -583,9 +583,9 @@
               {
                 "kind": "Name",
                 "source_span": {
-                  "lineno": 12,
+                  "lineno": 7,
                   "col": 26,
-                  "end_lineno": 12,
+                  "end_lineno": 7,
                   "end_col": 32
                 },
                 "resolved_type": "list[int64]",
@@ -598,14 +598,14 @@
             "keywords": [],
             "lowered_kind": "BuiltinCall",
             "builtin_name": "enumerate",
-            "runtime_call": "py_enumerate",
+            "runtime_call": "py_enumerate_object",
             "runtime_module_id": "pytra.built_in.iter_ops",
-            "runtime_symbol": "enumerate",
+            "runtime_symbol": "py_enumerate_object",
             "runtime_call_adapter_kind": "builtin",
             "semantic_tag": "iter.enumerate",
             "iterable_trait": "yes",
             "iter_protocol": "static_range",
-            "iter_element_type": "tuple[int64, int64]"
+            "iter_element_type": "tuple[int64,int64]"
           },
           "body": [
             {
@@ -748,8 +748,8 @@
           "source_span": {
             "lineno": 17,
             "col": 0,
-            "end_lineno": 19,
-            "end_col": 0
+            "end_lineno": 18,
+            "end_col": 31
           },
           "target": {
             "kind": "Tuple",
@@ -774,7 +774,7 @@
                 },
                 "resolved_type": "int64",
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "i",
                 "id": "i"
               },
@@ -788,16 +788,16 @@
                 },
                 "resolved_type": "int64",
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "v",
                 "id": "v"
               }
             ]
           },
-          "target_type": "tuple[int64, int64]",
+          "target_type": "tuple[int64,int64]",
           "iter_mode": "static_fastpath",
-          "iter_source_type": "list[tuple[int64, int64]]",
-          "iter_element_type": "tuple[int64, int64]",
+          "iter_source_type": "list[tuple[int64,int64]]",
+          "iter_element_type": "tuple[int64,int64]",
           "iter": {
             "kind": "Call",
             "source_span": {
@@ -806,7 +806,7 @@
               "end_lineno": 17,
               "end_col": 36
             },
-            "resolved_type": "list[tuple[int64, int64]]",
+            "resolved_type": "list[tuple[int64,int64]]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "enumerate(values, 1)",
@@ -857,14 +857,14 @@
             "keywords": [],
             "lowered_kind": "BuiltinCall",
             "builtin_name": "enumerate",
-            "runtime_call": "py_enumerate",
+            "runtime_call": "py_enumerate_object",
             "runtime_module_id": "pytra.built_in.iter_ops",
-            "runtime_symbol": "enumerate",
+            "runtime_symbol": "py_enumerate_object",
             "runtime_call_adapter_kind": "builtin",
             "semantic_tag": "iter.enumerate",
             "iterable_trait": "yes",
             "iter_protocol": "static_range",
-            "iter_element_type": "tuple[int64, int64]"
+            "iter_element_type": "tuple[int64,int64]"
           },
           "body": [
             {
@@ -995,8 +995,8 @@
           "source_span": {
             "lineno": 21,
             "col": 0,
-            "end_lineno": 24,
-            "end_col": 0
+            "end_lineno": 23,
+            "end_col": 23
           },
           "target": {
             "kind": "Name",
@@ -1006,16 +1006,16 @@
               "end_lineno": 21,
               "end_col": 12
             },
-            "resolved_type": "tuple[int64, int64]",
+            "resolved_type": "tuple[int64,int64]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "pair",
             "id": "pair"
           },
-          "target_type": "tuple[int64, int64]",
+          "target_type": "tuple[int64,int64]",
           "iter_mode": "static_fastpath",
-          "iter_source_type": "list[tuple[int64, int64]]",
-          "iter_element_type": "tuple[int64, int64]",
+          "iter_source_type": "list[tuple[int64,int64]]",
+          "iter_element_type": "tuple[int64,int64]",
           "iter": {
             "kind": "Call",
             "source_span": {
@@ -1024,7 +1024,7 @@
               "end_lineno": 21,
               "end_col": 36
             },
-            "resolved_type": "list[tuple[int64, int64]]",
+            "resolved_type": "list[tuple[int64,int64]]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "enumerate(values, 5)",
@@ -1075,14 +1075,14 @@
             "keywords": [],
             "lowered_kind": "BuiltinCall",
             "builtin_name": "enumerate",
-            "runtime_call": "py_enumerate",
+            "runtime_call": "py_enumerate_object",
             "runtime_module_id": "pytra.built_in.iter_ops",
-            "runtime_symbol": "enumerate",
+            "runtime_symbol": "py_enumerate_object",
             "runtime_call_adapter_kind": "builtin",
             "semantic_tag": "iter.enumerate",
             "iterable_trait": "yes",
             "iter_protocol": "static_range",
-            "iter_element_type": "tuple[int64, int64]"
+            "iter_element_type": "tuple[int64,int64]"
           },
           "body": [
             {
@@ -1115,14 +1115,14 @@
                   "end_lineno": 22,
                   "end_col": 16
                 },
-                "resolved_type": "tuple[int64, int64]",
+                "resolved_type": "tuple[int64,int64]",
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "pair",
                 "id": "pair"
               },
               "declare": true,
-              "decl_type": "tuple[int64, int64]",
+              "decl_type": "tuple[int64,int64]",
               "declare_init": true
             },
             {

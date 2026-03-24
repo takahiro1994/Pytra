@@ -130,7 +130,6 @@
               "end_lineno": 7,
               "end_col": 35
             },
-            "resolved_type": "callable[unknown,unknown->unknown]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "lambda a, b: a + b + base",
@@ -156,7 +155,7 @@
                 "end_lineno": 7,
                 "end_col": 35
               },
-              "resolved_type": "unknown",
+              "resolved_type": "int64",
               "casts": [],
               "borrow_kind": "value",
               "repr": "a + b + base",
@@ -218,10 +217,11 @@
                 "id": "base"
               }
             },
-            "return_type": "unknown"
+            "return_type": "unknown",
+            "resolved_type": "callable[unknown]"
           },
           "declare": true,
-          "decl_type": "callable[unknown,unknown->unknown]",
+          "decl_type": "callable[unknown]",
           "declare_init": true
         },
         {
@@ -396,9 +396,9 @@
                         "end_lineno": 10,
                         "end_col": 34
                       },
-                      "resolved_type": "callable[unknown,unknown->unknown]",
+                      "resolved_type": "unknown",
                       "casts": [],
-                      "borrow_kind": "readonly_ref",
+                      "borrow_kind": "value",
                       "repr": "mix",
                       "id": "mix"
                     },
@@ -591,9 +591,9 @@
                         "end_lineno": 11,
                         "end_col": 34
                       },
-                      "resolved_type": "callable[unknown,unknown->unknown]",
+                      "resolved_type": "unknown",
                       "casts": [],
-                      "borrow_kind": "readonly_ref",
+                      "borrow_kind": "value",
                       "repr": "mix",
                       "id": "mix"
                     },

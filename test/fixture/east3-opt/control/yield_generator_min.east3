@@ -144,7 +144,7 @@
           "kind": "While",
           "source_span": {
             "lineno": 3,
-            "col_offset": 0,
+            "col_offset": 4,
             "end_lineno": 5,
             "end_col_offset": 14
           },

@@ -232,7 +232,12 @@
                 "value": "a   b\tc"
               }
             ],
-            "keywords": []
+            "keywords": [],
+            "resolved_runtime_call": "re.sub",
+            "resolved_runtime_source": "import_symbol",
+            "runtime_module_id": "pytra.std.re",
+            "runtime_symbol": "sub",
+            "runtime_call_adapter_kind": "extern_delegate"
           },
           "declare": true,
           "decl_type": "str",

@@ -148,7 +148,12 @@
         "name": "int64"
       },
       "leading_comments": [],
-      "leading_trivia": [],
+      "leading_trivia": [
+        {
+          "kind": "blank",
+          "count": 1
+        }
+      ],
       "returns": "int64"
     },
     {

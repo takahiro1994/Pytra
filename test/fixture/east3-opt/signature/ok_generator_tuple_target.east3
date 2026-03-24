@@ -88,7 +88,7 @@
                     "end_lineno": 2,
                     "end_col_offset": 48
                   },
-                  "resolved_type": "list[float64]",
+                  "resolved_type": "list[unknown]",
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "wi * xi for wi, xi in zip(wo, x)",
@@ -100,7 +100,7 @@
                       "end_lineno": 2,
                       "end_col_offset": 23
                     },
-                    "resolved_type": "float64",
+                    "resolved_type": "unknown",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "wi * xi",
@@ -112,9 +112,9 @@
                         "end_lineno": 2,
                         "end_col_offset": 18
                       },
-                      "resolved_type": "float64",
+                      "resolved_type": "unknown",
                       "casts": [],
-                      "borrow_kind": "readonly_ref",
+                      "borrow_kind": "value",
                       "repr": "wi",
                       "id": "wi"
                     },
@@ -127,9 +127,9 @@
                         "end_lineno": 2,
                         "end_col_offset": 23
                       },
-                      "resolved_type": "float64",
+                      "resolved_type": "unknown",
                       "casts": [],
-                      "borrow_kind": "readonly_ref",
+                      "borrow_kind": "value",
                       "repr": "xi",
                       "id": "xi"
                     },
@@ -142,7 +142,7 @@
                         "end_lineno": 2,
                         "end_col_offset": 23
                       },
-                      "resolved_type": "float64",
+                      "resolved_type": "unknown",
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "wi * xi",
@@ -154,9 +154,9 @@
                           "end_lineno": 2,
                           "end_col_offset": 18
                         },
-                        "resolved_type": "float64",
+                        "resolved_type": "unknown",
                         "casts": [],
-                        "borrow_kind": "readonly_ref",
+                        "borrow_kind": "value",
                         "repr": "wi",
                         "id": "wi"
                       },
@@ -169,9 +169,9 @@
                           "end_lineno": 2,
                           "end_col_offset": 23
                         },
-                        "resolved_type": "float64",
+                        "resolved_type": "unknown",
                         "casts": [],
-                        "borrow_kind": "readonly_ref",
+                        "borrow_kind": "value",
                         "repr": "xi",
                         "id": "xi"
                       }
@@ -187,7 +187,6 @@
                           "end_lineno": 2,
                           "end_col_offset": 34
                         },
-                        "resolved_type": "tuple[unknown, unknown]",
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "wi, xi",
@@ -200,7 +199,6 @@
                               "end_lineno": 2,
                               "end_col_offset": 30
                             },
-                            "resolved_type": "float64",
                             "casts": [],
                             "borrow_kind": "value",
                             "repr": "wi",
@@ -214,7 +212,6 @@
                               "end_lineno": 2,
                               "end_col_offset": 34
                             },
-                            "resolved_type": "float64",
                             "casts": [],
                             "borrow_kind": "value",
                             "repr": "xi",
@@ -282,7 +279,7 @@
                         "lowered_kind": "BuiltinCall",
                         "builtin_name": "zip",
                         "runtime_call": "zip",
-                        "runtime_module_id": "pytra.core.py_runtime",
+                        "runtime_module_id": "pytra.built_in.zip_ops",
                         "runtime_symbol": "zip",
                         "runtime_call_adapter_kind": "builtin",
                         "semantic_tag": "iter.zip",
@@ -296,8 +293,7 @@
                       "ifs": [],
                       "is_async": false
                     }
-                  ],
-                  "lowered_kind": "GeneratorArg"
+                  ]
                 }
               ],
               "keywords": [],
@@ -315,11 +311,11 @@
                   "kind": "Name",
                   "source_span": {
                     "lineno": 2,
-                    "col_offset": 42,
+                    "col_offset": 54,
                     "end_lineno": 2,
-                    "end_col_offset": 44
+                    "end_col_offset": 56
                   },
-                  "resolved_type": "unknown",
+                  "resolved_type": "list[float64]",
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "wo",
@@ -329,9 +325,9 @@
                   "kind": "Name",
                   "source_span": {
                     "lineno": 2,
-                    "col_offset": 16,
+                    "col_offset": 60,
                     "end_lineno": 2,
-                    "end_col_offset": 17
+                    "end_col_offset": 61
                   },
                   "resolved_type": "list[list[float64]]",
                   "casts": [],

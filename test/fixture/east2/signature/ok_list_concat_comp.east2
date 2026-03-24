@@ -271,7 +271,7 @@
               "end_lineno": 8,
               "end_col": 72
             },
-            "resolved_type": "unknown",
+            "resolved_type": "list[int64]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "[BOS] + [uchars.index(ch) for ch in doc] + [BOS]",
@@ -283,7 +283,7 @@
                 "end_lineno": 8,
                 "end_col": 64
               },
-              "resolved_type": "unknown",
+              "resolved_type": "list[int64]",
               "casts": [],
               "borrow_kind": "value",
               "repr": "[BOS] + [uchars.index(ch) for ch in doc]",
@@ -378,14 +378,35 @@
                         "end_lineno": 8,
                         "end_col": 48
                       },
-                      "resolved_type": "str",
+                      "resolved_type": "unknown",
                       "casts": [],
-                      "borrow_kind": "readonly_ref",
+                      "borrow_kind": "value",
                       "repr": "ch",
                       "id": "ch"
                     }
                   ],
-                  "keywords": []
+                  "keywords": [],
+                  "lowered_kind": "BuiltinCall",
+                  "builtin_name": "index",
+                  "runtime_call": "list.index",
+                  "runtime_module_id": "pytra.core.list",
+                  "runtime_symbol": "list.index",
+                  "runtime_call_adapter_kind": "builtin",
+                  "semantic_tag": "stdlib.method.index",
+                  "runtime_owner": {
+                    "kind": "Name",
+                    "source_span": {
+                      "lineno": 8,
+                      "col": 33,
+                      "end_lineno": 8,
+                      "end_col": 39
+                    },
+                    "resolved_type": "list[str]",
+                    "casts": [],
+                    "borrow_kind": "readonly_ref",
+                    "repr": "uchars",
+                    "id": "uchars"
+                  }
                 },
                 "generators": [
                   {
@@ -397,7 +418,7 @@
                         "end_lineno": 8,
                         "end_col": 56
                       },
-                      "resolved_type": "str",
+                      "resolved_type": "unknown",
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "ch",

@@ -511,7 +511,7 @@
               "end_lineno": 14,
               "end_col": 29
             },
-            "resolved_type": "unknown",
+            "resolved_type": "bool",
             "casts": [],
             "borrow_kind": "value",
             "repr": "isinstance(c, Base)",
@@ -561,8 +561,8 @@
             ],
             "keywords": [],
             "lowered_kind": "TypePredicateCall",
-            "builtin_name": "isinstance",
-            "semantic_tag": "type.isinstance"
+            "semantic_tag": "type.isinstance",
+            "predicate_kind": "isinstance"
           }
         ],
         "keywords": [],

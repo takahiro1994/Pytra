@@ -105,7 +105,7 @@
               "end_lineno": 8,
               "end_col": 36
             },
-            "resolved_type": "unknown",
+            "resolved_type": "bool",
             "casts": [],
             "borrow_kind": "value",
             "repr": "isinstance(x, (Cat, Dog))",
@@ -184,8 +184,8 @@
             ],
             "keywords": [],
             "lowered_kind": "TypePredicateCall",
-            "builtin_name": "isinstance",
-            "semantic_tag": "type.isinstance"
+            "semantic_tag": "type.isinstance",
+            "predicate_kind": "isinstance"
           }
         }
       ],

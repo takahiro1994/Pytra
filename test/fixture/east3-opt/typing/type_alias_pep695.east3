@@ -35,8 +35,7 @@
         "end_lineno": 3,
         "end_col_offset": 25
       },
-      "name": "Scalar",
-      "type_expr": "int64|float64"
+      "name": "Scalar"
     },
     {
       "kind": "FunctionDef",
@@ -390,7 +389,16 @@
         "name": "int64"
       },
       "leading_comments": [],
-      "leading_trivia": [],
+      "leading_trivia": [
+        {
+          "kind": "blank",
+          "count": 1
+        },
+        {
+          "kind": "blank",
+          "count": 1
+        }
+      ],
       "returns": "int64",
       "meta": {
         "lifetime_analysis": {

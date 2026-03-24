@@ -229,7 +229,7 @@
               "end_lineno": 6,
               "end_col": 54
             },
-            "resolved_type": "list[int64]",
+            "resolved_type": "list[unknown]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "[x for row in rows for x in row]",
@@ -241,9 +241,9 @@
                 "end_lineno": 6,
                 "end_col": 24
               },
-              "resolved_type": "int64",
+              "resolved_type": "unknown",
               "casts": [],
-              "borrow_kind": "readonly_ref",
+              "borrow_kind": "value",
               "repr": "x",
               "id": "x"
             },
@@ -257,7 +257,7 @@
                     "end_lineno": 6,
                     "end_col": 32
                   },
-                  "resolved_type": "unknown",
+                  "resolved_type": "list[int64]",
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "row",
@@ -285,9 +285,9 @@
                   "kind": "Name",
                   "source_span": {
                     "lineno": 6,
-                    "col": 23,
+                    "col": 45,
                     "end_lineno": 6,
-                    "end_col": 24
+                    "end_col": 46
                   },
                   "resolved_type": "unknown",
                   "casts": [],
@@ -299,13 +299,13 @@
                   "kind": "Name",
                   "source_span": {
                     "lineno": 6,
-                    "col": 29,
+                    "col": 50,
                     "end_lineno": 6,
-                    "end_col": 32
+                    "end_col": 53
                   },
-                  "resolved_type": "list[int64]",
+                  "resolved_type": "unknown",
                   "casts": [],
-                  "borrow_kind": "readonly_ref",
+                  "borrow_kind": "value",
                   "repr": "row",
                   "id": "row"
                 },

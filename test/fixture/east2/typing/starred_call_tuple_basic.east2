@@ -433,11 +433,10 @@
                 "kind": "Starred",
                 "source_span": {
                   "lineno": 10,
-                  "col": 26,
+                  "col": 27,
                   "end_lineno": 10,
                   "end_col": 30
                 },
-                "resolved_type": "tuple[int64,int64,int64]",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "*rgb",
@@ -454,7 +453,8 @@
                   "borrow_kind": "readonly_ref",
                   "repr": "rgb",
                   "id": "rgb"
-                }
+                },
+                "resolved_type": "tuple[int64,int64,int64]"
               }
             ],
             "keywords": []
@@ -475,8 +475,8 @@
           "source_span": {
             "lineno": 11,
             "col": 4,
-            "end_lineno": 14,
-            "end_col": 5
+            "end_lineno": 11,
+            "end_col": 70
           },
           "target": {
             "kind": "Name",
@@ -605,11 +605,10 @@
                       "kind": "Starred",
                       "source_span": {
                         "lineno": 11,
-                        "col": 52,
+                        "col": 53,
                         "end_lineno": 11,
                         "end_col": 56
                       },
-                      "resolved_type": "tuple[int64,int64,int64]",
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "*rgb",
@@ -626,7 +625,8 @@
                         "borrow_kind": "readonly_ref",
                         "repr": "rgb",
                         "id": "rgb"
-                      }
+                      },
+                      "resolved_type": "tuple[int64,int64,int64]"
                     }
                   ],
                   "keywords": []

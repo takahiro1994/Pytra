@@ -216,7 +216,6 @@
               "end_lineno": 6,
               "end_col": 57
             },
-            "resolved_type": "set[int64]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "{x * x for x in xs if x % 2 == 1}",
@@ -268,11 +267,11 @@
                   "kind": "Name",
                   "source_span": {
                     "lineno": 6,
-                    "col": 25,
+                    "col": 35,
                     "end_lineno": 6,
-                    "end_col": 26
+                    "end_col": 36
                   },
-                  "resolved_type": "unknown",
+                  "resolved_type": "int64",
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "x",
@@ -370,7 +369,8 @@
                 ],
                 "is_async": false
               }
-            ]
+            ],
+            "resolved_type": "set[int64]"
           },
           "declare": true,
           "decl_type": "set[int64]",
@@ -440,7 +440,6 @@
               "end_lineno": 7,
               "end_col": 67
             },
-            "resolved_type": "dict[int64,int64]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "{x: x * x for x in xs if x % 2 == 0}",
@@ -506,11 +505,11 @@
                   "kind": "Name",
                   "source_span": {
                     "lineno": 7,
-                    "col": 32,
+                    "col": 45,
                     "end_lineno": 7,
-                    "end_col": 33
+                    "end_col": 46
                   },
-                  "resolved_type": "unknown",
+                  "resolved_type": "int64",
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "x",
@@ -608,7 +607,8 @@
                 ],
                 "is_async": false
               }
-            ]
+            ],
+            "resolved_type": "dict[int64,int64]"
           },
           "declare": true,
           "decl_type": "dict[int64,int64]",
@@ -838,7 +838,7 @@
                     "keywords": [],
                     "lowered_kind": "BuiltinCall",
                     "builtin_name": "len",
-                    "runtime_call": "py_len",
+                    "runtime_call": "len",
                     "runtime_module_id": "pytra.core.py_runtime",
                     "runtime_symbol": "len",
                     "runtime_call_adapter_kind": "builtin",
@@ -1392,7 +1392,7 @@
                     "keywords": [],
                     "lowered_kind": "BuiltinCall",
                     "builtin_name": "len",
-                    "runtime_call": "py_len",
+                    "runtime_call": "len",
                     "runtime_module_id": "pytra.core.py_runtime",
                     "runtime_symbol": "len",
                     "runtime_call_adapter_kind": "builtin",
@@ -2031,16 +2031,16 @@
           "runtime_group": "built_in"
         },
         {
-          "module_id": "pytra.built_in.sequence",
+          "module_id": "pytra.core.py_runtime",
           "export_name": "",
-          "local_name": "pytra.built_in.sequence",
+          "local_name": "pytra.core.py_runtime",
           "binding_kind": "implicit_builtin",
           "source_file": "test/fixture/source/py/collections/comprehension_dict_set.py",
           "source_line": 0,
-          "source_module_id": "pytra.built_in.sequence",
+          "source_module_id": "pytra.core.py_runtime",
           "source_binding_kind": "implicit_builtin",
-          "runtime_module_id": "pytra.built_in.sequence",
-          "runtime_group": "built_in"
+          "runtime_module_id": "pytra.core.py_runtime",
+          "runtime_group": "core"
         }
       ],
       "qualified_refs": [
@@ -2082,9 +2082,9 @@
         "source_line": 0
       },
       {
-        "module_id": "pytra.built_in.sequence",
+        "module_id": "pytra.core.py_runtime",
         "export_name": "",
-        "local_name": "pytra.built_in.sequence",
+        "local_name": "pytra.core.py_runtime",
         "binding_kind": "implicit_builtin",
         "source_file": "test/fixture/source/py/collections/comprehension_dict_set.py",
         "source_line": 0

@@ -251,7 +251,7 @@
               "end_lineno": 9,
               "end_col": 49
             },
-            "resolved_type": "list[unknown]",
+            "resolved_type": "list[set]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "[set(), {\"u\", \"v\"}]",
@@ -264,7 +264,7 @@
                   "end_lineno": 9,
                   "end_col": 36
                 },
-                "resolved_type": "set[unknown]",
+                "resolved_type": "set",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "set()",
@@ -283,14 +283,7 @@
                   "id": "set"
                 },
                 "args": [],
-                "keywords": [],
-                "lowered_kind": "BuiltinCall",
-                "builtin_name": "set",
-                "runtime_call": "set_ctor",
-                "runtime_module_id": "pytra.core.py_runtime",
-                "runtime_symbol": "set",
-                "runtime_call_adapter_kind": "builtin",
-                "semantic_tag": "ctor.set"
+                "keywords": []
               },
               {
                 "kind": "Set",
@@ -441,9 +434,9 @@
                   "kind": "Constant",
                   "source_span": {
                     "lineno": 10,
-                    "col": 33,
+                    "col": 37,
                     "end_lineno": 10,
-                    "end_col": 34
+                    "end_col": 38
                   },
                   "resolved_type": "int64",
                   "casts": [],
@@ -1141,7 +1134,7 @@
                       "keywords": [],
                       "lowered_kind": "BuiltinCall",
                       "builtin_name": "len",
-                      "runtime_call": "py_len",
+                      "runtime_call": "len",
                       "runtime_module_id": "pytra.core.py_runtime",
                       "runtime_symbol": "len",
                       "runtime_call_adapter_kind": "builtin",
@@ -1220,7 +1213,7 @@
                       "keywords": [],
                       "lowered_kind": "BuiltinCall",
                       "builtin_name": "len",
-                      "runtime_call": "py_len",
+                      "runtime_call": "len",
                       "runtime_module_id": "pytra.core.py_runtime",
                       "runtime_symbol": "len",
                       "runtime_call_adapter_kind": "builtin",
@@ -1711,16 +1704,16 @@
           "runtime_group": "built_in"
         },
         {
-          "module_id": "pytra.built_in.sequence",
+          "module_id": "pytra.core.py_runtime",
           "export_name": "",
-          "local_name": "pytra.built_in.sequence",
+          "local_name": "pytra.core.py_runtime",
           "binding_kind": "implicit_builtin",
           "source_file": "test/fixture/source/py/collections/nested_types.py",
           "source_line": 0,
-          "source_module_id": "pytra.built_in.sequence",
+          "source_module_id": "pytra.core.py_runtime",
           "source_binding_kind": "implicit_builtin",
-          "runtime_module_id": "pytra.built_in.sequence",
-          "runtime_group": "built_in"
+          "runtime_module_id": "pytra.core.py_runtime",
+          "runtime_group": "core"
         }
       ],
       "qualified_refs": [
@@ -1775,9 +1768,9 @@
         "source_line": 0
       },
       {
-        "module_id": "pytra.built_in.sequence",
+        "module_id": "pytra.core.py_runtime",
         "export_name": "",
-        "local_name": "pytra.built_in.sequence",
+        "local_name": "pytra.core.py_runtime",
         "binding_kind": "implicit_builtin",
         "source_file": "test/fixture/source/py/collections/nested_types.py",
         "source_line": 0

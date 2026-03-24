@@ -116,13 +116,11 @@
             },
             "args": [],
             "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "perf_counter",
-            "runtime_call": "perf_counter",
+            "resolved_runtime_call": "time.perf_counter",
+            "resolved_runtime_source": "import_symbol",
             "runtime_module_id": "pytra.std.time",
             "runtime_symbol": "perf_counter",
-            "runtime_call_adapter_kind": "extern_delegate",
-            "semantic_tag": "stdlib.fn.perf_counter"
+            "runtime_call_adapter_kind": "extern_delegate"
           },
           "declare": true,
           "decl_type": "float64",
@@ -190,13 +188,11 @@
             },
             "args": [],
             "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "perf_counter",
-            "runtime_call": "perf_counter",
+            "resolved_runtime_call": "time.perf_counter",
+            "resolved_runtime_source": "import_symbol",
             "runtime_module_id": "pytra.std.time",
             "runtime_symbol": "perf_counter",
-            "runtime_call_adapter_kind": "extern_delegate",
-            "semantic_tag": "stdlib.fn.perf_counter"
+            "runtime_call_adapter_kind": "extern_delegate"
           },
           "declare": true,
           "decl_type": "float64",
@@ -483,7 +479,6 @@
           "binding_kind": "symbol",
           "source_file": "test/fixture/source/py/imports/import_time_from.py",
           "source_line": 3,
-          "host_only": true,
           "source_module_id": "time",
           "source_export_name": "perf_counter",
           "source_binding_kind": "symbol",
@@ -546,8 +541,7 @@
         "local_name": "perf_counter",
         "binding_kind": "symbol",
         "source_file": "test/fixture/source/py/imports/import_time_from.py",
-        "source_line": 3,
-        "host_only": true
+        "source_line": 3
       },
       {
         "module_id": "pytra.utils.assertions",

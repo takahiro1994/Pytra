@@ -285,9 +285,9 @@
                       "end_lineno": 15,
                       "end_col": 20
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "int64",
                     "casts": [],
-                    "borrow_kind": "value",
+                    "borrow_kind": "readonly_ref",
                     "repr": "value",
                     "id": "value"
                   }
@@ -314,7 +314,16 @@
         "name": "None"
       },
       "leading_comments": [],
-      "leading_trivia": []
+      "leading_trivia": [
+        {
+          "kind": "blank",
+          "count": 1
+        },
+        {
+          "kind": "blank",
+          "count": 1
+        }
+      ]
     }
   ],
   "main_guard_body": [

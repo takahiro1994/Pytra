@@ -38,7 +38,7 @@
               "end_lineno": 2,
               "end_col": 5
             },
-            "resolved_type": "tuple[int64]",
+            "resolved_type": "unknown",
             "casts": [],
             "borrow_kind": "value",
             "repr": "X",

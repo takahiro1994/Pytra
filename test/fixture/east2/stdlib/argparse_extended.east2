@@ -134,7 +134,12 @@
                 "value": "x"
               }
             ],
-            "keywords": []
+            "keywords": [],
+            "resolved_runtime_call": "argparse.ArgumentParser",
+            "resolved_runtime_source": "import_symbol",
+            "runtime_module_id": "pytra.std.argparse",
+            "runtime_symbol": "ArgumentParser",
+            "runtime_call_adapter_kind": "extern_delegate"
           },
           "declare": true,
           "decl_type": "ArgumentParser",
@@ -570,7 +575,7 @@
               "end_lineno": 11,
               "end_col": 90
             },
-            "resolved_type": "dict[str,ArgValue]",
+            "resolved_type": "unknown",
             "casts": [],
             "borrow_kind": "value",
             "repr": "p.parse_args([\"a.py\", \"-o\", \"out.cpp\", \"--pretty\", \"-m\", \"b\"])",
@@ -954,7 +959,7 @@
                     "keywords": [],
                     "lowered_kind": "BuiltinCall",
                     "builtin_name": "str",
-                    "runtime_call": "py_to_string",
+                    "runtime_call": "str",
                     "runtime_module_id": "pytra.core.py_runtime",
                     "runtime_symbol": "str",
                     "runtime_call_adapter_kind": "builtin",
@@ -1169,7 +1174,7 @@
                     "keywords": [],
                     "lowered_kind": "BuiltinCall",
                     "builtin_name": "str",
-                    "runtime_call": "py_to_string",
+                    "runtime_call": "str",
                     "runtime_module_id": "pytra.core.py_runtime",
                     "runtime_symbol": "str",
                     "runtime_call_adapter_kind": "builtin",
@@ -1384,7 +1389,7 @@
                     "keywords": [],
                     "lowered_kind": "BuiltinCall",
                     "builtin_name": "bool",
-                    "runtime_call": "py_to_bool",
+                    "runtime_call": "bool",
                     "runtime_module_id": "pytra.core.py_runtime",
                     "runtime_symbol": "bool",
                     "runtime_call_adapter_kind": "builtin",
@@ -1599,7 +1604,7 @@
                     "keywords": [],
                     "lowered_kind": "BuiltinCall",
                     "builtin_name": "str",
-                    "runtime_call": "py_to_string",
+                    "runtime_call": "str",
                     "runtime_module_id": "pytra.core.py_runtime",
                     "runtime_symbol": "str",
                     "runtime_call_adapter_kind": "builtin",
@@ -1900,16 +1905,16 @@
           "runtime_group": "built_in"
         },
         {
-          "module_id": "pytra.built_in.scalar_ops",
+          "module_id": "pytra.core.py_runtime",
           "export_name": "",
-          "local_name": "pytra.built_in.scalar_ops",
+          "local_name": "pytra.core.py_runtime",
           "binding_kind": "implicit_builtin",
           "source_file": "test/fixture/source/py/stdlib/argparse_extended.py",
           "source_line": 0,
-          "source_module_id": "pytra.built_in.scalar_ops",
+          "source_module_id": "pytra.core.py_runtime",
           "source_binding_kind": "implicit_builtin",
-          "runtime_module_id": "pytra.built_in.scalar_ops",
-          "runtime_group": "built_in"
+          "runtime_module_id": "pytra.core.py_runtime",
+          "runtime_group": "core"
         }
       ],
       "qualified_refs": [
@@ -1964,9 +1969,9 @@
         "source_line": 0
       },
       {
-        "module_id": "pytra.built_in.scalar_ops",
+        "module_id": "pytra.core.py_runtime",
         "export_name": "",
-        "local_name": "pytra.built_in.scalar_ops",
+        "local_name": "pytra.core.py_runtime",
         "binding_kind": "implicit_builtin",
         "source_file": "test/fixture/source/py/stdlib/argparse_extended.py",
         "source_line": 0

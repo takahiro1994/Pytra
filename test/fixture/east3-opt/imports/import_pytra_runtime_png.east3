@@ -114,7 +114,6 @@
             "lifetime_uses": [],
             "lifetime_live_in": [
               "bytearray",
-              "len",
               "png",
               "print",
               "py_assert_all",
@@ -123,7 +122,6 @@
             ],
             "lifetime_live_out": [
               "bytearray",
-              "len",
               "out_path",
               "png",
               "print",
@@ -139,8 +137,8 @@
           "source_span": {
             "lineno": 9,
             "col_offset": 4,
-            "end_lineno": 14,
-            "end_col_offset": 6
+            "end_lineno": 9,
+            "end_col_offset": 75
           },
           "target": {
             "kind": "Name",
@@ -150,14 +148,13 @@
               "end_lineno": 9,
               "end_col_offset": 10
             },
-            "resolved_type": "bytearray",
+            "resolved_type": "unknown",
             "casts": [],
             "borrow_kind": "value",
             "repr": "pixels",
             "id": "pixels"
           },
           "declare": true,
-          "decl_type": "bytearray",
           "declare_init": true,
           "value": {
             "kind": "Call",
@@ -167,7 +164,7 @@
               "end_lineno": 9,
               "end_col_offset": 75
             },
-            "resolved_type": "bytearray",
+            "resolved_type": "unknown",
             "casts": [],
             "borrow_kind": "value",
             "repr": "bytearray([ 255, 0, 0, 0, 255, 0, 0, 0, 255, 255, 255, 255, ])",
@@ -371,25 +368,20 @@
               }
             ],
             "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "bytearray",
-            "runtime_call": "bytearray_ctor",
-            "runtime_module_id": "pytra.core.py_runtime",
-            "runtime_symbol": "bytearray",
-            "runtime_call_adapter_kind": "builtin",
-            "semantic_tag": "ctor.bytearray",
             "type_expr_summary_v1": {
               "schema_version": 1,
-              "kind": "NamedType",
-              "category": "static",
-              "mirror": "bytearray"
+              "kind": "DynamicType",
+              "category": "dynamic",
+              "mirror": "unknown",
+              "dynamic_name": "unknown"
             }
           },
           "type_expr_summary_v1": {
             "schema_version": 1,
-            "kind": "NamedType",
-            "category": "static",
-            "mirror": "bytearray"
+            "kind": "DynamicType",
+            "category": "dynamic",
+            "mirror": "unknown",
+            "dynamic_name": "unknown"
           },
           "meta": {
             "lifetime_node_id": "n5",
@@ -401,7 +393,6 @@
             ],
             "lifetime_live_in": [
               "bytearray",
-              "len",
               "out_path",
               "png",
               "print",
@@ -410,7 +401,6 @@
               "py_assert_true"
             ],
             "lifetime_live_out": [
-              "len",
               "out_path",
               "pixels",
               "png",
@@ -523,19 +513,18 @@
                   "end_lineno": 15,
                   "end_col_offset": 44
                 },
-                "resolved_type": "bytearray",
+                "resolved_type": "unknown",
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "pixels",
                 "id": "pixels"
               }
             ],
             "keywords": [],
-            "resolved_runtime_call": "write_rgb_png",
+            "resolved_runtime_call": "png.write_rgb_png",
             "resolved_runtime_source": "module_attr",
             "runtime_module_id": "pytra.utils.png",
             "runtime_symbol": "write_rgb_png",
-            "runtime_call_adapter_kind": "extern_delegate",
             "semantic_tag": "stdlib.method.write_rgb_png",
             "type_expr_summary_v1": {
               "schema_version": 1,
@@ -554,7 +543,6 @@
               "png"
             ],
             "lifetime_live_in": [
-              "len",
               "out_path",
               "pixels",
               "png",
@@ -564,7 +552,6 @@
               "py_assert_true"
             ],
             "lifetime_live_out": [
-              "len",
               "pixels",
               "print",
               "py_assert_all",
@@ -664,7 +651,6 @@
             ],
             "lifetime_uses": [],
             "lifetime_live_in": [
-              "len",
               "pixels",
               "print",
               "py_assert_all",
@@ -672,7 +658,6 @@
               "py_assert_true"
             ],
             "lifetime_live_out": [
-              "len",
               "pixels",
               "print",
               "py_assert_all",
@@ -760,55 +745,31 @@
                 },
                 "args": [
                   {
-                    "kind": "Call",
+                    "kind": "ObjLen",
+                    "resolved_type": "int64",
+                    "borrow_kind": "value",
+                    "casts": [],
+                    "value": {
+                      "kind": "Name",
+                      "source_span": {
+                        "lineno": 17,
+                        "col_offset": 36,
+                        "end_lineno": 17,
+                        "end_col_offset": 42
+                      },
+                      "resolved_type": "unknown",
+                      "casts": [],
+                      "borrow_kind": "value",
+                      "repr": "pixels",
+                      "id": "pixels"
+                    },
                     "source_span": {
                       "lineno": 17,
                       "col_offset": 32,
                       "end_lineno": 17,
                       "end_col_offset": 43
                     },
-                    "resolved_type": "int64",
-                    "casts": [],
-                    "borrow_kind": "value",
                     "repr": "len(pixels)",
-                    "func": {
-                      "kind": "Name",
-                      "source_span": {
-                        "lineno": 17,
-                        "col_offset": 32,
-                        "end_lineno": 17,
-                        "end_col_offset": 35
-                      },
-                      "resolved_type": "unknown",
-                      "casts": [],
-                      "borrow_kind": "value",
-                      "repr": "len",
-                      "id": "len"
-                    },
-                    "args": [
-                      {
-                        "kind": "Name",
-                        "source_span": {
-                          "lineno": 17,
-                          "col_offset": 36,
-                          "end_lineno": 17,
-                          "end_col_offset": 42
-                        },
-                        "resolved_type": "bytearray",
-                        "casts": [],
-                        "borrow_kind": "readonly_ref",
-                        "repr": "pixels",
-                        "id": "pixels"
-                      }
-                    ],
-                    "keywords": [],
-                    "lowered_kind": "BuiltinCall",
-                    "builtin_name": "len",
-                    "runtime_call": "py_len",
-                    "runtime_module_id": "pytra.core.py_runtime",
-                    "runtime_symbol": "len",
-                    "runtime_call_adapter_kind": "builtin",
-                    "semantic_tag": "core.len",
                     "type_expr_summary_v1": {
                       "schema_version": 1,
                       "kind": "NamedType",
@@ -893,13 +854,11 @@
             "lifetime_node_id": "n2",
             "lifetime_defs": [],
             "lifetime_uses": [
-              "len",
               "pixels",
               "py_assert_eq",
               "results"
             ],
             "lifetime_live_in": [
-              "len",
               "pixels",
               "print",
               "py_assert_all",
@@ -914,7 +873,6 @@
               "results"
             ],
             "lifetime_last_use_vars": [
-              "len",
               "pixels",
               "py_assert_eq"
             ]
@@ -1289,7 +1247,6 @@
               "kind": "Expr",
               "defs": [],
               "uses": [
-                "len",
                 "pixels",
                 "py_assert_eq",
                 "results"
@@ -1363,9 +1320,6 @@
               "bytearray": [
                 "n5"
               ],
-              "len": [
-                "n2"
-              ],
               "out_path": [
                 "n4"
               ],
@@ -1410,29 +1364,6 @@
               ],
               "last_use_nodes": [
                 "n5"
-              ],
-              "lifetime_class": "local_non_escape_candidate"
-            },
-            "len": {
-              "def_nodes": [],
-              "use_nodes": [
-                "n2"
-              ],
-              "live_in_nodes": [
-                "n2",
-                "n3",
-                "n4",
-                "n5",
-                "n6"
-              ],
-              "live_out_nodes": [
-                "n3",
-                "n4",
-                "n5",
-                "n6"
-              ],
-              "last_use_nodes": [
-                "n2"
               ],
               "lifetime_class": "local_non_escape_candidate"
             },
@@ -1831,10 +1762,12 @@
           "source_file": "test/fixture/source/py/imports/import_pytra_runtime_png.py",
           "source_line": 3,
           "source_module_id": "pytra.utils.png",
+          "source_export_name": "",
           "source_binding_kind": "module",
           "runtime_module_id": "pytra.utils.png",
           "runtime_group": "utils",
-          "resolved_binding_kind": "module"
+          "resolved_binding_kind": "module",
+          "host_only": true
         },
         {
           "module_id": "pytra.utils.assertions",
@@ -1903,16 +1836,16 @@
           "runtime_group": "built_in"
         },
         {
-          "module_id": "pytra.built_in.sequence",
+          "module_id": "pytra.core.py_runtime",
           "export_name": "",
-          "local_name": "pytra.built_in.sequence",
+          "local_name": "pytra.core.py_runtime",
           "binding_kind": "implicit_builtin",
           "source_file": "test/fixture/source/py/imports/import_pytra_runtime_png.py",
           "source_line": 0,
-          "source_module_id": "pytra.built_in.sequence",
+          "source_module_id": "pytra.core.py_runtime",
           "source_binding_kind": "implicit_builtin",
-          "runtime_module_id": "pytra.built_in.sequence",
-          "runtime_group": "built_in"
+          "runtime_module_id": "pytra.core.py_runtime",
+          "runtime_group": "core"
         }
       ],
       "qualified_refs": [
@@ -1940,7 +1873,8 @@
         "local_name": "png",
         "binding_kind": "module",
         "source_file": "test/fixture/source/py/imports/import_pytra_runtime_png.py",
-        "source_line": 3
+        "source_line": 3,
+        "host_only": true
       },
       {
         "module_id": "pytra.utils.assertions",
@@ -1975,9 +1909,9 @@
         "source_line": 0
       },
       {
-        "module_id": "pytra.built_in.sequence",
+        "module_id": "pytra.core.py_runtime",
         "export_name": "",
-        "local_name": "pytra.built_in.sequence",
+        "local_name": "pytra.core.py_runtime",
         "binding_kind": "implicit_builtin",
         "source_file": "test/fixture/source/py/imports/import_pytra_runtime_png.py",
         "source_line": 0

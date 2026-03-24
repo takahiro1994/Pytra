@@ -138,7 +138,7 @@
           }
         }
       ],
-      "class_storage_hint": "value",
+      "class_storage_hint": "ref",
       "leading_comments": [],
       "leading_trivia": []
     },
@@ -238,7 +238,7 @@
           }
         }
       ],
-      "class_storage_hint": "value"
+      "class_storage_hint": "ref"
     },
     {
       "kind": "FunctionDef",
@@ -483,7 +483,7 @@
                       "end_lineno": 20,
                       "end_col": 34
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "int64",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "p.x",
@@ -648,7 +648,7 @@
                       "end_lineno": 21,
                       "end_col": 34
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "int64",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "p.y",
@@ -897,7 +897,7 @@
                       "end_lineno": 23,
                       "end_col": 34
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "int64",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "a.x",
@@ -1062,7 +1062,7 @@
                       "end_lineno": 24,
                       "end_col": 34
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "int64",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "a.y",
@@ -1311,7 +1311,7 @@
                       "end_lineno": 26,
                       "end_col": 41
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "str",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "e.category",
@@ -1476,7 +1476,7 @@
                       "end_lineno": 27,
                       "end_col": 40
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "str",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "e.summary",

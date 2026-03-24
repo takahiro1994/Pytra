@@ -80,103 +80,134 @@
             "name": "bytearray"
           },
           "value": {
-            "kind": "Call",
+            "kind": "Unbox",
+            "resolved_type": "bytearray",
+            "borrow_kind": "value",
+            "casts": [],
+            "value": {
+              "kind": "Call",
+              "source_span": {
+                "lineno": 7,
+                "col_offset": 20,
+                "end_lineno": 7,
+                "end_col_offset": 43
+              },
+              "resolved_type": "unknown",
+              "casts": [],
+              "borrow_kind": "value",
+              "repr": "bytearray([10, 20, 30])",
+              "func": {
+                "kind": "Name",
+                "source_span": {
+                  "lineno": 7,
+                  "col_offset": 20,
+                  "end_lineno": 7,
+                  "end_col_offset": 29
+                },
+                "resolved_type": "unknown",
+                "casts": [],
+                "borrow_kind": "value",
+                "repr": "bytearray",
+                "id": "bytearray"
+              },
+              "args": [
+                {
+                  "kind": "List",
+                  "source_span": {
+                    "lineno": 7,
+                    "col_offset": 30,
+                    "end_lineno": 7,
+                    "end_col_offset": 42
+                  },
+                  "resolved_type": "list[int64]",
+                  "casts": [],
+                  "borrow_kind": "value",
+                  "repr": "[10, 20, 30]",
+                  "elements": [
+                    {
+                      "kind": "Constant",
+                      "source_span": {
+                        "lineno": 7,
+                        "col_offset": 31,
+                        "end_lineno": 7,
+                        "end_col_offset": 33
+                      },
+                      "resolved_type": "int64",
+                      "casts": [],
+                      "borrow_kind": "value",
+                      "repr": "10",
+                      "value": 10
+                    },
+                    {
+                      "kind": "Constant",
+                      "source_span": {
+                        "lineno": 7,
+                        "col_offset": 35,
+                        "end_lineno": 7,
+                        "end_col_offset": 37
+                      },
+                      "resolved_type": "int64",
+                      "casts": [],
+                      "borrow_kind": "value",
+                      "repr": "20",
+                      "value": 20
+                    },
+                    {
+                      "kind": "Constant",
+                      "source_span": {
+                        "lineno": 7,
+                        "col_offset": 39,
+                        "end_lineno": 7,
+                        "end_col_offset": 41
+                      },
+                      "resolved_type": "int64",
+                      "casts": [],
+                      "borrow_kind": "value",
+                      "repr": "30",
+                      "value": 30
+                    }
+                  ]
+                }
+              ],
+              "keywords": [],
+              "type_expr_summary_v1": {
+                "schema_version": 1,
+                "kind": "DynamicType",
+                "category": "dynamic",
+                "mirror": "unknown",
+                "dynamic_name": "unknown"
+              }
+            },
             "source_span": {
               "lineno": 7,
               "col_offset": 20,
               "end_lineno": 7,
               "end_col_offset": 43
             },
-            "resolved_type": "bytearray",
-            "casts": [],
-            "borrow_kind": "value",
             "repr": "bytearray([10, 20, 30])",
-            "func": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 7,
-                "col_offset": 20,
-                "end_lineno": 7,
-                "end_col_offset": 29
-              },
-              "resolved_type": "unknown",
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "bytearray",
-              "id": "bytearray"
-            },
-            "args": [
-              {
-                "kind": "List",
-                "source_span": {
-                  "lineno": 7,
-                  "col_offset": 30,
-                  "end_lineno": 7,
-                  "end_col_offset": 42
-                },
-                "resolved_type": "list[int64]",
-                "casts": [],
-                "borrow_kind": "value",
-                "repr": "[10, 20, 30]",
-                "elements": [
-                  {
-                    "kind": "Constant",
-                    "source_span": {
-                      "lineno": 7,
-                      "col_offset": 31,
-                      "end_lineno": 7,
-                      "end_col_offset": 33
-                    },
-                    "resolved_type": "int64",
-                    "casts": [],
-                    "borrow_kind": "value",
-                    "repr": "10",
-                    "value": 10
-                  },
-                  {
-                    "kind": "Constant",
-                    "source_span": {
-                      "lineno": 7,
-                      "col_offset": 35,
-                      "end_lineno": 7,
-                      "end_col_offset": 37
-                    },
-                    "resolved_type": "int64",
-                    "casts": [],
-                    "borrow_kind": "value",
-                    "repr": "20",
-                    "value": 20
-                  },
-                  {
-                    "kind": "Constant",
-                    "source_span": {
-                      "lineno": 7,
-                      "col_offset": 39,
-                      "end_lineno": 7,
-                      "end_col_offset": 41
-                    },
-                    "resolved_type": "int64",
-                    "casts": [],
-                    "borrow_kind": "value",
-                    "repr": "30",
-                    "value": 30
-                  }
-                ]
-              }
-            ],
-            "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "bytearray",
-            "runtime_call": "bytearray_ctor",
-            "runtime_module_id": "pytra.core.py_runtime",
-            "runtime_symbol": "bytearray",
-            "runtime_call_adapter_kind": "builtin",
-            "semantic_tag": "ctor.bytearray",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",
               "category": "static",
               "mirror": "bytearray"
+            },
+            "target": "bytearray",
+            "on_fail": "raise",
+            "bridge_lane_v1": {
+              "schema_version": 1,
+              "target": {
+                "kind": "NamedType",
+                "category": "static",
+                "mirror": "bytearray"
+              },
+              "target_category": "static",
+              "value": {
+                "kind": "DynamicType",
+                "category": "dynamic",
+                "mirror": "unknown",
+                "dynamic_name": "unknown"
+              },
+              "value_category": "dynamic"
             }
           },
           "type_expr_summary_v1": {
@@ -276,7 +307,7 @@
               "end_lineno": 9,
               "end_col_offset": 9
             },
-            "resolved_type": "uint8",
+            "resolved_type": "int32",
             "casts": [],
             "borrow_kind": "value",
             "repr": "ba[1]",
@@ -411,7 +442,7 @@
               "id": "ba",
               "iterable_trait": "yes",
               "iter_protocol": "static_range",
-              "iter_element_type": "uint8"
+              "iter_element_type": "unknown"
             },
             "dispatch_mode": "native",
             "init_op": "ObjIterInit",
@@ -419,8 +450,7 @@
           },
           "target_plan": {
             "kind": "NameTarget",
-            "id": "v",
-            "target_type": "int32"
+            "id": "v"
           },
           "body": [
             {
@@ -449,18 +479,55 @@
               "declare": false,
               "decl_type": "int64",
               "value": {
-                "kind": "Name",
+                "kind": "Unbox",
+                "resolved_type": "int64",
+                "borrow_kind": "value",
+                "casts": [],
+                "value": {
+                  "kind": "Name",
+                  "source_span": {
+                    "lineno": 12,
+                    "col_offset": 17,
+                    "end_lineno": 12,
+                    "end_col_offset": 18
+                  },
+                  "resolved_type": "unknown",
+                  "casts": [],
+                  "borrow_kind": "value",
+                  "repr": "v",
+                  "id": "v"
+                },
                 "source_span": {
                   "lineno": 12,
                   "col_offset": 17,
                   "end_lineno": 12,
                   "end_col_offset": 18
                 },
-                "resolved_type": "uint8",
-                "casts": [],
-                "borrow_kind": "readonly_ref",
                 "repr": "v",
-                "id": "v"
+                "type_expr_summary_v1": {
+                  "schema_version": 1,
+                  "kind": "NamedType",
+                  "category": "static",
+                  "mirror": "int64"
+                },
+                "target": "int64",
+                "on_fail": "raise",
+                "bridge_lane_v1": {
+                  "schema_version": 1,
+                  "target": {
+                    "kind": "NamedType",
+                    "category": "static",
+                    "mirror": "int64"
+                  },
+                  "target_category": "static",
+                  "value": {
+                    "kind": "DynamicType",
+                    "category": "dynamic",
+                    "mirror": "unknown",
+                    "dynamic_name": "unknown"
+                  },
+                  "value_category": "dynamic"
+                }
               },
               "type_expr_summary_v1": {
                 "schema_version": 1,
@@ -474,8 +541,8 @@
           "source_span": {
             "lineno": 11,
             "col_offset": 0,
-            "end_lineno": 13,
-            "end_col_offset": 0
+            "end_lineno": 12,
+            "end_col_offset": 18
           }
         },
         {
@@ -675,7 +742,7 @@
                     "keywords": [],
                     "lowered_kind": "BuiltinCall",
                     "builtin_name": "len",
-                    "runtime_call": "py_len",
+                    "runtime_call": "len",
                     "runtime_module_id": "pytra.core.py_runtime",
                     "runtime_symbol": "len",
                     "runtime_call_adapter_kind": "builtin",
@@ -845,7 +912,7 @@
                       "end_lineno": 16,
                       "end_col_offset": 36
                     },
-                    "resolved_type": "uint8",
+                    "resolved_type": "int32",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "ba[0]",
@@ -1036,7 +1103,7 @@
                       "end_lineno": 17,
                       "end_col_offset": 36
                     },
-                    "resolved_type": "uint8",
+                    "resolved_type": "int32",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "ba[1]",
@@ -1227,7 +1294,7 @@
                       "end_lineno": 18,
                       "end_col_offset": 37
                     },
-                    "resolved_type": "uint8",
+                    "resolved_type": "int32",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "ba[-1]",
@@ -1760,16 +1827,16 @@
           "runtime_group": "built_in"
         },
         {
-          "module_id": "pytra.built_in.sequence",
+          "module_id": "pytra.core.py_runtime",
           "export_name": "",
-          "local_name": "pytra.built_in.sequence",
+          "local_name": "pytra.core.py_runtime",
           "binding_kind": "implicit_builtin",
           "source_file": "test/fixture/source/py/typing/bytearray_basic.py",
           "source_line": 0,
-          "source_module_id": "pytra.built_in.sequence",
+          "source_module_id": "pytra.core.py_runtime",
           "source_binding_kind": "implicit_builtin",
-          "runtime_module_id": "pytra.built_in.sequence",
-          "runtime_group": "built_in"
+          "runtime_module_id": "pytra.core.py_runtime",
+          "runtime_group": "core"
         }
       ],
       "qualified_refs": [
@@ -1811,9 +1878,9 @@
         "source_line": 0
       },
       {
-        "module_id": "pytra.built_in.sequence",
+        "module_id": "pytra.core.py_runtime",
         "export_name": "",
-        "local_name": "pytra.built_in.sequence",
+        "local_name": "pytra.core.py_runtime",
         "binding_kind": "implicit_builtin",
         "source_file": "test/fixture/source/py/typing/bytearray_basic.py",
         "source_line": 0

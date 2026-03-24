@@ -268,7 +268,7 @@
                     "end_lineno": 8,
                     "end_col": 18
                   },
-                  "resolved_type": "unknown",
+                  "resolved_type": "int64",
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "o. value",

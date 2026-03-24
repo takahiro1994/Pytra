@@ -88,14 +88,13 @@
               "end_lineno": 11,
               "end_col_offset": 11
             },
-            "resolved_type": "bytearray",
+            "resolved_type": "unknown",
             "casts": [],
             "borrow_kind": "value",
             "repr": "palette",
             "id": "palette"
           },
           "declare": true,
-          "decl_type": "bytearray",
           "declare_init": true,
           "leading_trivia": [
             {
@@ -114,7 +113,7 @@
               "end_lineno": 11,
               "end_col_offset": 32
             },
-            "resolved_type": "bytearray",
+            "resolved_type": "unknown",
             "casts": [],
             "borrow_kind": "value",
             "repr": "bytearray(256 * 3)",
@@ -177,25 +176,20 @@
               }
             ],
             "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "bytearray",
-            "runtime_call": "bytearray_ctor",
-            "runtime_module_id": "pytra.core.py_runtime",
-            "runtime_symbol": "bytearray",
-            "runtime_call_adapter_kind": "builtin",
-            "semantic_tag": "ctor.bytearray",
             "type_expr_summary_v1": {
               "schema_version": 1,
-              "kind": "NamedType",
-              "category": "static",
-              "mirror": "bytearray"
+              "kind": "DynamicType",
+              "category": "dynamic",
+              "mirror": "unknown",
+              "dynamic_name": "unknown"
             }
           },
           "type_expr_summary_v1": {
             "schema_version": 1,
-            "kind": "NamedType",
-            "category": "static",
-            "mirror": "bytearray"
+            "kind": "DynamicType",
+            "category": "dynamic",
+            "mirror": "unknown",
+            "dynamic_name": "unknown"
           }
         },
         {
@@ -214,7 +208,7 @@
               "end_lineno": 12,
               "end_col_offset": 14
             },
-            "resolved_type": "uint8",
+            "resolved_type": "int64",
             "casts": [],
             "borrow_kind": "value",
             "repr": "palette[0]",
@@ -226,9 +220,9 @@
                 "end_lineno": 12,
                 "end_col_offset": 11
               },
-              "resolved_type": "bytearray",
+              "resolved_type": "unknown",
               "casts": [],
-              "borrow_kind": "readonly_ref",
+              "borrow_kind": "value",
               "repr": "palette",
               "id": "palette"
             },
@@ -287,7 +281,7 @@
               "end_lineno": 13,
               "end_col_offset": 14
             },
-            "resolved_type": "uint8",
+            "resolved_type": "int64",
             "casts": [],
             "borrow_kind": "value",
             "repr": "palette[1]",
@@ -299,9 +293,9 @@
                 "end_lineno": 13,
                 "end_col_offset": 11
               },
-              "resolved_type": "bytearray",
+              "resolved_type": "unknown",
               "casts": [],
-              "borrow_kind": "readonly_ref",
+              "borrow_kind": "value",
               "repr": "palette",
               "id": "palette"
             },
@@ -360,7 +354,7 @@
               "end_lineno": 14,
               "end_col_offset": 14
             },
-            "resolved_type": "uint8",
+            "resolved_type": "int64",
             "casts": [],
             "borrow_kind": "value",
             "repr": "palette[2]",
@@ -372,9 +366,9 @@
                 "end_lineno": 14,
                 "end_col_offset": 11
               },
-              "resolved_type": "bytearray",
+              "resolved_type": "unknown",
               "casts": [],
-              "borrow_kind": "readonly_ref",
+              "borrow_kind": "value",
               "repr": "palette",
               "id": "palette"
             },
@@ -818,7 +812,7 @@
                 "keywords": [],
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "int",
-                "runtime_call": "static_cast",
+                "runtime_call": "int",
                 "runtime_module_id": "pytra.core.py_runtime",
                 "runtime_symbol": "int",
                 "runtime_call_adapter_kind": "builtin",
@@ -1103,7 +1097,7 @@
                 "keywords": [],
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "int",
-                "runtime_call": "static_cast",
+                "runtime_call": "int",
                 "runtime_module_id": "pytra.core.py_runtime",
                 "runtime_symbol": "int",
                 "runtime_call_adapter_kind": "builtin",
@@ -1416,7 +1410,7 @@
                 "keywords": [],
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "int",
-                "runtime_call": "static_cast",
+                "runtime_call": "int",
                 "runtime_module_id": "pytra.core.py_runtime",
                 "runtime_symbol": "int",
                 "runtime_call_adapter_kind": "builtin",
@@ -1451,7 +1445,7 @@
                   "end_lineno": 20,
                   "end_col_offset": 26
                 },
-                "resolved_type": "uint8",
+                "resolved_type": "int64",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "palette[i * 3 + 0]",
@@ -1463,9 +1457,9 @@
                     "end_lineno": 20,
                     "end_col_offset": 15
                   },
-                  "resolved_type": "bytearray",
+                  "resolved_type": "unknown",
                   "casts": [],
-                  "borrow_kind": "readonly_ref",
+                  "borrow_kind": "value",
                   "repr": "palette",
                   "id": "palette"
                 },
@@ -1580,7 +1574,7 @@
                   "end_lineno": 21,
                   "end_col_offset": 26
                 },
-                "resolved_type": "uint8",
+                "resolved_type": "int64",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "palette[i * 3 + 1]",
@@ -1592,9 +1586,9 @@
                     "end_lineno": 21,
                     "end_col_offset": 15
                   },
-                  "resolved_type": "bytearray",
+                  "resolved_type": "unknown",
                   "casts": [],
-                  "borrow_kind": "readonly_ref",
+                  "borrow_kind": "value",
                   "repr": "palette",
                   "id": "palette"
                 },
@@ -1709,7 +1703,7 @@
                   "end_lineno": 22,
                   "end_col_offset": 26
                 },
-                "resolved_type": "uint8",
+                "resolved_type": "int64",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "palette[i * 3 + 2]",
@@ -1721,9 +1715,9 @@
                     "end_lineno": 22,
                     "end_col_offset": 15
                   },
-                  "resolved_type": "bytearray",
+                  "resolved_type": "unknown",
                   "casts": [],
-                  "borrow_kind": "readonly_ref",
+                  "borrow_kind": "value",
                   "repr": "palette",
                   "id": "palette"
                 },
@@ -1847,7 +1841,7 @@
               "end_lineno": 23,
               "end_col_offset": 25
             },
-            "resolved_type": "bytes",
+            "resolved_type": "unknown",
             "casts": [],
             "borrow_kind": "value",
             "repr": "bytes(palette)",
@@ -1874,26 +1868,20 @@
                   "end_lineno": 23,
                   "end_col_offset": 24
                 },
-                "resolved_type": "bytearray",
+                "resolved_type": "unknown",
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "palette",
                 "id": "palette"
               }
             ],
             "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "bytes",
-            "runtime_call": "bytes_ctor",
-            "runtime_module_id": "pytra.core.py_runtime",
-            "runtime_symbol": "bytes",
-            "runtime_call_adapter_kind": "builtin",
-            "semantic_tag": "ctor.bytes",
             "type_expr_summary_v1": {
               "schema_version": 1,
-              "kind": "NamedType",
-              "category": "static",
-              "mirror": "bytes"
+              "kind": "DynamicType",
+              "category": "dynamic",
+              "mirror": "unknown",
+              "dynamic_name": "unknown"
             }
           }
         }
@@ -1983,14 +1971,13 @@
               "end_lineno": 27,
               "end_col_offset": 9
             },
-            "resolved_type": "bytearray",
+            "resolved_type": "unknown",
             "casts": [],
             "borrow_kind": "value",
             "repr": "frame",
             "id": "frame"
           },
           "declare": true,
-          "decl_type": "bytearray",
           "declare_init": true,
           "value": {
             "kind": "Call",
@@ -2000,7 +1987,7 @@
               "end_lineno": 27,
               "end_col_offset": 37
             },
-            "resolved_type": "bytearray",
+            "resolved_type": "unknown",
             "casts": [],
             "borrow_kind": "value",
             "repr": "bytearray(width * height)",
@@ -2063,25 +2050,20 @@
               }
             ],
             "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "bytearray",
-            "runtime_call": "bytearray_ctor",
-            "runtime_module_id": "pytra.core.py_runtime",
-            "runtime_symbol": "bytearray",
-            "runtime_call_adapter_kind": "builtin",
-            "semantic_tag": "ctor.bytearray",
             "type_expr_summary_v1": {
               "schema_version": 1,
-              "kind": "NamedType",
-              "category": "static",
-              "mirror": "bytearray"
+              "kind": "DynamicType",
+              "category": "dynamic",
+              "mirror": "unknown",
+              "dynamic_name": "unknown"
             }
           },
           "type_expr_summary_v1": {
             "schema_version": 1,
-            "kind": "NamedType",
-            "category": "static",
-            "mirror": "bytearray"
+            "kind": "DynamicType",
+            "category": "dynamic",
+            "mirror": "unknown",
+            "dynamic_name": "unknown"
           }
         },
         {
@@ -2733,7 +2715,7 @@
                   "kind": "While",
                   "source_span": {
                     "lineno": 35,
-                    "col_offset": 0,
+                    "col_offset": 12,
                     "end_lineno": 42,
                     "end_col_offset": 22
                   },
@@ -3393,7 +3375,7 @@
                           "end_lineno": 44,
                           "end_col_offset": 35
                         },
-                        "resolved_type": "uint8",
+                        "resolved_type": "int64",
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "frame[row_base + x]",
@@ -3405,9 +3387,9 @@
                             "end_lineno": 44,
                             "end_col_offset": 21
                           },
-                          "resolved_type": "bytearray",
+                          "resolved_type": "unknown",
                           "casts": [],
-                          "borrow_kind": "readonly_ref",
+                          "borrow_kind": "value",
                           "repr": "frame",
                           "id": "frame"
                         },
@@ -3691,7 +3673,7 @@
                           "end_lineno": 48,
                           "end_col_offset": 35
                         },
-                        "resolved_type": "uint8",
+                        "resolved_type": "int64",
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "frame[row_base + x]",
@@ -3703,9 +3685,9 @@
                             "end_lineno": 48,
                             "end_col_offset": 21
                           },
-                          "resolved_type": "bytearray",
+                          "resolved_type": "unknown",
                           "casts": [],
-                          "borrow_kind": "readonly_ref",
+                          "borrow_kind": "value",
                           "repr": "frame",
                           "id": "frame"
                         },
@@ -3812,7 +3794,7 @@
               "end_lineno": 49,
               "end_col_offset": 23
             },
-            "resolved_type": "bytes",
+            "resolved_type": "unknown",
             "casts": [],
             "borrow_kind": "value",
             "repr": "bytes(frame)",
@@ -3839,26 +3821,20 @@
                   "end_lineno": 49,
                   "end_col_offset": 22
                 },
-                "resolved_type": "bytearray",
+                "resolved_type": "unknown",
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "frame",
                 "id": "frame"
               }
             ],
             "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "bytes",
-            "runtime_call": "bytes_ctor",
-            "runtime_module_id": "pytra.core.py_runtime",
-            "runtime_symbol": "bytes",
-            "runtime_call_adapter_kind": "builtin",
-            "semantic_tag": "ctor.bytes",
             "type_expr_summary_v1": {
               "schema_version": 1,
-              "kind": "NamedType",
-              "category": "static",
-              "mirror": "bytes"
+              "kind": "DynamicType",
+              "category": "dynamic",
+              "mirror": "unknown",
+              "dynamic_name": "unknown"
             }
           }
         }
@@ -4207,13 +4183,11 @@
             },
             "args": [],
             "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "perf_counter",
-            "runtime_call": "perf_counter",
+            "resolved_runtime_call": "time.perf_counter",
+            "resolved_runtime_source": "import_symbol",
             "runtime_module_id": "pytra.std.time",
             "runtime_symbol": "perf_counter",
             "runtime_call_adapter_kind": "extern_delegate",
-            "semantic_tag": "stdlib.fn.perf_counter",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",
@@ -4925,10 +4899,9 @@
               },
               "type_expr_summary_v1": {
                 "schema_version": 1,
-                "kind": "DynamicType",
-                "category": "dynamic",
-                "mirror": "unknown",
-                "dynamic_name": "unknown"
+                "kind": "NamedType",
+                "category": "static",
+                "mirror": "float64"
               }
             },
             {
@@ -5018,7 +4991,7 @@
                       "end_lineno": 73,
                       "end_col_offset": 52
                     },
-                    "resolved_type": "float64",
+                    "resolved_type": "unknown",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "math.cos(angle)",
@@ -5059,25 +5032,20 @@
                           "end_lineno": 73,
                           "end_col_offset": 51
                         },
-                        "resolved_type": "unknown",
+                        "resolved_type": "float64",
                         "casts": [],
-                        "borrow_kind": "value",
+                        "borrow_kind": "readonly_ref",
                         "repr": "angle",
                         "id": "angle"
                       }
                     ],
                     "keywords": [],
-                    "resolved_runtime_call": "math.cos",
-                    "resolved_runtime_source": "module_attr",
-                    "runtime_module_id": "pytra.std.math",
-                    "runtime_symbol": "cos",
-                    "runtime_call_adapter_kind": "math.float_args",
-                    "semantic_tag": "stdlib.method.cos",
                     "type_expr_summary_v1": {
                       "schema_version": 1,
-                      "kind": "NamedType",
-                      "category": "static",
-                      "mirror": "float64"
+                      "kind": "DynamicType",
+                      "category": "dynamic",
+                      "mirror": "unknown",
+                      "dynamic_name": "unknown"
                     }
                   }
                 }
@@ -5176,7 +5144,7 @@
                       "end_lineno": 74,
                       "end_col_offset": 52
                     },
-                    "resolved_type": "float64",
+                    "resolved_type": "unknown",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "math.sin(angle)",
@@ -5217,25 +5185,20 @@
                           "end_lineno": 74,
                           "end_col_offset": 51
                         },
-                        "resolved_type": "unknown",
+                        "resolved_type": "float64",
                         "casts": [],
-                        "borrow_kind": "value",
+                        "borrow_kind": "readonly_ref",
                         "repr": "angle",
                         "id": "angle"
                       }
                     ],
                     "keywords": [],
-                    "resolved_runtime_call": "math.sin",
-                    "resolved_runtime_source": "module_attr",
-                    "runtime_module_id": "pytra.std.math",
-                    "runtime_symbol": "sin",
-                    "runtime_call_adapter_kind": "math.float_args",
-                    "semantic_tag": "stdlib.method.sin",
                     "type_expr_summary_v1": {
                       "schema_version": 1,
-                      "kind": "NamedType",
-                      "category": "static",
-                      "mirror": "float64"
+                      "kind": "DynamicType",
+                      "category": "dynamic",
+                      "mirror": "unknown",
+                      "dynamic_name": "unknown"
                     }
                   }
                 }
@@ -5582,8 +5545,8 @@
           "source_span": {
             "lineno": 70,
             "col_offset": 0,
-            "end_lineno": 77,
-            "end_col_offset": 0
+            "end_lineno": 76,
+            "end_col_offset": 75
           }
         },
         {
@@ -5828,13 +5791,11 @@
               },
               "args": [],
               "keywords": [],
-              "lowered_kind": "BuiltinCall",
-              "builtin_name": "perf_counter",
-              "runtime_call": "perf_counter",
+              "resolved_runtime_call": "time.perf_counter",
+              "resolved_runtime_source": "import_symbol",
               "runtime_module_id": "pytra.std.time",
               "runtime_symbol": "perf_counter",
               "runtime_call_adapter_kind": "extern_delegate",
-              "semantic_tag": "stdlib.fn.perf_counter",
               "type_expr_summary_v1": {
                 "schema_version": 1,
                 "kind": "NamedType",
@@ -6181,9 +6142,8 @@
           "source_module_id": "pytra.std",
           "source_export_name": "math",
           "source_binding_kind": "symbol",
-          "runtime_module_id": "pytra.std.math",
-          "runtime_group": "std",
-          "resolved_binding_kind": "module"
+          "runtime_module_id": "pytra.std",
+          "runtime_group": "std"
         },
         {
           "module_id": "pytra.std.time",
@@ -6235,16 +6195,16 @@
           "runtime_group": "built_in"
         },
         {
-          "module_id": "pytra.built_in.scalar_ops",
+          "module_id": "pytra.core.py_runtime",
           "export_name": "",
-          "local_name": "pytra.built_in.scalar_ops",
+          "local_name": "pytra.core.py_runtime",
           "binding_kind": "implicit_builtin",
           "source_file": "sample/py/06_julia_parameter_sweep.py",
           "source_line": 0,
-          "source_module_id": "pytra.built_in.scalar_ops",
+          "source_module_id": "pytra.core.py_runtime",
           "source_binding_kind": "implicit_builtin",
-          "runtime_module_id": "pytra.built_in.scalar_ops",
-          "runtime_group": "built_in"
+          "runtime_module_id": "pytra.core.py_runtime",
+          "runtime_group": "core"
         }
       ],
       "qualified_refs": [
@@ -6299,9 +6259,9 @@
         "source_line": 0
       },
       {
-        "module_id": "pytra.built_in.scalar_ops",
+        "module_id": "pytra.core.py_runtime",
         "export_name": "",
-        "local_name": "pytra.built_in.scalar_ops",
+        "local_name": "pytra.core.py_runtime",
         "binding_kind": "implicit_builtin",
         "source_file": "sample/py/06_julia_parameter_sweep.py",
         "source_line": 0

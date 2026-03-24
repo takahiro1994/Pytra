@@ -157,7 +157,6 @@
             "keywords": []
           },
           "declare": true,
-          "decl_type": "unknown",
           "declare_init": true
         },
         {
@@ -176,7 +175,7 @@
               "end_lineno": 6,
               "end_col": 13
             },
-            "resolved_type": "unknown",
+            "resolved_type": "tuple[unknown, unknown]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "root, ext",
@@ -283,8 +282,7 @@
             ],
             "keywords": []
           },
-          "declare": false,
-          "decl_type": null
+          "declare": false
         },
         {
           "kind": "Assign",
@@ -1084,7 +1082,7 @@
                         "end_lineno": 14,
                         "end_col": 39
                       },
-                      "resolved_type": "list[str]",
+                      "resolved_type": "unknown",
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "glob.glob(\"*.cpp\")",
@@ -1138,7 +1136,7 @@
                   "keywords": [],
                   "lowered_kind": "BuiltinCall",
                   "builtin_name": "len",
-                  "runtime_call": "py_len",
+                  "runtime_call": "len",
                   "runtime_module_id": "pytra.core.py_runtime",
                   "runtime_symbol": "len",
                   "runtime_call_adapter_kind": "builtin",
@@ -1298,9 +1296,8 @@
           "source_module_id": "pytra.std",
           "source_export_name": "glob",
           "source_binding_kind": "symbol",
-          "runtime_module_id": "pytra.std.glob",
-          "runtime_group": "std",
-          "resolved_binding_kind": "module"
+          "runtime_module_id": "pytra.std",
+          "runtime_group": "std"
         },
         {
           "module_id": "pytra.std",
@@ -1312,9 +1309,8 @@
           "source_module_id": "pytra.std",
           "source_export_name": "os",
           "source_binding_kind": "symbol",
-          "runtime_module_id": "pytra.std.os",
-          "runtime_group": "std",
-          "resolved_binding_kind": "module"
+          "runtime_module_id": "pytra.std",
+          "runtime_group": "std"
         },
         {
           "module_id": "pytra.built_in.io_ops",
@@ -1329,16 +1325,16 @@
           "runtime_group": "built_in"
         },
         {
-          "module_id": "pytra.built_in.sequence",
+          "module_id": "pytra.core.py_runtime",
           "export_name": "",
-          "local_name": "pytra.built_in.sequence",
+          "local_name": "pytra.core.py_runtime",
           "binding_kind": "implicit_builtin",
           "source_file": "test/fixture/source/py/stdlib/os_glob_extended.py",
           "source_line": 0,
-          "source_module_id": "pytra.built_in.sequence",
+          "source_module_id": "pytra.core.py_runtime",
           "source_binding_kind": "implicit_builtin",
-          "runtime_module_id": "pytra.built_in.sequence",
-          "runtime_group": "built_in"
+          "runtime_module_id": "pytra.core.py_runtime",
+          "runtime_group": "core"
         }
       ],
       "qualified_refs": [
@@ -1380,9 +1376,9 @@
         "source_line": 0
       },
       {
-        "module_id": "pytra.built_in.sequence",
+        "module_id": "pytra.core.py_runtime",
         "export_name": "",
-        "local_name": "pytra.built_in.sequence",
+        "local_name": "pytra.core.py_runtime",
         "binding_kind": "implicit_builtin",
         "source_file": "test/fixture/source/py/stdlib/os_glob_extended.py",
         "source_line": 0

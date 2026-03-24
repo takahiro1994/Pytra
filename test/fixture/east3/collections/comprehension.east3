@@ -144,7 +144,8 @@
           },
           "target_plan": {
             "kind": "NameTarget",
-            "id": "i"
+            "id": "i",
+            "target_type": "int64"
           },
           "body": [
             {

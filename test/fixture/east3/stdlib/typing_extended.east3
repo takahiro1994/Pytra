@@ -299,7 +299,7 @@
               "end_lineno": 13,
               "end_col_offset": 18
             },
-            "resolved_type": "unknown",
+            "resolved_type": "int64",
             "casts": [],
             "borrow_kind": "value",
             "repr": "pair[0]",
@@ -1255,36 +1255,36 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "{\"a\": 1}",
-                        "keys": [
+                        "entries": [
                           {
-                            "kind": "Constant",
-                            "source_span": {
-                              "lineno": 27,
-                              "col_offset": 41,
-                              "end_lineno": 27,
-                              "end_col_offset": 44
+                            "key": {
+                              "kind": "Constant",
+                              "source_span": {
+                                "lineno": 27,
+                                "col_offset": 41,
+                                "end_lineno": 27,
+                                "end_col_offset": 44
+                              },
+                              "resolved_type": "str",
+                              "casts": [],
+                              "borrow_kind": "value",
+                              "repr": "\"a\"",
+                              "value": "a"
                             },
-                            "resolved_type": "str",
-                            "casts": [],
-                            "borrow_kind": "value",
-                            "repr": "\"a\"",
-                            "value": "a"
-                          }
-                        ],
-                        "values": [
-                          {
-                            "kind": "Constant",
-                            "source_span": {
-                              "lineno": 27,
-                              "col_offset": 46,
-                              "end_lineno": 27,
-                              "end_col_offset": 47
-                            },
-                            "resolved_type": "int64",
-                            "casts": [],
-                            "borrow_kind": "value",
-                            "repr": "1",
-                            "value": 1
+                            "value": {
+                              "kind": "Constant",
+                              "source_span": {
+                                "lineno": 27,
+                                "col_offset": 46,
+                                "end_lineno": 27,
+                                "end_col_offset": 47
+                              },
+                              "resolved_type": "int64",
+                              "casts": [],
+                              "borrow_kind": "value",
+                              "repr": "1",
+                              "value": 1
+                            }
                           }
                         ]
                       },
@@ -1608,7 +1608,14 @@
           "local_name": "typing",
           "binding_kind": "module",
           "source_file": "test/fixture/source/py/stdlib/typing_extended.py",
-          "source_line": 1
+          "source_line": 1,
+          "source_module_id": "pytra.typing",
+          "source_export_name": "",
+          "source_binding_kind": "module",
+          "runtime_module_id": "pytra.typing",
+          "runtime_group": "",
+          "resolved_binding_kind": "module",
+          "host_only": true
         },
         {
           "module_id": "pytra.utils.assertions",
@@ -1679,7 +1686,8 @@
         "local_name": "typing",
         "binding_kind": "module",
         "source_file": "test/fixture/source/py/stdlib/typing_extended.py",
-        "source_line": 1
+        "source_line": 1,
+        "host_only": true
       },
       {
         "module_id": "pytra.utils.assertions",

@@ -861,9 +861,9 @@
             "iter_expr": {
               "kind": "Name",
               "source_span": {
-                "lineno": 12,
+                "lineno": 7,
                 "col_offset": 26,
-                "end_lineno": 12,
+                "end_lineno": 7,
                 "end_col_offset": 32
               },
               "resolved_type": "list[int64]",
@@ -1767,9 +1767,9 @@
               "keywords": [],
               "lowered_kind": "BuiltinCall",
               "builtin_name": "enumerate",
-              "runtime_call": "py_enumerate",
+              "runtime_call": "py_enumerate_object",
               "runtime_module_id": "pytra.built_in.iter_ops",
-              "runtime_symbol": "enumerate",
+              "runtime_symbol": "py_enumerate_object",
               "runtime_call_adapter_kind": "builtin",
               "semantic_tag": "iter.enumerate",
               "iterable_trait": "yes",
@@ -1790,7 +1790,7 @@
           "target_plan": {
             "kind": "NameTarget",
             "id": "pair",
-            "target_type": "tuple[int64, int64]"
+            "target_type": "tuple[int64,int64]"
           },
           "body": [
             {
@@ -1809,14 +1809,14 @@
                   "end_lineno": 22,
                   "end_col_offset": 9
                 },
-                "resolved_type": "tuple[int64, int64]",
+                "resolved_type": "tuple[int64,int64]",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "_",
                 "id": "_"
               },
               "declare": true,
-              "decl_type": "tuple[int64, int64]",
+              "decl_type": "tuple[int64,int64]",
               "declare_init": true,
               "value": {
                 "kind": "Name",
@@ -1826,7 +1826,7 @@
                   "end_lineno": 22,
                   "end_col_offset": 16
                 },
-                "resolved_type": "tuple[int64, int64]",
+                "resolved_type": "tuple[int64,int64]",
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "pair",
@@ -1958,8 +1958,8 @@
           "source_span": {
             "lineno": 21,
             "col_offset": 0,
-            "end_lineno": 24,
-            "end_col_offset": 0
+            "end_lineno": 23,
+            "end_col_offset": 23
           },
           "meta": {
             "lifetime_node_id": "n7",

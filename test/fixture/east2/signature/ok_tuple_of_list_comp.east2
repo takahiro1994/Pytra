@@ -154,7 +154,7 @@
                     "end_lineno": 6,
                     "end_col": 37
                   },
-                  "resolved_type": "unknown",
+                  "resolved_type": "int64",
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "_",
@@ -168,7 +168,7 @@
                     "end_lineno": 6,
                     "end_col": 55
                   },
-                  "resolved_type": "range",
+                  "resolved_type": "list[int64]",
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "range(n_layer)",
@@ -176,9 +176,9 @@
                     "kind": "Constant",
                     "source_span": {
                       "lineno": 6,
-                      "col": 28,
+                      "col": 41,
                       "end_lineno": 6,
-                      "end_col": 28
+                      "end_col": 46
                     },
                     "resolved_type": "int64",
                     "casts": [],
@@ -204,9 +204,9 @@
                     "kind": "Constant",
                     "source_span": {
                       "lineno": 6,
-                      "col": 28,
+                      "col": 41,
                       "end_lineno": 6,
-                      "end_col": 28
+                      "end_col": 46
                     },
                     "resolved_type": "int64",
                     "casts": [],
@@ -331,7 +331,7 @@
                     "end_lineno": 7,
                     "end_col": 39
                   },
-                  "resolved_type": "unknown",
+                  "resolved_type": "int64",
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "_",
@@ -345,7 +345,7 @@
                     "end_lineno": 7,
                     "end_col": 57
                   },
-                  "resolved_type": "range",
+                  "resolved_type": "list[int64]",
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "range(n_layer)",
@@ -353,9 +353,9 @@
                     "kind": "Constant",
                     "source_span": {
                       "lineno": 7,
-                      "col": 30,
+                      "col": 43,
                       "end_lineno": 7,
-                      "end_col": 30
+                      "end_col": 48
                     },
                     "resolved_type": "int64",
                     "casts": [],
@@ -381,9 +381,9 @@
                     "kind": "Constant",
                     "source_span": {
                       "lineno": 7,
-                      "col": 30,
+                      "col": 43,
                       "end_lineno": 7,
-                      "end_col": 30
+                      "end_col": 48
                     },
                     "resolved_type": "int64",
                     "casts": [],
@@ -513,7 +513,7 @@
                 "keywords": [],
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "len",
-                "runtime_call": "py_len",
+                "runtime_call": "len",
                 "runtime_module_id": "pytra.core.py_runtime",
                 "runtime_symbol": "len",
                 "runtime_call_adapter_kind": "builtin",
@@ -564,7 +564,7 @@
                 "keywords": [],
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "len",
-                "runtime_call": "py_len",
+                "runtime_call": "len",
                 "runtime_module_id": "pytra.core.py_runtime",
                 "runtime_symbol": "len",
                 "runtime_call_adapter_kind": "builtin",
@@ -667,16 +667,16 @@
           "runtime_group": "built_in"
         },
         {
-          "module_id": "pytra.built_in.sequence",
+          "module_id": "pytra.core.py_runtime",
           "export_name": "",
-          "local_name": "pytra.built_in.sequence",
+          "local_name": "pytra.core.py_runtime",
           "binding_kind": "implicit_builtin",
           "source_file": "test/fixture/source/py/signature/ok_tuple_of_list_comp.py",
           "source_line": 0,
-          "source_module_id": "pytra.built_in.sequence",
+          "source_module_id": "pytra.core.py_runtime",
           "source_binding_kind": "implicit_builtin",
-          "runtime_module_id": "pytra.built_in.sequence",
-          "runtime_group": "built_in"
+          "runtime_module_id": "pytra.core.py_runtime",
+          "runtime_group": "core"
         }
       ],
       "qualified_refs": []
@@ -691,9 +691,9 @@
         "source_line": 0
       },
       {
-        "module_id": "pytra.built_in.sequence",
+        "module_id": "pytra.core.py_runtime",
         "export_name": "",
-        "local_name": "pytra.built_in.sequence",
+        "local_name": "pytra.core.py_runtime",
         "binding_kind": "implicit_builtin",
         "source_file": "test/fixture/source/py/signature/ok_tuple_of_list_comp.py",
         "source_line": 0

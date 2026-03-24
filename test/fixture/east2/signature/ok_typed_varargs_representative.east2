@@ -111,16 +111,16 @@
               "end_lineno": 6,
               "end_col": 13
             },
-            "resolved_type": "ControllerState",
+            "resolved_type": "unknown",
             "casts": [],
             "borrow_kind": "value",
             "repr": "state",
             "id": "state"
           },
-          "target_type": "ControllerState",
-          "iter_mode": "static_fastpath",
-          "iter_source_type": "list[ControllerState]",
-          "iter_element_type": "ControllerState",
+          "target_type": "unknown",
+          "iter_mode": "dynamic",
+          "iter_source_type": "unknown",
+          "iter_element_type": "unknown",
           "iter": {
             "kind": "Name",
             "source_span": {
@@ -129,14 +129,14 @@
               "end_lineno": 6,
               "end_col": 23
             },
-            "resolved_type": "list[ControllerState]",
+            "resolved_type": "unknown",
             "casts": [],
-            "borrow_kind": "readonly_ref",
+            "borrow_kind": "value",
             "repr": "states",
             "id": "states",
             "iterable_trait": "yes",
             "iter_protocol": "static_range",
-            "iter_element_type": "ControllerState"
+            "iter_element_type": "unknown"
           },
           "body": [
             {
@@ -155,7 +155,7 @@
                   "end_lineno": 7,
                   "end_col": 22
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "target.pressed",
@@ -197,7 +197,7 @@
                       "end_lineno": 7,
                       "end_col": 39
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "bool",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "target.pressed",
@@ -237,9 +237,9 @@
                         "end_lineno": 7,
                         "end_col": 48
                       },
-                      "resolved_type": "ControllerState",
+                      "resolved_type": "unknown",
                       "casts": [],
-                      "borrow_kind": "readonly_ref",
+                      "borrow_kind": "value",
                       "repr": "state",
                       "id": "state"
                     },
@@ -257,12 +257,6 @@
       ],
       "is_generator": 0,
       "yield_value_type": "unknown",
-      "vararg_name": "states",
-      "vararg_type": "ControllerState",
-      "vararg_type_expr": {
-        "kind": "NamedType",
-        "name": "ControllerState"
-      },
       "arg_type_exprs": {
         "target": {
           "kind": "NamedType",
@@ -274,7 +268,9 @@
         "name": "None"
       },
       "leading_comments": [],
-      "leading_trivia": []
+      "leading_trivia": [],
+      "vararg_name": "states",
+      "vararg_type": "ControllerState"
     },
     {
       "kind": "FunctionDef",
@@ -408,7 +404,7 @@
               "end_lineno": 16,
               "end_col": 25
             },
-            "resolved_type": "unknown",
+            "resolved_type": "bool",
             "casts": [],
             "borrow_kind": "value",
             "repr": "target.pressed",
@@ -538,7 +534,7 @@
           "end_lineno": 21,
           "end_col": 13
         },
-        "resolved_type": "unknown",
+        "resolved_type": "bool",
         "casts": [],
         "borrow_kind": "value",
         "repr": "t.pressed",
@@ -659,7 +655,7 @@
           "end_lineno": 23,
           "end_col": 13
         },
-        "resolved_type": "unknown",
+        "resolved_type": "bool",
         "casts": [],
         "borrow_kind": "value",
         "repr": "a.pressed",
@@ -780,7 +776,7 @@
           "end_lineno": 25,
           "end_col": 13
         },
-        "resolved_type": "unknown",
+        "resolved_type": "bool",
         "casts": [],
         "borrow_kind": "value",
         "repr": "b.pressed",

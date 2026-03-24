@@ -591,7 +591,7 @@
               "end_lineno": 22,
               "end_col_offset": 43
             },
-            "resolved_type": "float64",
+            "resolved_type": "unknown",
             "casts": [],
             "borrow_kind": "value",
             "repr": "math.sqrt(x * x + y * y + z * z)",
@@ -780,17 +780,12 @@
               }
             ],
             "keywords": [],
-            "resolved_runtime_call": "math.sqrt",
-            "resolved_runtime_source": "module_attr",
-            "runtime_module_id": "pytra.std.math",
-            "runtime_symbol": "sqrt",
-            "runtime_call_adapter_kind": "math.float_args",
-            "semantic_tag": "stdlib.method.sqrt",
             "type_expr_summary_v1": {
               "schema_version": 1,
-              "kind": "NamedType",
-              "category": "static",
-              "mirror": "float64"
+              "kind": "DynamicType",
+              "category": "dynamic",
+              "mirror": "unknown",
+              "dynamic_name": "unknown"
             }
           }
         }
@@ -1058,9 +1053,9 @@
                     "kind": "Constant",
                     "source_span": {
                       "lineno": 28,
-                      "col_offset": 15,
+                      "col_offset": 20,
                       "end_lineno": 28,
-                      "end_col_offset": 18
+                      "end_col_offset": 23
                     },
                     "resolved_type": "float64",
                     "casts": [],
@@ -1072,9 +1067,9 @@
                     "kind": "Constant",
                     "source_span": {
                       "lineno": 28,
-                      "col_offset": 15,
+                      "col_offset": 25,
                       "end_lineno": 28,
-                      "end_col_offset": 18
+                      "end_col_offset": 28
                     },
                     "resolved_type": "float64",
                     "casts": [],
@@ -2376,14 +2371,13 @@
               "end_lineno": 43,
               "end_col_offset": 8
             },
-            "resolved_type": "float64",
+            "resolved_type": "unknown",
             "casts": [],
             "borrow_kind": "value",
             "repr": "cost",
             "id": "cost"
           },
           "declare": true,
-          "decl_type": "float64",
           "declare_init": true,
           "value": {
             "kind": "Call",
@@ -2393,7 +2387,7 @@
               "end_lineno": 43,
               "end_col_offset": 33
             },
-            "resolved_type": "float64",
+            "resolved_type": "unknown",
             "casts": [],
             "borrow_kind": "value",
             "repr": "math.sqrt(1.0 - sint2)",
@@ -2470,24 +2464,20 @@
               }
             ],
             "keywords": [],
-            "resolved_runtime_call": "math.sqrt",
-            "resolved_runtime_source": "module_attr",
-            "runtime_module_id": "pytra.std.math",
-            "runtime_symbol": "sqrt",
-            "runtime_call_adapter_kind": "math.float_args",
-            "semantic_tag": "stdlib.method.sqrt",
             "type_expr_summary_v1": {
               "schema_version": 1,
-              "kind": "NamedType",
-              "category": "static",
-              "mirror": "float64"
+              "kind": "DynamicType",
+              "category": "dynamic",
+              "mirror": "unknown",
+              "dynamic_name": "unknown"
             }
           },
           "type_expr_summary_v1": {
             "schema_version": 1,
-            "kind": "NamedType",
-            "category": "static",
-            "mirror": "float64"
+            "kind": "DynamicType",
+            "category": "dynamic",
+            "mirror": "unknown",
+            "dynamic_name": "unknown"
           }
         },
         {
@@ -2578,9 +2568,9 @@
                 "end_lineno": 44,
                 "end_col_offset": 25
               },
-              "resolved_type": "float64",
+              "resolved_type": "unknown",
               "casts": [],
-              "borrow_kind": "readonly_ref",
+              "borrow_kind": "value",
               "repr": "cost",
               "id": "cost"
             }
@@ -3853,7 +3843,7 @@
                   "end_lineno": 59,
                   "end_col_offset": 61
                 },
-                "resolved_type": "float64",
+                "resolved_type": "unknown",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "math.sin(8.0 * dx + 6.0 * dz + tphase)",
@@ -4014,17 +4004,12 @@
                   }
                 ],
                 "keywords": [],
-                "resolved_runtime_call": "math.sin",
-                "resolved_runtime_source": "module_attr",
-                "runtime_module_id": "pytra.std.math",
-                "runtime_symbol": "sin",
-                "runtime_call_adapter_kind": "math.float_args",
-                "semantic_tag": "stdlib.method.sin",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
-                  "kind": "NamedType",
-                  "category": "static",
-                  "mirror": "float64"
+                  "kind": "DynamicType",
+                  "category": "dynamic",
+                  "mirror": "unknown",
+                  "dynamic_name": "unknown"
                 }
               }
             }
@@ -5401,14 +5386,13 @@
               "end_lineno": 86,
               "end_col_offset": 5
             },
-            "resolved_type": "float64",
+            "resolved_type": "unknown",
             "casts": [],
             "borrow_kind": "value",
             "repr": "s",
             "id": "s"
           },
           "declare": true,
-          "decl_type": "float64",
           "declare_init": true,
           "value": {
             "kind": "Call",
@@ -5418,7 +5402,7 @@
               "end_lineno": 86,
               "end_col_offset": 20
             },
-            "resolved_type": "float64",
+            "resolved_type": "unknown",
             "casts": [],
             "borrow_kind": "value",
             "repr": "math.sqrt(h)",
@@ -5467,24 +5451,20 @@
               }
             ],
             "keywords": [],
-            "resolved_runtime_call": "math.sqrt",
-            "resolved_runtime_source": "module_attr",
-            "runtime_module_id": "pytra.std.math",
-            "runtime_symbol": "sqrt",
-            "runtime_call_adapter_kind": "math.float_args",
-            "semantic_tag": "stdlib.method.sqrt",
             "type_expr_summary_v1": {
               "schema_version": 1,
-              "kind": "NamedType",
-              "category": "static",
-              "mirror": "float64"
+              "kind": "DynamicType",
+              "category": "dynamic",
+              "mirror": "unknown",
+              "dynamic_name": "unknown"
             }
           },
           "type_expr_summary_v1": {
             "schema_version": 1,
-            "kind": "NamedType",
-            "category": "static",
-            "mirror": "float64"
+            "kind": "DynamicType",
+            "category": "dynamic",
+            "mirror": "unknown",
+            "dynamic_name": "unknown"
           }
         },
         {
@@ -5561,9 +5541,9 @@
                 "end_lineno": 87,
                 "end_col_offset": 15
               },
-              "resolved_type": "float64",
+              "resolved_type": "unknown",
               "casts": [],
-              "borrow_kind": "readonly_ref",
+              "borrow_kind": "value",
               "repr": "s",
               "id": "s"
             }
@@ -5730,9 +5710,9 @@
                 "end_lineno": 90,
                 "end_col_offset": 15
               },
-              "resolved_type": "float64",
+              "resolved_type": "unknown",
               "casts": [],
-              "borrow_kind": "readonly_ref",
+              "borrow_kind": "value",
               "repr": "s",
               "id": "s"
             }
@@ -5950,14 +5930,13 @@
               "end_lineno": 98,
               "end_col_offset": 5
             },
-            "resolved_type": "bytearray",
+            "resolved_type": "unknown",
             "casts": [],
             "borrow_kind": "value",
             "repr": "p",
             "id": "p"
           },
           "declare": true,
-          "decl_type": "bytearray",
           "declare_init": true,
           "leading_trivia": [
             {
@@ -5976,7 +5955,7 @@
               "end_lineno": 98,
               "end_col_offset": 26
             },
-            "resolved_type": "bytearray",
+            "resolved_type": "unknown",
             "casts": [],
             "borrow_kind": "value",
             "repr": "bytearray(256 * 3)",
@@ -6039,25 +6018,20 @@
               }
             ],
             "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "bytearray",
-            "runtime_call": "bytearray_ctor",
-            "runtime_module_id": "pytra.core.py_runtime",
-            "runtime_symbol": "bytearray",
-            "runtime_call_adapter_kind": "builtin",
-            "semantic_tag": "ctor.bytearray",
             "type_expr_summary_v1": {
               "schema_version": 1,
-              "kind": "NamedType",
-              "category": "static",
-              "mirror": "bytearray"
+              "kind": "DynamicType",
+              "category": "dynamic",
+              "mirror": "unknown",
+              "dynamic_name": "unknown"
             }
           },
           "type_expr_summary_v1": {
             "schema_version": 1,
-            "kind": "NamedType",
-            "category": "static",
-            "mirror": "bytearray"
+            "kind": "DynamicType",
+            "category": "dynamic",
+            "mirror": "unknown",
+            "dynamic_name": "unknown"
           }
         },
         {
@@ -6408,7 +6382,7 @@
                   "end_lineno": 103,
                   "end_col_offset": 20
                 },
-                "resolved_type": "uint8",
+                "resolved_type": "int64",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "p[i * 3 + 0]",
@@ -6420,9 +6394,9 @@
                     "end_lineno": 103,
                     "end_col_offset": 9
                   },
-                  "resolved_type": "bytearray",
+                  "resolved_type": "unknown",
                   "casts": [],
-                  "borrow_kind": "readonly_ref",
+                  "borrow_kind": "value",
                   "repr": "p",
                   "id": "p"
                 },
@@ -6614,7 +6588,7 @@
                 "keywords": [],
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "int",
-                "runtime_call": "static_cast",
+                "runtime_call": "int",
                 "runtime_module_id": "pytra.core.py_runtime",
                 "runtime_symbol": "int",
                 "runtime_call_adapter_kind": "builtin",
@@ -6649,7 +6623,7 @@
                   "end_lineno": 104,
                   "end_col_offset": 20
                 },
-                "resolved_type": "uint8",
+                "resolved_type": "int64",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "p[i * 3 + 1]",
@@ -6661,9 +6635,9 @@
                     "end_lineno": 104,
                     "end_col_offset": 9
                   },
-                  "resolved_type": "bytearray",
+                  "resolved_type": "unknown",
                   "casts": [],
-                  "borrow_kind": "readonly_ref",
+                  "borrow_kind": "value",
                   "repr": "p",
                   "id": "p"
                 },
@@ -6855,7 +6829,7 @@
                 "keywords": [],
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "int",
-                "runtime_call": "static_cast",
+                "runtime_call": "int",
                 "runtime_module_id": "pytra.core.py_runtime",
                 "runtime_symbol": "int",
                 "runtime_call_adapter_kind": "builtin",
@@ -6890,7 +6864,7 @@
                   "end_lineno": 105,
                   "end_col_offset": 20
                 },
-                "resolved_type": "uint8",
+                "resolved_type": "int64",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "p[i * 3 + 2]",
@@ -6902,9 +6876,9 @@
                     "end_lineno": 105,
                     "end_col_offset": 9
                   },
-                  "resolved_type": "bytearray",
+                  "resolved_type": "unknown",
                   "casts": [],
-                  "borrow_kind": "readonly_ref",
+                  "borrow_kind": "value",
                   "repr": "p",
                   "id": "p"
                 },
@@ -7096,7 +7070,7 @@
                 "keywords": [],
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "int",
-                "runtime_call": "static_cast",
+                "runtime_call": "int",
                 "runtime_module_id": "pytra.core.py_runtime",
                 "runtime_symbol": "int",
                 "runtime_call_adapter_kind": "builtin",
@@ -7140,7 +7114,7 @@
               "end_lineno": 106,
               "end_col_offset": 19
             },
-            "resolved_type": "bytes",
+            "resolved_type": "unknown",
             "casts": [],
             "borrow_kind": "value",
             "repr": "bytes(p)",
@@ -7167,26 +7141,20 @@
                   "end_lineno": 106,
                   "end_col_offset": 18
                 },
-                "resolved_type": "bytearray",
+                "resolved_type": "unknown",
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "p",
                 "id": "p"
               }
             ],
             "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "bytes",
-            "runtime_call": "bytes_ctor",
-            "runtime_module_id": "pytra.core.py_runtime",
-            "runtime_symbol": "bytes",
-            "runtime_call_adapter_kind": "builtin",
-            "semantic_tag": "ctor.bytes",
             "type_expr_summary_v1": {
               "schema_version": 1,
-              "kind": "NamedType",
-              "category": "static",
-              "mirror": "bytes"
+              "kind": "DynamicType",
+              "category": "dynamic",
+              "mirror": "unknown",
+              "dynamic_name": "unknown"
             }
           }
         }
@@ -7371,7 +7339,7 @@
             "keywords": [],
             "lowered_kind": "BuiltinCall",
             "builtin_name": "int",
-            "runtime_call": "static_cast",
+            "runtime_call": "int",
             "runtime_module_id": "pytra.core.py_runtime",
             "runtime_symbol": "int",
             "runtime_call_adapter_kind": "builtin",
@@ -7524,7 +7492,7 @@
             "keywords": [],
             "lowered_kind": "BuiltinCall",
             "builtin_name": "int",
-            "runtime_call": "static_cast",
+            "runtime_call": "int",
             "runtime_module_id": "pytra.core.py_runtime",
             "runtime_symbol": "int",
             "runtime_call_adapter_kind": "builtin",
@@ -7677,7 +7645,7 @@
             "keywords": [],
             "lowered_kind": "BuiltinCall",
             "builtin_name": "int",
-            "runtime_call": "static_cast",
+            "runtime_call": "int",
             "runtime_module_id": "pytra.core.py_runtime",
             "runtime_symbol": "int",
             "runtime_call_adapter_kind": "builtin",
@@ -8177,10 +8145,9 @@
           },
           "type_expr_summary_v1": {
             "schema_version": 1,
-            "kind": "DynamicType",
-            "category": "dynamic",
-            "mirror": "unknown",
-            "dynamic_name": "unknown"
+            "kind": "NamedType",
+            "category": "static",
+            "mirror": "float64"
           }
         },
         {
@@ -8302,7 +8269,7 @@
                 "end_lineno": 122,
                 "end_col_offset": 42
               },
-              "resolved_type": "float64",
+              "resolved_type": "unknown",
               "casts": [],
               "borrow_kind": "value",
               "repr": "math.cos(tphase * 0.9)",
@@ -8355,9 +8322,9 @@
                       "end_lineno": 122,
                       "end_col_offset": 35
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "float64",
                     "casts": [],
-                    "borrow_kind": "value",
+                    "borrow_kind": "readonly_ref",
                     "repr": "tphase",
                     "id": "tphase"
                   },
@@ -8379,17 +8346,12 @@
                 }
               ],
               "keywords": [],
-              "resolved_runtime_call": "math.cos",
-              "resolved_runtime_source": "module_attr",
-              "runtime_module_id": "pytra.std.math",
-              "runtime_symbol": "cos",
-              "runtime_call_adapter_kind": "math.float_args",
-              "semantic_tag": "stdlib.method.cos",
               "type_expr_summary_v1": {
                 "schema_version": 1,
-                "kind": "NamedType",
-                "category": "static",
-                "mirror": "float64"
+                "kind": "DynamicType",
+                "category": "dynamic",
+                "mirror": "unknown",
+                "dynamic_name": "unknown"
               }
             }
           },
@@ -8487,7 +8449,7 @@
                   "end_lineno": 123,
                   "end_col_offset": 47
                 },
-                "resolved_type": "float64",
+                "resolved_type": "unknown",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "math.sin(tphase * 0.6)",
@@ -8540,9 +8502,9 @@
                         "end_lineno": 123,
                         "end_col_offset": 40
                       },
-                      "resolved_type": "unknown",
+                      "resolved_type": "float64",
                       "casts": [],
-                      "borrow_kind": "value",
+                      "borrow_kind": "readonly_ref",
                       "repr": "tphase",
                       "id": "tphase"
                     },
@@ -8564,17 +8526,12 @@
                   }
                 ],
                 "keywords": [],
-                "resolved_runtime_call": "math.sin",
-                "resolved_runtime_source": "module_attr",
-                "runtime_module_id": "pytra.std.math",
-                "runtime_symbol": "sin",
-                "runtime_call_adapter_kind": "math.float_args",
-                "semantic_tag": "stdlib.method.sin",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
-                  "kind": "NamedType",
-                  "category": "static",
-                  "mirror": "float64"
+                  "kind": "DynamicType",
+                  "category": "dynamic",
+                  "mirror": "unknown",
+                  "dynamic_name": "unknown"
                 }
               }
             }
@@ -8646,7 +8603,7 @@
                 "end_lineno": 124,
                 "end_col_offset": 42
               },
-              "resolved_type": "float64",
+              "resolved_type": "unknown",
               "casts": [],
               "borrow_kind": "value",
               "repr": "math.sin(tphase * 0.9)",
@@ -8699,9 +8656,9 @@
                       "end_lineno": 124,
                       "end_col_offset": 35
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "float64",
                     "casts": [],
-                    "borrow_kind": "value",
+                    "borrow_kind": "readonly_ref",
                     "repr": "tphase",
                     "id": "tphase"
                   },
@@ -8723,17 +8680,12 @@
                 }
               ],
               "keywords": [],
-              "resolved_runtime_call": "math.sin",
-              "resolved_runtime_source": "module_attr",
-              "runtime_module_id": "pytra.std.math",
-              "runtime_symbol": "sin",
-              "runtime_call_adapter_kind": "math.float_args",
-              "semantic_tag": "stdlib.method.sin",
               "type_expr_summary_v1": {
                 "schema_version": 1,
-                "kind": "NamedType",
-                "category": "static",
-                "mirror": "float64"
+                "kind": "DynamicType",
+                "category": "dynamic",
+                "mirror": "unknown",
+                "dynamic_name": "unknown"
               }
             }
           },
@@ -8947,9 +8899,7 @@
               }
             ]
           },
-          "declare": true,
-          "decl_type": "tuple[float64,float64,float64]",
-          "declare_init": true,
+          "declare": false,
           "leading_trivia": [
             {
               "kind": "blank",
@@ -9122,7 +9072,7 @@
             "schema_version": 1,
             "kind": "GenericType",
             "category": "static",
-            "mirror": "tuple[float64,float64,float64]"
+            "mirror": "tuple[unknown,unknown,unknown]"
           }
         },
         {
@@ -9190,9 +9140,7 @@
               }
             ]
           },
-          "declare": true,
-          "decl_type": "tuple[float64,float64,float64]",
-          "declare_init": true,
+          "declare": false,
           "value": {
             "kind": "Call",
             "source_span": {
@@ -9228,9 +9176,9 @@
                   "end_lineno": 130,
                   "end_col_offset": 47
                 },
-                "resolved_type": "float64",
+                "resolved_type": "unknown",
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "fwd_z",
                 "id": "fwd_z"
               },
@@ -9256,7 +9204,7 @@
                   "end_lineno": 130,
                   "end_col_offset": 60
                 },
-                "resolved_type": "float64",
+                "resolved_type": "unknown",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "-fwd_x",
@@ -9269,9 +9217,9 @@
                     "end_lineno": 130,
                     "end_col_offset": 60
                   },
-                  "resolved_type": "float64",
+                  "resolved_type": "unknown",
                   "casts": [],
-                  "borrow_kind": "readonly_ref",
+                  "borrow_kind": "value",
                   "repr": "fwd_x",
                   "id": "fwd_x"
                 }
@@ -9289,7 +9237,7 @@
             "schema_version": 1,
             "kind": "GenericType",
             "category": "static",
-            "mirror": "tuple[float64,float64,float64]"
+            "mirror": "tuple[unknown,unknown,unknown]"
           }
         },
         {
@@ -9297,8 +9245,8 @@
           "source_span": {
             "lineno": 131,
             "col_offset": 4,
-            "end_lineno": 135,
-            "end_col_offset": 5
+            "end_lineno": 131,
+            "end_col_offset": 140
           },
           "target": {
             "kind": "Tuple",
@@ -9357,9 +9305,7 @@
               }
             ]
           },
-          "declare": true,
-          "decl_type": "tuple[float64,float64,float64]",
-          "declare_init": true,
+          "declare": false,
           "value": {
             "kind": "Call",
             "source_span": {
@@ -9395,7 +9341,7 @@
                   "end_lineno": 131,
                   "end_col_offset": 67
                 },
-                "resolved_type": "float64",
+                "resolved_type": "unknown",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "right_y * fwd_z - right_z * fwd_y",
@@ -9407,7 +9353,7 @@
                     "end_lineno": 131,
                     "end_col_offset": 49
                   },
-                  "resolved_type": "float64",
+                  "resolved_type": "unknown",
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "right_y * fwd_z",
@@ -9419,9 +9365,9 @@
                       "end_lineno": 131,
                       "end_col_offset": 41
                     },
-                    "resolved_type": "float64",
+                    "resolved_type": "unknown",
                     "casts": [],
-                    "borrow_kind": "readonly_ref",
+                    "borrow_kind": "value",
                     "repr": "right_y",
                     "id": "right_y"
                   },
@@ -9434,9 +9380,9 @@
                       "end_lineno": 131,
                       "end_col_offset": 49
                     },
-                    "resolved_type": "float64",
+                    "resolved_type": "unknown",
                     "casts": [],
-                    "borrow_kind": "readonly_ref",
+                    "borrow_kind": "value",
                     "repr": "fwd_z",
                     "id": "fwd_z"
                   }
@@ -9450,7 +9396,7 @@
                     "end_lineno": 131,
                     "end_col_offset": 67
                   },
-                  "resolved_type": "float64",
+                  "resolved_type": "unknown",
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "right_z * fwd_y",
@@ -9462,9 +9408,9 @@
                       "end_lineno": 131,
                       "end_col_offset": 59
                     },
-                    "resolved_type": "float64",
+                    "resolved_type": "unknown",
                     "casts": [],
-                    "borrow_kind": "readonly_ref",
+                    "borrow_kind": "value",
                     "repr": "right_z",
                     "id": "right_z"
                   },
@@ -9477,9 +9423,9 @@
                       "end_lineno": 131,
                       "end_col_offset": 67
                     },
-                    "resolved_type": "float64",
+                    "resolved_type": "unknown",
                     "casts": [],
-                    "borrow_kind": "readonly_ref",
+                    "borrow_kind": "value",
                     "repr": "fwd_y",
                     "id": "fwd_y"
                   }
@@ -9493,7 +9439,7 @@
                   "end_lineno": 131,
                   "end_col_offset": 102
                 },
-                "resolved_type": "float64",
+                "resolved_type": "unknown",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "right_z * fwd_x - right_x * fwd_z",
@@ -9505,7 +9451,7 @@
                     "end_lineno": 131,
                     "end_col_offset": 84
                   },
-                  "resolved_type": "float64",
+                  "resolved_type": "unknown",
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "right_z * fwd_x",
@@ -9517,9 +9463,9 @@
                       "end_lineno": 131,
                       "end_col_offset": 76
                     },
-                    "resolved_type": "float64",
+                    "resolved_type": "unknown",
                     "casts": [],
-                    "borrow_kind": "readonly_ref",
+                    "borrow_kind": "value",
                     "repr": "right_z",
                     "id": "right_z"
                   },
@@ -9532,9 +9478,9 @@
                       "end_lineno": 131,
                       "end_col_offset": 84
                     },
-                    "resolved_type": "float64",
+                    "resolved_type": "unknown",
                     "casts": [],
-                    "borrow_kind": "readonly_ref",
+                    "borrow_kind": "value",
                     "repr": "fwd_x",
                     "id": "fwd_x"
                   }
@@ -9548,7 +9494,7 @@
                     "end_lineno": 131,
                     "end_col_offset": 102
                   },
-                  "resolved_type": "float64",
+                  "resolved_type": "unknown",
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "right_x * fwd_z",
@@ -9560,9 +9506,9 @@
                       "end_lineno": 131,
                       "end_col_offset": 94
                     },
-                    "resolved_type": "float64",
+                    "resolved_type": "unknown",
                     "casts": [],
-                    "borrow_kind": "readonly_ref",
+                    "borrow_kind": "value",
                     "repr": "right_x",
                     "id": "right_x"
                   },
@@ -9575,9 +9521,9 @@
                       "end_lineno": 131,
                       "end_col_offset": 102
                     },
-                    "resolved_type": "float64",
+                    "resolved_type": "unknown",
                     "casts": [],
-                    "borrow_kind": "readonly_ref",
+                    "borrow_kind": "value",
                     "repr": "fwd_z",
                     "id": "fwd_z"
                   }
@@ -9591,7 +9537,7 @@
                   "end_lineno": 131,
                   "end_col_offset": 137
                 },
-                "resolved_type": "float64",
+                "resolved_type": "unknown",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "right_x * fwd_y - right_y * fwd_x",
@@ -9603,7 +9549,7 @@
                     "end_lineno": 131,
                     "end_col_offset": 119
                   },
-                  "resolved_type": "float64",
+                  "resolved_type": "unknown",
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "right_x * fwd_y",
@@ -9615,9 +9561,9 @@
                       "end_lineno": 131,
                       "end_col_offset": 111
                     },
-                    "resolved_type": "float64",
+                    "resolved_type": "unknown",
                     "casts": [],
-                    "borrow_kind": "readonly_ref",
+                    "borrow_kind": "value",
                     "repr": "right_x",
                     "id": "right_x"
                   },
@@ -9630,9 +9576,9 @@
                       "end_lineno": 131,
                       "end_col_offset": 119
                     },
-                    "resolved_type": "float64",
+                    "resolved_type": "unknown",
                     "casts": [],
-                    "borrow_kind": "readonly_ref",
+                    "borrow_kind": "value",
                     "repr": "fwd_y",
                     "id": "fwd_y"
                   }
@@ -9646,7 +9592,7 @@
                     "end_lineno": 131,
                     "end_col_offset": 137
                   },
-                  "resolved_type": "float64",
+                  "resolved_type": "unknown",
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "right_y * fwd_x",
@@ -9658,9 +9604,9 @@
                       "end_lineno": 131,
                       "end_col_offset": 129
                     },
-                    "resolved_type": "float64",
+                    "resolved_type": "unknown",
                     "casts": [],
-                    "borrow_kind": "readonly_ref",
+                    "borrow_kind": "value",
                     "repr": "right_y",
                     "id": "right_y"
                   },
@@ -9673,9 +9619,9 @@
                       "end_lineno": 131,
                       "end_col_offset": 137
                     },
-                    "resolved_type": "float64",
+                    "resolved_type": "unknown",
                     "casts": [],
-                    "borrow_kind": "readonly_ref",
+                    "borrow_kind": "value",
                     "repr": "fwd_x",
                     "id": "fwd_x"
                   }
@@ -9694,7 +9640,7 @@
             "schema_version": 1,
             "kind": "GenericType",
             "category": "static",
-            "mirror": "tuple[float64,float64,float64]"
+            "mirror": "tuple[unknown,unknown,unknown]"
           }
         },
         {
@@ -9770,7 +9716,7 @@
                 "end_lineno": 138,
                 "end_col_offset": 38
               },
-              "resolved_type": "float64",
+              "resolved_type": "unknown",
               "casts": [],
               "borrow_kind": "value",
               "repr": "math.cos(1.3 * tphase)",
@@ -9838,26 +9784,21 @@
                       "end_lineno": 138,
                       "end_col_offset": 37
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "float64",
                     "casts": [],
-                    "borrow_kind": "value",
+                    "borrow_kind": "readonly_ref",
                     "repr": "tphase",
                     "id": "tphase"
                   }
                 }
               ],
               "keywords": [],
-              "resolved_runtime_call": "math.cos",
-              "resolved_runtime_source": "module_attr",
-              "runtime_module_id": "pytra.std.math",
-              "runtime_symbol": "cos",
-              "runtime_call_adapter_kind": "math.float_args",
-              "semantic_tag": "stdlib.method.cos",
               "type_expr_summary_v1": {
                 "schema_version": 1,
-                "kind": "NamedType",
-                "category": "static",
-                "mirror": "float64"
+                "kind": "DynamicType",
+                "category": "dynamic",
+                "mirror": "unknown",
+                "dynamic_name": "unknown"
               }
             }
           },
@@ -9955,7 +9896,7 @@
                   "end_lineno": 139,
                   "end_col_offset": 46
                 },
-                "resolved_type": "float64",
+                "resolved_type": "unknown",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "math.sin(1.7 * tphase)",
@@ -10023,26 +9964,21 @@
                         "end_lineno": 139,
                         "end_col_offset": 45
                       },
-                      "resolved_type": "unknown",
+                      "resolved_type": "float64",
                       "casts": [],
-                      "borrow_kind": "value",
+                      "borrow_kind": "readonly_ref",
                       "repr": "tphase",
                       "id": "tphase"
                     }
                   }
                 ],
                 "keywords": [],
-                "resolved_runtime_call": "math.sin",
-                "resolved_runtime_source": "module_attr",
-                "runtime_module_id": "pytra.std.math",
-                "runtime_symbol": "sin",
-                "runtime_call_adapter_kind": "math.float_args",
-                "semantic_tag": "stdlib.method.sin",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
-                  "kind": "NamedType",
-                  "category": "static",
-                  "mirror": "float64"
+                  "kind": "DynamicType",
+                  "category": "dynamic",
+                  "mirror": "unknown",
+                  "dynamic_name": "unknown"
                 }
               }
             }
@@ -10114,7 +10050,7 @@
                 "end_lineno": 140,
                 "end_col_offset": 38
               },
-              "resolved_type": "float64",
+              "resolved_type": "unknown",
               "casts": [],
               "borrow_kind": "value",
               "repr": "math.sin(1.3 * tphase)",
@@ -10182,26 +10118,21 @@
                       "end_lineno": 140,
                       "end_col_offset": 37
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "float64",
                     "casts": [],
-                    "borrow_kind": "value",
+                    "borrow_kind": "readonly_ref",
                     "repr": "tphase",
                     "id": "tphase"
                   }
                 }
               ],
               "keywords": [],
-              "resolved_runtime_call": "math.sin",
-              "resolved_runtime_source": "module_attr",
-              "runtime_module_id": "pytra.std.math",
-              "runtime_symbol": "sin",
-              "runtime_call_adapter_kind": "math.float_args",
-              "semantic_tag": "stdlib.method.sin",
               "type_expr_summary_v1": {
                 "schema_version": 1,
-                "kind": "NamedType",
-                "category": "static",
-                "mirror": "float64"
+                "kind": "DynamicType",
+                "category": "dynamic",
+                "mirror": "unknown",
+                "dynamic_name": "unknown"
               }
             }
           },
@@ -10272,7 +10203,7 @@
                 "end_lineno": 141,
                 "end_col_offset": 46
               },
-              "resolved_type": "float64",
+              "resolved_type": "unknown",
               "casts": [],
               "borrow_kind": "value",
               "repr": "math.cos(1.3 * tphase + 2.094)",
@@ -10352,9 +10283,9 @@
                         "end_lineno": 141,
                         "end_col_offset": 37
                       },
-                      "resolved_type": "unknown",
+                      "resolved_type": "float64",
                       "casts": [],
-                      "borrow_kind": "value",
+                      "borrow_kind": "readonly_ref",
                       "repr": "tphase",
                       "id": "tphase"
                     }
@@ -10377,17 +10308,12 @@
                 }
               ],
               "keywords": [],
-              "resolved_runtime_call": "math.cos",
-              "resolved_runtime_source": "module_attr",
-              "runtime_module_id": "pytra.std.math",
-              "runtime_symbol": "cos",
-              "runtime_call_adapter_kind": "math.float_args",
-              "semantic_tag": "stdlib.method.cos",
               "type_expr_summary_v1": {
                 "schema_version": 1,
-                "kind": "NamedType",
-                "category": "static",
-                "mirror": "float64"
+                "kind": "DynamicType",
+                "category": "dynamic",
+                "mirror": "unknown",
+                "dynamic_name": "unknown"
               }
             }
           },
@@ -10485,7 +10411,7 @@
                   "end_lineno": 142,
                   "end_col_offset": 52
                 },
-                "resolved_type": "float64",
+                "resolved_type": "unknown",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "math.sin(1.1 * tphase + 0.8)",
@@ -10565,9 +10491,9 @@
                           "end_lineno": 142,
                           "end_col_offset": 45
                         },
-                        "resolved_type": "unknown",
+                        "resolved_type": "float64",
                         "casts": [],
-                        "borrow_kind": "value",
+                        "borrow_kind": "readonly_ref",
                         "repr": "tphase",
                         "id": "tphase"
                       }
@@ -10590,17 +10516,12 @@
                   }
                 ],
                 "keywords": [],
-                "resolved_runtime_call": "math.sin",
-                "resolved_runtime_source": "module_attr",
-                "runtime_module_id": "pytra.std.math",
-                "runtime_symbol": "sin",
-                "runtime_call_adapter_kind": "math.float_args",
-                "semantic_tag": "stdlib.method.sin",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
-                  "kind": "NamedType",
-                  "category": "static",
-                  "mirror": "float64"
+                  "kind": "DynamicType",
+                  "category": "dynamic",
+                  "mirror": "unknown",
+                  "dynamic_name": "unknown"
                 }
               }
             }
@@ -10672,7 +10593,7 @@
                 "end_lineno": 143,
                 "end_col_offset": 46
               },
-              "resolved_type": "float64",
+              "resolved_type": "unknown",
               "casts": [],
               "borrow_kind": "value",
               "repr": "math.sin(1.3 * tphase + 2.094)",
@@ -10752,9 +10673,9 @@
                         "end_lineno": 143,
                         "end_col_offset": 37
                       },
-                      "resolved_type": "unknown",
+                      "resolved_type": "float64",
                       "casts": [],
-                      "borrow_kind": "value",
+                      "borrow_kind": "readonly_ref",
                       "repr": "tphase",
                       "id": "tphase"
                     }
@@ -10777,17 +10698,12 @@
                 }
               ],
               "keywords": [],
-              "resolved_runtime_call": "math.sin",
-              "resolved_runtime_source": "module_attr",
-              "runtime_module_id": "pytra.std.math",
-              "runtime_symbol": "sin",
-              "runtime_call_adapter_kind": "math.float_args",
-              "semantic_tag": "stdlib.method.sin",
               "type_expr_summary_v1": {
                 "schema_version": 1,
-                "kind": "NamedType",
-                "category": "static",
-                "mirror": "float64"
+                "kind": "DynamicType",
+                "category": "dynamic",
+                "mirror": "unknown",
+                "dynamic_name": "unknown"
               }
             }
           },
@@ -10858,7 +10774,7 @@
                 "end_lineno": 144,
                 "end_col_offset": 46
               },
-              "resolved_type": "float64",
+              "resolved_type": "unknown",
               "casts": [],
               "borrow_kind": "value",
               "repr": "math.cos(1.3 * tphase + 4.188)",
@@ -10938,9 +10854,9 @@
                         "end_lineno": 144,
                         "end_col_offset": 37
                       },
-                      "resolved_type": "unknown",
+                      "resolved_type": "float64",
                       "casts": [],
-                      "borrow_kind": "value",
+                      "borrow_kind": "readonly_ref",
                       "repr": "tphase",
                       "id": "tphase"
                     }
@@ -10963,17 +10879,12 @@
                 }
               ],
               "keywords": [],
-              "resolved_runtime_call": "math.cos",
-              "resolved_runtime_source": "module_attr",
-              "runtime_module_id": "pytra.std.math",
-              "runtime_symbol": "cos",
-              "runtime_call_adapter_kind": "math.float_args",
-              "semantic_tag": "stdlib.method.cos",
               "type_expr_summary_v1": {
                 "schema_version": 1,
-                "kind": "NamedType",
-                "category": "static",
-                "mirror": "float64"
+                "kind": "DynamicType",
+                "category": "dynamic",
+                "mirror": "unknown",
+                "dynamic_name": "unknown"
               }
             }
           },
@@ -11071,7 +10982,7 @@
                   "end_lineno": 145,
                   "end_col_offset": 52
                 },
-                "resolved_type": "float64",
+                "resolved_type": "unknown",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "math.sin(1.5 * tphase + 1.9)",
@@ -11151,9 +11062,9 @@
                           "end_lineno": 145,
                           "end_col_offset": 45
                         },
-                        "resolved_type": "unknown",
+                        "resolved_type": "float64",
                         "casts": [],
-                        "borrow_kind": "value",
+                        "borrow_kind": "readonly_ref",
                         "repr": "tphase",
                         "id": "tphase"
                       }
@@ -11176,17 +11087,12 @@
                   }
                 ],
                 "keywords": [],
-                "resolved_runtime_call": "math.sin",
-                "resolved_runtime_source": "module_attr",
-                "runtime_module_id": "pytra.std.math",
-                "runtime_symbol": "sin",
-                "runtime_call_adapter_kind": "math.float_args",
-                "semantic_tag": "stdlib.method.sin",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
-                  "kind": "NamedType",
-                  "category": "static",
-                  "mirror": "float64"
+                  "kind": "DynamicType",
+                  "category": "dynamic",
+                  "mirror": "unknown",
+                  "dynamic_name": "unknown"
                 }
               }
             }
@@ -11258,7 +11164,7 @@
                 "end_lineno": 146,
                 "end_col_offset": 46
               },
-              "resolved_type": "float64",
+              "resolved_type": "unknown",
               "casts": [],
               "borrow_kind": "value",
               "repr": "math.sin(1.3 * tphase + 4.188)",
@@ -11338,9 +11244,9 @@
                         "end_lineno": 146,
                         "end_col_offset": 37
                       },
-                      "resolved_type": "unknown",
+                      "resolved_type": "float64",
                       "casts": [],
-                      "borrow_kind": "value",
+                      "borrow_kind": "readonly_ref",
                       "repr": "tphase",
                       "id": "tphase"
                     }
@@ -11363,17 +11269,12 @@
                 }
               ],
               "keywords": [],
-              "resolved_runtime_call": "math.sin",
-              "resolved_runtime_source": "module_attr",
-              "runtime_module_id": "pytra.std.math",
-              "runtime_symbol": "sin",
-              "runtime_call_adapter_kind": "math.float_args",
-              "semantic_tag": "stdlib.method.sin",
               "type_expr_summary_v1": {
                 "schema_version": 1,
-                "kind": "NamedType",
-                "category": "static",
-                "mirror": "float64"
+                "kind": "DynamicType",
+                "category": "dynamic",
+                "mirror": "unknown",
+                "dynamic_name": "unknown"
               }
             }
           },
@@ -11491,7 +11392,7 @@
                 "end_lineno": 148,
                 "end_col_offset": 37
               },
-              "resolved_type": "float64",
+              "resolved_type": "unknown",
               "casts": [],
               "borrow_kind": "value",
               "repr": "math.cos(tphase * 1.8)",
@@ -11544,9 +11445,9 @@
                       "end_lineno": 148,
                       "end_col_offset": 30
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "float64",
                     "casts": [],
-                    "borrow_kind": "value",
+                    "borrow_kind": "readonly_ref",
                     "repr": "tphase",
                     "id": "tphase"
                   },
@@ -11568,17 +11469,12 @@
                 }
               ],
               "keywords": [],
-              "resolved_runtime_call": "math.cos",
-              "resolved_runtime_source": "module_attr",
-              "runtime_module_id": "pytra.std.math",
-              "runtime_symbol": "cos",
-              "runtime_call_adapter_kind": "math.float_args",
-              "semantic_tag": "stdlib.method.cos",
               "type_expr_summary_v1": {
                 "schema_version": 1,
-                "kind": "NamedType",
-                "category": "static",
-                "mirror": "float64"
+                "kind": "DynamicType",
+                "category": "dynamic",
+                "mirror": "unknown",
+                "dynamic_name": "unknown"
               }
             }
           },
@@ -11676,7 +11572,7 @@
                   "end_lineno": 149,
                   "end_col_offset": 43
                 },
-                "resolved_type": "float64",
+                "resolved_type": "unknown",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "math.sin(tphase * 1.2)",
@@ -11729,9 +11625,9 @@
                         "end_lineno": 149,
                         "end_col_offset": 36
                       },
-                      "resolved_type": "unknown",
+                      "resolved_type": "float64",
                       "casts": [],
-                      "borrow_kind": "value",
+                      "borrow_kind": "readonly_ref",
                       "repr": "tphase",
                       "id": "tphase"
                     },
@@ -11753,17 +11649,12 @@
                   }
                 ],
                 "keywords": [],
-                "resolved_runtime_call": "math.sin",
-                "resolved_runtime_source": "module_attr",
-                "runtime_module_id": "pytra.std.math",
-                "runtime_symbol": "sin",
-                "runtime_call_adapter_kind": "math.float_args",
-                "semantic_tag": "stdlib.method.sin",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
-                  "kind": "NamedType",
-                  "category": "static",
-                  "mirror": "float64"
+                  "kind": "DynamicType",
+                  "category": "dynamic",
+                  "mirror": "unknown",
+                  "dynamic_name": "unknown"
                 }
               }
             }
@@ -11835,7 +11726,7 @@
                 "end_lineno": 150,
                 "end_col_offset": 37
               },
-              "resolved_type": "float64",
+              "resolved_type": "unknown",
               "casts": [],
               "borrow_kind": "value",
               "repr": "math.sin(tphase * 1.8)",
@@ -11888,9 +11779,9 @@
                       "end_lineno": 150,
                       "end_col_offset": 30
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "float64",
                     "casts": [],
-                    "borrow_kind": "value",
+                    "borrow_kind": "readonly_ref",
                     "repr": "tphase",
                     "id": "tphase"
                   },
@@ -11912,17 +11803,12 @@
                 }
               ],
               "keywords": [],
-              "resolved_runtime_call": "math.sin",
-              "resolved_runtime_source": "module_attr",
-              "runtime_module_id": "pytra.std.math",
-              "runtime_symbol": "sin",
-              "runtime_call_adapter_kind": "math.float_args",
-              "semantic_tag": "stdlib.method.sin",
               "type_expr_summary_v1": {
                 "schema_version": 1,
-                "kind": "NamedType",
-                "category": "static",
-                "mirror": "float64"
+                "kind": "DynamicType",
+                "category": "dynamic",
+                "mirror": "unknown",
+                "dynamic_name": "unknown"
               }
             }
           },
@@ -11949,14 +11835,13 @@
               "end_lineno": 152,
               "end_col_offset": 9
             },
-            "resolved_type": "bytearray",
+            "resolved_type": "unknown",
             "casts": [],
             "borrow_kind": "value",
             "repr": "frame",
             "id": "frame"
           },
           "declare": true,
-          "decl_type": "bytearray",
           "declare_init": true,
           "leading_trivia": [
             {
@@ -11972,7 +11857,7 @@
               "end_lineno": 152,
               "end_col_offset": 37
             },
-            "resolved_type": "bytearray",
+            "resolved_type": "unknown",
             "casts": [],
             "borrow_kind": "value",
             "repr": "bytearray(width * height)",
@@ -12035,25 +11920,20 @@
               }
             ],
             "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "bytearray",
-            "runtime_call": "bytearray_ctor",
-            "runtime_module_id": "pytra.core.py_runtime",
-            "runtime_symbol": "bytearray",
-            "runtime_call_adapter_kind": "builtin",
-            "semantic_tag": "ctor.bytearray",
             "type_expr_summary_v1": {
               "schema_version": 1,
-              "kind": "NamedType",
-              "category": "static",
-              "mirror": "bytearray"
+              "kind": "DynamicType",
+              "category": "dynamic",
+              "mirror": "unknown",
+              "dynamic_name": "unknown"
             }
           },
           "type_expr_summary_v1": {
             "schema_version": 1,
-            "kind": "NamedType",
-            "category": "static",
-            "mirror": "bytearray"
+            "kind": "DynamicType",
+            "category": "dynamic",
+            "mirror": "unknown",
+            "dynamic_name": "unknown"
           }
         },
         {
@@ -12789,9 +12669,9 @@
                         "end_lineno": 161,
                         "end_col_offset": 22
                       },
-                      "resolved_type": "float64",
+                      "resolved_type": "unknown",
                       "casts": [],
-                      "borrow_kind": "readonly_ref",
+                      "borrow_kind": "value",
                       "repr": "fwd_x",
                       "id": "fwd_x"
                     },
@@ -12870,9 +12750,9 @@
                               "end_lineno": 161,
                               "end_col_offset": 44
                             },
-                            "resolved_type": "float64",
+                            "resolved_type": "unknown",
                             "casts": [],
-                            "borrow_kind": "readonly_ref",
+                            "borrow_kind": "value",
                             "repr": "right_x",
                             "id": "right_x"
                           }
@@ -12913,9 +12793,9 @@
                               "end_lineno": 161,
                               "end_col_offset": 56
                             },
-                            "resolved_type": "float64",
+                            "resolved_type": "unknown",
                             "casts": [],
-                            "borrow_kind": "readonly_ref",
+                            "borrow_kind": "value",
                             "repr": "up_x",
                             "id": "up_x"
                           }
@@ -12975,9 +12855,9 @@
                         "end_lineno": 162,
                         "end_col_offset": 22
                       },
-                      "resolved_type": "float64",
+                      "resolved_type": "unknown",
                       "casts": [],
-                      "borrow_kind": "readonly_ref",
+                      "borrow_kind": "value",
                       "repr": "fwd_y",
                       "id": "fwd_y"
                     },
@@ -13056,9 +12936,9 @@
                               "end_lineno": 162,
                               "end_col_offset": 44
                             },
-                            "resolved_type": "float64",
+                            "resolved_type": "unknown",
                             "casts": [],
-                            "borrow_kind": "readonly_ref",
+                            "borrow_kind": "value",
                             "repr": "right_y",
                             "id": "right_y"
                           }
@@ -13099,9 +12979,9 @@
                               "end_lineno": 162,
                               "end_col_offset": 56
                             },
-                            "resolved_type": "float64",
+                            "resolved_type": "unknown",
                             "casts": [],
-                            "borrow_kind": "readonly_ref",
+                            "borrow_kind": "value",
                             "repr": "up_y",
                             "id": "up_y"
                           }
@@ -13161,9 +13041,9 @@
                         "end_lineno": 163,
                         "end_col_offset": 22
                       },
-                      "resolved_type": "float64",
+                      "resolved_type": "unknown",
                       "casts": [],
-                      "borrow_kind": "readonly_ref",
+                      "borrow_kind": "value",
                       "repr": "fwd_z",
                       "id": "fwd_z"
                     },
@@ -13242,9 +13122,9 @@
                               "end_lineno": 163,
                               "end_col_offset": 44
                             },
-                            "resolved_type": "float64",
+                            "resolved_type": "unknown",
                             "casts": [],
-                            "borrow_kind": "readonly_ref",
+                            "borrow_kind": "value",
                             "repr": "right_z",
                             "id": "right_z"
                           }
@@ -13285,9 +13165,9 @@
                               "end_lineno": 163,
                               "end_col_offset": 56
                             },
-                            "resolved_type": "float64",
+                            "resolved_type": "unknown",
                             "casts": [],
-                            "borrow_kind": "readonly_ref",
+                            "borrow_kind": "value",
                             "repr": "up_z",
                             "id": "up_z"
                           }
@@ -13367,9 +13247,7 @@
                       }
                     ]
                   },
-                  "declare": true,
-                  "decl_type": "tuple[float64,float64,float64]",
-                  "declare_init": true,
+                  "declare": false,
                   "value": {
                     "kind": "Call",
                     "source_span": {
@@ -13452,7 +13330,7 @@
                     "schema_version": 1,
                     "kind": "GenericType",
                     "category": "static",
-                    "mirror": "tuple[float64,float64,float64]"
+                    "mirror": "tuple[unknown,unknown,unknown]"
                   }
                 },
                 {
@@ -13520,7 +13398,7 @@
                     "lineno": 168,
                     "col_offset": 12,
                     "end_lineno": 168,
-                    "end_col_offset": 62
+                    "end_col_offset": 24
                   },
                   "target": {
                     "kind": "Name",
@@ -13703,8 +13581,8 @@
                   "source_span": {
                     "lineno": 174,
                     "col_offset": 12,
-                    "end_lineno": 179,
-                    "end_col_offset": 0
+                    "end_lineno": 178,
+                    "end_col_offset": 32
                   },
                   "test": {
                     "kind": "Compare",
@@ -13726,9 +13604,9 @@
                         "end_lineno": 174,
                         "end_col_offset": 17
                       },
-                      "resolved_type": "float64",
+                      "resolved_type": "unknown",
                       "casts": [],
-                      "borrow_kind": "readonly_ref",
+                      "borrow_kind": "value",
                       "repr": "dy",
                       "id": "dy"
                     },
@@ -13869,9 +13747,9 @@
                             "end_lineno": 175,
                             "end_col_offset": 40
                           },
-                          "resolved_type": "float64",
+                          "resolved_type": "unknown",
                           "casts": [],
-                          "borrow_kind": "readonly_ref",
+                          "borrow_kind": "value",
                           "repr": "dy",
                           "id": "dy"
                         }
@@ -14213,9 +14091,9 @@
                           "end_lineno": 180,
                           "end_col_offset": 57
                         },
-                        "resolved_type": "float64",
+                        "resolved_type": "unknown",
                         "casts": [],
-                        "borrow_kind": "readonly_ref",
+                        "borrow_kind": "value",
                         "repr": "dx",
                         "id": "dx"
                       },
@@ -14227,9 +14105,9 @@
                           "end_lineno": 180,
                           "end_col_offset": 61
                         },
-                        "resolved_type": "float64",
+                        "resolved_type": "unknown",
                         "casts": [],
-                        "borrow_kind": "readonly_ref",
+                        "borrow_kind": "value",
                         "repr": "dy",
                         "id": "dy"
                       },
@@ -14241,9 +14119,9 @@
                           "end_lineno": 180,
                           "end_col_offset": 65
                         },
-                        "resolved_type": "float64",
+                        "resolved_type": "unknown",
                         "casts": [],
-                        "borrow_kind": "readonly_ref",
+                        "borrow_kind": "value",
                         "repr": "dz",
                         "id": "dz"
                       },
@@ -14633,9 +14511,9 @@
                           "end_lineno": 184,
                           "end_col_offset": 57
                         },
-                        "resolved_type": "float64",
+                        "resolved_type": "unknown",
                         "casts": [],
-                        "borrow_kind": "readonly_ref",
+                        "borrow_kind": "value",
                         "repr": "dx",
                         "id": "dx"
                       },
@@ -14647,9 +14525,9 @@
                           "end_lineno": 184,
                           "end_col_offset": 61
                         },
-                        "resolved_type": "float64",
+                        "resolved_type": "unknown",
                         "casts": [],
-                        "borrow_kind": "readonly_ref",
+                        "borrow_kind": "value",
                         "repr": "dy",
                         "id": "dy"
                       },
@@ -14661,9 +14539,9 @@
                           "end_lineno": 184,
                           "end_col_offset": 65
                         },
-                        "resolved_type": "float64",
+                        "resolved_type": "unknown",
                         "casts": [],
-                        "borrow_kind": "readonly_ref",
+                        "borrow_kind": "value",
                         "repr": "dz",
                         "id": "dz"
                       },
@@ -15053,9 +14931,9 @@
                           "end_lineno": 188,
                           "end_col_offset": 57
                         },
-                        "resolved_type": "float64",
+                        "resolved_type": "unknown",
                         "casts": [],
-                        "borrow_kind": "readonly_ref",
+                        "borrow_kind": "value",
                         "repr": "dx",
                         "id": "dx"
                       },
@@ -15067,9 +14945,9 @@
                           "end_lineno": 188,
                           "end_col_offset": 61
                         },
-                        "resolved_type": "float64",
+                        "resolved_type": "unknown",
                         "casts": [],
-                        "borrow_kind": "readonly_ref",
+                        "borrow_kind": "value",
                         "repr": "dy",
                         "id": "dy"
                       },
@@ -15081,9 +14959,9 @@
                           "end_lineno": 188,
                           "end_col_offset": 65
                         },
-                        "resolved_type": "float64",
+                        "resolved_type": "unknown",
                         "casts": [],
-                        "borrow_kind": "readonly_ref",
+                        "borrow_kind": "value",
                         "repr": "dz",
                         "id": "dz"
                       },
@@ -15164,8 +15042,8 @@
                   "source_span": {
                     "lineno": 189,
                     "col_offset": 12,
-                    "end_lineno": 192,
-                    "end_col_offset": 0
+                    "end_lineno": 191,
+                    "end_col_offset": 28
                   },
                   "test": {
                     "kind": "BoolOp",
@@ -15392,19 +15270,19 @@
                 {
                   "kind": "VarDecl",
                   "name": "ldx",
-                  "type": "float64",
+                  "type": "unknown",
                   "hoisted": true
                 },
                 {
                   "kind": "VarDecl",
                   "name": "ldy",
-                  "type": "float64",
+                  "type": "unknown",
                   "hoisted": true
                 },
                 {
                   "kind": "VarDecl",
                   "name": "ldz",
-                  "type": "float64",
+                  "type": "unknown",
                   "hoisted": true
                 },
                 {
@@ -15428,7 +15306,7 @@
                 {
                   "kind": "VarDecl",
                   "name": "ndotl",
-                  "type": "float64",
+                  "type": "unknown",
                   "hoisted": true
                 },
                 {
@@ -15436,8 +15314,8 @@
                   "source_span": {
                     "lineno": 193,
                     "col_offset": 12,
-                    "end_lineno": 280,
-                    "end_col_offset": 0
+                    "end_lineno": 195,
+                    "end_col_offset": 31
                   },
                   "test": {
                     "kind": "Compare",
@@ -15551,9 +15429,7 @@
                           }
                         ]
                       },
-                      "declare": true,
-                      "decl_type": "tuple[float64,float64,float64]",
-                      "declare_init": true,
+                      "declare": false,
                       "value": {
                         "kind": "Call",
                         "source_span": {
@@ -15589,9 +15465,9 @@
                               "end_lineno": 194,
                               "end_col_offset": 38
                             },
-                            "resolved_type": "float64",
+                            "resolved_type": "unknown",
                             "casts": [],
-                            "borrow_kind": "readonly_ref",
+                            "borrow_kind": "value",
                             "repr": "dx",
                             "id": "dx"
                           },
@@ -15603,9 +15479,9 @@
                               "end_lineno": 194,
                               "end_col_offset": 42
                             },
-                            "resolved_type": "float64",
+                            "resolved_type": "unknown",
                             "casts": [],
-                            "borrow_kind": "readonly_ref",
+                            "borrow_kind": "value",
                             "repr": "dy",
                             "id": "dy"
                           },
@@ -15617,9 +15493,9 @@
                               "end_lineno": 194,
                               "end_col_offset": 46
                             },
-                            "resolved_type": "float64",
+                            "resolved_type": "unknown",
                             "casts": [],
-                            "borrow_kind": "readonly_ref",
+                            "borrow_kind": "value",
                             "repr": "dz",
                             "id": "dz"
                           },
@@ -15631,9 +15507,9 @@
                               "end_lineno": 194,
                               "end_col_offset": 54
                             },
-                            "resolved_type": "unknown",
+                            "resolved_type": "float64",
                             "casts": [],
-                            "borrow_kind": "value",
+                            "borrow_kind": "readonly_ref",
                             "repr": "tphase",
                             "id": "tphase"
                           }
@@ -15660,8 +15536,8 @@
                       "source_span": {
                         "lineno": 195,
                         "col_offset": 12,
-                        "end_lineno": 280,
-                        "end_col_offset": 0
+                        "end_lineno": 195,
+                        "end_col_offset": 31
                       },
                       "test": {
                         "kind": "Compare",
@@ -15797,9 +15673,9 @@
                                   "end_lineno": 196,
                                   "end_col_offset": 40
                                 },
-                                "resolved_type": "float64",
+                                "resolved_type": "unknown",
                                 "casts": [],
-                                "borrow_kind": "readonly_ref",
+                                "borrow_kind": "value",
                                 "repr": "dx",
                                 "id": "dx"
                               }
@@ -15900,9 +15776,9 @@
                                   "end_lineno": 197,
                                   "end_col_offset": 40
                                 },
-                                "resolved_type": "float64",
+                                "resolved_type": "unknown",
                                 "casts": [],
-                                "borrow_kind": "readonly_ref",
+                                "borrow_kind": "value",
                                 "repr": "dz",
                                 "id": "dz"
                               }
@@ -15976,7 +15852,7 @@
                                   "end_lineno": 198,
                                   "end_col_offset": 47
                                 },
-                                "resolved_type": "float64",
+                                "resolved_type": "unknown",
                                 "casts": [],
                                 "borrow_kind": "value",
                                 "repr": "math.floor(hx * 2.0)",
@@ -16053,24 +15929,19 @@
                                   }
                                 ],
                                 "keywords": [],
-                                "resolved_runtime_call": "math.floor",
-                                "resolved_runtime_source": "module_attr",
-                                "runtime_module_id": "pytra.std.math",
-                                "runtime_symbol": "floor",
-                                "runtime_call_adapter_kind": "math.float_args",
-                                "semantic_tag": "stdlib.method.floor",
                                 "type_expr_summary_v1": {
                                   "schema_version": 1,
-                                  "kind": "NamedType",
-                                  "category": "static",
-                                  "mirror": "float64"
+                                  "kind": "DynamicType",
+                                  "category": "dynamic",
+                                  "mirror": "unknown",
+                                  "dynamic_name": "unknown"
                                 }
                               }
                             ],
                             "keywords": [],
                             "lowered_kind": "BuiltinCall",
                             "builtin_name": "int",
-                            "runtime_call": "static_cast",
+                            "runtime_call": "int",
                             "runtime_module_id": "pytra.core.py_runtime",
                             "runtime_symbol": "int",
                             "runtime_call_adapter_kind": "builtin",
@@ -16149,7 +16020,7 @@
                                   "end_lineno": 199,
                                   "end_col_offset": 47
                                 },
-                                "resolved_type": "float64",
+                                "resolved_type": "unknown",
                                 "casts": [],
                                 "borrow_kind": "value",
                                 "repr": "math.floor(hz * 2.0)",
@@ -16226,24 +16097,19 @@
                                   }
                                 ],
                                 "keywords": [],
-                                "resolved_runtime_call": "math.floor",
-                                "resolved_runtime_source": "module_attr",
-                                "runtime_module_id": "pytra.std.math",
-                                "runtime_symbol": "floor",
-                                "runtime_call_adapter_kind": "math.float_args",
-                                "semantic_tag": "stdlib.method.floor",
                                 "type_expr_summary_v1": {
                                   "schema_version": 1,
-                                  "kind": "NamedType",
-                                  "category": "static",
-                                  "mirror": "float64"
+                                  "kind": "DynamicType",
+                                  "category": "dynamic",
+                                  "mirror": "unknown",
+                                  "dynamic_name": "unknown"
                                 }
                               }
                             ],
                             "keywords": [],
                             "lowered_kind": "BuiltinCall",
                             "builtin_name": "int",
-                            "runtime_call": "static_cast",
+                            "runtime_call": "int",
                             "runtime_module_id": "pytra.core.py_runtime",
                             "runtime_symbol": "int",
                             "runtime_call_adapter_kind": "builtin",
@@ -17111,9 +16977,7 @@
                               }
                             ]
                           },
-                          "declare": true,
-                          "decl_type": "tuple[float64,float64,float64]",
-                          "declare_init": true,
+                          "declare": false,
                           "value": {
                             "kind": "Call",
                             "source_span": {
@@ -17196,7 +17060,7 @@
                             "schema_version": 1,
                             "kind": "GenericType",
                             "category": "static",
-                            "mirror": "tuple[float64,float64,float64]"
+                            "mirror": "tuple[unknown,unknown,unknown]"
                           },
                           "is_reassign": true
                         },
@@ -17216,14 +17080,13 @@
                               "end_lineno": 209,
                               "end_col_offset": 21
                             },
-                            "resolved_type": "float64",
+                            "resolved_type": "unknown",
                             "casts": [],
                             "borrow_kind": "value",
                             "repr": "ndotl",
                             "id": "ndotl"
                           },
                           "declare": true,
-                          "decl_type": "float64",
                           "declare_init": true,
                           "value": {
                             "kind": "Call",
@@ -17233,7 +17096,7 @@
                               "end_lineno": 209,
                               "end_col_offset": 37
                             },
-                            "resolved_type": "float64",
+                            "resolved_type": "unknown",
                             "casts": [],
                             "borrow_kind": "value",
                             "repr": "max(ldy, 0.0)",
@@ -17260,9 +17123,9 @@
                                   "end_lineno": 209,
                                   "end_col_offset": 31
                                 },
-                                "resolved_type": "float64",
+                                "resolved_type": "unknown",
                                 "casts": [],
-                                "borrow_kind": "readonly_ref",
+                                "borrow_kind": "value",
                                 "repr": "ldy",
                                 "id": "ldy"
                               },
@@ -17285,23 +17148,25 @@
                             "lowered_kind": "BuiltinCall",
                             "builtin_name": "max",
                             "runtime_call": "py_max",
-                            "runtime_module_id": "pytra.core.py_runtime",
-                            "runtime_symbol": "max",
+                            "runtime_module_id": "pytra.built_in.numeric_ops",
+                            "runtime_symbol": "py_max",
                             "runtime_call_adapter_kind": "builtin",
                             "semantic_tag": "math.max",
                             "type_expr_summary_v1": {
                               "schema_version": 1,
-                              "kind": "NamedType",
-                              "category": "static",
-                              "mirror": "float64"
+                              "kind": "DynamicType",
+                              "category": "dynamic",
+                              "mirror": "unknown",
+                              "dynamic_name": "unknown"
                             },
                             "yields_dynamic": true
                           },
                           "type_expr_summary_v1": {
                             "schema_version": 1,
-                            "kind": "NamedType",
-                            "category": "static",
-                            "mirror": "float64"
+                            "kind": "DynamicType",
+                            "category": "dynamic",
+                            "mirror": "unknown",
+                            "dynamic_name": "unknown"
                           },
                           "is_reassign": true
                         },
@@ -17737,9 +17602,9 @@
                                   "end_lineno": 212,
                                   "end_col_offset": 54
                                 },
-                                "resolved_type": "float64",
+                                "resolved_type": "unknown",
                                 "casts": [],
-                                "borrow_kind": "readonly_ref",
+                                "borrow_kind": "value",
                                 "repr": "ndotl",
                                 "id": "ndotl"
                               }
@@ -17895,9 +17760,9 @@
                                   "end_lineno": 213,
                                   "end_col_offset": 54
                                 },
-                                "resolved_type": "float64",
+                                "resolved_type": "unknown",
                                 "casts": [],
-                                "borrow_kind": "readonly_ref",
+                                "borrow_kind": "value",
                                 "repr": "ndotl",
                                 "id": "ndotl"
                               }
@@ -18053,9 +17918,9 @@
                                   "end_lineno": 214,
                                   "end_col_offset": 54
                                 },
-                                "resolved_type": "float64",
+                                "resolved_type": "unknown",
                                 "casts": [],
-                                "borrow_kind": "readonly_ref",
+                                "borrow_kind": "value",
                                 "repr": "ndotl",
                                 "id": "ndotl"
                               }
@@ -18259,8 +18124,8 @@
                           "source_span": {
                             "lineno": 220,
                             "col_offset": 16,
-                            "end_lineno": 234,
-                            "end_col_offset": 30
+                            "end_lineno": 225,
+                            "end_col_offset": 35
                           },
                           "test": {
                             "kind": "Compare",
@@ -18500,8 +18365,8 @@
                               "source_span": {
                                 "lineno": 225,
                                 "col_offset": 16,
-                                "end_lineno": 234,
-                                "end_col_offset": 30
+                                "end_lineno": 225,
+                                "end_col_offset": 35
                               },
                               "test": {
                                 "kind": "Compare",
@@ -18942,7 +18807,7 @@
                             },
                             "resolved_type": "float64",
                             "casts": [],
-                            "borrow_kind": "value",
+                            "borrow_kind": "readonly_ref",
                             "repr": "hx",
                             "id": "hx"
                           },
@@ -19011,9 +18876,9 @@
                                   "end_lineno": 235,
                                   "end_col_offset": 40
                                 },
-                                "resolved_type": "float64",
+                                "resolved_type": "unknown",
                                 "casts": [],
-                                "borrow_kind": "readonly_ref",
+                                "borrow_kind": "value",
                                 "repr": "dx",
                                 "id": "dx"
                               }
@@ -19114,9 +18979,9 @@
                                   "end_lineno": 236,
                                   "end_col_offset": 40
                                 },
-                                "resolved_type": "float64",
+                                "resolved_type": "unknown",
                                 "casts": [],
-                                "borrow_kind": "readonly_ref",
+                                "borrow_kind": "value",
                                 "repr": "dy",
                                 "id": "dy"
                               }
@@ -19147,7 +19012,7 @@
                             },
                             "resolved_type": "float64",
                             "casts": [],
-                            "borrow_kind": "value",
+                            "borrow_kind": "readonly_ref",
                             "repr": "hz",
                             "id": "hz"
                           },
@@ -19216,9 +19081,9 @@
                                   "end_lineno": 237,
                                   "end_col_offset": 40
                                 },
-                                "resolved_type": "float64",
+                                "resolved_type": "unknown",
                                 "casts": [],
-                                "borrow_kind": "readonly_ref",
+                                "borrow_kind": "value",
                                 "repr": "dz",
                                 "id": "dz"
                               }
@@ -19297,9 +19162,7 @@
                               }
                             ]
                           },
-                          "declare": true,
-                          "decl_type": "tuple[float64,float64,float64]",
-                          "declare_init": true,
+                          "declare": false,
                           "value": {
                             "kind": "Call",
                             "source_span": {
@@ -19550,7 +19413,7 @@
                             "schema_version": 1,
                             "kind": "GenericType",
                             "category": "static",
-                            "mirror": "tuple[float64,float64,float64]"
+                            "mirror": "tuple[unknown,unknown,unknown]"
                           }
                         },
                         {
@@ -19618,9 +19481,7 @@
                               }
                             ]
                           },
-                          "declare": true,
-                          "decl_type": "tuple[float64,float64,float64]",
-                          "declare_init": true,
+                          "declare": false,
                           "leading_trivia": [
                             {
                               "kind": "blank",
@@ -19669,9 +19530,9 @@
                                   "end_lineno": 241,
                                   "end_col_offset": 42
                                 },
-                                "resolved_type": "float64",
+                                "resolved_type": "unknown",
                                 "casts": [],
-                                "borrow_kind": "readonly_ref",
+                                "borrow_kind": "value",
                                 "repr": "dx",
                                 "id": "dx"
                               },
@@ -19683,9 +19544,9 @@
                                   "end_lineno": 241,
                                   "end_col_offset": 46
                                 },
-                                "resolved_type": "float64",
+                                "resolved_type": "unknown",
                                 "casts": [],
-                                "borrow_kind": "readonly_ref",
+                                "borrow_kind": "value",
                                 "repr": "dy",
                                 "id": "dy"
                               },
@@ -19697,9 +19558,9 @@
                                   "end_lineno": 241,
                                   "end_col_offset": 50
                                 },
-                                "resolved_type": "float64",
+                                "resolved_type": "unknown",
                                 "casts": [],
-                                "borrow_kind": "readonly_ref",
+                                "borrow_kind": "value",
                                 "repr": "dz",
                                 "id": "dz"
                               },
@@ -19711,9 +19572,9 @@
                                   "end_lineno": 241,
                                   "end_col_offset": 54
                                 },
-                                "resolved_type": "float64",
+                                "resolved_type": "unknown",
                                 "casts": [],
-                                "borrow_kind": "readonly_ref",
+                                "borrow_kind": "value",
                                 "repr": "nx",
                                 "id": "nx"
                               },
@@ -19725,9 +19586,9 @@
                                   "end_lineno": 241,
                                   "end_col_offset": 58
                                 },
-                                "resolved_type": "float64",
+                                "resolved_type": "unknown",
                                 "casts": [],
-                                "borrow_kind": "readonly_ref",
+                                "borrow_kind": "value",
                                 "repr": "ny",
                                 "id": "ny"
                               },
@@ -19739,9 +19600,9 @@
                                   "end_lineno": 241,
                                   "end_col_offset": 62
                                 },
-                                "resolved_type": "float64",
+                                "resolved_type": "unknown",
                                 "casts": [],
-                                "borrow_kind": "readonly_ref",
+                                "borrow_kind": "value",
                                 "repr": "nz",
                                 "id": "nz"
                               }
@@ -19758,7 +19619,7 @@
                             "schema_version": 1,
                             "kind": "GenericType",
                             "category": "static",
-                            "mirror": "tuple[float64,float64,float64]"
+                            "mirror": "tuple[unknown,unknown,unknown]"
                           }
                         },
                         {
@@ -19826,9 +19687,7 @@
                               }
                             ]
                           },
-                          "declare": true,
-                          "decl_type": "tuple[float64,float64,float64]",
-                          "declare_init": true,
+                          "declare": false,
                           "value": {
                             "kind": "Call",
                             "source_span": {
@@ -19864,9 +19723,9 @@
                                   "end_lineno": 242,
                                   "end_col_offset": 42
                                 },
-                                "resolved_type": "float64",
+                                "resolved_type": "unknown",
                                 "casts": [],
-                                "borrow_kind": "readonly_ref",
+                                "borrow_kind": "value",
                                 "repr": "dx",
                                 "id": "dx"
                               },
@@ -19878,9 +19737,9 @@
                                   "end_lineno": 242,
                                   "end_col_offset": 46
                                 },
-                                "resolved_type": "float64",
+                                "resolved_type": "unknown",
                                 "casts": [],
-                                "borrow_kind": "readonly_ref",
+                                "borrow_kind": "value",
                                 "repr": "dy",
                                 "id": "dy"
                               },
@@ -19892,9 +19751,9 @@
                                   "end_lineno": 242,
                                   "end_col_offset": 50
                                 },
-                                "resolved_type": "float64",
+                                "resolved_type": "unknown",
                                 "casts": [],
-                                "borrow_kind": "readonly_ref",
+                                "borrow_kind": "value",
                                 "repr": "dz",
                                 "id": "dz"
                               },
@@ -19906,9 +19765,9 @@
                                   "end_lineno": 242,
                                   "end_col_offset": 54
                                 },
-                                "resolved_type": "float64",
+                                "resolved_type": "unknown",
                                 "casts": [],
-                                "borrow_kind": "readonly_ref",
+                                "borrow_kind": "value",
                                 "repr": "nx",
                                 "id": "nx"
                               },
@@ -19920,9 +19779,9 @@
                                   "end_lineno": 242,
                                   "end_col_offset": 58
                                 },
-                                "resolved_type": "float64",
+                                "resolved_type": "unknown",
                                 "casts": [],
-                                "borrow_kind": "readonly_ref",
+                                "borrow_kind": "value",
                                 "repr": "ny",
                                 "id": "ny"
                               },
@@ -19934,9 +19793,9 @@
                                   "end_lineno": 242,
                                   "end_col_offset": 62
                                 },
-                                "resolved_type": "float64",
+                                "resolved_type": "unknown",
                                 "casts": [],
-                                "borrow_kind": "readonly_ref",
+                                "borrow_kind": "value",
                                 "repr": "nz",
                                 "id": "nz"
                               },
@@ -19995,7 +19854,7 @@
                             "schema_version": 1,
                             "kind": "GenericType",
                             "category": "static",
-                            "mirror": "tuple[float64,float64,float64]"
+                            "mirror": "tuple[unknown,unknown,unknown]"
                           }
                         },
                         {
@@ -20063,9 +19922,7 @@
                               }
                             ]
                           },
-                          "declare": true,
-                          "decl_type": "tuple[float64,float64,float64]",
-                          "declare_init": true,
+                          "declare": false,
                           "value": {
                             "kind": "Call",
                             "source_span": {
@@ -20101,9 +19958,9 @@
                                   "end_lineno": 243,
                                   "end_col_offset": 42
                                 },
-                                "resolved_type": "float64",
+                                "resolved_type": "unknown",
                                 "casts": [],
-                                "borrow_kind": "readonly_ref",
+                                "borrow_kind": "value",
                                 "repr": "rdx",
                                 "id": "rdx"
                               },
@@ -20115,9 +19972,9 @@
                                   "end_lineno": 243,
                                   "end_col_offset": 47
                                 },
-                                "resolved_type": "float64",
+                                "resolved_type": "unknown",
                                 "casts": [],
-                                "borrow_kind": "readonly_ref",
+                                "borrow_kind": "value",
                                 "repr": "rdy",
                                 "id": "rdy"
                               },
@@ -20129,9 +19986,9 @@
                                   "end_lineno": 243,
                                   "end_col_offset": 52
                                 },
-                                "resolved_type": "float64",
+                                "resolved_type": "unknown",
                                 "casts": [],
-                                "borrow_kind": "readonly_ref",
+                                "borrow_kind": "value",
                                 "repr": "rdz",
                                 "id": "rdz"
                               },
@@ -20143,9 +20000,9 @@
                                   "end_lineno": 243,
                                   "end_col_offset": 60
                                 },
-                                "resolved_type": "unknown",
+                                "resolved_type": "float64",
                                 "casts": [],
-                                "borrow_kind": "value",
+                                "borrow_kind": "readonly_ref",
                                 "repr": "tphase",
                                 "id": "tphase"
                               }
@@ -20162,7 +20019,7 @@
                             "schema_version": 1,
                             "kind": "GenericType",
                             "category": "static",
-                            "mirror": "tuple[float64,float64,float64]"
+                            "mirror": "tuple[unknown,unknown,unknown]"
                           }
                         },
                         {
@@ -20230,9 +20087,7 @@
                               }
                             ]
                           },
-                          "declare": true,
-                          "decl_type": "tuple[float64,float64,float64]",
-                          "declare_init": true,
+                          "declare": false,
                           "value": {
                             "kind": "Call",
                             "source_span": {
@@ -20268,9 +20123,9 @@
                                   "end_lineno": 244,
                                   "end_col_offset": 42
                                 },
-                                "resolved_type": "float64",
+                                "resolved_type": "unknown",
                                 "casts": [],
-                                "borrow_kind": "readonly_ref",
+                                "borrow_kind": "value",
                                 "repr": "tdx",
                                 "id": "tdx"
                               },
@@ -20282,9 +20137,9 @@
                                   "end_lineno": 244,
                                   "end_col_offset": 47
                                 },
-                                "resolved_type": "float64",
+                                "resolved_type": "unknown",
                                 "casts": [],
-                                "borrow_kind": "readonly_ref",
+                                "borrow_kind": "value",
                                 "repr": "tdy",
                                 "id": "tdy"
                               },
@@ -20296,9 +20151,9 @@
                                   "end_lineno": 244,
                                   "end_col_offset": 52
                                 },
-                                "resolved_type": "float64",
+                                "resolved_type": "unknown",
                                 "casts": [],
-                                "borrow_kind": "readonly_ref",
+                                "borrow_kind": "value",
                                 "repr": "tdz",
                                 "id": "tdz"
                               },
@@ -20322,9 +20177,9 @@
                                     "end_lineno": 244,
                                     "end_col_offset": 60
                                   },
-                                  "resolved_type": "unknown",
+                                  "resolved_type": "float64",
                                   "casts": [],
-                                  "borrow_kind": "value",
+                                  "borrow_kind": "readonly_ref",
                                   "repr": "tphase",
                                   "id": "tphase"
                                 },
@@ -20357,7 +20212,7 @@
                             "schema_version": 1,
                             "kind": "GenericType",
                             "category": "static",
-                            "mirror": "tuple[float64,float64,float64]"
+                            "mirror": "tuple[unknown,unknown,unknown]"
                           }
                         },
                         {
@@ -20376,14 +20231,13 @@
                               "end_lineno": 245,
                               "end_col_offset": 20
                             },
-                            "resolved_type": "float64",
+                            "resolved_type": "unknown",
                             "casts": [],
                             "borrow_kind": "value",
                             "repr": "cosi",
                             "id": "cosi"
                           },
                           "declare": true,
-                          "decl_type": "float64",
                           "declare_init": true,
                           "value": {
                             "kind": "Call",
@@ -20393,7 +20247,7 @@
                               "end_lineno": 245,
                               "end_col_offset": 63
                             },
-                            "resolved_type": "float64",
+                            "resolved_type": "unknown",
                             "casts": [],
                             "borrow_kind": "value",
                             "repr": "max(-(dx * nx + dy * ny + dz * nz), 0.0)",
@@ -20420,7 +20274,7 @@
                                   "end_lineno": 245,
                                   "end_col_offset": 57
                                 },
-                                "resolved_type": "float64",
+                                "resolved_type": "unknown",
                                 "casts": [],
                                 "borrow_kind": "value",
                                 "repr": "-(dx * nx + dy * ny + dz * nz)",
@@ -20433,7 +20287,7 @@
                                     "end_lineno": 245,
                                     "end_col_offset": 57
                                   },
-                                  "resolved_type": "float64",
+                                  "resolved_type": "unknown",
                                   "casts": [],
                                   "borrow_kind": "value",
                                   "repr": "(dx * nx + dy * ny + dz * nz)",
@@ -20445,7 +20299,7 @@
                                       "end_lineno": 245,
                                       "end_col_offset": 46
                                     },
-                                    "resolved_type": "float64",
+                                    "resolved_type": "unknown",
                                     "casts": [],
                                     "borrow_kind": "value",
                                     "repr": "dx * nx + dy * ny",
@@ -20457,7 +20311,7 @@
                                         "end_lineno": 245,
                                         "end_col_offset": 36
                                       },
-                                      "resolved_type": "float64",
+                                      "resolved_type": "unknown",
                                       "casts": [],
                                       "borrow_kind": "value",
                                       "repr": "dx * nx",
@@ -20469,9 +20323,9 @@
                                           "end_lineno": 245,
                                           "end_col_offset": 31
                                         },
-                                        "resolved_type": "float64",
+                                        "resolved_type": "unknown",
                                         "casts": [],
-                                        "borrow_kind": "readonly_ref",
+                                        "borrow_kind": "value",
                                         "repr": "dx",
                                         "id": "dx"
                                       },
@@ -20484,9 +20338,9 @@
                                           "end_lineno": 245,
                                           "end_col_offset": 36
                                         },
-                                        "resolved_type": "float64",
+                                        "resolved_type": "unknown",
                                         "casts": [],
-                                        "borrow_kind": "readonly_ref",
+                                        "borrow_kind": "value",
                                         "repr": "nx",
                                         "id": "nx"
                                       }
@@ -20500,7 +20354,7 @@
                                         "end_lineno": 245,
                                         "end_col_offset": 46
                                       },
-                                      "resolved_type": "float64",
+                                      "resolved_type": "unknown",
                                       "casts": [],
                                       "borrow_kind": "value",
                                       "repr": "dy * ny",
@@ -20512,9 +20366,9 @@
                                           "end_lineno": 245,
                                           "end_col_offset": 41
                                         },
-                                        "resolved_type": "float64",
+                                        "resolved_type": "unknown",
                                         "casts": [],
-                                        "borrow_kind": "readonly_ref",
+                                        "borrow_kind": "value",
                                         "repr": "dy",
                                         "id": "dy"
                                       },
@@ -20527,9 +20381,9 @@
                                           "end_lineno": 245,
                                           "end_col_offset": 46
                                         },
-                                        "resolved_type": "float64",
+                                        "resolved_type": "unknown",
                                         "casts": [],
-                                        "borrow_kind": "readonly_ref",
+                                        "borrow_kind": "value",
                                         "repr": "ny",
                                         "id": "ny"
                                       }
@@ -20544,7 +20398,7 @@
                                       "end_lineno": 245,
                                       "end_col_offset": 56
                                     },
-                                    "resolved_type": "float64",
+                                    "resolved_type": "unknown",
                                     "casts": [],
                                     "borrow_kind": "value",
                                     "repr": "dz * nz",
@@ -20556,9 +20410,9 @@
                                         "end_lineno": 245,
                                         "end_col_offset": 51
                                       },
-                                      "resolved_type": "float64",
+                                      "resolved_type": "unknown",
                                       "casts": [],
-                                      "borrow_kind": "readonly_ref",
+                                      "borrow_kind": "value",
                                       "repr": "dz",
                                       "id": "dz"
                                     },
@@ -20571,9 +20425,9 @@
                                         "end_lineno": 245,
                                         "end_col_offset": 56
                                       },
-                                      "resolved_type": "float64",
+                                      "resolved_type": "unknown",
                                       "casts": [],
-                                      "borrow_kind": "readonly_ref",
+                                      "borrow_kind": "value",
                                       "repr": "nz",
                                       "id": "nz"
                                     }
@@ -20599,23 +20453,25 @@
                             "lowered_kind": "BuiltinCall",
                             "builtin_name": "max",
                             "runtime_call": "py_max",
-                            "runtime_module_id": "pytra.core.py_runtime",
-                            "runtime_symbol": "max",
+                            "runtime_module_id": "pytra.built_in.numeric_ops",
+                            "runtime_symbol": "py_max",
                             "runtime_call_adapter_kind": "builtin",
                             "semantic_tag": "math.max",
                             "type_expr_summary_v1": {
                               "schema_version": 1,
-                              "kind": "NamedType",
-                              "category": "static",
-                              "mirror": "float64"
+                              "kind": "DynamicType",
+                              "category": "dynamic",
+                              "mirror": "unknown",
+                              "dynamic_name": "unknown"
                             },
                             "yields_dynamic": true
                           },
                           "type_expr_summary_v1": {
                             "schema_version": 1,
-                            "kind": "NamedType",
-                            "category": "static",
-                            "mirror": "float64"
+                            "kind": "DynamicType",
+                            "category": "dynamic",
+                            "mirror": "unknown",
+                            "dynamic_name": "unknown"
                           }
                         },
                         {
@@ -20678,9 +20534,9 @@
                                   "end_lineno": 246,
                                   "end_col_offset": 33
                                 },
-                                "resolved_type": "float64",
+                                "resolved_type": "unknown",
                                 "casts": [],
-                                "borrow_kind": "readonly_ref",
+                                "borrow_kind": "value",
                                 "repr": "cosi",
                                 "id": "cosi"
                               },
@@ -20771,9 +20627,9 @@
                                   "end_lineno": 247,
                                   "end_col_offset": 22
                                 },
-                                "resolved_type": "float64",
+                                "resolved_type": "unknown",
                                 "casts": [],
-                                "borrow_kind": "readonly_ref",
+                                "borrow_kind": "value",
                                 "repr": "tr",
                                 "id": "tr"
                               },
@@ -20842,9 +20698,9 @@
                                   "end_lineno": 247,
                                   "end_col_offset": 40
                                 },
-                                "resolved_type": "float64",
+                                "resolved_type": "unknown",
                                 "casts": [],
-                                "borrow_kind": "readonly_ref",
+                                "borrow_kind": "value",
                                 "repr": "sr",
                                 "id": "sr"
                               },
@@ -20929,9 +20785,9 @@
                                   "end_lineno": 248,
                                   "end_col_offset": 22
                                 },
-                                "resolved_type": "float64",
+                                "resolved_type": "unknown",
                                 "casts": [],
-                                "borrow_kind": "readonly_ref",
+                                "borrow_kind": "value",
                                 "repr": "tg",
                                 "id": "tg"
                               },
@@ -21000,9 +20856,9 @@
                                   "end_lineno": 248,
                                   "end_col_offset": 40
                                 },
-                                "resolved_type": "float64",
+                                "resolved_type": "unknown",
                                 "casts": [],
-                                "borrow_kind": "readonly_ref",
+                                "borrow_kind": "value",
                                 "repr": "sg",
                                 "id": "sg"
                               },
@@ -21087,9 +20943,9 @@
                                   "end_lineno": 249,
                                   "end_col_offset": 22
                                 },
-                                "resolved_type": "float64",
+                                "resolved_type": "unknown",
                                 "casts": [],
-                                "borrow_kind": "readonly_ref",
+                                "borrow_kind": "value",
                                 "repr": "tb",
                                 "id": "tb"
                               },
@@ -21158,9 +21014,9 @@
                                   "end_lineno": 249,
                                   "end_col_offset": 40
                                 },
-                                "resolved_type": "float64",
+                                "resolved_type": "unknown",
                                 "casts": [],
-                                "borrow_kind": "readonly_ref",
+                                "borrow_kind": "value",
                                 "repr": "sb",
                                 "id": "sb"
                               },
@@ -21206,7 +21062,7 @@
                             },
                             "resolved_type": "float64",
                             "casts": [],
-                            "borrow_kind": "value",
+                            "borrow_kind": "readonly_ref",
                             "repr": "lxv",
                             "id": "lxv"
                           },
@@ -21287,7 +21143,7 @@
                             },
                             "resolved_type": "float64",
                             "casts": [],
-                            "borrow_kind": "value",
+                            "borrow_kind": "readonly_ref",
                             "repr": "lyv",
                             "id": "lyv"
                           },
@@ -21362,7 +21218,7 @@
                             },
                             "resolved_type": "float64",
                             "casts": [],
-                            "borrow_kind": "value",
+                            "borrow_kind": "readonly_ref",
                             "repr": "lzv",
                             "id": "lzv"
                           },
@@ -21484,9 +21340,7 @@
                               }
                             ]
                           },
-                          "declare": true,
-                          "decl_type": "tuple[float64,float64,float64]",
-                          "declare_init": true,
+                          "declare": false,
                           "value": {
                             "kind": "Call",
                             "source_span": {
@@ -21569,7 +21423,7 @@
                             "schema_version": 1,
                             "kind": "GenericType",
                             "category": "static",
-                            "mirror": "tuple[float64,float64,float64]"
+                            "mirror": "tuple[unknown,unknown,unknown]"
                           },
                           "is_reassign": true
                         },
@@ -21589,14 +21443,13 @@
                               "end_lineno": 255,
                               "end_col_offset": 21
                             },
-                            "resolved_type": "float64",
+                            "resolved_type": "unknown",
                             "casts": [],
                             "borrow_kind": "value",
                             "repr": "ndotl",
                             "id": "ndotl"
                           },
                           "declare": true,
-                          "decl_type": "float64",
                           "declare_init": true,
                           "value": {
                             "kind": "Call",
@@ -21606,7 +21459,7 @@
                               "end_lineno": 255,
                               "end_col_offset": 64
                             },
-                            "resolved_type": "float64",
+                            "resolved_type": "unknown",
                             "casts": [],
                             "borrow_kind": "value",
                             "repr": "max(nx * ldx + ny * ldy + nz * ldz, 0.0)",
@@ -21633,7 +21486,7 @@
                                   "end_lineno": 255,
                                   "end_col_offset": 58
                                 },
-                                "resolved_type": "float64",
+                                "resolved_type": "unknown",
                                 "casts": [],
                                 "borrow_kind": "value",
                                 "repr": "nx * ldx + ny * ldy + nz * ldz",
@@ -21645,7 +21498,7 @@
                                     "end_lineno": 255,
                                     "end_col_offset": 47
                                   },
-                                  "resolved_type": "float64",
+                                  "resolved_type": "unknown",
                                   "casts": [],
                                   "borrow_kind": "value",
                                   "repr": "nx * ldx + ny * ldy",
@@ -21657,7 +21510,7 @@
                                       "end_lineno": 255,
                                       "end_col_offset": 36
                                     },
-                                    "resolved_type": "float64",
+                                    "resolved_type": "unknown",
                                     "casts": [],
                                     "borrow_kind": "value",
                                     "repr": "nx * ldx",
@@ -21669,9 +21522,9 @@
                                         "end_lineno": 255,
                                         "end_col_offset": 30
                                       },
-                                      "resolved_type": "float64",
+                                      "resolved_type": "unknown",
                                       "casts": [],
-                                      "borrow_kind": "readonly_ref",
+                                      "borrow_kind": "value",
                                       "repr": "nx",
                                       "id": "nx"
                                     },
@@ -21684,9 +21537,9 @@
                                         "end_lineno": 255,
                                         "end_col_offset": 36
                                       },
-                                      "resolved_type": "float64",
+                                      "resolved_type": "unknown",
                                       "casts": [],
-                                      "borrow_kind": "readonly_ref",
+                                      "borrow_kind": "value",
                                       "repr": "ldx",
                                       "id": "ldx"
                                     }
@@ -21700,7 +21553,7 @@
                                       "end_lineno": 255,
                                       "end_col_offset": 47
                                     },
-                                    "resolved_type": "float64",
+                                    "resolved_type": "unknown",
                                     "casts": [],
                                     "borrow_kind": "value",
                                     "repr": "ny * ldy",
@@ -21712,9 +21565,9 @@
                                         "end_lineno": 255,
                                         "end_col_offset": 41
                                       },
-                                      "resolved_type": "float64",
+                                      "resolved_type": "unknown",
                                       "casts": [],
-                                      "borrow_kind": "readonly_ref",
+                                      "borrow_kind": "value",
                                       "repr": "ny",
                                       "id": "ny"
                                     },
@@ -21727,9 +21580,9 @@
                                         "end_lineno": 255,
                                         "end_col_offset": 47
                                       },
-                                      "resolved_type": "float64",
+                                      "resolved_type": "unknown",
                                       "casts": [],
-                                      "borrow_kind": "readonly_ref",
+                                      "borrow_kind": "value",
                                       "repr": "ldy",
                                       "id": "ldy"
                                     }
@@ -21744,7 +21597,7 @@
                                     "end_lineno": 255,
                                     "end_col_offset": 58
                                   },
-                                  "resolved_type": "float64",
+                                  "resolved_type": "unknown",
                                   "casts": [],
                                   "borrow_kind": "value",
                                   "repr": "nz * ldz",
@@ -21756,9 +21609,9 @@
                                       "end_lineno": 255,
                                       "end_col_offset": 52
                                     },
-                                    "resolved_type": "float64",
+                                    "resolved_type": "unknown",
                                     "casts": [],
-                                    "borrow_kind": "readonly_ref",
+                                    "borrow_kind": "value",
                                     "repr": "nz",
                                     "id": "nz"
                                   },
@@ -21771,9 +21624,9 @@
                                       "end_lineno": 255,
                                       "end_col_offset": 58
                                     },
-                                    "resolved_type": "float64",
+                                    "resolved_type": "unknown",
                                     "casts": [],
-                                    "borrow_kind": "readonly_ref",
+                                    "borrow_kind": "value",
                                     "repr": "ldz",
                                     "id": "ldz"
                                   }
@@ -21798,23 +21651,25 @@
                             "lowered_kind": "BuiltinCall",
                             "builtin_name": "max",
                             "runtime_call": "py_max",
-                            "runtime_module_id": "pytra.core.py_runtime",
-                            "runtime_symbol": "max",
+                            "runtime_module_id": "pytra.built_in.numeric_ops",
+                            "runtime_symbol": "py_max",
                             "runtime_call_adapter_kind": "builtin",
                             "semantic_tag": "math.max",
                             "type_expr_summary_v1": {
                               "schema_version": 1,
-                              "kind": "NamedType",
-                              "category": "static",
-                              "mirror": "float64"
+                              "kind": "DynamicType",
+                              "category": "dynamic",
+                              "mirror": "unknown",
+                              "dynamic_name": "unknown"
                             },
                             "yields_dynamic": true
                           },
                           "type_expr_summary_v1": {
                             "schema_version": 1,
-                            "kind": "NamedType",
-                            "category": "static",
-                            "mirror": "float64"
+                            "kind": "DynamicType",
+                            "category": "dynamic",
+                            "mirror": "unknown",
+                            "dynamic_name": "unknown"
                           },
                           "is_reassign": true
                         },
@@ -21883,9 +21738,7 @@
                               }
                             ]
                           },
-                          "declare": true,
-                          "decl_type": "tuple[float64,float64,float64]",
-                          "declare_init": true,
+                          "declare": false,
                           "value": {
                             "kind": "Call",
                             "source_span": {
@@ -21921,7 +21774,7 @@
                                   "end_lineno": 256,
                                   "end_col_offset": 50
                                 },
-                                "resolved_type": "float64",
+                                "resolved_type": "unknown",
                                 "casts": [],
                                 "borrow_kind": "value",
                                 "repr": "ldx - dx",
@@ -21933,9 +21786,9 @@
                                     "end_lineno": 256,
                                     "end_col_offset": 45
                                   },
-                                  "resolved_type": "float64",
+                                  "resolved_type": "unknown",
                                   "casts": [],
-                                  "borrow_kind": "readonly_ref",
+                                  "borrow_kind": "value",
                                   "repr": "ldx",
                                   "id": "ldx"
                                 },
@@ -21948,9 +21801,9 @@
                                     "end_lineno": 256,
                                     "end_col_offset": 50
                                   },
-                                  "resolved_type": "float64",
+                                  "resolved_type": "unknown",
                                   "casts": [],
-                                  "borrow_kind": "readonly_ref",
+                                  "borrow_kind": "value",
                                   "repr": "dx",
                                   "id": "dx"
                                 }
@@ -21963,7 +21816,7 @@
                                   "end_lineno": 256,
                                   "end_col_offset": 60
                                 },
-                                "resolved_type": "float64",
+                                "resolved_type": "unknown",
                                 "casts": [],
                                 "borrow_kind": "value",
                                 "repr": "ldy - dy",
@@ -21975,9 +21828,9 @@
                                     "end_lineno": 256,
                                     "end_col_offset": 55
                                   },
-                                  "resolved_type": "float64",
+                                  "resolved_type": "unknown",
                                   "casts": [],
-                                  "borrow_kind": "readonly_ref",
+                                  "borrow_kind": "value",
                                   "repr": "ldy",
                                   "id": "ldy"
                                 },
@@ -21990,9 +21843,9 @@
                                     "end_lineno": 256,
                                     "end_col_offset": 60
                                   },
-                                  "resolved_type": "float64",
+                                  "resolved_type": "unknown",
                                   "casts": [],
-                                  "borrow_kind": "readonly_ref",
+                                  "borrow_kind": "value",
                                   "repr": "dy",
                                   "id": "dy"
                                 }
@@ -22005,7 +21858,7 @@
                                   "end_lineno": 256,
                                   "end_col_offset": 70
                                 },
-                                "resolved_type": "float64",
+                                "resolved_type": "unknown",
                                 "casts": [],
                                 "borrow_kind": "value",
                                 "repr": "ldz - dz",
@@ -22017,9 +21870,9 @@
                                     "end_lineno": 256,
                                     "end_col_offset": 65
                                   },
-                                  "resolved_type": "float64",
+                                  "resolved_type": "unknown",
                                   "casts": [],
-                                  "borrow_kind": "readonly_ref",
+                                  "borrow_kind": "value",
                                   "repr": "ldz",
                                   "id": "ldz"
                                 },
@@ -22032,9 +21885,9 @@
                                     "end_lineno": 256,
                                     "end_col_offset": 70
                                   },
-                                  "resolved_type": "float64",
+                                  "resolved_type": "unknown",
                                   "casts": [],
-                                  "borrow_kind": "readonly_ref",
+                                  "borrow_kind": "value",
                                   "repr": "dz",
                                   "id": "dz"
                                 }
@@ -22052,7 +21905,7 @@
                             "schema_version": 1,
                             "kind": "GenericType",
                             "category": "static",
-                            "mirror": "tuple[float64,float64,float64]"
+                            "mirror": "tuple[unknown,unknown,unknown]"
                           }
                         },
                         {
@@ -22071,14 +21924,13 @@
                               "end_lineno": 257,
                               "end_col_offset": 21
                             },
-                            "resolved_type": "float64",
+                            "resolved_type": "unknown",
                             "casts": [],
                             "borrow_kind": "value",
                             "repr": "ndoth",
                             "id": "ndoth"
                           },
                           "declare": true,
-                          "decl_type": "float64",
                           "declare_init": true,
                           "value": {
                             "kind": "Call",
@@ -22088,7 +21940,7 @@
                               "end_lineno": 257,
                               "end_col_offset": 64
                             },
-                            "resolved_type": "float64",
+                            "resolved_type": "unknown",
                             "casts": [],
                             "borrow_kind": "value",
                             "repr": "max(nx * hvx + ny * hvy + nz * hvz, 0.0)",
@@ -22115,7 +21967,7 @@
                                   "end_lineno": 257,
                                   "end_col_offset": 58
                                 },
-                                "resolved_type": "float64",
+                                "resolved_type": "unknown",
                                 "casts": [],
                                 "borrow_kind": "value",
                                 "repr": "nx * hvx + ny * hvy + nz * hvz",
@@ -22127,7 +21979,7 @@
                                     "end_lineno": 257,
                                     "end_col_offset": 47
                                   },
-                                  "resolved_type": "float64",
+                                  "resolved_type": "unknown",
                                   "casts": [],
                                   "borrow_kind": "value",
                                   "repr": "nx * hvx + ny * hvy",
@@ -22139,7 +21991,7 @@
                                       "end_lineno": 257,
                                       "end_col_offset": 36
                                     },
-                                    "resolved_type": "float64",
+                                    "resolved_type": "unknown",
                                     "casts": [],
                                     "borrow_kind": "value",
                                     "repr": "nx * hvx",
@@ -22151,9 +22003,9 @@
                                         "end_lineno": 257,
                                         "end_col_offset": 30
                                       },
-                                      "resolved_type": "float64",
+                                      "resolved_type": "unknown",
                                       "casts": [],
-                                      "borrow_kind": "readonly_ref",
+                                      "borrow_kind": "value",
                                       "repr": "nx",
                                       "id": "nx"
                                     },
@@ -22166,9 +22018,9 @@
                                         "end_lineno": 257,
                                         "end_col_offset": 36
                                       },
-                                      "resolved_type": "float64",
+                                      "resolved_type": "unknown",
                                       "casts": [],
-                                      "borrow_kind": "readonly_ref",
+                                      "borrow_kind": "value",
                                       "repr": "hvx",
                                       "id": "hvx"
                                     }
@@ -22182,7 +22034,7 @@
                                       "end_lineno": 257,
                                       "end_col_offset": 47
                                     },
-                                    "resolved_type": "float64",
+                                    "resolved_type": "unknown",
                                     "casts": [],
                                     "borrow_kind": "value",
                                     "repr": "ny * hvy",
@@ -22194,9 +22046,9 @@
                                         "end_lineno": 257,
                                         "end_col_offset": 41
                                       },
-                                      "resolved_type": "float64",
+                                      "resolved_type": "unknown",
                                       "casts": [],
-                                      "borrow_kind": "readonly_ref",
+                                      "borrow_kind": "value",
                                       "repr": "ny",
                                       "id": "ny"
                                     },
@@ -22209,9 +22061,9 @@
                                         "end_lineno": 257,
                                         "end_col_offset": 47
                                       },
-                                      "resolved_type": "float64",
+                                      "resolved_type": "unknown",
                                       "casts": [],
-                                      "borrow_kind": "readonly_ref",
+                                      "borrow_kind": "value",
                                       "repr": "hvy",
                                       "id": "hvy"
                                     }
@@ -22226,7 +22078,7 @@
                                     "end_lineno": 257,
                                     "end_col_offset": 58
                                   },
-                                  "resolved_type": "float64",
+                                  "resolved_type": "unknown",
                                   "casts": [],
                                   "borrow_kind": "value",
                                   "repr": "nz * hvz",
@@ -22238,9 +22090,9 @@
                                       "end_lineno": 257,
                                       "end_col_offset": 52
                                     },
-                                    "resolved_type": "float64",
+                                    "resolved_type": "unknown",
                                     "casts": [],
-                                    "borrow_kind": "readonly_ref",
+                                    "borrow_kind": "value",
                                     "repr": "nz",
                                     "id": "nz"
                                   },
@@ -22253,9 +22105,9 @@
                                       "end_lineno": 257,
                                       "end_col_offset": 58
                                     },
-                                    "resolved_type": "float64",
+                                    "resolved_type": "unknown",
                                     "casts": [],
-                                    "borrow_kind": "readonly_ref",
+                                    "borrow_kind": "value",
                                     "repr": "hvz",
                                     "id": "hvz"
                                   }
@@ -22280,23 +22132,25 @@
                             "lowered_kind": "BuiltinCall",
                             "builtin_name": "max",
                             "runtime_call": "py_max",
-                            "runtime_module_id": "pytra.core.py_runtime",
-                            "runtime_symbol": "max",
+                            "runtime_module_id": "pytra.built_in.numeric_ops",
+                            "runtime_symbol": "py_max",
                             "runtime_call_adapter_kind": "builtin",
                             "semantic_tag": "math.max",
                             "type_expr_summary_v1": {
                               "schema_version": 1,
-                              "kind": "NamedType",
-                              "category": "static",
-                              "mirror": "float64"
+                              "kind": "DynamicType",
+                              "category": "dynamic",
+                              "mirror": "unknown",
+                              "dynamic_name": "unknown"
                             },
                             "yields_dynamic": true
                           },
                           "type_expr_summary_v1": {
                             "schema_version": 1,
-                            "kind": "NamedType",
-                            "category": "static",
-                            "mirror": "float64"
+                            "kind": "DynamicType",
+                            "category": "dynamic",
+                            "mirror": "unknown",
+                            "dynamic_name": "unknown"
                           }
                         },
                         {
@@ -22315,14 +22169,13 @@
                               "end_lineno": 258,
                               "end_col_offset": 20
                             },
-                            "resolved_type": "float64",
+                            "resolved_type": "unknown",
                             "casts": [],
                             "borrow_kind": "value",
                             "repr": "spec",
                             "id": "spec"
                           },
                           "declare": true,
-                          "decl_type": "float64",
                           "declare_init": true,
                           "value": {
                             "kind": "BinOp",
@@ -22332,7 +22185,7 @@
                               "end_lineno": 258,
                               "end_col_offset": 36
                             },
-                            "resolved_type": "float64",
+                            "resolved_type": "unknown",
                             "casts": [],
                             "borrow_kind": "value",
                             "repr": "ndoth * ndoth",
@@ -22344,9 +22197,9 @@
                                 "end_lineno": 258,
                                 "end_col_offset": 28
                               },
-                              "resolved_type": "float64",
+                              "resolved_type": "unknown",
                               "casts": [],
-                              "borrow_kind": "readonly_ref",
+                              "borrow_kind": "value",
                               "repr": "ndoth",
                               "id": "ndoth"
                             },
@@ -22359,18 +22212,19 @@
                                 "end_lineno": 258,
                                 "end_col_offset": 36
                               },
-                              "resolved_type": "float64",
+                              "resolved_type": "unknown",
                               "casts": [],
-                              "borrow_kind": "readonly_ref",
+                              "borrow_kind": "value",
                               "repr": "ndoth",
                               "id": "ndoth"
                             }
                           },
                           "type_expr_summary_v1": {
                             "schema_version": 1,
-                            "kind": "NamedType",
-                            "category": "static",
-                            "mirror": "float64"
+                            "kind": "DynamicType",
+                            "category": "dynamic",
+                            "mirror": "unknown",
+                            "dynamic_name": "unknown"
                           }
                         },
                         {
@@ -22389,14 +22243,13 @@
                               "end_lineno": 259,
                               "end_col_offset": 20
                             },
-                            "resolved_type": "float64",
+                            "resolved_type": "unknown",
                             "casts": [],
-                            "borrow_kind": "readonly_ref",
+                            "borrow_kind": "value",
                             "repr": "spec",
                             "id": "spec"
                           },
                           "declare": true,
-                          "decl_type": "float64",
                           "declare_init": true,
                           "value": {
                             "kind": "BinOp",
@@ -22406,7 +22259,7 @@
                               "end_lineno": 259,
                               "end_col_offset": 34
                             },
-                            "resolved_type": "float64",
+                            "resolved_type": "unknown",
                             "casts": [],
                             "borrow_kind": "value",
                             "repr": "spec * spec",
@@ -22418,9 +22271,9 @@
                                 "end_lineno": 259,
                                 "end_col_offset": 27
                               },
-                              "resolved_type": "float64",
+                              "resolved_type": "unknown",
                               "casts": [],
-                              "borrow_kind": "readonly_ref",
+                              "borrow_kind": "value",
                               "repr": "spec",
                               "id": "spec"
                             },
@@ -22433,18 +22286,19 @@
                                 "end_lineno": 259,
                                 "end_col_offset": 34
                               },
-                              "resolved_type": "float64",
+                              "resolved_type": "unknown",
                               "casts": [],
-                              "borrow_kind": "readonly_ref",
+                              "borrow_kind": "value",
                               "repr": "spec",
                               "id": "spec"
                             }
                           },
                           "type_expr_summary_v1": {
                             "schema_version": 1,
-                            "kind": "NamedType",
-                            "category": "static",
-                            "mirror": "float64"
+                            "kind": "DynamicType",
+                            "category": "dynamic",
+                            "mirror": "unknown",
+                            "dynamic_name": "unknown"
                           }
                         },
                         {
@@ -22463,14 +22317,13 @@
                               "end_lineno": 260,
                               "end_col_offset": 20
                             },
-                            "resolved_type": "float64",
+                            "resolved_type": "unknown",
                             "casts": [],
-                            "borrow_kind": "readonly_ref",
+                            "borrow_kind": "value",
                             "repr": "spec",
                             "id": "spec"
                           },
                           "declare": true,
-                          "decl_type": "float64",
                           "declare_init": true,
                           "value": {
                             "kind": "BinOp",
@@ -22480,7 +22333,7 @@
                               "end_lineno": 260,
                               "end_col_offset": 34
                             },
-                            "resolved_type": "float64",
+                            "resolved_type": "unknown",
                             "casts": [],
                             "borrow_kind": "value",
                             "repr": "spec * spec",
@@ -22492,9 +22345,9 @@
                                 "end_lineno": 260,
                                 "end_col_offset": 27
                               },
-                              "resolved_type": "float64",
+                              "resolved_type": "unknown",
                               "casts": [],
-                              "borrow_kind": "readonly_ref",
+                              "borrow_kind": "value",
                               "repr": "spec",
                               "id": "spec"
                             },
@@ -22507,18 +22360,19 @@
                                 "end_lineno": 260,
                                 "end_col_offset": 34
                               },
-                              "resolved_type": "float64",
+                              "resolved_type": "unknown",
                               "casts": [],
-                              "borrow_kind": "readonly_ref",
+                              "borrow_kind": "value",
                               "repr": "spec",
                               "id": "spec"
                             }
                           },
                           "type_expr_summary_v1": {
                             "schema_version": 1,
-                            "kind": "NamedType",
-                            "category": "static",
-                            "mirror": "float64"
+                            "kind": "DynamicType",
+                            "category": "dynamic",
+                            "mirror": "unknown",
+                            "dynamic_name": "unknown"
                           }
                         },
                         {
@@ -22537,14 +22391,13 @@
                               "end_lineno": 261,
                               "end_col_offset": 20
                             },
-                            "resolved_type": "float64",
+                            "resolved_type": "unknown",
                             "casts": [],
-                            "borrow_kind": "readonly_ref",
+                            "borrow_kind": "value",
                             "repr": "spec",
                             "id": "spec"
                           },
                           "declare": true,
-                          "decl_type": "float64",
                           "declare_init": true,
                           "value": {
                             "kind": "BinOp",
@@ -22554,7 +22407,7 @@
                               "end_lineno": 261,
                               "end_col_offset": 34
                             },
-                            "resolved_type": "float64",
+                            "resolved_type": "unknown",
                             "casts": [],
                             "borrow_kind": "value",
                             "repr": "spec * spec",
@@ -22566,9 +22419,9 @@
                                 "end_lineno": 261,
                                 "end_col_offset": 27
                               },
-                              "resolved_type": "float64",
+                              "resolved_type": "unknown",
                               "casts": [],
-                              "borrow_kind": "readonly_ref",
+                              "borrow_kind": "value",
                               "repr": "spec",
                               "id": "spec"
                             },
@@ -22581,18 +22434,19 @@
                                 "end_lineno": 261,
                                 "end_col_offset": 34
                               },
-                              "resolved_type": "float64",
+                              "resolved_type": "unknown",
                               "casts": [],
-                              "borrow_kind": "readonly_ref",
+                              "borrow_kind": "value",
                               "repr": "spec",
                               "id": "spec"
                             }
                           },
                           "type_expr_summary_v1": {
                             "schema_version": 1,
-                            "kind": "NamedType",
-                            "category": "static",
-                            "mirror": "float64"
+                            "kind": "DynamicType",
+                            "category": "dynamic",
+                            "mirror": "unknown",
+                            "dynamic_name": "unknown"
                           }
                         },
                         {
@@ -22613,7 +22467,7 @@
                             },
                             "resolved_type": "float64",
                             "casts": [],
-                            "borrow_kind": "value",
+                            "borrow_kind": "readonly_ref",
                             "repr": "glow",
                             "id": "glow"
                           },
@@ -22922,9 +22776,9 @@
                                     "end_lineno": 263,
                                     "end_col_offset": 33
                                   },
-                                  "resolved_type": "float64",
+                                  "resolved_type": "unknown",
                                   "casts": [],
-                                  "borrow_kind": "readonly_ref",
+                                  "borrow_kind": "value",
                                   "repr": "ndotl",
                                   "id": "ndotl"
                                 }
@@ -22965,9 +22819,9 @@
                                     "end_lineno": 263,
                                     "end_col_offset": 47
                                   },
-                                  "resolved_type": "float64",
+                                  "resolved_type": "unknown",
                                   "casts": [],
-                                  "borrow_kind": "readonly_ref",
+                                  "borrow_kind": "value",
                                   "repr": "spec",
                                   "id": "spec"
                                 }
@@ -23108,9 +22962,9 @@
                                     "end_lineno": 264,
                                     "end_col_offset": 33
                                   },
-                                  "resolved_type": "float64",
+                                  "resolved_type": "unknown",
                                   "casts": [],
-                                  "borrow_kind": "readonly_ref",
+                                  "borrow_kind": "value",
                                   "repr": "ndotl",
                                   "id": "ndotl"
                                 }
@@ -23151,9 +23005,9 @@
                                     "end_lineno": 264,
                                     "end_col_offset": 47
                                   },
-                                  "resolved_type": "float64",
+                                  "resolved_type": "unknown",
                                   "casts": [],
-                                  "borrow_kind": "readonly_ref",
+                                  "borrow_kind": "value",
                                   "repr": "spec",
                                   "id": "spec"
                                 }
@@ -23294,9 +23148,9 @@
                                     "end_lineno": 265,
                                     "end_col_offset": 33
                                   },
-                                  "resolved_type": "float64",
+                                  "resolved_type": "unknown",
                                   "casts": [],
-                                  "borrow_kind": "readonly_ref",
+                                  "borrow_kind": "value",
                                   "repr": "ndotl",
                                   "id": "ndotl"
                                 }
@@ -23337,9 +23191,9 @@
                                     "end_lineno": 265,
                                     "end_col_offset": 47
                                   },
-                                  "resolved_type": "float64",
+                                  "resolved_type": "unknown",
                                   "casts": [],
-                                  "borrow_kind": "readonly_ref",
+                                  "borrow_kind": "value",
                                   "repr": "spec",
                                   "id": "spec"
                                 }
@@ -23399,17 +23253,17 @@
                         {
                           "kind": "If",
                           "source_span": {
-                            "lineno": 268,
+                            "lineno": 220,
                             "col_offset": 16,
-                            "end_lineno": 279,
-                            "end_col_offset": 29
+                            "end_lineno": 225,
+                            "end_col_offset": 35
                           },
                           "test": {
                             "kind": "Compare",
                             "source_span": {
-                              "lineno": 268,
+                              "lineno": 220,
                               "col_offset": 19,
-                              "end_lineno": 268,
+                              "end_lineno": 220,
                               "end_col_offset": 32
                             },
                             "resolved_type": "bool",
@@ -23419,9 +23273,9 @@
                             "left": {
                               "kind": "Name",
                               "source_span": {
-                                "lineno": 268,
+                                "lineno": 220,
                                 "col_offset": 19,
-                                "end_lineno": 268,
+                                "end_lineno": 220,
                                 "end_col_offset": 27
                               },
                               "resolved_type": "int64",
@@ -23437,9 +23291,9 @@
                               {
                                 "kind": "Constant",
                                 "source_span": {
-                                  "lineno": 268,
+                                  "lineno": 220,
                                   "col_offset": 31,
-                                  "end_lineno": 268,
+                                  "end_lineno": 220,
                                   "end_col_offset": 32
                                 },
                                 "resolved_type": "int64",
@@ -23594,17 +23448,17 @@
                             {
                               "kind": "If",
                               "source_span": {
-                                "lineno": 272,
+                                "lineno": 225,
                                 "col_offset": 16,
-                                "end_lineno": 279,
-                                "end_col_offset": 29
+                                "end_lineno": 225,
+                                "end_col_offset": 35
                               },
                               "test": {
                                 "kind": "Compare",
                                 "source_span": {
-                                  "lineno": 272,
+                                  "lineno": 225,
                                   "col_offset": 21,
-                                  "end_lineno": 272,
+                                  "end_lineno": 225,
                                   "end_col_offset": 34
                                 },
                                 "resolved_type": "bool",
@@ -23614,9 +23468,9 @@
                                 "left": {
                                   "kind": "Name",
                                   "source_span": {
-                                    "lineno": 272,
+                                    "lineno": 225,
                                     "col_offset": 21,
-                                    "end_lineno": 272,
+                                    "end_lineno": 225,
                                     "end_col_offset": 29
                                   },
                                   "resolved_type": "int64",
@@ -23632,9 +23486,9 @@
                                   {
                                     "kind": "Constant",
                                     "source_span": {
-                                      "lineno": 272,
+                                      "lineno": 225,
                                       "col_offset": 33,
-                                      "end_lineno": 272,
+                                      "end_lineno": 225,
                                       "end_col_offset": 34
                                     },
                                     "resolved_type": "int64",
@@ -23968,121 +23822,143 @@
                     "id": "r"
                   },
                   "declare": true,
-                  "decl_type": "float64",
                   "declare_init": true,
-                  "leading_trivia": [
-                    {
-                      "kind": "comment",
-                      "text": "Slightly stronger tone mapping."
-                    }
-                  ],
-                  "leading_comments": [
-                    "Slightly stronger tone mapping."
-                  ],
                   "value": {
-                    "kind": "Call",
+                    "kind": "Unbox",
+                    "resolved_type": "float64",
+                    "borrow_kind": "value",
+                    "casts": [],
+                    "value": {
+                      "kind": "Call",
+                      "source_span": {
+                        "lineno": 282,
+                        "col_offset": 16,
+                        "end_lineno": 282,
+                        "end_col_offset": 37
+                      },
+                      "resolved_type": "unknown",
+                      "casts": [],
+                      "borrow_kind": "value",
+                      "repr": "math.sqrt(clamp01(r))",
+                      "func": {
+                        "kind": "Attribute",
+                        "source_span": {
+                          "lineno": 282,
+                          "col_offset": 16,
+                          "end_lineno": 282,
+                          "end_col_offset": 25
+                        },
+                        "resolved_type": "unknown",
+                        "casts": [],
+                        "borrow_kind": "value",
+                        "repr": "math.sqrt",
+                        "value": {
+                          "kind": "Name",
+                          "source_span": {
+                            "lineno": 282,
+                            "col_offset": 16,
+                            "end_lineno": 282,
+                            "end_col_offset": 20
+                          },
+                          "resolved_type": "unknown",
+                          "casts": [],
+                          "borrow_kind": "value",
+                          "repr": "math",
+                          "id": "math"
+                        },
+                        "attr": "sqrt"
+                      },
+                      "args": [
+                        {
+                          "kind": "Call",
+                          "source_span": {
+                            "lineno": 282,
+                            "col_offset": 26,
+                            "end_lineno": 282,
+                            "end_col_offset": 36
+                          },
+                          "resolved_type": "float64",
+                          "casts": [],
+                          "borrow_kind": "value",
+                          "repr": "clamp01(r)",
+                          "func": {
+                            "kind": "Name",
+                            "source_span": {
+                              "lineno": 282,
+                              "col_offset": 26,
+                              "end_lineno": 282,
+                              "end_col_offset": 33
+                            },
+                            "resolved_type": "unknown",
+                            "casts": [],
+                            "borrow_kind": "value",
+                            "repr": "clamp01",
+                            "id": "clamp01"
+                          },
+                          "args": [
+                            {
+                              "kind": "Name",
+                              "source_span": {
+                                "lineno": 282,
+                                "col_offset": 34,
+                                "end_lineno": 282,
+                                "end_col_offset": 35
+                              },
+                              "resolved_type": "float64",
+                              "casts": [],
+                              "borrow_kind": "readonly_ref",
+                              "repr": "r",
+                              "id": "r"
+                            }
+                          ],
+                          "keywords": [],
+                          "type_expr_summary_v1": {
+                            "schema_version": 1,
+                            "kind": "NamedType",
+                            "category": "static",
+                            "mirror": "float64"
+                          }
+                        }
+                      ],
+                      "keywords": [],
+                      "type_expr_summary_v1": {
+                        "schema_version": 1,
+                        "kind": "DynamicType",
+                        "category": "dynamic",
+                        "mirror": "unknown",
+                        "dynamic_name": "unknown"
+                      }
+                    },
                     "source_span": {
                       "lineno": 282,
                       "col_offset": 16,
                       "end_lineno": 282,
                       "end_col_offset": 37
                     },
-                    "resolved_type": "float64",
-                    "casts": [],
-                    "borrow_kind": "value",
                     "repr": "math.sqrt(clamp01(r))",
-                    "func": {
-                      "kind": "Attribute",
-                      "source_span": {
-                        "lineno": 282,
-                        "col_offset": 16,
-                        "end_lineno": 282,
-                        "end_col_offset": 25
-                      },
-                      "resolved_type": "unknown",
-                      "casts": [],
-                      "borrow_kind": "value",
-                      "repr": "math.sqrt",
-                      "value": {
-                        "kind": "Name",
-                        "source_span": {
-                          "lineno": 282,
-                          "col_offset": 16,
-                          "end_lineno": 282,
-                          "end_col_offset": 20
-                        },
-                        "resolved_type": "unknown",
-                        "casts": [],
-                        "borrow_kind": "value",
-                        "repr": "math",
-                        "id": "math"
-                      },
-                      "attr": "sqrt"
-                    },
-                    "args": [
-                      {
-                        "kind": "Call",
-                        "source_span": {
-                          "lineno": 282,
-                          "col_offset": 26,
-                          "end_lineno": 282,
-                          "end_col_offset": 36
-                        },
-                        "resolved_type": "float64",
-                        "casts": [],
-                        "borrow_kind": "value",
-                        "repr": "clamp01(r)",
-                        "func": {
-                          "kind": "Name",
-                          "source_span": {
-                            "lineno": 282,
-                            "col_offset": 26,
-                            "end_lineno": 282,
-                            "end_col_offset": 33
-                          },
-                          "resolved_type": "unknown",
-                          "casts": [],
-                          "borrow_kind": "value",
-                          "repr": "clamp01",
-                          "id": "clamp01"
-                        },
-                        "args": [
-                          {
-                            "kind": "Name",
-                            "source_span": {
-                              "lineno": 282,
-                              "col_offset": 34,
-                              "end_lineno": 282,
-                              "end_col_offset": 35
-                            },
-                            "resolved_type": "float64",
-                            "casts": [],
-                            "borrow_kind": "readonly_ref",
-                            "repr": "r",
-                            "id": "r"
-                          }
-                        ],
-                        "keywords": [],
-                        "type_expr_summary_v1": {
-                          "schema_version": 1,
-                          "kind": "NamedType",
-                          "category": "static",
-                          "mirror": "float64"
-                        }
-                      }
-                    ],
-                    "keywords": [],
-                    "resolved_runtime_call": "math.sqrt",
-                    "resolved_runtime_source": "module_attr",
-                    "runtime_module_id": "pytra.std.math",
-                    "runtime_symbol": "sqrt",
-                    "runtime_call_adapter_kind": "math.float_args",
-                    "semantic_tag": "stdlib.method.sqrt",
                     "type_expr_summary_v1": {
                       "schema_version": 1,
                       "kind": "NamedType",
                       "category": "static",
                       "mirror": "float64"
+                    },
+                    "target": "float64",
+                    "on_fail": "raise",
+                    "bridge_lane_v1": {
+                      "schema_version": 1,
+                      "target": {
+                        "kind": "NamedType",
+                        "category": "static",
+                        "mirror": "float64"
+                      },
+                      "target_category": "static",
+                      "value": {
+                        "kind": "DynamicType",
+                        "category": "dynamic",
+                        "mirror": "unknown",
+                        "dynamic_name": "unknown"
+                      },
+                      "value_category": "dynamic"
                     }
                   },
                   "type_expr_summary_v1": {
@@ -24115,112 +23991,143 @@
                     "id": "g"
                   },
                   "declare": true,
-                  "decl_type": "float64",
                   "declare_init": true,
                   "value": {
-                    "kind": "Call",
+                    "kind": "Unbox",
+                    "resolved_type": "float64",
+                    "borrow_kind": "value",
+                    "casts": [],
+                    "value": {
+                      "kind": "Call",
+                      "source_span": {
+                        "lineno": 283,
+                        "col_offset": 16,
+                        "end_lineno": 283,
+                        "end_col_offset": 37
+                      },
+                      "resolved_type": "unknown",
+                      "casts": [],
+                      "borrow_kind": "value",
+                      "repr": "math.sqrt(clamp01(g))",
+                      "func": {
+                        "kind": "Attribute",
+                        "source_span": {
+                          "lineno": 283,
+                          "col_offset": 16,
+                          "end_lineno": 283,
+                          "end_col_offset": 25
+                        },
+                        "resolved_type": "unknown",
+                        "casts": [],
+                        "borrow_kind": "value",
+                        "repr": "math.sqrt",
+                        "value": {
+                          "kind": "Name",
+                          "source_span": {
+                            "lineno": 283,
+                            "col_offset": 16,
+                            "end_lineno": 283,
+                            "end_col_offset": 20
+                          },
+                          "resolved_type": "unknown",
+                          "casts": [],
+                          "borrow_kind": "value",
+                          "repr": "math",
+                          "id": "math"
+                        },
+                        "attr": "sqrt"
+                      },
+                      "args": [
+                        {
+                          "kind": "Call",
+                          "source_span": {
+                            "lineno": 283,
+                            "col_offset": 26,
+                            "end_lineno": 283,
+                            "end_col_offset": 36
+                          },
+                          "resolved_type": "float64",
+                          "casts": [],
+                          "borrow_kind": "value",
+                          "repr": "clamp01(g)",
+                          "func": {
+                            "kind": "Name",
+                            "source_span": {
+                              "lineno": 283,
+                              "col_offset": 26,
+                              "end_lineno": 283,
+                              "end_col_offset": 33
+                            },
+                            "resolved_type": "unknown",
+                            "casts": [],
+                            "borrow_kind": "value",
+                            "repr": "clamp01",
+                            "id": "clamp01"
+                          },
+                          "args": [
+                            {
+                              "kind": "Name",
+                              "source_span": {
+                                "lineno": 283,
+                                "col_offset": 34,
+                                "end_lineno": 283,
+                                "end_col_offset": 35
+                              },
+                              "resolved_type": "float64",
+                              "casts": [],
+                              "borrow_kind": "readonly_ref",
+                              "repr": "g",
+                              "id": "g"
+                            }
+                          ],
+                          "keywords": [],
+                          "type_expr_summary_v1": {
+                            "schema_version": 1,
+                            "kind": "NamedType",
+                            "category": "static",
+                            "mirror": "float64"
+                          }
+                        }
+                      ],
+                      "keywords": [],
+                      "type_expr_summary_v1": {
+                        "schema_version": 1,
+                        "kind": "DynamicType",
+                        "category": "dynamic",
+                        "mirror": "unknown",
+                        "dynamic_name": "unknown"
+                      }
+                    },
                     "source_span": {
                       "lineno": 283,
                       "col_offset": 16,
                       "end_lineno": 283,
                       "end_col_offset": 37
                     },
-                    "resolved_type": "float64",
-                    "casts": [],
-                    "borrow_kind": "value",
                     "repr": "math.sqrt(clamp01(g))",
-                    "func": {
-                      "kind": "Attribute",
-                      "source_span": {
-                        "lineno": 283,
-                        "col_offset": 16,
-                        "end_lineno": 283,
-                        "end_col_offset": 25
-                      },
-                      "resolved_type": "unknown",
-                      "casts": [],
-                      "borrow_kind": "value",
-                      "repr": "math.sqrt",
-                      "value": {
-                        "kind": "Name",
-                        "source_span": {
-                          "lineno": 283,
-                          "col_offset": 16,
-                          "end_lineno": 283,
-                          "end_col_offset": 20
-                        },
-                        "resolved_type": "unknown",
-                        "casts": [],
-                        "borrow_kind": "value",
-                        "repr": "math",
-                        "id": "math"
-                      },
-                      "attr": "sqrt"
-                    },
-                    "args": [
-                      {
-                        "kind": "Call",
-                        "source_span": {
-                          "lineno": 283,
-                          "col_offset": 26,
-                          "end_lineno": 283,
-                          "end_col_offset": 36
-                        },
-                        "resolved_type": "float64",
-                        "casts": [],
-                        "borrow_kind": "value",
-                        "repr": "clamp01(g)",
-                        "func": {
-                          "kind": "Name",
-                          "source_span": {
-                            "lineno": 283,
-                            "col_offset": 26,
-                            "end_lineno": 283,
-                            "end_col_offset": 33
-                          },
-                          "resolved_type": "unknown",
-                          "casts": [],
-                          "borrow_kind": "value",
-                          "repr": "clamp01",
-                          "id": "clamp01"
-                        },
-                        "args": [
-                          {
-                            "kind": "Name",
-                            "source_span": {
-                              "lineno": 283,
-                              "col_offset": 34,
-                              "end_lineno": 283,
-                              "end_col_offset": 35
-                            },
-                            "resolved_type": "float64",
-                            "casts": [],
-                            "borrow_kind": "readonly_ref",
-                            "repr": "g",
-                            "id": "g"
-                          }
-                        ],
-                        "keywords": [],
-                        "type_expr_summary_v1": {
-                          "schema_version": 1,
-                          "kind": "NamedType",
-                          "category": "static",
-                          "mirror": "float64"
-                        }
-                      }
-                    ],
-                    "keywords": [],
-                    "resolved_runtime_call": "math.sqrt",
-                    "resolved_runtime_source": "module_attr",
-                    "runtime_module_id": "pytra.std.math",
-                    "runtime_symbol": "sqrt",
-                    "runtime_call_adapter_kind": "math.float_args",
-                    "semantic_tag": "stdlib.method.sqrt",
                     "type_expr_summary_v1": {
                       "schema_version": 1,
                       "kind": "NamedType",
                       "category": "static",
                       "mirror": "float64"
+                    },
+                    "target": "float64",
+                    "on_fail": "raise",
+                    "bridge_lane_v1": {
+                      "schema_version": 1,
+                      "target": {
+                        "kind": "NamedType",
+                        "category": "static",
+                        "mirror": "float64"
+                      },
+                      "target_category": "static",
+                      "value": {
+                        "kind": "DynamicType",
+                        "category": "dynamic",
+                        "mirror": "unknown",
+                        "dynamic_name": "unknown"
+                      },
+                      "value_category": "dynamic"
                     }
                   },
                   "type_expr_summary_v1": {
@@ -24253,112 +24160,143 @@
                     "id": "b"
                   },
                   "declare": true,
-                  "decl_type": "float64",
                   "declare_init": true,
                   "value": {
-                    "kind": "Call",
+                    "kind": "Unbox",
+                    "resolved_type": "float64",
+                    "borrow_kind": "value",
+                    "casts": [],
+                    "value": {
+                      "kind": "Call",
+                      "source_span": {
+                        "lineno": 284,
+                        "col_offset": 16,
+                        "end_lineno": 284,
+                        "end_col_offset": 37
+                      },
+                      "resolved_type": "unknown",
+                      "casts": [],
+                      "borrow_kind": "value",
+                      "repr": "math.sqrt(clamp01(b))",
+                      "func": {
+                        "kind": "Attribute",
+                        "source_span": {
+                          "lineno": 284,
+                          "col_offset": 16,
+                          "end_lineno": 284,
+                          "end_col_offset": 25
+                        },
+                        "resolved_type": "unknown",
+                        "casts": [],
+                        "borrow_kind": "value",
+                        "repr": "math.sqrt",
+                        "value": {
+                          "kind": "Name",
+                          "source_span": {
+                            "lineno": 284,
+                            "col_offset": 16,
+                            "end_lineno": 284,
+                            "end_col_offset": 20
+                          },
+                          "resolved_type": "unknown",
+                          "casts": [],
+                          "borrow_kind": "value",
+                          "repr": "math",
+                          "id": "math"
+                        },
+                        "attr": "sqrt"
+                      },
+                      "args": [
+                        {
+                          "kind": "Call",
+                          "source_span": {
+                            "lineno": 284,
+                            "col_offset": 26,
+                            "end_lineno": 284,
+                            "end_col_offset": 36
+                          },
+                          "resolved_type": "float64",
+                          "casts": [],
+                          "borrow_kind": "value",
+                          "repr": "clamp01(b)",
+                          "func": {
+                            "kind": "Name",
+                            "source_span": {
+                              "lineno": 284,
+                              "col_offset": 26,
+                              "end_lineno": 284,
+                              "end_col_offset": 33
+                            },
+                            "resolved_type": "unknown",
+                            "casts": [],
+                            "borrow_kind": "value",
+                            "repr": "clamp01",
+                            "id": "clamp01"
+                          },
+                          "args": [
+                            {
+                              "kind": "Name",
+                              "source_span": {
+                                "lineno": 284,
+                                "col_offset": 34,
+                                "end_lineno": 284,
+                                "end_col_offset": 35
+                              },
+                              "resolved_type": "float64",
+                              "casts": [],
+                              "borrow_kind": "readonly_ref",
+                              "repr": "b",
+                              "id": "b"
+                            }
+                          ],
+                          "keywords": [],
+                          "type_expr_summary_v1": {
+                            "schema_version": 1,
+                            "kind": "NamedType",
+                            "category": "static",
+                            "mirror": "float64"
+                          }
+                        }
+                      ],
+                      "keywords": [],
+                      "type_expr_summary_v1": {
+                        "schema_version": 1,
+                        "kind": "DynamicType",
+                        "category": "dynamic",
+                        "mirror": "unknown",
+                        "dynamic_name": "unknown"
+                      }
+                    },
                     "source_span": {
                       "lineno": 284,
                       "col_offset": 16,
                       "end_lineno": 284,
                       "end_col_offset": 37
                     },
-                    "resolved_type": "float64",
-                    "casts": [],
-                    "borrow_kind": "value",
                     "repr": "math.sqrt(clamp01(b))",
-                    "func": {
-                      "kind": "Attribute",
-                      "source_span": {
-                        "lineno": 284,
-                        "col_offset": 16,
-                        "end_lineno": 284,
-                        "end_col_offset": 25
-                      },
-                      "resolved_type": "unknown",
-                      "casts": [],
-                      "borrow_kind": "value",
-                      "repr": "math.sqrt",
-                      "value": {
-                        "kind": "Name",
-                        "source_span": {
-                          "lineno": 284,
-                          "col_offset": 16,
-                          "end_lineno": 284,
-                          "end_col_offset": 20
-                        },
-                        "resolved_type": "unknown",
-                        "casts": [],
-                        "borrow_kind": "value",
-                        "repr": "math",
-                        "id": "math"
-                      },
-                      "attr": "sqrt"
-                    },
-                    "args": [
-                      {
-                        "kind": "Call",
-                        "source_span": {
-                          "lineno": 284,
-                          "col_offset": 26,
-                          "end_lineno": 284,
-                          "end_col_offset": 36
-                        },
-                        "resolved_type": "float64",
-                        "casts": [],
-                        "borrow_kind": "value",
-                        "repr": "clamp01(b)",
-                        "func": {
-                          "kind": "Name",
-                          "source_span": {
-                            "lineno": 284,
-                            "col_offset": 26,
-                            "end_lineno": 284,
-                            "end_col_offset": 33
-                          },
-                          "resolved_type": "unknown",
-                          "casts": [],
-                          "borrow_kind": "value",
-                          "repr": "clamp01",
-                          "id": "clamp01"
-                        },
-                        "args": [
-                          {
-                            "kind": "Name",
-                            "source_span": {
-                              "lineno": 284,
-                              "col_offset": 34,
-                              "end_lineno": 284,
-                              "end_col_offset": 35
-                            },
-                            "resolved_type": "float64",
-                            "casts": [],
-                            "borrow_kind": "readonly_ref",
-                            "repr": "b",
-                            "id": "b"
-                          }
-                        ],
-                        "keywords": [],
-                        "type_expr_summary_v1": {
-                          "schema_version": 1,
-                          "kind": "NamedType",
-                          "category": "static",
-                          "mirror": "float64"
-                        }
-                      }
-                    ],
-                    "keywords": [],
-                    "resolved_runtime_call": "math.sqrt",
-                    "resolved_runtime_source": "module_attr",
-                    "runtime_module_id": "pytra.std.math",
-                    "runtime_symbol": "sqrt",
-                    "runtime_call_adapter_kind": "math.float_args",
-                    "semantic_tag": "stdlib.method.sqrt",
                     "type_expr_summary_v1": {
                       "schema_version": 1,
                       "kind": "NamedType",
                       "category": "static",
                       "mirror": "float64"
+                    },
+                    "target": "float64",
+                    "on_fail": "raise",
+                    "bridge_lane_v1": {
+                      "schema_version": 1,
+                      "target": {
+                        "kind": "NamedType",
+                        "category": "static",
+                        "mirror": "float64"
+                      },
+                      "target_category": "static",
+                      "value": {
+                        "kind": "DynamicType",
+                        "category": "dynamic",
+                        "mirror": "unknown",
+                        "dynamic_name": "unknown"
+                      },
+                      "value_category": "dynamic"
                     }
                   },
                   "type_expr_summary_v1": {
@@ -24384,7 +24322,7 @@
                       "end_lineno": 285,
                       "end_col_offset": 32
                     },
-                    "resolved_type": "uint8",
+                    "resolved_type": "int64",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "frame[row_base + px]",
@@ -24396,9 +24334,9 @@
                         "end_lineno": 285,
                         "end_col_offset": 17
                       },
-                      "resolved_type": "bytearray",
+                      "resolved_type": "unknown",
                       "casts": [],
-                      "borrow_kind": "readonly_ref",
+                      "borrow_kind": "value",
                       "repr": "frame",
                       "id": "frame"
                     },
@@ -24483,9 +24421,9 @@
                           "end_lineno": 285,
                           "end_col_offset": 49
                         },
-                        "resolved_type": "float64",
+                        "resolved_type": "unknown",
                         "casts": [],
-                        "borrow_kind": "readonly_ref",
+                        "borrow_kind": "value",
                         "repr": "r",
                         "id": "r"
                       },
@@ -24497,9 +24435,9 @@
                           "end_lineno": 285,
                           "end_col_offset": 52
                         },
-                        "resolved_type": "float64",
+                        "resolved_type": "unknown",
                         "casts": [],
-                        "borrow_kind": "readonly_ref",
+                        "borrow_kind": "value",
                         "repr": "g",
                         "id": "g"
                       },
@@ -24511,9 +24449,9 @@
                           "end_lineno": 285,
                           "end_col_offset": 55
                         },
-                        "resolved_type": "float64",
+                        "resolved_type": "unknown",
                         "casts": [],
-                        "borrow_kind": "readonly_ref",
+                        "borrow_kind": "value",
                         "repr": "b",
                         "id": "b"
                       }
@@ -24547,8 +24485,8 @@
           "source_span": {
             "lineno": 156,
             "col_offset": 0,
-            "end_lineno": 286,
-            "end_col_offset": 0
+            "end_lineno": 285,
+            "end_col_offset": 56
           },
           "leading_trivia": [
             {
@@ -24573,7 +24511,7 @@
               "end_lineno": 287,
               "end_col_offset": 23
             },
-            "resolved_type": "bytes",
+            "resolved_type": "unknown",
             "casts": [],
             "borrow_kind": "value",
             "repr": "bytes(frame)",
@@ -24600,26 +24538,20 @@
                   "end_lineno": 287,
                   "end_col_offset": 22
                 },
-                "resolved_type": "bytearray",
+                "resolved_type": "unknown",
                 "casts": [],
-                "borrow_kind": "readonly_ref",
+                "borrow_kind": "value",
                 "repr": "frame",
                 "id": "frame"
               }
             ],
             "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "bytes",
-            "runtime_call": "bytes_ctor",
-            "runtime_module_id": "pytra.core.py_runtime",
-            "runtime_symbol": "bytes",
-            "runtime_call_adapter_kind": "builtin",
-            "semantic_tag": "ctor.bytes",
             "type_expr_summary_v1": {
               "schema_version": 1,
-              "kind": "NamedType",
-              "category": "static",
-              "mirror": "bytes"
+              "kind": "DynamicType",
+              "category": "dynamic",
+              "mirror": "unknown",
+              "dynamic_name": "unknown"
             }
           }
         }
@@ -24914,13 +24846,11 @@
             },
             "args": [],
             "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "perf_counter",
-            "runtime_call": "perf_counter",
+            "resolved_runtime_call": "time.perf_counter",
+            "resolved_runtime_source": "import_symbol",
             "runtime_module_id": "pytra.std.time",
             "runtime_symbol": "perf_counter",
             "runtime_call_adapter_kind": "extern_delegate",
-            "semantic_tag": "stdlib.fn.perf_counter",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",
@@ -25242,8 +25172,8 @@
           "source_span": {
             "lineno": 298,
             "col_offset": 0,
-            "end_lineno": 300,
-            "end_col_offset": 0
+            "end_lineno": 299,
+            "end_col_offset": 63
           }
         },
         {
@@ -25488,13 +25418,11 @@
               },
               "args": [],
               "keywords": [],
-              "lowered_kind": "BuiltinCall",
-              "builtin_name": "perf_counter",
-              "runtime_call": "perf_counter",
+              "resolved_runtime_call": "time.perf_counter",
+              "resolved_runtime_source": "import_symbol",
               "runtime_module_id": "pytra.std.time",
               "runtime_symbol": "perf_counter",
               "runtime_call_adapter_kind": "extern_delegate",
-              "semantic_tag": "stdlib.fn.perf_counter",
               "type_expr_summary_v1": {
                 "schema_version": 1,
                 "kind": "NamedType",
@@ -25841,9 +25769,8 @@
           "source_module_id": "pytra.std",
           "source_export_name": "math",
           "source_binding_kind": "symbol",
-          "runtime_module_id": "pytra.std.math",
-          "runtime_group": "std",
-          "resolved_binding_kind": "module"
+          "runtime_module_id": "pytra.std",
+          "runtime_group": "std"
         },
         {
           "module_id": "pytra.std.time",
@@ -25907,16 +25834,16 @@
           "runtime_group": "built_in"
         },
         {
-          "module_id": "pytra.built_in.scalar_ops",
+          "module_id": "pytra.core.py_runtime",
           "export_name": "",
-          "local_name": "pytra.built_in.scalar_ops",
+          "local_name": "pytra.core.py_runtime",
           "binding_kind": "implicit_builtin",
           "source_file": "sample/py/16_glass_sculpture_chaos.py",
           "source_line": 0,
-          "source_module_id": "pytra.built_in.scalar_ops",
+          "source_module_id": "pytra.core.py_runtime",
           "source_binding_kind": "implicit_builtin",
-          "runtime_module_id": "pytra.built_in.scalar_ops",
-          "runtime_group": "built_in"
+          "runtime_module_id": "pytra.core.py_runtime",
+          "runtime_group": "core"
         }
       ],
       "qualified_refs": [
@@ -25979,9 +25906,9 @@
         "source_line": 0
       },
       {
-        "module_id": "pytra.built_in.scalar_ops",
+        "module_id": "pytra.core.py_runtime",
         "export_name": "",
-        "local_name": "pytra.built_in.scalar_ops",
+        "local_name": "pytra.core.py_runtime",
         "binding_kind": "implicit_builtin",
         "source_file": "sample/py/16_glass_sculpture_chaos.py",
         "source_line": 0

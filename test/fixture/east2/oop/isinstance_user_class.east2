@@ -105,7 +105,7 @@
               "end_lineno": 8,
               "end_col": 30
             },
-            "resolved_type": "unknown",
+            "resolved_type": "bool",
             "casts": [],
             "borrow_kind": "value",
             "repr": "isinstance(x, Base)",
@@ -155,8 +155,8 @@
             ],
             "keywords": [],
             "lowered_kind": "TypePredicateCall",
-            "builtin_name": "isinstance",
-            "semantic_tag": "type.isinstance"
+            "semantic_tag": "type.isinstance",
+            "predicate_kind": "isinstance"
           }
         }
       ],
@@ -534,7 +534,7 @@
               "end_lineno": 15,
               "end_col": 30
             },
-            "resolved_type": "unknown",
+            "resolved_type": "bool",
             "casts": [],
             "borrow_kind": "value",
             "repr": "isinstance(c, Child)",
@@ -584,8 +584,8 @@
             ],
             "keywords": [],
             "lowered_kind": "TypePredicateCall",
-            "builtin_name": "isinstance",
-            "semantic_tag": "type.isinstance"
+            "semantic_tag": "type.isinstance",
+            "predicate_kind": "isinstance"
           }
         ],
         "keywords": [],
