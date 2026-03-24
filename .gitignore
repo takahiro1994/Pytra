@@ -32,5 +32,5 @@ __pycache__/
 src/runtime/cpp/generated/
 
 # Scala CLI transient workspace
-sample/scala/.bsp/
-sample/scala/.scala-build/
+.bsp/
+.scala-build/
