@@ -86,6 +86,8 @@ class ResolveContext:
     used_builtin_modules: set[str] = field(default_factory=set)
     # Current function parameters (for borrow_kind: readonly_ref)
     current_params: set[str] = field(default_factory=set)
+    # Whether we're inside a class body
+    in_class: bool = False
     # Source file path
     source_file: str = ""
     # Runtime symbol index (loaded lazily)
@@ -1251,14 +1253,24 @@ def _resolve_function_def(stmt: dict[str, JsonVal], ctx: ResolveContext) -> None
         ret = normalize_type(ret_raw)
         stmt["return_type"] = ret
 
-    # Build arg_type_exprs
-    arg_type_exprs: dict[str, JsonVal] = {}
-    for k, t in arg_types.items():
-        arg_type_exprs[k] = make_type_expr(t)
-    stmt["arg_type_exprs"] = arg_type_exprs
+    # Build arg_type_exprs / return_type_expr
+    # Class methods get null (type info comes from class definition)
+    ate_key_exists: bool = "arg_type_exprs" in stmt
+    ate_is_null: bool = ate_key_exists and stmt.get("arg_type_exprs") is None
+    if ate_is_null or ctx.in_class:
+        pass  # Don't add the field — golden omits it for class methods
+    else:
+        arg_type_exprs: dict[str, JsonVal] = {}
+        for k, t in arg_types.items():
+            arg_type_exprs[k] = make_type_expr(t)
+        stmt["arg_type_exprs"] = arg_type_exprs
 
-    # Build return_type_expr
-    stmt["return_type_expr"] = make_type_expr(ret)
+    rte_key_exists: bool = "return_type_expr" in stmt
+    rte_is_null: bool = rte_key_exists and stmt.get("return_type_expr") is None
+    if rte_is_null or ctx.in_class:
+        pass  # Don't add the field — golden omits it for class methods
+    else:
+        stmt["return_type_expr"] = make_type_expr(ret)
 
     # Resolve default values
     defaults_raw = stmt.get("arg_defaults")
@@ -1380,13 +1392,16 @@ def _resolve_class_def(stmt: dict[str, JsonVal], ctx: ResolveContext) -> None:
             cls_scope.define(fname, ftype)
 
     old_scope: Scope = ctx.scope
+    old_in_class: bool = ctx.in_class
     ctx.scope = cls_scope
+    ctx.in_class = True
     body = stmt.get("body")
     if isinstance(body, list):
         for item in body:
             if isinstance(item, dict):
                 _resolve_stmt(item, ctx)
     ctx.scope = old_scope
+    ctx.in_class = old_in_class
 
 
 def _resolve_assign(stmt: dict[str, JsonVal], ctx: ResolveContext) -> None:
