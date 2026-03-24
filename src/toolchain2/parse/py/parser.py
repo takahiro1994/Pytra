@@ -1049,7 +1049,11 @@ class ExprParser:
                 entries.append(DictEntry(key=k, value=v))
             self.expect("OP", "}")
             end_tok = self.tokens[self.pos - 1]
-            base = self._base(open_tok.start, end_tok.end, "unknown", "value")
+            # Infer dict type from first key/value
+            key_type = _get_resolved_type(keys[0]) if len(keys) > 0 else "unknown"
+            val_type = _get_resolved_type(values[0]) if len(values) > 0 else "unknown"
+            dict_type = "dict[" + key_type + "," + val_type + "]" if key_type != "unknown" and val_type != "unknown" else "unknown"
+            base = self._base(open_tok.start, end_tok.end, dict_type, "value")
             return DictExpr(base=base, keys=keys, dict_values=values, entries=entries)
         # Set literal or set comprehension
         if self.peek().value == "for":
@@ -1283,6 +1287,9 @@ def _prescan(ctx: ParseContext, lines: list[str]) -> None:
         if fn_name != "":
             if ret_ann != "":
                 ctx.fn_returns[fn_name] = _resolve_type(ret_ann, ctx)
+            else:
+                # 戻り値注釈なし → None がデフォルト
+                ctx.fn_returns[fn_name] = "None"
             continue
 
         # class Name:
