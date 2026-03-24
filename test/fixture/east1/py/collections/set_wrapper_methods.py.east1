@@ -47,7 +47,7 @@
             "repr": "s",
             "id": "s"
           },
-          "annotation": "set[int64]",
+          "annotation": "set[int]",
           "value": {
             "kind": "Set",
             "source_span": {

@@ -47,7 +47,7 @@
             "repr": "d",
             "id": "d"
           },
-          "annotation": "dict[str,int64]",
+          "annotation": "dict[str, int]",
           "value": {
             "kind": "Dict",
             "source_span": {
@@ -498,7 +498,7 @@
             "repr": "vs",
             "id": "vs"
           },
-          "annotation": "list[int64]",
+          "annotation": "list[int]",
           "value": {
             "kind": "Call",
             "source_span": {

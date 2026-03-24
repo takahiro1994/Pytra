@@ -346,7 +346,7 @@
             "repr": "n",
             "id": "n"
           },
-          "annotation": "int64",
+          "annotation": "int",
           "value": {
             "kind": "Constant",
             "source_span": {
@@ -383,7 +383,7 @@
             "repr": "m",
             "id": "m"
           },
-          "annotation": "int64",
+          "annotation": "int",
           "value": {
             "kind": "Constant",
             "source_span": {
@@ -420,7 +420,7 @@
             "repr": "t",
             "id": "t"
           },
-          "annotation": "int64",
+          "annotation": "int",
           "value": {
             "kind": "BoolOp",
             "source_span": {

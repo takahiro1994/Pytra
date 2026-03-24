@@ -64,7 +64,7 @@
             "repr": "l",
             "id": "l"
           },
-          "annotation": "list[int64]",
+          "annotation": "list[int]",
           "value": {
             "kind": "List",
             "source_span": {
@@ -184,10 +184,10 @@
             "repr": "v",
             "id": "v"
           },
-          "target_type": "int64",
+          "target_type": "int",
           "iter_mode": "static_fastpath",
           "iter_source_type": "list[int64]",
-          "iter_element_type": "int64",
+          "iter_element_type": "int",
           "iter": {
             "kind": "Name",
             "source_span": {
@@ -202,7 +202,7 @@
             "id": "l",
             "iterable_trait": "yes",
             "iter_protocol": "static_range",
-            "iter_element_type": "int64"
+            "iter_element_type": "int"
           },
           "body": [
             {

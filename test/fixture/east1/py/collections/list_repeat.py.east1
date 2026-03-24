@@ -105,7 +105,7 @@
             "repr": "a",
             "id": "a"
           },
-          "annotation": "list[int64]",
+          "annotation": "list[int]",
           "value": {
             "kind": "BinOp",
             "source_span": {
@@ -1052,7 +1052,7 @@
             "repr": "c",
             "id": "c"
           },
-          "annotation": "list[int64]",
+          "annotation": "list[int]",
           "value": {
             "kind": "BinOp",
             "source_span": {
@@ -1926,7 +1926,7 @@
             "repr": "d",
             "id": "d"
           },
-          "annotation": "list[int64]",
+          "annotation": "list[int]",
           "value": {
             "kind": "BinOp",
             "source_span": {

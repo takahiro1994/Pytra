@@ -68,7 +68,7 @@
             "repr": "values",
             "id": "values"
           },
-          "annotation": "list[int64]",
+          "annotation": "list[int]",
           "value": {
             "kind": "List",
             "source_span": {
@@ -145,7 +145,7 @@
             "repr": "acc",
             "id": "acc"
           },
-          "annotation": "int64",
+          "annotation": "int",
           "value": {
             "kind": "Constant",
             "source_span": {
@@ -209,10 +209,10 @@
               }
             ]
           },
-          "target_type": "tuple[int64, int64]",
+          "target_type": "tuple[int, int]",
           "iter_mode": "static_fastpath",
           "iter_source_type": "list[tuple[int64, int64]]",
-          "iter_element_type": "tuple[int64, int64]",
+          "iter_element_type": "tuple[int, int]",
           "iter": {
             "kind": "Call",
             "source_span": {
@@ -255,7 +255,7 @@
             "keywords": [],
             "iterable_trait": "yes",
             "iter_protocol": "static_range",
-            "iter_element_type": "tuple[int64, int64]"
+            "iter_element_type": "tuple[int, int]"
           },
           "body": [
             {
@@ -345,7 +345,7 @@
             "repr": "rev",
             "id": "rev"
           },
-          "annotation": "list[int64]",
+          "annotation": "list[int]",
           "value": {
             "kind": "List",
             "source_span": {

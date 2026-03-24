@@ -53,7 +53,7 @@
             "repr": "count",
             "id": "count"
           },
-          "annotation": "int64",
+          "annotation": "int",
           "value": {
             "kind": "Constant",
             "source_span": {

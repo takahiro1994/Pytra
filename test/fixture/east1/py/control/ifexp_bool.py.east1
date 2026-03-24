@@ -76,7 +76,7 @@
             "repr": "c",
             "id": "c"
           },
-          "annotation": "int64",
+          "annotation": "int",
           "value": {
             "kind": "IfExp",
             "source_span": {

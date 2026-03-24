@@ -132,7 +132,7 @@
             "repr": "i",
             "id": "i"
           },
-          "target_type": "int64",
+          "target_type": "int",
           "start": {
             "kind": "Constant",
             "source_span": {
@@ -1363,7 +1363,7 @@
             "repr": "heat",
             "id": "heat"
           },
-          "annotation": "list[list[int64]]",
+          "annotation": "list[list[int]]",
           "value": {
             "kind": "ListComp",
             "source_span": {
@@ -1560,7 +1560,7 @@
             "repr": "t",
             "id": "t"
           },
-          "target_type": "int64",
+          "target_type": "int",
           "start": {
             "kind": "Constant",
             "source_span": {
@@ -1623,7 +1623,7 @@
                 "repr": "x",
                 "id": "x"
               },
-              "target_type": "int64",
+              "target_type": "int",
               "start": {
                 "kind": "Constant",
                 "source_span": {
@@ -1969,7 +1969,7 @@
                 "repr": "y",
                 "id": "y"
               },
-              "target_type": "int64",
+              "target_type": "int",
               "start": {
                 "kind": "Constant",
                 "source_span": {
@@ -2032,7 +2032,7 @@
                     "repr": "x",
                     "id": "x"
                   },
-                  "target_type": "int64",
+                  "target_type": "int",
                   "start": {
                     "kind": "Constant",
                     "source_span": {
@@ -3248,7 +3248,7 @@
                 "repr": "yy",
                 "id": "yy"
               },
-              "target_type": "int64",
+              "target_type": "int",
               "start": {
                 "kind": "Constant",
                 "source_span": {
@@ -3374,7 +3374,7 @@
                     "repr": "xx",
                     "id": "xx"
                   },
-                  "target_type": "int64",
+                  "target_type": "int",
                   "start": {
                     "kind": "Constant",
                     "source_span": {

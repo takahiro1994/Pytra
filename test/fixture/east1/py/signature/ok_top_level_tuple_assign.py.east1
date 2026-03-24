@@ -47,7 +47,7 @@
             "repr": "a",
             "id": "a"
           },
-          "annotation": "int64",
+          "annotation": "int",
           "value": {
             "kind": "Constant",
             "source_span": {
@@ -84,7 +84,7 @@
             "repr": "b",
             "id": "b"
           },
-          "annotation": "int64",
+          "annotation": "int",
           "value": {
             "kind": "Constant",
             "source_span": {

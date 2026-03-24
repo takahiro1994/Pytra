@@ -47,7 +47,7 @@
             "repr": "a",
             "id": "a"
           },
-          "annotation": "list[int64]",
+          "annotation": "list[int]",
           "value": {
             "kind": "List",
             "source_span": {

@@ -149,7 +149,7 @@
             "repr": "i",
             "id": "i"
           },
-          "target_type": "int64",
+          "target_type": "int",
           "start": {
             "kind": "Constant",
             "source_span": {
@@ -957,7 +957,7 @@
             "repr": "t",
             "id": "t"
           },
-          "target_type": "int64",
+          "target_type": "int",
           "start": {
             "kind": "Constant",
             "source_span": {
@@ -1111,7 +1111,7 @@
                 "repr": "p",
                 "id": "p"
               },
-              "target_type": "int64",
+              "target_type": "int",
               "start": {
                 "kind": "Constant",
                 "source_span": {
@@ -1928,7 +1928,7 @@
                     "repr": "dy",
                     "id": "dy"
                   },
-                  "target_type": "int64",
+                  "target_type": "int",
                   "start": {
                     "kind": "UnaryOp",
                     "source_span": {
@@ -2004,7 +2004,7 @@
                         "repr": "dx",
                         "id": "dx"
                       },
-                      "target_type": "int64",
+                      "target_type": "int",
                       "start": {
                         "kind": "UnaryOp",
                         "source_span": {

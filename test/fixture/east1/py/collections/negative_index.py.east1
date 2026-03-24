@@ -64,7 +64,7 @@
             "repr": "stack",
             "id": "stack"
           },
-          "annotation": "list[int64]",
+          "annotation": "list[int]",
           "value": {
             "kind": "List",
             "source_span": {

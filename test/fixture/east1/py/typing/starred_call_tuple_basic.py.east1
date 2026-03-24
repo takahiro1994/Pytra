@@ -226,7 +226,7 @@
             "repr": "rgb",
             "id": "rgb"
           },
-          "annotation": "tuple[int64,int64,int64]",
+          "annotation": "tuple[int, int, int]",
           "value": {
             "kind": "Tuple",
             "source_span": {
@@ -303,7 +303,7 @@
             "repr": "packed",
             "id": "packed"
           },
-          "annotation": "int64",
+          "annotation": "int",
           "value": {
             "kind": "Call",
             "source_span": {

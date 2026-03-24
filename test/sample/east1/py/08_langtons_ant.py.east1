@@ -188,7 +188,7 @@
             "repr": "y",
             "id": "y"
           },
-          "target_type": "int64",
+          "target_type": "int",
           "start": {
             "kind": "Constant",
             "source_span": {
@@ -314,7 +314,7 @@
                 "repr": "x",
                 "id": "x"
               },
-              "target_type": "int64",
+              "target_type": "int",
               "start": {
                 "kind": "Constant",
                 "source_span": {
@@ -812,7 +812,7 @@
             "repr": "grid",
             "id": "grid"
           },
-          "annotation": "list[list[int64]]",
+          "annotation": "list[list[int]]",
           "value": {
             "kind": "ListComp",
             "source_span": {
@@ -1258,7 +1258,7 @@
             "repr": "i",
             "id": "i"
           },
-          "target_type": "int64",
+          "target_type": "int",
           "start": {
             "kind": "Constant",
             "source_span": {

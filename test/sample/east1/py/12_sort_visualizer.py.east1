@@ -316,7 +316,7 @@
             "repr": "i",
             "id": "i"
           },
-          "target_type": "int64",
+          "target_type": "int",
           "start": {
             "kind": "Constant",
             "source_span": {
@@ -910,7 +910,7 @@
                 "repr": "y",
                 "id": "y"
               },
-              "target_type": "int64",
+              "target_type": "int",
               "start": {
                 "kind": "Name",
                 "source_span": {
@@ -973,7 +973,7 @@
                     "repr": "x",
                     "id": "x"
                   },
-                  "target_type": "int64",
+                  "target_type": "int",
                   "start": {
                     "kind": "Name",
                     "source_span": {
@@ -1449,7 +1449,7 @@
             "repr": "values",
             "id": "values"
           },
-          "annotation": "list[int64]",
+          "annotation": "list[int]",
           "value": {
             "kind": "List",
             "source_span": {
@@ -1486,7 +1486,7 @@
             "repr": "i",
             "id": "i"
           },
-          "target_type": "int64",
+          "target_type": "int",
           "start": {
             "kind": "Constant",
             "source_span": {
@@ -1891,7 +1891,7 @@
             "repr": "i",
             "id": "i"
           },
-          "target_type": "int64",
+          "target_type": "int",
           "start": {
             "kind": "Constant",
             "source_span": {
@@ -1991,7 +1991,7 @@
                 "repr": "j",
                 "id": "j"
               },
-              "target_type": "int64",
+              "target_type": "int",
               "start": {
                 "kind": "Constant",
                 "source_span": {

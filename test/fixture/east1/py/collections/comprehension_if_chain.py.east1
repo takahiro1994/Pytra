@@ -68,7 +68,7 @@
             "repr": "xs",
             "id": "xs"
           },
-          "annotation": "list[int64]",
+          "annotation": "list[int]",
           "value": {
             "kind": "List",
             "source_span": {
@@ -184,7 +184,7 @@
             "repr": "picked",
             "id": "picked"
           },
-          "annotation": "list[int64]",
+          "annotation": "list[int]",
           "value": {
             "kind": "ListComp",
             "source_span": {

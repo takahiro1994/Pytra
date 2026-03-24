@@ -70,7 +70,7 @@
             "repr": "total",
             "id": "total"
           },
-          "annotation": "int64",
+          "annotation": "int",
           "value": {
             "kind": "Constant",
             "source_span": {
@@ -107,7 +107,7 @@
             "repr": "i",
             "id": "i"
           },
-          "target_type": "int64",
+          "target_type": "int",
           "start": {
             "kind": "Constant",
             "source_span": {

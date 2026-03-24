@@ -93,7 +93,7 @@
             "repr": "mod_main",
             "id": "mod_main"
           },
-          "annotation": "int64",
+          "annotation": "int",
           "value": {
             "kind": "Constant",
             "source_span": {
@@ -130,7 +130,7 @@
             "repr": "mod_out",
             "id": "mod_out"
           },
-          "annotation": "int64",
+          "annotation": "int",
           "value": {
             "kind": "Constant",
             "source_span": {
@@ -167,7 +167,7 @@
             "repr": "acc",
             "id": "acc"
           },
-          "annotation": "int64",
+          "annotation": "int",
           "value": {
             "kind": "BinOp",
             "source_span": {
@@ -230,7 +230,7 @@
             "repr": "y",
             "id": "y"
           },
-          "target_type": "int64",
+          "target_type": "int",
           "start": {
             "kind": "Constant",
             "source_span": {
@@ -293,7 +293,7 @@
                 "repr": "row_sum",
                 "id": "row_sum"
               },
-              "annotation": "int64",
+              "annotation": "int",
               "value": {
                 "kind": "Constant",
                 "source_span": {
@@ -330,7 +330,7 @@
                 "repr": "x",
                 "id": "x"
               },
-              "target_type": "int64",
+              "target_type": "int",
               "start": {
                 "kind": "Constant",
                 "source_span": {
@@ -393,7 +393,7 @@
                     "repr": "v",
                     "id": "v"
                   },
-                  "annotation": "int64",
+                  "annotation": "int",
                   "value": {
                     "kind": "BinOp",
                     "source_span": {
@@ -953,7 +953,7 @@
             "repr": "width",
             "id": "width"
           },
-          "annotation": "int64",
+          "annotation": "int",
           "value": {
             "kind": "Constant",
             "source_span": {
@@ -1009,7 +1009,7 @@
             "repr": "height",
             "id": "height"
           },
-          "annotation": "int64",
+          "annotation": "int",
           "value": {
             "kind": "Constant",
             "source_span": {
@@ -1083,7 +1083,7 @@
             "repr": "start",
             "id": "start"
           },
-          "annotation": "float64",
+          "annotation": "float",
           "value": {
             "kind": "Call",
             "source_span": {
@@ -1140,7 +1140,7 @@
             "repr": "checksum",
             "id": "checksum"
           },
-          "annotation": "int64",
+          "annotation": "int",
           "value": {
             "kind": "Call",
             "source_span": {
@@ -1231,7 +1231,7 @@
             "repr": "elapsed",
             "id": "elapsed"
           },
-          "annotation": "float64",
+          "annotation": "float",
           "value": {
             "kind": "BinOp",
             "source_span": {

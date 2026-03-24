@@ -72,7 +72,7 @@
             "repr": "m",
             "id": "m"
           },
-          "annotation": "dict[str,str | None]",
+          "annotation": "dict[str, str | None]",
           "value": {
             "kind": "Dict",
             "source_span": {
@@ -271,7 +271,7 @@
             "repr": "payload",
             "id": "payload"
           },
-          "annotation": "dict[str,Any]",
+          "annotation": "dict[str, Any]",
           "value": {
             "kind": "Dict",
             "source_span": {

@@ -68,7 +68,7 @@
             "repr": "stepped",
             "id": "stepped"
           },
-          "annotation": "list[int64]",
+          "annotation": "list[int]",
           "value": {
             "kind": "List",
             "source_span": {
@@ -171,7 +171,7 @@
             "repr": "doubled",
             "id": "doubled"
           },
-          "annotation": "list[int64]",
+          "annotation": "list[int]",
           "value": {
             "kind": "ListComp",
             "source_span": {

@@ -145,7 +145,7 @@
             "repr": "i",
             "id": "i"
           },
-          "annotation": "int64",
+          "annotation": "int",
           "value": {
             "kind": "Call",
             "source_span": {

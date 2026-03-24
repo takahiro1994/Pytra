@@ -64,6 +64,15 @@ _TOP_REMOVE_FIELDS: set[str] = {
     "schema_version",
 }
 
+# 型を含む文字列フィールド（正規化済み型をソース型に逆正規化する）
+_TYPE_STRING_FIELDS: set[str] = {
+    "annotation",
+    "target_type",
+    "iter_element_type",
+    "vararg_type",
+    "yield_value_type",
+}
+
 # --- 型注釈の逆正規化: EAST 正規型 → Python ソースの型 ---
 
 _DENORMALIZE_TYPES: dict[str, str] = {
@@ -198,6 +207,11 @@ def strip_node(node: object) -> object:
         # borrow_kind は全て "value" に統一（resolve の責務）
         if key == "borrow_kind":
             result["borrow_kind"] = "value"
+            continue
+
+        # 型を含む文字列フィールドをソース型に逆正規化
+        if key in _TYPE_STRING_FIELDS and isinstance(val, str):
+            result[key] = _denormalize_type(val)
             continue
 
         # arg_types: 正規化済み型をソース型に戻す（list or dict）

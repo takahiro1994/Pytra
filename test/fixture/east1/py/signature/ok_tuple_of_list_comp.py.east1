@@ -47,7 +47,7 @@
             "repr": "n_layer",
             "id": "n_layer"
           },
-          "annotation": "int64",
+          "annotation": "int",
           "value": {
             "kind": "Constant",
             "source_span": {
@@ -84,7 +84,7 @@
             "repr": "keys",
             "id": "keys"
           },
-          "annotation": "list[list[int64]]",
+          "annotation": "list[list[int]]",
           "value": {
             "kind": "ListComp",
             "source_span": {
@@ -204,7 +204,7 @@
             "repr": "values",
             "id": "values"
           },
-          "annotation": "list[list[int64]]",
+          "annotation": "list[list[int]]",
           "value": {
             "kind": "ListComp",
             "source_span": {

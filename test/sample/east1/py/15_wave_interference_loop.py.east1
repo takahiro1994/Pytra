@@ -344,7 +344,7 @@
             "repr": "t",
             "id": "t"
           },
-          "target_type": "int64",
+          "target_type": "int",
           "start": {
             "kind": "Constant",
             "source_span": {
@@ -561,7 +561,7 @@
                 "repr": "y",
                 "id": "y"
               },
-              "target_type": "int64",
+              "target_type": "int",
               "start": {
                 "kind": "Constant",
                 "source_span": {
@@ -687,7 +687,7 @@
                     "repr": "x",
                     "id": "x"
                   },
-                  "target_type": "int64",
+                  "target_type": "int",
                   "start": {
                     "kind": "Constant",
                     "source_span": {

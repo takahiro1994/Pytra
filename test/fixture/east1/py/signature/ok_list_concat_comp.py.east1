@@ -47,7 +47,7 @@
             "repr": "BOS",
             "id": "BOS"
           },
-          "annotation": "int64",
+          "annotation": "int",
           "value": {
             "kind": "Constant",
             "source_span": {
@@ -185,7 +185,7 @@
             "repr": "tokens",
             "id": "tokens"
           },
-          "annotation": "list[int64]",
+          "annotation": "list[int]",
           "value": {
             "kind": "BinOp",
             "source_span": {

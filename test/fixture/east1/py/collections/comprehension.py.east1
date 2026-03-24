@@ -70,7 +70,7 @@
             "repr": "values",
             "id": "values"
           },
-          "annotation": "list[int64]",
+          "annotation": "list[int]",
           "value": {
             "kind": "ListComp",
             "source_span": {

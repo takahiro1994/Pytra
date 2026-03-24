@@ -296,7 +296,7 @@
         "repr": "result",
         "id": "result"
       },
-      "annotation": "list[float64]",
+      "annotation": "list[float]",
       "value": {
         "kind": "Call",
         "source_span": {

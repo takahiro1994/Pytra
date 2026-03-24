@@ -64,7 +64,7 @@
             "repr": "fps",
             "id": "fps"
           },
-          "annotation": "float64",
+          "annotation": "float",
           "value": {
             "kind": "Constant",
             "source_span": {
@@ -189,7 +189,7 @@
             "repr": "step",
             "id": "step"
           },
-          "annotation": "int64",
+          "annotation": "int",
           "value": {
             "kind": "Constant",
             "source_span": {
@@ -239,7 +239,7 @@
             "repr": "num_steps",
             "id": "num_steps"
           },
-          "annotation": "int64",
+          "annotation": "int",
           "value": {
             "kind": "Constant",
             "source_span": {
@@ -276,7 +276,7 @@
             "repr": "loss",
             "id": "loss"
           },
-          "annotation": "float64",
+          "annotation": "float",
           "value": {
             "kind": "Constant",
             "source_span": {
@@ -448,7 +448,7 @@
             "repr": "value",
             "id": "value"
           },
-          "annotation": "int64",
+          "annotation": "int",
           "value": {
             "kind": "Constant",
             "source_span": {
@@ -605,7 +605,7 @@
             "repr": "big",
             "id": "big"
           },
-          "annotation": "int64",
+          "annotation": "int",
           "value": {
             "kind": "Constant",
             "source_span": {
@@ -734,7 +734,7 @@
             "repr": "ratio",
             "id": "ratio"
           },
-          "annotation": "float64",
+          "annotation": "float",
           "value": {
             "kind": "Constant",
             "source_span": {
@@ -1003,7 +1003,7 @@
             "repr": "code",
             "id": "code"
           },
-          "annotation": "int64",
+          "annotation": "int",
           "value": {
             "kind": "Constant",
             "source_span": {
@@ -1132,7 +1132,7 @@
             "repr": "pos",
             "id": "pos"
           },
-          "annotation": "int64",
+          "annotation": "int",
           "value": {
             "kind": "Constant",
             "source_span": {
@@ -1182,7 +1182,7 @@
             "repr": "neg",
             "id": "neg"
           },
-          "annotation": "int64",
+          "annotation": "int",
           "value": {
             "kind": "UnaryOp",
             "source_span": {

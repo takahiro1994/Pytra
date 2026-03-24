@@ -132,7 +132,7 @@
             "repr": "pos",
             "id": "pos"
           },
-          "annotation": "int64",
+          "annotation": "int",
           "value": null,
           "declare": true
         },
@@ -157,7 +157,7 @@
             "repr": "number_value",
             "id": "number_value"
           },
-          "annotation": "int64",
+          "annotation": "int",
           "value": null,
           "declare": true
         }
@@ -235,7 +235,7 @@
             "repr": "value",
             "id": "value"
           },
-          "annotation": "int64",
+          "annotation": "int",
           "value": null,
           "declare": true
         },
@@ -310,7 +310,7 @@
             "repr": "left",
             "id": "left"
           },
-          "annotation": "int64",
+          "annotation": "int",
           "value": null,
           "declare": true
         },
@@ -335,7 +335,7 @@
             "repr": "right",
             "id": "right"
           },
-          "annotation": "int64",
+          "annotation": "int",
           "value": null,
           "declare": true
         },
@@ -360,7 +360,7 @@
             "repr": "kind_tag",
             "id": "kind_tag"
           },
-          "annotation": "int64",
+          "annotation": "int",
           "value": null,
           "declare": true
         },
@@ -385,7 +385,7 @@
             "repr": "op_tag",
             "id": "op_tag"
           },
-          "annotation": "int64",
+          "annotation": "int",
           "value": null,
           "declare": true
         }
@@ -482,7 +482,7 @@
             "repr": "expr_index",
             "id": "expr_index"
           },
-          "annotation": "int64",
+          "annotation": "int",
           "value": null,
           "declare": true
         },
@@ -507,7 +507,7 @@
             "repr": "kind_tag",
             "id": "kind_tag"
           },
-          "annotation": "int64",
+          "annotation": "int",
           "value": null,
           "declare": true
         }
@@ -559,7 +559,7 @@
             "repr": "single_char_token_tags",
             "id": "single_char_token_tags"
           },
-          "annotation": "dict[str,int64]",
+          "annotation": "dict[str, int]",
           "value": {
             "kind": "Dict",
             "source_span": {
@@ -986,10 +986,10 @@
               }
             ]
           },
-          "target_type": "tuple[int64, str]",
+          "target_type": "tuple[int, str]",
           "iter_mode": "static_fastpath",
           "iter_source_type": "list[tuple[int64, str]]",
-          "iter_element_type": "tuple[int64, str]",
+          "iter_element_type": "tuple[int, str]",
           "iter": {
             "kind": "Call",
             "source_span": {
@@ -1032,7 +1032,7 @@
             "keywords": [],
             "iterable_trait": "yes",
             "iter_protocol": "static_range",
-            "iter_element_type": "tuple[int64, str]"
+            "iter_element_type": "tuple[int, str]"
           },
           "body": [
             {
@@ -1056,7 +1056,7 @@
                 "repr": "i",
                 "id": "i"
               },
-              "annotation": "int64",
+              "annotation": "int",
               "value": {
                 "kind": "Constant",
                 "source_span": {
@@ -1093,7 +1093,7 @@
                 "repr": "n",
                 "id": "n"
               },
-              "annotation": "int64",
+              "annotation": "int",
               "value": {
                 "kind": "Call",
                 "source_span": {
@@ -1392,7 +1392,7 @@
                     "repr": "single_tag",
                     "id": "single_tag"
                   },
-                  "annotation": "int64",
+                  "annotation": "int",
                   "value": {
                     "kind": "Call",
                     "source_span": {
@@ -1866,7 +1866,7 @@
                         "repr": "start",
                         "id": "start"
                       },
-                      "annotation": "int64",
+                      "annotation": "int",
                       "value": {
                         "kind": "Name",
                         "source_span": {
@@ -4397,7 +4397,7 @@
                 },
                 "attr": "pos"
               },
-              "annotation": "int64",
+              "annotation": "int",
               "value": {
                 "kind": "Constant",
                 "source_span": {
@@ -6492,7 +6492,7 @@
                     "repr": "let_expr_index",
                     "id": "let_expr_index"
                   },
-                  "annotation": "int64",
+                  "annotation": "int",
                   "value": {
                     "kind": "Call",
                     "source_span": {
@@ -6711,7 +6711,7 @@
                     "repr": "print_expr_index",
                     "id": "print_expr_index"
                   },
-                  "annotation": "int64",
+                  "annotation": "int",
                   "value": {
                     "kind": "Call",
                     "source_span": {
@@ -7021,7 +7021,7 @@
                 "repr": "assign_expr_index",
                 "id": "assign_expr_index"
               },
-              "annotation": "int64",
+              "annotation": "int",
               "value": {
                 "kind": "Call",
                 "source_span": {
@@ -7281,7 +7281,7 @@
                 "repr": "left",
                 "id": "left"
               },
-              "annotation": "int64",
+              "annotation": "int",
               "value": {
                 "kind": "Call",
                 "source_span": {
@@ -7430,7 +7430,7 @@
                         "repr": "right",
                         "id": "right"
                       },
-                      "annotation": "int64",
+                      "annotation": "int",
                       "value": {
                         "kind": "Call",
                         "source_span": {
@@ -8141,7 +8141,7 @@
                 "repr": "left",
                 "id": "left"
               },
-              "annotation": "int64",
+              "annotation": "int",
               "value": {
                 "kind": "Call",
                 "source_span": {
@@ -8290,7 +8290,7 @@
                         "repr": "right",
                         "id": "right"
                       },
-                      "annotation": "int64",
+                      "annotation": "int",
                       "value": {
                         "kind": "Call",
                         "source_span": {
@@ -9064,7 +9064,7 @@
                     "repr": "child",
                     "id": "child"
                   },
-                  "annotation": "int64",
+                  "annotation": "int",
                   "value": {
                     "kind": "Call",
                     "source_span": {
@@ -10169,7 +10169,7 @@
                     "repr": "expr_index",
                     "id": "expr_index"
                   },
-                  "annotation": "int64",
+                  "annotation": "int",
                   "value": {
                     "kind": "Call",
                     "source_span": {
@@ -11311,7 +11311,7 @@
                 "repr": "lhs",
                 "id": "lhs"
               },
-              "annotation": "int64",
+              "annotation": "int",
               "value": {
                 "kind": "Call",
                 "source_span": {
@@ -11415,7 +11415,7 @@
                 "repr": "rhs",
                 "id": "rhs"
               },
-              "annotation": "int64",
+              "annotation": "int",
               "value": {
                 "kind": "Call",
                 "source_span": {
@@ -12308,7 +12308,7 @@
             "repr": "env",
             "id": "env"
           },
-          "annotation": "dict[str,int64]",
+          "annotation": "dict[str, int]",
           "value": {
             "kind": "Dict",
             "source_span": {
@@ -12346,7 +12346,7 @@
             "repr": "checksum",
             "id": "checksum"
           },
-          "annotation": "int64",
+          "annotation": "int",
           "value": {
             "kind": "Constant",
             "source_span": {
@@ -12383,7 +12383,7 @@
             "repr": "printed",
             "id": "printed"
           },
-          "annotation": "int64",
+          "annotation": "int",
           "value": {
             "kind": "Constant",
             "source_span": {
@@ -13097,7 +13097,7 @@
                 "repr": "value",
                 "id": "value"
               },
-              "annotation": "int64",
+              "annotation": "int",
               "value": {
                 "kind": "Call",
                 "source_span": {
@@ -13276,7 +13276,7 @@
                 "repr": "norm",
                 "id": "norm"
               },
-              "annotation": "int64",
+              "annotation": "int",
               "value": {
                 "kind": "BinOp",
                 "source_span": {
@@ -13772,7 +13772,7 @@
             "repr": "i",
             "id": "i"
           },
-          "target_type": "int64",
+          "target_type": "int",
           "start": {
             "kind": "Constant",
             "source_span": {
@@ -14087,7 +14087,7 @@
             "repr": "i",
             "id": "i"
           },
-          "target_type": "int64",
+          "target_type": "int",
           "start": {
             "kind": "Constant",
             "source_span": {
@@ -14150,7 +14150,7 @@
                 "repr": "x",
                 "id": "x"
               },
-              "annotation": "int64",
+              "annotation": "int",
               "value": {
                 "kind": "BinOp",
                 "source_span": {
@@ -14213,7 +14213,7 @@
                 "repr": "y",
                 "id": "y"
               },
-              "annotation": "int64",
+              "annotation": "int",
               "value": {
                 "kind": "BinOp",
                 "source_span": {
@@ -14302,7 +14302,7 @@
                 "repr": "c1",
                 "id": "c1"
               },
-              "annotation": "int64",
+              "annotation": "int",
               "value": {
                 "kind": "BinOp",
                 "source_span": {
@@ -14391,7 +14391,7 @@
                 "repr": "c2",
                 "id": "c2"
               },
-              "annotation": "int64",
+              "annotation": "int",
               "value": {
                 "kind": "BinOp",
                 "source_span": {
@@ -15901,7 +15901,7 @@
             "repr": "checksum",
             "id": "checksum"
           },
-          "annotation": "int64",
+          "annotation": "int",
           "value": {
             "kind": "Call",
             "source_span": {
@@ -16207,7 +16207,7 @@
             "repr": "start",
             "id": "start"
           },
-          "annotation": "float64",
+          "annotation": "float",
           "value": {
             "kind": "Call",
             "source_span": {
@@ -16452,7 +16452,7 @@
             "repr": "checksum",
             "id": "checksum"
           },
-          "annotation": "int64",
+          "annotation": "int",
           "value": {
             "kind": "Call",
             "source_span": {
@@ -16556,7 +16556,7 @@
             "repr": "elapsed",
             "id": "elapsed"
           },
-          "annotation": "float64",
+          "annotation": "float",
           "value": {
             "kind": "BinOp",
             "source_span": {

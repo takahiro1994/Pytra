@@ -81,7 +81,7 @@
             "repr": "start",
             "id": "start"
           },
-          "annotation": "float64",
+          "annotation": "float",
           "value": {
             "kind": "Call",
             "source_span": {
@@ -132,7 +132,7 @@
             "repr": "end",
             "id": "end"
           },
-          "annotation": "float64",
+          "annotation": "float",
           "value": {
             "kind": "Call",
             "source_span": {

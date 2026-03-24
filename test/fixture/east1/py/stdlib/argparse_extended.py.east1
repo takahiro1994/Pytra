@@ -505,7 +505,7 @@
             "repr": "ns",
             "id": "ns"
           },
-          "annotation": "dict[str,object]",
+          "annotation": "dict[str, object]",
           "value": {
             "kind": "Call",
             "source_span": {

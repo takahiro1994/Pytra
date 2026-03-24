@@ -317,7 +317,7 @@
             "repr": "y",
             "id": "y"
           },
-          "target_type": "int64",
+          "target_type": "int",
           "start": {
             "kind": "Constant",
             "source_span": {
@@ -380,7 +380,7 @@
                 "repr": "x",
                 "id": "x"
               },
-              "target_type": "int64",
+              "target_type": "int",
               "start": {
                 "kind": "Constant",
                 "source_span": {
@@ -598,7 +598,7 @@
                     "repr": "yy",
                     "id": "yy"
                   },
-                  "target_type": "int64",
+                  "target_type": "int",
                   "start": {
                     "kind": "Constant",
                     "source_span": {
@@ -828,7 +828,7 @@
                         "repr": "xx",
                         "id": "xx"
                       },
-                      "target_type": "int64",
+                      "target_type": "int",
                       "start": {
                         "kind": "Constant",
                         "source_span": {
@@ -1327,7 +1327,7 @@
             "repr": "grid",
             "id": "grid"
           },
-          "annotation": "list[list[int64]]",
+          "annotation": "list[list[int]]",
           "value": {
             "kind": "ListComp",
             "source_span": {
@@ -1487,7 +1487,7 @@
             "repr": "stack",
             "id": "stack"
           },
-          "annotation": "list[tuple[int64,int64]]",
+          "annotation": "list[tuple[int, int]]",
           "value": {
             "kind": "List",
             "source_span": {
@@ -1652,7 +1652,7 @@
             "repr": "dirs",
             "id": "dirs"
           },
-          "annotation": "list[tuple[int64,int64]]",
+          "annotation": "list[tuple[int, int]]",
           "value": {
             "kind": "List",
             "source_span": {
@@ -2079,7 +2079,7 @@
                 "repr": "candidates",
                 "id": "candidates"
               },
-              "annotation": "list[tuple[int64,int64,int64,int64]]",
+              "annotation": "list[tuple[int, int, int, int]]",
               "value": {
                 "kind": "List",
                 "source_span": {
@@ -2116,7 +2116,7 @@
                 "repr": "k",
                 "id": "k"
               },
-              "target_type": "int64",
+              "target_type": "int",
               "start": {
                 "kind": "Constant",
                 "source_span": {

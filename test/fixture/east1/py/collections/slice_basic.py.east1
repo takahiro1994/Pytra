@@ -64,7 +64,7 @@
             "repr": "nums",
             "id": "nums"
           },
-          "annotation": "list[int64]",
+          "annotation": "list[int]",
           "value": {
             "kind": "List",
             "source_span": {
@@ -204,7 +204,7 @@
             "repr": "mid_nums",
             "id": "mid_nums"
           },
-          "annotation": "list[int64]",
+          "annotation": "list[int]",
           "value": {
             "kind": "Subscript",
             "source_span": {

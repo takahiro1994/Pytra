@@ -47,7 +47,7 @@
             "repr": "rows",
             "id": "rows"
           },
-          "annotation": "list[list[int64]]",
+          "annotation": "list[list[int]]",
           "value": {
             "kind": "List",
             "source_span": {
@@ -152,7 +152,7 @@
             "repr": "flat",
             "id": "flat"
           },
-          "annotation": "list[int64]",
+          "annotation": "list[int]",
           "value": {
             "kind": "ListComp",
             "source_span": {

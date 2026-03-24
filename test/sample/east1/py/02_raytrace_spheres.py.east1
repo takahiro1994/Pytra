@@ -353,7 +353,7 @@
             "repr": "lx",
             "id": "lx"
           },
-          "annotation": "float64",
+          "annotation": "float",
           "value": {
             "kind": "BinOp",
             "source_span": {
@@ -416,7 +416,7 @@
             "repr": "ly",
             "id": "ly"
           },
-          "annotation": "float64",
+          "annotation": "float",
           "value": {
             "kind": "BinOp",
             "source_span": {
@@ -479,7 +479,7 @@
             "repr": "lz",
             "id": "lz"
           },
-          "annotation": "float64",
+          "annotation": "float",
           "value": {
             "kind": "BinOp",
             "source_span": {
@@ -542,7 +542,7 @@
             "repr": "a",
             "id": "a"
           },
-          "annotation": "float64",
+          "annotation": "float",
           "value": {
             "kind": "BinOp",
             "source_span": {
@@ -715,7 +715,7 @@
             "repr": "b",
             "id": "b"
           },
-          "annotation": "float64",
+          "annotation": "float",
           "value": {
             "kind": "BinOp",
             "source_span": {
@@ -908,7 +908,7 @@
             "repr": "c",
             "id": "c"
           },
-          "annotation": "float64",
+          "annotation": "float",
           "value": {
             "kind": "BinOp",
             "source_span": {
@@ -1127,7 +1127,7 @@
             "repr": "d",
             "id": "d"
           },
-          "annotation": "float64",
+          "annotation": "float",
           "value": {
             "kind": "BinOp",
             "source_span": {
@@ -1364,7 +1364,7 @@
             "repr": "sd",
             "id": "sd"
           },
-          "annotation": "float64",
+          "annotation": "float",
           "value": {
             "kind": "Call",
             "source_span": {
@@ -1442,7 +1442,7 @@
             "repr": "t0",
             "id": "t0"
           },
-          "annotation": "float64",
+          "annotation": "float",
           "value": {
             "kind": "BinOp",
             "source_span": {
@@ -1570,7 +1570,7 @@
             "repr": "t1",
             "id": "t1"
           },
-          "annotation": "float64",
+          "annotation": "float",
           "value": {
             "kind": "BinOp",
             "source_span": {
@@ -1980,7 +1980,7 @@
             "repr": "ox",
             "id": "ox"
           },
-          "annotation": "float64",
+          "annotation": "float",
           "value": {
             "kind": "Constant",
             "source_span": {
@@ -2030,7 +2030,7 @@
             "repr": "oy",
             "id": "oy"
           },
-          "annotation": "float64",
+          "annotation": "float",
           "value": {
             "kind": "Constant",
             "source_span": {
@@ -2067,7 +2067,7 @@
             "repr": "oz",
             "id": "oz"
           },
-          "annotation": "float64",
+          "annotation": "float",
           "value": {
             "kind": "UnaryOp",
             "source_span": {
@@ -2117,7 +2117,7 @@
             "repr": "lx",
             "id": "lx"
           },
-          "annotation": "float64",
+          "annotation": "float",
           "value": {
             "kind": "UnaryOp",
             "source_span": {
@@ -2180,7 +2180,7 @@
             "repr": "ly",
             "id": "ly"
           },
-          "annotation": "float64",
+          "annotation": "float",
           "value": {
             "kind": "Constant",
             "source_span": {
@@ -2217,7 +2217,7 @@
             "repr": "lz",
             "id": "lz"
           },
-          "annotation": "float64",
+          "annotation": "float",
           "value": {
             "kind": "UnaryOp",
             "source_span": {
@@ -2267,7 +2267,7 @@
             "repr": "y",
             "id": "y"
           },
-          "target_type": "int64",
+          "target_type": "int",
           "start": {
             "kind": "Constant",
             "source_span": {
@@ -2330,7 +2330,7 @@
                 "repr": "x",
                 "id": "x"
               },
-              "target_type": "int64",
+              "target_type": "int",
               "start": {
                 "kind": "Constant",
                 "source_span": {
@@ -2393,7 +2393,7 @@
                     "repr": "ar",
                     "id": "ar"
                   },
-                  "annotation": "int64",
+                  "annotation": "int",
                   "value": {
                     "kind": "Constant",
                     "source_span": {
@@ -2430,7 +2430,7 @@
                     "repr": "ag",
                     "id": "ag"
                   },
-                  "annotation": "int64",
+                  "annotation": "int",
                   "value": {
                     "kind": "Constant",
                     "source_span": {
@@ -2467,7 +2467,7 @@
                     "repr": "ab",
                     "id": "ab"
                   },
-                  "annotation": "int64",
+                  "annotation": "int",
                   "value": {
                     "kind": "Constant",
                     "source_span": {
@@ -2504,7 +2504,7 @@
                     "repr": "ay",
                     "id": "ay"
                   },
-                  "target_type": "int64",
+                  "target_type": "int",
                   "start": {
                     "kind": "Constant",
                     "source_span": {
@@ -2567,7 +2567,7 @@
                         "repr": "ax",
                         "id": "ax"
                       },
-                      "target_type": "int64",
+                      "target_type": "int",
                       "start": {
                         "kind": "Constant",
                         "source_span": {
@@ -2964,7 +2964,7 @@
                             "repr": "sy",
                             "id": "sy"
                           },
-                          "annotation": "float64",
+                          "annotation": "float",
                           "value": {
                             "kind": "BinOp",
                             "source_span": {
@@ -3053,7 +3053,7 @@
                             "repr": "sx",
                             "id": "sx"
                           },
-                          "annotation": "float64",
+                          "annotation": "float",
                           "value": {
                             "kind": "BinOp",
                             "source_span": {
@@ -3194,7 +3194,7 @@
                             "repr": "dx",
                             "id": "dx"
                           },
-                          "annotation": "float64",
+                          "annotation": "float",
                           "value": {
                             "kind": "Name",
                             "source_span": {
@@ -3237,7 +3237,7 @@
                             "repr": "dy",
                             "id": "dy"
                           },
-                          "annotation": "float64",
+                          "annotation": "float",
                           "value": {
                             "kind": "Name",
                             "source_span": {
@@ -3274,7 +3274,7 @@
                             "repr": "dz",
                             "id": "dz"
                           },
-                          "annotation": "float64",
+                          "annotation": "float",
                           "value": {
                             "kind": "Constant",
                             "source_span": {
@@ -3311,7 +3311,7 @@
                             "repr": "inv_len",
                             "id": "inv_len"
                           },
-                          "annotation": "float64",
+                          "annotation": "float",
                           "value": {
                             "kind": "BinOp",
                             "source_span": {
@@ -3656,7 +3656,7 @@
                             "repr": "t_min",
                             "id": "t_min"
                           },
-                          "annotation": "float64",
+                          "annotation": "float",
                           "value": {
                             "kind": "Constant",
                             "source_span": {
@@ -3699,7 +3699,7 @@
                             "repr": "hit_id",
                             "id": "hit_id"
                           },
-                          "annotation": "int64",
+                          "annotation": "int",
                           "value": {
                             "kind": "UnaryOp",
                             "source_span": {
@@ -3749,7 +3749,7 @@
                             "repr": "t",
                             "id": "t"
                           },
-                          "annotation": "float64",
+                          "annotation": "float",
                           "value": {
                             "kind": "Call",
                             "source_span": {
@@ -4901,7 +4901,7 @@
                             "repr": "r",
                             "id": "r"
                           },
-                          "annotation": "int64",
+                          "annotation": "int",
                           "value": {
                             "kind": "Constant",
                             "source_span": {
@@ -4938,7 +4938,7 @@
                             "repr": "g",
                             "id": "g"
                           },
-                          "annotation": "int64",
+                          "annotation": "int",
                           "value": {
                             "kind": "Constant",
                             "source_span": {
@@ -4975,7 +4975,7 @@
                             "repr": "b",
                             "id": "b"
                           },
-                          "annotation": "int64",
+                          "annotation": "int",
                           "value": {
                             "kind": "Constant",
                             "source_span": {
@@ -5064,7 +5064,7 @@
                                 "repr": "px",
                                 "id": "px"
                               },
-                              "annotation": "float64",
+                              "annotation": "float",
                               "value": {
                                 "kind": "BinOp",
                                 "source_span": {
@@ -5153,7 +5153,7 @@
                                 "repr": "py",
                                 "id": "py"
                               },
-                              "annotation": "float64",
+                              "annotation": "float",
                               "value": {
                                 "kind": "BinOp",
                                 "source_span": {
@@ -5242,7 +5242,7 @@
                                 "repr": "pz",
                                 "id": "pz"
                               },
-                              "annotation": "float64",
+                              "annotation": "float",
                               "value": {
                                 "kind": "BinOp",
                                 "source_span": {
@@ -5331,7 +5331,7 @@
                                 "repr": "nx",
                                 "id": "nx"
                               },
-                              "annotation": "float64",
+                              "annotation": "float",
                               "value": {
                                 "kind": "Constant",
                                 "source_span": {
@@ -5374,7 +5374,7 @@
                                 "repr": "ny",
                                 "id": "ny"
                               },
-                              "annotation": "float64",
+                              "annotation": "float",
                               "value": {
                                 "kind": "Constant",
                                 "source_span": {
@@ -5411,7 +5411,7 @@
                                 "repr": "nz",
                                 "id": "nz"
                               },
-                              "annotation": "float64",
+                              "annotation": "float",
                               "value": {
                                 "kind": "Constant",
                                 "source_span": {
@@ -6211,7 +6211,7 @@
                                 "repr": "diff",
                                 "id": "diff"
                               },
-                              "annotation": "float64",
+                              "annotation": "float",
                               "value": {
                                 "kind": "BinOp",
                                 "source_span": {
@@ -6482,7 +6482,7 @@
                                 "repr": "base_r",
                                 "id": "base_r"
                               },
-                              "annotation": "float64",
+                              "annotation": "float",
                               "value": {
                                 "kind": "Constant",
                                 "source_span": {
@@ -6525,7 +6525,7 @@
                                 "repr": "base_g",
                                 "id": "base_g"
                               },
-                              "annotation": "float64",
+                              "annotation": "float",
                               "value": {
                                 "kind": "Constant",
                                 "source_span": {
@@ -6562,7 +6562,7 @@
                                 "repr": "base_b",
                                 "id": "base_b"
                               },
-                              "annotation": "float64",
+                              "annotation": "float",
                               "value": {
                                 "kind": "Constant",
                                 "source_span": {
@@ -6929,7 +6929,7 @@
                                         "repr": "checker",
                                         "id": "checker"
                                       },
-                                      "annotation": "int64",
+                                      "annotation": "int",
                                       "value": {
                                         "kind": "BinOp",
                                         "source_span": {
@@ -7466,7 +7466,7 @@
                                 "repr": "shade",
                                 "id": "shade"
                               },
-                              "annotation": "float64",
+                              "annotation": "float",
                               "value": {
                                 "kind": "BinOp",
                                 "source_span": {
@@ -7992,7 +7992,7 @@
                                 "repr": "tsky",
                                 "id": "tsky"
                               },
-                              "annotation": "float64",
+                              "annotation": "float",
                               "value": {
                                 "kind": "BinOp",
                                 "source_span": {
@@ -9029,7 +9029,7 @@
             "repr": "width",
             "id": "width"
           },
-          "annotation": "int64",
+          "annotation": "int",
           "value": {
             "kind": "Constant",
             "source_span": {
@@ -9066,7 +9066,7 @@
             "repr": "height",
             "id": "height"
           },
-          "annotation": "int64",
+          "annotation": "int",
           "value": {
             "kind": "Constant",
             "source_span": {
@@ -9103,7 +9103,7 @@
             "repr": "aa",
             "id": "aa"
           },
-          "annotation": "int64",
+          "annotation": "int",
           "value": {
             "kind": "Constant",
             "source_span": {
@@ -9177,7 +9177,7 @@
             "repr": "start",
             "id": "start"
           },
-          "annotation": "float64",
+          "annotation": "float",
           "value": {
             "kind": "Call",
             "source_span": {
@@ -9427,7 +9427,7 @@
             "repr": "elapsed",
             "id": "elapsed"
           },
-          "annotation": "float64",
+          "annotation": "float",
           "value": {
             "kind": "BinOp",
             "source_span": {

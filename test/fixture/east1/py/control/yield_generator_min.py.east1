@@ -53,7 +53,7 @@
             "repr": "i",
             "id": "i"
           },
-          "annotation": "int64",
+          "annotation": "int",
           "value": {
             "kind": "Constant",
             "source_span": {
@@ -185,7 +185,7 @@
         }
       ],
       "is_generator": 1,
-      "yield_value_type": "int64",
+      "yield_value_type": "int",
       "leading_comments": [],
       "leading_trivia": []
     },
@@ -228,7 +228,7 @@
             "repr": "total",
             "id": "total"
           },
-          "annotation": "int64",
+          "annotation": "int",
           "value": {
             "kind": "Constant",
             "source_span": {
@@ -265,10 +265,10 @@
             "repr": "v",
             "id": "v"
           },
-          "target_type": "int64",
+          "target_type": "int",
           "iter_mode": "static_fastpath",
           "iter_source_type": "list[int64]",
-          "iter_element_type": "int64",
+          "iter_element_type": "int",
           "iter": {
             "kind": "Call",
             "source_span": {
@@ -311,7 +311,7 @@
             "keywords": [],
             "iterable_trait": "yes",
             "iter_protocol": "static_range",
-            "iter_element_type": "int64"
+            "iter_element_type": "int"
           },
           "body": [
             {

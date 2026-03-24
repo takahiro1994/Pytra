@@ -68,7 +68,7 @@
             "repr": "rows",
             "id": "rows"
           },
-          "annotation": "list[list[int64]]",
+          "annotation": "list[list[int]]",
           "value": {
             "kind": "ListComp",
             "source_span": {

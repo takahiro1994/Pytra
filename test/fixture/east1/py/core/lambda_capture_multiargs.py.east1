@@ -68,7 +68,7 @@
             "repr": "base",
             "id": "base"
           },
-          "annotation": "int64",
+          "annotation": "int",
           "value": {
             "kind": "Constant",
             "source_span": {

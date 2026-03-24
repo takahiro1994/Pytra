@@ -68,7 +68,7 @@
             "repr": "x",
             "id": "x"
           },
-          "annotation": "int64",
+          "annotation": "int",
           "value": {
             "kind": "Constant",
             "source_span": {
@@ -105,7 +105,7 @@
             "repr": "y",
             "id": "y"
           },
-          "annotation": "int64",
+          "annotation": "int",
           "value": {
             "kind": "Constant",
             "source_span": {
@@ -142,7 +142,7 @@
             "repr": "inv_y",
             "id": "inv_y"
           },
-          "annotation": "int64",
+          "annotation": "int",
           "value": {
             "kind": "UnaryOp",
             "source_span": {
@@ -192,7 +192,7 @@
             "repr": "and_mask",
             "id": "and_mask"
           },
-          "annotation": "int64",
+          "annotation": "int",
           "value": {
             "kind": "BinOp",
             "source_span": {
@@ -268,7 +268,7 @@
             "repr": "or_mask",
             "id": "or_mask"
           },
-          "annotation": "int64",
+          "annotation": "int",
           "value": {
             "kind": "BinOp",
             "source_span": {
@@ -344,7 +344,7 @@
             "repr": "xor_mask",
             "id": "xor_mask"
           },
-          "annotation": "int64",
+          "annotation": "int",
           "value": {
             "kind": "BinOp",
             "source_span": {

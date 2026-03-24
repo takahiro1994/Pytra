@@ -68,7 +68,7 @@
             "repr": "xs",
             "id": "xs"
           },
-          "annotation": "list[int64]",
+          "annotation": "list[int]",
           "value": {
             "kind": "List",
             "source_span": {
@@ -158,7 +158,7 @@
             "repr": "odds_sq",
             "id": "odds_sq"
           },
-          "annotation": "set[int64]",
+          "annotation": "set[int]",
           "value": {
             "kind": "SetComp",
             "source_span": {
@@ -335,7 +335,7 @@
             "repr": "even_map",
             "id": "even_map"
           },
-          "annotation": "dict[int64,int64]",
+          "annotation": "dict[int, int]",
           "value": {
             "kind": "DictComp",
             "source_span": {

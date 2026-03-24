@@ -316,7 +316,7 @@
             "repr": "d",
             "id": "d"
           },
-          "annotation": "dict[str,int64]",
+          "annotation": "dict[str, int]",
           "value": {
             "kind": "Dict",
             "source_span": {

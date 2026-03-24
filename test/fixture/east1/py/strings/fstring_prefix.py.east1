@@ -105,7 +105,7 @@
             "repr": "x",
             "id": "x"
           },
-          "annotation": "int64",
+          "annotation": "int",
           "value": {
             "kind": "Constant",
             "source_span": {
@@ -142,7 +142,7 @@
             "repr": "y",
             "id": "y"
           },
-          "annotation": "int64",
+          "annotation": "int",
           "value": {
             "kind": "Constant",
             "source_span": {
