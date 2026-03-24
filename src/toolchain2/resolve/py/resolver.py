@@ -505,6 +505,15 @@ def _resolve_simple_call(expr: dict[str, JsonVal], func: dict[str, JsonVal], ctx
             expr["runtime_symbol"] = exc_extern.symbol
             expr["runtime_call_adapter_kind"] = "builtin"
             expr["semantic_tag"] = exc_extern.tag
+        else:
+            # Fallback: Exception not in registry, use defaults
+            expr["lowered_kind"] = "BuiltinCall"
+            expr["builtin_name"] = name
+            expr["runtime_call"] = "std::runtime_error"
+            expr["runtime_module_id"] = "pytra.core.py_runtime"
+            expr["runtime_symbol"] = name
+            expr["runtime_call_adapter_kind"] = "builtin"
+            expr["semantic_tag"] = "error.raise_ctor"
         return name
 
     # Class constructor?
@@ -1638,8 +1647,14 @@ def _resolve_class_def(stmt: dict[str, JsonVal], ctx: ResolveContext) -> None:
                 if isinstance(item, dict) and item.get("kind") == "FunctionDef" and item.get("name") == "__init__":
                     has_init = True
                     break
-        # base, __init__, or @dataclass → "ref", otherwise "value"
-        stmt["class_storage_hint"] = "ref" if (has_base or has_init or is_dataclass) else "value"
+        # Enum/IntEnum/IntFlag bases are value types
+        base_str: str = str(base_val) if isinstance(base_val, str) else ""
+        is_enum_base: bool = base_str in ("Enum", "IntEnum", "IntFlag")
+        # base (non-enum), __init__, or @dataclass → "ref", otherwise "value"
+        if (has_base and not is_enum_base) or has_init or is_dataclass:
+            stmt["class_storage_hint"] = "ref"
+        else:
+            stmt["class_storage_hint"] = "value"
 
     # Normalize field_types
     ft_raw = stmt.get("field_types")
@@ -1662,7 +1677,30 @@ def _resolve_class_def(stmt: dict[str, JsonVal], ctx: ResolveContext) -> None:
     old_in_class: bool = ctx.in_class
     ctx.scope = cls_scope
     ctx.in_class = True
+
+    # First pass: define class-level variables in scope
     body = stmt.get("body")
+    if isinstance(body, list):
+        for item in body:
+            if isinstance(item, dict):
+                ik: str = str(item.get("kind", ""))
+                if ik == "AnnAssign":
+                    ann = item.get("annotation")
+                    if isinstance(ann, str):
+                        tgt = item.get("target")
+                        if isinstance(tgt, dict) and tgt.get("kind") == "Name":
+                            vn = tgt.get("id")
+                            if isinstance(vn, str):
+                                cls_scope.define(vn, normalize_type(ann))
+                elif ik == "Assign":
+                    tgt2 = item.get("target")
+                    if isinstance(tgt2, dict) and tgt2.get("kind") == "Name":
+                        vn2 = tgt2.get("id")
+                        if isinstance(vn2, str):
+                            # Will be resolved in second pass
+                            pass
+
+    # Second pass: resolve all statements
     if isinstance(body, list):
         for item in body:
             if isinstance(item, dict):
@@ -2117,12 +2155,10 @@ def _resolve_try(stmt: dict[str, JsonVal], ctx: ResolveContext) -> None:
     if isinstance(handlers, list):
         for h in handlers:
             if isinstance(h, dict):
-                # Resolve exception type
+                # Resolve exception type — exception class names stay "unknown"
                 exc_type = h.get("type")
                 if isinstance(exc_type, dict) and exc_type.get("kind") == "Name":
-                    exc_name_val = exc_type.get("id")
-                    if isinstance(exc_name_val, str):
-                        exc_type["resolved_type"] = exc_name_val
+                    exc_type["resolved_type"] = "unknown"
                 handler_body = h.get("body")
                 if isinstance(handler_body, list):
                     for s in handler_body:
