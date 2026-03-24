@@ -1473,6 +1473,7 @@ def _parse_function_def(
     arg_index: dict[str, int] = {}
     arg_type_exprs: dict[str, dict[str, JsonVal]] = {}
 
+    name_types_empty: dict[str, str] = {}
     if args_text.strip() != "" and args_text.strip() != "self":
         idx = 0
         for param in _split_type_args_outer(args_text):
@@ -1497,6 +1498,11 @@ def _parse_function_def(
             arg_order.append(pname)
             arg_types[pname] = ptype
             arg_index[pname] = idx
+            # Default value
+            if default_part != "":
+                default_col = _find_expr_col(ctx, default_part, start_ln + 1, 0)
+                default_expr = _parse_expr_text(ctx, default_part, start_ln + 1, default_col, name_types_empty)
+                arg_defaults[pname] = expr_to_jv(default_expr)
             if ptype != "unknown":
                 arg_type_exprs[pname] = _make_type_expr(ptype, ctx).to_jv()
             idx += 1
