@@ -497,7 +497,39 @@ diff test/east1/py/01_mandelbrot.py.east1 work/tmp/01_mandelbrot.py.east1
 - toolchain/ への依存ゼロ。§5 コーディング規約 (Any/object 禁止、JsonVal ベース、pytra.std.* のみ) を遵守。
 - `copy.deepcopy` は pytra.std にないため、JSON 値の再帰コピー関数 (`deep_copy_json`) で代替。
 
-## 7. 未決事項
+## 7. toolchain2/ → toolchain/ 置換手順
+
+全段（parse→resolve→compile→optimize）の golden 一致が確認できた時点で、以下の手順で置換する。
+
+### Phase 1: toolchain2/ を toolchain/ に統合（emit は現行を維持）
+
+```
+src/toolchain/
+  parse/py/          ← toolchain2/parse/py/ から移動
+  resolve/py/        ← toolchain2/resolve/py/ から移動
+  compile/           ← toolchain2/compile/ から移動（旧 compile/ はリネーム）
+  optimize/          ← toolchain2/optimize/ から移動
+  emit/              ← 現行 toolchain/emit/ をそのまま維持
+  unused/            ← 旧 toolchain/ の残り（compile/, frontends/, misc/ 等）
+```
+
+- `toolchain2/` は削除
+- `pytra-cli2.py` → `pytra-cli.py` にリネーム（旧 `pytra-cli.py` は `pytra-cli-legacy.py` に退避）
+- import パスを `toolchain2.*` → `toolchain.*` に一括置換
+- `-build` は emit のみ `toolchain/emit/` を暫定で呼ぶ
+
+### Phase 2: emit を toolchain2 方式に移行
+
+- `toolchain/emit/cpp/` 等を新方式（EAST3 入力、写像のみ）に書き換え
+- 完了したら `toolchain/unused/` を削除
+
+### Phase 3: クリーンアップ
+
+- `toolchain/unused/` を削除
+- `pytra-cli-legacy.py` を削除
+- `tools/generate_golden.py` を toolchain2 ベース（toolchain/ の新実装）に切り替え
+
+## 8. 未決事項
 
 - `--from=python` 以外の frontend が現実的に必要になる時期
 - `.east1` / `.east2` / `.east3` のシリアライズ形式（JSON 維持 or バイナリ形式導入）
