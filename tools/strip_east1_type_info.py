@@ -108,6 +108,65 @@ def _split_top_level(text: str, sep: str) -> list[str]:
     return out
 
 
+# import_resolution.bindings から除去するフィールド
+_BINDING_REMOVE_FIELDS: set[str] = {
+    "source_module_id",
+    "source_export_name",
+    "source_binding_kind",
+    "runtime_group",
+    "runtime_symbol_kind",
+    "runtime_symbol_dispatch",
+    "runtime_semantic_tag",
+    "runtime_module_id",
+    "runtime_symbol",
+    "resolved_binding_kind",
+}
+
+
+def _strip_import_resolution(ir: object) -> object:
+    """import_resolution から resolve 段の情報を除去する。"""
+    if not isinstance(ir, dict):
+        return ir
+    result: dict[str, object] = {}
+    for k, v in ir.items():
+        if k == "bindings" and isinstance(v, list):
+            stripped_bindings: list[object] = []
+            for b in v:
+                if not isinstance(b, dict):
+                    stripped_bindings.append(b)
+                    continue
+                # implicit_builtin は resolve の責務なので除去
+                if b.get("binding_kind") == "implicit_builtin":
+                    continue
+                stripped_b: dict[str, object] = {}
+                for bk, bv in b.items():
+                    if bk not in _BINDING_REMOVE_FIELDS:
+                        stripped_b[bk] = bv
+                stripped_bindings.append(stripped_b)
+            result[k] = stripped_bindings
+        else:
+            result[k] = v
+    return result
+
+
+def _strip_binding_list(bindings: list[object]) -> list[object]:
+    """import_bindings / qualified_symbol_refs から resolve 段の情報を除去する。"""
+    out: list[object] = []
+    for b in bindings:
+        if not isinstance(b, dict):
+            out.append(b)
+            continue
+        # implicit_builtin は resolve の責務なので除去
+        if b.get("binding_kind") == "implicit_builtin":
+            continue
+        stripped: dict[str, object] = {}
+        for bk, bv in b.items():
+            if bk not in _BINDING_REMOVE_FIELDS:
+                stripped[bk] = bv
+        out.append(stripped)
+    return out
+
+
 def strip_node(node: object) -> object:
     """再帰的に EAST1 不要フィールドを除去する。"""
     if isinstance(node, list):
@@ -161,8 +220,18 @@ def strip_node(node: object) -> object:
         if key == "meta" and isinstance(val, dict):
             meta_result: dict[str, object] = {}
             for mk, mv in val.items():
-                if mk not in _META_REMOVE_FIELDS:
-                    meta_result[mk] = strip_node(mv)
+                if mk in _META_REMOVE_FIELDS:
+                    continue
+                if mk == "import_resolution":
+                    meta_result[mk] = _strip_import_resolution(mv)
+                    continue
+                if mk == "import_bindings" and isinstance(mv, list):
+                    meta_result[mk] = _strip_binding_list(mv)
+                    continue
+                if mk == "qualified_symbol_refs" and isinstance(mv, list):
+                    meta_result[mk] = _strip_binding_list(mv)
+                    continue
+                meta_result[mk] = strip_node(mv)
             result["meta"] = meta_result
             continue
 

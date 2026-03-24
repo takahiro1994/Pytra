@@ -876,15 +876,7 @@
           "local_name": "dumps",
           "binding_kind": "symbol",
           "source_file": "test/fixture/source/py/stdlib/json_extended.py",
-          "source_line": 1,
-          "source_module_id": "pytra.std.json",
-          "source_export_name": "dumps",
-          "source_binding_kind": "symbol",
-          "runtime_group": "std",
-          "resolved_binding_kind": "symbol",
-          "runtime_symbol_kind": "function",
-          "runtime_symbol_dispatch": "function",
-          "runtime_semantic_tag": "stdlib.fn.dumps"
+          "source_line": 1
         },
         {
           "module_id": "pytra.utils.assertions",
@@ -892,15 +884,7 @@
           "local_name": "py_assert_all",
           "binding_kind": "symbol",
           "source_file": "test/fixture/source/py/stdlib/json_extended.py",
-          "source_line": 2,
-          "source_module_id": "pytra.utils.assertions",
-          "source_export_name": "py_assert_all",
-          "source_binding_kind": "symbol",
-          "runtime_group": "utils",
-          "resolved_binding_kind": "symbol",
-          "runtime_symbol_kind": "function",
-          "runtime_symbol_dispatch": "function",
-          "runtime_semantic_tag": "stdlib.fn.py_assert_all"
+          "source_line": 2
         },
         {
           "module_id": "pytra.utils.assertions",
@@ -908,26 +892,7 @@
           "local_name": "py_assert_eq",
           "binding_kind": "symbol",
           "source_file": "test/fixture/source/py/stdlib/json_extended.py",
-          "source_line": 2,
-          "source_module_id": "pytra.utils.assertions",
-          "source_export_name": "py_assert_eq",
-          "source_binding_kind": "symbol",
-          "runtime_group": "utils",
-          "resolved_binding_kind": "symbol",
-          "runtime_symbol_kind": "function",
-          "runtime_symbol_dispatch": "function",
-          "runtime_semantic_tag": "stdlib.fn.py_assert_eq"
-        },
-        {
-          "module_id": "pytra.built_in.io_ops",
-          "export_name": "",
-          "local_name": "pytra.built_in.io_ops",
-          "binding_kind": "implicit_builtin",
-          "source_file": "test/fixture/source/py/stdlib/json_extended.py",
-          "source_line": 0,
-          "source_module_id": "pytra.built_in.io_ops",
-          "source_binding_kind": "implicit_builtin",
-          "runtime_group": "built_in"
+          "source_line": 2
         }
       ],
       "qualified_refs": [
@@ -972,14 +937,6 @@
         "binding_kind": "symbol",
         "source_file": "test/fixture/source/py/stdlib/json_extended.py",
         "source_line": 2
-      },
-      {
-        "module_id": "pytra.built_in.io_ops",
-        "export_name": "",
-        "local_name": "pytra.built_in.io_ops",
-        "binding_kind": "implicit_builtin",
-        "source_file": "test/fixture/source/py/stdlib/json_extended.py",
-        "source_line": 0
       }
     ],
     "qualified_symbol_refs": [
