@@ -222,8 +222,14 @@ def _resolve_expr(expr: dict[str, JsonVal], ctx: ResolveContext) -> str:
         return _resolve_ifexp(expr, ctx)
     if kind == "ListComp":
         return _resolve_listcomp(expr, ctx)
+    if kind == "SetComp":
+        return _resolve_setcomp(expr, ctx)
+    if kind == "DictComp":
+        return _resolve_dictcomp(expr, ctx)
     if kind == "Starred":
         return _resolve_starred(expr, ctx)
+    if kind == "Slice":
+        return _resolve_slice(expr, ctx)
     if kind == "JoinedStr":
         expr["resolved_type"] = "str"
         # Resolve child values
@@ -1163,6 +1169,104 @@ def _resolve_listcomp(expr: dict[str, JsonVal], ctx: ResolveContext) -> str:
     return result
 
 
+def _resolve_setcomp(expr: dict[str, JsonVal], ctx: ResolveContext) -> str:
+    """Resolve a set comprehension {elt for ...}."""
+    generators = expr.get("generators")
+    comp_scope: Scope = ctx.scope.child()
+    old_scope: Scope = ctx.scope
+    if isinstance(generators, list):
+        for gen in generators:
+            if isinstance(gen, dict):
+                iter_expr = gen.get("iter")
+                if isinstance(iter_expr, dict):
+                    if _is_range_call(iter_expr):
+                        _convert_call_to_range_expr(iter_expr, ctx)
+                        it = "list[int64]"
+                    else:
+                        it = _resolve_expr(iter_expr, ctx)
+                    elem: str = "unknown"
+                    if it.startswith("list[") and it.endswith("]"):
+                        elem = it[5:-1]
+                    target = gen.get("target")
+                    if isinstance(target, dict) and target.get("kind") == "Name":
+                        var_name = target.get("id")
+                        if isinstance(var_name, str):
+                            comp_scope.define(var_name, elem)
+                            target["resolved_type"] = elem
+                ifs = gen.get("ifs")
+                if isinstance(ifs, list):
+                    ctx.scope = comp_scope
+                    for cond in ifs:
+                        if isinstance(cond, dict):
+                            _resolve_expr(cond, ctx)
+                    ctx.scope = old_scope
+    ctx.scope = comp_scope
+    elt = expr.get("elt")
+    elt_type: str = "unknown"
+    if isinstance(elt, dict):
+        elt_type = _resolve_expr(elt, ctx)
+    ctx.scope = old_scope
+    result: str = "set[" + elt_type + "]"
+    expr["resolved_type"] = result
+    return result
+
+
+def _resolve_dictcomp(expr: dict[str, JsonVal], ctx: ResolveContext) -> str:
+    """Resolve a dict comprehension {k: v for ...}."""
+    generators = expr.get("generators")
+    comp_scope: Scope = ctx.scope.child()
+    old_scope: Scope = ctx.scope
+    if isinstance(generators, list):
+        for gen in generators:
+            if isinstance(gen, dict):
+                iter_expr = gen.get("iter")
+                if isinstance(iter_expr, dict):
+                    if _is_range_call(iter_expr):
+                        _convert_call_to_range_expr(iter_expr, ctx)
+                        it = "list[int64]"
+                    else:
+                        it = _resolve_expr(iter_expr, ctx)
+                    elem: str = "unknown"
+                    if it.startswith("list[") and it.endswith("]"):
+                        elem = it[5:-1]
+                    target = gen.get("target")
+                    if isinstance(target, dict) and target.get("kind") == "Name":
+                        var_name = target.get("id")
+                        if isinstance(var_name, str):
+                            comp_scope.define(var_name, elem)
+                            target["resolved_type"] = elem
+                ifs = gen.get("ifs")
+                if isinstance(ifs, list):
+                    ctx.scope = comp_scope
+                    for cond in ifs:
+                        if isinstance(cond, dict):
+                            _resolve_expr(cond, ctx)
+                    ctx.scope = old_scope
+    ctx.scope = comp_scope
+    key_node = expr.get("key")
+    val_node = expr.get("value")
+    kt: str = "unknown"
+    vt: str = "unknown"
+    if isinstance(key_node, dict):
+        kt = _resolve_expr(key_node, ctx)
+    if isinstance(val_node, dict):
+        vt = _resolve_expr(val_node, ctx)
+    ctx.scope = old_scope
+    result: str = "dict[" + kt + "," + vt + "]"
+    expr["resolved_type"] = result
+    return result
+
+
+def _resolve_slice(expr: dict[str, JsonVal], ctx: ResolveContext) -> str:
+    """Resolve a Slice node (lower:upper:step)."""
+    for key in ("lower", "upper", "step"):
+        child = expr.get(key)
+        if isinstance(child, dict) and "kind" in child:
+            _resolve_expr(child, ctx)
+    # Slice itself doesn't have a resolved_type in the same sense
+    return "slice"
+
+
 def _resolve_starred(expr: dict[str, JsonVal], ctx: ResolveContext) -> str:
     value = expr.get("value")
     if isinstance(value, dict):
@@ -1222,6 +1326,12 @@ def _resolve_stmt(stmt: dict[str, JsonVal], ctx: ResolveContext) -> None:
         exc = stmt.get("exc")
         if isinstance(exc, dict):
             _resolve_expr(exc, ctx)
+        # Exception type name in handler
+        exc_type = stmt.get("type")
+        if isinstance(exc_type, dict) and exc_type.get("kind") == "Name":
+            exc_name = exc_type.get("id")
+            if isinstance(exc_name, str):
+                exc_type["resolved_type"] = exc_name
     elif kind == "Break" or kind == "Continue" or kind == "Pass":
         pass
     elif kind == "Delete":
@@ -1530,6 +1640,9 @@ def _resolve_ann_assign(stmt: dict[str, JsonVal], ctx: ResolveContext) -> None:
             ctx.scope.define(name_val, ann_type)
             target["resolved_type"] = ann_type
             target["type_expr"] = make_type_expr(ann_type)
+    elif isinstance(target, dict) and target.get("kind") == "Attribute":
+        # self.field = ... — resolve the receiver (self)
+        _resolve_expr(target, ctx)
 
 
 def _resolve_aug_assign(stmt: dict[str, JsonVal], ctx: ResolveContext) -> None:
@@ -1872,6 +1985,12 @@ def _resolve_try(stmt: dict[str, JsonVal], ctx: ResolveContext) -> None:
     if isinstance(handlers, list):
         for h in handlers:
             if isinstance(h, dict):
+                # Resolve exception type
+                exc_type = h.get("type")
+                if isinstance(exc_type, dict) and exc_type.get("kind") == "Name":
+                    exc_name_val = exc_type.get("id")
+                    if isinstance(exc_name_val, str):
+                        exc_type["resolved_type"] = exc_name_val
                 handler_body = h.get("body")
                 if isinstance(handler_body, list):
                     for s in handler_body:

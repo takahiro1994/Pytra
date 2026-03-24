@@ -40,7 +40,7 @@ _EXPR_KINDS: set[str] = {
     "Name", "Constant", "BinOp", "UnaryOp", "Compare", "BoolOp",
     "Call", "Attribute", "Subscript", "List", "Dict", "Set", "Tuple",
     "IfExp", "ListComp", "DictComp", "SetComp", "Starred",
-    "JoinedStr", "FormattedValue", "Lambda", "Slice",
+    "JoinedStr", "FormattedValue", "Lambda",
 }
 
 # Unresolved Python types that should have been normalized
