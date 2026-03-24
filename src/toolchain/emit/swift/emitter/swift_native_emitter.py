@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 from toolchain.emit.common.emitter.code_emitter import (
+    build_import_alias_map,
     collect_reassigned_params,
     mutable_param_name,
     reject_backend_general_union_type_exprs,
@@ -243,7 +244,7 @@ def _swift_type(type_name: Any, *, allow_void: bool) -> str:
     ts3: str = type_name
     if type_name == "None":
         return "Void" if allow_void else "Any"
-    if type_name in {"int", "int64", "uint8"}:
+    if type_name in {"int", "int64", "int32", "int16", "int8", "uint8", "uint16", "uint32", "uint64", "byte"}:
         return "Int64"
     if type_name in {"float", "float64"}:
         return "Double"
@@ -708,10 +709,29 @@ def _snake_to_pascal(name: str) -> str:
     return "".join(out)
 
 
-def _resolved_runtime_symbol(runtime_call: str) -> str:
+def _resolved_runtime_symbol(runtime_call: str, adapter_kind: str = "") -> str:
+    """Resolve runtime call to Swift function name.
+
+    Uses runtime_call_adapter_kind (§1) when available,
+    falls back to runtime_call string parsing.
+    """
     name = runtime_call.strip()
     if name == "":
         return ""
+    # §1: use runtime_call_adapter_kind when available
+    if adapter_kind == "extern_delegate":
+        dot = name.find(".")
+        if dot >= 0:
+            module_name = name[:dot].strip()
+            symbol_name = name[dot + 1 :].strip()
+            if module_name != "" and symbol_name != "":
+                return module_name + "_native_" + symbol_name
+        return ""
+    if adapter_kind == "builtin":
+        dot = name.find(".")
+        bare = name[dot + 1:].strip() if dot >= 0 else name
+        return "__pytra_" + bare if bare != "" else ""
+    # Fallback: infer from runtime_call string structure
     dot = name.find(".")
     if dot >= 0:
         module_name = name[:dot].strip()
@@ -778,8 +798,11 @@ def _matches_math_symbol(expr: dict[str, Any], symbol: str, semantic_tag: str) -
         return True
     if _has_runtime_extern_module(expr):
         return True
-    runtime_call, _ = _resolved_runtime_call(expr)
-    return runtime_call.strip() == "math." + symbol
+    # §1: use runtime_call_adapter_kind instead of hardcoded module check
+    adapter = expr.get("runtime_call_adapter_kind", "")
+    if isinstance(adapter, str) and adapter == "extern_delegate":
+        return True
+    return False
 
 
 def _is_math_runtime(expr: dict[str, Any]) -> bool:
@@ -788,8 +811,11 @@ def _is_math_runtime(expr: dict[str, Any]) -> bool:
         return False
     if _has_runtime_extern_module(expr):
         return True
-    runtime_call, _ = _resolved_runtime_call(expr)
-    return runtime_call.strip() == "math." + symbol
+    # §1: use runtime_call_adapter_kind instead of hardcoded module check
+    adapter = expr.get("runtime_call_adapter_kind", "")
+    if isinstance(adapter, str) and adapter == "extern_delegate":
+        return True
+    return False
 
 
 def _is_math_constant(expr: dict[str, Any]) -> bool:
@@ -812,7 +838,9 @@ def _render_attribute_expr(expr: dict[str, Any]) -> str:
         resolved_source_any = expr.get("resolved_runtime_source")
         resolved_source = resolved_source_any if isinstance(resolved_source_any, str) else ""
         if resolved_source == "module_attr":
-            runtime_symbol = _resolved_runtime_symbol(resolved_runtime)
+            adapter = expr.get("runtime_call_adapter_kind", "")
+            adapter = adapter if isinstance(adapter, str) else ""
+            runtime_symbol = _resolved_runtime_symbol(resolved_runtime, adapter)
             if runtime_symbol != "":
                 if _is_math_constant(expr):
                     return runtime_symbol
@@ -927,9 +955,11 @@ def _render_call_via_runtime_call(
             rendered_assert_args.append(_render_expr(args[i]))
             i += 1
         return "__pytra_assert(" + ", ".join(rendered_assert_args) + ")"
+    adapter = expr.get("runtime_call_adapter_kind", "")
+    adapter = adapter if isinstance(adapter, str) else ""
     if runtime_source == "runtime_call":
         if semantic_tag.startswith("stdlib.fn."):
-            runtime_symbol = _resolved_runtime_symbol(runtime_call)
+            runtime_symbol = _resolved_runtime_symbol(runtime_call, adapter)
             if runtime_symbol == "":
                 return ""
             rendered_runtime_args: list[str] = []
@@ -939,7 +969,7 @@ def _render_call_via_runtime_call(
                 i += 1
             return runtime_symbol + "(" + ", ".join(rendered_runtime_args) + ")"
         return ""
-    runtime_symbol = _resolved_runtime_symbol(runtime_call)
+    runtime_symbol = _resolved_runtime_symbol(runtime_call, adapter)
     if runtime_symbol == "":
         return ""
     if runtime_call.find(".") >= 0:
@@ -1033,7 +1063,7 @@ def _render_call_expr(expr: dict[str, Any]) -> str:
         if len(args) == 0:
             return "false"
         return _to_truthy_expr(_render_expr(args[0]))
-    if callee_name == "str":
+    if callee_name == "str" or callee_name == "py_to_string":
         if len(args) == 0:
             return '""'
         return _to_str_expr(_render_expr(args[0]))
@@ -1070,6 +1100,13 @@ def _render_call_expr(expr: dict[str, Any]) -> str:
             rendered_args.append(_render_expr(args[i]))
             i += 1
         return "__pytra_print(" + ", ".join(rendered_args) + ")"
+    if callee_name == "open":
+        rendered_args = []
+        i = 0
+        while i < len(args):
+            rendered_args.append(_render_expr(args[i]))
+            i += 1
+        return "__pytra_open(" + ", ".join(rendered_args) + ")"
 
     func_any = expr.get("func")
     if isinstance(func_any, dict) and func_any.get("kind") == "Attribute":
@@ -2437,7 +2474,9 @@ def _emit_function(
             elif original_type == "[Any]":
                 cast_fn = "__pytra_as_list"
             if cast_fn != "":
-                lines.append(indent + "    let " + p + ": " + original_type + " = " + cast_fn + "(" + p + ")")
+                # Container types use var (may need mutating methods like .append)
+                decl_keyword = "var" if original_type == "[Any]" or original_type == "[AnyHashable: Any]" else "let"
+                lines.append(indent + "    " + decl_keyword + " " + p + ": " + original_type + " = " + cast_fn + "(" + p + ")")
                 param_cast_names.add(p)
         j += 1
     # Emit mutable copies for reassigned params
@@ -2832,16 +2871,21 @@ def transpile_to_swift_native(east_doc: dict[str, Any]) -> str:
     emit_ctx = emit_ctx_any if isinstance(emit_ctx_any, dict) else {}
     is_entry = emit_ctx.get("is_entry", True)
     module_id = emit_ctx.get("module_id", "")
-    # Extract stem for @extern delegation (e.g., "pytra.std.time" → "time")
+    # Extract stem for @extern delegation using canonical_runtime_module_id (§1).
+    # e.g., "pytra.std.time" → canonical "pytra.std.time" → stem "time"
     _extern_module_stem = ""
-    if module_id != "":
-        parts = module_id.split(".")
-        _extern_module_stem = parts[-1] if len(parts) > 0 else ""
+    if isinstance(module_id, str) and module_id != "":
+        canon = canonical_runtime_module_id(module_id)
+        if canon == "":
+            canon = module_id
+        canon_parts = canon.split(".")
+        _extern_module_stem = canon_parts[-1] if len(canon_parts) > 0 else ""
     main_guard_any = ed.get("main_guard_body")
     main_guard = main_guard_any if isinstance(main_guard_any, list) else []
 
     classes: list[dict[str, Any]] = []
     functions: list[dict[str, Any]] = []
+    extern_var_lines: list[str] = []
     i = 0
     while i < len(body_any):
         node = body_any[i]
@@ -2854,6 +2898,20 @@ def transpile_to_swift_native(east_doc: dict[str, Any]) -> str:
                 # Attach module stem for @extern delegation
                 nd["_extern_module_stem"] = _extern_module_stem
                 functions.append(node)
+            elif kind in {"AnnAssign", "Assign"}:
+                # §4: extern() variables → delegate to _native module
+                node_meta = nd.get("meta")
+                ev1 = node_meta.get("extern_var_v1") if isinstance(node_meta, dict) else None
+                if isinstance(ev1, dict):
+                    target_any = nd.get("target")
+                    if isinstance(target_any, dict) and target_any.get("kind") == "Name":
+                        var_name = _safe_ident(target_any.get("id"), "value")
+                        sym_name = ev1.get("symbol", "") if isinstance(ev1.get("symbol"), str) else ""
+                        if sym_name == "":
+                            sym_name = var_name
+                        swift_type = _swift_type(nd.get("decl_type") or nd.get("annotation"), allow_void=False)
+                        native_fn = _extern_module_stem + "_native_" + sym_name
+                        extern_var_lines.append("let " + var_name + ": " + swift_type + " = " + native_fn + "()")
         i += 1
 
     _CLASS_NAMES[0] = set()
@@ -2919,6 +2977,11 @@ def transpile_to_swift_native(east_doc: dict[str, Any]) -> str:
         lines.append("")
         lines.extend(_emit_function(functions[i], indent="", receiver_name=None))
         i += 1
+
+    # §4: extern() variable declarations (e.g., pi, e)
+    if len(extern_var_lines) > 0:
+        lines.append("")
+        lines.extend(extern_var_lines)
 
     has_user_main = False
     has_pytra_main = False

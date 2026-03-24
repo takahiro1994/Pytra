@@ -797,3 +797,43 @@ final class Path: CustomStringConvertible {
         return value
     }
 }
+
+// --- file I/O (Python open/write/close bridge) ---
+
+final class PyFile {
+    private let handle: FileHandle
+    private let path: String
+
+    init(_ path: String, _ mode: String = "r") {
+        self.path = path
+        if mode == "wb" || mode == "w" {
+            FileManager.default.createFile(atPath: path, contents: nil)
+            self.handle = FileHandle(forWritingAtPath: path)!
+        } else if mode == "ab" || mode == "a" {
+            if !FileManager.default.fileExists(atPath: path) {
+                FileManager.default.createFile(atPath: path, contents: nil)
+            }
+            self.handle = FileHandle(forWritingAtPath: path)!
+            self.handle.seekToEndOfFile()
+        } else {
+            self.handle = FileHandle(forReadingAtPath: path) ?? FileHandle.nullDevice
+        }
+    }
+
+    func write(_ data: Any?) {
+        if let list = data as? [Any] {
+            let bytes = list.map { UInt8(clamping: __pytra_int($0)) }
+            handle.write(Data(bytes))
+        } else if let s = data as? String {
+            if let d = s.data(using: .utf8) { handle.write(d) }
+        }
+    }
+
+    func close() {
+        handle.closeFile()
+    }
+}
+
+func __pytra_open(_ path: Any?, _ mode: Any? = "r") -> PyFile {
+    return PyFile(__pytra_str(path), __pytra_str(mode))
+}

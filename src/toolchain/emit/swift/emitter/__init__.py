@@ -21,6 +21,11 @@ def transpile_to_swift(east_doc: dict[str, Any], js_entry_path: str = "program.j
     meta = east_doc.get("meta", {}) if isinstance(east_doc, dict) else {}
     emit_ctx = meta.get("emit_context", {}) if isinstance(meta, dict) else {}
     module_id = emit_ctx.get("module_id", "") if isinstance(emit_ctx, dict) else ""
+    # built_in modules are covered by py_runtime.swift.
+    # utils modules are also skipped: Swift [Any] is a value type so EAST3-generated
+    # utils code (which uses pass-by-reference container mutation) does not work.
+    # Image functions are provided by hand-written stubs in py_runtime.swift.
+    # This will be resolved when §10 container reference semantics (class PyList) is implemented.
     if isinstance(module_id, str) and (module_id.startswith("pytra.built_in.") or module_id.startswith("pytra.utils.")):
         return ""
     return transpile_to_swift_native(east_doc)
