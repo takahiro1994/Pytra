@@ -306,14 +306,16 @@ def _resolve_binop(expr: dict[str, JsonVal], ctx: ResolveContext) -> str:
     expr["resolved_type"] = result
 
     # Cast insertion for numeric promotion
-    if is_int_type(lt) and is_float_type(rt):
-        casts = expr.get("casts")
-        if isinstance(casts, list):
+    casts = expr.get("casts")
+    if isinstance(casts, list):
+        if is_int_type(lt) and is_float_type(rt):
             casts.append({"on": "left", "from": lt, "to": rt, "reason": "numeric_promotion"})
-    elif is_float_type(lt) and is_int_type(rt):
-        casts = expr.get("casts")
-        if isinstance(casts, list):
+        elif is_float_type(lt) and is_int_type(rt):
             casts.append({"on": "right", "from": rt, "to": lt, "reason": "numeric_promotion"})
+        elif op == "Div" and is_int_type(lt) and is_int_type(rt):
+            # Division of ints: both need promotion to float64
+            casts.append({"on": "left", "from": lt, "to": "float64", "reason": "numeric_promotion"})
+            casts.append({"on": "right", "from": rt, "to": "float64", "reason": "numeric_promotion"})
 
     return result
 
