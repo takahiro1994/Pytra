@@ -491,8 +491,14 @@ def _emit_builtin_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
             if len(arg_strs) >= 1:
                 arg_code = arg_strs[0]
                 # Type coerce element if needed (e.g., int64 → byte for []byte)
-                if owner_rt == "list[uint8]" or owner_rt == "bytes" or owner_rt == "bytearray":
+                if owner_rt in ("list[uint8]", "bytes", "bytearray"):
                     arg_code = "byte(" + arg_code + ")"
+                # Also detect via var_types
+                owner_id = _str(owner_node, "id") if isinstance(owner_node, dict) else ""
+                if owner_id != "" and owner_id in ctx.var_types:
+                    declared = ctx.var_types[owner_id]
+                    if declared in ("list[uint8]", "bytes", "bytearray"):
+                        arg_code = "byte(" + arg_strs[0] + ")"
                 return owner + " = append(" + owner + ", " + arg_code + ")"
 
     if rc == "set.add":
@@ -899,6 +905,9 @@ def _emit_assign(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
                     decl_type = _str(target_node, "resolved_type")
                 ctx.var_types[gn] = decl_type
                 gt = go_type(decl_type)
+                # Detect bytes assignment: make([]byte, ...) or []byte{...}
+                if val_code.startswith("make([]byte") or val_code.startswith("[]byte"):
+                    ctx.var_types[gn] = "bytes"
                 if gt in ("int64", "int32", "int16", "int8", "uint8", "uint16", "uint32", "uint64",
                           "float64", "float32"):
                     _emit(ctx, "var " + gn + " " + gt + " = " + val_code)
