@@ -211,6 +211,30 @@ parser 等を修正するたびに golden file を手動で全段再生成する
 2. [x] [ID: P1-EMIT-GO-S2] sample 18 件の parity テストが通る — emit 成功 (Go 未インストールのため compile/run は未検証)
 3. [x] [ID: P1-EMIT-GO-S3] `pytra-cli2 -emit --target=go` を実装する — 完了
 
+#### P1-EMIT-GO-RUNTIME: Go runtime + parity 検証
+
+Go emitter が生成したコードを `go run` で実行し、Python 実行結果と一致することを検証する。
+まず sample 17（整数演算のみ、画像なし）で最小限の runtime から始める。
+
+作業ディレクトリ: `src/runtime/go/` (runtime 実装)
+
+必要な Go runtime（最小: sample 17 で必要なもの）:
+- `py_print` — `fmt.Println` 相当
+- `perf_counter` — `time.Now().UnixNano()` 相当
+- `py_to_string` — `fmt.Sprint` 相当
+
+追加（sample 01-16, 18 で必要）:
+- `write_rgb_png` / `save_gif` / `grayscale_palette` — 画像出力
+- `py_len`, `py_range`, `py_min`, `py_max` — コンテナ・数値操作
+- str メソッド群（`join`, `split`, `replace` 等）
+- `Path` — pathlib 相当
+- `open` / `close` / `write` — ファイル I/O
+
+手順:
+1. [ ] [ID: P1-GO-RUNTIME-S1] 最小 Go runtime（`py_print`, `perf_counter`, `py_to_string`）を実装し、sample 17 が `go run` で実行結果一致
+2. [ ] [ID: P1-GO-RUNTIME-S2] 画像不要の sample（17, 18）が parity 一致
+3. [ ] [ID: P1-GO-RUNTIME-S3] 画像あり sample（01-16）が parity 一致
+
 #### P1-EMIT-CPP: C++ emitter
 
 作業ディレクトリ: `toolchain2/emit/cpp/`
