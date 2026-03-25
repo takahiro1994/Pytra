@@ -469,9 +469,12 @@ def _emit_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
             # Class constructor: ClassName(...) → NewClassName(...)
             if fn_name in ctx.class_names:
                 return "New" + _safe_go_ident(fn_name) + "(" + ", ".join(arg_strs) + ")"
-            # Imported runtime function: use mapping prefix
+            # Imported runtime function: add prefix only if not already prefixed
             if fn_name in ctx.runtime_imports:
-                return ctx.mapping.builtin_prefix + _safe_go_ident(fn_name) + "(" + ", ".join(arg_strs) + ")"
+                gn = _safe_go_ident(fn_name)
+                if not gn.startswith(ctx.mapping.builtin_prefix):
+                    gn = ctx.mapping.builtin_prefix + gn
+                return gn + "(" + ", ".join(arg_strs) + ")"
             # Use _emit_name to handle main→py_main etc.
             go_fn = _emit_name(ctx, func)
             return go_fn + "(" + ", ".join(arg_strs) + ")"
@@ -845,15 +848,112 @@ def _emit_isinstance(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
 
 
 def _emit_list_comp(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
-    return "nil /* list comprehension */"
+    rt = _str(node, "resolved_type")
+    gt = go_type(rt)
+    elt = node.get("elt")
+    generators = _list(node, "generators")
+    return _emit_comp_iife(ctx, gt, elt, None, None, generators, "list")
 
 
 def _emit_set_comp(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
-    return "nil /* set comprehension */"
+    rt = _str(node, "resolved_type")
+    gt = go_type(rt)
+    elt = node.get("elt")
+    generators = _list(node, "generators")
+    return _emit_comp_iife(ctx, gt, elt, None, None, generators, "set")
 
 
 def _emit_dict_comp(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
-    return "nil /* dict comprehension */"
+    rt = _str(node, "resolved_type")
+    gt = go_type(rt)
+    key = node.get("key")
+    value = node.get("value")
+    generators = _list(node, "generators")
+    return _emit_comp_iife(ctx, gt, None, key, value, generators, "dict")
+
+
+def _emit_comp_iife(
+    ctx: EmitContext,
+    result_type: str,
+    elt: JsonVal,
+    key: JsonVal,
+    value: JsonVal,
+    generators: list[JsonVal],
+    comp_kind: str,
+) -> str:
+    """Emit a comprehension as a Go IIFE (immediately invoked function expression).
+
+    [expr for x in iter if cond] →
+    func() []T { result := []T{}; for _, x := range iter { if cond { result = append(result, expr) } }; return result }()
+    """
+    lines: list[str] = []
+    indent = "\t"
+
+    lines.append("func() " + result_type + " {")
+    if comp_kind == "set":
+        lines.append(indent + "__comp_result := " + result_type + "{}")
+    elif comp_kind == "dict":
+        lines.append(indent + "__comp_result := " + result_type + "{}")
+    else:
+        lines.append(indent + "__comp_result := " + result_type + "{}")
+
+    # Nest generators
+    depth = 1
+    for gen in generators:
+        if not isinstance(gen, dict):
+            continue
+        target = gen.get("target")
+        iter_expr = gen.get("iter")
+        ifs = gen.get("ifs")
+        if not isinstance(ifs, list):
+            ifs = []
+
+        t_name = ""
+        if isinstance(target, dict):
+            t_name = _str(target, "id")
+        if t_name == "":
+            t_name = "_"
+        t_name = _safe_go_ident(t_name)
+
+        iter_code = _emit_expr(ctx, iter_expr)
+        pad = indent * depth
+        lines.append(pad + "for _, " + t_name + " := range " + iter_code + " {")
+        depth += 1
+
+        for if_node in ifs:
+            if isinstance(if_node, dict):
+                cond = _emit_expr(ctx, if_node)
+                pad2 = indent * depth
+                lines.append(pad2 + "if " + cond + " {")
+                depth += 1
+
+    pad = indent * depth
+    if comp_kind == "dict":
+        k_code = _emit_expr(ctx, key)
+        v_code = _emit_expr(ctx, value)
+        lines.append(pad + "__comp_result[" + k_code + "] = " + v_code)
+    elif comp_kind == "set":
+        e_code = _emit_expr(ctx, elt)
+        lines.append(pad + "__comp_result[" + e_code + "] = struct{}{}")
+    else:
+        e_code = _emit_expr(ctx, elt)
+        lines.append(pad + "__comp_result = append(__comp_result, " + e_code + ")")
+
+    # Close ifs and generators
+    for gen in generators:
+        if not isinstance(gen, dict):
+            continue
+        ifs = gen.get("ifs")
+        if isinstance(ifs, list):
+            for _ in ifs:
+                depth -= 1
+                lines.append(indent * depth + "}")
+        depth -= 1
+        lines.append(indent * depth + "}")
+
+    lines.append(indent + "return __comp_result")
+    lines.append("}()")
+    return "\n".join(lines)
 
 
 # ---------------------------------------------------------------------------

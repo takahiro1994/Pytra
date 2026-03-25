@@ -41,7 +41,6 @@
   "skip_modules": [
     "pytra.built_in.",
     "pytra.std.",
-    "pytra.utils.",
     "pytra.core."
   ]
 }
