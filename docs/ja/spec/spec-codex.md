@@ -22,7 +22,7 @@
 - `docs/ja/` 直下（トップレベル）への新規ファイル追加は原則禁止とし、必要時は同一ターンでの明示指示を必須とします。
 - 例外として `docs/ja/AGENTS.md` は運用ブートストラップ入口として常設を許可します。
 - ルート `AGENTS.md` はローカル専用ポインタ（`.gitignore` 対象）とし、Git 管理しません。
-- 例外として、`docs/ja/plans/`、`docs/ja/language/`、`docs/ja/todo/archive/`、`docs/ja/spec/`、`docs/ja/news/` 配下は、運用ルールに沿う範囲で Codex が自律的に新規ファイルを作成してよいものとします。
+- 例外として、`docs/ja/plans/`、`docs/ja/language/`、`docs/ja/todo/archive/`、`docs/ja/spec/` 配下は、運用ルールに沿う範囲で Codex が自律的に新規ファイルを作成してよいものとします。
 
 ## 2. TODO 実施ルール
 
@@ -43,7 +43,7 @@
 - `README.md` からリンクされるドキュメント（`docs/ja/tutorial/README.md`, `sample/README-ja.md`, `docs/ja/spec/index.md`, `docs/ja/plans/pytra-wip.md`, `docs/ja/spec/spec-philosophy.md`）の整合性を確認し、必要なら同時更新します。
 - 実装とドキュメントの不一致を残さないことを、変更完了条件に含めます。
 - `tools/` にスクリプトを追加・削除・改名した場合は、`docs/ja/spec/spec-tools.md` を同時更新します。
-- `docs/ja/README.md` の「最新ニュース」は最新 3 件までを保持し、古くなったニュースはメジャーバージョン単位ファイル（例: `docs/ja/news/v0-releases.md`）へ追記して `docs/ja/news/index.md` を更新します。
+- `docs/ja/README.md` の「更新履歴」は最新 3 件までを保持し、全履歴は `docs/ja/changelog.md` に記録します。
 - 用語ルール: type annotation を指す場合は「注釈」ではなく必ず「型注釈」と記載します。
 - 記述ルール: 機能やフォルダ構成を説明するときは、何をするためのものか（目的性）を必ず明記します。
 - 記述ルール: 「どこに置くか」だけでなく「なぜそこに置くか」を併記し、`std` と `tra` の責務混在を防ぎます。

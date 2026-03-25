@@ -50,7 +50,7 @@
 ### 2.4 `docs/ja/`
 
 - 目的: 仕様・運用・履歴の正本（source of truth）を保持する。
-- 置くもの: `spec/`, `spec/archive/`, `plans/`, `todo/`, `language/`, `news/`
+- 置くもの: `spec/`, `spec/archive/`, `plans/`, `todo/`, `language/`, `changelog.md`
 - 置かないもの: 実装コード
 
 ### 2.5 `docs/en/`
