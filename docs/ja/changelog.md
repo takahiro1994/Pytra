@@ -31,37 +31,91 @@
 - **built-in 関数宣言**: `src/include/py/pytra/built_in/builtins.py` + `containers.py`。v2 extern（extern_fn/extern_var/extern_class/extern_method）。
 - **stdlib 宣言**: `src/include/py/pytra/std/` に math/time/glob/os/sys 等の v2 extern 宣言。
 
+## 2026-03-23
+
+- Dart emitter デッドコード除去（14 関数削除）。ランタイムヘルパー重複排除。18/18 parity。
+- Nim emitter spec-emitter-guide 準拠改善。`build_import_alias_map` 導入、`yields_dynamic` 対応。
+- 全 backend 共通テストスイート整備。`runtime_parity_check.py` で fixture 131 件を全言語実行可能に。
+- EAST3 型推論バグ修正 4 件（Nim 担当報告: Swap, returns, VarDecl, list[unknown]）。
+- ContainerValueLocalHintPass を全 backend 共通化。
+- Swap ノードを Name 限定に制約し、Subscript swap を Assign 展開。
+- tuple 分割代入の `_` 要素に `unused: true` 付与。
+- cast() の resolved_type 修正 + list.pop() の generic 解決。
+- C++ multi-file emit の runtime east パス解決修正。
+- C++ test_py2cpp_features.py テストパス率 64% → 95%。
+
+## 2026-03-22
+
+- REPO_ROOT 修正 + import alias 解決 + conftest extern 関数修正。
+- `build_multi_cpp.py` の generated source を include 追跡ベースの自動リンクに変更。
+- Object<T> 移行フェーズ 1〜4 完了（ControlBlock, emitter, list/dict, 旧型撤去）。
+
+## 2026-03-21
+
+- EAST1 パーサーから `noncpp_runtime_call` / `noncpp_module_id` を除去（EAST1 責務逸脱の解消）。
+- py_runtime.h を 6 ファイルに分解・ファサード化。
+- runtime .east を link パイプラインに自動統合。
+- object = tagged value 統一。tagged union を PyTaggedValue (object+tag) に統一。
+- 旧 object API 一掃（make_object, obj_to_rc_or_raise 等）。
+- escape 解析結果を class_storage_hint に反映。union type パラメータを ref (gc_managed) に強制。
+- self-contained C++ output: extern モジュールの宣言ヘッダー自動生成。
+
 ## 2026-03-20 | v0.15.0
 
-- backend として PowerShell をサポート。
+- backend として PowerShell をサポート。ネイティブ PowerShell コードを直接生成。
+- Zig backend: pathlib native 実装 + 汎用 native re-export 機構 → 18/18 parity 達成。
+- Go/Lua fixture parity 改善（第 2 弾）。
+- Ruby emitter: fixture parity 改善（Is/IsNot, lambda, str iteration, dunder methods, runtime 拡張）。
+- C# emitter: @extern 委譲コード生成 + ビルドパイプライン修正。
 
 ## 2026-03-18 | v0.14.0
 
-- 再帰的 union type をサポート。
+- 再帰的 union type（tagged union）をサポート。spec-tagged-union.md 策定。
+- nominal ADT: parser → EAST3 lowering → C++ backend まで一貫実装。
+- Match/case の exhaustiveness check（closed nominal ADT family）。
+- 非 C++ backend は nominal ADT lane を fail-closed。
 
-## 2026-03-11 | v0.13.0
+## 2026-03-14〜17
+
+- EAST core モジュール分割（core.py 8000 行 → 20+ ファイルに分解）。
+- IR core decomposition: builder, expr, stmt, call metadata, type parser 等を個別モジュールに。
+- backend registry selfhost parity 強化。local CI reentry guard。
+
+## 2026-03-11〜13 | v0.13.0
 
 - NES(ファミコン)のエミュレーターを Python + SDL3 で作成。C++ に変換できるよう Pytra 側を改良中。
+- Linker 仕様策定（spec-linker.md）。compile / link パイプライン計画。
+- 全 backend 共通の smoke テスト基盤整備。`test_py2x_smoke_common.py` を正本化。
+- non-C++ backend health gate を family 単位で集約。
 
 ## 2026-03-10 | v0.12.0
 
-- Runtime 整理の大工事中。
+- Runtime 整理の大工事。C++ generated runtime ヘッダー生成パイプライン整備。
+- `src/runtime/cpp/{generated,native}` の責務分離を確立。
+- runtime .east ファイルを正本化し、C++ ヘッダーを自動生成する仕組みを構築。
 
 ## 2026-03-09 | v0.11.0
 
-- object 境界を見直し中。チュートリアルを整備。
+- object 境界を見直し。selfhost stage2 parity (pass=18 fail=0) 達成。
+- チュートリアル整備（tutorial/README.md, how-to-use.md）。
 
 ## 2026-03-08 | v0.10.0
 
-- `@template` を使えるようになった。各言語の runtime を整備中。
+- `@template` を使えるようになった。linked runtime helper 向け v1。
+- 各言語の runtime を整備中。Debian 12 parity bootstrap。
+- 全 target sample parity の完了条件を定義。
 
 ## 2026-03-07 | v0.9.0
 
-- 大規模リファクタリング完了。全言語で再び使えるようになった。`@extern` と `@abi` を使えるようになり、変換後のコードを他言語からも呼び出せるようになった。
+- 大規模リファクタリング完了。全言語で再び使えるようになった。
+- `@extern` と `@abi` を使えるようになり、変換後のコードを他言語からも呼び出せるようになった。
+- selfhost stage1 build + direct .py route が green。
 
 ## 2026-03-06 | v0.8.0
 
-- ABI 境界を定義しなおして大規模リファクタリング実施中。(C++ 変換器以外は一時的に壊れていた)
+- ABI 境界を定義しなおして大規模リファクタリング実施中。
+- spec-abi.md 策定（@extern / @abi の固定 ABI 型）。
+- C++ 変換器以外は一時的に壊れていた。
 
 ## 2026-03-04 | v0.7.0
 
@@ -81,12 +135,13 @@
 
 ## 2026-02-27 | v0.3.0
 
-- EAST（中間表現）を段階処理（EAST1→EAST2→EAST3）へ整理。C++ CodeEmitter の大規模分割・縮退。
+- EAST（中間表現）を段階処理（EAST1→EAST2→EAST3）へ整理。
+- C++ CodeEmitter の大規模分割・縮退。
 
 ## 2026-02-25 | v0.2.0
 
-- 全言語について元ソースコードに近い形で出力されるようになった。
+- 全言語（C++, Rust, C#, JS, TS, Go, Java, Kotlin, Swift）について元ソースコードに近い形で出力されるようになった。
 
 ## 2026-02-23 | v0.1.0
 
-- Python の元ソースコードに極めて近いスタイルで、読みやすい C++ コードを生成できるようになった。
+- Pytra 初版リリース。Python の元ソースコードに極めて近いスタイルで、読みやすい C++ コードを生成できるようになった。
