@@ -491,7 +491,18 @@ def _transpile(east_doc: dict) -> str:
 | `pytra.std.time` | emit | `@extern` → `__native` 委譲コード生成 |
 | `pytra.utils.png` | emit | 通常の関数コード生成 |
 
-## 7. 共通ユーティリティ（`code_emitter.py` スタンドアロン関数）
+## 7. runtime mapping.json
+
+各言語の runtime に `mapping.json` を配置し、EAST3 の `runtime_call` をターゲット言語の関数名に写像する。
+`CodeEmitter` 基底クラスがこのファイルを読み込み、`resolve_runtime_call()` で解決する。
+
+- 配置: `src/runtime/<lang>/mapping.json`
+- 読み込み: `toolchain2/emit/common/code_emitter.py` の `load_runtime_mapping()`
+- 命名ルール: `py_<type>_<method>` 形式（例: `py_str_strip`, `py_dict_get`）
+
+**正式仕様: [spec-runtime-mapping.md](./spec-runtime-mapping.md)**
+
+## 8. 共通ユーティリティ（`code_emitter.py` スタンドアロン関数）
 
 `CodeEmitter` を継承しない emitter でも使える関数:
 

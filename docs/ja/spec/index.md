@@ -29,6 +29,7 @@
 - Lua native backend 契約仕様: [Lua Native Backend 契約仕様](./spec-lua-native-backend.md)
 - Zig native backend 契約仕様: [Zig Native Backend 契約仕様](./spec-zig-native-backend.md)
 - Backend Emitter 共通契約仕様: [Emitter 実装ガイドライン](./spec-emitter-guide.md)
+- runtime mapping.json 仕様: [runtime mapping 仕様](./spec-runtime-mapping.md)
 - EAST 三段構成の現行/移行後ファイル責務対応表: [責務対応表](./spec-east.md#east-file-mapping)
 - EAST1 build 責務境界: [EAST1 build 責務境界](./spec-east.md#east1-build-boundary)
 - EAST 移行フェーズ: [EAST 移行フェーズ](./spec-east.md#east-migration-phases)
