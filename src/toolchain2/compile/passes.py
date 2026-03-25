@@ -835,6 +835,12 @@ def _resolve_atype(stmt: Node) -> str:
         rt = target.get("resolved_type")
         if isinstance(rt, str) and rt.strip() not in ("", "unknown"):
             return rt.strip()
+    # Also check value's resolved_type (for computed assignments)
+    value = stmt.get("value")
+    if isinstance(value, dict):
+        vrt = value.get("resolved_type")
+        if isinstance(vrt, str) and vrt.strip() not in ("", "unknown"):
+            return vrt.strip()
     return ""
 
 

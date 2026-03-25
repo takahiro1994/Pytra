@@ -5839,14 +5839,14 @@
                   },
                   "body": [
                     {
-                      "kind": "Assign",
+                      "kind": "Swap",
                       "source_span": {
                         "lineno": 44,
                         "col_offset": 16,
                         "end_lineno": 44,
                         "end_col_offset": 67
                       },
-                      "target": {
+                      "left": {
                         "kind": "Subscript",
                         "source_span": {
                           "lineno": 44,
@@ -5887,16 +5887,13 @@
                           "id": "j"
                         }
                       },
-                      "declare": true,
-                      "decl_type": "int64",
-                      "declare_init": true,
-                      "value": {
+                      "right": {
                         "kind": "Subscript",
                         "source_span": {
                           "lineno": 44,
-                          "col_offset": 43,
+                          "col_offset": 27,
                           "end_lineno": 44,
-                          "end_col_offset": 56
+                          "end_col_offset": 40
                         },
                         "resolved_type": "int64",
                         "casts": [],
@@ -5906,9 +5903,9 @@
                           "kind": "Name",
                           "source_span": {
                             "lineno": 44,
-                            "col_offset": 43,
+                            "col_offset": 27,
                             "end_lineno": 44,
-                            "end_col_offset": 49
+                            "end_col_offset": 33
                           },
                           "resolved_type": "list[int64]",
                           "casts": [],
@@ -5920,9 +5917,9 @@
                           "kind": "BinOp",
                           "source_span": {
                             "lineno": 44,
-                            "col_offset": 50,
+                            "col_offset": 34,
                             "end_lineno": 44,
-                            "end_col_offset": 55
+                            "end_col_offset": 39
                           },
                           "resolved_type": "int64",
                           "casts": [],
@@ -5932,9 +5929,9 @@
                             "kind": "Name",
                             "source_span": {
                               "lineno": 44,
-                              "col_offset": 50,
+                              "col_offset": 34,
                               "end_lineno": 44,
-                              "end_col_offset": 51
+                              "end_col_offset": 35
                             },
                             "resolved_type": "int64",
                             "casts": [],
@@ -5947,9 +5944,9 @@
                             "kind": "Constant",
                             "source_span": {
                               "lineno": 44,
-                              "col_offset": 54,
+                              "col_offset": 38,
                               "end_lineno": 44,
-                              "end_col_offset": 55
+                              "end_col_offset": 39
                             },
                             "resolved_type": "int64",
                             "casts": [],
@@ -5962,9 +5959,9 @@
                             "kind": "BinOp",
                             "source_span": {
                               "lineno": 44,
-                              "col_offset": 50,
+                              "col_offset": 34,
                               "end_lineno": 44,
-                              "end_col_offset": 55
+                              "end_col_offset": 39
                             },
                             "resolved_type": "int64",
                             "casts": [],
@@ -5974,9 +5971,9 @@
                               "kind": "Name",
                               "source_span": {
                                 "lineno": 44,
-                                "col_offset": 50,
+                                "col_offset": 34,
                                 "end_lineno": 44,
-                                "end_col_offset": 51
+                                "end_col_offset": 35
                               },
                               "resolved_type": "int64",
                               "casts": [],
@@ -5989,9 +5986,9 @@
                               "kind": "Constant",
                               "source_span": {
                                 "lineno": 44,
-                                "col_offset": 54,
+                                "col_offset": 38,
                                 "end_lineno": 44,
-                                "end_col_offset": 55
+                                "end_col_offset": 39
                               },
                               "resolved_type": "int64",
                               "casts": [],
@@ -6001,12 +5998,6 @@
                             }
                           }
                         }
-                      },
-                      "type_expr_summary_v1": {
-                        "schema_version": 1,
-                        "kind": "NamedType",
-                        "category": "static",
-                        "mirror": "int64"
                       },
                       "meta": {
                         "lifetime_node_id": "n14",
@@ -8162,7 +8153,7 @@
             },
             {
               "id": "n14",
-              "kind": "Assign",
+              "kind": "Swap",
               "defs": [],
               "uses": [
                 "j",

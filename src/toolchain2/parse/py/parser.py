@@ -2268,41 +2268,42 @@ def _parse_block_lines(
             pending_comments = []
             continue
 
-        # Tuple unpacking or swap: a, b = ...
-        tuple_assign_match = re.match(r"^([A-Za-z_][A-Za-z0-9_]*(?:\s*,\s*[A-Za-z_][A-Za-z0-9_]*)+)\s*=\s*(.+)$", s_clean)
-        if tuple_assign_match is not None:
-            lhs_text = re.strip_group(tuple_assign_match, 1)
-            rhs_text = re.strip_group(tuple_assign_match, 2)
-            lhs_names = [n.strip() for n in lhs_text.split(",") if n.strip() != ""]
-            # Check for swap pattern: a, b = b, a
-            rhs_parts = [p.strip() for p in rhs_text.split(",") if p.strip() != ""]
-            is_swap = len(lhs_names) == 2 and len(rhs_parts) == 2 and rhs_parts[0] == lhs_names[1] and rhs_parts[1] == lhs_names[0]
-            if is_swap:
-                left = _make_name_expr(lhs_names[0], abs_ln, indent, ctx)
-                right = _make_name_expr(lhs_names[1], abs_ln, indent, ctx)
+        # Tuple unpacking or swap: a, b = ... OR a[i], a[j] = ...
+        tuple_lhs_text, tuple_rhs_text = _try_parse_tuple_assign(s_clean)
+        if tuple_lhs_text != "":
+            lhs_text = tuple_lhs_text
+            rhs_text = tuple_rhs_text
+            lhs_parts = [n.strip() for n in _split_tuple_targets(lhs_text) if n.strip() != ""]
+            if len(lhs_parts) >= 2:
+                # Check for swap pattern: a[i], a[j] = a[j], a[i]
+                rhs_parts = [p.strip() for p in _split_tuple_targets(rhs_text) if p.strip() != ""]
+                is_swap = len(lhs_parts) == 2 and len(rhs_parts) == 2 and rhs_parts[0] == lhs_parts[1] and rhs_parts[1] == lhs_parts[0]
+                if is_swap:
+                    left = _parse_expr_text(ctx, lhs_parts[0], abs_ln, _find_expr_col(ctx, lhs_parts[0], abs_ln, indent), name_types)
+                    right = _parse_expr_text(ctx, lhs_parts[1], abs_ln, _find_expr_col(ctx, lhs_parts[1], abs_ln, indent), name_types)
+                    span = make_span(abs_ln, indent, abs_ln, indent + len(s_clean))
+                    stmts.append(Swap(source_span=span, left=left, right=right))
+                    i += 1
+                    pending_trivia = []
+                    pending_comments = []
+                    continue
+                # Tuple unpacking: a, b = expr
+                elements = [_parse_expr_text(ctx, p, abs_ln, _find_expr_col(ctx, p, abs_ln, indent), name_types) for p in lhs_parts]
+                target_col = _find_expr_col(ctx, lhs_text, abs_ln, indent)
+                target_span = make_span(abs_ln, target_col, abs_ln, target_col + len(lhs_text))
+                tuple_target = TupleExpr(base=ExprBase(source_span=target_span, repr_text=lhs_text), elements=elements)
+                value = _parse_expr_text(ctx, rhs_text, abs_ln, _find_expr_col(ctx, rhs_text, abs_ln, indent + len(lhs_text) + 3), name_types)
                 span = make_span(abs_ln, indent, abs_ln, indent + len(s_clean))
-                stmts.append(Swap(source_span=span, left=left, right=right))
+                assign_stmt = Assign(source_span=span, target=tuple_target, value=value, declare=False)
+                if len(pending_trivia) > 0:
+                    assign_stmt.leading_trivia = list(pending_trivia)
+                if len(pending_comments) > 0:
+                    assign_stmt.leading_comments = list(pending_comments)
+                stmts.append(assign_stmt)
                 i += 1
                 pending_trivia = []
                 pending_comments = []
                 continue
-            # Tuple unpacking: a, b = expr
-            elements = [_make_name_expr(n, abs_ln, indent, ctx) for n in lhs_names]
-            target_col = _find_expr_col(ctx, lhs_text, abs_ln, indent)
-            target_span = make_span(abs_ln, target_col, abs_ln, target_col + len(lhs_text))
-            tuple_target = TupleExpr(base=ExprBase(source_span=target_span, repr_text=lhs_text), elements=elements)
-            value = _parse_expr_text(ctx, rhs_text, abs_ln, _find_expr_col(ctx, rhs_text, abs_ln, indent + len(lhs_text) + 3), name_types)
-            span = make_span(abs_ln, indent, abs_ln, indent + len(s_clean))
-            assign_stmt = Assign(source_span=span, target=tuple_target, value=value, declare=False)
-            if len(pending_trivia) > 0:
-                assign_stmt.leading_trivia = list(pending_trivia)
-            if len(pending_comments) > 0:
-                assign_stmt.leading_comments = list(pending_comments)
-            stmts.append(assign_stmt)
-            i += 1
-            pending_trivia = []
-            pending_comments = []
-            continue
 
         # Simple assignment: x = value
         target_text, value_text = _parse_simple_assign(s_clean)
@@ -2476,6 +2477,80 @@ def _parse_expr_text(
         ctx=ctx,
     )
     return parser.parse_expr()
+
+
+def _try_parse_tuple_assign(s: str) -> tuple[str, str]:
+    """Try to parse 'target1, target2 = value' where targets can be name or name[expr].
+
+    Returns (lhs_text, rhs_text) or ("", "") if not a tuple assign.
+    """
+    # Find the top-level '=' that is not '==' and not inside brackets
+    depth: int = 0
+    eq_pos: int = -1
+    i: int = 0
+    while i < len(s):
+        ch = s[i]
+        if ch == "[" or ch == "(":
+            depth += 1
+        elif ch == "]" or ch == ")":
+            depth -= 1
+        elif ch == "=" and depth == 0:
+            # Check not ==
+            if i + 1 < len(s) and s[i + 1] == "=":
+                i += 2
+                continue
+            # Check not !=, <=, >=
+            if i > 0 and s[i - 1] in ("!", "<", ">", "+", "-", "*", "/", "%"):
+                i += 1
+                continue
+            eq_pos = i
+            break
+        i += 1
+    if eq_pos <= 0:
+        return ("", "")
+    lhs = s[:eq_pos].rstrip()
+    rhs = s[eq_pos + 1:].lstrip()
+    # Check lhs has a top-level comma (= tuple targets)
+    has_comma = False
+    depth = 0
+    for ch in lhs:
+        if ch == "[" or ch == "(":
+            depth += 1
+        elif ch == "]" or ch == ")":
+            depth -= 1
+        elif ch == "," and depth == 0:
+            has_comma = True
+            break
+    if not has_comma:
+        return ("", "")
+    return (lhs, rhs)
+
+
+def _split_tuple_targets(text: str) -> list[str]:
+    """Split tuple target text by comma, respecting brackets.
+
+    'a[i], a[j]' → ['a[i]', 'a[j]']
+    'a, b' → ['a', 'b']
+    """
+    parts: list[str] = []
+    depth: int = 0
+    current: list[str] = []
+    for ch in text:
+        if ch == "[" or ch == "(":
+            depth += 1
+            current.append(ch)
+        elif ch == "]" or ch == ")":
+            depth -= 1
+            current.append(ch)
+        elif ch == "," and depth == 0:
+            parts.append("".join(current).strip())
+            current = []
+        else:
+            current.append(ch)
+    tail = "".join(current).strip()
+    if tail != "":
+        parts.append(tail)
+    return parts
 
 
 def _make_name_expr(name: str, line: int, col: int, ctx: ParseContext) -> Name:
