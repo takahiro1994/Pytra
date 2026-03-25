@@ -19,7 +19,6 @@ from toolchain2.link.type_id import build_type_id_table
 from toolchain2.link.call_graph import build_call_graph
 from toolchain2.link.dependencies import build_all_resolved_dependencies
 from toolchain2.link.import_maps import collect_import_maps
-from toolchain2.link.normalize_runtime_calls import normalize_runtime_calls
 from toolchain2.link.expand_defaults import expand_cross_module_defaults
 
 
@@ -242,13 +241,12 @@ def link_modules(
     # 7. program_id 生成
     pid = _program_id(target, dispatch_mode, all_module_ids)
 
-    # 8. Deep copy + normalize all modules
+    # 8. Deep copy all modules
     copied_docs: list[tuple[LinkedModule, dict[str, JsonVal]]] = []
     for module in modules:
         doc = deep_copy_json(module.east_doc)
         if not isinstance(doc, dict):
             continue
-        normalize_runtime_calls(doc)
         copied_docs.append((module, doc))
 
     # 9. Cross-module default argument expansion

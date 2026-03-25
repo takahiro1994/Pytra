@@ -20,6 +20,8 @@ from toolchain2.link.expand_defaults import expand_cross_module_defaults
 from toolchain2.link.manifest_loader import load_linked_output
 from toolchain2.link.runtime_discovery import discover_runtime_modules
 from toolchain2.link.type_id import build_type_id_table
+from toolchain2.emit.go.emitter import emit_go_module
+from toolchain2.emit.cpp.emitter import emit_cpp_module
 
 
 def _module_doc(
@@ -72,6 +74,11 @@ def _linked_module(module_id: str, body: list[dict[str, object]]) -> LinkedModul
         east_doc=_module_doc(module_id, body=body),
         module_kind="user",
     )
+
+
+def _fixture_doc(relative_path: str) -> dict[str, object]:
+    fixture_path = ROOT / relative_path
+    return json.loads(fixture_path.read_text(encoding="utf-8"))
 
 
 class Toolchain2LinkerSpecConform2Tests(unittest.TestCase):
@@ -475,6 +482,43 @@ class Toolchain2LinkerSpecConform2Tests(unittest.TestCase):
         assert isinstance(body, list)
         call = body[0]["value"]
         self.assertEqual(len(call["args"]), 1)
+
+    def test_emitters_consume_canonical_str_method_builtin_calls(self) -> None:
+        doc = _fixture_doc("test/fixture/east3-opt/strings/str_methods.east3")
+
+        go_code = emit_go_module(doc)
+        cpp_code = emit_cpp_module(doc)
+
+        self.assertIn("a := py_str_strip(s)", go_code)
+        self.assertIn('j := py_str_join(":", parts)', go_code)
+        self.assertIn("std::string a = py_str_strip(s);", cpp_code)
+        self.assertIn('std::string j = py_str_join(std::string(":"), parts);', cpp_code)
+
+    def test_go_emitter_handles_plain_set_constructor_without_link_normalization(self) -> None:
+        doc = _fixture_doc("test/fixture/east3-opt/collections/nested_types.east3")
+
+        go_code = emit_go_module(doc)
+
+        self.assertIn("py_set()", go_code)
+
+    def test_cpp_emitter_handles_plain_bytes_constructor_without_link_normalization(self) -> None:
+        doc = _fixture_doc("test/fixture/east3-opt/typing/bytes_basic.east3")
+
+        cpp_code = emit_cpp_module(doc)
+
+        self.assertIn("std::vector<uint8_t>{uint8_t(1), uint8_t(2), uint8_t(3), uint8_t(255)}", cpp_code)
+        self.assertNotIn("bytes(", cpp_code)
+
+    def test_emitters_treat_runtime_call_int_as_cast_without_link_normalization(self) -> None:
+        doc = _fixture_doc("test/fixture/east3-opt/typing/intenum_basic.east3")
+
+        go_code = emit_go_module(doc)
+        cpp_code = emit_cpp_module(doc)
+
+        self.assertIn("int64(Status.ERROR)", go_code)
+        self.assertNotIn("py_int(Status.ERROR)", go_code)
+        self.assertIn("static_cast<int64_t>(Status.ERROR)", cpp_code)
+        self.assertNotIn("py_int(Status.ERROR)", cpp_code)
 
 
 if __name__ == "__main__":

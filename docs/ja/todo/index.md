@@ -53,7 +53,7 @@ compile / link / optimize / emit の仕様逸脱を修正する。修正順は l
 2. [x] [ID: P1-SPEC-CONFORM2-S2] `runtime_discovery.py`: .east 読込失敗の `except: pass` をエラーにする
 3. [x] [ID: P1-SPEC-CONFORM2-S3] `manifest_loader.py`: 不正 entry・欠損ファイル・不正 JSON の `continue` 黙殺をエラーにする
 4. [x] [ID: P1-SPEC-CONFORM2-S4] `linker.py`: manifest `modules[*].input` を raw EAST3 入力パスに修正
-5. [ ] [ID: P1-SPEC-CONFORM2-S5] `normalize_runtime_calls.py`: 暫定互換レイヤを除去
+5. [x] [ID: P1-SPEC-CONFORM2-S5] `normalize_runtime_calls.py`: 暫定互換レイヤを除去
 6. [x] [ID: P1-SPEC-CONFORM2-S6] `expand_defaults.py`: シンボル解決を module_id::name ベースに限定し、曖昧解決を防止
 
 **フェーズ2: emit（workaround を剥がす）**

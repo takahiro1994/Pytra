@@ -475,6 +475,8 @@ def _emit_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
             fn_name = _str(func, "id")
             if fn_name == "":
                 fn_name = _str(func, "repr")
+            if fn_name == "set":
+                return "py_set(" + ", ".join(arg_strs) + ")"
             # bytearray/bytes constructor
             if fn_name in ("bytearray", "bytes"):
                 if len(args) == 0:
@@ -513,9 +515,15 @@ def _emit_builtin_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
     bn = _str(node, "builtin_name")
     args = _list(node, "args")
     arg_strs = [_emit_expr(ctx, a) for a in args]
+    func = node.get("func")
+    method_owner = ""
+    call_arg_strs = arg_strs
+    if isinstance(func, dict) and _str(func, "kind") == "Attribute":
+        method_owner = _emit_expr(ctx, func.get("value"))
+        call_arg_strs = [method_owner] + arg_strs
 
     # Type cast builtins
-    if rc == "static_cast":
+    if rc in ("static_cast", "int", "float", "bool"):
         rt = _str(node, "resolved_type")
         gt = go_type(rt)
         # Check if source is string → int conversion (needs runtime helper)
@@ -528,7 +536,7 @@ def _emit_builtin_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
         return gt + "(0)"
 
     # py_to_string
-    if rc == "py_to_string":
+    if rc in ("py_to_string", "str"):
         if len(arg_strs) >= 1:
             return "py_str(" + arg_strs[0] + ")"
         return "\"\""
@@ -564,7 +572,6 @@ def _emit_builtin_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
 
     # Container methods
     if rc == "list.append":
-        func = node.get("func")
         if isinstance(func, dict):
             owner = _emit_expr(ctx, func.get("value"))
             owner_node = func.get("value")
@@ -583,7 +590,6 @@ def _emit_builtin_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
                 return owner + " = append(" + owner + ", " + arg_code + ")"
 
     if rc == "set.add":
-        func = node.get("func")
         if isinstance(func, dict):
             owner = _emit_expr(ctx, func.get("value"))
             if len(arg_strs) >= 1:
@@ -591,7 +597,6 @@ def _emit_builtin_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
 
     # list.pop
     if rc == "list.pop":
-        func = node.get("func")
         if isinstance(func, dict):
             owner = _emit_expr(ctx, func.get("value"))
             if len(arg_strs) >= 1:
@@ -600,7 +605,6 @@ def _emit_builtin_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
 
     # dict.get
     if rc == "dict.get":
-        func = node.get("func")
         if isinstance(func, dict):
             owner = _emit_expr(ctx, func.get("value"))
             if len(arg_strs) >= 2:
@@ -641,7 +645,6 @@ def _emit_builtin_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
 
     # Pathlib
     if rc in ("py_write_text", "pathlib.write_text", "py_pathlib_write_text"):
-        func = node.get("func")
         if isinstance(func, dict):
             owner = _emit_expr(ctx, func.get("value"))
             if len(arg_strs) >= 1:
@@ -673,12 +676,12 @@ def _emit_builtin_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
     adapter = _str(node, "runtime_call_adapter_kind")
     resolved = resolve_runtime_call(rc, bn, adapter, ctx.mapping)
     if resolved != "":
-        return _safe_go_ident(resolved) + "(" + ", ".join(arg_strs) + ")"
+        return _safe_go_ident(resolved) + "(" + ", ".join(call_arg_strs) + ")"
 
     # Final fallback: prefix with py_
     fn_name = rc if rc != "" else bn
     if fn_name != "":
-        return ctx.mapping.builtin_prefix + _safe_go_ident(fn_name) + "(" + ", ".join(arg_strs) + ")"
+        return ctx.mapping.builtin_prefix + _safe_go_ident(fn_name) + "(" + ", ".join(call_arg_strs) + ")"
 
     return "nil /* unknown builtin */"
 

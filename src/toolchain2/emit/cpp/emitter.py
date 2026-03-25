@@ -235,6 +235,19 @@ def _emit_call(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
         if fk == "Name":
             fn = _str(func, "id")
             if fn == "": fn = _str(func, "repr")
+            if fn in ("bytearray", "bytes"):
+                if len(args) >= 1 and isinstance(args[0], dict):
+                    a0_kind = _str(args[0], "kind")
+                    a0_rt = _str(args[0], "resolved_type")
+                    if a0_kind == "List":
+                        elems = _list(args[0], "elements")
+                        parts = ["uint8_t(" + _emit_expr(ctx, e) + ")" for e in elems]
+                        return "std::vector<uint8_t>{" + ", ".join(parts) + "}"
+                    if a0_rt in ("int64", "int32", "int", "uint8", "int8"):
+                        return "std::vector<uint8_t>(" + arg_strs[0] + ")"
+                if len(arg_strs) >= 1:
+                    return "std::vector<uint8_t>(" + arg_strs[0] + ")"
+                return "std::vector<uint8_t>{}"
             if fn in ctx.class_names: return fn + "(" + ", ".join(arg_strs) + ")"
             if fn in ctx.runtime_imports: return ctx.mapping.builtin_prefix + fn + "(" + ", ".join(arg_strs) + ")"
             if fn == "main": return "__pytra_main(" + ", ".join(arg_strs) + ")"
@@ -247,14 +260,33 @@ def _emit_builtin_call(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
     bn = _str(node, "builtin_name")
     args = _list(node, "args")
     arg_strs = [_emit_expr(ctx, a) for a in args]
+    func = node.get("func")
+    method_owner = ""
+    call_arg_strs = arg_strs
+    if isinstance(func, dict) and _str(func, "kind") == "Attribute":
+        method_owner = _emit_expr(ctx, func.get("value"))
+        call_arg_strs = [method_owner] + arg_strs
 
-    if rc == "static_cast":
+    if rc in ("static_cast", "int", "float", "bool"):
         rt = _str(node, "resolved_type")
         ct = cpp_type(rt)
         if len(arg_strs) >= 1: return "static_cast<" + ct + ">(" + arg_strs[0] + ")"
         return ct + "()"
-    if rc == "py_to_string" and len(arg_strs) >= 1:
+    if rc in ("py_to_string", "str") and len(arg_strs) >= 1:
         return "std::to_string(" + arg_strs[0] + ")"
+    if rc in ("bytearray_ctor", "bytes_ctor"):
+        if len(args) >= 1 and isinstance(args[0], dict):
+            a0_kind = _str(args[0], "kind")
+            a0_rt = _str(args[0], "resolved_type")
+            if a0_kind == "List":
+                elems = _list(args[0], "elements")
+                parts = ["uint8_t(" + _emit_expr(ctx, e) + ")" for e in elems]
+                return "std::vector<uint8_t>{" + ", ".join(parts) + "}"
+            if a0_rt in ("int64", "int32", "int", "uint8", "int8"):
+                return "std::vector<uint8_t>(" + arg_strs[0] + ")"
+        if len(arg_strs) >= 1:
+            return "std::vector<uint8_t>(" + arg_strs[0] + ")"
+        return "std::vector<uint8_t>{}"
     if rc in ("py_print", "py_len") and len(arg_strs) >= 1:
         return rc + "(" + ", ".join(arg_strs) + ")"
     if rc == "py_int_from_str" and len(arg_strs) >= 1:
@@ -263,23 +295,21 @@ def _emit_builtin_call(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
         if len(arg_strs) >= 1: return "throw std::runtime_error(" + arg_strs[0] + ")"
         return 'throw std::runtime_error("' + bn + '")'
     if rc == "list.append":
-        func = node.get("func")
         if isinstance(func, dict):
             owner = _emit_expr(ctx, func.get("value"))
             if len(arg_strs) >= 1: return owner + ".push_back(" + arg_strs[0] + ")"
     if rc == "list.pop":
-        func = node.get("func")
         if isinstance(func, dict):
             owner = _emit_expr(ctx, func.get("value"))
             return "py_list_pop(" + owner + ")"
+    if rc == "list.index" and method_owner != "" and len(arg_strs) >= 1:
+        return "py_index(" + method_owner + ", " + arg_strs[0] + ")"
     if rc == "dict.get":
-        func = node.get("func")
         if isinstance(func, dict):
             owner = _emit_expr(ctx, func.get("value"))
             if len(arg_strs) >= 2: return "py_dict_get(" + owner + ", " + arg_strs[0] + ", " + arg_strs[1] + ")"
             if len(arg_strs) >= 1: return owner + "[" + arg_strs[0] + "]"
     if rc in ("py_write_text", "pathlib.write_text"):
-        func = node.get("func")
         if isinstance(func, dict):
             owner = _emit_expr(ctx, func.get("value"))
             if len(arg_strs) >= 1: return "py_pathlib_write_text(" + owner + ", " + arg_strs[0] + ")"
@@ -287,9 +317,9 @@ def _emit_builtin_call(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
     # Mapping resolution
     adapter = _str(node, "runtime_call_adapter_kind")
     resolved = resolve_runtime_call(rc, bn, adapter, ctx.mapping)
-    if resolved != "": return resolved + "(" + ", ".join(arg_strs) + ")"
+    if resolved != "": return resolved + "(" + ", ".join(call_arg_strs) + ")"
     fn = rc if rc != "" else bn
-    if fn != "": return ctx.mapping.builtin_prefix + fn + "(" + ", ".join(arg_strs) + ")"
+    if fn != "": return ctx.mapping.builtin_prefix + fn.replace(".", "_") + "(" + ", ".join(call_arg_strs) + ")"
     return "/* unknown builtin */"
 
 
