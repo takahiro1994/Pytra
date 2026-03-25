@@ -30,6 +30,8 @@ class EmitContext:
     imports_needed: set[str] = field(default_factory=set)
     # Variable types in current scope
     var_types: dict[str, str] = field(default_factory=dict)
+    # Current function return type (for empty list literal type inference)
+    current_return_type: str = ""
     # Class info
     class_names: set[str] = field(default_factory=set)
     class_bases: dict[str, str] = field(default_factory=dict)
@@ -224,6 +226,9 @@ def _emit_name(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
         return "continue"
     if name == "break":
         return "break"
+    # Avoid collision with Go's main()
+    if name == "main":
+        return "__pytra_main"
     return _safe_go_ident(name)
 
 
@@ -366,7 +371,9 @@ def _emit_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
             # Class constructor: ClassName(...) → NewClassName(...)
             if fn_name in ctx.class_names:
                 return "New" + _safe_go_ident(fn_name) + "(" + ", ".join(arg_strs) + ")"
-            return _safe_go_ident(fn_name) + "(" + ", ".join(arg_strs) + ")"
+            # Use _emit_name to handle main→__pytra_main etc.
+            go_fn = _emit_name(ctx, func)
+            return go_fn + "(" + ", ".join(arg_strs) + ")"
 
     fn = _emit_expr(ctx, func)
     return fn + "(" + ", ".join(arg_strs) + ")"
@@ -401,10 +408,10 @@ def _emit_builtin_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
     if rc == "py_print" or bn == "print":
         return "__pytra_print(" + ", ".join(arg_strs) + ")"
 
-    # len
+    # len — use Go native len() for type safety
     if rc == "py_len" or bn == "len":
         if len(arg_strs) >= 1:
-            return "__pytra_len(" + arg_strs[0] + ")"
+            return "int64(len(" + arg_strs[0] + "))"
 
     # Container constructors
     if rc == "bytearray_ctor" or rc == "bytes_ctor":
@@ -429,6 +436,16 @@ def _emit_builtin_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
             owner = _emit_expr(ctx, func.get("value"))
             if len(arg_strs) >= 1:
                 return owner + "[" + arg_strs[0] + "] = struct{}{}"
+
+    # dict.get
+    if rc == "dict.get":
+        func = node.get("func")
+        if isinstance(func, dict):
+            owner = _emit_expr(ctx, func.get("value"))
+            if len(arg_strs) >= 2:
+                return "__pytra_dict_get(" + owner + ", " + arg_strs[0] + ", " + arg_strs[1] + ")"
+            if len(arg_strs) >= 1:
+                return owner + "[" + arg_strs[0] + "]"
 
     # enumerate / reversed
     if rc == "py_enumerate" or bn == "enumerate":
@@ -457,6 +474,28 @@ def _emit_builtin_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
             owner = _emit_expr(ctx, func.get("value"))
             if len(arg_strs) >= 1:
                 return "__pytra_write_text(" + owner + ", " + arg_strs[0] + ")"
+
+    # RuntimeError / exceptions → panic
+    if bn in ("RuntimeError", "ValueError", "TypeError", "IndexError", "KeyError"):
+        if len(arg_strs) >= 1:
+            return "panic(" + arg_strs[0] + ")"
+        return "panic(\"" + bn + "\")"
+    if rc == "std::runtime_error" or rc.endswith("_error"):
+        if len(arg_strs) >= 1:
+            return "panic(" + arg_strs[0] + ")"
+        return "panic(\"runtime error\")"
+
+    # py_int_from_str / py_float_from_str
+    if rc == "py_int_from_str" and len(arg_strs) >= 1:
+        return "__pytra_str_to_int64(" + arg_strs[0] + ")"
+    if rc == "py_float_from_str" and len(arg_strs) >= 1:
+        return "__pytra_str_to_float64(" + arg_strs[0] + ")"
+
+    # py_to_string
+    if rc == "py_to_string":
+        if len(arg_strs) >= 1:
+            return "__pytra_str(" + arg_strs[0] + ")"
+        return "\"\""
 
     # Generic: prefix with __pytra_
     fn_name = rc if rc != "" else bn
@@ -502,22 +541,41 @@ def _emit_slice_expr(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
 def _emit_list_literal(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
     elements = _list(node, "elements")
     rt = _str(node, "resolved_type")
+    # If resolved_type contains "unknown", try decl_type or function return type
+    if "unknown" in rt or rt == "":
+        dt = _str(node, "decl_type")
+        if dt != "" and "unknown" not in dt:
+            rt = dt
+        elif ctx.current_return_type != "" and ctx.current_return_type.startswith("list["):
+            rt = ctx.current_return_type
     gt = go_type(rt)
     parts = [_emit_expr(ctx, e) for e in elements]
     return gt + "{" + ", ".join(parts) + "}"
 
 
 def _emit_dict_literal(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
-    keys = _list(node, "keys")
-    values = _list(node, "values")
     rt = _str(node, "resolved_type")
     gt = go_type(rt)
-    entries: list[str] = []
-    for i in range(len(keys)):
-        k = _emit_expr(ctx, keys[i]) if i < len(keys) else "nil"
-        v = _emit_expr(ctx, values[i]) if i < len(values) else "nil"
-        entries.append(k + ": " + v)
-    return gt + "{" + ", ".join(entries) + "}"
+    parts: list[str] = []
+
+    # EAST3 uses "entries" list of {key, value} dicts
+    entries_list = _list(node, "entries")
+    if len(entries_list) > 0:
+        for entry in entries_list:
+            if isinstance(entry, dict):
+                k = _emit_expr(ctx, entry.get("key"))
+                v = _emit_expr(ctx, entry.get("value"))
+                parts.append(k + ": " + v)
+    else:
+        # Fallback: separate keys/values lists
+        keys = _list(node, "keys")
+        values = _list(node, "values")
+        for i in range(len(keys)):
+            k = _emit_expr(ctx, keys[i]) if i < len(keys) else "nil"
+            v = _emit_expr(ctx, values[i]) if i < len(values) else "nil"
+            parts.append(k + ": " + v)
+
+    return gt + "{" + ", ".join(parts) + "}"
 
 
 def _emit_set_literal(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
@@ -692,18 +750,30 @@ def _emit_ann_assign(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
     gt = go_type(rt)
     value = node.get("value")
 
-    # target can be a string or a Name node dict
+    # target can be a string, Name node, or Attribute node
     target_name = ""
+    is_attr_target = False
     if isinstance(target_val, str):
         target_name = target_val
     elif isinstance(target_val, dict):
-        target_name = _str(target_val, "id")
-        if target_name == "":
-            target_name = _str(target_val, "repr")
-    if target_name == "":
+        if _str(target_val, "kind") == "Attribute":
+            # self.x = ... → emit as attribute assignment
+            is_attr_target = True
+        else:
+            target_name = _str(target_val, "id")
+            if target_name == "":
+                target_name = _str(target_val, "repr")
+    if target_name == "" and not is_attr_target:
         tn = node.get("target_node")
         if isinstance(tn, dict):
             target_name = _str(tn, "id")
+
+    if is_attr_target:
+        lhs = _emit_expr(ctx, target_val)
+        if value is not None:
+            _emit(ctx, lhs + " = " + _emit_expr(ctx, value))
+        return
+
     name = _safe_go_ident(target_name)
 
     ctx.var_types[name] = rt
@@ -891,7 +961,9 @@ def _emit_range_for(ctx: EmitContext, t_name: str, plan: dict[str, JsonVal], bod
         step_code = _emit_expr(ctx, step)
 
     cmp_op = " > " if step_negative else " < "
-    _emit(ctx, "for " + t_name + " := int64(" + s_code + "); " + t_name + cmp_op + e_code + "; " + t_name + " += " + step_code + " {")
+    # Use = if variable already declared (VarDecl), else :=
+    assign_op = " = " if t_name in ctx.var_types else " := "
+    _emit(ctx, "for " + t_name + assign_op + "int64(" + s_code + "); " + t_name + cmp_op + e_code + "; " + t_name + " += " + step_code + " {")
     ctx.indent_level += 1
     ctx.var_types[t_name] = "int64"
     _emit_body(ctx, body)
@@ -954,6 +1026,8 @@ def _emit_function_def(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
         ret_clause = " " + go_ret if go_ret != "" and return_type != "None" else ""
         _emit(ctx, "func " + fn_name + "(" + ", ".join(params) + ")" + ret_clause + " {")
 
+    saved_ret = ctx.current_return_type
+    ctx.current_return_type = return_type
     ctx.indent_level += 1
     _emit_body(ctx, body)
     ctx.indent_level -= 1
@@ -961,6 +1035,7 @@ def _emit_function_def(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
     _emit_blank(ctx)
 
     ctx.var_types = saved_vars
+    ctx.current_return_type = saved_ret
 
 
 def _emit_class_def(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
@@ -1016,6 +1091,10 @@ def _emit_class_def(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
                         if ft != "":
                             fields.append((ft, frt))
 
+    # Save class context early (before constructor and methods modify it)
+    saved_class = ctx.current_class
+    saved_receiver = ctx.current_receiver
+
     # Struct definition
     _emit(ctx, "type " + gn + " struct {")
     ctx.indent_level += 1
@@ -1027,20 +1106,51 @@ def _emit_class_def(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
     _emit(ctx, "}")
     _emit_blank(ctx)
 
-    # Constructor
+    # Constructor: for dataclass use all fields, for __init__ use its arg_order
+    ctor_params: list[tuple[str, str]] = list(fields)
+    has_init = False
+    init_body_stmts: list[JsonVal] = []
+    for stmt in body:
+        if isinstance(stmt, dict) and _str(stmt, "kind") == "FunctionDef" and _str(stmt, "name") == "__init__":
+            has_init = True
+            init_args = _dict(stmt, "arg_types")
+            init_order = _list(stmt, "arg_order")
+            init_body_stmts = _list(stmt, "body")
+            # Only use __init__ params (excluding self) as ctor params
+            ctor_params = []
+            for a in init_order:
+                a_name = a if isinstance(a, str) else ""
+                if a_name == "self":
+                    continue
+                a_type = init_args.get(a_name, "")
+                a_type_str = a_type if isinstance(a_type, str) else ""
+                ctor_params.append((a_name, a_type_str))
+            break
+
     _emit(ctx, "func New" + gn + "(" + ", ".join(
-        _safe_go_ident(f) + " " + go_type(t) for f, t in fields
+        _safe_go_ident(f) + " " + go_type(t) for f, t in ctor_params
     ) + ") *" + gn + " {")
     ctx.indent_level += 1
-    field_inits = ", ".join(_safe_go_ident(f) + ": " + _safe_go_ident(f) for f, _ in fields)
-    _emit(ctx, "return &" + gn + "{" + field_inits + "}")
+
+    if has_init and not is_dataclass:
+        # Emit __init__ body translated to Go (self.x = ... → obj.x = ...)
+        _emit(ctx, "obj := &" + gn + "{}")
+        saved_receiver = ctx.current_receiver
+        ctx.current_receiver = "obj"
+        ctx.current_class = name
+        for init_s in init_body_stmts:
+            _emit_stmt(ctx, init_s)
+        ctx.current_receiver = saved_receiver
+        _emit(ctx, "return obj")
+    else:
+        field_inits = ", ".join(_safe_go_ident(f) + ": " + _safe_go_ident(f) for f, _ in ctor_params)
+        _emit(ctx, "return &" + gn + "{" + field_inits + "}")
+
     ctx.indent_level -= 1
     _emit(ctx, "}")
     _emit_blank(ctx)
 
     # Methods
-    saved_class = ctx.current_class
-    saved_receiver = ctx.current_receiver
     ctx.current_class = name
     ctx.current_receiver = "self"
     for stmt in body:
@@ -1097,10 +1207,25 @@ def _emit_try(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
 
 def _emit_raise(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
     exc = node.get("exc")
-    if exc is not None:
+    if isinstance(exc, dict):
+        bn = _str(exc, "builtin_name")
+        rc = _str(exc, "runtime_call")
+        if bn in ("RuntimeError", "ValueError", "TypeError", "IndexError", "KeyError") or rc == "std::runtime_error":
+            exc_args = _list(exc, "args")
+            if len(exc_args) >= 1:
+                _emit(ctx, "panic(" + _emit_expr(ctx, exc_args[0]) + ")")
+            else:
+                _emit(ctx, "panic(\"" + bn + "\")")
+        else:
+            _emit(ctx, "panic(" + _emit_expr(ctx, exc) + ")")
+    elif exc is not None:
         _emit(ctx, "panic(" + _emit_expr(ctx, exc) + ")")
     else:
         _emit(ctx, "panic(nil)")
+    # Go requires unreachable return after panic in non-void functions
+    if ctx.current_return_type != "" and ctx.current_return_type != "None":
+        zv = go_zero_value(ctx.current_return_type)
+        _emit(ctx, "return " + zv + " // unreachable")
 
 
 def _emit_type_alias(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
