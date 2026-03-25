@@ -294,6 +294,34 @@ class GoEmitter(CodeEmitter):
 - mapping ファイルは runtime の近くに配置（`src/runtime/<lang>/toolchain2/mapping.json`）。
 - mapping にないメソッドはデフォルトでメソッド呼び出し形式。
 
+#### runtime 関数の命名ルール
+
+各言語の runtime に実装するヘルパー関数の命名は、全言語共通のベース名を使う。
+ベース名は `<frontend>_<type>_<method>` の形式で、frontend 由来の意味論を明示する。
+
+Python frontend の場合:
+
+| カテゴリ | パターン | 例 |
+|---|---|---|
+| built-in 関数 | `py_<name>` | `py_len`, `py_print`, `py_abs` |
+| str メソッド | `py_str_<method>` | `py_str_strip`, `py_str_join`, `py_str_upper` |
+| list メソッド | `py_list_<method>` | `py_list_append`, `py_list_pop` |
+| dict メソッド | `py_dict_<method>` | `py_dict_get`, `py_dict_keys` |
+| set メソッド | `py_set_<method>` | `py_set_add`, `py_set_discard` |
+| stdlib 関数 | `py_<module>_<name>` | `py_math_sqrt`, `py_time_perf_counter` |
+| stdlib 変数 | `py_<module>_<name>` | `py_math_pi`, `py_math_e` |
+
+ルール:
+- `py_` prefix は「Python frontend 由来の意味論」を示す
+- 将来の Ruby frontend なら `rb_str_strip` 等になる
+- **ベース名は全言語共通**。各言語は必要に応じて case を変換する:
+  - Go: `PyStrStrip` / `py_str_strip`
+  - C++: `py_str_strip`
+  - Rust: `py_str_strip`
+- EAST の `runtime_symbol: "str.strip"` から mapping が `py_str_strip` を導出する
+- mapping の `call` フィールドにこのベース名を書く
+- ターゲット言語にネイティブの等価関数がある場合（Go の `strings.TrimSpace` 等）は、mapping で直接そちらに写像してよい。ベース名を経由する必要はない
+
 ### 3.5 共有ユーティリティ (`toolchain2/common/`)
 
 全層で使う共有ユーティリティは `toolchain2/common/` に集約し、各層での重複実装を禁止する。
