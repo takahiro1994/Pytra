@@ -974,14 +974,27 @@ def _emit_assign(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
                 name = _str(target_node, "repr")
             gn = _safe_go_ident(name)
             if gn in ctx.var_types:
-                # Coerce value to declared type
                 declared_rt = ctx.var_types.get(gn, "")
-                if declared_rt != "":
-                    declared_gt = go_type(declared_rt)
-                    val_code = _coerce_to_type(val_code, declared_gt, value)
-                _emit(ctx, gn + " = " + val_code)
-                if is_unused:
-                    _emit(ctx, "_ = " + gn)
+                # If var was declared as unknown (interface{}), upgrade type
+                if declared_rt == "unknown" and isinstance(value, dict):
+                    new_rt = _str(value, "resolved_type")
+                    new_dt = _str(node, "decl_type")
+                    actual_rt = new_dt if new_dt != "" and new_dt != "unknown" else new_rt
+                    if actual_rt != "" and actual_rt != "unknown":
+                        ctx.var_types[gn] = actual_rt
+                        gt_new = go_type(actual_rt)
+                        _emit(ctx, gn + " = " + gt_new + "(" + val_code + ")")
+                        if is_unused:
+                            _emit(ctx, "_ = " + gn)
+                    else:
+                        _emit(ctx, gn + " = " + val_code)
+                else:
+                    if declared_rt != "":
+                        declared_gt = go_type(declared_rt)
+                        val_code = _coerce_to_type(val_code, declared_gt, value)
+                    _emit(ctx, gn + " = " + val_code)
+                    if is_unused:
+                        _emit(ctx, "_ = " + gn)
             else:
                 # Check for decl_type on the Assign node, target, or value
                 decl_type = _str(node, "decl_type")
@@ -1369,9 +1382,11 @@ def _emit_var_decl(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
     if rt == "":
         rt = _str(node, "resolved_type")
     gn = _safe_go_ident(name)
-    # For unknown types, use int64 as default (most common in Pytra)
+    # VarDecl with unknown type: emit as interface{} but track for later upgrade
     if rt == "" or rt == "unknown":
-        rt = "int64"
+        ctx.var_types[gn] = "unknown"
+        _emit(ctx, "var " + gn + " interface{}")
+        return
     gt = go_type(rt)
     ctx.var_types[gn] = rt
     _emit(ctx, "var " + gn + " " + gt)
