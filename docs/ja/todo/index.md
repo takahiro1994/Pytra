@@ -190,24 +190,7 @@ parser 等を修正するたびに golden file を手動で全段再生成する
 
 ### P0-TEST-REORG: test/ ディレクトリ再編 + pytra 実装本体の golden 生成
 
-test/builtin/ と test/stdlib/ を test/include/ に移動し、src/pytra/ の実装本体の golden を test/pytra/ に配置する。
-
-```
-test/
-  include/                ← src/include/ の宣言 golden（resolve シグネチャ参照用）
-    builtin/east1/py/       builtins.py.east1, containers.py.east1
-    stdlib/east1/py/        math.py.east1, time.py.east1, ...
-  pytra/                  ← src/pytra/ の実装本体 golden（全段）
-    east1/py/
-      std/                  re.py.east1, json.py.east1, ...
-      built_in/             sequence.py.east1, io_ops.py.east1, ...
-      utils/                png.py.east1, gif.py.east1
-    east2/
-    east3/
-    east3-opt/
-  fixture/                ← ユーザーコード fixture（既存）
-  sample/                 ← ユーザーコード sample（既存）
-```
+文脈: [docs/ja/plans/p0-test-reorg.md](../plans/p0-test-reorg.md)
 
 1. [ ] [ID: P0-TEST-REORG-S1] `test/builtin/` → `test/include/builtin/`、`test/stdlib/` → `test/include/stdlib/` に移動
 2. [ ] [ID: P0-TEST-REORG-S2] `src/pytra/` の全 .py を parse し、`test/pytra/east1/py/` に golden 配置
