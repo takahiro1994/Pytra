@@ -8836,76 +8836,11 @@
         },
         {
           "kind": "Assign",
-          "source_span": {
-            "lineno": 129,
-            "col_offset": 4,
-            "end_lineno": 129,
-            "end_col_offset": 83
-          },
           "target": {
-            "kind": "Tuple",
-            "source_span": {
-              "lineno": 129,
-              "col_offset": 4,
-              "end_lineno": 129,
-              "end_col_offset": 23
-            },
-            "resolved_type": "tuple[unknown, unknown, unknown]",
-            "casts": [],
-            "borrow_kind": "value",
-            "repr": "fwd_x, fwd_y, fwd_z",
-            "elements": [
-              {
-                "kind": "Name",
-                "source_span": {
-                  "lineno": 129,
-                  "col_offset": 4,
-                  "end_lineno": 129,
-                  "end_col_offset": 9
-                },
-                "resolved_type": "float64",
-                "casts": [],
-                "borrow_kind": "value",
-                "repr": "fwd_x",
-                "id": "fwd_x"
-              },
-              {
-                "kind": "Name",
-                "source_span": {
-                  "lineno": 129,
-                  "col_offset": 11,
-                  "end_lineno": 129,
-                  "end_col_offset": 16
-                },
-                "resolved_type": "float64",
-                "casts": [],
-                "borrow_kind": "value",
-                "repr": "fwd_y",
-                "id": "fwd_y"
-              },
-              {
-                "kind": "Name",
-                "source_span": {
-                  "lineno": 129,
-                  "col_offset": 18,
-                  "end_lineno": 129,
-                  "end_col_offset": 23
-                },
-                "resolved_type": "float64",
-                "casts": [],
-                "borrow_kind": "value",
-                "repr": "fwd_z",
-                "id": "fwd_z"
-              }
-            ]
+            "kind": "Name",
+            "id": "__tup_1",
+            "resolved_type": "tuple[float64,float64,float64]"
           },
-          "declare": false,
-          "leading_trivia": [
-            {
-              "kind": "blank",
-              "count": 1
-            }
-          ],
           "value": {
             "kind": "Call",
             "source_span": {
@@ -9068,79 +9003,88 @@
               "mirror": "tuple[float64,float64,float64]"
             }
           },
-          "type_expr_summary_v1": {
-            "schema_version": 1,
-            "kind": "GenericType",
-            "category": "static",
-            "mirror": "tuple[unknown,unknown,unknown]"
-          }
+          "declare": true,
+          "decl_type": "tuple[float64,float64,float64]"
         },
         {
           "kind": "Assign",
-          "source_span": {
-            "lineno": 130,
-            "col_offset": 4,
-            "end_lineno": 130,
-            "end_col_offset": 61
-          },
           "target": {
-            "kind": "Tuple",
-            "source_span": {
-              "lineno": 130,
-              "col_offset": 4,
-              "end_lineno": 130,
-              "end_col_offset": 29
-            },
-            "resolved_type": "tuple[unknown, unknown, unknown]",
-            "casts": [],
-            "borrow_kind": "value",
-            "repr": "right_x, right_y, right_z",
-            "elements": [
-              {
-                "kind": "Name",
-                "source_span": {
-                  "lineno": 130,
-                  "col_offset": 4,
-                  "end_lineno": 130,
-                  "end_col_offset": 11
-                },
-                "resolved_type": "float64",
-                "casts": [],
-                "borrow_kind": "value",
-                "repr": "right_x",
-                "id": "right_x"
-              },
-              {
-                "kind": "Name",
-                "source_span": {
-                  "lineno": 130,
-                  "col_offset": 13,
-                  "end_lineno": 130,
-                  "end_col_offset": 20
-                },
-                "resolved_type": "float64",
-                "casts": [],
-                "borrow_kind": "value",
-                "repr": "right_y",
-                "id": "right_y"
-              },
-              {
-                "kind": "Name",
-                "source_span": {
-                  "lineno": 130,
-                  "col_offset": 22,
-                  "end_lineno": 130,
-                  "end_col_offset": 29
-                },
-                "resolved_type": "float64",
-                "casts": [],
-                "borrow_kind": "value",
-                "repr": "right_z",
-                "id": "right_z"
-              }
-            ]
+            "kind": "Name",
+            "id": "fwd_x",
+            "resolved_type": "float64"
           },
-          "declare": false,
+          "value": {
+            "kind": "Subscript",
+            "value": {
+              "kind": "Name",
+              "id": "__tup_1",
+              "resolved_type": "tuple[float64,float64,float64]"
+            },
+            "slice": {
+              "kind": "Constant",
+              "value": 0,
+              "resolved_type": "int64"
+            },
+            "resolved_type": "float64"
+          },
+          "declare": true,
+          "decl_type": "float64"
+        },
+        {
+          "kind": "Assign",
+          "target": {
+            "kind": "Name",
+            "id": "fwd_y",
+            "resolved_type": "float64"
+          },
+          "value": {
+            "kind": "Subscript",
+            "value": {
+              "kind": "Name",
+              "id": "__tup_1",
+              "resolved_type": "tuple[float64,float64,float64]"
+            },
+            "slice": {
+              "kind": "Constant",
+              "value": 1,
+              "resolved_type": "int64"
+            },
+            "resolved_type": "float64"
+          },
+          "declare": true,
+          "decl_type": "float64"
+        },
+        {
+          "kind": "Assign",
+          "target": {
+            "kind": "Name",
+            "id": "fwd_z",
+            "resolved_type": "float64"
+          },
+          "value": {
+            "kind": "Subscript",
+            "value": {
+              "kind": "Name",
+              "id": "__tup_1",
+              "resolved_type": "tuple[float64,float64,float64]"
+            },
+            "slice": {
+              "kind": "Constant",
+              "value": 2,
+              "resolved_type": "int64"
+            },
+            "resolved_type": "float64"
+          },
+          "declare": true,
+          "decl_type": "float64"
+        },
+        {
+          "kind": "Assign",
+          "target": {
+            "kind": "Name",
+            "id": "__tup_2",
+            "resolved_type": "tuple[float64,float64,float64]"
+          },
           "value": {
             "kind": "Call",
             "source_span": {
@@ -9233,79 +9177,88 @@
               "mirror": "tuple[float64,float64,float64]"
             }
           },
-          "type_expr_summary_v1": {
-            "schema_version": 1,
-            "kind": "GenericType",
-            "category": "static",
-            "mirror": "tuple[unknown,unknown,unknown]"
-          }
+          "declare": true,
+          "decl_type": "tuple[float64,float64,float64]"
         },
         {
           "kind": "Assign",
-          "source_span": {
-            "lineno": 131,
-            "col_offset": 4,
-            "end_lineno": 131,
-            "end_col_offset": 140
-          },
           "target": {
-            "kind": "Tuple",
-            "source_span": {
-              "lineno": 131,
-              "col_offset": 4,
-              "end_lineno": 131,
-              "end_col_offset": 20
-            },
-            "resolved_type": "tuple[unknown, unknown, unknown]",
-            "casts": [],
-            "borrow_kind": "value",
-            "repr": "up_x, up_y, up_z",
-            "elements": [
-              {
-                "kind": "Name",
-                "source_span": {
-                  "lineno": 131,
-                  "col_offset": 4,
-                  "end_lineno": 131,
-                  "end_col_offset": 8
-                },
-                "resolved_type": "float64",
-                "casts": [],
-                "borrow_kind": "value",
-                "repr": "up_x",
-                "id": "up_x"
-              },
-              {
-                "kind": "Name",
-                "source_span": {
-                  "lineno": 131,
-                  "col_offset": 10,
-                  "end_lineno": 131,
-                  "end_col_offset": 14
-                },
-                "resolved_type": "float64",
-                "casts": [],
-                "borrow_kind": "value",
-                "repr": "up_y",
-                "id": "up_y"
-              },
-              {
-                "kind": "Name",
-                "source_span": {
-                  "lineno": 131,
-                  "col_offset": 16,
-                  "end_lineno": 131,
-                  "end_col_offset": 20
-                },
-                "resolved_type": "float64",
-                "casts": [],
-                "borrow_kind": "value",
-                "repr": "up_z",
-                "id": "up_z"
-              }
-            ]
+            "kind": "Name",
+            "id": "right_x",
+            "resolved_type": "float64"
           },
-          "declare": false,
+          "value": {
+            "kind": "Subscript",
+            "value": {
+              "kind": "Name",
+              "id": "__tup_2",
+              "resolved_type": "tuple[float64,float64,float64]"
+            },
+            "slice": {
+              "kind": "Constant",
+              "value": 0,
+              "resolved_type": "int64"
+            },
+            "resolved_type": "float64"
+          },
+          "declare": true,
+          "decl_type": "float64"
+        },
+        {
+          "kind": "Assign",
+          "target": {
+            "kind": "Name",
+            "id": "right_y",
+            "resolved_type": "float64"
+          },
+          "value": {
+            "kind": "Subscript",
+            "value": {
+              "kind": "Name",
+              "id": "__tup_2",
+              "resolved_type": "tuple[float64,float64,float64]"
+            },
+            "slice": {
+              "kind": "Constant",
+              "value": 1,
+              "resolved_type": "int64"
+            },
+            "resolved_type": "float64"
+          },
+          "declare": true,
+          "decl_type": "float64"
+        },
+        {
+          "kind": "Assign",
+          "target": {
+            "kind": "Name",
+            "id": "right_z",
+            "resolved_type": "float64"
+          },
+          "value": {
+            "kind": "Subscript",
+            "value": {
+              "kind": "Name",
+              "id": "__tup_2",
+              "resolved_type": "tuple[float64,float64,float64]"
+            },
+            "slice": {
+              "kind": "Constant",
+              "value": 2,
+              "resolved_type": "int64"
+            },
+            "resolved_type": "float64"
+          },
+          "declare": true,
+          "decl_type": "float64"
+        },
+        {
+          "kind": "Assign",
+          "target": {
+            "kind": "Name",
+            "id": "__tup_3",
+            "resolved_type": "tuple[float64,float64,float64]"
+          },
           "value": {
             "kind": "Call",
             "source_span": {
@@ -9636,12 +9589,80 @@
               "mirror": "tuple[float64,float64,float64]"
             }
           },
-          "type_expr_summary_v1": {
-            "schema_version": 1,
-            "kind": "GenericType",
-            "category": "static",
-            "mirror": "tuple[unknown,unknown,unknown]"
-          }
+          "declare": true,
+          "decl_type": "tuple[float64,float64,float64]"
+        },
+        {
+          "kind": "Assign",
+          "target": {
+            "kind": "Name",
+            "id": "up_x",
+            "resolved_type": "float64"
+          },
+          "value": {
+            "kind": "Subscript",
+            "value": {
+              "kind": "Name",
+              "id": "__tup_3",
+              "resolved_type": "tuple[float64,float64,float64]"
+            },
+            "slice": {
+              "kind": "Constant",
+              "value": 0,
+              "resolved_type": "int64"
+            },
+            "resolved_type": "float64"
+          },
+          "declare": true,
+          "decl_type": "float64"
+        },
+        {
+          "kind": "Assign",
+          "target": {
+            "kind": "Name",
+            "id": "up_y",
+            "resolved_type": "float64"
+          },
+          "value": {
+            "kind": "Subscript",
+            "value": {
+              "kind": "Name",
+              "id": "__tup_3",
+              "resolved_type": "tuple[float64,float64,float64]"
+            },
+            "slice": {
+              "kind": "Constant",
+              "value": 1,
+              "resolved_type": "int64"
+            },
+            "resolved_type": "float64"
+          },
+          "declare": true,
+          "decl_type": "float64"
+        },
+        {
+          "kind": "Assign",
+          "target": {
+            "kind": "Name",
+            "id": "up_z",
+            "resolved_type": "float64"
+          },
+          "value": {
+            "kind": "Subscript",
+            "value": {
+              "kind": "Name",
+              "id": "__tup_3",
+              "resolved_type": "tuple[float64,float64,float64]"
+            },
+            "slice": {
+              "kind": "Constant",
+              "value": 2,
+              "resolved_type": "int64"
+            },
+            "resolved_type": "float64"
+          },
+          "declare": true,
+          "decl_type": "float64"
         },
         {
           "kind": "Assign",
@@ -13184,70 +13205,11 @@
                 },
                 {
                   "kind": "Assign",
-                  "source_span": {
-                    "lineno": 164,
-                    "col_offset": 12,
-                    "end_lineno": 164,
-                    "end_col_offset": 46
-                  },
                   "target": {
-                    "kind": "Tuple",
-                    "source_span": {
-                      "lineno": 164,
-                      "col_offset": 12,
-                      "end_lineno": 164,
-                      "end_col_offset": 22
-                    },
-                    "resolved_type": "tuple[unknown, unknown, unknown]",
-                    "casts": [],
-                    "borrow_kind": "value",
-                    "repr": "dx, dy, dz",
-                    "elements": [
-                      {
-                        "kind": "Name",
-                        "source_span": {
-                          "lineno": 164,
-                          "col_offset": 12,
-                          "end_lineno": 164,
-                          "end_col_offset": 14
-                        },
-                        "resolved_type": "float64",
-                        "casts": [],
-                        "borrow_kind": "value",
-                        "repr": "dx",
-                        "id": "dx"
-                      },
-                      {
-                        "kind": "Name",
-                        "source_span": {
-                          "lineno": 164,
-                          "col_offset": 16,
-                          "end_lineno": 164,
-                          "end_col_offset": 18
-                        },
-                        "resolved_type": "float64",
-                        "casts": [],
-                        "borrow_kind": "value",
-                        "repr": "dy",
-                        "id": "dy"
-                      },
-                      {
-                        "kind": "Name",
-                        "source_span": {
-                          "lineno": 164,
-                          "col_offset": 20,
-                          "end_lineno": 164,
-                          "end_col_offset": 22
-                        },
-                        "resolved_type": "float64",
-                        "casts": [],
-                        "borrow_kind": "value",
-                        "repr": "dz",
-                        "id": "dz"
-                      }
-                    ]
+                    "kind": "Name",
+                    "id": "__tup_4",
+                    "resolved_type": "tuple[float64,float64,float64]"
                   },
-                  "declare": false,
                   "value": {
                     "kind": "Call",
                     "source_span": {
@@ -13326,12 +13288,80 @@
                       "mirror": "tuple[float64,float64,float64]"
                     }
                   },
-                  "type_expr_summary_v1": {
-                    "schema_version": 1,
-                    "kind": "GenericType",
-                    "category": "static",
-                    "mirror": "tuple[unknown,unknown,unknown]"
-                  }
+                  "declare": true,
+                  "decl_type": "tuple[float64,float64,float64]"
+                },
+                {
+                  "kind": "Assign",
+                  "target": {
+                    "kind": "Name",
+                    "id": "dx",
+                    "resolved_type": "float64"
+                  },
+                  "value": {
+                    "kind": "Subscript",
+                    "value": {
+                      "kind": "Name",
+                      "id": "__tup_4",
+                      "resolved_type": "tuple[float64,float64,float64]"
+                    },
+                    "slice": {
+                      "kind": "Constant",
+                      "value": 0,
+                      "resolved_type": "int64"
+                    },
+                    "resolved_type": "float64"
+                  },
+                  "declare": true,
+                  "decl_type": "float64"
+                },
+                {
+                  "kind": "Assign",
+                  "target": {
+                    "kind": "Name",
+                    "id": "dy",
+                    "resolved_type": "float64"
+                  },
+                  "value": {
+                    "kind": "Subscript",
+                    "value": {
+                      "kind": "Name",
+                      "id": "__tup_4",
+                      "resolved_type": "tuple[float64,float64,float64]"
+                    },
+                    "slice": {
+                      "kind": "Constant",
+                      "value": 1,
+                      "resolved_type": "int64"
+                    },
+                    "resolved_type": "float64"
+                  },
+                  "declare": true,
+                  "decl_type": "float64"
+                },
+                {
+                  "kind": "Assign",
+                  "target": {
+                    "kind": "Name",
+                    "id": "dz",
+                    "resolved_type": "float64"
+                  },
+                  "value": {
+                    "kind": "Subscript",
+                    "value": {
+                      "kind": "Name",
+                      "id": "__tup_4",
+                      "resolved_type": "tuple[float64,float64,float64]"
+                    },
+                    "slice": {
+                      "kind": "Constant",
+                      "value": 2,
+                      "resolved_type": "int64"
+                    },
+                    "resolved_type": "float64"
+                  },
+                  "declare": true,
+                  "decl_type": "float64"
                 },
                 {
                   "kind": "Assign",
@@ -15270,19 +15300,19 @@
                 {
                   "kind": "VarDecl",
                   "name": "ldx",
-                  "type": "unknown",
+                  "type": "float64",
                   "hoisted": true
                 },
                 {
                   "kind": "VarDecl",
                   "name": "ldy",
-                  "type": "unknown",
+                  "type": "float64",
                   "hoisted": true
                 },
                 {
                   "kind": "VarDecl",
                   "name": "ldz",
-                  "type": "unknown",
+                  "type": "float64",
                   "hoisted": true
                 },
                 {
@@ -15366,70 +15396,11 @@
                   "body": [
                     {
                       "kind": "Assign",
-                      "source_span": {
-                        "lineno": 194,
-                        "col_offset": 16,
-                        "end_lineno": 194,
-                        "end_col_offset": 55
-                      },
                       "target": {
-                        "kind": "Tuple",
-                        "source_span": {
-                          "lineno": 194,
-                          "col_offset": 16,
-                          "end_lineno": 194,
-                          "end_col_offset": 23
-                        },
-                        "resolved_type": "tuple[float64, float64, float64]",
-                        "casts": [],
-                        "borrow_kind": "value",
-                        "repr": "r, g, b",
-                        "elements": [
-                          {
-                            "kind": "Name",
-                            "source_span": {
-                              "lineno": 194,
-                              "col_offset": 16,
-                              "end_lineno": 194,
-                              "end_col_offset": 17
-                            },
-                            "resolved_type": "float64",
-                            "casts": [],
-                            "borrow_kind": "readonly_ref",
-                            "repr": "r",
-                            "id": "r"
-                          },
-                          {
-                            "kind": "Name",
-                            "source_span": {
-                              "lineno": 194,
-                              "col_offset": 19,
-                              "end_lineno": 194,
-                              "end_col_offset": 20
-                            },
-                            "resolved_type": "float64",
-                            "casts": [],
-                            "borrow_kind": "readonly_ref",
-                            "repr": "g",
-                            "id": "g"
-                          },
-                          {
-                            "kind": "Name",
-                            "source_span": {
-                              "lineno": 194,
-                              "col_offset": 22,
-                              "end_lineno": 194,
-                              "end_col_offset": 23
-                            },
-                            "resolved_type": "float64",
-                            "casts": [],
-                            "borrow_kind": "readonly_ref",
-                            "repr": "b",
-                            "id": "b"
-                          }
-                        ]
+                        "kind": "Name",
+                        "id": "__tup_5",
+                        "resolved_type": "tuple[float64,float64,float64]"
                       },
-                      "declare": false,
                       "value": {
                         "kind": "Call",
                         "source_span": {
@@ -15522,12 +15493,80 @@
                           "mirror": "tuple[float64,float64,float64]"
                         }
                       },
-                      "type_expr_summary_v1": {
-                        "schema_version": 1,
-                        "kind": "GenericType",
-                        "category": "static",
-                        "mirror": "tuple[float64,float64,float64]"
-                      }
+                      "declare": true,
+                      "decl_type": "tuple[float64,float64,float64]"
+                    },
+                    {
+                      "kind": "Assign",
+                      "target": {
+                        "kind": "Name",
+                        "id": "r",
+                        "resolved_type": "float64"
+                      },
+                      "value": {
+                        "kind": "Subscript",
+                        "value": {
+                          "kind": "Name",
+                          "id": "__tup_5",
+                          "resolved_type": "tuple[float64,float64,float64]"
+                        },
+                        "slice": {
+                          "kind": "Constant",
+                          "value": 0,
+                          "resolved_type": "int64"
+                        },
+                        "resolved_type": "float64"
+                      },
+                      "declare": true,
+                      "decl_type": "float64"
+                    },
+                    {
+                      "kind": "Assign",
+                      "target": {
+                        "kind": "Name",
+                        "id": "g",
+                        "resolved_type": "float64"
+                      },
+                      "value": {
+                        "kind": "Subscript",
+                        "value": {
+                          "kind": "Name",
+                          "id": "__tup_5",
+                          "resolved_type": "tuple[float64,float64,float64]"
+                        },
+                        "slice": {
+                          "kind": "Constant",
+                          "value": 1,
+                          "resolved_type": "int64"
+                        },
+                        "resolved_type": "float64"
+                      },
+                      "declare": true,
+                      "decl_type": "float64"
+                    },
+                    {
+                      "kind": "Assign",
+                      "target": {
+                        "kind": "Name",
+                        "id": "b",
+                        "resolved_type": "float64"
+                      },
+                      "value": {
+                        "kind": "Subscript",
+                        "value": {
+                          "kind": "Name",
+                          "id": "__tup_5",
+                          "resolved_type": "tuple[float64,float64,float64]"
+                        },
+                        "slice": {
+                          "kind": "Constant",
+                          "value": 2,
+                          "resolved_type": "int64"
+                        },
+                        "resolved_type": "float64"
+                      },
+                      "declare": true,
+                      "decl_type": "float64"
                     }
                   ],
                   "orelse": [
@@ -16914,70 +16953,11 @@
                         },
                         {
                           "kind": "Assign",
-                          "source_span": {
-                            "lineno": 208,
-                            "col_offset": 16,
-                            "end_lineno": 208,
-                            "end_col_offset": 56
-                          },
                           "target": {
-                            "kind": "Tuple",
-                            "source_span": {
-                              "lineno": 208,
-                              "col_offset": 16,
-                              "end_lineno": 208,
-                              "end_col_offset": 29
-                            },
-                            "resolved_type": "tuple[unknown, unknown, unknown]",
-                            "casts": [],
-                            "borrow_kind": "value",
-                            "repr": "ldx, ldy, ldz",
-                            "elements": [
-                              {
-                                "kind": "Name",
-                                "source_span": {
-                                  "lineno": 208,
-                                  "col_offset": 16,
-                                  "end_lineno": 208,
-                                  "end_col_offset": 19
-                                },
-                                "resolved_type": "float64",
-                                "casts": [],
-                                "borrow_kind": "value",
-                                "repr": "ldx",
-                                "id": "ldx"
-                              },
-                              {
-                                "kind": "Name",
-                                "source_span": {
-                                  "lineno": 208,
-                                  "col_offset": 21,
-                                  "end_lineno": 208,
-                                  "end_col_offset": 24
-                                },
-                                "resolved_type": "float64",
-                                "casts": [],
-                                "borrow_kind": "value",
-                                "repr": "ldy",
-                                "id": "ldy"
-                              },
-                              {
-                                "kind": "Name",
-                                "source_span": {
-                                  "lineno": 208,
-                                  "col_offset": 26,
-                                  "end_lineno": 208,
-                                  "end_col_offset": 29
-                                },
-                                "resolved_type": "float64",
-                                "casts": [],
-                                "borrow_kind": "value",
-                                "repr": "ldz",
-                                "id": "ldz"
-                              }
-                            ]
+                            "kind": "Name",
+                            "id": "__tup_6",
+                            "resolved_type": "tuple[float64,float64,float64]"
                           },
-                          "declare": false,
                           "value": {
                             "kind": "Call",
                             "source_span": {
@@ -17056,12 +17036,82 @@
                               "mirror": "tuple[float64,float64,float64]"
                             }
                           },
-                          "type_expr_summary_v1": {
-                            "schema_version": 1,
-                            "kind": "GenericType",
-                            "category": "static",
-                            "mirror": "tuple[unknown,unknown,unknown]"
+                          "declare": true,
+                          "decl_type": "tuple[float64,float64,float64]"
+                        },
+                        {
+                          "kind": "Assign",
+                          "target": {
+                            "kind": "Name",
+                            "id": "ldx",
+                            "resolved_type": "float64"
                           },
+                          "value": {
+                            "kind": "Subscript",
+                            "value": {
+                              "kind": "Name",
+                              "id": "__tup_6",
+                              "resolved_type": "tuple[float64,float64,float64]"
+                            },
+                            "slice": {
+                              "kind": "Constant",
+                              "value": 0,
+                              "resolved_type": "int64"
+                            },
+                            "resolved_type": "float64"
+                          },
+                          "declare": true,
+                          "decl_type": "float64",
+                          "is_reassign": true
+                        },
+                        {
+                          "kind": "Assign",
+                          "target": {
+                            "kind": "Name",
+                            "id": "ldy",
+                            "resolved_type": "float64"
+                          },
+                          "value": {
+                            "kind": "Subscript",
+                            "value": {
+                              "kind": "Name",
+                              "id": "__tup_6",
+                              "resolved_type": "tuple[float64,float64,float64]"
+                            },
+                            "slice": {
+                              "kind": "Constant",
+                              "value": 1,
+                              "resolved_type": "int64"
+                            },
+                            "resolved_type": "float64"
+                          },
+                          "declare": true,
+                          "decl_type": "float64",
+                          "is_reassign": true
+                        },
+                        {
+                          "kind": "Assign",
+                          "target": {
+                            "kind": "Name",
+                            "id": "ldz",
+                            "resolved_type": "float64"
+                          },
+                          "value": {
+                            "kind": "Subscript",
+                            "value": {
+                              "kind": "Name",
+                              "id": "__tup_6",
+                              "resolved_type": "tuple[float64,float64,float64]"
+                            },
+                            "slice": {
+                              "kind": "Constant",
+                              "value": 2,
+                              "resolved_type": "int64"
+                            },
+                            "resolved_type": "float64"
+                          },
+                          "declare": true,
+                          "decl_type": "float64",
                           "is_reassign": true
                         },
                         {
@@ -19099,70 +19149,11 @@
                         },
                         {
                           "kind": "Assign",
-                          "source_span": {
-                            "lineno": 238,
-                            "col_offset": 16,
-                            "end_lineno": 238,
-                            "end_col_offset": 89
-                          },
                           "target": {
-                            "kind": "Tuple",
-                            "source_span": {
-                              "lineno": 238,
-                              "col_offset": 16,
-                              "end_lineno": 238,
-                              "end_col_offset": 26
-                            },
-                            "resolved_type": "tuple[unknown, unknown, unknown]",
-                            "casts": [],
-                            "borrow_kind": "value",
-                            "repr": "nx, ny, nz",
-                            "elements": [
-                              {
-                                "kind": "Name",
-                                "source_span": {
-                                  "lineno": 238,
-                                  "col_offset": 16,
-                                  "end_lineno": 238,
-                                  "end_col_offset": 18
-                                },
-                                "resolved_type": "float64",
-                                "casts": [],
-                                "borrow_kind": "value",
-                                "repr": "nx",
-                                "id": "nx"
-                              },
-                              {
-                                "kind": "Name",
-                                "source_span": {
-                                  "lineno": 238,
-                                  "col_offset": 20,
-                                  "end_lineno": 238,
-                                  "end_col_offset": 22
-                                },
-                                "resolved_type": "float64",
-                                "casts": [],
-                                "borrow_kind": "value",
-                                "repr": "ny",
-                                "id": "ny"
-                              },
-                              {
-                                "kind": "Name",
-                                "source_span": {
-                                  "lineno": 238,
-                                  "col_offset": 24,
-                                  "end_lineno": 238,
-                                  "end_col_offset": 26
-                                },
-                                "resolved_type": "float64",
-                                "casts": [],
-                                "borrow_kind": "value",
-                                "repr": "nz",
-                                "id": "nz"
-                              }
-                            ]
+                            "kind": "Name",
+                            "id": "__tup_7",
+                            "resolved_type": "tuple[float64,float64,float64]"
                           },
-                          "declare": false,
                           "value": {
                             "kind": "Call",
                             "source_span": {
@@ -19409,92 +19400,88 @@
                               "mirror": "tuple[float64,float64,float64]"
                             }
                           },
-                          "type_expr_summary_v1": {
-                            "schema_version": 1,
-                            "kind": "GenericType",
-                            "category": "static",
-                            "mirror": "tuple[unknown,unknown,unknown]"
-                          }
+                          "declare": true,
+                          "decl_type": "tuple[float64,float64,float64]"
                         },
                         {
                           "kind": "Assign",
-                          "source_span": {
-                            "lineno": 241,
-                            "col_offset": 16,
-                            "end_lineno": 241,
-                            "end_col_offset": 63
-                          },
                           "target": {
-                            "kind": "Tuple",
-                            "source_span": {
-                              "lineno": 241,
-                              "col_offset": 16,
-                              "end_lineno": 241,
-                              "end_col_offset": 29
-                            },
-                            "resolved_type": "tuple[unknown, unknown, unknown]",
-                            "casts": [],
-                            "borrow_kind": "value",
-                            "repr": "rdx, rdy, rdz",
-                            "elements": [
-                              {
-                                "kind": "Name",
-                                "source_span": {
-                                  "lineno": 241,
-                                  "col_offset": 16,
-                                  "end_lineno": 241,
-                                  "end_col_offset": 19
-                                },
-                                "resolved_type": "float64",
-                                "casts": [],
-                                "borrow_kind": "value",
-                                "repr": "rdx",
-                                "id": "rdx"
-                              },
-                              {
-                                "kind": "Name",
-                                "source_span": {
-                                  "lineno": 241,
-                                  "col_offset": 21,
-                                  "end_lineno": 241,
-                                  "end_col_offset": 24
-                                },
-                                "resolved_type": "float64",
-                                "casts": [],
-                                "borrow_kind": "value",
-                                "repr": "rdy",
-                                "id": "rdy"
-                              },
-                              {
-                                "kind": "Name",
-                                "source_span": {
-                                  "lineno": 241,
-                                  "col_offset": 26,
-                                  "end_lineno": 241,
-                                  "end_col_offset": 29
-                                },
-                                "resolved_type": "float64",
-                                "casts": [],
-                                "borrow_kind": "value",
-                                "repr": "rdz",
-                                "id": "rdz"
-                              }
-                            ]
+                            "kind": "Name",
+                            "id": "nx",
+                            "resolved_type": "float64"
                           },
-                          "declare": false,
-                          "leading_trivia": [
-                            {
-                              "kind": "blank",
-                              "count": 1
+                          "value": {
+                            "kind": "Subscript",
+                            "value": {
+                              "kind": "Name",
+                              "id": "__tup_7",
+                              "resolved_type": "tuple[float64,float64,float64]"
                             },
-                            {
-                              "kind": "comment",
-                              "text": "Simple glass shading (reflection + refraction + light highlights)."
-                            }
-                          ],
-                          "leading_comments": [
-                            "Simple glass shading (reflection + refraction + light highlights)."
-                          ],
+                            "slice": {
+                              "kind": "Constant",
+                              "value": 0,
+                              "resolved_type": "int64"
+                            },
+                            "resolved_type": "float64"
+                          },
+                          "declare": true,
+                          "decl_type": "float64"
+                        },
+                        {
+                          "kind": "Assign",
+                          "target": {
+                            "kind": "Name",
+                            "id": "ny",
+                            "resolved_type": "float64"
+                          },
+                          "value": {
+                            "kind": "Subscript",
+                            "value": {
+                              "kind": "Name",
+                              "id": "__tup_7",
+                              "resolved_type": "tuple[float64,float64,float64]"
+                            },
+                            "slice": {
+                              "kind": "Constant",
+                              "value": 1,
+                              "resolved_type": "int64"
+                            },
+                            "resolved_type": "float64"
+                          },
+                          "declare": true,
+                          "decl_type": "float64"
+                        },
+                        {
+                          "kind": "Assign",
+                          "target": {
+                            "kind": "Name",
+                            "id": "nz",
+                            "resolved_type": "float64"
+                          },
+                          "value": {
+                            "kind": "Subscript",
+                            "value": {
+                              "kind": "Name",
+                              "id": "__tup_7",
+                              "resolved_type": "tuple[float64,float64,float64]"
+                            },
+                            "slice": {
+                              "kind": "Constant",
+                              "value": 2,
+                              "resolved_type": "int64"
+                            },
+                            "resolved_type": "float64"
+                          },
+                          "declare": true,
+                          "decl_type": "float64"
+                        },
+                        {
+                          "kind": "Assign",
+                          "target": {
+                            "kind": "Name",
+                            "id": "__tup_8",
+                            "resolved_type": "tuple[float64,float64,float64]"
+                          },
                           "value": {
                             "kind": "Call",
                             "source_span": {
@@ -19615,79 +19602,88 @@
                               "mirror": "tuple[float64,float64,float64]"
                             }
                           },
-                          "type_expr_summary_v1": {
-                            "schema_version": 1,
-                            "kind": "GenericType",
-                            "category": "static",
-                            "mirror": "tuple[unknown,unknown,unknown]"
-                          }
+                          "declare": true,
+                          "decl_type": "tuple[float64,float64,float64]"
                         },
                         {
                           "kind": "Assign",
-                          "source_span": {
-                            "lineno": 242,
-                            "col_offset": 16,
-                            "end_lineno": 242,
-                            "end_col_offset": 75
-                          },
                           "target": {
-                            "kind": "Tuple",
-                            "source_span": {
-                              "lineno": 242,
-                              "col_offset": 16,
-                              "end_lineno": 242,
-                              "end_col_offset": 29
-                            },
-                            "resolved_type": "tuple[unknown, unknown, unknown]",
-                            "casts": [],
-                            "borrow_kind": "value",
-                            "repr": "tdx, tdy, tdz",
-                            "elements": [
-                              {
-                                "kind": "Name",
-                                "source_span": {
-                                  "lineno": 242,
-                                  "col_offset": 16,
-                                  "end_lineno": 242,
-                                  "end_col_offset": 19
-                                },
-                                "resolved_type": "float64",
-                                "casts": [],
-                                "borrow_kind": "value",
-                                "repr": "tdx",
-                                "id": "tdx"
-                              },
-                              {
-                                "kind": "Name",
-                                "source_span": {
-                                  "lineno": 242,
-                                  "col_offset": 21,
-                                  "end_lineno": 242,
-                                  "end_col_offset": 24
-                                },
-                                "resolved_type": "float64",
-                                "casts": [],
-                                "borrow_kind": "value",
-                                "repr": "tdy",
-                                "id": "tdy"
-                              },
-                              {
-                                "kind": "Name",
-                                "source_span": {
-                                  "lineno": 242,
-                                  "col_offset": 26,
-                                  "end_lineno": 242,
-                                  "end_col_offset": 29
-                                },
-                                "resolved_type": "float64",
-                                "casts": [],
-                                "borrow_kind": "value",
-                                "repr": "tdz",
-                                "id": "tdz"
-                              }
-                            ]
+                            "kind": "Name",
+                            "id": "rdx",
+                            "resolved_type": "float64"
                           },
-                          "declare": false,
+                          "value": {
+                            "kind": "Subscript",
+                            "value": {
+                              "kind": "Name",
+                              "id": "__tup_8",
+                              "resolved_type": "tuple[float64,float64,float64]"
+                            },
+                            "slice": {
+                              "kind": "Constant",
+                              "value": 0,
+                              "resolved_type": "int64"
+                            },
+                            "resolved_type": "float64"
+                          },
+                          "declare": true,
+                          "decl_type": "float64"
+                        },
+                        {
+                          "kind": "Assign",
+                          "target": {
+                            "kind": "Name",
+                            "id": "rdy",
+                            "resolved_type": "float64"
+                          },
+                          "value": {
+                            "kind": "Subscript",
+                            "value": {
+                              "kind": "Name",
+                              "id": "__tup_8",
+                              "resolved_type": "tuple[float64,float64,float64]"
+                            },
+                            "slice": {
+                              "kind": "Constant",
+                              "value": 1,
+                              "resolved_type": "int64"
+                            },
+                            "resolved_type": "float64"
+                          },
+                          "declare": true,
+                          "decl_type": "float64"
+                        },
+                        {
+                          "kind": "Assign",
+                          "target": {
+                            "kind": "Name",
+                            "id": "rdz",
+                            "resolved_type": "float64"
+                          },
+                          "value": {
+                            "kind": "Subscript",
+                            "value": {
+                              "kind": "Name",
+                              "id": "__tup_8",
+                              "resolved_type": "tuple[float64,float64,float64]"
+                            },
+                            "slice": {
+                              "kind": "Constant",
+                              "value": 2,
+                              "resolved_type": "int64"
+                            },
+                            "resolved_type": "float64"
+                          },
+                          "declare": true,
+                          "decl_type": "float64"
+                        },
+                        {
+                          "kind": "Assign",
+                          "target": {
+                            "kind": "Name",
+                            "id": "__tup_9",
+                            "resolved_type": "tuple[float64,float64,float64]"
+                          },
                           "value": {
                             "kind": "Call",
                             "source_span": {
@@ -19850,79 +19846,88 @@
                               "mirror": "tuple[float64,float64,float64]"
                             }
                           },
-                          "type_expr_summary_v1": {
-                            "schema_version": 1,
-                            "kind": "GenericType",
-                            "category": "static",
-                            "mirror": "tuple[unknown,unknown,unknown]"
-                          }
+                          "declare": true,
+                          "decl_type": "tuple[float64,float64,float64]"
                         },
                         {
                           "kind": "Assign",
-                          "source_span": {
-                            "lineno": 243,
-                            "col_offset": 16,
-                            "end_lineno": 243,
-                            "end_col_offset": 61
-                          },
                           "target": {
-                            "kind": "Tuple",
-                            "source_span": {
-                              "lineno": 243,
-                              "col_offset": 16,
-                              "end_lineno": 243,
-                              "end_col_offset": 26
-                            },
-                            "resolved_type": "tuple[unknown, unknown, unknown]",
-                            "casts": [],
-                            "borrow_kind": "value",
-                            "repr": "sr, sg, sb",
-                            "elements": [
-                              {
-                                "kind": "Name",
-                                "source_span": {
-                                  "lineno": 243,
-                                  "col_offset": 16,
-                                  "end_lineno": 243,
-                                  "end_col_offset": 18
-                                },
-                                "resolved_type": "float64",
-                                "casts": [],
-                                "borrow_kind": "value",
-                                "repr": "sr",
-                                "id": "sr"
-                              },
-                              {
-                                "kind": "Name",
-                                "source_span": {
-                                  "lineno": 243,
-                                  "col_offset": 20,
-                                  "end_lineno": 243,
-                                  "end_col_offset": 22
-                                },
-                                "resolved_type": "float64",
-                                "casts": [],
-                                "borrow_kind": "value",
-                                "repr": "sg",
-                                "id": "sg"
-                              },
-                              {
-                                "kind": "Name",
-                                "source_span": {
-                                  "lineno": 243,
-                                  "col_offset": 24,
-                                  "end_lineno": 243,
-                                  "end_col_offset": 26
-                                },
-                                "resolved_type": "float64",
-                                "casts": [],
-                                "borrow_kind": "value",
-                                "repr": "sb",
-                                "id": "sb"
-                              }
-                            ]
+                            "kind": "Name",
+                            "id": "tdx",
+                            "resolved_type": "float64"
                           },
-                          "declare": false,
+                          "value": {
+                            "kind": "Subscript",
+                            "value": {
+                              "kind": "Name",
+                              "id": "__tup_9",
+                              "resolved_type": "tuple[float64,float64,float64]"
+                            },
+                            "slice": {
+                              "kind": "Constant",
+                              "value": 0,
+                              "resolved_type": "int64"
+                            },
+                            "resolved_type": "float64"
+                          },
+                          "declare": true,
+                          "decl_type": "float64"
+                        },
+                        {
+                          "kind": "Assign",
+                          "target": {
+                            "kind": "Name",
+                            "id": "tdy",
+                            "resolved_type": "float64"
+                          },
+                          "value": {
+                            "kind": "Subscript",
+                            "value": {
+                              "kind": "Name",
+                              "id": "__tup_9",
+                              "resolved_type": "tuple[float64,float64,float64]"
+                            },
+                            "slice": {
+                              "kind": "Constant",
+                              "value": 1,
+                              "resolved_type": "int64"
+                            },
+                            "resolved_type": "float64"
+                          },
+                          "declare": true,
+                          "decl_type": "float64"
+                        },
+                        {
+                          "kind": "Assign",
+                          "target": {
+                            "kind": "Name",
+                            "id": "tdz",
+                            "resolved_type": "float64"
+                          },
+                          "value": {
+                            "kind": "Subscript",
+                            "value": {
+                              "kind": "Name",
+                              "id": "__tup_9",
+                              "resolved_type": "tuple[float64,float64,float64]"
+                            },
+                            "slice": {
+                              "kind": "Constant",
+                              "value": 2,
+                              "resolved_type": "int64"
+                            },
+                            "resolved_type": "float64"
+                          },
+                          "declare": true,
+                          "decl_type": "float64"
+                        },
+                        {
+                          "kind": "Assign",
+                          "target": {
+                            "kind": "Name",
+                            "id": "__tup_10",
+                            "resolved_type": "tuple[float64,float64,float64]"
+                          },
                           "value": {
                             "kind": "Call",
                             "source_span": {
@@ -20015,79 +20020,88 @@
                               "mirror": "tuple[float64,float64,float64]"
                             }
                           },
-                          "type_expr_summary_v1": {
-                            "schema_version": 1,
-                            "kind": "GenericType",
-                            "category": "static",
-                            "mirror": "tuple[unknown,unknown,unknown]"
-                          }
+                          "declare": true,
+                          "decl_type": "tuple[float64,float64,float64]"
                         },
                         {
                           "kind": "Assign",
-                          "source_span": {
-                            "lineno": 244,
-                            "col_offset": 16,
-                            "end_lineno": 244,
-                            "end_col_offset": 67
-                          },
                           "target": {
-                            "kind": "Tuple",
-                            "source_span": {
-                              "lineno": 244,
-                              "col_offset": 16,
-                              "end_lineno": 244,
-                              "end_col_offset": 26
-                            },
-                            "resolved_type": "tuple[unknown, unknown, unknown]",
-                            "casts": [],
-                            "borrow_kind": "value",
-                            "repr": "tr, tg, tb",
-                            "elements": [
-                              {
-                                "kind": "Name",
-                                "source_span": {
-                                  "lineno": 244,
-                                  "col_offset": 16,
-                                  "end_lineno": 244,
-                                  "end_col_offset": 18
-                                },
-                                "resolved_type": "float64",
-                                "casts": [],
-                                "borrow_kind": "value",
-                                "repr": "tr",
-                                "id": "tr"
-                              },
-                              {
-                                "kind": "Name",
-                                "source_span": {
-                                  "lineno": 244,
-                                  "col_offset": 20,
-                                  "end_lineno": 244,
-                                  "end_col_offset": 22
-                                },
-                                "resolved_type": "float64",
-                                "casts": [],
-                                "borrow_kind": "value",
-                                "repr": "tg",
-                                "id": "tg"
-                              },
-                              {
-                                "kind": "Name",
-                                "source_span": {
-                                  "lineno": 244,
-                                  "col_offset": 24,
-                                  "end_lineno": 244,
-                                  "end_col_offset": 26
-                                },
-                                "resolved_type": "float64",
-                                "casts": [],
-                                "borrow_kind": "value",
-                                "repr": "tb",
-                                "id": "tb"
-                              }
-                            ]
+                            "kind": "Name",
+                            "id": "sr",
+                            "resolved_type": "float64"
                           },
-                          "declare": false,
+                          "value": {
+                            "kind": "Subscript",
+                            "value": {
+                              "kind": "Name",
+                              "id": "__tup_10",
+                              "resolved_type": "tuple[float64,float64,float64]"
+                            },
+                            "slice": {
+                              "kind": "Constant",
+                              "value": 0,
+                              "resolved_type": "int64"
+                            },
+                            "resolved_type": "float64"
+                          },
+                          "declare": true,
+                          "decl_type": "float64"
+                        },
+                        {
+                          "kind": "Assign",
+                          "target": {
+                            "kind": "Name",
+                            "id": "sg",
+                            "resolved_type": "float64"
+                          },
+                          "value": {
+                            "kind": "Subscript",
+                            "value": {
+                              "kind": "Name",
+                              "id": "__tup_10",
+                              "resolved_type": "tuple[float64,float64,float64]"
+                            },
+                            "slice": {
+                              "kind": "Constant",
+                              "value": 1,
+                              "resolved_type": "int64"
+                            },
+                            "resolved_type": "float64"
+                          },
+                          "declare": true,
+                          "decl_type": "float64"
+                        },
+                        {
+                          "kind": "Assign",
+                          "target": {
+                            "kind": "Name",
+                            "id": "sb",
+                            "resolved_type": "float64"
+                          },
+                          "value": {
+                            "kind": "Subscript",
+                            "value": {
+                              "kind": "Name",
+                              "id": "__tup_10",
+                              "resolved_type": "tuple[float64,float64,float64]"
+                            },
+                            "slice": {
+                              "kind": "Constant",
+                              "value": 2,
+                              "resolved_type": "int64"
+                            },
+                            "resolved_type": "float64"
+                          },
+                          "declare": true,
+                          "decl_type": "float64"
+                        },
+                        {
+                          "kind": "Assign",
+                          "target": {
+                            "kind": "Name",
+                            "id": "__tup_11",
+                            "resolved_type": "tuple[float64,float64,float64]"
+                          },
                           "value": {
                             "kind": "Call",
                             "source_span": {
@@ -20208,12 +20222,80 @@
                               "mirror": "tuple[float64,float64,float64]"
                             }
                           },
-                          "type_expr_summary_v1": {
-                            "schema_version": 1,
-                            "kind": "GenericType",
-                            "category": "static",
-                            "mirror": "tuple[unknown,unknown,unknown]"
-                          }
+                          "declare": true,
+                          "decl_type": "tuple[float64,float64,float64]"
+                        },
+                        {
+                          "kind": "Assign",
+                          "target": {
+                            "kind": "Name",
+                            "id": "tr",
+                            "resolved_type": "float64"
+                          },
+                          "value": {
+                            "kind": "Subscript",
+                            "value": {
+                              "kind": "Name",
+                              "id": "__tup_11",
+                              "resolved_type": "tuple[float64,float64,float64]"
+                            },
+                            "slice": {
+                              "kind": "Constant",
+                              "value": 0,
+                              "resolved_type": "int64"
+                            },
+                            "resolved_type": "float64"
+                          },
+                          "declare": true,
+                          "decl_type": "float64"
+                        },
+                        {
+                          "kind": "Assign",
+                          "target": {
+                            "kind": "Name",
+                            "id": "tg",
+                            "resolved_type": "float64"
+                          },
+                          "value": {
+                            "kind": "Subscript",
+                            "value": {
+                              "kind": "Name",
+                              "id": "__tup_11",
+                              "resolved_type": "tuple[float64,float64,float64]"
+                            },
+                            "slice": {
+                              "kind": "Constant",
+                              "value": 1,
+                              "resolved_type": "int64"
+                            },
+                            "resolved_type": "float64"
+                          },
+                          "declare": true,
+                          "decl_type": "float64"
+                        },
+                        {
+                          "kind": "Assign",
+                          "target": {
+                            "kind": "Name",
+                            "id": "tb",
+                            "resolved_type": "float64"
+                          },
+                          "value": {
+                            "kind": "Subscript",
+                            "value": {
+                              "kind": "Name",
+                              "id": "__tup_11",
+                              "resolved_type": "tuple[float64,float64,float64]"
+                            },
+                            "slice": {
+                              "kind": "Constant",
+                              "value": 2,
+                              "resolved_type": "int64"
+                            },
+                            "resolved_type": "float64"
+                          },
+                          "declare": true,
+                          "decl_type": "float64"
                         },
                         {
                           "kind": "Assign",
@@ -21277,70 +21359,11 @@
                         },
                         {
                           "kind": "Assign",
-                          "source_span": {
-                            "lineno": 254,
-                            "col_offset": 16,
-                            "end_lineno": 254,
-                            "end_col_offset": 56
-                          },
                           "target": {
-                            "kind": "Tuple",
-                            "source_span": {
-                              "lineno": 254,
-                              "col_offset": 16,
-                              "end_lineno": 254,
-                              "end_col_offset": 29
-                            },
-                            "resolved_type": "tuple[unknown, unknown, unknown]",
-                            "casts": [],
-                            "borrow_kind": "value",
-                            "repr": "ldx, ldy, ldz",
-                            "elements": [
-                              {
-                                "kind": "Name",
-                                "source_span": {
-                                  "lineno": 254,
-                                  "col_offset": 16,
-                                  "end_lineno": 254,
-                                  "end_col_offset": 19
-                                },
-                                "resolved_type": "float64",
-                                "casts": [],
-                                "borrow_kind": "value",
-                                "repr": "ldx",
-                                "id": "ldx"
-                              },
-                              {
-                                "kind": "Name",
-                                "source_span": {
-                                  "lineno": 254,
-                                  "col_offset": 21,
-                                  "end_lineno": 254,
-                                  "end_col_offset": 24
-                                },
-                                "resolved_type": "float64",
-                                "casts": [],
-                                "borrow_kind": "value",
-                                "repr": "ldy",
-                                "id": "ldy"
-                              },
-                              {
-                                "kind": "Name",
-                                "source_span": {
-                                  "lineno": 254,
-                                  "col_offset": 26,
-                                  "end_lineno": 254,
-                                  "end_col_offset": 29
-                                },
-                                "resolved_type": "float64",
-                                "casts": [],
-                                "borrow_kind": "value",
-                                "repr": "ldz",
-                                "id": "ldz"
-                              }
-                            ]
+                            "kind": "Name",
+                            "id": "__tup_12",
+                            "resolved_type": "tuple[float64,float64,float64]"
                           },
-                          "declare": false,
                           "value": {
                             "kind": "Call",
                             "source_span": {
@@ -21419,12 +21442,82 @@
                               "mirror": "tuple[float64,float64,float64]"
                             }
                           },
-                          "type_expr_summary_v1": {
-                            "schema_version": 1,
-                            "kind": "GenericType",
-                            "category": "static",
-                            "mirror": "tuple[unknown,unknown,unknown]"
+                          "declare": true,
+                          "decl_type": "tuple[float64,float64,float64]"
+                        },
+                        {
+                          "kind": "Assign",
+                          "target": {
+                            "kind": "Name",
+                            "id": "ldx",
+                            "resolved_type": "float64"
                           },
+                          "value": {
+                            "kind": "Subscript",
+                            "value": {
+                              "kind": "Name",
+                              "id": "__tup_12",
+                              "resolved_type": "tuple[float64,float64,float64]"
+                            },
+                            "slice": {
+                              "kind": "Constant",
+                              "value": 0,
+                              "resolved_type": "int64"
+                            },
+                            "resolved_type": "float64"
+                          },
+                          "declare": true,
+                          "decl_type": "float64",
+                          "is_reassign": true
+                        },
+                        {
+                          "kind": "Assign",
+                          "target": {
+                            "kind": "Name",
+                            "id": "ldy",
+                            "resolved_type": "float64"
+                          },
+                          "value": {
+                            "kind": "Subscript",
+                            "value": {
+                              "kind": "Name",
+                              "id": "__tup_12",
+                              "resolved_type": "tuple[float64,float64,float64]"
+                            },
+                            "slice": {
+                              "kind": "Constant",
+                              "value": 1,
+                              "resolved_type": "int64"
+                            },
+                            "resolved_type": "float64"
+                          },
+                          "declare": true,
+                          "decl_type": "float64",
+                          "is_reassign": true
+                        },
+                        {
+                          "kind": "Assign",
+                          "target": {
+                            "kind": "Name",
+                            "id": "ldz",
+                            "resolved_type": "float64"
+                          },
+                          "value": {
+                            "kind": "Subscript",
+                            "value": {
+                              "kind": "Name",
+                              "id": "__tup_12",
+                              "resolved_type": "tuple[float64,float64,float64]"
+                            },
+                            "slice": {
+                              "kind": "Constant",
+                              "value": 2,
+                              "resolved_type": "int64"
+                            },
+                            "resolved_type": "float64"
+                          },
+                          "declare": true,
+                          "decl_type": "float64",
                           "is_reassign": true
                         },
                         {
@@ -21675,70 +21768,11 @@
                         },
                         {
                           "kind": "Assign",
-                          "source_span": {
-                            "lineno": 256,
-                            "col_offset": 16,
-                            "end_lineno": 256,
-                            "end_col_offset": 71
-                          },
                           "target": {
-                            "kind": "Tuple",
-                            "source_span": {
-                              "lineno": 256,
-                              "col_offset": 16,
-                              "end_lineno": 256,
-                              "end_col_offset": 29
-                            },
-                            "resolved_type": "tuple[unknown, unknown, unknown]",
-                            "casts": [],
-                            "borrow_kind": "value",
-                            "repr": "hvx, hvy, hvz",
-                            "elements": [
-                              {
-                                "kind": "Name",
-                                "source_span": {
-                                  "lineno": 256,
-                                  "col_offset": 16,
-                                  "end_lineno": 256,
-                                  "end_col_offset": 19
-                                },
-                                "resolved_type": "float64",
-                                "casts": [],
-                                "borrow_kind": "value",
-                                "repr": "hvx",
-                                "id": "hvx"
-                              },
-                              {
-                                "kind": "Name",
-                                "source_span": {
-                                  "lineno": 256,
-                                  "col_offset": 21,
-                                  "end_lineno": 256,
-                                  "end_col_offset": 24
-                                },
-                                "resolved_type": "float64",
-                                "casts": [],
-                                "borrow_kind": "value",
-                                "repr": "hvy",
-                                "id": "hvy"
-                              },
-                              {
-                                "kind": "Name",
-                                "source_span": {
-                                  "lineno": 256,
-                                  "col_offset": 26,
-                                  "end_lineno": 256,
-                                  "end_col_offset": 29
-                                },
-                                "resolved_type": "float64",
-                                "casts": [],
-                                "borrow_kind": "value",
-                                "repr": "hvz",
-                                "id": "hvz"
-                              }
-                            ]
+                            "kind": "Name",
+                            "id": "__tup_13",
+                            "resolved_type": "tuple[float64,float64,float64]"
                           },
-                          "declare": false,
                           "value": {
                             "kind": "Call",
                             "source_span": {
@@ -21901,12 +21935,80 @@
                               "mirror": "tuple[float64,float64,float64]"
                             }
                           },
-                          "type_expr_summary_v1": {
-                            "schema_version": 1,
-                            "kind": "GenericType",
-                            "category": "static",
-                            "mirror": "tuple[unknown,unknown,unknown]"
-                          }
+                          "declare": true,
+                          "decl_type": "tuple[float64,float64,float64]"
+                        },
+                        {
+                          "kind": "Assign",
+                          "target": {
+                            "kind": "Name",
+                            "id": "hvx",
+                            "resolved_type": "float64"
+                          },
+                          "value": {
+                            "kind": "Subscript",
+                            "value": {
+                              "kind": "Name",
+                              "id": "__tup_13",
+                              "resolved_type": "tuple[float64,float64,float64]"
+                            },
+                            "slice": {
+                              "kind": "Constant",
+                              "value": 0,
+                              "resolved_type": "int64"
+                            },
+                            "resolved_type": "float64"
+                          },
+                          "declare": true,
+                          "decl_type": "float64"
+                        },
+                        {
+                          "kind": "Assign",
+                          "target": {
+                            "kind": "Name",
+                            "id": "hvy",
+                            "resolved_type": "float64"
+                          },
+                          "value": {
+                            "kind": "Subscript",
+                            "value": {
+                              "kind": "Name",
+                              "id": "__tup_13",
+                              "resolved_type": "tuple[float64,float64,float64]"
+                            },
+                            "slice": {
+                              "kind": "Constant",
+                              "value": 1,
+                              "resolved_type": "int64"
+                            },
+                            "resolved_type": "float64"
+                          },
+                          "declare": true,
+                          "decl_type": "float64"
+                        },
+                        {
+                          "kind": "Assign",
+                          "target": {
+                            "kind": "Name",
+                            "id": "hvz",
+                            "resolved_type": "float64"
+                          },
+                          "value": {
+                            "kind": "Subscript",
+                            "value": {
+                              "kind": "Name",
+                              "id": "__tup_13",
+                              "resolved_type": "tuple[float64,float64,float64]"
+                            },
+                            "slice": {
+                              "kind": "Constant",
+                              "value": 2,
+                              "resolved_type": "int64"
+                            },
+                            "resolved_type": "float64"
+                          },
+                          "declare": true,
+                          "decl_type": "float64"
                         },
                         {
                           "kind": "Assign",

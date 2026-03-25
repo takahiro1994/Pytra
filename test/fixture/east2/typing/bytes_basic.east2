@@ -668,7 +668,7 @@
                       "end_lineno": 14,
                       "end_col": 35
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "uint8",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "b[0]",
@@ -846,7 +846,7 @@
                       "end_lineno": 15,
                       "end_col": 36
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "uint8",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "b[-1]",

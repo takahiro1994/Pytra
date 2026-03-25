@@ -1149,6 +1149,11 @@ def _resolve_subscript(expr: dict[str, JsonVal], ctx: ResolveContext) -> str:
         expr["resolved_type"] = "str"
         return "str"
 
+    # bytes[i] → uint8, bytearray[i] → uint8
+    if vt in ("bytes", "bytearray"):
+        expr["resolved_type"] = "uint8"
+        return "uint8"
+
     # tuple[...][i] → depends on index
     if vt.startswith("tuple[") and vt.endswith("]"):
         args2: list[str] = extract_type_args(vt)

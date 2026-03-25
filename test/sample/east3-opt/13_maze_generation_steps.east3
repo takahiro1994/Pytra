@@ -3070,7 +3070,7 @@
             "mirror": "int64"
           },
           "meta": {
-            "lifetime_node_id": "n46",
+            "lifetime_node_id": "n54",
             "lifetime_defs": [
               "cell_w"
             ],
@@ -3141,7 +3141,7 @@
             "mirror": "int64"
           },
           "meta": {
-            "lifetime_node_id": "n45",
+            "lifetime_node_id": "n53",
             "lifetime_defs": [
               "cell_h"
             ],
@@ -3214,7 +3214,7 @@
             "mirror": "int64"
           },
           "meta": {
-            "lifetime_node_id": "n44",
+            "lifetime_node_id": "n52",
             "lifetime_defs": [
               "scale"
             ],
@@ -3289,7 +3289,7 @@
             "mirror": "int64"
           },
           "meta": {
-            "lifetime_node_id": "n43",
+            "lifetime_node_id": "n51",
             "lifetime_defs": [
               "capture_every"
             ],
@@ -3366,7 +3366,7 @@
             "mirror": "str"
           },
           "meta": {
-            "lifetime_node_id": "n42",
+            "lifetime_node_id": "n50",
             "lifetime_defs": [
               "out_path"
             ],
@@ -3477,7 +3477,7 @@
             "mirror": "float64"
           },
           "meta": {
-            "lifetime_node_id": "n41",
+            "lifetime_node_id": "n49",
             "lifetime_defs": [
               "start"
             ],
@@ -3535,7 +3535,7 @@
             "rhs_kind": "List"
           },
           "meta": {
-            "lifetime_node_id": "n40",
+            "lifetime_node_id": "n48",
             "lifetime_defs": [
               "grid"
             ],
@@ -3759,7 +3759,7 @@
                 "resolved_type": "None"
               },
               "meta": {
-                "lifetime_node_id": "n39",
+                "lifetime_node_id": "n47",
                 "lifetime_defs": [],
                 "lifetime_uses": [
                   "cell_w",
@@ -3914,7 +3914,7 @@
             }
           ],
           "meta": {
-            "lifetime_node_id": "n38",
+            "lifetime_node_id": "n46",
             "lifetime_defs": [
               "_"
             ],
@@ -4104,7 +4104,7 @@
             "mirror": "list[tuple[int64,int64]]"
           },
           "meta": {
-            "lifetime_node_id": "n37",
+            "lifetime_node_id": "n45",
             "lifetime_defs": [
               "stack"
             ],
@@ -4243,7 +4243,7 @@
             "mirror": "int64"
           },
           "meta": {
-            "lifetime_node_id": "n36",
+            "lifetime_node_id": "n44",
             "lifetime_defs": [],
             "lifetime_uses": [],
             "lifetime_live_in": [
@@ -4594,7 +4594,7 @@
             "mirror": "list[tuple[int64,int64]]"
           },
           "meta": {
-            "lifetime_node_id": "n35",
+            "lifetime_node_id": "n43",
             "lifetime_defs": [
               "dirs"
             ],
@@ -4716,7 +4716,7 @@
             "rhs_kind": "List"
           },
           "meta": {
-            "lifetime_node_id": "n34",
+            "lifetime_node_id": "n42",
             "lifetime_defs": [
               "frames"
             ],
@@ -4805,7 +4805,7 @@
             "mirror": "int64"
           },
           "meta": {
-            "lifetime_node_id": "n33",
+            "lifetime_node_id": "n41",
             "lifetime_defs": [
               "step"
             ],
@@ -4875,56 +4875,11 @@
           "body": [
             {
               "kind": "Assign",
-              "source_span": {
-                "lineno": 40,
-                "col_offset": 8,
-                "end_lineno": 40,
-                "end_col_offset": 24
-              },
               "target": {
-                "kind": "Tuple",
-                "source_span": {
-                  "lineno": 40,
-                  "col_offset": 8,
-                  "end_lineno": 40,
-                  "end_col_offset": 12
-                },
-                "resolved_type": "tuple[unknown, unknown]",
-                "casts": [],
-                "borrow_kind": "value",
-                "repr": "x, y",
-                "elements": [
-                  {
-                    "kind": "Name",
-                    "source_span": {
-                      "lineno": 40,
-                      "col_offset": 8,
-                      "end_lineno": 40,
-                      "end_col_offset": 9
-                    },
-                    "resolved_type": "int64",
-                    "casts": [],
-                    "borrow_kind": "value",
-                    "repr": "x",
-                    "id": "x"
-                  },
-                  {
-                    "kind": "Name",
-                    "source_span": {
-                      "lineno": 40,
-                      "col_offset": 11,
-                      "end_lineno": 40,
-                      "end_col_offset": 12
-                    },
-                    "resolved_type": "int64",
-                    "casts": [],
-                    "borrow_kind": "value",
-                    "repr": "y",
-                    "id": "y"
-                  }
-                ]
+                "kind": "Name",
+                "id": "__tup_1",
+                "resolved_type": "tuple[int64,int64]"
               },
-              "declare": false,
               "value": {
                 "kind": "Subscript",
                 "source_span": {
@@ -4980,28 +4935,12 @@
                   }
                 }
               },
-              "type_expr_summary_v1": {
-                "schema_version": 1,
-                "kind": "GenericType",
-                "category": "static",
-                "mirror": "tuple[unknown,unknown]"
-              },
-              "cpp_struct_bind_unpack_v1": {
-                "version": "1",
-                "names": [
-                  "x",
-                  "y"
-                ],
-                "types": [
-                  "int64",
-                  "int64"
-                ]
-              },
+              "declare": true,
+              "decl_type": "tuple[int64,int64]",
               "meta": {
-                "lifetime_node_id": "n32",
+                "lifetime_node_id": "n40",
                 "lifetime_defs": [
-                  "x",
-                  "y"
+                  "__tup_1"
                 ],
                 "lifetime_uses": [
                   "stack"
@@ -5026,6 +4965,156 @@
                   "step"
                 ],
                 "lifetime_live_out": [
+                  "__tup_1",
+                  "capture",
+                  "capture_every",
+                  "cell_h",
+                  "cell_w",
+                  "dirs",
+                  "frames",
+                  "grayscale_palette",
+                  "grid",
+                  "len",
+                  "out_path",
+                  "perf_counter",
+                  "print",
+                  "save_gif",
+                  "scale",
+                  "stack",
+                  "start",
+                  "step"
+                ],
+                "lifetime_last_use_vars": []
+              }
+            },
+            {
+              "kind": "Assign",
+              "target": {
+                "kind": "Name",
+                "id": "x",
+                "resolved_type": "int64"
+              },
+              "value": {
+                "kind": "Subscript",
+                "value": {
+                  "kind": "Name",
+                  "id": "__tup_1",
+                  "resolved_type": "tuple[int64,int64]"
+                },
+                "slice": {
+                  "kind": "Constant",
+                  "value": 0,
+                  "resolved_type": "int64"
+                },
+                "resolved_type": "int64"
+              },
+              "declare": true,
+              "decl_type": "int64",
+              "meta": {
+                "lifetime_node_id": "n39",
+                "lifetime_defs": [
+                  "x"
+                ],
+                "lifetime_uses": [
+                  "__tup_1"
+                ],
+                "lifetime_live_in": [
+                  "__tup_1",
+                  "capture",
+                  "capture_every",
+                  "cell_h",
+                  "cell_w",
+                  "dirs",
+                  "frames",
+                  "grayscale_palette",
+                  "grid",
+                  "len",
+                  "out_path",
+                  "perf_counter",
+                  "print",
+                  "save_gif",
+                  "scale",
+                  "stack",
+                  "start",
+                  "step"
+                ],
+                "lifetime_live_out": [
+                  "__tup_1",
+                  "capture",
+                  "capture_every",
+                  "cell_h",
+                  "cell_w",
+                  "dirs",
+                  "frames",
+                  "grayscale_palette",
+                  "grid",
+                  "len",
+                  "out_path",
+                  "perf_counter",
+                  "print",
+                  "save_gif",
+                  "scale",
+                  "stack",
+                  "start",
+                  "step",
+                  "x"
+                ],
+                "lifetime_last_use_vars": []
+              }
+            },
+            {
+              "kind": "Assign",
+              "target": {
+                "kind": "Name",
+                "id": "y",
+                "resolved_type": "int64"
+              },
+              "value": {
+                "kind": "Subscript",
+                "value": {
+                  "kind": "Name",
+                  "id": "__tup_1",
+                  "resolved_type": "tuple[int64,int64]"
+                },
+                "slice": {
+                  "kind": "Constant",
+                  "value": 1,
+                  "resolved_type": "int64"
+                },
+                "resolved_type": "int64"
+              },
+              "declare": true,
+              "decl_type": "int64",
+              "meta": {
+                "lifetime_node_id": "n38",
+                "lifetime_defs": [
+                  "y"
+                ],
+                "lifetime_uses": [
+                  "__tup_1"
+                ],
+                "lifetime_live_in": [
+                  "__tup_1",
+                  "capture",
+                  "capture_every",
+                  "cell_h",
+                  "cell_w",
+                  "dirs",
+                  "frames",
+                  "grayscale_palette",
+                  "grid",
+                  "len",
+                  "out_path",
+                  "perf_counter",
+                  "print",
+                  "save_gif",
+                  "scale",
+                  "stack",
+                  "start",
+                  "step",
+                  "x"
+                ],
+                "lifetime_live_out": [
                   "capture",
                   "capture_every",
                   "cell_h",
@@ -5046,7 +5135,9 @@
                   "x",
                   "y"
                 ],
-                "lifetime_last_use_vars": []
+                "lifetime_last_use_vars": [
+                  "__tup_1"
+                ]
               }
             },
             {
@@ -5184,7 +5275,7 @@
                 "rhs_kind": "List"
               },
               "meta": {
-                "lifetime_node_id": "n31",
+                "lifetime_node_id": "n37",
                 "lifetime_defs": [
                   "candidates"
                 ],
@@ -5241,7 +5332,7 @@
               "type": "unknown",
               "hoisted": true,
               "meta": {
-                "lifetime_node_id": "n30",
+                "lifetime_node_id": "n36",
                 "lifetime_defs": [],
                 "lifetime_uses": [],
                 "lifetime_live_in": [
@@ -5297,7 +5388,7 @@
               "type": "unknown",
               "hoisted": true,
               "meta": {
-                "lifetime_node_id": "n29",
+                "lifetime_node_id": "n35",
                 "lifetime_defs": [],
                 "lifetime_uses": [],
                 "lifetime_live_in": [
@@ -5403,56 +5494,11 @@
               "body": [
                 {
                   "kind": "Assign",
-                  "source_span": {
-                    "lineno": 43,
-                    "col_offset": 12,
-                    "end_lineno": 43,
-                    "end_col_offset": 28
-                  },
                   "target": {
-                    "kind": "Tuple",
-                    "source_span": {
-                      "lineno": 43,
-                      "col_offset": 12,
-                      "end_lineno": 43,
-                      "end_col_offset": 18
-                    },
-                    "resolved_type": "tuple[unknown, unknown]",
-                    "casts": [],
-                    "borrow_kind": "value",
-                    "repr": "dx, dy",
-                    "elements": [
-                      {
-                        "kind": "Name",
-                        "source_span": {
-                          "lineno": 43,
-                          "col_offset": 12,
-                          "end_lineno": 43,
-                          "end_col_offset": 14
-                        },
-                        "resolved_type": "int64",
-                        "casts": [],
-                        "borrow_kind": "value",
-                        "repr": "dx",
-                        "id": "dx"
-                      },
-                      {
-                        "kind": "Name",
-                        "source_span": {
-                          "lineno": 43,
-                          "col_offset": 16,
-                          "end_lineno": 43,
-                          "end_col_offset": 18
-                        },
-                        "resolved_type": "int64",
-                        "casts": [],
-                        "borrow_kind": "value",
-                        "repr": "dy",
-                        "id": "dy"
-                      }
-                    ]
+                    "kind": "Name",
+                    "id": "__tup_2",
+                    "resolved_type": "tuple[int64,int64]"
                   },
-                  "declare": false,
                   "value": {
                     "kind": "Subscript",
                     "source_span": {
@@ -5494,28 +5540,12 @@
                       "id": "k"
                     }
                   },
-                  "type_expr_summary_v1": {
-                    "schema_version": 1,
-                    "kind": "GenericType",
-                    "category": "static",
-                    "mirror": "tuple[unknown,unknown]"
-                  },
-                  "cpp_struct_bind_unpack_v1": {
-                    "version": "1",
-                    "names": [
-                      "dx",
-                      "dy"
-                    ],
-                    "types": [
-                      "int64",
-                      "int64"
-                    ]
-                  },
+                  "declare": true,
+                  "decl_type": "tuple[int64,int64]",
                   "meta": {
-                    "lifetime_node_id": "n28",
+                    "lifetime_node_id": "n34",
                     "lifetime_defs": [
-                      "dx",
-                      "dy"
+                      "__tup_2"
                     ],
                     "lifetime_uses": [
                       "dirs",
@@ -5532,6 +5562,170 @@
                       "grayscale_palette",
                       "grid",
                       "k",
+                      "len",
+                      "out_path",
+                      "perf_counter",
+                      "print",
+                      "save_gif",
+                      "scale",
+                      "stack",
+                      "start",
+                      "step",
+                      "x",
+                      "y"
+                    ],
+                    "lifetime_live_out": [
+                      "__tup_2",
+                      "candidates",
+                      "capture",
+                      "capture_every",
+                      "cell_h",
+                      "cell_w",
+                      "dirs",
+                      "frames",
+                      "grayscale_palette",
+                      "grid",
+                      "len",
+                      "out_path",
+                      "perf_counter",
+                      "print",
+                      "save_gif",
+                      "scale",
+                      "stack",
+                      "start",
+                      "step",
+                      "x",
+                      "y"
+                    ],
+                    "lifetime_last_use_vars": [
+                      "k"
+                    ]
+                  }
+                },
+                {
+                  "kind": "Assign",
+                  "target": {
+                    "kind": "Name",
+                    "id": "dx",
+                    "resolved_type": "int64"
+                  },
+                  "value": {
+                    "kind": "Subscript",
+                    "value": {
+                      "kind": "Name",
+                      "id": "__tup_2",
+                      "resolved_type": "tuple[int64,int64]"
+                    },
+                    "slice": {
+                      "kind": "Constant",
+                      "value": 0,
+                      "resolved_type": "int64"
+                    },
+                    "resolved_type": "int64"
+                  },
+                  "declare": true,
+                  "decl_type": "int64",
+                  "meta": {
+                    "lifetime_node_id": "n33",
+                    "lifetime_defs": [
+                      "dx"
+                    ],
+                    "lifetime_uses": [
+                      "__tup_2"
+                    ],
+                    "lifetime_live_in": [
+                      "__tup_2",
+                      "candidates",
+                      "capture",
+                      "capture_every",
+                      "cell_h",
+                      "cell_w",
+                      "dirs",
+                      "frames",
+                      "grayscale_palette",
+                      "grid",
+                      "len",
+                      "out_path",
+                      "perf_counter",
+                      "print",
+                      "save_gif",
+                      "scale",
+                      "stack",
+                      "start",
+                      "step",
+                      "x",
+                      "y"
+                    ],
+                    "lifetime_live_out": [
+                      "__tup_2",
+                      "candidates",
+                      "capture",
+                      "capture_every",
+                      "cell_h",
+                      "cell_w",
+                      "dirs",
+                      "dx",
+                      "frames",
+                      "grayscale_palette",
+                      "grid",
+                      "len",
+                      "out_path",
+                      "perf_counter",
+                      "print",
+                      "save_gif",
+                      "scale",
+                      "stack",
+                      "start",
+                      "step",
+                      "x",
+                      "y"
+                    ],
+                    "lifetime_last_use_vars": []
+                  }
+                },
+                {
+                  "kind": "Assign",
+                  "target": {
+                    "kind": "Name",
+                    "id": "dy",
+                    "resolved_type": "int64"
+                  },
+                  "value": {
+                    "kind": "Subscript",
+                    "value": {
+                      "kind": "Name",
+                      "id": "__tup_2",
+                      "resolved_type": "tuple[int64,int64]"
+                    },
+                    "slice": {
+                      "kind": "Constant",
+                      "value": 1,
+                      "resolved_type": "int64"
+                    },
+                    "resolved_type": "int64"
+                  },
+                  "declare": true,
+                  "decl_type": "int64",
+                  "meta": {
+                    "lifetime_node_id": "n32",
+                    "lifetime_defs": [
+                      "dy"
+                    ],
+                    "lifetime_uses": [
+                      "__tup_2"
+                    ],
+                    "lifetime_live_in": [
+                      "__tup_2",
+                      "candidates",
+                      "capture",
+                      "capture_every",
+                      "cell_h",
+                      "cell_w",
+                      "dirs",
+                      "dx",
+                      "frames",
+                      "grayscale_palette",
+                      "grid",
                       "len",
                       "out_path",
                       "perf_counter",
@@ -5569,7 +5763,7 @@
                       "y"
                     ],
                     "lifetime_last_use_vars": [
-                      "k"
+                      "__tup_2"
                     ]
                   }
                 },
@@ -5691,7 +5885,7 @@
                   },
                   "is_reassign": true,
                   "meta": {
-                    "lifetime_node_id": "n27",
+                    "lifetime_node_id": "n31",
                     "lifetime_defs": [
                       "nx"
                     ],
@@ -5869,7 +6063,7 @@
                   },
                   "is_reassign": true,
                   "meta": {
-                    "lifetime_node_id": "n26",
+                    "lifetime_node_id": "n30",
                     "lifetime_defs": [
                       "ny"
                     ],
@@ -7051,7 +7245,7 @@
                             }
                           },
                           "meta": {
-                            "lifetime_node_id": "n20",
+                            "lifetime_node_id": "n24",
                             "lifetime_defs": [],
                             "lifetime_uses": [
                               "candidates",
@@ -7466,7 +7660,7 @@
                                 }
                               },
                               "meta": {
-                                "lifetime_node_id": "n22",
+                                "lifetime_node_id": "n26",
                                 "lifetime_defs": [],
                                 "lifetime_uses": [
                                   "candidates",
@@ -7853,7 +8047,7 @@
                                     }
                                   },
                                   "meta": {
-                                    "lifetime_node_id": "n24",
+                                    "lifetime_node_id": "n28",
                                     "lifetime_defs": [],
                                     "lifetime_uses": [
                                       "candidates",
@@ -8138,7 +8332,7 @@
                                     }
                                   },
                                   "meta": {
-                                    "lifetime_node_id": "n25",
+                                    "lifetime_node_id": "n29",
                                     "lifetime_defs": [],
                                     "lifetime_uses": [
                                       "candidates",
@@ -8201,7 +8395,7 @@
                                 }
                               ],
                               "meta": {
-                                "lifetime_node_id": "n23",
+                                "lifetime_node_id": "n27",
                                 "lifetime_defs": [],
                                 "lifetime_uses": [
                                   "dy"
@@ -8262,7 +8456,7 @@
                             }
                           ],
                           "meta": {
-                            "lifetime_node_id": "n21",
+                            "lifetime_node_id": "n25",
                             "lifetime_defs": [],
                             "lifetime_uses": [
                               "dx"
@@ -8325,7 +8519,7 @@
                         }
                       ],
                       "meta": {
-                        "lifetime_node_id": "n19",
+                        "lifetime_node_id": "n23",
                         "lifetime_defs": [],
                         "lifetime_uses": [
                           "dx"
@@ -8388,7 +8582,7 @@
                   ],
                   "orelse": [],
                   "meta": {
-                    "lifetime_node_id": "n18",
+                    "lifetime_node_id": "n22",
                     "lifetime_defs": [],
                     "lifetime_uses": [
                       "cell_h",
@@ -8497,7 +8691,7 @@
                 }
               },
               "meta": {
-                "lifetime_node_id": "n17",
+                "lifetime_node_id": "n21",
                 "lifetime_defs": [
                   "k"
                 ],
@@ -9931,7 +10125,7 @@
                     "mirror": "tuple[int64,int64,int64,int64]"
                   },
                   "meta": {
-                    "lifetime_node_id": "n16",
+                    "lifetime_node_id": "n20",
                     "lifetime_defs": [
                       "sel"
                     ],
@@ -9993,86 +10187,11 @@
                 },
                 {
                   "kind": "Assign",
-                  "source_span": {
-                    "lineno": 60,
-                    "col_offset": 12,
-                    "end_lineno": 60,
-                    "end_col_offset": 32
-                  },
                   "target": {
-                    "kind": "Tuple",
-                    "source_span": {
-                      "lineno": 60,
-                      "col_offset": 12,
-                      "end_lineno": 60,
-                      "end_col_offset": 26
-                    },
-                    "resolved_type": "tuple[unknown, unknown, unknown, unknown]",
-                    "casts": [],
-                    "borrow_kind": "value",
-                    "repr": "nx, ny, wx, wy",
-                    "elements": [
-                      {
-                        "kind": "Name",
-                        "source_span": {
-                          "lineno": 60,
-                          "col_offset": 12,
-                          "end_lineno": 60,
-                          "end_col_offset": 14
-                        },
-                        "resolved_type": "int64",
-                        "casts": [],
-                        "borrow_kind": "value",
-                        "repr": "nx",
-                        "id": "nx"
-                      },
-                      {
-                        "kind": "Name",
-                        "source_span": {
-                          "lineno": 60,
-                          "col_offset": 16,
-                          "end_lineno": 60,
-                          "end_col_offset": 18
-                        },
-                        "resolved_type": "int64",
-                        "casts": [],
-                        "borrow_kind": "value",
-                        "repr": "ny",
-                        "id": "ny"
-                      },
-                      {
-                        "kind": "Name",
-                        "source_span": {
-                          "lineno": 60,
-                          "col_offset": 20,
-                          "end_lineno": 60,
-                          "end_col_offset": 22
-                        },
-                        "resolved_type": "int64",
-                        "casts": [],
-                        "borrow_kind": "value",
-                        "repr": "wx",
-                        "id": "wx",
-                        "unused": true
-                      },
-                      {
-                        "kind": "Name",
-                        "source_span": {
-                          "lineno": 60,
-                          "col_offset": 24,
-                          "end_lineno": 60,
-                          "end_col_offset": 26
-                        },
-                        "resolved_type": "int64",
-                        "casts": [],
-                        "borrow_kind": "value",
-                        "repr": "wy",
-                        "id": "wy",
-                        "unused": true
-                      }
-                    ]
+                    "kind": "Name",
+                    "id": "__tup_3",
+                    "resolved_type": "tuple[int64,int64,int64,int64]"
                   },
-                  "declare": false,
                   "value": {
                     "kind": "Name",
                     "source_span": {
@@ -10087,34 +10206,12 @@
                     "repr": "sel",
                     "id": "sel"
                   },
-                  "type_expr_summary_v1": {
-                    "schema_version": 1,
-                    "kind": "GenericType",
-                    "category": "static",
-                    "mirror": "tuple[unknown,unknown,unknown,unknown]"
-                  },
-                  "cpp_struct_bind_unpack_v1": {
-                    "version": "1",
-                    "names": [
-                      "nx",
-                      "ny",
-                      "wx",
-                      "wy"
-                    ],
-                    "types": [
-                      "int64",
-                      "int64",
-                      "int64",
-                      "int64"
-                    ]
-                  },
+                  "declare": true,
+                  "decl_type": "tuple[int64,int64,int64,int64]",
                   "meta": {
-                    "lifetime_node_id": "n15",
+                    "lifetime_node_id": "n19",
                     "lifetime_defs": [
-                      "nx",
-                      "ny",
-                      "wx",
-                      "wy"
+                      "__tup_3"
                     ],
                     "lifetime_uses": [
                       "sel"
@@ -10135,6 +10232,316 @@
                       "save_gif",
                       "scale",
                       "sel",
+                      "stack",
+                      "start",
+                      "step"
+                    ],
+                    "lifetime_live_out": [
+                      "__tup_3",
+                      "capture",
+                      "capture_every",
+                      "cell_h",
+                      "cell_w",
+                      "dirs",
+                      "frames",
+                      "grayscale_palette",
+                      "grid",
+                      "len",
+                      "out_path",
+                      "perf_counter",
+                      "print",
+                      "save_gif",
+                      "scale",
+                      "stack",
+                      "start",
+                      "step"
+                    ],
+                    "lifetime_last_use_vars": [
+                      "sel"
+                    ]
+                  }
+                },
+                {
+                  "kind": "Assign",
+                  "target": {
+                    "kind": "Name",
+                    "id": "nx",
+                    "resolved_type": "int64"
+                  },
+                  "value": {
+                    "kind": "Subscript",
+                    "value": {
+                      "kind": "Name",
+                      "id": "__tup_3",
+                      "resolved_type": "tuple[int64,int64,int64,int64]"
+                    },
+                    "slice": {
+                      "kind": "Constant",
+                      "value": 0,
+                      "resolved_type": "int64"
+                    },
+                    "resolved_type": "int64"
+                  },
+                  "declare": true,
+                  "decl_type": "int64",
+                  "meta": {
+                    "lifetime_node_id": "n18",
+                    "lifetime_defs": [
+                      "nx"
+                    ],
+                    "lifetime_uses": [
+                      "__tup_3"
+                    ],
+                    "lifetime_live_in": [
+                      "__tup_3",
+                      "capture",
+                      "capture_every",
+                      "cell_h",
+                      "cell_w",
+                      "dirs",
+                      "frames",
+                      "grayscale_palette",
+                      "grid",
+                      "len",
+                      "out_path",
+                      "perf_counter",
+                      "print",
+                      "save_gif",
+                      "scale",
+                      "stack",
+                      "start",
+                      "step"
+                    ],
+                    "lifetime_live_out": [
+                      "__tup_3",
+                      "capture",
+                      "capture_every",
+                      "cell_h",
+                      "cell_w",
+                      "dirs",
+                      "frames",
+                      "grayscale_palette",
+                      "grid",
+                      "len",
+                      "nx",
+                      "out_path",
+                      "perf_counter",
+                      "print",
+                      "save_gif",
+                      "scale",
+                      "stack",
+                      "start",
+                      "step"
+                    ],
+                    "lifetime_last_use_vars": []
+                  }
+                },
+                {
+                  "kind": "Assign",
+                  "target": {
+                    "kind": "Name",
+                    "id": "ny",
+                    "resolved_type": "int64"
+                  },
+                  "value": {
+                    "kind": "Subscript",
+                    "value": {
+                      "kind": "Name",
+                      "id": "__tup_3",
+                      "resolved_type": "tuple[int64,int64,int64,int64]"
+                    },
+                    "slice": {
+                      "kind": "Constant",
+                      "value": 1,
+                      "resolved_type": "int64"
+                    },
+                    "resolved_type": "int64"
+                  },
+                  "declare": true,
+                  "decl_type": "int64",
+                  "meta": {
+                    "lifetime_node_id": "n17",
+                    "lifetime_defs": [
+                      "ny"
+                    ],
+                    "lifetime_uses": [
+                      "__tup_3"
+                    ],
+                    "lifetime_live_in": [
+                      "__tup_3",
+                      "capture",
+                      "capture_every",
+                      "cell_h",
+                      "cell_w",
+                      "dirs",
+                      "frames",
+                      "grayscale_palette",
+                      "grid",
+                      "len",
+                      "nx",
+                      "out_path",
+                      "perf_counter",
+                      "print",
+                      "save_gif",
+                      "scale",
+                      "stack",
+                      "start",
+                      "step"
+                    ],
+                    "lifetime_live_out": [
+                      "__tup_3",
+                      "capture",
+                      "capture_every",
+                      "cell_h",
+                      "cell_w",
+                      "dirs",
+                      "frames",
+                      "grayscale_palette",
+                      "grid",
+                      "len",
+                      "nx",
+                      "ny",
+                      "out_path",
+                      "perf_counter",
+                      "print",
+                      "save_gif",
+                      "scale",
+                      "stack",
+                      "start",
+                      "step"
+                    ],
+                    "lifetime_last_use_vars": []
+                  }
+                },
+                {
+                  "kind": "Assign",
+                  "target": {
+                    "kind": "Name",
+                    "id": "wx",
+                    "resolved_type": "int64"
+                  },
+                  "value": {
+                    "kind": "Subscript",
+                    "value": {
+                      "kind": "Name",
+                      "id": "__tup_3",
+                      "resolved_type": "tuple[int64,int64,int64,int64]"
+                    },
+                    "slice": {
+                      "kind": "Constant",
+                      "value": 2,
+                      "resolved_type": "int64"
+                    },
+                    "resolved_type": "int64"
+                  },
+                  "declare": true,
+                  "decl_type": "int64",
+                  "unused": true,
+                  "meta": {
+                    "lifetime_node_id": "n16",
+                    "lifetime_defs": [
+                      "wx"
+                    ],
+                    "lifetime_uses": [
+                      "__tup_3"
+                    ],
+                    "lifetime_live_in": [
+                      "__tup_3",
+                      "capture",
+                      "capture_every",
+                      "cell_h",
+                      "cell_w",
+                      "dirs",
+                      "frames",
+                      "grayscale_palette",
+                      "grid",
+                      "len",
+                      "nx",
+                      "ny",
+                      "out_path",
+                      "perf_counter",
+                      "print",
+                      "save_gif",
+                      "scale",
+                      "stack",
+                      "start",
+                      "step"
+                    ],
+                    "lifetime_live_out": [
+                      "__tup_3",
+                      "capture",
+                      "capture_every",
+                      "cell_h",
+                      "cell_w",
+                      "dirs",
+                      "frames",
+                      "grayscale_palette",
+                      "grid",
+                      "len",
+                      "nx",
+                      "ny",
+                      "out_path",
+                      "perf_counter",
+                      "print",
+                      "save_gif",
+                      "scale",
+                      "stack",
+                      "start",
+                      "step"
+                    ],
+                    "lifetime_last_use_vars": []
+                  }
+                },
+                {
+                  "kind": "Assign",
+                  "target": {
+                    "kind": "Name",
+                    "id": "wy",
+                    "resolved_type": "int64"
+                  },
+                  "value": {
+                    "kind": "Subscript",
+                    "value": {
+                      "kind": "Name",
+                      "id": "__tup_3",
+                      "resolved_type": "tuple[int64,int64,int64,int64]"
+                    },
+                    "slice": {
+                      "kind": "Constant",
+                      "value": 3,
+                      "resolved_type": "int64"
+                    },
+                    "resolved_type": "int64"
+                  },
+                  "declare": true,
+                  "decl_type": "int64",
+                  "unused": true,
+                  "meta": {
+                    "lifetime_node_id": "n15",
+                    "lifetime_defs": [
+                      "wy"
+                    ],
+                    "lifetime_uses": [
+                      "__tup_3"
+                    ],
+                    "lifetime_live_in": [
+                      "__tup_3",
+                      "capture",
+                      "capture_every",
+                      "cell_h",
+                      "cell_w",
+                      "dirs",
+                      "frames",
+                      "grayscale_palette",
+                      "grid",
+                      "len",
+                      "nx",
+                      "ny",
+                      "out_path",
+                      "perf_counter",
+                      "print",
+                      "save_gif",
+                      "scale",
                       "stack",
                       "start",
                       "step"
@@ -10161,7 +10568,7 @@
                       "step"
                     ],
                     "lifetime_last_use_vars": [
-                      "sel"
+                      "__tup_3"
                     ]
                   }
                 },
@@ -12452,7 +12859,7 @@
           "schema_version": "east3_lifetime_v1",
           "status": "ok",
           "reason": "",
-          "entry_node": "n46",
+          "entry_node": "n54",
           "order": [
             "n0",
             "n1",
@@ -12500,7 +12907,15 @@
             "n43",
             "n44",
             "n45",
-            "n46"
+            "n46",
+            "n47",
+            "n48",
+            "n49",
+            "n50",
+            "n51",
+            "n52",
+            "n53",
+            "n54"
           ],
           "cfg": [
             {
@@ -12593,7 +13008,7 @@
                 "stack"
               ],
               "succ": [
-                "n32",
+                "n40",
                 "n5"
               ]
             },
@@ -12649,7 +13064,7 @@
               ],
               "succ": [
                 "n11",
-                "n16"
+                "n20"
               ]
             },
             {
@@ -12698,13 +13113,10 @@
               "id": "n15",
               "kind": "Assign",
               "defs": [
-                "nx",
-                "ny",
-                "wx",
                 "wy"
               ],
               "uses": [
-                "sel"
+                "__tup_3"
               ],
               "succ": [
                 "n14"
@@ -12712,6 +13124,58 @@
             },
             {
               "id": "n16",
+              "kind": "Assign",
+              "defs": [
+                "wx"
+              ],
+              "uses": [
+                "__tup_3"
+              ],
+              "succ": [
+                "n15"
+              ]
+            },
+            {
+              "id": "n17",
+              "kind": "Assign",
+              "defs": [
+                "ny"
+              ],
+              "uses": [
+                "__tup_3"
+              ],
+              "succ": [
+                "n16"
+              ]
+            },
+            {
+              "id": "n18",
+              "kind": "Assign",
+              "defs": [
+                "nx"
+              ],
+              "uses": [
+                "__tup_3"
+              ],
+              "succ": [
+                "n17"
+              ]
+            },
+            {
+              "id": "n19",
+              "kind": "Assign",
+              "defs": [
+                "__tup_3"
+              ],
+              "uses": [
+                "sel"
+              ],
+              "succ": [
+                "n18"
+              ]
+            },
+            {
+              "id": "n20",
               "kind": "Assign",
               "defs": [
                 "sel"
@@ -12724,11 +13188,11 @@
                 "y"
               ],
               "succ": [
-                "n15"
+                "n19"
               ]
             },
             {
-              "id": "n17",
+              "id": "n21",
               "kind": "ForCore",
               "defs": [
                 "k"
@@ -12736,11 +13200,11 @@
               "uses": [],
               "succ": [
                 "n10",
-                "n28"
+                "n34"
               ]
             },
             {
-              "id": "n18",
+              "id": "n22",
               "kind": "If",
               "defs": [],
               "uses": [
@@ -12751,62 +13215,8 @@
                 "ny"
               ],
               "succ": [
-                "n17",
-                "n19"
-              ]
-            },
-            {
-              "id": "n19",
-              "kind": "If",
-              "defs": [],
-              "uses": [
-                "dx"
-              ],
-              "succ": [
-                "n20",
-                "n21"
-              ]
-            },
-            {
-              "id": "n20",
-              "kind": "Expr",
-              "defs": [],
-              "uses": [
-                "candidates",
-                "nx",
-                "ny",
-                "x",
-                "y"
-              ],
-              "succ": [
-                "n17"
-              ]
-            },
-            {
-              "id": "n21",
-              "kind": "If",
-              "defs": [],
-              "uses": [
-                "dx"
-              ],
-              "succ": [
-                "n22",
+                "n21",
                 "n23"
-              ]
-            },
-            {
-              "id": "n22",
-              "kind": "Expr",
-              "defs": [],
-              "uses": [
-                "candidates",
-                "nx",
-                "ny",
-                "x",
-                "y"
-              ],
-              "succ": [
-                "n17"
               ]
             },
             {
@@ -12814,7 +13224,7 @@
               "kind": "If",
               "defs": [],
               "uses": [
-                "dy"
+                "dx"
               ],
               "succ": [
                 "n24",
@@ -12833,11 +13243,23 @@
                 "y"
               ],
               "succ": [
-                "n17"
+                "n21"
               ]
             },
             {
               "id": "n25",
+              "kind": "If",
+              "defs": [],
+              "uses": [
+                "dx"
+              ],
+              "succ": [
+                "n26",
+                "n27"
+              ]
+            },
+            {
+              "id": "n26",
               "kind": "Expr",
               "defs": [],
               "uses": [
@@ -12848,11 +13270,53 @@
                 "y"
               ],
               "succ": [
-                "n17"
+                "n21"
               ]
             },
             {
-              "id": "n26",
+              "id": "n27",
+              "kind": "If",
+              "defs": [],
+              "uses": [
+                "dy"
+              ],
+              "succ": [
+                "n28",
+                "n29"
+              ]
+            },
+            {
+              "id": "n28",
+              "kind": "Expr",
+              "defs": [],
+              "uses": [
+                "candidates",
+                "nx",
+                "ny",
+                "x",
+                "y"
+              ],
+              "succ": [
+                "n21"
+              ]
+            },
+            {
+              "id": "n29",
+              "kind": "Expr",
+              "defs": [],
+              "uses": [
+                "candidates",
+                "nx",
+                "ny",
+                "x",
+                "y"
+              ],
+              "succ": [
+                "n21"
+              ]
+            },
+            {
+              "id": "n30",
               "kind": "Assign",
               "defs": [
                 "ny"
@@ -12862,11 +13326,11 @@
                 "y"
               ],
               "succ": [
-                "n18"
+                "n22"
               ]
             },
             {
-              "id": "n27",
+              "id": "n31",
               "kind": "Assign",
               "defs": [
                 "nx"
@@ -12876,50 +13340,6 @@
                 "x"
               ],
               "succ": [
-                "n26"
-              ]
-            },
-            {
-              "id": "n28",
-              "kind": "Assign",
-              "defs": [
-                "dx",
-                "dy"
-              ],
-              "uses": [
-                "dirs",
-                "k"
-              ],
-              "succ": [
-                "n27"
-              ]
-            },
-            {
-              "id": "n29",
-              "kind": "VarDecl",
-              "defs": [],
-              "uses": [],
-              "succ": [
-                "n17"
-              ]
-            },
-            {
-              "id": "n30",
-              "kind": "VarDecl",
-              "defs": [],
-              "uses": [],
-              "succ": [
-                "n29"
-              ]
-            },
-            {
-              "id": "n31",
-              "kind": "AnnAssign",
-              "defs": [
-                "candidates"
-              ],
-              "uses": [],
-              "succ": [
                 "n30"
               ]
             },
@@ -12927,11 +13347,10 @@
               "id": "n32",
               "kind": "Assign",
               "defs": [
-                "x",
-                "y"
+                "dy"
               ],
               "uses": [
-                "stack"
+                "__tup_2"
               ],
               "succ": [
                 "n31"
@@ -12941,38 +13360,41 @@
               "id": "n33",
               "kind": "Assign",
               "defs": [
-                "step"
+                "dx"
               ],
-              "uses": [],
+              "uses": [
+                "__tup_2"
+              ],
               "succ": [
-                "n6"
+                "n32"
               ]
             },
             {
               "id": "n34",
-              "kind": "AnnAssign",
+              "kind": "Assign",
               "defs": [
-                "frames"
+                "__tup_2"
               ],
-              "uses": [],
+              "uses": [
+                "dirs",
+                "k"
+              ],
               "succ": [
                 "n33"
               ]
             },
             {
               "id": "n35",
-              "kind": "AnnAssign",
-              "defs": [
-                "dirs"
-              ],
+              "kind": "VarDecl",
+              "defs": [],
               "uses": [],
               "succ": [
-                "n34"
+                "n21"
               ]
             },
             {
               "id": "n36",
-              "kind": "Assign",
+              "kind": "VarDecl",
               "defs": [],
               "uses": [],
               "succ": [
@@ -12983,7 +13405,7 @@
               "id": "n37",
               "kind": "AnnAssign",
               "defs": [
-                "stack"
+                "candidates"
               ],
               "uses": [],
               "succ": [
@@ -12992,25 +13414,25 @@
             },
             {
               "id": "n38",
-              "kind": "ForCore",
+              "kind": "Assign",
               "defs": [
-                "_"
+                "y"
               ],
               "uses": [
-                "cell_h"
+                "__tup_1"
               ],
               "succ": [
-                "n37",
-                "n39"
+                "n37"
               ]
             },
             {
               "id": "n39",
-              "kind": "Expr",
-              "defs": [],
+              "kind": "Assign",
+              "defs": [
+                "x"
+              ],
               "uses": [
-                "cell_w",
-                "grid"
+                "__tup_1"
               ],
               "succ": [
                 "n38"
@@ -13018,33 +13440,33 @@
             },
             {
               "id": "n40",
-              "kind": "AnnAssign",
+              "kind": "Assign",
               "defs": [
-                "grid"
+                "__tup_1"
               ],
-              "uses": [],
+              "uses": [
+                "stack"
+              ],
               "succ": [
-                "n38"
+                "n39"
               ]
             },
             {
               "id": "n41",
               "kind": "Assign",
               "defs": [
-                "start"
+                "step"
               ],
-              "uses": [
-                "perf_counter"
-              ],
+              "uses": [],
               "succ": [
-                "n40"
+                "n6"
               ]
             },
             {
               "id": "n42",
-              "kind": "Assign",
+              "kind": "AnnAssign",
               "defs": [
-                "out_path"
+                "frames"
               ],
               "uses": [],
               "succ": [
@@ -13053,9 +13475,9 @@
             },
             {
               "id": "n43",
-              "kind": "Assign",
+              "kind": "AnnAssign",
               "defs": [
-                "capture_every"
+                "dirs"
               ],
               "uses": [],
               "succ": [
@@ -13065,9 +13487,7 @@
             {
               "id": "n44",
               "kind": "Assign",
-              "defs": [
-                "scale"
-              ],
+              "defs": [],
               "uses": [],
               "succ": [
                 "n43"
@@ -13075,9 +13495,9 @@
             },
             {
               "id": "n45",
-              "kind": "Assign",
+              "kind": "AnnAssign",
               "defs": [
-                "cell_h"
+                "stack"
               ],
               "uses": [],
               "succ": [
@@ -13086,102 +13506,219 @@
             },
             {
               "id": "n46",
+              "kind": "ForCore",
+              "defs": [
+                "_"
+              ],
+              "uses": [
+                "cell_h"
+              ],
+              "succ": [
+                "n45",
+                "n47"
+              ]
+            },
+            {
+              "id": "n47",
+              "kind": "Expr",
+              "defs": [],
+              "uses": [
+                "cell_w",
+                "grid"
+              ],
+              "succ": [
+                "n46"
+              ]
+            },
+            {
+              "id": "n48",
+              "kind": "AnnAssign",
+              "defs": [
+                "grid"
+              ],
+              "uses": [],
+              "succ": [
+                "n46"
+              ]
+            },
+            {
+              "id": "n49",
+              "kind": "Assign",
+              "defs": [
+                "start"
+              ],
+              "uses": [
+                "perf_counter"
+              ],
+              "succ": [
+                "n48"
+              ]
+            },
+            {
+              "id": "n50",
+              "kind": "Assign",
+              "defs": [
+                "out_path"
+              ],
+              "uses": [],
+              "succ": [
+                "n49"
+              ]
+            },
+            {
+              "id": "n51",
+              "kind": "Assign",
+              "defs": [
+                "capture_every"
+              ],
+              "uses": [],
+              "succ": [
+                "n50"
+              ]
+            },
+            {
+              "id": "n52",
+              "kind": "Assign",
+              "defs": [
+                "scale"
+              ],
+              "uses": [],
+              "succ": [
+                "n51"
+              ]
+            },
+            {
+              "id": "n53",
+              "kind": "Assign",
+              "defs": [
+                "cell_h"
+              ],
+              "uses": [],
+              "succ": [
+                "n52"
+              ]
+            },
+            {
+              "id": "n54",
               "kind": "Assign",
               "defs": [
                 "cell_w"
               ],
               "uses": [],
               "succ": [
-                "n45"
+                "n53"
               ]
             }
           ],
           "def_use": {
             "defs": {
               "_": [
-                "n38"
-              ],
-              "candidates": [
-                "n31"
-              ],
-              "capture_every": [
-                "n43"
-              ],
-              "cell_h": [
-                "n45"
-              ],
-              "cell_w": [
                 "n46"
               ],
+              "__tup_1": [
+                "n40"
+              ],
+              "__tup_2": [
+                "n34"
+              ],
+              "__tup_3": [
+                "n19"
+              ],
+              "candidates": [
+                "n37"
+              ],
+              "capture_every": [
+                "n51"
+              ],
+              "cell_h": [
+                "n53"
+              ],
+              "cell_w": [
+                "n54"
+              ],
               "dirs": [
-                "n35"
+                "n43"
               ],
               "dx": [
-                "n28"
+                "n33"
               ],
               "dy": [
-                "n28"
+                "n32"
               ],
               "elapsed": [
                 "n3"
               ],
               "frames": [
-                "n34"
-              ],
-              "grid": [
-                "n40"
-              ],
-              "k": [
-                "n17"
-              ],
-              "nx": [
-                "n15",
-                "n27"
-              ],
-              "ny": [
-                "n15",
-                "n26"
-              ],
-              "out_path": [
                 "n42"
               ],
+              "grid": [
+                "n48"
+              ],
+              "k": [
+                "n21"
+              ],
+              "nx": [
+                "n18",
+                "n31"
+              ],
+              "ny": [
+                "n17",
+                "n30"
+              ],
+              "out_path": [
+                "n50"
+              ],
               "scale": [
-                "n44"
+                "n52"
               ],
               "sel": [
-                "n16"
+                "n20"
               ],
               "stack": [
-                "n37"
+                "n45"
               ],
               "start": [
-                "n41"
+                "n49"
               ],
               "step": [
-                "n33",
+                "n41",
                 "n7"
               ],
               "wx": [
-                "n15"
+                "n16"
               ],
               "wy": [
                 "n15"
               ],
               "x": [
-                "n32"
+                "n39"
               ],
               "y": [
-                "n32"
+                "n38"
               ]
             },
             "uses": {
+              "__tup_1": [
+                "n38",
+                "n39"
+              ],
+              "__tup_2": [
+                "n32",
+                "n33"
+              ],
+              "__tup_3": [
+                "n15",
+                "n16",
+                "n17",
+                "n18"
+              ],
               "candidates": [
                 "n10",
-                "n16",
                 "n20",
-                "n22",
                 "n24",
-                "n25"
+                "n26",
+                "n28",
+                "n29"
               ],
               "capture": [
                 "n5",
@@ -13191,30 +13728,30 @@
                 "n8"
               ],
               "cell_h": [
-                "n18",
-                "n38",
+                "n22",
                 "n4",
+                "n46",
                 "n5",
                 "n9"
               ],
               "cell_w": [
-                "n18",
-                "n39",
+                "n22",
                 "n4",
+                "n47",
                 "n5",
                 "n9"
               ],
               "dirs": [
-                "n28"
+                "n34"
               ],
               "dx": [
-                "n19",
-                "n21",
-                "n27"
+                "n23",
+                "n25",
+                "n31"
               ],
               "dy": [
-                "n23",
-                "n26"
+                "n27",
+                "n30"
               ],
               "elapsed": [
                 "n0"
@@ -13229,34 +13766,34 @@
                 "n4"
               ],
               "grid": [
-                "n18",
-                "n39",
+                "n22",
+                "n47",
                 "n5",
                 "n9"
               ],
               "k": [
-                "n28"
+                "n34"
               ],
               "len": [
                 "n1",
                 "n10",
-                "n16"
+                "n20"
               ],
               "nx": [
                 "n12",
-                "n18",
-                "n20",
                 "n22",
                 "n24",
-                "n25"
+                "n26",
+                "n28",
+                "n29"
               ],
               "ny": [
                 "n12",
-                "n18",
-                "n20",
                 "n22",
                 "n24",
-                "n25"
+                "n26",
+                "n28",
+                "n29"
               ],
               "out_path": [
                 "n2",
@@ -13264,7 +13801,7 @@
               ],
               "perf_counter": [
                 "n3",
-                "n41"
+                "n49"
               ],
               "print": [
                 "n0",
@@ -13280,13 +13817,13 @@
                 "n9"
               ],
               "sel": [
-                "n15"
+                "n19"
               ],
               "stack": [
                 "n11",
                 "n12",
-                "n16",
-                "n32",
+                "n20",
+                "n40",
                 "n6"
               ],
               "start": [
@@ -13297,27 +13834,27 @@
                 "n8"
               ],
               "x": [
-                "n16",
                 "n20",
-                "n22",
                 "n24",
-                "n25",
-                "n27"
+                "n26",
+                "n28",
+                "n29",
+                "n31"
               ],
               "y": [
-                "n16",
                 "n20",
-                "n22",
                 "n24",
-                "n25",
-                "n26"
+                "n26",
+                "n28",
+                "n29",
+                "n30"
               ]
             }
           },
           "variables": {
             "_": {
               "def_nodes": [
-                "n38"
+                "n46"
               ],
               "use_nodes": [],
               "live_in_nodes": [],
@@ -13325,41 +13862,89 @@
               "last_use_nodes": [],
               "lifetime_class": "local_non_escape_candidate"
             },
+            "__tup_1": {
+              "def_nodes": [
+                "n40"
+              ],
+              "use_nodes": [
+                "n38",
+                "n39"
+              ],
+              "live_in_nodes": [
+                "n38",
+                "n39"
+              ],
+              "live_out_nodes": [
+                "n39",
+                "n40"
+              ],
+              "last_use_nodes": [
+                "n38"
+              ],
+              "lifetime_class": "local_non_escape_candidate"
+            },
+            "__tup_2": {
+              "def_nodes": [
+                "n34"
+              ],
+              "use_nodes": [
+                "n32",
+                "n33"
+              ],
+              "live_in_nodes": [
+                "n32",
+                "n33"
+              ],
+              "live_out_nodes": [
+                "n33",
+                "n34"
+              ],
+              "last_use_nodes": [
+                "n32"
+              ],
+              "lifetime_class": "local_non_escape_candidate"
+            },
+            "__tup_3": {
+              "def_nodes": [
+                "n19"
+              ],
+              "use_nodes": [
+                "n15",
+                "n16",
+                "n17",
+                "n18"
+              ],
+              "live_in_nodes": [
+                "n15",
+                "n16",
+                "n17",
+                "n18"
+              ],
+              "live_out_nodes": [
+                "n16",
+                "n17",
+                "n18",
+                "n19"
+              ],
+              "last_use_nodes": [
+                "n15"
+              ],
+              "lifetime_class": "local_non_escape_candidate"
+            },
             "candidates": {
               "def_nodes": [
-                "n31"
+                "n37"
               ],
               "use_nodes": [
                 "n10",
-                "n16",
                 "n20",
-                "n22",
                 "n24",
-                "n25"
+                "n26",
+                "n28",
+                "n29"
               ],
               "live_in_nodes": [
                 "n10",
-                "n16",
-                "n17",
-                "n18",
-                "n19",
-                "n20",
-                "n21",
-                "n22",
-                "n23",
-                "n24",
-                "n25",
-                "n26",
-                "n27",
-                "n28",
-                "n29",
-                "n30"
-              ],
-              "live_out_nodes": [
-                "n10",
-                "n17",
-                "n18",
-                "n19",
                 "n20",
                 "n21",
                 "n22",
@@ -13371,10 +13956,35 @@
                 "n28",
                 "n29",
                 "n30",
-                "n31"
+                "n31",
+                "n32",
+                "n33",
+                "n34",
+                "n35",
+                "n36"
+              ],
+              "live_out_nodes": [
+                "n10",
+                "n21",
+                "n22",
+                "n23",
+                "n24",
+                "n25",
+                "n26",
+                "n27",
+                "n28",
+                "n29",
+                "n30",
+                "n31",
+                "n32",
+                "n33",
+                "n34",
+                "n35",
+                "n36",
+                "n37"
               ],
               "last_use_nodes": [
-                "n16"
+                "n20"
               ],
               "lifetime_class": "local_non_escape_candidate"
             },
@@ -13426,7 +14036,15 @@
                 "n43",
                 "n44",
                 "n45",
-                "n46"
+                "n46",
+                "n47",
+                "n48",
+                "n49",
+                "n50",
+                "n51",
+                "n52",
+                "n53",
+                "n54"
               ],
               "live_out_nodes": [
                 "n6",
@@ -13469,7 +14087,15 @@
                 "n43",
                 "n44",
                 "n45",
-                "n46"
+                "n46",
+                "n47",
+                "n48",
+                "n49",
+                "n50",
+                "n51",
+                "n52",
+                "n53",
+                "n54"
               ],
               "last_use_nodes": [
                 "n5"
@@ -13478,10 +14104,353 @@
             },
             "capture_every": {
               "def_nodes": [
-                "n43"
+                "n51"
               ],
               "use_nodes": [
                 "n8"
+              ],
+              "live_in_nodes": [
+                "n6",
+                "n7",
+                "n8",
+                "n9",
+                "n10",
+                "n11",
+                "n12",
+                "n13",
+                "n14",
+                "n15",
+                "n16",
+                "n17",
+                "n18",
+                "n19",
+                "n20",
+                "n21",
+                "n22",
+                "n23",
+                "n24",
+                "n25",
+                "n26",
+                "n27",
+                "n28",
+                "n29",
+                "n30",
+                "n31",
+                "n32",
+                "n33",
+                "n34",
+                "n35",
+                "n36",
+                "n37",
+                "n38",
+                "n39",
+                "n40",
+                "n41",
+                "n42",
+                "n43",
+                "n44",
+                "n45",
+                "n46",
+                "n47",
+                "n48",
+                "n49",
+                "n50"
+              ],
+              "live_out_nodes": [
+                "n6",
+                "n7",
+                "n8",
+                "n9",
+                "n10",
+                "n11",
+                "n12",
+                "n13",
+                "n14",
+                "n15",
+                "n16",
+                "n17",
+                "n18",
+                "n19",
+                "n20",
+                "n21",
+                "n22",
+                "n23",
+                "n24",
+                "n25",
+                "n26",
+                "n27",
+                "n28",
+                "n29",
+                "n30",
+                "n31",
+                "n32",
+                "n33",
+                "n34",
+                "n35",
+                "n36",
+                "n37",
+                "n38",
+                "n39",
+                "n40",
+                "n41",
+                "n42",
+                "n43",
+                "n44",
+                "n45",
+                "n46",
+                "n47",
+                "n48",
+                "n49",
+                "n50",
+                "n51"
+              ],
+              "last_use_nodes": [],
+              "lifetime_class": "local_non_escape_candidate"
+            },
+            "cell_h": {
+              "def_nodes": [
+                "n53"
+              ],
+              "use_nodes": [
+                "n22",
+                "n4",
+                "n46",
+                "n5",
+                "n9"
+              ],
+              "live_in_nodes": [
+                "n4",
+                "n5",
+                "n6",
+                "n7",
+                "n8",
+                "n9",
+                "n10",
+                "n11",
+                "n12",
+                "n13",
+                "n14",
+                "n15",
+                "n16",
+                "n17",
+                "n18",
+                "n19",
+                "n20",
+                "n21",
+                "n22",
+                "n23",
+                "n24",
+                "n25",
+                "n26",
+                "n27",
+                "n28",
+                "n29",
+                "n30",
+                "n31",
+                "n32",
+                "n33",
+                "n34",
+                "n35",
+                "n36",
+                "n37",
+                "n38",
+                "n39",
+                "n40",
+                "n41",
+                "n42",
+                "n43",
+                "n44",
+                "n45",
+                "n46",
+                "n47",
+                "n48",
+                "n49",
+                "n50",
+                "n51",
+                "n52"
+              ],
+              "live_out_nodes": [
+                "n5",
+                "n6",
+                "n7",
+                "n8",
+                "n9",
+                "n10",
+                "n11",
+                "n12",
+                "n13",
+                "n14",
+                "n15",
+                "n16",
+                "n17",
+                "n18",
+                "n19",
+                "n20",
+                "n21",
+                "n22",
+                "n23",
+                "n24",
+                "n25",
+                "n26",
+                "n27",
+                "n28",
+                "n29",
+                "n30",
+                "n31",
+                "n32",
+                "n33",
+                "n34",
+                "n35",
+                "n36",
+                "n37",
+                "n38",
+                "n39",
+                "n40",
+                "n41",
+                "n42",
+                "n43",
+                "n44",
+                "n45",
+                "n46",
+                "n47",
+                "n48",
+                "n49",
+                "n50",
+                "n51",
+                "n52",
+                "n53"
+              ],
+              "last_use_nodes": [
+                "n4"
+              ],
+              "lifetime_class": "local_non_escape_candidate"
+            },
+            "cell_w": {
+              "def_nodes": [
+                "n54"
+              ],
+              "use_nodes": [
+                "n22",
+                "n4",
+                "n47",
+                "n5",
+                "n9"
+              ],
+              "live_in_nodes": [
+                "n4",
+                "n5",
+                "n6",
+                "n7",
+                "n8",
+                "n9",
+                "n10",
+                "n11",
+                "n12",
+                "n13",
+                "n14",
+                "n15",
+                "n16",
+                "n17",
+                "n18",
+                "n19",
+                "n20",
+                "n21",
+                "n22",
+                "n23",
+                "n24",
+                "n25",
+                "n26",
+                "n27",
+                "n28",
+                "n29",
+                "n30",
+                "n31",
+                "n32",
+                "n33",
+                "n34",
+                "n35",
+                "n36",
+                "n37",
+                "n38",
+                "n39",
+                "n40",
+                "n41",
+                "n42",
+                "n43",
+                "n44",
+                "n45",
+                "n46",
+                "n47",
+                "n48",
+                "n49",
+                "n50",
+                "n51",
+                "n52",
+                "n53"
+              ],
+              "live_out_nodes": [
+                "n5",
+                "n6",
+                "n7",
+                "n8",
+                "n9",
+                "n10",
+                "n11",
+                "n12",
+                "n13",
+                "n14",
+                "n15",
+                "n16",
+                "n17",
+                "n18",
+                "n19",
+                "n20",
+                "n21",
+                "n22",
+                "n23",
+                "n24",
+                "n25",
+                "n26",
+                "n27",
+                "n28",
+                "n29",
+                "n30",
+                "n31",
+                "n32",
+                "n33",
+                "n34",
+                "n35",
+                "n36",
+                "n37",
+                "n38",
+                "n39",
+                "n40",
+                "n41",
+                "n42",
+                "n43",
+                "n44",
+                "n45",
+                "n46",
+                "n47",
+                "n48",
+                "n49",
+                "n50",
+                "n51",
+                "n52",
+                "n53",
+                "n54"
+              ],
+              "last_use_nodes": [
+                "n4"
+              ],
+              "lifetime_class": "local_non_escape_candidate"
+            },
+            "dirs": {
+              "def_nodes": [
+                "n43"
+              ],
+              "use_nodes": [
+                "n34"
               ],
               "live_in_nodes": [
                 "n6",
@@ -13565,339 +14534,62 @@
               "last_use_nodes": [],
               "lifetime_class": "local_non_escape_candidate"
             },
-            "cell_h": {
-              "def_nodes": [
-                "n45"
-              ],
-              "use_nodes": [
-                "n18",
-                "n38",
-                "n4",
-                "n5",
-                "n9"
-              ],
-              "live_in_nodes": [
-                "n4",
-                "n5",
-                "n6",
-                "n7",
-                "n8",
-                "n9",
-                "n10",
-                "n11",
-                "n12",
-                "n13",
-                "n14",
-                "n15",
-                "n16",
-                "n17",
-                "n18",
-                "n19",
-                "n20",
-                "n21",
-                "n22",
-                "n23",
-                "n24",
-                "n25",
-                "n26",
-                "n27",
-                "n28",
-                "n29",
-                "n30",
-                "n31",
-                "n32",
-                "n33",
-                "n34",
-                "n35",
-                "n36",
-                "n37",
-                "n38",
-                "n39",
-                "n40",
-                "n41",
-                "n42",
-                "n43",
-                "n44"
-              ],
-              "live_out_nodes": [
-                "n5",
-                "n6",
-                "n7",
-                "n8",
-                "n9",
-                "n10",
-                "n11",
-                "n12",
-                "n13",
-                "n14",
-                "n15",
-                "n16",
-                "n17",
-                "n18",
-                "n19",
-                "n20",
-                "n21",
-                "n22",
-                "n23",
-                "n24",
-                "n25",
-                "n26",
-                "n27",
-                "n28",
-                "n29",
-                "n30",
-                "n31",
-                "n32",
-                "n33",
-                "n34",
-                "n35",
-                "n36",
-                "n37",
-                "n38",
-                "n39",
-                "n40",
-                "n41",
-                "n42",
-                "n43",
-                "n44",
-                "n45"
-              ],
-              "last_use_nodes": [
-                "n4"
-              ],
-              "lifetime_class": "local_non_escape_candidate"
-            },
-            "cell_w": {
-              "def_nodes": [
-                "n46"
-              ],
-              "use_nodes": [
-                "n18",
-                "n39",
-                "n4",
-                "n5",
-                "n9"
-              ],
-              "live_in_nodes": [
-                "n4",
-                "n5",
-                "n6",
-                "n7",
-                "n8",
-                "n9",
-                "n10",
-                "n11",
-                "n12",
-                "n13",
-                "n14",
-                "n15",
-                "n16",
-                "n17",
-                "n18",
-                "n19",
-                "n20",
-                "n21",
-                "n22",
-                "n23",
-                "n24",
-                "n25",
-                "n26",
-                "n27",
-                "n28",
-                "n29",
-                "n30",
-                "n31",
-                "n32",
-                "n33",
-                "n34",
-                "n35",
-                "n36",
-                "n37",
-                "n38",
-                "n39",
-                "n40",
-                "n41",
-                "n42",
-                "n43",
-                "n44",
-                "n45"
-              ],
-              "live_out_nodes": [
-                "n5",
-                "n6",
-                "n7",
-                "n8",
-                "n9",
-                "n10",
-                "n11",
-                "n12",
-                "n13",
-                "n14",
-                "n15",
-                "n16",
-                "n17",
-                "n18",
-                "n19",
-                "n20",
-                "n21",
-                "n22",
-                "n23",
-                "n24",
-                "n25",
-                "n26",
-                "n27",
-                "n28",
-                "n29",
-                "n30",
-                "n31",
-                "n32",
-                "n33",
-                "n34",
-                "n35",
-                "n36",
-                "n37",
-                "n38",
-                "n39",
-                "n40",
-                "n41",
-                "n42",
-                "n43",
-                "n44",
-                "n45",
-                "n46"
-              ],
-              "last_use_nodes": [
-                "n4"
-              ],
-              "lifetime_class": "local_non_escape_candidate"
-            },
-            "dirs": {
-              "def_nodes": [
-                "n35"
-              ],
-              "use_nodes": [
-                "n28"
-              ],
-              "live_in_nodes": [
-                "n6",
-                "n7",
-                "n8",
-                "n9",
-                "n10",
-                "n11",
-                "n12",
-                "n13",
-                "n14",
-                "n15",
-                "n16",
-                "n17",
-                "n18",
-                "n19",
-                "n20",
-                "n21",
-                "n22",
-                "n23",
-                "n24",
-                "n25",
-                "n26",
-                "n27",
-                "n28",
-                "n29",
-                "n30",
-                "n31",
-                "n32",
-                "n33",
-                "n34"
-              ],
-              "live_out_nodes": [
-                "n6",
-                "n7",
-                "n8",
-                "n9",
-                "n10",
-                "n11",
-                "n12",
-                "n13",
-                "n14",
-                "n15",
-                "n16",
-                "n17",
-                "n18",
-                "n19",
-                "n20",
-                "n21",
-                "n22",
-                "n23",
-                "n24",
-                "n25",
-                "n26",
-                "n27",
-                "n28",
-                "n29",
-                "n30",
-                "n31",
-                "n32",
-                "n33",
-                "n34",
-                "n35"
-              ],
-              "last_use_nodes": [],
-              "lifetime_class": "local_non_escape_candidate"
-            },
             "dx": {
               "def_nodes": [
-                "n28"
+                "n33"
               ],
               "use_nodes": [
-                "n19",
-                "n21",
-                "n27"
+                "n23",
+                "n25",
+                "n31"
               ],
               "live_in_nodes": [
-                "n18",
-                "n19",
-                "n21",
-                "n26",
-                "n27"
+                "n22",
+                "n23",
+                "n25",
+                "n30",
+                "n31",
+                "n32"
               ],
               "live_out_nodes": [
-                "n18",
-                "n19",
-                "n26",
-                "n27",
-                "n28"
+                "n22",
+                "n23",
+                "n30",
+                "n31",
+                "n32",
+                "n33"
               ],
               "last_use_nodes": [
-                "n21"
+                "n25"
               ],
               "lifetime_class": "local_non_escape_candidate"
             },
             "dy": {
               "def_nodes": [
-                "n28"
+                "n32"
               ],
               "use_nodes": [
-                "n23",
-                "n26"
+                "n27",
+                "n30"
               ],
               "live_in_nodes": [
-                "n18",
-                "n19",
-                "n21",
+                "n22",
                 "n23",
-                "n26",
-                "n27"
+                "n25",
+                "n27",
+                "n30",
+                "n31"
               ],
               "live_out_nodes": [
-                "n18",
-                "n19",
-                "n21",
-                "n26",
-                "n27",
-                "n28"
+                "n22",
+                "n23",
+                "n25",
+                "n30",
+                "n31",
+                "n32"
               ],
               "last_use_nodes": [
-                "n23"
+                "n27"
               ],
               "lifetime_class": "local_non_escape_candidate"
             },
@@ -13925,7 +14617,7 @@
             },
             "frames": {
               "def_nodes": [
-                "n34"
+                "n42"
               ],
               "use_nodes": [
                 "n1",
@@ -13966,7 +14658,15 @@
                 "n30",
                 "n31",
                 "n32",
-                "n33"
+                "n33",
+                "n34",
+                "n35",
+                "n36",
+                "n37",
+                "n38",
+                "n39",
+                "n40",
+                "n41"
               ],
               "live_out_nodes": [
                 "n2",
@@ -14001,7 +14701,15 @@
                 "n31",
                 "n32",
                 "n33",
-                "n34"
+                "n34",
+                "n35",
+                "n36",
+                "n37",
+                "n38",
+                "n39",
+                "n40",
+                "n41",
+                "n42"
               ],
               "last_use_nodes": [
                 "n1"
@@ -14056,7 +14764,15 @@
                 "n43",
                 "n44",
                 "n45",
-                "n46"
+                "n46",
+                "n47",
+                "n48",
+                "n49",
+                "n50",
+                "n51",
+                "n52",
+                "n53",
+                "n54"
               ],
               "live_out_nodes": [
                 "n5",
@@ -14100,7 +14816,15 @@
                 "n43",
                 "n44",
                 "n45",
-                "n46"
+                "n46",
+                "n47",
+                "n48",
+                "n49",
+                "n50",
+                "n51",
+                "n52",
+                "n53",
+                "n54"
               ],
               "last_use_nodes": [
                 "n4"
@@ -14109,11 +14833,11 @@
             },
             "grid": {
               "def_nodes": [
-                "n40"
+                "n48"
               ],
               "use_nodes": [
-                "n18",
-                "n39",
+                "n22",
+                "n47",
                 "n5",
                 "n9"
               ],
@@ -14152,7 +14876,15 @@
                 "n36",
                 "n37",
                 "n38",
-                "n39"
+                "n39",
+                "n40",
+                "n41",
+                "n42",
+                "n43",
+                "n44",
+                "n45",
+                "n46",
+                "n47"
               ],
               "live_out_nodes": [
                 "n6",
@@ -14189,7 +14921,15 @@
                 "n37",
                 "n38",
                 "n39",
-                "n40"
+                "n40",
+                "n41",
+                "n42",
+                "n43",
+                "n44",
+                "n45",
+                "n46",
+                "n47",
+                "n48"
               ],
               "last_use_nodes": [
                 "n5"
@@ -14198,19 +14938,19 @@
             },
             "k": {
               "def_nodes": [
-                "n17"
+                "n21"
               ],
               "use_nodes": [
-                "n28"
+                "n34"
               ],
               "live_in_nodes": [
-                "n28"
+                "n34"
               ],
               "live_out_nodes": [
-                "n17"
+                "n21"
               ],
               "last_use_nodes": [
-                "n28"
+                "n34"
               ],
               "lifetime_class": "local_non_escape_candidate"
             },
@@ -14219,7 +14959,7 @@
               "use_nodes": [
                 "n1",
                 "n10",
-                "n16"
+                "n20"
               ],
               "live_in_nodes": [
                 "n1",
@@ -14267,7 +15007,15 @@
                 "n43",
                 "n44",
                 "n45",
-                "n46"
+                "n46",
+                "n47",
+                "n48",
+                "n49",
+                "n50",
+                "n51",
+                "n52",
+                "n53",
+                "n54"
               ],
               "live_out_nodes": [
                 "n2",
@@ -14314,7 +15062,15 @@
                 "n43",
                 "n44",
                 "n45",
-                "n46"
+                "n46",
+                "n47",
+                "n48",
+                "n49",
+                "n50",
+                "n51",
+                "n52",
+                "n53",
+                "n54"
               ],
               "last_use_nodes": [
                 "n1"
@@ -14323,99 +15079,109 @@
             },
             "nx": {
               "def_nodes": [
-                "n15",
-                "n27"
+                "n18",
+                "n31"
               ],
               "use_nodes": [
                 "n12",
-                "n18",
-                "n20",
                 "n22",
                 "n24",
-                "n25"
+                "n26",
+                "n28",
+                "n29"
               ],
               "live_in_nodes": [
                 "n12",
                 "n13",
                 "n14",
-                "n18",
-                "n19",
-                "n20",
-                "n21",
+                "n15",
+                "n16",
+                "n17",
                 "n22",
                 "n23",
                 "n24",
                 "n25",
-                "n26"
+                "n26",
+                "n27",
+                "n28",
+                "n29",
+                "n30"
               ],
               "live_out_nodes": [
                 "n13",
                 "n14",
                 "n15",
+                "n16",
+                "n17",
                 "n18",
-                "n19",
-                "n21",
+                "n22",
                 "n23",
-                "n26",
-                "n27"
+                "n25",
+                "n27",
+                "n30",
+                "n31"
               ],
               "last_use_nodes": [
                 "n12",
-                "n20",
-                "n22",
                 "n24",
-                "n25"
+                "n26",
+                "n28",
+                "n29"
               ],
               "lifetime_class": "local_non_escape_candidate"
             },
             "ny": {
               "def_nodes": [
-                "n15",
-                "n26"
+                "n17",
+                "n30"
               ],
               "use_nodes": [
                 "n12",
-                "n18",
-                "n20",
                 "n22",
                 "n24",
-                "n25"
+                "n26",
+                "n28",
+                "n29"
               ],
               "live_in_nodes": [
                 "n12",
                 "n13",
                 "n14",
-                "n18",
-                "n19",
-                "n20",
-                "n21",
+                "n15",
+                "n16",
                 "n22",
                 "n23",
                 "n24",
-                "n25"
+                "n25",
+                "n26",
+                "n27",
+                "n28",
+                "n29"
               ],
               "live_out_nodes": [
                 "n13",
                 "n14",
                 "n15",
-                "n18",
-                "n19",
-                "n21",
+                "n16",
+                "n17",
+                "n22",
                 "n23",
-                "n26"
+                "n25",
+                "n27",
+                "n30"
               ],
               "last_use_nodes": [
                 "n12",
-                "n20",
-                "n22",
                 "n24",
-                "n25"
+                "n26",
+                "n28",
+                "n29"
               ],
               "lifetime_class": "local_non_escape_candidate"
             },
             "out_path": {
               "def_nodes": [
-                "n42"
+                "n50"
               ],
               "use_nodes": [
                 "n2",
@@ -14461,7 +15227,15 @@
                 "n38",
                 "n39",
                 "n40",
-                "n41"
+                "n41",
+                "n42",
+                "n43",
+                "n44",
+                "n45",
+                "n46",
+                "n47",
+                "n48",
+                "n49"
               ],
               "live_out_nodes": [
                 "n3",
@@ -14503,7 +15277,15 @@
                 "n39",
                 "n40",
                 "n41",
-                "n42"
+                "n42",
+                "n43",
+                "n44",
+                "n45",
+                "n46",
+                "n47",
+                "n48",
+                "n49",
+                "n50"
               ],
               "last_use_nodes": [
                 "n2"
@@ -14514,7 +15296,7 @@
               "def_nodes": [],
               "use_nodes": [
                 "n3",
-                "n41"
+                "n49"
               ],
               "live_in_nodes": [
                 "n3",
@@ -14560,7 +15342,15 @@
                 "n43",
                 "n44",
                 "n45",
-                "n46"
+                "n46",
+                "n47",
+                "n48",
+                "n49",
+                "n50",
+                "n51",
+                "n52",
+                "n53",
+                "n54"
               ],
               "live_out_nodes": [
                 "n4",
@@ -14605,7 +15395,15 @@
                 "n43",
                 "n44",
                 "n45",
-                "n46"
+                "n46",
+                "n47",
+                "n48",
+                "n49",
+                "n50",
+                "n51",
+                "n52",
+                "n53",
+                "n54"
               ],
               "last_use_nodes": [
                 "n3"
@@ -14666,7 +15464,15 @@
                 "n43",
                 "n44",
                 "n45",
-                "n46"
+                "n46",
+                "n47",
+                "n48",
+                "n49",
+                "n50",
+                "n51",
+                "n52",
+                "n53",
+                "n54"
               ],
               "live_out_nodes": [
                 "n1",
@@ -14714,7 +15520,15 @@
                 "n43",
                 "n44",
                 "n45",
-                "n46"
+                "n46",
+                "n47",
+                "n48",
+                "n49",
+                "n50",
+                "n51",
+                "n52",
+                "n53",
+                "n54"
               ],
               "last_use_nodes": [
                 "n0"
@@ -14769,7 +15583,15 @@
                 "n43",
                 "n44",
                 "n45",
-                "n46"
+                "n46",
+                "n47",
+                "n48",
+                "n49",
+                "n50",
+                "n51",
+                "n52",
+                "n53",
+                "n54"
               ],
               "live_out_nodes": [
                 "n5",
@@ -14813,7 +15635,15 @@
                 "n43",
                 "n44",
                 "n45",
-                "n46"
+                "n46",
+                "n47",
+                "n48",
+                "n49",
+                "n50",
+                "n51",
+                "n52",
+                "n53",
+                "n54"
               ],
               "last_use_nodes": [
                 "n4"
@@ -14822,7 +15652,7 @@
             },
             "scale": {
               "def_nodes": [
-                "n44"
+                "n52"
               ],
               "use_nodes": [
                 "n4",
@@ -14869,7 +15699,15 @@
                 "n40",
                 "n41",
                 "n42",
-                "n43"
+                "n43",
+                "n44",
+                "n45",
+                "n46",
+                "n47",
+                "n48",
+                "n49",
+                "n50",
+                "n51"
               ],
               "live_out_nodes": [
                 "n5",
@@ -14911,7 +15749,15 @@
                 "n41",
                 "n42",
                 "n43",
-                "n44"
+                "n44",
+                "n45",
+                "n46",
+                "n47",
+                "n48",
+                "n49",
+                "n50",
+                "n51",
+                "n52"
               ],
               "last_use_nodes": [
                 "n4"
@@ -14920,31 +15766,31 @@
             },
             "sel": {
               "def_nodes": [
-                "n16"
+                "n20"
               ],
               "use_nodes": [
-                "n15"
+                "n19"
               ],
               "live_in_nodes": [
-                "n15"
+                "n19"
               ],
               "live_out_nodes": [
-                "n16"
+                "n20"
               ],
               "last_use_nodes": [
-                "n15"
+                "n19"
               ],
               "lifetime_class": "local_non_escape_candidate"
             },
             "stack": {
               "def_nodes": [
-                "n37"
+                "n45"
               ],
               "use_nodes": [
                 "n11",
                 "n12",
-                "n16",
-                "n32",
+                "n20",
+                "n40",
                 "n6"
               ],
               "live_in_nodes": [
@@ -14978,7 +15824,15 @@
                 "n33",
                 "n34",
                 "n35",
-                "n36"
+                "n36",
+                "n37",
+                "n38",
+                "n39",
+                "n40",
+                "n41",
+                "n42",
+                "n43",
+                "n44"
               ],
               "live_out_nodes": [
                 "n6",
@@ -15012,14 +15866,22 @@
                 "n34",
                 "n35",
                 "n36",
-                "n37"
+                "n37",
+                "n38",
+                "n39",
+                "n40",
+                "n41",
+                "n42",
+                "n43",
+                "n44",
+                "n45"
               ],
               "last_use_nodes": [],
               "lifetime_class": "local_non_escape_candidate"
             },
             "start": {
               "def_nodes": [
-                "n41"
+                "n49"
               ],
               "use_nodes": [
                 "n3"
@@ -15062,7 +15924,15 @@
                 "n37",
                 "n38",
                 "n39",
-                "n40"
+                "n40",
+                "n41",
+                "n42",
+                "n43",
+                "n44",
+                "n45",
+                "n46",
+                "n47",
+                "n48"
               ],
               "live_out_nodes": [
                 "n4",
@@ -15102,7 +15972,15 @@
                 "n38",
                 "n39",
                 "n40",
-                "n41"
+                "n41",
+                "n42",
+                "n43",
+                "n44",
+                "n45",
+                "n46",
+                "n47",
+                "n48",
+                "n49"
               ],
               "last_use_nodes": [
                 "n3"
@@ -15111,7 +15989,7 @@
             },
             "step": {
               "def_nodes": [
-                "n33",
+                "n41",
                 "n7"
               ],
               "use_nodes": [
@@ -15145,7 +16023,15 @@
                 "n29",
                 "n30",
                 "n31",
-                "n32"
+                "n32",
+                "n33",
+                "n34",
+                "n35",
+                "n36",
+                "n37",
+                "n38",
+                "n39",
+                "n40"
               ],
               "live_out_nodes": [
                 "n6",
@@ -15175,14 +16061,22 @@
                 "n30",
                 "n31",
                 "n32",
-                "n33"
+                "n33",
+                "n34",
+                "n35",
+                "n36",
+                "n37",
+                "n38",
+                "n39",
+                "n40",
+                "n41"
               ],
               "last_use_nodes": [],
               "lifetime_class": "local_non_escape_candidate"
             },
             "wx": {
               "def_nodes": [
-                "n15"
+                "n16"
               ],
               "use_nodes": [],
               "live_in_nodes": [],
@@ -15202,40 +16096,18 @@
             },
             "x": {
               "def_nodes": [
-                "n32"
+                "n39"
               ],
               "use_nodes": [
-                "n16",
                 "n20",
-                "n22",
                 "n24",
-                "n25",
-                "n27"
+                "n26",
+                "n28",
+                "n29",
+                "n31"
               ],
               "live_in_nodes": [
                 "n10",
-                "n16",
-                "n17",
-                "n18",
-                "n19",
-                "n20",
-                "n21",
-                "n22",
-                "n23",
-                "n24",
-                "n25",
-                "n26",
-                "n27",
-                "n28",
-                "n29",
-                "n30",
-                "n31"
-              ],
-              "live_out_nodes": [
-                "n10",
-                "n17",
-                "n18",
-                "n19",
                 "n20",
                 "n21",
                 "n22",
@@ -15248,49 +16120,55 @@
                 "n29",
                 "n30",
                 "n31",
-                "n32"
+                "n32",
+                "n33",
+                "n34",
+                "n35",
+                "n36",
+                "n37",
+                "n38"
+              ],
+              "live_out_nodes": [
+                "n10",
+                "n21",
+                "n22",
+                "n23",
+                "n24",
+                "n25",
+                "n26",
+                "n27",
+                "n28",
+                "n29",
+                "n30",
+                "n31",
+                "n32",
+                "n33",
+                "n34",
+                "n35",
+                "n36",
+                "n37",
+                "n38",
+                "n39"
               ],
               "last_use_nodes": [
-                "n16"
+                "n20"
               ],
               "lifetime_class": "local_non_escape_candidate"
             },
             "y": {
               "def_nodes": [
-                "n32"
+                "n38"
               ],
               "use_nodes": [
-                "n16",
                 "n20",
-                "n22",
                 "n24",
-                "n25",
-                "n26"
+                "n26",
+                "n28",
+                "n29",
+                "n30"
               ],
               "live_in_nodes": [
                 "n10",
-                "n16",
-                "n17",
-                "n18",
-                "n19",
-                "n20",
-                "n21",
-                "n22",
-                "n23",
-                "n24",
-                "n25",
-                "n26",
-                "n27",
-                "n28",
-                "n29",
-                "n30",
-                "n31"
-              ],
-              "live_out_nodes": [
-                "n10",
-                "n17",
-                "n18",
-                "n19",
                 "n20",
                 "n21",
                 "n22",
@@ -15303,10 +16181,36 @@
                 "n29",
                 "n30",
                 "n31",
-                "n32"
+                "n32",
+                "n33",
+                "n34",
+                "n35",
+                "n36",
+                "n37"
+              ],
+              "live_out_nodes": [
+                "n10",
+                "n21",
+                "n22",
+                "n23",
+                "n24",
+                "n25",
+                "n26",
+                "n27",
+                "n28",
+                "n29",
+                "n30",
+                "n31",
+                "n32",
+                "n33",
+                "n34",
+                "n35",
+                "n36",
+                "n37",
+                "n38"
               ],
               "last_use_nodes": [
-                "n16"
+                "n20"
               ],
               "lifetime_class": "local_non_escape_candidate"
             }

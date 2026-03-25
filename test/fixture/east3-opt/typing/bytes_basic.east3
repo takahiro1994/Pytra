@@ -933,7 +933,7 @@
                       "end_lineno": 14,
                       "end_col_offset": 35
                     },
-                    "resolved_type": "int32",
+                    "resolved_type": "uint8",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "b[0]",
@@ -1148,7 +1148,7 @@
                       "end_lineno": 15,
                       "end_col_offset": 36
                     },
-                    "resolved_type": "int32",
+                    "resolved_type": "uint8",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "b[-1]",

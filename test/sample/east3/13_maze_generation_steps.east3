@@ -2358,56 +2358,11 @@
           "body": [
             {
               "kind": "Assign",
-              "source_span": {
-                "lineno": 40,
-                "col_offset": 8,
-                "end_lineno": 40,
-                "end_col_offset": 24
-              },
               "target": {
-                "kind": "Tuple",
-                "source_span": {
-                  "lineno": 40,
-                  "col_offset": 8,
-                  "end_lineno": 40,
-                  "end_col_offset": 12
-                },
-                "resolved_type": "tuple[unknown, unknown]",
-                "casts": [],
-                "borrow_kind": "value",
-                "repr": "x, y",
-                "elements": [
-                  {
-                    "kind": "Name",
-                    "source_span": {
-                      "lineno": 40,
-                      "col_offset": 8,
-                      "end_lineno": 40,
-                      "end_col_offset": 9
-                    },
-                    "resolved_type": "int64",
-                    "casts": [],
-                    "borrow_kind": "value",
-                    "repr": "x",
-                    "id": "x"
-                  },
-                  {
-                    "kind": "Name",
-                    "source_span": {
-                      "lineno": 40,
-                      "col_offset": 11,
-                      "end_lineno": 40,
-                      "end_col_offset": 12
-                    },
-                    "resolved_type": "int64",
-                    "casts": [],
-                    "borrow_kind": "value",
-                    "repr": "y",
-                    "id": "y"
-                  }
-                ]
+                "kind": "Name",
+                "id": "__tup_1",
+                "resolved_type": "tuple[int64,int64]"
               },
-              "declare": false,
               "value": {
                 "kind": "Subscript",
                 "source_span": {
@@ -2463,12 +2418,56 @@
                   }
                 }
               },
-              "type_expr_summary_v1": {
-                "schema_version": 1,
-                "kind": "GenericType",
-                "category": "static",
-                "mirror": "tuple[unknown,unknown]"
-              }
+              "declare": true,
+              "decl_type": "tuple[int64,int64]"
+            },
+            {
+              "kind": "Assign",
+              "target": {
+                "kind": "Name",
+                "id": "x",
+                "resolved_type": "int64"
+              },
+              "value": {
+                "kind": "Subscript",
+                "value": {
+                  "kind": "Name",
+                  "id": "__tup_1",
+                  "resolved_type": "tuple[int64,int64]"
+                },
+                "slice": {
+                  "kind": "Constant",
+                  "value": 0,
+                  "resolved_type": "int64"
+                },
+                "resolved_type": "int64"
+              },
+              "declare": true,
+              "decl_type": "int64"
+            },
+            {
+              "kind": "Assign",
+              "target": {
+                "kind": "Name",
+                "id": "y",
+                "resolved_type": "int64"
+              },
+              "value": {
+                "kind": "Subscript",
+                "value": {
+                  "kind": "Name",
+                  "id": "__tup_1",
+                  "resolved_type": "tuple[int64,int64]"
+                },
+                "slice": {
+                  "kind": "Constant",
+                  "value": 1,
+                  "resolved_type": "int64"
+                },
+                "resolved_type": "int64"
+              },
+              "declare": true,
+              "decl_type": "int64"
             },
             {
               "kind": "AnnAssign",
@@ -2668,56 +2667,11 @@
               "body": [
                 {
                   "kind": "Assign",
-                  "source_span": {
-                    "lineno": 43,
-                    "col_offset": 12,
-                    "end_lineno": 43,
-                    "end_col_offset": 28
-                  },
                   "target": {
-                    "kind": "Tuple",
-                    "source_span": {
-                      "lineno": 43,
-                      "col_offset": 12,
-                      "end_lineno": 43,
-                      "end_col_offset": 18
-                    },
-                    "resolved_type": "tuple[unknown, unknown]",
-                    "casts": [],
-                    "borrow_kind": "value",
-                    "repr": "dx, dy",
-                    "elements": [
-                      {
-                        "kind": "Name",
-                        "source_span": {
-                          "lineno": 43,
-                          "col_offset": 12,
-                          "end_lineno": 43,
-                          "end_col_offset": 14
-                        },
-                        "resolved_type": "int64",
-                        "casts": [],
-                        "borrow_kind": "value",
-                        "repr": "dx",
-                        "id": "dx"
-                      },
-                      {
-                        "kind": "Name",
-                        "source_span": {
-                          "lineno": 43,
-                          "col_offset": 16,
-                          "end_lineno": 43,
-                          "end_col_offset": 18
-                        },
-                        "resolved_type": "int64",
-                        "casts": [],
-                        "borrow_kind": "value",
-                        "repr": "dy",
-                        "id": "dy"
-                      }
-                    ]
+                    "kind": "Name",
+                    "id": "__tup_2",
+                    "resolved_type": "tuple[int64,int64]"
                   },
-                  "declare": false,
                   "value": {
                     "kind": "Subscript",
                     "source_span": {
@@ -2759,12 +2713,56 @@
                       "id": "k"
                     }
                   },
-                  "type_expr_summary_v1": {
-                    "schema_version": 1,
-                    "kind": "GenericType",
-                    "category": "static",
-                    "mirror": "tuple[unknown,unknown]"
-                  }
+                  "declare": true,
+                  "decl_type": "tuple[int64,int64]"
+                },
+                {
+                  "kind": "Assign",
+                  "target": {
+                    "kind": "Name",
+                    "id": "dx",
+                    "resolved_type": "int64"
+                  },
+                  "value": {
+                    "kind": "Subscript",
+                    "value": {
+                      "kind": "Name",
+                      "id": "__tup_2",
+                      "resolved_type": "tuple[int64,int64]"
+                    },
+                    "slice": {
+                      "kind": "Constant",
+                      "value": 0,
+                      "resolved_type": "int64"
+                    },
+                    "resolved_type": "int64"
+                  },
+                  "declare": true,
+                  "decl_type": "int64"
+                },
+                {
+                  "kind": "Assign",
+                  "target": {
+                    "kind": "Name",
+                    "id": "dy",
+                    "resolved_type": "int64"
+                  },
+                  "value": {
+                    "kind": "Subscript",
+                    "value": {
+                      "kind": "Name",
+                      "id": "__tup_2",
+                      "resolved_type": "tuple[int64,int64]"
+                    },
+                    "slice": {
+                      "kind": "Constant",
+                      "value": 1,
+                      "resolved_type": "int64"
+                    },
+                    "resolved_type": "int64"
+                  },
+                  "declare": true,
+                  "decl_type": "int64"
                 },
                 {
                   "kind": "Assign",
@@ -4709,86 +4707,11 @@
                 },
                 {
                   "kind": "Assign",
-                  "source_span": {
-                    "lineno": 60,
-                    "col_offset": 12,
-                    "end_lineno": 60,
-                    "end_col_offset": 32
-                  },
                   "target": {
-                    "kind": "Tuple",
-                    "source_span": {
-                      "lineno": 60,
-                      "col_offset": 12,
-                      "end_lineno": 60,
-                      "end_col_offset": 26
-                    },
-                    "resolved_type": "tuple[unknown, unknown, unknown, unknown]",
-                    "casts": [],
-                    "borrow_kind": "value",
-                    "repr": "nx, ny, wx, wy",
-                    "elements": [
-                      {
-                        "kind": "Name",
-                        "source_span": {
-                          "lineno": 60,
-                          "col_offset": 12,
-                          "end_lineno": 60,
-                          "end_col_offset": 14
-                        },
-                        "resolved_type": "int64",
-                        "casts": [],
-                        "borrow_kind": "value",
-                        "repr": "nx",
-                        "id": "nx"
-                      },
-                      {
-                        "kind": "Name",
-                        "source_span": {
-                          "lineno": 60,
-                          "col_offset": 16,
-                          "end_lineno": 60,
-                          "end_col_offset": 18
-                        },
-                        "resolved_type": "int64",
-                        "casts": [],
-                        "borrow_kind": "value",
-                        "repr": "ny",
-                        "id": "ny"
-                      },
-                      {
-                        "kind": "Name",
-                        "source_span": {
-                          "lineno": 60,
-                          "col_offset": 20,
-                          "end_lineno": 60,
-                          "end_col_offset": 22
-                        },
-                        "resolved_type": "int64",
-                        "casts": [],
-                        "borrow_kind": "value",
-                        "repr": "wx",
-                        "id": "wx",
-                        "unused": true
-                      },
-                      {
-                        "kind": "Name",
-                        "source_span": {
-                          "lineno": 60,
-                          "col_offset": 24,
-                          "end_lineno": 60,
-                          "end_col_offset": 26
-                        },
-                        "resolved_type": "int64",
-                        "casts": [],
-                        "borrow_kind": "value",
-                        "repr": "wy",
-                        "id": "wy",
-                        "unused": true
-                      }
-                    ]
+                    "kind": "Name",
+                    "id": "__tup_3",
+                    "resolved_type": "tuple[int64,int64,int64,int64]"
                   },
-                  "declare": false,
                   "value": {
                     "kind": "Name",
                     "source_span": {
@@ -4803,12 +4726,106 @@
                     "repr": "sel",
                     "id": "sel"
                   },
-                  "type_expr_summary_v1": {
-                    "schema_version": 1,
-                    "kind": "GenericType",
-                    "category": "static",
-                    "mirror": "tuple[unknown,unknown,unknown,unknown]"
-                  }
+                  "declare": true,
+                  "decl_type": "tuple[int64,int64,int64,int64]"
+                },
+                {
+                  "kind": "Assign",
+                  "target": {
+                    "kind": "Name",
+                    "id": "nx",
+                    "resolved_type": "int64"
+                  },
+                  "value": {
+                    "kind": "Subscript",
+                    "value": {
+                      "kind": "Name",
+                      "id": "__tup_3",
+                      "resolved_type": "tuple[int64,int64,int64,int64]"
+                    },
+                    "slice": {
+                      "kind": "Constant",
+                      "value": 0,
+                      "resolved_type": "int64"
+                    },
+                    "resolved_type": "int64"
+                  },
+                  "declare": true,
+                  "decl_type": "int64"
+                },
+                {
+                  "kind": "Assign",
+                  "target": {
+                    "kind": "Name",
+                    "id": "ny",
+                    "resolved_type": "int64"
+                  },
+                  "value": {
+                    "kind": "Subscript",
+                    "value": {
+                      "kind": "Name",
+                      "id": "__tup_3",
+                      "resolved_type": "tuple[int64,int64,int64,int64]"
+                    },
+                    "slice": {
+                      "kind": "Constant",
+                      "value": 1,
+                      "resolved_type": "int64"
+                    },
+                    "resolved_type": "int64"
+                  },
+                  "declare": true,
+                  "decl_type": "int64"
+                },
+                {
+                  "kind": "Assign",
+                  "target": {
+                    "kind": "Name",
+                    "id": "wx",
+                    "resolved_type": "int64"
+                  },
+                  "value": {
+                    "kind": "Subscript",
+                    "value": {
+                      "kind": "Name",
+                      "id": "__tup_3",
+                      "resolved_type": "tuple[int64,int64,int64,int64]"
+                    },
+                    "slice": {
+                      "kind": "Constant",
+                      "value": 2,
+                      "resolved_type": "int64"
+                    },
+                    "resolved_type": "int64"
+                  },
+                  "declare": true,
+                  "decl_type": "int64",
+                  "unused": true
+                },
+                {
+                  "kind": "Assign",
+                  "target": {
+                    "kind": "Name",
+                    "id": "wy",
+                    "resolved_type": "int64"
+                  },
+                  "value": {
+                    "kind": "Subscript",
+                    "value": {
+                      "kind": "Name",
+                      "id": "__tup_3",
+                      "resolved_type": "tuple[int64,int64,int64,int64]"
+                    },
+                    "slice": {
+                      "kind": "Constant",
+                      "value": 3,
+                      "resolved_type": "int64"
+                    },
+                    "resolved_type": "int64"
+                  },
+                  "declare": true,
+                  "decl_type": "int64",
+                  "unused": true
                 },
                 {
                   "kind": "Assign",

@@ -167,7 +167,7 @@
             "dynamic_name": "unknown"
           },
           "meta": {
-            "lifetime_node_id": "n9",
+            "lifetime_node_id": "n11",
             "lifetime_defs": [
               "joined"
             ],
@@ -190,56 +190,11 @@
         },
         {
           "kind": "Assign",
-          "source_span": {
-            "lineno": 6,
-            "col_offset": 4,
-            "end_lineno": 6,
-            "end_col_offset": 40
-          },
           "target": {
-            "kind": "Tuple",
-            "source_span": {
-              "lineno": 6,
-              "col_offset": 4,
-              "end_lineno": 6,
-              "end_col_offset": 13
-            },
-            "resolved_type": "tuple[unknown, unknown]",
-            "casts": [],
-            "borrow_kind": "value",
-            "repr": "root, ext",
-            "elements": [
-              {
-                "kind": "Name",
-                "source_span": {
-                  "lineno": 6,
-                  "col_offset": 4,
-                  "end_lineno": 6,
-                  "end_col_offset": 8
-                },
-                "resolved_type": "unknown",
-                "casts": [],
-                "borrow_kind": "value",
-                "repr": "root",
-                "id": "root"
-              },
-              {
-                "kind": "Name",
-                "source_span": {
-                  "lineno": 6,
-                  "col_offset": 10,
-                  "end_lineno": 6,
-                  "end_col_offset": 13
-                },
-                "resolved_type": "unknown",
-                "casts": [],
-                "borrow_kind": "value",
-                "repr": "ext",
-                "id": "ext"
-              }
-            ]
+            "kind": "Name",
+            "id": "__tup_1",
+            "resolved_type": "tuple[unknown,unknown]"
           },
-          "declare": false,
           "value": {
             "kind": "Unbox",
             "resolved_type": "tuple[unknown,unknown]",
@@ -356,17 +311,12 @@
               "value_category": "dynamic"
             }
           },
-          "type_expr_summary_v1": {
-            "schema_version": 1,
-            "kind": "GenericType",
-            "category": "static",
-            "mirror": "tuple[unknown,unknown]"
-          },
+          "declare": true,
+          "decl_type": "tuple[unknown,unknown]",
           "meta": {
-            "lifetime_node_id": "n8",
+            "lifetime_node_id": "n10",
             "lifetime_defs": [
-              "ext",
-              "root"
+              "__tup_1"
             ],
             "lifetime_uses": [
               "joined",
@@ -379,7 +329,55 @@
               "print"
             ],
             "lifetime_live_out": [
-              "ext",
+              "__tup_1",
+              "glob",
+              "joined",
+              "os",
+              "print"
+            ],
+            "lifetime_last_use_vars": []
+          }
+        },
+        {
+          "kind": "Assign",
+          "target": {
+            "kind": "Name",
+            "id": "root",
+            "resolved_type": "unknown"
+          },
+          "value": {
+            "kind": "Subscript",
+            "value": {
+              "kind": "Name",
+              "id": "__tup_1",
+              "resolved_type": "tuple[unknown,unknown]"
+            },
+            "slice": {
+              "kind": "Constant",
+              "value": 0,
+              "resolved_type": "int64"
+            },
+            "resolved_type": "unknown"
+          },
+          "declare": true,
+          "decl_type": "unknown",
+          "meta": {
+            "lifetime_node_id": "n9",
+            "lifetime_defs": [
+              "root"
+            ],
+            "lifetime_uses": [
+              "__tup_1"
+            ],
+            "lifetime_live_in": [
+              "__tup_1",
+              "glob",
+              "joined",
+              "os",
+              "print"
+            ],
+            "lifetime_live_out": [
+              "__tup_1",
               "glob",
               "joined",
               "os",
@@ -387,6 +385,58 @@
               "root"
             ],
             "lifetime_last_use_vars": []
+          }
+        },
+        {
+          "kind": "Assign",
+          "target": {
+            "kind": "Name",
+            "id": "ext",
+            "resolved_type": "unknown"
+          },
+          "value": {
+            "kind": "Subscript",
+            "value": {
+              "kind": "Name",
+              "id": "__tup_1",
+              "resolved_type": "tuple[unknown,unknown]"
+            },
+            "slice": {
+              "kind": "Constant",
+              "value": 1,
+              "resolved_type": "int64"
+            },
+            "resolved_type": "unknown"
+          },
+          "declare": true,
+          "decl_type": "unknown",
+          "meta": {
+            "lifetime_node_id": "n8",
+            "lifetime_defs": [
+              "ext"
+            ],
+            "lifetime_uses": [
+              "__tup_1"
+            ],
+            "lifetime_live_in": [
+              "__tup_1",
+              "glob",
+              "joined",
+              "os",
+              "print",
+              "root"
+            ],
+            "lifetime_live_out": [
+              "ext",
+              "glob",
+              "joined",
+              "os",
+              "print",
+              "root"
+            ],
+            "lifetime_last_use_vars": [
+              "__tup_1"
+            ]
           }
         },
         {
@@ -2045,7 +2095,7 @@
           "schema_version": "east3_lifetime_v1",
           "status": "ok",
           "reason": "",
-          "entry_node": "n9",
+          "entry_node": "n11",
           "order": [
             "n0",
             "n1",
@@ -2056,7 +2106,9 @@
             "n6",
             "n7",
             "n8",
-            "n9"
+            "n9",
+            "n10",
+            "n11"
           ],
           "cfg": [
             {
@@ -2170,12 +2222,10 @@
               "id": "n8",
               "kind": "Assign",
               "defs": [
-                "ext",
-                "root"
+                "ext"
               ],
               "uses": [
-                "joined",
-                "os"
+                "__tup_1"
               ],
               "succ": [
                 "n7"
@@ -2185,23 +2235,53 @@
               "id": "n9",
               "kind": "Assign",
               "defs": [
+                "root"
+              ],
+              "uses": [
+                "__tup_1"
+              ],
+              "succ": [
+                "n8"
+              ]
+            },
+            {
+              "id": "n10",
+              "kind": "Assign",
+              "defs": [
+                "__tup_1"
+              ],
+              "uses": [
+                "joined",
+                "os"
+              ],
+              "succ": [
+                "n9"
+              ]
+            },
+            {
+              "id": "n11",
+              "kind": "Assign",
+              "defs": [
                 "joined"
               ],
               "uses": [
                 "os"
               ],
               "succ": [
-                "n8"
+                "n10"
               ]
             }
           ],
           "def_use": {
             "defs": {
+              "__tup_1": [
+                "n10"
+              ],
               "ext": [
                 "n8"
               ],
               "joined": [
-                "n9"
+                "n11"
               ],
               "ok": [
                 "n1",
@@ -2213,10 +2293,14 @@
                 "n7"
               ],
               "root": [
-                "n8"
+                "n9"
               ]
             },
             "uses": {
+              "__tup_1": [
+                "n8",
+                "n9"
+              ],
               "ext": [
                 "n4"
               ],
@@ -2224,9 +2308,9 @@
                 "n1"
               ],
               "joined": [
+                "n10",
                 "n3",
-                "n6",
-                "n8"
+                "n6"
               ],
               "ok": [
                 "n0",
@@ -2238,11 +2322,11 @@
                 "n6"
               ],
               "os": [
+                "n10",
+                "n11",
                 "n2",
                 "n3",
-                "n6",
-                "n8",
-                "n9"
+                "n6"
               ],
               "print": [
                 "n0"
@@ -2253,6 +2337,27 @@
             }
           },
           "variables": {
+            "__tup_1": {
+              "def_nodes": [
+                "n10"
+              ],
+              "use_nodes": [
+                "n8",
+                "n9"
+              ],
+              "live_in_nodes": [
+                "n8",
+                "n9"
+              ],
+              "live_out_nodes": [
+                "n9",
+                "n10"
+              ],
+              "last_use_nodes": [
+                "n8"
+              ],
+              "lifetime_class": "local_non_escape_candidate"
+            },
             "ext": {
               "def_nodes": [
                 "n8"
@@ -2291,7 +2396,9 @@
                 "n6",
                 "n7",
                 "n8",
-                "n9"
+                "n9",
+                "n10",
+                "n11"
               ],
               "live_out_nodes": [
                 "n2",
@@ -2301,7 +2408,9 @@
                 "n6",
                 "n7",
                 "n8",
-                "n9"
+                "n9",
+                "n10",
+                "n11"
               ],
               "last_use_nodes": [
                 "n1"
@@ -2310,12 +2419,12 @@
             },
             "joined": {
               "def_nodes": [
-                "n9"
+                "n11"
               ],
               "use_nodes": [
+                "n10",
                 "n3",
-                "n6",
-                "n8"
+                "n6"
               ],
               "live_in_nodes": [
                 "n3",
@@ -2323,7 +2432,9 @@
                 "n5",
                 "n6",
                 "n7",
-                "n8"
+                "n8",
+                "n9",
+                "n10"
               ],
               "live_out_nodes": [
                 "n4",
@@ -2331,7 +2442,9 @@
                 "n6",
                 "n7",
                 "n8",
-                "n9"
+                "n9",
+                "n10",
+                "n11"
               ],
               "last_use_nodes": [
                 "n3"
@@ -2383,11 +2496,11 @@
             "os": {
               "def_nodes": [],
               "use_nodes": [
+                "n10",
+                "n11",
                 "n2",
                 "n3",
-                "n6",
-                "n8",
-                "n9"
+                "n6"
               ],
               "live_in_nodes": [
                 "n2",
@@ -2397,7 +2510,9 @@
                 "n6",
                 "n7",
                 "n8",
-                "n9"
+                "n9",
+                "n10",
+                "n11"
               ],
               "live_out_nodes": [
                 "n3",
@@ -2406,7 +2521,9 @@
                 "n6",
                 "n7",
                 "n8",
-                "n9"
+                "n9",
+                "n10",
+                "n11"
               ],
               "last_use_nodes": [
                 "n2"
@@ -2428,7 +2545,9 @@
                 "n6",
                 "n7",
                 "n8",
-                "n9"
+                "n9",
+                "n10",
+                "n11"
               ],
               "live_out_nodes": [
                 "n1",
@@ -2439,7 +2558,9 @@
                 "n6",
                 "n7",
                 "n8",
-                "n9"
+                "n9",
+                "n10",
+                "n11"
               ],
               "last_use_nodes": [
                 "n0"
@@ -2448,7 +2569,7 @@
             },
             "root": {
               "def_nodes": [
-                "n8"
+                "n9"
               ],
               "use_nodes": [
                 "n5"
@@ -2456,12 +2577,14 @@
               "live_in_nodes": [
                 "n5",
                 "n6",
-                "n7"
+                "n7",
+                "n8"
               ],
               "live_out_nodes": [
                 "n6",
                 "n7",
-                "n8"
+                "n8",
+                "n9"
               ],
               "last_use_nodes": [
                 "n5"

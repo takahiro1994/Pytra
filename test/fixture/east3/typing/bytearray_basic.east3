@@ -307,7 +307,7 @@
               "end_lineno": 9,
               "end_col_offset": 9
             },
-            "resolved_type": "int32",
+            "resolved_type": "uint8",
             "casts": [],
             "borrow_kind": "value",
             "repr": "ba[1]",
@@ -912,7 +912,7 @@
                       "end_lineno": 16,
                       "end_col_offset": 36
                     },
-                    "resolved_type": "int32",
+                    "resolved_type": "uint8",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "ba[0]",
@@ -1103,7 +1103,7 @@
                       "end_lineno": 17,
                       "end_col_offset": 36
                     },
-                    "resolved_type": "int32",
+                    "resolved_type": "uint8",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "ba[1]",
@@ -1294,7 +1294,7 @@
                       "end_lineno": 18,
                       "end_col_offset": 37
                     },
-                    "resolved_type": "int32",
+                    "resolved_type": "uint8",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "ba[-1]",

@@ -482,6 +482,133 @@ def expand_forcore_tuple_targets(module: Node, ctx: CompileContext) -> Node:
 
 
 # ===========================================================================
+# tuple unpack expansion: x, y = expr → _tmp = expr; x = _tmp[0]; y = _tmp[1]
+# ===========================================================================
+
+def _expand_tuple_unpack_in_stmts(stmts: list[JsonVal], ctx: CompileContext) -> list[JsonVal]:
+    """Expand Assign(target=Tuple, value=expr) into temp + individual assigns."""
+    result: list[JsonVal] = []
+    for stmt in stmts:
+        if not isinstance(stmt, dict):
+            result.append(stmt)
+            continue
+        kind = _sk(stmt)
+        # Recurse into block-creating statements first
+        if kind == FUNCTION_DEF or kind == CLASS_DEF:
+            body = stmt.get("body")
+            if isinstance(body, list):
+                stmt["body"] = _expand_tuple_unpack_in_stmts(body, ctx)
+            mg = stmt.get("main_guard_body")
+            if isinstance(mg, list):
+                stmt["main_guard_body"] = _expand_tuple_unpack_in_stmts(mg, ctx)
+        elif kind in (IF, WHILE, FOR, FOR_RANGE, FOR_CORE, TRY):
+            for key in ("body", "orelse", "finalbody"):
+                nested = stmt.get(key)
+                if isinstance(nested, list):
+                    stmt[key] = _expand_tuple_unpack_in_stmts(nested, ctx)
+            handlers = stmt.get("handlers")
+            if isinstance(handlers, list):
+                for h in handlers:
+                    if isinstance(h, dict):
+                        hb = h.get("body")
+                        if isinstance(hb, list):
+                            h["body"] = _expand_tuple_unpack_in_stmts(hb, ctx)
+
+        # Check for tuple unpack Assign
+        if kind != ASSIGN:
+            result.append(stmt)
+            continue
+        target = stmt.get("target")
+        if not isinstance(target, dict) or target.get("kind") != TUPLE:
+            result.append(stmt)
+            continue
+        elements = target.get("elements")
+        if not isinstance(elements, list) or len(elements) == 0:
+            result.append(stmt)
+            continue
+        value = stmt.get("value")
+
+        # Generate: _tmp = value
+        tmp_name: str = ctx.next_tuple_tmp_name()
+        val_rt = ""
+        if isinstance(value, dict):
+            val_rt = jv_str(value.get("resolved_type"))
+        tmp_assign: Node = {
+            "kind": ASSIGN,
+            "target": {"kind": NAME, "id": tmp_name, "resolved_type": val_rt},
+            "value": value,
+            "declare": True,
+            "decl_type": val_rt,
+        }
+        result.append(tmp_assign)
+
+        # Parse tuple element types from val_rt: "tuple[int64,str]" → ["int64", "str"]
+        elem_types: list[str] = _parse_tuple_element_types(val_rt)
+
+        # Generate: x = _tmp[0], y = _tmp[1], ...
+        for i, elem in enumerate(elements):
+            if not isinstance(elem, dict):
+                continue
+            elem_name = elem.get("id")
+            if not isinstance(elem_name, str) or elem_name == "":
+                continue
+            elem_rt = elem_types[i] if i < len(elem_types) else "unknown"
+            idx_node: Node = {
+                "kind": SUBSCRIPT,
+                "value": {"kind": NAME, "id": tmp_name, "resolved_type": val_rt},
+                "slice": {"kind": CONSTANT, "value": i, "resolved_type": "int64"},
+                "resolved_type": elem_rt,
+            }
+            elem_assign: Node = {
+                "kind": ASSIGN,
+                "target": {"kind": NAME, "id": elem_name, "resolved_type": elem_rt},
+                "value": idx_node,
+                "declare": True,
+                "decl_type": elem_rt,
+            }
+            result.append(elem_assign)
+
+    return result
+
+
+def _parse_tuple_element_types(rt: str) -> list[str]:
+    """Parse "tuple[int64,str,float64]" into ["int64", "str", "float64"]."""
+    if not rt.startswith("tuple[") or not rt.endswith("]"):
+        return []
+    inner = rt[6:-1]
+    parts: list[str] = []
+    depth = 0
+    cur: list[str] = []
+    for ch in inner:
+        if ch == "[":
+            depth += 1
+            cur.append(ch)
+        elif ch == "]":
+            depth -= 1
+            cur.append(ch)
+        elif ch == "," and depth == 0:
+            parts.append("".join(cur).strip())
+            cur = []
+        else:
+            cur.append(ch)
+    tail = "".join(cur).strip()
+    if tail != "":
+        parts.append(tail)
+    return parts
+
+
+def expand_tuple_unpack(module: Node, ctx: CompileContext) -> Node:
+    """Expand all Assign(target=Tuple, ...) in the module."""
+    body = module.get("body")
+    if isinstance(body, list):
+        module["body"] = _expand_tuple_unpack_in_stmts(body, ctx)
+    mg = module.get("main_guard_body")
+    if isinstance(mg, list):
+        module["main_guard_body"] = _expand_tuple_unpack_in_stmts(mg, ctx)
+    return module
+
+
+# ===========================================================================
 # enumerate lowering
 # ===========================================================================
 

@@ -53,6 +53,7 @@ from toolchain2.compile.passes import (
     lower_listcomp,
     expand_default_arguments,
     expand_forcore_tuple_targets,
+    expand_tuple_unpack,
     lower_enumerate,
     hoist_block_scope_variables,
     apply_integer_promotion,
@@ -1527,6 +1528,7 @@ def lower_east2_to_east3(east_module: Node, object_dispatch_mode: str = "") -> N
     lower_listcomp(lowered, ctx)
     expand_default_arguments(lowered, ctx)
     expand_forcore_tuple_targets(lowered, ctx)
+    expand_tuple_unpack(lowered, ctx)
     lower_enumerate(lowered, ctx)
     hoist_block_scope_variables(lowered, ctx)
     apply_integer_promotion(lowered, ctx)

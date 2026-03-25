@@ -60,6 +60,12 @@ class CompileContext:
         self.swap_counter += 1
         return name
 
+    tuple_unpack_counter: int = 0
+
+    def next_tuple_tmp_name(self) -> str:
+        self.tuple_unpack_counter += 1
+        return "__tup_" + str(self.tuple_unpack_counter)
+
 
 def jv_str(v: JsonVal) -> str:
     """JsonVal が str なら返す。それ以外は空文字。"""
