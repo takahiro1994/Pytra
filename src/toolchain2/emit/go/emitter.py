@@ -634,22 +634,38 @@ def _emit_expr_stmt(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
 
 
 def _emit_ann_assign(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
-    target = _str(node, "target")
-    rt = _str(node, "resolved_type")
+    target_val = node.get("target")
+    # Prefer decl_type over resolved_type for variable declarations
+    rt = _str(node, "decl_type")
+    if rt == "":
+        rt = _str(node, "resolved_type")
     gt = go_type(rt)
     value = node.get("value")
 
-    if target == "":
+    # target can be a string or a Name node dict
+    target_name = ""
+    if isinstance(target_val, str):
+        target_name = target_val
+    elif isinstance(target_val, dict):
+        target_name = _str(target_val, "id")
+        if target_name == "":
+            target_name = _str(target_val, "repr")
+    if target_name == "":
         tn = node.get("target_node")
         if isinstance(tn, dict):
-            target = _str(tn, "id")
-    name = _safe_go_ident(target)
+            target_name = _str(tn, "id")
+    name = _safe_go_ident(target_name)
 
     ctx.var_types[name] = rt
 
     if value is not None:
         val_code = _emit_expr(ctx, value)
-        _emit(ctx, name + " := " + val_code)
+        # Use typed declaration for numeric types to avoid Go's untyped int
+        if gt in ("int64", "int32", "int16", "int8", "uint8", "uint16", "uint32", "uint64",
+                  "float64", "float32"):
+            _emit(ctx, "var " + name + " " + gt + " = " + val_code)
+        else:
+            _emit(ctx, name + " := " + val_code)
     else:
         _emit(ctx, "var " + name + " " + gt)
 
@@ -657,6 +673,11 @@ def _emit_ann_assign(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
 def _emit_assign(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
     targets = _list(node, "targets")
     value = node.get("value")
+
+    # EAST3 may use "target" (single) or "targets" (list)
+    target_single = node.get("target")
+    if len(targets) == 0 and isinstance(target_single, dict):
+        targets = [target_single]
     if len(targets) == 0:
         return
 
@@ -672,8 +693,17 @@ def _emit_assign(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
             if gn in ctx.var_types:
                 _emit(ctx, gn + " = " + val_code)
             else:
-                ctx.var_types[gn] = _str(target_node, "resolved_type")
-                _emit(ctx, gn + " := " + val_code)
+                # Check for decl_type on the Assign node
+                decl_type = _str(node, "decl_type")
+                if decl_type == "":
+                    decl_type = _str(target_node, "resolved_type")
+                ctx.var_types[gn] = decl_type
+                gt = go_type(decl_type)
+                if gt in ("int64", "int32", "int16", "int8", "uint8", "uint16", "uint32", "uint64",
+                          "float64", "float32"):
+                    _emit(ctx, "var " + gn + " " + gt + " = " + val_code)
+                else:
+                    _emit(ctx, gn + " := " + val_code)
         elif t_kind == "Attribute":
             _emit(ctx, _emit_expr(ctx, target_node) + " = " + val_code)
         elif t_kind == "Subscript":
@@ -738,16 +768,33 @@ def _emit_while(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
 
 
 def _emit_for_core(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
+    body = _list(node, "body")
+
+    # ForCore uses iter_plan + target_plan (EAST3 lowered form)
+    iter_plan = node.get("iter_plan")
+    target_plan = node.get("target_plan")
+
+    if isinstance(iter_plan, dict):
+        ip_kind = _str(iter_plan, "kind")
+        t_name = ""
+        if isinstance(target_plan, dict):
+            t_name = _str(target_plan, "id")
+        t_name = _safe_go_ident(t_name) if t_name != "" else "_"
+
+        if ip_kind == "StaticRangeForPlan" or ip_kind == "RuntimeIterForPlan":
+            _emit_range_for(ctx, t_name, iter_plan, body)
+            return
+
+    # Fallback: legacy target/iter form
     target = node.get("target")
     iter_expr = node.get("iter")
-    body = _list(node, "body")
 
     t_name = ""
     if isinstance(target, dict):
         t_name = _str(target, "id")
         if t_name == "":
             t_name = _str(target, "repr")
-    t_name = _safe_go_ident(t_name)
+    t_name = _safe_go_ident(t_name) if t_name != "" else "_"
 
     iter_code = _emit_expr(ctx, iter_expr)
     _emit(ctx, "for _, " + t_name + " := range " + iter_code + " {")
@@ -758,31 +805,28 @@ def _emit_for_core(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
     _emit(ctx, "}")
 
 
-def _emit_runtime_iter_for(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
-    """RuntimeIterForPlan — range-based for with start/stop/step."""
-    target = node.get("target")
-    body = _list(node, "body")
-    start = node.get("start")
-    stop = node.get("stop")
-    step = node.get("step")
-
-    t_name = ""
-    if isinstance(target, dict):
-        t_name = _str(target, "id")
-        if t_name == "":
-            t_name = _str(target, "repr")
-    t_name = _safe_go_ident(t_name)
+def _emit_range_for(ctx: EmitContext, t_name: str, plan: dict[str, JsonVal], body: list[JsonVal]) -> None:
+    """Emit a range-based for loop from StaticRangeForPlan or RuntimeIterForPlan."""
+    start = plan.get("start")
+    stop = plan.get("stop")
+    step = plan.get("step")
 
     s_code = _emit_expr(ctx, start) if start is not None else "0"
     e_code = _emit_expr(ctx, stop) if stop is not None else "0"
-    step_code = _emit_expr(ctx, step) if step is not None else "1"
 
-    # Determine direction
-    step_val = step.get("value") if isinstance(step, dict) else None
-    if isinstance(step_val, int) and step_val < 0:
-        _emit(ctx, "for " + t_name + " := " + s_code + "; " + t_name + " > " + e_code + "; " + t_name + " += " + step_code + " {")
-    else:
-        _emit(ctx, "for " + t_name + " := " + s_code + "; " + t_name + " < " + e_code + "; " + t_name + " += " + step_code + " {")
+    # Determine step
+    step_code = "1"
+    step_negative = False
+    if isinstance(step, dict) and _str(step, "kind") == "Constant":
+        sv = step.get("value")
+        if isinstance(sv, int):
+            step_code = str(sv)
+            step_negative = sv < 0
+    elif step is not None:
+        step_code = _emit_expr(ctx, step)
+
+    cmp_op = " > " if step_negative else " < "
+    _emit(ctx, "for " + t_name + " := int64(" + s_code + "); " + t_name + cmp_op + e_code + "; " + t_name + " += " + step_code + " {")
     ctx.indent_level += 1
     ctx.var_types[t_name] = "int64"
     _emit_body(ctx, body)
@@ -790,8 +834,19 @@ def _emit_runtime_iter_for(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
     _emit(ctx, "}")
 
 
+def _emit_runtime_iter_for(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
+    """RuntimeIterForPlan as standalone statement (outside ForCore)."""
+    target = node.get("target")
+    body = _list(node, "body")
+    t_name = ""
+    if isinstance(target, dict):
+        t_name = _str(target, "id")
+    t_name = _safe_go_ident(t_name) if t_name != "" else "_"
+    _emit_range_for(ctx, t_name, node, body)
+
+
 def _emit_static_range_for(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
-    """StaticRangeForPlan — same as RuntimeIterForPlan."""
+    """StaticRangeForPlan as standalone statement (outside ForCore)."""
     _emit_runtime_iter_for(ctx, node)
 
 
@@ -1010,6 +1065,15 @@ def emit_go_module(east3_doc: dict[str, JsonVal]) -> str:
         ctx.indent_level += 1
         for stmt in main_guard:
             _emit_stmt(ctx, stmt)
+        ctx.indent_level -= 1
+        _emit(ctx, "}")
+
+    # Generate main() for entry module
+    if ctx.is_entry or len(main_guard) > 0:
+        _emit_blank(ctx)
+        _emit(ctx, "func main() {")
+        ctx.indent_level += 1
+        _emit(ctx, "_main_guard()")
         ctx.indent_level -= 1
         _emit(ctx, "}")
 
