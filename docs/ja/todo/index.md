@@ -34,7 +34,7 @@
 
 ### P1-GO-MIGRATE-S5: Go runtime 分解
 
-1. [ ] [ID: P1-GO-MIGRATE-S5] `runtime/go/toolchain2/pytra_runtime.go` を分解して `runtime/go/built_in/`, `runtime/go/std/` に棚卸し。PNG/GIF は `pytra/utils/{png,gif}.py` のトランスパイル結果に置き換え
+1. [ ] [ID: P1-GO-MIGRATE-S5] `runtime/go/toolchain2/pytra_runtime.go` を分解して `runtime/go/built_in/`, `runtime/go/std/` に棚卸し。PNG/GIF の手書き実装を削除し、パイプライン（link + emit）が `pytra/utils/{png,gif}.py` を自動変換するよう確認
 
 ### P1-CODE-EMITTER: CodeEmitter 基底クラス + runtime mapping
 
