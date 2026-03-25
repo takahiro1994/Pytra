@@ -19,24 +19,26 @@ from pytra.std.json import JsonVal
 _RUNTIME_CALL_MAP: dict[str, str] = {
     "int": "static_cast",
     "float": "static_cast",
+    "str": "py_to_string",
+    "bool": "static_cast",
     "len": "py_len",
-    "py_enumerate_object": "py_enumerate",
-    "py_reversed_object": "py_reversed",
-    "str.join": "py_join",
-    "str.strip": "py_strip",
-    "str.lstrip": "py_lstrip",
-    "str.rstrip": "py_rstrip",
-    "str.startswith": "py_startswith",
-    "str.endswith": "py_endswith",
-    "str.replace": "py_replace",
-    "str.find": "py_find",
-    "str.rfind": "py_rfind",
-    "str.upper": "py_upper",
-    "str.lower": "py_lower",
-    "str.split": "py_split",
-    "str.count": "py_count",
-    "str.index": "py_index",
+    # Note: py_enumerate_object/py_reversed_object are handled by de-lowering below
     "list.index": "py_list_index",
+    "pathlib.write_text": "py_write_text",
+    "pathlib.read_text": "py_read_text",
+}
+
+# str method runtime_call prefixes that should be de-lowered (removed from BuiltinCall)
+# so the emitter's selfhost fallback handles them as plain Attribute calls.
+_STR_METHOD_RUNTIME_CALLS: set[str] = {
+    "str.join", "str.strip", "str.lstrip", "str.rstrip",
+    "str.startswith", "str.endswith", "str.replace",
+    "str.find", "str.rfind", "str.upper", "str.lower",
+    "str.split", "str.count", "str.index",
+    "str.isdigit", "str.isalpha", "str.isalnum", "str.isspace",
+    "str.isupper", "str.islower", "str.title", "str.capitalize",
+    "str.zfill", "str.ljust", "str.rjust", "str.center", "str.encode",
+    "str.format",
 }
 
 # builtin_name ベースのコンストラクタ正規化
@@ -44,6 +46,12 @@ _CTOR_MAP: dict[str, str] = {
     "bytearray": "bytearray_ctor",
     "bytes": "bytes_ctor",
     "set": "set_ctor",
+}
+
+
+# BuiltinCalls that should be de-lowered (emitter doesn't have handlers)
+_DELOWER_BUILTIN_CALLS: set[str] = {
+    "type", "sum", "py_list_index", "list.insert",
 }
 
 
@@ -64,9 +72,14 @@ _BUILTIN_CALL_NAMES: set[str] = {
     "round", "divmod", "pow",
 }
 
-# Method names that should be lowered to BuiltinCall
+# Method names that should NOT be lowered to BuiltinCall.
+# These are handled by the emitter's selfhost fallback or native C++ method calls.
+# Only container mutation methods (append/extend/insert/pop/etc) need BuiltinCall lowering
+# because the emitter dispatches them via runtime_call, not C++ method syntax.
+
+# Method names that SHOULD be lowered to BuiltinCall (emitter expects these as BuiltinCall)
 _BUILTIN_METHOD_LOWER: dict[str, str] = {
-    # list methods
+    # list mutation methods — emitter routes via BuiltinCall
     "append": "list.append",
     "extend": "list.extend",
     "insert": "list.insert",
@@ -75,31 +88,12 @@ _BUILTIN_METHOD_LOWER: dict[str, str] = {
     "clear": "list.clear",
     "sort": "list.sort",
     "reverse": "list.reverse",
-    "index": "list.index",
-    "count": "list.count",
-    # dict methods
-    "get": "dict.get",
-    "items": "dict.items",
-    "keys": "dict.keys",
-    "values": "dict.values",
-    # set methods
+    # set mutation
     "add": "set.add",
     "discard": "set.discard",
-    # str methods
-    "join": "str.join",
-    "strip": "str.strip",
-    "lstrip": "str.lstrip",
-    "rstrip": "str.rstrip",
-    "startswith": "str.startswith",
-    "endswith": "str.endswith",
-    "replace": "str.replace",
-    "find": "str.find",
-    "rfind": "str.rfind",
-    "split": "str.split",
-    "upper": "str.upper",
-    "lower": "str.lower",
-    "count": "str.count",
-    "format": "str.format",
+    # pathlib methods
+    "write_text": "pathlib.write_text",
+    "read_text": "pathlib.read_text",
 }
 
 
@@ -111,10 +105,26 @@ def _walk(node: JsonVal) -> None:
 
         if kind == "Call":
             if lk == "BuiltinCall":
-                # Already a BuiltinCall: normalize runtime_call
                 rc = node.get("runtime_call")
                 bn = node.get("builtin_name")
-                if isinstance(rc, str) and rc in _RUNTIME_CALL_MAP:
+                # De-lower str method BuiltinCalls: emitter selfhost fallback
+                # handles them better as plain Attribute calls.
+                if isinstance(rc, str) and rc in _STR_METHOD_RUNTIME_CALLS:
+                    node["lowered_kind"] = ""
+                    node["runtime_call"] = ""
+                # enumerate/reversed: keep runtime_call for for-stmt detection
+                # but remove BuiltinCall lowering since the BuiltinCall handler
+                # doesn't know these — the for-stmt handler reads runtime_call.
+                elif isinstance(rc, str) and rc in (
+                    "py_enumerate_object", "py_reversed_object",
+                ):
+                    node["lowered_kind"] = ""
+                    node["runtime_call"] = "py_enumerate" if "enumerate" in rc else "py_reversed"
+                # type/sum/etc: emitter doesn't have BuiltinCall handlers for these.
+                # De-lower so they become regular function calls.
+                elif isinstance(rc, str) and rc in _DELOWER_BUILTIN_CALLS:
+                    node["lowered_kind"] = ""
+                elif isinstance(rc, str) and rc in _RUNTIME_CALL_MAP:
                     node["runtime_call"] = _RUNTIME_CALL_MAP[rc]
                 elif isinstance(bn, str) and bn in _CTOR_MAP:
                     if isinstance(rc, str) and (rc == bn or rc == ""):

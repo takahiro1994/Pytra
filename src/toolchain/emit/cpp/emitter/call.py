@@ -912,8 +912,11 @@ class CppCallEmitter:
             return None
         src = self.any_dict_get_str(self.doc, "source_path", "")
         # Restrict fallback to known selfhost bootstrap sources and linked docs.
+        meta = self.any_to_dict_or_empty(self.doc.get("meta"))
+        is_linked = isinstance(meta.get("linked_program_v1"), dict)
         if not (
             src == ""  # リンク済み doc（global optimizer が source_path を "" にセットする）
+            or is_linked  # toolchain2 linked doc（linked_program_v1 を持つ）
             or src.endswith("/selfhost/py2cpp.py")
             or src.endswith("/src/toolchain/emit/cpp/cli.py")
             or src.endswith("/src/pytra-cli.py")
