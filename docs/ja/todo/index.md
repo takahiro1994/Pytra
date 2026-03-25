@@ -42,6 +42,7 @@
 ### P1-CODE-EMITTER: CodeEmitter 基底クラス + runtime mapping
 
 文脈: `docs/ja/plans/plan-pipeline-redesign.md` §3.4
+必読: [docs/ja/spec/spec-emitter-guide.md](../spec/spec-emitter-guide.md)
 
 1. [ ] [ID: P1-CODE-EMITTER-S1] `toolchain2/emit/common/code_emitter.py` に CodeEmitter 基底クラスを実装
 2. [ ] [ID: P1-CODE-EMITTER-S2] Go runtime mapping（`src/runtime/go/toolchain2/mapping.json`）を作成
