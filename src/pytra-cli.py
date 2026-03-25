@@ -109,11 +109,14 @@ def _build_go_via_toolchain2(
     if result.returncode != 0:
         return result.returncode
 
-    # Copy runtime
+    # Copy all runtime .go files (flattened into emit_dir for Go)
+    import os as _os_walk
     import shutil as _shutil
-    runtime_src = src_dir + "/runtime/go/pytra_runtime.go"
-    if Path(runtime_src).exists():
-        _shutil.copy(runtime_src, emit_dir + "/pytra_runtime.go")
+    runtime_root = src_dir + "/runtime/go"
+    for _dirpath, _dirnames, _filenames in _os_walk.walk(runtime_root):
+        for _fn in _filenames:
+            if _fn.endswith(".go"):
+                _shutil.copy(_dirpath + "/" + _fn, emit_dir + "/" + _fn)
 
     if single_output != "":
         entry_stem = Path(input_file).stem

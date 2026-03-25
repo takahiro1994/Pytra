@@ -45,7 +45,7 @@
 
 必読: [docs/ja/spec/spec-emitter-guide.md](../spec/spec-emitter-guide.md)
 
-1. [ ] [ID: P1-GO-MIGRATE-S5] `runtime/go/toolchain2/pytra_runtime.go` を分解して `runtime/go/built_in/`, `runtime/go/std/` に棚卸し。PNG/GIF の手書き実装を削除し、パイプライン（link + emit）が `pytra/utils/{png,gif}.py` を自動変換するよう確認
+1. [x] [ID: P1-GO-MIGRATE-S5] runtime 分解: `built_in/py_runtime.go` + `std/{time,math,pathlib}_native.go` + `utils/{png,gif}_native.go` — 完了（18/18 維持）。PNG/GIF パイプライン自動変換は emitter の bytes 型対応後
 
 ### P1-CODE-EMITTER: CodeEmitter 基底クラス + runtime mapping
 

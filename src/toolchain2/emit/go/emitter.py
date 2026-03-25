@@ -911,10 +911,15 @@ def _emit_expr_stmt(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
     value = node.get("value")
     if not isinstance(value, dict):
         return
+    # String constant at statement level → module docstring, emit as comment
+    if _str(value, "kind") == "Constant" and isinstance(value.get("value"), str):
+        doc_text = value.get("value")
+        if isinstance(doc_text, str) and doc_text.strip() != "":
+            for line in doc_text.strip().split("\n"):
+                _emit(ctx, "// " + line)
+        return
     code = _emit_expr(ctx, value)
     if code != "":
-        # discard_result on void functions: just call, don't assign
-        # Only use _ = for non-void expressions
         _emit(ctx, code)
 
 
@@ -1495,7 +1500,9 @@ def emit_go_module(east3_doc: dict[str, JsonVal]) -> str:
     if module_id == "" and lp:
         module_id = _str(lp, "module_id")
 
-    # Skip runtime modules (provided by pytra_runtime.go)
+    # Skip runtime modules provided by hand-written native files.
+    # pytra.utils.* is skipped for now (hand-written native in utils/).
+    # TODO: When emitter handles bytes ops, switch to pipeline-generated code.
     if module_id.startswith("pytra.built_in.") or module_id.startswith("pytra.std.") or module_id.startswith("pytra.utils.") or module_id.startswith("pytra.core."):
         return ""
 
