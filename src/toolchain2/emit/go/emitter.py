@@ -254,6 +254,17 @@ def _emit_binop(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
         elif on == "right":
             right_code = gt + "(" + right_code + ")"
 
+    # List multiplication: [0] * N → make([]T, N)
+    if op == "Mult":
+        left_node = node.get("left")
+        right_node = node.get("right")
+        if isinstance(left_node, dict) and _str(left_node, "kind") == "List":
+            gt_list = go_type(rt)
+            return "make(" + gt_list + ", " + right_code + ")"
+        if isinstance(right_node, dict) and _str(right_node, "kind") == "List":
+            gt_list = go_type(rt)
+            return "make(" + gt_list + ", " + left_code + ")"
+
     # Integer division
     if op == "Div" and rt in ("int64", "int32", "int", "int8", "int16", "uint8"):
         return "(" + left_code + " / " + right_code + ")"
@@ -679,6 +690,11 @@ def _emit_ifexp(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
     orelse = _emit_expr(ctx, node.get("orelse"))
     rt = _str(node, "resolved_type")
     if rt in ("int64", "int32", "int", "uint8"):
+        # Ensure test is bool (int→bool: != 0)
+        test_node = node.get("test")
+        test_rt = _str(test_node, "resolved_type") if isinstance(test_node, dict) else ""
+        if test_rt in ("int64", "int32", "int", "uint8"):
+            test = "(" + test + " != 0)"
         return "__pytra_ternary_int(" + test + ", " + body + ", " + orelse + ")"
     if rt in ("float64", "float32"):
         return "__pytra_ternary_float(" + test + ", " + body + ", " + orelse + ")"
@@ -964,7 +980,14 @@ def _emit_return(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
 
 
 def _emit_if(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
-    test = _emit_expr(ctx, node.get("test"))
+    test_node = node.get("test")
+    test = _emit_expr(ctx, test_node)
+    # Go requires bool in if condition; int→bool: != 0
+    test_rt = _str(test_node, "resolved_type") if isinstance(test_node, dict) else ""
+    if test_rt in ("int64", "int32", "int", "uint8"):
+        test = "(" + test + " != 0)"
+    elif test_rt.startswith("list[") or test_rt in ("str", "bytes", "bytearray"):
+        test = "len(" + test + ") > 0"
     _emit(ctx, "if " + test + " {")
     ctx.indent_level += 1
     _emit_body(ctx, _list(node, "body"))
@@ -985,7 +1008,13 @@ def _emit_if(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
 
 
 def _emit_while(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
-    test = _emit_expr(ctx, node.get("test"))
+    test_node = node.get("test")
+    test = _emit_expr(ctx, test_node)
+    test_rt = _str(test_node, "resolved_type") if isinstance(test_node, dict) else ""
+    if test_rt in ("int64", "int32", "int", "uint8"):
+        test = "(" + test + " != 0)"
+    elif test_rt.startswith("list[") or test_rt in ("str", "bytes", "bytearray"):
+        test = "len(" + test + ") > 0"
     _emit(ctx, "for " + test + " {")
     ctx.indent_level += 1
     _emit_body(ctx, _list(node, "body"))

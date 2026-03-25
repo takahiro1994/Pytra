@@ -392,15 +392,17 @@ func _writePNGChunk(buf *bytes.Buffer, chunkType string, data []byte) {
 // GIF writer (minimal)
 // ---------------------------------------------------------------------------
 
-func __pytra_grayscale_palette() [][]byte {
-	pal := make([][]byte, 256)
+func __pytra_grayscale_palette() []byte {
+	pal := make([]byte, 256*3)
 	for i := 0; i < 256; i++ {
-		pal[i] = []byte{byte(i), byte(i), byte(i)}
+		pal[i*3] = byte(i)
+		pal[i*3+1] = byte(i)
+		pal[i*3+2] = byte(i)
 	}
 	return pal
 }
 
-func __pytra_save_gif(path string, width int64, height int64, frames [][]byte, palette [][]byte, args ...int64) {
+func __pytra_save_gif(path string, width int64, height int64, frames [][]byte, palette []byte, args ...int64) {
 	delay_cs := int64(4)
 	if len(args) > 0 {
 		delay_cs = args[0]
@@ -411,7 +413,8 @@ func __pytra_save_gif(path string, width int64, height int64, frames [][]byte, p
 	}
 	w := int(width)
 	h := int(height)
-	palSize := len(palette)
+	palSize := len(palette) / 3
+	if palSize > 256 { palSize = 256 }
 
 	var buf bytes.Buffer
 	// GIF89a header
@@ -434,7 +437,7 @@ func __pytra_save_gif(path string, width int64, height int64, frames [][]byte, p
 	tableSize := 1 << (gctBits + 1)
 	for i := 0; i < tableSize; i++ {
 		if i < palSize {
-			buf.Write(palette[i])
+			buf.Write(palette[i*3 : i*3+3])
 		} else {
 			buf.Write([]byte{0, 0, 0})
 		}
