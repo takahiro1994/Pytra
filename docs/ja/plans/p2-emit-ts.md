@@ -39,11 +39,22 @@ function escape_count(cx: number, cy: number, max_iter: number): number {
 
 ### 2. TypeScript らしい出力
 
-- `interface` / `class` の型定義を出力
-- `const` / `let` の使い分け（再代入しない変数は `const`）
-- アロー関数が適切な場面ではアロー関数を使う（lambda 等）
-- `strict` mode を前提とした出力（`strictNullChecks` 対応）
-- import は `.ts` 拡張子なし or `.js` 拡張子（TypeScript の規約に従う）
+- **ジェネリクス**: EAST の `@template` → `function min<T>(a: T, b: T): T`
+- **`const` / `let`**: EAST の `arg_usage: readonly` で判定。再代入しない変数は `const`
+- **discriminated union**: EAST の nominal ADT → TS の discriminated union
+  ```typescript
+  type Maybe = { kind: "just"; value: number } | { kind: "nothing" };
+  ```
+- **union 型**: EAST の `UnionType` → `string | number`
+- **optional 型**: EAST の `OptionalType` → `string | null`
+- **型エイリアス**: Python の `type Scalar = int | float` → `type Scalar = number`
+- **enum**: Python の `IntEnum` / `Enum` → TS の `enum`
+- **interface / class**: dataclass → `interface`（データ構造）、メソッド付き → `class`
+- **private / readonly**: クラスフィールドに適切なアクセス修飾子
+- **`??` / `?.`**: None チェックパターン → nullish coalescing / optional chaining
+- **アロー関数**: lambda → `(x) => x * 2`
+- **strict mode**: `strictNullChecks` 対応を前提とした出力
+- **import**: `.ts` 拡張子なし or `.js` 拡張子（TypeScript の規約に従う）
 
 ## JS との関係
 
