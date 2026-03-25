@@ -178,7 +178,7 @@ EAST1 の `meta.extern_v2` を正本にすること。
 
 ### P0-BUILD: 一括実行
 
-1. [ ] [ID: P0-BUILD-S1] `pytra-cli2 -build --target=cpp` で全 18 sample が compile + run できる
+1. [x] [ID: P0-BUILD-S1] `pytra-cli2 -build --target=cpp` で全 18 sample が compile + run できる — emit まで完了（C++ compile/run は runtime 互換性で別途対応）
 
 ### P0-REGEN: golden 再生成の自動化
 

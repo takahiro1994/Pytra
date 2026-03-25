@@ -598,8 +598,149 @@ def cmd_emit(args: list[str]) -> int:
 # ---------------------------------------------------------------------------
 
 def cmd_build(args: list[str]) -> int:
-    print("error: -build is not yet implemented")
-    return 1
+    """build サブコマンド: .py → target (parse→resolve→compile→optimize→link→emit 一括実行)"""
+    inputs: list[str] = []
+    output_dir_text = ""
+    target = "cpp"
+
+    i = 0
+    while i < len(args):
+        tok = args[i]
+        if tok == "-o" or tok == "--output-dir":
+            if i + 1 >= len(args):
+                print("error: missing value for " + tok)
+                return 1
+            output_dir_text = args[i + 1]
+            i += 2
+            continue
+        if tok == "--target":
+            if i + 1 >= len(args):
+                print("error: missing value for --target")
+                return 1
+            target = args[i + 1]
+            i += 2
+            continue
+        if tok == "-h" or tok == "--help":
+            print("usage: pytra-cli2 -build INPUT.py [-o OUTPUT_DIR] [--target TARGET]")
+            return 0
+        if not tok.startswith("-"):
+            inputs.append(tok)
+        i += 1
+
+    if len(inputs) == 0:
+        print("error: at least one input .py file is required")
+        return 1
+
+    if target != "cpp":
+        print("error: only --target=cpp is currently supported")
+        return 1
+
+    try:
+        return _build_pipeline(inputs, output_dir_text, target)
+    except Exception as e:
+        print("error: build failed: " + str(e))
+        return 1
+
+
+def _build_pipeline(inputs: list[str], output_dir_text: str, target: str) -> int:
+    """Run the full build pipeline in-memory."""
+    from toolchain2.parse.py.parse_python import parse_python_file
+    from toolchain2.resolve.py.resolver import resolve_east1_to_east2
+    from toolchain2.resolve.py.builtin_registry import load_builtin_registry
+    from toolchain2.compile.lower import lower_east2_to_east3
+    from toolchain2.optimize.optimizer import optimize_east3_document
+    from toolchain2.link.linker import link_modules
+    from toolchain.emit.cpp.emitter.multifile_writer import write_multi_file_cpp
+
+    # 1. Parse
+    east1_docs: list[tuple[str, dict]] = []
+    for inp in inputs:
+        p = Path(inp)
+        if not p.exists():
+            print("error: file not found: " + inp)
+            return 1
+        east1_doc = parse_python_file(str(p))
+        if not isinstance(east1_doc, dict):
+            print("error: parse failed: " + inp)
+            return 1
+        east1_docs.append((inp, east1_doc))
+    print("build: parsed " + str(len(east1_docs)) + " files")
+
+    # 2. Resolve
+    builtins_path = Path("test/builtin/east1/py/builtins.py.east1")
+    containers_path = Path("test/builtin/east1/py/containers.py.east1")
+    stdlib_dir = Path("test/stdlib/east1/py")
+    registry = load_builtin_registry(builtins_path, containers_path, stdlib_dir)
+
+    east2_docs: list[tuple[str, dict]] = []
+    for inp, east1_doc in east1_docs:
+        from toolchain2.common.jv import deep_copy_json
+        east2_doc = deep_copy_json(east1_doc)
+        if not isinstance(east2_doc, dict):
+            print("error: invalid east1 document: " + inp)
+            return 1
+        resolve_east1_to_east2(east2_doc, registry=registry)
+        east2_docs.append((inp, east2_doc))
+    print("build: resolved " + str(len(east2_docs)) + " files")
+
+    # 3. Compile
+    east3_docs: list[tuple[str, dict]] = []
+    for inp, east2_doc in east2_docs:
+        east3_doc = lower_east2_to_east3(east2_doc)
+        east3_docs.append((inp, east3_doc))
+    print("build: compiled " + str(len(east3_docs)) + " files")
+
+    # 4. Optimize
+    east3_opt_docs: list[tuple[str, dict]] = []
+    for inp, east3_doc in east3_docs:
+        east3_opt, _report = optimize_east3_document(east3_doc, opt_level=1)
+        east3_opt_docs.append((inp, east3_opt))
+    print("build: optimized " + str(len(east3_opt_docs)) + " files")
+
+    # 5. Link — write east3-opt to temp files for link_modules
+    work_dir = Path("work/tmp/build_" + Path(inputs[0]).stem)
+    east3_opt_dir = work_dir / "east3-opt"
+    east3_opt_dir.mkdir(parents=True, exist_ok=True)
+
+    east3_opt_paths: list[str] = []
+    for inp, east3_opt_doc in east3_opt_docs:
+        stem = Path(inp).stem
+        out_path = east3_opt_dir / (stem + ".east3")
+        out_path.write_text(
+            json.dumps(east3_opt_doc, ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+        )
+        east3_opt_paths.append(str(out_path))
+
+    link_result = link_modules(east3_opt_paths, target=target, dispatch_mode="native")
+    print("build: linked " + str(len(link_result.linked_modules)) + " modules")
+
+    # 6. Emit
+    if output_dir_text == "":
+        output_dir_text = str(work_dir / "emit" / target)
+    output_dir = Path(output_dir_text)
+
+    module_east_map: dict[str, dict] = {}
+    entry_path = Path("")
+    for m in link_result.linked_modules:
+        mp = Path(m.source_path) if m.source_path != "" else Path(m.module_id + ".py")
+        module_east_map[str(mp)] = m.east_doc
+        if m.is_entry:
+            entry_path = mp
+
+    if str(entry_path) == "":
+        print("error: no entry module found")
+        return 1
+
+    write_multi_file_cpp(
+        entry_path, module_east_map, output_dir,
+        negative_index_mode="const_only", bounds_check_mode="off",
+        floor_div_mode="native", mod_mode="native", int_width="64",
+        str_index_mode="native", str_slice_mode="byte",
+        opt_level="2", top_namespace="", emit_main=True,
+    )
+    print("build: emitted to " + str(output_dir))
+    return 0
 
 
 # ---------------------------------------------------------------------------
