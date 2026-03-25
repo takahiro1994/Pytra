@@ -431,7 +431,7 @@
               "end_lineno": 23,
               "end_col": 26
             },
-            "resolved_type": "unknown",
+            "resolved_type": "bytes",
             "casts": [],
             "borrow_kind": "value",
             "repr": "bytes()",
@@ -498,7 +498,7 @@
               "end_lineno": 24,
               "end_col": 36
             },
-            "resolved_type": "unknown",
+            "resolved_type": "bytes",
             "casts": [],
             "borrow_kind": "value",
             "repr": "bytes([1, 2, 3])",

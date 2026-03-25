@@ -83,7 +83,7 @@
               "end_lineno": 7,
               "end_col": 43
             },
-            "resolved_type": "unknown",
+            "resolved_type": "bytearray",
             "casts": [],
             "borrow_kind": "value",
             "repr": "bytearray([10, 20, 30])",

@@ -117,76 +117,38 @@
             "name": "bytearray"
           },
           "value": {
-            "kind": "Unbox",
-            "resolved_type": "bytearray",
-            "borrow_kind": "value",
-            "casts": [],
-            "value": {
-              "kind": "Call",
-              "source_span": {
-                "lineno": 9,
-                "col_offset": 24,
-                "end_lineno": 9,
-                "end_col_offset": 35
-              },
-              "resolved_type": "unknown",
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "bytearray()",
-              "func": {
-                "kind": "Name",
-                "source_span": {
-                  "lineno": 9,
-                  "col_offset": 24,
-                  "end_lineno": 9,
-                  "end_col_offset": 33
-                },
-                "resolved_type": "unknown",
-                "casts": [],
-                "borrow_kind": "value",
-                "repr": "bytearray",
-                "id": "bytearray"
-              },
-              "args": [],
-              "keywords": [],
-              "type_expr_summary_v1": {
-                "schema_version": 1,
-                "kind": "DynamicType",
-                "category": "dynamic",
-                "mirror": "unknown",
-                "dynamic_name": "unknown"
-              }
-            },
+            "kind": "Call",
             "source_span": {
               "lineno": 9,
               "col_offset": 24,
               "end_lineno": 9,
               "end_col_offset": 35
             },
+            "resolved_type": "bytearray",
+            "casts": [],
+            "borrow_kind": "value",
             "repr": "bytearray()",
+            "func": {
+              "kind": "Name",
+              "source_span": {
+                "lineno": 9,
+                "col_offset": 24,
+                "end_lineno": 9,
+                "end_col_offset": 33
+              },
+              "resolved_type": "unknown",
+              "casts": [],
+              "borrow_kind": "value",
+              "repr": "bytearray",
+              "id": "bytearray"
+            },
+            "args": [],
+            "keywords": [],
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",
               "category": "static",
               "mirror": "bytearray"
-            },
-            "target": "bytearray",
-            "on_fail": "raise",
-            "bridge_lane_v1": {
-              "schema_version": 1,
-              "target": {
-                "kind": "NamedType",
-                "category": "static",
-                "mirror": "bytearray"
-              },
-              "target_category": "static",
-              "value": {
-                "kind": "DynamicType",
-                "category": "dynamic",
-                "mirror": "unknown",
-                "dynamic_name": "unknown"
-              },
-              "value_category": "dynamic"
             }
           },
           "type_expr_summary_v1": {

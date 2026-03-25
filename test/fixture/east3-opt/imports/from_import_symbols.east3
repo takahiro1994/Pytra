@@ -196,6 +196,7 @@
               "bytearray",
               "floor",
               "int",
+              "len",
               "msqrt",
               "perf_counter",
               "print",
@@ -208,6 +209,7 @@
               "bytearray",
               "floor",
               "int",
+              "len",
               "msqrt",
               "perf_counter",
               "print",
@@ -275,6 +277,7 @@
               "bytearray",
               "floor",
               "int",
+              "len",
               "msqrt",
               "perf_counter",
               "print",
@@ -288,6 +291,7 @@
               "bytearray",
               "floor",
               "int",
+              "len",
               "msqrt",
               "out_path",
               "perf_counter",
@@ -317,13 +321,14 @@
               "end_lineno": 12,
               "end_col_offset": 10
             },
-            "resolved_type": "unknown",
+            "resolved_type": "bytearray",
             "casts": [],
             "borrow_kind": "value",
             "repr": "pixels",
             "id": "pixels"
           },
           "declare": true,
+          "decl_type": "bytearray",
           "declare_init": true,
           "value": {
             "kind": "Call",
@@ -333,7 +338,7 @@
               "end_lineno": 12,
               "end_col_offset": 61
             },
-            "resolved_type": "unknown",
+            "resolved_type": "bytearray",
             "casts": [],
             "borrow_kind": "value",
             "repr": "bytearray([0, 0, 0, 255, 255, 255, 32, 64, 128])",
@@ -497,18 +502,16 @@
             "keywords": [],
             "type_expr_summary_v1": {
               "schema_version": 1,
-              "kind": "DynamicType",
-              "category": "dynamic",
-              "mirror": "unknown",
-              "dynamic_name": "unknown"
+              "kind": "NamedType",
+              "category": "static",
+              "mirror": "bytearray"
             }
           },
           "type_expr_summary_v1": {
             "schema_version": 1,
-            "kind": "DynamicType",
-            "category": "dynamic",
-            "mirror": "unknown",
-            "dynamic_name": "unknown"
+            "kind": "NamedType",
+            "category": "static",
+            "mirror": "bytearray"
           },
           "meta": {
             "lifetime_node_id": "n8",
@@ -522,6 +525,7 @@
               "bytearray",
               "floor",
               "int",
+              "len",
               "msqrt",
               "out_path",
               "perf_counter",
@@ -535,6 +539,7 @@
             "lifetime_live_out": [
               "floor",
               "int",
+              "len",
               "msqrt",
               "out_path",
               "perf_counter",
@@ -636,9 +641,9 @@
                   "end_lineno": 13,
                   "end_col_offset": 40
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bytearray",
                 "casts": [],
-                "borrow_kind": "value",
+                "borrow_kind": "readonly_ref",
                 "repr": "pixels",
                 "id": "pixels"
               }
@@ -668,6 +673,7 @@
             "lifetime_live_in": [
               "floor",
               "int",
+              "len",
               "msqrt",
               "out_path",
               "perf_counter",
@@ -682,6 +688,7 @@
             "lifetime_live_out": [
               "floor",
               "int",
+              "len",
               "msqrt",
               "perf_counter",
               "pixels",
@@ -791,6 +798,7 @@
             "lifetime_live_in": [
               "floor",
               "int",
+              "len",
               "msqrt",
               "perf_counter",
               "pixels",
@@ -803,6 +811,7 @@
             "lifetime_live_out": [
               "floor",
               "int",
+              "len",
               "msqrt",
               "pixels",
               "print",
@@ -906,6 +915,7 @@
             "lifetime_live_in": [
               "floor",
               "int",
+              "len",
               "msqrt",
               "pixels",
               "print",
@@ -918,6 +928,7 @@
             "lifetime_live_out": [
               "floor",
               "int",
+              "len",
               "msqrt",
               "pixels",
               "print",
@@ -1190,6 +1201,7 @@
             "lifetime_live_in": [
               "floor",
               "int",
+              "len",
               "msqrt",
               "pixels",
               "print",
@@ -1203,6 +1215,7 @@
             "lifetime_live_out": [
               "floor",
               "int",
+              "len",
               "pixels",
               "print",
               "py_assert_all",
@@ -1476,6 +1489,7 @@
             "lifetime_live_in": [
               "floor",
               "int",
+              "len",
               "pixels",
               "print",
               "py_assert_all",
@@ -1486,6 +1500,7 @@
               "t1"
             ],
             "lifetime_live_out": [
+              "len",
               "pixels",
               "print",
               "py_assert_all",
@@ -1739,6 +1754,7 @@
               "t1"
             ],
             "lifetime_live_in": [
+              "len",
               "pixels",
               "print",
               "py_assert_all",
@@ -1749,6 +1765,7 @@
               "t1"
             ],
             "lifetime_live_out": [
+              "len",
               "pixels",
               "print",
               "py_assert_all",
@@ -1839,31 +1856,55 @@
                 },
                 "args": [
                   {
-                    "kind": "ObjLen",
-                    "resolved_type": "int64",
-                    "borrow_kind": "value",
-                    "casts": [],
-                    "value": {
-                      "kind": "Name",
-                      "source_span": {
-                        "lineno": 19,
-                        "col_offset": 36,
-                        "end_lineno": 19,
-                        "end_col_offset": 42
-                      },
-                      "resolved_type": "unknown",
-                      "casts": [],
-                      "borrow_kind": "value",
-                      "repr": "pixels",
-                      "id": "pixels"
-                    },
+                    "kind": "Call",
                     "source_span": {
                       "lineno": 19,
                       "col_offset": 32,
                       "end_lineno": 19,
                       "end_col_offset": 43
                     },
+                    "resolved_type": "int64",
+                    "casts": [],
+                    "borrow_kind": "value",
                     "repr": "len(pixels)",
+                    "func": {
+                      "kind": "Name",
+                      "source_span": {
+                        "lineno": 19,
+                        "col_offset": 32,
+                        "end_lineno": 19,
+                        "end_col_offset": 35
+                      },
+                      "resolved_type": "unknown",
+                      "casts": [],
+                      "borrow_kind": "value",
+                      "repr": "len",
+                      "id": "len"
+                    },
+                    "args": [
+                      {
+                        "kind": "Name",
+                        "source_span": {
+                          "lineno": 19,
+                          "col_offset": 36,
+                          "end_lineno": 19,
+                          "end_col_offset": 42
+                        },
+                        "resolved_type": "bytearray",
+                        "casts": [],
+                        "borrow_kind": "readonly_ref",
+                        "repr": "pixels",
+                        "id": "pixels"
+                      }
+                    ],
+                    "keywords": [],
+                    "lowered_kind": "BuiltinCall",
+                    "builtin_name": "len",
+                    "runtime_call": "len",
+                    "runtime_module_id": "pytra.core.py_runtime",
+                    "runtime_symbol": "len",
+                    "runtime_call_adapter_kind": "builtin",
+                    "semantic_tag": "core.len",
                     "type_expr_summary_v1": {
                       "schema_version": 1,
                       "kind": "NamedType",
@@ -1948,11 +1989,13 @@
             "lifetime_node_id": "n1",
             "lifetime_defs": [],
             "lifetime_uses": [
+              "len",
               "pixels",
               "py_assert_eq",
               "results"
             ],
             "lifetime_live_in": [
+              "len",
               "pixels",
               "print",
               "py_assert_all",
@@ -1965,6 +2008,7 @@
               "results"
             ],
             "lifetime_last_use_vars": [
+              "len",
               "pixels",
               "py_assert_eq"
             ]
@@ -2159,6 +2203,7 @@
               "kind": "Expr",
               "defs": [],
               "uses": [
+                "len",
                 "pixels",
                 "py_assert_eq",
                 "results"
@@ -2313,6 +2358,9 @@
                 "n3",
                 "n4"
               ],
+              "len": [
+                "n1"
+              ],
               "msqrt": [
                 "n4"
               ],
@@ -2435,6 +2483,39 @@
               ],
               "last_use_nodes": [
                 "n3"
+              ],
+              "lifetime_class": "local_non_escape_candidate"
+            },
+            "len": {
+              "def_nodes": [],
+              "use_nodes": [
+                "n1"
+              ],
+              "live_in_nodes": [
+                "n1",
+                "n2",
+                "n3",
+                "n4",
+                "n5",
+                "n6",
+                "n7",
+                "n8",
+                "n9",
+                "n10"
+              ],
+              "live_out_nodes": [
+                "n2",
+                "n3",
+                "n4",
+                "n5",
+                "n6",
+                "n7",
+                "n8",
+                "n9",
+                "n10"
+              ],
+              "last_use_nodes": [
+                "n1"
               ],
               "lifetime_class": "local_non_escape_candidate"
             },

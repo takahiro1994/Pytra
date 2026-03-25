@@ -528,6 +528,15 @@ def _emit_builtin_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
             if len(arg_strs) >= 1:
                 return owner + "[" + arg_strs[0] + "] = struct{}{}"
 
+    # list.pop
+    if rc == "list.pop":
+        func = node.get("func")
+        if isinstance(func, dict):
+            owner = _emit_expr(ctx, func.get("value"))
+            if len(arg_strs) >= 1:
+                return "__pytra_list_pop(&" + owner + ", " + arg_strs[0] + ")"
+            return "__pytra_list_pop(&" + owner + ")"
+
     # dict.get
     if rc == "dict.get":
         func = node.get("func")
@@ -547,10 +556,21 @@ def _emit_builtin_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
     # abs / min / max / sum
     if bn == "abs" and len(arg_strs) >= 1:
         return "__pytra_abs(" + arg_strs[0] + ")"
-    if bn == "min":
-        return "__pytra_min(" + ", ".join(arg_strs) + ")"
-    if bn == "max":
-        return "__pytra_max(" + ", ".join(arg_strs) + ")"
+    if bn == "min" or bn == "max":
+        fn_base = "__pytra_min" if bn == "min" else "__pytra_max"
+        rt_node = _str(node, "resolved_type")
+        # Infer float if any arg is float
+        is_float = rt_node in ("float64", "float32")
+        if not is_float:
+            for a in args:
+                if isinstance(a, dict) and _str(a, "resolved_type") in ("float64", "float32"):
+                    is_float = True
+                    break
+        if is_float:
+            # Cast all args to float64
+            float_args = ["float64(" + s + ")" if isinstance(args[i], dict) and _str(args[i], "resolved_type") not in ("float64", "float32") else s for i, s in enumerate(arg_strs)]
+            return fn_base + "_float(" + ", ".join(float_args) + ")"
+        return fn_base + "_int(" + ", ".join(arg_strs) + ")"
     if bn == "sum" and len(arg_strs) >= 1:
         return "__pytra_sum(" + arg_strs[0] + ")"
 
@@ -619,6 +639,31 @@ def _emit_subscript(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
     if isinstance(slice_node, dict) and _str(slice_node, "kind") == "Slice":
         return _emit_slice_access(ctx, value, slice_node)
     idx = _emit_expr(ctx, slice_node)
+
+    # Tuple subscript: __tup_N[i] → safe type conversion from interface{}
+    if isinstance(value_node, dict):
+        vt = _str(value_node, "resolved_type")
+        if vt.startswith("tuple["):
+            elem_rt = _str(node, "resolved_type")
+            base = value + ".([]interface{})[" + idx + "]"
+            if elem_rt in ("int64", "int32", "int", "uint8"):
+                return "__pytra_to_int64(" + base + ")"
+            if elem_rt in ("float64", "float32"):
+                return "__pytra_to_float64(" + base + ")"
+            if elem_rt == "str":
+                return base + ".(string)"
+            return base
+
+    # Negative constant index: x[-1] → x[len(x)-1]
+    if isinstance(slice_node, dict) and _str(slice_node, "kind") == "Constant":
+        idx_val = slice_node.get("value")
+        if isinstance(idx_val, int) and idx_val < 0:
+            idx = "len(" + value + ")" + str(idx_val)
+    # Negative unary: x[-expr] → x[len(x)-expr]
+    if isinstance(slice_node, dict) and _str(slice_node, "kind") == "UnaryOp" and _str(slice_node, "op") == "USub":
+        operand = _emit_expr(ctx, slice_node.get("operand"))
+        idx = "len(" + value + ")-" + operand
+
     # String indexing: wrap with __pytra_byte_to_string for str[int] → string
     if isinstance(value_node, dict):
         vt = _str(value_node, "resolved_type")
@@ -1317,8 +1362,11 @@ def _emit_var_decl(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
     rt = _str(node, "type")
     if rt == "":
         rt = _str(node, "resolved_type")
-    gt = go_type(rt)
     gn = _safe_go_ident(name)
+    # For unknown types, use int64 as default (most common in Pytra)
+    if rt == "" or rt == "unknown":
+        rt = "int64"
+    gt = go_type(rt)
     ctx.var_types[gn] = rt
     _emit(ctx, "var " + gn + " " + gt)
 

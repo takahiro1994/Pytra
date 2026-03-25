@@ -487,9 +487,18 @@ def _resolve_simple_call(expr: dict[str, JsonVal], func: dict[str, JsonVal], ctx
     # Resolve arguments first
     _resolve_call_args(expr, ctx)
 
-    # Built-in function?
+    # Built-in function (registry or known constructors)
     if ctx.registry.is_builtin(name):
         return _resolve_builtin_call(expr, func, name, ctx)
+    # bytearray/bytes are built-in constructors not always in registry
+    if name == "bytearray":
+        expr["resolved_type"] = "bytearray"
+        func["resolved_type"] = "unknown"
+        return "bytearray"
+    if name == "bytes":
+        expr["resolved_type"] = "bytes"
+        func["resolved_type"] = "unknown"
+        return "bytes"
 
     # Imported symbol?
     imp: dict[str, str] = ctx.import_symbols.get(name, {})

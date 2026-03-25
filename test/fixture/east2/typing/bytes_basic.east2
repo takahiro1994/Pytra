@@ -83,7 +83,7 @@
               "end_lineno": 7,
               "end_col": 36
             },
-            "resolved_type": "unknown",
+            "resolved_type": "bytes",
             "casts": [],
             "borrow_kind": "value",
             "repr": "bytes([1, 2, 3, 255])",

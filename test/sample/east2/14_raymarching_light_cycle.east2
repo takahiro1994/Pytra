@@ -108,7 +108,7 @@
               "end_lineno": 10,
               "end_col": 19
             },
-            "resolved_type": "unknown",
+            "resolved_type": "bytearray",
             "casts": [],
             "borrow_kind": "value",
             "repr": "bytearray()",
@@ -130,6 +130,7 @@
             "keywords": []
           },
           "declare": true,
+          "decl_type": "bytearray",
           "declare_init": true
         },
         {
@@ -791,9 +792,9 @@
                       "end_lineno": 15,
                       "end_col": 9
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "bytearray",
                     "casts": [],
-                    "borrow_kind": "value",
+                    "borrow_kind": "readonly_ref",
                     "repr": "p",
                     "id": "p"
                   },
@@ -858,9 +859,9 @@
                       "end_lineno": 16,
                       "end_col": 9
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "bytearray",
                     "casts": [],
-                    "borrow_kind": "value",
+                    "borrow_kind": "readonly_ref",
                     "repr": "p",
                     "id": "p"
                   },
@@ -925,9 +926,9 @@
                       "end_lineno": 17,
                       "end_col": 9
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "bytearray",
                     "casts": [],
-                    "borrow_kind": "value",
+                    "borrow_kind": "readonly_ref",
                     "repr": "p",
                     "id": "p"
                   },
@@ -971,7 +972,7 @@
               "end_lineno": 18,
               "end_col": 19
             },
-            "resolved_type": "unknown",
+            "resolved_type": "bytes",
             "casts": [],
             "borrow_kind": "value",
             "repr": "bytes(p)",
@@ -998,9 +999,9 @@
                   "end_lineno": 18,
                   "end_col": 18
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bytearray",
                 "casts": [],
-                "borrow_kind": "value",
+                "borrow_kind": "readonly_ref",
                 "repr": "p",
                 "id": "p"
               }
@@ -3163,7 +3164,7 @@
                   "end_lineno": 49,
                   "end_col": 32
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bytearray",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "bytearray(w * h)",
@@ -3228,6 +3229,7 @@
                 "keywords": []
               },
               "declare": true,
+              "decl_type": "bytearray",
               "declare_init": true
             },
             {
@@ -4181,7 +4183,7 @@
                           "end_lineno": 59,
                           "end_col": 35
                         },
-                        "resolved_type": "unknown",
+                        "resolved_type": "uint8",
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "frame[row_base + x]",
@@ -4193,9 +4195,9 @@
                             "end_lineno": 59,
                             "end_col": 21
                           },
-                          "resolved_type": "unknown",
+                          "resolved_type": "bytearray",
                           "casts": [],
-                          "borrow_kind": "value",
+                          "borrow_kind": "readonly_ref",
                           "repr": "frame",
                           "id": "frame"
                         },
@@ -4401,7 +4403,7 @@
                       "end_lineno": 61,
                       "end_col": 34
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "bytes",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "bytes(frame)",
@@ -4428,9 +4430,9 @@
                           "end_lineno": 61,
                           "end_col": 33
                         },
-                        "resolved_type": "unknown",
+                        "resolved_type": "bytearray",
                         "casts": [],
-                        "borrow_kind": "value",
+                        "borrow_kind": "readonly_ref",
                         "repr": "frame",
                         "id": "frame"
                       }

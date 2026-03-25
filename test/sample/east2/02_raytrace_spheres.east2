@@ -2260,7 +2260,7 @@
               "end_lineno": 43,
               "end_col": 35
             },
-            "resolved_type": "unknown",
+            "resolved_type": "bytearray",
             "casts": [],
             "borrow_kind": "value",
             "repr": "bytearray()",

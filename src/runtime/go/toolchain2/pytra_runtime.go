@@ -111,21 +111,10 @@ func __pytra_abs_float(v float64) float64 {
 	return v
 }
 
-// __pytra_min returns the minimum of two int64 values.
-func __pytra_min(a int64, b int64) int64 {
-	if a < b {
-		return a
-	}
-	return b
-}
-
-// __pytra_max returns the maximum of two int64 values.
-func __pytra_max(a int64, b int64) int64 {
-	if a > b {
-		return a
-	}
-	return b
-}
+func __pytra_min_int(a int64, b int64) int64 { if a < b { return a }; return b }
+func __pytra_max_int(a int64, b int64) int64 { if a > b { return a }; return b }
+func __pytra_min_float(a float64, b float64) float64 { if a < b { return a }; return b }
+func __pytra_max_float(a float64, b float64) float64 { if a > b { return a }; return b }
 
 // __pytra_floordiv performs Python-style floor division.
 func __pytra_floordiv(a int64, b int64) int64 {
@@ -282,6 +271,21 @@ func __pytra_str_to_int64(s string) int64 {
 	return v
 }
 
+// __pytra_to_int64 safely converts interface{} to int64 (for tuple element access).
+func __pytra_to_int64(v interface{}) int64 {
+	switch t := v.(type) {
+	case int64: return t
+	case int: return int64(t)
+	case float64: return int64(t)
+	default: return 0
+	}
+}
+
+// __pytra_to_float64 safely converts interface{} to float64 (for tuple element access).
+func __pytra_to_float64(v interface{}) float64 {
+	return _toF64(v)
+}
+
 // __pytra_ternary emulates Python's ternary (x if cond else y).
 // Go doesn't have ternary, so we use a generic function.
 func __pytra_ternary_int(cond bool, a int64, b int64) int64 {
@@ -300,6 +304,20 @@ func __pytra_ternary_str(cond bool, a string, b string) string {
 // __pytra_append_byte appends an int64 as byte to a byte slice.
 func __pytra_append_byte(s []byte, v int64) []byte {
 	return append(s, byte(v))
+}
+
+// __pytra_list_pop removes and returns the last element (or at index) from a slice.
+func __pytra_list_pop(s *[]interface{}, args ...int64) interface{} {
+	sl := *s
+	n := len(sl)
+	idx := n - 1
+	if len(args) > 0 {
+		idx = int(args[0])
+		if idx < 0 { idx += n }
+	}
+	val := sl[idx]
+	*s = append(sl[:idx], sl[idx+1:]...)
+	return val
 }
 
 // __pytra_str_to_float64 converts a string to float64.

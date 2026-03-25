@@ -137,7 +137,7 @@
               "end_lineno": 9,
               "end_col": 75
             },
-            "resolved_type": "unknown",
+            "resolved_type": "bytearray",
             "casts": [],
             "borrow_kind": "value",
             "repr": "bytearray([ 255, 0, 0, 0, 255, 0, 0, 0, 255, 255, 255, 255, ])",
@@ -343,6 +343,7 @@
             "keywords": []
           },
           "declare": true,
+          "decl_type": "bytearray",
           "declare_init": true
         },
         {
@@ -444,9 +445,9 @@
                   "end_lineno": 15,
                   "end_col": 44
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bytearray",
                 "casts": [],
-                "borrow_kind": "value",
+                "borrow_kind": "readonly_ref",
                 "repr": "pixels",
                 "id": "pixels"
               }
@@ -640,9 +641,9 @@
                           "end_lineno": 17,
                           "end_col": 42
                         },
-                        "resolved_type": "unknown",
+                        "resolved_type": "bytearray",
                         "casts": [],
-                        "borrow_kind": "value",
+                        "borrow_kind": "readonly_ref",
                         "repr": "pixels",
                         "id": "pixels"
                       }

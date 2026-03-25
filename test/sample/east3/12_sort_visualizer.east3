@@ -91,13 +91,14 @@
               "end_lineno": 9,
               "end_col_offset": 9
             },
-            "resolved_type": "unknown",
+            "resolved_type": "bytearray",
             "casts": [],
             "borrow_kind": "value",
             "repr": "frame",
             "id": "frame"
           },
           "declare": true,
+          "decl_type": "bytearray",
           "declare_init": true,
           "value": {
             "kind": "Call",
@@ -107,7 +108,7 @@
               "end_lineno": 9,
               "end_col_offset": 28
             },
-            "resolved_type": "unknown",
+            "resolved_type": "bytearray",
             "casts": [],
             "borrow_kind": "value",
             "repr": "bytearray(w * h)",
@@ -172,18 +173,16 @@
             "keywords": [],
             "type_expr_summary_v1": {
               "schema_version": 1,
-              "kind": "DynamicType",
-              "category": "dynamic",
-              "mirror": "unknown",
-              "dynamic_name": "unknown"
+              "kind": "NamedType",
+              "category": "static",
+              "mirror": "bytearray"
             }
           },
           "type_expr_summary_v1": {
             "schema_version": 1,
-            "kind": "DynamicType",
-            "category": "dynamic",
-            "mirror": "unknown",
-            "dynamic_name": "unknown"
+            "kind": "NamedType",
+            "category": "static",
+            "mirror": "bytearray"
           }
         },
         {
@@ -1214,7 +1213,7 @@
                           "end_lineno": 21,
                           "end_col_offset": 32
                         },
-                        "resolved_type": "int64",
+                        "resolved_type": "uint8",
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "frame[y * w + x]",
@@ -1226,9 +1225,9 @@
                             "end_lineno": 21,
                             "end_col_offset": 21
                           },
-                          "resolved_type": "unknown",
+                          "resolved_type": "bytearray",
                           "casts": [],
-                          "borrow_kind": "value",
+                          "borrow_kind": "readonly_ref",
                           "repr": "frame",
                           "id": "frame"
                         },
@@ -1370,7 +1369,7 @@
               "end_lineno": 22,
               "end_col_offset": 23
             },
-            "resolved_type": "unknown",
+            "resolved_type": "bytes",
             "casts": [],
             "borrow_kind": "value",
             "repr": "bytes(frame)",
@@ -1397,9 +1396,9 @@
                   "end_lineno": 22,
                   "end_col_offset": 22
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bytearray",
                 "casts": [],
-                "borrow_kind": "value",
+                "borrow_kind": "readonly_ref",
                 "repr": "frame",
                 "id": "frame"
               }
@@ -1407,10 +1406,9 @@
             "keywords": [],
             "type_expr_summary_v1": {
               "schema_version": 1,
-              "kind": "DynamicType",
-              "category": "dynamic",
-              "mirror": "unknown",
-              "dynamic_name": "unknown"
+              "kind": "NamedType",
+              "category": "static",
+              "mirror": "bytes"
             }
           }
         }

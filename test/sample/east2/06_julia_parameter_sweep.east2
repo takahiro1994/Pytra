@@ -108,7 +108,7 @@
               "end_lineno": 11,
               "end_col": 32
             },
-            "resolved_type": "unknown",
+            "resolved_type": "bytearray",
             "casts": [],
             "borrow_kind": "value",
             "repr": "bytearray(256 * 3)",
@@ -173,6 +173,7 @@
             "keywords": []
           },
           "declare": true,
+          "decl_type": "bytearray",
           "declare_init": true,
           "leading_trivia": [
             {
@@ -200,7 +201,7 @@
               "end_lineno": 12,
               "end_col": 14
             },
-            "resolved_type": "unknown",
+            "resolved_type": "uint8",
             "casts": [],
             "borrow_kind": "value",
             "repr": "palette[0]",
@@ -212,9 +213,9 @@
                 "end_lineno": 12,
                 "end_col": 11
               },
-              "resolved_type": "unknown",
+              "resolved_type": "bytearray",
               "casts": [],
-              "borrow_kind": "value",
+              "borrow_kind": "readonly_ref",
               "repr": "palette",
               "id": "palette"
             },
@@ -267,7 +268,7 @@
               "end_lineno": 13,
               "end_col": 14
             },
-            "resolved_type": "unknown",
+            "resolved_type": "uint8",
             "casts": [],
             "borrow_kind": "value",
             "repr": "palette[1]",
@@ -279,9 +280,9 @@
                 "end_lineno": 13,
                 "end_col": 11
               },
-              "resolved_type": "unknown",
+              "resolved_type": "bytearray",
               "casts": [],
-              "borrow_kind": "value",
+              "borrow_kind": "readonly_ref",
               "repr": "palette",
               "id": "palette"
             },
@@ -334,7 +335,7 @@
               "end_lineno": 14,
               "end_col": 14
             },
-            "resolved_type": "unknown",
+            "resolved_type": "uint8",
             "casts": [],
             "borrow_kind": "value",
             "repr": "palette[2]",
@@ -346,9 +347,9 @@
                 "end_lineno": 14,
                 "end_col": 11
               },
-              "resolved_type": "unknown",
+              "resolved_type": "bytearray",
               "casts": [],
-              "borrow_kind": "value",
+              "borrow_kind": "readonly_ref",
               "repr": "palette",
               "id": "palette"
             },
@@ -1390,7 +1391,7 @@
                   "end_lineno": 20,
                   "end_col": 26
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "uint8",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "palette[i * 3 + 0]",
@@ -1402,9 +1403,9 @@
                     "end_lineno": 20,
                     "end_col": 15
                   },
-                  "resolved_type": "unknown",
+                  "resolved_type": "bytearray",
                   "casts": [],
-                  "borrow_kind": "value",
+                  "borrow_kind": "readonly_ref",
                   "repr": "palette",
                   "id": "palette"
                 },
@@ -1513,7 +1514,7 @@
                   "end_lineno": 21,
                   "end_col": 26
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "uint8",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "palette[i * 3 + 1]",
@@ -1525,9 +1526,9 @@
                     "end_lineno": 21,
                     "end_col": 15
                   },
-                  "resolved_type": "unknown",
+                  "resolved_type": "bytearray",
                   "casts": [],
-                  "borrow_kind": "value",
+                  "borrow_kind": "readonly_ref",
                   "repr": "palette",
                   "id": "palette"
                 },
@@ -1636,7 +1637,7 @@
                   "end_lineno": 22,
                   "end_col": 26
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "uint8",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "palette[i * 3 + 2]",
@@ -1648,9 +1649,9 @@
                     "end_lineno": 22,
                     "end_col": 15
                   },
-                  "resolved_type": "unknown",
+                  "resolved_type": "bytearray",
                   "casts": [],
-                  "borrow_kind": "value",
+                  "borrow_kind": "readonly_ref",
                   "repr": "palette",
                   "id": "palette"
                 },
@@ -1762,7 +1763,7 @@
               "end_lineno": 23,
               "end_col": 25
             },
-            "resolved_type": "unknown",
+            "resolved_type": "bytes",
             "casts": [],
             "borrow_kind": "value",
             "repr": "bytes(palette)",
@@ -1789,9 +1790,9 @@
                   "end_lineno": 23,
                   "end_col": 24
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bytearray",
                 "casts": [],
-                "borrow_kind": "value",
+                "borrow_kind": "readonly_ref",
                 "repr": "palette",
                 "id": "palette"
               }
@@ -1898,7 +1899,7 @@
               "end_lineno": 27,
               "end_col": 37
             },
-            "resolved_type": "unknown",
+            "resolved_type": "bytearray",
             "casts": [],
             "borrow_kind": "value",
             "repr": "bytearray(width * height)",
@@ -1963,6 +1964,7 @@
             "keywords": []
           },
           "declare": true,
+          "decl_type": "bytearray",
           "declare_init": true
         },
         {
@@ -3239,7 +3241,7 @@
                           "end_lineno": 44,
                           "end_col": 35
                         },
-                        "resolved_type": "unknown",
+                        "resolved_type": "uint8",
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "frame[row_base + x]",
@@ -3251,9 +3253,9 @@
                             "end_lineno": 44,
                             "end_col": 21
                           },
-                          "resolved_type": "unknown",
+                          "resolved_type": "bytearray",
                           "casts": [],
-                          "borrow_kind": "value",
+                          "borrow_kind": "readonly_ref",
                           "repr": "frame",
                           "id": "frame"
                         },
@@ -3525,7 +3527,7 @@
                           "end_lineno": 48,
                           "end_col": 35
                         },
-                        "resolved_type": "unknown",
+                        "resolved_type": "uint8",
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "frame[row_base + x]",
@@ -3537,9 +3539,9 @@
                             "end_lineno": 48,
                             "end_col": 21
                           },
-                          "resolved_type": "unknown",
+                          "resolved_type": "bytearray",
                           "casts": [],
-                          "borrow_kind": "value",
+                          "borrow_kind": "readonly_ref",
                           "repr": "frame",
                           "id": "frame"
                         },
@@ -3628,7 +3630,7 @@
               "end_lineno": 49,
               "end_col": 23
             },
-            "resolved_type": "unknown",
+            "resolved_type": "bytes",
             "casts": [],
             "borrow_kind": "value",
             "repr": "bytes(frame)",
@@ -3655,9 +3657,9 @@
                   "end_lineno": 49,
                   "end_col": 22
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bytearray",
                 "casts": [],
-                "borrow_kind": "value",
+                "borrow_kind": "readonly_ref",
                 "repr": "frame",
                 "id": "frame"
               }
