@@ -1565,10 +1565,12 @@ def _emit_var_decl(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
     if rt == "" or rt == "unknown":
         ctx.var_types[gn] = "unknown"
         _emit(ctx, "var " + gn + " interface{}")
+        _emit(ctx, "_ = " + gn)
         return
     gt = go_type(rt)
     ctx.var_types[gn] = rt
     _emit(ctx, "var " + gn + " " + gt)
+    _emit(ctx, "_ = " + gn)
 
 
 def _emit_swap(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
