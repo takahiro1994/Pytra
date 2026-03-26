@@ -11,6 +11,7 @@
 
 2026-03-14 時点の active live plan:
 - `p2-cpp-pyruntime-upstream-fallback-shrink.md`
+- `p1-emit-cpp-parity.md`
 
 ## ルール
 

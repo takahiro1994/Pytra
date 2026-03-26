@@ -20,36 +20,9 @@
 
 ## 未完了タスク
 
-### P1-EMIT-GO-PARITY: Go emitter の compile + run parity 修正
-
-文脈: [docs/ja/plans/p1-emit-go-parity.md](../plans/p1-emit-go-parity.md)
-必読: [docs/ja/spec/spec-emitter-guide.md](../spec/spec-emitter-guide.md)
-
-1. [x] [ID: P1-GO-PARITY-S1] list/dict comprehension の Go 変換を実装
-2. [x] [ID: P1-GO-PARITY-S2] EAST 不足の修正: `write_text` 等を resolve で BuiltinCall に lowering、with 文 parser 対応、bytearray 型伝播
-3. [x] [ID: P1-GO-PARITY-S3] fixture 132 件で `go run` + stdout 一致
-4. [x] [ID: P1-GO-PARITY-S4] sample 18 件で `go run` + stdout 一致（PNG/GIF artifact CRC32 一致を含む）
-
-### P1-SPEC-CONFORM2: 仕様整合 フェーズ2+3（Codex-review 追加指摘対応）
-
-文脈: [docs/ja/plans/p1-spec-conform2.md](../plans/p1-spec-conform2.md)
-
-フェーズ1 (link) は完了。フェーズ2 (emit) とフェーズ3 (optimize/compile) が残り。
-
-**フェーズ2: emit（workaround を剥がす）**
-
-7. [x] [ID: P1-SPEC-CONFORM2-S7] `emit/go/emitter.py`: 型推論・型変更・cast 追加・ハードコードモジュール判定を除去 — `_emit_unbox()` の `Name` fallback を削除し、runtime lane を toolchain2 生成へ同期して `json_extended` Go parity を維持
-8. [x] [ID: P1-SPEC-CONFORM2-S8] `emit/cpp/emitter.py`: 同上 — `Assign` の target/value 型推論と `VarDecl` の `unknown -> int64` fallback を除去し、`unknown` は `auto`、range target は EAST3 `target_type`、skipped runtime value は metadata + mapping 経由へ整理
-9. [x] [ID: P1-SPEC-CONFORM2-S9] `emit/common/code_emitter.py`: mapping.json のみで分岐するように整理 — skipped runtime symbol/value 名解決と import binding -> runtime helper 名解決を common helper へ集約し、Go/C++ emitter の `mapping.calls` 直参照と prefix 組み立て重複を削除
-
-**フェーズ3: optimize / compile（型責務を前段に戻す）**
-
-10. [x] [ID: P1-SPEC-CONFORM2-S10] `optimize/passes/typed_repeat_materialization.py`: resolved_type 後付け補完を除去 — repeat/listcomp の型補完は `resolved_type` ではなく hint (`repeat_result_type_hint`, `list_comp_result_type_hint`) に限定
-11. [x] [ID: P1-SPEC-CONFORM2-S11] `optimize/passes/typed_enumerate_normalization.py`: 同上 — `iter_expr.resolved_type` は維持し、`iter_element_type` / `iter_item_type` / `target_type` の metadata 正規化だけを行う
-12. [x] [ID: P1-SPEC-CONFORM2-S12] `compile/passes.py`: int32 先行混入を戻す（bytes/bytearray 系の `uint8` target を `int64` に復帰）
-13. [x] [ID: P1-SPEC-CONFORM2-S13] golden 再生成 + parity 維持確認（fixture 132/132, sample 18/18, pytra 33/33）
-
 ### P1-EMIT-CPP: C++ emitter
+
+文脈: `docs/ja/plans/p1-emit-cpp-parity.md`
 
 作業ディレクトリ: `toolchain2/emit/cpp/`
 必読: [docs/ja/spec/spec-emitter-guide.md](../spec/spec-emitter-guide.md)
@@ -69,17 +42,9 @@
 3. [x] [ID: P2-SELFHOST-S3] golden を `test/selfhost/` に配置し、回帰テストとして維持 — east1/east2/east3/east3-opt 各 37 件
 4. [ ] [ID: P2-SELFHOST-S4] Go emitter で toolchain2 を Go に変換し、`go build` が通る — emit 25/25 成功、`go build` は docstring/構文問題で未達
 
-### P4: int のデフォルトサイズを int64 → int32 に変更
+### P4-INT32: int のデフォルトサイズを int64 → int32 に変更
 
-Python の `int` を `int64` に正規化しているが、C++/Go/Java/C# は `int` が 32bit で、通常利用には十分。
-64bit はメモリ・キャッシュ効率が悪い。`int` → `int32` に変更し、64bit が必要な場合はユーザーが `int64` と明示する。
-
-影響範囲:
-- spec-east.md §6.2 の正規化ルール変更
-- 全 golden 再生成
-- 全 emitter の型マッピング修正
-- sample のオーバーフロー確認（中間計算が 32bit を超えないか）
-- `len()` の戻り値型も `int32` に
+文脈: [docs/ja/plans/p4-int32-default.md](../plans/p4-int32-default.md)
 
 前提: Go selfhost 完了後に着手。
 
