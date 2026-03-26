@@ -59,9 +59,13 @@ template <class T, ::std::enable_if_t<
     !::std::is_same_v<::std::decay_t<T>, object> &&
     !::std::is_same_v<::std::decay_t<T>, ::std::string>, int> = 0>
 static inline ::std::string py_to_string(const T& v) {
-    ::std::ostringstream oss;
-    oss << v;
-    return oss.str();
+    if constexpr (requires(const T& x) { x.__str__(); }) {
+        return str(v.__str__()).std();
+    } else {
+        ::std::ostringstream oss;
+        oss << v;
+        return oss.str();
+    }
 }
 
 static inline ::std::string py_to_string(const ::std::string& v) {

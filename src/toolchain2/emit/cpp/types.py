@@ -1,30 +1,34 @@
 """C++ type mapping from EAST3 resolved types.
 
-§5 準拠: Any/object 禁止, pytra.std.* のみ, selfhost 対象。
+toolchain2 C++ backend は `src/runtime/cpp/core/*` の公開 alias (`str`,
+`list[T]`, `dict[K,V]`, `float64`, `object` など) を正本として使う。
 """
 
 from __future__ import annotations
 
 
 _TYPE_MAP: dict[str, str] = {
-    "int": "int64_t",
-    "int8": "int8_t",
-    "int16": "int16_t",
-    "int32": "int32_t",
-    "int64": "int64_t",
-    "uint8": "uint8_t",
-    "uint16": "uint16_t",
-    "uint32": "uint32_t",
-    "uint64": "uint64_t",
-    "float": "double",
-    "float32": "float",
-    "float64": "double",
+    "int": "int64",
+    "int8": "int8",
+    "int16": "int16",
+    "int32": "int32",
+    "int64": "int64",
+    "uint8": "uint8",
+    "uint16": "uint16",
+    "uint32": "uint32",
+    "uint64": "uint64",
+    "float": "float64",
+    "float32": "float32",
+    "float64": "float64",
     "bool": "bool",
-    "str": "std::string",
+    "str": "str",
     "None": "void",
     "none": "void",
-    "bytes": "std::vector<uint8_t>",
-    "bytearray": "std::vector<uint8_t>",
+    "bytes": "bytes",
+    "bytearray": "bytearray",
+    "Any": "object",
+    "Obj": "object",
+    "object": "object",
 }
 
 
@@ -37,55 +41,94 @@ def cpp_type(resolved_type: str) -> str:
     if mapped != "":
         return mapped
 
-    # list[T] → std::vector<T>
+    # list[T] → list<T>
     if resolved_type.startswith("list[") and resolved_type.endswith("]"):
         inner = resolved_type[5:-1]
-        return "std::vector<" + cpp_type(inner) + ">"
+        return "list<" + cpp_type(inner) + ">"
 
-    # dict[K, V] → std::unordered_map<K, V>
+    # dict[K, V] → dict<K, V>
     if resolved_type.startswith("dict[") and resolved_type.endswith("]"):
         inner = resolved_type[5:-1]
         parts = _split_generic_args(inner)
         if len(parts) == 2:
-            return "std::unordered_map<" + cpp_type(parts[0]) + ", " + cpp_type(parts[1]) + ">"
+            return "dict<" + cpp_type(parts[0]) + ", " + cpp_type(parts[1]) + ">"
 
-    # set[T] → std::unordered_set<T>
+    # set[T] → set<T>
     if resolved_type.startswith("set[") and resolved_type.endswith("]"):
         inner = resolved_type[4:-1]
-        return "std::unordered_set<" + cpp_type(inner) + ">"
+        return "set<" + cpp_type(inner) + ">"
 
     # tuple[A, B, ...]
     if resolved_type.startswith("tuple[") and resolved_type.endswith("]"):
         inner = resolved_type[6:-1]
         parts = _split_generic_args(inner)
         if len(parts) > 0:
-            return "std::tuple<" + ", ".join(cpp_type(p) for p in parts) + ">"
+            return "::std::tuple<" + ", ".join(cpp_type(p) for p in parts) + ">"
 
-    # Optional / None union
-    if resolved_type.endswith(" | None"):
-        inner = resolved_type[:-7]
-        return "std::optional<" + cpp_type(inner) + ">"
+    optional_inner = _top_level_optional_inner(resolved_type)
+    if optional_inner != "":
+        return "::std::optional<" + cpp_signature_type(optional_inner) + ">"
 
-    # Union → auto (simplified)
-    if " | " in resolved_type:
-        return "auto"
+    # General union → object (variant 導入までは fail-closed)
+    if _is_top_level_union(resolved_type):
+        return "object"
 
     # User class → ClassName (by value or shared_ptr depending on context)
     return resolved_type
 
 
+def cpp_signature_type(resolved_type: str) -> str:
+    """Type text for declarations/signatures.
+
+    `unknown` / general union は `auto` にせず fail-closed で `object` に倒す。
+    """
+    if resolved_type == "" or resolved_type == "unknown":
+        return "object"
+    if resolved_type in ("Any", "Obj", "object"):
+        return "object"
+    optional_inner = _top_level_optional_inner(resolved_type)
+    if optional_inner != "":
+        return "::std::optional<" + cpp_signature_type(optional_inner) + ">"
+    if _is_top_level_union(resolved_type):
+        return "object"
+    return cpp_type(resolved_type)
+
+
+def cpp_param_decl(resolved_type: str, name: str, *, mutable: bool = False) -> str:
+    """Render a function parameter declaration."""
+    ct = cpp_signature_type(resolved_type)
+    if _is_small_value_type(ct):
+        return ct + " " + name
+    if mutable:
+        return ct + "& " + name
+    return "const " + ct + "& " + name
+
+
 def cpp_zero_value(resolved_type: str) -> str:
-    ct = cpp_type(resolved_type)
-    if ct in ("int8_t", "int16_t", "int32_t", "int64_t",
-              "uint8_t", "uint16_t", "uint32_t", "uint64_t"):
-        return "0"
-    if ct in ("float", "double"):
-        return "0.0"
-    if ct == "bool":
-        return "false"
-    if ct == "std::string":
-        return '""'
-    return "{}"
+    ct = cpp_signature_type(resolved_type)
+    if ct == "void":
+        return ""
+    if ct == "object":
+        return "object()"
+    if ct == "auto":
+        return "{}"
+    return ct + "{}"
+
+
+def _is_small_value_type(cpp_text: str) -> bool:
+    return cpp_text in {
+        "bool",
+        "int8",
+        "int16",
+        "int32",
+        "int64",
+        "uint8",
+        "uint16",
+        "uint32",
+        "uint64",
+        "float32",
+        "float64",
+    }
 
 
 def _split_generic_args(s: str) -> list[str]:
@@ -108,3 +151,50 @@ def _split_generic_args(s: str) -> list[str]:
     if tail != "":
         parts.append(tail)
     return parts
+
+
+def _split_top_level_union(resolved_type: str) -> list[str]:
+    parts: list[str] = []
+    depth = 0
+    current: list[str] = []
+    i = 0
+    while i < len(resolved_type):
+        ch = resolved_type[i]
+        if ch in "[<(":
+            depth += 1
+            current.append(ch)
+            i += 1
+            continue
+        if ch in "]>)":
+            depth -= 1
+            current.append(ch)
+            i += 1
+            continue
+        if ch == "|" and depth == 0:
+            part = "".join(current).strip()
+            if part != "":
+                parts.append(part)
+            current = []
+            i += 1
+            continue
+        current.append(ch)
+        i += 1
+    tail = "".join(current).strip()
+    if tail != "":
+        parts.append(tail)
+    return parts
+
+
+def _is_top_level_union(resolved_type: str) -> bool:
+    return len(_split_top_level_union(resolved_type)) > 1
+
+
+def _top_level_optional_inner(resolved_type: str) -> str:
+    parts = _split_top_level_union(resolved_type)
+    if len(parts) != 2:
+        return ""
+    if parts[0] in ("None", "none"):
+        return parts[1]
+    if parts[1] in ("None", "none"):
+        return parts[0]
+    return ""

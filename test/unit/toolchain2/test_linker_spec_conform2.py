@@ -6,6 +6,7 @@ import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
+import shutil
 
 
 ROOT = next(p for p in Path(__file__).resolve().parents if (p / "src").exists())
@@ -16,12 +17,19 @@ if str(ROOT / "src") not in sys.path:
 
 
 from toolchain2.link.linker import LinkedModule, link_modules
+from toolchain2.link.dependencies import build_all_resolved_dependencies
 from toolchain2.link.expand_defaults import expand_cross_module_defaults
 from toolchain2.link.manifest_loader import load_linked_output
 from toolchain2.link.runtime_discovery import discover_runtime_modules
 from toolchain2.link.type_id import build_type_id_table
+from toolchain2.parse.py.parse_python import parse_python_file
+from toolchain2.resolve.py.builtin_registry import load_builtin_registry
+from toolchain2.resolve.py.resolver import resolve_east1_to_east2
+from toolchain2.compile.lower import lower_east2_to_east3
+from toolchain2.optimize.optimizer import optimize_east3_document
 from toolchain2.emit.go.emitter import emit_go_module
 from toolchain2.emit.cpp.emitter import emit_cpp_module
+from toolchain2.emit.cpp.runtime_bundle import emit_runtime_module_artifacts
 from toolchain2.emit.common.code_emitter import RuntimeMapping
 
 
@@ -82,7 +90,122 @@ def _fixture_doc(relative_path: str) -> dict[str, object]:
     return json.loads(fixture_path.read_text(encoding="utf-8"))
 
 
+def _walk_nodes(node: object) -> list[dict[str, object]]:
+    out: list[dict[str, object]] = []
+    if isinstance(node, dict):
+        out.append(node)
+        for value in node.values():
+            out.extend(_walk_nodes(value))
+    elif isinstance(node, list):
+        for item in node:
+            out.extend(_walk_nodes(item))
+    return out
+
+
+def _build_current_selfhost_east3_paths(tmpdir: Path) -> list[str]:
+    inputs: list[Path] = []
+    for p in sorted((ROOT / "test" / "selfhost" / "east3-opt").rglob("*.east3")):
+        data = json.loads(p.read_text(encoding="utf-8"))
+        source_path = data.get("source_path", "")
+        if isinstance(source_path, str) and source_path.startswith("src/toolchain2/"):
+            inputs.append(ROOT / source_path)
+    inputs = sorted(dict.fromkeys(inputs))
+
+    builtins_path = ROOT / "test" / "include" / "east1" / "py" / "built_in" / "builtins.py.east1"
+    containers_path = ROOT / "test" / "include" / "east1" / "py" / "built_in" / "containers.py.east1"
+    stdlib_dir = ROOT / "test" / "include" / "east1" / "py" / "std"
+    registry = load_builtin_registry(builtins_path, containers_path, stdlib_dir)
+
+    outdir = tmpdir / "selfhost-e3"
+    shutil.rmtree(outdir, ignore_errors=True)
+    outdir.mkdir(parents=True, exist_ok=True)
+
+    out_paths: list[str] = []
+    for src in inputs:
+        rel = str(src.relative_to(ROOT)).replace("\\", "/")
+        east1 = parse_python_file(str(src))
+        east1["source_path"] = rel
+        resolve_east1_to_east2(east1, registry=registry)
+        east3 = lower_east2_to_east3(east1)
+        east3["source_path"] = rel
+        east3, _ = optimize_east3_document(east3, opt_level=1)
+        east3["source_path"] = rel
+        target = outdir / (src.stem + ".east3")
+        target.write_text(json.dumps(east3, ensure_ascii=False), encoding="utf-8")
+        out_paths.append(str(target))
+    return out_paths
+
+
 class Toolchain2LinkerSpecConform2Tests(unittest.TestCase):
+    def test_link_modules_rejects_unresolved_user_import_dependency(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            entry_path = Path(tmp) / "app.main.east3.json"
+            entry_path.write_text(
+                json.dumps(
+                    _module_doc(
+                        "app.main",
+                        source_path="app/main.py",
+                        meta_extra={
+                            "import_bindings": [
+                                {"module_id": "pkg.dep", "binding_kind": "symbol", "local_name": "dep"},
+                            ]
+                        },
+                    ),
+                    ensure_ascii=False,
+                ),
+                encoding="utf-8",
+            )
+
+            with self.assertRaisesRegex(RuntimeError, "pkg\\.dep"):
+                link_modules([str(entry_path)], target="go", dispatch_mode="native")
+
+    def test_link_modules_allows_external_runtime_whitelist_import(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            entry_path = Path(tmp) / "app.main.east3.json"
+            entry_path.write_text(
+                json.dumps(
+                    _module_doc(
+                        "app.main",
+                        source_path="app/main.py",
+                        meta_extra={
+                            "import_bindings": [
+                                {"module_id": "pytra.std.json", "binding_kind": "symbol", "local_name": "json"},
+                            ]
+                        },
+                    ),
+                    ensure_ascii=False,
+                ),
+                encoding="utf-8",
+            )
+
+            result = link_modules([str(entry_path)], target="go", dispatch_mode="native")
+
+            self.assertEqual(result.manifest["entry_modules"], ["app.main"])
+
+    def test_link_modules_reports_missing_selfhost_transitive_modules(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            paths = _build_current_selfhost_east3_paths(Path(tmp))
+            self.assertEqual(len(paths), 37)
+
+            with self.assertRaisesRegex(RuntimeError, "toolchain2\\.compile\\.jv"):
+                link_modules(paths, target="go", dispatch_mode="native")
+
+            try:
+                link_modules(paths, target="go", dispatch_mode="native")
+            except RuntimeError as exc:
+                msg = str(exc)
+            else:
+                self.fail("expected unresolved import dependency")
+
+        self.assertIn("toolchain2.compile.jv", msg)
+        self.assertIn("toolchain2.common.types", msg)
+        self.assertIn("toolchain2.link.expand_defaults", msg)
+        self.assertIn("toolchain2.optimize.passes", msg)
+        self.assertIn("toolchain2.parse.py.nodes", msg)
+        self.assertIn("toolchain2.parse.py.parser", msg)
+        self.assertIn("toolchain2.resolve.py.builtin_registry", msg)
+        self.assertIn("toolchain2.resolve.py.normalize_order", msg)
+
     def test_type_id_builder_accepts_single_base_from_bases_array(self) -> None:
         modules = [
             _linked_module(
@@ -243,6 +366,57 @@ class Toolchain2LinkerSpecConform2Tests(unittest.TestCase):
                 result = discover_runtime_modules(module_map)
 
             self.assertIn(str(runtime_path), result)
+
+    def test_link_dependencies_prefer_runtime_module_ids_and_skip_host_python_modules(self) -> None:
+        module = LinkedModule(
+            module_id="app.main",
+            input_path="app/main.east3.json",
+            source_path="app/main.py",
+            is_entry=True,
+            module_kind="user",
+            east_doc=_module_doc(
+                "app.main",
+                body=[
+                    {
+                        "kind": "ImportFrom",
+                        "module": "pytra.std",
+                        "names": [{"name": "os_path", "asname": "path"}],
+                    },
+                    {
+                        "kind": "Import",
+                        "names": [{"name": "os.path", "asname": None}],
+                    },
+                ],
+                meta_extra={
+                    "import_bindings": [
+                        {
+                            "module_id": "pytra.std",
+                            "export_name": "os_path",
+                            "local_name": "path",
+                            "binding_kind": "symbol",
+                            "runtime_module_id": "pytra.std.os_path",
+                            "runtime_group": "std",
+                            "resolved_binding_kind": "module",
+                            "host_only": True,
+                        },
+                        {
+                            "module_id": "os.path",
+                            "export_name": "",
+                            "local_name": "os.path",
+                            "binding_kind": "module",
+                            "runtime_module_id": "os.path",
+                            "runtime_group": "",
+                            "host_only": True,
+                        },
+                    ]
+                },
+            ),
+        )
+
+        resolved, user_deps = build_all_resolved_dependencies([module])
+
+        self.assertEqual(resolved["app.main"], ["pytra.std.os_path"])
+        self.assertEqual(user_deps["app.main"], [])
 
     def test_manifest_loader_rejects_invalid_module_entry(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -587,8 +761,8 @@ class Toolchain2LinkerSpecConform2Tests(unittest.TestCase):
 
         self.assertIn("a := py_str_strip(s)", go_code)
         self.assertIn('j := py_str_join(":", parts)', go_code)
-        self.assertIn("std::string a = py_str_strip(s);", cpp_code)
-        self.assertIn('std::string j = py_str_join(std::string(":"), parts);', cpp_code)
+        self.assertIn("str a = py_str_strip(s);", cpp_code)
+        self.assertIn('str j = py_str_join(str(":"), parts);', cpp_code)
 
     def test_go_emitter_handles_plain_set_constructor_without_link_normalization(self) -> None:
         doc = _fixture_doc("test/fixture/east3-opt/collections/nested_types.east3")
@@ -603,8 +777,133 @@ class Toolchain2LinkerSpecConform2Tests(unittest.TestCase):
 
         cpp_code = emit_cpp_module(doc)
 
-        self.assertIn("std::vector<uint8_t>{uint8_t(1), uint8_t(2), uint8_t(3), uint8_t(255)}", cpp_code)
+        self.assertIn("bytes{uint8(1), uint8(2), uint8(3), uint8(255)}", cpp_code)
         self.assertNotIn("bytes(", cpp_code)
+
+    def test_cpp_emitter_includes_runtime_dependency_headers(self) -> None:
+        doc = _fixture_doc("test/fixture/east3-opt/typing/bytes_basic.east3")
+
+        cpp_code = emit_cpp_module(doc)
+
+        self.assertIn('#include "core/py_runtime.h"', cpp_code)
+        self.assertIn('#include "built_in/io_ops.h"', cpp_code)
+        self.assertIn('#include "utils/assertions.h"', cpp_code)
+
+    def test_cpp_emitter_rewrites_runtime_module_alias_calls_to_direct_symbols(self) -> None:
+        doc = _module_doc(
+            "app.main",
+            meta_extra={
+                "import_modules": {"json": "pytra.std.json"},
+                "linked_program_v1": {"module_id": "app.main", "resolved_dependencies_v1": ["pytra.std.json"]},
+            },
+            body=[
+                {
+                    "kind": "Expr",
+                    "value": {
+                        "kind": "Call",
+                        "func": {
+                            "kind": "Attribute",
+                            "value": {"kind": "Name", "id": "json"},
+                            "attr": "loads",
+                        },
+                        "args": [{"kind": "Name", "id": "text"}],
+                    },
+                }
+            ],
+        )
+
+        cpp_code = emit_cpp_module(doc)
+
+        self.assertIn('loads(text);', cpp_code)
+        self.assertNotIn('json.loads(text);', cpp_code)
+
+    def test_runtime_bundle_emits_header_only_for_native_companion_modules(self) -> None:
+        doc = _fixture_doc("src/runtime/east/built_in/io_ops.east")
+        if "meta" not in doc:
+            doc["meta"] = {}
+        doc["meta"]["linked_program_v1"] = {
+            "module_id": "pytra.built_in.io_ops",
+            "resolved_dependencies_v1": ["pytra.core.py_runtime"],
+        }
+
+        with tempfile.TemporaryDirectory() as tmp:
+            header_path, source_path = emit_runtime_module_artifacts(
+                "pytra.built_in.io_ops",
+                doc,
+                output_dir=Path(tmp),
+                source_path=str(ROOT / "src" / "pytra" / "built_in" / "io_ops.py"),
+            )
+
+            self.assertTrue(Path(header_path).exists())
+            self.assertEqual(source_path, "")
+            header_text = Path(header_path).read_text(encoding="utf-8")
+            self.assertIn('#include "runtime/cpp/built_in/io_ops.h"', header_text)
+
+    def test_cpp_runtime_bundle_pathlib_filters_host_only_includes_and_reuses_header(self) -> None:
+        doc = _fixture_doc("src/runtime/east/std/pathlib.east")
+        meta = doc.setdefault("meta", {})
+        assert isinstance(meta, dict)
+        meta["linked_program_v1"] = {"module_id": "pytra.std.pathlib"}
+
+        with tempfile.TemporaryDirectory() as tmp:
+            header_path, source_path = emit_runtime_module_artifacts(
+                "pytra.std.pathlib",
+                doc,
+                output_dir=Path(tmp),
+                source_path=str(ROOT / "src" / "pytra" / "std" / "pathlib.py"),
+            )
+
+            self.assertNotEqual(source_path, "")
+            header_text = Path(header_path).read_text(encoding="utf-8")
+            source_text = Path(source_path).read_text(encoding="utf-8")
+
+        self.assertNotIn('pytra/typing.h', header_text)
+        self.assertNotIn('pytra/typing.h', source_text)
+        self.assertNotIn('os/path.h', header_text)
+        self.assertNotIn('#include "glob.h"', header_text)
+        self.assertIn("Path joinpath(const list<object>& parts) const;", header_text)
+        self.assertNotIn("struct Path {", source_text)
+        self.assertIn("::splitext(", source_text)
+        self.assertIn("py_str_slice(", source_text)
+
+    def test_runtime_pathlib_lane_uses_string_ops_for_string_methods(self) -> None:
+        doc = _fixture_doc("src/runtime/east/std/pathlib.east")
+        method_calls: list[dict[str, object]] = []
+        for node in _walk_nodes(doc):
+            if node.get("kind") != "Call":
+                continue
+            func = node.get("func")
+            if not isinstance(func, dict) or func.get("kind") != "Attribute":
+                continue
+            if func.get("attr") not in ("startswith", "endswith"):
+                continue
+            method_calls.append(node)
+
+        self.assertEqual(len(method_calls), 2)
+        for node in method_calls:
+            self.assertEqual(node.get("runtime_module_id"), "pytra.built_in.string_ops")
+            self.assertIn(node.get("runtime_call"), ("str.startswith", "str.endswith", "py_startswith", "py_endswith"))
+
+    def test_cpp_emitter_uses_mutable_ref_for_reassigned_bytearray_param(self) -> None:
+        doc = _module_doc(
+            "pytra.utils.png",
+            body=[
+                {
+                    "kind": "FunctionDef",
+                    "name": "_png_append",
+                    "arg_types": {"dst": "bytearray", "src": "bytearray"},
+                    "arg_order": ["dst", "src"],
+                    "arg_defaults": {},
+                    "arg_usage": {"dst": "reassigned", "src": "readonly"},
+                    "return_type": "None",
+                    "body": [{"kind": "Pass"}],
+                }
+            ],
+        )
+
+        cpp_code = emit_cpp_module(doc, allow_runtime_module=True)
+
+        self.assertIn("void _png_append(bytearray& dst, const bytearray& src)", cpp_code)
 
     def test_emitters_treat_runtime_call_int_as_cast_without_link_normalization(self) -> None:
         doc = _fixture_doc("test/fixture/east3-opt/typing/intenum_basic.east3")
@@ -815,8 +1114,8 @@ class Toolchain2LinkerSpecConform2Tests(unittest.TestCase):
 
         cpp_code = emit_cpp_module(doc)
 
-        self.assertIn("return py_argv;", cpp_code)
-        self.assertNotIn("return py_argv();", cpp_code)
+        self.assertIn("return argv;", cpp_code)
+        self.assertNotIn("return argv();", cpp_code)
 
     def test_go_emitter_uses_list_index_helper_for_list_receivers(self) -> None:
         doc = _module_doc(

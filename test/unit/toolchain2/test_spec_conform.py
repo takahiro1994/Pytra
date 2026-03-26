@@ -789,6 +789,86 @@ def f(p: Path) -> str:
         self.assertEqual(with_node.get("context_expr", {}).get("args", [])[0].get("resolved_type"), "str")
         self.assertEqual(with_body_call.get("args", [])[0].get("resolved_type"), "bytes")
 
+    def test_resolver_keeps_builtin_calls_lowered_when_registry_also_has_runtime_helpers(self) -> None:
+        source = """
+def py_find_window(s: str) -> int:
+    return len(s)
+
+def run(s: str) -> int:
+    return py_find_window(s)
+"""
+        east2 = parse_python_source(source, "<mem>").to_jv()
+        resolve_east1_to_east2(east2, registry=_load_registry())
+
+        len_call = next(
+            node
+            for node in _walk(east2)
+            if node.get("kind") == "Call"
+            and isinstance(node.get("func"), dict)
+            and node["func"].get("kind") == "Name"
+            and node["func"].get("id") == "len"
+        )
+        helper_call = next(
+            node
+            for node in _walk(east2)
+            if node.get("kind") == "Call"
+            and isinstance(node.get("func"), dict)
+            and node["func"].get("kind") == "Name"
+            and node["func"].get("id") == "py_find_window"
+        )
+
+        self.assertEqual(len_call.get("lowered_kind"), "BuiltinCall")
+        self.assertEqual(len_call.get("builtin_name"), "len")
+        self.assertEqual(len_call.get("runtime_call"), "len")
+        self.assertEqual(len_call.get("runtime_module_id"), "pytra.core.py_runtime")
+        self.assertNotEqual(helper_call.get("lowered_kind"), "BuiltinCall")
+        self.assertEqual(helper_call.get("resolved_type"), "int64")
+
+    def test_resolver_lowers_builtin_str_before_registry_class_ctor_path(self) -> None:
+        source = """
+from pytra.std.pathlib import Path
+
+def stringify(p: Path) -> str:
+    return str(p)
+"""
+        east2 = parse_python_source(source, "<mem>").to_jv()
+        resolve_east1_to_east2(east2, registry=_load_registry())
+
+        str_call = next(
+            node
+            for node in _walk(east2)
+            if node.get("kind") == "Call"
+            and isinstance(node.get("func"), dict)
+            and node["func"].get("kind") == "Name"
+            and node["func"].get("id") == "str"
+        )
+
+        self.assertEqual(str_call.get("lowered_kind"), "BuiltinCall")
+        self.assertEqual(str_call.get("builtin_name"), "str")
+        self.assertEqual(str_call.get("runtime_call"), "py_to_string")
+        self.assertEqual(str_call.get("runtime_module_id"), "pytra.core.py_runtime")
+        self.assertEqual(str_call.get("runtime_call_adapter_kind"), "builtin")
+
+    def test_resolver_marks_in_place_mutation_params_as_reassigned(self) -> None:
+        source = """
+def append_all(dst: bytearray, src: bytearray) -> None:
+    i = 0
+    while i < len(src):
+        dst.append(src[i])
+        i += 1
+"""
+        east2 = parse_python_source(source, "<mem>").to_jv()
+        resolve_east1_to_east2(east2, registry=_load_registry())
+
+        fn = next(
+            node
+            for node in _walk(east2)
+            if node.get("kind") == "FunctionDef" and node.get("name") == "append_all"
+        )
+
+        self.assertEqual(fn.get("arg_usage", {}).get("dst"), "reassigned")
+        self.assertEqual(fn.get("arg_usage", {}).get("src"), "readonly")
+
     def test_boolop_value_select_preserves_operand_type(self) -> None:
         source = """
 def f() -> None:

@@ -14,6 +14,47 @@ if TYPE_CHECKING:
     from toolchain2.link.linker import LinkedModule
 
 
+def _scan_runtime_refs(node: JsonVal, out: set[str]) -> None:
+    if isinstance(node, list):
+        for item in node:
+            _scan_runtime_refs(item, out)
+        return
+    if not isinstance(node, dict):
+        return
+
+    runtime_module_id = node.get("runtime_module_id")
+    if isinstance(runtime_module_id, str) and runtime_module_id != "":
+        out.add(runtime_module_id)
+
+    for value in node.values():
+        if isinstance(value, (dict, list)):
+            _scan_runtime_refs(value, out)
+
+
+def _binding_dependency_module_id(binding: JsonVal) -> str:
+    if not isinstance(binding, dict):
+        return ""
+
+    runtime_module_id = binding.get("runtime_module_id")
+    runtime_group = binding.get("runtime_group")
+    module_id = binding.get("module_id")
+    host_only = binding.get("host_only") is True
+
+    if isinstance(runtime_module_id, str) and runtime_module_id != "":
+        if runtime_module_id.startswith("pytra."):
+            return runtime_module_id
+        if isinstance(runtime_group, str) and runtime_group != "" and not host_only:
+            return runtime_module_id
+        if not host_only:
+            return runtime_module_id
+        return ""
+
+    if isinstance(module_id, str) and module_id != "":
+        if module_id.startswith("pytra.") or not host_only:
+            return module_id
+    return ""
+
+
 def _build_resolved_dependencies(
     east_doc: dict[str, JsonVal],
 ) -> list[str]:
@@ -25,38 +66,46 @@ def _build_resolved_dependencies(
     if not isinstance(meta_val, dict):
         return deps
 
-    # From import_bindings
+    # Prefer resolved runtime binding metadata when present.
     bindings = meta_val.get("import_bindings")
+    saw_import_bindings = False
     if isinstance(bindings, list):
+        saw_import_bindings = True
         for binding in bindings:
-            if not isinstance(binding, dict):
-                continue
-            mod_id = binding.get("module_id")
-            if isinstance(mod_id, str) and mod_id.strip() != "" and mod_id not in seen:
+            mod_id = _binding_dependency_module_id(binding)
+            if mod_id != "" and mod_id not in seen:
                 seen.add(mod_id)
                 deps.append(mod_id)
 
-    # From body Import/ImportFrom
-    body_val = east_doc.get("body")
-    if isinstance(body_val, list):
-        for stmt in body_val:
-            if not isinstance(stmt, dict):
-                continue
-            kind = stmt.get("kind")
-            if kind == "ImportFrom":
-                mod = stmt.get("module")
-                if isinstance(mod, str) and mod.strip() != "" and mod not in seen:
-                    seen.add(mod)
-                    deps.append(mod)
-            elif kind == "Import":
-                names = stmt.get("names")
-                if isinstance(names, list):
-                    for ent in names:
-                        if isinstance(ent, dict):
-                            name = ent.get("name")
-                            if isinstance(name, str) and name.strip() != "" and name not in seen:
-                                seen.add(name)
-                                deps.append(name)
+    embedded_runtime_refs: set[str] = set()
+    _scan_runtime_refs(east_doc.get("body"), embedded_runtime_refs)
+    for runtime_module_id in sorted(embedded_runtime_refs):
+        if runtime_module_id != "" and runtime_module_id not in seen:
+            seen.add(runtime_module_id)
+            deps.append(runtime_module_id)
+
+    # Fallback for older docs that still lack import metadata.
+    if not saw_import_bindings:
+        body_val = east_doc.get("body")
+        if isinstance(body_val, list):
+            for stmt in body_val:
+                if not isinstance(stmt, dict):
+                    continue
+                kind = stmt.get("kind")
+                if kind == "ImportFrom":
+                    mod = stmt.get("module")
+                    if isinstance(mod, str) and mod.strip() != "" and mod not in seen:
+                        seen.add(mod)
+                        deps.append(mod)
+                elif kind == "Import":
+                    names = stmt.get("names")
+                    if isinstance(names, list):
+                        for ent in names:
+                            if isinstance(ent, dict):
+                                name = ent.get("name")
+                                if isinstance(name, str) and name.strip() != "" and name not in seen:
+                                    seen.add(name)
+                                    deps.append(name)
 
     return sorted(deps)
 

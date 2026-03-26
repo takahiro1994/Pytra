@@ -3,6 +3,8 @@
 #include <stdexcept>
 #include <utility>
 
+#include "core/py_types.h"
+
 namespace pytra::runtime::cpp::base {
 
 PyFile::PyFile(const ::std::string& path, const ::std::string& mode) {
@@ -94,17 +96,17 @@ void PyFile::ensure_readable() const {
     }
 }
 
-::std::size_t PyFile::write(const ::std::string& text) {
+object PyFile::write(const ::std::string& text) {
     ensure_writable();
     ofs_ << text;
-    return text.size();
+    return object(static_cast<int64>(text.size()));
 }
 
-::std::string PyFile::read() {
+object PyFile::read() {
     ensure_readable();
     ::std::stringstream ss;
     ss << ifs_.rdbuf();
-    return ss.str();
+    return object(str(ss.str()));
 }
 
 PyFile::iterator PyFile::begin() {

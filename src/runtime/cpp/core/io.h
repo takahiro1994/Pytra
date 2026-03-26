@@ -7,6 +7,10 @@
 #include <type_traits>
 #include <vector>
 
+template <typename T>
+struct Object;
+using object = Object<void>;
+
 namespace pytra::runtime::cpp::base {
 
 class PyFile {
@@ -26,8 +30,8 @@ public:
     bool is_open() const;
     void close();
 
-    ::std::size_t write(const ::std::string& text);
-    ::std::string read();
+    object write(const ::std::string& text);
+    object read();
     iterator begin();
     iterator end();
     const_iterator begin() const;

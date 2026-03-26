@@ -14,11 +14,12 @@ from dataclasses import field
 from pytra.std.json import JsonVal
 from pytra.std.pathlib import Path
 
-from toolchain2.emit.cpp.types import cpp_type, cpp_zero_value
+from toolchain2.emit.cpp.types import cpp_type, cpp_zero_value, cpp_signature_type, cpp_param_decl
 from toolchain2.emit.common.code_emitter import (
     RuntimeMapping, load_runtime_mapping, resolve_runtime_call,
-    should_skip_module, build_runtime_import_map, resolve_runtime_symbol_name,
+    should_skip_module, build_import_alias_map, build_runtime_import_map, resolve_runtime_symbol_name,
 )
+from toolchain2.emit.cpp.runtime_paths import collect_cpp_dependency_module_ids, cpp_include_for_module
 
 
 # ---------------------------------------------------------------------------
@@ -37,7 +38,10 @@ class CppEmitContext:
     current_class: str = ""
     current_return_type: str = ""
     runtime_imports: dict[str, str] = field(default_factory=dict)
+    import_aliases: dict[str, str] = field(default_factory=dict)
     mapping: RuntimeMapping = field(default_factory=RuntimeMapping)
+    temp_counter: int = 0
+    emit_class_decls: bool = True
 
 
 def _indent(ctx: CppEmitContext) -> str:
@@ -86,6 +90,7 @@ def _emit_expr(ctx: CppEmitContext, node: JsonVal) -> str:
 
     if kind == "Constant": return _emit_constant(ctx, node)
     if kind == "Name": return _emit_name(ctx, node)
+    if kind == "IsInstance": return _emit_isinstance(ctx, node)
     if kind == "BinOp": return _emit_binop(ctx, node)
     if kind == "UnaryOp": return _emit_unaryop(ctx, node)
     if kind == "Compare": return _emit_compare(ctx, node)
@@ -100,7 +105,7 @@ def _emit_expr(ctx: CppEmitContext, node: JsonVal) -> str:
     if kind == "JoinedStr": return _emit_fstring(ctx, node)
     if kind == "FormattedValue": return _emit_formatted_value(ctx, node)
     if kind == "Lambda": return _emit_lambda(ctx, node)
-    if kind == "Unbox": return _emit_expr(ctx, node.get("value"))
+    if kind == "Unbox": return _emit_unbox(ctx, node)
     if kind == "Box": return _emit_expr(ctx, node.get("value"))
     if kind == "ObjStr": return "py_str(" + _emit_expr(ctx, node.get("value")) + ")"
     if kind == "ObjLen": return "py_len(" + _emit_expr(ctx, node.get("value")) + ")"
@@ -110,7 +115,7 @@ def _emit_expr(ctx: CppEmitContext, node: JsonVal) -> str:
 
 def _emit_constant(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
     val = node.get("value")
-    if val is None: return "nullptr"
+    if val is None: return "::std::nullopt"
     if isinstance(val, bool): return "true" if val else "false"
     if isinstance(val, int):
         rt = _str(node, "resolved_type")
@@ -137,7 +142,7 @@ def _cpp_string(s: str) -> str:
         elif ord(ch) < 32: out.append("\\x" + format(ord(ch), "02x"))
         else: out.append(ch)
     out.append('"')
-    return "std::string(" + "".join(out) + ")"
+    return "str(" + "".join(out) + ")"
 
 
 def _emit_name(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
@@ -145,7 +150,7 @@ def _emit_name(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
     if name == "": name = _str(node, "repr")
     if name == "True": return "true"
     if name == "False": return "false"
-    if name == "None": return "nullptr"
+    if name == "None": return "::std::nullopt"
     if name == "self": return "this"
     if name == "continue": return "continue"
     if name == "break": return "break"
@@ -229,25 +234,36 @@ def _emit_call(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
         if fk == "Attribute":
             owner = _emit_expr(ctx, func.get("value"))
             attr = _str(func, "attr")
+            owner_node = func.get("value")
+            owner_id = _str(owner_node, "id") if isinstance(owner_node, dict) else ""
+            owner_module = ctx.import_aliases.get(owner_id, "")
+            if _is_type_owner(ctx, owner_node):
+                return owner + "::" + attr + "(" + ", ".join(arg_strs) + ")"
+            if owner_module.startswith("pytra.") or owner_module.startswith("toolchain."):
+                return "::" + attr + "(" + ", ".join(arg_strs) + ")"
             if attr == "append" and len(arg_strs) >= 1:
                 return owner + ".push_back(" + arg_strs[0] + ")"
+            if owner == "this":
+                return "this->" + attr + "(" + ", ".join(arg_strs) + ")"
             return owner + "." + attr + "(" + ", ".join(arg_strs) + ")"
         if fk == "Name":
             fn = _str(func, "id")
             if fn == "": fn = _str(func, "repr")
+            if fn == "cast" and len(args) >= 2:
+                return _emit_cast_expr(ctx, args[0], args[1])
             if fn in ("bytearray", "bytes"):
                 if len(args) >= 1 and isinstance(args[0], dict):
                     a0_kind = _str(args[0], "kind")
                     a0_rt = _str(args[0], "resolved_type")
                     if a0_kind == "List":
                         elems = _list(args[0], "elements")
-                        parts = ["uint8_t(" + _emit_expr(ctx, e) + ")" for e in elems]
-                        return "std::vector<uint8_t>{" + ", ".join(parts) + "}"
+                        parts = ["uint8(" + _emit_expr(ctx, e) + ")" for e in elems]
+                        return "bytes{" + ", ".join(parts) + "}"
                     if a0_rt in ("int64", "int32", "int", "uint8", "int8"):
-                        return "std::vector<uint8_t>(" + arg_strs[0] + ")"
+                        return "bytes(" + arg_strs[0] + ")"
                 if len(arg_strs) >= 1:
-                    return "std::vector<uint8_t>(" + arg_strs[0] + ")"
-                return "std::vector<uint8_t>{}"
+                    return "bytes(" + arg_strs[0] + ")"
+                return "bytes{}"
             if fn in ctx.class_names: return fn + "(" + ", ".join(arg_strs) + ")"
             if fn in ctx.runtime_imports: return ctx.runtime_imports[fn] + "(" + ", ".join(arg_strs) + ")"
             if fn == "main": return "__pytra_main(" + ", ".join(arg_strs) + ")"
@@ -269,24 +285,26 @@ def _emit_builtin_call(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
 
     if rc in ("static_cast", "int", "float", "bool"):
         rt = _str(node, "resolved_type")
-        ct = cpp_type(rt)
+        ct = cpp_signature_type(rt)
         if len(arg_strs) >= 1: return "static_cast<" + ct + ">(" + arg_strs[0] + ")"
         return ct + "()"
     if rc in ("py_to_string", "str") and len(arg_strs) >= 1:
-        return "std::to_string(" + arg_strs[0] + ")"
+        if len(args) >= 1 and isinstance(args[0], dict) and _str(args[0], "resolved_type") == "str":
+            return arg_strs[0]
+        return "str(py_to_string(" + arg_strs[0] + "))"
     if rc in ("bytearray_ctor", "bytes_ctor"):
         if len(args) >= 1 and isinstance(args[0], dict):
             a0_kind = _str(args[0], "kind")
             a0_rt = _str(args[0], "resolved_type")
             if a0_kind == "List":
                 elems = _list(args[0], "elements")
-                parts = ["uint8_t(" + _emit_expr(ctx, e) + ")" for e in elems]
-                return "std::vector<uint8_t>{" + ", ".join(parts) + "}"
+                parts = ["uint8(" + _emit_expr(ctx, e) + ")" for e in elems]
+                return "bytes{" + ", ".join(parts) + "}"
             if a0_rt in ("int64", "int32", "int", "uint8", "int8"):
-                return "std::vector<uint8_t>(" + arg_strs[0] + ")"
+                return "bytes(" + arg_strs[0] + ")"
         if len(arg_strs) >= 1:
-            return "std::vector<uint8_t>(" + arg_strs[0] + ")"
-        return "std::vector<uint8_t>{}"
+            return "bytes(" + arg_strs[0] + ")"
+        return "bytes{}"
     if rc in ("py_print", "py_len") and len(arg_strs) >= 1:
         return rc + "(" + ", ".join(arg_strs) + ")"
     if rc == "py_int_from_str" and len(arg_strs) >= 1:
@@ -331,6 +349,17 @@ def _emit_attribute(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
     runtime_module_id = _str(node, "runtime_module_id")
     runtime_symbol = _str(node, "runtime_symbol")
     runtime_symbol_dispatch = _str(node, "runtime_symbol_dispatch")
+    owner_module = ctx.import_aliases.get(owner_id, "")
+    if _is_type_owner(ctx, owner_node):
+        return owner + "::" + attr
+    if owner_module.startswith("pytra.") or owner_module.startswith("toolchain."):
+        if owner_id == "math":
+            if attr == "pi": return "M_PI"
+            if attr == "e": return "M_E"
+        return "::" + attr
+    if runtime_symbol_dispatch == "value" and runtime_module_id.startswith("pytra."):
+        value_name = runtime_symbol if runtime_symbol != "" else attr
+        return "::" + value_name
     if (
         runtime_module_id != ""
         and should_skip_module(runtime_module_id, ctx.mapping)
@@ -347,6 +376,8 @@ def _emit_attribute(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
     if owner_id == "math":
         if attr == "pi": return "M_PI"
         if attr == "e": return "M_E"
+    if owner == "this":
+        return "this->" + attr
     return owner + "." + attr
 
 
@@ -354,7 +385,13 @@ def _emit_subscript(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
     value = _emit_expr(ctx, node.get("value"))
     sl = node.get("slice")
     if isinstance(sl, dict) and _str(sl, "kind") == "Slice":
-        return value + " /* slice */"
+        return _emit_slice_expr(ctx, node, value, sl)
+    value_node = node.get("value")
+    value_type = _str(value_node, "resolved_type") if isinstance(value_node, dict) else ""
+    if value_type.startswith("tuple[") and isinstance(sl, dict) and _str(sl, "kind") == "Constant":
+        iv = sl.get("value")
+        if isinstance(iv, int) and iv >= 0:
+            return "::std::get<" + str(iv) + ">(" + value + ")"
     idx = _emit_expr(ctx, sl)
     # Negative index
     if isinstance(sl, dict) and _str(sl, "kind") == "Constant":
@@ -391,6 +428,71 @@ def _emit_tuple_literal(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
     return "std::make_tuple(" + ", ".join(parts) + ")"
 
 
+def _emit_unbox(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
+    value = node.get("value")
+    value_expr = _emit_expr(ctx, value)
+    target = _str(node, "target")
+    if target == "":
+        target = _str(node, "resolved_type")
+    if target == "" or target == "object":
+        return value_expr
+    if target in ctx.class_names:
+        return "(*(" + value_expr + ").as<" + target + ">())"
+    if target in ("str", "int", "int64", "float", "float64", "bool"):
+        return _emit_object_unbox(value_expr, target)
+    if target.startswith("list[") or target.startswith("dict[") or target.startswith("set[") or target in ("bytes", "bytearray"):
+        return "(*(" + value_expr + ").as<" + cpp_signature_type(target) + ">())"
+    return value_expr
+
+
+def _emit_object_unbox(value_expr: str, target: str) -> str:
+    if target == "str":
+        return "(" + value_expr + ").unbox<str, PYTRA_TID_STR>()"
+    if target in ("int", "int64"):
+        return "(" + value_expr + ").unbox<int64, PYTRA_TID_INT>()"
+    if target in ("float", "float64"):
+        return "(" + value_expr + ").unbox<float64, PYTRA_TID_FLOAT>()"
+    if target == "bool":
+        return "(" + value_expr + ").unbox<bool, PYTRA_TID_BOOL>()"
+    return value_expr
+
+
+def _emit_isinstance(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
+    value = node.get("value")
+    expected = node.get("expected_type_id")
+    expected_name = _str(expected, "id") if isinstance(expected, dict) else ""
+    value_expr = _emit_expr(ctx, value)
+    value_type = _str(value, "resolved_type") if isinstance(value, dict) else ""
+    tid = {
+        "None": "PYTRA_TID_NONE",
+        "bool": "PYTRA_TID_BOOL",
+        "int": "PYTRA_TID_INT",
+        "int64": "PYTRA_TID_INT",
+        "float": "PYTRA_TID_FLOAT",
+        "float64": "PYTRA_TID_FLOAT",
+        "str": "PYTRA_TID_STR",
+    }.get(expected_name, "")
+    if tid == "":
+        return "false"
+    if value_type in ("object", "Any", "Obj", "unknown") or " | " in value_type:
+        return "py_runtime_object_isinstance(" + value_expr + ", " + tid + ")"
+    return "py_runtime_value_isinstance(" + value_expr + ", " + tid + ")"
+
+
+def _emit_slice_expr(ctx: CppEmitContext, node: dict[str, JsonVal], value_expr: str, slice_node: dict[str, JsonVal]) -> str:
+    value_node = node.get("value")
+    value_type = _str(value_node, "resolved_type") if isinstance(value_node, dict) else ""
+    lower = slice_node.get("lower")
+    upper = slice_node.get("upper")
+    lo_expr = _emit_expr(ctx, lower) if isinstance(lower, dict) else "0"
+    up_expr = _emit_expr(ctx, upper) if isinstance(upper, dict) else "py_len(" + value_expr + ")"
+    if value_type == "str":
+        return "py_str_slice(" + value_expr + ", " + lo_expr + ", " + up_expr + ")"
+    if value_type.startswith("list[") or value_type in ("bytes", "bytearray"):
+        return "py_list_slice_copy(" + value_expr + ", " + lo_expr + ", " + up_expr + ")"
+    return value_expr + " /* slice */"
+
+
 def _emit_ifexp(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
     test = _emit_expr(ctx, node.get("test"))
     body = _emit_expr(ctx, node.get("body"))
@@ -412,7 +514,7 @@ def _emit_fstring(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
 
 
 def _emit_formatted_value(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
-    return "std::to_string(" + _emit_expr(ctx, node.get("value")) + ")"
+    return "str(py_to_string(" + _emit_expr(ctx, node.get("value")) + "))"
 
 
 def _emit_lambda(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
@@ -424,7 +526,7 @@ def _emit_lambda(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
         an = a if isinstance(a, str) else ""
         at = arg_types.get(an, "")
         at_str = at if isinstance(at, str) else ""
-        params.append(cpp_type(at_str) + " " + an)
+        params.append(cpp_param_decl(at_str, an))
     return "[&](" + ", ".join(params) + ") { return " + _emit_expr(ctx, body) + "; }"
 
 
@@ -445,6 +547,7 @@ def _emit_stmt(ctx: CppEmitContext, node: JsonVal) -> None:
     elif kind == "While": _emit_while(ctx, node)
     elif kind == "ForCore": _emit_for_core(ctx, node)
     elif kind == "FunctionDef": _emit_function_def(ctx, node)
+    elif kind == "ClosureDef": _emit_closure_def(ctx, node)
     elif kind == "ClassDef": _emit_class_def(ctx, node)
     elif kind == "ImportFrom" or kind == "Import": pass
     elif kind == "Pass": _emit(ctx, "// pass")
@@ -452,6 +555,7 @@ def _emit_stmt(ctx: CppEmitContext, node: JsonVal) -> None:
     elif kind == "Swap": _emit_swap(ctx, node)
     elif kind == "Try": _emit_try(ctx, node)
     elif kind == "Raise": _emit_raise(ctx, node)
+    elif kind == "With": _emit_with(ctx, node)
     elif kind == "comment":
         t = _str(node, "text")
         if t != "": _emit(ctx, "// " + t)
@@ -478,7 +582,7 @@ def _emit_ann_assign(ctx: CppEmitContext, node: dict[str, JsonVal]) -> None:
     target_val = node.get("target")
     rt = _str(node, "decl_type")
     if rt == "": rt = _str(node, "resolved_type")
-    ct = cpp_type(rt)
+    ct = cpp_signature_type(rt)
     value = node.get("value")
 
     name = ""
@@ -529,7 +633,7 @@ def _emit_assign(ctx: CppEmitContext, node: dict[str, JsonVal]) -> None:
             if dt == "" or dt == "unknown":
                 _emit(ctx, "auto " + name + " = " + val_code + ";")
             else:
-                ct = cpp_type(dt)
+                ct = cpp_signature_type(dt)
                 _emit(ctx, ct + " " + name + " = " + val_code + ";")
         if _bool(node, "unused") and _bool(node, "declare"):
             _emit(ctx, "(void)" + name + ";")
@@ -609,7 +713,7 @@ def _emit_for_core(ctx: CppEmitContext, node: dict[str, JsonVal]) -> None:
                 cmp = " > " if neg else " < "
                 decl = ""
                 if t_name not in ctx.var_types:
-                    decl = (cpp_type(target_type) if target_type not in ("", "unknown") else "auto") + " "
+                    decl = (cpp_signature_type(target_type) if target_type not in ("", "unknown") else "auto") + " "
                 _emit(ctx, "for (" + decl + t_name + " = " + start + "; " + t_name + cmp + stop + "; " + t_name + " += " + step + ") {")
                 ctx.indent_level += 1
                 ctx.var_types[t_name] = target_type
@@ -631,35 +735,40 @@ def _emit_for_core(ctx: CppEmitContext, node: dict[str, JsonVal]) -> None:
 
 
 def _emit_function_def(ctx: CppEmitContext, node: dict[str, JsonVal]) -> None:
+    _emit_function_def_impl(ctx, node)
+
+
+def _closure_function_type(node: dict[str, JsonVal]) -> str:
+    params = [cpp_signature_type(arg_type) for _, arg_type, _ in _function_param_meta(node)]
+    ret = cpp_signature_type(_return_type(node))
+    return "::std::function<" + ret + "(" + ", ".join(params) + ")>"
+
+
+def _emit_closure_def(ctx: CppEmitContext, node: dict[str, JsonVal]) -> None:
     name = _str(node, "name")
-    arg_types = _dict(node, "arg_types")
-    arg_order = _list(node, "arg_order")
-    return_type = _str(node, "return_type")
-    body = _list(node, "body")
-    for d in _list(node, "decorators"):
-        if isinstance(d, str) and d == "extern": return
-
-    ct_ret = cpp_type(return_type)
-    if return_type == "None": ct_ret = "void"
-    params: list[str] = []
+    if name == "":
+        return
+    ctx.includes_needed.add("functional")
     saved = dict(ctx.var_types)
-    for a in arg_order:
-        an = a if isinstance(a, str) else ""
-        if an == "self": continue
-        at = arg_types.get(an, "")
-        at_str = at if isinstance(at, str) else ""
-        params.append(cpp_type(at_str) + " " + an)
-        ctx.var_types[an] = at_str
-
     saved_ret = ctx.current_return_type
+    return_type = _return_type(node)
     ctx.current_return_type = return_type
-    _emit(ctx, ct_ret + " " + name + "(" + ", ".join(params) + ") {")
+    for arg_name, arg_type, _ in _function_param_meta(node):
+        ctx.var_types[arg_name] = arg_type
+    ctx.var_types[name] = _closure_function_type(node)
+    params = [_param_decl_text(arg_type, arg_name, mutable) for arg_name, arg_type, mutable in _function_param_meta(node)]
+    ret = cpp_signature_type(return_type)
+    signature = "[" + "&" + "](" + ", ".join(params) + ")"
+    if ret != "void":
+        signature += " -> " + ret
+    _emit(ctx, _closure_function_type(node) + " " + name + " = " + signature + " {")
     ctx.indent_level += 1
-    _emit_body(ctx, body)
+    _emit_body(ctx, _list(node, "body"))
     ctx.indent_level -= 1
-    _emit(ctx, "}")
+    _emit(ctx, "};")
     _emit_blank(ctx)
     ctx.var_types = saved
+    ctx.var_types[name] = _closure_function_type(node)
     ctx.current_return_type = saved_ret
 
 
@@ -682,24 +791,31 @@ def _emit_class_def(ctx: CppEmitContext, node: dict[str, JsonVal]) -> None:
                 if tr == "": tr = _str(s, "resolved_type")
                 if tn != "": fields.append((tn, tr))
 
-    _emit(ctx, "struct " + name + " {")
-    ctx.indent_level += 1
-    for fn, ftype in fields: _emit(ctx, cpp_type(ftype) + " " + fn + ";")
-    ctx.indent_level -= 1
-    _emit(ctx, "};")
-    _emit_blank(ctx)
+    if ctx.emit_class_decls:
+        _emit(ctx, "struct " + name + " {")
+        ctx.indent_level += 1
+        for fn, ftype in fields:
+            _emit(ctx, cpp_signature_type(ftype) + " " + fn + ";")
+        for s in body:
+            if not isinstance(s, dict) or _str(s, "kind") not in ("FunctionDef", "ClosureDef"):
+                continue
+            decl = _function_signature(ctx, s, owner_name=name, declaration_only=True)
+            if decl != "":
+                _emit(ctx, decl + ";")
+        ctx.indent_level -= 1
+        _emit(ctx, "};")
+        _emit_blank(ctx)
 
     for s in body:
-        if isinstance(s, dict) and _str(s, "kind") == "FunctionDef":
-            if _str(s, "name") == "__init__": continue
-            _emit_function_def(ctx, s)
+        if isinstance(s, dict) and _str(s, "kind") in ("FunctionDef", "ClosureDef"):
+            _emit_function_def_impl(ctx, s, owner_name=name)
 
 
 def _emit_var_decl(ctx: CppEmitContext, node: dict[str, JsonVal]) -> None:
     name = _str(node, "name")
     rt = _str(node, "type")
     if rt == "": rt = _str(node, "resolved_type")
-    ct = cpp_type(rt)
+    ct = cpp_signature_type(rt)
     ctx.var_types[name] = rt
     _emit(ctx, ct + " " + name + " = " + cpp_zero_value(rt) + ";")
 
@@ -742,11 +858,171 @@ def _emit_raise(ctx: CppEmitContext, node: dict[str, JsonVal]) -> None:
         _emit(ctx, "throw;")
 
 
+def _emit_with(ctx: CppEmitContext, node: dict[str, JsonVal]) -> None:
+    context_expr = _emit_expr(ctx, node.get("context_expr"))
+    var_name = _str(node, "var_name")
+    if var_name == "":
+        var_name = _next_temp(ctx, "__with")
+    finally_name = _next_temp(ctx, "__finally")
+    _emit(ctx, "auto " + var_name + " = " + context_expr + ";")
+    _emit(ctx, "{")
+    ctx.indent_level += 1
+    _emit(ctx, "auto " + finally_name + " = py_make_scope_exit([&]() {")
+    ctx.indent_level += 1
+    _emit(ctx, var_name + ".close();")
+    ctx.indent_level -= 1
+    _emit(ctx, "});")
+    _emit_body(ctx, _list(node, "body"))
+    ctx.indent_level -= 1
+    _emit(ctx, "}")
+
+
+def _emit_function_def_impl(ctx: CppEmitContext, node: dict[str, JsonVal], owner_name: str = "") -> None:
+    if _has_decorator(node, "extern"):
+        return
+    saved = dict(ctx.var_types)
+    saved_ret = ctx.current_return_type
+    return_type = _return_type(node)
+    ctx.current_return_type = return_type
+    for arg_name, arg_type, _ in _function_param_meta(node):
+        ctx.var_types[arg_name] = arg_type
+    signature = _function_signature(ctx, node, owner_name=owner_name, declaration_only=False)
+    if signature == "":
+        ctx.var_types = saved
+        ctx.current_return_type = saved_ret
+        return
+    _emit(ctx, signature + " {")
+    ctx.indent_level += 1
+    _emit_body(ctx, _list(node, "body"))
+    ctx.indent_level -= 1
+    _emit(ctx, "}")
+    _emit_blank(ctx)
+    ctx.var_types = saved
+    ctx.current_return_type = saved_ret
+
+
+def _function_signature(
+    ctx: CppEmitContext,
+    node: dict[str, JsonVal],
+    *,
+    owner_name: str = "",
+    declaration_only: bool,
+) -> str:
+    name = _str(node, "name")
+    if name == "":
+        return ""
+    is_static = _has_decorator(node, "staticmethod")
+    params = [_param_decl_text(arg_type, arg_name, mutable) for arg_name, arg_type, mutable in _function_param_meta(node)]
+    if declaration_only and owner_name != "" and is_static:
+        static_prefix = "static "
+    else:
+        static_prefix = ""
+    if name == "__init__" and owner_name != "":
+        prefix = owner_name if declaration_only else owner_name + "::" + owner_name
+        return static_prefix + prefix + "(" + ", ".join(params) + ")"
+    ret = cpp_signature_type(_return_type(node))
+    qual_name = name
+    if owner_name != "" and not declaration_only:
+        qual_name = owner_name + "::" + name
+    suffix = ""
+    if declaration_only and owner_name != "" and not is_static and not _bool(node, "mutates_self"):
+        suffix = " const"
+    if (not declaration_only) and owner_name != "" and not is_static and not _bool(node, "mutates_self"):
+        suffix = " const"
+    return static_prefix + ret + " " + qual_name + "(" + ", ".join(params) + ")" + suffix
+
+
+def _function_param_meta(node: dict[str, JsonVal]) -> list[tuple[str, str, bool]]:
+    arg_types = _dict(node, "arg_types")
+    arg_order = _list(node, "arg_order")
+    arg_usage = _dict(node, "arg_usage")
+    is_static = _has_decorator(node, "staticmethod")
+    out: list[tuple[str, str, bool]] = []
+    for arg in arg_order:
+        arg_name = arg if isinstance(arg, str) else ""
+        if arg_name == "":
+            continue
+        if arg_name == "self" and not is_static:
+            continue
+        arg_type = arg_types.get(arg_name, "")
+        arg_type_str = arg_type if isinstance(arg_type, str) else "object"
+        out.append((arg_name, arg_type_str, arg_usage.get(arg_name) == "reassigned"))
+    return out
+
+
+def _param_decl_text(resolved_type: str, name: str, mutable: bool) -> str:
+    return cpp_param_decl(resolved_type, name, mutable=mutable)
+
+
+def _return_type(node: dict[str, JsonVal]) -> str:
+    return_type = _str(node, "return_type")
+    if return_type == "":
+        return_type = _str(node, "returns")
+    if return_type == "":
+        return_type = "None"
+    return return_type
+
+
+def _has_decorator(node: dict[str, JsonVal], name: str) -> bool:
+    for d in _list(node, "decorators"):
+        if isinstance(d, str) and d == name:
+            return True
+    return False
+
+
+def _is_type_owner(ctx: CppEmitContext, owner_node: JsonVal) -> bool:
+    if not isinstance(owner_node, dict):
+        return False
+    if _str(owner_node, "type_object_of") != "":
+        return True
+    owner_id = _str(owner_node, "id")
+    return owner_id != "" and owner_id in ctx.class_names
+
+
+def _emit_cast_expr(ctx: CppEmitContext, target_node: JsonVal, value_node: JsonVal) -> str:
+    target_name = ""
+    if isinstance(target_node, dict):
+        target_name = _str(target_node, "id")
+        if target_name == "":
+            target_name = _str(target_node, "repr")
+    value_expr = _emit_expr(ctx, value_node)
+    value_type = _str(value_node, "resolved_type") if isinstance(value_node, dict) else ""
+    if target_name == "":
+        return value_expr
+    if value_type == target_name:
+        return value_expr
+    if target_name in ctx.class_names and _needs_object_cast(value_type):
+        return "(*(" + value_expr + ").as<" + target_name + ">())"
+    if target_name == "str" and _needs_object_cast(value_type):
+        return _emit_object_unbox(value_expr, "str")
+    if target_name in ("int", "int64") and _needs_object_cast(value_type):
+        return _emit_object_unbox(value_expr, "int64")
+    if target_name in ("float", "float64") and _needs_object_cast(value_type):
+        return _emit_object_unbox(value_expr, "float64")
+    if target_name == "bool" and _needs_object_cast(value_type):
+        return _emit_object_unbox(value_expr, "bool")
+    return "static_cast<" + cpp_signature_type(target_name) + ">(" + value_expr + ")"
+
+
+def _needs_object_cast(resolved_type: str) -> bool:
+    return resolved_type in ("", "unknown", "Any", "Obj", "object") or " | " in resolved_type
+
+
+def _next_temp(ctx: CppEmitContext, prefix: str) -> str:
+    ctx.temp_counter += 1
+    return prefix + "_" + str(ctx.temp_counter)
+
+
 # ---------------------------------------------------------------------------
 # Module emission
 # ---------------------------------------------------------------------------
 
-def emit_cpp_module(east3_doc: dict[str, JsonVal]) -> str:
+def emit_cpp_module(
+    east3_doc: dict[str, JsonVal],
+    *,
+    allow_runtime_module: bool = False,
+    self_header: str = "",
+) -> str:
     meta = _dict(east3_doc, "meta")
     module_id = ""
     emit_ctx_meta = _dict(meta, "emit_context")
@@ -757,18 +1033,20 @@ def emit_cpp_module(east3_doc: dict[str, JsonVal]) -> str:
     mapping_path = Path(__file__).resolve().parents[3] / "runtime" / "cpp" / "mapping.json"
     mapping = load_runtime_mapping(mapping_path)
 
-    if should_skip_module(module_id, mapping): return ""
+    if should_skip_module(module_id, mapping) and not allow_runtime_module: return ""
 
     ctx = CppEmitContext(
         module_id=module_id,
         is_entry=_bool(emit_ctx_meta, "is_entry") if emit_ctx_meta else False,
         mapping=mapping,
+        emit_class_decls=(self_header == ""),
     )
 
     body = _list(east3_doc, "body")
     main_guard = _list(east3_doc, "main_guard_body")
 
     # Collect imports and class names
+    ctx.import_aliases = build_import_alias_map(meta)
     ctx.runtime_imports = build_runtime_import_map(meta, mapping)
     for s in body:
         if isinstance(s, dict) and _str(s, "kind") == "ClassDef":
@@ -797,6 +1075,8 @@ def emit_cpp_module(east3_doc: dict[str, JsonVal]) -> str:
         _emit(ctx, "}")
 
     # Build header
+    dep_ids = collect_cpp_dependency_module_ids(module_id, meta)
+
     header: list[str] = [
         "#include <cstdint>",
         "#include <string>",
@@ -804,9 +1084,28 @@ def emit_cpp_module(east3_doc: dict[str, JsonVal]) -> str:
         "#include <iostream>",
         "#include <stdexcept>",
         "#include <cmath>",
+        '#include "core/py_runtime.h"',
+    ]
+    if "functional" in ctx.includes_needed:
+        header.insert(6, "#include <functional>")
+
+    if self_header != "":
+        header.append('#include "' + self_header + '"')
+
+    seen_includes: set[str] = set()
+    for dep_id in dep_ids:
+        if dep_id == "" or dep_id == module_id or dep_id == "pytra.core.py_runtime":
+            continue
+        include_path = cpp_include_for_module(dep_id)
+        if include_path == "" or include_path in seen_includes:
+            continue
+        seen_includes.add(include_path)
+        header.append('#include "' + include_path + '"')
+
+    header.extend([
         "",
         "// Generated by toolchain2/emit/cpp",
         "",
-    ]
+    ])
 
     return "\n".join(header + ctx.lines) + "\n"

@@ -206,12 +206,26 @@ class ResolveContext:
                 return local2
         return self.registry.lookup_function(name)
 
+    def lookup_local_function(self, name: str) -> FuncSig | None:
+        """Look up only module-local functions, excluding registry builtins."""
+        local: FuncSig | None = self.module_functions.get(name)
+        if local is not None:
+            return local
+        renamed: str = self.renamed_symbols.get(name, "")
+        if renamed != "":
+            return self.module_functions.get(renamed)
+        return None
+
     def lookup_class(self, name: str) -> ClassSig | None:
         """Look up class: module-local first, then builtins."""
         local: ClassSig | None = self.module_classes.get(name)
         if local is not None:
             return local
         return self.registry.classes.get(name)
+
+    def lookup_local_class(self, name: str) -> ClassSig | None:
+        """Look up only module-local classes, excluding registry classes."""
+        return self.module_classes.get(name)
 
 
 def _ctx_normalize_type(raw: str, ctx: ResolveContext) -> str:
@@ -598,6 +612,56 @@ def _merge_literal_type(current: str, new_type: str) -> str:
                 merged_val = _merge_literal_type(current_args[1], new_args[1])
                 return "dict[" + merged_key + "," + merged_val + "]"
     return current
+
+
+def _is_dynamic_supertype(type_str: str) -> bool:
+    return type_str == "JsonVal" or type_str == "Any" or type_str == "Obj" or type_str == "object"
+
+
+def _same_expr_shape(left: JsonVal, right: JsonVal) -> bool:
+    if not isinstance(left, dict) or not isinstance(right, dict):
+        return False
+    left_kind = str(left.get("kind", ""))
+    right_kind = str(right.get("kind", ""))
+    if left_kind != right_kind:
+        return False
+    if left_kind == "Name":
+        left_id = left.get("id")
+        right_id = right.get("id")
+        return isinstance(left_id, str) and left_id != "" and left_id == right_id
+    left_repr = left.get("repr")
+    right_repr = right.get("repr")
+    return isinstance(left_repr, str) and left_repr != "" and left_repr == right_repr
+
+
+def _narrow_ifexp_branch_type(
+    test: JsonVal,
+    body: JsonVal,
+    orelse: JsonVal,
+    body_type: str,
+    orelse_type: str,
+) -> tuple[str, str, str]:
+    if not isinstance(test, dict):
+        return body_type, body_type, orelse_type
+    guarded: JsonVal = None
+    test_kind = str(test.get("kind", ""))
+    if test_kind == "IsInstance":
+        guarded = test.get("value")
+    elif test_kind == "Call" and str(test.get("predicate_kind", "")) == "isinstance":
+        args = test.get("args")
+        if isinstance(args, list) and len(args) >= 1:
+            guarded = args[0]
+    else:
+        return body_type, body_type, orelse_type
+    if _same_expr_shape(guarded, body) and _is_dynamic_supertype(body_type) and not _is_unknown_like_type(orelse_type):
+        if orelse_type == "None":
+            return body_type + " | None", body_type, orelse_type
+        return orelse_type, orelse_type, orelse_type
+    if _same_expr_shape(guarded, orelse) and _is_dynamic_supertype(orelse_type) and not _is_unknown_like_type(body_type):
+        if body_type == "None":
+            return orelse_type + " | None", body_type, orelse_type
+        return body_type, body_type, body_type
+    return body_type, body_type, orelse_type
 
 
 def _bind_comp_target(scope: Scope, target: dict[str, JsonVal], elem_type: str) -> None:
@@ -1313,6 +1377,76 @@ def _resolve_simple_call(expr: dict[str, JsonVal], func: dict[str, JsonVal], ctx
     # Resolve arguments first
     _resolve_call_args(expr, ctx)
 
+    # Imported symbol?
+    imp: dict[str, str] = ctx.import_symbols.get(name, {})
+    if len(imp) > 0:
+        return _resolve_imported_call(expr, func, name, imp, ctx)
+
+    # Module-local function?
+    local_func: FuncSig | None = ctx.lookup_local_function(name)
+    if local_func is not None:
+        _apply_call_arg_hints(expr, local_func.arg_names, local_func.arg_types, ctx)
+        t: str = local_func.return_type
+        expr["resolved_type"] = t
+        func["resolved_type"] = "callable"
+        return t
+
+    # Exception constructor? (Exception, RuntimeError, etc.)
+    exception_names: set[str] = {"Exception", "RuntimeError", "NotImplementedError", "ValueError", "TypeError", "KeyError", "IndexError"}
+    if name in exception_names:
+        expr["resolved_type"] = name
+        func["resolved_type"] = "type"
+        # Annotate as BuiltinCall
+        exc_extern: ExternV2 | None = None
+        exc_sig: FuncSig | None = ctx.registry.lookup_function(name)
+        if exc_sig is not None:
+            exc_extern = exc_sig.extern
+        if exc_extern is not None:
+            expr["lowered_kind"] = "BuiltinCall"
+            expr["builtin_name"] = name
+            expr["runtime_call"] = exc_extern.symbol
+            expr["runtime_module_id"] = exc_extern.module
+            expr["runtime_symbol"] = exc_extern.symbol
+            expr["runtime_call_adapter_kind"] = "builtin"
+            expr["semantic_tag"] = exc_extern.tag
+        else:
+            # Fallback: Exception not in registry, use defaults
+            expr["lowered_kind"] = "BuiltinCall"
+            expr["builtin_name"] = name
+            expr["runtime_call"] = "std::runtime_error"
+            expr["runtime_module_id"] = "pytra.core.py_runtime"
+            expr["runtime_symbol"] = name
+            expr["runtime_call_adapter_kind"] = "builtin"
+            expr["semantic_tag"] = "error.raise_ctor"
+        return name
+
+    # Class constructor?
+    local_class: ClassSig | None = ctx.lookup_local_class(name)
+    if local_class is not None:
+        init_sig: FuncSig | None = local_class.methods.get("__init__")
+        if init_sig is not None:
+            _apply_call_arg_hints(expr, init_sig.arg_names[1:], init_sig.arg_types, ctx)
+        expr["resolved_type"] = name
+        func["resolved_type"] = "type"
+        return name
+
+    bound_lambda = ctx.scope.lookup_lambda(name)
+    if bound_lambda is not None:
+        _resolve_call_args(expr, ctx)
+        callable_type2 = _refine_lambda_from_call(bound_lambda, ctx, _collect_call_arg_types(expr))
+        ctx.scope.define(name, callable_type2)
+        func["resolved_type"] = callable_type2
+        _, callable_ret2 = _parse_callable_signature(callable_type2, ctx)
+        expr["resolved_type"] = callable_ret2 if not _is_unknown_like_type(callable_ret2) else "unknown"
+        return str(expr.get("resolved_type", "unknown"))
+
+    scoped_type: str = ctx.scope.lookup(name)
+    if scoped_type.startswith("callable"):
+        _, callable_ret = _parse_callable_signature(scoped_type, ctx)
+        expr["resolved_type"] = callable_ret if not _is_unknown_like_type(callable_ret) else "unknown"
+        func["resolved_type"] = scoped_type
+        return str(expr.get("resolved_type", "unknown"))
+
     # Built-in function (registry or known constructors)
     if ctx.registry.is_builtin(name):
         return _resolve_builtin_call(expr, func, name, ctx)
@@ -1369,76 +1503,6 @@ def _resolve_simple_call(expr: dict[str, JsonVal], func: dict[str, JsonVal], ctx
         expr["runtime_call_adapter_kind"] = "builtin"
         expr["semantic_tag"] = "core.set_ctor"
         return ret
-
-    # Imported symbol?
-    imp: dict[str, str] = ctx.import_symbols.get(name, {})
-    if len(imp) > 0:
-        return _resolve_imported_call(expr, func, name, imp, ctx)
-
-    # Module-local function?
-    local_func: FuncSig | None = ctx.lookup_function(name)
-    if local_func is not None:
-        _apply_call_arg_hints(expr, local_func.arg_names, local_func.arg_types, ctx)
-        t: str = local_func.return_type
-        expr["resolved_type"] = t
-        func["resolved_type"] = "callable"
-        return t
-
-    # Exception constructor? (Exception, RuntimeError, etc.)
-    exception_names: set[str] = {"Exception", "RuntimeError", "NotImplementedError", "ValueError", "TypeError", "KeyError", "IndexError"}
-    if name in exception_names:
-        expr["resolved_type"] = name
-        func["resolved_type"] = "type"
-        # Annotate as BuiltinCall
-        exc_extern: ExternV2 | None = None
-        exc_sig: FuncSig | None = ctx.registry.lookup_function(name)
-        if exc_sig is not None:
-            exc_extern = exc_sig.extern
-        if exc_extern is not None:
-            expr["lowered_kind"] = "BuiltinCall"
-            expr["builtin_name"] = name
-            expr["runtime_call"] = exc_extern.symbol
-            expr["runtime_module_id"] = exc_extern.module
-            expr["runtime_symbol"] = exc_extern.symbol
-            expr["runtime_call_adapter_kind"] = "builtin"
-            expr["semantic_tag"] = exc_extern.tag
-        else:
-            # Fallback: Exception not in registry, use defaults
-            expr["lowered_kind"] = "BuiltinCall"
-            expr["builtin_name"] = name
-            expr["runtime_call"] = "std::runtime_error"
-            expr["runtime_module_id"] = "pytra.core.py_runtime"
-            expr["runtime_symbol"] = name
-            expr["runtime_call_adapter_kind"] = "builtin"
-            expr["semantic_tag"] = "error.raise_ctor"
-        return name
-
-    # Class constructor?
-    local_class: ClassSig | None = ctx.lookup_class(name)
-    if local_class is not None:
-        init_sig: FuncSig | None = local_class.methods.get("__init__")
-        if init_sig is not None:
-            _apply_call_arg_hints(expr, init_sig.arg_names[1:], init_sig.arg_types, ctx)
-        expr["resolved_type"] = name
-        func["resolved_type"] = "type"
-        return name
-
-    bound_lambda = ctx.scope.lookup_lambda(name)
-    if bound_lambda is not None:
-        _resolve_call_args(expr, ctx)
-        callable_type2 = _refine_lambda_from_call(bound_lambda, ctx, _collect_call_arg_types(expr))
-        ctx.scope.define(name, callable_type2)
-        func["resolved_type"] = callable_type2
-        _, callable_ret2 = _parse_callable_signature(callable_type2, ctx)
-        expr["resolved_type"] = callable_ret2 if not _is_unknown_like_type(callable_ret2) else "unknown"
-        return str(expr.get("resolved_type", "unknown"))
-
-    scoped_type: str = ctx.scope.lookup(name)
-    if scoped_type.startswith("callable"):
-        _, callable_ret = _parse_callable_signature(scoped_type, ctx)
-        expr["resolved_type"] = callable_ret if not _is_unknown_like_type(callable_ret) else "unknown"
-        func["resolved_type"] = scoped_type
-        return str(expr.get("resolved_type", "unknown"))
 
     # Unknown
     func["resolved_type"] = "unknown"
@@ -2130,12 +2194,23 @@ def _resolve_ifexp(expr: dict[str, JsonVal], ctx: ResolveContext) -> str:
     if isinstance(test, dict):
         _resolve_expr(test, ctx)
     bt: str = "unknown"
+    ot: str = "unknown"
     if isinstance(body, dict):
         bt = _resolve_expr(body, ctx)
     if isinstance(orelse, dict):
-        _resolve_expr(orelse, ctx)
-    expr["resolved_type"] = bt
-    return bt
+        ot = _resolve_expr(orelse, ctx)
+    merged, narrowed_body, narrowed_orelse = _narrow_ifexp_branch_type(test, body, orelse, bt, ot)
+    if isinstance(body, dict) and not _is_unknown_like_type(narrowed_body):
+        body["resolved_type"] = narrowed_body
+    if isinstance(orelse, dict) and not _is_unknown_like_type(narrowed_orelse):
+        orelse["resolved_type"] = narrowed_orelse
+    merged_literal = _merge_literal_type(narrowed_body, narrowed_orelse)
+    if _is_unknown_like_type(merged):
+        merged = merged_literal
+    elif not _is_unknown_like_type(merged_literal) and merged_literal != narrowed_body:
+        merged = merged_literal
+    expr["resolved_type"] = merged
+    return merged
 
 
 def _resolve_listcomp(expr: dict[str, JsonVal], ctx: ResolveContext) -> str:
@@ -2554,6 +2629,20 @@ def _compute_arg_usage(arg_order: list[str], func: dict[str, JsonVal]) -> dict[s
 
 def _collect_reassigned(stmts: list[JsonVal], out: set[str]) -> None:
     """Collect variable names that are reassigned in statements."""
+    mutating_methods: set[str] = {
+        "append",
+        "extend",
+        "insert",
+        "remove",
+        "pop",
+        "clear",
+        "update",
+        "add",
+        "discard",
+        "setdefault",
+        "sort",
+        "reverse",
+    }
     for s in stmts:
         if not isinstance(s, dict):
             continue
@@ -2572,24 +2661,58 @@ def _collect_reassigned(stmts: list[JsonVal], out: set[str]) -> None:
                     name2 = target.get("id")
                     if isinstance(name2, str):
                         out.add(name2)
+                _collect_mutated_base_name(target, out)
         elif kind == "AugAssign":
             target3 = s.get("target")
             if isinstance(target3, dict) and target3.get("kind") == "Name":
                 name3 = target3.get("id")
                 if isinstance(name3, str):
                     out.add(name3)
+            _collect_mutated_base_name(target3, out)
         elif kind == "AnnAssign":
             target4 = s.get("target")
             if isinstance(target4, dict) and target4.get("kind") == "Name":
                 name4 = target4.get("id")
                 if isinstance(name4, str):
                     out.add(name4)
+            _collect_mutated_base_name(target4, out)
+        elif kind == "Expr":
+            value = s.get("value")
+            if isinstance(value, dict) and value.get("kind") == "Call":
+                func = value.get("func")
+                if isinstance(func, dict) and func.get("kind") == "Attribute":
+                    method = func.get("attr")
+                    owner = func.get("value")
+                    if isinstance(method, str) and method in mutating_methods:
+                        _collect_mutated_base_name(owner, out)
 
         # Recurse into blocks
         for block_key in ["body", "orelse", "finalbody", "handlers"]:
             block = s.get(block_key)
             if isinstance(block, list):
                 _collect_reassigned(block, out)
+
+
+def _collect_mutated_base_name(target: JsonVal, out: set[str]) -> None:
+    if not isinstance(target, dict):
+        return
+    kind = target.get("kind")
+    if kind == "Name":
+        name0 = target.get("id")
+        if isinstance(name0, str):
+            out.add(name0)
+    elif kind == "Subscript":
+        value = target.get("value")
+        if isinstance(value, dict) and value.get("kind") == "Name":
+            name = value.get("id")
+            if isinstance(name, str):
+                out.add(name)
+    elif kind == "Attribute":
+        value2 = target.get("value")
+        if isinstance(value2, dict) and value2.get("kind") == "Name":
+            name2 = value2.get("id")
+            if isinstance(name2, str):
+                out.add(name2)
 
 
 def _resolve_class_def(stmt: dict[str, JsonVal], ctx: ResolveContext) -> None:

@@ -28,10 +28,37 @@
 必読: [docs/ja/spec/spec-emitter-guide.md](../spec/spec-emitter-guide.md)
 
 1. [x] [ID: P1-EMIT-CPP-S1] C++ emitter を `toolchain2/emit/cpp/` に新規実装し、emit 成功 — fixture 132/132, sample 18/18 emit 成功
-2. [ ] [ID: P1-EMIT-CPP-S2] 既存 `src/runtime/cpp/` を新パイプラインの emitter 出力に合わせて修正する。新規作成ではなく既存の分割構成（`built_in/`, `std/`, `core/` 等）をそのまま活用する。`src/runtime/cpp/mapping.json` を追加し、命名ルールは plan §3.4 準拠。動作確認が取れるまで git push しない。
+2. [x] [ID: P1-EMIT-CPP-S2] 既存 `src/runtime/cpp/` を新パイプラインの emitter 出力に合わせて修正する。新規作成ではなく既存の分割構成（`built_in/`, `std/`, `core/` 等）をそのまま活用する。`src/runtime/cpp/mapping.json` を追加し、命名ルールは plan §3.4 準拠。動作確認が取れるまで git push しない。— runtime symbol/include 解決を metadata + mapping ベースへ統一し、runtime bundle header/source を toolchain2 C++ 型系へ移行、`pytra-cli.py ... path_stringify.py --target cpp` の representative compile 成功
 3. [ ] [ID: P1-EMIT-CPP-S3] sample 18 件の parity テストが通る — **emit + g++ compile + run + stdout 一致** が完了条件。emit のみ成功では不可。
 4. [x] [ID: P1-EMIT-CPP-S4] `pytra-cli2 -emit --target=cpp` を toolchain2 emitter に切り替える — 完了
 5. [x] [ID: P1-EMIT-CPP-S5] `toolchain/` への依存をゼロにし、`toolchain/` を除去する — pytra-cli2.py から toolchain/ import ゼロ達成
+
+### P1-ISINSTANCE-POD: POD 型の isinstance exact match 実装 + golden 生成
+
+文脈: [docs/ja/plans/p1-isinstance-pod-exact.md](../plans/p1-isinstance-pod-exact.md)
+
+1. [ ] [ID: P1-ISINSTANCE-POD-S1] パーサー / resolve が `isinstance(x, int16)` 等の POD 型判定を処理できるようにする
+2. [ ] [ID: P1-ISINSTANCE-POD-S2] EAST3 で POD isinstance を exact match 命令に lower する
+3. [ ] [ID: P1-ISINSTANCE-POD-S3] `isinstance_pod_exact.py` の golden 生成（east1/east2/east3/east3-opt/linked）
+4. [ ] [ID: P1-ISINSTANCE-POD-S4] C++ / Go emitter で compile + run + stdout 一致（`py_assert_stdout` 通過）
+
+### P1-CLOSURE-DEF: nested FunctionDef の ClosureDef lowering
+
+文脈: [docs/ja/plans/p1-closure-def-lowering.md](../plans/p1-closure-def-lowering.md)
+
+1. [x] [ID: P1-CLOSURE-DEF-S1] EAST3 の ClosureDef ノード仕様を spec-east.md に追加
+2. [x] [ID: P1-CLOSURE-DEF-S2] EAST3 lowering でキャプチャ解析 + ClosureDef 生成を実装
+3. [x] [ID: P1-CLOSURE-DEF-S3] fixture 追加（nested function のキャプチャパターン）+ golden 生成
+4. [x] [ID: P1-CLOSURE-DEF-S4] 各 emitter の ClosureDef 写像実装 + parity 確認
+
+### P2-LINK-INPUT-COMPLETENESS: link 層の入力完全性検証
+
+文脈: [docs/ja/plans/p2-link-input-completeness.md](../plans/p2-link-input-completeness.md)
+
+1. [x] [ID: P2-LINK-COMPLETE-S1] link 層で import 解決の完全性検証を実装（未解決 import を fail-closed で報告）— `link_modules()` が未提供 module_id を列挙して停止
+2. [x] [ID: P2-LINK-COMPLETE-S2] runtime / stdlib モジュールのホワイトリスト（検証除外対象）を定義 — `pytra.*` と runtime importer 由来の外部 stdlib import を除外
+3. [ ] [ID: P2-LINK-COMPLETE-S3] 型スタブ生成の仕組みを設計・実装（parse 不能モジュール向け）
+4. [x] [ID: P2-LINK-COMPLETE-S4] selfhost 37本に対して完全性検証を実行し、欠落モジュールを確認 — current source 再生成ベースの回帰テストを追加
 
 ### P2-SELFHOST: toolchain2 自身の変換テスト
 

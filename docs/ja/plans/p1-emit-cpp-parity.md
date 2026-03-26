@@ -48,9 +48,9 @@
 
 ## 子タスク
 
-- [ ] [ID: P1-EMIT-CPP-S2-01] runtime symbol 解決と include/path 解決を `mapping.json` / metadata ベースに寄せ、module ID ハードコードと旧 include fallback を整理する。
-- [ ] [ID: P1-EMIT-CPP-S2-02] runtime bundle の header/source 生成を toolchain2 C++ 型系に揃え、旧 `toolchain.emit.cpp.emitter.header_builder` 依存を除去する。
-- [ ] [ID: P1-EMIT-CPP-S2-03] `pytra-cli.py` / `pytra-cli2.py` の C++ build 経路で runtime bundle と native companion を正しく取り込み、representative fixture compile を通す。
+- [x] [ID: P1-EMIT-CPP-S2-01] runtime symbol 解決と include/path 解決を `mapping.json` / metadata ベースに寄せ、module ID ハードコードと旧 include fallback を整理する。
+- [x] [ID: P1-EMIT-CPP-S2-02] runtime bundle の header/source 生成を toolchain2 C++ 型系に揃え、旧 `toolchain.emit.cpp.emitter.header_builder` 依存を除去する。
+- [x] [ID: P1-EMIT-CPP-S2-03] `pytra-cli.py` / `pytra-cli2.py` の C++ build 経路で runtime bundle と native companion を正しく取り込み、representative fixture compile を通す。
 - [ ] [ID: P1-EMIT-CPP-S3-01] sample 18 件の C++ `emit + g++ compile` を通す。
 - [ ] [ID: P1-EMIT-CPP-S3-02] sample 18 件の `run + stdout 一致` を確認し、`runtime_parity_check.py --targets cpp` を通す。
 
@@ -58,3 +58,4 @@
 
 - 2026-03-27: 初版作成。`P1-EMIT-CPP-S2` と `P1-EMIT-CPP-S3` は粒度が大きく、runtime 整合、build 配線、parity 実行が混在していたため、実作業単位の子タスクへ分解した。
 - 2026-03-27: 現時点の主要ブロッカーは `runtime_bundle.py` が runtime `.cpp` を toolchain2 方式で生成する一方、header 側に旧 `toolchain` の型系が混入し、`py_assert_all(std::vector<bool>, std::string)` と旧 `Object<list<bool>>` 宣言が食い違う点である。まず `S2-02` を優先する。
+- 2026-03-27: `S2-01` から `S2-03` を完了。`runtime_paths.py` / `dependencies.py` / `mapping.json` で runtime symbol と include 解決を metadata ベースへ寄せ、`header_gen.py` / `runtime_bundle.py` / `emitter.py` で toolchain2 C++ 型系へ統一した。`pytra-cli.py test/fixture/source/py/stdlib/path_stringify.py --target cpp` が compile 成功し、`test_linker_spec_conform2` の runtime bundle/pathlib 回帰も通過。

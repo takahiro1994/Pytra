@@ -355,6 +355,29 @@ def _register_stdlib_module(reg: BuiltinRegistry, module_id: str, msig: ModuleSi
                 reg.classes[name] = cls
 
 
+def _retarget_string_method_runtime_modules(reg: BuiltinRegistry) -> None:
+    str_cls = reg.classes.get("str")
+    string_ops = reg.stdlib_modules.get("pytra.built_in.string_ops")
+    if str_cls is None or string_ops is None:
+        return
+
+    for method_name, sig in str_cls.methods.items():
+        extern = sig.extern
+        if extern is None or extern.module != "pytra.core.str":
+            continue
+        if not extern.symbol.startswith("str."):
+            continue
+        candidate_symbol = "py_" + method_name
+        if candidate_symbol not in string_ops.functions:
+            continue
+        sig.extern = ExternV2(
+            module="pytra.built_in.string_ops",
+            symbol=extern.symbol,
+            tag=extern.tag,
+            kind=extern.kind,
+        )
+
+
 def _candidate_module_dirs(base_dir: Path, group: str) -> list[Path]:
     """Return runtime module directories in merge order for std/utils/built_in overlays."""
     dirs: list[Path] = []
@@ -455,5 +478,7 @@ def load_builtin_registry(
                     canonical: str = prefix + mod_name
                     msig: ModuleSig = _load_module_sig(module_file, canonical)
                     _register_stdlib_module(reg, canonical, msig)
+
+    _retarget_string_method_runtime_modules(reg)
 
     return reg
