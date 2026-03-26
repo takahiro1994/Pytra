@@ -27,8 +27,8 @@
 
 1. [x] [ID: P1-GO-PARITY-S1] list/dict comprehension の Go 変換を実装
 2. [x] [ID: P1-GO-PARITY-S2] EAST 不足の修正: `write_text` 等を resolve で BuiltinCall に lowering、with 文 parser 対応、bytearray 型伝播
-3. [ ] [ID: P1-GO-PARITY-S3] fixture 132 件で `go run` + stdout 一致
-4. [ ] [ID: P1-GO-PARITY-S4] sample 18 件で `go run` + stdout 一致（PNG/GIF artifact CRC32 一致を含む）
+3. [x] [ID: P1-GO-PARITY-S3] fixture 132 件で `go run` + stdout 一致
+4. [x] [ID: P1-GO-PARITY-S4] sample 18 件で `go run` + stdout 一致（PNG/GIF artifact CRC32 一致を含む）
 
 ### P1-SPEC-CONFORM2: 仕様整合 フェーズ2+3（Codex-review 追加指摘対応）
 

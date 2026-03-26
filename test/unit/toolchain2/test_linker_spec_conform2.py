@@ -681,6 +681,14 @@ class Toolchain2LinkerSpecConform2Tests(unittest.TestCase):
         self.assertIn("Perm((Perm_READ | Perm_WRITE))", intflag_go)
         self.assertNotIn("IntFlag", intflag_go)
 
+    def test_go_emitter_spreads_typed_varargs_and_keeps_plain_class_ctor_zero_arg(self) -> None:
+        doc = _fixture_doc("test/fixture/east3-opt/signature/ok_typed_varargs_representative.east3")
+
+        go_code = emit_go_module(doc)
+
+        self.assertIn("func NewControllerState() *ControllerState {", go_code)
+        self.assertIn("merge_controller_states(target, []*ControllerState{lhs, rhs}...)", go_code)
+
     def test_cpp_emitter_runtime_symbol_prefix_uses_skip_modules_without_pytra_hardcode(self) -> None:
         doc = _module_doc(
             "app.main",

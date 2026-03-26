@@ -332,34 +332,51 @@ def _merge_module_sig(dst: ModuleSig, src: ModuleSig) -> None:
 
 def _module_aliases(module_id: str) -> list[str]:
     aliases: list[str] = [module_id]
-    if module_id.startswith("pytra.std."):
-        aliases.append(module_id[len("pytra.std."):])
+    for prefix in ("pytra.std.", "pytra.utils.", "pytra.built_in."):
+        if module_id.startswith(prefix):
+            aliases.append(module_id[len(prefix):])
     return aliases
 
 
 def _register_stdlib_module(reg: BuiltinRegistry, module_id: str, msig: ModuleSig) -> None:
-    canonical: str = module_id if module_id.startswith("pytra.std.") else "pytra.std." + module_id
+    canonical: str = module_id if module_id.startswith("pytra.") else "pytra.std." + module_id
     existing: ModuleSig | None = reg.stdlib_modules.get(canonical)
     if existing is not None:
         _merge_module_sig(existing, msig)
         msig = existing
     for alias in _module_aliases(canonical):
         reg.stdlib_modules[alias] = msig
+    if canonical.startswith("pytra.built_in."):
+        for name, sig in msig.functions.items():
+            if name not in reg.functions:
+                reg.functions[name] = sig
+        for name, cls in msig.classes.items():
+            if name not in reg.classes:
+                reg.classes[name] = cls
 
 
-def _candidate_stdlib_dirs(stdlib_dir: Path) -> list[Path]:
-    """Return stdlib EAST1 directories in merge order: runtime source first, include overlay last."""
+def _candidate_module_dirs(base_dir: Path, group: str) -> list[Path]:
+    """Return runtime module directories in merge order for std/utils/built_in overlays."""
     dirs: list[Path] = []
-    if stdlib_dir.exists():
-        if len(stdlib_dir.parents) >= 4 and stdlib_dir.parents[3].name == "test":
-            test_root: Path = stdlib_dir.parents[3]
-            pytra_std = test_root / "pytra" / "east1" / "py" / "std"
-            include_std = test_root / "include" / "east1" / "py" / "std"
-            for candidate in (pytra_std, include_std):
+    if base_dir.exists():
+        if len(base_dir.parents) >= 4 and base_dir.parents[3].name == "test":
+            test_root: Path = base_dir.parents[3]
+            repo_root: Path = test_root.parent
+            runtime_dir = repo_root / "src" / "runtime" / "east" / group
+            pytra_dir = test_root / "pytra" / "east1" / "py" / group
+            include_dir = test_root / "include" / "east1" / "py" / group
+            candidates = (runtime_dir, pytra_dir, include_dir)
+            for candidate in candidates:
                 if candidate.exists():
                     dirs.append(candidate)
         else:
-            dirs.append(stdlib_dir)
+            repo_root2 = base_dir.parents[3] if len(base_dir.parents) >= 4 else None
+            if group == "std":
+                dirs.append(base_dir)
+            elif repo_root2 is not None:
+                sibling = repo_root2 / "src" / "runtime" / "east" / group
+                if sibling.exists():
+                    dirs.append(sibling)
     unique: list[Path] = []
     seen: set[str] = set()
     for candidate2 in dirs:
@@ -371,13 +388,15 @@ def _candidate_stdlib_dirs(stdlib_dir: Path) -> list[Path]:
     return unique
 
 
-def _module_name_from_east1_path(east1_file: Path, stdlib_dir: Path) -> str:
-    rel: Path = east1_file.relative_to(stdlib_dir)
+def _module_name_from_module_path(module_file: Path, stdlib_dir: Path) -> str:
+    rel: Path = module_file.relative_to(stdlib_dir)
     name: str = str(rel)
     if name.endswith(".py.east1"):
         return name[: -len(".py.east1")].replace("/", ".")
     if name.endswith(".east1"):
         return name[: -len(".east1")].replace("/", ".")
+    if name.endswith(".east"):
+        return name[: -len(".east")].replace("/", ".")
     return rel.stem.replace("/", ".")
 
 
@@ -424,11 +443,17 @@ def load_builtin_registry(
 
     # Load stdlib modules
     if stdlib_dir is not None and stdlib_dir.exists():
-        for std_dir in _candidate_stdlib_dirs(stdlib_dir):
-            for east1_file in sorted(std_dir.glob("*.east1"), key=str):
-                mod_name: str = _module_name_from_east1_path(east1_file, std_dir)
-                canonical: str = "pytra.std." + mod_name
-                msig: ModuleSig = _load_module_sig(east1_file, canonical)
-                _register_stdlib_module(reg, canonical, msig)
+        for group, prefix in (
+            ("std", "pytra.std."),
+            ("utils", "pytra.utils."),
+            ("built_in", "pytra.built_in."),
+        ):
+            for module_dir in _candidate_module_dirs(stdlib_dir, group):
+                module_files = sorted(module_dir.glob("*.east"), key=str) + sorted(module_dir.glob("*.east1"), key=str)
+                for module_file in module_files:
+                    mod_name: str = _module_name_from_module_path(module_file, module_dir)
+                    canonical: str = prefix + mod_name
+                    msig: ModuleSig = _load_module_sig(module_file, canonical)
+                    _register_stdlib_module(reg, canonical, msig)
 
     return reg

@@ -54,6 +54,7 @@ class ResolveResult:
 class Scope:
     """Variable type environment."""
     vars: dict[str, str] = field(default_factory=dict)
+    lambda_vars: dict[str, dict[str, JsonVal]] = field(default_factory=dict)
     parent: Scope | None = None
 
     def lookup(self, name: str) -> str:
@@ -66,6 +67,20 @@ class Scope:
 
     def define(self, name: str, typ: str) -> None:
         self.vars[name] = typ
+
+    def bind_lambda(self, name: str, expr: dict[str, JsonVal]) -> None:
+        self.lambda_vars[name] = expr
+
+    def clear_lambda(self, name: str) -> None:
+        self.lambda_vars.pop(name, None)
+
+    def lookup_lambda(self, name: str) -> dict[str, JsonVal] | None:
+        expr = self.lambda_vars.get(name)
+        if isinstance(expr, dict):
+            return expr
+        if self.parent is not None:
+            return self.parent.lookup_lambda(name)
+        return None
 
     def child(self) -> Scope:
         return Scope(parent=self)
@@ -100,7 +115,7 @@ class ResolveContext:
         if self._runtime_index is not None:
             return self._runtime_index
         try:
-            idx_path: Path = Path("tools/runtime_symbol_index.json")
+            idx_path: Path = Path(__file__).resolve().parents[4] / "tools" / "runtime_symbol_index.json"
             if idx_path.exists():
                 text: str = idx_path.read_text(encoding="utf-8")
                 raw: JsonVal = json.loads(text).raw
@@ -191,6 +206,481 @@ def _ctx_normalize_type(raw: str, ctx: ResolveContext) -> str:
 
 def _ctx_make_type_expr(type_str: str, ctx: ResolveContext) -> dict[str, JsonVal]:
     return make_type_expr(_ctx_normalize_type(type_str, ctx))
+
+
+def _is_unknown_like_type(type_str: str) -> bool:
+    return type_str == "" or type_str == "unknown"
+
+
+def _make_callable_type(param_types: list[str], return_type: str) -> str:
+    params: list[str] = []
+    for param in param_types:
+        p: str = param.strip()
+        params.append(p if p != "" else "unknown")
+    ret: str = return_type.strip()
+    if ret == "":
+        ret = "unknown"
+    if len(params) == 0 and ret == "unknown":
+        return "callable[unknown]"
+    return "callable[[" + ",".join(params) + "]," + ret + "]"
+
+
+def _parse_callable_signature(type_str: str, ctx: ResolveContext) -> tuple[list[str], str]:
+    t: str = _ctx_normalize_type(type_str, ctx)
+    if not t.startswith("callable[") or not t.endswith("]"):
+        return [], "unknown"
+    inner: str = t[len("callable["):-1].strip()
+    if inner == "":
+        return [], "unknown"
+    if inner.startswith("["):
+        depth: int = 0
+        close_idx: int = -1
+        i: int = 0
+        while i < len(inner):
+            ch: str = inner[i]
+            if ch == "[":
+                depth += 1
+            elif ch == "]":
+                depth -= 1
+                if depth == 0:
+                    close_idx = i
+                    break
+            i += 1
+        if close_idx >= 0 and close_idx + 1 < len(inner) and inner[close_idx + 1] == ",":
+            params_text: str = inner[1:close_idx].strip()
+            return_text: str = inner[close_idx + 2:].strip()
+            params: list[str] = extract_type_args("tuple[" + params_text + "]") if params_text != "" else []
+            return [normalize_type(param, ctx.type_aliases) for param in params], _ctx_normalize_type(return_text, ctx)
+    arrow_idx: int = inner.find("->")
+    if arrow_idx >= 0:
+        params_text2: str = inner[:arrow_idx].strip()
+        return_text2: str = inner[arrow_idx + 2:].strip()
+        params2: list[str] = []
+        if params_text2 != "":
+            params2 = [normalize_type(part.strip(), ctx.type_aliases) for part in params_text2.split(",") if part.strip() != ""]
+        return params2, _ctx_normalize_type(return_text2, ctx)
+    return [], _ctx_normalize_type(inner, ctx)
+
+
+def _default_collection_hint(param_type: str) -> str:
+    t: str = param_type.strip()
+    if t.endswith(" | None"):
+        t = t[:-7].strip()
+    elif t.endswith("|None"):
+        t = t[:-6].strip()
+    if t.startswith("list[") or t.startswith("dict[") or t.startswith("set["):
+        return t
+    return ""
+
+
+def _apply_default_annotation_type(default_node: dict[str, JsonVal], param_type: str, ctx: ResolveContext) -> None:
+    hinted_type: str = _default_collection_hint(_ctx_normalize_type(param_type, ctx))
+    if hinted_type == "":
+        return
+    kind: str = str(default_node.get("kind", ""))
+    current: str = str(default_node.get("resolved_type", ""))
+    if kind == "List" and hinted_type.startswith("list[") and current in ("", "unknown", "list[unknown]"):
+        default_node["resolved_type"] = hinted_type
+        return
+    if kind == "Dict" and hinted_type.startswith("dict[") and current in ("", "unknown", "dict[unknown,unknown]"):
+        default_node["resolved_type"] = hinted_type
+        return
+    if kind == "Set" and hinted_type.startswith("set[") and current in ("", "unknown", "set[unknown]"):
+        default_node["resolved_type"] = hinted_type
+
+
+def _apply_collection_type_hint(node: dict[str, JsonVal], target_type: str, ctx: ResolveContext) -> None:
+    hinted_type: str = _default_collection_hint(_ctx_normalize_type(target_type, ctx))
+    if hinted_type == "":
+        return
+    kind: str = str(node.get("kind", ""))
+    current: str = str(node.get("resolved_type", ""))
+    if kind == "List" and hinted_type.startswith("list[") and current in ("", "unknown", "list[unknown]"):
+        node["resolved_type"] = hinted_type
+        return
+    if kind == "Dict" and hinted_type.startswith("dict[") and current in ("", "unknown", "dict[unknown,unknown]"):
+        node["resolved_type"] = hinted_type
+        return
+    if kind == "Set" and hinted_type.startswith("set[") and current in ("", "unknown", "set[unknown]"):
+        node["resolved_type"] = hinted_type
+
+
+def _apply_call_arg_hints(
+    expr: dict[str, JsonVal],
+    arg_names: list[str],
+    arg_types: dict[str, str],
+    ctx: ResolveContext,
+) -> None:
+    generic_param_names: set[str] = {"T", "K", "V", "KT", "VT", "R", "P"}
+    args = expr.get("args")
+    if isinstance(args, list):
+        for idx, arg in enumerate(args):
+            if not isinstance(arg, dict):
+                continue
+            if idx >= len(arg_names):
+                continue
+            param_name: str = arg_names[idx]
+            hinted_type: str = arg_types.get(param_name, "")
+            if hinted_type != "":
+                _apply_collection_type_hint(arg, hinted_type, ctx)
+                hinted_type_norm = _ctx_normalize_type(hinted_type, ctx)
+                if hinted_type_norm not in ("", "unknown") and hinted_type_norm not in generic_param_names:
+                    arg["call_arg_type"] = hinted_type_norm
+    keywords = expr.get("keywords")
+    if isinstance(keywords, list):
+        for kw in keywords:
+            if not isinstance(kw, dict):
+                continue
+            kw_name = kw.get("arg")
+            kw_value = kw.get("value")
+            if not isinstance(kw_name, str) or not isinstance(kw_value, dict):
+                continue
+            hinted_type2: str = arg_types.get(kw_name, "")
+            if hinted_type2 != "":
+                _apply_collection_type_hint(kw_value, hinted_type2, ctx)
+                hinted_type2_norm = _ctx_normalize_type(hinted_type2, ctx)
+                if hinted_type2_norm not in ("", "unknown") and hinted_type2_norm not in generic_param_names:
+                    kw_value["call_arg_type"] = hinted_type2_norm
+
+
+def _lambda_arg_names(expr: dict[str, JsonVal]) -> list[str]:
+    arg_order_raw = expr.get("arg_order")
+    arg_order: list[str] = []
+    if isinstance(arg_order_raw, list):
+        for item in arg_order_raw:
+            if isinstance(item, str) and item != "":
+                arg_order.append(item)
+    if len(arg_order) > 0:
+        return arg_order
+    args_list = expr.get("args")
+    if isinstance(args_list, list):
+        for arg in args_list:
+            if isinstance(arg, dict):
+                name = arg.get("arg")
+                if isinstance(name, str) and name != "":
+                    arg_order.append(name)
+    return arg_order
+
+
+def _lambda_arg_types(expr: dict[str, JsonVal], ctx: ResolveContext, arg_order: list[str]) -> dict[str, str]:
+    result: dict[str, str] = {}
+    arg_types_raw = expr.get("arg_types")
+    if isinstance(arg_types_raw, dict):
+        for name, value in arg_types_raw.items():
+            if isinstance(name, str) and isinstance(value, str):
+                result[name] = _ctx_normalize_type(value, ctx)
+    args_list = expr.get("args")
+    if isinstance(args_list, list):
+        for arg in args_list:
+            if not isinstance(arg, dict):
+                continue
+            name2 = arg.get("arg")
+            if not isinstance(name2, str) or name2 == "":
+                continue
+            resolved_type = arg.get("resolved_type")
+            if isinstance(resolved_type, str) and not _is_unknown_like_type(resolved_type):
+                result[name2] = _ctx_normalize_type(resolved_type, ctx)
+    for name3 in arg_order:
+        if name3 not in result:
+            result[name3] = "unknown"
+    return result
+
+
+def _resolve_lambda_defaults(
+    expr: dict[str, JsonVal],
+    ctx: ResolveContext,
+    arg_types: dict[str, str],
+) -> None:
+    args_list = expr.get("args")
+    if not isinstance(args_list, list):
+        return
+    for arg in args_list:
+        if not isinstance(arg, dict):
+            continue
+        arg_name = arg.get("arg")
+        default_node = arg.get("default")
+        if not isinstance(arg_name, str) or not isinstance(default_node, dict):
+            continue
+        default_type = _resolve_expr(default_node, ctx)
+        current = arg_types.get(arg_name, "")
+        if _is_unknown_like_type(current) and not _is_unknown_like_type(default_type):
+            arg_types[arg_name] = default_type
+
+
+def _merge_refined_type(current: str, hinted: str) -> str:
+    if _is_unknown_like_type(hinted):
+        return current
+    if _is_unknown_like_type(current):
+        return hinted
+    if current == hinted:
+        return current
+    if is_numeric(current) and is_numeric(hinted):
+        return _binop_result_type(current, hinted, "Add")
+    return current
+
+
+def _merge_literal_type(current: str, new_type: str) -> str:
+    if _is_unknown_like_type(current):
+        return new_type
+    if _is_unknown_like_type(new_type):
+        return current
+    if current == new_type:
+        return current
+    if current == "None":
+        if new_type.endswith(" | None") or new_type.endswith("|None"):
+            return new_type
+        return new_type + " | None"
+    if new_type == "None":
+        if current.endswith(" | None") or current.endswith("|None"):
+            return current
+        return current + " | None"
+    current_base = extract_base_type(current)
+    new_base = extract_base_type(new_type)
+    if current_base == new_base and current_base != "":
+        current_has_args = "[" in current and current.endswith("]")
+        new_has_args = "[" in new_type and new_type.endswith("]")
+        if not current_has_args and new_has_args:
+            return new_type
+        if current_has_args and not new_has_args:
+            return current
+        if current.startswith("set[") and new_type.startswith("set["):
+            current_inner = current[4:-1]
+            new_inner = new_type[4:-1]
+            return "set[" + _merge_literal_type(current_inner, new_inner) + "]"
+        if current.startswith("list[") and new_type.startswith("list["):
+            current_inner2 = current[5:-1]
+            new_inner2 = new_type[5:-1]
+            return "list[" + _merge_literal_type(current_inner2, new_inner2) + "]"
+        if current.startswith("dict[") and new_type.startswith("dict["):
+            current_args = extract_type_args(current)
+            new_args = extract_type_args(new_type)
+            if len(current_args) == 2 and len(new_args) == 2:
+                merged_key = _merge_literal_type(current_args[0], new_args[0])
+                merged_val = _merge_literal_type(current_args[1], new_args[1])
+                return "dict[" + merged_key + "," + merged_val + "]"
+    return current
+
+
+def _bind_comp_target(scope: Scope, target: dict[str, JsonVal], elem_type: str) -> None:
+    target_kind = str(target.get("kind", ""))
+    if target_kind == "Name":
+        var_name = target.get("id")
+        if isinstance(var_name, str) and var_name != "":
+            scope.define(var_name, elem_type)
+            target["resolved_type"] = elem_type
+        return
+    if target_kind != "Tuple":
+        return
+    target["resolved_type"] = elem_type
+    if not elem_type.startswith("tuple[") or not elem_type.endswith("]"):
+        return
+    item_types = extract_type_args(elem_type)
+    elements = target.get("elements")
+    if not isinstance(elements, list):
+        return
+    for index, elem in enumerate(elements):
+        if not isinstance(elem, dict) or elem.get("kind") != "Name":
+            continue
+        item_name = elem.get("id")
+        if not isinstance(item_name, str) or item_name == "":
+            continue
+        item_type = item_types[index] if index < len(item_types) else "unknown"
+        scope.define(item_name, item_type)
+        elem["resolved_type"] = item_type
+
+
+def _write_lambda_arg_nodes(expr: dict[str, JsonVal], arg_types: dict[str, str]) -> None:
+    args_list = expr.get("args")
+    if not isinstance(args_list, list):
+        return
+    for arg in args_list:
+        if not isinstance(arg, dict):
+            continue
+        arg_name = arg.get("arg")
+        if isinstance(arg_name, str):
+            arg["resolved_type"] = arg_types.get(arg_name, "unknown")
+
+
+def _resolve_lambda_body(
+    expr: dict[str, JsonVal],
+    ctx: ResolveContext,
+    arg_types: dict[str, str],
+) -> str:
+    lam_scope: Scope = ctx.scope.child()
+    for name, typ in arg_types.items():
+        lam_scope.define(name, typ)
+    old_scope: Scope = ctx.scope
+    ctx.scope = lam_scope
+    body = expr.get("body")
+    body_type: str = "unknown"
+    if isinstance(body, dict):
+        body_type = _resolve_expr(body, ctx)
+    elif isinstance(body, list):
+        for stmt in body:
+            if isinstance(stmt, dict):
+                _resolve_stmt(stmt, ctx)
+    ctx.scope = old_scope
+    return body_type
+
+
+def _refine_lambda_from_call(
+    expr: dict[str, JsonVal],
+    ctx: ResolveContext,
+    call_arg_types: list[str],
+) -> str:
+    arg_order: list[str] = _lambda_arg_names(expr)
+    arg_types: dict[str, str] = _lambda_arg_types(expr, ctx, arg_order)
+    _resolve_lambda_defaults(expr, ctx, arg_types)
+    for index, actual_type in enumerate(call_arg_types):
+        if index >= len(arg_order):
+            break
+        arg_name = arg_order[index]
+        arg_types[arg_name] = _merge_refined_type(arg_types.get(arg_name, "unknown"), actual_type)
+
+    ret_raw = expr.get("return_type")
+    ret: str = _ctx_normalize_type(str(ret_raw), ctx) if isinstance(ret_raw, str) else "unknown"
+    _write_lambda_arg_nodes(expr, arg_types)
+    body_type: str = _resolve_lambda_body(expr, ctx, arg_types)
+
+    inferred: dict[str, str] = _infer_lambda_arg_types(expr, arg_order)
+    rerun: bool = False
+    for arg_name2 in arg_order:
+        inferred_type = inferred.get(arg_name2, "")
+        merged = _merge_refined_type(arg_types.get(arg_name2, "unknown"), inferred_type)
+        if merged != arg_types.get(arg_name2, "unknown"):
+            arg_types[arg_name2] = merged
+            rerun = True
+    if rerun:
+        _write_lambda_arg_nodes(expr, arg_types)
+        body_type = _resolve_lambda_body(expr, ctx, arg_types)
+
+    if _is_unknown_like_type(ret) and not _is_unknown_like_type(body_type):
+        ret = body_type
+
+    expr["arg_order"] = arg_order
+    expr["arg_types"] = arg_types
+    expr["return_type"] = ret
+    arg_type_strs: list[str] = [arg_types.get(name, "unknown") for name in arg_order]
+    callable_type: str = _make_callable_type(arg_type_strs, ret)
+    expr["resolved_type"] = callable_type
+    return callable_type
+
+
+def _lambda_assign_expected_type(node: JsonVal, expected: str, arg_names: set[str], inferred: dict[str, str]) -> None:
+    if not isinstance(node, dict) or _is_unknown_like_type(expected):
+        return
+    kind: str = str(node.get("kind", ""))
+    if kind == "Name":
+        name = node.get("id")
+        current = node.get("resolved_type")
+        if (
+            isinstance(name, str)
+            and name in arg_names
+            and (not isinstance(current, str) or _is_unknown_like_type(current))
+            and name not in inferred
+        ):
+            inferred[name] = expected
+        return
+    if kind == "BinOp":
+        _lambda_assign_expected_type(node.get("left"), expected, arg_names, inferred)
+        _lambda_assign_expected_type(node.get("right"), expected, arg_names, inferred)
+        return
+    if kind == "UnaryOp":
+        _lambda_assign_expected_type(node.get("operand"), expected, arg_names, inferred)
+        return
+    if kind == "IfExp":
+        _lambda_assign_expected_type(node.get("body"), expected, arg_names, inferred)
+        _lambda_assign_expected_type(node.get("orelse"), expected, arg_names, inferred)
+
+
+def _infer_lambda_arg_types(expr: dict[str, JsonVal], arg_order: list[str]) -> dict[str, str]:
+    inferred: dict[str, str] = {}
+    arg_names: set[str] = set(arg_order)
+
+    def visit(node: JsonVal) -> None:
+        if isinstance(node, list):
+            for item in node:
+                visit(item)
+            return
+        if not isinstance(node, dict):
+            return
+        kind: str = str(node.get("kind", ""))
+        if kind == "BinOp":
+            left = node.get("left")
+            right = node.get("right")
+            lt = str(left.get("resolved_type", "")) if isinstance(left, dict) else "unknown"
+            rt = str(right.get("resolved_type", "")) if isinstance(right, dict) else "unknown"
+            result = str(node.get("resolved_type", ""))
+            if not _is_unknown_like_type(rt):
+                _lambda_assign_expected_type(left, rt, arg_names, inferred)
+            if not _is_unknown_like_type(lt):
+                _lambda_assign_expected_type(right, lt, arg_names, inferred)
+            if not _is_unknown_like_type(result):
+                _lambda_assign_expected_type(left, result, arg_names, inferred)
+                _lambda_assign_expected_type(right, result, arg_names, inferred)
+        elif kind == "Compare":
+            left_node = node.get("left")
+            comparators = node.get("comparators")
+            prev = left_node if isinstance(left_node, dict) else None
+            if isinstance(comparators, list):
+                for comp in comparators:
+                    prev_t = str(prev.get("resolved_type", "")) if isinstance(prev, dict) else "unknown"
+                    comp_t = str(comp.get("resolved_type", "")) if isinstance(comp, dict) else "unknown"
+                    if not _is_unknown_like_type(comp_t):
+                        _lambda_assign_expected_type(prev, comp_t, arg_names, inferred)
+                    if not _is_unknown_like_type(prev_t):
+                        _lambda_assign_expected_type(comp, prev_t, arg_names, inferred)
+                    prev = comp if isinstance(comp, dict) else None
+        for value in node.values():
+            if isinstance(value, (dict, list)):
+                visit(value)
+
+    visit(expr.get("body"))
+    return inferred
+
+
+def _collect_callable_param_uses(node: JsonVal, params: set[str], out: dict[str, list[str]], invalid: set[str]) -> None:
+    if isinstance(node, list):
+        for item in node:
+            _collect_callable_param_uses(item, params, out, invalid)
+        return
+    if not isinstance(node, dict):
+        return
+    if node.get("kind") == "Call":
+        func = node.get("func")
+        if isinstance(func, dict) and func.get("kind") == "Name":
+            fn_name = func.get("id")
+            if isinstance(fn_name, str) and fn_name in params and fn_name not in invalid:
+                actual = _collect_call_arg_types(node)
+                if fn_name in out and out[fn_name] != actual:
+                    invalid.add(fn_name)
+                    out.pop(fn_name, None)
+                else:
+                    out[fn_name] = actual
+    for value in node.values():
+        if isinstance(value, (dict, list)):
+            _collect_callable_param_uses(value, params, out, invalid)
+
+
+def _refresh_callable_param_calls(node: JsonVal, refined: dict[str, str], ctx: ResolveContext) -> None:
+    if isinstance(node, list):
+        for item in node:
+            _refresh_callable_param_calls(item, refined, ctx)
+        return
+    if not isinstance(node, dict):
+        return
+    if node.get("kind") == "Call":
+        func = node.get("func")
+        if isinstance(func, dict) and func.get("kind") == "Name":
+            fn_name = func.get("id")
+            if isinstance(fn_name, str) and fn_name in refined:
+                callable_type = refined[fn_name]
+                _, ret = _parse_callable_signature(callable_type, ctx)
+                func["resolved_type"] = callable_type
+                node["resolved_type"] = ret if not _is_unknown_like_type(ret) else "unknown"
+    for value in node.values():
+        if isinstance(value, (dict, list)):
+            _refresh_callable_param_calls(value, refined, ctx)
 
 
 # ---------------------------------------------------------------------------
@@ -308,6 +798,7 @@ def _resolve_name(expr: dict[str, JsonVal], ctx: ResolveContext) -> str:
     name: str = str(name_val) if isinstance(name_val, str) else ""
     if name in ctx.import_modules:
         expr["resolved_type"] = "module"
+        expr["runtime_module_id"] = ctx.canonical_module_id(ctx.import_modules.get(name, ""))
         return "module"
     imp: dict[str, str] = ctx.import_symbols.get(name, {})
     if len(imp) > 0:
@@ -516,6 +1007,14 @@ def _resolve_call(expr: dict[str, JsonVal], ctx: ResolveContext) -> str:
     if func_kind == "Attribute":
         return _resolve_method_call(expr, func, ctx)
 
+    # Inline lambda call: (lambda ...)(...)
+    if func_kind == "Lambda":
+        _resolve_call_args(expr, ctx)
+        callable_type = _refine_lambda_from_call(func, ctx, _collect_call_arg_types(expr))
+        _, callable_ret = _parse_callable_signature(callable_type, ctx)
+        expr["resolved_type"] = callable_ret if not _is_unknown_like_type(callable_ret) else "unknown"
+        return str(expr.get("resolved_type", "unknown"))
+
     # Simple function call: f(...)
     if func_kind == "Name":
         return _resolve_simple_call(expr, func, ctx)
@@ -649,6 +1148,50 @@ def _resolve_simple_call(expr: dict[str, JsonVal], func: dict[str, JsonVal], ctx
         expr["resolved_type"] = "bytes"
         func["resolved_type"] = "type"
         return "bytes"
+    if name == "list":
+        arg_types = _collect_call_arg_types(expr)
+        ret = "list[unknown]"
+        if len(arg_types) >= 1:
+            src_type: str = _ctx_normalize_type(arg_types[0], ctx)
+            if src_type.startswith("list["):
+                ret = src_type
+            elif src_type.startswith("tuple["):
+                items: list[str] = extract_type_args(src_type)
+                if len(items) > 0:
+                    ret = "list[" + items[0] + "]"
+            elif src_type == "str":
+                ret = "list[str]"
+        expr["resolved_type"] = ret
+        func["resolved_type"] = "type"
+        expr["lowered_kind"] = "BuiltinCall"
+        expr["builtin_name"] = "list"
+        expr["runtime_call"] = "list_ctor"
+        expr["runtime_module_id"] = "pytra.core.list"
+        expr["runtime_symbol"] = "list"
+        expr["runtime_call_adapter_kind"] = "builtin"
+        expr["semantic_tag"] = "core.list_ctor"
+        return ret
+    if name == "set":
+        arg_types = _collect_call_arg_types(expr)
+        ret = "set[unknown]"
+        if len(arg_types) >= 1:
+            src_type2: str = _ctx_normalize_type(arg_types[0], ctx)
+            if src_type2.startswith("list[") and src_type2.endswith("]"):
+                ret = "set[" + src_type2[5:-1] + "]"
+            elif src_type2.startswith("set[") and src_type2.endswith("]"):
+                ret = src_type2
+            elif src_type2 == "str":
+                ret = "set[str]"
+        expr["resolved_type"] = ret
+        func["resolved_type"] = "type"
+        expr["lowered_kind"] = "BuiltinCall"
+        expr["builtin_name"] = "set"
+        expr["runtime_call"] = "set_ctor"
+        expr["runtime_module_id"] = "pytra.core.set"
+        expr["runtime_symbol"] = "set"
+        expr["runtime_call_adapter_kind"] = "builtin"
+        expr["semantic_tag"] = "core.set_ctor"
+        return ret
 
     # Imported symbol?
     imp: dict[str, str] = ctx.import_symbols.get(name, {})
@@ -658,6 +1201,7 @@ def _resolve_simple_call(expr: dict[str, JsonVal], func: dict[str, JsonVal], ctx
     # Module-local function?
     local_func: FuncSig | None = ctx.lookup_function(name)
     if local_func is not None:
+        _apply_call_arg_hints(expr, local_func.arg_names, local_func.arg_types, ctx)
         t: str = local_func.return_type
         expr["resolved_type"] = t
         func["resolved_type"] = "callable"
@@ -695,9 +1239,29 @@ def _resolve_simple_call(expr: dict[str, JsonVal], func: dict[str, JsonVal], ctx
     # Class constructor?
     local_class: ClassSig | None = ctx.lookup_class(name)
     if local_class is not None:
+        init_sig: FuncSig | None = local_class.methods.get("__init__")
+        if init_sig is not None:
+            _apply_call_arg_hints(expr, init_sig.arg_names[1:], init_sig.arg_types, ctx)
         expr["resolved_type"] = name
         func["resolved_type"] = "type"
         return name
+
+    bound_lambda = ctx.scope.lookup_lambda(name)
+    if bound_lambda is not None:
+        _resolve_call_args(expr, ctx)
+        callable_type2 = _refine_lambda_from_call(bound_lambda, ctx, _collect_call_arg_types(expr))
+        ctx.scope.define(name, callable_type2)
+        func["resolved_type"] = callable_type2
+        _, callable_ret2 = _parse_callable_signature(callable_type2, ctx)
+        expr["resolved_type"] = callable_ret2 if not _is_unknown_like_type(callable_ret2) else "unknown"
+        return str(expr.get("resolved_type", "unknown"))
+
+    scoped_type: str = ctx.scope.lookup(name)
+    if scoped_type.startswith("callable"):
+        _, callable_ret = _parse_callable_signature(scoped_type, ctx)
+        expr["resolved_type"] = callable_ret if not _is_unknown_like_type(callable_ret) else "unknown"
+        func["resolved_type"] = scoped_type
+        return str(expr.get("resolved_type", "unknown"))
 
     # Unknown
     func["resolved_type"] = "unknown"
@@ -715,6 +1279,7 @@ def _resolve_builtin_call(
     sig: FuncSig | None = ctx.registry.lookup_function(name)
     ret: str = "unknown"
     if sig is not None:
+        _apply_call_arg_hints(expr, sig.arg_names, sig.arg_types, ctx)
         ret = _infer_signature_return_type(sig, _collect_call_arg_types(expr))
 
     expr["resolved_type"] = ret
@@ -793,9 +1358,13 @@ def _resolve_imported_call(
     stdlib_func: FuncSig | None = ctx.registry.lookup_stdlib_function(module_id, export_name)
     stdlib_class: ClassSig | None = ctx.registry.lookup_stdlib_class(module_id, export_name)
     if stdlib_func is not None:
-        ret = _infer_signature_return_type(stdlib_func, arg_types)
+        _apply_call_arg_hints(expr, stdlib_func.arg_names, stdlib_func.arg_types, ctx)
+        ret = _infer_signature_return_type(stdlib_func, _collect_call_arg_types(expr))
         func["resolved_type"] = "callable"
     elif stdlib_class is not None:
+        init_sig: FuncSig | None = stdlib_class.methods.get("__init__")
+        if init_sig is not None:
+            _apply_call_arg_hints(expr, init_sig.arg_names[1:], init_sig.arg_types, ctx)
         ret = stdlib_class.name
         func["resolved_type"] = "type"
     else:
@@ -853,18 +1422,23 @@ def _resolve_method_call(
     # Resolve arguments
     _resolve_call_args(expr, ctx)
 
-    # Module attribute call (math.sqrt etc.)
-    if isinstance(value, dict) and value.get("kind") == "Name":
-        receiver_name: str = str(value.get("id", ""))
-        mod_id: str = ctx.import_modules.get(receiver_name, "")
+    # Module attribute call (math.sqrt, os.path.join, etc.)
+    if isinstance(value, dict):
+        mod_id = _resolve_module_expr_id(value, ctx)
         if mod_id != "":
             value["resolved_type"] = "module"
+            receiver_name: str = _module_expr_display_name(value, mod_id)
             return _resolve_module_attr_call(expr, func, receiver_name, mod_id, attr, ctx)
 
     # Container method call (list.append, str.split, etc.)
     owner_base: str = extract_base_type(receiver_type)
     method_sig: FuncSig | None = ctx.registry.lookup_method(owner_base, attr)
     if method_sig is not None:
+        hinted_arg_types = method_sig.arg_types
+        container_cls: ClassSig | None = ctx.registry.classes.get(owner_base)
+        if container_cls is not None:
+            hinted_arg_types = _substitute_arg_types(method_sig.arg_types, receiver_type, container_cls)
+        _apply_call_arg_hints(expr, method_sig.arg_names[1:], hinted_arg_types, ctx)
         return _resolve_container_method_call(expr, func, receiver_type, owner_base, attr, method_sig, ctx)
 
     # User-defined class method
@@ -872,6 +1446,7 @@ def _resolve_method_call(
     if cls is not None:
         msig: FuncSig | None = cls.methods.get(attr)
         if msig is not None:
+            _apply_call_arg_hints(expr, msig.arg_names[1:], msig.arg_types, ctx)
             ret: str = _substitute_type_params(msig.return_type, receiver_type, cls)
             expr["resolved_type"] = ret
             func["resolved_type"] = "callable"
@@ -884,6 +1459,7 @@ def _resolve_method_call(
     if stdlib_cls is not None:
         stdlib_msig: FuncSig | None = stdlib_cls.methods.get(attr)
         if stdlib_msig is not None and "property" not in stdlib_msig.decorators:
+            _apply_call_arg_hints(expr, stdlib_msig.arg_names[1:], stdlib_msig.arg_types, ctx)
             ret2: str = _ctx_normalize_type(_substitute_type_params(stdlib_msig.return_type, receiver_type, stdlib_cls), ctx)
             expr["resolved_type"] = ret2
             func["resolved_type"] = "callable"
@@ -918,9 +1494,13 @@ def _resolve_module_attr_call(
     # Determine return type
     ret: str = "unknown"
     if stdlib_func is not None:
+        _apply_call_arg_hints(expr, stdlib_func.arg_names, stdlib_func.arg_types, ctx)
         ret = _infer_signature_return_type(stdlib_func, _collect_call_arg_types(expr))
         func["resolved_type"] = "callable"
     elif stdlib_class is not None:
+        init_sig: FuncSig | None = stdlib_class.methods.get("__init__")
+        if init_sig is not None:
+            _apply_call_arg_hints(expr, init_sig.arg_names[1:], init_sig.arg_types, ctx)
         ret = stdlib_class.name
         func["resolved_type"] = "type"
     else:
@@ -1056,6 +1636,14 @@ def _substitute_type_params(ret_type: str, concrete_type: str, cls: ClassSig) ->
     return result
 
 
+def _substitute_arg_types(arg_types: dict[str, str], concrete_type: str, cls: ClassSig) -> dict[str, str]:
+    substituted: dict[str, str] = {}
+    for arg_name, arg_type in arg_types.items():
+        if isinstance(arg_name, str) and isinstance(arg_type, str):
+            substituted[arg_name] = _substitute_type_params(arg_type, concrete_type, cls)
+    return substituted
+
+
 def _resolve_attribute(expr: dict[str, JsonVal], ctx: ResolveContext) -> str:
     value = expr.get("value")
     attr_val = expr.get("attr")
@@ -1065,13 +1653,23 @@ def _resolve_attribute(expr: dict[str, JsonVal], ctx: ResolveContext) -> str:
     if isinstance(value, dict):
         receiver_type = _resolve_expr(value, ctx)
 
-    # Module-level attribute access (e.g., math.pi)
-    if isinstance(value, dict) and value.get("kind") == "Name":
-        receiver_name: str = str(value.get("id", ""))
-        mod_id: str = ctx.import_modules.get(receiver_name, "")
+    if attr == "__name__" and isinstance(value, dict) and value.get("kind") == "Call":
+        func_node = value.get("func")
+        if isinstance(func_node, dict) and func_node.get("kind") == "Name" and func_node.get("id") == "type":
+            expr["resolved_type"] = "str"
+            return "str"
+
+    # Module-level attribute access (e.g., math.pi, os.path)
+    if isinstance(value, dict):
+        mod_id: str = _resolve_module_expr_id(value, ctx)
         if mod_id != "":
             canonical: str = ctx.canonical_module_id(mod_id)
             value["resolved_type"] = "module"
+            promoted_module: str = _resolve_module_member_module(canonical, attr, ctx)
+            if promoted_module != "":
+                expr["resolved_type"] = "module"
+                expr["runtime_module_id"] = promoted_module
+                return "module"
             t: str = _infer_module_attr_type(canonical, attr, ctx)
             if t == "unknown":
                 if ctx.registry.lookup_stdlib_class(canonical, attr) is not None:
@@ -1136,6 +1734,72 @@ def _infer_module_attr_type(canonical: str, attr: str, ctx: ResolveContext) -> s
     return "unknown"
 
 
+def _resolve_module_member_module(module_id: str, attr: str, ctx: ResolveContext) -> str:
+    """Resolve nested module references like os.path -> pytra.std.os_path."""
+    if module_id == "" or attr == "":
+        return ""
+    candidates: list[str] = [module_id + "." + attr, module_id + "_" + attr]
+    seen: set[str] = set()
+    for candidate in candidates:
+        normalized: str = ctx.canonical_module_id(candidate)
+        if normalized == "" or normalized in seen:
+            continue
+        seen.add(normalized)
+        if ctx.runtime_module_exists(normalized) or normalized in ctx.registry.stdlib_modules:
+            return normalized
+    return ""
+
+
+def _resolve_module_expr_id(expr: dict[str, JsonVal], ctx: ResolveContext) -> str:
+    """Resolve an expression that denotes a module object to its module_id."""
+    runtime_module_id = expr.get("runtime_module_id")
+    resolved_type = expr.get("resolved_type")
+    if isinstance(runtime_module_id, str) and runtime_module_id != "" and resolved_type == "module":
+        return ctx.canonical_module_id(runtime_module_id)
+
+    kind = expr.get("kind")
+    if kind == "Name":
+        name = expr.get("id")
+        if isinstance(name, str):
+            mod_id: str = ctx.import_modules.get(name, "")
+            if mod_id != "":
+                canonical = ctx.canonical_module_id(mod_id)
+                expr["resolved_type"] = "module"
+                expr["runtime_module_id"] = canonical
+                return canonical
+        return ""
+
+    if kind == "Attribute":
+        value = expr.get("value")
+        attr = expr.get("attr")
+        if isinstance(value, dict) and isinstance(attr, str):
+            parent_mod = _resolve_module_expr_id(value, ctx)
+            if parent_mod != "":
+                promoted = _resolve_module_member_module(parent_mod, attr, ctx)
+                if promoted != "":
+                    expr["resolved_type"] = "module"
+                    expr["runtime_module_id"] = promoted
+                    return promoted
+        return ""
+
+    return ""
+
+
+def _module_expr_display_name(expr: dict[str, JsonVal], module_id: str) -> str:
+    """Best-effort label for diagnostics/runtime-call strings of module expressions."""
+    kind = expr.get("kind")
+    if kind == "Name":
+        name = expr.get("id")
+        if isinstance(name, str) and name != "":
+            return name
+    if kind == "Attribute":
+        attr = expr.get("attr")
+        if isinstance(attr, str) and attr != "":
+            return attr
+    tail = module_id.rsplit(".", 1)[-1]
+    return tail if tail != "" else module_id
+
+
 def _resolve_subscript(expr: dict[str, JsonVal], ctx: ResolveContext) -> str:
     value = expr.get("value")
     slice_node = expr.get("slice")
@@ -1143,6 +1807,14 @@ def _resolve_subscript(expr: dict[str, JsonVal], ctx: ResolveContext) -> str:
     vt: str = "unknown"
     if isinstance(value, dict):
         vt = _resolve_expr(value, ctx)
+    if vt.endswith(" | None"):
+        vt_inner: str = vt[:-7].strip()
+        if vt_inner.startswith(("list[", "dict[", "tuple[")) or vt_inner in ("str", "bytes", "bytearray"):
+            vt = vt_inner
+    elif vt.endswith("|None"):
+        vt_inner2: str = vt[:-6].strip()
+        if vt_inner2.startswith(("list[", "dict[", "tuple[")) or vt_inner2 in ("str", "bytes", "bytearray"):
+            vt = vt_inner2
     is_slice: bool = False
     if isinstance(slice_node, dict):
         _resolve_expr(slice_node, ctx)
@@ -1209,12 +1881,23 @@ def _resolve_list(expr: dict[str, JsonVal], ctx: ResolveContext) -> str:
         for e in elems:
             if isinstance(e, dict):
                 t: str = _resolve_expr(e, ctx)
-                if elem_type == "unknown":
-                    elem_type = t
+                elem_type = _merge_literal_type(elem_type, t)
     if elem_type != "unknown":
         result: str = "list[" + elem_type + "]"
     else:
         result = "list[unknown]"
+    if isinstance(elems, list):
+        target_base = extract_base_type(elem_type)
+        for e2 in elems:
+            if not isinstance(e2, dict):
+                continue
+            current = str(e2.get("resolved_type", ""))
+            current_base = extract_base_type(current)
+            if (
+                current in ("", "unknown", "list[unknown]", "set[unknown]", "dict[unknown,unknown]")
+                or (target_base != "" and current_base == target_base and ("[" not in current or "unknown" in current))
+            ):
+                e2["resolved_type"] = elem_type
     expr["resolved_type"] = result
     return result
 
@@ -1231,12 +1914,10 @@ def _resolve_dict(expr: dict[str, JsonVal], ctx: ResolveContext) -> str:
                 val_node = entry.get("value")
                 if isinstance(key_node, dict):
                     t: str = _resolve_expr(key_node, ctx)
-                    if kt == "unknown":
-                        kt = t
+                    kt = _merge_literal_type(kt, t)
                 if isinstance(val_node, dict):
                     t2: str = _resolve_expr(val_node, ctx)
-                    if vt == "unknown":
-                        vt = t2
+                    vt = _merge_literal_type(vt, t2)
     else:
         # Fallback: separate keys/values arrays
         keys = expr.get("keys")
@@ -1245,14 +1926,12 @@ def _resolve_dict(expr: dict[str, JsonVal], ctx: ResolveContext) -> str:
             for k in keys:
                 if isinstance(k, dict):
                     t3: str = _resolve_expr(k, ctx)
-                    if kt == "unknown":
-                        kt = t3
+                    kt = _merge_literal_type(kt, t3)
         if isinstance(values, list):
             for v in values:
                 if isinstance(v, dict):
                     t4: str = _resolve_expr(v, ctx)
-                    if vt == "unknown":
-                        vt = t4
+                    vt = _merge_literal_type(vt, t4)
     result: str = "dict[" + kt + "," + vt + "]"
     expr["resolved_type"] = result
     return result
@@ -1265,8 +1944,7 @@ def _resolve_set(expr: dict[str, JsonVal], ctx: ResolveContext) -> str:
         for e in elems:
             if isinstance(e, dict):
                 t: str = _resolve_expr(e, ctx)
-                if elem_type == "unknown":
-                    elem_type = t
+                elem_type = _merge_literal_type(elem_type, t)
     result: str = "set[" + elem_type + "]"
     expr["resolved_type"] = result
     return result
@@ -1326,14 +2004,15 @@ def _resolve_listcomp(expr: dict[str, JsonVal], ctx: ResolveContext) -> str:
                         elem = it[5:-1]
                     elif it.startswith("set[") and it.endswith("]"):
                         elem = it[4:-1]
+                    elif it == "str":
+                        elem = "str"
+                    elif it in ("bytes", "bytearray", "list[uint8]"):
+                        elem = "int64"
                     elif it == "list[int64]" or it.startswith("RangeExpr"):
                         elem = "int64"
                     target = gen.get("target")
-                    if isinstance(target, dict) and target.get("kind") == "Name":
-                        var_name = target.get("id")
-                        if isinstance(var_name, str):
-                            comp_scope.define(var_name, elem)
-                            target["resolved_type"] = elem
+                    if isinstance(target, dict):
+                        _bind_comp_target(comp_scope, target, elem)
                 # Resolve filter conditions
                 ifs = gen.get("ifs")
                 if isinstance(ifs, list):
@@ -1374,12 +2053,13 @@ def _resolve_setcomp(expr: dict[str, JsonVal], ctx: ResolveContext) -> str:
                     elem: str = "unknown"
                     if it.startswith("list[") and it.endswith("]"):
                         elem = it[5:-1]
+                    elif it == "str":
+                        elem = "str"
+                    elif it in ("bytes", "bytearray", "list[uint8]"):
+                        elem = "int64"
                     target = gen.get("target")
-                    if isinstance(target, dict) and target.get("kind") == "Name":
-                        var_name = target.get("id")
-                        if isinstance(var_name, str):
-                            comp_scope.define(var_name, elem)
-                            target["resolved_type"] = elem
+                    if isinstance(target, dict):
+                        _bind_comp_target(comp_scope, target, elem)
                 ifs = gen.get("ifs")
                 if isinstance(ifs, list):
                     ctx.scope = comp_scope
@@ -1416,12 +2096,13 @@ def _resolve_dictcomp(expr: dict[str, JsonVal], ctx: ResolveContext) -> str:
                     elem: str = "unknown"
                     if it.startswith("list[") and it.endswith("]"):
                         elem = it[5:-1]
+                    elif it == "str":
+                        elem = "str"
+                    elif it in ("bytes", "bytearray", "list[uint8]"):
+                        elem = "int64"
                     target = gen.get("target")
-                    if isinstance(target, dict) and target.get("kind") == "Name":
-                        var_name = target.get("id")
-                        if isinstance(var_name, str):
-                            comp_scope.define(var_name, elem)
-                            target["resolved_type"] = elem
+                    if isinstance(target, dict):
+                        _bind_comp_target(comp_scope, target, elem)
                 ifs = gen.get("ifs")
                 if isinstance(ifs, list):
                     ctx.scope = comp_scope
@@ -1446,49 +2127,7 @@ def _resolve_dictcomp(expr: dict[str, JsonVal], ctx: ResolveContext) -> str:
 
 def _resolve_lambda(expr: dict[str, JsonVal], ctx: ResolveContext) -> str:
     """Resolve a Lambda expression."""
-    arg_types_raw = expr.get("arg_types")
-    ret_raw = expr.get("return_type")
-    arg_type_strs: list[str] = []
-    if isinstance(arg_types_raw, dict):
-        arg_order = expr.get("arg_order", [])
-        if isinstance(arg_order, list):
-            for a in arg_order:
-                if isinstance(a, str):
-                    at = arg_types_raw.get(a)
-                    arg_type_strs.append(_ctx_normalize_type(str(at), ctx) if isinstance(at, str) else "unknown")
-    ret: str = _ctx_normalize_type(str(ret_raw), ctx) if isinstance(ret_raw, str) else "unknown"
-
-    # Add resolved_type to args entries
-    args_list = expr.get("args")
-    if isinstance(args_list, list):
-        for arg in args_list:
-            if isinstance(arg, dict) and "resolved_type" not in arg:
-                arg["resolved_type"] = "unknown"
-
-    # Resolve body in lambda scope
-    lam_scope: Scope = ctx.scope.child()
-    if isinstance(arg_types_raw, dict):
-        for k, v in arg_types_raw.items():
-            if isinstance(v, str):
-                lam_scope.define(k, _ctx_normalize_type(v, ctx))
-    old_scope: Scope = ctx.scope
-    ctx.scope = lam_scope
-    body = expr.get("body")
-    if isinstance(body, dict):
-        _resolve_expr(body, ctx)
-    elif isinstance(body, list):
-        for s in body:
-            if isinstance(s, dict):
-                _resolve_stmt(s, ctx)
-    ctx.scope = old_scope
-
-    # Build callable type
-    if len(arg_type_strs) > 0:
-        callable_type: str = "callable[" + ",".join(arg_type_strs) + "->" + ret + "]"
-    else:
-        callable_type = "callable[" + ret + "]"
-    expr["resolved_type"] = callable_type
-    return callable_type
+    return _refine_lambda_from_call(expr, ctx, [])
 
 
 def _resolve_slice(expr: dict[str, JsonVal], ctx: ResolveContext) -> str:
@@ -1672,6 +2311,9 @@ def _resolve_function_def(stmt: dict[str, JsonVal], ctx: ResolveContext) -> None
         for dk, dv in defaults_raw.items():
             if isinstance(dv, dict) and "kind" in dv:
                 _resolve_expr(dv, ctx)
+                param_type = arg_types.get(dk, "")
+                if param_type != "":
+                    _apply_default_annotation_type(dv, param_type, ctx)
 
     # Compute arg_usage
     arg_order_raw = stmt.get("arg_order")
@@ -1706,6 +2348,30 @@ def _resolve_function_def(stmt: dict[str, JsonVal], ctx: ResolveContext) -> None
                 _resolve_stmt(s, ctx)
     ctx.scope = old_scope
     ctx.current_params = old_params
+
+    refined_callable_params: dict[str, str] = {}
+    callable_param_names: set[str] = set()
+    for arg_name, arg_type in arg_types.items():
+        if arg_type == "callable":
+            callable_param_names.add(arg_name)
+    if len(callable_param_names) > 0 and not _is_unknown_like_type(ret):
+        observed_calls: dict[str, list[str]] = {}
+        invalid_calls: set[str] = set()
+        _collect_callable_param_uses(body, callable_param_names, observed_calls, invalid_calls)
+        for arg_name2, observed_types in observed_calls.items():
+            if arg_name2 in invalid_calls:
+                continue
+            callable_sig = _make_callable_type(observed_types, ret)
+            arg_types[arg_name2] = callable_sig
+            refined_callable_params[arg_name2] = callable_sig
+            if isinstance(arg_types_raw, dict):
+                arg_types_raw[arg_name2] = callable_sig
+        if len(refined_callable_params) > 0:
+            arg_type_exprs = stmt.get("arg_type_exprs")
+            if isinstance(arg_type_exprs, dict):
+                for arg_name3, callable_sig2 in refined_callable_params.items():
+                    arg_type_exprs[arg_name3] = make_type_expr(callable_sig2)
+            _refresh_callable_param_calls(body, refined_callable_params, ctx)
 
 
 def _compute_arg_usage(arg_order: list[str], func: dict[str, JsonVal]) -> dict[str, str]:
@@ -1793,12 +2459,20 @@ def _resolve_class_def(stmt: dict[str, JsonVal], ctx: ResolveContext) -> None:
         else:
             stmt["class_storage_hint"] = "value"
 
-    # Normalize field_types
+    # Normalize and refresh field_types from the prescanned class signature.
     ft_raw = stmt.get("field_types")
-    if isinstance(ft_raw, dict):
+    if not isinstance(ft_raw, dict):
+        ft_raw = {}
+        stmt["field_types"] = ft_raw
+    else:
         for fk, fv in ft_raw.items():
             if isinstance(fv, str):
                 ft_raw[fk] = _ctx_normalize_type(fv, ctx)
+
+    cls_sig_existing: ClassSig | None = ctx.module_classes.get(class_name)
+    if cls_sig_existing is not None:
+        for fname, ftype in cls_sig_existing.fields.items():
+            ft_raw[fname] = _ctx_normalize_type(ftype, ctx)
 
     # Collect fields from body
     cls_scope: Scope = ctx.scope.child()
@@ -1845,6 +2519,38 @@ def _resolve_class_def(stmt: dict[str, JsonVal], ctx: ResolveContext) -> None:
     ctx.scope = old_scope
     ctx.in_class = old_in_class
 
+    if cls_sig_existing is not None and isinstance(body, list):
+        for item in body:
+            if not isinstance(item, dict):
+                continue
+            ik: str = str(item.get("kind", ""))
+            if ik == "AnnAssign":
+                target = item.get("target")
+                if isinstance(target, dict) and target.get("kind") == "Name":
+                    field_name = target.get("id")
+                    field_type = item.get("decl_type")
+                    if isinstance(field_name, str) and isinstance(field_type, str) and field_type != "" and field_type != "unknown":
+                        cls_sig_existing.fields[field_name] = _ctx_normalize_type(field_type, ctx)
+                        ft_raw[field_name] = cls_sig_existing.fields[field_name]
+            elif ik == "FunctionDef" and item.get("name") == "__init__":
+                init_body = item.get("body")
+                if not isinstance(init_body, list):
+                    continue
+                for init_stmt in init_body:
+                    if not isinstance(init_stmt, dict):
+                        continue
+                    target2 = init_stmt.get("target")
+                    if not isinstance(target2, dict) or target2.get("kind") != "Attribute":
+                        continue
+                    owner = target2.get("value")
+                    if not isinstance(owner, dict) or owner.get("kind") != "Name" or owner.get("id") != "self":
+                        continue
+                    field_name2 = target2.get("attr")
+                    field_type2 = target2.get("resolved_type")
+                    if isinstance(field_name2, str) and isinstance(field_type2, str) and field_type2 != "" and field_type2 != "unknown":
+                        cls_sig_existing.fields[field_name2] = _ctx_normalize_type(field_type2, ctx)
+                        ft_raw[field_name2] = cls_sig_existing.fields[field_name2]
+
 
 def _resolve_assign(stmt: dict[str, JsonVal], ctx: ResolveContext) -> None:
     """Resolve an Assign statement."""
@@ -1864,6 +2570,9 @@ def _resolve_assign(stmt: dict[str, JsonVal], ctx: ResolveContext) -> None:
                     name_val = t.get("id")
                     if isinstance(name_val, str):
                         existing: str = ctx.scope.lookup(name_val)
+                        if isinstance(value, dict) and existing != "unknown":
+                            _apply_collection_type_hint(value, existing, ctx)
+                            vt = str(value.get("resolved_type", vt))
                         if existing != "unknown":
                             # Re-assignment: keep resolved type
                             t["resolved_type"] = existing
@@ -1871,6 +2580,10 @@ def _resolve_assign(stmt: dict[str, JsonVal], ctx: ResolveContext) -> None:
                         else:
                             t["resolved_type"] = "unknown"
                         ctx.scope.define(name_val, vt)
+                        if isinstance(value, dict) and value.get("kind") == "Lambda":
+                            ctx.scope.bind_lambda(name_val, value)
+                        else:
+                            ctx.scope.clear_lambda(name_val)
                 elif t.get("kind") == "Tuple":
                     _resolve_expr(t, ctx)
                     # Define tuple element variables
@@ -1885,7 +2598,10 @@ def _resolve_assign(stmt: dict[str, JsonVal], ctx: ResolveContext) -> None:
                                     elem["resolved_type"] = et
                                     ctx.scope.define(elem_name, et)
                 else:
-                    _resolve_expr(t, ctx)
+                    tt = _resolve_expr(t, ctx)
+                    if isinstance(value, dict) and tt != "unknown":
+                        _apply_collection_type_hint(value, tt, ctx)
+                        vt = str(value.get("resolved_type", vt))
     else:
         target = stmt.get("target")
         if isinstance(target, dict):
@@ -1893,12 +2609,19 @@ def _resolve_assign(stmt: dict[str, JsonVal], ctx: ResolveContext) -> None:
                 name_val2 = target.get("id")
                 if isinstance(name_val2, str):
                     existing2: str = ctx.scope.lookup(name_val2)
+                    if isinstance(value, dict) and existing2 != "unknown":
+                        _apply_collection_type_hint(value, existing2, ctx)
+                        vt = str(value.get("resolved_type", vt))
                     if existing2 != "unknown":
                         target["resolved_type"] = existing2
                         target["borrow_kind"] = "readonly_ref"
                     else:
                         target["resolved_type"] = "unknown"
                     ctx.scope.define(name_val2, vt)
+                    if isinstance(value, dict) and value.get("kind") == "Lambda":
+                        ctx.scope.bind_lambda(name_val2, value)
+                    else:
+                        ctx.scope.clear_lambda(name_val2)
             elif target.get("kind") == "Tuple":
                 _resolve_expr(target, ctx)
                 elems2 = target.get("elements")
@@ -1912,7 +2635,10 @@ def _resolve_assign(stmt: dict[str, JsonVal], ctx: ResolveContext) -> None:
                                 elem2["resolved_type"] = et2
                                 ctx.scope.define(elem_name2, et2)
             else:
-                _resolve_expr(target, ctx)
+                target_type = _resolve_expr(target, ctx)
+                if isinstance(value, dict) and target_type != "unknown":
+                    _apply_collection_type_hint(value, target_type, ctx)
+                    vt = str(value.get("resolved_type", vt))
 
     # Add decl_type for declarations (declare=true)
     declare_val = stmt.get("declare")
@@ -1941,6 +2667,8 @@ def _resolve_ann_assign(stmt: dict[str, JsonVal], ctx: ResolveContext) -> None:
     value = stmt.get("value")
     if isinstance(value, dict):
         _resolve_expr(value, ctx)
+        if ann_type != "":
+            _apply_collection_type_hint(value, ann_type, ctx)
 
     # Resolve target
     target = stmt.get("target")
@@ -1950,6 +2678,10 @@ def _resolve_ann_assign(stmt: dict[str, JsonVal], ctx: ResolveContext) -> None:
             ctx.scope.define(name_val, ann_type)
             target["resolved_type"] = ann_type
             target["type_expr"] = make_type_expr(ann_type)
+            if isinstance(value, dict) and value.get("kind") == "Lambda":
+                ctx.scope.bind_lambda(name_val, value)
+            else:
+                ctx.scope.clear_lambda(name_val)
     elif isinstance(target, dict) and target.get("kind") == "Attribute":
         # self.field = ... — resolve the receiver (self) and add type_expr
         _resolve_expr(target, ctx)
@@ -2583,10 +3315,12 @@ def _prescan_module(doc: dict[str, JsonVal], ctx: ResolveContext) -> None:
                 continue
             alias_name = item.get("name")
             alias_value = item.get("value")
+            if not isinstance(alias_value, str):
+                alias_value = item.get("type_expr")
             if isinstance(alias_name, str) and alias_name != "" and isinstance(alias_value, str) and alias_value != "":
                 ctx.type_aliases[alias_name] = alias_value
         for alias_name, alias_value in list(ctx.type_aliases.items()):
-            ctx.type_aliases[alias_name] = _ctx_normalize_type(alias_value, ctx)
+            ctx.type_aliases[alias_name] = normalize_type(alias_value, ctx.type_aliases, {alias_name})
 
     # Collect function and class signatures
     if isinstance(body, list):

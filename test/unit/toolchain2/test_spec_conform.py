@@ -182,6 +182,49 @@ def f(xs: list[int], ys: list[str], text: str) -> None:
         self.assertEqual(for_range.get("target_type"), "int64")
         self.assertEqual(for_range.get("target", {}).get("resolved_type"), "int64")
 
+    def test_registry_loads_runtime_builtins_and_tuple_target_comprehensions(self) -> None:
+        registry = _load_registry()
+        sum_sig = registry.lookup_function("sum")
+
+        self.assertIsNotNone(sum_sig)
+        self.assertEqual(sum_sig.return_type, "T")
+
+        source = """
+def linear(x: list[float], w: list[list[float]]) -> list[float]:
+    return [sum(wi * xi for wi, xi in zip(wo, x)) for wo in w]
+"""
+        east2 = parse_python_source(source, "<mem>").to_jv()
+        resolve_east1_to_east2(east2, registry=registry)
+
+        linear_fn = next(
+            node for node in _walk(east2)
+            if node.get("kind") == "FunctionDef" and node.get("name") == "linear"
+        )
+        sum_call = next(
+            node
+            for node in _walk(linear_fn)
+            if node.get("kind") == "Call"
+            and isinstance(node.get("func"), dict)
+            and node["func"].get("kind") == "Name"
+            and node["func"].get("id") == "sum"
+        )
+        wi_nodes = [
+            node for node in _walk(linear_fn)
+            if node.get("kind") == "Name" and node.get("id") == "wi"
+        ]
+        xi_nodes = [
+            node for node in _walk(linear_fn)
+            if node.get("kind") == "Name" and node.get("id") == "xi"
+        ]
+
+        self.assertEqual(linear_fn.get("return_type"), "list[float64]")
+        self.assertEqual(sum_call.get("lowered_kind"), "BuiltinCall")
+        self.assertEqual(sum_call.get("resolved_type"), "float64")
+        self.assertTrue(wi_nodes)
+        self.assertTrue(xi_nodes)
+        self.assertTrue(all(node.get("resolved_type") == "float64" for node in wi_nodes))
+        self.assertTrue(all(node.get("resolved_type") == "float64" for node in xi_nodes))
+
     def test_resolve_requires_registry(self) -> None:
         east1 = parse_python_source("def f() -> None:\n    pass\n", "<mem>").to_jv()
         with self.assertRaisesRegex(ValueError, "registry is required"):
@@ -356,6 +399,199 @@ def add_scalars(a: Scalar, b: Scalar) -> int:
         self.assertEqual(right.get("kind"), "Unbox")
         self.assertEqual(right.get("target"), "int64")
         self.assertEqual(binop.get("resolved_type"), "int64")
+
+    def test_compile_boxes_imported_stdlib_alias_arguments(self) -> None:
+        source = """
+from pytra.std.json import dumps
+
+def f() -> str:
+    return dumps(123)
+"""
+        east2 = parse_python_source(source, "<mem>").to_jv()
+        resolve_east1_to_east2(east2, registry=_load_registry())
+        east3 = lower_east2_to_east3(east2)
+
+        dumps_call = next(
+            node
+            for node in _walk(east3)
+            if node.get("kind") == "Call"
+            and isinstance(node.get("func"), dict)
+            and node["func"].get("kind") == "Name"
+            and node["func"].get("id") == "dumps"
+        )
+        boxed_arg = dumps_call.get("args", [])[0]
+
+        self.assertEqual(boxed_arg.get("kind"), "Box")
+        self.assertEqual(boxed_arg.get("target"), "bool|int64|float64|str|list[Any]|dict[str,Any]|None")
+        self.assertEqual(boxed_arg.get("value", {}).get("resolved_type"), "int64")
+
+    def test_compile_preserves_tuple_unpack_value_type_for_static_tuple_calls(self) -> None:
+        source = """
+def pair() -> tuple[int, int]:
+    return 1, 2
+
+def f() -> int:
+    x, y = pair()
+    return x + y
+"""
+        east2 = parse_python_source(source, "<mem>").to_jv()
+        resolve_east1_to_east2(east2, registry=_load_registry())
+        east3 = lower_east2_to_east3(east2)
+
+        tmp_assign = next(
+            node
+            for node in _walk(east3)
+            if node.get("kind") == "Assign"
+            and isinstance(node.get("target"), dict)
+            and node["target"].get("id") == "__tup_1"
+        )
+        x_assign = next(
+            node
+            for node in _walk(east3)
+            if node.get("kind") == "Assign"
+            and isinstance(node.get("target"), dict)
+            and node["target"].get("id") == "x"
+        )
+
+        self.assertEqual(tmp_assign.get("decl_type"), "tuple[int64,int64]")
+        self.assertEqual(tmp_assign.get("value", {}).get("kind"), "Call")
+        self.assertEqual(x_assign.get("decl_type"), "int64")
+        self.assertEqual(x_assign.get("value", {}).get("resolved_type"), "int64")
+
+    def test_resolver_refines_lambda_args_from_calls_and_defaults(self) -> None:
+        source = """
+def f() -> tuple[int, float]:
+    direct: int = (lambda x, y: x + y)(4, 5)
+    matrix = lambda nout, nin, std=0.08: nout + nin * std
+    return direct, matrix(1, 2)
+"""
+        east2 = parse_python_source(source, "<mem>").to_jv()
+        resolve_east1_to_east2(east2, registry=_load_registry())
+
+        lambdas = [node for node in _walk(east2) if node.get("kind") == "Lambda"]
+        direct_lambda = lambdas[0]
+        named_lambda = lambdas[1]
+        direct_call = next(
+            node
+            for node in _walk(east2)
+            if node.get("kind") == "Call"
+            and isinstance(node.get("func"), dict)
+            and node["func"].get("kind") == "Lambda"
+        )
+        named_call = next(
+            node
+            for node in _walk(east2)
+            if node.get("kind") == "Call"
+            and isinstance(node.get("func"), dict)
+            and node["func"].get("kind") == "Name"
+            and node["func"].get("id") == "matrix"
+        )
+
+        self.assertEqual(direct_lambda.get("arg_types"), {"x": "int64", "y": "int64"})
+        self.assertEqual(direct_lambda.get("return_type"), "int64")
+        self.assertEqual(direct_call.get("resolved_type"), "int64")
+
+        self.assertEqual(named_lambda.get("arg_types", {}).get("std"), "float64")
+        self.assertEqual(named_lambda.get("return_type"), "float64")
+        self.assertEqual(named_call.get("resolved_type"), "float64")
+
+    def test_compile_expands_defaults_for_lambda_assigned_to_name(self) -> None:
+        source = """
+def f() -> None:
+    matrix = lambda nout, nin, std=0.08: nout + nin * std
+    print(matrix(1, 2))
+"""
+        east2 = parse_python_source(source, "<mem>").to_jv()
+        resolve_east1_to_east2(east2, registry=_load_registry())
+        validate_east2(east2)
+
+        east3 = lower_east2_to_east3(deep_copy_json(east2))
+        matrix_call = next(
+            node
+            for node in _walk(east3)
+            if node.get("kind") == "Call"
+            and isinstance(node.get("func"), dict)
+            and node["func"].get("kind") == "Name"
+            and node["func"].get("id") == "matrix"
+        )
+
+        self.assertEqual(len(matrix_call.get("args", [])), 3)
+        self.assertEqual(matrix_call.get("args", [])[2].get("resolved_type"), "float64")
+
+    def test_resolver_substitutes_container_method_arg_hints(self) -> None:
+        source = """
+def f() -> None:
+    keys: list[list[int]] = []
+    keys.append([])
+"""
+        east2 = parse_python_source(source, "<mem>").to_jv()
+        resolve_east1_to_east2(east2, registry=_load_registry())
+
+        append_call = next(
+            node
+            for node in _walk(east2)
+            if node.get("kind") == "Call"
+            and isinstance(node.get("func"), dict)
+            and node["func"].get("kind") == "Attribute"
+            and node["func"].get("attr") == "append"
+        )
+        append_arg = append_call.get("args", [])[0]
+
+        self.assertEqual(append_arg.get("resolved_type"), "list[int64]")
+        self.assertEqual(append_arg.get("call_arg_type"), "list[int64]")
+
+    def test_resolver_loads_utils_registry_and_type_name_attribute(self) -> None:
+        source = """
+from pytra.utils.assertions import py_assert_eq
+
+class Value:
+    pass
+
+def f(v: Value) -> bool:
+    name = type(v).__name__
+    return py_assert_eq(name, "Value", "type name")
+"""
+        east2 = parse_python_source(source, "<mem>").to_jv()
+        resolve_east1_to_east2(east2, registry=_load_registry())
+
+        type_name_attr = next(
+            node for node in _walk(east2)
+            if node.get("kind") == "Attribute" and node.get("attr") == "__name__"
+        )
+        assert_call = next(
+            node
+            for node in _walk(east2)
+            if node.get("kind") == "Call"
+            and isinstance(node.get("func"), dict)
+            and node["func"].get("kind") == "Name"
+            and node["func"].get("id") == "py_assert_eq"
+        )
+
+        self.assertEqual(type_name_attr.get("resolved_type"), "str")
+        self.assertEqual(assert_call.get("resolved_type"), "bool")
+
+    def test_compile_preserves_nested_list_comp_element_type(self) -> None:
+        source = """
+def f(n_layer: int) -> list[list[int]]:
+    keys: list[list[int]] = [[] for _ in range(n_layer)]
+    return keys
+"""
+        east2 = parse_python_source(source, "<mem>").to_jv()
+        resolve_east1_to_east2(east2, registry=_load_registry())
+        east3 = lower_east2_to_east3(deep_copy_json(east2))
+
+        append_call = next(
+            node
+            for node in _walk(east3)
+            if node.get("kind") == "Call"
+            and isinstance(node.get("func"), dict)
+            and node["func"].get("kind") == "Attribute"
+            and node["func"].get("attr") == "append"
+        )
+        append_arg = append_call.get("args", [])[0]
+
+        self.assertEqual(append_arg.get("resolved_type"), "list[int64]")
+        self.assertEqual(append_arg.get("call_arg_type"), "list[int64]")
 
     def test_validator_reports_unknown_missing_and_unnormalized_types(self) -> None:
         unknown_doc = {
