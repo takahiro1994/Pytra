@@ -9992,6 +9992,7 @@
                     "borrow_kind": "value",
                     "repr": "dict",
                     "id": "dict",
+                    "type_object_of": "dict",
                     "call_arg_type": "type"
                   }
                 ],
@@ -10075,7 +10076,8 @@
                             "casts": [],
                             "borrow_kind": "value",
                             "repr": "dict",
-                            "id": "dict"
+                            "id": "dict",
+                            "type_object_of": "dict"
                           },
                           {
                             "kind": "Name",
@@ -10331,6 +10333,7 @@
                     "borrow_kind": "value",
                     "repr": "list",
                     "id": "list",
+                    "type_object_of": "list",
                     "call_arg_type": "type"
                   }
                 ],
@@ -10414,7 +10417,8 @@
                             "casts": [],
                             "borrow_kind": "value",
                             "repr": "list",
-                            "id": "list"
+                            "id": "list",
+                            "type_object_of": "list"
                           },
                           {
                             "kind": "Name",
@@ -10670,6 +10674,7 @@
                     "borrow_kind": "value",
                     "repr": "str",
                     "id": "str",
+                    "type_object_of": "str",
                     "call_arg_type": "type"
                   }
                 ],
@@ -10726,7 +10731,8 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "str",
-                        "id": "str"
+                        "id": "str",
+                        "type_object_of": "str"
                       },
                       {
                         "kind": "Name",
@@ -10978,6 +10984,7 @@
                     "borrow_kind": "value",
                     "repr": "int",
                     "id": "int",
+                    "type_object_of": "int",
                     "call_arg_type": "type"
                   }
                 ],
@@ -11034,7 +11041,8 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "int",
-                        "id": "int"
+                        "id": "int",
+                        "type_object_of": "int"
                       },
                       {
                         "kind": "Name",
@@ -11286,6 +11294,7 @@
                     "borrow_kind": "value",
                     "repr": "float",
                     "id": "float",
+                    "type_object_of": "float",
                     "call_arg_type": "type"
                   }
                 ],
@@ -11342,7 +11351,8 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "float",
-                        "id": "float"
+                        "id": "float",
+                        "type_object_of": "float"
                       },
                       {
                         "kind": "Name",
@@ -11594,6 +11604,7 @@
                     "borrow_kind": "value",
                     "repr": "bool",
                     "id": "bool",
+                    "type_object_of": "bool",
                     "call_arg_type": "type"
                   }
                 ],
@@ -11650,7 +11661,8 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "bool",
-                        "id": "bool"
+                        "id": "bool",
+                        "type_object_of": "bool"
                       },
                       {
                         "kind": "Name",
@@ -25049,6 +25061,7 @@
                 "borrow_kind": "value",
                 "repr": "dict",
                 "id": "dict",
+                "type_object_of": "dict",
                 "call_arg_type": "type"
               }
             ],
@@ -25132,7 +25145,8 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "dict",
-                        "id": "dict"
+                        "id": "dict",
+                        "type_object_of": "dict"
                       },
                       {
                         "kind": "Name",
@@ -25448,6 +25462,7 @@
                 "borrow_kind": "value",
                 "repr": "list",
                 "id": "list",
+                "type_object_of": "list",
                 "call_arg_type": "type"
               }
             ],
@@ -25531,7 +25546,8 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "list",
-                        "id": "list"
+                        "id": "list",
+                        "type_object_of": "list"
                       },
                       {
                         "kind": "Name",
@@ -32095,6 +32111,7 @@
                 "borrow_kind": "value",
                 "repr": "bool",
                 "id": "bool",
+                "type_object_of": "bool",
                 "call_arg_type": "type"
               }
             ],
@@ -32170,7 +32187,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "bool",
-                    "id": "bool"
+                    "id": "bool",
+                    "type_object_of": "bool"
                   },
                   {
                     "kind": "Name",
@@ -32338,6 +32356,7 @@
                 "borrow_kind": "value",
                 "repr": "int",
                 "id": "int",
+                "type_object_of": "int",
                 "call_arg_type": "type"
               }
             ],
@@ -32421,7 +32440,8 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "int",
-                        "id": "int"
+                        "id": "int",
+                        "type_object_of": "int"
                       },
                       {
                         "kind": "Name",
@@ -32518,6 +32538,7 @@
                 "borrow_kind": "value",
                 "repr": "float",
                 "id": "float",
+                "type_object_of": "float",
                 "call_arg_type": "type"
               }
             ],
@@ -32601,7 +32622,8 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "float",
-                        "id": "float"
+                        "id": "float",
+                        "type_object_of": "float"
                       },
                       {
                         "kind": "Name",
@@ -32698,6 +32720,7 @@
                 "borrow_kind": "value",
                 "repr": "str",
                 "id": "str",
+                "type_object_of": "str",
                 "call_arg_type": "type"
               }
             ],
@@ -32781,7 +32804,8 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "str",
-                        "id": "str"
+                        "id": "str",
+                        "type_object_of": "str"
                       },
                       {
                         "kind": "Name",
@@ -32886,6 +32910,7 @@
                 "borrow_kind": "value",
                 "repr": "list",
                 "id": "list",
+                "type_object_of": "list",
                 "call_arg_type": "type"
               }
             ],
@@ -32969,7 +32994,8 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "list",
-                        "id": "list"
+                        "id": "list",
+                        "type_object_of": "list"
                       },
                       {
                         "kind": "Name",
@@ -33134,6 +33160,7 @@
                 "borrow_kind": "value",
                 "repr": "dict",
                 "id": "dict",
+                "type_object_of": "dict",
                 "call_arg_type": "type"
               }
             ],
@@ -33217,7 +33244,8 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "dict",
-                        "id": "dict"
+                        "id": "dict",
+                        "type_object_of": "dict"
                       },
                       {
                         "kind": "Name",

@@ -504,22 +504,6 @@ def _emit_unbox(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
     source_optional_inner = _optional_inner_type(source_type)
     if source_optional_inner != "" and go_type(source_optional_inner) == target_gt and source_gt.startswith("*"):
         return "(*(" + _emit_expr(ctx, value_node) + "))"
-    if isinstance(value_node, dict) and _str(value_node, "kind") == "Attribute":
-        owner_node = value_node.get("value")
-        owner_type = _str(owner_node, "resolved_type") if isinstance(owner_node, dict) else ""
-        if owner_type in ("", "unknown") and isinstance(owner_node, dict) and _str(owner_node, "kind") == "Call":
-            func = owner_node.get("func")
-            args = _list(owner_node, "args")
-            if isinstance(func, dict) and _str(func, "kind") == "Name" and _str(func, "id") == "cast" and len(args) >= 1:
-                cast_target = args[0]
-                if isinstance(cast_target, dict):
-                    owner_type = _str(cast_target, "id")
-                    if owner_type == "":
-                        owner_type = _str(cast_target, "repr")
-        attr_name = _str(value_node, "attr")
-        field_type = ctx.class_fields.get(owner_type, {}).get(attr_name, "")
-        if field_type == target_type:
-            return _emit_expr(ctx, value_node)
     if target_type in ctx.enum_bases:
         return _safe_go_ident(target_type) + "(" + _emit_expr(ctx, value_node) + ")"
     optional_inner = _optional_inner_type(target_type)
@@ -537,53 +521,6 @@ def _emit_unbox(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
             + "\treturn " + wrapped + "\n"
             + "}()"
         )
-    if isinstance(value_node, dict) and _str(value_node, "kind") == "Call":
-        runtime_call = _str(value_node, "runtime_call")
-        builtin_name = _str(value_node, "builtin_name")
-        func = value_node.get("func")
-        func_name = _str(func, "id") if isinstance(func, dict) else ""
-        args = _list(value_node, "args")
-        if func_name == "cast" and len(args) >= 1 and isinstance(args[0], dict):
-            cast_target = _str(args[0], "id")
-            if cast_target == "":
-                cast_target = _str(args[0], "repr")
-            if cast_target == target_type or (cast_target == "str" and target_type == "string") or (cast_target == "string" and target_type == "str"):
-                return _emit_expr(ctx, value_node)
-        if target_type in ("int64", "int32", "int16", "int8", "uint8", "uint16", "uint32", "uint64") and (
-            runtime_call in ("int", "static_cast") or builtin_name == "int" or func_name == "int"
-        ):
-            cast_call = dict(value_node)
-            cast_call["resolved_type"] = target_type
-            cast_call["lowered_kind"] = "BuiltinCall"
-            cast_call["builtin_name"] = "int"
-            cast_call["runtime_call"] = "int"
-            return _emit_builtin_call(ctx, cast_call)
-        if target_type in ("float64", "float32") and (
-            runtime_call == "float" or builtin_name == "float" or func_name == "float"
-        ):
-            cast_call = dict(value_node)
-            cast_call["resolved_type"] = target_type
-            cast_call["lowered_kind"] = "BuiltinCall"
-            cast_call["builtin_name"] = "float"
-            cast_call["runtime_call"] = "float"
-            return _emit_builtin_call(ctx, cast_call)
-        if target_type in ("str", "string") and (
-            runtime_call in ("str", "py_to_string") or builtin_name == "str" or func_name == "str"
-        ):
-            return _emit_expr(ctx, value_node)
-        if target_type == "bool" and (
-            runtime_call == "bool" or builtin_name == "bool" or func_name == "bool"
-        ):
-            return _emit_expr(ctx, value_node)
-    if isinstance(value_node, dict) and _str(value_node, "kind") == "Subscript":
-        slice_node = value_node.get("slice")
-        base_node = value_node.get("value")
-        base_type = _effective_resolved_type(ctx, base_node)
-        if isinstance(slice_node, dict) and _str(slice_node, "kind") == "Slice":
-            if base_type == target_type or go_type(base_type) == target_gt:
-                return _emit_expr(ctx, value_node)
-            if target_gt.startswith("[]") or target_gt == "string":
-                return _emit_expr(ctx, value_node)
     if target_type == "dict[str,Any]":
         return "py_to_map_string_any(" + _emit_expr(ctx, value_node) + ")"
     return _coerce_from_any(_emit_expr(ctx, value_node), target_type)

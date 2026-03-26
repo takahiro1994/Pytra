@@ -367,7 +367,7 @@
                   "end_lineno": 15,
                   "end_col": 46
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "Callable",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "_case_main",

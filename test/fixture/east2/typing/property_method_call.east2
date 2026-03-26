@@ -261,7 +261,7 @@
                     "end_lineno": 15,
                     "end_col": 26
                   },
-                  "resolved_type": "unknown",
+                  "resolved_type": "int64",
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "self.mapper",
@@ -279,7 +279,8 @@
                     "repr": "self",
                     "id": "self"
                   },
-                  "attr": "mapper"
+                  "attr": "mapper",
+                  "attribute_access_kind": "property_getter"
                 },
                 "ops": [
                   "Eq"
@@ -377,7 +378,7 @@
                       "end_lineno": 18,
                       "end_col": 30
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "int64",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "self.mapper",
@@ -396,6 +397,7 @@
                       "id": "self"
                     },
                     "attr": "mapper",
+                    "attribute_access_kind": "property_getter",
                     "call_arg_type": "Obj"
                   }
                 ],
@@ -686,7 +688,7 @@
                       "end_lineno": 24,
                       "end_col": 44
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "int64",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "holder.mapper",
@@ -705,6 +707,7 @@
                       "id": "holder"
                     },
                     "attr": "mapper",
+                    "attribute_access_kind": "property_getter",
                     "call_arg_type": "object"
                   },
                   {

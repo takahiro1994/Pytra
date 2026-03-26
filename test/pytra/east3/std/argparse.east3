@@ -5815,7 +5815,8 @@
                                 "casts": [],
                                 "borrow_kind": "value",
                                 "repr": "bool",
-                                "id": "bool"
+                                "id": "bool",
+                                "type_object_of": "bool"
                               },
                               {
                                 "kind": "Attribute",

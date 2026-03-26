@@ -345,6 +345,7 @@
                   "borrow_kind": "value",
                   "repr": "Dog",
                   "id": "Dog",
+                  "type_object_of": "Dog",
                   "call_arg_type": "type"
                 },
                 "source_span": {
@@ -455,6 +456,7 @@
                   "borrow_kind": "value",
                   "repr": "Animal",
                   "id": "Animal",
+                  "type_object_of": "Animal",
                   "call_arg_type": "type"
                 },
                 "source_span": {
@@ -565,6 +567,7 @@
                   "borrow_kind": "value",
                   "repr": "Cat",
                   "id": "Cat",
+                  "type_object_of": "Cat",
                   "call_arg_type": "type"
                 },
                 "source_span": {
@@ -675,6 +678,7 @@
                   "borrow_kind": "value",
                   "repr": "Animal",
                   "id": "Animal",
+                  "type_object_of": "Animal",
                   "call_arg_type": "type"
                 },
                 "source_span": {
@@ -872,19 +876,55 @@
                 }
               },
               {
-                "kind": "Name",
+                "kind": "Box",
+                "resolved_type": "object",
+                "borrow_kind": "value",
+                "casts": [],
+                "value": {
+                  "kind": "Name",
+                  "source_span": {
+                    "lineno": 27,
+                    "col_offset": 60,
+                    "end_lineno": 27,
+                    "end_col_offset": 70
+                  },
+                  "resolved_type": "Callable",
+                  "casts": [],
+                  "borrow_kind": "value",
+                  "repr": "_case_main",
+                  "id": "_case_main",
+                  "call_arg_type": "object"
+                },
                 "source_span": {
                   "lineno": 27,
                   "col_offset": 60,
                   "end_lineno": 27,
                   "end_col_offset": 70
                 },
-                "resolved_type": "callable[[],None]",
-                "casts": [],
-                "borrow_kind": "value",
                 "repr": "_case_main",
-                "id": "_case_main",
-                "call_arg_type": "object"
+                "type_expr_summary_v1": {
+                  "schema_version": 1,
+                  "kind": "DynamicType",
+                  "category": "dynamic",
+                  "mirror": "object",
+                  "dynamic_name": "object"
+                },
+                "bridge_lane_v1": {
+                  "schema_version": 1,
+                  "target": {
+                    "kind": "DynamicType",
+                    "category": "dynamic",
+                    "mirror": "object",
+                    "dynamic_name": "object"
+                  },
+                  "target_category": "dynamic",
+                  "value": {
+                    "kind": "NamedType",
+                    "category": "static",
+                    "mirror": "Callable"
+                  },
+                  "value_category": "static"
+                }
               }
             ],
             "keywords": [],

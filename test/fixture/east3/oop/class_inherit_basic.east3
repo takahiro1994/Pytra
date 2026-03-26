@@ -584,6 +584,7 @@
               "borrow_kind": "value",
               "repr": "Base",
               "id": "Base",
+              "type_object_of": "Base",
               "call_arg_type": "type"
             },
             "source_span": {

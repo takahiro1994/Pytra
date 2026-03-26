@@ -91,7 +91,8 @@
         "casts": [],
         "borrow_kind": "value",
         "repr": "int",
-        "id": "int"
+        "id": "int",
+        "type_object_of": "int"
       },
       "type_expr_summary_v1": {
         "schema_version": 1,
@@ -137,7 +138,8 @@
         "casts": [],
         "borrow_kind": "value",
         "repr": "int",
-        "id": "int"
+        "id": "int",
+        "type_object_of": "int"
       },
       "type_expr_summary_v1": {
         "schema_version": 1,
@@ -183,7 +185,8 @@
         "casts": [],
         "borrow_kind": "value",
         "repr": "int",
-        "id": "int"
+        "id": "int",
+        "type_object_of": "int"
       },
       "type_expr_summary_v1": {
         "schema_version": 1,
@@ -229,7 +232,8 @@
         "casts": [],
         "borrow_kind": "value",
         "repr": "int",
-        "id": "int"
+        "id": "int",
+        "type_object_of": "int"
       },
       "type_expr_summary_v1": {
         "schema_version": 1,
@@ -275,7 +279,8 @@
         "casts": [],
         "borrow_kind": "value",
         "repr": "int",
-        "id": "int"
+        "id": "int",
+        "type_object_of": "int"
       },
       "type_expr_summary_v1": {
         "schema_version": 1,
@@ -321,7 +326,8 @@
         "casts": [],
         "borrow_kind": "value",
         "repr": "int",
-        "id": "int"
+        "id": "int",
+        "type_object_of": "int"
       },
       "type_expr_summary_v1": {
         "schema_version": 1,
@@ -367,7 +373,8 @@
         "casts": [],
         "borrow_kind": "value",
         "repr": "int",
-        "id": "int"
+        "id": "int",
+        "type_object_of": "int"
       },
       "type_expr_summary_v1": {
         "schema_version": 1,
@@ -413,7 +420,8 @@
         "casts": [],
         "borrow_kind": "value",
         "repr": "int",
-        "id": "int"
+        "id": "int",
+        "type_object_of": "int"
       },
       "type_expr_summary_v1": {
         "schema_version": 1,
@@ -459,7 +467,8 @@
         "casts": [],
         "borrow_kind": "value",
         "repr": "float",
-        "id": "float"
+        "id": "float",
+        "type_object_of": "float"
       },
       "type_expr_summary_v1": {
         "schema_version": 1,
@@ -505,7 +514,8 @@
         "casts": [],
         "borrow_kind": "value",
         "repr": "float",
-        "id": "float"
+        "id": "float",
+        "type_object_of": "float"
       },
       "type_expr_summary_v1": {
         "schema_version": 1,
@@ -638,7 +648,8 @@
             "casts": [],
             "borrow_kind": "value",
             "repr": "bool",
-            "id": "bool"
+            "id": "bool",
+            "type_object_of": "bool"
           },
           {
             "kind": "Name",
@@ -652,7 +663,8 @@
             "casts": [],
             "borrow_kind": "value",
             "repr": "int",
-            "id": "int"
+            "id": "int",
+            "type_object_of": "int"
           },
           {
             "kind": "Name",
@@ -666,7 +678,8 @@
             "casts": [],
             "borrow_kind": "value",
             "repr": "float",
-            "id": "float"
+            "id": "float",
+            "type_object_of": "float"
           },
           {
             "kind": "Name",
@@ -680,7 +693,8 @@
             "casts": [],
             "borrow_kind": "value",
             "repr": "str",
-            "id": "str"
+            "id": "str",
+            "type_object_of": "str"
           }
         ]
       },
@@ -728,7 +742,8 @@
         "casts": [],
         "borrow_kind": "value",
         "repr": "object",
-        "id": "object"
+        "id": "object",
+        "type_object_of": "object"
       },
       "type_expr_summary_v1": {
         "schema_version": 1,

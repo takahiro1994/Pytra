@@ -184,7 +184,8 @@
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "Holder",
-                      "id": "Holder"
+                      "id": "Holder",
+                      "type_object_of": "Holder"
                     },
                     "attr": "X"
                   },

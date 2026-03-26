@@ -1267,7 +1267,8 @@
             "casts": [],
             "borrow_kind": "value",
             "repr": "CompletedProcess",
-            "id": "CompletedProcess"
+            "id": "CompletedProcess",
+            "type_object_of": "CompletedProcess"
           },
           "meta": {
             "lifetime_node_id": "n24",

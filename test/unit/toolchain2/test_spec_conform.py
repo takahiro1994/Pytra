@@ -124,6 +124,144 @@ def identity(value: Scalar) -> Scalar:
         self.assertEqual(fn.get("return_type"), "int64 | float64")
         self.assertEqual(ret_name.get("resolved_type"), "int64 | float64")
 
+    def test_resolver_treats_function_value_refs_as_callable(self) -> None:
+        source = """
+from pytra.typing import Callable  # type:ignore
+
+def takes_cb(cb: Callable) -> bool:
+    return cb is not None
+
+def main() -> None:
+    print(takes_cb(main))
+"""
+        east2 = parse_python_source(source, "<mem>").to_jv()
+        resolve_east1_to_east2(east2, registry=_load_registry())
+
+        main_ref = next(
+            node
+            for node in _walk(east2)
+            if node.get("kind") == "Name"
+            and node.get("id") == "main"
+            and node.get("call_arg_type") == "Callable"
+        )
+
+        self.assertEqual(main_ref.get("resolved_type"), "Callable")
+
+    def test_resolver_resolves_class_object_fields_staticmethods_and_enum_members(self) -> None:
+        source = """
+from pytra.enum import IntEnum
+
+class Counter:
+    value: int = 0
+
+    def inc(self) -> int:
+        Counter.value += 1
+        return Counter.value
+
+class MathUtil:
+    @staticmethod
+    def double(x: int) -> int:
+        return x * 2
+
+class Status(IntEnum):
+    OK = 0
+    ERROR = 1
+
+def run() -> int:
+    return Counter().inc() + MathUtil.double(2) + int(Status.ERROR)
+"""
+        east2 = parse_python_source(source, "<mem>").to_jv()
+        resolve_east1_to_east2(east2, registry=_load_registry())
+
+        counter_attrs = [
+            node
+            for node in _walk(east2)
+            if node.get("kind") == "Attribute"
+            and node.get("attr") == "value"
+            and isinstance(node.get("value"), dict)
+            and node["value"].get("kind") == "Name"
+            and node["value"].get("id") == "Counter"
+        ]
+        static_call = next(
+            node
+            for node in _walk(east2)
+            if node.get("kind") == "Call"
+            and node.get("repr") == "MathUtil.double(2)"
+        )
+        enum_attr = next(
+            node
+            for node in _walk(east2)
+            if node.get("kind") == "Attribute"
+            and node.get("attr") == "ERROR"
+            and isinstance(node.get("value"), dict)
+            and node["value"].get("id") == "Status"
+        )
+
+        self.assertEqual([node.get("resolved_type") for node in counter_attrs], ["int64", "int64"])
+        self.assertEqual(static_call.get("resolved_type"), "int64")
+        self.assertEqual(static_call.get("call_dispatch_kind"), "static_method")
+        self.assertEqual(enum_attr.get("resolved_type"), "Status")
+
+    def test_resolver_preserves_property_getters_across_inherited_fields(self) -> None:
+        source = """
+class Base:
+    def __init__(self) -> None:
+        self.value: int = 1
+
+class Child(Base):
+    @property
+    def prop(self) -> int:
+        return self.value
+
+    def total(self) -> int:
+        return self.prop + self.value
+"""
+        east2 = parse_python_source(source, "<mem>").to_jv()
+        resolve_east1_to_east2(east2, registry=_load_registry())
+
+        prop_attr = next(
+            node
+            for node in _walk(east2)
+            if node.get("kind") == "Attribute"
+            and node.get("attr") == "prop"
+            and isinstance(node.get("value"), dict)
+            and node["value"].get("id") == "self"
+        )
+        self_attrs = [
+            node
+            for node in _walk(east2)
+            if node.get("kind") == "Attribute"
+            and node.get("attr") == "value"
+            and isinstance(node.get("value"), dict)
+            and node["value"].get("id") == "self"
+        ]
+
+        self.assertEqual(prop_attr.get("resolved_type"), "int64")
+        self.assertTrue(self_attrs)
+        self.assertTrue(all(node.get("resolved_type") == "int64" for node in self_attrs))
+
+    def test_resolver_does_not_materialize_inherited_init_fields_on_child(self) -> None:
+        source = """
+class Base:
+    def __init__(self) -> None:
+        self.value: int = 1
+
+class Child(Base):
+    def __init__(self) -> None:
+        super().__init__()
+        self.value += 1
+"""
+        east2 = parse_python_source(source, "<mem>").to_jv()
+        resolve_east1_to_east2(east2, registry=_load_registry())
+
+        child_cls = next(
+            node
+            for node in _walk(east2)
+            if node.get("kind") == "ClassDef" and node.get("name") == "Child"
+        )
+
+        self.assertEqual(child_cls.get("field_types"), {})
+
     def test_pytra_typing_cast_is_kept_as_value_import_and_resolves_target_type(self) -> None:
         source = """
 from pytra.typing import Any, cast

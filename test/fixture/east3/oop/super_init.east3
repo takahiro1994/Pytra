@@ -284,7 +284,7 @@
                   "end_lineno": 12,
                   "end_col_offset": 18
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "int64",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "self.value",
@@ -323,10 +323,9 @@
               },
               "type_expr_summary_v1": {
                 "schema_version": 1,
-                "kind": "DynamicType",
-                "category": "dynamic",
-                "mirror": "unknown",
-                "dynamic_name": "unknown"
+                "kind": "NamedType",
+                "category": "static",
+                "mirror": "int64"
               }
             }
           ],
@@ -372,69 +371,32 @@
                 "end_col_offset": 25
               },
               "value": {
-                "kind": "Unbox",
-                "resolved_type": "int64",
-                "borrow_kind": "value",
-                "casts": [],
-                "value": {
-                  "kind": "Attribute",
-                  "source_span": {
-                    "lineno": 15,
-                    "col_offset": 15,
-                    "end_lineno": 15,
-                    "end_col_offset": 25
-                  },
-                  "resolved_type": "unknown",
-                  "casts": [],
-                  "borrow_kind": "value",
-                  "repr": "self.value",
-                  "value": {
-                    "kind": "Name",
-                    "source_span": {
-                      "lineno": 15,
-                      "col_offset": 15,
-                      "end_lineno": 15,
-                      "end_col_offset": 19
-                    },
-                    "resolved_type": "Child",
-                    "casts": [],
-                    "borrow_kind": "readonly_ref",
-                    "repr": "self",
-                    "id": "self"
-                  },
-                  "attr": "value"
-                },
+                "kind": "Attribute",
                 "source_span": {
                   "lineno": 15,
                   "col_offset": 15,
                   "end_lineno": 15,
                   "end_col_offset": 25
                 },
+                "resolved_type": "int64",
+                "casts": [],
+                "borrow_kind": "value",
                 "repr": "self.value",
-                "type_expr_summary_v1": {
-                  "schema_version": 1,
-                  "kind": "NamedType",
-                  "category": "static",
-                  "mirror": "int64"
+                "value": {
+                  "kind": "Name",
+                  "source_span": {
+                    "lineno": 15,
+                    "col_offset": 15,
+                    "end_lineno": 15,
+                    "end_col_offset": 19
+                  },
+                  "resolved_type": "Child",
+                  "casts": [],
+                  "borrow_kind": "readonly_ref",
+                  "repr": "self",
+                  "id": "self"
                 },
-                "target": "int64",
-                "on_fail": "raise",
-                "bridge_lane_v1": {
-                  "schema_version": 1,
-                  "target": {
-                    "kind": "NamedType",
-                    "category": "static",
-                    "mirror": "int64"
-                  },
-                  "target_category": "static",
-                  "value": {
-                    "kind": "DynamicType",
-                    "category": "dynamic",
-                    "mirror": "unknown",
-                    "dynamic_name": "unknown"
-                  },
-                  "value_category": "dynamic"
-                }
+                "attr": "value"
               }
             }
           ],

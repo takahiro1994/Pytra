@@ -20901,7 +20901,8 @@
                               "casts": [],
                               "borrow_kind": "value",
                               "repr": "dict",
-                              "id": "dict"
+                              "id": "dict",
+                              "type_object_of": "dict"
                             },
                             {
                               "kind": "Unbox",
@@ -21597,7 +21598,8 @@
                               "casts": [],
                               "borrow_kind": "value",
                               "repr": "list",
-                              "id": "list"
+                              "id": "list",
+                              "type_object_of": "list"
                             },
                             {
                               "kind": "Unbox",
@@ -22259,7 +22261,8 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "str",
-                        "id": "str"
+                        "id": "str",
+                        "type_object_of": "str"
                       },
                       {
                         "kind": "Unbox",
@@ -22850,7 +22853,8 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "int",
-                        "id": "int"
+                        "id": "int",
+                        "type_object_of": "int"
                       },
                       {
                         "kind": "Unbox",
@@ -23441,7 +23445,8 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "float",
-                        "id": "float"
+                        "id": "float",
+                        "type_object_of": "float"
                       },
                       {
                         "kind": "Unbox",
@@ -24032,7 +24037,8 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "bool",
-                        "id": "bool"
+                        "id": "bool",
+                        "type_object_of": "bool"
                       },
                       {
                         "kind": "Unbox",
@@ -51413,7 +51419,8 @@
                           "casts": [],
                           "borrow_kind": "value",
                           "repr": "dict",
-                          "id": "dict"
+                          "id": "dict",
+                          "type_object_of": "dict"
                         },
                         {
                           "kind": "Unbox",
@@ -52202,7 +52209,8 @@
                           "casts": [],
                           "borrow_kind": "value",
                           "repr": "list",
-                          "id": "list"
+                          "id": "list",
+                          "type_object_of": "list"
                         },
                         {
                           "kind": "Unbox",
@@ -69504,7 +69512,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "bool",
-                    "id": "bool"
+                    "id": "bool",
+                    "type_object_of": "bool"
                   },
                   {
                     "kind": "Unbox",
@@ -69897,7 +69906,8 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "int",
-                        "id": "int"
+                        "id": "int",
+                        "type_object_of": "int"
                       },
                       {
                         "kind": "Unbox",
@@ -70194,7 +70204,8 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "float",
-                        "id": "float"
+                        "id": "float",
+                        "type_object_of": "float"
                       },
                       {
                         "kind": "Unbox",
@@ -70487,7 +70498,8 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "str",
-                        "id": "str"
+                        "id": "str",
+                        "type_object_of": "str"
                       },
                       {
                         "kind": "Unbox",
@@ -70792,7 +70804,8 @@
                           "casts": [],
                           "borrow_kind": "value",
                           "repr": "list",
-                          "id": "list"
+                          "id": "list",
+                          "type_object_of": "list"
                         },
                         {
                           "kind": "Unbox",
@@ -71193,7 +71206,8 @@
                           "casts": [],
                           "borrow_kind": "value",
                           "repr": "dict",
-                          "id": "dict"
+                          "id": "dict",
+                          "type_object_of": "dict"
                         },
                         {
                           "kind": "Unbox",

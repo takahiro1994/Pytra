@@ -202,6 +202,7 @@
                   "borrow_kind": "value",
                   "repr": "Path",
                   "id": "Path",
+                  "type_object_of": "Path",
                   "call_arg_type": "type"
                 },
                 "source_span": {
@@ -320,7 +321,8 @@
                           "casts": [],
                           "borrow_kind": "value",
                           "repr": "Path",
-                          "id": "Path"
+                          "id": "Path",
+                          "type_object_of": "Path"
                         },
                         {
                           "kind": "Unbox",
@@ -449,7 +451,8 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "str",
-                        "id": "str"
+                        "id": "str",
+                        "type_object_of": "str"
                       },
                       {
                         "kind": "Name",
@@ -831,6 +834,7 @@
                   "borrow_kind": "value",
                   "repr": "Path",
                   "id": "Path",
+                  "type_object_of": "Path",
                   "call_arg_type": "type"
                 },
                 "source_span": {
@@ -1016,7 +1020,8 @@
                                   "casts": [],
                                   "borrow_kind": "value",
                                   "repr": "Path",
-                                  "id": "Path"
+                                  "id": "Path",
+                                  "type_object_of": "Path"
                                 },
                                 {
                                   "kind": "Unbox",
@@ -1232,7 +1237,8 @@
                             "casts": [],
                             "borrow_kind": "value",
                             "repr": "str",
-                            "id": "str"
+                            "id": "str",
+                            "type_object_of": "str"
                           },
                           {
                             "kind": "Name",
@@ -3560,6 +3566,7 @@
                   "borrow_kind": "value",
                   "repr": "Path",
                   "id": "Path",
+                  "type_object_of": "Path",
                   "call_arg_type": "type"
                 },
                 "source_span": {
@@ -3676,7 +3683,8 @@
                           "casts": [],
                           "borrow_kind": "value",
                           "repr": "Path",
-                          "id": "Path"
+                          "id": "Path",
+                          "type_object_of": "Path"
                         },
                         {
                           "kind": "Unbox",
@@ -3792,7 +3800,8 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "str",
-                        "id": "str"
+                        "id": "str",
+                        "type_object_of": "str"
                       },
                       {
                         "kind": "Name",
@@ -6489,6 +6498,7 @@
                       "borrow_kind": "value",
                       "repr": "Path",
                       "id": "Path",
+                      "type_object_of": "Path",
                       "call_arg_type": "type"
                     },
                     "source_span": {
@@ -6650,7 +6660,8 @@
                                   "casts": [],
                                   "borrow_kind": "value",
                                   "repr": "Path",
-                                  "id": "Path"
+                                  "id": "Path",
+                                  "type_object_of": "Path"
                                 },
                                 {
                                   "kind": "Name",
@@ -6822,7 +6833,8 @@
                                 "casts": [],
                                 "borrow_kind": "value",
                                 "repr": "str",
-                                "id": "str"
+                                "id": "str",
+                                "type_object_of": "str"
                               },
                               {
                                 "kind": "Name",

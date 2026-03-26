@@ -240,7 +240,7 @@
               "end_lineno": 11,
               "end_col_offset": 28
             },
-            "resolved_type": "unknown",
+            "resolved_type": "int64",
             "casts": [],
             "borrow_kind": "value",
             "repr": "MathUtil.double(5)",
@@ -252,7 +252,7 @@
                 "end_lineno": 11,
                 "end_col_offset": 25
               },
-              "resolved_type": "unknown",
+              "resolved_type": "callable",
               "casts": [],
               "borrow_kind": "value",
               "repr": "MathUtil.double",
@@ -268,7 +268,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "MathUtil",
-                "id": "MathUtil"
+                "id": "MathUtil",
+                "type_object_of": "MathUtil"
               },
               "attr": "double"
             },
@@ -289,12 +290,12 @@
               }
             ],
             "keywords": [],
+            "call_dispatch_kind": "static_method",
             "type_expr_summary_v1": {
               "schema_version": 1,
-              "kind": "DynamicType",
-              "category": "dynamic",
-              "mirror": "unknown",
-              "dynamic_name": "unknown"
+              "kind": "NamedType",
+              "category": "static",
+              "mirror": "int64"
             }
           }
         ],
@@ -358,7 +359,7 @@
               "end_lineno": 12,
               "end_col_offset": 28
             },
-            "resolved_type": "unknown",
+            "resolved_type": "int64",
             "casts": [],
             "borrow_kind": "value",
             "repr": "MathUtil.triple(4)",
@@ -370,7 +371,7 @@
                 "end_lineno": 12,
                 "end_col_offset": 25
               },
-              "resolved_type": "unknown",
+              "resolved_type": "callable",
               "casts": [],
               "borrow_kind": "value",
               "repr": "MathUtil.triple",
@@ -386,7 +387,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "MathUtil",
-                "id": "MathUtil"
+                "id": "MathUtil",
+                "type_object_of": "MathUtil"
               },
               "attr": "triple"
             },
@@ -407,12 +409,12 @@
               }
             ],
             "keywords": [],
+            "call_dispatch_kind": "static_method",
             "type_expr_summary_v1": {
               "schema_version": 1,
-              "kind": "DynamicType",
-              "category": "dynamic",
-              "mirror": "unknown",
-              "dynamic_name": "unknown"
+              "kind": "NamedType",
+              "category": "static",
+              "mirror": "int64"
             }
           }
         ],

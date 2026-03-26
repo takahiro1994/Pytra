@@ -88,7 +88,8 @@
         "casts": [],
         "borrow_kind": "value",
         "repr": "int",
-        "id": "int"
+        "id": "int",
+        "type_object_of": "int"
       },
       "declare": true,
       "decl_type": "type",
@@ -134,7 +135,8 @@
         "casts": [],
         "borrow_kind": "value",
         "repr": "int",
-        "id": "int"
+        "id": "int",
+        "type_object_of": "int"
       },
       "declare": true,
       "decl_type": "type",
@@ -174,7 +176,8 @@
         "casts": [],
         "borrow_kind": "value",
         "repr": "int",
-        "id": "int"
+        "id": "int",
+        "type_object_of": "int"
       },
       "declare": true,
       "decl_type": "type",
@@ -214,7 +217,8 @@
         "casts": [],
         "borrow_kind": "value",
         "repr": "int",
-        "id": "int"
+        "id": "int",
+        "type_object_of": "int"
       },
       "declare": true,
       "decl_type": "type",
@@ -254,7 +258,8 @@
         "casts": [],
         "borrow_kind": "value",
         "repr": "int",
-        "id": "int"
+        "id": "int",
+        "type_object_of": "int"
       },
       "declare": true,
       "decl_type": "type",
@@ -294,7 +299,8 @@
         "casts": [],
         "borrow_kind": "value",
         "repr": "int",
-        "id": "int"
+        "id": "int",
+        "type_object_of": "int"
       },
       "declare": true,
       "decl_type": "type",
@@ -334,7 +340,8 @@
         "casts": [],
         "borrow_kind": "value",
         "repr": "int",
-        "id": "int"
+        "id": "int",
+        "type_object_of": "int"
       },
       "declare": true,
       "decl_type": "type",
@@ -374,7 +381,8 @@
         "casts": [],
         "borrow_kind": "value",
         "repr": "int",
-        "id": "int"
+        "id": "int",
+        "type_object_of": "int"
       },
       "declare": true,
       "decl_type": "type",
@@ -414,7 +422,8 @@
         "casts": [],
         "borrow_kind": "value",
         "repr": "float",
-        "id": "float"
+        "id": "float",
+        "type_object_of": "float"
       },
       "declare": true,
       "decl_type": "type",
@@ -454,7 +463,8 @@
         "casts": [],
         "borrow_kind": "value",
         "repr": "float",
-        "id": "float"
+        "id": "float",
+        "type_object_of": "float"
       },
       "declare": true,
       "decl_type": "type",
@@ -551,7 +561,8 @@
             "casts": [],
             "borrow_kind": "value",
             "repr": "bool",
-            "id": "bool"
+            "id": "bool",
+            "type_object_of": "bool"
           },
           {
             "kind": "Name",
@@ -565,7 +576,8 @@
             "casts": [],
             "borrow_kind": "value",
             "repr": "int",
-            "id": "int"
+            "id": "int",
+            "type_object_of": "int"
           },
           {
             "kind": "Name",
@@ -579,7 +591,8 @@
             "casts": [],
             "borrow_kind": "value",
             "repr": "float",
-            "id": "float"
+            "id": "float",
+            "type_object_of": "float"
           },
           {
             "kind": "Name",
@@ -593,7 +606,8 @@
             "casts": [],
             "borrow_kind": "value",
             "repr": "str",
-            "id": "str"
+            "id": "str",
+            "type_object_of": "str"
           }
         ]
       },
@@ -658,7 +672,8 @@
         "casts": [],
         "borrow_kind": "value",
         "repr": "object",
-        "id": "object"
+        "id": "object",
+        "type_object_of": "object"
       },
       "declare": true,
       "decl_type": "type",

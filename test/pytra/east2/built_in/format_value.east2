@@ -1126,6 +1126,7 @@
                 "borrow_kind": "value",
                 "repr": "str",
                 "id": "str",
+                "type_object_of": "str",
                 "call_arg_type": "type"
               }
             ],
@@ -1240,6 +1241,7 @@
                     "borrow_kind": "value",
                     "repr": "bool",
                     "id": "bool",
+                    "type_object_of": "bool",
                     "call_arg_type": "type"
                   }
                 ],
@@ -1421,6 +1423,7 @@
                         "borrow_kind": "value",
                         "repr": "int",
                         "id": "int",
+                        "type_object_of": "int",
                         "call_arg_type": "type"
                       }
                     ],
@@ -1568,6 +1571,7 @@
                             "borrow_kind": "value",
                             "repr": "float",
                             "id": "float",
+                            "type_object_of": "float",
                             "call_arg_type": "type"
                           }
                         ],
@@ -1867,6 +1871,7 @@
                 "borrow_kind": "value",
                 "repr": "str",
                 "id": "str",
+                "type_object_of": "str",
                 "call_arg_type": "type"
               }
             ],
@@ -10616,6 +10621,7 @@
                         "borrow_kind": "value",
                         "repr": "str",
                         "id": "str",
+                        "type_object_of": "str",
                         "call_arg_type": "type"
                       }
                     ],
@@ -11150,6 +11156,7 @@
                     "borrow_kind": "value",
                     "repr": "int",
                     "id": "int",
+                    "type_object_of": "int",
                     "call_arg_type": "type"
                   }
                 ],
@@ -11226,6 +11233,7 @@
                       "borrow_kind": "value",
                       "repr": "bool",
                       "id": "bool",
+                      "type_object_of": "bool",
                       "call_arg_type": "type"
                     }
                   ],
@@ -11405,6 +11413,7 @@
                 "borrow_kind": "value",
                 "repr": "float",
                 "id": "float",
+                "type_object_of": "float",
                 "call_arg_type": "type"
               }
             ],

@@ -276,6 +276,85 @@ def _parse_callable_signature(type_str: str, ctx: ResolveContext) -> tuple[list[
     return [], _ctx_normalize_type(inner, ctx)
 
 
+def _lookup_any_class(name: str, ctx: ResolveContext) -> ClassSig | None:
+    local: ClassSig | None = ctx.module_classes.get(name)
+    if local is not None:
+        return local
+    builtin_cls: ClassSig | None = ctx.registry.classes.get(name)
+    if builtin_cls is not None:
+        return builtin_cls
+    return ctx.registry.find_stdlib_class(name)
+
+
+def _iter_class_hierarchy(name: str, ctx: ResolveContext) -> list[ClassSig]:
+    out: list[ClassSig] = []
+    pending: list[str] = [extract_base_type(name)]
+    seen: set[str] = set()
+    while len(pending) > 0:
+        cur: str = extract_base_type(pending.pop(0))
+        if cur == "" or cur in seen:
+            continue
+        seen.add(cur)
+        cls_sig: ClassSig | None = _lookup_any_class(cur, ctx)
+        if cls_sig is None:
+            continue
+        out.append(cls_sig)
+        for base in cls_sig.bases:
+            if isinstance(base, str) and base != "":
+                pending.append(base)
+    return out
+
+
+def _resolve_owner_base_type(value: dict[str, JsonVal], receiver_type: str, ctx: ResolveContext) -> str:
+    owner_base: str = extract_base_type(receiver_type)
+    if owner_base != "type":
+        return owner_base
+    type_object_of = value.get("type_object_of")
+    if isinstance(type_object_of, str) and type_object_of != "":
+        return extract_base_type(type_object_of)
+    if value.get("kind") == "Name":
+        name = value.get("id")
+        if isinstance(name, str):
+            imp: dict[str, str] = ctx.import_symbols.get(name, {})
+            module_id = imp.get("module", "")
+            export_name = imp.get("name", "")
+            if module_id != "" and export_name != "" and ctx.registry.lookup_stdlib_class(module_id, export_name) is not None:
+                return export_name
+            if ctx.lookup_class(name) is not None:
+                return name
+    return ""
+
+
+def _lookup_method_sig(owner_base: str, attr: str, ctx: ResolveContext) -> tuple[ClassSig | None, FuncSig | None]:
+    for cls_sig in _iter_class_hierarchy(owner_base, ctx):
+        msig: FuncSig | None = cls_sig.methods.get(attr)
+        if msig is not None:
+            return cls_sig, msig
+    return None, None
+
+
+def _has_inherited_field(class_name: str, field_name: str, ctx: ResolveContext) -> bool:
+    cls_sig: ClassSig | None = ctx.module_classes.get(class_name)
+    if cls_sig is None:
+        return False
+    pending: list[str] = list(cls_sig.bases)
+    seen: set[str] = {class_name}
+    while len(pending) > 0:
+        cur: str = extract_base_type(pending.pop(0))
+        if cur == "" or cur in seen:
+            continue
+        seen.add(cur)
+        base_sig: ClassSig | None = _lookup_any_class(cur, ctx)
+        if base_sig is None:
+            continue
+        if field_name in base_sig.fields:
+            return True
+        for base in base_sig.bases:
+            if isinstance(base, str) and base != "":
+                pending.append(base)
+    return False
+
+
 def _default_collection_hint(param_type: str) -> str:
     t: str = param_type.strip()
     if t.endswith(" | None"):
@@ -822,6 +901,7 @@ def _resolve_name(expr: dict[str, JsonVal], ctx: ResolveContext) -> str:
             export_name = name
         if ctx.registry.lookup_stdlib_class(module_id, export_name) is not None:
             expr["resolved_type"] = "type"
+            expr["type_object_of"] = export_name
             return "type"
         if ctx.registry.lookup_stdlib_function(module_id, export_name) is not None:
             expr["resolved_type"] = "callable"
@@ -830,10 +910,17 @@ def _resolve_name(expr: dict[str, JsonVal], ctx: ResolveContext) -> str:
     # Class names are type objects in value position.
     if ctx.lookup_class(name) is not None:
         expr["resolved_type"] = "type"
+        expr["type_object_of"] = name
         return "type"
     if t == "unknown" and name in _BUILTIN_TYPE_OBJECT_NAMES:
         expr["resolved_type"] = "type"
+        expr["type_object_of"] = name
         return "type"
+    if t == "unknown":
+        fn_sig: FuncSig | None = ctx.lookup_function(name)
+        if fn_sig is not None:
+            expr["resolved_type"] = "Callable"
+            return "Callable"
     expr["resolved_type"] = t
     # Borrow kind: readonly_ref for typed names (references to known variables)
     # value for untyped (function names, unknown)
@@ -1486,7 +1573,7 @@ def _resolve_method_call(
             return _resolve_module_attr_call(expr, func, receiver_name, mod_id, attr, ctx)
 
     # Container method call (list.append, str.split, etc.)
-    owner_base: str = extract_base_type(receiver_type)
+    owner_base: str = _resolve_owner_base_type(value, receiver_type, ctx)
     method_sig: FuncSig | None = ctx.registry.lookup_method(owner_base, attr)
     if method_sig is not None:
         hinted_arg_types = method_sig.arg_types
@@ -1496,31 +1583,16 @@ def _resolve_method_call(
         _apply_call_arg_hints(expr, method_sig.arg_names[1:], hinted_arg_types, ctx)
         return _resolve_container_method_call(expr, func, receiver_type, owner_base, attr, method_sig, ctx)
 
-    # User-defined class method
-    cls: ClassSig | None = ctx.lookup_class(owner_base)
-    if cls is not None:
-        msig: FuncSig | None = cls.methods.get(attr)
-        if msig is not None:
-            _apply_call_arg_hints(expr, msig.arg_names[1:], msig.arg_types, ctx)
-            ret: str = _substitute_type_params(msig.return_type, receiver_type, cls)
-            expr["resolved_type"] = ret
-            func["resolved_type"] = "callable"
-            if "staticmethod" in msig.decorators:
-                expr["call_dispatch_kind"] = "static_method"
-            return ret
-
-    # Imported/runtime stdlib class method
-    stdlib_cls: ClassSig | None = ctx.registry.find_stdlib_class(owner_base)
-    if stdlib_cls is not None:
-        stdlib_msig: FuncSig | None = stdlib_cls.methods.get(attr)
-        if stdlib_msig is not None and "property" not in stdlib_msig.decorators:
-            _apply_call_arg_hints(expr, stdlib_msig.arg_names[1:], stdlib_msig.arg_types, ctx)
-            ret2: str = _ctx_normalize_type(_substitute_type_params(stdlib_msig.return_type, receiver_type, stdlib_cls), ctx)
-            expr["resolved_type"] = ret2
-            func["resolved_type"] = "callable"
-            if "staticmethod" in stdlib_msig.decorators:
-                expr["call_dispatch_kind"] = "static_method"
-            return ret2
+    cls, msig = _lookup_method_sig(owner_base, attr, ctx)
+    if cls is not None and msig is not None and "property" not in msig.decorators:
+        hinted_arg_types = _substitute_arg_types(msig.arg_types, receiver_type, cls)
+        _apply_call_arg_hints(expr, msig.arg_names[1:], hinted_arg_types, ctx)
+        ret: str = _ctx_normalize_type(_substitute_type_params(msig.return_type, receiver_type, cls), ctx)
+        expr["resolved_type"] = ret
+        func["resolved_type"] = "callable"
+        if "staticmethod" in msig.decorators:
+            expr["call_dispatch_kind"] = "static_method"
+        return ret
 
     # Fallback
     func["resolved_type"] = "unknown"
@@ -1747,47 +1819,18 @@ def _resolve_attribute(expr: dict[str, JsonVal], ctx: ResolveContext) -> str:
                     expr["semantic_tag"] = semantic_tag
             return t
 
-    # Class field access — check field_types from ClassDef (parse が収集済み)
-    owner_base: str = extract_base_type(receiver_type)
-
-    # Look up in module classes first (field_types from EAST1)
-    cls_sig: ClassSig | None = ctx.module_classes.get(owner_base)
-    if cls_sig is None:
-        cls_sig = ctx.module_classes.get(receiver_type)
-    if cls_sig is not None and attr in cls_sig.fields:
-        ft: str = cls_sig.fields[attr]
-        ft_resolved: str = _ctx_normalize_type(ft, ctx)
-        expr["resolved_type"] = ft_resolved
-        return ft_resolved
-    if cls_sig is not None:
+    owner_base: str = _resolve_owner_base_type(value, receiver_type, ctx) if isinstance(value, dict) else ""
+    for cls_sig in _iter_class_hierarchy(owner_base, ctx):
+        if attr in cls_sig.fields:
+            field_type: str = _ctx_normalize_type(_substitute_type_params(cls_sig.fields[attr], receiver_type, cls_sig), ctx)
+            expr["resolved_type"] = field_type
+            return field_type
         property_sig: FuncSig | None = cls_sig.methods.get(attr)
         if property_sig is not None and "property" in property_sig.decorators:
-            pret: str = _ctx_normalize_type(_substitute_type_params(property_sig.return_type, receiver_type, cls_sig), ctx)
-            expr["resolved_type"] = pret
+            prop_type: str = _ctx_normalize_type(_substitute_type_params(property_sig.return_type, receiver_type, cls_sig), ctx)
+            expr["resolved_type"] = prop_type
             expr["attribute_access_kind"] = "property_getter"
-            return pret
-
-    # Fall back to builtin registry classes
-    cls2: ClassSig | None = ctx.registry.classes.get(owner_base)
-    if cls2 is not None and attr in cls2.fields:
-        ft2: str = cls2.fields[attr]
-        ft2_resolved: str = _substitute_type_params(ft2, receiver_type, cls2)
-        expr["resolved_type"] = _ctx_normalize_type(ft2_resolved, ctx)
-        return _ctx_normalize_type(ft2_resolved, ctx)
-
-    stdlib_cls: ClassSig | None = ctx.registry.find_stdlib_class(owner_base)
-    if stdlib_cls is not None:
-        if attr in stdlib_cls.fields:
-            sft: str = stdlib_cls.fields[attr]
-            sft_resolved: str = _ctx_normalize_type(_substitute_type_params(sft, receiver_type, stdlib_cls), ctx)
-            expr["resolved_type"] = sft_resolved
-            return sft_resolved
-        stdlib_prop: FuncSig | None = stdlib_cls.methods.get(attr)
-        if stdlib_prop is not None and "property" in stdlib_prop.decorators:
-            sret: str = _ctx_normalize_type(_substitute_type_params(stdlib_prop.return_type, receiver_type, stdlib_cls), ctx)
-            expr["resolved_type"] = sret
-            expr["attribute_access_kind"] = "property_getter"
-            return sret
+            return prop_type
 
     expr["resolved_type"] = "unknown"
     return "unknown"
@@ -2616,6 +2659,8 @@ def _resolve_class_def(stmt: dict[str, JsonVal], ctx: ResolveContext) -> None:
                     field_name2 = target2.get("attr")
                     field_type2 = target2.get("resolved_type")
                     if isinstance(field_name2, str) and isinstance(field_type2, str) and field_type2 != "" and field_type2 != "unknown":
+                        if _has_inherited_field(class_name, field_name2, ctx):
+                            continue
                         cls_sig_existing.fields[field_name2] = _ctx_normalize_type(field_type2, ctx)
                         ft_raw[field_name2] = cls_sig_existing.fields[field_name2]
 
@@ -3441,12 +3486,18 @@ def _extract_func_sig_for_prescan(node: dict[str, JsonVal], ctx: ResolveContext)
     vararg_name: str = str(vararg_name_val) if isinstance(vararg_name_val, str) else ""
     vararg_type_raw = node.get("vararg_type")
     vararg_type: str = _ctx_normalize_type(str(vararg_type_raw), ctx) if isinstance(vararg_type_raw, str) else ""
+    decorators_raw = node.get("decorators")
+    decorators: list[str] = []
+    if isinstance(decorators_raw, list):
+        for item in decorators_raw:
+            if isinstance(item, str):
+                decorators.append(item)
     return FuncSig(
         name=name,
         arg_names=arg_names,
         arg_types=arg_types,
         return_type=ret,
-        decorators=[],
+        decorators=decorators,
         vararg_name=vararg_name,
         vararg_type=vararg_type,
     )
@@ -3456,14 +3507,18 @@ def _extract_class_sig_for_prescan(node: dict[str, JsonVal], ctx: ResolveContext
     """Extract a class signature during prescan."""
     name_val = node.get("name")
     name: str = str(name_val) if isinstance(name_val, str) else ""
+    base_raw = node.get("base")
     bases_raw = node.get("bases")
     bases: list[str] = []
+    if isinstance(base_raw, str) and base_raw != "":
+        bases.append(base_raw)
     if isinstance(bases_raw, list):
         for b in bases_raw:
-            if isinstance(b, str):
+            if isinstance(b, str) and b not in bases:
                 bases.append(b)
     methods: dict[str, FuncSig] = {}
     fields: dict[str, str] = {}
+    is_enum_class: bool = any(base in ("Enum", "IntEnum", "IntFlag") for base in bases)
     body_raw = node.get("body")
     if isinstance(body_raw, list):
         for item in body_raw:
@@ -3482,6 +3537,12 @@ def _extract_class_sig_for_prescan(node: dict[str, JsonVal], ctx: ResolveContext
                     ann = item.get("annotation")
                     if isinstance(fld_name, str) and isinstance(ann, str):
                         fields[fld_name] = _ctx_normalize_type(ann, ctx)
+            elif kind == "Assign" and is_enum_class:
+                target2 = item.get("target")
+                if isinstance(target2, dict) and target2.get("kind") == "Name":
+                    fld_name2 = target2.get("id")
+                    if isinstance(fld_name2, str) and fld_name2 != "":
+                        fields[fld_name2] = name
     # Also extract from field_types (top-level ClassDef field from parse)
     ft_raw = node.get("field_types")
     if isinstance(ft_raw, dict):

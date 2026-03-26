@@ -843,7 +843,8 @@
             "casts": [],
             "borrow_kind": "value",
             "repr": "CompletedProcess",
-            "id": "CompletedProcess"
+            "id": "CompletedProcess",
+            "type_object_of": "CompletedProcess"
           }
         },
         {

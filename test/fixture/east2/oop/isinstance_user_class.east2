@@ -152,6 +152,7 @@
                 "borrow_kind": "value",
                 "repr": "Base",
                 "id": "Base",
+                "type_object_of": "Base",
                 "call_arg_type": "type"
               }
             ],
@@ -585,6 +586,7 @@
                 "borrow_kind": "value",
                 "repr": "Child",
                 "id": "Child",
+                "type_object_of": "Child",
                 "call_arg_type": "type"
               }
             ],

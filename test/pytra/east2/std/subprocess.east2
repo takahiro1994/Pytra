@@ -745,7 +745,8 @@
             "casts": [],
             "borrow_kind": "value",
             "repr": "CompletedProcess",
-            "id": "CompletedProcess"
+            "id": "CompletedProcess",
+            "type_object_of": "CompletedProcess"
           }
         },
         {
@@ -1869,6 +1870,7 @@
                     "borrow_kind": "value",
                     "repr": "str",
                     "id": "str",
+                    "type_object_of": "str",
                     "call_arg_type": "type"
                   }
                 ],
@@ -2012,6 +2014,7 @@
                     "borrow_kind": "value",
                     "repr": "str",
                     "id": "str",
+                    "type_object_of": "str",
                     "call_arg_type": "type"
                   }
                 ],

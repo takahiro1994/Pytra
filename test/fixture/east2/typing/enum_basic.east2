@@ -41,7 +41,10 @@
       "original_name": "Color",
       "base": "Enum",
       "dataclass": false,
-      "field_types": {},
+      "field_types": {
+        "RED": "Color",
+        "BLUE": "Color"
+      },
       "body": [
         {
           "kind": "Assign",
@@ -59,9 +62,9 @@
               "end_lineno": 6,
               "end_col": 7
             },
-            "resolved_type": "unknown",
+            "resolved_type": "Color",
             "casts": [],
-            "borrow_kind": "value",
+            "borrow_kind": "readonly_ref",
             "repr": "RED",
             "id": "RED"
           },
@@ -99,9 +102,9 @@
               "end_lineno": 7,
               "end_col": 8
             },
-            "resolved_type": "unknown",
+            "resolved_type": "Color",
             "casts": [],
-            "borrow_kind": "value",
+            "borrow_kind": "readonly_ref",
             "repr": "BLUE",
             "id": "BLUE"
           },
@@ -313,7 +316,7 @@
                         "end_lineno": 12,
                         "end_col": 40
                       },
-                      "resolved_type": "unknown",
+                      "resolved_type": "Color",
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "Color.RED",
@@ -329,7 +332,8 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "Color",
-                        "id": "Color"
+                        "id": "Color",
+                        "type_object_of": "Color"
                       },
                       "attr": "RED"
                     },
@@ -345,7 +349,7 @@
                           "end_lineno": 12,
                           "end_col": 53
                         },
-                        "resolved_type": "unknown",
+                        "resolved_type": "Color",
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "Color.RED",
@@ -361,7 +365,8 @@
                           "casts": [],
                           "borrow_kind": "value",
                           "repr": "Color",
-                          "id": "Color"
+                          "id": "Color",
+                          "type_object_of": "Color"
                         },
                         "attr": "RED"
                       }
@@ -528,7 +533,7 @@
                         "end_lineno": 13,
                         "end_col": 40
                       },
-                      "resolved_type": "unknown",
+                      "resolved_type": "Color",
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "Color.RED",
@@ -544,7 +549,8 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "Color",
-                        "id": "Color"
+                        "id": "Color",
+                        "type_object_of": "Color"
                       },
                       "attr": "RED"
                     },
@@ -560,7 +566,7 @@
                           "end_lineno": 13,
                           "end_col": 54
                         },
-                        "resolved_type": "unknown",
+                        "resolved_type": "Color",
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "Color.BLUE",
@@ -576,7 +582,8 @@
                           "casts": [],
                           "borrow_kind": "value",
                           "repr": "Color",
-                          "id": "Color"
+                          "id": "Color",
+                          "type_object_of": "Color"
                         },
                         "attr": "BLUE"
                       }
@@ -743,7 +750,7 @@
                         "end_lineno": 14,
                         "end_col": 41
                       },
-                      "resolved_type": "unknown",
+                      "resolved_type": "Color",
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "Color.BLUE",
@@ -759,7 +766,8 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "Color",
-                        "id": "Color"
+                        "id": "Color",
+                        "type_object_of": "Color"
                       },
                       "attr": "BLUE"
                     },
@@ -775,7 +783,7 @@
                           "end_lineno": 14,
                           "end_col": 55
                         },
-                        "resolved_type": "unknown",
+                        "resolved_type": "Color",
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "Color.BLUE",
@@ -791,7 +799,8 @@
                           "casts": [],
                           "borrow_kind": "value",
                           "repr": "Color",
-                          "id": "Color"
+                          "id": "Color",
+                          "type_object_of": "Color"
                         },
                         "attr": "BLUE"
                       }
@@ -958,7 +967,7 @@
                         "end_lineno": 15,
                         "end_col": 41
                       },
-                      "resolved_type": "unknown",
+                      "resolved_type": "Color",
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "Color.BLUE",
@@ -974,7 +983,8 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "Color",
-                        "id": "Color"
+                        "id": "Color",
+                        "type_object_of": "Color"
                       },
                       "attr": "BLUE"
                     },
@@ -990,7 +1000,7 @@
                           "end_lineno": 15,
                           "end_col": 54
                         },
-                        "resolved_type": "unknown",
+                        "resolved_type": "Color",
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "Color.RED",
@@ -1006,7 +1016,8 @@
                           "casts": [],
                           "borrow_kind": "value",
                           "repr": "Color",
-                          "id": "Color"
+                          "id": "Color",
+                          "type_object_of": "Color"
                         },
                         "attr": "RED"
                       }

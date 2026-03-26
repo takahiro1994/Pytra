@@ -127,7 +127,8 @@
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "Cat",
-                  "id": "Cat"
+                  "id": "Cat",
+                  "type_object_of": "Cat"
                 },
                 "source_span": {
                   "lineno": 8,
@@ -186,7 +187,8 @@
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "Dog",
-                  "id": "Dog"
+                  "id": "Dog",
+                  "type_object_of": "Dog"
                 },
                 "source_span": {
                   "lineno": 8,

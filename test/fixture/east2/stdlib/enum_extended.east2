@@ -41,7 +41,10 @@
       "original_name": "Color",
       "base": "Enum",
       "dataclass": false,
-      "field_types": {},
+      "field_types": {
+        "RED": "Color",
+        "BLUE": "Color"
+      },
       "body": [
         {
           "kind": "Assign",
@@ -59,9 +62,9 @@
               "end_lineno": 6,
               "end_col": 7
             },
-            "resolved_type": "unknown",
+            "resolved_type": "Color",
             "casts": [],
-            "borrow_kind": "value",
+            "borrow_kind": "readonly_ref",
             "repr": "RED",
             "id": "RED"
           },
@@ -99,9 +102,9 @@
               "end_lineno": 7,
               "end_col": 8
             },
-            "resolved_type": "unknown",
+            "resolved_type": "Color",
             "casts": [],
-            "borrow_kind": "value",
+            "borrow_kind": "readonly_ref",
             "repr": "BLUE",
             "id": "BLUE"
           },
@@ -140,7 +143,10 @@
       "original_name": "Status",
       "base": "IntEnum",
       "dataclass": false,
-      "field_types": {},
+      "field_types": {
+        "OK": "Status",
+        "ERROR": "Status"
+      },
       "body": [
         {
           "kind": "Assign",
@@ -158,9 +164,9 @@
               "end_lineno": 11,
               "end_col": 6
             },
-            "resolved_type": "unknown",
+            "resolved_type": "Status",
             "casts": [],
-            "borrow_kind": "value",
+            "borrow_kind": "readonly_ref",
             "repr": "OK",
             "id": "OK"
           },
@@ -198,9 +204,9 @@
               "end_lineno": 12,
               "end_col": 9
             },
-            "resolved_type": "unknown",
+            "resolved_type": "Status",
             "casts": [],
-            "borrow_kind": "value",
+            "borrow_kind": "readonly_ref",
             "repr": "ERROR",
             "id": "ERROR"
           },
@@ -237,7 +243,11 @@
       "original_name": "Perm",
       "base": "IntFlag",
       "dataclass": false,
-      "field_types": {},
+      "field_types": {
+        "READ": "Perm",
+        "WRITE": "Perm",
+        "EXEC": "Perm"
+      },
       "body": [
         {
           "kind": "Assign",
@@ -255,9 +265,9 @@
               "end_lineno": 16,
               "end_col": 8
             },
-            "resolved_type": "unknown",
+            "resolved_type": "Perm",
             "casts": [],
-            "borrow_kind": "value",
+            "borrow_kind": "readonly_ref",
             "repr": "READ",
             "id": "READ"
           },
@@ -295,9 +305,9 @@
               "end_lineno": 17,
               "end_col": 9
             },
-            "resolved_type": "unknown",
+            "resolved_type": "Perm",
             "casts": [],
-            "borrow_kind": "value",
+            "borrow_kind": "readonly_ref",
             "repr": "WRITE",
             "id": "WRITE"
           },
@@ -335,9 +345,9 @@
               "end_lineno": 18,
               "end_col": 8
             },
-            "resolved_type": "unknown",
+            "resolved_type": "Perm",
             "casts": [],
-            "borrow_kind": "value",
+            "borrow_kind": "readonly_ref",
             "repr": "EXEC",
             "id": "EXEC"
           },
@@ -547,7 +557,7 @@
                         "end_lineno": 23,
                         "end_col": 40
                       },
-                      "resolved_type": "unknown",
+                      "resolved_type": "Color",
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "Color.RED",
@@ -563,7 +573,8 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "Color",
-                        "id": "Color"
+                        "id": "Color",
+                        "type_object_of": "Color"
                       },
                       "attr": "RED"
                     },
@@ -579,7 +590,7 @@
                           "end_lineno": 23,
                           "end_col": 53
                         },
-                        "resolved_type": "unknown",
+                        "resolved_type": "Color",
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "Color.RED",
@@ -595,7 +606,8 @@
                           "casts": [],
                           "borrow_kind": "value",
                           "repr": "Color",
-                          "id": "Color"
+                          "id": "Color",
+                          "type_object_of": "Color"
                         },
                         "attr": "RED"
                       }
@@ -762,7 +774,7 @@
                         "end_lineno": 24,
                         "end_col": 40
                       },
-                      "resolved_type": "unknown",
+                      "resolved_type": "Color",
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "Color.RED",
@@ -778,7 +790,8 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "Color",
-                        "id": "Color"
+                        "id": "Color",
+                        "type_object_of": "Color"
                       },
                       "attr": "RED"
                     },
@@ -794,7 +807,7 @@
                           "end_lineno": 24,
                           "end_col": 54
                         },
-                        "resolved_type": "unknown",
+                        "resolved_type": "Color",
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "Color.BLUE",
@@ -810,7 +823,8 @@
                           "casts": [],
                           "borrow_kind": "value",
                           "repr": "Color",
-                          "id": "Color"
+                          "id": "Color",
+                          "type_object_of": "Color"
                         },
                         "attr": "BLUE"
                       }
@@ -977,7 +991,7 @@
                         "end_lineno": 25,
                         "end_col": 40
                       },
-                      "resolved_type": "unknown",
+                      "resolved_type": "Status",
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "Status.OK",
@@ -993,7 +1007,8 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "Status",
-                        "id": "Status"
+                        "id": "Status",
+                        "type_object_of": "Status"
                       },
                       "attr": "OK"
                     },
@@ -1193,7 +1208,7 @@
                           "end_lineno": 26,
                           "end_col": 47
                         },
-                        "resolved_type": "unknown",
+                        "resolved_type": "Status",
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "Status.ERROR",
@@ -1209,7 +1224,8 @@
                           "casts": [],
                           "borrow_kind": "value",
                           "repr": "Status",
-                          "id": "Status"
+                          "id": "Status",
+                          "type_object_of": "Status"
                         },
                         "attr": "ERROR",
                         "call_arg_type": "Obj"
@@ -1218,7 +1234,7 @@
                     "keywords": [],
                     "lowered_kind": "BuiltinCall",
                     "builtin_name": "int",
-                    "runtime_call": "int",
+                    "runtime_call": "static_cast",
                     "runtime_module_id": "pytra.core.py_runtime",
                     "runtime_symbol": "int",
                     "runtime_call_adapter_kind": "builtin",
@@ -1324,7 +1340,7 @@
               "end_lineno": 27,
               "end_col": 37
             },
-            "resolved_type": "unknown",
+            "resolved_type": "Perm",
             "casts": [],
             "borrow_kind": "value",
             "repr": "Perm.READ | Perm.WRITE",
@@ -1336,7 +1352,7 @@
                 "end_lineno": 27,
                 "end_col": 24
               },
-              "resolved_type": "unknown",
+              "resolved_type": "Perm",
               "casts": [],
               "borrow_kind": "value",
               "repr": "Perm.READ",
@@ -1352,7 +1368,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "Perm",
-                "id": "Perm"
+                "id": "Perm",
+                "type_object_of": "Perm"
               },
               "attr": "READ"
             },
@@ -1365,7 +1382,7 @@
                 "end_lineno": 27,
                 "end_col": 37
               },
-              "resolved_type": "unknown",
+              "resolved_type": "Perm",
               "casts": [],
               "borrow_kind": "value",
               "repr": "Perm.WRITE",
@@ -1381,7 +1398,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "Perm",
-                "id": "Perm"
+                "id": "Perm",
+                "type_object_of": "Perm"
               },
               "attr": "WRITE"
             }
@@ -1728,7 +1746,7 @@
                             "end_lineno": 29,
                             "end_col": 50
                           },
-                          "resolved_type": "unknown",
+                          "resolved_type": "Perm",
                           "casts": [],
                           "borrow_kind": "value",
                           "repr": "Perm.WRITE",
@@ -1744,7 +1762,8 @@
                             "casts": [],
                             "borrow_kind": "value",
                             "repr": "Perm",
-                            "id": "Perm"
+                            "id": "Perm",
+                            "type_object_of": "Perm"
                           },
                           "attr": "WRITE"
                         },
@@ -1963,7 +1982,7 @@
                             "end_lineno": 30,
                             "end_col": 50
                           },
-                          "resolved_type": "unknown",
+                          "resolved_type": "Perm",
                           "casts": [],
                           "borrow_kind": "value",
                           "repr": "Perm.WRITE",
@@ -1979,7 +1998,8 @@
                             "casts": [],
                             "borrow_kind": "value",
                             "repr": "Perm",
-                            "id": "Perm"
+                            "id": "Perm",
+                            "type_object_of": "Perm"
                           },
                           "attr": "WRITE"
                         },

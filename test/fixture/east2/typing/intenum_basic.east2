@@ -41,7 +41,10 @@
       "original_name": "Status",
       "base": "IntEnum",
       "dataclass": false,
-      "field_types": {},
+      "field_types": {
+        "OK": "Status",
+        "ERROR": "Status"
+      },
       "body": [
         {
           "kind": "Assign",
@@ -59,9 +62,9 @@
               "end_lineno": 6,
               "end_col": 6
             },
-            "resolved_type": "unknown",
+            "resolved_type": "Status",
             "casts": [],
-            "borrow_kind": "value",
+            "borrow_kind": "readonly_ref",
             "repr": "OK",
             "id": "OK"
           },
@@ -99,9 +102,9 @@
               "end_lineno": 7,
               "end_col": 9
             },
-            "resolved_type": "unknown",
+            "resolved_type": "Status",
             "casts": [],
-            "borrow_kind": "value",
+            "borrow_kind": "readonly_ref",
             "repr": "ERROR",
             "id": "ERROR"
           },
@@ -313,7 +316,7 @@
                         "end_lineno": 12,
                         "end_col": 40
                       },
-                      "resolved_type": "unknown",
+                      "resolved_type": "Status",
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "Status.OK",
@@ -329,7 +332,8 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "Status",
-                        "id": "Status"
+                        "id": "Status",
+                        "type_object_of": "Status"
                       },
                       "attr": "OK"
                     },
@@ -514,7 +518,7 @@
                         "end_lineno": 13,
                         "end_col": 43
                       },
-                      "resolved_type": "unknown",
+                      "resolved_type": "Status",
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "Status.ERROR",
@@ -530,7 +534,8 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "Status",
-                        "id": "Status"
+                        "id": "Status",
+                        "type_object_of": "Status"
                       },
                       "attr": "ERROR"
                     },
@@ -730,7 +735,7 @@
                           "end_lineno": 14,
                           "end_col": 47
                         },
-                        "resolved_type": "unknown",
+                        "resolved_type": "Status",
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "Status.ERROR",
@@ -746,7 +751,8 @@
                           "casts": [],
                           "borrow_kind": "value",
                           "repr": "Status",
-                          "id": "Status"
+                          "id": "Status",
+                          "type_object_of": "Status"
                         },
                         "attr": "ERROR",
                         "call_arg_type": "Obj"
@@ -755,7 +761,7 @@
                     "keywords": [],
                     "lowered_kind": "BuiltinCall",
                     "builtin_name": "int",
-                    "runtime_call": "int",
+                    "runtime_call": "static_cast",
                     "runtime_module_id": "pytra.core.py_runtime",
                     "runtime_symbol": "int",
                     "runtime_call_adapter_kind": "builtin",

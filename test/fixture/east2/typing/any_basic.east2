@@ -1892,6 +1892,7 @@
                         "borrow_kind": "value",
                         "repr": "dict",
                         "id": "dict",
+                        "type_object_of": "dict",
                         "call_arg_type": "type"
                       }
                     ],
