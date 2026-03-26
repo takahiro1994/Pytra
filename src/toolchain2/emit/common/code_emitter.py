@@ -118,7 +118,7 @@ def build_import_alias_map(meta: dict[str, JsonVal]) -> dict[str, str]:
         for alias, info in isyms.items():
             if isinstance(alias, str) and isinstance(info, dict):
                 mod = info.get("module")
-                if isinstance(mod, str) and mod != "":
+                if isinstance(mod, str) and mod != "" and alias not in alias_map:
                     alias_map[alias] = mod
 
     return alias_map

@@ -612,6 +612,18 @@ func py_str_index(s, sub string) int64 {
 	}
 	return int64(idx)
 }
+func py_list_index(seq any, needle any) int64 {
+	rv := goreflect.ValueOf(seq)
+	if !rv.IsValid() || (rv.Kind() != goreflect.Slice && rv.Kind() != goreflect.Array) {
+		panic("value is not a list")
+	}
+	for i := 0; i < rv.Len(); i++ {
+		if py_eq(rv.Index(i).Interface(), needle) {
+			return int64(i)
+		}
+	}
+	panic("value not in list")
+}
 func py_strip(s string) string            { return py_str_strip(s) }
 func py_rstrip(s string) string           { return py_str_rstrip(s) }
 func py_find(s, sub string) int64         { return py_str_find(s, sub) }

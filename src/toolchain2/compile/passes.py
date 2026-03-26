@@ -1376,7 +1376,7 @@ def _int_promo_walk(node: JsonVal) -> None:
         if isinstance(tp, dict):
             tt = _nt(tp.get("target_type"))
             if tt == "uint8":
-                tp["target_type"] = "int32"
+                tp["target_type"] = "int64"
     for v in nd.values():
         if isinstance(v, (dict, list)):
             _int_promo_walk(v)
@@ -1559,6 +1559,10 @@ def _guard_narrowing_from_expr(expr: JsonVal) -> dict[str, str]:
     if kind == "IsInstance":
         value = nd.get("value")
         expected = nd.get("expected_type_id")
+        if isinstance(value, dict) and value.get("kind") == UNBOX:
+            inner = value.get("value")
+            if isinstance(inner, dict):
+                value = inner
         if not isinstance(value, dict) or value.get("kind") != NAME:
             return {}
         name = _tp_safe(value.get("id"))

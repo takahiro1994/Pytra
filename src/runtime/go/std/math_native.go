@@ -30,8 +30,9 @@ func py_exp(x any) float64   { return math.Exp(_toF64(x)) }
 func py_log(x any) float64   { return math.Log(_toF64(x)) }
 func py_log10(x any) float64 { return math.Log10(_toF64(x)) }
 func py_fabs(x any) float64  { return math.Abs(_toF64(x)) }
-func py_pi() float64                 { return math.Pi }
-func py_e() float64                  { return math.E }
+
+var py_pi float64 = math.Pi
+var py_e float64 = math.E
 
 var _pytra_rng = rand.New(rand.NewSource(time.Now().UnixNano()))
 

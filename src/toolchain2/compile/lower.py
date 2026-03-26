@@ -649,6 +649,19 @@ def _lower_assignment_like_stmt(stmt: Node, *, lower_node_fn: Callable[[JsonVal]
     if target_type_expr is None and isinstance(target_obj, dict):
         tod: Node = target_obj
         target_type_expr = tod.get("type_expr")
+    if target_type_expr is None and isinstance(value_lowered, dict) and nd_kind(value_lowered) == UNBOX:
+        unboxed_type = normalize_type_name(value_lowered.get("resolved_type"))
+        if unboxed_type not in ("", "unknown"):
+            optional_inner = _optional_inner_target_type(target_type)
+            if target_type in ("", "unknown") or optional_inner == unboxed_type:
+                target_type = unboxed_type
+                target_type_expr = _make_named_type_expr(unboxed_type)
+                out["decl_type"] = unboxed_type
+                out["decl_type_expr"] = target_type_expr
+                target_out = out.get("target")
+                if isinstance(target_out, dict):
+                    target_out["resolved_type"] = unboxed_type
+                    target_out["type_expr"] = target_type_expr
     storage_type = _assignment_storage_type_override(stmt, value_lowered, target_type)
     if storage_type != "":
         target_type = storage_type

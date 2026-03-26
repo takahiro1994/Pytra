@@ -13,7 +13,9 @@ if str(ROOT / "src") not in sys.path:
 
 
 from toolchain2.common.jv import deep_copy_json
+from toolchain2.compile.jv import CompileContext
 from toolchain2.compile.lower import lower_east2_to_east3
+from toolchain2.compile.passes import apply_guard_narrowing
 from toolchain2.parse.py.parser import parse_python_source
 from toolchain2.resolve.py.builtin_registry import BuiltinRegistry, load_builtin_registry
 from toolchain2.resolve.py.resolver import resolve_east1_to_east2
@@ -276,6 +278,54 @@ stdout = extern(sys.stdout)
 
         self.assertEqual(stdout_assign.get("decl_type"), "str")
         self.assertEqual(stdout_assign.get("value", {}).get("resolved_type"), "str")
+
+    def test_bound_method_call_keeps_only_explicit_args_even_with_same_named_free_function(self) -> None:
+        source = """
+class C:
+    def group(self, idx: int = 0) -> int:
+        return idx
+
+def group(m: C | None, idx: int = 0) -> int:
+    if m is None:
+        return 0
+    mm: C = m
+    return mm.group(idx)
+"""
+        east2 = parse_python_source(source, "<mem>").to_jv()
+        resolve_east1_to_east2(east2, registry=_load_registry())
+        east3 = lower_east2_to_east3(deep_copy_json(east2))
+
+        bound_call = next(
+            node
+            for node in _walk(east3)
+            if node.get("kind") == "Call" and node.get("repr") == "mm.group(idx)"
+        )
+
+        self.assertEqual(len(bound_call.get("args", [])), 1)
+
+    def test_class_constructor_hints_empty_list_literals_from_signature(self) -> None:
+        source = """
+class Match:
+    def __init__(self, text: str, groups: list[str]) -> None:
+        self.text = text
+        self.groups = groups
+
+def f(text: str) -> Match:
+    return Match(text, [])
+"""
+        east2 = parse_python_source(source, "<mem>").to_jv()
+        resolve_east1_to_east2(east2, registry=_load_registry())
+        east3 = lower_east2_to_east3(deep_copy_json(east2))
+
+        ctor_call = next(
+            node
+            for node in _walk(east3)
+            if node.get("kind") == "Call" and node.get("repr") == "Match(text, [])"
+        )
+        list_arg = ctor_call.get("args", [])[1]
+
+        self.assertIsInstance(list_arg, dict)
+        self.assertEqual(list_arg.get("resolved_type"), "list[str]")
 
     def test_resolver_recognizes_builtin_type_objects_in_value_position(self) -> None:
         source = """
@@ -680,6 +730,62 @@ def add_scalars(a: Scalar, b: Scalar) -> int:
         self.assertEqual(right.get("kind"), "Unbox")
         self.assertEqual(right.get("target"), "int64")
         self.assertEqual(binop.get("resolved_type"), "int64")
+
+    def test_guard_narrowing_sees_through_unbox_wrapped_isinstance_subject(self) -> None:
+        module = {
+            "kind": "Module",
+            "body": [
+                {
+                    "kind": "FunctionDef",
+                    "name": "f",
+                    "arg_types": {"v": "list[Any] | dict[str,Any]"},
+                    "arg_order": ["v"],
+                    "arg_defaults": {},
+                    "arg_index": {"v": 0},
+                    "return_type": "list[Any]",
+                    "arg_usage": {"v": "readonly"},
+                    "renamed_symbols": {},
+                    "docstring": None,
+                    "body": [
+                        {
+                            "kind": "If",
+                            "test": {
+                                "kind": "IsInstance",
+                                "value": {
+                                    "kind": "Unbox",
+                                    "value": {
+                                        "kind": "Name",
+                                        "id": "v",
+                                        "resolved_type": "list[Any] | dict[str,Any]",
+                                    },
+                                    "resolved_type": "list[Any] | dict[str,Any]",
+                                    "target": "list[Any] | dict[str,Any]",
+                                },
+                                "expected_type_id": {"kind": "Name", "id": "PYTRA_TID_LIST"},
+                            },
+                            "body": [
+                                {
+                                    "kind": "Return",
+                                    "value": {
+                                        "kind": "Name",
+                                        "id": "v",
+                                        "resolved_type": "list[Any] | dict[str,Any]",
+                                    },
+                                }
+                            ],
+                            "orelse": [],
+                        }
+                    ],
+                }
+            ],
+            "main_guard_body": [],
+        }
+
+        apply_guard_narrowing(module, CompileContext())
+
+        guarded_return = module["body"][0]["body"][0]["body"][0]["value"]
+        self.assertEqual(guarded_return.get("kind"), "Unbox")
+        self.assertEqual(guarded_return.get("target"), "list[Any]")
 
     def test_compile_boxes_imported_stdlib_alias_arguments(self) -> None:
         source = """

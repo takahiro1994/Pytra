@@ -20,6 +20,7 @@ from toolchain2.link.call_graph import build_call_graph
 from toolchain2.link.dependencies import build_all_resolved_dependencies
 from toolchain2.link.import_maps import collect_import_maps
 from toolchain2.link.expand_defaults import expand_cross_module_defaults
+from toolchain2.resolve.py.type_norm import normalize_type
 
 
 # ---------------------------------------------------------------------------
@@ -135,6 +136,121 @@ def _ensure_meta(doc: dict[str, JsonVal]) -> dict[str, JsonVal]:
     return meta
 
 
+_TYPE_STRING_KEYS: set[str] = {
+    "resolved_type",
+    "decl_type",
+    "return_type",
+    "returns",
+    "yield_value_type",
+    "annotation",
+    "type_expr",
+    "iter_element_type",
+    "target_type",
+    "target",
+    "storage_type",
+}
+
+_TYPE_MAP_KEYS: set[str] = {
+    "arg_types",
+    "field_types",
+}
+
+
+def _collect_module_type_aliases(doc: dict[str, JsonVal]) -> dict[str, str]:
+    aliases: dict[str, str] = {}
+    body = doc.get("body")
+    if not isinstance(body, list):
+        return aliases
+    for stmt in body:
+        if not isinstance(stmt, dict) or stmt.get("kind") != "TypeAlias":
+            continue
+        name = stmt.get("name")
+        raw = stmt.get("type_expr")
+        if isinstance(name, str) and name != "" and isinstance(raw, str) and raw != "":
+            aliases[name] = normalize_type(raw, aliases, {name})
+    return aliases
+
+
+def _default_collection_hint(type_name: str) -> str:
+    t = type_name.strip()
+    if t.endswith(" | None"):
+        t = t[:-7].strip()
+    elif t.endswith("|None"):
+        t = t[:-6].strip()
+    if t.startswith("list[") or t.startswith("dict[") or t.startswith("set["):
+        return t
+    return ""
+
+
+def _apply_collection_hint(node: JsonVal, target_type: str, aliases: dict[str, str]) -> None:
+    if not isinstance(node, dict):
+        return
+    hinted = _default_collection_hint(normalize_type(target_type, aliases))
+    if hinted == "":
+        return
+    kind = node.get("kind")
+    current = node.get("resolved_type")
+    current_type = current if isinstance(current, str) else ""
+    if kind == "List" and hinted.startswith("list[") and current_type in ("", "unknown", "list[unknown]"):
+        node["resolved_type"] = hinted
+        return
+    if kind == "Dict" and hinted.startswith("dict[") and current_type in ("", "unknown", "dict[unknown,unknown]"):
+        node["resolved_type"] = hinted
+        return
+    if kind == "Set" and hinted.startswith("set[") and current_type in ("", "unknown", "set[unknown]"):
+        node["resolved_type"] = hinted
+        return
+
+
+def _normalize_runtime_type_aliases(node: JsonVal, aliases: dict[str, str]) -> None:
+    if isinstance(node, list):
+        for item in node:
+            _normalize_runtime_type_aliases(item, aliases)
+        return
+    if not isinstance(node, dict):
+        return
+
+    for key, value in list(node.items()):
+        if key in _TYPE_STRING_KEYS and isinstance(value, str) and value != "":
+            node[key] = normalize_type(value, aliases)
+            continue
+        if key in _TYPE_MAP_KEYS and isinstance(value, dict):
+            normalized_map: dict[str, JsonVal] = {}
+            for k, v in value.items():
+                if isinstance(v, str):
+                    normalized_map[k] = normalize_type(v, aliases)
+                else:
+                    normalized_map[k] = v
+            node[key] = normalized_map
+            continue
+        if isinstance(value, (dict, list)):
+            _normalize_runtime_type_aliases(value, aliases)
+
+    kind = node.get("kind")
+    if kind == "FunctionDef":
+        arg_types = node.get("arg_types")
+        arg_defaults = node.get("arg_defaults")
+        if isinstance(arg_types, dict) and isinstance(arg_defaults, dict):
+            for name, default_node in arg_defaults.items():
+                param_type = arg_types.get(name)
+                if isinstance(param_type, str):
+                    _apply_collection_hint(default_node, param_type, aliases)
+    elif kind in ("Assign", "AnnAssign"):
+        target = node.get("target")
+        value = node.get("value")
+        target_type = ""
+        if isinstance(target, dict):
+            rt = target.get("resolved_type")
+            if isinstance(rt, str):
+                target_type = rt
+        if target_type == "":
+            decl = node.get("decl_type")
+            if isinstance(decl, str):
+                target_type = decl
+        if target_type != "":
+            _apply_collection_hint(value, target_type, aliases)
+
+
 # ---------------------------------------------------------------------------
 # Public API
 # ---------------------------------------------------------------------------
@@ -247,6 +363,9 @@ def link_modules(
         doc = deep_copy_json(module.east_doc)
         if not isinstance(doc, dict):
             continue
+        aliases = _collect_module_type_aliases(doc)
+        if len(aliases) > 0:
+            _normalize_runtime_type_aliases(doc, aliases)
         copied_docs.append((module, doc))
 
     # 9. Cross-module default argument expansion

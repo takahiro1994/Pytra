@@ -12,6 +12,7 @@ from pytra.std.json import JsonVal
 
 from toolchain2.common.jv import deep_copy_json
 from toolchain2.link.import_maps import collect_import_maps
+from toolchain2.resolve.py.type_norm import make_type_expr, normalize_type
 
 
 def _module_id_from_doc(doc: dict[str, JsonVal]) -> str:
@@ -74,6 +75,7 @@ def _collect_sig(
         sig: dict[str, JsonVal] = {
             "arg_order": ao,
             "arg_defaults": ad if isinstance(ad, dict) else {},
+            "arg_types": node.get("arg_types") if isinstance(node.get("arg_types"), dict) else {},
         }
         full = class_name + "." + name if class_name != "" else name
         sigs[module_id + "::" + full] = sig
@@ -94,6 +96,37 @@ def _collect_sig(
             for s in body:
                 if isinstance(s, dict):
                     _collect_sig(s, sigs, module_id, cn)
+
+
+def _default_collection_hint(type_name: str) -> str:
+    t = type_name.strip()
+    if t.endswith(" | None"):
+        t = t[:-7].strip()
+    elif t.endswith("|None"):
+        t = t[:-6].strip()
+    if t.startswith("list[") or t.startswith("dict[") or t.startswith("set["):
+        return t
+    return ""
+
+
+def _apply_collection_default_hint(default_node: JsonVal, param_type: str) -> None:
+    if not isinstance(default_node, dict):
+        return
+    hinted = _default_collection_hint(normalize_type(param_type))
+    if hinted == "":
+        return
+    kind = default_node.get("kind")
+    current = default_node.get("resolved_type")
+    current_type = current if isinstance(current, str) else ""
+    if kind == "List" and hinted.startswith("list[") and current_type in ("", "unknown", "list[unknown]"):
+        default_node["resolved_type"] = hinted
+        return
+    if kind == "Dict" and hinted.startswith("dict[") and current_type in ("", "unknown", "dict[unknown,unknown]"):
+        default_node["resolved_type"] = hinted
+        return
+    if kind == "Set" and hinted.startswith("set[") and current_type in ("", "unknown", "set[unknown]"):
+        default_node["resolved_type"] = hinted
+        return
 
 
 def _resolve_call_sig_key(
@@ -137,6 +170,17 @@ def _resolve_call_sig_key(
             return ""
         module_id = import_modules.get(owner_id, "")
         if module_id == "":
+            imported = import_symbols.get(owner_id, "")
+            if isinstance(imported, str) and imported != "":
+                owner_rt = owner.get("resolved_type")
+                if owner_rt == "module":
+                    runtime_module_id = owner.get("runtime_module_id")
+                    if isinstance(runtime_module_id, str) and runtime_module_id != "":
+                        return runtime_module_id + "::" + attr
+                    if "::" in imported:
+                        mod, export = imported.split("::", 1)
+                        if mod != "" and export != "":
+                            return mod + "." + export + "::" + attr
             owner_rt = owner.get("resolved_type")
             if isinstance(owner_rt, str) and owner_rt != "":
                 # First try any imported class symbol that matches the receiver type.
@@ -192,8 +236,10 @@ def _expand_walk(
             sig = sigs[sig_key]
             ao = sig.get("arg_order")
             ad = sig.get("arg_defaults")
+            at = sig.get("arg_types")
             args = node.get("args")
             if isinstance(args, list) and isinstance(ao, list) and isinstance(ad, dict):
+                arg_types = at if isinstance(at, dict) else {}
                 # Exclude 'self' from expected params
                 expected: list[str] = []
                 for p in ao:
@@ -222,7 +268,14 @@ def _expand_walk(
                         elif param_name in ad:
                             default_val = ad[param_name]
                             if isinstance(default_val, (dict, list)):
-                                args.append(deep_copy_json(default_val))
+                                copied = deep_copy_json(default_val)
+                                if isinstance(copied, dict):
+                                    param_type = arg_types.get(param_name, "")
+                                    if isinstance(param_type, str) and param_type != "":
+                                        _apply_collection_default_hint(copied, param_type)
+                                        if "resolved_type" in copied and "type_expr" in copied and isinstance(copied.get("resolved_type"), str):
+                                            copied["type_expr"] = make_type_expr(copied["resolved_type"])
+                                args.append(copied)
                             else:
                                 args.append(default_val)
                 if len(kw_map) > 0:

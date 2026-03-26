@@ -205,6 +205,45 @@ class Toolchain2LinkerSpecConform2Tests(unittest.TestCase):
 
             self.assertIn(str(runtime_path), result)
 
+    def test_runtime_discovery_ignores_meta_binding_runtime_ids_without_ast_kind(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            runtime_path = Path(tmp) / "sequence.east"
+            runtime_path.write_text(
+                json.dumps(
+                    _module_doc("pytra.built_in.sequence"),
+                    ensure_ascii=False,
+                ),
+                encoding="utf-8",
+            )
+            module_map = {
+                "/tmp/app.main.east3.json": _module_doc(
+                    "app.main",
+                    meta_extra={
+                        "import_bindings": [{"module_id": "pytra.built_in.sequence"}],
+                        "import_resolution": {
+                            "bindings": [
+                                {
+                                    "runtime_module_id": "pytra.std.template",
+                                    "resolved_binding_kind": "module",
+                                }
+                            ]
+                        },
+                    },
+                )
+            }
+
+            def _resolve(module_id: str) -> str:
+                if module_id == "pytra.built_in.sequence":
+                    return str(runtime_path)
+                if module_id == "pytra.std.template":
+                    return ""
+                return ""
+
+            with patch("toolchain2.link.runtime_discovery.resolve_runtime_east_path", side_effect=_resolve):
+                result = discover_runtime_modules(module_map)
+
+            self.assertIn(str(runtime_path), result)
+
     def test_manifest_loader_rejects_invalid_module_entry(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             manifest_path = Path(tmp) / "manifest.json"
@@ -418,6 +457,62 @@ class Toolchain2LinkerSpecConform2Tests(unittest.TestCase):
         self.assertEqual(len(call["args"]), 2)
         self.assertEqual(call["args"][1]["value"], 9)
 
+    def test_expand_defaults_uses_imported_module_symbol_runtime_module_id(self) -> None:
+        dep_doc = _module_doc(
+            "pytra.std.os",
+            body=[
+                {
+                    "kind": "FunctionDef",
+                    "name": "mkdir",
+                    "arg_order": ["p", "exist_ok"],
+                    "arg_defaults": {
+                        "exist_ok": {"kind": "Constant", "resolved_type": "bool", "value": False},
+                    },
+                    "body": [],
+                }
+            ],
+        )
+        main_doc = _module_doc(
+            "pytra.std.pathlib",
+            meta_extra={
+                "import_symbols": {
+                    "os": {"module": "pytra.std", "name": "os"},
+                }
+            },
+            body=[
+                {
+                    "kind": "Expr",
+                    "value": {
+                        "kind": "Call",
+                        "resolved_type": "None",
+                        "func": {
+                            "kind": "Attribute",
+                            "attr": "mkdir",
+                            "value": {
+                                "kind": "Name",
+                                "id": "os",
+                                "resolved_type": "module",
+                                "runtime_module_id": "pytra.std.os",
+                            },
+                        },
+                        "args": [{"kind": "Constant", "resolved_type": "str", "value": "tmp"}],
+                        "keywords": [],
+                        "runtime_module_id": "pytra.std.os",
+                        "runtime_symbol": "mkdir",
+                        "resolved_runtime_call": "os.mkdir",
+                    },
+                }
+            ],
+        )
+
+        expand_cross_module_defaults([dep_doc, main_doc])
+
+        body = main_doc["body"]
+        assert isinstance(body, list)
+        call = body[0]["value"]
+        self.assertEqual(len(call["args"]), 2)
+        self.assertFalse(call["args"][1]["value"])
+
     def test_expand_defaults_does_not_expand_ambiguous_object_method_calls(self) -> None:
         doc_a = _module_doc(
             "pkg.a",
@@ -500,7 +595,8 @@ class Toolchain2LinkerSpecConform2Tests(unittest.TestCase):
 
         go_code = emit_go_module(doc)
 
-        self.assertIn("py_set()", go_code)
+        self.assertIn("map[string]struct{}{}", go_code)
+        self.assertNotIn("set()", go_code)
 
     def test_cpp_emitter_handles_plain_bytes_constructor_without_link_normalization(self) -> None:
         doc = _fixture_doc("test/fixture/east3-opt/typing/bytes_basic.east3")
@@ -614,7 +710,7 @@ class Toolchain2LinkerSpecConform2Tests(unittest.TestCase):
 
         go_code = emit_go_module(doc)
 
-        self.assertIn("return py_sin(py_pi())", go_code)
+        self.assertIn("return py_sin(py_pi)", go_code)
         self.assertNotIn("math.Pi", go_code)
 
     def test_go_emitter_emits_pathlib_class_and_uses_native_os_path_helpers(self) -> None:
@@ -630,8 +726,146 @@ class Toolchain2LinkerSpecConform2Tests(unittest.TestCase):
         self.assertIn("func (self *Path) joinpath(", go_code)
         self.assertIn("join(", go_code)
         self.assertIn("dirname(", go_code)
+        self.assertIn("py_open(self._value, \"r\")", go_code)
+        self.assertIn("py_open(self._value, \"w\")", go_code)
+        self.assertNotIn("// with f {", go_code)
         self.assertNotIn("py_Path(", go_code)
         self.assertNotIn("py_pathlib_write_text", go_code)
+
+    def test_go_emitter_reads_runtime_module_value_symbols_without_call(self) -> None:
+        doc = _module_doc(
+            "app.main",
+            body=[
+                {
+                    "kind": "FunctionDef",
+                    "name": "run",
+                    "arg_types": {},
+                    "arg_order": [],
+                    "arg_defaults": {},
+                    "arg_index": {},
+                    "return_type": "list[str]",
+                    "arg_usage": {},
+                    "renamed_symbols": {},
+                    "docstring": None,
+                    "body": [
+                        {
+                            "kind": "Return",
+                            "value": {
+                                "kind": "Attribute",
+                                "resolved_type": "list[str]",
+                                "value": {
+                                    "kind": "Name",
+                                    "id": "sys",
+                                    "resolved_type": "module",
+                                    "runtime_module_id": "pytra.std.sys",
+                                },
+                                "attr": "argv",
+                                "runtime_module_id": "pytra.std.sys",
+                                "runtime_symbol": "argv",
+                                "runtime_symbol_dispatch": "value",
+                            },
+                        }
+                    ],
+                }
+            ],
+        )
+
+        go_code = emit_go_module(doc)
+
+        self.assertIn("return py_argv", go_code)
+        self.assertNotIn("return py_argv()", go_code)
+
+    def test_go_emitter_uses_list_index_helper_for_list_receivers(self) -> None:
+        doc = _module_doc(
+            "app.main",
+            body=[
+                {
+                    "kind": "FunctionDef",
+                    "name": "run",
+                    "arg_types": {"uchars": "list[str]", "ch": "str"},
+                    "arg_order": ["uchars", "ch"],
+                    "arg_defaults": {},
+                    "arg_index": {"uchars": 0, "ch": 1},
+                    "return_type": "int64",
+                    "arg_usage": {"uchars": "readonly", "ch": "readonly"},
+                    "renamed_symbols": {},
+                    "docstring": None,
+                    "body": [
+                        {
+                            "kind": "Return",
+                            "value": {
+                                "kind": "Call",
+                                "resolved_type": "int64",
+                                "lowered_kind": "BuiltinCall",
+                                "builtin_name": "index",
+                                "runtime_call": "list.index",
+                                "runtime_module_id": "pytra.core.list",
+                                "runtime_symbol": "list.index",
+                                "runtime_call_adapter_kind": "builtin",
+                                "semantic_tag": "stdlib.method.index",
+                                "func": {
+                                    "kind": "Attribute",
+                                    "resolved_type": "unknown",
+                                    "value": {
+                                        "kind": "Name",
+                                        "id": "uchars",
+                                        "resolved_type": "list[str]",
+                                    },
+                                    "attr": "index",
+                                },
+                                "args": [{"kind": "Name", "id": "ch", "resolved_type": "str"}],
+                                "keywords": [],
+                                "runtime_owner": {
+                                    "kind": "Name",
+                                    "id": "uchars",
+                                    "resolved_type": "list[str]",
+                                },
+                            },
+                        }
+                    ],
+                }
+            ],
+        )
+
+        go_code = emit_go_module(doc)
+
+        self.assertIn("return py_list_index(uchars, ch)", go_code)
+        self.assertNotIn("py_str_index(uchars, ch)", go_code)
+
+    def test_linker_normalizes_runtime_type_aliases_and_builtin_refs_for_argparse(self) -> None:
+        result = link_modules(
+            [str(ROOT / "test/fixture/east3-opt/stdlib/argparse_extended.east3")],
+            target="go",
+        )
+        modules = {module.module_id: module for module in result.linked_modules}
+
+        self.assertIn("pytra.std.argparse", modules)
+        self.assertIn("pytra.built_in.string_ops", modules)
+
+        runtime_go = emit_go_module(modules["pytra.std.argparse"].east_doc)
+        entry_go = emit_go_module(next(module.east_doc for module in result.linked_modules if module.is_entry))
+
+        self.assertNotIn("*ArgValue", runtime_go)
+        self.assertIn("map[string]interface{}", runtime_go)
+        self.assertIn("py_str_replace(", runtime_go)
+        self.assertIn("py_str_lstrip(", runtime_go)
+        self.assertNotIn("[]any{}", entry_go)
+        self.assertIn("[]string{}", entry_go)
+
+    def test_linker_normalizes_runtime_type_aliases_for_json(self) -> None:
+        result = link_modules(
+            [str(ROOT / "test/fixture/east3-opt/stdlib/json_extended.east3")],
+            target="go",
+        )
+        modules = {module.module_id: module for module in result.linked_modules}
+
+        self.assertIn("pytra.std.json", modules)
+        runtime_go = emit_go_module(modules["pytra.std.json"].east_doc)
+
+        self.assertNotIn("map[string]*JsonVal", runtime_go)
+        self.assertNotIn("[]*JsonVal", runtime_go)
+        self.assertIn("map[string]interface{}", runtime_go)
+        self.assertIn("[]interface{}", runtime_go)
 
     def test_go_emitter_keeps_comprehensions_as_iife_instead_of_placeholder(self) -> None:
         doc = _fixture_doc("test/fixture/east3-opt/collections/comprehension_dict_set.east3")
@@ -723,7 +957,7 @@ class Toolchain2LinkerSpecConform2Tests(unittest.TestCase):
 
         self.assertIn("func maybe_value(flag bool) *int64 {", go_code)
         self.assertIn("var __opt_1 int64 = 42", go_code)
-        self.assertIn("var __opt_3 int64 = __dict_get_2", go_code)
+        self.assertIn("var __opt_3 int64 = py_to_int64(__unbox_2)", go_code)
         self.assertIn("var __opt_5 int64 = __dict_get_4", go_code)
 
     def test_go_emitter_lowers_enum_family_to_named_int_consts(self) -> None:
