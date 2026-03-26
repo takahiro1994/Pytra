@@ -681,7 +681,7 @@
               "end_lineno": 25,
               "end_col": 54
             },
-            "resolved_type": "unknown",
+            "resolved_type": "bool",
             "casts": [],
             "borrow_kind": "value",
             "repr": "py_assert_eq(c.get_value(), 2, \"super_init\")",
@@ -741,7 +741,8 @@
                   "attr": "get_value"
                 },
                 "args": [],
-                "keywords": []
+                "keywords": [],
+                "call_arg_type": "object"
               },
               {
                 "kind": "Constant",
@@ -755,7 +756,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "2",
-                "value": 2
+                "value": 2,
+                "call_arg_type": "object"
               },
               {
                 "kind": "Constant",
@@ -769,7 +771,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "\"super_init\"",
-                "value": "super_init"
+                "value": "super_init",
+                "call_arg_type": "str"
               }
             ],
             "keywords": [],

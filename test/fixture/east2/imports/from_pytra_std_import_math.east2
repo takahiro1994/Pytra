@@ -110,7 +110,7 @@
               "end_lineno": 8,
               "end_col": 28
             },
-            "resolved_type": "list[unknown]",
+            "resolved_type": "list[bool]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "[]",
@@ -196,7 +196,7 @@
                   "end_lineno": 9,
                   "end_col": 96
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(int(msqrt(81.0)), 9, \"from pytra.std.math import sqrt as msqrt\")",
@@ -281,7 +281,8 @@
                             "casts": [],
                             "borrow_kind": "value",
                             "repr": "81.0",
-                            "value": 81.0
+                            "value": 81.0,
+                            "call_arg_type": "float64"
                           }
                         ],
                         "keywords": [],
@@ -289,7 +290,8 @@
                         "resolved_runtime_source": "import_symbol",
                         "runtime_module_id": "pytra.std.math",
                         "runtime_symbol": "sqrt",
-                        "runtime_call_adapter_kind": "math.float_args"
+                        "runtime_call_adapter_kind": "math.float_args",
+                        "call_arg_type": "Obj"
                       }
                     ],
                     "keywords": [],
@@ -299,7 +301,8 @@
                     "runtime_module_id": "pytra.core.py_runtime",
                     "runtime_symbol": "int",
                     "runtime_call_adapter_kind": "builtin",
-                    "semantic_tag": "cast.int"
+                    "semantic_tag": "cast.int",
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -313,7 +316,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "9",
-                    "value": 9
+                    "value": 9,
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -327,7 +331,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"from pytra.std.math import sqrt as msqrt\"",
-                    "value": "from pytra.std.math import sqrt as msqrt"
+                    "value": "from pytra.std.math import sqrt as msqrt",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -335,7 +340,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -419,7 +425,7 @@
                   "end_lineno": 10,
                   "end_col": 87
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(int(floor(3.9)), 3, \"from pytra.std.math import floor\")",
@@ -504,7 +510,8 @@
                             "casts": [],
                             "borrow_kind": "value",
                             "repr": "3.9",
-                            "value": 3.9
+                            "value": 3.9,
+                            "call_arg_type": "float64"
                           }
                         ],
                         "keywords": [],
@@ -512,7 +519,8 @@
                         "resolved_runtime_source": "import_symbol",
                         "runtime_module_id": "pytra.std.math",
                         "runtime_symbol": "floor",
-                        "runtime_call_adapter_kind": "math.float_args"
+                        "runtime_call_adapter_kind": "math.float_args",
+                        "call_arg_type": "Obj"
                       }
                     ],
                     "keywords": [],
@@ -522,7 +530,8 @@
                     "runtime_module_id": "pytra.core.py_runtime",
                     "runtime_symbol": "int",
                     "runtime_call_adapter_kind": "builtin",
-                    "semantic_tag": "cast.int"
+                    "semantic_tag": "cast.int",
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -536,7 +545,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "3",
-                    "value": 3
+                    "value": 3,
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -550,7 +560,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"from pytra.std.math import floor\"",
-                    "value": "from pytra.std.math import floor"
+                    "value": "from pytra.std.math import floor",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -558,7 +569,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -628,7 +640,7 @@
                   "end_lineno": 11,
                   "end_col": 65
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_all(results, \"from pytra std import symbols\")",
@@ -659,7 +671,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "results",
-                    "id": "results"
+                    "id": "results",
+                    "call_arg_type": "list[bool]"
                   },
                   {
                     "kind": "Constant",
@@ -673,7 +686,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"from pytra std import symbols\"",
-                    "value": "from pytra std import symbols"
+                    "value": "from pytra std import symbols",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],

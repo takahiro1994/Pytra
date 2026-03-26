@@ -530,7 +530,7 @@
               "end_lineno": 21,
               "end_col": 50
             },
-            "resolved_type": "unknown",
+            "resolved_type": "bool",
             "casts": [],
             "borrow_kind": "value",
             "repr": "py_assert_stdout(['7', '7'], _case_main)",
@@ -590,7 +590,8 @@
                     "repr": "'7'",
                     "value": "7"
                   }
-                ]
+                ],
+                "call_arg_type": "list[str]"
               },
               {
                 "kind": "Name",
@@ -604,7 +605,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "_case_main",
-                "id": "_case_main"
+                "id": "_case_main",
+                "call_arg_type": "object"
               }
             ],
             "keywords": [],

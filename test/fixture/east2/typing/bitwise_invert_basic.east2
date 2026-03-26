@@ -541,7 +541,7 @@
               "end_lineno": 11,
               "end_col": 27
             },
-            "resolved_type": "list[unknown]",
+            "resolved_type": "list[bool]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "[]",
@@ -627,7 +627,7 @@
                   "end_lineno": 12,
                   "end_col": 51
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(inv_y, -4, \"invert\")",
@@ -658,7 +658,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "inv_y",
-                    "id": "inv_y"
+                    "id": "inv_y",
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "UnaryOp",
@@ -686,7 +687,8 @@
                       "borrow_kind": "value",
                       "repr": "4",
                       "value": 4
-                    }
+                    },
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -700,7 +702,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"invert\"",
-                    "value": "invert"
+                    "value": "invert",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -708,7 +711,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -792,7 +796,7 @@
                   "end_lineno": 13,
                   "end_col": 57
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(and_mask, 4, \"and_invert\")",
@@ -823,7 +827,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "and_mask",
-                    "id": "and_mask"
+                    "id": "and_mask",
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -837,7 +842,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "4",
-                    "value": 4
+                    "value": 4,
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -851,7 +857,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"and_invert\"",
-                    "value": "and_invert"
+                    "value": "and_invert",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -859,7 +866,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -943,7 +951,7 @@
                   "end_lineno": 14,
                   "end_col": 56
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(or_mask, -2, \"or_invert\")",
@@ -974,7 +982,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "or_mask",
-                    "id": "or_mask"
+                    "id": "or_mask",
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "UnaryOp",
@@ -1002,7 +1011,8 @@
                       "borrow_kind": "value",
                       "repr": "2",
                       "value": 2
-                    }
+                    },
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1016,7 +1026,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"or_invert\"",
-                    "value": "or_invert"
+                    "value": "or_invert",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -1024,7 +1035,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -1108,7 +1120,7 @@
                   "end_lineno": 15,
                   "end_col": 58
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(xor_mask, -6, \"xor_invert\")",
@@ -1139,7 +1151,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "xor_mask",
-                    "id": "xor_mask"
+                    "id": "xor_mask",
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "UnaryOp",
@@ -1167,7 +1180,8 @@
                       "borrow_kind": "value",
                       "repr": "6",
                       "value": 6
-                    }
+                    },
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1181,7 +1195,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"xor_invert\"",
-                    "value": "xor_invert"
+                    "value": "xor_invert",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -1189,7 +1204,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -1232,7 +1248,7 @@
               "end_lineno": 16,
               "end_col": 56
             },
-            "resolved_type": "unknown",
+            "resolved_type": "bool",
             "casts": [],
             "borrow_kind": "value",
             "repr": "py_assert_all(checks, \"bitwise_invert_basic\")",
@@ -1263,7 +1279,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "checks",
-                "id": "checks"
+                "id": "checks",
+                "call_arg_type": "list[bool]"
               },
               {
                 "kind": "Constant",
@@ -1277,7 +1294,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "\"bitwise_invert_basic\"",
-                "value": "bitwise_invert_basic"
+                "value": "bitwise_invert_basic",
+                "call_arg_type": "str"
               }
             ],
             "keywords": [],

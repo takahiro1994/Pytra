@@ -187,7 +187,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "3",
-                "value": 3
+                "value": 3,
+                "call_arg_type": "int64"
               }
             ],
             "keywords": [],
@@ -281,7 +282,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "1",
-                "value": 1
+                "value": 1,
+                "call_arg_type": "int64"
               }
             ],
             "keywords": [],
@@ -408,7 +410,8 @@
                   "casts": [],
                   "borrow_kind": "readonly_ref",
                   "repr": "s",
-                  "id": "s"
+                  "id": "s",
+                  "call_arg_type": "Obj"
                 }
               ],
               "keywords": [],

@@ -72,7 +72,8 @@
         "end_lineno": 9,
         "end_col": 33
       },
-      "name": "ArgValue"
+      "name": "ArgValue",
+      "value": "str | bool | None"
     },
     {
       "kind": "ClassDef",
@@ -287,26 +288,14 @@
                   "declare": true
                 },
                 {
-                  "kind": "Expr",
+                  "kind": "Return",
                   "source_span": {
                     "lineno": 20,
                     "col": 12,
                     "end_lineno": 20,
                     "end_col": 18
                   },
-                  "value": {
-                    "kind": "Name",
-                    "source_span": {
-                      "lineno": 20,
-                      "col": 12,
-                      "end_lineno": 20,
-                      "end_col": 18
-                    },
-                    "casts": [],
-                    "borrow_kind": "value",
-                    "repr": "return",
-                    "id": "return"
-                  }
+                  "value": null
                 }
               ],
               "orelse": []
@@ -6553,6 +6542,14 @@
     "import_resolution": {
       "bindings": [
         {
+          "module_id": "pytra.typing",
+          "export_name": "cast",
+          "local_name": "cast",
+          "binding_kind": "symbol",
+          "source_file": "src/pytra/std/argparse.py",
+          "source_line": 4
+        },
+        {
           "module_id": "pytra.types",
           "export_name": "int64",
           "local_name": "int64",
@@ -6571,6 +6568,11 @@
       ],
       "qualified_refs": [
         {
+          "module_id": "pytra.typing",
+          "symbol": "cast",
+          "local_name": "cast"
+        },
+        {
           "module_id": "pytra.types",
           "symbol": "int64",
           "local_name": "int64"
@@ -6583,6 +6585,14 @@
       ]
     },
     "import_bindings": [
+      {
+        "module_id": "pytra.typing",
+        "export_name": "cast",
+        "local_name": "cast",
+        "binding_kind": "symbol",
+        "source_file": "src/pytra/std/argparse.py",
+        "source_line": 4
+      },
       {
         "module_id": "pytra.types",
         "export_name": "int64",
@@ -6602,6 +6612,11 @@
     ],
     "qualified_symbol_refs": [
       {
+        "module_id": "pytra.typing",
+        "symbol": "cast",
+        "local_name": "cast"
+      },
+      {
         "module_id": "pytra.types",
         "symbol": "int64",
         "local_name": "int64"
@@ -6614,6 +6629,10 @@
     ],
     "import_modules": {},
     "import_symbols": {
+      "cast": {
+        "module": "pytra.typing",
+        "name": "cast"
+      },
       "int64": {
         "module": "pytra.types",
         "name": "int64"

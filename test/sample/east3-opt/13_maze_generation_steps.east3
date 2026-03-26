@@ -3694,6 +3694,7 @@
                       "repr": "cell_w",
                       "id": "cell_w"
                     },
+                    "call_arg_type": "list[int64]",
                     "normalized_expr_version": "east3_expr_v1",
                     "normalized_expr": {
                       "kind": "BinOp",
@@ -3750,7 +3751,8 @@
                         "borrow_kind": "readonly_ref",
                         "repr": "cell_w",
                         "id": "cell_w"
-                      }
+                      },
+                      "call_arg_type": "list[int64]"
                     }
                   }
                 ],
@@ -4045,7 +4047,7 @@
               "end_lineno": 32,
               "end_col_offset": 43
             },
-            "resolved_type": "list[tuple[int64, int64]]",
+            "resolved_type": "list[tuple[int64,int64]]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "[(1, 1)]",
@@ -4093,7 +4095,13 @@
                   }
                 ]
               }
-            ]
+            ],
+            "type_expr_summary_v1": {
+              "schema_version": 1,
+              "kind": "GenericType",
+              "category": "static",
+              "mirror": "list[tuple[int64,int64]]"
+            }
           },
           "type_expr_summary_v1": {
             "schema_version": 1,
@@ -4378,7 +4386,7 @@
               "end_lineno": 35,
               "end_col_offset": 68
             },
-            "resolved_type": "list[tuple[int64, int64]]",
+            "resolved_type": "list[tuple[int64,int64]]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "[(2, 0), (-2, 0), (0, 2), (0, -2)]",
@@ -4583,7 +4591,13 @@
                   }
                 ]
               }
-            ]
+            ],
+            "type_expr_summary_v1": {
+              "schema_version": 1,
+              "kind": "GenericType",
+              "category": "static",
+              "mirror": "list[tuple[int64,int64]]"
+            }
           },
           "type_expr_summary_v1": {
             "schema_version": 1,
@@ -4700,7 +4714,13 @@
             "casts": [],
             "borrow_kind": "value",
             "repr": "[]",
-            "elements": []
+            "elements": [],
+            "type_expr_summary_v1": {
+              "schema_version": 1,
+              "kind": "GenericType",
+              "category": "static",
+              "mirror": "list[bytes]"
+            }
           },
           "type_expr_summary_v1": {
             "schema_version": 1,
@@ -5259,7 +5279,13 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "[]",
-                "elements": []
+                "elements": [],
+                "type_expr_summary_v1": {
+                  "schema_version": 1,
+                  "kind": "GenericType",
+                  "category": "static",
+                  "mirror": "list[tuple[int64,int64,int64,int64]]"
+                }
               },
               "type_expr_summary_v1": {
                 "schema_version": 1,
@@ -7210,7 +7236,8 @@
                                     "repr": "y",
                                     "id": "y"
                                   }
-                                ]
+                                ],
+                                "call_arg_type": "tuple[int64,int64,int64,int64]"
                               }
                             ],
                             "keywords": [],
@@ -7625,7 +7652,8 @@
                                         "repr": "y",
                                         "id": "y"
                                       }
-                                    ]
+                                    ],
+                                    "call_arg_type": "tuple[int64,int64,int64,int64]"
                                   }
                                 ],
                                 "keywords": [],
@@ -8012,7 +8040,8 @@
                                               }
                                             }
                                           }
-                                        ]
+                                        ],
+                                        "call_arg_type": "tuple[int64,int64,int64,int64]"
                                       }
                                     ],
                                     "keywords": [],
@@ -8297,7 +8326,8 @@
                                               }
                                             }
                                           }
-                                        ]
+                                        ],
+                                        "call_arg_type": "tuple[int64,int64,int64,int64]"
                                       }
                                     ],
                                     "keywords": [],
@@ -8801,7 +8831,8 @@
                       "casts": [],
                       "borrow_kind": "readonly_ref",
                       "repr": "candidates",
-                      "id": "candidates"
+                      "id": "candidates",
+                      "call_arg_type": "Obj"
                     }
                   ],
                   "keywords": [],
@@ -8890,7 +8921,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "candidates",
-                        "id": "candidates"
+                        "id": "candidates",
+                        "call_arg_type": "Obj"
                       }
                     ],
                     "keywords": [],
@@ -9468,7 +9500,8 @@
                                 "casts": [],
                                 "borrow_kind": "readonly_ref",
                                 "repr": "stack",
-                                "id": "stack"
+                                "id": "stack",
+                                "call_arg_type": "Obj"
                               }
                             ],
                             "keywords": [],
@@ -9553,7 +9586,8 @@
                                   "casts": [],
                                   "borrow_kind": "readonly_ref",
                                   "repr": "stack",
-                                  "id": "stack"
+                                  "id": "stack",
+                                  "call_arg_type": "Obj"
                                 }
                               ],
                               "keywords": [],
@@ -9751,7 +9785,8 @@
                                   "casts": [],
                                   "borrow_kind": "readonly_ref",
                                   "repr": "stack",
-                                  "id": "stack"
+                                  "id": "stack",
+                                  "call_arg_type": "Obj"
                                 }
                               ],
                               "keywords": [],
@@ -9827,7 +9862,8 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "candidates",
-                            "id": "candidates"
+                            "id": "candidates",
+                            "call_arg_type": "Obj"
                           }
                         ],
                         "keywords": [],
@@ -10020,7 +10056,8 @@
                                   "casts": [],
                                   "borrow_kind": "readonly_ref",
                                   "repr": "stack",
-                                  "id": "stack"
+                                  "id": "stack",
+                                  "call_arg_type": "Obj"
                                 }
                               ],
                               "keywords": [],
@@ -10095,7 +10132,8 @@
                               "casts": [],
                               "borrow_kind": "readonly_ref",
                               "repr": "candidates",
-                              "id": "candidates"
+                              "id": "candidates",
+                              "call_arg_type": "Obj"
                             }
                           ],
                           "keywords": [],
@@ -10956,7 +10994,8 @@
                             "repr": "ny",
                             "id": "ny"
                           }
-                        ]
+                        ],
+                        "call_arg_type": "tuple[int64,int64]"
                       }
                     ],
                     "keywords": [],
@@ -11386,7 +11425,8 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "grid",
-                            "id": "grid"
+                            "id": "grid",
+                            "call_arg_type": "list[list[int64]]"
                           },
                           {
                             "kind": "Name",
@@ -11400,7 +11440,8 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "cell_w",
-                            "id": "cell_w"
+                            "id": "cell_w",
+                            "call_arg_type": "int64"
                           },
                           {
                             "kind": "Name",
@@ -11414,7 +11455,8 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "cell_h",
-                            "id": "cell_h"
+                            "id": "cell_h",
+                            "call_arg_type": "int64"
                           },
                           {
                             "kind": "Name",
@@ -11428,10 +11470,12 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "scale",
-                            "id": "scale"
+                            "id": "scale",
+                            "call_arg_type": "int64"
                           }
                         ],
                         "keywords": [],
+                        "call_arg_type": "bytes",
                         "type_expr_summary_v1": {
                           "schema_version": 1,
                           "kind": "NamedType",
@@ -11802,7 +11846,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "grid",
-                    "id": "grid"
+                    "id": "grid",
+                    "call_arg_type": "list[list[int64]]"
                   },
                   {
                     "kind": "Name",
@@ -11816,7 +11861,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "cell_w",
-                    "id": "cell_w"
+                    "id": "cell_w",
+                    "call_arg_type": "int64"
                   },
                   {
                     "kind": "Name",
@@ -11830,7 +11876,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "cell_h",
-                    "id": "cell_h"
+                    "id": "cell_h",
+                    "call_arg_type": "int64"
                   },
                   {
                     "kind": "Name",
@@ -11844,10 +11891,12 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "scale",
-                    "id": "scale"
+                    "id": "scale",
+                    "call_arg_type": "int64"
                   }
                 ],
                 "keywords": [],
+                "call_arg_type": "bytes",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -11946,7 +11995,7 @@
               "end_lineno": 70,
               "end_col_offset": 103
             },
-            "resolved_type": "unknown",
+            "resolved_type": "None",
             "casts": [],
             "borrow_kind": "value",
             "repr": "save_gif(out_path, cell_w * scale, cell_h * scale, frames, grayscale_palette(), delay_cs=4, loop=0)",
@@ -11977,7 +12026,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "out_path",
-                "id": "out_path"
+                "id": "out_path",
+                "call_arg_type": "str"
               },
               {
                 "kind": "BinOp",
@@ -12020,6 +12070,7 @@
                   "repr": "scale",
                   "id": "scale"
                 },
+                "call_arg_type": "int64",
                 "normalized_expr_version": "east3_expr_v1",
                 "normalized_expr": {
                   "kind": "BinOp",
@@ -12061,7 +12112,8 @@
                     "borrow_kind": "readonly_ref",
                     "repr": "scale",
                     "id": "scale"
-                  }
+                  },
+                  "call_arg_type": "int64"
                 }
               },
               {
@@ -12105,6 +12157,7 @@
                   "repr": "scale",
                   "id": "scale"
                 },
+                "call_arg_type": "int64",
                 "normalized_expr_version": "east3_expr_v1",
                 "normalized_expr": {
                   "kind": "BinOp",
@@ -12146,7 +12199,8 @@
                     "borrow_kind": "readonly_ref",
                     "repr": "scale",
                     "id": "scale"
-                  }
+                  },
+                  "call_arg_type": "int64"
                 }
               },
               {
@@ -12161,7 +12215,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "frames",
-                "id": "frames"
+                "id": "frames",
+                "call_arg_type": "list[bytes]"
               },
               {
                 "kind": "Call",
@@ -12171,7 +12226,7 @@
                   "end_lineno": 70,
                   "end_col_offset": 82
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bytes",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "grayscale_palette()",
@@ -12196,12 +12251,12 @@
                 "runtime_module_id": "pytra.utils.gif",
                 "runtime_symbol": "grayscale_palette",
                 "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bytes",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
-                  "kind": "DynamicType",
-                  "category": "dynamic",
-                  "mirror": "unknown",
-                  "dynamic_name": "unknown"
+                  "kind": "NamedType",
+                  "category": "static",
+                  "mirror": "bytes"
                 }
               }
             ],
@@ -12220,7 +12275,8 @@
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "4",
-                  "value": 4
+                  "value": 4,
+                  "call_arg_type": "int64"
                 }
               },
               {
@@ -12237,7 +12293,8 @@
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "0",
-                  "value": 0
+                  "value": 0,
+                  "call_arg_type": "int64"
                 }
               }
             ],
@@ -12248,10 +12305,9 @@
             "runtime_call_adapter_kind": "image.save_gif.keyword_defaults",
             "type_expr_summary_v1": {
               "schema_version": 1,
-              "kind": "DynamicType",
-              "category": "dynamic",
-              "mirror": "unknown",
-              "dynamic_name": "unknown"
+              "kind": "NamedType",
+              "category": "static",
+              "mirror": "None"
             }
           },
           "meta": {
@@ -12686,7 +12742,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "frames",
-                    "id": "frames"
+                    "id": "frames",
+                    "call_arg_type": "Obj"
                   }
                 ],
                 "keywords": [],

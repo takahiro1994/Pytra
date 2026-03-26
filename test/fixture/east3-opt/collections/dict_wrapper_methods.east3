@@ -161,7 +161,13 @@
                   "value": 2
                 }
               }
-            ]
+            ],
+            "type_expr_summary_v1": {
+              "schema_version": 1,
+              "kind": "GenericType",
+              "category": "static",
+              "mirror": "dict[str,int64]"
+            }
           },
           "type_expr_summary_v1": {
             "schema_version": 1,
@@ -294,6 +300,7 @@
                   "borrow_kind": "value",
                   "repr": "\"x\"",
                   "value": "x",
+                  "call_arg_type": "str",
                   "dict_key_verified": true
                 },
                 {
@@ -308,7 +315,8 @@
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "99",
-                  "value": 99
+                  "value": 99,
+                  "call_arg_type": "int64"
                 }
               ],
               "keywords": [],
@@ -427,6 +435,7 @@
                     "borrow_kind": "value",
                     "repr": "\"x\"",
                     "value": "x",
+                    "call_arg_type": "str",
                     "dict_key_verified": true
                   },
                   {
@@ -441,7 +450,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "99",
-                    "value": 99
+                    "value": 99,
+                    "call_arg_type": "int64"
                   }
                 ],
                 "keywords": [],
@@ -624,6 +634,7 @@
                   "borrow_kind": "value",
                   "repr": "\"a\"",
                   "value": "a",
+                  "call_arg_type": "str",
                   "dict_key_verified": true
                 },
                 {
@@ -638,7 +649,8 @@
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "0",
-                  "value": 0
+                  "value": 0,
+                  "call_arg_type": "int64"
                 }
               ],
               "keywords": [],
@@ -757,6 +769,7 @@
                     "borrow_kind": "value",
                     "repr": "\"a\"",
                     "value": "a",
+                    "call_arg_type": "str",
                     "dict_key_verified": true
                   },
                   {
@@ -771,7 +784,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "0",
-                    "value": 0
+                    "value": 0,
+                    "call_arg_type": "int64"
                   }
                 ],
                 "keywords": [],

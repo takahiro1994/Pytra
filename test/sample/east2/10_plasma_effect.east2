@@ -349,7 +349,7 @@
               "end_lineno": 16,
               "end_col": 28
             },
-            "resolved_type": "list[unknown]",
+            "resolved_type": "list[bytes]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "[]",
@@ -975,7 +975,8 @@
                                   "casts": [],
                                   "borrow_kind": "value",
                                   "repr": "math",
-                                  "id": "math"
+                                  "id": "math",
+                                  "runtime_module_id": "pytra.std.math"
                                 },
                                 "attr": "sin"
                               },
@@ -1090,7 +1091,8 @@
                                     "borrow_kind": "value",
                                     "repr": "0.045",
                                     "value": 0.045
-                                  }
+                                  },
+                                  "call_arg_type": "float64"
                                 }
                               ],
                               "keywords": [],
@@ -1138,7 +1140,8 @@
                                   "casts": [],
                                   "borrow_kind": "value",
                                   "repr": "math",
-                                  "id": "math"
+                                  "id": "math",
+                                  "runtime_module_id": "pytra.std.math"
                                 },
                                 "attr": "sin"
                               },
@@ -1253,7 +1256,8 @@
                                     "borrow_kind": "value",
                                     "repr": "0.05",
                                     "value": 0.05
-                                  }
+                                  },
+                                  "call_arg_type": "float64"
                                 }
                               ],
                               "keywords": [],
@@ -1302,7 +1306,8 @@
                                 "casts": [],
                                 "borrow_kind": "value",
                                 "repr": "math",
-                                "id": "math"
+                                "id": "math",
+                                "runtime_module_id": "pytra.std.math"
                               },
                               "attr": "sin"
                             },
@@ -1445,7 +1450,8 @@
                                   "borrow_kind": "value",
                                   "repr": "0.03",
                                   "value": 0.03
-                                }
+                                },
+                                "call_arg_type": "float64"
                               }
                             ],
                             "keywords": [],
@@ -1494,7 +1500,8 @@
                               "casts": [],
                               "borrow_kind": "value",
                               "repr": "math",
-                              "id": "math"
+                              "id": "math",
+                              "runtime_module_id": "pytra.std.math"
                             },
                             "attr": "sin"
                           },
@@ -1559,7 +1566,8 @@
                                       "casts": [],
                                       "borrow_kind": "value",
                                       "repr": "math",
-                                      "id": "math"
+                                      "id": "math",
+                                      "runtime_module_id": "pytra.std.math"
                                     },
                                     "attr": "sqrt"
                                   },
@@ -1660,7 +1668,8 @@
                                           "repr": "dy",
                                           "id": "dy"
                                         }
-                                      }
+                                      },
+                                      "call_arg_type": "float64"
                                     }
                                   ],
                                   "keywords": [],
@@ -1736,7 +1745,8 @@
                                   "repr": "0.18",
                                   "value": 0.18
                                 }
-                              }
+                              },
+                              "call_arg_type": "float64"
                             }
                           ],
                           "keywords": [],
@@ -1897,7 +1907,8 @@
                                 "repr": "8.0",
                                 "value": 8.0
                               }
-                            }
+                            },
+                            "call_arg_type": "Obj"
                           }
                         ],
                         "keywords": [],
@@ -2323,7 +2334,8 @@
                         "id": "frame"
                       }
                     ],
-                    "keywords": []
+                    "keywords": [],
+                    "call_arg_type": "bytes"
                   }
                 ],
                 "keywords": [],
@@ -2375,7 +2387,7 @@
               "end_lineno": 39,
               "end_col": 77
             },
-            "resolved_type": "unknown",
+            "resolved_type": "None",
             "casts": [],
             "borrow_kind": "value",
             "repr": "save_gif(out_path, w, h, frames, grayscale_palette(), delay_cs=3, loop=0)",
@@ -2406,7 +2418,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "out_path",
-                "id": "out_path"
+                "id": "out_path",
+                "call_arg_type": "str"
               },
               {
                 "kind": "Name",
@@ -2420,7 +2433,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "w",
-                "id": "w"
+                "id": "w",
+                "call_arg_type": "int64"
               },
               {
                 "kind": "Name",
@@ -2434,7 +2448,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "h",
-                "id": "h"
+                "id": "h",
+                "call_arg_type": "int64"
               },
               {
                 "kind": "Name",
@@ -2448,7 +2463,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "frames",
-                "id": "frames"
+                "id": "frames",
+                "call_arg_type": "list[bytes]"
               },
               {
                 "kind": "Call",
@@ -2458,7 +2474,7 @@
                   "end_lineno": 39,
                   "end_col": 56
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bytes",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "grayscale_palette()",
@@ -2482,7 +2498,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.gif",
                 "runtime_symbol": "grayscale_palette",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bytes"
               }
             ],
             "keywords": [
@@ -2500,7 +2517,8 @@
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "3",
-                  "value": 3
+                  "value": 3,
+                  "call_arg_type": "int64"
                 }
               },
               {
@@ -2517,7 +2535,8 @@
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "0",
-                  "value": 0
+                  "value": 0,
+                  "call_arg_type": "int64"
                 }
               }
             ],

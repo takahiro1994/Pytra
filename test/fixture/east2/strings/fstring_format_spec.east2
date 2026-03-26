@@ -1829,7 +1829,7 @@
               "end_lineno": 52,
               "end_col": 48
             },
-            "resolved_type": "unknown",
+            "resolved_type": "bool",
             "casts": [],
             "borrow_kind": "value",
             "repr": "py_assert_stdout(expected, _case_main)",
@@ -1860,7 +1860,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "expected",
-                "id": "expected"
+                "id": "expected",
+                "call_arg_type": "list[str]"
               },
               {
                 "kind": "Name",
@@ -1874,7 +1875,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "_case_main",
-                "id": "_case_main"
+                "id": "_case_main",
+                "call_arg_type": "object"
               }
             ],
             "keywords": [],

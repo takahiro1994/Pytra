@@ -37,14 +37,14 @@
               "end_lineno": 5,
               "end_col_offset": 10
             },
-            "resolved_type": "callable[unknown]",
+            "resolved_type": "callable[[float64,float64,float64],float64]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "matrix",
             "id": "matrix"
           },
           "declare": true,
-          "decl_type": "callable[unknown]",
+          "decl_type": "callable[[float64,float64,float64],float64]",
           "declare_init": true,
           "value": {
             "kind": "Lambda",
@@ -62,13 +62,13 @@
                 "kind": "arg",
                 "arg": "nout",
                 "annotation": null,
-                "resolved_type": "unknown"
+                "resolved_type": "float64"
               },
               {
                 "kind": "arg",
                 "arg": "nin",
                 "annotation": null,
-                "resolved_type": "unknown"
+                "resolved_type": "float64"
               },
               {
                 "kind": "arg",
@@ -82,12 +82,13 @@
                     "end_lineno": 5,
                     "end_col_offset": 39
                   },
+                  "resolved_type": "float64",
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "0.08",
                   "value": 0.08
                 },
-                "resolved_type": "unknown"
+                "resolved_type": "float64"
               }
             ],
             "body": {
@@ -98,7 +99,7 @@
                 "end_lineno": 5,
                 "end_col_offset": 57
               },
-              "resolved_type": "unknown",
+              "resolved_type": "float64",
               "casts": [],
               "borrow_kind": "value",
               "repr": "nout + nin * std",
@@ -110,9 +111,9 @@
                   "end_lineno": 5,
                   "end_col_offset": 45
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "float64",
                 "casts": [],
-                "borrow_kind": "value",
+                "borrow_kind": "readonly_ref",
                 "repr": "nout",
                 "id": "nout"
               },
@@ -125,7 +126,7 @@
                   "end_lineno": 5,
                   "end_col_offset": 57
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "float64",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "nin * std",
@@ -137,9 +138,9 @@
                     "end_lineno": 5,
                     "end_col_offset": 51
                   },
-                  "resolved_type": "unknown",
+                  "resolved_type": "float64",
                   "casts": [],
-                  "borrow_kind": "value",
+                  "borrow_kind": "readonly_ref",
                   "repr": "nin",
                   "id": "nin"
                 },
@@ -152,9 +153,9 @@
                     "end_lineno": 5,
                     "end_col_offset": 57
                   },
-                  "resolved_type": "unknown",
+                  "resolved_type": "float64",
                   "casts": [],
-                  "borrow_kind": "value",
+                  "borrow_kind": "readonly_ref",
                   "repr": "std",
                   "id": "std"
                 },
@@ -167,7 +168,7 @@
                     "end_lineno": 5,
                     "end_col_offset": 57
                   },
-                  "resolved_type": "unknown",
+                  "resolved_type": "float64",
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "nin * std",
@@ -179,9 +180,9 @@
                       "end_lineno": 5,
                       "end_col_offset": 51
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "float64",
                     "casts": [],
-                    "borrow_kind": "value",
+                    "borrow_kind": "readonly_ref",
                     "repr": "nin",
                     "id": "nin"
                   },
@@ -194,9 +195,9 @@
                       "end_lineno": 5,
                       "end_col_offset": 57
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "float64",
                     "casts": [],
-                    "borrow_kind": "value",
+                    "borrow_kind": "readonly_ref",
                     "repr": "std",
                     "id": "std"
                   }
@@ -211,7 +212,7 @@
                   "end_lineno": 5,
                   "end_col_offset": 57
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "float64",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "nout + nin * std",
@@ -223,9 +224,9 @@
                     "end_lineno": 5,
                     "end_col_offset": 45
                   },
-                  "resolved_type": "unknown",
+                  "resolved_type": "float64",
                   "casts": [],
-                  "borrow_kind": "value",
+                  "borrow_kind": "readonly_ref",
                   "repr": "nout",
                   "id": "nout"
                 },
@@ -238,7 +239,7 @@
                     "end_lineno": 5,
                     "end_col_offset": 57
                   },
-                  "resolved_type": "unknown",
+                  "resolved_type": "float64",
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "nin * std",
@@ -250,9 +251,9 @@
                       "end_lineno": 5,
                       "end_col_offset": 51
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "float64",
                     "casts": [],
-                    "borrow_kind": "value",
+                    "borrow_kind": "readonly_ref",
                     "repr": "nin",
                     "id": "nin"
                   },
@@ -265,23 +266,33 @@
                       "end_lineno": 5,
                       "end_col_offset": 57
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "float64",
                     "casts": [],
-                    "borrow_kind": "value",
+                    "borrow_kind": "readonly_ref",
                     "repr": "std",
                     "id": "std"
                   }
                 }
               }
             },
-            "return_type": "unknown",
-            "resolved_type": "callable[unknown]"
+            "return_type": "float64",
+            "arg_order": [
+              "nout",
+              "nin",
+              "std"
+            ],
+            "arg_types": {
+              "nout": "float64",
+              "nin": "float64",
+              "std": "float64"
+            },
+            "resolved_type": "callable[[float64,float64,float64],float64]"
           },
           "type_expr_summary_v1": {
             "schema_version": 1,
             "kind": "GenericType",
             "category": "static",
-            "mirror": "callable[unknown]"
+            "mirror": "callable[[float64,float64,float64],float64]"
           },
           "meta": {
             "lifetime_node_id": "n2",
@@ -353,7 +364,7 @@
                   "end_lineno": 6,
                   "end_col_offset": 22
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "float64",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "matrix(1, 2)",
@@ -365,7 +376,7 @@
                     "end_lineno": 6,
                     "end_col_offset": 16
                   },
-                  "resolved_type": "unknown",
+                  "resolved_type": "callable[[float64,float64,float64],float64]",
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "matrix",
@@ -381,7 +392,14 @@
                       "end_col_offset": 18
                     },
                     "resolved_type": "int64",
-                    "casts": [],
+                    "casts": [
+                      {
+                        "on": "body",
+                        "from": "int64",
+                        "to": "float64",
+                        "reason": "numeric_promotion"
+                      }
+                    ],
                     "borrow_kind": "value",
                     "repr": "1",
                     "value": 1
@@ -395,19 +413,39 @@
                       "end_col_offset": 21
                     },
                     "resolved_type": "int64",
-                    "casts": [],
+                    "casts": [
+                      {
+                        "on": "body",
+                        "from": "int64",
+                        "to": "float64",
+                        "reason": "numeric_promotion"
+                      }
+                    ],
                     "borrow_kind": "value",
                     "repr": "2",
                     "value": 2
+                  },
+                  {
+                    "kind": "Constant",
+                    "source_span": {
+                      "lineno": 5,
+                      "col_offset": 35,
+                      "end_lineno": 5,
+                      "end_col_offset": 39
+                    },
+                    "resolved_type": "float64",
+                    "casts": [],
+                    "borrow_kind": "value",
+                    "repr": "0.08",
+                    "value": 0.08
                   }
                 ],
                 "keywords": [],
                 "type_expr_summary_v1": {
                   "schema_version": 1,
-                  "kind": "DynamicType",
-                  "category": "dynamic",
-                  "mirror": "unknown",
-                  "dynamic_name": "unknown"
+                  "kind": "NamedType",
+                  "category": "static",
+                  "mirror": "float64"
                 }
               }
             ],
@@ -487,7 +525,7 @@
                   "end_lineno": 7,
                   "end_col_offset": 27
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "float64",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "matrix(1, 2, 0.5)",
@@ -499,7 +537,7 @@
                     "end_lineno": 7,
                     "end_col_offset": 16
                   },
-                  "resolved_type": "unknown",
+                  "resolved_type": "callable[[float64,float64,float64],float64]",
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "matrix",
@@ -515,7 +553,14 @@
                       "end_col_offset": 18
                     },
                     "resolved_type": "int64",
-                    "casts": [],
+                    "casts": [
+                      {
+                        "on": "body",
+                        "from": "int64",
+                        "to": "float64",
+                        "reason": "numeric_promotion"
+                      }
+                    ],
                     "borrow_kind": "value",
                     "repr": "1",
                     "value": 1
@@ -529,7 +574,14 @@
                       "end_col_offset": 21
                     },
                     "resolved_type": "int64",
-                    "casts": [],
+                    "casts": [
+                      {
+                        "on": "body",
+                        "from": "int64",
+                        "to": "float64",
+                        "reason": "numeric_promotion"
+                      }
+                    ],
                     "borrow_kind": "value",
                     "repr": "2",
                     "value": 2
@@ -552,10 +604,9 @@
                 "keywords": [],
                 "type_expr_summary_v1": {
                   "schema_version": 1,
-                  "kind": "DynamicType",
-                  "category": "dynamic",
-                  "mirror": "unknown",
-                  "dynamic_name": "unknown"
+                  "kind": "NamedType",
+                  "category": "static",
+                  "mirror": "float64"
                 }
               }
             ],

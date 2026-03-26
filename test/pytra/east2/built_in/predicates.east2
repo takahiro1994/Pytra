@@ -166,7 +166,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "value",
-                    "id": "value"
+                    "id": "value",
+                    "call_arg_type": "Obj"
                   }
                 ],
                 "keywords": [],
@@ -383,7 +384,8 @@
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "value",
-                      "id": "value"
+                      "id": "value",
+                      "call_arg_type": "Obj"
                     }
                   ],
                   "keywords": [],

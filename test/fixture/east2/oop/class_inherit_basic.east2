@@ -542,7 +542,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "c",
-                "id": "c"
+                "id": "c",
+                "call_arg_type": "Obj"
               },
               {
                 "kind": "Name",
@@ -556,7 +557,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "Base",
-                "id": "Base"
+                "id": "Base",
+                "call_arg_type": "type"
               }
             ],
             "keywords": [],

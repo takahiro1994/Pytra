@@ -34,7 +34,7 @@
       "module_id": "pytra.utils.png",
       "input": "/workspace/Pytra/src/runtime/east/utils/png.east",
       "output": "east3/pytra/utils/png.east3.json",
-      "source_path": "src/pytra/utils/png.py",
+      "source_path": "/workspace/Pytra/src/pytra/utils/png.py",
       "is_entry": false,
       "module_kind": "runtime"
     }

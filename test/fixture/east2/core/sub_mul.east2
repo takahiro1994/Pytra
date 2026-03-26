@@ -388,7 +388,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "9",
-                    "value": 9
+                    "value": 9,
+                    "call_arg_type": "int64"
                   },
                   {
                     "kind": "Constant",
@@ -402,7 +403,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "4",
-                    "value": 4
+                    "value": 4,
+                    "call_arg_type": "int64"
                   }
                 ],
                 "keywords": []
@@ -492,7 +494,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "9",
-                    "value": 9
+                    "value": 9,
+                    "call_arg_type": "int64"
                   },
                   {
                     "kind": "Constant",
@@ -506,7 +509,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "4",
-                    "value": 4
+                    "value": 4,
+                    "call_arg_type": "int64"
                   }
                 ],
                 "keywords": []
@@ -578,7 +582,7 @@
               "end_lineno": 19,
               "end_col": 54
             },
-            "resolved_type": "unknown",
+            "resolved_type": "bool",
             "casts": [],
             "borrow_kind": "value",
             "repr": "py_assert_stdout(['10', '2.25'], _case_main)",
@@ -638,7 +642,8 @@
                     "repr": "'2.25'",
                     "value": "2.25"
                   }
-                ]
+                ],
+                "call_arg_type": "list[str]"
               },
               {
                 "kind": "Name",
@@ -652,7 +657,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "_case_main",
-                "id": "_case_main"
+                "id": "_case_main",
+                "call_arg_type": "object"
               }
             ],
             "keywords": [],

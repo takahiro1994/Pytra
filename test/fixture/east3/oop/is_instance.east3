@@ -329,7 +329,8 @@
                   "casts": [],
                   "borrow_kind": "readonly_ref",
                   "repr": "cat",
-                  "id": "cat"
+                  "id": "cat",
+                  "call_arg_type": "Obj"
                 },
                 "expected_type_id": {
                   "kind": "Name",
@@ -343,7 +344,8 @@
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "Dog",
-                  "id": "Dog"
+                  "id": "Dog",
+                  "call_arg_type": "type"
                 },
                 "source_span": {
                   "lineno": 21,
@@ -437,7 +439,8 @@
                   "casts": [],
                   "borrow_kind": "readonly_ref",
                   "repr": "cat",
-                  "id": "cat"
+                  "id": "cat",
+                  "call_arg_type": "Obj"
                 },
                 "expected_type_id": {
                   "kind": "Name",
@@ -451,7 +454,8 @@
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "Animal",
-                  "id": "Animal"
+                  "id": "Animal",
+                  "call_arg_type": "type"
                 },
                 "source_span": {
                   "lineno": 22,
@@ -545,7 +549,8 @@
                   "casts": [],
                   "borrow_kind": "readonly_ref",
                   "repr": "dog",
-                  "id": "dog"
+                  "id": "dog",
+                  "call_arg_type": "Obj"
                 },
                 "expected_type_id": {
                   "kind": "Name",
@@ -559,7 +564,8 @@
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "Cat",
-                  "id": "Cat"
+                  "id": "Cat",
+                  "call_arg_type": "type"
                 },
                 "source_span": {
                   "lineno": 23,
@@ -653,7 +659,8 @@
                   "casts": [],
                   "borrow_kind": "readonly_ref",
                   "repr": "dog",
-                  "id": "dog"
+                  "id": "dog",
+                  "call_arg_type": "Obj"
                 },
                 "expected_type_id": {
                   "kind": "Name",
@@ -667,7 +674,8 @@
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "Animal",
-                  "id": "Animal"
+                  "id": "Animal",
+                  "call_arg_type": "type"
                 },
                 "source_span": {
                   "lineno": 24,
@@ -766,7 +774,7 @@
               "end_lineno": 27,
               "end_col_offset": 71
             },
-            "resolved_type": "unknown",
+            "resolved_type": "bool",
             "casts": [],
             "borrow_kind": "value",
             "repr": "py_assert_stdout(['False','True','False','True'], _case_main)",
@@ -854,7 +862,14 @@
                     "repr": "'True'",
                     "value": "True"
                   }
-                ]
+                ],
+                "call_arg_type": "list[str]",
+                "type_expr_summary_v1": {
+                  "schema_version": 1,
+                  "kind": "GenericType",
+                  "category": "static",
+                  "mirror": "list[str]"
+                }
               },
               {
                 "kind": "Name",
@@ -868,7 +883,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "_case_main",
-                "id": "_case_main"
+                "id": "_case_main",
+                "call_arg_type": "object"
               }
             ],
             "keywords": [],
@@ -879,10 +895,9 @@
             "runtime_call_adapter_kind": "extern_delegate",
             "type_expr_summary_v1": {
               "schema_version": 1,
-              "kind": "DynamicType",
-              "category": "dynamic",
-              "mirror": "unknown",
-              "dynamic_name": "unknown"
+              "kind": "NamedType",
+              "category": "static",
+              "mirror": "bool"
             }
           }
         ],

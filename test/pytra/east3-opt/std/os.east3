@@ -137,7 +137,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "os",
-                "id": "os"
+                "id": "os",
+                "runtime_module_id": "pytra.std.os"
               },
               "attr": "getcwd"
             },
@@ -147,7 +148,7 @@
             "resolved_runtime_source": "module_attr",
             "runtime_module_id": "pytra.std.os",
             "runtime_symbol": "getcwd",
-            "semantic_tag": "stdlib.fn.getcwd",
+            "semantic_tag": "stdlib.method.getcwd",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",
@@ -358,7 +359,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "path",
-                    "id": "path"
+                    "id": "path",
+                    "runtime_module_id": "pytra.std.os_path"
                   },
                   "attr": "exists"
                 },
@@ -375,7 +377,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "p",
-                    "id": "p"
+                    "id": "p",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -383,7 +386,7 @@
                 "resolved_runtime_source": "module_attr",
                 "runtime_module_id": "pytra.std.os_path",
                 "runtime_symbol": "exists",
-                "semantic_tag": "stdlib.fn.path_exists",
+                "semantic_tag": "stdlib.method.exists",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -395,45 +398,20 @@
           },
           "body": [
             {
-              "kind": "Expr",
+              "kind": "Return",
               "source_span": {
                 "lineno": 18,
                 "col_offset": 8,
                 "end_lineno": 18,
                 "end_col_offset": 14
               },
-              "value": {
-                "kind": "Name",
-                "source_span": {
-                  "lineno": 18,
-                  "col_offset": 8,
-                  "end_lineno": 18,
-                  "end_col_offset": 14
-                },
-                "resolved_type": "unknown",
-                "casts": [],
-                "borrow_kind": "value",
-                "repr": "return",
-                "id": "return"
-              },
               "meta": {
                 "lifetime_node_id": "n2",
                 "lifetime_defs": [],
-                "lifetime_uses": [
-                  "return"
-                ],
-                "lifetime_live_in": [
-                  "os",
-                  "p",
-                  "return"
-                ],
-                "lifetime_live_out": [
-                  "os",
-                  "p"
-                ],
-                "lifetime_last_use_vars": [
-                  "return"
-                ]
+                "lifetime_uses": [],
+                "lifetime_live_in": [],
+                "lifetime_live_out": [],
+                "lifetime_last_use_vars": []
               }
             }
           ],
@@ -450,13 +428,11 @@
               "exist_ok",
               "os",
               "p",
-              "path",
-              "return"
+              "path"
             ],
             "lifetime_live_out": [
               "os",
-              "p",
-              "return"
+              "p"
             ],
             "lifetime_last_use_vars": [
               "exist_ok",
@@ -508,7 +484,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "os",
-                "id": "os"
+                "id": "os",
+                "runtime_module_id": "pytra.std.os"
               },
               "attr": "mkdir"
             },
@@ -525,7 +502,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "p",
-                "id": "p"
+                "id": "p",
+                "call_arg_type": "str"
               },
               {
                 "kind": "Constant",
@@ -547,7 +525,7 @@
             "resolved_runtime_source": "module_attr",
             "runtime_module_id": "pytra.std.os",
             "runtime_symbol": "mkdir",
-            "semantic_tag": "stdlib.fn.mkdir",
+            "semantic_tag": "stdlib.method.mkdir",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",
@@ -631,14 +609,10 @@
             },
             {
               "id": "n2",
-              "kind": "Expr",
+              "kind": "Return",
               "defs": [],
-              "uses": [
-                "return"
-              ],
-              "succ": [
-                "n0"
-              ]
+              "uses": [],
+              "succ": []
             }
           ],
           "def_use": {
@@ -656,9 +630,6 @@
               ],
               "path": [
                 "n1"
-              ],
-              "return": [
-                "n2"
               ]
             }
           },
@@ -684,12 +655,10 @@
               ],
               "live_in_nodes": [
                 "n0",
-                "n1",
-                "n2"
+                "n1"
               ],
               "live_out_nodes": [
-                "n1",
-                "n2"
+                "n1"
               ],
               "last_use_nodes": [
                 "n0"
@@ -704,12 +673,10 @@
               ],
               "live_in_nodes": [
                 "n0",
-                "n1",
-                "n2"
+                "n1"
               ],
               "live_out_nodes": [
-                "n1",
-                "n2"
+                "n1"
               ],
               "last_use_nodes": [
                 "n0"
@@ -727,23 +694,6 @@
               "live_out_nodes": [],
               "last_use_nodes": [
                 "n1"
-              ],
-              "lifetime_class": "local_non_escape_candidate"
-            },
-            "return": {
-              "def_nodes": [],
-              "use_nodes": [
-                "n2"
-              ],
-              "live_in_nodes": [
-                "n1",
-                "n2"
-              ],
-              "live_out_nodes": [
-                "n1"
-              ],
-              "last_use_nodes": [
-                "n2"
               ],
               "lifetime_class": "local_non_escape_candidate"
             }
@@ -850,7 +800,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "os",
-                "id": "os"
+                "id": "os",
+                "runtime_module_id": "pytra.std.os"
               },
               "attr": "makedirs"
             },
@@ -867,7 +818,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "p",
-                "id": "p"
+                "id": "p",
+                "call_arg_type": "str"
               },
               {
                 "kind": "Name",
@@ -881,7 +833,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "exist_ok",
-                "id": "exist_ok"
+                "id": "exist_ok",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -889,7 +842,7 @@
             "resolved_runtime_source": "module_attr",
             "runtime_module_id": "pytra.std.os",
             "runtime_symbol": "makedirs",
-            "semantic_tag": "stdlib.fn.makedirs",
+            "semantic_tag": "stdlib.method.makedirs",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",

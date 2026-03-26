@@ -23,26 +23,10 @@
       "module_kind": "runtime"
     },
     {
-      "module_id": "pytra.built_in.scalar_ops",
-      "input": "/workspace/Pytra/src/runtime/east/built_in/scalar_ops.east",
-      "output": "east3/pytra/built_in/scalar_ops.east3.json",
-      "source_path": "/workspace/Pytra/src/pytra/built_in/scalar_ops.py",
-      "is_entry": false,
-      "module_kind": "runtime"
-    },
-    {
-      "module_id": "pytra.built_in.sequence",
-      "input": "/workspace/Pytra/src/runtime/east/built_in/sequence.east",
-      "output": "east3/pytra/built_in/sequence.east3.json",
-      "source_path": "/workspace/Pytra/src/pytra/built_in/sequence.py",
-      "is_entry": false,
-      "module_kind": "runtime"
-    },
-    {
       "module_id": "pytra.std.json",
       "input": "/workspace/Pytra/src/runtime/east/std/json.east",
       "output": "east3/pytra/std/json.east3.json",
-      "source_path": "/workspace/Pytra/src/pytra/std/json.py",
+      "source_path": "std/json.py",
       "is_entry": false,
       "module_kind": "runtime"
     },
@@ -50,7 +34,7 @@
       "module_id": "pytra.utils.assertions",
       "input": "/workspace/Pytra/src/runtime/east/utils/assertions.east",
       "output": "east3/pytra/utils/assertions.east3.json",
-      "source_path": "src/pytra/utils/assertions.py",
+      "source_path": "/workspace/Pytra/src/pytra/utils/assertions.py",
       "is_entry": false,
       "module_kind": "runtime"
     }
@@ -78,11 +62,6 @@
         "pytra.utils.assertions::py_assert_eq"
       ],
       "pytra.built_in.io_ops::py_print": [],
-      "pytra.built_in.scalar_ops::py_chr": [],
-      "pytra.built_in.scalar_ops::py_ord": [],
-      "pytra.built_in.scalar_ops::py_to_int64_base": [],
-      "pytra.built_in.sequence::py_range": [],
-      "pytra.built_in.sequence::py_repeat": [],
       "pytra.std.json::JsonArr.__init__": [],
       "pytra.std.json::JsonArr.get": [],
       "pytra.std.json::JsonArr.get_arr": [],
@@ -220,21 +199,6 @@
       ],
       [
         "pytra.built_in.io_ops::py_print"
-      ],
-      [
-        "pytra.built_in.scalar_ops::py_chr"
-      ],
-      [
-        "pytra.built_in.scalar_ops::py_ord"
-      ],
-      [
-        "pytra.built_in.scalar_ops::py_to_int64_base"
-      ],
-      [
-        "pytra.built_in.sequence::py_range"
-      ],
-      [
-        "pytra.built_in.sequence::py_repeat"
       ],
       [
         "pytra.std.json::JsonArr.__init__"

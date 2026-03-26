@@ -108,7 +108,8 @@
               "casts": [],
               "borrow_kind": "readonly_ref",
               "repr": "x",
-              "id": "x"
+              "id": "x",
+              "call_arg_type": "Obj"
             },
             "expected_type_id": {
               "kind": "Name",
@@ -122,7 +123,8 @@
               "casts": [],
               "borrow_kind": "value",
               "repr": "Base",
-              "id": "Base"
+              "id": "Base",
+              "call_arg_type": "type"
             },
             "source_span": {
               "lineno": 8,
@@ -390,18 +392,55 @@
             },
             "args": [
               {
-                "kind": "Name",
+                "kind": "Box",
+                "resolved_type": "object",
+                "borrow_kind": "value",
+                "casts": [],
+                "value": {
+                  "kind": "Name",
+                  "source_span": {
+                    "lineno": 13,
+                    "col_offset": 16,
+                    "end_lineno": 13,
+                    "end_col_offset": 17
+                  },
+                  "resolved_type": "Base",
+                  "casts": [],
+                  "borrow_kind": "readonly_ref",
+                  "repr": "b",
+                  "id": "b",
+                  "call_arg_type": "object"
+                },
                 "source_span": {
                   "lineno": 13,
                   "col_offset": 16,
                   "end_lineno": 13,
                   "end_col_offset": 17
                 },
-                "resolved_type": "Base",
-                "casts": [],
-                "borrow_kind": "readonly_ref",
                 "repr": "b",
-                "id": "b"
+                "type_expr_summary_v1": {
+                  "schema_version": 1,
+                  "kind": "DynamicType",
+                  "category": "dynamic",
+                  "mirror": "object",
+                  "dynamic_name": "object"
+                },
+                "bridge_lane_v1": {
+                  "schema_version": 1,
+                  "target": {
+                    "kind": "DynamicType",
+                    "category": "dynamic",
+                    "mirror": "object",
+                    "dynamic_name": "object"
+                  },
+                  "target_category": "dynamic",
+                  "value": {
+                    "kind": "NamedType",
+                    "category": "static",
+                    "mirror": "Base"
+                  },
+                  "value_category": "static"
+                }
               }
             ],
             "keywords": [],
@@ -493,18 +532,55 @@
             },
             "args": [
               {
-                "kind": "Name",
+                "kind": "Box",
+                "resolved_type": "object",
+                "borrow_kind": "value",
+                "casts": [],
+                "value": {
+                  "kind": "Name",
+                  "source_span": {
+                    "lineno": 14,
+                    "col_offset": 16,
+                    "end_lineno": 14,
+                    "end_col_offset": 17
+                  },
+                  "resolved_type": "Child",
+                  "casts": [],
+                  "borrow_kind": "readonly_ref",
+                  "repr": "c",
+                  "id": "c",
+                  "call_arg_type": "object"
+                },
                 "source_span": {
                   "lineno": 14,
                   "col_offset": 16,
                   "end_lineno": 14,
                   "end_col_offset": 17
                 },
-                "resolved_type": "Child",
-                "casts": [],
-                "borrow_kind": "readonly_ref",
                 "repr": "c",
-                "id": "c"
+                "type_expr_summary_v1": {
+                  "schema_version": 1,
+                  "kind": "DynamicType",
+                  "category": "dynamic",
+                  "mirror": "object",
+                  "dynamic_name": "object"
+                },
+                "bridge_lane_v1": {
+                  "schema_version": 1,
+                  "target": {
+                    "kind": "DynamicType",
+                    "category": "dynamic",
+                    "mirror": "object",
+                    "dynamic_name": "object"
+                  },
+                  "target_category": "dynamic",
+                  "value": {
+                    "kind": "NamedType",
+                    "category": "static",
+                    "mirror": "Child"
+                  },
+                  "value_category": "static"
+                }
               }
             ],
             "keywords": [],
@@ -585,7 +661,8 @@
               "casts": [],
               "borrow_kind": "readonly_ref",
               "repr": "c",
-              "id": "c"
+              "id": "c",
+              "call_arg_type": "Obj"
             },
             "expected_type_id": {
               "kind": "Name",
@@ -599,7 +676,8 @@
               "casts": [],
               "borrow_kind": "value",
               "repr": "Child",
-              "id": "Child"
+              "id": "Child",
+              "call_arg_type": "type"
             },
             "source_span": {
               "lineno": 15,

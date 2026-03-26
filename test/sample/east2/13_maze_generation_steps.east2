@@ -2245,7 +2245,7 @@
               "end_lineno": 36,
               "end_col": 28
             },
-            "resolved_type": "list[unknown]",
+            "resolved_type": "list[bytes]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "[]",
@@ -2504,7 +2504,7 @@
                   "end_lineno": 41,
                   "end_col": 56
                 },
-                "resolved_type": "list[unknown]",
+                "resolved_type": "list[tuple[int64,int64,int64,int64]]",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "[]",
@@ -3432,7 +3432,8 @@
                                     "repr": "y",
                                     "id": "y"
                                   }
-                                ]
+                                ],
+                                "call_arg_type": "tuple[int64,int64,int64,int64]"
                               }
                             ],
                             "keywords": [],
@@ -3676,7 +3677,8 @@
                                         "repr": "y",
                                         "id": "y"
                                       }
-                                    ]
+                                    ],
+                                    "call_arg_type": "tuple[int64,int64,int64,int64]"
                                   }
                                 ],
                                 "keywords": [],
@@ -3906,7 +3908,8 @@
                                               "value": 1
                                             }
                                           }
-                                        ]
+                                        ],
+                                        "call_arg_type": "tuple[int64,int64,int64,int64]"
                                       }
                                     ],
                                     "keywords": [],
@@ -4081,7 +4084,8 @@
                                               "value": 1
                                             }
                                           }
-                                        ]
+                                        ],
+                                        "call_arg_type": "tuple[int64,int64,int64,int64]"
                                       }
                                     ],
                                     "keywords": [],
@@ -4179,7 +4183,8 @@
                       "casts": [],
                       "borrow_kind": "readonly_ref",
                       "repr": "candidates",
-                      "id": "candidates"
+                      "id": "candidates",
+                      "call_arg_type": "Obj"
                     }
                   ],
                   "keywords": [],
@@ -4510,7 +4515,8 @@
                                 "casts": [],
                                 "borrow_kind": "readonly_ref",
                                 "repr": "stack",
-                                "id": "stack"
+                                "id": "stack",
+                                "call_arg_type": "Obj"
                               }
                             ],
                             "keywords": [],
@@ -4579,7 +4585,8 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "candidates",
-                            "id": "candidates"
+                            "id": "candidates",
+                            "call_arg_type": "Obj"
                           }
                         ],
                         "keywords": [],
@@ -4970,7 +4977,8 @@
                             "repr": "ny",
                             "id": "ny"
                           }
-                        ]
+                        ],
+                        "call_arg_type": "tuple[int64,int64]"
                       }
                     ],
                     "keywords": [],
@@ -5170,7 +5178,8 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "grid",
-                            "id": "grid"
+                            "id": "grid",
+                            "call_arg_type": "list[list[int64]]"
                           },
                           {
                             "kind": "Name",
@@ -5184,7 +5193,8 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "cell_w",
-                            "id": "cell_w"
+                            "id": "cell_w",
+                            "call_arg_type": "int64"
                           },
                           {
                             "kind": "Name",
@@ -5198,7 +5208,8 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "cell_h",
-                            "id": "cell_h"
+                            "id": "cell_h",
+                            "call_arg_type": "int64"
                           },
                           {
                             "kind": "Name",
@@ -5212,10 +5223,12 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "scale",
-                            "id": "scale"
+                            "id": "scale",
+                            "call_arg_type": "int64"
                           }
                         ],
-                        "keywords": []
+                        "keywords": [],
+                        "call_arg_type": "bytes"
                       }
                     ],
                     "keywords": [],
@@ -5376,7 +5389,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "grid",
-                    "id": "grid"
+                    "id": "grid",
+                    "call_arg_type": "list[list[int64]]"
                   },
                   {
                     "kind": "Name",
@@ -5390,7 +5404,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "cell_w",
-                    "id": "cell_w"
+                    "id": "cell_w",
+                    "call_arg_type": "int64"
                   },
                   {
                     "kind": "Name",
@@ -5404,7 +5419,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "cell_h",
-                    "id": "cell_h"
+                    "id": "cell_h",
+                    "call_arg_type": "int64"
                   },
                   {
                     "kind": "Name",
@@ -5418,10 +5434,12 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "scale",
-                    "id": "scale"
+                    "id": "scale",
+                    "call_arg_type": "int64"
                   }
                 ],
-                "keywords": []
+                "keywords": [],
+                "call_arg_type": "bytes"
               }
             ],
             "keywords": [],
@@ -5464,7 +5482,7 @@
               "end_lineno": 70,
               "end_col": 103
             },
-            "resolved_type": "unknown",
+            "resolved_type": "None",
             "casts": [],
             "borrow_kind": "value",
             "repr": "save_gif(out_path, cell_w * scale, cell_h * scale, frames, grayscale_palette(), delay_cs=4, loop=0)",
@@ -5495,7 +5513,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "out_path",
-                "id": "out_path"
+                "id": "out_path",
+                "call_arg_type": "str"
               },
               {
                 "kind": "BinOp",
@@ -5537,7 +5556,8 @@
                   "borrow_kind": "readonly_ref",
                   "repr": "scale",
                   "id": "scale"
-                }
+                },
+                "call_arg_type": "int64"
               },
               {
                 "kind": "BinOp",
@@ -5579,7 +5599,8 @@
                   "borrow_kind": "readonly_ref",
                   "repr": "scale",
                   "id": "scale"
-                }
+                },
+                "call_arg_type": "int64"
               },
               {
                 "kind": "Name",
@@ -5593,7 +5614,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "frames",
-                "id": "frames"
+                "id": "frames",
+                "call_arg_type": "list[bytes]"
               },
               {
                 "kind": "Call",
@@ -5603,7 +5625,7 @@
                   "end_lineno": 70,
                   "end_col": 82
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bytes",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "grayscale_palette()",
@@ -5627,7 +5649,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.gif",
                 "runtime_symbol": "grayscale_palette",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bytes"
               }
             ],
             "keywords": [
@@ -5645,7 +5668,8 @@
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "4",
-                  "value": 4
+                  "value": 4,
+                  "call_arg_type": "int64"
                 }
               },
               {
@@ -5662,7 +5686,8 @@
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "0",
-                  "value": 0
+                  "value": 0,
+                  "call_arg_type": "int64"
                 }
               }
             ],
@@ -5923,7 +5948,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "frames",
-                    "id": "frames"
+                    "id": "frames",
+                    "call_arg_type": "Obj"
                   }
                 ],
                 "keywords": [],

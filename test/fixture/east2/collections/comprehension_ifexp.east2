@@ -448,7 +448,7 @@
               "end_lineno": 8,
               "end_col": 27
             },
-            "resolved_type": "list[unknown]",
+            "resolved_type": "list[bool]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "[]",
@@ -540,7 +540,7 @@
                   "end_lineno": 9,
                   "end_col": 52
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(len(ys), 4, \"len ys\")",
@@ -598,7 +598,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "ys",
-                        "id": "ys"
+                        "id": "ys",
+                        "call_arg_type": "Obj"
                       }
                     ],
                     "keywords": [],
@@ -608,7 +609,8 @@
                     "runtime_module_id": "pytra.core.py_runtime",
                     "runtime_symbol": "len",
                     "runtime_call_adapter_kind": "builtin",
-                    "semantic_tag": "core.len"
+                    "semantic_tag": "core.len",
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -622,7 +624,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "4",
-                    "value": 4
+                    "value": 4,
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -636,7 +639,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"len ys\"",
-                    "value": "len ys"
+                    "value": "len ys",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -644,7 +648,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -728,7 +733,7 @@
                   "end_lineno": 10,
                   "end_col": 50
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(ys[0], -1, \"ys[0]\")",
@@ -786,7 +791,8 @@
                       "borrow_kind": "value",
                       "repr": "0",
                       "value": 0
-                    }
+                    },
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "UnaryOp",
@@ -814,7 +820,8 @@
                       "borrow_kind": "value",
                       "repr": "1",
                       "value": 1
-                    }
+                    },
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -828,7 +835,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"ys[0]\"",
-                    "value": "ys[0]"
+                    "value": "ys[0]",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -836,7 +844,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -920,7 +929,7 @@
                   "end_lineno": 11,
                   "end_col": 49
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(ys[1], 2, \"ys[1]\")",
@@ -978,7 +987,8 @@
                       "borrow_kind": "value",
                       "repr": "1",
                       "value": 1
-                    }
+                    },
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -992,7 +1002,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "2",
-                    "value": 2
+                    "value": 2,
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1006,7 +1017,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"ys[1]\"",
-                    "value": "ys[1]"
+                    "value": "ys[1]",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -1014,7 +1026,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -1098,7 +1111,7 @@
                   "end_lineno": 12,
                   "end_col": 50
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(ys[2], -3, \"ys[2]\")",
@@ -1156,7 +1169,8 @@
                       "borrow_kind": "value",
                       "repr": "2",
                       "value": 2
-                    }
+                    },
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "UnaryOp",
@@ -1184,7 +1198,8 @@
                       "borrow_kind": "value",
                       "repr": "3",
                       "value": 3
-                    }
+                    },
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1198,7 +1213,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"ys[2]\"",
-                    "value": "ys[2]"
+                    "value": "ys[2]",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -1206,7 +1222,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -1290,7 +1307,7 @@
                   "end_lineno": 13,
                   "end_col": 49
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(ys[3], 4, \"ys[3]\")",
@@ -1348,7 +1365,8 @@
                       "borrow_kind": "value",
                       "repr": "3",
                       "value": 3
-                    }
+                    },
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1362,7 +1380,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "4",
-                    "value": 4
+                    "value": 4,
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1376,7 +1395,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"ys[3]\"",
-                    "value": "ys[3]"
+                    "value": "ys[3]",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -1384,7 +1404,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -1427,7 +1448,7 @@
               "end_lineno": 14,
               "end_col": 55
             },
-            "resolved_type": "unknown",
+            "resolved_type": "bool",
             "casts": [],
             "borrow_kind": "value",
             "repr": "py_assert_all(checks, \"comprehension_ifexp\")",
@@ -1458,7 +1479,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "checks",
-                "id": "checks"
+                "id": "checks",
+                "call_arg_type": "list[bool]"
               },
               {
                 "kind": "Constant",
@@ -1472,7 +1494,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "\"comprehension_ifexp\"",
-                "value": "comprehension_ifexp"
+                "value": "comprehension_ifexp",
+                "call_arg_type": "str"
               }
             ],
             "keywords": [],

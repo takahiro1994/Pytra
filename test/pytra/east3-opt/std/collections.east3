@@ -53,7 +53,7 @@
       "source_span": {
         "lineno": 10,
         "col_offset": 0,
-        "end_lineno": 40,
+        "end_lineno": 43,
         "end_col_offset": 0
       },
       "name": "deque",
@@ -257,7 +257,13 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "[]",
-                "elements": []
+                "elements": [],
+                "type_expr_summary_v1": {
+                  "schema_version": 1,
+                  "kind": "GenericType",
+                  "category": "static",
+                  "mirror": "list[int64]"
+                }
               },
               "type_expr_summary_v1": {
                 "schema_version": 1,
@@ -433,7 +439,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "value",
-                    "id": "value"
+                    "id": "value",
+                    "call_arg_type": "int64"
                   }
                 ],
                 "keywords": [],
@@ -582,8 +589,8 @@
           "source_span": {
             "lineno": 21,
             "col_offset": 4,
-            "end_lineno": 22,
-            "end_col_offset": 36
+            "end_lineno": 25,
+            "end_col_offset": 31
           },
           "name": "appendleft",
           "original_name": "appendleft",
@@ -609,89 +616,80 @@
           "docstring": null,
           "body": [
             {
-              "kind": "Expr",
+              "kind": "AnnAssign",
               "source_span": {
                 "lineno": 22,
                 "col_offset": 8,
                 "end_lineno": 22,
-                "end_col_offset": 36
+                "end_col_offset": 38
               },
-              "value": {
-                "kind": "Call",
+              "target": {
+                "kind": "Name",
                 "source_span": {
                   "lineno": 22,
                   "col_offset": 8,
                   "end_lineno": 22,
-                  "end_col_offset": 36
+                  "end_col_offset": 17
                 },
-                "resolved_type": "None",
+                "resolved_type": "list[int64]",
                 "casts": [],
                 "borrow_kind": "value",
-                "repr": "self._items.insert(0, value)",
-                "func": {
-                  "kind": "Attribute",
-                  "source_span": {
-                    "lineno": 22,
-                    "col_offset": 8,
-                    "end_lineno": 22,
-                    "end_col_offset": 26
-                  },
-                  "resolved_type": "callable",
-                  "casts": [],
-                  "borrow_kind": "value",
-                  "repr": "self._items.insert",
-                  "value": {
-                    "kind": "Attribute",
-                    "source_span": {
-                      "lineno": 22,
-                      "col_offset": 8,
-                      "end_lineno": 22,
-                      "end_col_offset": 19
-                    },
-                    "resolved_type": "list[int64]",
-                    "casts": [],
-                    "borrow_kind": "value",
-                    "repr": "self._items",
-                    "value": {
-                      "kind": "Name",
-                      "source_span": {
-                        "lineno": 22,
-                        "col_offset": 8,
-                        "end_lineno": 22,
-                        "end_col_offset": 12
-                      },
-                      "resolved_type": "deque",
-                      "casts": [],
-                      "borrow_kind": "readonly_ref",
-                      "repr": "self",
-                      "id": "self"
-                    },
-                    "attr": "_items"
-                  },
-                  "attr": "insert"
-                },
+                "repr": "new_items",
+                "id": "new_items",
+                "type_expr": {
+                  "kind": "GenericType",
+                  "base": "list",
+                  "args": [
+                    {
+                      "kind": "NamedType",
+                      "name": "int64"
+                    }
+                  ]
+                }
+              },
+              "annotation": "list[int64]",
+              "declare": true,
+              "decl_type": "list[int64]",
+              "annotation_type_expr": {
+                "kind": "GenericType",
+                "base": "list",
                 "args": [
                   {
-                    "kind": "Constant",
-                    "source_span": {
-                      "lineno": 22,
-                      "col_offset": 27,
-                      "end_lineno": 22,
-                      "end_col_offset": 28
-                    },
-                    "resolved_type": "int64",
-                    "casts": [],
-                    "borrow_kind": "value",
-                    "repr": "0",
-                    "value": 0
-                  },
+                    "kind": "NamedType",
+                    "name": "int64"
+                  }
+                ]
+              },
+              "decl_type_expr": {
+                "kind": "GenericType",
+                "base": "list",
+                "args": [
+                  {
+                    "kind": "NamedType",
+                    "name": "int64"
+                  }
+                ]
+              },
+              "value": {
+                "kind": "List",
+                "source_span": {
+                  "lineno": 22,
+                  "col_offset": 31,
+                  "end_lineno": 22,
+                  "end_col_offset": 38
+                },
+                "resolved_type": "list[int64]",
+                "casts": [],
+                "borrow_kind": "value",
+                "repr": "[value]",
+                "elements": [
                   {
                     "kind": "Name",
                     "source_span": {
                       "lineno": 22,
-                      "col_offset": 30,
+                      "col_offset": 32,
                       "end_lineno": 22,
-                      "end_col_offset": 35
+                      "end_col_offset": 37
                     },
                     "resolved_type": "int64",
                     "casts": [],
@@ -700,21 +698,52 @@
                     "id": "value"
                   }
                 ],
-                "keywords": [],
-                "lowered_kind": "BuiltinCall",
-                "builtin_name": "insert",
-                "runtime_call": "list.insert",
-                "runtime_module_id": "pytra.core.list",
-                "runtime_symbol": "list.insert",
-                "runtime_call_adapter_kind": "builtin",
-                "semantic_tag": "stdlib.method.insert",
-                "runtime_owner": {
+                "type_expr_summary_v1": {
+                  "schema_version": 1,
+                  "kind": "GenericType",
+                  "category": "static",
+                  "mirror": "list[int64]"
+                }
+              },
+              "type_expr_summary_v1": {
+                "schema_version": 1,
+                "kind": "GenericType",
+                "category": "static",
+                "mirror": "list[int64]"
+              },
+              "meta": {
+                "lifetime_node_id": "n3",
+                "lifetime_defs": [
+                  "new_items"
+                ],
+                "lifetime_uses": [
+                  "value"
+                ],
+                "lifetime_live_in": [
+                  "self",
+                  "value"
+                ],
+                "lifetime_live_out": [
+                  "new_items",
+                  "self"
+                ],
+                "lifetime_last_use_vars": [
+                  "value"
+                ]
+              }
+            },
+            {
+              "kind": "ForCore",
+              "iter_mode": "runtime_protocol",
+              "iter_plan": {
+                "kind": "RuntimeIterForPlan",
+                "iter_expr": {
                   "kind": "Attribute",
                   "source_span": {
-                    "lineno": 22,
-                    "col_offset": 8,
-                    "end_lineno": 22,
-                    "end_col_offset": 19
+                    "lineno": 23,
+                    "col_offset": 20,
+                    "end_lineno": 23,
+                    "end_col_offset": 31
                   },
                   "resolved_type": "list[int64]",
                   "casts": [],
@@ -723,10 +752,10 @@
                   "value": {
                     "kind": "Name",
                     "source_span": {
-                      "lineno": 22,
-                      "col_offset": 8,
-                      "end_lineno": 22,
-                      "end_col_offset": 12
+                      "lineno": 23,
+                      "col_offset": 20,
+                      "end_lineno": 23,
+                      "end_col_offset": 24
                     },
                     "resolved_type": "deque",
                     "casts": [],
@@ -734,30 +763,235 @@
                     "repr": "self",
                     "id": "self"
                   },
-                  "attr": "_items"
+                  "attr": "_items",
+                  "iterable_trait": "yes",
+                  "iter_protocol": "static_range",
+                  "iter_element_type": "int64"
                 },
-                "type_expr_summary_v1": {
-                  "schema_version": 1,
-                  "kind": "NamedType",
-                  "category": "static",
-                  "mirror": "None"
+                "dispatch_mode": "native",
+                "init_op": "ObjIterInit",
+                "next_op": "ObjIterNext"
+              },
+              "target_plan": {
+                "kind": "NameTarget",
+                "id": "item",
+                "target_type": "int64"
+              },
+              "body": [
+                {
+                  "kind": "Expr",
+                  "source_span": {
+                    "lineno": 24,
+                    "col_offset": 12,
+                    "end_lineno": 24,
+                    "end_col_offset": 34
+                  },
+                  "value": {
+                    "kind": "Call",
+                    "source_span": {
+                      "lineno": 24,
+                      "col_offset": 12,
+                      "end_lineno": 24,
+                      "end_col_offset": 34
+                    },
+                    "resolved_type": "None",
+                    "casts": [],
+                    "borrow_kind": "value",
+                    "repr": "new_items.append(item)",
+                    "func": {
+                      "kind": "Attribute",
+                      "source_span": {
+                        "lineno": 24,
+                        "col_offset": 12,
+                        "end_lineno": 24,
+                        "end_col_offset": 28
+                      },
+                      "resolved_type": "callable",
+                      "casts": [],
+                      "borrow_kind": "value",
+                      "repr": "new_items.append",
+                      "value": {
+                        "kind": "Name",
+                        "source_span": {
+                          "lineno": 24,
+                          "col_offset": 12,
+                          "end_lineno": 24,
+                          "end_col_offset": 21
+                        },
+                        "resolved_type": "list[int64]",
+                        "casts": [],
+                        "borrow_kind": "readonly_ref",
+                        "repr": "new_items",
+                        "id": "new_items"
+                      },
+                      "attr": "append"
+                    },
+                    "args": [
+                      {
+                        "kind": "Name",
+                        "source_span": {
+                          "lineno": 24,
+                          "col_offset": 29,
+                          "end_lineno": 24,
+                          "end_col_offset": 33
+                        },
+                        "resolved_type": "int64",
+                        "casts": [],
+                        "borrow_kind": "readonly_ref",
+                        "repr": "item",
+                        "id": "item",
+                        "call_arg_type": "int64"
+                      }
+                    ],
+                    "keywords": [],
+                    "lowered_kind": "BuiltinCall",
+                    "builtin_name": "append",
+                    "runtime_call": "list.append",
+                    "runtime_module_id": "pytra.core.list",
+                    "runtime_symbol": "list.append",
+                    "runtime_call_adapter_kind": "builtin",
+                    "semantic_tag": "stdlib.method.append",
+                    "runtime_owner": {
+                      "kind": "Name",
+                      "source_span": {
+                        "lineno": 24,
+                        "col_offset": 12,
+                        "end_lineno": 24,
+                        "end_col_offset": 21
+                      },
+                      "resolved_type": "list[int64]",
+                      "casts": [],
+                      "borrow_kind": "readonly_ref",
+                      "repr": "new_items",
+                      "id": "new_items"
+                    },
+                    "type_expr_summary_v1": {
+                      "schema_version": 1,
+                      "kind": "NamedType",
+                      "category": "static",
+                      "mirror": "None"
+                    }
+                  },
+                  "meta": {
+                    "lifetime_node_id": "n2",
+                    "lifetime_defs": [],
+                    "lifetime_uses": [
+                      "item",
+                      "new_items"
+                    ],
+                    "lifetime_live_in": [
+                      "item",
+                      "new_items",
+                      "self"
+                    ],
+                    "lifetime_live_out": [
+                      "new_items",
+                      "self"
+                    ],
+                    "lifetime_last_use_vars": [
+                      "item"
+                    ]
+                  }
                 }
+              ],
+              "orelse": [],
+              "source_span": {
+                "lineno": 23,
+                "col_offset": 0,
+                "end_lineno": 24,
+                "end_col_offset": 34
+              },
+              "meta": {
+                "lifetime_node_id": "n1",
+                "lifetime_defs": [
+                  "item"
+                ],
+                "lifetime_uses": [
+                  "self"
+                ],
+                "lifetime_live_in": [
+                  "new_items",
+                  "self"
+                ],
+                "lifetime_live_out": [
+                  "item",
+                  "new_items",
+                  "self"
+                ],
+                "lifetime_last_use_vars": []
+              }
+            },
+            {
+              "kind": "Assign",
+              "source_span": {
+                "lineno": 25,
+                "col_offset": 8,
+                "end_lineno": 25,
+                "end_col_offset": 31
+              },
+              "target": {
+                "kind": "Attribute",
+                "source_span": {
+                  "lineno": 25,
+                  "col_offset": 8,
+                  "end_lineno": 25,
+                  "end_col_offset": 19
+                },
+                "resolved_type": "list[int64]",
+                "casts": [],
+                "borrow_kind": "value",
+                "repr": "self._items",
+                "value": {
+                  "kind": "Name",
+                  "source_span": {
+                    "lineno": 25,
+                    "col_offset": 8,
+                    "end_lineno": 25,
+                    "end_col_offset": 12
+                  },
+                  "resolved_type": "deque",
+                  "casts": [],
+                  "borrow_kind": "readonly_ref",
+                  "repr": "self",
+                  "id": "self"
+                },
+                "attr": "_items"
+              },
+              "declare": true,
+              "decl_type": "list[int64]",
+              "declare_init": true,
+              "value": {
+                "kind": "Name",
+                "source_span": {
+                  "lineno": 25,
+                  "col_offset": 22,
+                  "end_lineno": 25,
+                  "end_col_offset": 31
+                },
+                "resolved_type": "list[int64]",
+                "casts": [],
+                "borrow_kind": "readonly_ref",
+                "repr": "new_items",
+                "id": "new_items"
+              },
+              "type_expr_summary_v1": {
+                "schema_version": 1,
+                "kind": "GenericType",
+                "category": "static",
+                "mirror": "list[int64]"
               },
               "meta": {
                 "lifetime_node_id": "n0",
                 "lifetime_defs": [],
                 "lifetime_uses": [
-                  "self",
-                  "value"
+                  "new_items"
                 ],
                 "lifetime_live_in": [
-                  "self",
-                  "value"
+                  "new_items"
                 ],
                 "lifetime_live_out": [],
                 "lifetime_last_use_vars": [
-                  "self",
-                  "value"
+                  "new_items"
                 ]
               }
             }
@@ -772,59 +1006,159 @@
               "schema_version": "east3_lifetime_v1",
               "status": "ok",
               "reason": "",
-              "entry_node": "n0",
+              "entry_node": "n3",
               "order": [
-                "n0"
+                "n0",
+                "n1",
+                "n2",
+                "n3"
               ],
               "cfg": [
                 {
                   "id": "n0",
+                  "kind": "Assign",
+                  "defs": [],
+                  "uses": [
+                    "new_items"
+                  ],
+                  "succ": []
+                },
+                {
+                  "id": "n1",
+                  "kind": "ForCore",
+                  "defs": [
+                    "item"
+                  ],
+                  "uses": [
+                    "self"
+                  ],
+                  "succ": [
+                    "n0",
+                    "n2"
+                  ]
+                },
+                {
+                  "id": "n2",
                   "kind": "Expr",
                   "defs": [],
                   "uses": [
-                    "self",
+                    "item",
+                    "new_items"
+                  ],
+                  "succ": [
+                    "n1"
+                  ]
+                },
+                {
+                  "id": "n3",
+                  "kind": "AnnAssign",
+                  "defs": [
+                    "new_items"
+                  ],
+                  "uses": [
                     "value"
                   ],
-                  "succ": []
+                  "succ": [
+                    "n1"
+                  ]
                 }
               ],
               "def_use": {
-                "defs": {},
+                "defs": {
+                  "item": [
+                    "n1"
+                  ],
+                  "new_items": [
+                    "n3"
+                  ]
+                },
                 "uses": {
+                  "item": [
+                    "n2"
+                  ],
+                  "new_items": [
+                    "n0",
+                    "n2"
+                  ],
                   "self": [
-                    "n0"
+                    "n1"
                   ],
                   "value": [
-                    "n0"
+                    "n3"
                   ]
                 }
               },
               "variables": {
-                "self": {
-                  "def_nodes": [],
+                "item": {
+                  "def_nodes": [
+                    "n1"
+                  ],
                   "use_nodes": [
-                    "n0"
+                    "n2"
                   ],
                   "live_in_nodes": [
-                    "n0"
+                    "n2"
                   ],
-                  "live_out_nodes": [],
+                  "live_out_nodes": [
+                    "n1"
+                  ],
+                  "last_use_nodes": [
+                    "n2"
+                  ],
+                  "lifetime_class": "local_non_escape_candidate"
+                },
+                "new_items": {
+                  "def_nodes": [
+                    "n3"
+                  ],
+                  "use_nodes": [
+                    "n0",
+                    "n2"
+                  ],
+                  "live_in_nodes": [
+                    "n0",
+                    "n1",
+                    "n2"
+                  ],
+                  "live_out_nodes": [
+                    "n1",
+                    "n2",
+                    "n3"
+                  ],
                   "last_use_nodes": [
                     "n0"
                   ],
+                  "lifetime_class": "local_non_escape_candidate"
+                },
+                "self": {
+                  "def_nodes": [],
+                  "use_nodes": [
+                    "n1"
+                  ],
+                  "live_in_nodes": [
+                    "n1",
+                    "n2",
+                    "n3"
+                  ],
+                  "live_out_nodes": [
+                    "n1",
+                    "n2",
+                    "n3"
+                  ],
+                  "last_use_nodes": [],
                   "lifetime_class": "escape_or_unknown"
                 },
                 "value": {
                   "def_nodes": [],
                   "use_nodes": [
-                    "n0"
+                    "n3"
                   ],
                   "live_in_nodes": [
-                    "n0"
+                    "n3"
                   ],
                   "live_out_nodes": [],
                   "last_use_nodes": [
-                    "n0"
+                    "n3"
                   ],
                   "lifetime_class": "escape_or_unknown"
                 }
@@ -844,9 +1178,9 @@
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 24,
+            "lineno": 27,
             "col_offset": 4,
-            "end_lineno": 27,
+            "end_lineno": 30,
             "end_col_offset": 32
           },
           "name": "pop",
@@ -871,17 +1205,17 @@
             {
               "kind": "If",
               "source_span": {
-                "lineno": 25,
+                "lineno": 28,
                 "col_offset": 8,
-                "end_lineno": 26,
+                "end_lineno": 29,
                 "end_col_offset": 52
               },
               "test": {
                 "kind": "Compare",
                 "source_span": {
-                  "lineno": 25,
+                  "lineno": 28,
                   "col_offset": 11,
-                  "end_lineno": 25,
+                  "end_lineno": 28,
                   "end_col_offset": 32
                 },
                 "resolved_type": "bool",
@@ -891,9 +1225,9 @@
                 "left": {
                   "kind": "Call",
                   "source_span": {
-                    "lineno": 25,
+                    "lineno": 28,
                     "col_offset": 11,
-                    "end_lineno": 25,
+                    "end_lineno": 28,
                     "end_col_offset": 27
                   },
                   "resolved_type": "int64",
@@ -903,9 +1237,9 @@
                   "func": {
                     "kind": "Name",
                     "source_span": {
-                      "lineno": 25,
+                      "lineno": 28,
                       "col_offset": 11,
-                      "end_lineno": 25,
+                      "end_lineno": 28,
                       "end_col_offset": 14
                     },
                     "resolved_type": "callable",
@@ -918,9 +1252,9 @@
                     {
                       "kind": "Attribute",
                       "source_span": {
-                        "lineno": 25,
+                        "lineno": 28,
                         "col_offset": 15,
-                        "end_lineno": 25,
+                        "end_lineno": 28,
                         "end_col_offset": 26
                       },
                       "resolved_type": "list[int64]",
@@ -930,9 +1264,9 @@
                       "value": {
                         "kind": "Name",
                         "source_span": {
-                          "lineno": 25,
+                          "lineno": 28,
                           "col_offset": 15,
-                          "end_lineno": 25,
+                          "end_lineno": 28,
                           "end_col_offset": 19
                         },
                         "resolved_type": "deque",
@@ -941,7 +1275,8 @@
                         "repr": "self",
                         "id": "self"
                       },
-                      "attr": "_items"
+                      "attr": "_items",
+                      "call_arg_type": "Obj"
                     }
                   ],
                   "keywords": [],
@@ -966,9 +1301,9 @@
                   {
                     "kind": "Constant",
                     "source_span": {
-                      "lineno": 25,
+                      "lineno": 28,
                       "col_offset": 31,
-                      "end_lineno": 25,
+                      "end_lineno": 28,
                       "end_col_offset": 32
                     },
                     "resolved_type": "int64",
@@ -982,9 +1317,9 @@
                 "normalized_expr": {
                   "kind": "Compare",
                   "source_span": {
-                    "lineno": 25,
+                    "lineno": 28,
                     "col_offset": 11,
-                    "end_lineno": 25,
+                    "end_lineno": 28,
                     "end_col_offset": 32
                   },
                   "resolved_type": "bool",
@@ -994,9 +1329,9 @@
                   "left": {
                     "kind": "Call",
                     "source_span": {
-                      "lineno": 25,
+                      "lineno": 28,
                       "col_offset": 11,
-                      "end_lineno": 25,
+                      "end_lineno": 28,
                       "end_col_offset": 27
                     },
                     "resolved_type": "int64",
@@ -1006,9 +1341,9 @@
                     "func": {
                       "kind": "Name",
                       "source_span": {
-                        "lineno": 25,
+                        "lineno": 28,
                         "col_offset": 11,
-                        "end_lineno": 25,
+                        "end_lineno": 28,
                         "end_col_offset": 14
                       },
                       "resolved_type": "callable",
@@ -1021,9 +1356,9 @@
                       {
                         "kind": "Attribute",
                         "source_span": {
-                          "lineno": 25,
+                          "lineno": 28,
                           "col_offset": 15,
-                          "end_lineno": 25,
+                          "end_lineno": 28,
                           "end_col_offset": 26
                         },
                         "resolved_type": "list[int64]",
@@ -1033,9 +1368,9 @@
                         "value": {
                           "kind": "Name",
                           "source_span": {
-                            "lineno": 25,
+                            "lineno": 28,
                             "col_offset": 15,
-                            "end_lineno": 25,
+                            "end_lineno": 28,
                             "end_col_offset": 19
                           },
                           "resolved_type": "deque",
@@ -1044,7 +1379,8 @@
                           "repr": "self",
                           "id": "self"
                         },
-                        "attr": "_items"
+                        "attr": "_items",
+                        "call_arg_type": "Obj"
                       }
                     ],
                     "keywords": [],
@@ -1069,9 +1405,9 @@
                     {
                       "kind": "Constant",
                       "source_span": {
-                        "lineno": 25,
+                        "lineno": 28,
                         "col_offset": 31,
-                        "end_lineno": 25,
+                        "end_lineno": 28,
                         "end_col_offset": 32
                       },
                       "resolved_type": "int64",
@@ -1087,17 +1423,17 @@
                 {
                   "kind": "Raise",
                   "source_span": {
-                    "lineno": 26,
+                    "lineno": 29,
                     "col_offset": 12,
-                    "end_lineno": 26,
+                    "end_lineno": 29,
                     "end_col_offset": 52
                   },
                   "exc": {
                     "kind": "Call",
                     "source_span": {
-                      "lineno": 26,
+                      "lineno": 29,
                       "col_offset": 18,
-                      "end_lineno": 26,
+                      "end_lineno": 29,
                       "end_col_offset": 52
                     },
                     "resolved_type": "IndexError",
@@ -1107,9 +1443,9 @@
                     "func": {
                       "kind": "Name",
                       "source_span": {
-                        "lineno": 26,
+                        "lineno": 29,
                         "col_offset": 18,
-                        "end_lineno": 26,
+                        "end_lineno": 29,
                         "end_col_offset": 28
                       },
                       "resolved_type": "type",
@@ -1122,9 +1458,9 @@
                       {
                         "kind": "Constant",
                         "source_span": {
-                          "lineno": 26,
+                          "lineno": 29,
                           "col_offset": 29,
-                          "end_lineno": 26,
+                          "end_lineno": 29,
                           "end_col_offset": 51
                         },
                         "resolved_type": "str",
@@ -1194,17 +1530,17 @@
             {
               "kind": "Return",
               "source_span": {
-                "lineno": 27,
+                "lineno": 30,
                 "col_offset": 8,
-                "end_lineno": 27,
+                "end_lineno": 30,
                 "end_col_offset": 32
               },
               "value": {
                 "kind": "Call",
                 "source_span": {
-                  "lineno": 27,
+                  "lineno": 30,
                   "col_offset": 15,
-                  "end_lineno": 27,
+                  "end_lineno": 30,
                   "end_col_offset": 32
                 },
                 "resolved_type": "int64",
@@ -1214,9 +1550,9 @@
                 "func": {
                   "kind": "Attribute",
                   "source_span": {
-                    "lineno": 27,
+                    "lineno": 30,
                     "col_offset": 15,
-                    "end_lineno": 27,
+                    "end_lineno": 30,
                     "end_col_offset": 30
                   },
                   "resolved_type": "callable",
@@ -1226,9 +1562,9 @@
                   "value": {
                     "kind": "Attribute",
                     "source_span": {
-                      "lineno": 27,
+                      "lineno": 30,
                       "col_offset": 15,
-                      "end_lineno": 27,
+                      "end_lineno": 30,
                       "end_col_offset": 26
                     },
                     "resolved_type": "list[int64]",
@@ -1238,9 +1574,9 @@
                     "value": {
                       "kind": "Name",
                       "source_span": {
-                        "lineno": 27,
+                        "lineno": 30,
                         "col_offset": 15,
-                        "end_lineno": 27,
+                        "end_lineno": 30,
                         "end_col_offset": 19
                       },
                       "resolved_type": "deque",
@@ -1265,9 +1601,9 @@
                 "runtime_owner": {
                   "kind": "Attribute",
                   "source_span": {
-                    "lineno": 27,
+                    "lineno": 30,
                     "col_offset": 15,
-                    "end_lineno": 27,
+                    "end_lineno": 30,
                     "end_col_offset": 26
                   },
                   "resolved_type": "list[int64]",
@@ -1277,9 +1613,9 @@
                   "value": {
                     "kind": "Name",
                     "source_span": {
-                      "lineno": 27,
+                      "lineno": 30,
                       "col_offset": 15,
-                      "end_lineno": 27,
+                      "end_lineno": 30,
                       "end_col_offset": 19
                     },
                     "resolved_type": "deque",
@@ -1446,9 +1782,9 @@
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 29,
+            "lineno": 32,
             "col_offset": 4,
-            "end_lineno": 34,
+            "end_lineno": 37,
             "end_col_offset": 19
           },
           "name": "popleft",
@@ -1473,17 +1809,17 @@
             {
               "kind": "If",
               "source_span": {
-                "lineno": 25,
+                "lineno": 28,
                 "col_offset": 8,
-                "end_lineno": 26,
+                "end_lineno": 29,
                 "end_col_offset": 52
               },
               "test": {
                 "kind": "Compare",
                 "source_span": {
-                  "lineno": 25,
+                  "lineno": 28,
                   "col_offset": 11,
-                  "end_lineno": 25,
+                  "end_lineno": 28,
                   "end_col_offset": 32
                 },
                 "resolved_type": "bool",
@@ -1493,9 +1829,9 @@
                 "left": {
                   "kind": "Call",
                   "source_span": {
-                    "lineno": 25,
+                    "lineno": 28,
                     "col_offset": 11,
-                    "end_lineno": 25,
+                    "end_lineno": 28,
                     "end_col_offset": 27
                   },
                   "resolved_type": "int64",
@@ -1505,9 +1841,9 @@
                   "func": {
                     "kind": "Name",
                     "source_span": {
-                      "lineno": 25,
+                      "lineno": 28,
                       "col_offset": 11,
-                      "end_lineno": 25,
+                      "end_lineno": 28,
                       "end_col_offset": 14
                     },
                     "resolved_type": "callable",
@@ -1520,9 +1856,9 @@
                     {
                       "kind": "Attribute",
                       "source_span": {
-                        "lineno": 25,
+                        "lineno": 28,
                         "col_offset": 15,
-                        "end_lineno": 25,
+                        "end_lineno": 28,
                         "end_col_offset": 26
                       },
                       "resolved_type": "list[int64]",
@@ -1532,9 +1868,9 @@
                       "value": {
                         "kind": "Name",
                         "source_span": {
-                          "lineno": 25,
+                          "lineno": 28,
                           "col_offset": 15,
-                          "end_lineno": 25,
+                          "end_lineno": 28,
                           "end_col_offset": 19
                         },
                         "resolved_type": "deque",
@@ -1543,7 +1879,8 @@
                         "repr": "self",
                         "id": "self"
                       },
-                      "attr": "_items"
+                      "attr": "_items",
+                      "call_arg_type": "Obj"
                     }
                   ],
                   "keywords": [],
@@ -1568,9 +1905,9 @@
                   {
                     "kind": "Constant",
                     "source_span": {
-                      "lineno": 25,
+                      "lineno": 28,
                       "col_offset": 31,
-                      "end_lineno": 25,
+                      "end_lineno": 28,
                       "end_col_offset": 32
                     },
                     "resolved_type": "int64",
@@ -1584,9 +1921,9 @@
                 "normalized_expr": {
                   "kind": "Compare",
                   "source_span": {
-                    "lineno": 25,
+                    "lineno": 28,
                     "col_offset": 11,
-                    "end_lineno": 25,
+                    "end_lineno": 28,
                     "end_col_offset": 32
                   },
                   "resolved_type": "bool",
@@ -1596,9 +1933,9 @@
                   "left": {
                     "kind": "Call",
                     "source_span": {
-                      "lineno": 25,
+                      "lineno": 28,
                       "col_offset": 11,
-                      "end_lineno": 25,
+                      "end_lineno": 28,
                       "end_col_offset": 27
                     },
                     "resolved_type": "int64",
@@ -1608,9 +1945,9 @@
                     "func": {
                       "kind": "Name",
                       "source_span": {
-                        "lineno": 25,
+                        "lineno": 28,
                         "col_offset": 11,
-                        "end_lineno": 25,
+                        "end_lineno": 28,
                         "end_col_offset": 14
                       },
                       "resolved_type": "callable",
@@ -1623,9 +1960,9 @@
                       {
                         "kind": "Attribute",
                         "source_span": {
-                          "lineno": 25,
+                          "lineno": 28,
                           "col_offset": 15,
-                          "end_lineno": 25,
+                          "end_lineno": 28,
                           "end_col_offset": 26
                         },
                         "resolved_type": "list[int64]",
@@ -1635,9 +1972,9 @@
                         "value": {
                           "kind": "Name",
                           "source_span": {
-                            "lineno": 25,
+                            "lineno": 28,
                             "col_offset": 15,
-                            "end_lineno": 25,
+                            "end_lineno": 28,
                             "end_col_offset": 19
                           },
                           "resolved_type": "deque",
@@ -1646,7 +1983,8 @@
                           "repr": "self",
                           "id": "self"
                         },
-                        "attr": "_items"
+                        "attr": "_items",
+                        "call_arg_type": "Obj"
                       }
                     ],
                     "keywords": [],
@@ -1671,9 +2009,9 @@
                     {
                       "kind": "Constant",
                       "source_span": {
-                        "lineno": 25,
+                        "lineno": 28,
                         "col_offset": 31,
-                        "end_lineno": 25,
+                        "end_lineno": 28,
                         "end_col_offset": 32
                       },
                       "resolved_type": "int64",
@@ -1689,17 +2027,17 @@
                 {
                   "kind": "Raise",
                   "source_span": {
-                    "lineno": 26,
+                    "lineno": 29,
                     "col_offset": 12,
-                    "end_lineno": 26,
+                    "end_lineno": 29,
                     "end_col_offset": 52
                   },
                   "exc": {
                     "kind": "Call",
                     "source_span": {
-                      "lineno": 26,
+                      "lineno": 29,
                       "col_offset": 18,
-                      "end_lineno": 26,
+                      "end_lineno": 29,
                       "end_col_offset": 52
                     },
                     "resolved_type": "IndexError",
@@ -1709,9 +2047,9 @@
                     "func": {
                       "kind": "Name",
                       "source_span": {
-                        "lineno": 26,
+                        "lineno": 29,
                         "col_offset": 18,
-                        "end_lineno": 26,
+                        "end_lineno": 29,
                         "end_col_offset": 28
                       },
                       "resolved_type": "type",
@@ -1724,9 +2062,9 @@
                       {
                         "kind": "Constant",
                         "source_span": {
-                          "lineno": 26,
+                          "lineno": 29,
                           "col_offset": 29,
-                          "end_lineno": 26,
+                          "end_lineno": 29,
                           "end_col_offset": 51
                         },
                         "resolved_type": "str",
@@ -1796,17 +2134,17 @@
             {
               "kind": "AnnAssign",
               "source_span": {
-                "lineno": 32,
+                "lineno": 35,
                 "col_offset": 8,
-                "end_lineno": 32,
+                "end_lineno": 35,
                 "end_col_offset": 34
               },
               "target": {
                 "kind": "Name",
                 "source_span": {
-                  "lineno": 32,
+                  "lineno": 35,
                   "col_offset": 8,
-                  "end_lineno": 32,
+                  "end_lineno": 35,
                   "end_col_offset": 12
                 },
                 "resolved_type": "int64",
@@ -1833,9 +2171,9 @@
               "value": {
                 "kind": "Subscript",
                 "source_span": {
-                  "lineno": 32,
+                  "lineno": 35,
                   "col_offset": 20,
-                  "end_lineno": 32,
+                  "end_lineno": 35,
                   "end_col_offset": 34
                 },
                 "resolved_type": "int64",
@@ -1845,9 +2183,9 @@
                 "value": {
                   "kind": "Attribute",
                   "source_span": {
-                    "lineno": 32,
+                    "lineno": 35,
                     "col_offset": 20,
-                    "end_lineno": 32,
+                    "end_lineno": 35,
                     "end_col_offset": 31
                   },
                   "resolved_type": "list[int64]",
@@ -1857,9 +2195,9 @@
                   "value": {
                     "kind": "Name",
                     "source_span": {
-                      "lineno": 32,
+                      "lineno": 35,
                       "col_offset": 20,
-                      "end_lineno": 32,
+                      "end_lineno": 35,
                       "end_col_offset": 24
                     },
                     "resolved_type": "deque",
@@ -1873,9 +2211,9 @@
                 "slice": {
                   "kind": "Constant",
                   "source_span": {
-                    "lineno": 32,
+                    "lineno": 35,
                     "col_offset": 32,
-                    "end_lineno": 32,
+                    "end_lineno": 35,
                     "end_col_offset": 33
                   },
                   "resolved_type": "int64",
@@ -1912,17 +2250,17 @@
             {
               "kind": "Assign",
               "source_span": {
-                "lineno": 33,
+                "lineno": 36,
                 "col_offset": 8,
-                "end_lineno": 33,
+                "end_lineno": 36,
                 "end_col_offset": 37
               },
               "target": {
                 "kind": "Attribute",
                 "source_span": {
-                  "lineno": 33,
+                  "lineno": 36,
                   "col_offset": 8,
-                  "end_lineno": 33,
+                  "end_lineno": 36,
                   "end_col_offset": 19
                 },
                 "resolved_type": "list[int64]",
@@ -1932,9 +2270,9 @@
                 "value": {
                   "kind": "Name",
                   "source_span": {
-                    "lineno": 33,
+                    "lineno": 36,
                     "col_offset": 8,
-                    "end_lineno": 33,
+                    "end_lineno": 36,
                     "end_col_offset": 12
                   },
                   "resolved_type": "deque",
@@ -1951,9 +2289,9 @@
               "value": {
                 "kind": "Subscript",
                 "source_span": {
-                  "lineno": 33,
+                  "lineno": 36,
                   "col_offset": 22,
-                  "end_lineno": 33,
+                  "end_lineno": 36,
                   "end_col_offset": 37
                 },
                 "resolved_type": "list[int64]",
@@ -1963,9 +2301,9 @@
                 "value": {
                   "kind": "Attribute",
                   "source_span": {
-                    "lineno": 33,
+                    "lineno": 36,
                     "col_offset": 22,
-                    "end_lineno": 33,
+                    "end_lineno": 36,
                     "end_col_offset": 33
                   },
                   "resolved_type": "list[int64]",
@@ -1975,9 +2313,9 @@
                   "value": {
                     "kind": "Name",
                     "source_span": {
-                      "lineno": 33,
+                      "lineno": 36,
                       "col_offset": 22,
-                      "end_lineno": 33,
+                      "end_lineno": 36,
                       "end_col_offset": 26
                     },
                     "resolved_type": "deque",
@@ -1993,9 +2331,9 @@
                   "lower": {
                     "kind": "Constant",
                     "source_span": {
-                      "lineno": 33,
+                      "lineno": 36,
                       "col_offset": 34,
-                      "end_lineno": 33,
+                      "end_lineno": 36,
                       "end_col_offset": 35
                     },
                     "resolved_type": "int64",
@@ -2011,9 +2349,9 @@
                 "lower": {
                   "kind": "Constant",
                   "source_span": {
-                    "lineno": 33,
+                    "lineno": 36,
                     "col_offset": 34,
-                    "end_lineno": 33,
+                    "end_lineno": 36,
                     "end_col_offset": 35
                   },
                   "resolved_type": "int64",
@@ -2051,17 +2389,17 @@
             {
               "kind": "Return",
               "source_span": {
-                "lineno": 34,
+                "lineno": 37,
                 "col_offset": 8,
-                "end_lineno": 34,
+                "end_lineno": 37,
                 "end_col_offset": 19
               },
               "value": {
                 "kind": "Name",
                 "source_span": {
-                  "lineno": 34,
+                  "lineno": 37,
                   "col_offset": 15,
-                  "end_lineno": 34,
+                  "end_lineno": 37,
                   "end_col_offset": 19
                 },
                 "resolved_type": "int64",
@@ -2275,9 +2613,9 @@
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 36,
+            "lineno": 39,
             "col_offset": 4,
-            "end_lineno": 37,
+            "end_lineno": 40,
             "end_col_offset": 31
           },
           "name": "__len__",
@@ -2302,17 +2640,17 @@
             {
               "kind": "Return",
               "source_span": {
-                "lineno": 37,
+                "lineno": 40,
                 "col_offset": 8,
-                "end_lineno": 37,
+                "end_lineno": 40,
                 "end_col_offset": 31
               },
               "value": {
                 "kind": "Call",
                 "source_span": {
-                  "lineno": 37,
+                  "lineno": 40,
                   "col_offset": 15,
-                  "end_lineno": 37,
+                  "end_lineno": 40,
                   "end_col_offset": 31
                 },
                 "resolved_type": "int64",
@@ -2322,9 +2660,9 @@
                 "func": {
                   "kind": "Name",
                   "source_span": {
-                    "lineno": 37,
+                    "lineno": 40,
                     "col_offset": 15,
-                    "end_lineno": 37,
+                    "end_lineno": 40,
                     "end_col_offset": 18
                   },
                   "resolved_type": "callable",
@@ -2337,9 +2675,9 @@
                   {
                     "kind": "Attribute",
                     "source_span": {
-                      "lineno": 37,
+                      "lineno": 40,
                       "col_offset": 19,
-                      "end_lineno": 37,
+                      "end_lineno": 40,
                       "end_col_offset": 30
                     },
                     "resolved_type": "list[int64]",
@@ -2349,9 +2687,9 @@
                     "value": {
                       "kind": "Name",
                       "source_span": {
-                        "lineno": 37,
+                        "lineno": 40,
                         "col_offset": 19,
-                        "end_lineno": 37,
+                        "end_lineno": 40,
                         "end_col_offset": 23
                       },
                       "resolved_type": "deque",
@@ -2360,7 +2698,8 @@
                       "repr": "self",
                       "id": "self"
                     },
-                    "attr": "_items"
+                    "attr": "_items",
+                    "call_arg_type": "Obj"
                   }
                 ],
                 "keywords": [],
@@ -2477,10 +2816,10 @@
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 39,
+            "lineno": 42,
             "col_offset": 4,
-            "end_lineno": 40,
-            "end_col_offset": 24
+            "end_lineno": 43,
+            "end_col_offset": 37
           },
           "name": "clear",
           "original_name": "clear",
@@ -2504,17 +2843,17 @@
             {
               "kind": "Assign",
               "source_span": {
-                "lineno": 40,
+                "lineno": 43,
                 "col_offset": 8,
-                "end_lineno": 40,
-                "end_col_offset": 24
+                "end_lineno": 43,
+                "end_col_offset": 37
               },
               "target": {
                 "kind": "Attribute",
                 "source_span": {
-                  "lineno": 40,
+                  "lineno": 43,
                   "col_offset": 8,
-                  "end_lineno": 40,
+                  "end_lineno": 43,
                   "end_col_offset": 19
                 },
                 "resolved_type": "list[int64]",
@@ -2524,9 +2863,9 @@
                 "value": {
                   "kind": "Name",
                   "source_span": {
-                    "lineno": 40,
+                    "lineno": 43,
                     "col_offset": 8,
-                    "end_lineno": 40,
+                    "end_lineno": 43,
                     "end_col_offset": 12
                   },
                   "resolved_type": "deque",
@@ -2538,35 +2877,103 @@
                 "attr": "_items"
               },
               "declare": true,
-              "decl_type": "list[unknown]",
+              "decl_type": "list[int64]",
               "declare_init": true,
               "value": {
-                "kind": "List",
+                "kind": "Subscript",
                 "source_span": {
-                  "lineno": 40,
+                  "lineno": 43,
                   "col_offset": 22,
-                  "end_lineno": 40,
-                  "end_col_offset": 24
+                  "end_lineno": 43,
+                  "end_col_offset": 37
                 },
-                "resolved_type": "list[unknown]",
+                "resolved_type": "list[int64]",
                 "casts": [],
                 "borrow_kind": "value",
-                "repr": "[]",
-                "elements": []
+                "repr": "self._items[:0]",
+                "value": {
+                  "kind": "Attribute",
+                  "source_span": {
+                    "lineno": 43,
+                    "col_offset": 22,
+                    "end_lineno": 43,
+                    "end_col_offset": 33
+                  },
+                  "resolved_type": "list[int64]",
+                  "casts": [],
+                  "borrow_kind": "value",
+                  "repr": "self._items",
+                  "value": {
+                    "kind": "Name",
+                    "source_span": {
+                      "lineno": 43,
+                      "col_offset": 22,
+                      "end_lineno": 43,
+                      "end_col_offset": 26
+                    },
+                    "resolved_type": "deque",
+                    "casts": [],
+                    "borrow_kind": "readonly_ref",
+                    "repr": "self",
+                    "id": "self"
+                  },
+                  "attr": "_items"
+                },
+                "slice": {
+                  "kind": "Slice",
+                  "lower": null,
+                  "upper": {
+                    "kind": "Constant",
+                    "source_span": {
+                      "lineno": 43,
+                      "col_offset": 35,
+                      "end_lineno": 43,
+                      "end_col_offset": 36
+                    },
+                    "resolved_type": "int64",
+                    "casts": [],
+                    "borrow_kind": "value",
+                    "repr": "0",
+                    "value": 0
+                  },
+                  "step": null
+                },
+                "lowered_kind": "SliceExpr",
+                "lower": null,
+                "upper": {
+                  "kind": "Constant",
+                  "source_span": {
+                    "lineno": 43,
+                    "col_offset": 35,
+                    "end_lineno": 43,
+                    "end_col_offset": 36
+                  },
+                  "resolved_type": "int64",
+                  "casts": [],
+                  "borrow_kind": "value",
+                  "repr": "0",
+                  "value": 0
+                }
               },
               "type_expr_summary_v1": {
                 "schema_version": 1,
                 "kind": "GenericType",
                 "category": "static",
-                "mirror": "list[unknown]"
+                "mirror": "list[int64]"
               },
               "meta": {
                 "lifetime_node_id": "n0",
                 "lifetime_defs": [],
-                "lifetime_uses": [],
-                "lifetime_live_in": [],
+                "lifetime_uses": [
+                  "self"
+                ],
+                "lifetime_live_in": [
+                  "self"
+                ],
                 "lifetime_live_out": [],
-                "lifetime_last_use_vars": []
+                "lifetime_last_use_vars": [
+                  "self"
+                ]
               }
             }
           ],
@@ -2589,21 +2996,33 @@
                   "id": "n0",
                   "kind": "Assign",
                   "defs": [],
-                  "uses": [],
+                  "uses": [
+                    "self"
+                  ],
                   "succ": []
                 }
               ],
               "def_use": {
                 "defs": {},
-                "uses": {}
+                "uses": {
+                  "self": [
+                    "n0"
+                  ]
+                }
               },
               "variables": {
                 "self": {
                   "def_nodes": [],
-                  "use_nodes": [],
-                  "live_in_nodes": [],
+                  "use_nodes": [
+                    "n0"
+                  ],
+                  "live_in_nodes": [
+                    "n0"
+                  ],
                   "live_out_nodes": [],
-                  "last_use_nodes": [],
+                  "last_use_nodes": [
+                    "n0"
+                  ],
                   "lifetime_class": "escape_or_unknown"
                 }
               },

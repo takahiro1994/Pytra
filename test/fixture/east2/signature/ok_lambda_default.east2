@@ -65,13 +65,13 @@
                 "kind": "arg",
                 "arg": "nout",
                 "annotation": null,
-                "resolved_type": "unknown"
+                "resolved_type": "float64"
               },
               {
                 "kind": "arg",
                 "arg": "nin",
                 "annotation": null,
-                "resolved_type": "unknown"
+                "resolved_type": "float64"
               },
               {
                 "kind": "arg",
@@ -85,12 +85,13 @@
                     "end_lineno": 5,
                     "end_col": 39
                   },
+                  "resolved_type": "float64",
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "0.08",
                   "value": 0.08
                 },
-                "resolved_type": "unknown"
+                "resolved_type": "float64"
               }
             ],
             "body": {
@@ -101,7 +102,7 @@
                 "end_lineno": 5,
                 "end_col": 57
               },
-              "resolved_type": "unknown",
+              "resolved_type": "float64",
               "casts": [],
               "borrow_kind": "value",
               "repr": "nout + nin * std",
@@ -113,9 +114,9 @@
                   "end_lineno": 5,
                   "end_col": 45
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "float64",
                 "casts": [],
-                "borrow_kind": "value",
+                "borrow_kind": "readonly_ref",
                 "repr": "nout",
                 "id": "nout"
               },
@@ -128,7 +129,7 @@
                   "end_lineno": 5,
                   "end_col": 57
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "float64",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "nin * std",
@@ -140,9 +141,9 @@
                     "end_lineno": 5,
                     "end_col": 51
                   },
-                  "resolved_type": "unknown",
+                  "resolved_type": "float64",
                   "casts": [],
-                  "borrow_kind": "value",
+                  "borrow_kind": "readonly_ref",
                   "repr": "nin",
                   "id": "nin"
                 },
@@ -155,19 +156,29 @@
                     "end_lineno": 5,
                     "end_col": 57
                   },
-                  "resolved_type": "unknown",
+                  "resolved_type": "float64",
                   "casts": [],
-                  "borrow_kind": "value",
+                  "borrow_kind": "readonly_ref",
                   "repr": "std",
                   "id": "std"
                 }
               }
             },
-            "return_type": "unknown",
-            "resolved_type": "callable[unknown]"
+            "return_type": "float64",
+            "arg_order": [
+              "nout",
+              "nin",
+              "std"
+            ],
+            "arg_types": {
+              "nout": "float64",
+              "nin": "float64",
+              "std": "float64"
+            },
+            "resolved_type": "callable[[float64,float64,float64],float64]"
           },
           "declare": true,
-          "decl_type": "callable[unknown]",
+          "decl_type": "callable[[float64,float64,float64],float64]",
           "declare_init": true
         },
         {
@@ -213,7 +224,7 @@
                   "end_lineno": 6,
                   "end_col": 22
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "float64",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "matrix(1, 2)",
@@ -225,7 +236,7 @@
                     "end_lineno": 6,
                     "end_col": 16
                   },
-                  "resolved_type": "unknown",
+                  "resolved_type": "callable[[float64,float64,float64],float64]",
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "matrix",
@@ -317,7 +328,7 @@
                   "end_lineno": 7,
                   "end_col": 27
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "float64",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "matrix(1, 2, 0.5)",
@@ -329,7 +340,7 @@
                     "end_lineno": 7,
                     "end_col": 16
                   },
-                  "resolved_type": "unknown",
+                  "resolved_type": "callable[[float64,float64,float64],float64]",
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "matrix",

@@ -1936,7 +1936,8 @@
                                   "id": "t"
                                 }
                               }
-                            }
+                            },
+                            "call_arg_type": "Obj"
                           }
                         ],
                         "keywords": [],
@@ -2125,7 +2126,8 @@
                                   }
                                 }
                               }
-                            }
+                            },
+                            "call_arg_type": "Obj"
                           }
                         ],
                         "keywords": [],
@@ -2258,7 +2260,8 @@
                                 "repr": "t",
                                 "id": "t"
                               }
-                            }
+                            },
+                            "call_arg_type": "Obj"
                           }
                         ],
                         "keywords": [],
@@ -2937,7 +2940,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "width",
-                "id": "width"
+                "id": "width",
+                "call_arg_type": "int64"
               },
               {
                 "kind": "Name",
@@ -2951,7 +2955,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "height",
-                "id": "height"
+                "id": "height",
+                "call_arg_type": "int64"
               },
               {
                 "kind": "Name",
@@ -2965,7 +2970,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "max_iter",
-                "id": "max_iter"
+                "id": "max_iter",
+                "call_arg_type": "int64"
               },
               {
                 "kind": "UnaryOp",
@@ -2993,7 +2999,8 @@
                   "borrow_kind": "value",
                   "repr": "0.8",
                   "value": 0.8
-                }
+                },
+                "call_arg_type": "float64"
               },
               {
                 "kind": "Constant",
@@ -3007,7 +3014,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "0.156",
-                "value": 0.156
+                "value": 0.156,
+                "call_arg_type": "float64"
               }
             ],
             "keywords": []
@@ -3039,7 +3047,7 @@
               "end_lineno": 56,
               "end_col": 54
             },
-            "resolved_type": "unknown",
+            "resolved_type": "None",
             "casts": [],
             "borrow_kind": "value",
             "repr": "png.write_rgb_png(out_path, width, height, pixels)",
@@ -3067,7 +3075,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "png",
-                "id": "png"
+                "id": "png",
+                "runtime_module_id": "pytra.utils.png"
               },
               "attr": "write_rgb_png"
             },
@@ -3084,7 +3093,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "out_path",
-                "id": "out_path"
+                "id": "out_path",
+                "call_arg_type": "str"
               },
               {
                 "kind": "Name",
@@ -3098,7 +3108,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "width",
-                "id": "width"
+                "id": "width",
+                "call_arg_type": "int64"
               },
               {
                 "kind": "Name",
@@ -3112,7 +3123,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "height",
-                "id": "height"
+                "id": "height",
+                "call_arg_type": "int64"
               },
               {
                 "kind": "Name",
@@ -3126,7 +3138,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "pixels",
-                "id": "pixels"
+                "id": "pixels",
+                "call_arg_type": "bytes"
               }
             ],
             "keywords": [],

@@ -91,7 +91,7 @@
                 "end_lineno": 5,
                 "end_col_offset": 15
               },
-              "resolved_type": "type",
+              "resolved_type": "callable",
               "casts": [],
               "borrow_kind": "value",
               "repr": "Path",
@@ -99,18 +99,56 @@
             },
             "args": [
               {
-                "kind": "Name",
+                "kind": "Unbox",
+                "resolved_type": "str",
+                "borrow_kind": "value",
+                "casts": [],
+                "value": {
+                  "kind": "Name",
+                  "source_span": {
+                    "lineno": 5,
+                    "col_offset": 16,
+                    "end_lineno": 5,
+                    "end_col_offset": 19
+                  },
+                  "resolved_type": "object",
+                  "casts": [],
+                  "borrow_kind": "readonly_ref",
+                  "repr": "raw",
+                  "id": "raw",
+                  "call_arg_type": "str"
+                },
                 "source_span": {
                   "lineno": 5,
                   "col_offset": 16,
                   "end_lineno": 5,
                   "end_col_offset": 19
                 },
-                "resolved_type": "object",
-                "casts": [],
-                "borrow_kind": "readonly_ref",
                 "repr": "raw",
-                "id": "raw"
+                "type_expr_summary_v1": {
+                  "schema_version": 1,
+                  "kind": "NamedType",
+                  "category": "static",
+                  "mirror": "str"
+                },
+                "target": "str",
+                "on_fail": "raise",
+                "bridge_lane_v1": {
+                  "schema_version": 1,
+                  "target": {
+                    "kind": "NamedType",
+                    "category": "static",
+                    "mirror": "str"
+                  },
+                  "target_category": "static",
+                  "value": {
+                    "kind": "DynamicType",
+                    "category": "dynamic",
+                    "mirror": "object",
+                    "dynamic_name": "object"
+                  },
+                  "value_category": "dynamic"
+                }
               }
             ],
             "keywords": [],
@@ -203,7 +241,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "path",
-                "id": "path"
+                "id": "path",
+                "call_arg_type": "Obj"
               }
             ],
             "keywords": [],
@@ -469,18 +508,55 @@
                 },
                 "args": [
                   {
-                    "kind": "Constant",
+                    "kind": "Box",
+                    "resolved_type": "object",
+                    "borrow_kind": "value",
+                    "casts": [],
+                    "value": {
+                      "kind": "Constant",
+                      "source_span": {
+                        "lineno": 10,
+                        "col_offset": 20,
+                        "end_lineno": 10,
+                        "end_col_offset": 34
+                      },
+                      "resolved_type": "str",
+                      "casts": [],
+                      "borrow_kind": "value",
+                      "repr": "\"tmp/data.bin\"",
+                      "value": "tmp/data.bin",
+                      "call_arg_type": "object"
+                    },
                     "source_span": {
                       "lineno": 10,
                       "col_offset": 20,
                       "end_lineno": 10,
                       "end_col_offset": 34
                     },
-                    "resolved_type": "str",
-                    "casts": [],
-                    "borrow_kind": "value",
                     "repr": "\"tmp/data.bin\"",
-                    "value": "tmp/data.bin"
+                    "type_expr_summary_v1": {
+                      "schema_version": 1,
+                      "kind": "DynamicType",
+                      "category": "dynamic",
+                      "mirror": "object",
+                      "dynamic_name": "object"
+                    },
+                    "bridge_lane_v1": {
+                      "schema_version": 1,
+                      "target": {
+                        "kind": "DynamicType",
+                        "category": "dynamic",
+                        "mirror": "object",
+                        "dynamic_name": "object"
+                      },
+                      "target_category": "dynamic",
+                      "value": {
+                        "kind": "NamedType",
+                        "category": "static",
+                        "mirror": "str"
+                      },
+                      "value_category": "static"
+                    }
                   }
                 ],
                 "keywords": [],

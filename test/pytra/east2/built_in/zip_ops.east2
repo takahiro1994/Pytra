@@ -134,7 +134,7 @@
               "end_lineno": 10,
               "end_col": 31
             },
-            "resolved_type": "list[unknown]",
+            "resolved_type": "list[tuple[A,B]]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "[]",
@@ -284,7 +284,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "lhs",
-                "id": "lhs"
+                "id": "lhs",
+                "call_arg_type": "Obj"
               }
             ],
             "keywords": [],
@@ -359,7 +360,8 @@
                   "casts": [],
                   "borrow_kind": "readonly_ref",
                   "repr": "rhs",
-                  "id": "rhs"
+                  "id": "rhs",
+                  "call_arg_type": "Obj"
                 }
               ],
               "keywords": [],
@@ -453,7 +455,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "rhs",
-                    "id": "rhs"
+                    "id": "rhs",
+                    "call_arg_type": "Obj"
                   }
                 ],
                 "keywords": [],
@@ -671,7 +674,8 @@
                           "id": "i"
                         }
                       }
-                    ]
+                    ],
+                    "call_arg_type": "tuple[A,B]"
                   }
                 ],
                 "keywords": [],

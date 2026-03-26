@@ -138,13 +138,13 @@
                 "kind": "arg",
                 "arg": "a",
                 "annotation": null,
-                "resolved_type": "unknown"
+                "resolved_type": "int64"
               },
               {
                 "kind": "arg",
                 "arg": "b",
                 "annotation": null,
-                "resolved_type": "unknown"
+                "resolved_type": "int64"
               }
             ],
             "body": {
@@ -167,7 +167,7 @@
                   "end_lineno": 7,
                   "end_col": 28
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "int64",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "a + b",
@@ -179,9 +179,9 @@
                     "end_lineno": 7,
                     "end_col": 24
                   },
-                  "resolved_type": "unknown",
+                  "resolved_type": "int64",
                   "casts": [],
-                  "borrow_kind": "value",
+                  "borrow_kind": "readonly_ref",
                   "repr": "a",
                   "id": "a"
                 },
@@ -194,9 +194,9 @@
                     "end_lineno": 7,
                     "end_col": 28
                   },
-                  "resolved_type": "unknown",
+                  "resolved_type": "int64",
                   "casts": [],
-                  "borrow_kind": "value",
+                  "borrow_kind": "readonly_ref",
                   "repr": "b",
                   "id": "b"
                 }
@@ -217,11 +217,19 @@
                 "id": "base"
               }
             },
-            "return_type": "unknown",
-            "resolved_type": "callable[unknown]"
+            "return_type": "int64",
+            "arg_order": [
+              "a",
+              "b"
+            ],
+            "arg_types": {
+              "a": "int64",
+              "b": "int64"
+            },
+            "resolved_type": "callable[[int64,int64],int64]"
           },
           "declare": true,
-          "decl_type": "callable[unknown]",
+          "decl_type": "callable[[int64,int64],int64]",
           "declare_init": true
         },
         {
@@ -265,7 +273,7 @@
               "end_lineno": 9,
               "end_col": 27
             },
-            "resolved_type": "list[unknown]",
+            "resolved_type": "list[bool]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "[]",
@@ -357,7 +365,7 @@
                   "end_lineno": 10,
                   "end_col": 57
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(mix(1, 2), 13, \"mix(1,2)\")",
@@ -384,7 +392,7 @@
                       "end_lineno": 10,
                       "end_col": 40
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "int64",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "mix(1, 2)",
@@ -396,7 +404,7 @@
                         "end_lineno": 10,
                         "end_col": 34
                       },
-                      "resolved_type": "unknown",
+                      "resolved_type": "callable[[int64,int64],int64]",
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "mix",
@@ -432,7 +440,8 @@
                         "value": 2
                       }
                     ],
-                    "keywords": []
+                    "keywords": [],
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -446,7 +455,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "13",
-                    "value": 13
+                    "value": 13,
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -460,7 +470,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"mix(1,2)\"",
-                    "value": "mix(1,2)"
+                    "value": "mix(1,2)",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -468,7 +479,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -552,7 +564,7 @@
                   "end_lineno": 11,
                   "end_col": 59
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(mix(-3, 4), 11, \"mix(-3,4)\")",
@@ -579,7 +591,7 @@
                       "end_lineno": 11,
                       "end_col": 41
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "int64",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "mix(-3, 4)",
@@ -591,7 +603,7 @@
                         "end_lineno": 11,
                         "end_col": 34
                       },
-                      "resolved_type": "unknown",
+                      "resolved_type": "callable[[int64,int64],int64]",
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "mix",
@@ -641,7 +653,8 @@
                         "value": 4
                       }
                     ],
-                    "keywords": []
+                    "keywords": [],
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -655,7 +668,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "11",
-                    "value": 11
+                    "value": 11,
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -669,7 +683,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"mix(-3,4)\"",
-                    "value": "mix(-3,4)"
+                    "value": "mix(-3,4)",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -677,7 +692,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -720,7 +736,7 @@
               "end_lineno": 12,
               "end_col": 60
             },
-            "resolved_type": "unknown",
+            "resolved_type": "bool",
             "casts": [],
             "borrow_kind": "value",
             "repr": "py_assert_all(checks, \"lambda_capture_multiargs\")",
@@ -751,7 +767,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "checks",
-                "id": "checks"
+                "id": "checks",
+                "call_arg_type": "list[bool]"
               },
               {
                 "kind": "Constant",
@@ -765,7 +782,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "\"lambda_capture_multiargs\"",
-                "value": "lambda_capture_multiargs"
+                "value": "lambda_capture_multiargs",
+                "call_arg_type": "str"
               }
             ],
             "keywords": [],

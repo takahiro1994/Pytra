@@ -124,7 +124,8 @@
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "9.0",
-                      "value": 9.0
+                      "value": 9.0,
+                      "call_arg_type": "float64"
                     }
                   ],
                   "keywords": [],
@@ -211,7 +212,8 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "9.0",
-                        "value": 9.0
+                        "value": 9.0,
+                        "call_arg_type": "float64"
                       }
                     ],
                     "keywords": [],

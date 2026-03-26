@@ -892,7 +892,7 @@
               "end_lineno": 21,
               "end_col": 59
             },
-            "resolved_type": "unknown",
+            "resolved_type": "bool",
             "casts": [],
             "borrow_kind": "value",
             "repr": "py_assert_stdout(['20', '40', 'cde'], _case_main)",
@@ -966,7 +966,8 @@
                     "repr": "'cde'",
                     "value": "cde"
                   }
-                ]
+                ],
+                "call_arg_type": "list[str]"
               },
               {
                 "kind": "Name",
@@ -980,7 +981,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "_case_main",
-                "id": "_case_main"
+                "id": "_case_main",
+                "call_arg_type": "object"
               }
             ],
             "keywords": [],

@@ -848,7 +848,8 @@
                               "repr": "self",
                               "id": "self"
                             },
-                            "attr": "_groups"
+                            "attr": "_groups",
+                            "call_arg_type": "Obj"
                           }
                         ],
                         "keywords": [],
@@ -951,7 +952,8 @@
                                 "repr": "self",
                                 "id": "self"
                               },
-                              "attr": "_groups"
+                              "attr": "_groups",
+                              "call_arg_type": "Obj"
                             }
                           ],
                           "keywords": [],
@@ -1685,18 +1687,33 @@
             "name": "Match"
           },
           "value": {
-            "kind": "Name",
+            "kind": "Unbox",
+            "value": {
+              "kind": "Name",
+              "source_span": {
+                "lineno": 29,
+                "col_offset": 4,
+                "end_lineno": 29,
+                "end_col_offset": 5
+              },
+              "resolved_type": "Match | None",
+              "casts": [],
+              "borrow_kind": "readonly_ref",
+              "repr": "m",
+              "id": "m"
+            },
+            "resolved_type": "Match",
+            "borrow_kind": "value",
+            "casts": [],
+            "target": "Match",
+            "on_fail": "raise",
             "source_span": {
               "lineno": 29,
               "col_offset": 4,
               "end_lineno": 29,
               "end_col_offset": 5
             },
-            "resolved_type": "Match | None",
-            "casts": [],
-            "borrow_kind": "readonly_ref",
-            "repr": "m",
-            "id": "m"
+            "repr": "m"
           },
           "type_expr_summary_v1": {
             "schema_version": 1,
@@ -1786,21 +1803,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "idx",
-                "id": "idx"
-              },
-              {
-                "kind": "Constant",
-                "source_span": {
-                  "lineno": 25,
-                  "col_offset": 38,
-                  "end_lineno": 25,
-                  "end_col_offset": 39
-                },
-                "resolved_type": "int64",
-                "casts": [],
-                "borrow_kind": "value",
-                "repr": "0",
-                "value": 0
+                "id": "idx",
+                "call_arg_type": "int64"
               }
             ],
             "keywords": [],
@@ -2113,7 +2117,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "m",
-                    "id": "m"
+                    "id": "m",
+                    "call_arg_type": "Match | None"
                   },
                   {
                     "kind": "Name",
@@ -2127,7 +2132,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "idx",
-                    "id": "idx"
+                    "id": "idx",
+                    "call_arg_type": "int64"
                   }
                 ],
                 "keywords": [],
@@ -2188,7 +2194,8 @@
                   "casts": [],
                   "borrow_kind": "readonly_ref",
                   "repr": "m",
-                  "id": "m"
+                  "id": "m",
+                  "call_arg_type": "Match | None"
                 },
                 {
                   "kind": "Name",
@@ -2202,7 +2209,8 @@
                   "casts": [],
                   "borrow_kind": "readonly_ref",
                   "repr": "idx",
-                  "id": "idx"
+                  "id": "idx",
+                  "call_arg_type": "int64"
                 }
               ],
               "keywords": [],
@@ -4824,7 +4832,8 @@
                           "casts": [],
                           "borrow_kind": "readonly_ref",
                           "repr": "part",
-                          "id": "part"
+                          "id": "part",
+                          "call_arg_type": "str"
                         }
                       ],
                       "keywords": [],
@@ -5196,7 +5205,8 @@
                   "casts": [],
                   "borrow_kind": "readonly_ref",
                   "repr": "part",
-                  "id": "part"
+                  "id": "part",
+                  "call_arg_type": "str"
                 }
               ],
               "keywords": [],
@@ -6048,7 +6058,8 @@
                   "casts": [],
                   "borrow_kind": "readonly_ref",
                   "repr": "t",
-                  "id": "t"
+                  "id": "t",
+                  "call_arg_type": "Obj"
                 }
               ],
               "keywords": [],
@@ -6137,7 +6148,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "t",
-                    "id": "t"
+                    "id": "t",
+                    "call_arg_type": "Obj"
                   }
                 ],
                 "keywords": [],
@@ -8672,7 +8684,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "t",
-                    "id": "t"
+                    "id": "t",
+                    "call_arg_type": "Obj"
                   }
                 ],
                 "keywords": [],
@@ -8761,7 +8774,8 @@
                       "casts": [],
                       "borrow_kind": "readonly_ref",
                       "repr": "t",
-                      "id": "t"
+                      "id": "t",
+                      "call_arg_type": "Obj"
                     }
                   ],
                   "keywords": [],
@@ -9059,7 +9073,8 @@
                             "value": 1
                           }
                         }
-                      }
+                      },
+                      "call_arg_type": "str"
                     }
                   ],
                   "keywords": [],
@@ -9746,7 +9761,8 @@
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "\"]\"",
-                      "value": "]"
+                      "value": "]",
+                      "call_arg_type": "str"
                     }
                   ],
                   "keywords": [],
@@ -9910,7 +9926,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"[\"",
-                    "value": "["
+                    "value": "[",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -10305,7 +10322,8 @@
                       "casts": [],
                       "borrow_kind": "readonly_ref",
                       "repr": "head",
-                      "id": "head"
+                      "id": "head",
+                      "call_arg_type": "str"
                     }
                   ],
                   "keywords": [],
@@ -10423,7 +10441,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "text",
-                    "id": "text"
+                    "id": "text",
+                    "call_arg_type": "str"
                   },
                   {
                     "kind": "List",
@@ -10710,7 +10729,14 @@
                           }
                         }
                       }
-                    ]
+                    ],
+                    "call_arg_type": "list[str]",
+                    "type_expr_summary_v1": {
+                      "schema_version": 1,
+                      "kind": "GenericType",
+                      "category": "static",
+                      "mirror": "list[str]"
+                    }
                   }
                 ],
                 "keywords": [],
@@ -11109,7 +11135,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "text",
-                    "id": "text"
+                    "id": "text",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -11473,7 +11500,8 @@
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "\"def\"",
-                      "value": "def"
+                      "value": "def",
+                      "call_arg_type": "str"
                     }
                   ],
                   "keywords": [],
@@ -11735,7 +11763,8 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "t",
-                            "id": "t"
+                            "id": "t",
+                            "call_arg_type": "Obj"
                           }
                         ],
                         "keywords": [],
@@ -11824,7 +11853,8 @@
                               "casts": [],
                               "borrow_kind": "readonly_ref",
                               "repr": "t",
-                              "id": "t"
+                              "id": "t",
+                              "call_arg_type": "Obj"
                             }
                           ],
                           "keywords": [],
@@ -12113,7 +12143,8 @@
                                 "value": 1
                               }
                             }
-                          }
+                          },
+                          "call_arg_type": "str"
                         }
                       ],
                       "keywords": [],
@@ -12260,7 +12291,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "t",
-                    "id": "t"
+                    "id": "t",
+                    "call_arg_type": "str"
                   },
                   {
                     "kind": "Name",
@@ -12274,7 +12306,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "i",
-                    "id": "i"
+                    "id": "i",
+                    "call_arg_type": "int64"
                   }
                 ],
                 "keywords": [],
@@ -12493,7 +12526,8 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "t",
-                            "id": "t"
+                            "id": "t",
+                            "call_arg_type": "Obj"
                           }
                         ],
                         "keywords": [],
@@ -12582,7 +12616,8 @@
                               "casts": [],
                               "borrow_kind": "readonly_ref",
                               "repr": "t",
-                              "id": "t"
+                              "id": "t",
+                              "call_arg_type": "Obj"
                             }
                           ],
                           "keywords": [],
@@ -12858,7 +12893,8 @@
                               "value": 1
                             }
                           }
-                        }
+                        },
+                        "call_arg_type": "str"
                       }
                     ],
                     "keywords": [],
@@ -13213,7 +13249,8 @@
                       "casts": [],
                       "borrow_kind": "readonly_ref",
                       "repr": "name",
-                      "id": "name"
+                      "id": "name",
+                      "call_arg_type": "str"
                     }
                   ],
                   "keywords": [],
@@ -13430,7 +13467,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "t",
-                    "id": "t"
+                    "id": "t",
+                    "call_arg_type": "str"
                   },
                   {
                     "kind": "Name",
@@ -13444,7 +13482,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "k",
-                    "id": "k"
+                    "id": "k",
+                    "call_arg_type": "int64"
                   }
                 ],
                 "keywords": [],
@@ -13584,7 +13623,8 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "t",
-                            "id": "t"
+                            "id": "t",
+                            "call_arg_type": "Obj"
                           }
                         ],
                         "keywords": [],
@@ -13673,7 +13713,8 @@
                               "casts": [],
                               "borrow_kind": "readonly_ref",
                               "repr": "t",
-                              "id": "t"
+                              "id": "t",
+                              "call_arg_type": "Obj"
                             }
                           ],
                           "keywords": [],
@@ -14287,7 +14328,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\")\"",
-                    "value": ")"
+                    "value": ")",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -15489,7 +15531,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "text",
-                        "id": "text"
+                        "id": "text",
+                        "call_arg_type": "str"
                       },
                       {
                         "kind": "List",
@@ -15546,7 +15589,14 @@
                             "repr": "\"\"",
                             "value": ""
                           }
-                        ]
+                        ],
+                        "call_arg_type": "list[str]",
+                        "type_expr_summary_v1": {
+                          "schema_version": 1,
+                          "kind": "GenericType",
+                          "category": "static",
+                          "mirror": "list[str]"
+                        }
                       }
                     ],
                     "keywords": [],
@@ -15680,7 +15730,8 @@
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "\"->\"",
-                      "value": "->"
+                      "value": "->",
+                      "call_arg_type": "str"
                     }
                   ],
                   "keywords": [],
@@ -16211,7 +16262,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "text",
-                    "id": "text"
+                    "id": "text",
+                    "call_arg_type": "str"
                   },
                   {
                     "kind": "List",
@@ -16268,7 +16320,14 @@
                         "repr": "ret",
                         "id": "ret"
                       }
-                    ]
+                    ],
+                    "call_arg_type": "list[str]",
+                    "type_expr_summary_v1": {
+                      "schema_version": 1,
+                      "kind": "GenericType",
+                      "category": "static",
+                      "mirror": "list[str]"
+                    }
                   }
                 ],
                 "keywords": [],
@@ -16675,7 +16734,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\":\"",
-                    "value": ":"
+                    "value": ":",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -17174,7 +17234,8 @@
                       "casts": [],
                       "borrow_kind": "readonly_ref",
                       "repr": "name",
-                      "id": "name"
+                      "id": "name",
+                      "call_arg_type": "str"
                     }
                   ],
                   "keywords": [],
@@ -17585,7 +17646,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"=\"",
-                    "value": "="
+                    "value": "=",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -18080,7 +18142,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "text",
-                        "id": "text"
+                        "id": "text",
+                        "call_arg_type": "str"
                       },
                       {
                         "kind": "List",
@@ -18137,7 +18200,14 @@
                             "repr": "\"\"",
                             "value": ""
                           }
-                        ]
+                        ],
+                        "call_arg_type": "list[str]",
+                        "type_expr_summary_v1": {
+                          "schema_version": 1,
+                          "kind": "GenericType",
+                          "category": "static",
+                          "mirror": "list[str]"
+                        }
                       }
                     ],
                     "keywords": [],
@@ -19248,7 +19318,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "text",
-                    "id": "text"
+                    "id": "text",
+                    "call_arg_type": "str"
                   },
                   {
                     "kind": "List",
@@ -19305,7 +19376,14 @@
                         "repr": "val",
                         "id": "val"
                       }
-                    ]
+                    ],
+                    "call_arg_type": "list[str]",
+                    "type_expr_summary_v1": {
+                      "schema_version": 1,
+                      "kind": "GenericType",
+                      "category": "static",
+                      "mirror": "list[str]"
+                    }
                   }
                 ],
                 "keywords": [],
@@ -19529,7 +19607,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "text",
-                    "id": "text"
+                    "id": "text",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -19588,7 +19667,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "text",
-                        "id": "text"
+                        "id": "text",
+                        "call_arg_type": "str"
                       },
                       {
                         "kind": "List",
@@ -19598,11 +19678,18 @@
                           "end_lineno": 181,
                           "end_col_offset": 33
                         },
-                        "resolved_type": "list[unknown]",
+                        "resolved_type": "list[str]",
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "[]",
-                        "elements": []
+                        "elements": [],
+                        "call_arg_type": "list[str]",
+                        "type_expr_summary_v1": {
+                          "schema_version": 1,
+                          "kind": "GenericType",
+                          "category": "static",
+                          "mirror": "list[str]"
+                        }
                       }
                     ],
                     "keywords": [],
@@ -20070,7 +20157,8 @@
                           "casts": [],
                           "borrow_kind": "readonly_ref",
                           "repr": "ch",
-                          "id": "ch"
+                          "id": "ch",
+                          "call_arg_type": "str"
                         }
                       ],
                       "keywords": [],
@@ -20216,7 +20304,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "text",
-                    "id": "text"
+                    "id": "text",
+                    "call_arg_type": "str"
                   },
                   {
                     "kind": "List",
@@ -20226,11 +20315,18 @@
                       "end_lineno": 191,
                       "end_col_offset": 29
                     },
-                    "resolved_type": "list[unknown]",
+                    "resolved_type": "list[str]",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "[]",
-                    "elements": []
+                    "elements": [],
+                    "call_arg_type": "list[str]",
+                    "type_expr_summary_v1": {
+                      "schema_version": 1,
+                      "kind": "GenericType",
+                      "category": "static",
+                      "mirror": "list[str]"
+                    }
                   }
                 ],
                 "keywords": [],
@@ -20462,7 +20558,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "text",
-                    "id": "text"
+                    "id": "text",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -20751,7 +20848,8 @@
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "\"class\"",
-                      "value": "class"
+                      "value": "class",
+                      "call_arg_type": "str"
                     }
                   ],
                   "keywords": [],
@@ -21013,7 +21111,8 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "t",
-                            "id": "t"
+                            "id": "t",
+                            "call_arg_type": "Obj"
                           }
                         ],
                         "keywords": [],
@@ -21102,7 +21201,8 @@
                               "casts": [],
                               "borrow_kind": "readonly_ref",
                               "repr": "t",
-                              "id": "t"
+                              "id": "t",
+                              "call_arg_type": "Obj"
                             }
                           ],
                           "keywords": [],
@@ -21391,7 +21491,8 @@
                                 "value": 1
                               }
                             }
-                          }
+                          },
+                          "call_arg_type": "str"
                         }
                       ],
                       "keywords": [],
@@ -21538,7 +21639,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "t",
-                    "id": "t"
+                    "id": "t",
+                    "call_arg_type": "str"
                   },
                   {
                     "kind": "Name",
@@ -21552,7 +21654,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "i",
-                    "id": "i"
+                    "id": "i",
+                    "call_arg_type": "int64"
                   }
                 ],
                 "keywords": [],
@@ -21769,7 +21872,8 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "t",
-                            "id": "t"
+                            "id": "t",
+                            "call_arg_type": "Obj"
                           }
                         ],
                         "keywords": [],
@@ -21858,7 +21962,8 @@
                               "casts": [],
                               "borrow_kind": "readonly_ref",
                               "repr": "t",
-                              "id": "t"
+                              "id": "t",
+                              "call_arg_type": "Obj"
                             }
                           ],
                           "keywords": [],
@@ -22134,7 +22239,8 @@
                               "value": 1
                             }
                           }
-                        }
+                        },
+                        "call_arg_type": "str"
                       }
                     ],
                     "keywords": [],
@@ -22480,7 +22586,8 @@
                       "casts": [],
                       "borrow_kind": "readonly_ref",
                       "repr": "name",
-                      "id": "name"
+                      "id": "name",
+                      "call_arg_type": "str"
                     }
                   ],
                   "keywords": [],
@@ -22940,7 +23047,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "text",
-                        "id": "text"
+                        "id": "text",
+                        "call_arg_type": "str"
                       },
                       {
                         "kind": "List",
@@ -22983,7 +23091,14 @@
                             "repr": "\"\"",
                             "value": ""
                           }
-                        ]
+                        ],
+                        "call_arg_type": "list[str]",
+                        "type_expr_summary_v1": {
+                          "schema_version": 1,
+                          "kind": "GenericType",
+                          "category": "static",
+                          "mirror": "list[str]"
+                        }
                       }
                     ],
                     "keywords": [],
@@ -23128,7 +23243,8 @@
                           "casts": [],
                           "borrow_kind": "value",
                           "repr": "\"(\"",
-                          "value": "("
+                          "value": "(",
+                          "call_arg_type": "str"
                         }
                       ],
                       "keywords": [],
@@ -23213,7 +23329,8 @@
                           "casts": [],
                           "borrow_kind": "value",
                           "repr": "\")\"",
-                          "value": ")"
+                          "value": ")",
+                          "call_arg_type": "str"
                         }
                       ],
                       "keywords": [],
@@ -23709,7 +23826,8 @@
                       "casts": [],
                       "borrow_kind": "readonly_ref",
                       "repr": "base",
-                      "id": "base"
+                      "id": "base",
+                      "call_arg_type": "str"
                     }
                   ],
                   "keywords": [],
@@ -23827,7 +23945,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "text",
-                    "id": "text"
+                    "id": "text",
+                    "call_arg_type": "str"
                   },
                   {
                     "kind": "List",
@@ -23870,7 +23989,14 @@
                         "repr": "base",
                         "id": "base"
                       }
-                    ]
+                    ],
+                    "call_arg_type": "list[str]",
+                    "type_expr_summary_v1": {
+                      "schema_version": 1,
+                      "kind": "GenericType",
+                      "category": "static",
+                      "mirror": "list[str]"
+                    }
                   }
                 ],
                 "keywords": [],
@@ -24119,7 +24245,8 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "\"any(\"",
-                        "value": "any("
+                        "value": "any(",
+                        "call_arg_type": "str"
                       }
                     ],
                     "keywords": [],
@@ -24204,7 +24331,8 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "\")\"",
-                        "value": ")"
+                        "value": ")",
+                        "call_arg_type": "str"
                       }
                     ],
                     "keywords": [],
@@ -24287,7 +24415,8 @@
                           "casts": [],
                           "borrow_kind": "readonly_ref",
                           "repr": "text",
-                          "id": "text"
+                          "id": "text",
+                          "call_arg_type": "Obj"
                         }
                       ],
                       "keywords": [],
@@ -24376,7 +24505,8 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "text",
-                            "id": "text"
+                            "id": "text",
+                            "call_arg_type": "Obj"
                           }
                         ],
                         "keywords": [],
@@ -24465,7 +24595,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "text",
-                        "id": "text"
+                        "id": "text",
+                        "call_arg_type": "str"
                       },
                       {
                         "kind": "List",
@@ -24610,7 +24741,14 @@
                               }
                             }
                           }
-                        ]
+                        ],
+                        "call_arg_type": "list[str]",
+                        "type_expr_summary_v1": {
+                          "schema_version": 1,
+                          "kind": "GenericType",
+                          "category": "static",
+                          "mirror": "list[str]"
+                        }
                       }
                     ],
                     "keywords": [],
@@ -24736,7 +24874,8 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "\"all(\"",
-                        "value": "all("
+                        "value": "all(",
+                        "call_arg_type": "str"
                       }
                     ],
                     "keywords": [],
@@ -24821,7 +24960,8 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "\")\"",
-                        "value": ")"
+                        "value": ")",
+                        "call_arg_type": "str"
                       }
                     ],
                     "keywords": [],
@@ -24904,7 +25044,8 @@
                           "casts": [],
                           "borrow_kind": "readonly_ref",
                           "repr": "text",
-                          "id": "text"
+                          "id": "text",
+                          "call_arg_type": "Obj"
                         }
                       ],
                       "keywords": [],
@@ -24993,7 +25134,8 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "text",
-                            "id": "text"
+                            "id": "text",
+                            "call_arg_type": "Obj"
                           }
                         ],
                         "keywords": [],
@@ -25082,7 +25224,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "text",
-                        "id": "text"
+                        "id": "text",
+                        "call_arg_type": "str"
                       },
                       {
                         "kind": "List",
@@ -25227,7 +25370,14 @@
                               }
                             }
                           }
-                        ]
+                        ],
+                        "call_arg_type": "list[str]",
+                        "type_expr_summary_v1": {
+                          "schema_version": 1,
+                          "kind": "GenericType",
+                          "category": "static",
+                          "mirror": "list[str]"
+                        }
                       }
                     ],
                     "keywords": [],
@@ -25595,7 +25745,8 @@
                           "casts": [],
                           "borrow_kind": "value",
                           "repr": "\"[\"",
-                          "value": "["
+                          "value": "[",
+                          "call_arg_type": "str"
                         }
                       ],
                       "keywords": [],
@@ -25680,7 +25831,8 @@
                           "casts": [],
                           "borrow_kind": "value",
                           "repr": "\"]\"",
-                          "value": "]"
+                          "value": "]",
+                          "call_arg_type": "str"
                         }
                       ],
                       "keywords": [],
@@ -26341,7 +26493,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "m1",
-                    "id": "m1"
+                    "id": "m1",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -26948,7 +27101,8 @@
                           "casts": [],
                           "borrow_kind": "readonly_ref",
                           "repr": "m1",
-                          "id": "m1"
+                          "id": "m1",
+                          "call_arg_type": "Obj"
                         }
                       ],
                       "keywords": [],
@@ -27033,7 +27187,8 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "m1",
-                            "id": "m1"
+                            "id": "m1",
+                            "call_arg_type": "Obj"
                           }
                         ],
                         "keywords": [],
@@ -27123,7 +27278,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "m1",
-                        "id": "m1"
+                        "id": "m1",
+                        "call_arg_type": "Obj"
                       }
                     ],
                     "keywords": [],
@@ -27208,7 +27364,8 @@
                           "casts": [],
                           "borrow_kind": "readonly_ref",
                           "repr": "m1",
-                          "id": "m1"
+                          "id": "m1",
+                          "call_arg_type": "Obj"
                         }
                       ],
                       "keywords": [],
@@ -27365,7 +27522,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "m2",
-                    "id": "m2"
+                    "id": "m2",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -27995,7 +28153,8 @@
                               "casts": [],
                               "borrow_kind": "readonly_ref",
                               "repr": "m2",
-                              "id": "m2"
+                              "id": "m2",
+                              "call_arg_type": "Obj"
                             }
                           ],
                           "keywords": [],
@@ -28080,7 +28239,8 @@
                                 "casts": [],
                                 "borrow_kind": "readonly_ref",
                                 "repr": "m2",
-                                "id": "m2"
+                                "id": "m2",
+                                "call_arg_type": "Obj"
                               }
                             ],
                             "keywords": [],
@@ -28170,7 +28330,8 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "m2",
-                            "id": "m2"
+                            "id": "m2",
+                            "call_arg_type": "Obj"
                           }
                         ],
                         "keywords": [],
@@ -28255,7 +28416,8 @@
                               "casts": [],
                               "borrow_kind": "readonly_ref",
                               "repr": "m2",
-                              "id": "m2"
+                              "id": "m2",
+                              "call_arg_type": "Obj"
                             }
                           ],
                           "keywords": [],
@@ -28382,7 +28544,8 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "m2",
-                            "id": "m2"
+                            "id": "m2",
+                            "call_arg_type": "Obj"
                           }
                         ],
                         "keywords": [],
@@ -28467,7 +28630,8 @@
                               "casts": [],
                               "borrow_kind": "readonly_ref",
                               "repr": "m2",
-                              "id": "m2"
+                              "id": "m2",
+                              "call_arg_type": "Obj"
                             }
                           ],
                           "keywords": [],
@@ -28557,7 +28721,8 @@
                           "casts": [],
                           "borrow_kind": "readonly_ref",
                           "repr": "m2",
-                          "id": "m2"
+                          "id": "m2",
+                          "call_arg_type": "Obj"
                         }
                       ],
                       "keywords": [],
@@ -28642,7 +28807,8 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "m2",
-                            "id": "m2"
+                            "id": "m2",
+                            "call_arg_type": "Obj"
                           }
                         ],
                         "keywords": [],
@@ -28789,7 +28955,8 @@
                           "casts": [],
                           "borrow_kind": "readonly_ref",
                           "repr": "expr",
-                          "id": "expr"
+                          "id": "expr",
+                          "call_arg_type": "str"
                         }
                       ],
                       "keywords": [],
@@ -28853,7 +29020,8 @@
                           "casts": [],
                           "borrow_kind": "readonly_ref",
                           "repr": "var",
-                          "id": "var"
+                          "id": "var",
+                          "call_arg_type": "str"
                         }
                       ],
                       "keywords": [],
@@ -29070,7 +29238,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "text",
-                    "id": "text"
+                    "id": "text",
+                    "call_arg_type": "str"
                   },
                   {
                     "kind": "List",
@@ -29127,7 +29296,14 @@
                         "repr": "it",
                         "id": "it"
                       }
-                    ]
+                    ],
+                    "call_arg_type": "list[str]",
+                    "type_expr_summary_v1": {
+                      "schema_version": 1,
+                      "kind": "GenericType",
+                      "category": "static",
+                      "mirror": "list[str]"
+                    }
                   }
                 ],
                 "keywords": [],
@@ -29426,7 +29602,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "text",
-                    "id": "text"
+                    "id": "text",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -29648,7 +29825,8 @@
                           "casts": [],
                           "borrow_kind": "value",
                           "repr": "\"for\"",
-                          "value": "for"
+                          "value": "for",
+                          "call_arg_type": "str"
                         }
                       ],
                       "keywords": [],
@@ -30058,7 +30236,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\" in \"",
-                    "value": " in "
+                    "value": " in ",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -31344,7 +31523,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "text",
-                    "id": "text"
+                    "id": "text",
+                    "call_arg_type": "str"
                   },
                   {
                     "kind": "List",
@@ -31387,7 +31567,14 @@
                         "repr": "right",
                         "id": "right"
                       }
-                    ]
+                    ],
+                    "call_arg_type": "list[str]",
+                    "type_expr_summary_v1": {
+                      "schema_version": 1,
+                      "kind": "GenericType",
+                      "category": "static",
+                      "mirror": "list[str]"
+                    }
                   }
                 ],
                 "keywords": [],
@@ -31619,7 +31806,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "text",
-                    "id": "text"
+                    "id": "text",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -31843,7 +32031,8 @@
                           "casts": [],
                           "borrow_kind": "value",
                           "repr": "\"with\"",
-                          "value": "with"
+                          "value": "with",
+                          "call_arg_type": "str"
                         }
                       ],
                       "keywords": [],
@@ -32257,7 +32446,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\" as \"",
-                    "value": " as "
+                    "value": " as ",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -33403,7 +33593,8 @@
                           "casts": [],
                           "borrow_kind": "readonly_ref",
                           "repr": "name",
-                          "id": "name"
+                          "id": "name",
+                          "call_arg_type": "str"
                         }
                       ],
                       "keywords": [],
@@ -33524,7 +33715,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "text",
-                    "id": "text"
+                    "id": "text",
+                    "call_arg_type": "str"
                   },
                   {
                     "kind": "List",
@@ -33567,7 +33759,14 @@
                         "repr": "name",
                         "id": "name"
                       }
-                    ]
+                    ],
+                    "call_arg_type": "list[str]",
+                    "type_expr_summary_v1": {
+                      "schema_version": 1,
+                      "kind": "GenericType",
+                      "category": "static",
+                      "mirror": "list[str]"
+                    }
                   }
                 ],
                 "keywords": [],
@@ -33799,7 +33998,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "text",
-                    "id": "text"
+                    "id": "text",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -34023,7 +34223,8 @@
                           "casts": [],
                           "borrow_kind": "value",
                           "repr": "\"except\"",
-                          "value": "except"
+                          "value": "except",
+                          "call_arg_type": "str"
                         }
                       ],
                       "keywords": [],
@@ -34437,7 +34638,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\" as \"",
-                    "value": " as "
+                    "value": " as ",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -35583,7 +35785,8 @@
                           "casts": [],
                           "borrow_kind": "readonly_ref",
                           "repr": "name",
-                          "id": "name"
+                          "id": "name",
+                          "call_arg_type": "str"
                         }
                       ],
                       "keywords": [],
@@ -35704,7 +35907,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "text",
-                    "id": "text"
+                    "id": "text",
+                    "call_arg_type": "str"
                   },
                   {
                     "kind": "List",
@@ -35747,7 +35951,14 @@
                         "repr": "name",
                         "id": "name"
                       }
-                    ]
+                    ],
+                    "call_arg_type": "list[str]",
+                    "type_expr_summary_v1": {
+                      "schema_version": 1,
+                      "kind": "GenericType",
+                      "category": "static",
+                      "mirror": "list[str]"
+                    }
                   }
                 ],
                 "keywords": [],
@@ -35979,7 +36190,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "text",
-                    "id": "text"
+                    "id": "text",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -36201,7 +36413,8 @@
                           "casts": [],
                           "borrow_kind": "value",
                           "repr": "\"except\"",
-                          "value": "except"
+                          "value": "except",
+                          "call_arg_type": "str"
                         }
                       ],
                       "keywords": [],
@@ -36722,7 +36935,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "text",
-                    "id": "text"
+                    "id": "text",
+                    "call_arg_type": "str"
                   },
                   {
                     "kind": "List",
@@ -36751,7 +36965,14 @@
                         "repr": "rest",
                         "id": "rest"
                       }
-                    ]
+                    ],
+                    "call_arg_type": "list[str]",
+                    "type_expr_summary_v1": {
+                      "schema_version": 1,
+                      "kind": "GenericType",
+                      "category": "static",
+                      "mirror": "list[str]"
+                    }
                   }
                 ],
                 "keywords": [],
@@ -37024,7 +37245,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\":\"",
-                    "value": ":"
+                    "value": ":",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -38163,7 +38385,8 @@
                           "casts": [],
                           "borrow_kind": "readonly_ref",
                           "repr": "target",
-                          "id": "target"
+                          "id": "target",
+                          "call_arg_type": "str"
                         }
                       ],
                       "keywords": [],
@@ -38284,7 +38507,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "text",
-                    "id": "text"
+                    "id": "text",
+                    "call_arg_type": "str"
                   },
                   {
                     "kind": "List",
@@ -38327,7 +38551,14 @@
                         "repr": "ann",
                         "id": "ann"
                       }
-                    ]
+                    ],
+                    "call_arg_type": "list[str]",
+                    "type_expr_summary_v1": {
+                      "schema_version": 1,
+                      "kind": "GenericType",
+                      "category": "static",
+                      "mirror": "list[str]"
+                    }
                   }
                 ],
                 "keywords": [],
@@ -38571,7 +38802,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\":\"",
-                    "value": ":"
+                    "value": ":",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -39386,7 +39618,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"=\"",
-                    "value": "="
+                    "value": "=",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -40447,7 +40680,8 @@
                           "casts": [],
                           "borrow_kind": "readonly_ref",
                           "repr": "target",
-                          "id": "target"
+                          "id": "target",
+                          "call_arg_type": "str"
                         }
                       ],
                       "keywords": [],
@@ -40757,7 +40991,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "text",
-                    "id": "text"
+                    "id": "text",
+                    "call_arg_type": "str"
                   },
                   {
                     "kind": "List",
@@ -40814,7 +41049,14 @@
                         "repr": "expr",
                         "id": "expr"
                       }
-                    ]
+                    ],
+                    "call_arg_type": "list[str]",
+                    "type_expr_summary_v1": {
+                      "schema_version": 1,
+                      "kind": "GenericType",
+                      "category": "static",
+                      "mirror": "list[str]"
+                    }
                   }
                 ],
                 "keywords": [],
@@ -41205,7 +41447,13 @@
                     "repr": "\"^=\"",
                     "value": "^="
                   }
-                ]
+                ],
+                "type_expr_summary_v1": {
+                  "schema_version": 1,
+                  "kind": "GenericType",
+                  "category": "static",
+                  "mirror": "list[str]"
+                }
               },
               "type_expr_summary_v1": {
                 "schema_version": 1,
@@ -41499,7 +41747,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "op",
-                        "id": "op"
+                        "id": "op",
+                        "call_arg_type": "str"
                       }
                     ],
                     "keywords": [],
@@ -42668,7 +42917,8 @@
                               "casts": [],
                               "borrow_kind": "readonly_ref",
                               "repr": "op_txt",
-                              "id": "op_txt"
+                              "id": "op_txt",
+                              "call_arg_type": "Obj"
                             }
                           ],
                           "keywords": [],
@@ -42753,7 +43003,8 @@
                                 "casts": [],
                                 "borrow_kind": "readonly_ref",
                                 "repr": "op_txt",
-                                "id": "op_txt"
+                                "id": "op_txt",
+                                "call_arg_type": "Obj"
                               }
                             ],
                             "keywords": [],
@@ -42843,7 +43094,8 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "op_txt",
-                            "id": "op_txt"
+                            "id": "op_txt",
+                            "call_arg_type": "Obj"
                           }
                         ],
                         "keywords": [],
@@ -42928,7 +43180,8 @@
                               "casts": [],
                               "borrow_kind": "readonly_ref",
                               "repr": "op_txt",
-                              "id": "op_txt"
+                              "id": "op_txt",
+                              "call_arg_type": "Obj"
                             }
                           ],
                           "keywords": [],
@@ -43055,7 +43308,8 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "op_txt",
-                            "id": "op_txt"
+                            "id": "op_txt",
+                            "call_arg_type": "Obj"
                           }
                         ],
                         "keywords": [],
@@ -43140,7 +43394,8 @@
                               "casts": [],
                               "borrow_kind": "readonly_ref",
                               "repr": "op_txt",
-                              "id": "op_txt"
+                              "id": "op_txt",
+                              "call_arg_type": "Obj"
                             }
                           ],
                           "keywords": [],
@@ -43230,7 +43485,8 @@
                           "casts": [],
                           "borrow_kind": "readonly_ref",
                           "repr": "op_txt",
-                          "id": "op_txt"
+                          "id": "op_txt",
+                          "call_arg_type": "Obj"
                         }
                       ],
                       "keywords": [],
@@ -43315,7 +43571,8 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "op_txt",
-                            "id": "op_txt"
+                            "id": "op_txt",
+                            "call_arg_type": "Obj"
                           }
                         ],
                         "keywords": [],
@@ -43551,7 +43808,8 @@
                           "casts": [],
                           "borrow_kind": "readonly_ref",
                           "repr": "left",
-                          "id": "left"
+                          "id": "left",
+                          "call_arg_type": "str"
                         }
                       ],
                       "keywords": [],
@@ -43674,7 +43932,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "text",
-                    "id": "text"
+                    "id": "text",
+                    "call_arg_type": "str"
                   },
                   {
                     "kind": "List",
@@ -43731,7 +43990,14 @@
                         "repr": "right",
                         "id": "right"
                       }
-                    ]
+                    ],
+                    "call_arg_type": "list[str]",
+                    "type_expr_summary_v1": {
+                      "schema_version": 1,
+                      "kind": "GenericType",
+                      "category": "static",
+                      "mirror": "list[str]"
+                    }
                   }
                 ],
                 "keywords": [],
@@ -43990,7 +44256,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"=\"",
-                    "value": "="
+                    "value": "=",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -45105,7 +45372,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\",\"",
-                    "value": ","
+                    "value": ",",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -46166,7 +46434,8 @@
                           "casts": [],
                           "borrow_kind": "readonly_ref",
                           "repr": "a",
-                          "id": "a"
+                          "id": "a",
+                          "call_arg_type": "str"
                         }
                       ],
                       "keywords": [],
@@ -46230,7 +46499,8 @@
                           "casts": [],
                           "borrow_kind": "readonly_ref",
                           "repr": "b",
-                          "id": "b"
+                          "id": "b",
+                          "call_arg_type": "str"
                         }
                       ],
                       "keywords": [],
@@ -46353,7 +46623,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "text",
-                    "id": "text"
+                    "id": "text",
+                    "call_arg_type": "str"
                   },
                   {
                     "kind": "List",
@@ -46410,7 +46681,14 @@
                         "repr": "right",
                         "id": "right"
                       }
-                    ]
+                    ],
+                    "call_arg_type": "list[str]",
+                    "type_expr_summary_v1": {
+                      "schema_version": 1,
+                      "kind": "GenericType",
+                      "category": "static",
+                      "mirror": "list[str]"
+                    }
                   }
                 ],
                 "keywords": [],
@@ -46799,7 +47077,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"=\"",
-                    "value": "="
+                    "value": "=",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -48105,7 +48384,8 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "text",
-                            "id": "text"
+                            "id": "text",
+                            "call_arg_type": "Obj"
                           }
                         ],
                         "keywords": [],
@@ -48222,7 +48502,8 @@
                               "casts": [],
                               "borrow_kind": "readonly_ref",
                               "repr": "text",
-                              "id": "text"
+                              "id": "text",
+                              "call_arg_type": "Obj"
                             }
                           ],
                           "keywords": [],
@@ -50094,7 +50375,8 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "\"]\"",
-                        "value": "]"
+                        "value": "]",
+                        "call_arg_type": "str"
                       }
                     ],
                     "keywords": [],
@@ -50437,7 +50719,8 @@
                       "casts": [],
                       "borrow_kind": "readonly_ref",
                       "repr": "base_left",
-                      "id": "base_left"
+                      "id": "base_left",
+                      "call_arg_type": "str"
                     }
                   ],
                   "keywords": [],
@@ -50557,7 +50840,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "text",
-                    "id": "text"
+                    "id": "text",
+                    "call_arg_type": "str"
                   },
                   {
                     "kind": "List",
@@ -50600,7 +50884,14 @@
                         "repr": "right",
                         "id": "right"
                       }
-                    ]
+                    ],
+                    "call_arg_type": "list[str]",
+                    "type_expr_summary_v1": {
+                      "schema_version": 1,
+                      "kind": "GenericType",
+                      "category": "static",
+                      "mirror": "list[str]"
+                    }
                   }
                 ],
                 "keywords": [],
@@ -50856,7 +51147,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"=\"",
-                    "value": "="
+                    "value": "=",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -52162,7 +52454,8 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "text",
-                            "id": "text"
+                            "id": "text",
+                            "call_arg_type": "Obj"
                           }
                         ],
                         "keywords": [],
@@ -52279,7 +52572,8 @@
                               "casts": [],
                               "borrow_kind": "readonly_ref",
                               "repr": "text",
-                              "id": "text"
+                              "id": "text",
+                              "call_arg_type": "Obj"
                             }
                           ],
                           "keywords": [],
@@ -54135,7 +54429,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\",\"",
-                    "value": ","
+                    "value": ",",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -54344,6 +54639,7 @@
                             "repr": "p",
                             "id": "p"
                           },
+                          "call_arg_type": "str",
                           "type_expr_summary_v1": {
                             "schema_version": 1,
                             "kind": "NamedType",
@@ -54523,7 +54819,8 @@
                       "casts": [],
                       "borrow_kind": "readonly_ref",
                       "repr": "parts",
-                      "id": "parts"
+                      "id": "parts",
+                      "call_arg_type": "Obj"
                     }
                   ],
                   "keywords": [],
@@ -54612,7 +54909,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "parts",
-                        "id": "parts"
+                        "id": "parts",
+                        "call_arg_type": "Obj"
                       }
                     ],
                     "keywords": [],
@@ -54759,7 +55057,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "text",
-                    "id": "text"
+                    "id": "text",
+                    "call_arg_type": "str"
                   },
                   {
                     "kind": "List",
@@ -54802,7 +55101,14 @@
                         "repr": "right",
                         "id": "right"
                       }
-                    ]
+                    ],
+                    "call_arg_type": "list[str]",
+                    "type_expr_summary_v1": {
+                      "schema_version": 1,
+                      "kind": "GenericType",
+                      "category": "static",
+                      "mirror": "list[str]"
+                    }
                   }
                 ],
                 "keywords": [],
@@ -63372,7 +63678,8 @@
                       "repr": "self",
                       "id": "self"
                     },
-                    "attr": "_pattern"
+                    "attr": "_pattern",
+                    "call_arg_type": "str"
                   },
                   {
                     "kind": "Name",
@@ -63386,7 +63693,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "text",
-                    "id": "text"
+                    "id": "text",
+                    "call_arg_type": "str"
                   },
                   {
                     "kind": "Attribute",
@@ -63414,7 +63722,8 @@
                       "repr": "self",
                       "id": "self"
                     },
-                    "attr": "_flags"
+                    "attr": "_flags",
+                    "call_arg_type": "int64"
                   }
                 ],
                 "keywords": [],
@@ -63641,7 +63950,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "pattern",
-                "id": "pattern"
+                "id": "pattern",
+                "call_arg_type": "str"
               },
               {
                 "kind": "Name",
@@ -63655,7 +63965,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "flags",
-                "id": "flags"
+                "id": "flags",
+                "call_arg_type": "int64"
               }
             ],
             "keywords": [],
@@ -64074,7 +64385,13 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "[]",
-                "elements": []
+                "elements": [],
+                "type_expr_summary_v1": {
+                  "schema_version": 1,
+                  "kind": "GenericType",
+                  "category": "static",
+                  "mirror": "list[str]"
+                }
               },
               "type_expr_summary_v1": {
                 "schema_version": 1,
@@ -64360,7 +64677,8 @@
                                 "casts": [],
                                 "borrow_kind": "readonly_ref",
                                 "repr": "repl",
-                                "id": "repl"
+                                "id": "repl",
+                                "call_arg_type": "str"
                               }
                             ],
                             "keywords": [],
@@ -64563,7 +64881,8 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "ch",
-                            "id": "ch"
+                            "id": "ch",
+                            "call_arg_type": "str"
                           }
                         ],
                         "keywords": [],
@@ -64800,7 +65119,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "out",
-                    "id": "out"
+                    "id": "out",
+                    "call_arg_type": "list[str]"
                   }
                 ],
                 "keywords": [],
@@ -65116,7 +65436,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "text",
-                        "id": "text"
+                        "id": "text",
+                        "call_arg_type": "Obj"
                       }
                     ],
                     "keywords": [],
@@ -65205,7 +65526,8 @@
                           "casts": [],
                           "borrow_kind": "readonly_ref",
                           "repr": "text",
-                          "id": "text"
+                          "id": "text",
+                          "call_arg_type": "Obj"
                         }
                       ],
                       "keywords": [],
@@ -65544,7 +65866,8 @@
                                     "casts": [],
                                     "borrow_kind": "readonly_ref",
                                     "repr": "text",
-                                    "id": "text"
+                                    "id": "text",
+                                    "call_arg_type": "Obj"
                                   }
                                 ],
                                 "keywords": [],
@@ -65633,7 +65956,8 @@
                                       "casts": [],
                                       "borrow_kind": "readonly_ref",
                                       "repr": "text",
-                                      "id": "text"
+                                      "id": "text",
+                                      "call_arg_type": "Obj"
                                     }
                                   ],
                                   "keywords": [],
@@ -65922,7 +66246,8 @@
                                     "casts": [],
                                     "borrow_kind": "readonly_ref",
                                     "repr": "text",
-                                    "id": "text"
+                                    "id": "text",
+                                    "call_arg_type": "Obj"
                                   }
                                 ],
                                 "keywords": [],
@@ -66011,7 +66336,8 @@
                                       "casts": [],
                                       "borrow_kind": "readonly_ref",
                                       "repr": "text",
-                                      "id": "text"
+                                      "id": "text",
+                                      "call_arg_type": "Obj"
                                     }
                                   ],
                                   "keywords": [],
@@ -66768,7 +67094,13 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "[]",
-                "elements": []
+                "elements": [],
+                "type_expr_summary_v1": {
+                  "schema_version": 1,
+                  "kind": "GenericType",
+                  "category": "static",
+                  "mirror": "list[str]"
+                }
               },
               "type_expr_summary_v1": {
                 "schema_version": 1,
@@ -67080,7 +67412,8 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "ch",
-                            "id": "ch"
+                            "id": "ch",
+                            "call_arg_type": "str"
                           }
                         ],
                         "keywords": [],
@@ -67198,7 +67531,8 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "repl",
-                            "id": "repl"
+                            "id": "repl",
+                            "call_arg_type": "str"
                           }
                         ],
                         "keywords": [],
@@ -67363,7 +67697,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "out",
-                    "id": "out"
+                    "id": "out",
+                    "call_arg_type": "list[str]"
                   }
                 ],
                 "keywords": [],

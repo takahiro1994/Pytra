@@ -1912,6 +1912,7 @@
                       "repr": "w",
                       "id": "w"
                     },
+                    "call_arg_type": "list[int64]",
                     "normalized_expr_version": "east3_expr_v1",
                     "normalized_expr": {
                       "kind": "BinOp",
@@ -1968,7 +1969,8 @@
                         "borrow_kind": "readonly_ref",
                         "repr": "w",
                         "id": "w"
-                      }
+                      },
+                      "call_arg_type": "list[int64]"
                     }
                   }
                 ],
@@ -2806,7 +2808,13 @@
             "casts": [],
             "borrow_kind": "value",
             "repr": "[]",
-            "elements": []
+            "elements": [],
+            "type_expr_summary_v1": {
+              "schema_version": 1,
+              "kind": "GenericType",
+              "category": "static",
+              "mirror": "list[bytes]"
+            }
           },
           "type_expr_summary_v1": {
             "schema_version": 1,
@@ -6080,7 +6088,8 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "grid",
-                            "id": "grid"
+                            "id": "grid",
+                            "call_arg_type": "list[list[int64]]"
                           },
                           {
                             "kind": "Name",
@@ -6094,7 +6103,8 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "w",
-                            "id": "w"
+                            "id": "w",
+                            "call_arg_type": "int64"
                           },
                           {
                             "kind": "Name",
@@ -6108,10 +6118,12 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "h",
-                            "id": "h"
+                            "id": "h",
+                            "call_arg_type": "int64"
                           }
                         ],
                         "keywords": [],
+                        "call_arg_type": "bytes",
                         "type_expr_summary_v1": {
                           "schema_version": 1,
                           "kind": "NamedType",
@@ -6369,7 +6381,7 @@
               "end_lineno": 53,
               "end_col_offset": 77
             },
-            "resolved_type": "unknown",
+            "resolved_type": "None",
             "casts": [],
             "borrow_kind": "value",
             "repr": "save_gif(out_path, w, h, frames, grayscale_palette(), delay_cs=5, loop=0)",
@@ -6400,7 +6412,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "out_path",
-                "id": "out_path"
+                "id": "out_path",
+                "call_arg_type": "str"
               },
               {
                 "kind": "Name",
@@ -6414,7 +6427,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "w",
-                "id": "w"
+                "id": "w",
+                "call_arg_type": "int64"
               },
               {
                 "kind": "Name",
@@ -6428,7 +6442,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "h",
-                "id": "h"
+                "id": "h",
+                "call_arg_type": "int64"
               },
               {
                 "kind": "Name",
@@ -6442,7 +6457,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "frames",
-                "id": "frames"
+                "id": "frames",
+                "call_arg_type": "list[bytes]"
               },
               {
                 "kind": "Call",
@@ -6452,7 +6468,7 @@
                   "end_lineno": 53,
                   "end_col_offset": 56
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bytes",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "grayscale_palette()",
@@ -6477,12 +6493,12 @@
                 "runtime_module_id": "pytra.utils.gif",
                 "runtime_symbol": "grayscale_palette",
                 "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bytes",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
-                  "kind": "DynamicType",
-                  "category": "dynamic",
-                  "mirror": "unknown",
-                  "dynamic_name": "unknown"
+                  "kind": "NamedType",
+                  "category": "static",
+                  "mirror": "bytes"
                 }
               }
             ],
@@ -6501,7 +6517,8 @@
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "5",
-                  "value": 5
+                  "value": 5,
+                  "call_arg_type": "int64"
                 }
               },
               {
@@ -6518,7 +6535,8 @@
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "0",
-                  "value": 0
+                  "value": 0,
+                  "call_arg_type": "int64"
                 }
               }
             ],
@@ -6529,10 +6547,9 @@
             "runtime_call_adapter_kind": "image.save_gif.keyword_defaults",
             "type_expr_summary_v1": {
               "schema_version": 1,
-              "kind": "DynamicType",
-              "category": "dynamic",
-              "mirror": "unknown",
-              "dynamic_name": "unknown"
+              "kind": "NamedType",
+              "category": "static",
+              "mirror": "None"
             }
           },
           "meta": {
@@ -6964,7 +6981,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "frames",
-                    "id": "frames"
+                    "id": "frames",
+                    "call_arg_type": "Obj"
                   }
                 ],
                 "keywords": [],

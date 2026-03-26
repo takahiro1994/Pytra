@@ -1706,7 +1706,7 @@
               "end_lineno": 40,
               "end_col": 28
             },
-            "resolved_type": "list[unknown]",
+            "resolved_type": "list[bytes]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "[]",
@@ -3999,7 +3999,8 @@
                         "id": "frame"
                       }
                     ],
-                    "keywords": []
+                    "keywords": [],
+                    "call_arg_type": "bytes"
                   }
                 ],
                 "keywords": [],
@@ -4051,7 +4052,7 @@
               "end_lineno": 65,
               "end_col": 72
             },
-            "resolved_type": "unknown",
+            "resolved_type": "None",
             "casts": [],
             "borrow_kind": "value",
             "repr": "save_gif(out_path, w, h, frames, fire_palette(), delay_cs=4, loop=0)",
@@ -4082,7 +4083,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "out_path",
-                "id": "out_path"
+                "id": "out_path",
+                "call_arg_type": "str"
               },
               {
                 "kind": "Name",
@@ -4096,7 +4098,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "w",
-                "id": "w"
+                "id": "w",
+                "call_arg_type": "int64"
               },
               {
                 "kind": "Name",
@@ -4110,7 +4113,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "h",
-                "id": "h"
+                "id": "h",
+                "call_arg_type": "int64"
               },
               {
                 "kind": "Name",
@@ -4124,7 +4128,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "frames",
-                "id": "frames"
+                "id": "frames",
+                "call_arg_type": "list[bytes]"
               },
               {
                 "kind": "Call",
@@ -4153,7 +4158,8 @@
                   "id": "fire_palette"
                 },
                 "args": [],
-                "keywords": []
+                "keywords": [],
+                "call_arg_type": "bytes"
               }
             ],
             "keywords": [
@@ -4171,7 +4177,8 @@
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "4",
-                  "value": 4
+                  "value": 4,
+                  "call_arg_type": "int64"
                 }
               },
               {
@@ -4188,7 +4195,8 @@
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "0",
-                  "value": 0
+                  "value": 0,
+                  "call_arg_type": "int64"
                 }
               }
             ],

@@ -255,16 +255,16 @@
               "end_lineno": 9,
               "end_col": 9
             },
-            "resolved_type": "unknown",
+            "resolved_type": "int64",
             "casts": [],
             "borrow_kind": "value",
             "repr": "v",
             "id": "v"
           },
-          "target_type": "unknown",
+          "target_type": "int64",
           "iter_mode": "static_fastpath",
           "iter_source_type": "bytes",
-          "iter_element_type": "unknown",
+          "iter_element_type": "int64",
           "iter": {
             "kind": "Name",
             "source_span": {
@@ -280,7 +280,7 @@
             "id": "b",
             "iterable_trait": "yes",
             "iter_protocol": "static_range",
-            "iter_element_type": "unknown"
+            "iter_element_type": "int64"
           },
           "body": [
             {
@@ -314,9 +314,9 @@
                   "end_lineno": 10,
                   "end_col": 18
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "int64",
                 "casts": [],
-                "borrow_kind": "value",
+                "borrow_kind": "readonly_ref",
                 "repr": "v",
                 "id": "v"
               },
@@ -367,7 +367,7 @@
               "end_lineno": 12,
               "end_col": 27
             },
-            "resolved_type": "list[unknown]",
+            "resolved_type": "list[bool]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "[]",
@@ -453,7 +453,7 @@
                   "end_lineno": 13,
                   "end_col": 54
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(len(b), 4, \"bytes len\")",
@@ -511,7 +511,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "b",
-                        "id": "b"
+                        "id": "b",
+                        "call_arg_type": "Obj"
                       }
                     ],
                     "keywords": [],
@@ -521,7 +522,8 @@
                     "runtime_module_id": "pytra.core.py_runtime",
                     "runtime_symbol": "len",
                     "runtime_call_adapter_kind": "builtin",
-                    "semantic_tag": "core.len"
+                    "semantic_tag": "core.len",
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -535,7 +537,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "4",
-                    "value": 4
+                    "value": 4,
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -549,7 +552,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"bytes len\"",
-                    "value": "bytes len"
+                    "value": "bytes len",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -557,7 +561,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -641,7 +646,7 @@
                   "end_lineno": 14,
                   "end_col": 54
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(b[0], 1, \"bytes first\")",
@@ -699,7 +704,8 @@
                       "borrow_kind": "value",
                       "repr": "0",
                       "value": 0
-                    }
+                    },
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -713,7 +719,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "1",
-                    "value": 1
+                    "value": 1,
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -727,7 +734,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"bytes first\"",
-                    "value": "bytes first"
+                    "value": "bytes first",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -735,7 +743,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -819,7 +828,7 @@
                   "end_lineno": 15,
                   "end_col": 56
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(b[-1], 255, \"bytes last\")",
@@ -891,7 +900,8 @@
                         "repr": "1",
                         "value": 1
                       }
-                    }
+                    },
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -905,7 +915,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "255",
-                    "value": 255
+                    "value": 255,
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -919,7 +930,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"bytes last\"",
-                    "value": "bytes last"
+                    "value": "bytes last",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -927,7 +939,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -1011,7 +1024,7 @@
                   "end_lineno": 16,
                   "end_col": 55
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(total, 261, \"bytes sum\")",
@@ -1042,7 +1055,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "total",
-                    "id": "total"
+                    "id": "total",
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1056,7 +1070,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "261",
-                    "value": 261
+                    "value": 261,
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1070,7 +1085,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"bytes sum\"",
-                    "value": "bytes sum"
+                    "value": "bytes sum",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -1078,7 +1094,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -1121,7 +1138,7 @@
               "end_lineno": 17,
               "end_col": 47
             },
-            "resolved_type": "unknown",
+            "resolved_type": "bool",
             "casts": [],
             "borrow_kind": "value",
             "repr": "py_assert_all(checks, \"bytes_basic\")",
@@ -1152,7 +1169,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "checks",
-                "id": "checks"
+                "id": "checks",
+                "call_arg_type": "list[bool]"
               },
               {
                 "kind": "Constant",
@@ -1166,7 +1184,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "\"bytes_basic\"",
-                "value": "bytes_basic"
+                "value": "bytes_basic",
+                "call_arg_type": "str"
               }
             ],
             "keywords": [],

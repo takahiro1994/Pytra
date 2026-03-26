@@ -141,7 +141,7 @@
               "end_lineno": 6,
               "end_col": 27
             },
-            "resolved_type": "list[unknown]",
+            "resolved_type": "list[bool]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "[]",
@@ -227,7 +227,7 @@
                   "end_lineno": 7,
                   "end_col": 62
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(s[:5], \"abcde\", \"slice_prefix\")",
@@ -306,7 +306,8 @@
                       "borrow_kind": "value",
                       "repr": "5",
                       "value": 5
-                    }
+                    },
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -320,7 +321,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"abcde\"",
-                    "value": "abcde"
+                    "value": "abcde",
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -334,7 +336,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"slice_prefix\"",
-                    "value": "slice_prefix"
+                    "value": "slice_prefix",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -342,7 +345,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -426,7 +430,7 @@
                   "end_lineno": 8,
                   "end_col": 62
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(s[5:], \"fghij\", \"slice_suffix\")",
@@ -505,7 +509,8 @@
                       "repr": "5",
                       "value": 5
                     },
-                    "upper": null
+                    "upper": null,
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -519,7 +524,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"fghij\"",
-                    "value": "fghij"
+                    "value": "fghij",
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -533,7 +539,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"slice_suffix\"",
-                    "value": "slice_suffix"
+                    "value": "slice_suffix",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -541,7 +548,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -625,7 +633,7 @@
                   "end_lineno": 9,
                   "end_col": 63
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(s[2:7], \"cdefg\", \"slice_middle\")",
@@ -730,7 +738,8 @@
                       "borrow_kind": "value",
                       "repr": "7",
                       "value": 7
-                    }
+                    },
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -744,7 +753,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"cdefg\"",
-                    "value": "cdefg"
+                    "value": "cdefg",
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -758,7 +768,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"slice_middle\"",
-                    "value": "slice_middle"
+                    "value": "slice_middle",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -766,7 +777,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -850,7 +862,7 @@
                   "end_lineno": 10,
                   "end_col": 63
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(s[:], \"abcdefghij\", \"slice_all\")",
@@ -903,7 +915,8 @@
                     },
                     "lowered_kind": "SliceExpr",
                     "lower": null,
-                    "upper": null
+                    "upper": null,
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -917,7 +930,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"abcdefghij\"",
-                    "value": "abcdefghij"
+                    "value": "abcdefghij",
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -931,7 +945,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"slice_all\"",
-                    "value": "slice_all"
+                    "value": "slice_all",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -939,7 +954,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -1023,7 +1039,7 @@
                   "end_lineno": 11,
                   "end_col": 70
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(s[-3:], \"hij\", \"slice_negative_prefix\")",
@@ -1130,7 +1146,8 @@
                         "value": 3
                       }
                     },
-                    "upper": null
+                    "upper": null,
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1144,7 +1161,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"hij\"",
-                    "value": "hij"
+                    "value": "hij",
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1158,7 +1176,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"slice_negative_prefix\"",
-                    "value": "slice_negative_prefix"
+                    "value": "slice_negative_prefix",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -1166,7 +1185,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -1209,7 +1229,7 @@
               "end_lineno": 12,
               "end_col": 45
             },
-            "resolved_type": "unknown",
+            "resolved_type": "bool",
             "casts": [],
             "borrow_kind": "value",
             "repr": "py_assert_all(checks, \"str_slice\")",
@@ -1240,7 +1260,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "checks",
-                "id": "checks"
+                "id": "checks",
+                "call_arg_type": "list[bool]"
               },
               {
                 "kind": "Constant",
@@ -1254,7 +1275,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "\"str_slice\"",
-                "value": "str_slice"
+                "value": "str_slice",
+                "call_arg_type": "str"
               }
             ],
             "keywords": [],

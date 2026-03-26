@@ -346,7 +346,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "\"world\"",
-                "value": "world"
+                "value": "world",
+                "call_arg_type": "str"
               }
             ],
             "keywords": []
@@ -436,7 +437,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "\"world\"",
-                "value": "world"
+                "value": "world",
+                "call_arg_type": "str"
               },
               {
                 "kind": "Constant",
@@ -450,7 +452,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "\"Hi\"",
-                "value": "Hi"
+                "value": "Hi",
+                "call_arg_type": "str"
               }
             ],
             "keywords": []
@@ -540,7 +543,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "5",
-                "value": 5
+                "value": 5,
+                "call_arg_type": "int64"
               }
             ],
             "keywords": []
@@ -630,7 +634,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "5",
-                "value": 5
+                "value": 5,
+                "call_arg_type": "int64"
               },
               {
                 "kind": "Constant",
@@ -644,7 +649,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "20",
-                "value": 20
+                "value": 20,
+                "call_arg_type": "int64"
               }
             ],
             "keywords": []

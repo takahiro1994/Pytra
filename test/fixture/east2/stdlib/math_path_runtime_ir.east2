@@ -101,7 +101,7 @@
                 "end_lineno": 6,
                 "end_col": 12
               },
-              "resolved_type": "type",
+              "resolved_type": "callable",
               "casts": [],
               "borrow_kind": "value",
               "repr": "Path",
@@ -120,7 +120,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "\"tmp/a.txt\"",
-                "value": "tmp/a.txt"
+                "value": "tmp/a.txt",
+                "call_arg_type": "str"
               }
             ],
             "keywords": [],
@@ -164,7 +165,7 @@
               "end_lineno": 7,
               "end_col": 16
             },
-            "resolved_type": "unknown",
+            "resolved_type": "Path",
             "casts": [],
             "borrow_kind": "value",
             "repr": "p.parent",
@@ -182,9 +183,11 @@
               "repr": "p",
               "id": "p"
             },
-            "attr": "parent"
+            "attr": "parent",
+            "attribute_access_kind": "property_getter"
           },
           "declare": true,
+          "decl_type": "Path",
           "declare_init": true
         },
         {
@@ -217,7 +220,7 @@
               "end_lineno": 8,
               "end_col": 14
             },
-            "resolved_type": "unknown",
+            "resolved_type": "str",
             "casts": [],
             "borrow_kind": "value",
             "repr": "p.name",
@@ -235,9 +238,11 @@
               "repr": "p",
               "id": "p"
             },
-            "attr": "name"
+            "attr": "name",
+            "attribute_access_kind": "property_getter"
           },
           "declare": true,
+          "decl_type": "str",
           "declare_init": true
         },
         {
@@ -270,7 +275,7 @@
               "end_lineno": 9,
               "end_col": 14
             },
-            "resolved_type": "unknown",
+            "resolved_type": "str",
             "casts": [],
             "borrow_kind": "value",
             "repr": "p.stem",
@@ -288,9 +293,11 @@
               "repr": "p",
               "id": "p"
             },
-            "attr": "stem"
+            "attr": "stem",
+            "attribute_access_kind": "property_getter"
           },
           "declare": true,
+          "decl_type": "str",
           "declare_init": true
         },
         {
@@ -351,7 +358,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "math",
-                "id": "math"
+                "id": "math",
+                "runtime_module_id": "pytra.std.math"
               },
               "attr": "sin"
             },
@@ -380,9 +388,16 @@
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "math",
-                  "id": "math"
+                  "id": "math",
+                  "runtime_module_id": "pytra.std.math"
                 },
-                "attr": "pi"
+                "attr": "pi",
+                "runtime_module_id": "pytra.std.math",
+                "runtime_symbol": "pi",
+                "runtime_symbol_dispatch": "value",
+                "runtime_call_adapter_kind": "math.value_getter",
+                "semantic_tag": "stdlib.symbol.pi",
+                "call_arg_type": "float64"
               }
             ],
             "keywords": [],
@@ -440,9 +455,9 @@
                   "end_lineno": 11,
                   "end_col": 11
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "Path",
                 "casts": [],
-                "borrow_kind": "value",
+                "borrow_kind": "readonly_ref",
                 "repr": "q",
                 "id": "q"
               },
@@ -454,9 +469,9 @@
                   "end_lineno": 11,
                   "end_col": 14
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "str",
                 "casts": [],
-                "borrow_kind": "value",
+                "borrow_kind": "readonly_ref",
                 "repr": "n",
                 "id": "n"
               },
@@ -468,9 +483,9 @@
                   "end_lineno": 11,
                   "end_col": 17
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "str",
                 "casts": [],
-                "borrow_kind": "value",
+                "borrow_kind": "readonly_ref",
                 "repr": "s",
                 "id": "s"
               },

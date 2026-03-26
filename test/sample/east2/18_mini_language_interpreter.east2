@@ -1309,7 +1309,7 @@
               "end_lineno": 55,
               "end_col": 28
             },
-            "resolved_type": "list[unknown]",
+            "resolved_type": "list[Token]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "[]",
@@ -1466,7 +1466,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "lines",
-                "id": "lines"
+                "id": "lines",
+                "call_arg_type": "list[T]"
               }
             ],
             "keywords": [],
@@ -1600,7 +1601,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "source",
-                    "id": "source"
+                    "id": "source",
+                    "call_arg_type": "Obj"
                   }
                 ],
                 "keywords": [],
@@ -1964,7 +1966,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "ch",
-                        "id": "ch"
+                        "id": "ch",
+                        "call_arg_type": "str"
                       },
                       {
                         "kind": "Constant",
@@ -1978,7 +1981,8 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "0",
-                        "value": 0
+                        "value": 0,
+                        "call_arg_type": "int64"
                       }
                     ],
                     "keywords": [],
@@ -2259,7 +2263,8 @@
                                 "value": 0
                               }
                             ],
-                            "keywords": []
+                            "keywords": [],
+                            "call_arg_type": "Token"
                           }
                         ],
                         "keywords": [],
@@ -2992,7 +2997,8 @@
                                     "casts": [],
                                     "borrow_kind": "readonly_ref",
                                     "repr": "text",
-                                    "id": "text"
+                                    "id": "text",
+                                    "call_arg_type": "Obj"
                                   }
                                 ],
                                 "keywords": [],
@@ -3005,7 +3011,8 @@
                                 "semantic_tag": "cast.int"
                               }
                             ],
-                            "keywords": []
+                            "keywords": [],
+                            "call_arg_type": "Token"
                           }
                         ],
                         "keywords": [],
@@ -3990,7 +3997,8 @@
                                     "value": 0
                                   }
                                 ],
-                                "keywords": []
+                                "keywords": [],
+                                "call_arg_type": "Token"
                               }
                             ],
                             "keywords": [],
@@ -4207,7 +4215,8 @@
                                         "value": 0
                                       }
                                     ],
-                                    "keywords": []
+                                    "keywords": [],
+                                    "call_arg_type": "Token"
                                   }
                                 ],
                                 "keywords": [],
@@ -4369,7 +4378,8 @@
                                         "value": 0
                                       }
                                     ],
-                                    "keywords": []
+                                    "keywords": [],
+                                    "call_arg_type": "Token"
                                   }
                                 ],
                                 "keywords": [],
@@ -4575,7 +4585,8 @@
                                       "casts": [],
                                       "borrow_kind": "readonly_ref",
                                       "repr": "line_index",
-                                      "id": "line_index"
+                                      "id": "line_index",
+                                      "call_arg_type": "Obj"
                                     }
                                   ],
                                   "keywords": [],
@@ -4644,7 +4655,8 @@
                                   "casts": [],
                                   "borrow_kind": "readonly_ref",
                                   "repr": "i",
-                                  "id": "i"
+                                  "id": "i",
+                                  "call_arg_type": "Obj"
                                 }
                               ],
                               "keywords": [],
@@ -4837,7 +4849,8 @@
                         "value": 0
                       }
                     ],
-                    "keywords": []
+                    "keywords": [],
+                    "call_arg_type": "Token"
                   }
                 ],
                 "keywords": [],
@@ -5010,7 +5023,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "lines",
-                        "id": "lines"
+                        "id": "lines",
+                        "call_arg_type": "Obj"
                       }
                     ],
                     "keywords": [],
@@ -5037,7 +5051,8 @@
                     "value": 0
                   }
                 ],
-                "keywords": []
+                "keywords": [],
+                "call_arg_type": "Token"
               }
             ],
             "keywords": [],
@@ -6400,7 +6415,8 @@
                                         "repr": "token",
                                         "id": "token"
                                       },
-                                      "attr": "pos"
+                                      "attr": "pos",
+                                      "call_arg_type": "Obj"
                                     }
                                   ],
                                   "keywords": [],
@@ -6676,7 +6692,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"NEWLINE\"",
-                    "value": "NEWLINE"
+                    "value": "NEWLINE",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": []
@@ -6805,7 +6822,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "node",
-                    "id": "node"
+                    "id": "node",
+                    "call_arg_type": "ExprNode"
                   }
                 ],
                 "keywords": [],
@@ -6919,7 +6937,8 @@
                         "repr": "self",
                         "id": "self"
                       },
-                      "attr": "expr_nodes"
+                      "attr": "expr_nodes",
+                      "call_arg_type": "Obj"
                     }
                   ],
                   "keywords": [],
@@ -7021,7 +7040,7 @@
                   "end_lineno": 141,
                   "end_col": 34
                 },
-                "resolved_type": "list[unknown]",
+                "resolved_type": "list[StmtNode]",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "[]",
@@ -7328,7 +7347,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "stmt",
-                        "id": "stmt"
+                        "id": "stmt",
+                        "call_arg_type": "StmtNode"
                       }
                     ],
                     "keywords": [],
@@ -7526,7 +7546,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"LET\"",
-                    "value": "LET"
+                    "value": "LET",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": []
@@ -7624,7 +7645,8 @@
                           "casts": [],
                           "borrow_kind": "value",
                           "repr": "\"IDENT\"",
-                          "value": "IDENT"
+                          "value": "IDENT",
+                          "call_arg_type": "str"
                         }
                       ],
                       "keywords": []
@@ -7703,7 +7725,8 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "\"EQUAL\"",
-                        "value": "EQUAL"
+                        "value": "EQUAL",
+                        "call_arg_type": "str"
                       }
                     ],
                     "keywords": []
@@ -7949,7 +7972,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"PRINT\"",
-                    "value": "PRINT"
+                    "value": "PRINT",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": []
@@ -8226,7 +8250,8 @@
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "\"IDENT\"",
-                      "value": "IDENT"
+                      "value": "IDENT",
+                      "call_arg_type": "str"
                     }
                   ],
                   "keywords": []
@@ -8305,7 +8330,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"EQUAL\"",
-                    "value": "EQUAL"
+                    "value": "EQUAL",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": []
@@ -8768,7 +8794,8 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "\"PLUS\"",
-                        "value": "PLUS"
+                        "value": "PLUS",
+                        "call_arg_type": "str"
                       }
                     ],
                     "keywords": []
@@ -9058,7 +9085,8 @@
                                 "value": 1
                               }
                             ],
-                            "keywords": []
+                            "keywords": [],
+                            "call_arg_type": "ExprNode"
                           }
                         ],
                         "keywords": []
@@ -9154,7 +9182,8 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "\"MINUS\"",
-                        "value": "MINUS"
+                        "value": "MINUS",
+                        "call_arg_type": "str"
                       }
                     ],
                     "keywords": []
@@ -9432,7 +9461,8 @@
                                 "value": 2
                               }
                             ],
-                            "keywords": []
+                            "keywords": [],
+                            "call_arg_type": "ExprNode"
                           }
                         ],
                         "keywords": []
@@ -9713,7 +9743,8 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "\"STAR\"",
-                        "value": "STAR"
+                        "value": "STAR",
+                        "call_arg_type": "str"
                       }
                     ],
                     "keywords": []
@@ -10003,7 +10034,8 @@
                                 "value": 3
                               }
                             ],
-                            "keywords": []
+                            "keywords": [],
+                            "call_arg_type": "ExprNode"
                           }
                         ],
                         "keywords": []
@@ -10099,7 +10131,8 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "\"SLASH\"",
-                        "value": "SLASH"
+                        "value": "SLASH",
+                        "call_arg_type": "str"
                       }
                     ],
                     "keywords": []
@@ -10377,7 +10410,8 @@
                                 "value": 4
                               }
                             ],
-                            "keywords": []
+                            "keywords": [],
+                            "call_arg_type": "ExprNode"
                           }
                         ],
                         "keywords": []
@@ -10554,7 +10588,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"MINUS\"",
-                    "value": "MINUS"
+                    "value": "MINUS",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": []
@@ -10844,7 +10879,8 @@
                             "value": 0
                           }
                         ],
-                        "keywords": []
+                        "keywords": [],
+                        "call_arg_type": "ExprNode"
                       }
                     ],
                     "keywords": []
@@ -10998,7 +11034,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"NUMBER\"",
-                    "value": "NUMBER"
+                    "value": "NUMBER",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": []
@@ -11316,7 +11353,8 @@
                             "value": 0
                           }
                         ],
-                        "keywords": []
+                        "keywords": [],
+                        "call_arg_type": "ExprNode"
                       }
                     ],
                     "keywords": []
@@ -11386,7 +11424,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"IDENT\"",
-                    "value": "IDENT"
+                    "value": "IDENT",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": []
@@ -11704,7 +11743,8 @@
                             "value": 0
                           }
                         ],
-                        "keywords": []
+                        "keywords": [],
+                        "call_arg_type": "ExprNode"
                       }
                     ],
                     "keywords": []
@@ -11774,7 +11814,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"LPAREN\"",
-                    "value": "LPAREN"
+                    "value": "LPAREN",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": []
@@ -11922,7 +11963,8 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "\"RPAREN\"",
-                        "value": "RPAREN"
+                        "value": "RPAREN",
+                        "call_arg_type": "str"
                       }
                     ],
                     "keywords": []
@@ -12162,7 +12204,8 @@
                                 "repr": "t",
                                 "id": "t"
                               },
-                              "attr": "pos"
+                              "attr": "pos",
+                              "call_arg_type": "Obj"
                             }
                           ],
                           "keywords": [],
@@ -12938,7 +12981,8 @@
                         "repr": "node",
                         "id": "node"
                       },
-                      "attr": "left"
+                      "attr": "left",
+                      "call_arg_type": "int64"
                     },
                     {
                       "kind": "Name",
@@ -12952,7 +12996,8 @@
                       "casts": [],
                       "borrow_kind": "readonly_ref",
                       "repr": "expr_nodes",
-                      "id": "expr_nodes"
+                      "id": "expr_nodes",
+                      "call_arg_type": "list[ExprNode]"
                     },
                     {
                       "kind": "Name",
@@ -12966,7 +13011,8 @@
                       "casts": [],
                       "borrow_kind": "readonly_ref",
                       "repr": "env",
-                      "id": "env"
+                      "id": "env",
+                      "call_arg_type": "dict[str,int64]"
                     }
                   ],
                   "keywords": []
@@ -13125,7 +13171,8 @@
                       "repr": "node",
                       "id": "node"
                     },
-                    "attr": "left"
+                    "attr": "left",
+                    "call_arg_type": "int64"
                   },
                   {
                     "kind": "Name",
@@ -13139,7 +13186,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "expr_nodes",
-                    "id": "expr_nodes"
+                    "id": "expr_nodes",
+                    "call_arg_type": "list[ExprNode]"
                   },
                   {
                     "kind": "Name",
@@ -13153,7 +13201,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "env",
-                    "id": "env"
+                    "id": "env",
+                    "call_arg_type": "dict[str,int64]"
                   }
                 ],
                 "keywords": []
@@ -13249,7 +13298,8 @@
                       "repr": "node",
                       "id": "node"
                     },
-                    "attr": "right"
+                    "attr": "right",
+                    "call_arg_type": "int64"
                   },
                   {
                     "kind": "Name",
@@ -13263,7 +13313,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "expr_nodes",
-                    "id": "expr_nodes"
+                    "id": "expr_nodes",
+                    "call_arg_type": "list[ExprNode]"
                   },
                   {
                     "kind": "Name",
@@ -13277,7 +13328,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "env",
-                    "id": "env"
+                    "id": "env",
+                    "call_arg_type": "dict[str,int64]"
                   }
                 ],
                 "keywords": []
@@ -14233,7 +14285,7 @@
               "end_lineno": 254,
               "end_col": 28
             },
-            "resolved_type": "dict[unknown,unknown]",
+            "resolved_type": "dict[str,int64]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "{}",
@@ -14604,7 +14656,8 @@
                           "repr": "stmt",
                           "id": "stmt"
                         },
-                        "attr": "expr_index"
+                        "attr": "expr_index",
+                        "call_arg_type": "int64"
                       },
                       {
                         "kind": "Name",
@@ -14618,7 +14671,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "expr_nodes",
-                        "id": "expr_nodes"
+                        "id": "expr_nodes",
+                        "call_arg_type": "list[ExprNode]"
                       },
                       {
                         "kind": "Name",
@@ -14632,7 +14686,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "env",
-                        "id": "env"
+                        "id": "env",
+                        "call_arg_type": "dict[str,int64]"
                       }
                     ],
                     "keywords": []
@@ -15041,7 +15096,8 @@
                           "repr": "stmt",
                           "id": "stmt"
                         },
-                        "attr": "expr_index"
+                        "attr": "expr_index",
+                        "call_arg_type": "int64"
                       },
                       {
                         "kind": "Name",
@@ -15055,7 +15111,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "expr_nodes",
-                        "id": "expr_nodes"
+                        "id": "expr_nodes",
+                        "call_arg_type": "list[ExprNode]"
                       },
                       {
                         "kind": "Name",
@@ -15069,7 +15126,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "env",
-                        "id": "env"
+                        "id": "env",
+                        "call_arg_type": "dict[str,int64]"
                       }
                     ],
                     "keywords": []
@@ -15184,7 +15242,8 @@
                       "repr": "stmt",
                       "id": "stmt"
                     },
-                    "attr": "expr_index"
+                    "attr": "expr_index",
+                    "call_arg_type": "int64"
                   },
                   {
                     "kind": "Name",
@@ -15198,7 +15257,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "expr_nodes",
-                    "id": "expr_nodes"
+                    "id": "expr_nodes",
+                    "call_arg_type": "list[ExprNode]"
                   },
                   {
                     "kind": "Name",
@@ -15212,7 +15272,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "env",
-                    "id": "env"
+                    "id": "env",
+                    "call_arg_type": "dict[str,int64]"
                   }
                 ],
                 "keywords": []
@@ -15896,7 +15957,7 @@
               "end_lineno": 284,
               "end_col": 25
             },
-            "resolved_type": "list[unknown]",
+            "resolved_type": "list[str]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "[]",
@@ -16131,7 +16192,8 @@
                               "casts": [],
                               "borrow_kind": "readonly_ref",
                               "repr": "i",
-                              "id": "i"
+                              "id": "i",
+                              "call_arg_type": "Obj"
                             }
                           ],
                           "keywords": [],
@@ -16228,7 +16290,8 @@
                             "borrow_kind": "value",
                             "repr": "1",
                             "value": 1
-                          }
+                          },
+                          "call_arg_type": "Obj"
                         }
                       ],
                       "keywords": [],
@@ -16239,7 +16302,8 @@
                       "runtime_symbol": "str",
                       "runtime_call_adapter_kind": "builtin",
                       "semantic_tag": "cast.str"
-                    }
+                    },
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -16961,7 +17025,8 @@
                                           "casts": [],
                                           "borrow_kind": "readonly_ref",
                                           "repr": "x",
-                                          "id": "x"
+                                          "id": "x",
+                                          "call_arg_type": "Obj"
                                         }
                                       ],
                                       "keywords": [],
@@ -17030,7 +17095,8 @@
                                       "casts": [],
                                       "borrow_kind": "readonly_ref",
                                       "repr": "x",
-                                      "id": "x"
+                                      "id": "x",
+                                      "call_arg_type": "Obj"
                                     }
                                   ],
                                   "keywords": [],
@@ -17099,7 +17165,8 @@
                                   "casts": [],
                                   "borrow_kind": "readonly_ref",
                                   "repr": "c1",
-                                  "id": "c1"
+                                  "id": "c1",
+                                  "call_arg_type": "Obj"
                                 }
                               ],
                               "keywords": [],
@@ -17168,7 +17235,8 @@
                               "casts": [],
                               "borrow_kind": "readonly_ref",
                               "repr": "y",
-                              "id": "y"
+                              "id": "y",
+                              "call_arg_type": "Obj"
                             }
                           ],
                           "keywords": [],
@@ -17237,7 +17305,8 @@
                           "casts": [],
                           "borrow_kind": "readonly_ref",
                           "repr": "c2",
-                          "id": "c2"
+                          "id": "c2",
+                          "call_arg_type": "Obj"
                         }
                       ],
                       "keywords": [],
@@ -17248,7 +17317,8 @@
                       "runtime_symbol": "str",
                       "runtime_call_adapter_kind": "builtin",
                       "semantic_tag": "cast.str"
-                    }
+                    },
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -17473,7 +17543,8 @@
                               "casts": [],
                               "borrow_kind": "readonly_ref",
                               "repr": "x",
-                              "id": "x"
+                              "id": "x",
+                              "call_arg_type": "Obj"
                             }
                           ],
                           "keywords": [],
@@ -17484,7 +17555,8 @@
                           "runtime_symbol": "str",
                           "runtime_call_adapter_kind": "builtin",
                           "semantic_tag": "cast.str"
-                        }
+                        },
+                        "call_arg_type": "str"
                       }
                     ],
                     "keywords": [],
@@ -17588,7 +17660,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "\"print (v0 + v1 + v2 + v3)\"",
-                "value": "print (v0 + v1 + v2 + v3)"
+                "value": "print (v0 + v1 + v2 + v3)",
+                "call_arg_type": "str"
               }
             ],
             "keywords": [],
@@ -17724,7 +17797,7 @@
               "end_lineno": 308,
               "end_col": 30
             },
-            "resolved_type": "list[unknown]",
+            "resolved_type": "list[str]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "[]",
@@ -17814,7 +17887,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "\"let a = 10\"",
-                "value": "let a = 10"
+                "value": "let a = 10",
+                "call_arg_type": "str"
               }
             ],
             "keywords": [],
@@ -17902,7 +17976,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "\"let b = 3\"",
-                "value": "let b = 3"
+                "value": "let b = 3",
+                "call_arg_type": "str"
               }
             ],
             "keywords": [],
@@ -17990,7 +18065,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "\"a = (a + b) * 2\"",
-                "value": "a = (a + b) * 2"
+                "value": "a = (a + b) * 2",
+                "call_arg_type": "str"
               }
             ],
             "keywords": [],
@@ -18078,7 +18154,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "\"print a\"",
-                "value": "print a"
+                "value": "print a",
+                "call_arg_type": "str"
               }
             ],
             "keywords": [],
@@ -18166,7 +18243,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "\"print a / b\"",
-                "value": "print a / b"
+                "value": "print a / b",
+                "call_arg_type": "str"
               }
             ],
             "keywords": [],
@@ -18265,7 +18343,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "demo_lines",
-                "id": "demo_lines"
+                "id": "demo_lines",
+                "call_arg_type": "list[str]"
               }
             ],
             "keywords": []
@@ -18365,7 +18444,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "tokens",
-                "id": "tokens"
+                "id": "tokens",
+                "call_arg_type": "list[Token]"
               }
             ],
             "keywords": []
@@ -18546,7 +18626,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "stmts",
-                "id": "stmts"
+                "id": "stmts",
+                "call_arg_type": "list[StmtNode]"
               },
               {
                 "kind": "Attribute",
@@ -18574,7 +18655,8 @@
                   "repr": "parser",
                   "id": "parser"
                 },
-                "attr": "expr_nodes"
+                "attr": "expr_nodes",
+                "call_arg_type": "list[ExprNode]"
               },
               {
                 "kind": "Constant",
@@ -18588,7 +18670,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "True",
-                "value": true
+                "value": true,
+                "call_arg_type": "bool"
               }
             ],
             "keywords": []
@@ -18832,7 +18915,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "32",
-                "value": 32
+                "value": 32,
+                "call_arg_type": "int64"
               },
               {
                 "kind": "Constant",
@@ -18846,7 +18930,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "120000",
-                "value": 120000
+                "value": 120000,
+                "call_arg_type": "int64"
               }
             ],
             "keywords": []
@@ -19018,7 +19103,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "source_lines",
-                "id": "source_lines"
+                "id": "source_lines",
+                "call_arg_type": "list[str]"
               }
             ],
             "keywords": []
@@ -19112,7 +19198,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "tokens",
-                "id": "tokens"
+                "id": "tokens",
+                "call_arg_type": "list[Token]"
               }
             ],
             "keywords": []
@@ -19293,7 +19380,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "stmts",
-                "id": "stmts"
+                "id": "stmts",
+                "call_arg_type": "list[StmtNode]"
               },
               {
                 "kind": "Attribute",
@@ -19321,7 +19409,8 @@
                   "repr": "parser",
                   "id": "parser"
                 },
-                "attr": "expr_nodes"
+                "attr": "expr_nodes",
+                "call_arg_type": "list[ExprNode]"
               },
               {
                 "kind": "Constant",
@@ -19335,7 +19424,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "False",
-                "value": false
+                "value": false,
+                "call_arg_type": "bool"
               }
             ],
             "keywords": []
@@ -19655,7 +19745,8 @@
                                     "casts": [],
                                     "borrow_kind": "readonly_ref",
                                     "repr": "tokens",
-                                    "id": "tokens"
+                                    "id": "tokens",
+                                    "call_arg_type": "Obj"
                                   }
                                 ],
                                 "keywords": [],
@@ -19665,7 +19756,8 @@
                                 "runtime_module_id": "pytra.core.py_runtime",
                                 "runtime_symbol": "len",
                                 "runtime_call_adapter_kind": "builtin",
-                                "semantic_tag": "core.len"
+                                "semantic_tag": "core.len",
+                                "call_arg_type": "Obj"
                               }
                             ],
                             "keywords": [],
@@ -19775,7 +19867,8 @@
                                   "repr": "parser",
                                   "id": "parser"
                                 },
-                                "attr": "expr_nodes"
+                                "attr": "expr_nodes",
+                                "call_arg_type": "Obj"
                               }
                             ],
                             "keywords": [],
@@ -19785,7 +19878,8 @@
                             "runtime_module_id": "pytra.core.py_runtime",
                             "runtime_symbol": "len",
                             "runtime_call_adapter_kind": "builtin",
-                            "semantic_tag": "core.len"
+                            "semantic_tag": "core.len",
+                            "call_arg_type": "Obj"
                           }
                         ],
                         "keywords": [],
@@ -19881,7 +19975,8 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "stmts",
-                            "id": "stmts"
+                            "id": "stmts",
+                            "call_arg_type": "Obj"
                           }
                         ],
                         "keywords": [],
@@ -19891,7 +19986,8 @@
                         "runtime_module_id": "pytra.core.py_runtime",
                         "runtime_symbol": "len",
                         "runtime_call_adapter_kind": "builtin",
-                        "semantic_tag": "core.len"
+                        "semantic_tag": "core.len",
+                        "call_arg_type": "Obj"
                       }
                     ],
                     "keywords": [],
@@ -19960,7 +20056,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "checksum",
-                    "id": "checksum"
+                    "id": "checksum",
+                    "call_arg_type": "Obj"
                   }
                 ],
                 "keywords": [],
@@ -20053,7 +20150,7 @@
                 "end_lineno": 333,
                 "end_col": 18
               },
-              "resolved_type": "type",
+              "resolved_type": "callable",
               "casts": [],
               "borrow_kind": "value",
               "repr": "Path",
@@ -20072,7 +20169,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "out_path",
-                "id": "out_path"
+                "id": "out_path",
+                "call_arg_type": "str"
               }
             ],
             "keywords": [],
@@ -20109,7 +20207,7 @@
               "end_lineno": 334,
               "end_col": 24
             },
-            "resolved_type": "unknown",
+            "resolved_type": "int64",
             "casts": [],
             "borrow_kind": "value",
             "repr": "p.write_text(result)",
@@ -20121,7 +20219,7 @@
                 "end_lineno": 334,
                 "end_col": 16
               },
-              "resolved_type": "unknown",
+              "resolved_type": "callable",
               "casts": [],
               "borrow_kind": "value",
               "repr": "p.write_text",
@@ -20154,7 +20252,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "result",
-                "id": "result"
+                "id": "result",
+                "call_arg_type": "str"
               }
             ],
             "keywords": []
@@ -20248,7 +20347,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "tokens",
-                    "id": "tokens"
+                    "id": "tokens",
+                    "call_arg_type": "Obj"
                   }
                 ],
                 "keywords": [],
@@ -20379,7 +20479,8 @@
                       "repr": "parser",
                       "id": "parser"
                     },
-                    "attr": "expr_nodes"
+                    "attr": "expr_nodes",
+                    "call_arg_type": "Obj"
                   }
                 ],
                 "keywords": [],
@@ -20490,7 +20591,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "stmts",
-                    "id": "stmts"
+                    "id": "stmts",
+                    "call_arg_type": "Obj"
                   }
                 ],
                 "keywords": [],

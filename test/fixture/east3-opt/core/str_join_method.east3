@@ -218,7 +218,13 @@
                 "repr": "\"c\"",
                 "value": "c"
               }
-            ]
+            ],
+            "type_expr_summary_v1": {
+              "schema_version": 1,
+              "kind": "GenericType",
+              "category": "static",
+              "mirror": "list[str]"
+            }
           },
           "type_expr_summary_v1": {
             "schema_version": 1,
@@ -303,7 +309,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "items",
-                "id": "items"
+                "id": "items",
+                "call_arg_type": "list[str]"
               }
             ],
             "keywords": [],
@@ -731,7 +738,7 @@
               "end_lineno": 17,
               "end_col_offset": 49
             },
-            "resolved_type": "unknown",
+            "resolved_type": "bool",
             "casts": [],
             "borrow_kind": "value",
             "repr": "py_assert_stdout([\"a,b,c\"], _case_main)",
@@ -777,7 +784,14 @@
                     "repr": "\"a,b,c\"",
                     "value": "a,b,c"
                   }
-                ]
+                ],
+                "call_arg_type": "list[str]",
+                "type_expr_summary_v1": {
+                  "schema_version": 1,
+                  "kind": "GenericType",
+                  "category": "static",
+                  "mirror": "list[str]"
+                }
               },
               {
                 "kind": "Name",
@@ -791,7 +805,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "_case_main",
-                "id": "_case_main"
+                "id": "_case_main",
+                "call_arg_type": "object"
               }
             ],
             "keywords": [],
@@ -802,10 +817,9 @@
             "runtime_call_adapter_kind": "extern_delegate",
             "type_expr_summary_v1": {
               "schema_version": 1,
-              "kind": "DynamicType",
-              "category": "dynamic",
-              "mirror": "unknown",
-              "dynamic_name": "unknown"
+              "kind": "NamedType",
+              "category": "static",
+              "mirror": "bool"
             }
           }
         ],

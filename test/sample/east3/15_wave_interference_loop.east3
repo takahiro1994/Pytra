@@ -405,7 +405,13 @@
             "casts": [],
             "borrow_kind": "value",
             "repr": "[]",
-            "elements": []
+            "elements": [],
+            "type_expr_summary_v1": {
+              "schema_version": 1,
+              "kind": "GenericType",
+              "category": "static",
+              "mirror": "list[bytes]"
+            }
           },
           "type_expr_summary_v1": {
             "schema_version": 1,
@@ -1087,7 +1093,8 @@
                                   "casts": [],
                                   "borrow_kind": "value",
                                   "repr": "math",
-                                  "id": "math"
+                                  "id": "math",
+                                  "runtime_module_id": "pytra.std.math"
                                 },
                                 "attr": "sin"
                               },
@@ -1202,7 +1209,8 @@
                                     "borrow_kind": "value",
                                     "repr": "0.045",
                                     "value": 0.045
-                                  }
+                                  },
+                                  "call_arg_type": "float64"
                                 }
                               ],
                               "keywords": [],
@@ -1256,7 +1264,8 @@
                                   "casts": [],
                                   "borrow_kind": "value",
                                   "repr": "math",
-                                  "id": "math"
+                                  "id": "math",
+                                  "runtime_module_id": "pytra.std.math"
                                 },
                                 "attr": "sin"
                               },
@@ -1371,7 +1380,8 @@
                                     "borrow_kind": "value",
                                     "repr": "0.04",
                                     "value": 0.04
-                                  }
+                                  },
+                                  "call_arg_type": "float64"
                                 }
                               ],
                               "keywords": [],
@@ -1426,7 +1436,8 @@
                                 "casts": [],
                                 "borrow_kind": "value",
                                 "repr": "math",
-                                "id": "math"
+                                "id": "math",
+                                "runtime_module_id": "pytra.std.math"
                               },
                               "attr": "sin"
                             },
@@ -1534,7 +1545,8 @@
                                   "borrow_kind": "readonly_ref",
                                   "repr": "phase",
                                   "id": "phase"
-                                }
+                                },
+                                "call_arg_type": "float64"
                               }
                             ],
                             "keywords": [],
@@ -1589,7 +1601,8 @@
                               "casts": [],
                               "borrow_kind": "value",
                               "repr": "math",
-                              "id": "math"
+                              "id": "math",
+                              "runtime_module_id": "pytra.std.math"
                             },
                             "attr": "sin"
                           },
@@ -1654,114 +1667,149 @@
                                       "casts": [],
                                       "borrow_kind": "value",
                                       "repr": "math",
-                                      "id": "math"
+                                      "id": "math",
+                                      "runtime_module_id": "pytra.std.math"
                                     },
                                     "attr": "sqrt"
                                   },
                                   "args": [
                                     {
-                                      "kind": "BinOp",
+                                      "kind": "Call",
+                                      "func": {
+                                        "kind": "Name",
+                                        "id": "float",
+                                        "resolved_type": "callable",
+                                        "borrow_kind": "value",
+                                        "casts": [],
+                                        "repr": "float"
+                                      },
+                                      "args": [
+                                        {
+                                          "kind": "BinOp",
+                                          "source_span": {
+                                            "lineno": 26,
+                                            "col_offset": 143,
+                                            "end_lineno": 26,
+                                            "end_col_offset": 160
+                                          },
+                                          "resolved_type": "int64",
+                                          "casts": [
+                                            {
+                                              "on": "body",
+                                              "from": "int64",
+                                              "to": "float64",
+                                              "reason": "numeric_promotion"
+                                            }
+                                          ],
+                                          "borrow_kind": "value",
+                                          "repr": "dx * dx + dy * dy",
+                                          "left": {
+                                            "kind": "BinOp",
+                                            "source_span": {
+                                              "lineno": 26,
+                                              "col_offset": 143,
+                                              "end_lineno": 26,
+                                              "end_col_offset": 150
+                                            },
+                                            "resolved_type": "int64",
+                                            "casts": [],
+                                            "borrow_kind": "value",
+                                            "repr": "dx * dx",
+                                            "left": {
+                                              "kind": "Name",
+                                              "source_span": {
+                                                "lineno": 26,
+                                                "col_offset": 143,
+                                                "end_lineno": 26,
+                                                "end_col_offset": 145
+                                              },
+                                              "resolved_type": "int64",
+                                              "casts": [],
+                                              "borrow_kind": "readonly_ref",
+                                              "repr": "dx",
+                                              "id": "dx"
+                                            },
+                                            "op": "Mult",
+                                            "right": {
+                                              "kind": "Name",
+                                              "source_span": {
+                                                "lineno": 26,
+                                                "col_offset": 148,
+                                                "end_lineno": 26,
+                                                "end_col_offset": 150
+                                              },
+                                              "resolved_type": "int64",
+                                              "casts": [],
+                                              "borrow_kind": "readonly_ref",
+                                              "repr": "dx",
+                                              "id": "dx"
+                                            }
+                                          },
+                                          "op": "Add",
+                                          "right": {
+                                            "kind": "BinOp",
+                                            "source_span": {
+                                              "lineno": 26,
+                                              "col_offset": 153,
+                                              "end_lineno": 26,
+                                              "end_col_offset": 160
+                                            },
+                                            "resolved_type": "int64",
+                                            "casts": [],
+                                            "borrow_kind": "value",
+                                            "repr": "dy * dy",
+                                            "left": {
+                                              "kind": "Name",
+                                              "source_span": {
+                                                "lineno": 26,
+                                                "col_offset": 153,
+                                                "end_lineno": 26,
+                                                "end_col_offset": 155
+                                              },
+                                              "resolved_type": "int64",
+                                              "casts": [],
+                                              "borrow_kind": "readonly_ref",
+                                              "repr": "dy",
+                                              "id": "dy"
+                                            },
+                                            "op": "Mult",
+                                            "right": {
+                                              "kind": "Name",
+                                              "source_span": {
+                                                "lineno": 26,
+                                                "col_offset": 158,
+                                                "end_lineno": 26,
+                                                "end_col_offset": 160
+                                              },
+                                              "resolved_type": "int64",
+                                              "casts": [],
+                                              "borrow_kind": "readonly_ref",
+                                              "repr": "dy",
+                                              "id": "dy"
+                                            }
+                                          },
+                                          "call_arg_type": "float64"
+                                        }
+                                      ],
+                                      "keywords": [],
+                                      "resolved_type": "float64",
+                                      "borrow_kind": "value",
+                                      "casts": [],
+                                      "lowered_kind": "BuiltinCall",
+                                      "builtin_name": "float",
+                                      "runtime_call": "static_cast",
                                       "source_span": {
                                         "lineno": 26,
                                         "col_offset": 143,
                                         "end_lineno": 26,
                                         "end_col_offset": 160
                                       },
-                                      "resolved_type": "int64",
-                                      "casts": [
-                                        {
-                                          "on": "body",
-                                          "from": "int64",
-                                          "to": "float64",
-                                          "reason": "numeric_promotion"
-                                        }
-                                      ],
-                                      "borrow_kind": "value",
                                       "repr": "dx * dx + dy * dy",
-                                      "left": {
-                                        "kind": "BinOp",
-                                        "source_span": {
-                                          "lineno": 26,
-                                          "col_offset": 143,
-                                          "end_lineno": 26,
-                                          "end_col_offset": 150
-                                        },
-                                        "resolved_type": "int64",
-                                        "casts": [],
-                                        "borrow_kind": "value",
-                                        "repr": "dx * dx",
-                                        "left": {
-                                          "kind": "Name",
-                                          "source_span": {
-                                            "lineno": 26,
-                                            "col_offset": 143,
-                                            "end_lineno": 26,
-                                            "end_col_offset": 145
-                                          },
-                                          "resolved_type": "int64",
-                                          "casts": [],
-                                          "borrow_kind": "readonly_ref",
-                                          "repr": "dx",
-                                          "id": "dx"
-                                        },
-                                        "op": "Mult",
-                                        "right": {
-                                          "kind": "Name",
-                                          "source_span": {
-                                            "lineno": 26,
-                                            "col_offset": 148,
-                                            "end_lineno": 26,
-                                            "end_col_offset": 150
-                                          },
-                                          "resolved_type": "int64",
-                                          "casts": [],
-                                          "borrow_kind": "readonly_ref",
-                                          "repr": "dx",
-                                          "id": "dx"
-                                        }
-                                      },
-                                      "op": "Add",
-                                      "right": {
-                                        "kind": "BinOp",
-                                        "source_span": {
-                                          "lineno": 26,
-                                          "col_offset": 153,
-                                          "end_lineno": 26,
-                                          "end_col_offset": 160
-                                        },
-                                        "resolved_type": "int64",
-                                        "casts": [],
-                                        "borrow_kind": "value",
-                                        "repr": "dy * dy",
-                                        "left": {
-                                          "kind": "Name",
-                                          "source_span": {
-                                            "lineno": 26,
-                                            "col_offset": 153,
-                                            "end_lineno": 26,
-                                            "end_col_offset": 155
-                                          },
-                                          "resolved_type": "int64",
-                                          "casts": [],
-                                          "borrow_kind": "readonly_ref",
-                                          "repr": "dy",
-                                          "id": "dy"
-                                        },
-                                        "op": "Mult",
-                                        "right": {
-                                          "kind": "Name",
-                                          "source_span": {
-                                            "lineno": 26,
-                                            "col_offset": 158,
-                                            "end_lineno": 26,
-                                            "end_col_offset": 160
-                                          },
-                                          "resolved_type": "int64",
-                                          "casts": [],
-                                          "borrow_kind": "readonly_ref",
-                                          "repr": "dy",
-                                          "id": "dy"
-                                        }
+                                      "type_expr_summary_v1": {
+                                        "schema_version": 1,
+                                        "kind": "NamedType",
+                                        "category": "static",
+                                        "mirror": "float64"
                                       }
                                     }
                                   ],
@@ -1837,7 +1885,8 @@
                                   "repr": "1.3",
                                   "value": 1.3
                                 }
-                              }
+                              },
+                              "call_arg_type": "float64"
                             }
                           ],
                           "keywords": [],
@@ -2032,7 +2081,8 @@
                                 "repr": "8.0",
                                 "value": 8.0
                               }
-                            }
+                            },
+                            "call_arg_type": "Obj"
                           }
                         ],
                         "keywords": [],
@@ -2476,6 +2526,7 @@
                       }
                     ],
                     "keywords": [],
+                    "call_arg_type": "bytes",
                     "type_expr_summary_v1": {
                       "schema_version": 1,
                       "kind": "NamedType",
@@ -2545,7 +2596,7 @@
               "end_lineno": 40,
               "end_col_offset": 77
             },
-            "resolved_type": "unknown",
+            "resolved_type": "None",
             "casts": [],
             "borrow_kind": "value",
             "repr": "save_gif(out_path, w, h, frames, grayscale_palette(), delay_cs=4, loop=0)",
@@ -2576,7 +2627,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "out_path",
-                "id": "out_path"
+                "id": "out_path",
+                "call_arg_type": "str"
               },
               {
                 "kind": "Name",
@@ -2590,7 +2642,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "w",
-                "id": "w"
+                "id": "w",
+                "call_arg_type": "int64"
               },
               {
                 "kind": "Name",
@@ -2604,7 +2657,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "h",
-                "id": "h"
+                "id": "h",
+                "call_arg_type": "int64"
               },
               {
                 "kind": "Name",
@@ -2618,7 +2672,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "frames",
-                "id": "frames"
+                "id": "frames",
+                "call_arg_type": "list[bytes]"
               },
               {
                 "kind": "Call",
@@ -2628,7 +2683,7 @@
                   "end_lineno": 40,
                   "end_col_offset": 56
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bytes",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "grayscale_palette()",
@@ -2653,12 +2708,12 @@
                 "runtime_module_id": "pytra.utils.gif",
                 "runtime_symbol": "grayscale_palette",
                 "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bytes",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
-                  "kind": "DynamicType",
-                  "category": "dynamic",
-                  "mirror": "unknown",
-                  "dynamic_name": "unknown"
+                  "kind": "NamedType",
+                  "category": "static",
+                  "mirror": "bytes"
                 }
               }
             ],
@@ -2677,7 +2732,8 @@
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "4",
-                  "value": 4
+                  "value": 4,
+                  "call_arg_type": "int64"
                 }
               },
               {
@@ -2694,7 +2750,8 @@
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "0",
-                  "value": 0
+                  "value": 0,
+                  "call_arg_type": "int64"
                 }
               }
             ],
@@ -2705,10 +2762,9 @@
             "runtime_call_adapter_kind": "image.save_gif.keyword_defaults",
             "type_expr_summary_v1": {
               "schema_version": 1,
-              "kind": "DynamicType",
-              "category": "dynamic",
-              "mirror": "unknown",
-              "dynamic_name": "unknown"
+              "kind": "NamedType",
+              "category": "static",
+              "mirror": "None"
             }
           }
         },

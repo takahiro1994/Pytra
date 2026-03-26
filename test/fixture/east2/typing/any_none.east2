@@ -468,7 +468,8 @@
                   "casts": [],
                   "borrow_kind": "readonly_ref",
                   "repr": "v",
-                  "id": "v"
+                  "id": "v",
+                  "call_arg_type": "Obj"
                 }
               ],
               "keywords": [],
@@ -539,7 +540,7 @@
               "end_lineno": 16,
               "end_col": 27
             },
-            "resolved_type": "list[unknown]",
+            "resolved_type": "list[bool]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "[]",
@@ -631,7 +632,7 @@
                   "end_lineno": 17,
                   "end_col": 56
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_true(is_none_v, \"v is None\")",
@@ -662,7 +663,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "is_none_v",
-                    "id": "is_none_v"
+                    "id": "is_none_v",
+                    "call_arg_type": "bool"
                   },
                   {
                     "kind": "Constant",
@@ -676,7 +678,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"v is None\"",
-                    "value": "v is None"
+                    "value": "v is None",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -684,7 +687,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_true",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -768,7 +772,7 @@
                   "end_lineno": 18,
                   "end_col": 64
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_true(is_not_none_w, \"w is not None\")",
@@ -799,7 +803,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "is_not_none_w",
-                    "id": "is_not_none_w"
+                    "id": "is_not_none_w",
+                    "call_arg_type": "bool"
                   },
                   {
                     "kind": "Constant",
@@ -813,7 +818,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"w is not None\"",
-                    "value": "w is not None"
+                    "value": "w is not None",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -821,7 +827,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_true",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -905,7 +912,7 @@
                   "end_lineno": 19,
                   "end_col": 64
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(out, \"fallback\", \"none fallback\")",
@@ -936,7 +943,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "out",
-                    "id": "out"
+                    "id": "out",
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -950,7 +958,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"fallback\"",
-                    "value": "fallback"
+                    "value": "fallback",
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -964,7 +973,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"none fallback\"",
-                    "value": "none fallback"
+                    "value": "none fallback",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -972,7 +982,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -1015,7 +1026,7 @@
               "end_lineno": 20,
               "end_col": 44
             },
-            "resolved_type": "unknown",
+            "resolved_type": "bool",
             "casts": [],
             "borrow_kind": "value",
             "repr": "py_assert_all(checks, \"any_none\")",
@@ -1046,7 +1057,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "checks",
-                "id": "checks"
+                "id": "checks",
+                "call_arg_type": "list[bool]"
               },
               {
                 "kind": "Constant",
@@ -1060,7 +1072,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "\"any_none\"",
-                "value": "any_none"
+                "value": "any_none",
+                "call_arg_type": "str"
               }
             ],
             "keywords": [],

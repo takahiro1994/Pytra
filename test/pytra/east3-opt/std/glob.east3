@@ -128,7 +128,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "_glob_mod",
-                "id": "_glob_mod"
+                "id": "_glob_mod",
+                "runtime_module_id": "pytra.std.glob"
               },
               "attr": "glob"
             },
@@ -145,7 +146,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "pattern",
-                "id": "pattern"
+                "id": "pattern",
+                "call_arg_type": "str"
               }
             ],
             "keywords": [],
@@ -153,7 +155,7 @@
             "resolved_runtime_source": "module_attr",
             "runtime_module_id": "pytra.std.glob",
             "runtime_symbol": "glob",
-            "semantic_tag": "stdlib.fn.glob",
+            "semantic_tag": "stdlib.method.glob",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "GenericType",

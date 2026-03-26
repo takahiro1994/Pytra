@@ -686,7 +686,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "10",
-                    "value": 10
+                    "value": 10,
+                    "call_arg_type": "int64"
                   },
                   {
                     "kind": "Constant",
@@ -700,7 +701,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "20",
-                    "value": 20
+                    "value": 20,
+                    "call_arg_type": "int64"
                   }
                 ],
                 "keywords": [],
@@ -869,7 +871,7 @@
               "end_lineno": 18,
               "end_col_offset": 46
             },
-            "resolved_type": "unknown",
+            "resolved_type": "bool",
             "casts": [],
             "borrow_kind": "value",
             "repr": "py_assert_stdout(['30'], _case_main)",
@@ -915,7 +917,14 @@
                     "repr": "'30'",
                     "value": "30"
                   }
-                ]
+                ],
+                "call_arg_type": "list[str]",
+                "type_expr_summary_v1": {
+                  "schema_version": 1,
+                  "kind": "GenericType",
+                  "category": "static",
+                  "mirror": "list[str]"
+                }
               },
               {
                 "kind": "Name",
@@ -929,7 +938,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "_case_main",
-                "id": "_case_main"
+                "id": "_case_main",
+                "call_arg_type": "object"
               }
             ],
             "keywords": [],
@@ -940,10 +950,9 @@
             "runtime_call_adapter_kind": "extern_delegate",
             "type_expr_summary_v1": {
               "schema_version": 1,
-              "kind": "DynamicType",
-              "category": "dynamic",
-              "mirror": "unknown",
-              "dynamic_name": "unknown"
+              "kind": "NamedType",
+              "category": "static",
+              "mirror": "bool"
             }
           }
         ],

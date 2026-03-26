@@ -422,7 +422,7 @@
               "end_lineno": 22,
               "end_col": 27
             },
-            "resolved_type": "list[unknown]",
+            "resolved_type": "list[bool]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "[]",
@@ -508,7 +508,7 @@
                   "end_lineno": 23,
                   "end_col": 71
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(Color.RED == Color.RED, True, \"enum-eq\")",
@@ -599,7 +599,8 @@
                         },
                         "attr": "RED"
                       }
-                    ]
+                    ],
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -613,7 +614,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "True",
-                    "value": true
+                    "value": true,
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -627,7 +629,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"enum-eq\"",
-                    "value": "enum-eq"
+                    "value": "enum-eq",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -635,7 +638,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -719,7 +723,7 @@
                   "end_lineno": 24,
                   "end_col": 74
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(Color.RED == Color.BLUE, False, \"enum-neq\")",
@@ -810,7 +814,8 @@
                         },
                         "attr": "BLUE"
                       }
-                    ]
+                    ],
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -824,7 +829,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "False",
-                    "value": false
+                    "value": false,
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -838,7 +844,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"enum-neq\"",
-                    "value": "enum-neq"
+                    "value": "enum-neq",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -846,7 +853,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -930,7 +938,7 @@
                   "end_lineno": 25,
                   "end_col": 67
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(Status.OK == 0, True, \"int-enum-eq\")",
@@ -1007,7 +1015,8 @@
                         "repr": "0",
                         "value": 0
                       }
-                    ]
+                    ],
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1021,7 +1030,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "True",
-                    "value": true
+                    "value": true,
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1035,7 +1045,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"int-enum-eq\"",
-                    "value": "int-enum-eq"
+                    "value": "int-enum-eq",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -1043,7 +1054,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -1127,7 +1139,7 @@
                   "end_lineno": 26,
                   "end_col": 68
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(int(Status.ERROR), 1, \"int-enum-int\")",
@@ -1199,7 +1211,8 @@
                           "repr": "Status",
                           "id": "Status"
                         },
-                        "attr": "ERROR"
+                        "attr": "ERROR",
+                        "call_arg_type": "Obj"
                       }
                     ],
                     "keywords": [],
@@ -1209,7 +1222,8 @@
                     "runtime_module_id": "pytra.core.py_runtime",
                     "runtime_symbol": "int",
                     "runtime_call_adapter_kind": "builtin",
-                    "semantic_tag": "cast.int"
+                    "semantic_tag": "cast.int",
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1223,7 +1237,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "1",
-                    "value": 1
+                    "value": 1,
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1237,7 +1252,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"int-enum-int\"",
-                    "value": "int-enum-int"
+                    "value": "int-enum-int",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -1245,7 +1261,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -1437,7 +1454,7 @@
                   "end_lineno": 28,
                   "end_col": 53
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(int(rw), 3, \"flag-or\")",
@@ -1495,7 +1512,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "rw",
-                        "id": "rw"
+                        "id": "rw",
+                        "call_arg_type": "Obj"
                       }
                     ],
                     "keywords": [],
@@ -1505,7 +1523,8 @@
                     "runtime_module_id": "pytra.core.py_runtime",
                     "runtime_symbol": "int",
                     "runtime_call_adapter_kind": "builtin",
-                    "semantic_tag": "cast.int"
+                    "semantic_tag": "cast.int",
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1519,7 +1538,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "3",
-                    "value": 3
+                    "value": 3,
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1533,7 +1553,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"flag-or\"",
-                    "value": "flag-or"
+                    "value": "flag-or",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -1541,7 +1562,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -1625,7 +1647,7 @@
                   "end_lineno": 29,
                   "end_col": 67
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(int(rw & Perm.WRITE), 2, \"flag-and\")",
@@ -1725,7 +1747,8 @@
                             "id": "Perm"
                           },
                           "attr": "WRITE"
-                        }
+                        },
+                        "call_arg_type": "Obj"
                       }
                     ],
                     "keywords": [],
@@ -1735,7 +1758,8 @@
                     "runtime_module_id": "pytra.core.py_runtime",
                     "runtime_symbol": "int",
                     "runtime_call_adapter_kind": "builtin",
-                    "semantic_tag": "cast.int"
+                    "semantic_tag": "cast.int",
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1749,7 +1773,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "2",
-                    "value": 2
+                    "value": 2,
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1763,7 +1788,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"flag-and\"",
-                    "value": "flag-and"
+                    "value": "flag-and",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -1771,7 +1797,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -1855,7 +1882,7 @@
                   "end_lineno": 30,
                   "end_col": 67
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(int(rw ^ Perm.WRITE), 1, \"flag-xor\")",
@@ -1955,7 +1982,8 @@
                             "id": "Perm"
                           },
                           "attr": "WRITE"
-                        }
+                        },
+                        "call_arg_type": "Obj"
                       }
                     ],
                     "keywords": [],
@@ -1965,7 +1993,8 @@
                     "runtime_module_id": "pytra.core.py_runtime",
                     "runtime_symbol": "int",
                     "runtime_call_adapter_kind": "builtin",
-                    "semantic_tag": "cast.int"
+                    "semantic_tag": "cast.int",
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1979,7 +2008,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "1",
-                    "value": 1
+                    "value": 1,
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1993,7 +2023,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"flag-xor\"",
-                    "value": "flag-xor"
+                    "value": "flag-xor",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -2001,7 +2032,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -2044,7 +2076,7 @@
               "end_lineno": 31,
               "end_col": 49
             },
-            "resolved_type": "unknown",
+            "resolved_type": "bool",
             "casts": [],
             "borrow_kind": "value",
             "repr": "py_assert_all(checks, \"enum_extended\")",
@@ -2075,7 +2107,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "checks",
-                "id": "checks"
+                "id": "checks",
+                "call_arg_type": "list[bool]"
               },
               {
                 "kind": "Constant",
@@ -2089,7 +2122,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "\"enum_extended\"",
-                "value": "enum_extended"
+                "value": "enum_extended",
+                "call_arg_type": "str"
               }
             ],
             "keywords": [],

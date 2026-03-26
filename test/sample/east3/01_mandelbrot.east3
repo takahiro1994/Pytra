@@ -1213,7 +1213,8 @@
                     "repr": "t",
                     "id": "t"
                   }
-                }
+                },
+                "call_arg_type": "Obj"
               }
             ],
             "keywords": [],
@@ -1342,7 +1343,8 @@
                   "borrow_kind": "readonly_ref",
                   "repr": "t",
                   "id": "t"
-                }
+                },
+                "call_arg_type": "Obj"
               }
             ],
             "keywords": [],
@@ -1499,7 +1501,8 @@
                     "repr": "t",
                     "id": "t"
                   }
-                }
+                },
+                "call_arg_type": "Obj"
               }
             ],
             "keywords": [],
@@ -2361,7 +2364,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "px",
-                        "id": "px"
+                        "id": "px",
+                        "call_arg_type": "float64"
                       },
                       {
                         "kind": "Name",
@@ -2375,7 +2379,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "py",
-                        "id": "py"
+                        "id": "py",
+                        "call_arg_type": "float64"
                       },
                       {
                         "kind": "Name",
@@ -2389,7 +2394,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "max_iter",
-                        "id": "max_iter"
+                        "id": "max_iter",
+                        "call_arg_type": "int64"
                       }
                     ],
                     "keywords": [],
@@ -2935,7 +2941,8 @@
                                 "repr": "t",
                                 "id": "t"
                               }
-                            }
+                            },
+                            "call_arg_type": "Obj"
                           }
                         ],
                         "keywords": [],
@@ -3052,7 +3059,8 @@
                               "borrow_kind": "readonly_ref",
                               "repr": "t",
                               "id": "t"
-                            }
+                            },
+                            "call_arg_type": "Obj"
                           }
                         ],
                         "keywords": [],
@@ -3197,7 +3205,8 @@
                                 "repr": "t",
                                 "id": "t"
                               }
-                            }
+                            },
+                            "call_arg_type": "Obj"
                           }
                         ],
                         "keywords": [],
@@ -3963,7 +3972,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "width",
-                "id": "width"
+                "id": "width",
+                "call_arg_type": "int64"
               },
               {
                 "kind": "Name",
@@ -3977,7 +3987,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "height",
-                "id": "height"
+                "id": "height",
+                "call_arg_type": "int64"
               },
               {
                 "kind": "Name",
@@ -3991,7 +4002,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "max_iter",
-                "id": "max_iter"
+                "id": "max_iter",
+                "call_arg_type": "int64"
               },
               {
                 "kind": "UnaryOp",
@@ -4019,7 +4031,8 @@
                   "borrow_kind": "value",
                   "repr": "2.2",
                   "value": 2.2
-                }
+                },
+                "call_arg_type": "float64"
               },
               {
                 "kind": "Constant",
@@ -4033,7 +4046,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "1.0",
-                "value": 1.0
+                "value": 1.0,
+                "call_arg_type": "float64"
               },
               {
                 "kind": "UnaryOp",
@@ -4061,7 +4075,8 @@
                   "borrow_kind": "value",
                   "repr": "1.2",
                   "value": 1.2
-                }
+                },
+                "call_arg_type": "float64"
               },
               {
                 "kind": "Constant",
@@ -4075,7 +4090,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "1.2",
-                "value": 1.2
+                "value": 1.2,
+                "call_arg_type": "float64"
               }
             ],
             "keywords": [],
@@ -4109,7 +4125,7 @@
               "end_lineno": 89,
               "end_col_offset": 54
             },
-            "resolved_type": "unknown",
+            "resolved_type": "None",
             "casts": [],
             "borrow_kind": "value",
             "repr": "png.write_rgb_png(out_path, width, height, pixels)",
@@ -4137,7 +4153,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "png",
-                "id": "png"
+                "id": "png",
+                "runtime_module_id": "pytra.utils.png"
               },
               "attr": "write_rgb_png"
             },
@@ -4154,7 +4171,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "out_path",
-                "id": "out_path"
+                "id": "out_path",
+                "call_arg_type": "str"
               },
               {
                 "kind": "Name",
@@ -4168,7 +4186,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "width",
-                "id": "width"
+                "id": "width",
+                "call_arg_type": "int64"
               },
               {
                 "kind": "Name",
@@ -4182,7 +4201,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "height",
-                "id": "height"
+                "id": "height",
+                "call_arg_type": "int64"
               },
               {
                 "kind": "Name",
@@ -4196,7 +4216,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "pixels",
-                "id": "pixels"
+                "id": "pixels",
+                "call_arg_type": "bytes"
               }
             ],
             "keywords": [],
@@ -4207,10 +4228,9 @@
             "semantic_tag": "stdlib.method.write_rgb_png",
             "type_expr_summary_v1": {
               "schema_version": 1,
-              "kind": "DynamicType",
-              "category": "dynamic",
-              "mirror": "unknown",
-              "dynamic_name": "unknown"
+              "kind": "NamedType",
+              "category": "static",
+              "mirror": "None"
             }
           },
           "leading_trivia": [

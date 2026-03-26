@@ -750,7 +750,7 @@
               "end_lineno": 13,
               "end_col": 27
             },
-            "resolved_type": "list[unknown]",
+            "resolved_type": "list[bool]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "[]",
@@ -836,7 +836,7 @@
                   "end_lineno": 14,
                   "end_col": 59
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(s1, \"name=Pytra, x=7\", \"s1\")",
@@ -867,7 +867,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "s1",
-                    "id": "s1"
+                    "id": "s1",
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -881,7 +882,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"name=Pytra, x=7\"",
-                    "value": "name=Pytra, x=7"
+                    "value": "name=Pytra, x=7",
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -895,7 +897,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"s1\"",
-                    "value": "s1"
+                    "value": "s1",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -903,7 +906,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -987,7 +991,7 @@
                   "end_lineno": 15,
                   "end_col": 56
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(s2, \"{escaped}:12\", \"s2\")",
@@ -1018,7 +1022,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "s2",
-                    "id": "s2"
+                    "id": "s2",
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1032,7 +1037,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"{escaped}:12\"",
-                    "value": "{escaped}:12"
+                    "value": "{escaped}:12",
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1046,7 +1052,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"s2\"",
-                    "value": "s2"
+                    "value": "s2",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -1054,7 +1061,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -1138,7 +1146,7 @@
                   "end_lineno": 16,
                   "end_col": 64
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(s3, \"raw\\\\\\\\path\\\\\\\\Pytra\", \"s3\")",
@@ -1169,7 +1177,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "s3",
-                    "id": "s3"
+                    "id": "s3",
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1183,7 +1192,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"raw\\\\\\\\path\\\\\\\\Pytra\"",
-                    "value": "raw\\\\path\\\\Pytra"
+                    "value": "raw\\\\path\\\\Pytra",
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1197,7 +1207,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"s3\"",
-                    "value": "s3"
+                    "value": "s3",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -1205,7 +1216,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -1289,7 +1301,7 @@
                   "end_lineno": 17,
                   "end_col": 56
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(s4, \"mix:Pytra:ok\", \"s4\")",
@@ -1320,7 +1332,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "s4",
-                    "id": "s4"
+                    "id": "s4",
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1334,7 +1347,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"mix:Pytra:ok\"",
-                    "value": "mix:Pytra:ok"
+                    "value": "mix:Pytra:ok",
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1348,7 +1362,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"s4\"",
-                    "value": "s4"
+                    "value": "s4",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -1356,7 +1371,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -1399,7 +1415,7 @@
               "end_lineno": 18,
               "end_col": 42
             },
-            "resolved_type": "unknown",
+            "resolved_type": "bool",
             "casts": [],
             "borrow_kind": "value",
             "repr": "py_assert_all(checks, \"case37\")",
@@ -1430,7 +1446,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "checks",
-                "id": "checks"
+                "id": "checks",
+                "call_arg_type": "list[bool]"
               },
               {
                 "kind": "Constant",
@@ -1444,7 +1461,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "\"case37\"",
-                "value": "case37"
+                "value": "case37",
+                "call_arg_type": "str"
               }
             ],
             "keywords": [],

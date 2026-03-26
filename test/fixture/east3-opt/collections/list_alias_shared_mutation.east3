@@ -117,7 +117,13 @@
                 "repr": "2",
                 "value": 2
               }
-            ]
+            ],
+            "type_expr_summary_v1": {
+              "schema_version": 1,
+              "kind": "GenericType",
+              "category": "static",
+              "mirror": "list[int64]"
+            }
           },
           "type_expr_summary_v1": {
             "schema_version": 1,
@@ -267,7 +273,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "3",
-                "value": 3
+                "value": 3,
+                "call_arg_type": "int64"
               }
             ],
             "keywords": [],
@@ -394,7 +401,8 @@
                   "casts": [],
                   "borrow_kind": "readonly_ref",
                   "repr": "a",
-                  "id": "a"
+                  "id": "a",
+                  "call_arg_type": "Obj"
                 }
               ],
               "keywords": [],
@@ -483,7 +491,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "a",
-                    "id": "a"
+                    "id": "a",
+                    "call_arg_type": "Obj"
                   }
                 ],
                 "keywords": [],
@@ -728,7 +737,8 @@
                   "casts": [],
                   "borrow_kind": "readonly_ref",
                   "repr": "a",
-                  "id": "a"
+                  "id": "a",
+                  "call_arg_type": "Obj"
                 }
               ],
               "keywords": [],
@@ -817,7 +827,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "a",
-                    "id": "a"
+                    "id": "a",
+                    "call_arg_type": "Obj"
                   }
                 ],
                 "keywords": [],

@@ -629,7 +629,7 @@
               "end_lineno": 26,
               "end_col": 27
             },
-            "resolved_type": "list[unknown]",
+            "resolved_type": "list[bool]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "[]",
@@ -721,7 +721,7 @@
                   "end_lineno": 27,
                   "end_col": 75
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(has_data_if(empty), False, \"bytes if empty\")",
@@ -779,10 +779,12 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "empty",
-                        "id": "empty"
+                        "id": "empty",
+                        "call_arg_type": "bytes"
                       }
                     ],
-                    "keywords": []
+                    "keywords": [],
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -796,7 +798,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "False",
-                    "value": false
+                    "value": false,
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -810,7 +813,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"bytes if empty\"",
-                    "value": "bytes if empty"
+                    "value": "bytes if empty",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -818,7 +822,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -902,7 +907,7 @@
                   "end_lineno": 28,
                   "end_col": 76
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(has_data_if(filled), True, \"bytes if filled\")",
@@ -960,10 +965,12 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "filled",
-                        "id": "filled"
+                        "id": "filled",
+                        "call_arg_type": "bytes"
                       }
                     ],
-                    "keywords": []
+                    "keywords": [],
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -977,7 +984,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "True",
-                    "value": true
+                    "value": true,
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -991,7 +999,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"bytes if filled\"",
-                    "value": "bytes if filled"
+                    "value": "bytes if filled",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -999,7 +1008,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -1083,7 +1093,7 @@
                   "end_lineno": 29,
                   "end_col": 81
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(has_data_while(empty), False, \"bytes while empty\")",
@@ -1141,10 +1151,12 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "empty",
-                        "id": "empty"
+                        "id": "empty",
+                        "call_arg_type": "bytes"
                       }
                     ],
-                    "keywords": []
+                    "keywords": [],
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1158,7 +1170,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "False",
-                    "value": false
+                    "value": false,
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1172,7 +1185,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"bytes while empty\"",
-                    "value": "bytes while empty"
+                    "value": "bytes while empty",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -1180,7 +1194,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -1264,7 +1279,7 @@
                   "end_lineno": 30,
                   "end_col": 82
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(has_data_while(filled), True, \"bytes while filled\")",
@@ -1322,10 +1337,12 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "filled",
-                        "id": "filled"
+                        "id": "filled",
+                        "call_arg_type": "bytes"
                       }
                     ],
-                    "keywords": []
+                    "keywords": [],
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1339,7 +1356,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "True",
-                    "value": true
+                    "value": true,
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1353,7 +1371,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"bytes while filled\"",
-                    "value": "bytes while filled"
+                    "value": "bytes while filled",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -1361,7 +1380,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -1445,7 +1465,7 @@
                   "end_lineno": 31,
                   "end_col": 77
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(choose_payload(empty), 0, \"bytes ifexp empty\")",
@@ -1503,10 +1523,12 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "empty",
-                        "id": "empty"
+                        "id": "empty",
+                        "call_arg_type": "bytes"
                       }
                     ],
-                    "keywords": []
+                    "keywords": [],
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1520,7 +1542,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "0",
-                    "value": 0
+                    "value": 0,
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1534,7 +1557,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"bytes ifexp empty\"",
-                    "value": "bytes ifexp empty"
+                    "value": "bytes ifexp empty",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -1542,7 +1566,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -1626,7 +1651,7 @@
                   "end_lineno": 32,
                   "end_col": 79
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(choose_payload(filled), 1, \"bytes ifexp filled\")",
@@ -1684,10 +1709,12 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "filled",
-                        "id": "filled"
+                        "id": "filled",
+                        "call_arg_type": "bytes"
                       }
                     ],
-                    "keywords": []
+                    "keywords": [],
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1701,7 +1728,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "1",
-                    "value": 1
+                    "value": 1,
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1715,7 +1743,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"bytes ifexp filled\"",
-                    "value": "bytes ifexp filled"
+                    "value": "bytes ifexp filled",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -1723,7 +1752,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -1766,7 +1796,7 @@
               "end_lineno": 33,
               "end_col": 52
             },
-            "resolved_type": "unknown",
+            "resolved_type": "bool",
             "casts": [],
             "borrow_kind": "value",
             "repr": "py_assert_all(checks, \"bytes_truthiness\")",
@@ -1797,7 +1827,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "checks",
-                "id": "checks"
+                "id": "checks",
+                "call_arg_type": "list[bool]"
               },
               {
                 "kind": "Constant",
@@ -1811,7 +1842,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "\"bytes_truthiness\"",
-                "value": "bytes_truthiness"
+                "value": "bytes_truthiness",
+                "call_arg_type": "str"
               }
             ],
             "keywords": [],

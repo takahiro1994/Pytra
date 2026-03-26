@@ -34,7 +34,7 @@
       "module_id": "pytra.utils.assertions",
       "input": "/workspace/Pytra/src/runtime/east/utils/assertions.east",
       "output": "east3/pytra/utils/assertions.east3.json",
-      "source_path": "src/pytra/utils/assertions.py",
+      "source_path": "/workspace/Pytra/src/pytra/utils/assertions.py",
       "is_entry": false,
       "module_kind": "runtime"
     }

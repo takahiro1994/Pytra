@@ -153,26 +153,26 @@
               "end_lineno": 4,
               "end_col_offset": 6
             },
-            "resolved_type": "uint8",
+            "resolved_type": "str",
             "casts": [],
             "borrow_kind": "value",
             "repr": "ch",
             "id": "ch",
             "type_expr": {
               "kind": "NamedType",
-              "name": "uint8"
+              "name": "str"
             }
           },
           "annotation": "uint8",
           "declare": true,
-          "decl_type": "uint8",
+          "decl_type": "str",
           "annotation_type_expr": {
             "kind": "NamedType",
             "name": "uint8"
           },
           "decl_type_expr": {
             "kind": "NamedType",
-            "name": "uint8"
+            "name": "str"
           },
           "value": {
             "kind": "Subscript",
@@ -219,7 +219,7 @@
             "schema_version": 1,
             "kind": "NamedType",
             "category": "static",
-            "mirror": "uint8"
+            "mirror": "str"
           }
         },
         {

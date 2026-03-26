@@ -15,14 +15,6 @@
       "module_kind": "runtime"
     },
     {
-      "module_id": "pytra.built_in.sequence",
-      "input": "/workspace/Pytra/src/runtime/east/built_in/sequence.east",
-      "output": "east3/pytra/built_in/sequence.east3.json",
-      "source_path": "/workspace/Pytra/src/pytra/built_in/sequence.py",
-      "is_entry": false,
-      "module_kind": "runtime"
-    },
-    {
       "module_id": "pytra.std.re",
       "input": "/workspace/Pytra/src/runtime/east/std/re.east",
       "output": "east3/pytra/std/re.east3.json",
@@ -34,7 +26,7 @@
       "module_id": "pytra.utils.assertions",
       "input": "/workspace/Pytra/src/runtime/east/utils/assertions.east",
       "output": "east3/pytra/utils/assertions.east3.json",
-      "source_path": "src/pytra/utils/assertions.py",
+      "source_path": "/workspace/Pytra/src/pytra/utils/assertions.py",
       "is_entry": false,
       "module_kind": "runtime"
     },
@@ -58,8 +50,6 @@
     },
     "call_graph": {
       "pytra.built_in.io_ops::py_print": [],
-      "pytra.built_in.sequence::py_range": [],
-      "pytra.built_in.sequence::py_repeat": [],
       "pytra.std.re::Match.__init__": [],
       "pytra.std.re::Match.group": [],
       "pytra.std.re::Pattern.__init__": [],
@@ -109,12 +99,6 @@
     "sccs": [
       [
         "pytra.built_in.io_ops::py_print"
-      ],
-      [
-        "pytra.built_in.sequence::py_range"
-      ],
-      [
-        "pytra.built_in.sequence::py_repeat"
       ],
       [
         "pytra.std.re::Match.__init__"

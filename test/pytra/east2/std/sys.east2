@@ -104,7 +104,7 @@
           "end_lineno": 8,
           "end_col": 34
         },
-        "resolved_type": "unknown",
+        "resolved_type": "list[str]",
         "casts": [],
         "borrow_kind": "value",
         "repr": "extern(sys.argv)",
@@ -147,17 +147,17 @@
               "casts": [],
               "borrow_kind": "value",
               "repr": "sys",
-              "id": "sys"
+              "id": "sys",
+              "runtime_module_id": "pytra.std.sys"
             },
-            "attr": "argv"
+            "attr": "argv",
+            "runtime_module_id": "pytra.std.sys",
+            "runtime_symbol": "argv",
+            "runtime_symbol_dispatch": "value",
+            "semantic_tag": "stdlib.symbol.argv"
           }
         ],
-        "keywords": [],
-        "resolved_runtime_call": "extern",
-        "resolved_runtime_source": "import_symbol",
-        "runtime_module_id": "pytra.std",
-        "runtime_symbol": "extern",
-        "runtime_call_adapter_kind": "extern_delegate"
+        "keywords": []
       },
       "declare": true,
       "decl_type": "list[str]",
@@ -233,7 +233,7 @@
           "end_lineno": 9,
           "end_col": 34
         },
-        "resolved_type": "unknown",
+        "resolved_type": "list[str]",
         "casts": [],
         "borrow_kind": "value",
         "repr": "extern(sys.path)",
@@ -276,17 +276,17 @@
               "casts": [],
               "borrow_kind": "value",
               "repr": "sys",
-              "id": "sys"
+              "id": "sys",
+              "runtime_module_id": "pytra.std.sys"
             },
-            "attr": "path"
+            "attr": "path",
+            "runtime_module_id": "pytra.std.sys",
+            "runtime_symbol": "path",
+            "runtime_symbol_dispatch": "value",
+            "semantic_tag": "stdlib.symbol.path"
           }
         ],
-        "keywords": [],
-        "resolved_runtime_call": "extern",
-        "resolved_runtime_source": "import_symbol",
-        "runtime_module_id": "pytra.std",
-        "runtime_symbol": "extern",
-        "runtime_call_adapter_kind": "extern_delegate"
+        "keywords": []
       },
       "declare": true,
       "decl_type": "list[str]",
@@ -341,7 +341,7 @@
           "end_lineno": 10,
           "end_col": 27
         },
-        "resolved_type": "unknown",
+        "resolved_type": "str",
         "casts": [],
         "borrow_kind": "value",
         "repr": "extern(sys.stderr)",
@@ -384,19 +384,20 @@
               "casts": [],
               "borrow_kind": "value",
               "repr": "sys",
-              "id": "sys"
+              "id": "sys",
+              "runtime_module_id": "pytra.std.sys"
             },
-            "attr": "stderr"
+            "attr": "stderr",
+            "runtime_module_id": "pytra.std.sys",
+            "runtime_symbol": "stderr",
+            "runtime_symbol_dispatch": "value",
+            "semantic_tag": "stdlib.symbol.stderr"
           }
         ],
-        "keywords": [],
-        "resolved_runtime_call": "extern",
-        "resolved_runtime_source": "import_symbol",
-        "runtime_module_id": "pytra.std",
-        "runtime_symbol": "extern",
-        "runtime_call_adapter_kind": "extern_delegate"
+        "keywords": []
       },
       "declare": true,
+      "decl_type": "str",
       "declare_init": true
     },
     {
@@ -429,7 +430,7 @@
           "end_lineno": 11,
           "end_col": 27
         },
-        "resolved_type": "unknown",
+        "resolved_type": "str",
         "casts": [],
         "borrow_kind": "value",
         "repr": "extern(sys.stdout)",
@@ -472,19 +473,20 @@
               "casts": [],
               "borrow_kind": "value",
               "repr": "sys",
-              "id": "sys"
+              "id": "sys",
+              "runtime_module_id": "pytra.std.sys"
             },
-            "attr": "stdout"
+            "attr": "stdout",
+            "runtime_module_id": "pytra.std.sys",
+            "runtime_symbol": "stdout",
+            "runtime_symbol_dispatch": "value",
+            "semantic_tag": "stdlib.symbol.stdout"
           }
         ],
-        "keywords": [],
-        "resolved_runtime_call": "extern",
-        "resolved_runtime_source": "import_symbol",
-        "runtime_module_id": "pytra.std",
-        "runtime_symbol": "extern",
-        "runtime_call_adapter_kind": "extern_delegate"
+        "keywords": []
       },
       "declare": true,
+      "decl_type": "str",
       "declare_init": true
     },
     {
@@ -573,7 +575,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "sys",
-                "id": "sys"
+                "id": "sys",
+                "runtime_module_id": "pytra.std.sys"
               },
               "attr": "exit"
             },
@@ -590,7 +593,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "code",
-                "id": "code"
+                "id": "code",
+                "call_arg_type": "int64"
               }
             ],
             "keywords": [],
@@ -598,7 +602,7 @@
             "resolved_runtime_source": "module_attr",
             "runtime_module_id": "pytra.std.sys",
             "runtime_symbol": "exit",
-            "semantic_tag": "stdlib.fn.exit"
+            "semantic_tag": "stdlib.method.exit"
           }
         }
       ],
@@ -831,7 +835,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "v",
-                    "id": "v"
+                    "id": "v",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -1088,7 +1093,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "v",
-                    "id": "v"
+                    "id": "v",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -1223,9 +1229,14 @@
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "sys",
-                  "id": "sys"
+                  "id": "sys",
+                  "runtime_module_id": "pytra.std.sys"
                 },
-                "attr": "stderr"
+                "attr": "stderr",
+                "runtime_module_id": "pytra.std.sys",
+                "runtime_symbol": "stderr",
+                "runtime_symbol_dispatch": "value",
+                "semantic_tag": "stdlib.symbol.stderr"
               },
               "attr": "write"
             },
@@ -1347,9 +1358,14 @@
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "sys",
-                  "id": "sys"
+                  "id": "sys",
+                  "runtime_module_id": "pytra.std.sys"
                 },
-                "attr": "stdout"
+                "attr": "stdout",
+                "runtime_module_id": "pytra.std.sys",
+                "runtime_symbol": "stdout",
+                "runtime_symbol_dispatch": "value",
+                "semantic_tag": "stdlib.symbol.stdout"
               },
               "attr": "write"
             },

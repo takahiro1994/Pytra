@@ -270,7 +270,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "items",
-                "id": "items"
+                "id": "items",
+                "call_arg_type": "list[str]"
               }
             ],
             "keywords": [],
@@ -469,7 +470,7 @@
               "end_lineno": 17,
               "end_col": 49
             },
-            "resolved_type": "unknown",
+            "resolved_type": "bool",
             "casts": [],
             "borrow_kind": "value",
             "repr": "py_assert_stdout([\"a,b,c\"], _case_main)",
@@ -515,7 +516,8 @@
                     "repr": "\"a,b,c\"",
                     "value": "a,b,c"
                   }
-                ]
+                ],
+                "call_arg_type": "list[str]"
               },
               {
                 "kind": "Name",
@@ -529,7 +531,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "_case_main",
-                "id": "_case_main"
+                "id": "_case_main",
+                "call_arg_type": "object"
               }
             ],
             "keywords": [],

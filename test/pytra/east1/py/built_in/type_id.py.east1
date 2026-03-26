@@ -2831,26 +2831,14 @@
           },
           "body": [
             {
-              "kind": "Expr",
+              "kind": "Return",
               "source_span": {
                 "lineno": 106,
                 "col": 8,
                 "end_lineno": 106,
                 "end_col": 14
               },
-              "value": {
-                "kind": "Name",
-                "source_span": {
-                  "lineno": 106,
-                  "col": 8,
-                  "end_lineno": 106,
-                  "end_col": 14
-                },
-                "casts": [],
-                "borrow_kind": "value",
-                "repr": "return",
-                "id": "return"
-              }
+              "value": null
             }
           ],
           "orelse": []
@@ -6532,26 +6520,14 @@
           },
           "body": [
             {
-              "kind": "Expr",
+              "kind": "Return",
               "source_span": {
                 "lineno": 106,
                 "col": 8,
                 "end_lineno": 106,
                 "end_col": 14
               },
-              "value": {
-                "kind": "Name",
-                "source_span": {
-                  "lineno": 106,
-                  "col": 8,
-                  "end_lineno": 106,
-                  "end_col": 14
-                },
-                "casts": [],
-                "borrow_kind": "value",
-                "repr": "return",
-                "id": "return"
-              }
+              "value": null
             }
           ],
           "orelse": []

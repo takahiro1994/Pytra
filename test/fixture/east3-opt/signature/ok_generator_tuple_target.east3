@@ -49,7 +49,7 @@
               "end_lineno": 2,
               "end_col_offset": 62
             },
-            "resolved_type": "list[unknown]",
+            "resolved_type": "list[float64]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "[sum(wi * xi for wi, xi in zip(wo, x)) for wo in w]",
@@ -61,7 +61,7 @@
                 "end_lineno": 2,
                 "end_col_offset": 49
               },
-              "resolved_type": "unknown",
+              "resolved_type": "float64",
               "casts": [],
               "borrow_kind": "value",
               "repr": "sum(wi * xi for wi, xi in zip(wo, x))",
@@ -73,7 +73,7 @@
                   "end_lineno": 2,
                   "end_col_offset": 15
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "callable",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "sum",
@@ -88,7 +88,7 @@
                     "end_lineno": 2,
                     "end_col_offset": 48
                   },
-                  "resolved_type": "list[unknown]",
+                  "resolved_type": "list[float64]",
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "wi * xi for wi, xi in zip(wo, x)",
@@ -100,7 +100,7 @@
                       "end_lineno": 2,
                       "end_col_offset": 23
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "float64",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "wi * xi",
@@ -112,9 +112,9 @@
                         "end_lineno": 2,
                         "end_col_offset": 18
                       },
-                      "resolved_type": "unknown",
+                      "resolved_type": "float64",
                       "casts": [],
-                      "borrow_kind": "value",
+                      "borrow_kind": "readonly_ref",
                       "repr": "wi",
                       "id": "wi"
                     },
@@ -127,9 +127,9 @@
                         "end_lineno": 2,
                         "end_col_offset": 23
                       },
-                      "resolved_type": "unknown",
+                      "resolved_type": "float64",
                       "casts": [],
-                      "borrow_kind": "value",
+                      "borrow_kind": "readonly_ref",
                       "repr": "xi",
                       "id": "xi"
                     },
@@ -142,7 +142,7 @@
                         "end_lineno": 2,
                         "end_col_offset": 23
                       },
-                      "resolved_type": "unknown",
+                      "resolved_type": "float64",
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "wi * xi",
@@ -154,9 +154,9 @@
                           "end_lineno": 2,
                           "end_col_offset": 18
                         },
-                        "resolved_type": "unknown",
+                        "resolved_type": "float64",
                         "casts": [],
-                        "borrow_kind": "value",
+                        "borrow_kind": "readonly_ref",
                         "repr": "wi",
                         "id": "wi"
                       },
@@ -169,9 +169,9 @@
                           "end_lineno": 2,
                           "end_col_offset": 23
                         },
-                        "resolved_type": "unknown",
+                        "resolved_type": "float64",
                         "casts": [],
-                        "borrow_kind": "value",
+                        "borrow_kind": "readonly_ref",
                         "repr": "xi",
                         "id": "xi"
                       }
@@ -187,6 +187,7 @@
                           "end_lineno": 2,
                           "end_col_offset": 34
                         },
+                        "resolved_type": "tuple[float64,float64]",
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "wi, xi",
@@ -199,6 +200,7 @@
                               "end_lineno": 2,
                               "end_col_offset": 30
                             },
+                            "resolved_type": "float64",
                             "casts": [],
                             "borrow_kind": "value",
                             "repr": "wi",
@@ -212,6 +214,7 @@
                               "end_lineno": 2,
                               "end_col_offset": 34
                             },
+                            "resolved_type": "float64",
                             "casts": [],
                             "borrow_kind": "value",
                             "repr": "xi",
@@ -258,7 +261,8 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "wo",
-                            "id": "wo"
+                            "id": "wo",
+                            "call_arg_type": "list[T]"
                           },
                           {
                             "kind": "Name",
@@ -272,7 +276,8 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "x",
-                            "id": "x"
+                            "id": "x",
+                            "call_arg_type": "list[U]"
                           }
                         ],
                         "keywords": [],
@@ -293,16 +298,18 @@
                       "ifs": [],
                       "is_async": false
                     }
-                  ]
+                  ],
+                  "call_arg_type": "list[T]"
                 }
               ],
               "keywords": [],
+              "lowered_kind": "BuiltinCall",
+              "builtin_name": "sum",
               "type_expr_summary_v1": {
                 "schema_version": 1,
-                "kind": "DynamicType",
-                "category": "dynamic",
-                "mirror": "unknown",
-                "dynamic_name": "unknown"
+                "kind": "NamedType",
+                "category": "static",
+                "mirror": "float64"
               }
             },
             "generators": [
@@ -706,7 +713,14 @@
                 "repr": "2.0",
                 "value": 2.0
               }
-            ]
+            ],
+            "call_arg_type": "list[float64]",
+            "type_expr_summary_v1": {
+              "schema_version": 1,
+              "kind": "GenericType",
+              "category": "static",
+              "mirror": "list[float64]"
+            }
           },
           {
             "kind": "List",
@@ -762,7 +776,13 @@
                     "repr": "4.0",
                     "value": 4.0
                   }
-                ]
+                ],
+                "type_expr_summary_v1": {
+                  "schema_version": 1,
+                  "kind": "GenericType",
+                  "category": "static",
+                  "mirror": "list[float64]"
+                }
               },
               {
                 "kind": "List",
@@ -805,9 +825,22 @@
                     "repr": "6.0",
                     "value": 6.0
                   }
-                ]
+                ],
+                "type_expr_summary_v1": {
+                  "schema_version": 1,
+                  "kind": "GenericType",
+                  "category": "static",
+                  "mirror": "list[float64]"
+                }
               }
-            ]
+            ],
+            "call_arg_type": "list[list[float64]]",
+            "type_expr_summary_v1": {
+              "schema_version": 1,
+              "kind": "GenericType",
+              "category": "static",
+              "mirror": "list[list[float64]]"
+            }
           }
         ],
         "keywords": [],

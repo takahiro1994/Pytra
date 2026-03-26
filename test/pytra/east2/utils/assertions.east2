@@ -752,7 +752,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "actual",
-                "id": "actual"
+                "id": "actual",
+                "call_arg_type": "object"
               },
               {
                 "kind": "Name",
@@ -766,7 +767,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "expected",
-                "id": "expected"
+                "id": "expected",
+                "call_arg_type": "object"
               }
             ],
             "keywords": []

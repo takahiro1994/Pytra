@@ -884,7 +884,13 @@
                   }
                 ]
               }
-            ]
+            ],
+            "type_expr_summary_v1": {
+              "schema_version": 1,
+              "kind": "GenericType",
+              "category": "static",
+              "mirror": "list[bool]"
+            }
           },
           "type_expr_summary_v1": {
             "schema_version": 1,
@@ -901,6 +907,20 @@
             "end_lineno": 15,
             "end_col_offset": 60
           },
+          "leading_trivia": [
+            {
+              "kind": "blank",
+              "count": 1
+            },
+            {
+              "kind": "blank",
+              "count": 1
+            },
+            {
+              "kind": "blank",
+              "count": 1
+            }
+          ],
           "value": {
             "kind": "Call",
             "source_span": {
@@ -909,7 +929,7 @@
               "end_lineno": 15,
               "end_col_offset": 60
             },
-            "resolved_type": "unknown",
+            "resolved_type": "bool",
             "casts": [],
             "borrow_kind": "value",
             "repr": "py_assert_all(checks, \"starred_call_tuple_basic\")",
@@ -940,7 +960,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "checks",
-                "id": "checks"
+                "id": "checks",
+                "call_arg_type": "list[bool]"
               },
               {
                 "kind": "Constant",
@@ -954,7 +975,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "\"starred_call_tuple_basic\"",
-                "value": "starred_call_tuple_basic"
+                "value": "starred_call_tuple_basic",
+                "call_arg_type": "str"
               }
             ],
             "keywords": [],
@@ -965,26 +987,11 @@
             "runtime_call_adapter_kind": "extern_delegate",
             "type_expr_summary_v1": {
               "schema_version": 1,
-              "kind": "DynamicType",
-              "category": "dynamic",
-              "mirror": "unknown",
-              "dynamic_name": "unknown"
+              "kind": "NamedType",
+              "category": "static",
+              "mirror": "bool"
             }
-          },
-          "leading_trivia": [
-            {
-              "kind": "blank",
-              "count": 1
-            },
-            {
-              "kind": "blank",
-              "count": 1
-            },
-            {
-              "kind": "blank",
-              "count": 1
-            }
-          ]
+          }
         }
       ],
       "is_generator": 0,

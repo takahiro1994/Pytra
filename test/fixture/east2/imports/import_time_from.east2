@@ -248,7 +248,7 @@
                   "end_lineno": 11,
                   "end_col": 71
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_true(end >= start, \"from time import perf_counter\")",
@@ -311,7 +311,8 @@
                         "repr": "start",
                         "id": "start"
                       }
-                    ]
+                    ],
+                    "call_arg_type": "bool"
                   },
                   {
                     "kind": "Constant",
@@ -325,7 +326,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"from time import perf_counter\"",
-                    "value": "from time import perf_counter"
+                    "value": "from time import perf_counter",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],

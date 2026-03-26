@@ -107,7 +107,7 @@
                 "end_lineno": 7,
                 "end_col": 15
               },
-              "resolved_type": "type",
+              "resolved_type": "callable",
               "casts": [],
               "borrow_kind": "value",
               "repr": "Path",
@@ -126,7 +126,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "\"work/transpile/obj/pathlib_case32\"",
-                "value": "work/transpile/obj/pathlib_case32"
+                "value": "work/transpile/obj/pathlib_case32",
+                "call_arg_type": "str"
               }
             ],
             "keywords": [],
@@ -156,7 +157,7 @@
               "end_lineno": 8,
               "end_col": 43
             },
-            "resolved_type": "unknown",
+            "resolved_type": "None",
             "casts": [],
             "borrow_kind": "value",
             "repr": "root.mkdir(parents=True, exist_ok=True)",
@@ -168,7 +169,7 @@
                 "end_lineno": 8,
                 "end_col": 14
               },
-              "resolved_type": "unknown",
+              "resolved_type": "callable",
               "casts": [],
               "borrow_kind": "value",
               "repr": "root.mkdir",
@@ -204,7 +205,8 @@
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "True",
-                  "value": true
+                  "value": true,
+                  "call_arg_type": "bool"
                 }
               },
               {
@@ -221,7 +223,8 @@
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "True",
-                  "value": true
+                  "value": true,
+                  "call_arg_type": "bool"
                 }
               }
             ]
@@ -317,7 +320,7 @@
               "end_lineno": 11,
               "end_col": 26
             },
-            "resolved_type": "unknown",
+            "resolved_type": "int64",
             "casts": [],
             "borrow_kind": "value",
             "repr": "child.write_text(\"42\")",
@@ -329,7 +332,7 @@
                 "end_lineno": 11,
                 "end_col": 20
               },
-              "resolved_type": "unknown",
+              "resolved_type": "callable",
               "casts": [],
               "borrow_kind": "value",
               "repr": "child.write_text",
@@ -362,7 +365,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "\"42\"",
-                "value": "42"
+                "value": "42",
+                "call_arg_type": "str"
               }
             ],
             "keywords": []
@@ -409,7 +413,7 @@
               "end_lineno": 13,
               "end_col": 27
             },
-            "resolved_type": "list[unknown]",
+            "resolved_type": "list[bool]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "[]",
@@ -501,7 +505,7 @@
                   "end_lineno": 14,
                   "end_col": 62
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(child.exists(), True, \"exists\")",
@@ -528,7 +532,7 @@
                       "end_lineno": 14,
                       "end_col": 45
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "bool",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "child.exists()",
@@ -540,7 +544,7 @@
                         "end_lineno": 14,
                         "end_col": 43
                       },
-                      "resolved_type": "unknown",
+                      "resolved_type": "callable",
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "child.exists",
@@ -561,7 +565,8 @@
                       "attr": "exists"
                     },
                     "args": [],
-                    "keywords": []
+                    "keywords": [],
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -575,7 +580,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "True",
-                    "value": true
+                    "value": true,
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -589,7 +595,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"exists\"",
-                    "value": "exists"
+                    "value": "exists",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -597,7 +604,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -681,7 +689,7 @@
                   "end_lineno": 15,
                   "end_col": 64
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(child.name, \"values.txt\", \"name\")",
@@ -708,7 +716,7 @@
                       "end_lineno": 15,
                       "end_col": 41
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "str",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "child.name",
@@ -726,7 +734,9 @@
                       "repr": "child",
                       "id": "child"
                     },
-                    "attr": "name"
+                    "attr": "name",
+                    "attribute_access_kind": "property_getter",
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -740,7 +750,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"values.txt\"",
-                    "value": "values.txt"
+                    "value": "values.txt",
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -754,7 +765,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"name\"",
-                    "value": "name"
+                    "value": "name",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -762,7 +774,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -846,7 +859,7 @@
                   "end_lineno": 16,
                   "end_col": 60
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(child.stem, \"values\", \"stem\")",
@@ -873,7 +886,7 @@
                       "end_lineno": 16,
                       "end_col": 41
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "str",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "child.stem",
@@ -891,7 +904,9 @@
                       "repr": "child",
                       "id": "child"
                     },
-                    "attr": "stem"
+                    "attr": "stem",
+                    "attribute_access_kind": "property_getter",
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -905,7 +920,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"values\"",
-                    "value": "values"
+                    "value": "values",
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -919,7 +935,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"stem\"",
-                    "value": "stem"
+                    "value": "stem",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -927,7 +944,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -1011,7 +1029,7 @@
                   "end_lineno": 17,
                   "end_col": 98
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq((child.parent / \"values.txt\").exists(), True, \"parent_join_exists\")",
@@ -1038,7 +1056,7 @@
                       "end_lineno": 17,
                       "end_col": 69
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "bool",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "(child.parent / \"values.txt\").exists()",
@@ -1050,7 +1068,7 @@
                         "end_lineno": 17,
                         "end_col": 67
                       },
-                      "resolved_type": "unknown",
+                      "resolved_type": "callable",
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "(child.parent / \"values.txt\").exists",
@@ -1062,7 +1080,7 @@
                           "end_lineno": 17,
                           "end_col": 60
                         },
-                        "resolved_type": "str",
+                        "resolved_type": "Path",
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "(child.parent / \"values.txt\")",
@@ -1074,7 +1092,7 @@
                             "end_lineno": 17,
                             "end_col": 44
                           },
-                          "resolved_type": "unknown",
+                          "resolved_type": "Path",
                           "casts": [],
                           "borrow_kind": "value",
                           "repr": "child.parent",
@@ -1092,7 +1110,8 @@
                             "repr": "child",
                             "id": "child"
                           },
-                          "attr": "parent"
+                          "attr": "parent",
+                          "attribute_access_kind": "property_getter"
                         },
                         "op": "Div",
                         "right": {
@@ -1113,7 +1132,8 @@
                       "attr": "exists"
                     },
                     "args": [],
-                    "keywords": []
+                    "keywords": [],
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1127,7 +1147,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "True",
-                    "value": true
+                    "value": true,
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1141,7 +1162,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"parent_join_exists\"",
-                    "value": "parent_join_exists"
+                    "value": "parent_join_exists",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -1149,7 +1171,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -1233,7 +1256,7 @@
                   "end_lineno": 18,
                   "end_col": 68
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(child.read_text(), \"42\", \"read_text\")",
@@ -1260,7 +1283,7 @@
                       "end_lineno": 18,
                       "end_col": 48
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "str",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "child.read_text()",
@@ -1272,7 +1295,7 @@
                         "end_lineno": 18,
                         "end_col": 46
                       },
-                      "resolved_type": "unknown",
+                      "resolved_type": "callable",
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "child.read_text",
@@ -1293,7 +1316,8 @@
                       "attr": "read_text"
                     },
                     "args": [],
-                    "keywords": []
+                    "keywords": [],
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1307,7 +1331,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"42\"",
-                    "value": "42"
+                    "value": "42",
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1321,7 +1346,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"read_text\"",
-                    "value": "read_text"
+                    "value": "read_text",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -1329,7 +1355,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -1372,7 +1399,7 @@
               "end_lineno": 19,
               "end_col": 52
             },
-            "resolved_type": "unknown",
+            "resolved_type": "bool",
             "casts": [],
             "borrow_kind": "value",
             "repr": "py_assert_all(checks, \"pathlib_extended\")",
@@ -1403,7 +1430,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "checks",
-                "id": "checks"
+                "id": "checks",
+                "call_arg_type": "list[bool]"
               },
               {
                 "kind": "Constant",
@@ -1417,7 +1445,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "\"pathlib_extended\"",
-                "value": "pathlib_extended"
+                "value": "pathlib_extended",
+                "call_arg_type": "str"
               }
             ],
             "keywords": [],

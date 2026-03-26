@@ -72,7 +72,8 @@
         "end_lineno": 9,
         "end_col": 83
       },
-      "name": "JsonVal"
+      "name": "JsonVal",
+      "value": "None | bool | int | float | str | list[JsonVal] | dict[str, JsonVal]"
     },
     {
       "kind": "AnnAssign",
@@ -29472,6 +29473,14 @@
     "import_resolution": {
       "bindings": [
         {
+          "module_id": "pytra.typing",
+          "export_name": "cast",
+          "local_name": "cast",
+          "binding_kind": "symbol",
+          "source_file": "src/pytra/std/json.py",
+          "source_line": 5
+        },
+        {
           "module_id": "pytra.types",
           "export_name": "int64",
           "local_name": "int64",
@@ -29490,6 +29499,11 @@
       ],
       "qualified_refs": [
         {
+          "module_id": "pytra.typing",
+          "symbol": "cast",
+          "local_name": "cast"
+        },
+        {
           "module_id": "pytra.types",
           "symbol": "int64",
           "local_name": "int64"
@@ -29502,6 +29516,14 @@
       ]
     },
     "import_bindings": [
+      {
+        "module_id": "pytra.typing",
+        "export_name": "cast",
+        "local_name": "cast",
+        "binding_kind": "symbol",
+        "source_file": "src/pytra/std/json.py",
+        "source_line": 5
+      },
       {
         "module_id": "pytra.types",
         "export_name": "int64",
@@ -29521,6 +29543,11 @@
     ],
     "qualified_symbol_refs": [
       {
+        "module_id": "pytra.typing",
+        "symbol": "cast",
+        "local_name": "cast"
+      },
+      {
         "module_id": "pytra.types",
         "symbol": "int64",
         "local_name": "int64"
@@ -29533,6 +29560,10 @@
     ],
     "import_modules": {},
     "import_symbols": {
+      "cast": {
+        "module": "pytra.typing",
+        "name": "cast"
+      },
       "int64": {
         "module": "pytra.types",
         "name": "int64"

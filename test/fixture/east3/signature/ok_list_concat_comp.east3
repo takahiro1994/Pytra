@@ -175,7 +175,13 @@
                 "repr": "\"b\"",
                 "value": "b"
               }
-            ]
+            ],
+            "type_expr_summary_v1": {
+              "schema_version": 1,
+              "kind": "GenericType",
+              "category": "static",
+              "mirror": "list[str]"
+            }
           },
           "type_expr_summary_v1": {
             "schema_version": 1,
@@ -412,11 +418,12 @@
                         "end_lineno": 8,
                         "end_col_offset": 48
                       },
-                      "resolved_type": "unknown",
+                      "resolved_type": "str",
                       "casts": [],
-                      "borrow_kind": "value",
+                      "borrow_kind": "readonly_ref",
                       "repr": "ch",
-                      "id": "ch"
+                      "id": "ch",
+                      "call_arg_type": "str"
                     }
                   ],
                   "keywords": [],
@@ -458,7 +465,7 @@
                         "end_lineno": 8,
                         "end_col_offset": 56
                       },
-                      "resolved_type": "unknown",
+                      "resolved_type": "str",
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "ch",

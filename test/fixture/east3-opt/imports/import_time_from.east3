@@ -311,7 +311,7 @@
                   "end_lineno": 11,
                   "end_col_offset": 71
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_true(end >= start, \"from time import perf_counter\")",
@@ -375,6 +375,7 @@
                         "id": "start"
                       }
                     ],
+                    "call_arg_type": "bool",
                     "normalized_expr_version": "east3_expr_v1",
                     "normalized_expr": {
                       "kind": "Compare",
@@ -420,7 +421,8 @@
                           "repr": "start",
                           "id": "start"
                         }
-                      ]
+                      ],
+                      "call_arg_type": "bool"
                     }
                   },
                   {
@@ -435,7 +437,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"from time import perf_counter\"",
-                    "value": "from time import perf_counter"
+                    "value": "from time import perf_counter",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -446,10 +449,9 @@
                 "runtime_call_adapter_kind": "extern_delegate",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
-                  "kind": "DynamicType",
-                  "category": "dynamic",
-                  "mirror": "unknown",
-                  "dynamic_name": "unknown"
+                  "kind": "NamedType",
+                  "category": "static",
+                  "mirror": "bool"
                 }
               }
             ],

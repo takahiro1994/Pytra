@@ -109,31 +109,93 @@
                 "end_col_offset": 23
               },
               "test": {
-                "kind": "ObjBool",
-                "resolved_type": "bool",
-                "borrow_kind": "value",
-                "casts": [],
-                "value": {
-                  "kind": "Name",
-                  "source_span": {
-                    "lineno": 9,
-                    "col_offset": 16,
-                    "end_lineno": 9,
-                    "end_col_offset": 21
-                  },
-                  "resolved_type": "unknown",
-                  "casts": [],
-                  "borrow_kind": "value",
-                  "repr": "value",
-                  "id": "value"
-                },
+                "kind": "Call",
                 "source_span": {
                   "lineno": 9,
                   "col_offset": 11,
                   "end_lineno": 9,
                   "end_col_offset": 22
                 },
+                "resolved_type": "bool",
+                "casts": [],
+                "borrow_kind": "value",
                 "repr": "bool(value)",
+                "func": {
+                  "kind": "Name",
+                  "source_span": {
+                    "lineno": 9,
+                    "col_offset": 11,
+                    "end_lineno": 9,
+                    "end_col_offset": 15
+                  },
+                  "resolved_type": "callable",
+                  "casts": [],
+                  "borrow_kind": "value",
+                  "repr": "bool",
+                  "id": "bool"
+                },
+                "args": [
+                  {
+                    "kind": "Unbox",
+                    "resolved_type": "Obj",
+                    "borrow_kind": "value",
+                    "casts": [],
+                    "value": {
+                      "kind": "Name",
+                      "source_span": {
+                        "lineno": 9,
+                        "col_offset": 16,
+                        "end_lineno": 9,
+                        "end_col_offset": 21
+                      },
+                      "resolved_type": "unknown",
+                      "casts": [],
+                      "borrow_kind": "value",
+                      "repr": "value",
+                      "id": "value",
+                      "call_arg_type": "Obj"
+                    },
+                    "source_span": {
+                      "lineno": 9,
+                      "col_offset": 16,
+                      "end_lineno": 9,
+                      "end_col_offset": 21
+                    },
+                    "repr": "value",
+                    "type_expr_summary_v1": {
+                      "schema_version": 1,
+                      "kind": "NamedType",
+                      "category": "static",
+                      "mirror": "Obj"
+                    },
+                    "target": "Obj",
+                    "on_fail": "raise",
+                    "bridge_lane_v1": {
+                      "schema_version": 1,
+                      "target": {
+                        "kind": "NamedType",
+                        "category": "static",
+                        "mirror": "Obj"
+                      },
+                      "target_category": "static",
+                      "value": {
+                        "kind": "DynamicType",
+                        "category": "dynamic",
+                        "mirror": "unknown",
+                        "dynamic_name": "unknown"
+                      },
+                      "value_category": "dynamic"
+                    }
+                  }
+                ],
+                "keywords": [],
+                "lowered_kind": "BuiltinCall",
+                "builtin_name": "bool",
+                "runtime_call": "bool",
+                "runtime_module_id": "pytra.core.py_runtime",
+                "runtime_symbol": "bool",
+                "runtime_call_adapter_kind": "builtin",
+                "semantic_tag": "cast.bool",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -179,13 +241,16 @@
                 "lifetime_node_id": "n2",
                 "lifetime_defs": [],
                 "lifetime_uses": [
+                  "bool",
                   "value"
                 ],
                 "lifetime_live_in": [
+                  "bool",
                   "value",
                   "values"
                 ],
                 "lifetime_live_out": [
+                  "bool",
                   "values"
                 ],
                 "lifetime_last_use_vars": [
@@ -210,9 +275,11 @@
               "values"
             ],
             "lifetime_live_in": [
+              "bool",
               "values"
             ],
             "lifetime_live_out": [
+              "bool",
               "value",
               "values"
             ],
@@ -310,6 +377,7 @@
               "kind": "If",
               "defs": [],
               "uses": [
+                "bool",
                 "value"
               ],
               "succ": [
@@ -332,6 +400,9 @@
               ]
             },
             "uses": {
+              "bool": [
+                "n2"
+              ],
               "value": [
                 "n2"
               ],
@@ -341,6 +412,22 @@
             }
           },
           "variables": {
+            "bool": {
+              "def_nodes": [],
+              "use_nodes": [
+                "n2"
+              ],
+              "live_in_nodes": [
+                "n1",
+                "n2"
+              ],
+              "live_out_nodes": [
+                "n1",
+                "n2"
+              ],
+              "last_use_nodes": [],
+              "lifetime_class": "local_non_escape_candidate"
+            },
             "value": {
               "def_nodes": [
                 "n1"
@@ -466,31 +553,93 @@
                 "repr": "not bool(value)",
                 "op": "Not",
                 "operand": {
-                  "kind": "ObjBool",
-                  "resolved_type": "bool",
-                  "borrow_kind": "value",
-                  "casts": [],
-                  "value": {
-                    "kind": "Name",
-                    "source_span": {
-                      "lineno": 17,
-                      "col_offset": 20,
-                      "end_lineno": 17,
-                      "end_col_offset": 25
-                    },
-                    "resolved_type": "unknown",
-                    "casts": [],
-                    "borrow_kind": "value",
-                    "repr": "value",
-                    "id": "value"
-                  },
+                  "kind": "Call",
                   "source_span": {
                     "lineno": 17,
                     "col_offset": 15,
                     "end_lineno": 17,
                     "end_col_offset": 26
                   },
+                  "resolved_type": "bool",
+                  "casts": [],
+                  "borrow_kind": "value",
                   "repr": "bool(value)",
+                  "func": {
+                    "kind": "Name",
+                    "source_span": {
+                      "lineno": 17,
+                      "col_offset": 15,
+                      "end_lineno": 17,
+                      "end_col_offset": 19
+                    },
+                    "resolved_type": "callable",
+                    "casts": [],
+                    "borrow_kind": "value",
+                    "repr": "bool",
+                    "id": "bool"
+                  },
+                  "args": [
+                    {
+                      "kind": "Unbox",
+                      "resolved_type": "Obj",
+                      "borrow_kind": "value",
+                      "casts": [],
+                      "value": {
+                        "kind": "Name",
+                        "source_span": {
+                          "lineno": 17,
+                          "col_offset": 20,
+                          "end_lineno": 17,
+                          "end_col_offset": 25
+                        },
+                        "resolved_type": "unknown",
+                        "casts": [],
+                        "borrow_kind": "value",
+                        "repr": "value",
+                        "id": "value",
+                        "call_arg_type": "Obj"
+                      },
+                      "source_span": {
+                        "lineno": 17,
+                        "col_offset": 20,
+                        "end_lineno": 17,
+                        "end_col_offset": 25
+                      },
+                      "repr": "value",
+                      "type_expr_summary_v1": {
+                        "schema_version": 1,
+                        "kind": "NamedType",
+                        "category": "static",
+                        "mirror": "Obj"
+                      },
+                      "target": "Obj",
+                      "on_fail": "raise",
+                      "bridge_lane_v1": {
+                        "schema_version": 1,
+                        "target": {
+                          "kind": "NamedType",
+                          "category": "static",
+                          "mirror": "Obj"
+                        },
+                        "target_category": "static",
+                        "value": {
+                          "kind": "DynamicType",
+                          "category": "dynamic",
+                          "mirror": "unknown",
+                          "dynamic_name": "unknown"
+                        },
+                        "value_category": "dynamic"
+                      }
+                    }
+                  ],
+                  "keywords": [],
+                  "lowered_kind": "BuiltinCall",
+                  "builtin_name": "bool",
+                  "runtime_call": "bool",
+                  "runtime_module_id": "pytra.core.py_runtime",
+                  "runtime_symbol": "bool",
+                  "runtime_call_adapter_kind": "builtin",
+                  "semantic_tag": "cast.bool",
                   "type_expr_summary_v1": {
                     "schema_version": 1,
                     "kind": "NamedType",
@@ -537,13 +686,16 @@
                 "lifetime_node_id": "n2",
                 "lifetime_defs": [],
                 "lifetime_uses": [
+                  "bool",
                   "value"
                 ],
                 "lifetime_live_in": [
+                  "bool",
                   "value",
                   "values"
                 ],
                 "lifetime_live_out": [
+                  "bool",
                   "values"
                 ],
                 "lifetime_last_use_vars": [
@@ -568,9 +720,11 @@
               "values"
             ],
             "lifetime_live_in": [
+              "bool",
               "values"
             ],
             "lifetime_live_out": [
+              "bool",
               "value",
               "values"
             ],
@@ -663,6 +817,7 @@
               "kind": "If",
               "defs": [],
               "uses": [
+                "bool",
                 "value"
               ],
               "succ": [
@@ -685,6 +840,9 @@
               ]
             },
             "uses": {
+              "bool": [
+                "n2"
+              ],
               "value": [
                 "n2"
               ],
@@ -694,6 +852,22 @@
             }
           },
           "variables": {
+            "bool": {
+              "def_nodes": [],
+              "use_nodes": [
+                "n2"
+              ],
+              "live_in_nodes": [
+                "n1",
+                "n2"
+              ],
+              "live_out_nodes": [
+                "n1",
+                "n2"
+              ],
+              "last_use_nodes": [],
+              "lifetime_class": "local_non_escape_candidate"
+            },
             "value": {
               "def_nodes": [
                 "n1"

@@ -82,31 +82,93 @@
           "decl_type": "str",
           "declare_init": true,
           "value": {
-            "kind": "ObjStr",
-            "resolved_type": "str",
-            "borrow_kind": "value",
-            "casts": [],
-            "value": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 5,
-                "col_offset": 17,
-                "end_lineno": 5,
-                "end_col_offset": 20
-              },
-              "resolved_type": "object",
-              "casts": [],
-              "borrow_kind": "readonly_ref",
-              "repr": "key",
-              "id": "key"
-            },
+            "kind": "Call",
             "source_span": {
               "lineno": 5,
               "col_offset": 13,
               "end_lineno": 5,
               "end_col_offset": 21
             },
+            "resolved_type": "str",
+            "casts": [],
+            "borrow_kind": "value",
             "repr": "str(key)",
+            "func": {
+              "kind": "Name",
+              "source_span": {
+                "lineno": 5,
+                "col_offset": 13,
+                "end_lineno": 5,
+                "end_col_offset": 16
+              },
+              "resolved_type": "callable",
+              "casts": [],
+              "borrow_kind": "value",
+              "repr": "str",
+              "id": "str"
+            },
+            "args": [
+              {
+                "kind": "Unbox",
+                "resolved_type": "Obj",
+                "borrow_kind": "value",
+                "casts": [],
+                "value": {
+                  "kind": "Name",
+                  "source_span": {
+                    "lineno": 5,
+                    "col_offset": 17,
+                    "end_lineno": 5,
+                    "end_col_offset": 20
+                  },
+                  "resolved_type": "object",
+                  "casts": [],
+                  "borrow_kind": "readonly_ref",
+                  "repr": "key",
+                  "id": "key",
+                  "call_arg_type": "Obj"
+                },
+                "source_span": {
+                  "lineno": 5,
+                  "col_offset": 17,
+                  "end_lineno": 5,
+                  "end_col_offset": 20
+                },
+                "repr": "key",
+                "type_expr_summary_v1": {
+                  "schema_version": 1,
+                  "kind": "NamedType",
+                  "category": "static",
+                  "mirror": "Obj"
+                },
+                "target": "Obj",
+                "on_fail": "raise",
+                "bridge_lane_v1": {
+                  "schema_version": 1,
+                  "target": {
+                    "kind": "NamedType",
+                    "category": "static",
+                    "mirror": "Obj"
+                  },
+                  "target_category": "static",
+                  "value": {
+                    "kind": "DynamicType",
+                    "category": "dynamic",
+                    "mirror": "object",
+                    "dynamic_name": "object"
+                  },
+                  "value_category": "dynamic"
+                }
+              }
+            ],
+            "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "str",
+            "runtime_call": "py_to_string",
+            "runtime_module_id": "pytra.core.py_runtime",
+            "runtime_symbol": "str",
+            "runtime_call_adapter_kind": "builtin",
+            "semantic_tag": "cast.str",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",
@@ -126,10 +188,12 @@
               "needle"
             ],
             "lifetime_uses": [
-              "key"
+              "key",
+              "str"
             ],
             "lifetime_live_in": [
               "key",
+              "str",
               "values"
             ],
             "lifetime_live_out": [
@@ -137,7 +201,8 @@
               "values"
             ],
             "lifetime_last_use_vars": [
-              "key"
+              "key",
+              "str"
             ]
           }
         },
@@ -478,7 +543,8 @@
                 "needle"
               ],
               "uses": [
-                "key"
+                "key",
+                "str"
               ],
               "succ": [
                 "n1"
@@ -503,6 +569,9 @@
               ],
               "needle": [
                 "n2"
+              ],
+              "str": [
+                "n4"
               ],
               "values": [
                 "n1"
@@ -559,6 +628,20 @@
                 "n4"
               ],
               "last_use_nodes": [],
+              "lifetime_class": "local_non_escape_candidate"
+            },
+            "str": {
+              "def_nodes": [],
+              "use_nodes": [
+                "n4"
+              ],
+              "live_in_nodes": [
+                "n4"
+              ],
+              "live_out_nodes": [],
+              "last_use_nodes": [
+                "n4"
+              ],
               "lifetime_class": "local_non_escape_candidate"
             },
             "values": {
@@ -1517,31 +1600,93 @@
           "decl_type": "str",
           "declare_init": true,
           "value": {
-            "kind": "ObjStr",
-            "resolved_type": "str",
-            "borrow_kind": "value",
-            "casts": [],
-            "value": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 27,
-                "col_offset": 17,
-                "end_lineno": 27,
-                "end_col_offset": 20
-              },
-              "resolved_type": "object",
-              "casts": [],
-              "borrow_kind": "readonly_ref",
-              "repr": "key",
-              "id": "key"
-            },
+            "kind": "Call",
             "source_span": {
               "lineno": 27,
               "col_offset": 13,
               "end_lineno": 27,
               "end_col_offset": 21
             },
+            "resolved_type": "str",
+            "casts": [],
+            "borrow_kind": "value",
             "repr": "str(key)",
+            "func": {
+              "kind": "Name",
+              "source_span": {
+                "lineno": 27,
+                "col_offset": 13,
+                "end_lineno": 27,
+                "end_col_offset": 16
+              },
+              "resolved_type": "callable",
+              "casts": [],
+              "borrow_kind": "value",
+              "repr": "str",
+              "id": "str"
+            },
+            "args": [
+              {
+                "kind": "Unbox",
+                "resolved_type": "Obj",
+                "borrow_kind": "value",
+                "casts": [],
+                "value": {
+                  "kind": "Name",
+                  "source_span": {
+                    "lineno": 27,
+                    "col_offset": 17,
+                    "end_lineno": 27,
+                    "end_col_offset": 20
+                  },
+                  "resolved_type": "object",
+                  "casts": [],
+                  "borrow_kind": "readonly_ref",
+                  "repr": "key",
+                  "id": "key",
+                  "call_arg_type": "Obj"
+                },
+                "source_span": {
+                  "lineno": 27,
+                  "col_offset": 17,
+                  "end_lineno": 27,
+                  "end_col_offset": 20
+                },
+                "repr": "key",
+                "type_expr_summary_v1": {
+                  "schema_version": 1,
+                  "kind": "NamedType",
+                  "category": "static",
+                  "mirror": "Obj"
+                },
+                "target": "Obj",
+                "on_fail": "raise",
+                "bridge_lane_v1": {
+                  "schema_version": 1,
+                  "target": {
+                    "kind": "NamedType",
+                    "category": "static",
+                    "mirror": "Obj"
+                  },
+                  "target_category": "static",
+                  "value": {
+                    "kind": "DynamicType",
+                    "category": "dynamic",
+                    "mirror": "object",
+                    "dynamic_name": "object"
+                  },
+                  "value_category": "dynamic"
+                }
+              }
+            ],
+            "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "str",
+            "runtime_call": "py_to_string",
+            "runtime_module_id": "pytra.core.py_runtime",
+            "runtime_symbol": "str",
+            "runtime_call_adapter_kind": "builtin",
+            "semantic_tag": "cast.str",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",
@@ -1561,18 +1706,21 @@
               "needle"
             ],
             "lifetime_uses": [
-              "key"
+              "key",
+              "str"
             ],
             "lifetime_live_in": [
               "break",
               "key",
               "len",
+              "str",
               "values"
             ],
             "lifetime_live_out": [
               "break",
               "len",
               "needle",
+              "str",
               "values"
             ],
             "lifetime_last_use_vars": [
@@ -1606,31 +1754,93 @@
           "decl_type": "str",
           "declare_init": true,
           "value": {
-            "kind": "ObjStr",
-            "resolved_type": "str",
-            "borrow_kind": "value",
-            "casts": [],
-            "value": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 28,
-                "col_offset": 19,
-                "end_lineno": 28,
-                "end_col_offset": 25
-              },
-              "resolved_type": "object",
-              "casts": [],
-              "borrow_kind": "readonly_ref",
-              "repr": "values",
-              "id": "values"
-            },
+            "kind": "Call",
             "source_span": {
               "lineno": 28,
               "col_offset": 15,
               "end_lineno": 28,
               "end_col_offset": 26
             },
+            "resolved_type": "str",
+            "casts": [],
+            "borrow_kind": "value",
             "repr": "str(values)",
+            "func": {
+              "kind": "Name",
+              "source_span": {
+                "lineno": 28,
+                "col_offset": 15,
+                "end_lineno": 28,
+                "end_col_offset": 18
+              },
+              "resolved_type": "callable",
+              "casts": [],
+              "borrow_kind": "value",
+              "repr": "str",
+              "id": "str"
+            },
+            "args": [
+              {
+                "kind": "Unbox",
+                "resolved_type": "Obj",
+                "borrow_kind": "value",
+                "casts": [],
+                "value": {
+                  "kind": "Name",
+                  "source_span": {
+                    "lineno": 28,
+                    "col_offset": 19,
+                    "end_lineno": 28,
+                    "end_col_offset": 25
+                  },
+                  "resolved_type": "object",
+                  "casts": [],
+                  "borrow_kind": "readonly_ref",
+                  "repr": "values",
+                  "id": "values",
+                  "call_arg_type": "Obj"
+                },
+                "source_span": {
+                  "lineno": 28,
+                  "col_offset": 19,
+                  "end_lineno": 28,
+                  "end_col_offset": 25
+                },
+                "repr": "values",
+                "type_expr_summary_v1": {
+                  "schema_version": 1,
+                  "kind": "NamedType",
+                  "category": "static",
+                  "mirror": "Obj"
+                },
+                "target": "Obj",
+                "on_fail": "raise",
+                "bridge_lane_v1": {
+                  "schema_version": 1,
+                  "target": {
+                    "kind": "NamedType",
+                    "category": "static",
+                    "mirror": "Obj"
+                  },
+                  "target_category": "static",
+                  "value": {
+                    "kind": "DynamicType",
+                    "category": "dynamic",
+                    "mirror": "object",
+                    "dynamic_name": "object"
+                  },
+                  "value_category": "dynamic"
+                }
+              }
+            ],
+            "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "str",
+            "runtime_call": "py_to_string",
+            "runtime_module_id": "pytra.core.py_runtime",
+            "runtime_symbol": "str",
+            "runtime_call_adapter_kind": "builtin",
+            "semantic_tag": "cast.str",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",
@@ -1650,12 +1860,14 @@
               "haystack"
             ],
             "lifetime_uses": [
+              "str",
               "values"
             ],
             "lifetime_live_in": [
               "break",
               "len",
               "needle",
+              "str",
               "values"
             ],
             "lifetime_live_out": [
@@ -1665,6 +1877,7 @@
               "needle"
             ],
             "lifetime_last_use_vars": [
+              "str",
               "values"
             ]
           }
@@ -1733,7 +1946,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "haystack",
-                "id": "haystack"
+                "id": "haystack",
+                "call_arg_type": "Obj"
               }
             ],
             "keywords": [],
@@ -1846,7 +2060,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "needle",
-                "id": "needle"
+                "id": "needle",
+                "call_arg_type": "Obj"
               }
             ],
             "keywords": [],
@@ -3674,6 +3889,7 @@
                 "haystack"
               ],
               "uses": [
+                "str",
                 "values"
               ],
               "succ": [
@@ -3687,7 +3903,8 @@
                 "needle"
               ],
               "uses": [
-                "key"
+                "key",
+                "str"
               ],
               "succ": [
                 "n18"
@@ -3766,6 +3983,10 @@
               ],
               "ok": [
                 "n3"
+              ],
+              "str": [
+                "n18",
+                "n19"
               ],
               "values": [
                 "n18"
@@ -4146,6 +4367,24 @@
               ],
               "last_use_nodes": [
                 "n3"
+              ],
+              "lifetime_class": "local_non_escape_candidate"
+            },
+            "str": {
+              "def_nodes": [],
+              "use_nodes": [
+                "n18",
+                "n19"
+              ],
+              "live_in_nodes": [
+                "n18",
+                "n19"
+              ],
+              "live_out_nodes": [
+                "n19"
+              ],
+              "last_use_nodes": [
+                "n18"
               ],
               "lifetime_class": "local_non_escape_candidate"
             },

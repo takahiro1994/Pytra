@@ -333,7 +333,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "cat",
-                    "id": "cat"
+                    "id": "cat",
+                    "call_arg_type": "Obj"
                   },
                   {
                     "kind": "Name",
@@ -347,7 +348,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "Dog",
-                    "id": "Dog"
+                    "id": "Dog",
+                    "call_arg_type": "type"
                   }
                 ],
                 "keywords": [],
@@ -440,7 +442,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "cat",
-                    "id": "cat"
+                    "id": "cat",
+                    "call_arg_type": "Obj"
                   },
                   {
                     "kind": "Name",
@@ -454,7 +457,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "Animal",
-                    "id": "Animal"
+                    "id": "Animal",
+                    "call_arg_type": "type"
                   }
                 ],
                 "keywords": [],
@@ -547,7 +551,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "dog",
-                    "id": "dog"
+                    "id": "dog",
+                    "call_arg_type": "Obj"
                   },
                   {
                     "kind": "Name",
@@ -561,7 +566,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "Cat",
-                    "id": "Cat"
+                    "id": "Cat",
+                    "call_arg_type": "type"
                   }
                 ],
                 "keywords": [],
@@ -654,7 +660,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "dog",
-                    "id": "dog"
+                    "id": "dog",
+                    "call_arg_type": "Obj"
                   },
                   {
                     "kind": "Name",
@@ -668,7 +675,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "Animal",
-                    "id": "Animal"
+                    "id": "Animal",
+                    "call_arg_type": "type"
                   }
                 ],
                 "keywords": [],
@@ -743,7 +751,7 @@
               "end_lineno": 27,
               "end_col": 71
             },
-            "resolved_type": "unknown",
+            "resolved_type": "bool",
             "casts": [],
             "borrow_kind": "value",
             "repr": "py_assert_stdout(['False','True','False','True'], _case_main)",
@@ -831,7 +839,8 @@
                     "repr": "'True'",
                     "value": "True"
                   }
-                ]
+                ],
+                "call_arg_type": "list[str]"
               },
               {
                 "kind": "Name",
@@ -845,7 +854,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "_case_main",
-                "id": "_case_main"
+                "id": "_case_main",
+                "call_arg_type": "object"
               }
             ],
             "keywords": [],

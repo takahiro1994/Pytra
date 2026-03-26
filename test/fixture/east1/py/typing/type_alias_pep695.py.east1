@@ -41,7 +41,8 @@
         "end_lineno": 3,
         "end_col": 25
       },
-      "name": "Scalar"
+      "name": "Scalar",
+      "value": "int | float"
     },
     {
       "kind": "FunctionDef",

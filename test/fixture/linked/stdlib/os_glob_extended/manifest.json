@@ -34,7 +34,7 @@
       "module_id": "pytra.std.os",
       "input": "/workspace/Pytra/src/runtime/east/std/os.east",
       "output": "east3/pytra/std/os.east3.json",
-      "source_path": "src/pytra/std/os.py",
+      "source_path": "/workspace/Pytra/src/pytra/std/os.py",
       "is_entry": false,
       "module_kind": "runtime"
     },

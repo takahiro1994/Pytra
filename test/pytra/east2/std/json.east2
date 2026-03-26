@@ -73,7 +73,8 @@
         "end_lineno": 9,
         "end_col": 83
       },
-      "name": "JsonVal"
+      "name": "JsonVal",
+      "value": "None | bool | int64 | float64 | str | list[None | bool | int64 | float64 | str | list[Any] | dict[str,Any]] | dict[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]"
     },
     {
       "kind": "AnnAssign",
@@ -849,7 +850,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "ch",
-                    "id": "ch"
+                    "id": "ch",
+                    "call_arg_type": "Obj"
                   }
                 ],
                 "keywords": [],
@@ -1886,7 +1888,8 @@
                   "casts": [],
                   "borrow_kind": "readonly_ref",
                   "repr": "hx",
-                  "id": "hx"
+                  "id": "hx",
+                  "call_arg_type": "Obj"
                 }
               ],
               "keywords": [],
@@ -2118,7 +2121,8 @@
                   "borrow_kind": "value",
                   "repr": "1",
                   "value": 1
-                }
+                },
+                "call_arg_type": "str"
               }
             ],
             "keywords": []
@@ -2262,7 +2266,8 @@
                   "borrow_kind": "value",
                   "repr": "2",
                   "value": 2
-                }
+                },
+                "call_arg_type": "str"
               }
             ],
             "keywords": []
@@ -2406,7 +2411,8 @@
                   "borrow_kind": "value",
                   "repr": "3",
                   "value": 3
-                }
+                },
+                "call_arg_type": "str"
               }
             ],
             "keywords": []
@@ -2550,7 +2556,8 @@
                   "borrow_kind": "value",
                   "repr": "4",
                   "value": 4
-                }
+                },
+                "call_arg_type": "str"
               }
             ],
             "keywords": []
@@ -4439,7 +4446,7 @@
       "name": "_jv_obj_require",
       "original_name": "_jv_obj_require",
       "arg_types": {
-        "raw": "dict[str,JsonVal]",
+        "raw": "dict[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
         "key": "str"
       },
       "arg_order": [
@@ -4451,7 +4458,7 @@
         "raw": 0,
         "key": 1
       },
-      "return_type": "JsonVal",
+      "return_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
       "arg_usage": {
         "raw": "readonly",
         "key": "readonly"
@@ -4475,7 +4482,7 @@
               "end_lineno": 76,
               "end_col": 16
             },
-            "resolved_type": "tuple[str,JsonVal]",
+            "resolved_type": "tuple[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "k, value",
@@ -4502,7 +4509,7 @@
                   "end_lineno": 76,
                   "end_col": 16
                 },
-                "resolved_type": "JsonVal",
+                "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "value",
@@ -4510,10 +4517,10 @@
               }
             ]
           },
-          "target_type": "tuple[str,JsonVal]",
+          "target_type": "tuple[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
           "iter_mode": "static_fastpath",
-          "iter_source_type": "list[tuple[str,JsonVal]]",
-          "iter_element_type": "tuple[str,JsonVal]",
+          "iter_source_type": "list[tuple[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]]",
+          "iter_element_type": "tuple[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
           "iter": {
             "kind": "Call",
             "source_span": {
@@ -4522,7 +4529,7 @@
               "end_lineno": 76,
               "end_col": 31
             },
-            "resolved_type": "list[tuple[str,JsonVal]]",
+            "resolved_type": "list[tuple[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "raw.items()",
@@ -4546,7 +4553,7 @@
                   "end_lineno": 76,
                   "end_col": 23
                 },
-                "resolved_type": "dict[str,JsonVal]",
+                "resolved_type": "dict[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "raw",
@@ -4571,7 +4578,7 @@
                 "end_lineno": 76,
                 "end_col": 23
               },
-              "resolved_type": "dict[str,JsonVal]",
+              "resolved_type": "dict[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
               "casts": [],
               "borrow_kind": "readonly_ref",
               "repr": "raw",
@@ -4579,7 +4586,7 @@
             },
             "iterable_trait": "yes",
             "iter_protocol": "static_range",
-            "iter_element_type": "tuple[str,JsonVal]"
+            "iter_element_type": "tuple[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]"
           },
           "body": [
             {
@@ -4653,7 +4660,7 @@
                       "end_lineno": 78,
                       "end_col": 24
                     },
-                    "resolved_type": "JsonVal",
+                    "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "value",
@@ -4768,8 +4775,23 @@
               "name": "str"
             },
             {
-              "kind": "NamedType",
-              "name": "JsonVal"
+              "kind": "GenericType",
+              "base": "None | bool | int64 | float64 | str | list",
+              "args": [
+                {
+                  "kind": "UnionType",
+                  "types": [
+                    {
+                      "kind": "NamedType",
+                      "name": "Any]"
+                    },
+                    {
+                      "kind": "NamedType",
+                      "name": "dict[str,Any"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -4779,8 +4801,23 @@
         }
       },
       "return_type_expr": {
-        "kind": "NamedType",
-        "name": "JsonVal"
+        "kind": "GenericType",
+        "base": "None | bool | int64 | float64 | str | list",
+        "args": [
+          {
+            "kind": "UnionType",
+            "types": [
+              {
+                "kind": "NamedType",
+                "name": "Any]"
+              },
+              {
+                "kind": "NamedType",
+                "name": "dict[str,Any"
+              }
+            ]
+          }
+        ]
       },
       "leading_comments": [],
       "leading_trivia": []
@@ -4798,7 +4835,7 @@
       "base": null,
       "dataclass": false,
       "field_types": {
-        "raw": "dict[str,JsonVal]"
+        "raw": "dict[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]"
       },
       "body": [
         {
@@ -4817,7 +4854,7 @@
               "end_lineno": 83,
               "end_col": 7
             },
-            "resolved_type": "dict[str,JsonVal]",
+            "resolved_type": "dict[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "raw",
@@ -4831,16 +4868,31 @@
                   "name": "str"
                 },
                 {
-                  "kind": "NamedType",
-                  "name": "JsonVal"
+                  "kind": "GenericType",
+                  "base": "None | bool | int64 | float64 | str | list",
+                  "args": [
+                    {
+                      "kind": "UnionType",
+                      "types": [
+                        {
+                          "kind": "NamedType",
+                          "name": "Any]"
+                        },
+                        {
+                          "kind": "NamedType",
+                          "name": "dict[str,Any"
+                        }
+                      ]
+                    }
+                  ]
                 }
               ]
             }
           },
-          "annotation": "dict[str,JsonVal]",
+          "annotation": "dict[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
           "value": null,
           "declare": true,
-          "decl_type": "dict[str,JsonVal]",
+          "decl_type": "dict[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
           "annotation_type_expr": {
             "kind": "GenericType",
             "base": "dict",
@@ -4850,8 +4902,23 @@
                 "name": "str"
               },
               {
-                "kind": "NamedType",
-                "name": "JsonVal"
+                "kind": "GenericType",
+                "base": "None | bool | int64 | float64 | str | list",
+                "args": [
+                  {
+                    "kind": "UnionType",
+                    "types": [
+                      {
+                        "kind": "NamedType",
+                        "name": "Any]"
+                      },
+                      {
+                        "kind": "NamedType",
+                        "name": "dict[str,Any"
+                      }
+                    ]
+                  }
+                ]
               }
             ]
           },
@@ -4864,8 +4931,23 @@
                 "name": "str"
               },
               {
-                "kind": "NamedType",
-                "name": "JsonVal"
+                "kind": "GenericType",
+                "base": "None | bool | int64 | float64 | str | list",
+                "args": [
+                  {
+                    "kind": "UnionType",
+                    "types": [
+                      {
+                        "kind": "NamedType",
+                        "name": "Any]"
+                      },
+                      {
+                        "kind": "NamedType",
+                        "name": "dict[str,Any"
+                      }
+                    ]
+                  }
+                ]
               }
             ]
           }
@@ -4882,7 +4964,7 @@
           "original_name": "__init__",
           "arg_types": {
             "self": "JsonObj",
-            "raw": "dict[str,JsonVal]"
+            "raw": "dict[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]"
           },
           "arg_order": [
             "self",
@@ -4917,7 +4999,7 @@
                   "end_lineno": 86,
                   "end_col": 16
                 },
-                "resolved_type": "dict[str,JsonVal]",
+                "resolved_type": "dict[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "self.raw",
@@ -4945,14 +5027,14 @@
                   "end_lineno": 86,
                   "end_col": 16
                 },
-                "resolved_type": "dict[str,JsonVal]",
+                "resolved_type": "dict[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "raw",
                 "id": "raw"
               },
               "declare": true,
-              "decl_type": "dict[str,JsonVal]",
+              "decl_type": "dict[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
               "declare_init": true
             }
           ],
@@ -5037,7 +5119,7 @@
                       "end_lineno": 89,
                       "end_col": 30
                     },
-                    "resolved_type": "dict[str,JsonVal]",
+                    "resolved_type": "dict[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "self.raw",
@@ -5129,7 +5211,7 @@
                       "end_lineno": 91,
                       "end_col": 55
                     },
-                    "resolved_type": "JsonVal",
+                    "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "_jv_obj_require(self.raw, key)",
@@ -5156,7 +5238,7 @@
                           "end_lineno": 91,
                           "end_col": 49
                         },
-                        "resolved_type": "dict[str,JsonVal]",
+                        "resolved_type": "dict[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "self.raw",
@@ -5174,7 +5256,8 @@
                           "repr": "self",
                           "id": "self"
                         },
-                        "attr": "raw"
+                        "attr": "raw",
+                        "call_arg_type": "dict[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]"
                       },
                       {
                         "kind": "Name",
@@ -5188,10 +5271,12 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "key",
-                        "id": "key"
+                        "id": "key",
+                        "call_arg_type": "str"
                       }
                     ],
-                    "keywords": []
+                    "keywords": [],
+                    "call_arg_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]"
                   }
                 ],
                 "keywords": []
@@ -5279,7 +5364,7 @@
                       "end_lineno": 89,
                       "end_col": 30
                     },
-                    "resolved_type": "dict[str,JsonVal]",
+                    "resolved_type": "dict[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "self.raw",
@@ -5395,7 +5480,7 @@
                           "end_lineno": 96,
                           "end_col": 55
                         },
-                        "resolved_type": "JsonVal",
+                        "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "_jv_obj_require(self.raw, key)",
@@ -5422,7 +5507,7 @@
                               "end_lineno": 96,
                               "end_col": 49
                             },
-                            "resolved_type": "dict[str,JsonVal]",
+                            "resolved_type": "dict[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
                             "casts": [],
                             "borrow_kind": "value",
                             "repr": "self.raw",
@@ -5440,7 +5525,8 @@
                               "repr": "self",
                               "id": "self"
                             },
-                            "attr": "raw"
+                            "attr": "raw",
+                            "call_arg_type": "dict[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]"
                           },
                           {
                             "kind": "Name",
@@ -5454,10 +5540,12 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "key",
-                            "id": "key"
+                            "id": "key",
+                            "call_arg_type": "str"
                           }
                         ],
-                        "keywords": []
+                        "keywords": [],
+                        "call_arg_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]"
                       }
                     ],
                     "keywords": []
@@ -5550,7 +5638,7 @@
                       "end_lineno": 89,
                       "end_col": 30
                     },
-                    "resolved_type": "dict[str,JsonVal]",
+                    "resolved_type": "dict[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "self.raw",
@@ -5666,7 +5754,7 @@
                           "end_lineno": 101,
                           "end_col": 55
                         },
-                        "resolved_type": "JsonVal",
+                        "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "_jv_obj_require(self.raw, key)",
@@ -5693,7 +5781,7 @@
                               "end_lineno": 101,
                               "end_col": 49
                             },
-                            "resolved_type": "dict[str,JsonVal]",
+                            "resolved_type": "dict[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
                             "casts": [],
                             "borrow_kind": "value",
                             "repr": "self.raw",
@@ -5711,7 +5799,8 @@
                               "repr": "self",
                               "id": "self"
                             },
-                            "attr": "raw"
+                            "attr": "raw",
+                            "call_arg_type": "dict[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]"
                           },
                           {
                             "kind": "Name",
@@ -5725,10 +5814,12 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "key",
-                            "id": "key"
+                            "id": "key",
+                            "call_arg_type": "str"
                           }
                         ],
-                        "keywords": []
+                        "keywords": [],
+                        "call_arg_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]"
                       }
                     ],
                     "keywords": []
@@ -5821,7 +5912,7 @@
                       "end_lineno": 89,
                       "end_col": 30
                     },
-                    "resolved_type": "dict[str,JsonVal]",
+                    "resolved_type": "dict[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "self.raw",
@@ -5937,7 +6028,7 @@
                           "end_lineno": 106,
                           "end_col": 55
                         },
-                        "resolved_type": "JsonVal",
+                        "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "_jv_obj_require(self.raw, key)",
@@ -5964,7 +6055,7 @@
                               "end_lineno": 106,
                               "end_col": 49
                             },
-                            "resolved_type": "dict[str,JsonVal]",
+                            "resolved_type": "dict[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
                             "casts": [],
                             "borrow_kind": "value",
                             "repr": "self.raw",
@@ -5982,7 +6073,8 @@
                               "repr": "self",
                               "id": "self"
                             },
-                            "attr": "raw"
+                            "attr": "raw",
+                            "call_arg_type": "dict[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]"
                           },
                           {
                             "kind": "Name",
@@ -5996,10 +6088,12 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "key",
-                            "id": "key"
+                            "id": "key",
+                            "call_arg_type": "str"
                           }
                         ],
-                        "keywords": []
+                        "keywords": [],
+                        "call_arg_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]"
                       }
                     ],
                     "keywords": []
@@ -6092,7 +6186,7 @@
                       "end_lineno": 89,
                       "end_col": 30
                     },
-                    "resolved_type": "dict[str,JsonVal]",
+                    "resolved_type": "dict[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "self.raw",
@@ -6208,7 +6302,7 @@
                           "end_lineno": 111,
                           "end_col": 55
                         },
-                        "resolved_type": "JsonVal",
+                        "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "_jv_obj_require(self.raw, key)",
@@ -6235,7 +6329,7 @@
                               "end_lineno": 111,
                               "end_col": 49
                             },
-                            "resolved_type": "dict[str,JsonVal]",
+                            "resolved_type": "dict[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
                             "casts": [],
                             "borrow_kind": "value",
                             "repr": "self.raw",
@@ -6253,7 +6347,8 @@
                               "repr": "self",
                               "id": "self"
                             },
-                            "attr": "raw"
+                            "attr": "raw",
+                            "call_arg_type": "dict[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]"
                           },
                           {
                             "kind": "Name",
@@ -6267,10 +6362,12 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "key",
-                            "id": "key"
+                            "id": "key",
+                            "call_arg_type": "str"
                           }
                         ],
-                        "keywords": []
+                        "keywords": [],
+                        "call_arg_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]"
                       }
                     ],
                     "keywords": []
@@ -6363,7 +6460,7 @@
                       "end_lineno": 89,
                       "end_col": 30
                     },
-                    "resolved_type": "dict[str,JsonVal]",
+                    "resolved_type": "dict[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "self.raw",
@@ -6479,7 +6576,7 @@
                           "end_lineno": 116,
                           "end_col": 55
                         },
-                        "resolved_type": "JsonVal",
+                        "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "_jv_obj_require(self.raw, key)",
@@ -6506,7 +6603,7 @@
                               "end_lineno": 116,
                               "end_col": 49
                             },
-                            "resolved_type": "dict[str,JsonVal]",
+                            "resolved_type": "dict[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
                             "casts": [],
                             "borrow_kind": "value",
                             "repr": "self.raw",
@@ -6524,7 +6621,8 @@
                               "repr": "self",
                               "id": "self"
                             },
-                            "attr": "raw"
+                            "attr": "raw",
+                            "call_arg_type": "dict[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]"
                           },
                           {
                             "kind": "Name",
@@ -6538,10 +6636,12 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "key",
-                            "id": "key"
+                            "id": "key",
+                            "call_arg_type": "str"
                           }
                         ],
-                        "keywords": []
+                        "keywords": [],
+                        "call_arg_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]"
                       }
                     ],
                     "keywords": []
@@ -6634,7 +6734,7 @@
                       "end_lineno": 89,
                       "end_col": 30
                     },
-                    "resolved_type": "dict[str,JsonVal]",
+                    "resolved_type": "dict[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "self.raw",
@@ -6750,7 +6850,7 @@
                           "end_lineno": 121,
                           "end_col": 55
                         },
-                        "resolved_type": "JsonVal",
+                        "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "_jv_obj_require(self.raw, key)",
@@ -6777,7 +6877,7 @@
                               "end_lineno": 121,
                               "end_col": 49
                             },
-                            "resolved_type": "dict[str,JsonVal]",
+                            "resolved_type": "dict[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
                             "casts": [],
                             "borrow_kind": "value",
                             "repr": "self.raw",
@@ -6795,7 +6895,8 @@
                               "repr": "self",
                               "id": "self"
                             },
-                            "attr": "raw"
+                            "attr": "raw",
+                            "call_arg_type": "dict[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]"
                           },
                           {
                             "kind": "Name",
@@ -6809,10 +6910,12 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "key",
-                            "id": "key"
+                            "id": "key",
+                            "call_arg_type": "str"
                           }
                         ],
-                        "keywords": []
+                        "keywords": [],
+                        "call_arg_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]"
                       }
                     ],
                     "keywords": []
@@ -6844,7 +6947,7 @@
       "base": null,
       "dataclass": false,
       "field_types": {
-        "raw": "list[JsonVal]"
+        "raw": "list[None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]"
       },
       "body": [
         {
@@ -6863,7 +6966,7 @@
               "end_lineno": 125,
               "end_col": 7
             },
-            "resolved_type": "list[JsonVal]",
+            "resolved_type": "list[None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "raw",
@@ -6873,23 +6976,53 @@
               "base": "list",
               "args": [
                 {
-                  "kind": "NamedType",
-                  "name": "JsonVal"
+                  "kind": "GenericType",
+                  "base": "None | bool | int64 | float64 | str | list",
+                  "args": [
+                    {
+                      "kind": "UnionType",
+                      "types": [
+                        {
+                          "kind": "NamedType",
+                          "name": "Any]"
+                        },
+                        {
+                          "kind": "NamedType",
+                          "name": "dict[str,Any"
+                        }
+                      ]
+                    }
+                  ]
                 }
               ]
             }
           },
-          "annotation": "list[JsonVal]",
+          "annotation": "list[None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
           "value": null,
           "declare": true,
-          "decl_type": "list[JsonVal]",
+          "decl_type": "list[None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
           "annotation_type_expr": {
             "kind": "GenericType",
             "base": "list",
             "args": [
               {
-                "kind": "NamedType",
-                "name": "JsonVal"
+                "kind": "GenericType",
+                "base": "None | bool | int64 | float64 | str | list",
+                "args": [
+                  {
+                    "kind": "UnionType",
+                    "types": [
+                      {
+                        "kind": "NamedType",
+                        "name": "Any]"
+                      },
+                      {
+                        "kind": "NamedType",
+                        "name": "dict[str,Any"
+                      }
+                    ]
+                  }
+                ]
               }
             ]
           },
@@ -6898,8 +7031,23 @@
             "base": "list",
             "args": [
               {
-                "kind": "NamedType",
-                "name": "JsonVal"
+                "kind": "GenericType",
+                "base": "None | bool | int64 | float64 | str | list",
+                "args": [
+                  {
+                    "kind": "UnionType",
+                    "types": [
+                      {
+                        "kind": "NamedType",
+                        "name": "Any]"
+                      },
+                      {
+                        "kind": "NamedType",
+                        "name": "dict[str,Any"
+                      }
+                    ]
+                  }
+                ]
               }
             ]
           }
@@ -6916,7 +7064,7 @@
           "original_name": "__init__",
           "arg_types": {
             "self": "JsonArr",
-            "raw": "list[JsonVal]"
+            "raw": "list[None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]"
           },
           "arg_order": [
             "self",
@@ -6951,7 +7099,7 @@
                   "end_lineno": 128,
                   "end_col": 16
                 },
-                "resolved_type": "list[JsonVal]",
+                "resolved_type": "list[None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "self.raw",
@@ -6979,14 +7127,14 @@
                   "end_lineno": 128,
                   "end_col": 16
                 },
-                "resolved_type": "list[JsonVal]",
+                "resolved_type": "list[None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "raw",
                 "id": "raw"
               },
               "declare": true,
-              "decl_type": "list[JsonVal]",
+              "decl_type": "list[None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
               "declare_init": true
             }
           ],
@@ -7158,7 +7306,7 @@
                               "end_lineno": 131,
                               "end_col": 45
                             },
-                            "resolved_type": "list[JsonVal]",
+                            "resolved_type": "list[None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
                             "casts": [],
                             "borrow_kind": "value",
                             "repr": "self.raw",
@@ -7176,7 +7324,8 @@
                               "repr": "self",
                               "id": "self"
                             },
-                            "attr": "raw"
+                            "attr": "raw",
+                            "call_arg_type": "Obj"
                           }
                         ],
                         "keywords": [],
@@ -7262,7 +7411,7 @@
                       "end_lineno": 133,
                       "end_col": 40
                     },
-                    "resolved_type": "JsonVal",
+                    "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "self.raw[index]",
@@ -7274,7 +7423,7 @@
                         "end_lineno": 133,
                         "end_col": 33
                       },
-                      "resolved_type": "list[JsonVal]",
+                      "resolved_type": "list[None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "self.raw",
@@ -7307,7 +7456,8 @@
                       "borrow_kind": "readonly_ref",
                       "repr": "index",
                       "id": "index"
-                    }
+                    },
+                    "call_arg_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]"
                   }
                 ],
                 "keywords": []
@@ -7482,7 +7632,7 @@
                               "end_lineno": 131,
                               "end_col": 45
                             },
-                            "resolved_type": "list[JsonVal]",
+                            "resolved_type": "list[None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
                             "casts": [],
                             "borrow_kind": "value",
                             "repr": "self.raw",
@@ -7500,7 +7650,8 @@
                               "repr": "self",
                               "id": "self"
                             },
-                            "attr": "raw"
+                            "attr": "raw",
+                            "call_arg_type": "Obj"
                           }
                         ],
                         "keywords": [],
@@ -7610,7 +7761,7 @@
                           "end_lineno": 138,
                           "end_col": 40
                         },
-                        "resolved_type": "JsonVal",
+                        "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "self.raw[index]",
@@ -7622,7 +7773,7 @@
                             "end_lineno": 138,
                             "end_col": 33
                           },
-                          "resolved_type": "list[JsonVal]",
+                          "resolved_type": "list[None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
                           "casts": [],
                           "borrow_kind": "value",
                           "repr": "self.raw",
@@ -7655,7 +7806,8 @@
                           "borrow_kind": "readonly_ref",
                           "repr": "index",
                           "id": "index"
-                        }
+                        },
+                        "call_arg_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]"
                       }
                     ],
                     "keywords": []
@@ -7835,7 +7987,7 @@
                               "end_lineno": 131,
                               "end_col": 45
                             },
-                            "resolved_type": "list[JsonVal]",
+                            "resolved_type": "list[None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
                             "casts": [],
                             "borrow_kind": "value",
                             "repr": "self.raw",
@@ -7853,7 +8005,8 @@
                               "repr": "self",
                               "id": "self"
                             },
-                            "attr": "raw"
+                            "attr": "raw",
+                            "call_arg_type": "Obj"
                           }
                         ],
                         "keywords": [],
@@ -7963,7 +8116,7 @@
                           "end_lineno": 143,
                           "end_col": 40
                         },
-                        "resolved_type": "JsonVal",
+                        "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "self.raw[index]",
@@ -7975,7 +8128,7 @@
                             "end_lineno": 143,
                             "end_col": 33
                           },
-                          "resolved_type": "list[JsonVal]",
+                          "resolved_type": "list[None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
                           "casts": [],
                           "borrow_kind": "value",
                           "repr": "self.raw",
@@ -8008,7 +8161,8 @@
                           "borrow_kind": "readonly_ref",
                           "repr": "index",
                           "id": "index"
-                        }
+                        },
+                        "call_arg_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]"
                       }
                     ],
                     "keywords": []
@@ -8188,7 +8342,7 @@
                               "end_lineno": 131,
                               "end_col": 45
                             },
-                            "resolved_type": "list[JsonVal]",
+                            "resolved_type": "list[None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
                             "casts": [],
                             "borrow_kind": "value",
                             "repr": "self.raw",
@@ -8206,7 +8360,8 @@
                               "repr": "self",
                               "id": "self"
                             },
-                            "attr": "raw"
+                            "attr": "raw",
+                            "call_arg_type": "Obj"
                           }
                         ],
                         "keywords": [],
@@ -8316,7 +8471,7 @@
                           "end_lineno": 148,
                           "end_col": 40
                         },
-                        "resolved_type": "JsonVal",
+                        "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "self.raw[index]",
@@ -8328,7 +8483,7 @@
                             "end_lineno": 148,
                             "end_col": 33
                           },
-                          "resolved_type": "list[JsonVal]",
+                          "resolved_type": "list[None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
                           "casts": [],
                           "borrow_kind": "value",
                           "repr": "self.raw",
@@ -8361,7 +8516,8 @@
                           "borrow_kind": "readonly_ref",
                           "repr": "index",
                           "id": "index"
-                        }
+                        },
+                        "call_arg_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]"
                       }
                     ],
                     "keywords": []
@@ -8541,7 +8697,7 @@
                               "end_lineno": 131,
                               "end_col": 45
                             },
-                            "resolved_type": "list[JsonVal]",
+                            "resolved_type": "list[None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
                             "casts": [],
                             "borrow_kind": "value",
                             "repr": "self.raw",
@@ -8559,7 +8715,8 @@
                               "repr": "self",
                               "id": "self"
                             },
-                            "attr": "raw"
+                            "attr": "raw",
+                            "call_arg_type": "Obj"
                           }
                         ],
                         "keywords": [],
@@ -8669,7 +8826,7 @@
                           "end_lineno": 153,
                           "end_col": 40
                         },
-                        "resolved_type": "JsonVal",
+                        "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "self.raw[index]",
@@ -8681,7 +8838,7 @@
                             "end_lineno": 153,
                             "end_col": 33
                           },
-                          "resolved_type": "list[JsonVal]",
+                          "resolved_type": "list[None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
                           "casts": [],
                           "borrow_kind": "value",
                           "repr": "self.raw",
@@ -8714,7 +8871,8 @@
                           "borrow_kind": "readonly_ref",
                           "repr": "index",
                           "id": "index"
-                        }
+                        },
+                        "call_arg_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]"
                       }
                     ],
                     "keywords": []
@@ -8894,7 +9052,7 @@
                               "end_lineno": 131,
                               "end_col": 45
                             },
-                            "resolved_type": "list[JsonVal]",
+                            "resolved_type": "list[None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
                             "casts": [],
                             "borrow_kind": "value",
                             "repr": "self.raw",
@@ -8912,7 +9070,8 @@
                               "repr": "self",
                               "id": "self"
                             },
-                            "attr": "raw"
+                            "attr": "raw",
+                            "call_arg_type": "Obj"
                           }
                         ],
                         "keywords": [],
@@ -9022,7 +9181,7 @@
                           "end_lineno": 158,
                           "end_col": 40
                         },
-                        "resolved_type": "JsonVal",
+                        "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "self.raw[index]",
@@ -9034,7 +9193,7 @@
                             "end_lineno": 158,
                             "end_col": 33
                           },
-                          "resolved_type": "list[JsonVal]",
+                          "resolved_type": "list[None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
                           "casts": [],
                           "borrow_kind": "value",
                           "repr": "self.raw",
@@ -9067,7 +9226,8 @@
                           "borrow_kind": "readonly_ref",
                           "repr": "index",
                           "id": "index"
-                        }
+                        },
+                        "call_arg_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]"
                       }
                     ],
                     "keywords": []
@@ -9247,7 +9407,7 @@
                               "end_lineno": 131,
                               "end_col": 45
                             },
-                            "resolved_type": "list[JsonVal]",
+                            "resolved_type": "list[None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
                             "casts": [],
                             "borrow_kind": "value",
                             "repr": "self.raw",
@@ -9265,7 +9425,8 @@
                               "repr": "self",
                               "id": "self"
                             },
-                            "attr": "raw"
+                            "attr": "raw",
+                            "call_arg_type": "Obj"
                           }
                         ],
                         "keywords": [],
@@ -9375,7 +9536,7 @@
                           "end_lineno": 163,
                           "end_col": 40
                         },
-                        "resolved_type": "JsonVal",
+                        "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "self.raw[index]",
@@ -9387,7 +9548,7 @@
                             "end_lineno": 163,
                             "end_col": 33
                           },
-                          "resolved_type": "list[JsonVal]",
+                          "resolved_type": "list[None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
                           "casts": [],
                           "borrow_kind": "value",
                           "repr": "self.raw",
@@ -9420,7 +9581,8 @@
                           "borrow_kind": "readonly_ref",
                           "repr": "index",
                           "id": "index"
-                        }
+                        },
+                        "call_arg_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]"
                       }
                     ],
                     "keywords": []
@@ -9452,7 +9614,7 @@
       "base": null,
       "dataclass": false,
       "field_types": {
-        "raw": "JsonVal"
+        "raw": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]"
       },
       "body": [
         {
@@ -9471,27 +9633,72 @@
               "end_lineno": 167,
               "end_col": 7
             },
-            "resolved_type": "JsonVal",
+            "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "raw",
             "id": "raw",
             "type_expr": {
-              "kind": "NamedType",
-              "name": "JsonVal"
+              "kind": "GenericType",
+              "base": "None | bool | int64 | float64 | str | list",
+              "args": [
+                {
+                  "kind": "UnionType",
+                  "types": [
+                    {
+                      "kind": "NamedType",
+                      "name": "Any]"
+                    },
+                    {
+                      "kind": "NamedType",
+                      "name": "dict[str,Any"
+                    }
+                  ]
+                }
+              ]
             }
           },
-          "annotation": "JsonVal",
+          "annotation": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
           "value": null,
           "declare": true,
-          "decl_type": "JsonVal",
+          "decl_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
           "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "JsonVal"
+            "kind": "GenericType",
+            "base": "None | bool | int64 | float64 | str | list",
+            "args": [
+              {
+                "kind": "UnionType",
+                "types": [
+                  {
+                    "kind": "NamedType",
+                    "name": "Any]"
+                  },
+                  {
+                    "kind": "NamedType",
+                    "name": "dict[str,Any"
+                  }
+                ]
+              }
+            ]
           },
           "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "JsonVal"
+            "kind": "GenericType",
+            "base": "None | bool | int64 | float64 | str | list",
+            "args": [
+              {
+                "kind": "UnionType",
+                "types": [
+                  {
+                    "kind": "NamedType",
+                    "name": "Any]"
+                  },
+                  {
+                    "kind": "NamedType",
+                    "name": "dict[str,Any"
+                  }
+                ]
+              }
+            ]
           }
         },
         {
@@ -9506,7 +9713,7 @@
           "original_name": "__init__",
           "arg_types": {
             "self": "JsonValue",
-            "raw": "JsonVal"
+            "raw": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]"
           },
           "arg_order": [
             "self",
@@ -9541,7 +9748,7 @@
                   "end_lineno": 170,
                   "end_col": 16
                 },
-                "resolved_type": "JsonVal",
+                "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "self.raw",
@@ -9569,14 +9776,14 @@
                   "end_lineno": 170,
                   "end_col": 16
                 },
-                "resolved_type": "JsonVal",
+                "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "raw",
                 "id": "raw"
               },
               "declare": true,
-              "decl_type": "JsonVal",
+              "decl_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
               "declare_init": true
             }
           ],
@@ -9627,17 +9834,32 @@
                   "end_lineno": 173,
                   "end_col": 10
                 },
-                "resolved_type": "JsonVal",
+                "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "jv",
                 "id": "jv",
                 "type_expr": {
-                  "kind": "NamedType",
-                  "name": "JsonVal"
+                  "kind": "GenericType",
+                  "base": "None | bool | int64 | float64 | str | list",
+                  "args": [
+                    {
+                      "kind": "UnionType",
+                      "types": [
+                        {
+                          "kind": "NamedType",
+                          "name": "Any]"
+                        },
+                        {
+                          "kind": "NamedType",
+                          "name": "dict[str,Any"
+                        }
+                      ]
+                    }
+                  ]
                 }
               },
-              "annotation": "JsonVal",
+              "annotation": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
               "value": {
                 "kind": "Attribute",
                 "source_span": {
@@ -9646,7 +9868,7 @@
                   "end_lineno": 173,
                   "end_col": 30
                 },
-                "resolved_type": "JsonVal",
+                "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "self.raw",
@@ -9667,14 +9889,44 @@
                 "attr": "raw"
               },
               "declare": true,
-              "decl_type": "JsonVal",
+              "decl_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
               "annotation_type_expr": {
-                "kind": "NamedType",
-                "name": "JsonVal"
+                "kind": "GenericType",
+                "base": "None | bool | int64 | float64 | str | list",
+                "args": [
+                  {
+                    "kind": "UnionType",
+                    "types": [
+                      {
+                        "kind": "NamedType",
+                        "name": "Any]"
+                      },
+                      {
+                        "kind": "NamedType",
+                        "name": "dict[str,Any"
+                      }
+                    ]
+                  }
+                ]
               },
               "decl_type_expr": {
-                "kind": "NamedType",
-                "name": "JsonVal"
+                "kind": "GenericType",
+                "base": "None | bool | int64 | float64 | str | list",
+                "args": [
+                  {
+                    "kind": "UnionType",
+                    "types": [
+                      {
+                        "kind": "NamedType",
+                        "name": "Any]"
+                      },
+                      {
+                        "kind": "NamedType",
+                        "name": "dict[str,Any"
+                      }
+                    ]
+                  }
+                ]
               }
             },
             {
@@ -9720,11 +9972,12 @@
                       "end_lineno": 174,
                       "end_col": 24
                     },
-                    "resolved_type": "JsonVal",
+                    "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "jv",
-                    "id": "jv"
+                    "id": "jv",
+                    "call_arg_type": "Obj"
                   },
                   {
                     "kind": "Name",
@@ -9738,7 +9991,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "dict",
-                    "id": "dict"
+                    "id": "dict",
+                    "call_arg_type": "type"
                   }
                 ],
                 "keywords": [],
@@ -9790,7 +10044,7 @@
                           "end_lineno": 175,
                           "end_col": 41
                         },
-                        "resolved_type": "unknown",
+                        "resolved_type": "dict",
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "cast(dict, jv)",
@@ -9802,7 +10056,7 @@
                             "end_lineno": 175,
                             "end_col": 31
                           },
-                          "resolved_type": "unknown",
+                          "resolved_type": "callable",
                           "casts": [],
                           "borrow_kind": "value",
                           "repr": "cast",
@@ -9831,14 +10085,15 @@
                               "end_lineno": 175,
                               "end_col": 40
                             },
-                            "resolved_type": "JsonVal",
+                            "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "jv",
                             "id": "jv"
                           }
                         ],
-                        "keywords": []
+                        "keywords": [],
+                        "call_arg_type": "dict[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]"
                       }
                     ],
                     "keywords": []
@@ -9918,17 +10173,32 @@
                   "end_lineno": 179,
                   "end_col": 10
                 },
-                "resolved_type": "JsonVal",
+                "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "jv",
                 "id": "jv",
                 "type_expr": {
-                  "kind": "NamedType",
-                  "name": "JsonVal"
+                  "kind": "GenericType",
+                  "base": "None | bool | int64 | float64 | str | list",
+                  "args": [
+                    {
+                      "kind": "UnionType",
+                      "types": [
+                        {
+                          "kind": "NamedType",
+                          "name": "Any]"
+                        },
+                        {
+                          "kind": "NamedType",
+                          "name": "dict[str,Any"
+                        }
+                      ]
+                    }
+                  ]
                 }
               },
-              "annotation": "JsonVal",
+              "annotation": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
               "value": {
                 "kind": "Attribute",
                 "source_span": {
@@ -9937,7 +10207,7 @@
                   "end_lineno": 179,
                   "end_col": 30
                 },
-                "resolved_type": "JsonVal",
+                "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "self.raw",
@@ -9958,14 +10228,44 @@
                 "attr": "raw"
               },
               "declare": true,
-              "decl_type": "JsonVal",
+              "decl_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
               "annotation_type_expr": {
-                "kind": "NamedType",
-                "name": "JsonVal"
+                "kind": "GenericType",
+                "base": "None | bool | int64 | float64 | str | list",
+                "args": [
+                  {
+                    "kind": "UnionType",
+                    "types": [
+                      {
+                        "kind": "NamedType",
+                        "name": "Any]"
+                      },
+                      {
+                        "kind": "NamedType",
+                        "name": "dict[str,Any"
+                      }
+                    ]
+                  }
+                ]
               },
               "decl_type_expr": {
-                "kind": "NamedType",
-                "name": "JsonVal"
+                "kind": "GenericType",
+                "base": "None | bool | int64 | float64 | str | list",
+                "args": [
+                  {
+                    "kind": "UnionType",
+                    "types": [
+                      {
+                        "kind": "NamedType",
+                        "name": "Any]"
+                      },
+                      {
+                        "kind": "NamedType",
+                        "name": "dict[str,Any"
+                      }
+                    ]
+                  }
+                ]
               }
             },
             {
@@ -10011,11 +10311,12 @@
                       "end_lineno": 180,
                       "end_col": 24
                     },
-                    "resolved_type": "JsonVal",
+                    "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "jv",
-                    "id": "jv"
+                    "id": "jv",
+                    "call_arg_type": "Obj"
                   },
                   {
                     "kind": "Name",
@@ -10029,7 +10330,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "list",
-                    "id": "list"
+                    "id": "list",
+                    "call_arg_type": "type"
                   }
                 ],
                 "keywords": [],
@@ -10081,7 +10383,7 @@
                           "end_lineno": 181,
                           "end_col": 41
                         },
-                        "resolved_type": "unknown",
+                        "resolved_type": "list",
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "cast(list, jv)",
@@ -10093,7 +10395,7 @@
                             "end_lineno": 181,
                             "end_col": 31
                           },
-                          "resolved_type": "unknown",
+                          "resolved_type": "callable",
                           "casts": [],
                           "borrow_kind": "value",
                           "repr": "cast",
@@ -10122,14 +10424,15 @@
                               "end_lineno": 181,
                               "end_col": 40
                             },
-                            "resolved_type": "JsonVal",
+                            "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "jv",
                             "id": "jv"
                           }
                         ],
-                        "keywords": []
+                        "keywords": [],
+                        "call_arg_type": "list[None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]"
                       }
                     ],
                     "keywords": []
@@ -10209,17 +10512,32 @@
                   "end_lineno": 185,
                   "end_col": 10
                 },
-                "resolved_type": "JsonVal",
+                "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "jv",
                 "id": "jv",
                 "type_expr": {
-                  "kind": "NamedType",
-                  "name": "JsonVal"
+                  "kind": "GenericType",
+                  "base": "None | bool | int64 | float64 | str | list",
+                  "args": [
+                    {
+                      "kind": "UnionType",
+                      "types": [
+                        {
+                          "kind": "NamedType",
+                          "name": "Any]"
+                        },
+                        {
+                          "kind": "NamedType",
+                          "name": "dict[str,Any"
+                        }
+                      ]
+                    }
+                  ]
                 }
               },
-              "annotation": "JsonVal",
+              "annotation": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
               "value": {
                 "kind": "Attribute",
                 "source_span": {
@@ -10228,7 +10546,7 @@
                   "end_lineno": 185,
                   "end_col": 30
                 },
-                "resolved_type": "JsonVal",
+                "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "self.raw",
@@ -10249,14 +10567,44 @@
                 "attr": "raw"
               },
               "declare": true,
-              "decl_type": "JsonVal",
+              "decl_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
               "annotation_type_expr": {
-                "kind": "NamedType",
-                "name": "JsonVal"
+                "kind": "GenericType",
+                "base": "None | bool | int64 | float64 | str | list",
+                "args": [
+                  {
+                    "kind": "UnionType",
+                    "types": [
+                      {
+                        "kind": "NamedType",
+                        "name": "Any]"
+                      },
+                      {
+                        "kind": "NamedType",
+                        "name": "dict[str,Any"
+                      }
+                    ]
+                  }
+                ]
               },
               "decl_type_expr": {
-                "kind": "NamedType",
-                "name": "JsonVal"
+                "kind": "GenericType",
+                "base": "None | bool | int64 | float64 | str | list",
+                "args": [
+                  {
+                    "kind": "UnionType",
+                    "types": [
+                      {
+                        "kind": "NamedType",
+                        "name": "Any]"
+                      },
+                      {
+                        "kind": "NamedType",
+                        "name": "dict[str,Any"
+                      }
+                    ]
+                  }
+                ]
               }
             },
             {
@@ -10302,11 +10650,12 @@
                       "end_lineno": 186,
                       "end_col": 24
                     },
-                    "resolved_type": "JsonVal",
+                    "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "jv",
-                    "id": "jv"
+                    "id": "jv",
+                    "call_arg_type": "Obj"
                   },
                   {
                     "kind": "Name",
@@ -10320,7 +10669,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "str",
-                    "id": "str"
+                    "id": "str",
+                    "call_arg_type": "type"
                   }
                 ],
                 "keywords": [],
@@ -10345,7 +10695,7 @@
                       "end_lineno": 187,
                       "end_col": 32
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "str",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "cast(str, jv)",
@@ -10357,7 +10707,7 @@
                         "end_lineno": 187,
                         "end_col": 23
                       },
-                      "resolved_type": "unknown",
+                      "resolved_type": "callable",
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "cast",
@@ -10386,7 +10736,7 @@
                           "end_lineno": 187,
                           "end_col": 31
                         },
-                        "resolved_type": "JsonVal",
+                        "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "jv",
@@ -10470,17 +10820,32 @@
                   "end_lineno": 191,
                   "end_col": 10
                 },
-                "resolved_type": "JsonVal",
+                "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "jv",
                 "id": "jv",
                 "type_expr": {
-                  "kind": "NamedType",
-                  "name": "JsonVal"
+                  "kind": "GenericType",
+                  "base": "None | bool | int64 | float64 | str | list",
+                  "args": [
+                    {
+                      "kind": "UnionType",
+                      "types": [
+                        {
+                          "kind": "NamedType",
+                          "name": "Any]"
+                        },
+                        {
+                          "kind": "NamedType",
+                          "name": "dict[str,Any"
+                        }
+                      ]
+                    }
+                  ]
                 }
               },
-              "annotation": "JsonVal",
+              "annotation": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
               "value": {
                 "kind": "Attribute",
                 "source_span": {
@@ -10489,7 +10854,7 @@
                   "end_lineno": 191,
                   "end_col": 30
                 },
-                "resolved_type": "JsonVal",
+                "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "self.raw",
@@ -10510,14 +10875,44 @@
                 "attr": "raw"
               },
               "declare": true,
-              "decl_type": "JsonVal",
+              "decl_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
               "annotation_type_expr": {
-                "kind": "NamedType",
-                "name": "JsonVal"
+                "kind": "GenericType",
+                "base": "None | bool | int64 | float64 | str | list",
+                "args": [
+                  {
+                    "kind": "UnionType",
+                    "types": [
+                      {
+                        "kind": "NamedType",
+                        "name": "Any]"
+                      },
+                      {
+                        "kind": "NamedType",
+                        "name": "dict[str,Any"
+                      }
+                    ]
+                  }
+                ]
               },
               "decl_type_expr": {
-                "kind": "NamedType",
-                "name": "JsonVal"
+                "kind": "GenericType",
+                "base": "None | bool | int64 | float64 | str | list",
+                "args": [
+                  {
+                    "kind": "UnionType",
+                    "types": [
+                      {
+                        "kind": "NamedType",
+                        "name": "Any]"
+                      },
+                      {
+                        "kind": "NamedType",
+                        "name": "dict[str,Any"
+                      }
+                    ]
+                  }
+                ]
               }
             },
             {
@@ -10563,11 +10958,12 @@
                       "end_lineno": 192,
                       "end_col": 24
                     },
-                    "resolved_type": "JsonVal",
+                    "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "jv",
-                    "id": "jv"
+                    "id": "jv",
+                    "call_arg_type": "Obj"
                   },
                   {
                     "kind": "Name",
@@ -10577,11 +10973,12 @@
                       "end_lineno": 192,
                       "end_col": 29
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "type",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "int",
-                    "id": "int"
+                    "id": "int",
+                    "call_arg_type": "type"
                   }
                 ],
                 "keywords": [],
@@ -10606,7 +11003,7 @@
                       "end_lineno": 193,
                       "end_col": 32
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "int64",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "cast(int, jv)",
@@ -10618,7 +11015,7 @@
                         "end_lineno": 193,
                         "end_col": 23
                       },
-                      "resolved_type": "unknown",
+                      "resolved_type": "callable",
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "cast",
@@ -10633,7 +11030,7 @@
                           "end_lineno": 193,
                           "end_col": 27
                         },
-                        "resolved_type": "unknown",
+                        "resolved_type": "type",
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "int",
@@ -10647,7 +11044,7 @@
                           "end_lineno": 193,
                           "end_col": 31
                         },
-                        "resolved_type": "JsonVal",
+                        "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "jv",
@@ -10731,17 +11128,32 @@
                   "end_lineno": 197,
                   "end_col": 10
                 },
-                "resolved_type": "JsonVal",
+                "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "jv",
                 "id": "jv",
                 "type_expr": {
-                  "kind": "NamedType",
-                  "name": "JsonVal"
+                  "kind": "GenericType",
+                  "base": "None | bool | int64 | float64 | str | list",
+                  "args": [
+                    {
+                      "kind": "UnionType",
+                      "types": [
+                        {
+                          "kind": "NamedType",
+                          "name": "Any]"
+                        },
+                        {
+                          "kind": "NamedType",
+                          "name": "dict[str,Any"
+                        }
+                      ]
+                    }
+                  ]
                 }
               },
-              "annotation": "JsonVal",
+              "annotation": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
               "value": {
                 "kind": "Attribute",
                 "source_span": {
@@ -10750,7 +11162,7 @@
                   "end_lineno": 197,
                   "end_col": 30
                 },
-                "resolved_type": "JsonVal",
+                "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "self.raw",
@@ -10771,14 +11183,44 @@
                 "attr": "raw"
               },
               "declare": true,
-              "decl_type": "JsonVal",
+              "decl_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
               "annotation_type_expr": {
-                "kind": "NamedType",
-                "name": "JsonVal"
+                "kind": "GenericType",
+                "base": "None | bool | int64 | float64 | str | list",
+                "args": [
+                  {
+                    "kind": "UnionType",
+                    "types": [
+                      {
+                        "kind": "NamedType",
+                        "name": "Any]"
+                      },
+                      {
+                        "kind": "NamedType",
+                        "name": "dict[str,Any"
+                      }
+                    ]
+                  }
+                ]
               },
               "decl_type_expr": {
-                "kind": "NamedType",
-                "name": "JsonVal"
+                "kind": "GenericType",
+                "base": "None | bool | int64 | float64 | str | list",
+                "args": [
+                  {
+                    "kind": "UnionType",
+                    "types": [
+                      {
+                        "kind": "NamedType",
+                        "name": "Any]"
+                      },
+                      {
+                        "kind": "NamedType",
+                        "name": "dict[str,Any"
+                      }
+                    ]
+                  }
+                ]
               }
             },
             {
@@ -10824,11 +11266,12 @@
                       "end_lineno": 198,
                       "end_col": 24
                     },
-                    "resolved_type": "JsonVal",
+                    "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "jv",
-                    "id": "jv"
+                    "id": "jv",
+                    "call_arg_type": "Obj"
                   },
                   {
                     "kind": "Name",
@@ -10838,11 +11281,12 @@
                       "end_lineno": 198,
                       "end_col": 31
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "type",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "float",
-                    "id": "float"
+                    "id": "float",
+                    "call_arg_type": "type"
                   }
                 ],
                 "keywords": [],
@@ -10867,7 +11311,7 @@
                       "end_lineno": 199,
                       "end_col": 34
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "float64",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "cast(float, jv)",
@@ -10879,7 +11323,7 @@
                         "end_lineno": 199,
                         "end_col": 23
                       },
-                      "resolved_type": "unknown",
+                      "resolved_type": "callable",
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "cast",
@@ -10894,7 +11338,7 @@
                           "end_lineno": 199,
                           "end_col": 29
                         },
-                        "resolved_type": "unknown",
+                        "resolved_type": "type",
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "float",
@@ -10908,7 +11352,7 @@
                           "end_lineno": 199,
                           "end_col": 33
                         },
-                        "resolved_type": "JsonVal",
+                        "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "jv",
@@ -10992,17 +11436,32 @@
                   "end_lineno": 203,
                   "end_col": 10
                 },
-                "resolved_type": "JsonVal",
+                "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "jv",
                 "id": "jv",
                 "type_expr": {
-                  "kind": "NamedType",
-                  "name": "JsonVal"
+                  "kind": "GenericType",
+                  "base": "None | bool | int64 | float64 | str | list",
+                  "args": [
+                    {
+                      "kind": "UnionType",
+                      "types": [
+                        {
+                          "kind": "NamedType",
+                          "name": "Any]"
+                        },
+                        {
+                          "kind": "NamedType",
+                          "name": "dict[str,Any"
+                        }
+                      ]
+                    }
+                  ]
                 }
               },
-              "annotation": "JsonVal",
+              "annotation": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
               "value": {
                 "kind": "Attribute",
                 "source_span": {
@@ -11011,7 +11470,7 @@
                   "end_lineno": 203,
                   "end_col": 30
                 },
-                "resolved_type": "JsonVal",
+                "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "self.raw",
@@ -11032,14 +11491,44 @@
                 "attr": "raw"
               },
               "declare": true,
-              "decl_type": "JsonVal",
+              "decl_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
               "annotation_type_expr": {
-                "kind": "NamedType",
-                "name": "JsonVal"
+                "kind": "GenericType",
+                "base": "None | bool | int64 | float64 | str | list",
+                "args": [
+                  {
+                    "kind": "UnionType",
+                    "types": [
+                      {
+                        "kind": "NamedType",
+                        "name": "Any]"
+                      },
+                      {
+                        "kind": "NamedType",
+                        "name": "dict[str,Any"
+                      }
+                    ]
+                  }
+                ]
               },
               "decl_type_expr": {
-                "kind": "NamedType",
-                "name": "JsonVal"
+                "kind": "GenericType",
+                "base": "None | bool | int64 | float64 | str | list",
+                "args": [
+                  {
+                    "kind": "UnionType",
+                    "types": [
+                      {
+                        "kind": "NamedType",
+                        "name": "Any]"
+                      },
+                      {
+                        "kind": "NamedType",
+                        "name": "dict[str,Any"
+                      }
+                    ]
+                  }
+                ]
               }
             },
             {
@@ -11085,11 +11574,12 @@
                       "end_lineno": 204,
                       "end_col": 24
                     },
-                    "resolved_type": "JsonVal",
+                    "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "jv",
-                    "id": "jv"
+                    "id": "jv",
+                    "call_arg_type": "Obj"
                   },
                   {
                     "kind": "Name",
@@ -11099,11 +11589,12 @@
                       "end_lineno": 204,
                       "end_col": 30
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "type",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "bool",
-                    "id": "bool"
+                    "id": "bool",
+                    "call_arg_type": "type"
                   }
                 ],
                 "keywords": [],
@@ -11128,7 +11619,7 @@
                       "end_lineno": 205,
                       "end_col": 33
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "bool",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "cast(bool, jv)",
@@ -11140,7 +11631,7 @@
                         "end_lineno": 205,
                         "end_col": 23
                       },
-                      "resolved_type": "unknown",
+                      "resolved_type": "callable",
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "cast",
@@ -11155,7 +11646,7 @@
                           "end_lineno": 205,
                           "end_col": 28
                         },
-                        "resolved_type": "unknown",
+                        "resolved_type": "type",
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "bool",
@@ -11169,7 +11660,7 @@
                           "end_lineno": 205,
                           "end_col": 32
                         },
-                        "resolved_type": "JsonVal",
+                        "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "jv",
@@ -11227,8 +11718,8 @@
       "dataclass": false,
       "field_types": {
         "text": "str",
-        "n": "unknown",
-        "i": "unknown"
+        "n": "int64",
+        "i": "int64"
       },
       "body": [
         {
@@ -11508,7 +11999,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "text",
-                    "id": "text"
+                    "id": "text",
+                    "call_arg_type": "Obj"
                   }
                 ],
                 "keywords": [],
@@ -11603,7 +12095,7 @@
           "arg_index": {
             "self": 0
           },
-          "return_type": "JsonVal",
+          "return_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
           "arg_usage": {
             "self": "readonly"
           },
@@ -11678,17 +12170,32 @@
                   "end_lineno": 221,
                   "end_col": 11
                 },
-                "resolved_type": "JsonVal",
+                "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "out",
                 "id": "out",
                 "type_expr": {
-                  "kind": "NamedType",
-                  "name": "JsonVal"
+                  "kind": "GenericType",
+                  "base": "None | bool | int64 | float64 | str | list",
+                  "args": [
+                    {
+                      "kind": "UnionType",
+                      "types": [
+                        {
+                          "kind": "NamedType",
+                          "name": "Any]"
+                        },
+                        {
+                          "kind": "NamedType",
+                          "name": "dict[str,Any"
+                        }
+                      ]
+                    }
+                  ]
                 }
               },
-              "annotation": "JsonVal",
+              "annotation": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
               "value": {
                 "kind": "Call",
                 "source_span": {
@@ -11697,7 +12204,7 @@
                   "end_lineno": 221,
                   "end_col": 42
                 },
-                "resolved_type": "JsonVal",
+                "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "self._parse_value()",
@@ -11733,14 +12240,44 @@
                 "keywords": []
               },
               "declare": true,
-              "decl_type": "JsonVal",
+              "decl_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
               "annotation_type_expr": {
-                "kind": "NamedType",
-                "name": "JsonVal"
+                "kind": "GenericType",
+                "base": "None | bool | int64 | float64 | str | list",
+                "args": [
+                  {
+                    "kind": "UnionType",
+                    "types": [
+                      {
+                        "kind": "NamedType",
+                        "name": "Any]"
+                      },
+                      {
+                        "kind": "NamedType",
+                        "name": "dict[str,Any"
+                      }
+                    ]
+                  }
+                ]
               },
               "decl_type_expr": {
-                "kind": "NamedType",
-                "name": "JsonVal"
+                "kind": "GenericType",
+                "base": "None | bool | int64 | float64 | str | list",
+                "args": [
+                  {
+                    "kind": "UnionType",
+                    "types": [
+                      {
+                        "kind": "NamedType",
+                        "name": "Any]"
+                      },
+                      {
+                        "kind": "NamedType",
+                        "name": "dict[str,Any"
+                      }
+                    ]
+                  }
+                ]
               }
             },
             {
@@ -11958,7 +12495,7 @@
                   "end_lineno": 225,
                   "end_col": 18
                 },
-                "resolved_type": "JsonVal",
+                "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "out",
@@ -12187,7 +12724,8 @@
                             "id": "self"
                           },
                           "attr": "i"
-                        }
+                        },
+                        "call_arg_type": "str"
                       }
                     ],
                     "keywords": []
@@ -12277,7 +12815,7 @@
           "arg_index": {
             "self": 0
           },
-          "return_type": "JsonVal",
+          "return_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
           "arg_usage": {
             "self": "readonly"
           },
@@ -12597,7 +13135,7 @@
                       "end_lineno": 236,
                       "end_col": 39
                     },
-                    "resolved_type": "dict[str,JsonVal]",
+                    "resolved_type": "dict[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "self._parse_object()",
@@ -12707,7 +13245,7 @@
                       "end_lineno": 238,
                       "end_col": 38
                     },
-                    "resolved_type": "list[JsonVal]",
+                    "resolved_type": "list[None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "self._parse_array()",
@@ -14063,7 +14601,7 @@
                   "end_lineno": 250,
                   "end_col": 35
                 },
-                "resolved_type": "JsonVal",
+                "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "self._parse_number()",
@@ -14124,7 +14662,7 @@
           "arg_index": {
             "self": 0
           },
-          "return_type": "dict[str,JsonVal]",
+          "return_type": "dict[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
           "arg_usage": {
             "self": "readonly"
           },
@@ -14147,7 +14685,7 @@
                   "end_lineno": 253,
                   "end_col": 11
                 },
-                "resolved_type": "dict[str,JsonVal]",
+                "resolved_type": "dict[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "out",
@@ -14161,13 +14699,28 @@
                       "name": "str"
                     },
                     {
-                      "kind": "NamedType",
-                      "name": "JsonVal"
+                      "kind": "GenericType",
+                      "base": "None | bool | int64 | float64 | str | list",
+                      "args": [
+                        {
+                          "kind": "UnionType",
+                          "types": [
+                            {
+                              "kind": "NamedType",
+                              "name": "Any]"
+                            },
+                            {
+                              "kind": "NamedType",
+                              "name": "dict[str,Any"
+                            }
+                          ]
+                        }
+                      ]
                     }
                   ]
                 }
               },
-              "annotation": "dict[str,JsonVal]",
+              "annotation": "dict[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
               "value": {
                 "kind": "Dict",
                 "source_span": {
@@ -14176,7 +14729,7 @@
                   "end_lineno": 253,
                   "end_col": 36
                 },
-                "resolved_type": "dict[unknown,unknown]",
+                "resolved_type": "dict[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "{}",
@@ -14184,7 +14737,7 @@
                 "values": []
               },
               "declare": true,
-              "decl_type": "dict[str,JsonVal]",
+              "decl_type": "dict[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
               "annotation_type_expr": {
                 "kind": "GenericType",
                 "base": "dict",
@@ -14194,8 +14747,23 @@
                     "name": "str"
                   },
                   {
-                    "kind": "NamedType",
-                    "name": "JsonVal"
+                    "kind": "GenericType",
+                    "base": "None | bool | int64 | float64 | str | list",
+                    "args": [
+                      {
+                        "kind": "UnionType",
+                        "types": [
+                          {
+                            "kind": "NamedType",
+                            "name": "Any]"
+                          },
+                          {
+                            "kind": "NamedType",
+                            "name": "dict[str,Any"
+                          }
+                        ]
+                      }
+                    ]
                   }
                 ]
               },
@@ -14208,8 +14776,23 @@
                     "name": "str"
                   },
                   {
-                    "kind": "NamedType",
-                    "name": "JsonVal"
+                    "kind": "GenericType",
+                    "base": "None | bool | int64 | float64 | str | list",
+                    "args": [
+                      {
+                        "kind": "UnionType",
+                        "types": [
+                          {
+                            "kind": "NamedType",
+                            "name": "Any]"
+                          },
+                          {
+                            "kind": "NamedType",
+                            "name": "dict[str,Any"
+                          }
+                        ]
+                      }
+                    ]
                   }
                 ]
               }
@@ -14590,7 +15173,7 @@
                       "end_lineno": 258,
                       "end_col": 22
                     },
-                    "resolved_type": "dict[str,JsonVal]",
+                    "resolved_type": "dict[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "out",
@@ -15446,7 +16029,7 @@
                       "end_lineno": 269,
                       "end_col": 20
                     },
-                    "resolved_type": "JsonVal",
+                    "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "out[key]",
@@ -15458,7 +16041,7 @@
                         "end_lineno": 269,
                         "end_col": 15
                       },
-                      "resolved_type": "dict[str,JsonVal]",
+                      "resolved_type": "dict[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
                       "casts": [],
                       "borrow_kind": "readonly_ref",
                       "repr": "out",
@@ -15487,7 +16070,7 @@
                       "end_lineno": 269,
                       "end_col": 42
                     },
-                    "resolved_type": "JsonVal",
+                    "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "self._parse_value()",
@@ -15523,7 +16106,7 @@
                     "keywords": []
                   },
                   "declare": true,
-                  "decl_type": "JsonVal",
+                  "decl_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                   "declare_init": true
                 },
                 {
@@ -15945,7 +16528,7 @@
                           "end_lineno": 276,
                           "end_col": 26
                         },
-                        "resolved_type": "dict[str,JsonVal]",
+                        "resolved_type": "dict[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "out",
@@ -16102,7 +16685,7 @@
           "arg_index": {
             "self": 0
           },
-          "return_type": "list[JsonVal]",
+          "return_type": "list[None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
           "arg_usage": {
             "self": "readonly"
           },
@@ -16125,7 +16708,7 @@
                   "end_lineno": 281,
                   "end_col": 11
                 },
-                "resolved_type": "list[JsonVal]",
+                "resolved_type": "list[None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "out",
@@ -16135,13 +16718,28 @@
                   "base": "list",
                   "args": [
                     {
-                      "kind": "NamedType",
-                      "name": "JsonVal"
+                      "kind": "GenericType",
+                      "base": "None | bool | int64 | float64 | str | list",
+                      "args": [
+                        {
+                          "kind": "UnionType",
+                          "types": [
+                            {
+                              "kind": "NamedType",
+                              "name": "Any]"
+                            },
+                            {
+                              "kind": "NamedType",
+                              "name": "dict[str,Any"
+                            }
+                          ]
+                        }
+                      ]
                     }
                   ]
                 }
               },
-              "annotation": "list[JsonVal]",
+              "annotation": "list[None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
               "value": {
                 "kind": "List",
                 "source_span": {
@@ -16150,21 +16748,36 @@
                   "end_lineno": 281,
                   "end_col": 31
                 },
-                "resolved_type": "list[unknown]",
+                "resolved_type": "list[None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "[]",
                 "elements": []
               },
               "declare": true,
-              "decl_type": "list[JsonVal]",
+              "decl_type": "list[None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
               "annotation_type_expr": {
                 "kind": "GenericType",
                 "base": "list",
                 "args": [
                   {
-                    "kind": "NamedType",
-                    "name": "JsonVal"
+                    "kind": "GenericType",
+                    "base": "None | bool | int64 | float64 | str | list",
+                    "args": [
+                      {
+                        "kind": "UnionType",
+                        "types": [
+                          {
+                            "kind": "NamedType",
+                            "name": "Any]"
+                          },
+                          {
+                            "kind": "NamedType",
+                            "name": "dict[str,Any"
+                          }
+                        ]
+                      }
+                    ]
                   }
                 ]
               },
@@ -16173,8 +16786,23 @@
                 "base": "list",
                 "args": [
                   {
-                    "kind": "NamedType",
-                    "name": "JsonVal"
+                    "kind": "GenericType",
+                    "base": "None | bool | int64 | float64 | str | list",
+                    "args": [
+                      {
+                        "kind": "UnionType",
+                        "types": [
+                          {
+                            "kind": "NamedType",
+                            "name": "Any]"
+                          },
+                          {
+                            "kind": "NamedType",
+                            "name": "dict[str,Any"
+                          }
+                        ]
+                      }
+                    ]
                   }
                 ]
               }
@@ -16555,7 +17183,7 @@
                       "end_lineno": 258,
                       "end_col": 22
                     },
-                    "resolved_type": "list[JsonVal]",
+                    "resolved_type": "list[None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "out",
@@ -16680,7 +17308,7 @@
                           "end_lineno": 289,
                           "end_col": 15
                         },
-                        "resolved_type": "list[JsonVal]",
+                        "resolved_type": "list[None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "out",
@@ -16697,7 +17325,7 @@
                           "end_lineno": 289,
                           "end_col": 42
                         },
-                        "resolved_type": "JsonVal",
+                        "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "self._parse_value()",
@@ -16730,7 +17358,8 @@
                           "attr": "_parse_value"
                         },
                         "args": [],
-                        "keywords": []
+                        "keywords": [],
+                        "call_arg_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]"
                       }
                     ],
                     "keywords": [],
@@ -16749,7 +17378,7 @@
                         "end_lineno": 289,
                         "end_col": 15
                       },
-                      "resolved_type": "list[JsonVal]",
+                      "resolved_type": "list[None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
                       "casts": [],
                       "borrow_kind": "readonly_ref",
                       "repr": "out",
@@ -17176,7 +17805,7 @@
                           "end_lineno": 276,
                           "end_col": 26
                         },
-                        "resolved_type": "list[JsonVal]",
+                        "resolved_type": "list[None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "out",
@@ -17609,7 +18238,7 @@
                   "end_lineno": 304,
                   "end_col": 33
                 },
-                "resolved_type": "list[unknown]",
+                "resolved_type": "list[str]",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "[]",
@@ -17972,7 +18601,8 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "out_chars",
-                            "id": "out_chars"
+                            "id": "out_chars",
+                            "call_arg_type": "list[str]"
                           },
                           {
                             "kind": "Name",
@@ -17986,7 +18616,8 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "_EMPTY",
-                            "id": "_EMPTY"
+                            "id": "_EMPTY",
+                            "call_arg_type": "str"
                           }
                         ],
                         "keywords": []
@@ -18462,7 +19093,8 @@
                                 "casts": [],
                                 "borrow_kind": "value",
                                 "repr": "'\"'",
-                                "value": "\""
+                                "value": "\"",
+                                "call_arg_type": "str"
                               }
                             ],
                             "keywords": [],
@@ -18607,7 +19239,8 @@
                                     "casts": [],
                                     "borrow_kind": "value",
                                     "repr": "\"\\\\\"",
-                                    "value": "\\"
+                                    "value": "\\",
+                                    "call_arg_type": "str"
                                   }
                                 ],
                                 "keywords": [],
@@ -18752,7 +19385,8 @@
                                         "casts": [],
                                         "borrow_kind": "value",
                                         "repr": "\"/\"",
-                                        "value": "/"
+                                        "value": "/",
+                                        "call_arg_type": "str"
                                       }
                                     ],
                                     "keywords": [],
@@ -18897,7 +19531,8 @@
                                             "casts": [],
                                             "borrow_kind": "value",
                                             "repr": "\"\\b\"",
-                                            "value": "\\b"
+                                            "value": "\\b",
+                                            "call_arg_type": "str"
                                           }
                                         ],
                                         "keywords": [],
@@ -19042,7 +19677,8 @@
                                                 "casts": [],
                                                 "borrow_kind": "value",
                                                 "repr": "\"\\f\"",
-                                                "value": "\\f"
+                                                "value": "\\f",
+                                                "call_arg_type": "str"
                                               }
                                             ],
                                             "keywords": [],
@@ -19187,7 +19823,8 @@
                                                     "casts": [],
                                                     "borrow_kind": "value",
                                                     "repr": "\"\\n\"",
-                                                    "value": "\n"
+                                                    "value": "\n",
+                                                    "call_arg_type": "str"
                                                   }
                                                 ],
                                                 "keywords": [],
@@ -19332,7 +19969,8 @@
                                                         "casts": [],
                                                         "borrow_kind": "value",
                                                         "repr": "\"\\r\"",
-                                                        "value": "\r"
+                                                        "value": "\r",
+                                                        "call_arg_type": "str"
                                                       }
                                                     ],
                                                     "keywords": [],
@@ -19477,7 +20115,8 @@
                                                             "casts": [],
                                                             "borrow_kind": "value",
                                                             "repr": "\"\\t\"",
-                                                            "value": "\t"
+                                                            "value": "\t",
+                                                            "call_arg_type": "str"
                                                           }
                                                         ],
                                                         "keywords": [],
@@ -20145,10 +20784,12 @@
                                                                         "casts": [],
                                                                         "borrow_kind": "readonly_ref",
                                                                         "repr": "hx",
-                                                                        "id": "hx"
+                                                                        "id": "hx",
+                                                                        "call_arg_type": "str"
                                                                       }
                                                                     ],
-                                                                    "keywords": []
+                                                                    "keywords": [],
+                                                                    "call_arg_type": "int64"
                                                                   }
                                                                 ],
                                                                 "keywords": [],
@@ -20158,7 +20799,8 @@
                                                                 "runtime_module_id": "pytra.built_in.scalar_ops",
                                                                 "runtime_symbol": "py_chr",
                                                                 "runtime_call_adapter_kind": "builtin",
-                                                                "semantic_tag": "cast.chr"
+                                                                "semantic_tag": "cast.chr",
+                                                                "call_arg_type": "str"
                                                               }
                                                             ],
                                                             "keywords": [],
@@ -20329,7 +20971,8 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "ch",
-                            "id": "ch"
+                            "id": "ch",
+                            "call_arg_type": "str"
                           }
                         ],
                         "keywords": [],
@@ -20447,7 +21090,7 @@
           "arg_index": {
             "self": 0
           },
-          "return_type": "JsonVal",
+          "return_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
           "arg_usage": {
             "self": "readonly"
           },
@@ -21103,7 +21746,8 @@
                               "id": "self"
                             },
                             "attr": "i"
-                          }
+                          },
+                          "call_arg_type": "str"
                         }
                       ],
                       "keywords": []
@@ -21364,7 +22008,8 @@
                                 "id": "self"
                               },
                               "attr": "i"
-                            }
+                            },
+                            "call_arg_type": "str"
                           }
                         ],
                         "keywords": []
@@ -21968,7 +22613,8 @@
                                   "id": "self"
                                 },
                                 "attr": "i"
-                              }
+                              },
+                              "call_arg_type": "str"
                             }
                           ],
                           "keywords": []
@@ -22231,7 +22877,8 @@
                                 "id": "self"
                               },
                               "attr": "i"
-                            }
+                            },
+                            "call_arg_type": "str"
                           }
                         ],
                         "keywords": []
@@ -23246,7 +23893,8 @@
                                       "id": "self"
                                     },
                                     "attr": "i"
-                                  }
+                                  },
+                                  "call_arg_type": "str"
                                 }
                               ],
                               "keywords": []
@@ -23509,7 +24157,8 @@
                                     "id": "self"
                                   },
                                   "attr": "i"
-                                }
+                                },
+                                "call_arg_type": "str"
                               }
                             ],
                             "keywords": []
@@ -23825,7 +24474,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "token",
-                        "id": "token"
+                        "id": "token",
+                        "call_arg_type": "Obj"
                       }
                     ],
                     "keywords": [],
@@ -23940,7 +24590,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "token",
-                    "id": "token"
+                    "id": "token",
+                    "call_arg_type": "Obj"
                   }
                 ],
                 "keywords": [],
@@ -24064,7 +24715,7 @@
                   "end_lineno": 386,
                   "end_col": 46
                 },
-                "resolved_type": "JsonVal",
+                "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "_JsonParser(text).parse()",
@@ -24119,7 +24770,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "text",
-                        "id": "text"
+                        "id": "text",
+                        "call_arg_type": "str"
                       }
                     ],
                     "keywords": []
@@ -24127,7 +24779,8 @@
                   "attr": "parse"
                 },
                 "args": [],
-                "keywords": []
+                "keywords": [],
+                "call_arg_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]"
               }
             ],
             "keywords": []
@@ -24192,17 +24845,32 @@
               "end_lineno": 390,
               "end_col": 7
             },
-            "resolved_type": "JsonVal",
+            "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "val",
             "id": "val",
             "type_expr": {
-              "kind": "NamedType",
-              "name": "JsonVal"
+              "kind": "GenericType",
+              "base": "None | bool | int64 | float64 | str | list",
+              "args": [
+                {
+                  "kind": "UnionType",
+                  "types": [
+                    {
+                      "kind": "NamedType",
+                      "name": "Any]"
+                    },
+                    {
+                      "kind": "NamedType",
+                      "name": "dict[str,Any"
+                    }
+                  ]
+                }
+              ]
             }
           },
-          "annotation": "JsonVal",
+          "annotation": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
           "value": {
             "kind": "Call",
             "source_span": {
@@ -24211,7 +24879,7 @@
               "end_lineno": 390,
               "end_col": 44
             },
-            "resolved_type": "JsonVal",
+            "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "_JsonParser(text).parse()",
@@ -24266,7 +24934,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "text",
-                    "id": "text"
+                    "id": "text",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": []
@@ -24277,14 +24946,44 @@
             "keywords": []
           },
           "declare": true,
-          "decl_type": "JsonVal",
+          "decl_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
           "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "JsonVal"
+            "kind": "GenericType",
+            "base": "None | bool | int64 | float64 | str | list",
+            "args": [
+              {
+                "kind": "UnionType",
+                "types": [
+                  {
+                    "kind": "NamedType",
+                    "name": "Any]"
+                  },
+                  {
+                    "kind": "NamedType",
+                    "name": "dict[str,Any"
+                  }
+                ]
+              }
+            ]
           },
           "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "JsonVal"
+            "kind": "GenericType",
+            "base": "None | bool | int64 | float64 | str | list",
+            "args": [
+              {
+                "kind": "UnionType",
+                "types": [
+                  {
+                    "kind": "NamedType",
+                    "name": "Any]"
+                  },
+                  {
+                    "kind": "NamedType",
+                    "name": "dict[str,Any"
+                  }
+                ]
+              }
+            ]
           }
         },
         {
@@ -24330,11 +25029,12 @@
                   "end_lineno": 391,
                   "end_col": 21
                 },
-                "resolved_type": "JsonVal",
+                "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "val",
-                "id": "val"
+                "id": "val",
+                "call_arg_type": "Obj"
               },
               {
                 "kind": "Name",
@@ -24348,7 +25048,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "dict",
-                "id": "dict"
+                "id": "dict",
+                "call_arg_type": "type"
               }
             ],
             "keywords": [],
@@ -24400,7 +25101,7 @@
                       "end_lineno": 392,
                       "end_col": 38
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "dict",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "cast(dict, val)",
@@ -24412,7 +25113,7 @@
                         "end_lineno": 392,
                         "end_col": 27
                       },
-                      "resolved_type": "unknown",
+                      "resolved_type": "callable",
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "cast",
@@ -24441,14 +25142,15 @@
                           "end_lineno": 392,
                           "end_col": 37
                         },
-                        "resolved_type": "JsonVal",
+                        "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "val",
                         "id": "val"
                       }
                     ],
-                    "keywords": []
+                    "keywords": [],
+                    "call_arg_type": "dict[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]"
                   }
                 ],
                 "keywords": []
@@ -24542,17 +25244,32 @@
               "end_lineno": 397,
               "end_col": 7
             },
-            "resolved_type": "JsonVal",
+            "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "val",
             "id": "val",
             "type_expr": {
-              "kind": "NamedType",
-              "name": "JsonVal"
+              "kind": "GenericType",
+              "base": "None | bool | int64 | float64 | str | list",
+              "args": [
+                {
+                  "kind": "UnionType",
+                  "types": [
+                    {
+                      "kind": "NamedType",
+                      "name": "Any]"
+                    },
+                    {
+                      "kind": "NamedType",
+                      "name": "dict[str,Any"
+                    }
+                  ]
+                }
+              ]
             }
           },
-          "annotation": "JsonVal",
+          "annotation": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
           "value": {
             "kind": "Call",
             "source_span": {
@@ -24561,7 +25278,7 @@
               "end_lineno": 397,
               "end_col": 44
             },
-            "resolved_type": "JsonVal",
+            "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "_JsonParser(text).parse()",
@@ -24616,7 +25333,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "text",
-                    "id": "text"
+                    "id": "text",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": []
@@ -24627,14 +25345,44 @@
             "keywords": []
           },
           "declare": true,
-          "decl_type": "JsonVal",
+          "decl_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
           "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "JsonVal"
+            "kind": "GenericType",
+            "base": "None | bool | int64 | float64 | str | list",
+            "args": [
+              {
+                "kind": "UnionType",
+                "types": [
+                  {
+                    "kind": "NamedType",
+                    "name": "Any]"
+                  },
+                  {
+                    "kind": "NamedType",
+                    "name": "dict[str,Any"
+                  }
+                ]
+              }
+            ]
           },
           "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "JsonVal"
+            "kind": "GenericType",
+            "base": "None | bool | int64 | float64 | str | list",
+            "args": [
+              {
+                "kind": "UnionType",
+                "types": [
+                  {
+                    "kind": "NamedType",
+                    "name": "Any]"
+                  },
+                  {
+                    "kind": "NamedType",
+                    "name": "dict[str,Any"
+                  }
+                ]
+              }
+            ]
           }
         },
         {
@@ -24680,11 +25428,12 @@
                   "end_lineno": 398,
                   "end_col": 21
                 },
-                "resolved_type": "JsonVal",
+                "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "val",
-                "id": "val"
+                "id": "val",
+                "call_arg_type": "Obj"
               },
               {
                 "kind": "Name",
@@ -24698,7 +25447,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "list",
-                "id": "list"
+                "id": "list",
+                "call_arg_type": "type"
               }
             ],
             "keywords": [],
@@ -24750,7 +25500,7 @@
                       "end_lineno": 399,
                       "end_col": 38
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "list",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "cast(list, val)",
@@ -24762,7 +25512,7 @@
                         "end_lineno": 399,
                         "end_col": 27
                       },
-                      "resolved_type": "unknown",
+                      "resolved_type": "callable",
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "cast",
@@ -24791,14 +25541,15 @@
                           "end_lineno": 399,
                           "end_col": 37
                         },
-                        "resolved_type": "JsonVal",
+                        "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "val",
                         "id": "val"
                       }
                     ],
-                    "keywords": []
+                    "keywords": [],
+                    "call_arg_type": "list[None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]"
                   }
                 ],
                 "keywords": []
@@ -24939,7 +25690,8 @@
                   "casts": [],
                   "borrow_kind": "readonly_ref",
                   "repr": "parts",
-                  "id": "parts"
+                  "id": "parts",
+                  "call_arg_type": "Obj"
                 }
               ],
               "keywords": [],
@@ -25194,7 +25946,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "parts",
-                    "id": "parts"
+                    "id": "parts",
+                    "call_arg_type": "Obj"
                   }
                 ],
                 "keywords": [],
@@ -25650,7 +26403,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "ch",
-                    "id": "ch"
+                    "id": "ch",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -25789,7 +26543,8 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "'\\\\\"'",
-                        "value": "\\\""
+                        "value": "\\\"",
+                        "call_arg_type": "str"
                       }
                     ],
                     "keywords": [],
@@ -25934,7 +26689,8 @@
                             "casts": [],
                             "borrow_kind": "value",
                             "repr": "\"\\\\\\\\\"",
-                            "value": "\\\\"
+                            "value": "\\\\",
+                            "call_arg_type": "str"
                           }
                         ],
                         "keywords": [],
@@ -26079,7 +26835,8 @@
                                 "casts": [],
                                 "borrow_kind": "value",
                                 "repr": "\"\\\\b\"",
-                                "value": "\\b"
+                                "value": "\\b",
+                                "call_arg_type": "str"
                               }
                             ],
                             "keywords": [],
@@ -26224,7 +26981,8 @@
                                     "casts": [],
                                     "borrow_kind": "value",
                                     "repr": "\"\\\\f\"",
-                                    "value": "\\f"
+                                    "value": "\\f",
+                                    "call_arg_type": "str"
                                   }
                                 ],
                                 "keywords": [],
@@ -26369,7 +27127,8 @@
                                         "casts": [],
                                         "borrow_kind": "value",
                                         "repr": "\"\\\\n\"",
-                                        "value": "\\n"
+                                        "value": "\\n",
+                                        "call_arg_type": "str"
                                       }
                                     ],
                                     "keywords": [],
@@ -26514,7 +27273,8 @@
                                             "casts": [],
                                             "borrow_kind": "value",
                                             "repr": "\"\\\\r\"",
-                                            "value": "\\r"
+                                            "value": "\\r",
+                                            "call_arg_type": "str"
                                           }
                                         ],
                                         "keywords": [],
@@ -26659,7 +27419,8 @@
                                                 "casts": [],
                                                 "borrow_kind": "value",
                                                 "repr": "\"\\\\t\"",
-                                                "value": "\\t"
+                                                "value": "\\t",
+                                                "call_arg_type": "str"
                                               }
                                             ],
                                             "keywords": [],
@@ -26888,11 +27649,13 @@
                                                           "casts": [],
                                                           "borrow_kind": "readonly_ref",
                                                           "repr": "code",
-                                                          "id": "code"
+                                                          "id": "code",
+                                                          "call_arg_type": "int64"
                                                         }
                                                       ],
                                                       "keywords": []
-                                                    }
+                                                    },
+                                                    "call_arg_type": "str"
                                                   }
                                                 ],
                                                 "keywords": [],
@@ -26982,7 +27745,8 @@
                                                     "casts": [],
                                                     "borrow_kind": "readonly_ref",
                                                     "repr": "ch",
-                                                    "id": "ch"
+                                                    "id": "ch",
+                                                    "call_arg_type": "str"
                                                   }
                                                 ],
                                                 "keywords": [],
@@ -27089,7 +27853,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "'\"'",
-                "value": "\""
+                "value": "\"",
+                "call_arg_type": "str"
               }
             ],
             "keywords": [],
@@ -27163,7 +27928,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "out",
-                "id": "out"
+                "id": "out",
+                "call_arg_type": "list[str]"
               },
               {
                 "kind": "Name",
@@ -27177,7 +27943,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "_EMPTY",
-                "id": "_EMPTY"
+                "id": "_EMPTY",
+                "call_arg_type": "str"
               }
             ],
             "keywords": []
@@ -27214,7 +27981,7 @@
       "name": "_dump_json_list",
       "original_name": "_dump_json_list",
       "arg_types": {
-        "values": "list[JsonVal]",
+        "values": "list[None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
         "ensure_ascii": "bool",
         "indent": "int64 | None",
         "item_sep": "str",
@@ -27305,11 +28072,12 @@
                     "end_lineno": 448,
                     "end_col": 17
                   },
-                  "resolved_type": "list[JsonVal]",
+                  "resolved_type": "list[None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
                   "casts": [],
                   "borrow_kind": "readonly_ref",
                   "repr": "values",
-                  "id": "values"
+                  "id": "values",
+                  "call_arg_type": "Obj"
                 }
               ],
               "keywords": [],
@@ -27494,7 +28262,7 @@
                   "end_lineno": 451,
                   "end_col": 30
                 },
-                "resolved_type": "list[unknown]",
+                "resolved_type": "list[str]",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "[]",
@@ -27539,16 +28307,16 @@
                   "end_lineno": 452,
                   "end_col": 13
                 },
-                "resolved_type": "JsonVal",
+                "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "x",
                 "id": "x"
               },
-              "target_type": "JsonVal",
+              "target_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
               "iter_mode": "static_fastpath",
-              "iter_source_type": "list[JsonVal]",
-              "iter_element_type": "JsonVal",
+              "iter_source_type": "list[None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
+              "iter_element_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
               "iter": {
                 "kind": "Name",
                 "source_span": {
@@ -27557,14 +28325,14 @@
                   "end_lineno": 452,
                   "end_col": 23
                 },
-                "resolved_type": "list[JsonVal]",
+                "resolved_type": "list[None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "values",
                 "id": "values",
                 "iterable_trait": "yes",
                 "iter_protocol": "static_range",
-                "iter_element_type": "JsonVal"
+                "iter_element_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]"
               },
               "body": [
                 {
@@ -27629,11 +28397,12 @@
                           "end_lineno": 453,
                           "end_col": 48
                         },
-                        "resolved_type": "JsonVal",
+                        "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "x",
-                        "id": "x"
+                        "id": "x",
+                        "call_arg_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]"
                       },
                       {
                         "kind": "Name",
@@ -27647,7 +28416,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "ensure_ascii",
-                        "id": "ensure_ascii"
+                        "id": "ensure_ascii",
+                        "call_arg_type": "bool"
                       },
                       {
                         "kind": "Name",
@@ -27661,7 +28431,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "indent",
-                        "id": "indent"
+                        "id": "indent",
+                        "call_arg_type": "int64 | None"
                       },
                       {
                         "kind": "Name",
@@ -27675,7 +28446,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "item_sep",
-                        "id": "item_sep"
+                        "id": "item_sep",
+                        "call_arg_type": "str"
                       },
                       {
                         "kind": "Name",
@@ -27689,7 +28461,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "key_sep",
-                        "id": "key_sep"
+                        "id": "key_sep",
+                        "call_arg_type": "str"
                       },
                       {
                         "kind": "Name",
@@ -27703,7 +28476,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "level",
-                        "id": "level"
+                        "id": "level",
+                        "call_arg_type": "int64"
                       }
                     ],
                     "keywords": []
@@ -27780,7 +28554,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "dumped_txt",
-                        "id": "dumped_txt"
+                        "id": "dumped_txt",
+                        "call_arg_type": "str"
                       }
                     ],
                     "keywords": [],
@@ -27896,7 +28671,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "dumped",
-                        "id": "dumped"
+                        "id": "dumped",
+                        "call_arg_type": "list[str]"
                       },
                       {
                         "kind": "Name",
@@ -27910,7 +28686,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "item_sep",
-                        "id": "item_sep"
+                        "id": "item_sep",
+                        "call_arg_type": "str"
                       }
                     ],
                     "keywords": []
@@ -28002,7 +28779,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "indent",
-                "id": "indent"
+                "id": "indent",
+                "call_arg_type": "int64 | None"
               }
             ],
             "keywords": []
@@ -28059,7 +28837,7 @@
               "end_lineno": 457,
               "end_col": 25
             },
-            "resolved_type": "list[unknown]",
+            "resolved_type": "list[str]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "[]",
@@ -28104,16 +28882,16 @@
               "end_lineno": 458,
               "end_col": 9
             },
-            "resolved_type": "JsonVal",
+            "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "x",
             "id": "x"
           },
-          "target_type": "JsonVal",
+          "target_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
           "iter_mode": "static_fastpath",
-          "iter_source_type": "list[JsonVal]",
-          "iter_element_type": "JsonVal",
+          "iter_source_type": "list[None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
+          "iter_element_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
           "iter": {
             "kind": "Name",
             "source_span": {
@@ -28122,14 +28900,14 @@
               "end_lineno": 458,
               "end_col": 19
             },
-            "resolved_type": "list[JsonVal]",
+            "resolved_type": "list[None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
             "casts": [],
             "borrow_kind": "readonly_ref",
             "repr": "values",
             "id": "values",
             "iterable_trait": "yes",
             "iter_protocol": "static_range",
-            "iter_element_type": "JsonVal"
+            "iter_element_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]"
           },
           "body": [
             {
@@ -28330,11 +29108,12 @@
                       "end_lineno": 460,
                       "end_col": 43
                     },
-                    "resolved_type": "JsonVal",
+                    "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "x",
-                    "id": "x"
+                    "id": "x",
+                    "call_arg_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]"
                   },
                   {
                     "kind": "Name",
@@ -28348,7 +29127,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "ensure_ascii",
-                    "id": "ensure_ascii"
+                    "id": "ensure_ascii",
+                    "call_arg_type": "bool"
                   },
                   {
                     "kind": "Name",
@@ -28362,7 +29142,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "indent",
-                    "id": "indent"
+                    "id": "indent",
+                    "call_arg_type": "int64 | None"
                   },
                   {
                     "kind": "Name",
@@ -28376,7 +29157,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "item_sep",
-                    "id": "item_sep"
+                    "id": "item_sep",
+                    "call_arg_type": "str"
                   },
                   {
                     "kind": "Name",
@@ -28390,7 +29172,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "key_sep",
-                    "id": "key_sep"
+                    "id": "key_sep",
+                    "call_arg_type": "str"
                   },
                   {
                     "kind": "BinOp",
@@ -28432,7 +29215,8 @@
                       "borrow_kind": "value",
                       "repr": "1",
                       "value": 1
-                    }
+                    },
+                    "call_arg_type": "int64"
                   }
                 ],
                 "keywords": []
@@ -28537,7 +29321,8 @@
                       "borrow_kind": "readonly_ref",
                       "repr": "value_txt",
                       "id": "value_txt"
-                    }
+                    },
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -28677,7 +29462,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "inner",
-                        "id": "inner"
+                        "id": "inner",
+                        "call_arg_type": "list[str]"
                       },
                       {
                         "kind": "Name",
@@ -28691,7 +29477,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "_COMMA_NL",
-                        "id": "_COMMA_NL"
+                        "id": "_COMMA_NL",
+                        "call_arg_type": "str"
                       }
                     ],
                     "keywords": []
@@ -28811,8 +29598,23 @@
           "base": "list",
           "args": [
             {
-              "kind": "NamedType",
-              "name": "JsonVal"
+              "kind": "GenericType",
+              "base": "None | bool | int64 | float64 | str | list",
+              "args": [
+                {
+                  "kind": "UnionType",
+                  "types": [
+                    {
+                      "kind": "NamedType",
+                      "name": "Any]"
+                    },
+                    {
+                      "kind": "NamedType",
+                      "name": "dict[str,Any"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -28858,7 +29660,7 @@
       "name": "_dump_json_dict",
       "original_name": "_dump_json_dict",
       "arg_types": {
-        "values": "dict[str,JsonVal]",
+        "values": "dict[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
         "ensure_ascii": "bool",
         "indent": "int64 | None",
         "item_sep": "str",
@@ -28949,11 +29751,12 @@
                     "end_lineno": 448,
                     "end_col": 17
                   },
-                  "resolved_type": "dict[str,JsonVal]",
+                  "resolved_type": "dict[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
                   "casts": [],
                   "borrow_kind": "readonly_ref",
                   "repr": "values",
-                  "id": "values"
+                  "id": "values",
+                  "call_arg_type": "Obj"
                 }
               ],
               "keywords": [],
@@ -29138,7 +29941,7 @@
                   "end_lineno": 476,
                   "end_col": 29
                 },
-                "resolved_type": "list[unknown]",
+                "resolved_type": "list[str]",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "[]",
@@ -29183,7 +29986,7 @@
                   "end_lineno": 477,
                   "end_col": 16
                 },
-                "resolved_type": "tuple[str,JsonVal]",
+                "resolved_type": "tuple[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "k, x",
@@ -29210,7 +30013,7 @@
                       "end_lineno": 477,
                       "end_col": 16
                     },
-                    "resolved_type": "JsonVal",
+                    "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "x",
@@ -29218,10 +30021,10 @@
                   }
                 ]
               },
-              "target_type": "tuple[str,JsonVal]",
+              "target_type": "tuple[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
               "iter_mode": "static_fastpath",
-              "iter_source_type": "list[tuple[str,JsonVal]]",
-              "iter_element_type": "tuple[str,JsonVal]",
+              "iter_source_type": "list[tuple[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]]",
+              "iter_element_type": "tuple[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
               "iter": {
                 "kind": "Call",
                 "source_span": {
@@ -29230,7 +30033,7 @@
                   "end_lineno": 477,
                   "end_col": 34
                 },
-                "resolved_type": "list[tuple[str,JsonVal]]",
+                "resolved_type": "list[tuple[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]]",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "values.items()",
@@ -29254,7 +30057,7 @@
                       "end_lineno": 477,
                       "end_col": 26
                     },
-                    "resolved_type": "dict[str,JsonVal]",
+                    "resolved_type": "dict[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "values",
@@ -29279,7 +30082,7 @@
                     "end_lineno": 477,
                     "end_col": 26
                   },
-                  "resolved_type": "dict[str,JsonVal]",
+                  "resolved_type": "dict[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
                   "casts": [],
                   "borrow_kind": "readonly_ref",
                   "repr": "values",
@@ -29287,7 +30090,7 @@
                 },
                 "iterable_trait": "yes",
                 "iter_protocol": "static_range",
-                "iter_element_type": "tuple[str,JsonVal]"
+                "iter_element_type": "tuple[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]"
               },
               "body": [
                 {
@@ -29383,7 +30186,8 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "k",
-                            "id": "k"
+                            "id": "k",
+                            "call_arg_type": "Obj"
                           }
                         ],
                         "keywords": [],
@@ -29393,7 +30197,8 @@
                         "runtime_module_id": "pytra.core.py_runtime",
                         "runtime_symbol": "str",
                         "runtime_call_adapter_kind": "builtin",
-                        "semantic_tag": "cast.str"
+                        "semantic_tag": "cast.str",
+                        "call_arg_type": "str"
                       },
                       {
                         "kind": "Name",
@@ -29407,7 +30212,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "ensure_ascii",
-                        "id": "ensure_ascii"
+                        "id": "ensure_ascii",
+                        "call_arg_type": "bool"
                       }
                     ],
                     "keywords": []
@@ -29485,11 +30291,12 @@
                           "end_lineno": 479,
                           "end_col": 43
                         },
-                        "resolved_type": "JsonVal",
+                        "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "x",
-                        "id": "x"
+                        "id": "x",
+                        "call_arg_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]"
                       },
                       {
                         "kind": "Name",
@@ -29503,7 +30310,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "ensure_ascii",
-                        "id": "ensure_ascii"
+                        "id": "ensure_ascii",
+                        "call_arg_type": "bool"
                       },
                       {
                         "kind": "Name",
@@ -29517,7 +30325,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "indent",
-                        "id": "indent"
+                        "id": "indent",
+                        "call_arg_type": "int64 | None"
                       },
                       {
                         "kind": "Name",
@@ -29531,7 +30340,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "item_sep",
-                        "id": "item_sep"
+                        "id": "item_sep",
+                        "call_arg_type": "str"
                       },
                       {
                         "kind": "Name",
@@ -29545,7 +30355,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "key_sep",
-                        "id": "key_sep"
+                        "id": "key_sep",
+                        "call_arg_type": "str"
                       },
                       {
                         "kind": "Name",
@@ -29559,7 +30370,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "level",
-                        "id": "level"
+                        "id": "level",
+                        "call_arg_type": "int64"
                       }
                     ],
                     "keywords": []
@@ -29692,7 +30504,8 @@
                           "borrow_kind": "readonly_ref",
                           "repr": "v_txt",
                           "id": "v_txt"
-                        }
+                        },
+                        "call_arg_type": "str"
                       }
                     ],
                     "keywords": [],
@@ -29808,7 +30621,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "parts",
-                        "id": "parts"
+                        "id": "parts",
+                        "call_arg_type": "list[str]"
                       },
                       {
                         "kind": "Name",
@@ -29822,7 +30636,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "item_sep",
-                        "id": "item_sep"
+                        "id": "item_sep",
+                        "call_arg_type": "str"
                       }
                     ],
                     "keywords": []
@@ -29914,7 +30729,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "indent",
-                "id": "indent"
+                "id": "indent",
+                "call_arg_type": "int64 | None"
               }
             ],
             "keywords": []
@@ -29971,7 +30787,7 @@
               "end_lineno": 483,
               "end_col": 25
             },
-            "resolved_type": "list[unknown]",
+            "resolved_type": "list[str]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "[]",
@@ -30016,7 +30832,7 @@
               "end_lineno": 484,
               "end_col": 12
             },
-            "resolved_type": "tuple[str,JsonVal]",
+            "resolved_type": "tuple[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "k, x",
@@ -30043,7 +30859,7 @@
                   "end_lineno": 484,
                   "end_col": 12
                 },
-                "resolved_type": "JsonVal",
+                "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "x",
@@ -30051,10 +30867,10 @@
               }
             ]
           },
-          "target_type": "tuple[str,JsonVal]",
+          "target_type": "tuple[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
           "iter_mode": "static_fastpath",
-          "iter_source_type": "list[tuple[str,JsonVal]]",
-          "iter_element_type": "tuple[str,JsonVal]",
+          "iter_source_type": "list[tuple[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]]",
+          "iter_element_type": "tuple[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
           "iter": {
             "kind": "Call",
             "source_span": {
@@ -30063,7 +30879,7 @@
               "end_lineno": 484,
               "end_col": 30
             },
-            "resolved_type": "list[tuple[str,JsonVal]]",
+            "resolved_type": "list[tuple[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "values.items()",
@@ -30087,7 +30903,7 @@
                   "end_lineno": 484,
                   "end_col": 22
                 },
-                "resolved_type": "dict[str,JsonVal]",
+                "resolved_type": "dict[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "values",
@@ -30112,7 +30928,7 @@
                 "end_lineno": 484,
                 "end_col": 22
               },
-              "resolved_type": "dict[str,JsonVal]",
+              "resolved_type": "dict[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]",
               "casts": [],
               "borrow_kind": "readonly_ref",
               "repr": "values",
@@ -30120,7 +30936,7 @@
             },
             "iterable_trait": "yes",
             "iter_protocol": "static_range",
-            "iter_element_type": "tuple[str,JsonVal]"
+            "iter_element_type": "tuple[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]"
           },
           "body": [
             {
@@ -30352,7 +31168,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "k",
-                        "id": "k"
+                        "id": "k",
+                        "call_arg_type": "Obj"
                       }
                     ],
                     "keywords": [],
@@ -30362,7 +31179,8 @@
                     "runtime_module_id": "pytra.core.py_runtime",
                     "runtime_symbol": "str",
                     "runtime_call_adapter_kind": "builtin",
-                    "semantic_tag": "cast.str"
+                    "semantic_tag": "cast.str",
+                    "call_arg_type": "str"
                   },
                   {
                     "kind": "Name",
@@ -30376,7 +31194,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "ensure_ascii",
-                    "id": "ensure_ascii"
+                    "id": "ensure_ascii",
+                    "call_arg_type": "bool"
                   }
                 ],
                 "keywords": []
@@ -30454,11 +31273,12 @@
                       "end_lineno": 487,
                       "end_col": 39
                     },
-                    "resolved_type": "JsonVal",
+                    "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "x",
-                    "id": "x"
+                    "id": "x",
+                    "call_arg_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]"
                   },
                   {
                     "kind": "Name",
@@ -30472,7 +31292,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "ensure_ascii",
-                    "id": "ensure_ascii"
+                    "id": "ensure_ascii",
+                    "call_arg_type": "bool"
                   },
                   {
                     "kind": "Name",
@@ -30486,7 +31307,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "indent",
-                    "id": "indent"
+                    "id": "indent",
+                    "call_arg_type": "int64 | None"
                   },
                   {
                     "kind": "Name",
@@ -30500,7 +31322,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "item_sep",
-                    "id": "item_sep"
+                    "id": "item_sep",
+                    "call_arg_type": "str"
                   },
                   {
                     "kind": "Name",
@@ -30514,7 +31337,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "key_sep",
-                    "id": "key_sep"
+                    "id": "key_sep",
+                    "call_arg_type": "str"
                   },
                   {
                     "kind": "BinOp",
@@ -30556,7 +31380,8 @@
                       "borrow_kind": "value",
                       "repr": "1",
                       "value": 1
-                    }
+                    },
+                    "call_arg_type": "int64"
                   }
                 ],
                 "keywords": []
@@ -30717,7 +31542,8 @@
                       "borrow_kind": "readonly_ref",
                       "repr": "v_txt",
                       "id": "v_txt"
-                    }
+                    },
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -30857,7 +31683,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "inner",
-                        "id": "inner"
+                        "id": "inner",
+                        "call_arg_type": "list[str]"
                       },
                       {
                         "kind": "Name",
@@ -30871,7 +31698,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "_COMMA_NL",
-                        "id": "_COMMA_NL"
+                        "id": "_COMMA_NL",
+                        "call_arg_type": "str"
                       }
                     ],
                     "keywords": []
@@ -30995,8 +31823,23 @@
               "name": "str"
             },
             {
-              "kind": "NamedType",
-              "name": "JsonVal"
+              "kind": "GenericType",
+              "base": "None | bool | int64 | float64 | str | list",
+              "args": [
+                {
+                  "kind": "UnionType",
+                  "types": [
+                    {
+                      "kind": "NamedType",
+                      "name": "Any]"
+                    },
+                    {
+                      "kind": "NamedType",
+                      "name": "dict[str,Any"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -31042,7 +31885,7 @@
       "name": "_dump_json_value",
       "original_name": "_dump_json_value",
       "arg_types": {
-        "v": "JsonVal",
+        "v": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
         "ensure_ascii": "bool",
         "indent": "int64 | None",
         "item_sep": "str",
@@ -31106,7 +31949,7 @@
                 "end_lineno": 500,
                 "end_col": 8
               },
-              "resolved_type": "JsonVal",
+              "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
               "casts": [],
               "borrow_kind": "readonly_ref",
               "repr": "v",
@@ -31232,11 +32075,12 @@
                   "end_lineno": 502,
                   "end_col": 19
                 },
-                "resolved_type": "JsonVal",
+                "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "v",
-                "id": "v"
+                "id": "v",
+                "call_arg_type": "Obj"
               },
               {
                 "kind": "Name",
@@ -31246,11 +32090,12 @@
                   "end_lineno": 502,
                   "end_col": 25
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "type",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "bool",
-                "id": "bool"
+                "id": "bool",
+                "call_arg_type": "type"
               }
             ],
             "keywords": [],
@@ -31294,7 +32139,7 @@
                   "end_lineno": 503,
                   "end_col": 35
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "cast(bool, v)",
@@ -31306,7 +32151,7 @@
                     "end_lineno": 503,
                     "end_col": 26
                   },
-                  "resolved_type": "unknown",
+                  "resolved_type": "callable",
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "cast",
@@ -31321,7 +32166,7 @@
                       "end_lineno": 503,
                       "end_col": 31
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "type",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "bool",
@@ -31335,7 +32180,7 @@
                       "end_lineno": 503,
                       "end_col": 34
                     },
-                    "resolved_type": "JsonVal",
+                    "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "v",
@@ -31473,11 +32318,12 @@
                   "end_lineno": 507,
                   "end_col": 19
                 },
-                "resolved_type": "JsonVal",
+                "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "v",
-                "id": "v"
+                "id": "v",
+                "call_arg_type": "Obj"
               },
               {
                 "kind": "Name",
@@ -31487,11 +32333,12 @@
                   "end_lineno": 507,
                   "end_col": 24
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "type",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "int",
-                "id": "int"
+                "id": "int",
+                "call_arg_type": "type"
               }
             ],
             "keywords": [],
@@ -31543,7 +32390,7 @@
                       "end_lineno": 508,
                       "end_col": 31
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "int64",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "cast(int, v)",
@@ -31555,7 +32402,7 @@
                         "end_lineno": 508,
                         "end_col": 23
                       },
-                      "resolved_type": "unknown",
+                      "resolved_type": "callable",
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "cast",
@@ -31570,7 +32417,7 @@
                           "end_lineno": 508,
                           "end_col": 27
                         },
-                        "resolved_type": "unknown",
+                        "resolved_type": "type",
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "int",
@@ -31584,14 +32431,15 @@
                           "end_lineno": 508,
                           "end_col": 30
                         },
-                        "resolved_type": "JsonVal",
+                        "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "v",
                         "id": "v"
                       }
                     ],
-                    "keywords": []
+                    "keywords": [],
+                    "call_arg_type": "Obj"
                   }
                 ],
                 "keywords": [],
@@ -31650,11 +32498,12 @@
                   "end_lineno": 509,
                   "end_col": 19
                 },
-                "resolved_type": "JsonVal",
+                "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "v",
-                "id": "v"
+                "id": "v",
+                "call_arg_type": "Obj"
               },
               {
                 "kind": "Name",
@@ -31664,11 +32513,12 @@
                   "end_lineno": 509,
                   "end_col": 26
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "type",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "float",
-                "id": "float"
+                "id": "float",
+                "call_arg_type": "type"
               }
             ],
             "keywords": [],
@@ -31720,7 +32570,7 @@
                       "end_lineno": 510,
                       "end_col": 33
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "float64",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "cast(float, v)",
@@ -31732,7 +32582,7 @@
                         "end_lineno": 510,
                         "end_col": 23
                       },
-                      "resolved_type": "unknown",
+                      "resolved_type": "callable",
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "cast",
@@ -31747,7 +32597,7 @@
                           "end_lineno": 510,
                           "end_col": 29
                         },
-                        "resolved_type": "unknown",
+                        "resolved_type": "type",
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "float",
@@ -31761,14 +32611,15 @@
                           "end_lineno": 510,
                           "end_col": 32
                         },
-                        "resolved_type": "JsonVal",
+                        "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "v",
                         "id": "v"
                       }
                     ],
-                    "keywords": []
+                    "keywords": [],
+                    "call_arg_type": "Obj"
                   }
                 ],
                 "keywords": [],
@@ -31827,11 +32678,12 @@
                   "end_lineno": 511,
                   "end_col": 19
                 },
-                "resolved_type": "JsonVal",
+                "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "v",
-                "id": "v"
+                "id": "v",
+                "call_arg_type": "Obj"
               },
               {
                 "kind": "Name",
@@ -31845,7 +32697,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "str",
-                "id": "str"
+                "id": "str",
+                "call_arg_type": "type"
               }
             ],
             "keywords": [],
@@ -31897,7 +32750,7 @@
                       "end_lineno": 512,
                       "end_col": 39
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "str",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "cast(str, v)",
@@ -31909,7 +32762,7 @@
                         "end_lineno": 512,
                         "end_col": 31
                       },
-                      "resolved_type": "unknown",
+                      "resolved_type": "callable",
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "cast",
@@ -31938,14 +32791,15 @@
                           "end_lineno": 512,
                           "end_col": 38
                         },
-                        "resolved_type": "JsonVal",
+                        "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "v",
                         "id": "v"
                       }
                     ],
-                    "keywords": []
+                    "keywords": [],
+                    "call_arg_type": "str"
                   },
                   {
                     "kind": "Name",
@@ -31959,7 +32813,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "ensure_ascii",
-                    "id": "ensure_ascii"
+                    "id": "ensure_ascii",
+                    "call_arg_type": "bool"
                   }
                 ],
                 "keywords": []
@@ -32011,11 +32866,12 @@
                   "end_lineno": 513,
                   "end_col": 19
                 },
-                "resolved_type": "JsonVal",
+                "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "v",
-                "id": "v"
+                "id": "v",
+                "call_arg_type": "Obj"
               },
               {
                 "kind": "Name",
@@ -32029,7 +32885,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "list",
-                "id": "list"
+                "id": "list",
+                "call_arg_type": "type"
               }
             ],
             "keywords": [],
@@ -32081,7 +32938,7 @@
                       "end_lineno": 514,
                       "end_col": 44
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "list",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "cast(list, v)",
@@ -32093,7 +32950,7 @@
                         "end_lineno": 514,
                         "end_col": 35
                       },
-                      "resolved_type": "unknown",
+                      "resolved_type": "callable",
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "cast",
@@ -32122,14 +32979,15 @@
                           "end_lineno": 514,
                           "end_col": 43
                         },
-                        "resolved_type": "JsonVal",
+                        "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "v",
                         "id": "v"
                       }
                     ],
-                    "keywords": []
+                    "keywords": [],
+                    "call_arg_type": "list[None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]"
                   },
                   {
                     "kind": "Name",
@@ -32143,7 +33001,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "ensure_ascii",
-                    "id": "ensure_ascii"
+                    "id": "ensure_ascii",
+                    "call_arg_type": "bool"
                   },
                   {
                     "kind": "Name",
@@ -32157,7 +33016,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "indent",
-                    "id": "indent"
+                    "id": "indent",
+                    "call_arg_type": "int64 | None"
                   },
                   {
                     "kind": "Name",
@@ -32171,7 +33031,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "item_sep",
-                    "id": "item_sep"
+                    "id": "item_sep",
+                    "call_arg_type": "str"
                   },
                   {
                     "kind": "Name",
@@ -32185,7 +33046,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "key_sep",
-                    "id": "key_sep"
+                    "id": "key_sep",
+                    "call_arg_type": "str"
                   },
                   {
                     "kind": "Name",
@@ -32199,7 +33061,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "level",
-                    "id": "level"
+                    "id": "level",
+                    "call_arg_type": "int64"
                   }
                 ],
                 "keywords": []
@@ -32251,11 +33114,12 @@
                   "end_lineno": 515,
                   "end_col": 19
                 },
-                "resolved_type": "JsonVal",
+                "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "v",
-                "id": "v"
+                "id": "v",
+                "call_arg_type": "Obj"
               },
               {
                 "kind": "Name",
@@ -32269,7 +33133,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "dict",
-                "id": "dict"
+                "id": "dict",
+                "call_arg_type": "type"
               }
             ],
             "keywords": [],
@@ -32321,7 +33186,7 @@
                       "end_lineno": 516,
                       "end_col": 44
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "dict",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "cast(dict, v)",
@@ -32333,7 +33198,7 @@
                         "end_lineno": 516,
                         "end_col": 35
                       },
-                      "resolved_type": "unknown",
+                      "resolved_type": "callable",
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "cast",
@@ -32362,14 +33227,15 @@
                           "end_lineno": 516,
                           "end_col": 43
                         },
-                        "resolved_type": "JsonVal",
+                        "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "v",
                         "id": "v"
                       }
                     ],
-                    "keywords": []
+                    "keywords": [],
+                    "call_arg_type": "dict[str,None | bool | int64 | float64 | str | list[Any] | dict[str,Any]]"
                   },
                   {
                     "kind": "Name",
@@ -32383,7 +33249,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "ensure_ascii",
-                    "id": "ensure_ascii"
+                    "id": "ensure_ascii",
+                    "call_arg_type": "bool"
                   },
                   {
                     "kind": "Name",
@@ -32397,7 +33264,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "indent",
-                    "id": "indent"
+                    "id": "indent",
+                    "call_arg_type": "int64 | None"
                   },
                   {
                     "kind": "Name",
@@ -32411,7 +33279,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "item_sep",
-                    "id": "item_sep"
+                    "id": "item_sep",
+                    "call_arg_type": "str"
                   },
                   {
                     "kind": "Name",
@@ -32425,7 +33294,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "key_sep",
-                    "id": "key_sep"
+                    "id": "key_sep",
+                    "call_arg_type": "str"
                   },
                   {
                     "kind": "Name",
@@ -32439,7 +33309,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "level",
-                    "id": "level"
+                    "id": "level",
+                    "call_arg_type": "int64"
                   }
                 ],
                 "keywords": []
@@ -32514,8 +33385,23 @@
       "yield_value_type": "unknown",
       "arg_type_exprs": {
         "v": {
-          "kind": "NamedType",
-          "name": "JsonVal"
+          "kind": "GenericType",
+          "base": "None | bool | int64 | float64 | str | list",
+          "args": [
+            {
+              "kind": "UnionType",
+              "types": [
+                {
+                  "kind": "NamedType",
+                  "name": "Any]"
+                },
+                {
+                  "kind": "NamedType",
+                  "name": "dict[str,Any"
+                }
+              ]
+            }
+          ]
         },
         "ensure_ascii": {
           "kind": "NamedType",
@@ -32559,7 +33445,7 @@
       "name": "dumps",
       "original_name": "dumps",
       "arg_types": {
-        "obj": "JsonVal",
+        "obj": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
         "ensure_ascii": "bool",
         "indent": "int64 | None",
         "separators": "tuple[str,str] | None"
@@ -32977,11 +33863,12 @@
                   "end_lineno": 531,
                   "end_col": 31
                 },
-                "resolved_type": "JsonVal",
+                "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "obj",
-                "id": "obj"
+                "id": "obj",
+                "call_arg_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]"
               },
               {
                 "kind": "Name",
@@ -32995,7 +33882,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "ensure_ascii",
-                "id": "ensure_ascii"
+                "id": "ensure_ascii",
+                "call_arg_type": "bool"
               },
               {
                 "kind": "Name",
@@ -33009,7 +33897,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "indent",
-                "id": "indent"
+                "id": "indent",
+                "call_arg_type": "int64 | None"
               },
               {
                 "kind": "Name",
@@ -33023,7 +33912,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "item_sep",
-                "id": "item_sep"
+                "id": "item_sep",
+                "call_arg_type": "str"
               },
               {
                 "kind": "Name",
@@ -33037,7 +33927,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "key_sep",
-                "id": "key_sep"
+                "id": "key_sep",
+                "call_arg_type": "str"
               },
               {
                 "kind": "Constant",
@@ -33051,7 +33942,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "0",
-                "value": 0
+                "value": 0,
+                "call_arg_type": "int64"
               }
             ],
             "keywords": []
@@ -33062,8 +33954,23 @@
       "yield_value_type": "unknown",
       "arg_type_exprs": {
         "obj": {
-          "kind": "NamedType",
-          "name": "JsonVal"
+          "kind": "GenericType",
+          "base": "None | bool | int64 | float64 | str | list",
+          "args": [
+            {
+              "kind": "UnionType",
+              "types": [
+                {
+                  "kind": "NamedType",
+                  "name": "Any]"
+                },
+                {
+                  "kind": "NamedType",
+                  "name": "dict[str,Any"
+                }
+              ]
+            }
+          ]
         },
         "ensure_ascii": {
           "kind": "NamedType",
@@ -33112,7 +34019,7 @@
       "name": "dumps_jv",
       "original_name": "dumps_jv",
       "arg_types": {
-        "jv": "JsonVal",
+        "jv": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
         "ensure_ascii": "bool",
         "indent": "int64 | None",
         "separators": "tuple[str,str] | None"
@@ -33530,11 +34437,12 @@
                   "end_lineno": 545,
                   "end_col": 30
                 },
-                "resolved_type": "JsonVal",
+                "resolved_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]",
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "jv",
-                "id": "jv"
+                "id": "jv",
+                "call_arg_type": "None | bool | int64 | float64 | str | list[Any] | dict[str,Any]"
               },
               {
                 "kind": "Name",
@@ -33548,7 +34456,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "ensure_ascii",
-                "id": "ensure_ascii"
+                "id": "ensure_ascii",
+                "call_arg_type": "bool"
               },
               {
                 "kind": "Name",
@@ -33562,7 +34471,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "indent",
-                "id": "indent"
+                "id": "indent",
+                "call_arg_type": "int64 | None"
               },
               {
                 "kind": "Name",
@@ -33576,7 +34486,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "item_sep",
-                "id": "item_sep"
+                "id": "item_sep",
+                "call_arg_type": "str"
               },
               {
                 "kind": "Name",
@@ -33590,7 +34501,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "key_sep",
-                "id": "key_sep"
+                "id": "key_sep",
+                "call_arg_type": "str"
               },
               {
                 "kind": "Constant",
@@ -33604,7 +34516,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "0",
-                "value": 0
+                "value": 0,
+                "call_arg_type": "int64"
               }
             ],
             "keywords": []
@@ -33615,8 +34528,23 @@
       "yield_value_type": "unknown",
       "arg_type_exprs": {
         "jv": {
-          "kind": "NamedType",
-          "name": "JsonVal"
+          "kind": "GenericType",
+          "base": "None | bool | int64 | float64 | str | list",
+          "args": [
+            {
+              "kind": "UnionType",
+              "types": [
+                {
+                  "kind": "NamedType",
+                  "name": "Any]"
+                },
+                {
+                  "kind": "NamedType",
+                  "name": "dict[str,Any"
+                }
+              ]
+            }
+          ]
         },
         "ensure_ascii": {
           "kind": "NamedType",
@@ -33662,6 +34590,19 @@
     "import_resolution": {
       "schema_version": 1,
       "bindings": [
+        {
+          "module_id": "pytra.typing",
+          "export_name": "cast",
+          "local_name": "cast",
+          "binding_kind": "symbol",
+          "source_file": "src/pytra/std/json.py",
+          "source_line": 5,
+          "source_module_id": "pytra.typing",
+          "source_export_name": "cast",
+          "source_binding_kind": "symbol",
+          "runtime_module_id": "pytra.typing",
+          "runtime_group": ""
+        },
         {
           "module_id": "pytra.types",
           "export_name": "int64",
@@ -33720,6 +34661,11 @@
       ],
       "qualified_refs": [
         {
+          "module_id": "pytra.typing",
+          "symbol": "cast",
+          "local_name": "cast"
+        },
+        {
           "module_id": "pytra.types",
           "symbol": "int64",
           "local_name": "int64"
@@ -33732,6 +34678,14 @@
       ]
     },
     "import_bindings": [
+      {
+        "module_id": "pytra.typing",
+        "export_name": "cast",
+        "local_name": "cast",
+        "binding_kind": "symbol",
+        "source_file": "src/pytra/std/json.py",
+        "source_line": 5
+      },
       {
         "module_id": "pytra.types",
         "export_name": "int64",
@@ -33767,6 +34721,11 @@
     ],
     "qualified_symbol_refs": [
       {
+        "module_id": "pytra.typing",
+        "symbol": "cast",
+        "local_name": "cast"
+      },
+      {
         "module_id": "pytra.types",
         "symbol": "int64",
         "local_name": "int64"
@@ -33779,6 +34738,10 @@
     ],
     "import_modules": {},
     "import_symbols": {
+      "cast": {
+        "module": "pytra.typing",
+        "name": "cast"
+      },
       "int64": {
         "module": "pytra.types",
         "name": "int64"

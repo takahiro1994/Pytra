@@ -106,7 +106,7 @@
               "end_lineno": 6,
               "end_col": 27
             },
-            "resolved_type": "list[unknown]",
+            "resolved_type": "list[bool]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "[]",
@@ -229,7 +229,7 @@
               "end_lineno": 9,
               "end_col": 15
             },
-            "resolved_type": "unknown",
+            "resolved_type": "None",
             "casts": [],
             "borrow_kind": "value",
             "repr": "d.append(1)",
@@ -241,7 +241,7 @@
                 "end_lineno": 9,
                 "end_col": 12
               },
-              "resolved_type": "unknown",
+              "resolved_type": "callable",
               "casts": [],
               "borrow_kind": "value",
               "repr": "d.append",
@@ -274,7 +274,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "1",
-                "value": 1
+                "value": 1,
+                "call_arg_type": "int64"
               }
             ],
             "keywords": []
@@ -296,7 +297,7 @@
               "end_lineno": 10,
               "end_col": 15
             },
-            "resolved_type": "unknown",
+            "resolved_type": "None",
             "casts": [],
             "borrow_kind": "value",
             "repr": "d.append(2)",
@@ -308,7 +309,7 @@
                 "end_lineno": 10,
                 "end_col": 12
               },
-              "resolved_type": "unknown",
+              "resolved_type": "callable",
               "casts": [],
               "borrow_kind": "value",
               "repr": "d.append",
@@ -341,7 +342,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "2",
-                "value": 2
+                "value": 2,
+                "call_arg_type": "int64"
               }
             ],
             "keywords": []
@@ -363,7 +365,7 @@
               "end_lineno": 11,
               "end_col": 15
             },
-            "resolved_type": "unknown",
+            "resolved_type": "None",
             "casts": [],
             "borrow_kind": "value",
             "repr": "d.append(3)",
@@ -375,7 +377,7 @@
                 "end_lineno": 11,
                 "end_col": 12
               },
-              "resolved_type": "unknown",
+              "resolved_type": "callable",
               "casts": [],
               "borrow_kind": "value",
               "repr": "d.append",
@@ -408,7 +410,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "3",
-                "value": 3
+                "value": 3,
+                "call_arg_type": "int64"
               }
             ],
             "keywords": []
@@ -471,7 +474,7 @@
                   "end_lineno": 12,
                   "end_col": 61
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(len(d), 3, \"len_after_append\")",
@@ -529,7 +532,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "d",
-                        "id": "d"
+                        "id": "d",
+                        "call_arg_type": "Obj"
                       }
                     ],
                     "keywords": [],
@@ -539,7 +543,8 @@
                     "runtime_module_id": "pytra.core.py_runtime",
                     "runtime_symbol": "len",
                     "runtime_call_adapter_kind": "builtin",
-                    "semantic_tag": "core.len"
+                    "semantic_tag": "core.len",
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -553,7 +558,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "3",
-                    "value": 3
+                    "value": 3,
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -567,7 +573,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"len_after_append\"",
-                    "value": "len_after_append"
+                    "value": "len_after_append",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -575,7 +582,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -659,7 +667,7 @@
                   "end_lineno": 14,
                   "end_col": 63
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(d.popleft(), 1, \"popleft_first\")",
@@ -686,7 +694,7 @@
                       "end_lineno": 14,
                       "end_col": 42
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "int64",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "d.popleft()",
@@ -698,7 +706,7 @@
                         "end_lineno": 14,
                         "end_col": 40
                       },
-                      "resolved_type": "unknown",
+                      "resolved_type": "callable",
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "d.popleft",
@@ -719,7 +727,8 @@
                       "attr": "popleft"
                     },
                     "args": [],
-                    "keywords": []
+                    "keywords": [],
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -733,7 +742,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "1",
-                    "value": 1
+                    "value": 1,
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -747,7 +757,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"popleft_first\"",
-                    "value": "popleft_first"
+                    "value": "popleft_first",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -755,7 +766,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -845,7 +857,7 @@
                   "end_lineno": 15,
                   "end_col": 64
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(d.popleft(), 2, \"popleft_second\")",
@@ -872,7 +884,7 @@
                       "end_lineno": 15,
                       "end_col": 42
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "int64",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "d.popleft()",
@@ -884,7 +896,7 @@
                         "end_lineno": 15,
                         "end_col": 40
                       },
-                      "resolved_type": "unknown",
+                      "resolved_type": "callable",
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "d.popleft",
@@ -905,7 +917,8 @@
                       "attr": "popleft"
                     },
                     "args": [],
-                    "keywords": []
+                    "keywords": [],
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -919,7 +932,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "2",
-                    "value": 2
+                    "value": 2,
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -933,7 +947,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"popleft_second\"",
-                    "value": "popleft_second"
+                    "value": "popleft_second",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -941,7 +956,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -1025,7 +1041,7 @@
                   "end_lineno": 16,
                   "end_col": 62
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(len(d), 1, \"len_after_popleft\")",
@@ -1083,7 +1099,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "d",
-                        "id": "d"
+                        "id": "d",
+                        "call_arg_type": "Obj"
                       }
                     ],
                     "keywords": [],
@@ -1093,7 +1110,8 @@
                     "runtime_module_id": "pytra.core.py_runtime",
                     "runtime_symbol": "len",
                     "runtime_call_adapter_kind": "builtin",
-                    "semantic_tag": "core.len"
+                    "semantic_tag": "core.len",
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1107,7 +1125,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "1",
-                    "value": 1
+                    "value": 1,
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1121,7 +1140,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"len_after_popleft\"",
-                    "value": "len_after_popleft"
+                    "value": "len_after_popleft",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -1129,7 +1149,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -1213,7 +1234,7 @@
                   "end_lineno": 18,
                   "end_col": 54
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(d.pop(), 3, \"pop_last\")",
@@ -1240,7 +1261,7 @@
                       "end_lineno": 18,
                       "end_col": 38
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "int64",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "d.pop()",
@@ -1252,7 +1273,7 @@
                         "end_lineno": 18,
                         "end_col": 36
                       },
-                      "resolved_type": "unknown",
+                      "resolved_type": "callable",
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "d.pop",
@@ -1273,7 +1294,8 @@
                       "attr": "pop"
                     },
                     "args": [],
-                    "keywords": []
+                    "keywords": [],
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1287,7 +1309,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "3",
-                    "value": 3
+                    "value": 3,
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1301,7 +1324,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"pop_last\"",
-                    "value": "pop_last"
+                    "value": "pop_last",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -1309,7 +1333,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -1399,7 +1424,7 @@
                   "end_lineno": 19,
                   "end_col": 58
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(len(d), 0, \"len_after_pop\")",
@@ -1457,7 +1482,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "d",
-                        "id": "d"
+                        "id": "d",
+                        "call_arg_type": "Obj"
                       }
                     ],
                     "keywords": [],
@@ -1467,7 +1493,8 @@
                     "runtime_module_id": "pytra.core.py_runtime",
                     "runtime_symbol": "len",
                     "runtime_call_adapter_kind": "builtin",
-                    "semantic_tag": "core.len"
+                    "semantic_tag": "core.len",
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1481,7 +1508,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "0",
-                    "value": 0
+                    "value": 0,
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1495,7 +1523,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"len_after_pop\"",
-                    "value": "len_after_pop"
+                    "value": "len_after_pop",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -1503,7 +1532,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -1546,7 +1576,7 @@
               "end_lineno": 21,
               "end_col": 20
             },
-            "resolved_type": "unknown",
+            "resolved_type": "None",
             "casts": [],
             "borrow_kind": "value",
             "repr": "d.appendleft(10)",
@@ -1558,7 +1588,7 @@
                 "end_lineno": 21,
                 "end_col": 16
               },
-              "resolved_type": "unknown",
+              "resolved_type": "callable",
               "casts": [],
               "borrow_kind": "value",
               "repr": "d.appendleft",
@@ -1591,7 +1621,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "10",
-                "value": 10
+                "value": 10,
+                "call_arg_type": "int64"
               }
             ],
             "keywords": []
@@ -1619,7 +1650,7 @@
               "end_lineno": 22,
               "end_col": 20
             },
-            "resolved_type": "unknown",
+            "resolved_type": "None",
             "casts": [],
             "borrow_kind": "value",
             "repr": "d.appendleft(20)",
@@ -1631,7 +1662,7 @@
                 "end_lineno": 22,
                 "end_col": 16
               },
-              "resolved_type": "unknown",
+              "resolved_type": "callable",
               "casts": [],
               "borrow_kind": "value",
               "repr": "d.appendleft",
@@ -1664,7 +1695,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "20",
-                "value": 20
+                "value": 20,
+                "call_arg_type": "int64"
               }
             ],
             "keywords": []
@@ -1686,7 +1718,7 @@
               "end_lineno": 23,
               "end_col": 16
             },
-            "resolved_type": "unknown",
+            "resolved_type": "None",
             "casts": [],
             "borrow_kind": "value",
             "repr": "d.append(30)",
@@ -1698,7 +1730,7 @@
                 "end_lineno": 23,
                 "end_col": 12
               },
-              "resolved_type": "unknown",
+              "resolved_type": "callable",
               "casts": [],
               "borrow_kind": "value",
               "repr": "d.append",
@@ -1731,7 +1763,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "30",
-                "value": 30
+                "value": 30,
+                "call_arg_type": "int64"
               }
             ],
             "keywords": []
@@ -1794,7 +1827,7 @@
                   "end_lineno": 24,
                   "end_col": 67
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(d.popleft(), 20, \"appendleft_order\")",
@@ -1821,7 +1854,7 @@
                       "end_lineno": 24,
                       "end_col": 42
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "int64",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "d.popleft()",
@@ -1833,7 +1866,7 @@
                         "end_lineno": 24,
                         "end_col": 40
                       },
-                      "resolved_type": "unknown",
+                      "resolved_type": "callable",
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "d.popleft",
@@ -1854,7 +1887,8 @@
                       "attr": "popleft"
                     },
                     "args": [],
-                    "keywords": []
+                    "keywords": [],
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1868,7 +1902,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "20",
-                    "value": 20
+                    "value": 20,
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1882,7 +1917,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"appendleft_order\"",
-                    "value": "appendleft_order"
+                    "value": "appendleft_order",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -1890,7 +1926,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -1974,7 +2011,7 @@
                   "end_lineno": 25,
                   "end_col": 69
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(d.popleft(), 10, \"appendleft_order_2\")",
@@ -2001,7 +2038,7 @@
                       "end_lineno": 25,
                       "end_col": 42
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "int64",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "d.popleft()",
@@ -2013,7 +2050,7 @@
                         "end_lineno": 25,
                         "end_col": 40
                       },
-                      "resolved_type": "unknown",
+                      "resolved_type": "callable",
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "d.popleft",
@@ -2034,7 +2071,8 @@
                       "attr": "popleft"
                     },
                     "args": [],
-                    "keywords": []
+                    "keywords": [],
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -2048,7 +2086,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "10",
-                    "value": 10
+                    "value": 10,
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -2062,7 +2101,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"appendleft_order_2\"",
-                    "value": "appendleft_order_2"
+                    "value": "appendleft_order_2",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -2070,7 +2110,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -2154,7 +2195,7 @@
                   "end_lineno": 26,
                   "end_col": 74
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(d.popleft(), 30, \"append_after_appendleft\")",
@@ -2181,7 +2222,7 @@
                       "end_lineno": 26,
                       "end_col": 42
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "int64",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "d.popleft()",
@@ -2193,7 +2234,7 @@
                         "end_lineno": 26,
                         "end_col": 40
                       },
-                      "resolved_type": "unknown",
+                      "resolved_type": "callable",
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "d.popleft",
@@ -2214,7 +2255,8 @@
                       "attr": "popleft"
                     },
                     "args": [],
-                    "keywords": []
+                    "keywords": [],
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -2228,7 +2270,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "30",
-                    "value": 30
+                    "value": 30,
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -2242,7 +2285,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"append_after_appendleft\"",
-                    "value": "append_after_appendleft"
+                    "value": "append_after_appendleft",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -2250,7 +2294,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -2293,7 +2338,7 @@
               "end_lineno": 28,
               "end_col": 15
             },
-            "resolved_type": "unknown",
+            "resolved_type": "None",
             "casts": [],
             "borrow_kind": "value",
             "repr": "d.append(1)",
@@ -2305,7 +2350,7 @@
                 "end_lineno": 28,
                 "end_col": 12
               },
-              "resolved_type": "unknown",
+              "resolved_type": "callable",
               "casts": [],
               "borrow_kind": "value",
               "repr": "d.append",
@@ -2338,7 +2383,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "1",
-                "value": 1
+                "value": 1,
+                "call_arg_type": "int64"
               }
             ],
             "keywords": []
@@ -2366,7 +2412,7 @@
               "end_lineno": 29,
               "end_col": 15
             },
-            "resolved_type": "unknown",
+            "resolved_type": "None",
             "casts": [],
             "borrow_kind": "value",
             "repr": "d.append(2)",
@@ -2378,7 +2424,7 @@
                 "end_lineno": 29,
                 "end_col": 12
               },
-              "resolved_type": "unknown",
+              "resolved_type": "callable",
               "casts": [],
               "borrow_kind": "value",
               "repr": "d.append",
@@ -2411,7 +2457,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "2",
-                "value": 2
+                "value": 2,
+                "call_arg_type": "int64"
               }
             ],
             "keywords": []
@@ -2433,7 +2480,7 @@
               "end_lineno": 30,
               "end_col": 13
             },
-            "resolved_type": "unknown",
+            "resolved_type": "None",
             "casts": [],
             "borrow_kind": "value",
             "repr": "d.clear()",
@@ -2445,7 +2492,7 @@
                 "end_lineno": 30,
                 "end_col": 11
               },
-              "resolved_type": "unknown",
+              "resolved_type": "callable",
               "casts": [],
               "borrow_kind": "value",
               "repr": "d.clear",
@@ -2526,7 +2573,7 @@
                   "end_lineno": 31,
                   "end_col": 50
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(len(d), 0, \"clear\")",
@@ -2584,7 +2631,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "d",
-                        "id": "d"
+                        "id": "d",
+                        "call_arg_type": "Obj"
                       }
                     ],
                     "keywords": [],
@@ -2594,7 +2642,8 @@
                     "runtime_module_id": "pytra.core.py_runtime",
                     "runtime_symbol": "len",
                     "runtime_call_adapter_kind": "builtin",
-                    "semantic_tag": "core.len"
+                    "semantic_tag": "core.len",
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -2608,7 +2657,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "0",
-                    "value": 0
+                    "value": 0,
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -2622,7 +2672,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"clear\"",
-                    "value": "clear"
+                    "value": "clear",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -2630,7 +2681,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -2673,7 +2725,7 @@
               "end_lineno": 33,
               "end_col": 47
             },
-            "resolved_type": "unknown",
+            "resolved_type": "bool",
             "casts": [],
             "borrow_kind": "value",
             "repr": "py_assert_all(checks, \"deque_basic\")",
@@ -2704,7 +2756,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "checks",
-                "id": "checks"
+                "id": "checks",
+                "call_arg_type": "list[bool]"
               },
               {
                 "kind": "Constant",
@@ -2718,7 +2771,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "\"deque_basic\"",
-                "value": "deque_basic"
+                "value": "deque_basic",
+                "call_arg_type": "str"
               }
             ],
             "keywords": [],

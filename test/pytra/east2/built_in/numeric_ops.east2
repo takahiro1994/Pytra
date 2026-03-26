@@ -138,7 +138,8 @@
                   "casts": [],
                   "borrow_kind": "readonly_ref",
                   "repr": "values",
-                  "id": "values"
+                  "id": "values",
+                  "call_arg_type": "Obj"
                 }
               ],
               "keywords": [],
@@ -420,7 +421,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "values",
-                "id": "values"
+                "id": "values",
+                "call_arg_type": "Obj"
               }
             ],
             "keywords": [],

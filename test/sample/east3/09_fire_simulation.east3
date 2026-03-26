@@ -1719,7 +1719,8 @@
                       "borrow_kind": "readonly_ref",
                       "repr": "w",
                       "id": "w"
-                    }
+                    },
+                    "call_arg_type": "list[int64]"
                   }
                 ],
                 "resolved_type": "None"
@@ -1795,7 +1796,13 @@
             "casts": [],
             "borrow_kind": "value",
             "repr": "[]",
-            "elements": []
+            "elements": [],
+            "type_expr_summary_v1": {
+              "schema_version": 1,
+              "kind": "GenericType",
+              "category": "static",
+              "mirror": "list[bytes]"
+            }
           },
           "type_expr_summary_v1": {
             "schema_version": 1,
@@ -4113,6 +4120,7 @@
                       }
                     ],
                     "keywords": [],
+                    "call_arg_type": "bytes",
                     "type_expr_summary_v1": {
                       "schema_version": 1,
                       "kind": "NamedType",
@@ -4182,7 +4190,7 @@
               "end_lineno": 65,
               "end_col_offset": 72
             },
-            "resolved_type": "unknown",
+            "resolved_type": "None",
             "casts": [],
             "borrow_kind": "value",
             "repr": "save_gif(out_path, w, h, frames, fire_palette(), delay_cs=4, loop=0)",
@@ -4213,7 +4221,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "out_path",
-                "id": "out_path"
+                "id": "out_path",
+                "call_arg_type": "str"
               },
               {
                 "kind": "Name",
@@ -4227,7 +4236,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "w",
-                "id": "w"
+                "id": "w",
+                "call_arg_type": "int64"
               },
               {
                 "kind": "Name",
@@ -4241,7 +4251,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "h",
-                "id": "h"
+                "id": "h",
+                "call_arg_type": "int64"
               },
               {
                 "kind": "Name",
@@ -4255,7 +4266,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "frames",
-                "id": "frames"
+                "id": "frames",
+                "call_arg_type": "list[bytes]"
               },
               {
                 "kind": "Call",
@@ -4285,6 +4297,7 @@
                 },
                 "args": [],
                 "keywords": [],
+                "call_arg_type": "bytes",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -4308,7 +4321,8 @@
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "4",
-                  "value": 4
+                  "value": 4,
+                  "call_arg_type": "int64"
                 }
               },
               {
@@ -4325,7 +4339,8 @@
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "0",
-                  "value": 0
+                  "value": 0,
+                  "call_arg_type": "int64"
                 }
               }
             ],
@@ -4336,10 +4351,9 @@
             "runtime_call_adapter_kind": "image.save_gif.keyword_defaults",
             "type_expr_summary_v1": {
               "schema_version": 1,
-              "kind": "DynamicType",
-              "category": "dynamic",
-              "mirror": "unknown",
-              "dynamic_name": "unknown"
+              "kind": "NamedType",
+              "category": "static",
+              "mirror": "None"
             }
           }
         },

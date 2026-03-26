@@ -193,7 +193,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "21",
-                "value": 21
+                "value": 21,
+                "call_arg_type": "int64"
               }
             ],
             "keywords": []

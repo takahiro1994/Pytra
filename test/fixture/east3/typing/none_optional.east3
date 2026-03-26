@@ -265,7 +265,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "True",
-                "value": true
+                "value": true,
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -370,7 +371,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "False",
-                "value": false
+                "value": false,
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -500,7 +502,13 @@
                   "value": 10
                 }
               }
-            ]
+            ],
+            "type_expr_summary_v1": {
+              "schema_version": 1,
+              "kind": "GenericType",
+              "category": "static",
+              "mirror": "dict[str,int64]"
+            }
           },
           "type_expr_summary_v1": {
             "schema_version": 1,
@@ -556,30 +564,76 @@
             }
           },
           "value": {
-            "kind": "Call",
-            "source_span": {
-              "lineno": 15,
-              "col_offset": 21,
-              "end_lineno": 15,
-              "end_col_offset": 31
-            },
-            "resolved_type": "int64",
-            "casts": [],
+            "kind": "Unbox",
+            "resolved_type": "int64 | None",
             "borrow_kind": "value",
-            "repr": "d.get(\"x\")",
-            "func": {
-              "kind": "Attribute",
+            "casts": [],
+            "value": {
+              "kind": "Call",
               "source_span": {
                 "lineno": 15,
                 "col_offset": 21,
                 "end_lineno": 15,
-                "end_col_offset": 26
+                "end_col_offset": 31
               },
-              "resolved_type": "callable",
+              "resolved_type": "int64",
               "casts": [],
               "borrow_kind": "value",
-              "repr": "d.get",
-              "value": {
+              "repr": "d.get(\"x\")",
+              "func": {
+                "kind": "Attribute",
+                "source_span": {
+                  "lineno": 15,
+                  "col_offset": 21,
+                  "end_lineno": 15,
+                  "end_col_offset": 26
+                },
+                "resolved_type": "callable",
+                "casts": [],
+                "borrow_kind": "value",
+                "repr": "d.get",
+                "value": {
+                  "kind": "Name",
+                  "source_span": {
+                    "lineno": 15,
+                    "col_offset": 21,
+                    "end_lineno": 15,
+                    "end_col_offset": 22
+                  },
+                  "resolved_type": "dict[str,int64]",
+                  "casts": [],
+                  "borrow_kind": "readonly_ref",
+                  "repr": "d",
+                  "id": "d"
+                },
+                "attr": "get"
+              },
+              "args": [
+                {
+                  "kind": "Constant",
+                  "source_span": {
+                    "lineno": 15,
+                    "col_offset": 27,
+                    "end_lineno": 15,
+                    "end_col_offset": 30
+                  },
+                  "resolved_type": "str",
+                  "casts": [],
+                  "borrow_kind": "value",
+                  "repr": "\"x\"",
+                  "value": "x",
+                  "call_arg_type": "str"
+                }
+              ],
+              "keywords": [],
+              "lowered_kind": "BuiltinCall",
+              "builtin_name": "get",
+              "runtime_call": "dict.get",
+              "runtime_module_id": "pytra.core.dict",
+              "runtime_symbol": "dict.get",
+              "runtime_call_adapter_kind": "builtin",
+              "semantic_tag": "stdlib.method.get",
+              "runtime_owner": {
                 "kind": "Name",
                 "source_span": {
                   "lineno": 15,
@@ -593,52 +647,45 @@
                 "repr": "d",
                 "id": "d"
               },
-              "attr": "get"
-            },
-            "args": [
-              {
-                "kind": "Constant",
-                "source_span": {
-                  "lineno": 15,
-                  "col_offset": 27,
-                  "end_lineno": 15,
-                  "end_col_offset": 30
-                },
-                "resolved_type": "str",
-                "casts": [],
-                "borrow_kind": "value",
-                "repr": "\"x\"",
-                "value": "x"
+              "yields_dynamic": true,
+              "type_expr_summary_v1": {
+                "schema_version": 1,
+                "kind": "NamedType",
+                "category": "static",
+                "mirror": "int64"
               }
-            ],
-            "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "get",
-            "runtime_call": "dict.get",
-            "runtime_module_id": "pytra.core.dict",
-            "runtime_symbol": "dict.get",
-            "runtime_call_adapter_kind": "builtin",
-            "semantic_tag": "stdlib.method.get",
-            "runtime_owner": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 15,
-                "col_offset": 21,
-                "end_lineno": 15,
-                "end_col_offset": 22
-              },
-              "resolved_type": "dict[str,int64]",
-              "casts": [],
-              "borrow_kind": "readonly_ref",
-              "repr": "d",
-              "id": "d"
             },
-            "yields_dynamic": true,
+            "source_span": {
+              "lineno": 15,
+              "col_offset": 21,
+              "end_lineno": 15,
+              "end_col_offset": 31
+            },
+            "repr": "d.get(\"x\")",
             "type_expr_summary_v1": {
               "schema_version": 1,
-              "kind": "NamedType",
-              "category": "static",
-              "mirror": "int64"
+              "kind": "OptionalType",
+              "category": "optional",
+              "mirror": "int64 | None",
+              "inner_category": "static"
+            },
+            "target": "int64 | None",
+            "on_fail": "raise",
+            "bridge_lane_v1": {
+              "schema_version": 1,
+              "target": {
+                "kind": "OptionalType",
+                "category": "optional",
+                "mirror": "int64 | None",
+                "inner_category": "static"
+              },
+              "target_category": "optional",
+              "value": {
+                "kind": "unknown",
+                "category": "unknown",
+                "mirror": "unknown"
+              },
+              "value_category": "unknown"
             }
           },
           "type_expr_summary_v1": {
@@ -696,30 +743,76 @@
             }
           },
           "value": {
-            "kind": "Call",
-            "source_span": {
-              "lineno": 16,
-              "col_offset": 21,
-              "end_lineno": 16,
-              "end_col_offset": 31
-            },
-            "resolved_type": "int64",
-            "casts": [],
+            "kind": "Unbox",
+            "resolved_type": "int64 | None",
             "borrow_kind": "value",
-            "repr": "d.get(\"y\")",
-            "func": {
-              "kind": "Attribute",
+            "casts": [],
+            "value": {
+              "kind": "Call",
               "source_span": {
                 "lineno": 16,
                 "col_offset": 21,
                 "end_lineno": 16,
-                "end_col_offset": 26
+                "end_col_offset": 31
               },
-              "resolved_type": "callable",
+              "resolved_type": "int64",
               "casts": [],
               "borrow_kind": "value",
-              "repr": "d.get",
-              "value": {
+              "repr": "d.get(\"y\")",
+              "func": {
+                "kind": "Attribute",
+                "source_span": {
+                  "lineno": 16,
+                  "col_offset": 21,
+                  "end_lineno": 16,
+                  "end_col_offset": 26
+                },
+                "resolved_type": "callable",
+                "casts": [],
+                "borrow_kind": "value",
+                "repr": "d.get",
+                "value": {
+                  "kind": "Name",
+                  "source_span": {
+                    "lineno": 16,
+                    "col_offset": 21,
+                    "end_lineno": 16,
+                    "end_col_offset": 22
+                  },
+                  "resolved_type": "dict[str,int64]",
+                  "casts": [],
+                  "borrow_kind": "readonly_ref",
+                  "repr": "d",
+                  "id": "d"
+                },
+                "attr": "get"
+              },
+              "args": [
+                {
+                  "kind": "Constant",
+                  "source_span": {
+                    "lineno": 16,
+                    "col_offset": 27,
+                    "end_lineno": 16,
+                    "end_col_offset": 30
+                  },
+                  "resolved_type": "str",
+                  "casts": [],
+                  "borrow_kind": "value",
+                  "repr": "\"y\"",
+                  "value": "y",
+                  "call_arg_type": "str"
+                }
+              ],
+              "keywords": [],
+              "lowered_kind": "BuiltinCall",
+              "builtin_name": "get",
+              "runtime_call": "dict.get",
+              "runtime_module_id": "pytra.core.dict",
+              "runtime_symbol": "dict.get",
+              "runtime_call_adapter_kind": "builtin",
+              "semantic_tag": "stdlib.method.get",
+              "runtime_owner": {
                 "kind": "Name",
                 "source_span": {
                   "lineno": 16,
@@ -733,52 +826,45 @@
                 "repr": "d",
                 "id": "d"
               },
-              "attr": "get"
-            },
-            "args": [
-              {
-                "kind": "Constant",
-                "source_span": {
-                  "lineno": 16,
-                  "col_offset": 27,
-                  "end_lineno": 16,
-                  "end_col_offset": 30
-                },
-                "resolved_type": "str",
-                "casts": [],
-                "borrow_kind": "value",
-                "repr": "\"y\"",
-                "value": "y"
+              "yields_dynamic": true,
+              "type_expr_summary_v1": {
+                "schema_version": 1,
+                "kind": "NamedType",
+                "category": "static",
+                "mirror": "int64"
               }
-            ],
-            "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "get",
-            "runtime_call": "dict.get",
-            "runtime_module_id": "pytra.core.dict",
-            "runtime_symbol": "dict.get",
-            "runtime_call_adapter_kind": "builtin",
-            "semantic_tag": "stdlib.method.get",
-            "runtime_owner": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 16,
-                "col_offset": 21,
-                "end_lineno": 16,
-                "end_col_offset": 22
-              },
-              "resolved_type": "dict[str,int64]",
-              "casts": [],
-              "borrow_kind": "readonly_ref",
-              "repr": "d",
-              "id": "d"
             },
-            "yields_dynamic": true,
+            "source_span": {
+              "lineno": 16,
+              "col_offset": 21,
+              "end_lineno": 16,
+              "end_col_offset": 31
+            },
+            "repr": "d.get(\"y\")",
             "type_expr_summary_v1": {
               "schema_version": 1,
-              "kind": "NamedType",
-              "category": "static",
-              "mirror": "int64"
+              "kind": "OptionalType",
+              "category": "optional",
+              "mirror": "int64 | None",
+              "inner_category": "static"
+            },
+            "target": "int64 | None",
+            "on_fail": "raise",
+            "bridge_lane_v1": {
+              "schema_version": 1,
+              "target": {
+                "kind": "OptionalType",
+                "category": "optional",
+                "mirror": "int64 | None",
+                "inner_category": "static"
+              },
+              "target_category": "optional",
+              "value": {
+                "kind": "unknown",
+                "category": "unknown",
+                "mirror": "unknown"
+              },
+              "value_category": "unknown"
             }
           },
           "type_expr_summary_v1": {
@@ -856,7 +942,13 @@
             "casts": [],
             "borrow_kind": "value",
             "repr": "[]",
-            "elements": []
+            "elements": [],
+            "type_expr_summary_v1": {
+              "schema_version": 1,
+              "kind": "GenericType",
+              "category": "static",
+              "mirror": "list[bool]"
+            }
           },
           "type_expr_summary_v1": {
             "schema_version": 1,
@@ -922,7 +1014,7 @@
                   "end_lineno": 18,
                   "end_col_offset": 42
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(a, 42, \"a\")",
@@ -942,32 +1034,107 @@
                 },
                 "args": [
                   {
-                    "kind": "Name",
+                    "kind": "Box",
+                    "resolved_type": "object",
+                    "borrow_kind": "value",
+                    "casts": [],
+                    "value": {
+                      "kind": "Name",
+                      "source_span": {
+                        "lineno": 18,
+                        "col_offset": 31,
+                        "end_lineno": 18,
+                        "end_col_offset": 32
+                      },
+                      "resolved_type": "int64 | None",
+                      "casts": [],
+                      "borrow_kind": "readonly_ref",
+                      "repr": "a",
+                      "id": "a",
+                      "call_arg_type": "object"
+                    },
                     "source_span": {
                       "lineno": 18,
                       "col_offset": 31,
                       "end_lineno": 18,
                       "end_col_offset": 32
                     },
-                    "resolved_type": "int64 | None",
-                    "casts": [],
-                    "borrow_kind": "readonly_ref",
                     "repr": "a",
-                    "id": "a"
+                    "type_expr_summary_v1": {
+                      "schema_version": 1,
+                      "kind": "DynamicType",
+                      "category": "dynamic",
+                      "mirror": "object",
+                      "dynamic_name": "object"
+                    },
+                    "bridge_lane_v1": {
+                      "schema_version": 1,
+                      "target": {
+                        "kind": "DynamicType",
+                        "category": "dynamic",
+                        "mirror": "object",
+                        "dynamic_name": "object"
+                      },
+                      "target_category": "dynamic",
+                      "value": {
+                        "kind": "OptionalType",
+                        "category": "optional",
+                        "mirror": "int64 | None",
+                        "inner_category": "static"
+                      },
+                      "value_category": "optional"
+                    }
                   },
                   {
-                    "kind": "Constant",
+                    "kind": "Box",
+                    "resolved_type": "object",
+                    "borrow_kind": "value",
+                    "casts": [],
+                    "value": {
+                      "kind": "Constant",
+                      "source_span": {
+                        "lineno": 18,
+                        "col_offset": 34,
+                        "end_lineno": 18,
+                        "end_col_offset": 36
+                      },
+                      "resolved_type": "int64",
+                      "casts": [],
+                      "borrow_kind": "value",
+                      "repr": "42",
+                      "value": 42,
+                      "call_arg_type": "object"
+                    },
                     "source_span": {
                       "lineno": 18,
                       "col_offset": 34,
                       "end_lineno": 18,
                       "end_col_offset": 36
                     },
-                    "resolved_type": "int64",
-                    "casts": [],
-                    "borrow_kind": "value",
                     "repr": "42",
-                    "value": 42
+                    "type_expr_summary_v1": {
+                      "schema_version": 1,
+                      "kind": "DynamicType",
+                      "category": "dynamic",
+                      "mirror": "object",
+                      "dynamic_name": "object"
+                    },
+                    "bridge_lane_v1": {
+                      "schema_version": 1,
+                      "target": {
+                        "kind": "DynamicType",
+                        "category": "dynamic",
+                        "mirror": "object",
+                        "dynamic_name": "object"
+                      },
+                      "target_category": "dynamic",
+                      "value": {
+                        "kind": "NamedType",
+                        "category": "static",
+                        "mirror": "int64"
+                      },
+                      "value_category": "static"
+                    }
                   },
                   {
                     "kind": "Constant",
@@ -981,7 +1148,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"a\"",
-                    "value": "a"
+                    "value": "a",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -990,12 +1158,12 @@
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
                 "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
-                  "kind": "DynamicType",
-                  "category": "dynamic",
-                  "mirror": "unknown",
-                  "dynamic_name": "unknown"
+                  "kind": "NamedType",
+                  "category": "static",
+                  "mirror": "bool"
                 }
               }
             ],
@@ -1086,7 +1254,7 @@
                   "end_lineno": 19,
                   "end_col_offset": 44
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(b, None, \"b\")",
@@ -1106,32 +1274,107 @@
                 },
                 "args": [
                   {
-                    "kind": "Name",
+                    "kind": "Box",
+                    "resolved_type": "object",
+                    "borrow_kind": "value",
+                    "casts": [],
+                    "value": {
+                      "kind": "Name",
+                      "source_span": {
+                        "lineno": 19,
+                        "col_offset": 31,
+                        "end_lineno": 19,
+                        "end_col_offset": 32
+                      },
+                      "resolved_type": "int64 | None",
+                      "casts": [],
+                      "borrow_kind": "readonly_ref",
+                      "repr": "b",
+                      "id": "b",
+                      "call_arg_type": "object"
+                    },
                     "source_span": {
                       "lineno": 19,
                       "col_offset": 31,
                       "end_lineno": 19,
                       "end_col_offset": 32
                     },
-                    "resolved_type": "int64 | None",
-                    "casts": [],
-                    "borrow_kind": "readonly_ref",
                     "repr": "b",
-                    "id": "b"
+                    "type_expr_summary_v1": {
+                      "schema_version": 1,
+                      "kind": "DynamicType",
+                      "category": "dynamic",
+                      "mirror": "object",
+                      "dynamic_name": "object"
+                    },
+                    "bridge_lane_v1": {
+                      "schema_version": 1,
+                      "target": {
+                        "kind": "DynamicType",
+                        "category": "dynamic",
+                        "mirror": "object",
+                        "dynamic_name": "object"
+                      },
+                      "target_category": "dynamic",
+                      "value": {
+                        "kind": "OptionalType",
+                        "category": "optional",
+                        "mirror": "int64 | None",
+                        "inner_category": "static"
+                      },
+                      "value_category": "optional"
+                    }
                   },
                   {
-                    "kind": "Constant",
+                    "kind": "Box",
+                    "resolved_type": "object",
+                    "borrow_kind": "value",
+                    "casts": [],
+                    "value": {
+                      "kind": "Constant",
+                      "source_span": {
+                        "lineno": 19,
+                        "col_offset": 34,
+                        "end_lineno": 19,
+                        "end_col_offset": 38
+                      },
+                      "resolved_type": "None",
+                      "casts": [],
+                      "borrow_kind": "value",
+                      "repr": "None",
+                      "value": null,
+                      "call_arg_type": "object"
+                    },
                     "source_span": {
                       "lineno": 19,
                       "col_offset": 34,
                       "end_lineno": 19,
                       "end_col_offset": 38
                     },
-                    "resolved_type": "None",
-                    "casts": [],
-                    "borrow_kind": "value",
                     "repr": "None",
-                    "value": null
+                    "type_expr_summary_v1": {
+                      "schema_version": 1,
+                      "kind": "DynamicType",
+                      "category": "dynamic",
+                      "mirror": "object",
+                      "dynamic_name": "object"
+                    },
+                    "bridge_lane_v1": {
+                      "schema_version": 1,
+                      "target": {
+                        "kind": "DynamicType",
+                        "category": "dynamic",
+                        "mirror": "object",
+                        "dynamic_name": "object"
+                      },
+                      "target_category": "dynamic",
+                      "value": {
+                        "kind": "NamedType",
+                        "category": "static",
+                        "mirror": "None"
+                      },
+                      "value_category": "static"
+                    }
                   },
                   {
                     "kind": "Constant",
@@ -1145,7 +1388,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"b\"",
-                    "value": "b"
+                    "value": "b",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -1154,12 +1398,12 @@
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
                 "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
-                  "kind": "DynamicType",
-                  "category": "dynamic",
-                  "mirror": "unknown",
-                  "dynamic_name": "unknown"
+                  "kind": "NamedType",
+                  "category": "static",
+                  "mirror": "bool"
                 }
               }
             ],
@@ -1250,7 +1494,7 @@
                   "end_lineno": 20,
                   "end_col_offset": 66
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_true(g1 is not None, \"g1 is not None\")",
@@ -1313,7 +1557,8 @@
                         "repr": "None",
                         "value": null
                       }
-                    ]
+                    ],
+                    "call_arg_type": "bool"
                   },
                   {
                     "kind": "Constant",
@@ -1327,7 +1572,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"g1 is not None\"",
-                    "value": "g1 is not None"
+                    "value": "g1 is not None",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -1336,12 +1582,12 @@
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_true",
                 "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
-                  "kind": "DynamicType",
-                  "category": "dynamic",
-                  "mirror": "unknown",
-                  "dynamic_name": "unknown"
+                  "kind": "NamedType",
+                  "category": "static",
+                  "mirror": "bool"
                 }
               }
             ],
@@ -1432,7 +1678,7 @@
                   "end_lineno": 21,
                   "end_col_offset": 58
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_true(g2 is None, \"g2 is None\")",
@@ -1495,7 +1741,8 @@
                         "repr": "None",
                         "value": null
                       }
-                    ]
+                    ],
+                    "call_arg_type": "bool"
                   },
                   {
                     "kind": "Constant",
@@ -1509,7 +1756,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"g2 is None\"",
-                    "value": "g2 is None"
+                    "value": "g2 is None",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -1518,12 +1766,12 @@
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_true",
                 "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
-                  "kind": "DynamicType",
-                  "category": "dynamic",
-                  "mirror": "unknown",
-                  "dynamic_name": "unknown"
+                  "kind": "NamedType",
+                  "category": "static",
+                  "mirror": "bool"
                 }
               }
             ],
@@ -1573,7 +1821,7 @@
               "end_lineno": 22,
               "end_col_offset": 42
             },
-            "resolved_type": "unknown",
+            "resolved_type": "bool",
             "casts": [],
             "borrow_kind": "value",
             "repr": "py_assert_all(checks, \"case40\")",
@@ -1604,7 +1852,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "checks",
-                "id": "checks"
+                "id": "checks",
+                "call_arg_type": "list[bool]"
               },
               {
                 "kind": "Constant",
@@ -1618,7 +1867,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "\"case40\"",
-                "value": "case40"
+                "value": "case40",
+                "call_arg_type": "str"
               }
             ],
             "keywords": [],
@@ -1629,10 +1879,9 @@
             "runtime_call_adapter_kind": "extern_delegate",
             "type_expr_summary_v1": {
               "schema_version": 1,
-              "kind": "DynamicType",
-              "category": "dynamic",
-              "mirror": "unknown",
-              "dynamic_name": "unknown"
+              "kind": "NamedType",
+              "category": "static",
+              "mirror": "bool"
             }
           }
         }

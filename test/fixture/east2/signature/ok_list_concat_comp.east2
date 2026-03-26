@@ -378,11 +378,12 @@
                         "end_lineno": 8,
                         "end_col": 48
                       },
-                      "resolved_type": "unknown",
+                      "resolved_type": "str",
                       "casts": [],
-                      "borrow_kind": "value",
+                      "borrow_kind": "readonly_ref",
                       "repr": "ch",
-                      "id": "ch"
+                      "id": "ch",
+                      "call_arg_type": "str"
                     }
                   ],
                   "keywords": [],
@@ -418,7 +419,7 @@
                         "end_lineno": 8,
                         "end_col": 56
                       },
-                      "resolved_type": "unknown",
+                      "resolved_type": "str",
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "ch",

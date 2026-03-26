@@ -106,7 +106,7 @@
               "end_lineno": 6,
               "end_col": 27
             },
-            "resolved_type": "list[unknown]",
+            "resolved_type": "list[bool]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "[]",
@@ -181,9 +181,14 @@
               "casts": [],
               "borrow_kind": "value",
               "repr": "sys",
-              "id": "sys"
+              "id": "sys",
+              "runtime_module_id": "pytra.std.sys"
             },
-            "attr": "argv"
+            "attr": "argv",
+            "runtime_module_id": "pytra.std.sys",
+            "runtime_symbol": "argv",
+            "runtime_symbol_dispatch": "value",
+            "semantic_tag": "stdlib.symbol.argv"
           },
           "declare": true,
           "decl_type": "list[str]",
@@ -235,9 +240,14 @@
               "casts": [],
               "borrow_kind": "value",
               "repr": "sys",
-              "id": "sys"
+              "id": "sys",
+              "runtime_module_id": "pytra.std.sys"
             },
-            "attr": "path"
+            "attr": "path",
+            "runtime_module_id": "pytra.std.sys",
+            "runtime_symbol": "path",
+            "runtime_symbol_dispatch": "value",
+            "semantic_tag": "stdlib.symbol.path"
           },
           "declare": true,
           "decl_type": "list[str]",
@@ -287,7 +297,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "sys",
-                "id": "sys"
+                "id": "sys",
+                "runtime_module_id": "pytra.std.sys"
               },
               "attr": "set_argv"
             },
@@ -333,7 +344,8 @@
                     "repr": "\"b\"",
                     "value": "b"
                   }
-                ]
+                ],
+                "call_arg_type": "list[str]"
               }
             ],
             "keywords": [],
@@ -341,7 +353,7 @@
             "resolved_runtime_source": "module_attr",
             "runtime_module_id": "pytra.std.sys",
             "runtime_symbol": "set_argv",
-            "semantic_tag": "stdlib.fn.set_argv"
+            "semantic_tag": "stdlib.method.set_argv"
           }
         },
         {
@@ -388,7 +400,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "sys",
-                "id": "sys"
+                "id": "sys",
+                "runtime_module_id": "pytra.std.sys"
               },
               "attr": "set_path"
             },
@@ -420,7 +433,8 @@
                     "repr": "\"x\"",
                     "value": "x"
                   }
-                ]
+                ],
+                "call_arg_type": "list[str]"
               }
             ],
             "keywords": [],
@@ -428,7 +442,7 @@
             "resolved_runtime_source": "module_attr",
             "runtime_module_id": "pytra.std.sys",
             "runtime_symbol": "set_path",
-            "semantic_tag": "stdlib.fn.set_path"
+            "semantic_tag": "stdlib.method.set_path"
           }
         },
         {
@@ -488,7 +502,7 @@
                   "end_lineno": 11,
                   "end_col": 80
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(isinstance(sys.argv, list), True, \"argv-is-list\")",
@@ -558,9 +572,15 @@
                           "casts": [],
                           "borrow_kind": "value",
                           "repr": "sys",
-                          "id": "sys"
+                          "id": "sys",
+                          "runtime_module_id": "pytra.std.sys"
                         },
-                        "attr": "argv"
+                        "attr": "argv",
+                        "runtime_module_id": "pytra.std.sys",
+                        "runtime_symbol": "argv",
+                        "runtime_symbol_dispatch": "value",
+                        "semantic_tag": "stdlib.symbol.argv",
+                        "call_arg_type": "Obj"
                       },
                       {
                         "kind": "Name",
@@ -574,13 +594,15 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "list",
-                        "id": "list"
+                        "id": "list",
+                        "call_arg_type": "type"
                       }
                     ],
                     "keywords": [],
                     "lowered_kind": "TypePredicateCall",
                     "semantic_tag": "type.isinstance",
-                    "predicate_kind": "isinstance"
+                    "predicate_kind": "isinstance",
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -594,7 +616,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "True",
-                    "value": true
+                    "value": true,
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -608,7 +631,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"argv-is-list\"",
-                    "value": "argv-is-list"
+                    "value": "argv-is-list",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -616,7 +640,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -700,7 +725,7 @@
                   "end_lineno": 12,
                   "end_col": 80
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(isinstance(sys.path, list), True, \"path-is-list\")",
@@ -770,9 +795,15 @@
                           "casts": [],
                           "borrow_kind": "value",
                           "repr": "sys",
-                          "id": "sys"
+                          "id": "sys",
+                          "runtime_module_id": "pytra.std.sys"
                         },
-                        "attr": "path"
+                        "attr": "path",
+                        "runtime_module_id": "pytra.std.sys",
+                        "runtime_symbol": "path",
+                        "runtime_symbol_dispatch": "value",
+                        "semantic_tag": "stdlib.symbol.path",
+                        "call_arg_type": "Obj"
                       },
                       {
                         "kind": "Name",
@@ -786,13 +817,15 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "list",
-                        "id": "list"
+                        "id": "list",
+                        "call_arg_type": "type"
                       }
                     ],
                     "keywords": [],
                     "lowered_kind": "TypePredicateCall",
                     "semantic_tag": "type.isinstance",
-                    "predicate_kind": "isinstance"
+                    "predicate_kind": "isinstance",
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -806,7 +839,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "True",
-                    "value": true
+                    "value": true,
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -820,7 +854,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"path-is-list\"",
-                    "value": "path-is-list"
+                    "value": "path-is-list",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -828,7 +863,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -912,7 +948,7 @@
                   "end_lineno": 13,
                   "end_col": 57
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(sys.argv[0], \"a\", \"argv0\")",
@@ -967,9 +1003,14 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "sys",
-                        "id": "sys"
+                        "id": "sys",
+                        "runtime_module_id": "pytra.std.sys"
                       },
-                      "attr": "argv"
+                      "attr": "argv",
+                      "runtime_module_id": "pytra.std.sys",
+                      "runtime_symbol": "argv",
+                      "runtime_symbol_dispatch": "value",
+                      "semantic_tag": "stdlib.symbol.argv"
                     },
                     "slice": {
                       "kind": "Constant",
@@ -984,7 +1025,8 @@
                       "borrow_kind": "value",
                       "repr": "0",
                       "value": 0
-                    }
+                    },
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -998,7 +1040,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"a\"",
-                    "value": "a"
+                    "value": "a",
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1012,7 +1055,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"argv0\"",
-                    "value": "argv0"
+                    "value": "argv0",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -1020,7 +1064,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -1104,7 +1149,7 @@
                   "end_lineno": 14,
                   "end_col": 57
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(sys.path[0], \"x\", \"path0\")",
@@ -1159,9 +1204,14 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "sys",
-                        "id": "sys"
+                        "id": "sys",
+                        "runtime_module_id": "pytra.std.sys"
                       },
-                      "attr": "path"
+                      "attr": "path",
+                      "runtime_module_id": "pytra.std.sys",
+                      "runtime_symbol": "path",
+                      "runtime_symbol_dispatch": "value",
+                      "semantic_tag": "stdlib.symbol.path"
                     },
                     "slice": {
                       "kind": "Constant",
@@ -1176,7 +1226,8 @@
                       "borrow_kind": "value",
                       "repr": "0",
                       "value": 0
-                    }
+                    },
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1190,7 +1241,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"x\"",
-                    "value": "x"
+                    "value": "x",
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1204,7 +1256,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"path0\"",
-                    "value": "path0"
+                    "value": "path0",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -1212,7 +1265,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -1283,7 +1337,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "sys",
-                "id": "sys"
+                "id": "sys",
+                "runtime_module_id": "pytra.std.sys"
               },
               "attr": "set_argv"
             },
@@ -1300,7 +1355,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "old_argv",
-                "id": "old_argv"
+                "id": "old_argv",
+                "call_arg_type": "list[str]"
               }
             ],
             "keywords": [],
@@ -1308,7 +1364,7 @@
             "resolved_runtime_source": "module_attr",
             "runtime_module_id": "pytra.std.sys",
             "runtime_symbol": "set_argv",
-            "semantic_tag": "stdlib.fn.set_argv"
+            "semantic_tag": "stdlib.method.set_argv"
           }
         },
         {
@@ -1355,7 +1411,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "sys",
-                "id": "sys"
+                "id": "sys",
+                "runtime_module_id": "pytra.std.sys"
               },
               "attr": "set_path"
             },
@@ -1372,7 +1429,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "old_path",
-                "id": "old_path"
+                "id": "old_path",
+                "call_arg_type": "list[str]"
               }
             ],
             "keywords": [],
@@ -1380,7 +1438,7 @@
             "resolved_runtime_source": "module_attr",
             "runtime_module_id": "pytra.std.sys",
             "runtime_symbol": "set_path",
-            "semantic_tag": "stdlib.fn.set_path"
+            "semantic_tag": "stdlib.method.set_path"
           }
         },
         {
@@ -1399,7 +1457,7 @@
               "end_lineno": 17,
               "end_col": 48
             },
-            "resolved_type": "unknown",
+            "resolved_type": "bool",
             "casts": [],
             "borrow_kind": "value",
             "repr": "py_assert_all(checks, \"sys_extended\")",
@@ -1430,7 +1488,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "checks",
-                "id": "checks"
+                "id": "checks",
+                "call_arg_type": "list[bool]"
               },
               {
                 "kind": "Constant",
@@ -1444,7 +1503,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "\"sys_extended\"",
-                "value": "sys_extended"
+                "value": "sys_extended",
+                "call_arg_type": "str"
               }
             ],
             "keywords": [],

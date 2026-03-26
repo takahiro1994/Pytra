@@ -138,7 +138,7 @@
                 "kind": "arg",
                 "arg": "x",
                 "annotation": null,
-                "resolved_type": "unknown"
+                "resolved_type": "int64"
               }
             ],
             "body": {
@@ -161,9 +161,9 @@
                   "end_lineno": 8,
                   "end_col": 26
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "int64",
                 "casts": [],
-                "borrow_kind": "value",
+                "borrow_kind": "readonly_ref",
                 "repr": "x",
                 "id": "x"
               },
@@ -183,11 +183,17 @@
                 "id": "base"
               }
             },
-            "return_type": "unknown",
-            "resolved_type": "callable[unknown]"
+            "return_type": "int64",
+            "arg_order": [
+              "x"
+            ],
+            "arg_types": {
+              "x": "int64"
+            },
+            "resolved_type": "callable[[int64],int64]"
           },
           "declare": true,
-          "decl_type": "callable[unknown]",
+          "decl_type": "callable[[int64],int64]",
           "declare_init": true
         },
         {
@@ -238,11 +244,13 @@
               "repr": "True",
               "value": true
             },
-            "return_type": "unknown",
-            "resolved_type": "callable[unknown]"
+            "return_type": "bool",
+            "arg_order": [],
+            "arg_types": {},
+            "resolved_type": "callable[[],bool]"
           },
           "declare": true,
-          "decl_type": "callable[unknown]",
+          "decl_type": "callable[[],bool]",
           "declare_init": true
         },
         {
@@ -283,7 +291,7 @@
                 "kind": "arg",
                 "arg": "x",
                 "annotation": null,
-                "resolved_type": "unknown"
+                "resolved_type": "int64"
               }
             ],
             "body": {
@@ -306,9 +314,9 @@
                   "end_lineno": 10,
                   "end_col": 29
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "int64",
                 "casts": [],
-                "borrow_kind": "value",
+                "borrow_kind": "readonly_ref",
                 "repr": "x",
                 "id": "x"
               },
@@ -332,11 +340,17 @@
                 }
               ]
             },
-            "return_type": "unknown",
-            "resolved_type": "callable[unknown]"
+            "return_type": "bool",
+            "arg_order": [
+              "x"
+            ],
+            "arg_types": {
+              "x": "int64"
+            },
+            "resolved_type": "callable[[int64],bool]"
           },
           "declare": true,
-          "decl_type": "callable[unknown]",
+          "decl_type": "callable[[int64],bool]",
           "declare_init": true
         },
         {
@@ -374,7 +388,7 @@
               "end_lineno": 12,
               "end_col": 24
             },
-            "resolved_type": "unknown",
+            "resolved_type": "int64",
             "casts": [],
             "borrow_kind": "value",
             "repr": "add_base(5)",
@@ -386,7 +400,7 @@
                 "end_lineno": 12,
                 "end_col": 21
               },
-              "resolved_type": "unknown",
+              "resolved_type": "callable[[int64],int64]",
               "casts": [],
               "borrow_kind": "value",
               "repr": "add_base",
@@ -462,7 +476,7 @@
               "end_lineno": 13,
               "end_col": 25
             },
-            "resolved_type": "unknown",
+            "resolved_type": "int64",
             "casts": [],
             "borrow_kind": "value",
             "repr": "add_base(-2)",
@@ -474,7 +488,7 @@
                 "end_lineno": 13,
                 "end_col": 21
               },
-              "resolved_type": "unknown",
+              "resolved_type": "callable[[int64],int64]",
               "casts": [],
               "borrow_kind": "value",
               "repr": "add_base",
@@ -558,7 +572,7 @@
               "end_lineno": 14,
               "end_col": 29
             },
-            "resolved_type": "unknown",
+            "resolved_type": "bool",
             "casts": [],
             "borrow_kind": "value",
             "repr": "is_positive(3)",
@@ -570,7 +584,7 @@
                 "end_lineno": 14,
                 "end_col": 26
               },
-              "resolved_type": "unknown",
+              "resolved_type": "callable[[int64],bool]",
               "casts": [],
               "borrow_kind": "value",
               "repr": "is_positive",
@@ -640,7 +654,7 @@
               "end_lineno": 15,
               "end_col": 30
             },
-            "resolved_type": "unknown",
+            "resolved_type": "bool",
             "casts": [],
             "borrow_kind": "value",
             "repr": "is_positive(-1)",
@@ -652,7 +666,7 @@
                 "end_lineno": 15,
                 "end_col": 26
               },
-              "resolved_type": "unknown",
+              "resolved_type": "callable[[int64],bool]",
               "casts": [],
               "borrow_kind": "value",
               "repr": "is_positive",
@@ -742,7 +756,7 @@
               "end_lineno": 17,
               "end_col": 27
             },
-            "resolved_type": "list[unknown]",
+            "resolved_type": "list[bool]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "[]",
@@ -834,7 +848,7 @@
                   "end_lineno": 18,
                   "end_col": 59
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(y, 12, \"lambda add_base(5)\")",
@@ -865,7 +879,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "y",
-                    "id": "y"
+                    "id": "y",
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -879,7 +894,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "12",
-                    "value": 12
+                    "value": 12,
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -893,7 +909,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"lambda add_base(5)\"",
-                    "value": "lambda add_base(5)"
+                    "value": "lambda add_base(5)",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -901,7 +918,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -985,7 +1003,7 @@
                   "end_lineno": 19,
                   "end_col": 59
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(z, 5, \"lambda add_base(-2)\")",
@@ -1016,7 +1034,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "z",
-                    "id": "z"
+                    "id": "z",
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1030,7 +1049,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "5",
-                    "value": 5
+                    "value": 5,
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1044,7 +1064,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"lambda add_base(-2)\"",
-                    "value": "lambda add_base(-2)"
+                    "value": "lambda add_base(-2)",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -1052,7 +1073,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -1136,7 +1158,7 @@
                   "end_lineno": 20,
                   "end_col": 68
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(always_true(), True, \"lambda no-arg\")",
@@ -1163,7 +1185,7 @@
                       "end_lineno": 20,
                       "end_col": 44
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "bool",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "always_true()",
@@ -1175,14 +1197,15 @@
                         "end_lineno": 20,
                         "end_col": 42
                       },
-                      "resolved_type": "unknown",
+                      "resolved_type": "callable[[],bool]",
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "always_true",
                       "id": "always_true"
                     },
                     "args": [],
-                    "keywords": []
+                    "keywords": [],
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1196,7 +1219,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "True",
-                    "value": true
+                    "value": true,
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1210,7 +1234,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"lambda no-arg\"",
-                    "value": "lambda no-arg"
+                    "value": "lambda no-arg",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -1218,7 +1243,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -1302,7 +1328,7 @@
                   "end_lineno": 21,
                   "end_col": 65
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(b1, True, \"lambda is_positive(3)\")",
@@ -1333,7 +1359,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "b1",
-                    "id": "b1"
+                    "id": "b1",
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1347,7 +1374,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "True",
-                    "value": true
+                    "value": true,
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1361,7 +1389,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"lambda is_positive(3)\"",
-                    "value": "lambda is_positive(3)"
+                    "value": "lambda is_positive(3)",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -1369,7 +1398,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -1453,7 +1483,7 @@
                   "end_lineno": 22,
                   "end_col": 67
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(b2, False, \"lambda is_positive(-1)\")",
@@ -1484,7 +1514,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "b2",
-                    "id": "b2"
+                    "id": "b2",
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1498,7 +1529,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "False",
-                    "value": false
+                    "value": false,
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1512,7 +1544,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"lambda is_positive(-1)\"",
-                    "value": "lambda is_positive(-1)"
+                    "value": "lambda is_positive(-1)",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -1520,7 +1553,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -1563,7 +1597,7 @@
               "end_lineno": 23,
               "end_col": 48
             },
-            "resolved_type": "unknown",
+            "resolved_type": "bool",
             "casts": [],
             "borrow_kind": "value",
             "repr": "py_assert_all(checks, \"lambda_basic\")",
@@ -1594,7 +1628,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "checks",
-                "id": "checks"
+                "id": "checks",
+                "call_arg_type": "list[bool]"
               },
               {
                 "kind": "Constant",
@@ -1608,7 +1643,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "\"lambda_basic\"",
-                "value": "lambda_basic"
+                "value": "lambda_basic",
+                "call_arg_type": "str"
               }
             ],
             "keywords": [],

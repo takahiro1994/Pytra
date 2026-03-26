@@ -161,7 +161,8 @@
                   "casts": [],
                   "borrow_kind": "readonly_ref",
                   "repr": "xs",
-                  "id": "xs"
+                  "id": "xs",
+                  "call_arg_type": "Obj"
                 }
               ],
               "keywords": [],
@@ -527,7 +528,8 @@
                         "repr": "4",
                         "value": 4
                       }
-                    ]
+                    ],
+                    "call_arg_type": "list[int64]"
                   }
                 ],
                 "keywords": []

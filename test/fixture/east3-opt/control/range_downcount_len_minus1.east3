@@ -160,7 +160,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "xs",
-                    "id": "xs"
+                    "id": "xs",
+                    "call_arg_type": "Obj"
                   }
                 ],
                 "keywords": [],
@@ -245,7 +246,8 @@
                       "casts": [],
                       "borrow_kind": "readonly_ref",
                       "repr": "xs",
-                      "id": "xs"
+                      "id": "xs",
+                      "call_arg_type": "Obj"
                     }
                   ],
                   "keywords": [],
@@ -1028,7 +1030,14 @@
                         "repr": "4",
                         "value": 4
                       }
-                    ]
+                    ],
+                    "call_arg_type": "list[int64]",
+                    "type_expr_summary_v1": {
+                      "schema_version": 1,
+                      "kind": "GenericType",
+                      "category": "static",
+                      "mirror": "list[int64]"
+                    }
                   }
                 ],
                 "keywords": [],

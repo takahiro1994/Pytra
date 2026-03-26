@@ -174,7 +174,13 @@
             "casts": [],
             "borrow_kind": "value",
             "repr": "[]",
-            "elements": []
+            "elements": [],
+            "type_expr_summary_v1": {
+              "schema_version": 1,
+              "kind": "GenericType",
+              "category": "static",
+              "mirror": "list[tuple[A,B]]"
+            }
           },
           "type_expr_summary_v1": {
             "schema_version": 1,
@@ -338,7 +344,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "lhs",
-                "id": "lhs"
+                "id": "lhs",
+                "call_arg_type": "Obj"
               }
             ],
             "keywords": [],
@@ -448,7 +455,8 @@
                   "casts": [],
                   "borrow_kind": "readonly_ref",
                   "repr": "rhs",
-                  "id": "rhs"
+                  "id": "rhs",
+                  "call_arg_type": "Obj"
                 }
               ],
               "keywords": [],
@@ -537,7 +545,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "rhs",
-                    "id": "rhs"
+                    "id": "rhs",
+                    "call_arg_type": "Obj"
                   }
                 ],
                 "keywords": [],
@@ -641,7 +650,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "rhs",
-                    "id": "rhs"
+                    "id": "rhs",
+                    "call_arg_type": "Obj"
                   }
                 ],
                 "keywords": [],
@@ -968,7 +978,8 @@
                           "id": "i"
                         }
                       }
-                    ]
+                    ],
+                    "call_arg_type": "tuple[A,B]"
                   }
                 ],
                 "keywords": [],

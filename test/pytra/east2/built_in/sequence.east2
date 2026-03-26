@@ -124,7 +124,7 @@
               "end_lineno": 8,
               "end_col": 23
             },
-            "resolved_type": "list[unknown]",
+            "resolved_type": "list[int64]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "[]",
@@ -445,7 +445,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "i",
-                        "id": "i"
+                        "id": "i",
+                        "call_arg_type": "int64"
                       }
                     ],
                     "keywords": [],
@@ -673,7 +674,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "i",
-                        "id": "i"
+                        "id": "i",
+                        "call_arg_type": "int64"
                       }
                     ],
                     "keywords": [],

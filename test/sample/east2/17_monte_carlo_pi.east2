@@ -1396,7 +1396,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "width",
-                "id": "width"
+                "id": "width",
+                "call_arg_type": "int64"
               },
               {
                 "kind": "Name",
@@ -1410,7 +1411,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "height",
-                "id": "height"
+                "id": "height",
+                "call_arg_type": "int64"
               },
               {
                 "kind": "Constant",
@@ -1424,7 +1426,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "123456789",
-                "value": 123456789
+                "value": 123456789,
+                "call_arg_type": "int64"
               }
             ],
             "keywords": []
@@ -1697,7 +1700,8 @@
                           "borrow_kind": "readonly_ref",
                           "repr": "height",
                           "id": "height"
-                        }
+                        },
+                        "call_arg_type": "Obj"
                       }
                     ],
                     "keywords": [],
@@ -1766,7 +1770,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "checksum",
-                    "id": "checksum"
+                    "id": "checksum",
+                    "call_arg_type": "Obj"
                   }
                 ],
                 "keywords": [],
@@ -1859,7 +1864,7 @@
                 "end_lineno": 37,
                 "end_col": 18
               },
-              "resolved_type": "type",
+              "resolved_type": "callable",
               "casts": [],
               "borrow_kind": "value",
               "repr": "Path",
@@ -1878,7 +1883,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "out_path",
-                "id": "out_path"
+                "id": "out_path",
+                "call_arg_type": "str"
               }
             ],
             "keywords": [],
@@ -1915,7 +1921,7 @@
               "end_lineno": 38,
               "end_col": 24
             },
-            "resolved_type": "unknown",
+            "resolved_type": "int64",
             "casts": [],
             "borrow_kind": "value",
             "repr": "p.write_text(result)",
@@ -1927,7 +1933,7 @@
                 "end_lineno": 38,
                 "end_col": 16
               },
-              "resolved_type": "unknown",
+              "resolved_type": "callable",
               "casts": [],
               "borrow_kind": "value",
               "repr": "p.write_text",
@@ -1960,7 +1966,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "result",
-                "id": "result"
+                "id": "result",
+                "call_arg_type": "str"
               }
             ],
             "keywords": []

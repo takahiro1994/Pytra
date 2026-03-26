@@ -204,32 +204,69 @@
                 "end_col_offset": 28
               },
               "value": {
-                "kind": "Attribute",
+                "kind": "Unbox",
+                "resolved_type": "int64",
+                "borrow_kind": "value",
+                "casts": [],
+                "value": {
+                  "kind": "Attribute",
+                  "source_span": {
+                    "lineno": 12,
+                    "col_offset": 15,
+                    "end_lineno": 12,
+                    "end_col_offset": 28
+                  },
+                  "resolved_type": "unknown",
+                  "casts": [],
+                  "borrow_kind": "value",
+                  "repr": "Counter.value",
+                  "value": {
+                    "kind": "Name",
+                    "source_span": {
+                      "lineno": 12,
+                      "col_offset": 15,
+                      "end_lineno": 12,
+                      "end_col_offset": 22
+                    },
+                    "resolved_type": "type",
+                    "casts": [],
+                    "borrow_kind": "value",
+                    "repr": "Counter",
+                    "id": "Counter"
+                  },
+                  "attr": "value"
+                },
                 "source_span": {
                   "lineno": 12,
                   "col_offset": 15,
                   "end_lineno": 12,
                   "end_col_offset": 28
                 },
-                "resolved_type": "unknown",
-                "casts": [],
-                "borrow_kind": "value",
                 "repr": "Counter.value",
-                "value": {
-                  "kind": "Name",
-                  "source_span": {
-                    "lineno": 12,
-                    "col_offset": 15,
-                    "end_lineno": 12,
-                    "end_col_offset": 22
-                  },
-                  "resolved_type": "type",
-                  "casts": [],
-                  "borrow_kind": "value",
-                  "repr": "Counter",
-                  "id": "Counter"
+                "type_expr_summary_v1": {
+                  "schema_version": 1,
+                  "kind": "NamedType",
+                  "category": "static",
+                  "mirror": "int64"
                 },
-                "attr": "value"
+                "target": "int64",
+                "on_fail": "raise",
+                "bridge_lane_v1": {
+                  "schema_version": 1,
+                  "target": {
+                    "kind": "NamedType",
+                    "category": "static",
+                    "mirror": "int64"
+                  },
+                  "target_category": "static",
+                  "value": {
+                    "kind": "DynamicType",
+                    "category": "dynamic",
+                    "mirror": "unknown",
+                    "dynamic_name": "unknown"
+                  },
+                  "value_category": "dynamic"
+                }
               },
               "meta": {
                 "lifetime_node_id": "n0",
@@ -970,7 +1007,7 @@
               "end_lineno": 22,
               "end_col_offset": 45
             },
-            "resolved_type": "unknown",
+            "resolved_type": "bool",
             "casts": [],
             "borrow_kind": "value",
             "repr": "py_assert_stdout(['2'], _case_main)",
@@ -1016,7 +1053,14 @@
                     "repr": "'2'",
                     "value": "2"
                   }
-                ]
+                ],
+                "call_arg_type": "list[str]",
+                "type_expr_summary_v1": {
+                  "schema_version": 1,
+                  "kind": "GenericType",
+                  "category": "static",
+                  "mirror": "list[str]"
+                }
               },
               {
                 "kind": "Name",
@@ -1030,7 +1074,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "_case_main",
-                "id": "_case_main"
+                "id": "_case_main",
+                "call_arg_type": "object"
               }
             ],
             "keywords": [],
@@ -1041,10 +1086,9 @@
             "runtime_call_adapter_kind": "extern_delegate",
             "type_expr_summary_v1": {
               "schema_version": 1,
-              "kind": "DynamicType",
-              "category": "dynamic",
-              "mirror": "unknown",
-              "dynamic_name": "unknown"
+              "kind": "NamedType",
+              "category": "static",
+              "mirror": "bool"
             }
           }
         ],

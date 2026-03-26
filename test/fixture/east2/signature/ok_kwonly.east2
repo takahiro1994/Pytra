@@ -197,7 +197,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "2",
-                "value": 2
+                "value": 2,
+                "call_arg_type": "int64"
               }
             ],
             "keywords": [
@@ -215,7 +216,8 @@
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "3",
-                  "value": 3
+                  "value": 3,
+                  "call_arg_type": "int64"
                 }
               }
             ]

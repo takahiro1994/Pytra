@@ -42,7 +42,7 @@
       "module_id": "pytra.utils.gif",
       "input": "/workspace/Pytra/src/runtime/east/utils/gif.east",
       "output": "east3/pytra/utils/gif.east3.json",
-      "source_path": "src/pytra/utils/gif.py",
+      "source_path": "/workspace/Pytra/src/pytra/utils/gif.py",
       "is_entry": false,
       "module_kind": "runtime"
     }

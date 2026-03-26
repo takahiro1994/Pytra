@@ -148,7 +148,13 @@
                     "repr": "2",
                     "value": 2
                   }
-                ]
+                ],
+                "type_expr_summary_v1": {
+                  "schema_version": 1,
+                  "kind": "GenericType",
+                  "category": "static",
+                  "mirror": "list[int64]"
+                }
               },
               {
                 "kind": "List",
@@ -177,9 +183,21 @@
                     "repr": "3",
                     "value": 3
                   }
-                ]
+                ],
+                "type_expr_summary_v1": {
+                  "schema_version": 1,
+                  "kind": "GenericType",
+                  "category": "static",
+                  "mirror": "list[int64]"
+                }
               }
-            ]
+            ],
+            "type_expr_summary_v1": {
+              "schema_version": 1,
+              "kind": "GenericType",
+              "category": "static",
+              "mirror": "list[list[int64]]"
+            }
           },
           "type_expr_summary_v1": {
             "schema_version": 1,
@@ -287,7 +305,8 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "x",
-                        "id": "x"
+                        "id": "x",
+                        "call_arg_type": "int64"
                       }
                     ],
                     "resolved_type": "None"

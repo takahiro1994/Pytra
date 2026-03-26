@@ -362,7 +362,7 @@
               "end_lineno": 15,
               "end_col": 45
             },
-            "resolved_type": "unknown",
+            "resolved_type": "None",
             "casts": [],
             "borrow_kind": "value",
             "repr": "png.write_rgb_png(out_path, 2, 2, pixels)",
@@ -390,7 +390,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "png",
-                "id": "png"
+                "id": "png",
+                "runtime_module_id": "pytra.utils.png"
               },
               "attr": "write_rgb_png"
             },
@@ -407,7 +408,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "out_path",
-                "id": "out_path"
+                "id": "out_path",
+                "call_arg_type": "str"
               },
               {
                 "kind": "Constant",
@@ -421,7 +423,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "2",
-                "value": 2
+                "value": 2,
+                "call_arg_type": "int64"
               },
               {
                 "kind": "Constant",
@@ -435,7 +438,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "2",
-                "value": 2
+                "value": 2,
+                "call_arg_type": "int64"
               },
               {
                 "kind": "Name",
@@ -449,7 +453,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "pixels",
-                "id": "pixels"
+                "id": "pixels",
+                "call_arg_type": "bytes"
               }
             ],
             "keywords": [],
@@ -523,7 +528,7 @@
               "end_lineno": 16,
               "end_col": 28
             },
-            "resolved_type": "list[unknown]",
+            "resolved_type": "list[bool]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "[]",
@@ -609,7 +614,7 @@
                   "end_lineno": 17,
                   "end_col": 65
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(len(pixels), 12, \"pixels length\")",
@@ -667,7 +672,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "pixels",
-                        "id": "pixels"
+                        "id": "pixels",
+                        "call_arg_type": "Obj"
                       }
                     ],
                     "keywords": [],
@@ -677,7 +683,8 @@
                     "runtime_module_id": "pytra.core.py_runtime",
                     "runtime_symbol": "len",
                     "runtime_call_adapter_kind": "builtin",
-                    "semantic_tag": "core.len"
+                    "semantic_tag": "core.len",
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -691,7 +698,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "12",
-                    "value": 12
+                    "value": 12,
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -705,7 +713,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"pixels length\"",
-                    "value": "pixels length"
+                    "value": "pixels length",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -713,7 +722,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -797,7 +807,7 @@
                   "end_lineno": 18,
                   "end_col": 59
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_true(True, \"png call reached\")",
@@ -828,7 +838,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "True",
-                    "value": true
+                    "value": true,
+                    "call_arg_type": "bool"
                   },
                   {
                     "kind": "Constant",
@@ -842,7 +853,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"png call reached\"",
-                    "value": "png call reached"
+                    "value": "png call reached",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -850,7 +862,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_true",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -920,7 +933,7 @@
                   "end_lineno": 19,
                   "end_col": 60
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_all(results, \"import pytra runtime png\")",
@@ -951,7 +964,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "results",
-                    "id": "results"
+                    "id": "results",
+                    "call_arg_type": "list[bool]"
                   },
                   {
                     "kind": "Constant",
@@ -965,7 +979,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"import pytra runtime png\"",
-                    "value": "import pytra runtime png"
+                    "value": "import pytra runtime png",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],

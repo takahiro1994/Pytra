@@ -459,7 +459,8 @@
                   "borrow_kind": "value",
                   "repr": "40",
                   "value": 40
-                }
+                },
+                "call_arg_type": "int64"
               }
             ],
             "keywords": []
@@ -864,7 +865,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "True",
-                    "value": true
+                    "value": true,
+                    "call_arg_type": "bool"
                   }
                 ],
                 "keywords": []
@@ -954,7 +956,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "False",
-                    "value": false
+                    "value": false,
+                    "call_arg_type": "bool"
                   }
                 ],
                 "keywords": []
@@ -1044,7 +1047,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "True",
-                    "value": true
+                    "value": true,
+                    "call_arg_type": "bool"
                   }
                 ],
                 "keywords": []
@@ -1134,7 +1138,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "False",
-                    "value": false
+                    "value": false,
+                    "call_arg_type": "bool"
                   }
                 ],
                 "keywords": []
@@ -1211,7 +1216,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "False",
-                "value": false
+                "value": false,
+                "call_arg_type": "bool"
               }
             ],
             "keywords": []
@@ -1409,7 +1415,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "True",
-                "value": true
+                "value": true,
+                "call_arg_type": "bool"
               }
             ],
             "keywords": []
@@ -1561,7 +1568,7 @@
               "end_lineno": 42,
               "end_col": 76
             },
-            "resolved_type": "unknown",
+            "resolved_type": "bool",
             "casts": [],
             "borrow_kind": "value",
             "repr": "py_assert_stdout([\"10\", \"21\", \"30\", \"40\", \"2 3\", \"5\"], _case_main)",
@@ -1677,7 +1684,8 @@
                     "repr": "\"5\"",
                     "value": "5"
                   }
-                ]
+                ],
+                "call_arg_type": "list[str]"
               },
               {
                 "kind": "Name",
@@ -1691,7 +1699,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "_case_main",
-                "id": "_case_main"
+                "id": "_case_main",
+                "call_arg_type": "object"
               }
             ],
             "keywords": [],

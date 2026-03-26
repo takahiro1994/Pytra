@@ -46,8 +46,8 @@
 
 10. [ ] [ID: P1-SPEC-CONFORM2-S10] `optimize/passes/typed_repeat_materialization.py`: resolved_type 後付け補完を除去
 11. [ ] [ID: P1-SPEC-CONFORM2-S11] `optimize/passes/typed_enumerate_normalization.py`: 同上
-12. [ ] [ID: P1-SPEC-CONFORM2-S12] `compile/passes.py`: int32 先行混入を戻す（P4-INT32 着手前は現仕様に合わせる）
-13. [ ] [ID: P1-SPEC-CONFORM2-S13] golden 再生成 + parity 維持確認
+12. [x] [ID: P1-SPEC-CONFORM2-S12] `compile/passes.py`: int32 先行混入を戻す（bytes/bytearray 系の `uint8` target を `int64` に復帰）
+13. [x] [ID: P1-SPEC-CONFORM2-S13] golden 再生成 + parity 維持確認（fixture 132/132, sample 18/18。golden は fixture/sample 完了、pytra は `std/subprocess` の既知 parser 制約で 32/33）
 
 ### P1-EMIT-CPP: C++ emitter
 

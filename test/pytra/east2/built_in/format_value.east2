@@ -262,10 +262,13 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "value",
-                    "id": "value"
+                    "id": "value",
+                    "call_arg_type": "object"
                   }
                 ],
-                "keywords": []
+                "keywords": [],
+                "lowered_kind": "BuiltinCall",
+                "builtin_name": "_to_str"
               }
             }
           ],
@@ -332,10 +335,13 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "spec",
-                "id": "spec"
+                "id": "spec",
+                "call_arg_type": "str"
               }
             ],
-            "keywords": []
+            "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "_parse_format_spec"
           },
           "declare": true,
           "decl_type": "list[str]",
@@ -402,7 +408,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "value",
-                "id": "value"
+                "id": "value",
+                "call_arg_type": "object"
               },
               {
                 "kind": "Name",
@@ -416,10 +423,13 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "parsed",
-                "id": "parsed"
+                "id": "parsed",
+                "call_arg_type": "list[str]"
               }
             ],
-            "keywords": []
+            "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "_format_core"
           },
           "declare": true,
           "decl_type": "str",
@@ -472,7 +482,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "raw",
-                "id": "raw"
+                "id": "raw",
+                "call_arg_type": "str"
               },
               {
                 "kind": "Name",
@@ -486,10 +497,13 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "parsed",
-                "id": "parsed"
+                "id": "parsed",
+                "call_arg_type": "list[str]"
               }
             ],
-            "keywords": []
+            "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "_apply_align"
           }
         }
       ],
@@ -654,10 +668,13 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "value",
-                    "id": "value"
+                    "id": "value",
+                    "call_arg_type": "object"
                   }
                 ],
-                "keywords": []
+                "keywords": [],
+                "lowered_kind": "BuiltinCall",
+                "builtin_name": "_to_str"
               }
             }
           ],
@@ -765,10 +782,13 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "value",
-                    "id": "value"
+                    "id": "value",
+                    "call_arg_type": "object"
                   }
                 ],
-                "keywords": []
+                "keywords": [],
+                "lowered_kind": "BuiltinCall",
+                "builtin_name": "_repr_value"
               }
             }
           ],
@@ -876,10 +896,13 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "value",
-                    "id": "value"
+                    "id": "value",
+                    "call_arg_type": "object"
                   }
                 ],
-                "keywords": []
+                "keywords": [],
+                "lowered_kind": "BuiltinCall",
+                "builtin_name": "_repr_value"
               }
             }
           ],
@@ -932,10 +955,13 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "value",
-                "id": "value"
+                "id": "value",
+                "call_arg_type": "object"
               }
             ],
-            "keywords": []
+            "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "_to_str"
           }
         }
       ],
@@ -1084,7 +1110,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "value",
-                "id": "value"
+                "id": "value",
+                "call_arg_type": "Obj"
               },
               {
                 "kind": "Name",
@@ -1098,7 +1125,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "str",
-                "id": "str"
+                "id": "str",
+                "call_arg_type": "type"
               }
             ],
             "keywords": [],
@@ -1196,7 +1224,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "value",
-                    "id": "value"
+                    "id": "value",
+                    "call_arg_type": "Obj"
                   },
                   {
                     "kind": "Name",
@@ -1206,11 +1235,12 @@
                       "end_lineno": 43,
                       "end_col": 31
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "type",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "bool",
-                    "id": "bool"
+                    "id": "bool",
+                    "call_arg_type": "type"
                   }
                 ],
                 "keywords": [],
@@ -1375,7 +1405,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "value",
-                        "id": "value"
+                        "id": "value",
+                        "call_arg_type": "Obj"
                       },
                       {
                         "kind": "Name",
@@ -1385,11 +1416,12 @@
                           "end_lineno": 48,
                           "end_col": 30
                         },
-                        "resolved_type": "unknown",
+                        "resolved_type": "type",
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "int",
-                        "id": "int"
+                        "id": "int",
+                        "call_arg_type": "type"
                       }
                     ],
                     "keywords": [],
@@ -1459,10 +1491,13 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "value",
-                            "id": "value"
+                            "id": "value",
+                            "call_arg_type": "int64"
                           }
                         ],
-                        "keywords": []
+                        "keywords": [],
+                        "lowered_kind": "BuiltinCall",
+                        "builtin_name": "_int_to_str"
                       },
                       "declare": true,
                       "decl_type": "str",
@@ -1517,7 +1552,8 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "value",
-                            "id": "value"
+                            "id": "value",
+                            "call_arg_type": "Obj"
                           },
                           {
                             "kind": "Name",
@@ -1527,11 +1563,12 @@
                               "end_lineno": 50,
                               "end_col": 32
                             },
-                            "resolved_type": "unknown",
+                            "resolved_type": "type",
                             "casts": [],
                             "borrow_kind": "value",
                             "repr": "float",
-                            "id": "float"
+                            "id": "float",
+                            "call_arg_type": "type"
                           }
                         ],
                         "keywords": [],
@@ -1601,10 +1638,13 @@
                                 "casts": [],
                                 "borrow_kind": "readonly_ref",
                                 "repr": "value",
-                                "id": "value"
+                                "id": "value",
+                                "call_arg_type": "float64"
                               }
                             ],
-                            "keywords": []
+                            "keywords": [],
+                            "lowered_kind": "BuiltinCall",
+                            "builtin_name": "_float_to_str"
                           },
                           "declare": true,
                           "decl_type": "str",
@@ -1673,7 +1713,8 @@
                                 "casts": [],
                                 "borrow_kind": "readonly_ref",
                                 "repr": "value",
-                                "id": "value"
+                                "id": "value",
+                                "call_arg_type": "Obj"
                               }
                             ],
                             "keywords": [],
@@ -1810,7 +1851,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "value",
-                "id": "value"
+                "id": "value",
+                "call_arg_type": "Obj"
               },
               {
                 "kind": "Name",
@@ -1824,7 +1866,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "str",
-                "id": "str"
+                "id": "str",
+                "call_arg_type": "type"
               }
             ],
             "keywords": [],
@@ -1962,10 +2005,13 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "value",
-                "id": "value"
+                "id": "value",
+                "call_arg_type": "object"
               }
             ],
-            "keywords": []
+            "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "_to_str"
           }
         }
       ],
@@ -2154,10 +2200,13 @@
                         "borrow_kind": "readonly_ref",
                         "repr": "value",
                         "id": "value"
-                      }
+                      },
+                      "call_arg_type": "int64"
                     }
                   ],
-                  "keywords": []
+                  "keywords": [],
+                  "lowered_kind": "BuiltinCall",
+                  "builtin_name": "_int_to_str"
                 }
               }
             }
@@ -2286,7 +2335,7 @@
               "end_lineno": 68,
               "end_col": 26
             },
-            "resolved_type": "list[unknown]",
+            "resolved_type": "list[str]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "[]",
@@ -2618,7 +2667,8 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "\"0\"",
-                        "value": "0"
+                        "value": "0",
+                        "call_arg_type": "str"
                       }
                     ],
                     "keywords": [],
@@ -2763,7 +2813,8 @@
                             "casts": [],
                             "borrow_kind": "value",
                             "repr": "\"1\"",
-                            "value": "1"
+                            "value": "1",
+                            "call_arg_type": "str"
                           }
                         ],
                         "keywords": [],
@@ -2908,7 +2959,8 @@
                                 "casts": [],
                                 "borrow_kind": "value",
                                 "repr": "\"2\"",
-                                "value": "2"
+                                "value": "2",
+                                "call_arg_type": "str"
                               }
                             ],
                             "keywords": [],
@@ -3053,7 +3105,8 @@
                                     "casts": [],
                                     "borrow_kind": "value",
                                     "repr": "\"3\"",
-                                    "value": "3"
+                                    "value": "3",
+                                    "call_arg_type": "str"
                                   }
                                 ],
                                 "keywords": [],
@@ -3198,7 +3251,8 @@
                                         "casts": [],
                                         "borrow_kind": "value",
                                         "repr": "\"4\"",
-                                        "value": "4"
+                                        "value": "4",
+                                        "call_arg_type": "str"
                                       }
                                     ],
                                     "keywords": [],
@@ -3343,7 +3397,8 @@
                                             "casts": [],
                                             "borrow_kind": "value",
                                             "repr": "\"5\"",
-                                            "value": "5"
+                                            "value": "5",
+                                            "call_arg_type": "str"
                                           }
                                         ],
                                         "keywords": [],
@@ -3488,7 +3543,8 @@
                                                 "casts": [],
                                                 "borrow_kind": "value",
                                                 "repr": "\"6\"",
-                                                "value": "6"
+                                                "value": "6",
+                                                "call_arg_type": "str"
                                               }
                                             ],
                                             "keywords": [],
@@ -3633,7 +3689,8 @@
                                                     "casts": [],
                                                     "borrow_kind": "value",
                                                     "repr": "\"7\"",
-                                                    "value": "7"
+                                                    "value": "7",
+                                                    "call_arg_type": "str"
                                                   }
                                                 ],
                                                 "keywords": [],
@@ -3778,7 +3835,8 @@
                                                         "casts": [],
                                                         "borrow_kind": "value",
                                                         "repr": "\"8\"",
-                                                        "value": "8"
+                                                        "value": "8",
+                                                        "call_arg_type": "str"
                                                       }
                                                     ],
                                                     "keywords": [],
@@ -3868,7 +3926,8 @@
                                                         "casts": [],
                                                         "borrow_kind": "value",
                                                         "repr": "\"9\"",
-                                                        "value": "9"
+                                                        "value": "9",
+                                                        "call_arg_type": "str"
                                                       }
                                                     ],
                                                     "keywords": [],
@@ -4114,7 +4173,8 @@
                   "casts": [],
                   "borrow_kind": "readonly_ref",
                   "repr": "digits",
-                  "id": "digits"
+                  "id": "digits",
+                  "call_arg_type": "Obj"
                 }
               ],
               "keywords": [],
@@ -4487,7 +4547,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "value",
-                "id": "value"
+                "id": "value",
+                "call_arg_type": "Obj"
               }
             ],
             "keywords": [],
@@ -5115,7 +5176,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "spec",
-                "id": "spec"
+                "id": "spec",
+                "call_arg_type": "Obj"
               }
             ],
             "keywords": [],
@@ -10097,10 +10159,13 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "parsed",
-                "id": "parsed"
+                "id": "parsed",
+                "call_arg_type": "list[str]"
               }
             ],
-            "keywords": []
+            "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "_spec_type"
           },
           "declare": true,
           "decl_type": "str",
@@ -10179,10 +10244,13 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "parsed",
-                "id": "parsed"
+                "id": "parsed",
+                "call_arg_type": "list[str]"
               }
             ],
-            "keywords": []
+            "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "_spec_sign"
           },
           "declare": true,
           "decl_type": "str",
@@ -10261,10 +10329,13 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "parsed",
-                "id": "parsed"
+                "id": "parsed",
+                "call_arg_type": "list[str]"
               }
             ],
-            "keywords": []
+            "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "_spec_precision"
           },
           "declare": true,
           "decl_type": "str",
@@ -10343,10 +10414,13 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "parsed",
-                "id": "parsed"
+                "id": "parsed",
+                "call_arg_type": "list[str]"
               }
             ],
-            "keywords": []
+            "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "_spec_grouping"
           },
           "declare": true,
           "decl_type": "str",
@@ -10526,7 +10600,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "value",
-                        "id": "value"
+                        "id": "value",
+                        "call_arg_type": "Obj"
                       },
                       {
                         "kind": "Name",
@@ -10540,7 +10615,8 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "str",
-                        "id": "str"
+                        "id": "str",
+                        "call_arg_type": "type"
                       }
                     ],
                     "keywords": [],
@@ -10619,10 +10695,13 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "value",
-                    "id": "value"
+                    "id": "value",
+                    "call_arg_type": "object"
                   }
                 ],
-                "keywords": []
+                "keywords": [],
+                "lowered_kind": "BuiltinCall",
+                "builtin_name": "_to_str"
               },
               "declare": true,
               "decl_type": "str",
@@ -10756,10 +10835,13 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "precision",
-                        "id": "precision"
+                        "id": "precision",
+                        "call_arg_type": "str"
                       }
                     ],
-                    "keywords": []
+                    "keywords": [],
+                    "lowered_kind": "BuiltinCall",
+                    "builtin_name": "_str_to_int"
                   },
                   "declare": true,
                   "decl_type": "int64",
@@ -10831,7 +10913,8 @@
                           "casts": [],
                           "borrow_kind": "readonly_ref",
                           "repr": "s",
-                          "id": "s"
+                          "id": "s",
+                          "call_arg_type": "Obj"
                         }
                       ],
                       "keywords": [],
@@ -11051,7 +11134,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "value",
-                    "id": "value"
+                    "id": "value",
+                    "call_arg_type": "Obj"
                   },
                   {
                     "kind": "Name",
@@ -11061,11 +11145,12 @@
                       "end_lineno": 219,
                       "end_col": 28
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "type",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "int",
-                    "id": "int"
+                    "id": "int",
+                    "call_arg_type": "type"
                   }
                 ],
                 "keywords": [],
@@ -11125,7 +11210,8 @@
                       "casts": [],
                       "borrow_kind": "readonly_ref",
                       "repr": "value",
-                      "id": "value"
+                      "id": "value",
+                      "call_arg_type": "Obj"
                     },
                     {
                       "kind": "Name",
@@ -11135,11 +11221,12 @@
                         "end_lineno": 219,
                         "end_col": 60
                       },
-                      "resolved_type": "unknown",
+                      "resolved_type": "type",
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "bool",
-                      "id": "bool"
+                      "id": "bool",
+                      "call_arg_type": "type"
                     }
                   ],
                   "keywords": [],
@@ -11198,7 +11285,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "value",
-                    "id": "value"
+                    "id": "value",
+                    "call_arg_type": "int64"
                   },
                   {
                     "kind": "Name",
@@ -11212,7 +11300,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "tc",
-                    "id": "tc"
+                    "id": "tc",
+                    "call_arg_type": "str"
                   },
                   {
                     "kind": "Name",
@@ -11226,7 +11315,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "sign",
-                    "id": "sign"
+                    "id": "sign",
+                    "call_arg_type": "str"
                   },
                   {
                     "kind": "Name",
@@ -11240,10 +11330,13 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "grouping",
-                    "id": "grouping"
+                    "id": "grouping",
+                    "call_arg_type": "str"
                   }
                 ],
-                "keywords": []
+                "keywords": [],
+                "lowered_kind": "BuiltinCall",
+                "builtin_name": "_format_int"
               }
             }
           ],
@@ -11296,7 +11389,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "value",
-                "id": "value"
+                "id": "value",
+                "call_arg_type": "Obj"
               },
               {
                 "kind": "Name",
@@ -11306,11 +11400,12 @@
                   "end_lineno": 222,
                   "end_col": 30
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "type",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "float",
-                "id": "float"
+                "id": "float",
+                "call_arg_type": "type"
               }
             ],
             "keywords": [],
@@ -11366,7 +11461,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "value",
-                    "id": "value"
+                    "id": "value",
+                    "call_arg_type": "float64"
                   },
                   {
                     "kind": "Name",
@@ -11380,7 +11476,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "tc",
-                    "id": "tc"
+                    "id": "tc",
+                    "call_arg_type": "str"
                   },
                   {
                     "kind": "Name",
@@ -11394,7 +11491,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "sign",
-                    "id": "sign"
+                    "id": "sign",
+                    "call_arg_type": "str"
                   },
                   {
                     "kind": "Name",
@@ -11408,7 +11506,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "precision",
-                    "id": "precision"
+                    "id": "precision",
+                    "call_arg_type": "str"
                   },
                   {
                     "kind": "Name",
@@ -11422,10 +11521,13 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "grouping",
-                    "id": "grouping"
+                    "id": "grouping",
+                    "call_arg_type": "str"
                   }
                 ],
-                "keywords": []
+                "keywords": [],
+                "lowered_kind": "BuiltinCall",
+                "builtin_name": "_format_float"
               }
             }
           ],
@@ -11478,10 +11580,13 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "value",
-                "id": "value"
+                "id": "value",
+                "call_arg_type": "object"
               }
             ],
-            "keywords": []
+            "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "_to_str"
           }
         }
       ],
@@ -12022,10 +12127,13 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "abs_val",
-                    "id": "abs_val"
+                    "id": "abs_val",
+                    "call_arg_type": "int64"
                   }
                 ],
-                "keywords": []
+                "keywords": [],
+                "lowered_kind": "BuiltinCall",
+                "builtin_name": "_int_to_str"
               },
               "declare": true,
               "decl_type": "str",
@@ -12149,7 +12257,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "abs_val",
-                        "id": "abs_val"
+                        "id": "abs_val",
+                        "call_arg_type": "int64"
                       },
                       {
                         "kind": "Constant",
@@ -12163,10 +12272,13 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "False",
-                        "value": false
+                        "value": false,
+                        "call_arg_type": "bool"
                       }
                     ],
-                    "keywords": []
+                    "keywords": [],
+                    "lowered_kind": "BuiltinCall",
+                    "builtin_name": "_int_to_hex"
                   },
                   "declare": true,
                   "decl_type": "str",
@@ -12290,7 +12402,8 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "abs_val",
-                            "id": "abs_val"
+                            "id": "abs_val",
+                            "call_arg_type": "int64"
                           },
                           {
                             "kind": "Constant",
@@ -12304,10 +12417,13 @@
                             "casts": [],
                             "borrow_kind": "value",
                             "repr": "True",
-                            "value": true
+                            "value": true,
+                            "call_arg_type": "bool"
                           }
                         ],
-                        "keywords": []
+                        "keywords": [],
+                        "lowered_kind": "BuiltinCall",
+                        "builtin_name": "_int_to_hex"
                       },
                       "declare": true,
                       "decl_type": "str",
@@ -12431,10 +12547,13 @@
                                 "casts": [],
                                 "borrow_kind": "readonly_ref",
                                 "repr": "abs_val",
-                                "id": "abs_val"
+                                "id": "abs_val",
+                                "call_arg_type": "int64"
                               }
                             ],
-                            "keywords": []
+                            "keywords": [],
+                            "lowered_kind": "BuiltinCall",
+                            "builtin_name": "_int_to_oct"
                           },
                           "declare": true,
                           "decl_type": "str",
@@ -12558,10 +12677,13 @@
                                     "casts": [],
                                     "borrow_kind": "readonly_ref",
                                     "repr": "abs_val",
-                                    "id": "abs_val"
+                                    "id": "abs_val",
+                                    "call_arg_type": "int64"
                                   }
                                 ],
-                                "keywords": []
+                                "keywords": [],
+                                "lowered_kind": "BuiltinCall",
+                                "builtin_name": "_int_to_bin"
                               },
                               "declare": true,
                               "decl_type": "str",
@@ -12898,7 +13020,8 @@
                                             "casts": [],
                                             "borrow_kind": "readonly_ref",
                                             "repr": "value",
-                                            "id": "value"
+                                            "id": "value",
+                                            "call_arg_type": "Obj"
                                           }
                                         ],
                                         "keywords": [],
@@ -12908,7 +13031,8 @@
                                         "runtime_module_id": "pytra.core.py_runtime",
                                         "runtime_symbol": "float",
                                         "runtime_call_adapter_kind": "builtin",
-                                        "semantic_tag": "cast.float"
+                                        "semantic_tag": "cast.float",
+                                        "call_arg_type": "float64"
                                       },
                                       {
                                         "kind": "Name",
@@ -12922,7 +13046,8 @@
                                         "casts": [],
                                         "borrow_kind": "readonly_ref",
                                         "repr": "tc",
-                                        "id": "tc"
+                                        "id": "tc",
+                                        "call_arg_type": "str"
                                       },
                                       {
                                         "kind": "Name",
@@ -12936,7 +13061,8 @@
                                         "casts": [],
                                         "borrow_kind": "readonly_ref",
                                         "repr": "sign",
-                                        "id": "sign"
+                                        "id": "sign",
+                                        "call_arg_type": "str"
                                       },
                                       {
                                         "kind": "Constant",
@@ -12950,7 +13076,8 @@
                                         "casts": [],
                                         "borrow_kind": "value",
                                         "repr": "\"\"",
-                                        "value": ""
+                                        "value": "",
+                                        "call_arg_type": "str"
                                       },
                                       {
                                         "kind": "Name",
@@ -12964,10 +13091,13 @@
                                         "casts": [],
                                         "borrow_kind": "readonly_ref",
                                         "repr": "grouping",
-                                        "id": "grouping"
+                                        "id": "grouping",
+                                        "call_arg_type": "str"
                                       }
                                     ],
-                                    "keywords": []
+                                    "keywords": [],
+                                    "lowered_kind": "BuiltinCall",
+                                    "builtin_name": "_format_float"
                                   },
                                   "leading_trivia": [
                                     {
@@ -13042,10 +13172,13 @@
                                         "casts": [],
                                         "borrow_kind": "readonly_ref",
                                         "repr": "abs_val",
-                                        "id": "abs_val"
+                                        "id": "abs_val",
+                                        "call_arg_type": "int64"
                                       }
                                     ],
-                                    "keywords": []
+                                    "keywords": [],
+                                    "lowered_kind": "BuiltinCall",
+                                    "builtin_name": "_int_to_str"
                                   },
                                   "declare": true,
                                   "decl_type": "str",
@@ -13179,7 +13312,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "raw",
-                    "id": "raw"
+                    "id": "raw",
+                    "call_arg_type": "str"
                   },
                   {
                     "kind": "Constant",
@@ -13193,7 +13327,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\",\"",
-                    "value": ","
+                    "value": ",",
+                    "call_arg_type": "str"
                   },
                   {
                     "kind": "Constant",
@@ -13207,10 +13342,13 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "3",
-                    "value": 3
+                    "value": 3,
+                    "call_arg_type": "int64"
                   }
                 ],
-                "keywords": []
+                "keywords": [],
+                "lowered_kind": "BuiltinCall",
+                "builtin_name": "_insert_grouping"
               },
               "declare": true,
               "decl_type": "str",
@@ -13451,7 +13589,8 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "raw",
-                            "id": "raw"
+                            "id": "raw",
+                            "call_arg_type": "str"
                           },
                           {
                             "kind": "Constant",
@@ -13465,7 +13604,8 @@
                             "casts": [],
                             "borrow_kind": "value",
                             "repr": "\"_\"",
-                            "value": "_"
+                            "value": "_",
+                            "call_arg_type": "str"
                           },
                           {
                             "kind": "Constant",
@@ -13479,10 +13619,13 @@
                             "casts": [],
                             "borrow_kind": "value",
                             "repr": "4",
-                            "value": 4
+                            "value": 4,
+                            "call_arg_type": "int64"
                           }
                         ],
-                        "keywords": []
+                        "keywords": [],
+                        "lowered_kind": "BuiltinCall",
+                        "builtin_name": "_insert_grouping"
                       },
                       "declare": true,
                       "decl_type": "str",
@@ -13606,7 +13749,8 @@
                                 "casts": [],
                                 "borrow_kind": "readonly_ref",
                                 "repr": "raw",
-                                "id": "raw"
+                                "id": "raw",
+                                "call_arg_type": "str"
                               },
                               {
                                 "kind": "Constant",
@@ -13620,7 +13764,8 @@
                                 "casts": [],
                                 "borrow_kind": "value",
                                 "repr": "\"_\"",
-                                "value": "_"
+                                "value": "_",
+                                "call_arg_type": "str"
                               },
                               {
                                 "kind": "Constant",
@@ -13634,10 +13779,13 @@
                                 "casts": [],
                                 "borrow_kind": "value",
                                 "repr": "4",
-                                "value": 4
+                                "value": 4,
+                                "call_arg_type": "int64"
                               }
                             ],
-                            "keywords": []
+                            "keywords": [],
+                            "lowered_kind": "BuiltinCall",
+                            "builtin_name": "_insert_grouping"
                           },
                           "declare": true,
                           "decl_type": "str",
@@ -13761,7 +13909,8 @@
                                     "casts": [],
                                     "borrow_kind": "readonly_ref",
                                     "repr": "raw",
-                                    "id": "raw"
+                                    "id": "raw",
+                                    "call_arg_type": "str"
                                   },
                                   {
                                     "kind": "Constant",
@@ -13775,7 +13924,8 @@
                                     "casts": [],
                                     "borrow_kind": "value",
                                     "repr": "\"_\"",
-                                    "value": "_"
+                                    "value": "_",
+                                    "call_arg_type": "str"
                                   },
                                   {
                                     "kind": "Constant",
@@ -13789,10 +13939,13 @@
                                     "casts": [],
                                     "borrow_kind": "value",
                                     "repr": "4",
-                                    "value": 4
+                                    "value": 4,
+                                    "call_arg_type": "int64"
                                   }
                                 ],
-                                "keywords": []
+                                "keywords": [],
+                                "lowered_kind": "BuiltinCall",
+                                "builtin_name": "_insert_grouping"
                               },
                               "declare": true,
                               "decl_type": "str",
@@ -13861,7 +14014,8 @@
                                     "casts": [],
                                     "borrow_kind": "readonly_ref",
                                     "repr": "raw",
-                                    "id": "raw"
+                                    "id": "raw",
+                                    "call_arg_type": "str"
                                   },
                                   {
                                     "kind": "Constant",
@@ -13875,7 +14029,8 @@
                                     "casts": [],
                                     "borrow_kind": "value",
                                     "repr": "\"_\"",
-                                    "value": "_"
+                                    "value": "_",
+                                    "call_arg_type": "str"
                                   },
                                   {
                                     "kind": "Constant",
@@ -13889,10 +14044,13 @@
                                     "casts": [],
                                     "borrow_kind": "value",
                                     "repr": "3",
-                                    "value": 3
+                                    "value": 3,
+                                    "call_arg_type": "int64"
                                   }
                                 ],
-                                "keywords": []
+                                "keywords": [],
+                                "lowered_kind": "BuiltinCall",
+                                "builtin_name": "_insert_grouping"
                               },
                               "declare": true,
                               "decl_type": "str",
@@ -13956,7 +14114,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "raw",
-                "id": "raw"
+                "id": "raw",
+                "call_arg_type": "str"
               },
               {
                 "kind": "Name",
@@ -13970,7 +14129,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "negative",
-                "id": "negative"
+                "id": "negative",
+                "call_arg_type": "bool"
               },
               {
                 "kind": "Name",
@@ -13984,10 +14144,13 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "sign",
-                "id": "sign"
+                "id": "sign",
+                "call_arg_type": "str"
               }
             ],
-            "keywords": []
+            "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "_apply_sign"
           }
         }
       ],
@@ -14229,10 +14392,13 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "precision",
-                    "id": "precision"
+                    "id": "precision",
+                    "call_arg_type": "str"
                   }
                 ],
-                "keywords": []
+                "keywords": [],
+                "lowered_kind": "BuiltinCall",
+                "builtin_name": "_str_to_int"
               },
               "declare": true,
               "decl_type": "int64",
@@ -14714,7 +14880,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "abs_val",
-                    "id": "abs_val"
+                    "id": "abs_val",
+                    "call_arg_type": "float64"
                   },
                   {
                     "kind": "Name",
@@ -14728,10 +14895,13 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "prec",
-                    "id": "prec"
+                    "id": "prec",
+                    "call_arg_type": "int64"
                   }
                 ],
-                "keywords": []
+                "keywords": [],
+                "lowered_kind": "BuiltinCall",
+                "builtin_name": "_float_fixed"
               },
               "declare": true,
               "decl_type": "str",
@@ -14855,7 +15025,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "abs_val",
-                        "id": "abs_val"
+                        "id": "abs_val",
+                        "call_arg_type": "float64"
                       },
                       {
                         "kind": "Name",
@@ -14869,7 +15040,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "prec",
-                        "id": "prec"
+                        "id": "prec",
+                        "call_arg_type": "int64"
                       },
                       {
                         "kind": "Constant",
@@ -14883,10 +15055,13 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "\"e\"",
-                        "value": "e"
+                        "value": "e",
+                        "call_arg_type": "str"
                       }
                     ],
-                    "keywords": []
+                    "keywords": [],
+                    "lowered_kind": "BuiltinCall",
+                    "builtin_name": "_float_exp"
                   },
                   "declare": true,
                   "decl_type": "str",
@@ -15010,7 +15185,8 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "abs_val",
-                            "id": "abs_val"
+                            "id": "abs_val",
+                            "call_arg_type": "float64"
                           },
                           {
                             "kind": "Name",
@@ -15024,7 +15200,8 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "prec",
-                            "id": "prec"
+                            "id": "prec",
+                            "call_arg_type": "int64"
                           },
                           {
                             "kind": "Constant",
@@ -15038,10 +15215,13 @@
                             "casts": [],
                             "borrow_kind": "value",
                             "repr": "\"E\"",
-                            "value": "E"
+                            "value": "E",
+                            "call_arg_type": "str"
                           }
                         ],
-                        "keywords": []
+                        "keywords": [],
+                        "lowered_kind": "BuiltinCall",
+                        "builtin_name": "_float_exp"
                       },
                       "declare": true,
                       "decl_type": "str",
@@ -15227,7 +15407,8 @@
                                 "casts": [],
                                 "borrow_kind": "readonly_ref",
                                 "repr": "abs_val",
-                                "id": "abs_val"
+                                "id": "abs_val",
+                                "call_arg_type": "float64"
                               },
                               {
                                 "kind": "Name",
@@ -15241,7 +15422,8 @@
                                 "casts": [],
                                 "borrow_kind": "readonly_ref",
                                 "repr": "prec",
-                                "id": "prec"
+                                "id": "prec",
+                                "call_arg_type": "int64"
                               },
                               {
                                 "kind": "Name",
@@ -15255,10 +15437,13 @@
                                 "casts": [],
                                 "borrow_kind": "readonly_ref",
                                 "repr": "tc",
-                                "id": "tc"
+                                "id": "tc",
+                                "call_arg_type": "str"
                               }
                             ],
-                            "keywords": []
+                            "keywords": [],
+                            "lowered_kind": "BuiltinCall",
+                            "builtin_name": "_float_general"
                           },
                           "declare": true,
                           "decl_type": "str",
@@ -15422,7 +15607,8 @@
                                         "borrow_kind": "value",
                                         "repr": "100.0",
                                         "value": 100.0
-                                      }
+                                      },
+                                      "call_arg_type": "float64"
                                     },
                                     {
                                       "kind": "Name",
@@ -15436,10 +15622,13 @@
                                       "casts": [],
                                       "borrow_kind": "readonly_ref",
                                       "repr": "prec",
-                                      "id": "prec"
+                                      "id": "prec",
+                                      "call_arg_type": "int64"
                                     }
                                   ],
-                                  "keywords": []
+                                  "keywords": [],
+                                  "lowered_kind": "BuiltinCall",
+                                  "builtin_name": "_float_fixed"
                                 },
                                 "op": "Add",
                                 "right": {
@@ -15641,7 +15830,8 @@
                                         "casts": [],
                                         "borrow_kind": "readonly_ref",
                                         "repr": "abs_val",
-                                        "id": "abs_val"
+                                        "id": "abs_val",
+                                        "call_arg_type": "float64"
                                       },
                                       {
                                         "kind": "Name",
@@ -15655,10 +15845,13 @@
                                         "casts": [],
                                         "borrow_kind": "readonly_ref",
                                         "repr": "prec",
-                                        "id": "prec"
+                                        "id": "prec",
+                                        "call_arg_type": "int64"
                                       }
                                     ],
-                                    "keywords": []
+                                    "keywords": [],
+                                    "lowered_kind": "BuiltinCall",
+                                    "builtin_name": "_float_fixed"
                                   },
                                   "declare": true,
                                   "decl_type": "str",
@@ -15727,7 +15920,8 @@
                                         "casts": [],
                                         "borrow_kind": "readonly_ref",
                                         "repr": "abs_val",
-                                        "id": "abs_val"
+                                        "id": "abs_val",
+                                        "call_arg_type": "float64"
                                       },
                                       {
                                         "kind": "Name",
@@ -15741,10 +15935,13 @@
                                         "casts": [],
                                         "borrow_kind": "readonly_ref",
                                         "repr": "prec",
-                                        "id": "prec"
+                                        "id": "prec",
+                                        "call_arg_type": "int64"
                                       }
                                     ],
-                                    "keywords": []
+                                    "keywords": [],
+                                    "lowered_kind": "BuiltinCall",
+                                    "builtin_name": "_float_fixed"
                                   },
                                   "declare": true,
                                   "decl_type": "str",
@@ -15897,7 +16094,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\".\"",
-                    "value": "."
+                    "value": ".",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -16271,7 +16469,8 @@
                           "casts": [],
                           "borrow_kind": "readonly_ref",
                           "repr": "int_part",
-                          "id": "int_part"
+                          "id": "int_part",
+                          "call_arg_type": "str"
                         },
                         {
                           "kind": "Name",
@@ -16285,7 +16484,8 @@
                           "casts": [],
                           "borrow_kind": "readonly_ref",
                           "repr": "grouping",
-                          "id": "grouping"
+                          "id": "grouping",
+                          "call_arg_type": "str"
                         },
                         {
                           "kind": "Constant",
@@ -16299,10 +16499,13 @@
                           "casts": [],
                           "borrow_kind": "value",
                           "repr": "3",
-                          "value": 3
+                          "value": 3,
+                          "call_arg_type": "int64"
                         }
                       ],
-                      "keywords": []
+                      "keywords": [],
+                      "lowered_kind": "BuiltinCall",
+                      "builtin_name": "_insert_grouping"
                     },
                     "op": "Add",
                     "right": {
@@ -16406,7 +16609,8 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "\"%\"",
-                        "value": "%"
+                        "value": "%",
+                        "call_arg_type": "str"
                       }
                     ],
                     "keywords": [],
@@ -16619,7 +16823,8 @@
                                 "borrow_kind": "readonly_ref",
                                 "repr": "pct_pos",
                                 "id": "pct_pos"
-                              }
+                              },
+                              "call_arg_type": "str"
                             },
                             {
                               "kind": "Name",
@@ -16633,7 +16838,8 @@
                               "casts": [],
                               "borrow_kind": "readonly_ref",
                               "repr": "grouping",
-                              "id": "grouping"
+                              "id": "grouping",
+                              "call_arg_type": "str"
                             },
                             {
                               "kind": "Constant",
@@ -16647,10 +16853,13 @@
                               "casts": [],
                               "borrow_kind": "value",
                               "repr": "3",
-                              "value": 3
+                              "value": 3,
+                              "call_arg_type": "int64"
                             }
                           ],
-                          "keywords": []
+                          "keywords": [],
+                          "lowered_kind": "BuiltinCall",
+                          "builtin_name": "_insert_grouping"
                         },
                         "op": "Add",
                         "right": {
@@ -16735,7 +16944,8 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "raw",
-                            "id": "raw"
+                            "id": "raw",
+                            "call_arg_type": "str"
                           },
                           {
                             "kind": "Name",
@@ -16749,7 +16959,8 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "grouping",
-                            "id": "grouping"
+                            "id": "grouping",
+                            "call_arg_type": "str"
                           },
                           {
                             "kind": "Constant",
@@ -16763,10 +16974,13 @@
                             "casts": [],
                             "borrow_kind": "value",
                             "repr": "3",
-                            "value": 3
+                            "value": 3,
+                            "call_arg_type": "int64"
                           }
                         ],
-                        "keywords": []
+                        "keywords": [],
+                        "lowered_kind": "BuiltinCall",
+                        "builtin_name": "_insert_grouping"
                       },
                       "declare": true,
                       "decl_type": "str",
@@ -16826,7 +17040,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "raw",
-                "id": "raw"
+                "id": "raw",
+                "call_arg_type": "str"
               },
               {
                 "kind": "Name",
@@ -16840,7 +17055,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "negative",
-                "id": "negative"
+                "id": "negative",
+                "call_arg_type": "bool"
               },
               {
                 "kind": "Name",
@@ -16854,10 +17070,13 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "sign",
-                "id": "sign"
+                "id": "sign",
+                "call_arg_type": "str"
               }
             ],
-            "keywords": []
+            "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "_apply_sign"
           }
         }
       ],
@@ -17242,7 +17461,7 @@
               "end_lineno": 315,
               "end_col": 26
             },
-            "resolved_type": "list[unknown]",
+            "resolved_type": "list[str]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "[]",
@@ -17494,7 +17713,8 @@
                         "repr": "16",
                         "value": 16
                       }
-                    }
+                    },
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -17722,7 +17942,8 @@
                   "casts": [],
                   "borrow_kind": "readonly_ref",
                   "repr": "digits",
-                  "id": "digits"
+                  "id": "digits",
+                  "call_arg_type": "Obj"
                 }
               ],
               "keywords": [],
@@ -18174,7 +18395,7 @@
               "end_lineno": 331,
               "end_col": 26
             },
-            "resolved_type": "list[unknown]",
+            "resolved_type": "list[str]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "[]",
@@ -18426,10 +18647,14 @@
                           "borrow_kind": "value",
                           "repr": "8",
                           "value": 8
-                        }
+                        },
+                        "call_arg_type": "int64"
                       }
                     ],
-                    "keywords": []
+                    "keywords": [],
+                    "lowered_kind": "BuiltinCall",
+                    "builtin_name": "_int_to_str",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -18657,7 +18882,8 @@
                   "casts": [],
                   "borrow_kind": "readonly_ref",
                   "repr": "digits",
-                  "id": "digits"
+                  "id": "digits",
+                  "call_arg_type": "Obj"
                 }
               ],
               "keywords": [],
@@ -19105,7 +19331,7 @@
               "end_lineno": 347,
               "end_col": 26
             },
-            "resolved_type": "list[unknown]",
+            "resolved_type": "list[str]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "[]",
@@ -19385,7 +19611,8 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "\"0\"",
-                        "value": "0"
+                        "value": "0",
+                        "call_arg_type": "str"
                       }
                     ],
                     "keywords": [],
@@ -19475,7 +19702,8 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "\"1\"",
-                        "value": "1"
+                        "value": "1",
+                        "call_arg_type": "str"
                       }
                     ],
                     "keywords": [],
@@ -19705,7 +19933,8 @@
                   "casts": [],
                   "borrow_kind": "readonly_ref",
                   "repr": "digits",
-                  "id": "digits"
+                  "id": "digits",
+                  "call_arg_type": "Obj"
                 }
               ],
               "keywords": [],
@@ -20184,7 +20413,8 @@
                       "borrow_kind": "value",
                       "repr": "0.5",
                       "value": 0.5
-                    }
+                    },
+                    "call_arg_type": "Obj"
                   }
                 ],
                 "keywords": [],
@@ -20254,10 +20484,13 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "rounded",
-                    "id": "rounded"
+                    "id": "rounded",
+                    "call_arg_type": "int64"
                   }
                 ],
-                "keywords": []
+                "keywords": [],
+                "lowered_kind": "BuiltinCall",
+                "builtin_name": "_int_to_str"
               }
             }
           ],
@@ -20683,7 +20916,8 @@
                   "borrow_kind": "value",
                   "repr": "0.5",
                   "value": 0.5
-                }
+                },
+                "call_arg_type": "Obj"
               }
             ],
             "keywords": [],
@@ -20799,7 +21033,8 @@
                   "casts": [],
                   "borrow_kind": "readonly_ref",
                   "repr": "factor",
-                  "id": "factor"
+                  "id": "factor",
+                  "call_arg_type": "Obj"
                 }
               ],
               "keywords": [],
@@ -20916,7 +21151,8 @@
                   "casts": [],
                   "borrow_kind": "readonly_ref",
                   "repr": "factor",
-                  "id": "factor"
+                  "id": "factor",
+                  "call_arg_type": "Obj"
                 }
               ],
               "keywords": [],
@@ -21006,10 +21242,13 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "frac_part",
-                "id": "frac_part"
+                "id": "frac_part",
+                "call_arg_type": "int64"
               }
             ],
-            "keywords": []
+            "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "_int_to_str"
           },
           "declare": true,
           "decl_type": "str",
@@ -21087,7 +21326,8 @@
                   "casts": [],
                   "borrow_kind": "readonly_ref",
                   "repr": "frac_str",
-                  "id": "frac_str"
+                  "id": "frac_str",
+                  "call_arg_type": "Obj"
                 }
               ],
               "keywords": [],
@@ -21262,10 +21502,13 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "int_part",
-                    "id": "int_part"
+                    "id": "int_part",
+                    "call_arg_type": "int64"
                   }
                 ],
-                "keywords": []
+                "keywords": [],
+                "lowered_kind": "BuiltinCall",
+                "builtin_name": "_int_to_str"
               },
               "op": "Add",
               "right": {
@@ -22401,7 +22644,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "v",
-                "id": "v"
+                "id": "v",
+                "call_arg_type": "float64"
               },
               {
                 "kind": "Name",
@@ -22415,10 +22659,13 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "prec",
-                "id": "prec"
+                "id": "prec",
+                "call_arg_type": "int64"
               }
             ],
-            "keywords": []
+            "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "_float_fixed"
           },
           "declare": true,
           "decl_type": "str",
@@ -22761,10 +23008,13 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "abs_exp",
-                "id": "abs_exp"
+                "id": "abs_exp",
+                "call_arg_type": "int64"
               }
             ],
-            "keywords": []
+            "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "_int_to_str"
           },
           "declare": true,
           "decl_type": "str",
@@ -22836,7 +23086,8 @@
                   "casts": [],
                   "borrow_kind": "readonly_ref",
                   "repr": "exp_str",
-                  "id": "exp_str"
+                  "id": "exp_str",
+                  "call_arg_type": "Obj"
                 }
               ],
               "keywords": [],
@@ -23364,7 +23615,8 @@
                       "casts": [],
                       "borrow_kind": "readonly_ref",
                       "repr": "value",
-                      "id": "value"
+                      "id": "value",
+                      "call_arg_type": "float64"
                     },
                     {
                       "kind": "BinOp",
@@ -23406,10 +23658,13 @@
                         "borrow_kind": "value",
                         "repr": "1",
                         "value": 1
-                      }
+                      },
+                      "call_arg_type": "int64"
                     }
                   ],
-                  "keywords": []
+                  "keywords": [],
+                  "lowered_kind": "BuiltinCall",
+                  "builtin_name": "_float_fixed"
                 },
                 "orelse": {
                   "kind": "Constant",
@@ -24768,7 +25023,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "value",
-                    "id": "value"
+                    "id": "value",
+                    "call_arg_type": "float64"
                   },
                   {
                     "kind": "Name",
@@ -24782,10 +25038,13 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "fixed_prec",
-                    "id": "fixed_prec"
+                    "id": "fixed_prec",
+                    "call_arg_type": "int64"
                   }
                 ],
-                "keywords": []
+                "keywords": [],
+                "lowered_kind": "BuiltinCall",
+                "builtin_name": "_float_fixed"
               },
               "declare": true,
               "decl_type": "str",
@@ -24914,7 +25173,8 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "\"0\"",
-                        "value": "0"
+                        "value": "0",
+                        "call_arg_type": "str"
                       }
                     ],
                     "keywords": [],
@@ -25121,7 +25381,8 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "\".\"",
-                        "value": "."
+                        "value": ".",
+                        "call_arg_type": "str"
                       }
                     ],
                     "keywords": [],
@@ -25352,7 +25613,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "value",
-                "id": "value"
+                "id": "value",
+                "call_arg_type": "float64"
               },
               {
                 "kind": "BinOp",
@@ -25394,7 +25656,8 @@
                   "borrow_kind": "value",
                   "repr": "1",
                   "value": 1
-                }
+                },
+                "call_arg_type": "int64"
               },
               {
                 "kind": "Name",
@@ -25408,10 +25671,13 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "e_char",
-                "id": "e_char"
+                "id": "e_char",
+                "call_arg_type": "str"
               }
             ],
-            "keywords": []
+            "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "_float_exp"
           }
         }
       ],
@@ -25912,10 +26178,13 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "parsed",
-                "id": "parsed"
+                "id": "parsed",
+                "call_arg_type": "list[str]"
               }
             ],
-            "keywords": []
+            "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "_spec_width"
           },
           "declare": true,
           "decl_type": "str",
@@ -26075,10 +26344,13 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "width_str",
-                "id": "width_str"
+                "id": "width_str",
+                "call_arg_type": "str"
               }
             ],
-            "keywords": []
+            "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "_str_to_int"
           },
           "declare": true,
           "decl_type": "int64",
@@ -26150,7 +26422,8 @@
                   "casts": [],
                   "borrow_kind": "readonly_ref",
                   "repr": "raw",
-                  "id": "raw"
+                  "id": "raw",
+                  "call_arg_type": "Obj"
                 }
               ],
               "keywords": [],
@@ -26275,10 +26548,13 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "parsed",
-                "id": "parsed"
+                "id": "parsed",
+                "call_arg_type": "list[str]"
               }
             ],
-            "keywords": []
+            "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "_spec_fill"
           },
           "declare": true,
           "decl_type": "str",
@@ -26455,10 +26731,13 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "parsed",
-                "id": "parsed"
+                "id": "parsed",
+                "call_arg_type": "list[str]"
               }
             ],
-            "keywords": []
+            "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "_spec_align"
           },
           "declare": true,
           "decl_type": "str",
@@ -26564,7 +26843,8 @@
                   "casts": [],
                   "borrow_kind": "readonly_ref",
                   "repr": "raw",
-                  "id": "raw"
+                  "id": "raw",
+                  "call_arg_type": "Obj"
                 }
               ],
               "keywords": [],
@@ -27264,7 +27544,8 @@
                           "casts": [],
                           "borrow_kind": "readonly_ref",
                           "repr": "raw",
-                          "id": "raw"
+                          "id": "raw",
+                          "call_arg_type": "Obj"
                         }
                       ],
                       "keywords": [],
@@ -27820,10 +28101,13 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "parsed",
-                "id": "parsed"
+                "id": "parsed",
+                "call_arg_type": "list[str]"
               }
             ],
-            "keywords": []
+            "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "_spec_type"
           },
           "declare": true,
           "decl_type": "str",
@@ -28230,7 +28514,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "s",
-                    "id": "s"
+                    "id": "s",
+                    "call_arg_type": "Obj"
                   }
                 ],
                 "keywords": [],
@@ -29573,7 +29858,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "digits",
-                "id": "digits"
+                "id": "digits",
+                "call_arg_type": "Obj"
               }
             ],
             "keywords": [],
@@ -29718,7 +30004,7 @@
               "end_lineno": 532,
               "end_col": 25
             },
-            "resolved_type": "list[unknown]",
+            "resolved_type": "list[str]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "[]",
@@ -30167,7 +30453,8 @@
                       "borrow_kind": "readonly_ref",
                       "repr": "pos",
                       "id": "pos"
-                    }
+                    },
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -30367,7 +30654,8 @@
                   "casts": [],
                   "borrow_kind": "readonly_ref",
                   "repr": "parts",
-                  "id": "parts"
+                  "id": "parts",
+                  "call_arg_type": "Obj"
                 }
               ],
               "keywords": [],

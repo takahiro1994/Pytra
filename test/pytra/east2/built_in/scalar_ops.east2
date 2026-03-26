@@ -126,7 +126,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "v",
-                "id": "v"
+                "id": "v",
+                "call_arg_type": "Obj"
               },
               {
                 "kind": "Name",
@@ -256,7 +257,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "ch",
-                "id": "ch"
+                "id": "ch",
+                "call_arg_type": "str"
               }
             ],
             "keywords": [],
@@ -359,7 +361,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "codepoint",
-                "id": "codepoint"
+                "id": "codepoint",
+                "call_arg_type": "int64"
               }
             ],
             "keywords": [],

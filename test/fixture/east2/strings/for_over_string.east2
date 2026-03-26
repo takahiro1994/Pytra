@@ -547,7 +547,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "\"hello world\"",
-                "value": "hello world"
+                "value": "hello world",
+                "call_arg_type": "str"
               }
             ],
             "keywords": []
@@ -637,7 +638,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "\"aeiou\"",
-                "value": "aeiou"
+                "value": "aeiou",
+                "call_arg_type": "str"
               }
             ],
             "keywords": []

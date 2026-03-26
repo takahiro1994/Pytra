@@ -369,7 +369,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"Alice\"",
-                    "value": "Alice"
+                    "value": "Alice",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": []
@@ -441,7 +442,7 @@
               "end_lineno": 17,
               "end_col": 57
             },
-            "resolved_type": "unknown",
+            "resolved_type": "bool",
             "casts": [],
             "borrow_kind": "value",
             "repr": "py_assert_stdout(['[USER] Alice!'], _case_main)",
@@ -487,7 +488,8 @@
                     "repr": "'[USER] Alice!'",
                     "value": "[USER] Alice!"
                   }
-                ]
+                ],
+                "call_arg_type": "list[str]"
               },
               {
                 "kind": "Name",
@@ -501,7 +503,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "_case_main",
-                "id": "_case_main"
+                "id": "_case_main",
+                "call_arg_type": "object"
               }
             ],
             "keywords": [],

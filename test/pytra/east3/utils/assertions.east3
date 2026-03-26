@@ -777,7 +777,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "actual",
-                "id": "actual"
+                "id": "actual",
+                "call_arg_type": "object"
               },
               {
                 "kind": "Name",
@@ -791,7 +792,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "expected",
-                "id": "expected"
+                "id": "expected",
+                "call_arg_type": "object"
               }
             ],
             "keywords": [],
@@ -1722,6 +1724,15 @@
             "end_lineno": 48,
             "end_col_offset": 15
           },
+          "leading_trivia": [
+            {
+              "kind": "comment",
+              "text": "self_hosted parser / runtime 互換優先: stdout capture は未実装。"
+            }
+          ],
+          "leading_comments": [
+            "self_hosted parser / runtime 互換優先: stdout capture は未実装。"
+          ],
           "value": {
             "kind": "Constant",
             "source_span": {
@@ -1735,16 +1746,7 @@
             "borrow_kind": "value",
             "repr": "True",
             "value": true
-          },
-          "leading_trivia": [
-            {
-              "kind": "comment",
-              "text": "self_hosted parser / runtime 互換優先: stdout capture は未実装。"
-            }
-          ],
-          "leading_comments": [
-            "self_hosted parser / runtime 互換優先: stdout capture は未実装。"
-          ]
+          }
         }
       ],
       "is_generator": 0,

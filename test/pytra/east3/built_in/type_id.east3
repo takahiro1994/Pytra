@@ -98,7 +98,13 @@
         "casts": [],
         "borrow_kind": "value",
         "repr": "[]",
-        "elements": []
+        "elements": [],
+        "type_expr_summary_v1": {
+          "schema_version": 1,
+          "kind": "GenericType",
+          "category": "static",
+          "mirror": "list[int64]"
+        }
       },
       "type_expr_summary_v1": {
         "schema_version": 1,
@@ -187,7 +193,13 @@
         "borrow_kind": "value",
         "repr": "{}",
         "keys": [],
-        "values": []
+        "values": [],
+        "type_expr_summary_v1": {
+          "schema_version": 1,
+          "kind": "GenericType",
+          "category": "static",
+          "mirror": "dict[int64,int64]"
+        }
       },
       "type_expr_summary_v1": {
         "schema_version": 1,
@@ -294,7 +306,13 @@
         "borrow_kind": "value",
         "repr": "{}",
         "keys": [],
-        "values": []
+        "values": [],
+        "type_expr_summary_v1": {
+          "schema_version": 1,
+          "kind": "GenericType",
+          "category": "static",
+          "mirror": "dict[int64,list[int64]]"
+        }
       },
       "type_expr_summary_v1": {
         "schema_version": 1,
@@ -383,7 +401,13 @@
         "borrow_kind": "value",
         "repr": "{}",
         "keys": [],
-        "values": []
+        "values": [],
+        "type_expr_summary_v1": {
+          "schema_version": 1,
+          "kind": "GenericType",
+          "category": "static",
+          "mirror": "dict[int64,int64]"
+        }
       },
       "type_expr_summary_v1": {
         "schema_version": 1,
@@ -472,7 +496,13 @@
         "borrow_kind": "value",
         "repr": "{}",
         "keys": [],
-        "values": []
+        "values": [],
+        "type_expr_summary_v1": {
+          "schema_version": 1,
+          "kind": "GenericType",
+          "category": "static",
+          "mirror": "dict[int64,int64]"
+        }
       },
       "type_expr_summary_v1": {
         "schema_version": 1,
@@ -561,7 +591,13 @@
         "borrow_kind": "value",
         "repr": "{}",
         "keys": [],
-        "values": []
+        "values": [],
+        "type_expr_summary_v1": {
+          "schema_version": 1,
+          "kind": "GenericType",
+          "category": "static",
+          "mirror": "dict[int64,int64]"
+        }
       },
       "type_expr_summary_v1": {
         "schema_version": 1,
@@ -650,7 +686,13 @@
         "borrow_kind": "value",
         "repr": "{}",
         "keys": [],
-        "values": []
+        "values": [],
+        "type_expr_summary_v1": {
+          "schema_version": 1,
+          "kind": "GenericType",
+          "category": "static",
+          "mirror": "dict[str,int64]"
+        }
       },
       "type_expr_summary_v1": {
         "schema_version": 1,
@@ -1294,7 +1336,13 @@
             "casts": [],
             "borrow_kind": "value",
             "repr": "[]",
-            "elements": []
+            "elements": [],
+            "type_expr_summary_v1": {
+              "schema_version": 1,
+              "kind": "GenericType",
+              "category": "static",
+              "mirror": "list[int64]"
+            }
           },
           "type_expr_summary_v1": {
             "schema_version": 1,
@@ -1438,7 +1486,13 @@
             "casts": [],
             "borrow_kind": "value",
             "repr": "[]",
-            "elements": []
+            "elements": [],
+            "type_expr_summary_v1": {
+              "schema_version": 1,
+              "kind": "GenericType",
+              "category": "static",
+              "mirror": "list[int64]"
+            }
           },
           "type_expr_summary_v1": {
             "schema_version": 1,
@@ -1508,7 +1562,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "a0",
-                "id": "a0"
+                "id": "a0",
+                "call_arg_type": "int64"
               }
             ],
             "keywords": [],
@@ -1741,7 +1796,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "items",
-                    "id": "items"
+                    "id": "items",
+                    "call_arg_type": "Obj"
                   }
                 ],
                 "keywords": [],
@@ -2063,7 +2119,13 @@
             "casts": [],
             "borrow_kind": "value",
             "repr": "[]",
-            "elements": []
+            "elements": [],
+            "type_expr_summary_v1": {
+              "schema_version": 1,
+              "kind": "GenericType",
+              "category": "static",
+              "mirror": "list[int64]"
+            }
           },
           "type_expr_summary_v1": {
             "schema_version": 1,
@@ -2195,7 +2257,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "items",
-                    "id": "items"
+                    "id": "items",
+                    "call_arg_type": "Obj"
                   }
                 ],
                 "keywords": [],
@@ -2304,7 +2367,8 @@
                       "borrow_kind": "readonly_ref",
                       "repr": "i",
                       "id": "i"
-                    }
+                    },
+                    "call_arg_type": "int64"
                   }
                 ],
                 "keywords": [],
@@ -2529,10 +2593,13 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "items",
-                "id": "items"
+                "id": "items",
+                "call_arg_type": "list[int64]"
               }
             ],
             "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "_copy_int_list",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "GenericType",
@@ -2670,7 +2737,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "out",
-                    "id": "out"
+                    "id": "out",
+                    "call_arg_type": "Obj"
                   }
                 ],
                 "keywords": [],
@@ -2842,7 +2910,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "out",
-                        "id": "out"
+                        "id": "out",
+                        "call_arg_type": "Obj"
                       }
                     ],
                     "keywords": [],
@@ -3462,7 +3531,8 @@
                   "casts": [],
                   "borrow_kind": "readonly_ref",
                   "repr": "_TYPE_IDS",
-                  "id": "_TYPE_IDS"
+                  "id": "_TYPE_IDS",
+                  "call_arg_type": "list[int64]"
                 },
                 {
                   "kind": "Name",
@@ -3476,10 +3546,13 @@
                   "casts": [],
                   "borrow_kind": "readonly_ref",
                   "repr": "type_id",
-                  "id": "type_id"
+                  "id": "type_id",
+                  "call_arg_type": "int64"
                 }
               ],
               "keywords": [],
+              "lowered_kind": "BuiltinCall",
+              "builtin_name": "_contains_int",
               "type_expr_summary_v1": {
                 "schema_version": 1,
                 "kind": "NamedType",
@@ -3550,7 +3623,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "type_id",
-                    "id": "type_id"
+                    "id": "type_id",
+                    "call_arg_type": "int64"
                   }
                 ],
                 "keywords": [],
@@ -3794,6 +3868,8 @@
                 },
                 "args": [],
                 "keywords": [],
+                "lowered_kind": "BuiltinCall",
+                "builtin_name": "_make_int_list_0",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "GenericType",
@@ -3867,26 +3943,12 @@
           },
           "body": [
             {
-              "kind": "Expr",
+              "kind": "Return",
               "source_span": {
                 "lineno": 106,
                 "col_offset": 8,
                 "end_lineno": 106,
                 "end_col_offset": 14
-              },
-              "value": {
-                "kind": "Name",
-                "source_span": {
-                  "lineno": 106,
-                  "col_offset": 8,
-                  "end_lineno": 106,
-                  "end_col_offset": 14
-                },
-                "resolved_type": "unknown",
-                "casts": [],
-                "borrow_kind": "value",
-                "repr": "return",
-                "id": "return"
               }
             }
           ],
@@ -4027,6 +4089,8 @@
                 },
                 "args": [],
                 "keywords": [],
+                "lowered_kind": "BuiltinCall",
+                "builtin_name": "_make_int_list_0",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "GenericType",
@@ -4177,7 +4241,8 @@
                   "casts": [],
                   "borrow_kind": "readonly_ref",
                   "repr": "children",
-                  "id": "children"
+                  "id": "children",
+                  "call_arg_type": "list[int64]"
                 },
                 {
                   "kind": "Name",
@@ -4191,10 +4256,13 @@
                   "casts": [],
                   "borrow_kind": "readonly_ref",
                   "repr": "type_id",
-                  "id": "type_id"
+                  "id": "type_id",
+                  "call_arg_type": "int64"
                 }
               ],
               "keywords": [],
+              "lowered_kind": "BuiltinCall",
+              "builtin_name": "_contains_int",
               "type_expr_summary_v1": {
                 "schema_version": 1,
                 "kind": "NamedType",
@@ -4265,7 +4333,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "type_id",
-                    "id": "type_id"
+                    "id": "type_id",
+                    "call_arg_type": "int64"
                   }
                 ],
                 "keywords": [],
@@ -4475,6 +4544,8 @@
             },
             "args": [],
             "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "_make_int_list_0",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "GenericType",
@@ -4667,10 +4738,13 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "children",
-                "id": "children"
+                "id": "children",
+                "call_arg_type": "list[int64]"
               }
             ],
             "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "_sorted_ints",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "GenericType",
@@ -4788,7 +4862,13 @@
             "casts": [],
             "borrow_kind": "value",
             "repr": "[]",
-            "elements": []
+            "elements": [],
+            "type_expr_summary_v1": {
+              "schema_version": 1,
+              "kind": "GenericType",
+              "category": "static",
+              "mirror": "list[int64]"
+            }
           },
           "type_expr_summary_v1": {
             "schema_version": 1,
@@ -4920,7 +5000,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "_TYPE_IDS",
-                    "id": "_TYPE_IDS"
+                    "id": "_TYPE_IDS",
+                    "call_arg_type": "Obj"
                   }
                 ],
                 "keywords": [],
@@ -5383,7 +5464,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "tid",
-                        "id": "tid"
+                        "id": "tid",
+                        "call_arg_type": "int64"
                       }
                     ],
                     "keywords": [],
@@ -5515,10 +5597,13 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "roots",
-                "id": "roots"
+                "id": "roots",
+                "call_arg_type": "list[int64]"
               }
             ],
             "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "_sorted_ints",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "GenericType",
@@ -5860,10 +5945,13 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "type_id",
-                "id": "type_id"
+                "id": "type_id",
+                "call_arg_type": "int64"
               }
             ],
             "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "_sorted_child_type_ids",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "GenericType",
@@ -6001,7 +6089,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "children",
-                    "id": "children"
+                    "id": "children",
+                    "call_arg_type": "Obj"
                   }
                 ],
                 "keywords": [],
@@ -6113,7 +6202,8 @@
                       "borrow_kind": "readonly_ref",
                       "repr": "i",
                       "id": "i"
-                    }
+                    },
+                    "call_arg_type": "int64"
                   },
                   {
                     "kind": "Name",
@@ -6127,10 +6217,13 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "cur",
-                    "id": "cur"
+                    "id": "cur",
+                    "call_arg_type": "int64"
                   }
                 ],
                 "keywords": [],
+                "lowered_kind": "BuiltinCall",
+                "builtin_name": "_assign_type_ranges_dfs",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -6700,6 +6793,8 @@
             },
             "args": [],
             "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "_collect_root_type_ids",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "GenericType",
@@ -6837,7 +6932,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "roots",
-                    "id": "roots"
+                    "id": "roots",
+                    "call_arg_type": "Obj"
                   }
                 ],
                 "keywords": [],
@@ -6949,7 +7045,8 @@
                       "borrow_kind": "readonly_ref",
                       "repr": "i",
                       "id": "i"
-                    }
+                    },
+                    "call_arg_type": "int64"
                   },
                   {
                     "kind": "Name",
@@ -6963,10 +7060,13 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "next_order",
-                    "id": "next_order"
+                    "id": "next_order",
+                    "call_arg_type": "int64"
                   }
                 ],
                 "keywords": [],
+                "lowered_kind": "BuiltinCall",
+                "builtin_name": "_assign_type_ranges_dfs",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -7094,10 +7194,13 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "_TYPE_IDS",
-                "id": "_TYPE_IDS"
+                "id": "_TYPE_IDS",
+                "call_arg_type": "list[int64]"
               }
             ],
             "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "_sorted_ints",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "GenericType",
@@ -7235,7 +7338,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "all_ids",
-                    "id": "all_ids"
+                    "id": "all_ids",
+                    "call_arg_type": "Obj"
                   }
                 ],
                 "keywords": [],
@@ -7448,7 +7552,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "tid",
-                        "id": "tid"
+                        "id": "tid",
+                        "call_arg_type": "int64"
                       },
                       {
                         "kind": "Name",
@@ -7462,10 +7567,13 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "next_order",
-                        "id": "next_order"
+                        "id": "next_order",
+                        "call_arg_type": "int64"
                       }
                     ],
                     "keywords": [],
+                    "lowered_kind": "BuiltinCall",
+                    "builtin_name": "_assign_type_ranges_dfs",
                     "type_expr_summary_v1": {
                       "schema_version": 1,
                       "kind": "NamedType",
@@ -7844,7 +7952,8 @@
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "\"ranges_dirty\"",
-                  "value": "ranges_dirty"
+                  "value": "ranges_dirty",
+                  "call_arg_type": "str"
                 },
                 {
                   "kind": "Constant",
@@ -7858,7 +7967,8 @@
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "1",
-                  "value": 1
+                  "value": 1,
+                  "call_arg_type": "int64"
                 }
               ],
               "keywords": [],
@@ -7979,6 +8089,8 @@
             },
             "args": [],
             "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "_is_type_ranges_dirty",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",
@@ -8023,6 +8135,8 @@
                 },
                 "args": [],
                 "keywords": [],
+                "lowered_kind": "BuiltinCall",
+                "builtin_name": "_recompute_type_ranges",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -8067,6 +8181,8 @@
                 },
                 "args": [],
                 "keywords": [],
+                "lowered_kind": "BuiltinCall",
+                "builtin_name": "_mark_type_ranges_clean",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -8244,6 +8360,8 @@
                 },
                 "args": [],
                 "keywords": [],
+                "lowered_kind": "BuiltinCall",
+                "builtin_name": "_tid_user_base",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -8451,7 +8569,8 @@
                   "casts": [],
                   "borrow_kind": "readonly_ref",
                   "repr": "_TYPE_IDS",
-                  "id": "_TYPE_IDS"
+                  "id": "_TYPE_IDS",
+                  "call_arg_type": "Obj"
                 }
               ],
               "keywords": [],
@@ -8491,26 +8610,12 @@
           },
           "body": [
             {
-              "kind": "Expr",
+              "kind": "Return",
               "source_span": {
                 "lineno": 106,
                 "col_offset": 8,
                 "end_lineno": 106,
                 "end_col_offset": 14
-              },
-              "value": {
-                "kind": "Name",
-                "source_span": {
-                  "lineno": 106,
-                  "col_offset": 8,
-                  "end_lineno": 106,
-                  "end_col_offset": 14
-                },
-                "resolved_type": "unknown",
-                "casts": [],
-                "borrow_kind": "value",
-                "repr": "return",
-                "id": "return"
               }
             }
           ],
@@ -8579,6 +8684,9 @@
                 },
                 "args": [],
                 "keywords": [],
+                "lowered_kind": "BuiltinCall",
+                "builtin_name": "_tid_none",
+                "call_arg_type": "int64",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -8612,10 +8720,13 @@
                   "borrow_kind": "value",
                   "repr": "1",
                   "value": 1
-                }
+                },
+                "call_arg_type": "int64"
               }
             ],
             "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "_register_type_node",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",
@@ -8687,6 +8798,9 @@
                 },
                 "args": [],
                 "keywords": [],
+                "lowered_kind": "BuiltinCall",
+                "builtin_name": "_tid_object",
+                "call_arg_type": "int64",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -8720,10 +8834,13 @@
                   "borrow_kind": "value",
                   "repr": "1",
                   "value": 1
-                }
+                },
+                "call_arg_type": "int64"
               }
             ],
             "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "_register_type_node",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",
@@ -8795,6 +8912,9 @@
                 },
                 "args": [],
                 "keywords": [],
+                "lowered_kind": "BuiltinCall",
+                "builtin_name": "_tid_int",
+                "call_arg_type": "int64",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -8830,6 +8950,9 @@
                 },
                 "args": [],
                 "keywords": [],
+                "lowered_kind": "BuiltinCall",
+                "builtin_name": "_tid_object",
+                "call_arg_type": "int64",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -8839,6 +8962,8 @@
               }
             ],
             "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "_register_type_node",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",
@@ -8910,6 +9035,9 @@
                 },
                 "args": [],
                 "keywords": [],
+                "lowered_kind": "BuiltinCall",
+                "builtin_name": "_tid_bool",
+                "call_arg_type": "int64",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -8945,6 +9073,9 @@
                 },
                 "args": [],
                 "keywords": [],
+                "lowered_kind": "BuiltinCall",
+                "builtin_name": "_tid_int",
+                "call_arg_type": "int64",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -8954,6 +9085,8 @@
               }
             ],
             "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "_register_type_node",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",
@@ -9025,6 +9158,9 @@
                 },
                 "args": [],
                 "keywords": [],
+                "lowered_kind": "BuiltinCall",
+                "builtin_name": "_tid_float",
+                "call_arg_type": "int64",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -9060,6 +9196,9 @@
                 },
                 "args": [],
                 "keywords": [],
+                "lowered_kind": "BuiltinCall",
+                "builtin_name": "_tid_object",
+                "call_arg_type": "int64",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -9069,6 +9208,8 @@
               }
             ],
             "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "_register_type_node",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",
@@ -9140,6 +9281,9 @@
                 },
                 "args": [],
                 "keywords": [],
+                "lowered_kind": "BuiltinCall",
+                "builtin_name": "_tid_str",
+                "call_arg_type": "int64",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -9175,6 +9319,9 @@
                 },
                 "args": [],
                 "keywords": [],
+                "lowered_kind": "BuiltinCall",
+                "builtin_name": "_tid_object",
+                "call_arg_type": "int64",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -9184,6 +9331,8 @@
               }
             ],
             "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "_register_type_node",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",
@@ -9255,6 +9404,9 @@
                 },
                 "args": [],
                 "keywords": [],
+                "lowered_kind": "BuiltinCall",
+                "builtin_name": "_tid_list",
+                "call_arg_type": "int64",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -9290,6 +9442,9 @@
                 },
                 "args": [],
                 "keywords": [],
+                "lowered_kind": "BuiltinCall",
+                "builtin_name": "_tid_object",
+                "call_arg_type": "int64",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -9299,6 +9454,8 @@
               }
             ],
             "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "_register_type_node",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",
@@ -9370,6 +9527,9 @@
                 },
                 "args": [],
                 "keywords": [],
+                "lowered_kind": "BuiltinCall",
+                "builtin_name": "_tid_dict",
+                "call_arg_type": "int64",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -9405,6 +9565,9 @@
                 },
                 "args": [],
                 "keywords": [],
+                "lowered_kind": "BuiltinCall",
+                "builtin_name": "_tid_object",
+                "call_arg_type": "int64",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -9414,6 +9577,8 @@
               }
             ],
             "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "_register_type_node",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",
@@ -9485,6 +9650,9 @@
                 },
                 "args": [],
                 "keywords": [],
+                "lowered_kind": "BuiltinCall",
+                "builtin_name": "_tid_set",
+                "call_arg_type": "int64",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -9520,6 +9688,9 @@
                 },
                 "args": [],
                 "keywords": [],
+                "lowered_kind": "BuiltinCall",
+                "builtin_name": "_tid_object",
+                "call_arg_type": "int64",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -9529,6 +9700,8 @@
               }
             ],
             "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "_register_type_node",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",
@@ -9573,6 +9746,8 @@
             },
             "args": [],
             "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "_recompute_type_ranges",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",
@@ -9617,6 +9792,8 @@
             },
             "args": [],
             "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "_mark_type_ranges_clean",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",
@@ -9700,6 +9877,8 @@
             },
             "args": [],
             "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "_ensure_builtins",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",
@@ -9746,7 +9925,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "base_type_id",
-                "id": "base_type_id"
+                "id": "base_type_id",
+                "call_arg_type": "Obj"
               },
               "expected_type_id": {
                 "kind": "Name",
@@ -10013,7 +10193,8 @@
                           "casts": [],
                           "borrow_kind": "readonly_ref",
                           "repr": "base_type_id",
-                          "id": "base_type_id"
+                          "id": "base_type_id",
+                          "call_arg_type": "Obj"
                         }
                       ],
                       "keywords": [],
@@ -10138,6 +10319,8 @@
           },
           "args": [],
           "keywords": [],
+          "lowered_kind": "BuiltinCall",
+          "builtin_name": "_tid_object",
           "type_expr_summary_v1": {
             "schema_version": 1,
             "kind": "NamedType",
@@ -10192,6 +10375,8 @@
             },
             "args": [],
             "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "_ensure_builtins",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",
@@ -10264,10 +10449,13 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "base_type_id",
-                "id": "base_type_id"
+                "id": "base_type_id",
+                "call_arg_type": "int64"
               }
             ],
             "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "_normalize_base_type_id",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",
@@ -10613,7 +10801,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "tid",
-                "id": "tid"
+                "id": "tid",
+                "call_arg_type": "int64"
               },
               {
                 "kind": "Name",
@@ -10627,10 +10816,13 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "base_tid",
-                "id": "base_tid"
+                "id": "base_tid",
+                "call_arg_type": "int64"
               }
             ],
             "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "_register_type_node",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",
@@ -10681,6 +10873,8 @@
             },
             "args": [],
             "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "_mark_type_ranges_dirty",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",
@@ -10796,6 +10990,8 @@
             },
             "args": [],
             "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "_ensure_builtins",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",
@@ -10842,7 +11038,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "type_id",
-                "id": "type_id"
+                "id": "type_id",
+                "call_arg_type": "Obj"
               },
               "expected_type_id": {
                 "kind": "Name",
@@ -11019,6 +11216,8 @@
                 },
                 "args": [],
                 "keywords": [],
+                "lowered_kind": "BuiltinCall",
+                "builtin_name": "_tid_user_base",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -11146,6 +11345,9 @@
                           },
                           "args": [],
                           "keywords": [],
+                          "lowered_kind": "BuiltinCall",
+                          "builtin_name": "_tid_user_base",
+                          "call_arg_type": "Obj",
                           "type_expr_summary_v1": {
                             "schema_version": 1,
                             "kind": "NamedType",
@@ -11255,10 +11457,13 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "base_type_id",
-                "id": "base_type_id"
+                "id": "base_type_id",
+                "call_arg_type": "int64"
               }
             ],
             "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "_normalize_base_type_id",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",
@@ -11553,7 +11758,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "type_id",
-                "id": "type_id"
+                "id": "type_id",
+                "call_arg_type": "int64"
               },
               {
                 "kind": "Name",
@@ -11567,10 +11773,13 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "base_tid",
-                "id": "base_tid"
+                "id": "base_tid",
+                "call_arg_type": "int64"
               }
             ],
             "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "_register_type_node",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",
@@ -11847,6 +12056,8 @@
             },
             "args": [],
             "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "_mark_type_ranges_dirty",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",
@@ -12017,7 +12228,8 @@
               "casts": [],
               "borrow_kind": "value",
               "repr": "tagged",
-              "id": "tagged"
+              "id": "tagged",
+              "call_arg_type": "Obj"
             },
             "expected_type_id": {
               "kind": "Name",
@@ -12112,18 +12324,56 @@
                 },
                 "args": [
                   {
-                    "kind": "Name",
+                    "kind": "Unbox",
+                    "resolved_type": "Obj",
+                    "borrow_kind": "value",
+                    "casts": [],
+                    "value": {
+                      "kind": "Name",
+                      "source_span": {
+                        "lineno": 258,
+                        "col_offset": 24,
+                        "end_lineno": 258,
+                        "end_col_offset": 30
+                      },
+                      "resolved_type": "unknown",
+                      "casts": [],
+                      "borrow_kind": "value",
+                      "repr": "tagged",
+                      "id": "tagged",
+                      "call_arg_type": "Obj"
+                    },
                     "source_span": {
                       "lineno": 258,
                       "col_offset": 24,
                       "end_lineno": 258,
                       "end_col_offset": 30
                     },
-                    "resolved_type": "unknown",
-                    "casts": [],
-                    "borrow_kind": "value",
                     "repr": "tagged",
-                    "id": "tagged"
+                    "type_expr_summary_v1": {
+                      "schema_version": 1,
+                      "kind": "NamedType",
+                      "category": "static",
+                      "mirror": "Obj"
+                    },
+                    "target": "Obj",
+                    "on_fail": "raise",
+                    "bridge_lane_v1": {
+                      "schema_version": 1,
+                      "target": {
+                        "kind": "NamedType",
+                        "category": "static",
+                        "mirror": "Obj"
+                      },
+                      "target_category": "static",
+                      "value": {
+                        "kind": "DynamicType",
+                        "category": "dynamic",
+                        "mirror": "unknown",
+                        "dynamic_name": "unknown"
+                      },
+                      "value_category": "dynamic"
+                    }
                   }
                 ],
                 "keywords": [],
@@ -12349,6 +12599,8 @@
             },
             "args": [],
             "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "_ensure_builtins",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",
@@ -12448,6 +12700,8 @@
                 },
                 "args": [],
                 "keywords": [],
+                "lowered_kind": "BuiltinCall",
+                "builtin_name": "_tid_none",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -12484,7 +12738,8 @@
               "casts": [],
               "borrow_kind": "readonly_ref",
               "repr": "value",
-              "id": "value"
+              "id": "value",
+              "call_arg_type": "Obj"
             },
             "expected_type_id": {
               "kind": "Name",
@@ -12562,6 +12817,8 @@
                 },
                 "args": [],
                 "keywords": [],
+                "lowered_kind": "BuiltinCall",
+                "builtin_name": "_tid_bool",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -12598,7 +12855,8 @@
               "casts": [],
               "borrow_kind": "readonly_ref",
               "repr": "value",
-              "id": "value"
+              "id": "value",
+              "call_arg_type": "Obj"
             },
             "expected_type_id": {
               "kind": "Name",
@@ -12676,6 +12934,8 @@
                 },
                 "args": [],
                 "keywords": [],
+                "lowered_kind": "BuiltinCall",
+                "builtin_name": "_tid_int",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -12712,7 +12972,8 @@
               "casts": [],
               "borrow_kind": "readonly_ref",
               "repr": "value",
-              "id": "value"
+              "id": "value",
+              "call_arg_type": "Obj"
             },
             "expected_type_id": {
               "kind": "Name",
@@ -12790,6 +13051,8 @@
                 },
                 "args": [],
                 "keywords": [],
+                "lowered_kind": "BuiltinCall",
+                "builtin_name": "_tid_float",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -12826,7 +13089,8 @@
               "casts": [],
               "borrow_kind": "readonly_ref",
               "repr": "value",
-              "id": "value"
+              "id": "value",
+              "call_arg_type": "Obj"
             },
             "expected_type_id": {
               "kind": "Name",
@@ -12904,6 +13168,8 @@
                 },
                 "args": [],
                 "keywords": [],
+                "lowered_kind": "BuiltinCall",
+                "builtin_name": "_tid_str",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -12940,7 +13206,8 @@
               "casts": [],
               "borrow_kind": "readonly_ref",
               "repr": "value",
-              "id": "value"
+              "id": "value",
+              "call_arg_type": "Obj"
             },
             "expected_type_id": {
               "kind": "Name",
@@ -13018,6 +13285,8 @@
                 },
                 "args": [],
                 "keywords": [],
+                "lowered_kind": "BuiltinCall",
+                "builtin_name": "_tid_list",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -13054,7 +13323,8 @@
               "casts": [],
               "borrow_kind": "readonly_ref",
               "repr": "value",
-              "id": "value"
+              "id": "value",
+              "call_arg_type": "Obj"
             },
             "expected_type_id": {
               "kind": "Name",
@@ -13132,6 +13402,8 @@
                 },
                 "args": [],
                 "keywords": [],
+                "lowered_kind": "BuiltinCall",
+                "builtin_name": "_tid_dict",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -13168,7 +13440,8 @@
               "casts": [],
               "borrow_kind": "readonly_ref",
               "repr": "value",
-              "id": "value"
+              "id": "value",
+              "call_arg_type": "Obj"
             },
             "expected_type_id": {
               "kind": "Name",
@@ -13246,6 +13519,8 @@
                 },
                 "args": [],
                 "keywords": [],
+                "lowered_kind": "BuiltinCall",
+                "builtin_name": "_tid_set",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -13321,10 +13596,13 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "value",
-                "id": "value"
+                "id": "value",
+                "call_arg_type": "Any"
               }
             ],
             "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "_try_runtime_tagged_type_id",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",
@@ -13456,6 +13734,8 @@
             },
             "args": [],
             "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "_tid_object",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",
@@ -13548,6 +13828,8 @@
             },
             "args": [],
             "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "_ensure_builtins",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",
@@ -13592,6 +13874,8 @@
             },
             "args": [],
             "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "_ensure_type_ranges",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",
@@ -14175,7 +14459,8 @@
               "casts": [],
               "borrow_kind": "readonly_ref",
               "repr": "actual_type_id",
-              "id": "actual_type_id"
+              "id": "actual_type_id",
+              "call_arg_type": "int64"
             },
             "expected_type_id": {
               "kind": "Name",
@@ -14189,7 +14474,8 @@
               "casts": [],
               "borrow_kind": "readonly_ref",
               "repr": "expected_type_id",
-              "id": "expected_type_id"
+              "id": "expected_type_id",
+              "call_arg_type": "int64"
             },
             "source_span": {
               "lineno": 304,
@@ -14297,7 +14583,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "value",
-                "id": "value"
+                "id": "value",
+                "call_arg_type": "Any"
               },
               "source_span": {
                 "lineno": 308,
@@ -14325,7 +14612,8 @@
               "casts": [],
               "borrow_kind": "readonly_ref",
               "repr": "expected_type_id",
-              "id": "expected_type_id"
+              "id": "expected_type_id",
+              "call_arg_type": "int64"
             },
             "source_span": {
               "lineno": 308,
@@ -15024,6 +15312,8 @@
             },
             "args": [],
             "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "_tid_user_base",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",
@@ -15147,6 +15437,8 @@
             },
             "args": [],
             "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "_ensure_builtins",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",

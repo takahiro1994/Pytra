@@ -291,7 +291,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "11",
-                    "value": 11
+                    "value": 11,
+                    "call_arg_type": "int64"
                   }
                 ],
                 "keywords": []
@@ -363,7 +364,7 @@
               "end_lineno": 18,
               "end_col": 48
             },
-            "resolved_type": "unknown",
+            "resolved_type": "bool",
             "casts": [],
             "borrow_kind": "value",
             "repr": "py_assert_stdout(['True'], _case_main)",
@@ -409,7 +410,8 @@
                     "repr": "'True'",
                     "value": "True"
                   }
-                ]
+                ],
+                "call_arg_type": "list[str]"
               },
               {
                 "kind": "Name",
@@ -423,7 +425,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "_case_main",
-                "id": "_case_main"
+                "id": "_case_main",
+                "call_arg_type": "object"
               }
             ],
             "keywords": [],

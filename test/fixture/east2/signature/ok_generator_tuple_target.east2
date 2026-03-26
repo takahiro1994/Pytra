@@ -55,7 +55,7 @@
               "end_lineno": 2,
               "end_col": 62
             },
-            "resolved_type": "list[unknown]",
+            "resolved_type": "list[float64]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "[sum(wi * xi for wi, xi in zip(wo, x)) for wo in w]",
@@ -67,7 +67,7 @@
                 "end_lineno": 2,
                 "end_col": 49
               },
-              "resolved_type": "unknown",
+              "resolved_type": "float64",
               "casts": [],
               "borrow_kind": "value",
               "repr": "sum(wi * xi for wi, xi in zip(wo, x))",
@@ -79,7 +79,7 @@
                   "end_lineno": 2,
                   "end_col": 15
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "callable",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "sum",
@@ -94,7 +94,7 @@
                     "end_lineno": 2,
                     "end_col": 48
                   },
-                  "resolved_type": "list[unknown]",
+                  "resolved_type": "list[float64]",
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "wi * xi for wi, xi in zip(wo, x)",
@@ -106,7 +106,7 @@
                       "end_lineno": 2,
                       "end_col": 23
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "float64",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "wi * xi",
@@ -118,9 +118,9 @@
                         "end_lineno": 2,
                         "end_col": 18
                       },
-                      "resolved_type": "unknown",
+                      "resolved_type": "float64",
                       "casts": [],
-                      "borrow_kind": "value",
+                      "borrow_kind": "readonly_ref",
                       "repr": "wi",
                       "id": "wi"
                     },
@@ -133,9 +133,9 @@
                         "end_lineno": 2,
                         "end_col": 23
                       },
-                      "resolved_type": "unknown",
+                      "resolved_type": "float64",
                       "casts": [],
-                      "borrow_kind": "value",
+                      "borrow_kind": "readonly_ref",
                       "repr": "xi",
                       "id": "xi"
                     }
@@ -150,6 +150,7 @@
                           "end_lineno": 2,
                           "end_col": 34
                         },
+                        "resolved_type": "tuple[float64,float64]",
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "wi, xi",
@@ -162,6 +163,7 @@
                               "end_lineno": 2,
                               "end_col": 30
                             },
+                            "resolved_type": "float64",
                             "casts": [],
                             "borrow_kind": "value",
                             "repr": "wi",
@@ -175,6 +177,7 @@
                               "end_lineno": 2,
                               "end_col": 34
                             },
+                            "resolved_type": "float64",
                             "casts": [],
                             "borrow_kind": "value",
                             "repr": "xi",
@@ -221,7 +224,8 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "wo",
-                            "id": "wo"
+                            "id": "wo",
+                            "call_arg_type": "list[T]"
                           },
                           {
                             "kind": "Name",
@@ -235,7 +239,8 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "x",
-                            "id": "x"
+                            "id": "x",
+                            "call_arg_type": "list[U]"
                           }
                         ],
                         "keywords": [],
@@ -250,10 +255,13 @@
                       "ifs": [],
                       "is_async": false
                     }
-                  ]
+                  ],
+                  "call_arg_type": "list[T]"
                 }
               ],
-              "keywords": []
+              "keywords": [],
+              "lowered_kind": "BuiltinCall",
+              "builtin_name": "sum"
             },
             "generators": [
               {
@@ -438,7 +446,8 @@
                 "repr": "2.0",
                 "value": 2.0
               }
-            ]
+            ],
+            "call_arg_type": "list[float64]"
           },
           {
             "kind": "List",
@@ -539,7 +548,8 @@
                   }
                 ]
               }
-            ]
+            ],
+            "call_arg_type": "list[list[float64]]"
           }
         ],
         "keywords": []

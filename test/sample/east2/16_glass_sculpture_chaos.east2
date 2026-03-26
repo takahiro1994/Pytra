@@ -623,7 +623,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "math",
-                "id": "math"
+                "id": "math",
+                "runtime_module_id": "pytra.std.math"
               },
               "attr": "sqrt"
             },
@@ -780,7 +781,8 @@
                     "repr": "z",
                     "id": "z"
                   }
-                }
+                },
+                "call_arg_type": "float64"
               }
             ],
             "keywords": [],
@@ -912,7 +914,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "x",
-                "id": "x"
+                "id": "x",
+                "call_arg_type": "float64"
               },
               {
                 "kind": "Name",
@@ -926,7 +929,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "y",
-                "id": "y"
+                "id": "y",
+                "call_arg_type": "float64"
               },
               {
                 "kind": "Name",
@@ -940,7 +944,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "z",
-                "id": "z"
+                "id": "z",
+                "call_arg_type": "float64"
               }
             ],
             "keywords": []
@@ -1381,7 +1386,8 @@
                   "casts": [],
                   "borrow_kind": "readonly_ref",
                   "repr": "ix",
-                  "id": "ix"
+                  "id": "ix",
+                  "call_arg_type": "float64"
                 },
                 {
                   "kind": "Name",
@@ -1395,7 +1401,8 @@
                   "casts": [],
                   "borrow_kind": "readonly_ref",
                   "repr": "iy",
-                  "id": "iy"
+                  "id": "iy",
+                  "call_arg_type": "float64"
                 },
                 {
                   "kind": "Name",
@@ -1409,7 +1416,8 @@
                   "casts": [],
                   "borrow_kind": "readonly_ref",
                   "repr": "iz",
-                  "id": "iz"
+                  "id": "iz",
+                  "call_arg_type": "float64"
                 },
                 {
                   "kind": "Name",
@@ -1423,7 +1431,8 @@
                   "casts": [],
                   "borrow_kind": "readonly_ref",
                   "repr": "nx",
-                  "id": "nx"
+                  "id": "nx",
+                  "call_arg_type": "float64"
                 },
                 {
                   "kind": "Name",
@@ -1437,7 +1446,8 @@
                   "casts": [],
                   "borrow_kind": "readonly_ref",
                   "repr": "ny",
-                  "id": "ny"
+                  "id": "ny",
+                  "call_arg_type": "float64"
                 },
                 {
                   "kind": "Name",
@@ -1451,7 +1461,8 @@
                   "casts": [],
                   "borrow_kind": "readonly_ref",
                   "repr": "nz",
-                  "id": "nz"
+                  "id": "nz",
+                  "call_arg_type": "float64"
                 }
               ],
               "keywords": []
@@ -1885,7 +1896,8 @@
                   "casts": [],
                   "borrow_kind": "readonly_ref",
                   "repr": "ix",
-                  "id": "ix"
+                  "id": "ix",
+                  "call_arg_type": "float64"
                 },
                 {
                   "kind": "Name",
@@ -1899,7 +1911,8 @@
                   "casts": [],
                   "borrow_kind": "readonly_ref",
                   "repr": "iy",
-                  "id": "iy"
+                  "id": "iy",
+                  "call_arg_type": "float64"
                 },
                 {
                   "kind": "Name",
@@ -1913,7 +1926,8 @@
                   "casts": [],
                   "borrow_kind": "readonly_ref",
                   "repr": "iz",
-                  "id": "iz"
+                  "id": "iz",
+                  "call_arg_type": "float64"
                 },
                 {
                   "kind": "Name",
@@ -1927,7 +1941,8 @@
                   "casts": [],
                   "borrow_kind": "readonly_ref",
                   "repr": "nx",
-                  "id": "nx"
+                  "id": "nx",
+                  "call_arg_type": "float64"
                 },
                 {
                   "kind": "Name",
@@ -1941,7 +1956,8 @@
                   "casts": [],
                   "borrow_kind": "readonly_ref",
                   "repr": "ny",
-                  "id": "ny"
+                  "id": "ny",
+                  "call_arg_type": "float64"
                 },
                 {
                   "kind": "Name",
@@ -1955,7 +1971,8 @@
                   "casts": [],
                   "borrow_kind": "readonly_ref",
                   "repr": "nz",
-                  "id": "nz"
+                  "id": "nz",
+                  "call_arg_type": "float64"
                 }
               ],
               "keywords": []
@@ -2228,7 +2245,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "ix",
-                    "id": "ix"
+                    "id": "ix",
+                    "call_arg_type": "float64"
                   },
                   {
                     "kind": "Name",
@@ -2242,7 +2260,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "iy",
-                    "id": "iy"
+                    "id": "iy",
+                    "call_arg_type": "float64"
                   },
                   {
                     "kind": "Name",
@@ -2256,7 +2275,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "iz",
-                    "id": "iz"
+                    "id": "iz",
+                    "call_arg_type": "float64"
                   },
                   {
                     "kind": "Name",
@@ -2270,7 +2290,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "nx",
-                    "id": "nx"
+                    "id": "nx",
+                    "call_arg_type": "float64"
                   },
                   {
                     "kind": "Name",
@@ -2284,7 +2305,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "ny",
-                    "id": "ny"
+                    "id": "ny",
+                    "call_arg_type": "float64"
                   },
                   {
                     "kind": "Name",
@@ -2298,7 +2320,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "nz",
-                    "id": "nz"
+                    "id": "nz",
+                    "call_arg_type": "float64"
                   }
                 ],
                 "keywords": []
@@ -2365,7 +2388,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "math",
-                "id": "math"
+                "id": "math",
+                "runtime_module_id": "pytra.std.math"
               },
               "attr": "sqrt"
             },
@@ -2410,7 +2434,8 @@
                   "borrow_kind": "readonly_ref",
                   "repr": "sint2",
                   "id": "sint2"
-                }
+                },
+                "call_arg_type": "float64"
               }
             ],
             "keywords": [],
@@ -3775,7 +3800,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "math",
-                    "id": "math"
+                    "id": "math",
+                    "runtime_module_id": "pytra.std.math"
                   },
                   "attr": "sin"
                 },
@@ -3904,7 +3930,8 @@
                       "borrow_kind": "readonly_ref",
                       "repr": "tphase",
                       "id": "tphase"
-                    }
+                    },
+                    "call_arg_type": "float64"
                   }
                 ],
                 "keywords": [],
@@ -4185,7 +4212,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "r",
-                    "id": "r"
+                    "id": "r",
+                    "call_arg_type": "float64"
                   }
                 ],
                 "keywords": []
@@ -4229,7 +4257,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "g",
-                    "id": "g"
+                    "id": "g",
+                    "call_arg_type": "float64"
                   }
                 ],
                 "keywords": []
@@ -4273,7 +4302,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "b",
-                    "id": "b"
+                    "id": "b",
+                    "call_arg_type": "float64"
                   }
                 ],
                 "keywords": []
@@ -5301,7 +5331,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "math",
-                "id": "math"
+                "id": "math",
+                "runtime_module_id": "pytra.std.math"
               },
               "attr": "sqrt"
             },
@@ -5318,7 +5349,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "h",
-                "id": "h"
+                "id": "h",
+                "call_arg_type": "float64"
               }
             ],
             "keywords": [],
@@ -6414,7 +6446,8 @@
                       "borrow_kind": "value",
                       "repr": "7",
                       "value": 7
-                    }
+                    },
+                    "call_arg_type": "Obj"
                   }
                 ],
                 "keywords": [],
@@ -6643,7 +6676,8 @@
                       "borrow_kind": "value",
                       "repr": "7",
                       "value": 7
-                    }
+                    },
+                    "call_arg_type": "Obj"
                   }
                 ],
                 "keywords": [],
@@ -6872,7 +6906,8 @@
                       "borrow_kind": "value",
                       "repr": "3",
                       "value": 3
-                    }
+                    },
+                    "call_arg_type": "Obj"
                   }
                 ],
                 "keywords": [],
@@ -7090,7 +7125,8 @@
                       "casts": [],
                       "borrow_kind": "readonly_ref",
                       "repr": "r",
-                      "id": "r"
+                      "id": "r",
+                      "call_arg_type": "float64"
                     }
                   ],
                   "keywords": []
@@ -7109,7 +7145,8 @@
                   "borrow_kind": "value",
                   "repr": "255.0",
                   "value": 255.0
-                }
+                },
+                "call_arg_type": "Obj"
               }
             ],
             "keywords": [],
@@ -7225,7 +7262,8 @@
                       "casts": [],
                       "borrow_kind": "readonly_ref",
                       "repr": "g",
-                      "id": "g"
+                      "id": "g",
+                      "call_arg_type": "float64"
                     }
                   ],
                   "keywords": []
@@ -7244,7 +7282,8 @@
                   "borrow_kind": "value",
                   "repr": "255.0",
                   "value": 255.0
-                }
+                },
+                "call_arg_type": "Obj"
               }
             ],
             "keywords": [],
@@ -7360,7 +7399,8 @@
                       "casts": [],
                       "borrow_kind": "readonly_ref",
                       "repr": "b",
-                      "id": "b"
+                      "id": "b",
+                      "call_arg_type": "float64"
                     }
                   ],
                   "keywords": []
@@ -7379,7 +7419,8 @@
                   "borrow_kind": "value",
                   "repr": "255.0",
                   "value": 255.0
-                }
+                },
+                "call_arg_type": "Obj"
               }
             ],
             "keywords": [],
@@ -7843,9 +7884,15 @@
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "math",
-                  "id": "math"
+                  "id": "math",
+                  "runtime_module_id": "pytra.std.math"
                 },
-                "attr": "pi"
+                "attr": "pi",
+                "runtime_module_id": "pytra.std.math",
+                "runtime_symbol": "pi",
+                "runtime_symbol_dispatch": "value",
+                "runtime_call_adapter_kind": "math.value_getter",
+                "semantic_tag": "stdlib.symbol.pi"
               }
             },
             "op": "Mult",
@@ -8006,7 +8053,8 @@
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "math",
-                  "id": "math"
+                  "id": "math",
+                  "runtime_module_id": "pytra.std.math"
                 },
                 "attr": "cos"
               },
@@ -8051,7 +8099,8 @@
                     "borrow_kind": "value",
                     "repr": "0.9",
                     "value": 0.9
-                  }
+                  },
+                  "call_arg_type": "float64"
                 }
               ],
               "keywords": [],
@@ -8179,7 +8228,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "math",
-                    "id": "math"
+                    "id": "math",
+                    "runtime_module_id": "pytra.std.math"
                   },
                   "attr": "sin"
                 },
@@ -8224,7 +8274,8 @@
                       "borrow_kind": "value",
                       "repr": "0.6",
                       "value": 0.6
-                    }
+                    },
+                    "call_arg_type": "float64"
                   }
                 ],
                 "keywords": [],
@@ -8326,7 +8377,8 @@
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "math",
-                  "id": "math"
+                  "id": "math",
+                  "runtime_module_id": "pytra.std.math"
                 },
                 "attr": "sin"
               },
@@ -8371,7 +8423,8 @@
                     "borrow_kind": "value",
                     "repr": "0.9",
                     "value": 0.9
-                  }
+                  },
+                  "call_arg_type": "float64"
                 }
               ],
               "keywords": [],
@@ -8639,7 +8692,8 @@
                   "borrow_kind": "readonly_ref",
                   "repr": "cam_x",
                   "id": "cam_x"
-                }
+                },
+                "call_arg_type": "float64"
               },
               {
                 "kind": "BinOp",
@@ -8681,7 +8735,8 @@
                   "borrow_kind": "readonly_ref",
                   "repr": "cam_y",
                   "id": "cam_y"
-                }
+                },
+                "call_arg_type": "float64"
               },
               {
                 "kind": "BinOp",
@@ -8723,7 +8778,8 @@
                   "borrow_kind": "readonly_ref",
                   "repr": "cam_z",
                   "id": "cam_z"
-                }
+                },
+                "call_arg_type": "float64"
               }
             ],
             "keywords": []
@@ -8840,7 +8896,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "fwd_z",
-                "id": "fwd_z"
+                "id": "fwd_z",
+                "call_arg_type": "float64"
               },
               {
                 "kind": "Constant",
@@ -8854,7 +8911,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "0.0",
-                "value": 0.0
+                "value": 0.0,
+                "call_arg_type": "float64"
               },
               {
                 "kind": "UnaryOp",
@@ -8882,7 +8940,8 @@
                   "borrow_kind": "readonly_ref",
                   "repr": "fwd_x",
                   "id": "fwd_x"
-                }
+                },
+                "call_arg_type": "float64"
               }
             ],
             "keywords": []
@@ -9077,7 +9136,8 @@
                     "repr": "fwd_y",
                     "id": "fwd_y"
                   }
-                }
+                },
+                "call_arg_type": "float64"
               },
               {
                 "kind": "BinOp",
@@ -9175,7 +9235,8 @@
                     "repr": "fwd_z",
                     "id": "fwd_z"
                   }
-                }
+                },
+                "call_arg_type": "float64"
               },
               {
                 "kind": "BinOp",
@@ -9273,7 +9334,8 @@
                     "repr": "fwd_x",
                     "id": "fwd_x"
                   }
-                }
+                },
+                "call_arg_type": "float64"
               }
             ],
             "keywords": []
@@ -9365,7 +9427,8 @@
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "math",
-                  "id": "math"
+                  "id": "math",
+                  "runtime_module_id": "pytra.std.math"
                 },
                 "attr": "cos"
               },
@@ -9410,7 +9473,8 @@
                     "borrow_kind": "readonly_ref",
                     "repr": "tphase",
                     "id": "tphase"
-                  }
+                  },
+                  "call_arg_type": "float64"
                 }
               ],
               "keywords": [],
@@ -9567,7 +9631,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "math",
-                    "id": "math"
+                    "id": "math",
+                    "runtime_module_id": "pytra.std.math"
                   },
                   "attr": "sin"
                 },
@@ -9612,7 +9677,8 @@
                       "borrow_kind": "readonly_ref",
                       "repr": "tphase",
                       "id": "tphase"
-                    }
+                    },
+                    "call_arg_type": "float64"
                   }
                 ],
                 "keywords": [],
@@ -9714,7 +9780,8 @@
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "math",
-                  "id": "math"
+                  "id": "math",
+                  "runtime_module_id": "pytra.std.math"
                 },
                 "attr": "sin"
               },
@@ -9759,7 +9826,8 @@
                     "borrow_kind": "readonly_ref",
                     "repr": "tphase",
                     "id": "tphase"
-                  }
+                  },
+                  "call_arg_type": "float64"
                 }
               ],
               "keywords": [],
@@ -9860,7 +9928,8 @@
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "math",
-                  "id": "math"
+                  "id": "math",
+                  "runtime_module_id": "pytra.std.math"
                 },
                 "attr": "cos"
               },
@@ -9933,7 +10002,8 @@
                     "borrow_kind": "value",
                     "repr": "2.094",
                     "value": 2.094
-                  }
+                  },
+                  "call_arg_type": "float64"
                 }
               ],
               "keywords": [],
@@ -10061,7 +10131,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "math",
-                    "id": "math"
+                    "id": "math",
+                    "runtime_module_id": "pytra.std.math"
                   },
                   "attr": "sin"
                 },
@@ -10134,7 +10205,8 @@
                       "borrow_kind": "value",
                       "repr": "0.8",
                       "value": 0.8
-                    }
+                    },
+                    "call_arg_type": "float64"
                   }
                 ],
                 "keywords": [],
@@ -10236,7 +10308,8 @@
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "math",
-                  "id": "math"
+                  "id": "math",
+                  "runtime_module_id": "pytra.std.math"
                 },
                 "attr": "sin"
               },
@@ -10309,7 +10382,8 @@
                     "borrow_kind": "value",
                     "repr": "2.094",
                     "value": 2.094
-                  }
+                  },
+                  "call_arg_type": "float64"
                 }
               ],
               "keywords": [],
@@ -10410,7 +10484,8 @@
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "math",
-                  "id": "math"
+                  "id": "math",
+                  "runtime_module_id": "pytra.std.math"
                 },
                 "attr": "cos"
               },
@@ -10483,7 +10558,8 @@
                     "borrow_kind": "value",
                     "repr": "4.188",
                     "value": 4.188
-                  }
+                  },
+                  "call_arg_type": "float64"
                 }
               ],
               "keywords": [],
@@ -10611,7 +10687,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "math",
-                    "id": "math"
+                    "id": "math",
+                    "runtime_module_id": "pytra.std.math"
                   },
                   "attr": "sin"
                 },
@@ -10684,7 +10761,8 @@
                       "borrow_kind": "value",
                       "repr": "1.9",
                       "value": 1.9
-                    }
+                    },
+                    "call_arg_type": "float64"
                   }
                 ],
                 "keywords": [],
@@ -10786,7 +10864,8 @@
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "math",
-                  "id": "math"
+                  "id": "math",
+                  "runtime_module_id": "pytra.std.math"
                 },
                 "attr": "sin"
               },
@@ -10859,7 +10938,8 @@
                     "borrow_kind": "value",
                     "repr": "4.188",
                     "value": 4.188
-                  }
+                  },
+                  "call_arg_type": "float64"
                 }
               ],
               "keywords": [],
@@ -11000,7 +11080,8 @@
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "math",
-                  "id": "math"
+                  "id": "math",
+                  "runtime_module_id": "pytra.std.math"
                 },
                 "attr": "cos"
               },
@@ -11045,7 +11126,8 @@
                     "borrow_kind": "value",
                     "repr": "1.8",
                     "value": 1.8
-                  }
+                  },
+                  "call_arg_type": "float64"
                 }
               ],
               "keywords": [],
@@ -11173,7 +11255,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "math",
-                    "id": "math"
+                    "id": "math",
+                    "runtime_module_id": "pytra.std.math"
                   },
                   "attr": "sin"
                 },
@@ -11218,7 +11301,8 @@
                       "borrow_kind": "value",
                       "repr": "1.2",
                       "value": 1.2
-                    }
+                    },
+                    "call_arg_type": "float64"
                   }
                 ],
                 "keywords": [],
@@ -11320,7 +11404,8 @@
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "math",
-                  "id": "math"
+                  "id": "math",
+                  "runtime_module_id": "pytra.std.math"
                 },
                 "attr": "sin"
               },
@@ -11365,7 +11450,8 @@
                     "borrow_kind": "value",
                     "repr": "1.8",
                     "value": 1.8
-                  }
+                  },
+                  "call_arg_type": "float64"
                 }
               ],
               "keywords": [],
@@ -12812,7 +12898,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "rx",
-                        "id": "rx"
+                        "id": "rx",
+                        "call_arg_type": "float64"
                       },
                       {
                         "kind": "Name",
@@ -12826,7 +12913,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "ry",
-                        "id": "ry"
+                        "id": "ry",
+                        "call_arg_type": "float64"
                       },
                       {
                         "kind": "Name",
@@ -12840,7 +12928,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "rz",
-                        "id": "rz"
+                        "id": "rz",
+                        "call_arg_type": "float64"
                       }
                     ],
                     "keywords": []
@@ -13516,7 +13605,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "cam_x",
-                        "id": "cam_x"
+                        "id": "cam_x",
+                        "call_arg_type": "float64"
                       },
                       {
                         "kind": "Name",
@@ -13530,7 +13620,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "cam_y",
-                        "id": "cam_y"
+                        "id": "cam_y",
+                        "call_arg_type": "float64"
                       },
                       {
                         "kind": "Name",
@@ -13544,7 +13635,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "cam_z",
-                        "id": "cam_z"
+                        "id": "cam_z",
+                        "call_arg_type": "float64"
                       },
                       {
                         "kind": "Name",
@@ -13558,7 +13650,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "dx",
-                        "id": "dx"
+                        "id": "dx",
+                        "call_arg_type": "float64"
                       },
                       {
                         "kind": "Name",
@@ -13572,7 +13665,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "dy",
-                        "id": "dy"
+                        "id": "dy",
+                        "call_arg_type": "float64"
                       },
                       {
                         "kind": "Name",
@@ -13586,7 +13680,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "dz",
-                        "id": "dz"
+                        "id": "dz",
+                        "call_arg_type": "float64"
                       },
                       {
                         "kind": "Name",
@@ -13600,7 +13695,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "s0x",
-                        "id": "s0x"
+                        "id": "s0x",
+                        "call_arg_type": "float64"
                       },
                       {
                         "kind": "Name",
@@ -13614,7 +13710,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "s0y",
-                        "id": "s0y"
+                        "id": "s0y",
+                        "call_arg_type": "float64"
                       },
                       {
                         "kind": "Name",
@@ -13628,7 +13725,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "s0z",
-                        "id": "s0z"
+                        "id": "s0z",
+                        "call_arg_type": "float64"
                       },
                       {
                         "kind": "Constant",
@@ -13642,7 +13740,8 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "0.65",
-                        "value": 0.65
+                        "value": 0.65,
+                        "call_arg_type": "float64"
                       }
                     ],
                     "keywords": []
@@ -13912,7 +14011,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "cam_x",
-                        "id": "cam_x"
+                        "id": "cam_x",
+                        "call_arg_type": "float64"
                       },
                       {
                         "kind": "Name",
@@ -13926,7 +14026,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "cam_y",
-                        "id": "cam_y"
+                        "id": "cam_y",
+                        "call_arg_type": "float64"
                       },
                       {
                         "kind": "Name",
@@ -13940,7 +14041,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "cam_z",
-                        "id": "cam_z"
+                        "id": "cam_z",
+                        "call_arg_type": "float64"
                       },
                       {
                         "kind": "Name",
@@ -13954,7 +14056,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "dx",
-                        "id": "dx"
+                        "id": "dx",
+                        "call_arg_type": "float64"
                       },
                       {
                         "kind": "Name",
@@ -13968,7 +14071,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "dy",
-                        "id": "dy"
+                        "id": "dy",
+                        "call_arg_type": "float64"
                       },
                       {
                         "kind": "Name",
@@ -13982,7 +14086,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "dz",
-                        "id": "dz"
+                        "id": "dz",
+                        "call_arg_type": "float64"
                       },
                       {
                         "kind": "Name",
@@ -13996,7 +14101,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "s1x",
-                        "id": "s1x"
+                        "id": "s1x",
+                        "call_arg_type": "float64"
                       },
                       {
                         "kind": "Name",
@@ -14010,7 +14116,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "s1y",
-                        "id": "s1y"
+                        "id": "s1y",
+                        "call_arg_type": "float64"
                       },
                       {
                         "kind": "Name",
@@ -14024,7 +14131,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "s1z",
-                        "id": "s1z"
+                        "id": "s1z",
+                        "call_arg_type": "float64"
                       },
                       {
                         "kind": "Constant",
@@ -14038,7 +14146,8 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "0.72",
-                        "value": 0.72
+                        "value": 0.72,
+                        "call_arg_type": "float64"
                       }
                     ],
                     "keywords": []
@@ -14308,7 +14417,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "cam_x",
-                        "id": "cam_x"
+                        "id": "cam_x",
+                        "call_arg_type": "float64"
                       },
                       {
                         "kind": "Name",
@@ -14322,7 +14432,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "cam_y",
-                        "id": "cam_y"
+                        "id": "cam_y",
+                        "call_arg_type": "float64"
                       },
                       {
                         "kind": "Name",
@@ -14336,7 +14447,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "cam_z",
-                        "id": "cam_z"
+                        "id": "cam_z",
+                        "call_arg_type": "float64"
                       },
                       {
                         "kind": "Name",
@@ -14350,7 +14462,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "dx",
-                        "id": "dx"
+                        "id": "dx",
+                        "call_arg_type": "float64"
                       },
                       {
                         "kind": "Name",
@@ -14364,7 +14477,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "dy",
-                        "id": "dy"
+                        "id": "dy",
+                        "call_arg_type": "float64"
                       },
                       {
                         "kind": "Name",
@@ -14378,7 +14492,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "dz",
-                        "id": "dz"
+                        "id": "dz",
+                        "call_arg_type": "float64"
                       },
                       {
                         "kind": "Name",
@@ -14392,7 +14507,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "s2x",
-                        "id": "s2x"
+                        "id": "s2x",
+                        "call_arg_type": "float64"
                       },
                       {
                         "kind": "Name",
@@ -14406,7 +14522,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "s2y",
-                        "id": "s2y"
+                        "id": "s2y",
+                        "call_arg_type": "float64"
                       },
                       {
                         "kind": "Name",
@@ -14420,7 +14537,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "s2z",
-                        "id": "s2z"
+                        "id": "s2z",
+                        "call_arg_type": "float64"
                       },
                       {
                         "kind": "Constant",
@@ -14434,7 +14552,8 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "0.58",
-                        "value": 0.58
+                        "value": 0.58,
+                        "call_arg_type": "float64"
                       }
                     ],
                     "keywords": []
@@ -14802,7 +14921,8 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "dx",
-                            "id": "dx"
+                            "id": "dx",
+                            "call_arg_type": "float64"
                           },
                           {
                             "kind": "Name",
@@ -14816,7 +14936,8 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "dy",
-                            "id": "dy"
+                            "id": "dy",
+                            "call_arg_type": "float64"
                           },
                           {
                             "kind": "Name",
@@ -14830,7 +14951,8 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "dz",
-                            "id": "dz"
+                            "id": "dz",
+                            "call_arg_type": "float64"
                           },
                           {
                             "kind": "Name",
@@ -14844,7 +14966,8 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "tphase",
-                            "id": "tphase"
+                            "id": "tphase",
+                            "call_arg_type": "float64"
                           }
                         ],
                         "keywords": []
@@ -15185,7 +15308,8 @@
                                     "casts": [],
                                     "borrow_kind": "value",
                                     "repr": "math",
-                                    "id": "math"
+                                    "id": "math",
+                                    "runtime_module_id": "pytra.std.math"
                                   },
                                   "attr": "floor"
                                 },
@@ -15230,7 +15354,8 @@
                                       "borrow_kind": "value",
                                       "repr": "2.0",
                                       "value": 2.0
-                                    }
+                                    },
+                                    "call_arg_type": "float64"
                                   }
                                 ],
                                 "keywords": [],
@@ -15239,7 +15364,8 @@
                                 "runtime_module_id": "pytra.std.math",
                                 "runtime_symbol": "floor",
                                 "runtime_call_adapter_kind": "math.float_args",
-                                "semantic_tag": "stdlib.method.floor"
+                                "semantic_tag": "stdlib.method.floor",
+                                "call_arg_type": "Obj"
                               }
                             ],
                             "keywords": [],
@@ -15340,7 +15466,8 @@
                                     "casts": [],
                                     "borrow_kind": "value",
                                     "repr": "math",
-                                    "id": "math"
+                                    "id": "math",
+                                    "runtime_module_id": "pytra.std.math"
                                   },
                                   "attr": "floor"
                                 },
@@ -15385,7 +15512,8 @@
                                       "borrow_kind": "value",
                                       "repr": "2.0",
                                       "value": 2.0
-                                    }
+                                    },
+                                    "call_arg_type": "float64"
                                   }
                                 ],
                                 "keywords": [],
@@ -15394,7 +15522,8 @@
                                 "runtime_module_id": "pytra.std.math",
                                 "runtime_symbol": "floor",
                                 "runtime_call_adapter_kind": "math.float_args",
-                                "semantic_tag": "stdlib.method.floor"
+                                "semantic_tag": "stdlib.method.floor",
+                                "call_arg_type": "Obj"
                               }
                             ],
                             "keywords": [],
@@ -16249,7 +16378,8 @@
                                 "casts": [],
                                 "borrow_kind": "readonly_ref",
                                 "repr": "lxv",
-                                "id": "lxv"
+                                "id": "lxv",
+                                "call_arg_type": "float64"
                               },
                               {
                                 "kind": "Name",
@@ -16263,7 +16393,8 @@
                                 "casts": [],
                                 "borrow_kind": "readonly_ref",
                                 "repr": "lyv",
-                                "id": "lyv"
+                                "id": "lyv",
+                                "call_arg_type": "float64"
                               },
                               {
                                 "kind": "Name",
@@ -16277,7 +16408,8 @@
                                 "casts": [],
                                 "borrow_kind": "readonly_ref",
                                 "repr": "lzv",
-                                "id": "lzv"
+                                "id": "lzv",
+                                "call_arg_type": "float64"
                               }
                             ],
                             "keywords": []
@@ -18315,7 +18447,8 @@
                                   "borrow_kind": "readonly_ref",
                                   "repr": "rad",
                                   "id": "rad"
-                                }
+                                },
+                                "call_arg_type": "float64"
                               },
                               {
                                 "kind": "BinOp",
@@ -18385,7 +18518,8 @@
                                   "borrow_kind": "readonly_ref",
                                   "repr": "rad",
                                   "id": "rad"
-                                }
+                                },
+                                "call_arg_type": "float64"
                               },
                               {
                                 "kind": "BinOp",
@@ -18455,7 +18589,8 @@
                                   "borrow_kind": "readonly_ref",
                                   "repr": "rad",
                                   "id": "rad"
-                                }
+                                },
+                                "call_arg_type": "float64"
                               }
                             ],
                             "keywords": []
@@ -18566,7 +18701,8 @@
                                 "casts": [],
                                 "borrow_kind": "readonly_ref",
                                 "repr": "dx",
-                                "id": "dx"
+                                "id": "dx",
+                                "call_arg_type": "float64"
                               },
                               {
                                 "kind": "Name",
@@ -18580,7 +18716,8 @@
                                 "casts": [],
                                 "borrow_kind": "readonly_ref",
                                 "repr": "dy",
-                                "id": "dy"
+                                "id": "dy",
+                                "call_arg_type": "float64"
                               },
                               {
                                 "kind": "Name",
@@ -18594,7 +18731,8 @@
                                 "casts": [],
                                 "borrow_kind": "readonly_ref",
                                 "repr": "dz",
-                                "id": "dz"
+                                "id": "dz",
+                                "call_arg_type": "float64"
                               },
                               {
                                 "kind": "Name",
@@ -18608,7 +18746,8 @@
                                 "casts": [],
                                 "borrow_kind": "readonly_ref",
                                 "repr": "nx",
-                                "id": "nx"
+                                "id": "nx",
+                                "call_arg_type": "float64"
                               },
                               {
                                 "kind": "Name",
@@ -18622,7 +18761,8 @@
                                 "casts": [],
                                 "borrow_kind": "readonly_ref",
                                 "repr": "ny",
-                                "id": "ny"
+                                "id": "ny",
+                                "call_arg_type": "float64"
                               },
                               {
                                 "kind": "Name",
@@ -18636,7 +18776,8 @@
                                 "casts": [],
                                 "borrow_kind": "readonly_ref",
                                 "repr": "nz",
-                                "id": "nz"
+                                "id": "nz",
+                                "call_arg_type": "float64"
                               }
                             ],
                             "keywords": []
@@ -18760,7 +18901,8 @@
                                 "casts": [],
                                 "borrow_kind": "readonly_ref",
                                 "repr": "dx",
-                                "id": "dx"
+                                "id": "dx",
+                                "call_arg_type": "float64"
                               },
                               {
                                 "kind": "Name",
@@ -18774,7 +18916,8 @@
                                 "casts": [],
                                 "borrow_kind": "readonly_ref",
                                 "repr": "dy",
-                                "id": "dy"
+                                "id": "dy",
+                                "call_arg_type": "float64"
                               },
                               {
                                 "kind": "Name",
@@ -18788,7 +18931,8 @@
                                 "casts": [],
                                 "borrow_kind": "readonly_ref",
                                 "repr": "dz",
-                                "id": "dz"
+                                "id": "dz",
+                                "call_arg_type": "float64"
                               },
                               {
                                 "kind": "Name",
@@ -18802,7 +18946,8 @@
                                 "casts": [],
                                 "borrow_kind": "readonly_ref",
                                 "repr": "nx",
-                                "id": "nx"
+                                "id": "nx",
+                                "call_arg_type": "float64"
                               },
                               {
                                 "kind": "Name",
@@ -18816,7 +18961,8 @@
                                 "casts": [],
                                 "borrow_kind": "readonly_ref",
                                 "repr": "ny",
-                                "id": "ny"
+                                "id": "ny",
+                                "call_arg_type": "float64"
                               },
                               {
                                 "kind": "Name",
@@ -18830,7 +18976,8 @@
                                 "casts": [],
                                 "borrow_kind": "readonly_ref",
                                 "repr": "nz",
-                                "id": "nz"
+                                "id": "nz",
+                                "call_arg_type": "float64"
                               },
                               {
                                 "kind": "BinOp",
@@ -18872,7 +19019,8 @@
                                   "borrow_kind": "value",
                                   "repr": "1.45",
                                   "value": 1.45
-                                }
+                                },
+                                "call_arg_type": "float64"
                               }
                             ],
                             "keywords": []
@@ -18983,7 +19131,8 @@
                                 "casts": [],
                                 "borrow_kind": "readonly_ref",
                                 "repr": "rdx",
-                                "id": "rdx"
+                                "id": "rdx",
+                                "call_arg_type": "float64"
                               },
                               {
                                 "kind": "Name",
@@ -18997,7 +19146,8 @@
                                 "casts": [],
                                 "borrow_kind": "readonly_ref",
                                 "repr": "rdy",
-                                "id": "rdy"
+                                "id": "rdy",
+                                "call_arg_type": "float64"
                               },
                               {
                                 "kind": "Name",
@@ -19011,7 +19161,8 @@
                                 "casts": [],
                                 "borrow_kind": "readonly_ref",
                                 "repr": "rdz",
-                                "id": "rdz"
+                                "id": "rdz",
+                                "call_arg_type": "float64"
                               },
                               {
                                 "kind": "Name",
@@ -19025,7 +19176,8 @@
                                 "casts": [],
                                 "borrow_kind": "readonly_ref",
                                 "repr": "tphase",
-                                "id": "tphase"
+                                "id": "tphase",
+                                "call_arg_type": "float64"
                               }
                             ],
                             "keywords": []
@@ -19136,7 +19288,8 @@
                                 "casts": [],
                                 "borrow_kind": "readonly_ref",
                                 "repr": "tdx",
-                                "id": "tdx"
+                                "id": "tdx",
+                                "call_arg_type": "float64"
                               },
                               {
                                 "kind": "Name",
@@ -19150,7 +19303,8 @@
                                 "casts": [],
                                 "borrow_kind": "readonly_ref",
                                 "repr": "tdy",
-                                "id": "tdy"
+                                "id": "tdy",
+                                "call_arg_type": "float64"
                               },
                               {
                                 "kind": "Name",
@@ -19164,7 +19318,8 @@
                                 "casts": [],
                                 "borrow_kind": "readonly_ref",
                                 "repr": "tdz",
-                                "id": "tdz"
+                                "id": "tdz",
+                                "call_arg_type": "float64"
                               },
                               {
                                 "kind": "BinOp",
@@ -19206,7 +19361,8 @@
                                   "borrow_kind": "value",
                                   "repr": "0.8",
                                   "value": 0.8
-                                }
+                                },
+                                "call_arg_type": "float64"
                               }
                             ],
                             "keywords": []
@@ -19519,7 +19675,8 @@
                                 "casts": [],
                                 "borrow_kind": "readonly_ref",
                                 "repr": "cosi",
-                                "id": "cosi"
+                                "id": "cosi",
+                                "call_arg_type": "float64"
                               },
                               {
                                 "kind": "Constant",
@@ -19533,7 +19690,8 @@
                                 "casts": [],
                                 "borrow_kind": "value",
                                 "repr": "0.04",
-                                "value": 0.04
+                                "value": 0.04,
+                                "call_arg_type": "float64"
                               }
                             ],
                             "keywords": []
@@ -20312,7 +20470,8 @@
                                 "casts": [],
                                 "borrow_kind": "readonly_ref",
                                 "repr": "lxv",
-                                "id": "lxv"
+                                "id": "lxv",
+                                "call_arg_type": "float64"
                               },
                               {
                                 "kind": "Name",
@@ -20326,7 +20485,8 @@
                                 "casts": [],
                                 "borrow_kind": "readonly_ref",
                                 "repr": "lyv",
-                                "id": "lyv"
+                                "id": "lyv",
+                                "call_arg_type": "float64"
                               },
                               {
                                 "kind": "Name",
@@ -20340,7 +20500,8 @@
                                 "casts": [],
                                 "borrow_kind": "readonly_ref",
                                 "repr": "lzv",
-                                "id": "lzv"
+                                "id": "lzv",
+                                "call_arg_type": "float64"
                               }
                             ],
                             "keywords": []
@@ -20710,7 +20871,8 @@
                                   "borrow_kind": "readonly_ref",
                                   "repr": "dx",
                                   "id": "dx"
-                                }
+                                },
+                                "call_arg_type": "float64"
                               },
                               {
                                 "kind": "BinOp",
@@ -20752,7 +20914,8 @@
                                   "borrow_kind": "readonly_ref",
                                   "repr": "dy",
                                   "id": "dy"
-                                }
+                                },
+                                "call_arg_type": "float64"
                               },
                               {
                                 "kind": "BinOp",
@@ -20794,7 +20957,8 @@
                                   "borrow_kind": "readonly_ref",
                                   "repr": "dz",
                                   "id": "dz"
-                                }
+                                },
+                                "call_arg_type": "float64"
                               }
                             ],
                             "keywords": []
@@ -22633,7 +22797,8 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "math",
-                        "id": "math"
+                        "id": "math",
+                        "runtime_module_id": "pytra.std.math"
                       },
                       "attr": "sqrt"
                     },
@@ -22677,10 +22842,12 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "r",
-                            "id": "r"
+                            "id": "r",
+                            "call_arg_type": "float64"
                           }
                         ],
-                        "keywords": []
+                        "keywords": [],
+                        "call_arg_type": "float64"
                       }
                     ],
                     "keywords": [],
@@ -22753,7 +22920,8 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "math",
-                        "id": "math"
+                        "id": "math",
+                        "runtime_module_id": "pytra.std.math"
                       },
                       "attr": "sqrt"
                     },
@@ -22797,10 +22965,12 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "g",
-                            "id": "g"
+                            "id": "g",
+                            "call_arg_type": "float64"
                           }
                         ],
-                        "keywords": []
+                        "keywords": [],
+                        "call_arg_type": "float64"
                       }
                     ],
                     "keywords": [],
@@ -22873,7 +23043,8 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "math",
-                        "id": "math"
+                        "id": "math",
+                        "runtime_module_id": "pytra.std.math"
                       },
                       "attr": "sqrt"
                     },
@@ -22917,10 +23088,12 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "b",
-                            "id": "b"
+                            "id": "b",
+                            "call_arg_type": "float64"
                           }
                         ],
-                        "keywords": []
+                        "keywords": [],
+                        "call_arg_type": "float64"
                       }
                     ],
                     "keywords": [],
@@ -23051,7 +23224,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "r",
-                        "id": "r"
+                        "id": "r",
+                        "call_arg_type": "float64"
                       },
                       {
                         "kind": "Name",
@@ -23065,7 +23239,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "g",
-                        "id": "g"
+                        "id": "g",
+                        "call_arg_type": "float64"
                       },
                       {
                         "kind": "Name",
@@ -23079,7 +23254,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "b",
-                        "id": "b"
+                        "id": "b",
+                        "call_arg_type": "float64"
                       }
                     ],
                     "keywords": []
@@ -23467,7 +23643,7 @@
               "end_lineno": 297,
               "end_col": 28
             },
-            "resolved_type": "list[unknown]",
+            "resolved_type": "list[bytes]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "[]",
@@ -23651,7 +23827,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "width",
-                        "id": "width"
+                        "id": "width",
+                        "call_arg_type": "int64"
                       },
                       {
                         "kind": "Name",
@@ -23665,7 +23842,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "height",
-                        "id": "height"
+                        "id": "height",
+                        "call_arg_type": "int64"
                       },
                       {
                         "kind": "Name",
@@ -23679,7 +23857,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "i",
-                        "id": "i"
+                        "id": "i",
+                        "call_arg_type": "int64"
                       },
                       {
                         "kind": "Name",
@@ -23693,10 +23872,12 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "frames_n",
-                        "id": "frames_n"
+                        "id": "frames_n",
+                        "call_arg_type": "int64"
                       }
                     ],
-                    "keywords": []
+                    "keywords": [],
+                    "call_arg_type": "bytes"
                   }
                 ],
                 "keywords": [],
@@ -23742,7 +23923,7 @@
               "end_lineno": 301,
               "end_col": 80
             },
-            "resolved_type": "unknown",
+            "resolved_type": "None",
             "casts": [],
             "borrow_kind": "value",
             "repr": "save_gif(out_path, width, height, frames, palette_332(), delay_cs=6, loop=0)",
@@ -23773,7 +23954,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "out_path",
-                "id": "out_path"
+                "id": "out_path",
+                "call_arg_type": "str"
               },
               {
                 "kind": "Name",
@@ -23787,7 +23969,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "width",
-                "id": "width"
+                "id": "width",
+                "call_arg_type": "int64"
               },
               {
                 "kind": "Name",
@@ -23801,7 +23984,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "height",
-                "id": "height"
+                "id": "height",
+                "call_arg_type": "int64"
               },
               {
                 "kind": "Name",
@@ -23815,7 +23999,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "frames",
-                "id": "frames"
+                "id": "frames",
+                "call_arg_type": "list[bytes]"
               },
               {
                 "kind": "Call",
@@ -23844,7 +24029,8 @@
                   "id": "palette_332"
                 },
                 "args": [],
-                "keywords": []
+                "keywords": [],
+                "call_arg_type": "bytes"
               }
             ],
             "keywords": [
@@ -23862,7 +24048,8 @@
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "6",
-                  "value": 6
+                  "value": 6,
+                  "call_arg_type": "int64"
                 }
               },
               {
@@ -23879,7 +24066,8 @@
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "0",
-                  "value": 0
+                  "value": 0,
+                  "call_arg_type": "int64"
                 }
               }
             ],

@@ -189,7 +189,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "src",
-                "id": "src"
+                "id": "src",
+                "call_arg_type": "Obj"
               }
             ],
             "keywords": [],
@@ -592,7 +593,7 @@
               "id": "data",
               "iterable_trait": "yes",
               "iter_protocol": "static_range",
-              "iter_element_type": "unknown"
+              "iter_element_type": "int64"
             },
             "dispatch_mode": "native",
             "init_op": "ObjIterInit",
@@ -600,7 +601,8 @@
           },
           "target_plan": {
             "kind": "NameTarget",
-            "id": "b"
+            "id": "b",
+            "target_type": "int64"
           },
           "body": [
             {
@@ -663,9 +665,9 @@
                     "end_lineno": 21,
                     "end_col_offset": 21
                   },
-                  "resolved_type": "unknown",
+                  "resolved_type": "int64",
                   "casts": [],
-                  "borrow_kind": "value",
+                  "borrow_kind": "readonly_ref",
                   "repr": "b",
                   "id": "b"
                 }
@@ -1398,7 +1400,7 @@
               "id": "data",
               "iterable_trait": "yes",
               "iter_protocol": "static_range",
-              "iter_element_type": "unknown"
+              "iter_element_type": "int64"
             },
             "dispatch_mode": "native",
             "init_op": "ObjIterInit",
@@ -1406,7 +1408,8 @@
           },
           "target_plan": {
             "kind": "NameTarget",
-            "id": "b"
+            "id": "b",
+            "target_type": "int64"
           },
           "body": [
             {
@@ -1435,55 +1438,18 @@
               "declare": false,
               "decl_type": "int64",
               "value": {
-                "kind": "Unbox",
-                "resolved_type": "int64",
-                "borrow_kind": "value",
-                "casts": [],
-                "value": {
-                  "kind": "Name",
-                  "source_span": {
-                    "lineno": 38,
-                    "col_offset": 14,
-                    "end_lineno": 38,
-                    "end_col_offset": 15
-                  },
-                  "resolved_type": "unknown",
-                  "casts": [],
-                  "borrow_kind": "value",
-                  "repr": "b",
-                  "id": "b"
-                },
+                "kind": "Name",
                 "source_span": {
                   "lineno": 38,
                   "col_offset": 14,
                   "end_lineno": 38,
                   "end_col_offset": 15
                 },
+                "resolved_type": "int64",
+                "casts": [],
+                "borrow_kind": "readonly_ref",
                 "repr": "b",
-                "type_expr_summary_v1": {
-                  "schema_version": 1,
-                  "kind": "NamedType",
-                  "category": "static",
-                  "mirror": "int64"
-                },
-                "target": "int64",
-                "on_fail": "raise",
-                "bridge_lane_v1": {
-                  "schema_version": 1,
-                  "target": {
-                    "kind": "NamedType",
-                    "category": "static",
-                    "mirror": "int64"
-                  },
-                  "target_category": "static",
-                  "value": {
-                    "kind": "DynamicType",
-                    "category": "dynamic",
-                    "mirror": "unknown",
-                    "dynamic_name": "unknown"
-                  },
-                  "value_category": "dynamic"
-                }
+                "id": "b"
               },
               "type_expr_summary_v1": {
                 "schema_version": 1,
@@ -2574,7 +2540,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "out",
-                "id": "out"
+                "id": "out",
+                "call_arg_type": "bytearray"
               },
               {
                 "kind": "Call",
@@ -2648,6 +2615,7 @@
                   }
                 ],
                 "keywords": [],
+                "call_arg_type": "bytearray",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -2729,7 +2697,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "data",
-                "id": "data"
+                "id": "data",
+                "call_arg_type": "Obj"
               }
             ],
             "keywords": [],
@@ -3318,7 +3287,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "out",
-                    "id": "out"
+                    "id": "out",
+                    "call_arg_type": "bytearray"
                   },
                   {
                     "kind": "Call",
@@ -3359,10 +3329,12 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "chunk_len",
-                        "id": "chunk_len"
+                        "id": "chunk_len",
+                        "call_arg_type": "int64"
                       }
                     ],
                     "keywords": [],
+                    "call_arg_type": "bytearray",
                     "type_expr_summary_v1": {
                       "schema_version": 1,
                       "kind": "NamedType",
@@ -3427,7 +3399,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "out",
-                    "id": "out"
+                    "id": "out",
+                    "call_arg_type": "bytearray"
                   },
                   {
                     "kind": "Call",
@@ -3496,10 +3469,12 @@
                           "borrow_kind": "readonly_ref",
                           "repr": "chunk_len",
                           "id": "chunk_len"
-                        }
+                        },
+                        "call_arg_type": "int64"
                       }
                     ],
                     "keywords": [],
+                    "call_arg_type": "bytearray",
                     "type_expr_summary_v1": {
                       "schema_version": 1,
                       "kind": "NamedType",
@@ -3938,7 +3913,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "out",
-                "id": "out"
+                "id": "out",
+                "call_arg_type": "bytearray"
               },
               {
                 "kind": "Call",
@@ -4006,10 +3982,12 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "data",
-                        "id": "data"
+                        "id": "data",
+                        "call_arg_type": "bytearray"
                       }
                     ],
                     "keywords": [],
+                    "call_arg_type": "int64",
                     "type_expr_summary_v1": {
                       "schema_version": 1,
                       "kind": "NamedType",
@@ -4019,6 +3997,7 @@
                   }
                 ],
                 "keywords": [],
+                "call_arg_type": "bytearray",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -4233,7 +4212,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "crc_input",
-                "id": "crc_input"
+                "id": "crc_input",
+                "call_arg_type": "bytearray"
               },
               {
                 "kind": "Name",
@@ -4247,7 +4227,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "chunk_type",
-                "id": "chunk_type"
+                "id": "chunk_type",
+                "call_arg_type": "bytearray"
               }
             ],
             "keywords": [],
@@ -4306,7 +4287,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "crc_input",
-                "id": "crc_input"
+                "id": "crc_input",
+                "call_arg_type": "bytearray"
               },
               {
                 "kind": "Name",
@@ -4320,7 +4302,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "data",
-                "id": "data"
+                "id": "data",
+                "call_arg_type": "bytearray"
               }
             ],
             "keywords": [],
@@ -4408,7 +4391,8 @@
                   "casts": [],
                   "borrow_kind": "readonly_ref",
                   "repr": "crc_input",
-                  "id": "crc_input"
+                  "id": "crc_input",
+                  "call_arg_type": "bytearray"
                 }
               ],
               "keywords": [],
@@ -4568,7 +4552,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "out",
-                "id": "out"
+                "id": "out",
+                "call_arg_type": "bytearray"
               },
               {
                 "kind": "Call",
@@ -4636,7 +4621,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "data",
-                        "id": "data"
+                        "id": "data",
+                        "call_arg_type": "Obj"
                       }
                     ],
                     "keywords": [],
@@ -4647,6 +4633,7 @@
                     "runtime_symbol": "len",
                     "runtime_call_adapter_kind": "builtin",
                     "semantic_tag": "core.len",
+                    "call_arg_type": "int64",
                     "type_expr_summary_v1": {
                       "schema_version": 1,
                       "kind": "NamedType",
@@ -4656,6 +4643,7 @@
                   }
                 ],
                 "keywords": [],
+                "call_arg_type": "bytearray",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -4720,7 +4708,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "out",
-                "id": "out"
+                "id": "out",
+                "call_arg_type": "bytearray"
               },
               {
                 "kind": "Name",
@@ -4734,7 +4723,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "chunk_type",
-                "id": "chunk_type"
+                "id": "chunk_type",
+                "call_arg_type": "bytearray"
               }
             ],
             "keywords": [],
@@ -4793,7 +4783,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "out",
-                "id": "out"
+                "id": "out",
+                "call_arg_type": "bytearray"
               },
               {
                 "kind": "Name",
@@ -4807,7 +4798,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "data",
-                "id": "data"
+                "id": "data",
+                "call_arg_type": "bytearray"
               }
             ],
             "keywords": [],
@@ -4866,7 +4858,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "out",
-                "id": "out"
+                "id": "out",
+                "call_arg_type": "bytearray"
               },
               {
                 "kind": "Call",
@@ -4907,10 +4900,12 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "crc",
-                    "id": "crc"
+                    "id": "crc",
+                    "call_arg_type": "int64"
                   }
                 ],
                 "keywords": [],
+                "call_arg_type": "bytearray",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -5110,7 +5105,7 @@
               "id": "pixels",
               "iterable_trait": "yes",
               "iter_protocol": "static_range",
-              "iter_element_type": "unknown"
+              "iter_element_type": "int64"
             },
             "dispatch_mode": "native",
             "init_op": "ObjIterInit",
@@ -5118,7 +5113,8 @@
           },
           "target_plan": {
             "kind": "NameTarget",
-            "id": "b"
+            "id": "b",
+            "target_type": "int64"
           },
           "body": [
             {
@@ -5205,17 +5201,18 @@
                           "end_lineno": 92,
                           "end_col_offset": 24
                         },
-                        "resolved_type": "unknown",
+                        "resolved_type": "int64",
                         "casts": [],
-                        "borrow_kind": "value",
+                        "borrow_kind": "readonly_ref",
                         "repr": "b",
-                        "id": "b"
+                        "id": "b",
+                        "call_arg_type": "Obj"
                       }
                     ],
                     "keywords": [],
                     "lowered_kind": "BuiltinCall",
                     "builtin_name": "int",
-                    "runtime_call": "int",
+                    "runtime_call": "static_cast",
                     "runtime_module_id": "pytra.core.py_runtime",
                     "runtime_symbol": "int",
                     "runtime_call_adapter_kind": "builtin",
@@ -5408,7 +5405,8 @@
                   "casts": [],
                   "borrow_kind": "readonly_ref",
                   "repr": "raw",
-                  "id": "raw"
+                  "id": "raw",
+                  "call_arg_type": "Obj"
                 }
               ],
               "keywords": [],
@@ -5599,7 +5597,8 @@
                                   "casts": [],
                                   "borrow_kind": "readonly_ref",
                                   "repr": "raw",
-                                  "id": "raw"
+                                  "id": "raw",
+                                  "call_arg_type": "Obj"
                                 }
                               ],
                               "keywords": [],
@@ -5610,6 +5609,7 @@
                               "runtime_symbol": "len",
                               "runtime_call_adapter_kind": "builtin",
                               "semantic_tag": "core.len",
+                              "call_arg_type": "Obj",
                               "type_expr_summary_v1": {
                                 "schema_version": 1,
                                 "kind": "NamedType",
@@ -5690,7 +5690,8 @@
                           "casts": [],
                           "borrow_kind": "readonly_ref",
                           "repr": "expected",
-                          "id": "expected"
+                          "id": "expected",
+                          "call_arg_type": "Obj"
                         }
                       ],
                       "keywords": [],
@@ -6632,7 +6633,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "ihdr",
-                "id": "ihdr"
+                "id": "ihdr",
+                "call_arg_type": "bytearray"
               },
               {
                 "kind": "Call",
@@ -6673,10 +6675,12 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "width",
-                    "id": "width"
+                    "id": "width",
+                    "call_arg_type": "int64"
                   }
                 ],
                 "keywords": [],
+                "call_arg_type": "bytearray",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -6741,7 +6745,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "ihdr",
-                "id": "ihdr"
+                "id": "ihdr",
+                "call_arg_type": "bytearray"
               },
               {
                 "kind": "Call",
@@ -6782,10 +6787,12 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "height",
-                    "id": "height"
+                    "id": "height",
+                    "call_arg_type": "int64"
                   }
                 ],
                 "keywords": [],
+                "call_arg_type": "bytearray",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -6850,7 +6857,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "ihdr",
-                "id": "ihdr"
+                "id": "ihdr",
+                "call_arg_type": "bytearray"
               },
               {
                 "kind": "Call",
@@ -6966,6 +6974,7 @@
                   }
                 ],
                 "keywords": [],
+                "call_arg_type": "bytearray",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -7047,7 +7056,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "scanlines",
-                "id": "scanlines"
+                "id": "scanlines",
+                "call_arg_type": "bytearray"
               }
             ],
             "keywords": [],
@@ -7197,7 +7207,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "png",
-                "id": "png"
+                "id": "png",
+                "call_arg_type": "bytearray"
               },
               {
                 "kind": "Call",
@@ -7355,6 +7366,7 @@
                   }
                 ],
                 "keywords": [],
+                "call_arg_type": "bytearray",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -7419,7 +7431,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "png",
-                "id": "png"
+                "id": "png",
+                "call_arg_type": "bytearray"
               },
               {
                 "kind": "Call",
@@ -7548,6 +7561,7 @@
                       }
                     ],
                     "keywords": [],
+                    "call_arg_type": "bytearray",
                     "type_expr_summary_v1": {
                       "schema_version": 1,
                       "kind": "NamedType",
@@ -7567,10 +7581,12 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "ihdr",
-                    "id": "ihdr"
+                    "id": "ihdr",
+                    "call_arg_type": "bytearray"
                   }
                 ],
                 "keywords": [],
+                "call_arg_type": "bytearray",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -7635,7 +7651,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "png",
-                "id": "png"
+                "id": "png",
+                "call_arg_type": "bytearray"
               },
               {
                 "kind": "Call",
@@ -7764,6 +7781,7 @@
                       }
                     ],
                     "keywords": [],
+                    "call_arg_type": "bytearray",
                     "type_expr_summary_v1": {
                       "schema_version": 1,
                       "kind": "NamedType",
@@ -7783,10 +7801,12 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "idat",
-                    "id": "idat"
+                    "id": "idat",
+                    "call_arg_type": "bytearray"
                   }
                 ],
                 "keywords": [],
+                "call_arg_type": "bytearray",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -7930,7 +7950,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "png",
-                "id": "png"
+                "id": "png",
+                "call_arg_type": "bytearray"
               },
               {
                 "kind": "Call",
@@ -8059,6 +8080,7 @@
                       }
                     ],
                     "keywords": [],
+                    "call_arg_type": "bytearray",
                     "type_expr_summary_v1": {
                       "schema_version": 1,
                       "kind": "NamedType",
@@ -8078,10 +8100,12 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "iend_data",
-                    "id": "iend_data"
+                    "id": "iend_data",
+                    "call_arg_type": "bytearray"
                   }
                 ],
                 "keywords": [],
+                "call_arg_type": "bytearray",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -8115,6 +8139,7 @@
               "end_lineno": 123,
               "end_col_offset": 25
             },
+            "resolved_type": "unknown",
             "casts": [],
             "borrow_kind": "value",
             "repr": "open(path, \"wb\")",
@@ -8126,6 +8151,7 @@
                 "end_lineno": 123,
                 "end_col_offset": 13
               },
+              "resolved_type": "unknown",
               "casts": [],
               "borrow_kind": "value",
               "repr": "open",
@@ -8140,8 +8166,9 @@
                   "end_lineno": 123,
                   "end_col_offset": 18
                 },
+                "resolved_type": "str",
                 "casts": [],
-                "borrow_kind": "value",
+                "borrow_kind": "readonly_ref",
                 "repr": "path",
                 "id": "path"
               },
@@ -8153,13 +8180,21 @@
                   "end_lineno": 123,
                   "end_col_offset": 24
                 },
+                "resolved_type": "str",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "\"wb\"",
                 "value": "wb"
               }
             ],
-            "keywords": []
+            "keywords": [],
+            "type_expr_summary_v1": {
+              "schema_version": 1,
+              "kind": "DynamicType",
+              "category": "dynamic",
+              "mirror": "unknown",
+              "dynamic_name": "unknown"
+            }
           },
           "var_name": "f",
           "body": [

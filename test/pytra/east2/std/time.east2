@@ -126,7 +126,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "time",
-                "id": "time"
+                "id": "time",
+                "runtime_module_id": "pytra.std.time"
               },
               "attr": "perf_counter"
             },
@@ -136,7 +137,7 @@
             "resolved_runtime_source": "module_attr",
             "runtime_module_id": "pytra.std.time",
             "runtime_symbol": "perf_counter",
-            "semantic_tag": "stdlib.fn.perf_counter"
+            "semantic_tag": "stdlib.method.perf_counter"
           }
         }
       ],

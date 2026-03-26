@@ -412,7 +412,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "\"meta\"",
-                "value": "meta"
+                "value": "meta",
+                "call_arg_type": "str"
               },
               {
                 "kind": "Dict",
@@ -427,7 +428,8 @@
                 "borrow_kind": "value",
                 "repr": "{}",
                 "keys": [],
-                "values": []
+                "values": [],
+                "call_arg_type": "Any"
               }
             ],
             "keywords": [],
@@ -692,7 +694,7 @@
               "end_lineno": 18,
               "end_col": 27
             },
-            "resolved_type": "list[unknown]",
+            "resolved_type": "list[bool]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "[]",
@@ -778,7 +780,7 @@
                   "end_lineno": 19,
                   "end_col": 52
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(total, 5, \"sum meta\")",
@@ -809,7 +811,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "total",
-                    "id": "total"
+                    "id": "total",
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -823,7 +826,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "5",
-                    "value": 5
+                    "value": 5,
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -837,7 +841,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"sum meta\"",
-                    "value": "sum meta"
+                    "value": "sum meta",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -845,7 +850,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -929,7 +935,7 @@
                   "end_lineno": 20,
                   "end_col": 73
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(str(root.get(\"name\", \"\")), \"demo\", \"name\")",
@@ -1028,7 +1034,8 @@
                             "casts": [],
                             "borrow_kind": "value",
                             "repr": "\"name\"",
-                            "value": "name"
+                            "value": "name",
+                            "call_arg_type": "str"
                           },
                           {
                             "kind": "Constant",
@@ -1042,7 +1049,8 @@
                             "casts": [],
                             "borrow_kind": "value",
                             "repr": "\"\"",
-                            "value": ""
+                            "value": "",
+                            "call_arg_type": "Any"
                           }
                         ],
                         "keywords": [],
@@ -1067,7 +1075,8 @@
                           "repr": "root",
                           "id": "root"
                         },
-                        "yields_dynamic": true
+                        "yields_dynamic": true,
+                        "call_arg_type": "Obj"
                       }
                     ],
                     "keywords": [],
@@ -1077,7 +1086,8 @@
                     "runtime_module_id": "pytra.core.py_runtime",
                     "runtime_symbol": "str",
                     "runtime_call_adapter_kind": "builtin",
-                    "semantic_tag": "cast.str"
+                    "semantic_tag": "cast.str",
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1091,7 +1101,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"demo\"",
-                    "value": "demo"
+                    "value": "demo",
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1105,7 +1116,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"name\"",
-                    "value": "name"
+                    "value": "name",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -1113,7 +1125,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -1156,7 +1169,7 @@
               "end_lineno": 21,
               "end_col": 50
             },
-            "resolved_type": "unknown",
+            "resolved_type": "bool",
             "casts": [],
             "borrow_kind": "value",
             "repr": "py_assert_all(checks, \"any_dict_items\")",
@@ -1187,7 +1200,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "checks",
-                "id": "checks"
+                "id": "checks",
+                "call_arg_type": "list[bool]"
               },
               {
                 "kind": "Constant",
@@ -1201,7 +1215,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "\"any_dict_items\"",
-                "value": "any_dict_items"
+                "value": "any_dict_items",
+                "call_arg_type": "str"
               }
             ],
             "keywords": [],

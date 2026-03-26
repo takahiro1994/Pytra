@@ -372,7 +372,8 @@
                             "repr": "0.9",
                             "value": 0.9
                           }
-                        }
+                        },
+                        "call_arg_type": "Obj"
                       }
                     ],
                     "keywords": [],
@@ -570,7 +571,8 @@
                             "repr": "0.7",
                             "value": 0.7
                           }
-                        }
+                        },
+                        "call_arg_type": "Obj"
                       }
                     ],
                     "keywords": [],
@@ -726,7 +728,8 @@
                           "borrow_kind": "readonly_ref",
                           "repr": "i",
                           "id": "i"
-                        }
+                        },
+                        "call_arg_type": "Obj"
                       }
                     ],
                     "keywords": [],
@@ -1400,7 +1403,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "math",
-                "id": "math"
+                "id": "math",
+                "runtime_module_id": "pytra.std.math"
               },
               "attr": "sqrt"
             },
@@ -1501,7 +1505,8 @@
                     "repr": "y1",
                     "id": "y1"
                   }
-                }
+                },
+                "call_arg_type": "float64"
               }
             ],
             "keywords": [],
@@ -1574,7 +1579,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "math",
-                "id": "math"
+                "id": "math",
+                "runtime_module_id": "pytra.std.math"
               },
               "attr": "sqrt"
             },
@@ -1675,7 +1681,8 @@
                     "repr": "y2",
                     "id": "y2"
                   }
-                }
+                },
+                "call_arg_type": "float64"
               }
             ],
             "keywords": [],
@@ -1760,7 +1767,8 @@
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "math",
-                  "id": "math"
+                  "id": "math",
+                  "runtime_module_id": "pytra.std.math"
                 },
                 "attr": "exp"
               },
@@ -1847,7 +1855,8 @@
                     "borrow_kind": "readonly_ref",
                     "repr": "r1",
                     "id": "r1"
-                  }
+                  },
+                  "call_arg_type": "float64"
                 }
               ],
               "keywords": [],
@@ -1895,7 +1904,8 @@
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "math",
-                  "id": "math"
+                  "id": "math",
+                  "runtime_module_id": "pytra.std.math"
                 },
                 "attr": "exp"
               },
@@ -1982,7 +1992,8 @@
                     "borrow_kind": "readonly_ref",
                     "repr": "r2",
                     "id": "r2"
-                  }
+                  },
+                  "call_arg_type": "float64"
                 }
               ],
               "keywords": [],
@@ -2198,7 +2209,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "math",
-                "id": "math"
+                "id": "math",
+                "runtime_module_id": "pytra.std.math"
               },
               "attr": "sqrt"
             },
@@ -2299,7 +2311,8 @@
                     "repr": "ly",
                     "id": "ly"
                   }
-                }
+                },
+                "call_arg_type": "float64"
               }
             ],
             "keywords": [],
@@ -2611,7 +2624,8 @@
                   "borrow_kind": "value",
                   "repr": "5.0",
                   "value": 5.0
-                }
+                },
+                "call_arg_type": "Obj"
               }
             ],
             "keywords": [],
@@ -3072,7 +3086,7 @@
               "end_lineno": 46,
               "end_col": 28
             },
-            "resolved_type": "list[unknown]",
+            "resolved_type": "list[bytes]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "[]",
@@ -3392,9 +3406,15 @@
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "math",
-                      "id": "math"
+                      "id": "math",
+                      "runtime_module_id": "pytra.std.math"
                     },
-                    "attr": "pi"
+                    "attr": "pi",
+                    "runtime_module_id": "pytra.std.math",
+                    "runtime_symbol": "pi",
+                    "runtime_symbol_dispatch": "value",
+                    "runtime_call_adapter_kind": "math.value_getter",
+                    "semantic_tag": "stdlib.symbol.pi"
                   }
                 },
                 "op": "Mult",
@@ -3502,7 +3522,8 @@
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "math",
-                      "id": "math"
+                      "id": "math",
+                      "runtime_module_id": "pytra.std.math"
                     },
                     "attr": "cos"
                   },
@@ -3519,7 +3540,8 @@
                       "casts": [],
                       "borrow_kind": "readonly_ref",
                       "repr": "a",
-                      "id": "a"
+                      "id": "a",
+                      "call_arg_type": "float64"
                     }
                   ],
                   "keywords": [],
@@ -3620,7 +3642,8 @@
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "math",
-                      "id": "math"
+                      "id": "math",
+                      "runtime_module_id": "pytra.std.math"
                     },
                     "attr": "sin"
                   },
@@ -3665,7 +3688,8 @@
                         "borrow_kind": "value",
                         "repr": "1.2",
                         "value": 1.2
-                      }
+                      },
+                      "call_arg_type": "float64"
                     }
                   ],
                   "keywords": [],
@@ -4329,7 +4353,8 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "px",
-                            "id": "px"
+                            "id": "px",
+                            "call_arg_type": "float64"
                           },
                           {
                             "kind": "Name",
@@ -4343,7 +4368,8 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "py",
-                            "id": "py"
+                            "id": "py",
+                            "call_arg_type": "float64"
                           },
                           {
                             "kind": "Name",
@@ -4357,7 +4383,8 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "light_x",
-                            "id": "light_x"
+                            "id": "light_x",
+                            "call_arg_type": "float64"
                           },
                           {
                             "kind": "Name",
@@ -4371,7 +4398,8 @@
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "light_y",
-                            "id": "light_y"
+                            "id": "light_y",
+                            "call_arg_type": "float64"
                           }
                         ],
                         "keywords": []
@@ -4483,7 +4511,8 @@
                         "id": "frame"
                       }
                     ],
-                    "keywords": []
+                    "keywords": [],
+                    "call_arg_type": "bytes"
                   }
                 ],
                 "keywords": [],
@@ -4535,7 +4564,7 @@
               "end_lineno": 63,
               "end_col": 67
             },
-            "resolved_type": "unknown",
+            "resolved_type": "None",
             "casts": [],
             "borrow_kind": "value",
             "repr": "save_gif(out_path, w, h, frames, palette(), delay_cs=3, loop=0)",
@@ -4566,7 +4595,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "out_path",
-                "id": "out_path"
+                "id": "out_path",
+                "call_arg_type": "str"
               },
               {
                 "kind": "Name",
@@ -4580,7 +4610,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "w",
-                "id": "w"
+                "id": "w",
+                "call_arg_type": "int64"
               },
               {
                 "kind": "Name",
@@ -4594,7 +4625,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "h",
-                "id": "h"
+                "id": "h",
+                "call_arg_type": "int64"
               },
               {
                 "kind": "Name",
@@ -4608,7 +4640,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "frames",
-                "id": "frames"
+                "id": "frames",
+                "call_arg_type": "list[bytes]"
               },
               {
                 "kind": "Call",
@@ -4637,7 +4670,8 @@
                   "id": "palette"
                 },
                 "args": [],
-                "keywords": []
+                "keywords": [],
+                "call_arg_type": "bytes"
               }
             ],
             "keywords": [
@@ -4655,7 +4689,8 @@
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "3",
-                  "value": 3
+                  "value": 3,
+                  "call_arg_type": "int64"
                 }
               },
               {
@@ -4672,7 +4707,8 @@
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "0",
-                  "value": 0
+                  "value": 0,
+                  "call_arg_type": "int64"
                 }
               }
             ],

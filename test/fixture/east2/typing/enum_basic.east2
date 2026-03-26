@@ -188,7 +188,7 @@
               "end_lineno": 11,
               "end_col": 27
             },
-            "resolved_type": "list[unknown]",
+            "resolved_type": "list[bool]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "[]",
@@ -274,7 +274,7 @@
                   "end_lineno": 12,
                   "end_col": 75
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(Color.RED == Color.RED, True, \"same_member\")",
@@ -365,7 +365,8 @@
                         },
                         "attr": "RED"
                       }
-                    ]
+                    ],
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -379,7 +380,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "True",
-                    "value": true
+                    "value": true,
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -393,7 +395,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"same_member\"",
-                    "value": "same_member"
+                    "value": "same_member",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -401,7 +404,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -485,7 +489,7 @@
                   "end_lineno": 13,
                   "end_col": 82
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(Color.RED == Color.BLUE, False, \"different_member\")",
@@ -576,7 +580,8 @@
                         },
                         "attr": "BLUE"
                       }
-                    ]
+                    ],
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -590,7 +595,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "False",
-                    "value": false
+                    "value": false,
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -604,7 +610,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"different_member\"",
-                    "value": "different_member"
+                    "value": "different_member",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -612,7 +619,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -696,7 +704,7 @@
                   "end_lineno": 14,
                   "end_col": 82
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(Color.BLUE == Color.BLUE, True, \"same_member_blue\")",
@@ -787,7 +795,8 @@
                         },
                         "attr": "BLUE"
                       }
-                    ]
+                    ],
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -801,7 +810,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "True",
-                    "value": true
+                    "value": true,
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -815,7 +825,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"same_member_blue\"",
-                    "value": "same_member_blue"
+                    "value": "same_member_blue",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -823,7 +834,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -907,7 +919,7 @@
                   "end_lineno": 15,
                   "end_col": 90
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(Color.BLUE == Color.RED, False, \"different_member_reverse\")",
@@ -998,7 +1010,8 @@
                         },
                         "attr": "RED"
                       }
-                    ]
+                    ],
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1012,7 +1025,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "False",
-                    "value": false
+                    "value": false,
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1026,7 +1040,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"different_member_reverse\"",
-                    "value": "different_member_reverse"
+                    "value": "different_member_reverse",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -1034,7 +1049,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -1077,7 +1093,7 @@
               "end_lineno": 16,
               "end_col": 46
             },
-            "resolved_type": "unknown",
+            "resolved_type": "bool",
             "casts": [],
             "borrow_kind": "value",
             "repr": "py_assert_all(checks, \"enum_basic\")",
@@ -1108,7 +1124,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "checks",
-                "id": "checks"
+                "id": "checks",
+                "call_arg_type": "list[bool]"
               },
               {
                 "kind": "Constant",
@@ -1122,7 +1139,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "\"enum_basic\"",
-                "value": "enum_basic"
+                "value": "enum_basic",
+                "call_arg_type": "str"
               }
             ],
             "keywords": [],

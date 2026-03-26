@@ -136,7 +136,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "x",
-                "id": "x"
+                "id": "x",
+                "call_arg_type": "Obj"
               },
               {
                 "kind": "Name",
@@ -150,7 +151,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "Base",
-                "id": "Base"
+                "id": "Base",
+                "call_arg_type": "type"
               }
             ],
             "keywords": [],
@@ -385,7 +387,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "b",
-                "id": "b"
+                "id": "b",
+                "call_arg_type": "object"
               }
             ],
             "keywords": []
@@ -475,7 +478,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "c",
-                "id": "c"
+                "id": "c",
+                "call_arg_type": "object"
               }
             ],
             "keywords": []
@@ -565,7 +569,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "c",
-                "id": "c"
+                "id": "c",
+                "call_arg_type": "Obj"
               },
               {
                 "kind": "Name",
@@ -579,7 +584,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "Child",
-                "id": "Child"
+                "id": "Child",
+                "call_arg_type": "type"
               }
             ],
             "keywords": [],

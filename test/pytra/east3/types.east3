@@ -64,13 +64,14 @@
           "end_lineno": 7,
           "end_col_offset": 4
         },
-        "resolved_type": "unknown",
+        "resolved_type": "type",
         "casts": [],
         "borrow_kind": "value",
         "repr": "int8",
         "id": "int8"
       },
       "declare": true,
+      "decl_type": "type",
       "declare_init": true,
       "leading_trivia": [
         {
@@ -86,7 +87,7 @@
           "end_lineno": 7,
           "end_col_offset": 3
         },
-        "resolved_type": "unknown",
+        "resolved_type": "type",
         "casts": [],
         "borrow_kind": "value",
         "repr": "int",
@@ -94,10 +95,9 @@
       },
       "type_expr_summary_v1": {
         "schema_version": 1,
-        "kind": "DynamicType",
-        "category": "dynamic",
-        "mirror": "unknown",
-        "dynamic_name": "unknown"
+        "kind": "NamedType",
+        "category": "static",
+        "mirror": "type"
       }
     },
     {
@@ -116,13 +116,14 @@
           "end_lineno": 8,
           "end_col_offset": 5
         },
-        "resolved_type": "unknown",
+        "resolved_type": "type",
         "casts": [],
         "borrow_kind": "value",
         "repr": "uint8",
         "id": "uint8"
       },
       "declare": true,
+      "decl_type": "type",
       "declare_init": true,
       "value": {
         "kind": "Name",
@@ -132,7 +133,7 @@
           "end_lineno": 8,
           "end_col_offset": 4
         },
-        "resolved_type": "unknown",
+        "resolved_type": "type",
         "casts": [],
         "borrow_kind": "value",
         "repr": "int",
@@ -140,10 +141,9 @@
       },
       "type_expr_summary_v1": {
         "schema_version": 1,
-        "kind": "DynamicType",
-        "category": "dynamic",
-        "mirror": "unknown",
-        "dynamic_name": "unknown"
+        "kind": "NamedType",
+        "category": "static",
+        "mirror": "type"
       }
     },
     {
@@ -162,13 +162,14 @@
           "end_lineno": 9,
           "end_col_offset": 5
         },
-        "resolved_type": "unknown",
+        "resolved_type": "type",
         "casts": [],
         "borrow_kind": "value",
         "repr": "int16",
         "id": "int16"
       },
       "declare": true,
+      "decl_type": "type",
       "declare_init": true,
       "value": {
         "kind": "Name",
@@ -178,7 +179,7 @@
           "end_lineno": 9,
           "end_col_offset": 3
         },
-        "resolved_type": "unknown",
+        "resolved_type": "type",
         "casts": [],
         "borrow_kind": "value",
         "repr": "int",
@@ -186,10 +187,9 @@
       },
       "type_expr_summary_v1": {
         "schema_version": 1,
-        "kind": "DynamicType",
-        "category": "dynamic",
-        "mirror": "unknown",
-        "dynamic_name": "unknown"
+        "kind": "NamedType",
+        "category": "static",
+        "mirror": "type"
       }
     },
     {
@@ -208,13 +208,14 @@
           "end_lineno": 10,
           "end_col_offset": 6
         },
-        "resolved_type": "unknown",
+        "resolved_type": "type",
         "casts": [],
         "borrow_kind": "value",
         "repr": "uint16",
         "id": "uint16"
       },
       "declare": true,
+      "decl_type": "type",
       "declare_init": true,
       "value": {
         "kind": "Name",
@@ -224,7 +225,7 @@
           "end_lineno": 10,
           "end_col_offset": 4
         },
-        "resolved_type": "unknown",
+        "resolved_type": "type",
         "casts": [],
         "borrow_kind": "value",
         "repr": "int",
@@ -232,10 +233,9 @@
       },
       "type_expr_summary_v1": {
         "schema_version": 1,
-        "kind": "DynamicType",
-        "category": "dynamic",
-        "mirror": "unknown",
-        "dynamic_name": "unknown"
+        "kind": "NamedType",
+        "category": "static",
+        "mirror": "type"
       }
     },
     {
@@ -254,13 +254,14 @@
           "end_lineno": 11,
           "end_col_offset": 5
         },
-        "resolved_type": "unknown",
+        "resolved_type": "type",
         "casts": [],
         "borrow_kind": "value",
         "repr": "int32",
         "id": "int32"
       },
       "declare": true,
+      "decl_type": "type",
       "declare_init": true,
       "value": {
         "kind": "Name",
@@ -270,7 +271,7 @@
           "end_lineno": 11,
           "end_col_offset": 3
         },
-        "resolved_type": "unknown",
+        "resolved_type": "type",
         "casts": [],
         "borrow_kind": "value",
         "repr": "int",
@@ -278,10 +279,9 @@
       },
       "type_expr_summary_v1": {
         "schema_version": 1,
-        "kind": "DynamicType",
-        "category": "dynamic",
-        "mirror": "unknown",
-        "dynamic_name": "unknown"
+        "kind": "NamedType",
+        "category": "static",
+        "mirror": "type"
       }
     },
     {
@@ -300,13 +300,14 @@
           "end_lineno": 12,
           "end_col_offset": 6
         },
-        "resolved_type": "unknown",
+        "resolved_type": "type",
         "casts": [],
         "borrow_kind": "value",
         "repr": "uint32",
         "id": "uint32"
       },
       "declare": true,
+      "decl_type": "type",
       "declare_init": true,
       "value": {
         "kind": "Name",
@@ -316,7 +317,7 @@
           "end_lineno": 12,
           "end_col_offset": 4
         },
-        "resolved_type": "unknown",
+        "resolved_type": "type",
         "casts": [],
         "borrow_kind": "value",
         "repr": "int",
@@ -324,10 +325,9 @@
       },
       "type_expr_summary_v1": {
         "schema_version": 1,
-        "kind": "DynamicType",
-        "category": "dynamic",
-        "mirror": "unknown",
-        "dynamic_name": "unknown"
+        "kind": "NamedType",
+        "category": "static",
+        "mirror": "type"
       }
     },
     {
@@ -346,13 +346,14 @@
           "end_lineno": 13,
           "end_col_offset": 5
         },
-        "resolved_type": "unknown",
+        "resolved_type": "type",
         "casts": [],
         "borrow_kind": "value",
         "repr": "int64",
         "id": "int64"
       },
       "declare": true,
+      "decl_type": "type",
       "declare_init": true,
       "value": {
         "kind": "Name",
@@ -362,7 +363,7 @@
           "end_lineno": 13,
           "end_col_offset": 3
         },
-        "resolved_type": "unknown",
+        "resolved_type": "type",
         "casts": [],
         "borrow_kind": "value",
         "repr": "int",
@@ -370,10 +371,9 @@
       },
       "type_expr_summary_v1": {
         "schema_version": 1,
-        "kind": "DynamicType",
-        "category": "dynamic",
-        "mirror": "unknown",
-        "dynamic_name": "unknown"
+        "kind": "NamedType",
+        "category": "static",
+        "mirror": "type"
       }
     },
     {
@@ -392,13 +392,14 @@
           "end_lineno": 14,
           "end_col_offset": 6
         },
-        "resolved_type": "unknown",
+        "resolved_type": "type",
         "casts": [],
         "borrow_kind": "value",
         "repr": "uint64",
         "id": "uint64"
       },
       "declare": true,
+      "decl_type": "type",
       "declare_init": true,
       "value": {
         "kind": "Name",
@@ -408,7 +409,7 @@
           "end_lineno": 14,
           "end_col_offset": 4
         },
-        "resolved_type": "unknown",
+        "resolved_type": "type",
         "casts": [],
         "borrow_kind": "value",
         "repr": "int",
@@ -416,10 +417,9 @@
       },
       "type_expr_summary_v1": {
         "schema_version": 1,
-        "kind": "DynamicType",
-        "category": "dynamic",
-        "mirror": "unknown",
-        "dynamic_name": "unknown"
+        "kind": "NamedType",
+        "category": "static",
+        "mirror": "type"
       }
     },
     {
@@ -438,13 +438,14 @@
           "end_lineno": 15,
           "end_col_offset": 7
         },
-        "resolved_type": "unknown",
+        "resolved_type": "type",
         "casts": [],
         "borrow_kind": "value",
         "repr": "float32",
         "id": "float32"
       },
       "declare": true,
+      "decl_type": "type",
       "declare_init": true,
       "value": {
         "kind": "Name",
@@ -454,7 +455,7 @@
           "end_lineno": 15,
           "end_col_offset": 5
         },
-        "resolved_type": "unknown",
+        "resolved_type": "type",
         "casts": [],
         "borrow_kind": "value",
         "repr": "float",
@@ -462,10 +463,9 @@
       },
       "type_expr_summary_v1": {
         "schema_version": 1,
-        "kind": "DynamicType",
-        "category": "dynamic",
-        "mirror": "unknown",
-        "dynamic_name": "unknown"
+        "kind": "NamedType",
+        "category": "static",
+        "mirror": "type"
       }
     },
     {
@@ -484,13 +484,14 @@
           "end_lineno": 16,
           "end_col_offset": 7
         },
-        "resolved_type": "unknown",
+        "resolved_type": "type",
         "casts": [],
         "borrow_kind": "value",
         "repr": "float64",
         "id": "float64"
       },
       "declare": true,
+      "decl_type": "type",
       "declare_init": true,
       "value": {
         "kind": "Name",
@@ -500,7 +501,7 @@
           "end_lineno": 16,
           "end_col_offset": 5
         },
-        "resolved_type": "unknown",
+        "resolved_type": "type",
         "casts": [],
         "borrow_kind": "value",
         "repr": "float",
@@ -508,10 +509,9 @@
       },
       "type_expr_summary_v1": {
         "schema_version": 1,
-        "kind": "DynamicType",
-        "category": "dynamic",
-        "mirror": "unknown",
-        "dynamic_name": "unknown"
+        "kind": "NamedType",
+        "category": "static",
+        "mirror": "type"
       }
     },
     {
@@ -530,14 +530,14 @@
           "end_lineno": 21,
           "end_col_offset": 3
         },
-        "resolved_type": "tuple[unknown, unknown, unknown, unknown, type]",
+        "resolved_type": "tuple[unknown, type, type, type, type]",
         "casts": [],
         "borrow_kind": "value",
         "repr": "POD",
         "id": "POD"
       },
       "declare": true,
-      "decl_type": "tuple[unknown, unknown, unknown, unknown, type]",
+      "decl_type": "tuple[unknown, type, type, type, type]",
       "declare_init": true,
       "leading_trivia": [
         {
@@ -570,7 +570,7 @@
           "end_lineno": 21,
           "end_col_offset": 41
         },
-        "resolved_type": "tuple[unknown, unknown, unknown, unknown, type]",
+        "resolved_type": "tuple[unknown, type, type, type, type]",
         "casts": [],
         "borrow_kind": "value",
         "repr": "(type(None), bool, int, float, str)",
@@ -634,7 +634,7 @@
               "end_lineno": 21,
               "end_col_offset": 23
             },
-            "resolved_type": "unknown",
+            "resolved_type": "type",
             "casts": [],
             "borrow_kind": "value",
             "repr": "bool",
@@ -648,7 +648,7 @@
               "end_lineno": 21,
               "end_col_offset": 28
             },
-            "resolved_type": "unknown",
+            "resolved_type": "type",
             "casts": [],
             "borrow_kind": "value",
             "repr": "int",
@@ -662,7 +662,7 @@
               "end_lineno": 21,
               "end_col_offset": 35
             },
-            "resolved_type": "unknown",
+            "resolved_type": "type",
             "casts": [],
             "borrow_kind": "value",
             "repr": "float",
@@ -688,7 +688,7 @@
         "schema_version": 1,
         "kind": "GenericType",
         "category": "static",
-        "mirror": "tuple[unknown,unknown,unknown,unknown,type]"
+        "mirror": "tuple[unknown,type,type,type,type]"
       }
     },
     {
@@ -707,13 +707,14 @@
           "end_lineno": 22,
           "end_col_offset": 3
         },
-        "resolved_type": "unknown",
+        "resolved_type": "type",
         "casts": [],
         "borrow_kind": "value",
         "repr": "Obj",
         "id": "Obj"
       },
       "declare": true,
+      "decl_type": "type",
       "declare_init": true,
       "value": {
         "kind": "Name",
@@ -723,7 +724,7 @@
           "end_lineno": 22,
           "end_col_offset": 12
         },
-        "resolved_type": "unknown",
+        "resolved_type": "type",
         "casts": [],
         "borrow_kind": "value",
         "repr": "object",
@@ -731,10 +732,9 @@
       },
       "type_expr_summary_v1": {
         "schema_version": 1,
-        "kind": "DynamicType",
-        "category": "dynamic",
-        "mirror": "unknown",
-        "dynamic_name": "unknown"
+        "kind": "NamedType",
+        "category": "static",
+        "mirror": "type"
       }
     }
   ],

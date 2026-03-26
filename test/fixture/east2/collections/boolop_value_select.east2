@@ -187,7 +187,7 @@
               "end_lineno": 8,
               "end_col": 19
             },
-            "resolved_type": "bool",
+            "resolved_type": "str",
             "casts": [],
             "borrow_kind": "value",
             "repr": "x or y",
@@ -373,7 +373,7 @@
               "end_lineno": 11,
               "end_col": 20
             },
-            "resolved_type": "bool",
+            "resolved_type": "str",
             "casts": [],
             "borrow_kind": "value",
             "repr": "p and q",
@@ -559,7 +559,7 @@
               "end_lineno": 14,
               "end_col": 19
             },
-            "resolved_type": "bool",
+            "resolved_type": "int64",
             "casts": [],
             "borrow_kind": "value",
             "repr": "n or m",
@@ -647,7 +647,7 @@
               "end_lineno": 15,
               "end_col": 27
             },
-            "resolved_type": "list[unknown]",
+            "resolved_type": "list[bool]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "[]",
@@ -733,7 +733,7 @@
                   "end_lineno": 16,
                   "end_col": 64
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(z, \"fallback\", \"or value select\")",
@@ -764,7 +764,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "z",
-                    "id": "z"
+                    "id": "z",
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -778,7 +779,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"fallback\"",
-                    "value": "fallback"
+                    "value": "fallback",
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -792,7 +794,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"or value select\"",
-                    "value": "or value select"
+                    "value": "or value select",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -800,7 +803,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -884,7 +888,7 @@
                   "end_lineno": 17,
                   "end_col": 62
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(r, \"right\", \"and value select\")",
@@ -915,7 +919,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "r",
-                    "id": "r"
+                    "id": "r",
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -929,7 +934,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"right\"",
-                    "value": "right"
+                    "value": "right",
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -943,7 +949,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"and value select\"",
-                    "value": "and value select"
+                    "value": "and value select",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -951,7 +958,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -1035,7 +1043,7 @@
                   "end_lineno": 18,
                   "end_col": 59
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(t, 9, \"int or value select\")",
@@ -1066,7 +1074,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "t",
-                    "id": "t"
+                    "id": "t",
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1080,7 +1089,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "9",
-                    "value": 9
+                    "value": 9,
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1094,7 +1104,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"int or value select\"",
-                    "value": "int or value select"
+                    "value": "int or value select",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -1102,7 +1113,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -1145,7 +1157,7 @@
               "end_lineno": 19,
               "end_col": 42
             },
-            "resolved_type": "unknown",
+            "resolved_type": "bool",
             "casts": [],
             "borrow_kind": "value",
             "repr": "py_assert_all(checks, \"case42\")",
@@ -1176,7 +1188,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "checks",
-                "id": "checks"
+                "id": "checks",
+                "call_arg_type": "list[bool]"
               },
               {
                 "kind": "Constant",
@@ -1190,7 +1203,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "\"case42\"",
-                "value": "case42"
+                "value": "case42",
+                "call_arg_type": "str"
               }
             ],
             "keywords": [],

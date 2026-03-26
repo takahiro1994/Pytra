@@ -136,7 +136,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "x",
-                "id": "x"
+                "id": "x",
+                "call_arg_type": "Obj"
               },
               {
                 "kind": "Tuple",
@@ -179,7 +180,8 @@
                     "repr": "Dog",
                     "id": "Dog"
                   }
-                ]
+                ],
+                "call_arg_type": "type"
               }
             ],
             "keywords": [],
@@ -414,7 +416,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "c",
-                "id": "c"
+                "id": "c",
+                "call_arg_type": "object"
               }
             ],
             "keywords": []
@@ -504,7 +507,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "d",
-                "id": "d"
+                "id": "d",
+                "call_arg_type": "object"
               }
             ],
             "keywords": []
@@ -594,7 +598,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "42",
-                "value": 42
+                "value": 42,
+                "call_arg_type": "object"
               }
             ],
             "keywords": []

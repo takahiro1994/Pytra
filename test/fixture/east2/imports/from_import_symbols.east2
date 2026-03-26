@@ -432,7 +432,7 @@
               "end_lineno": 13,
               "end_col": 41
             },
-            "resolved_type": "unknown",
+            "resolved_type": "None",
             "casts": [],
             "borrow_kind": "value",
             "repr": "write_rgb_png(out_path, 1, 3, pixels)",
@@ -463,7 +463,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "out_path",
-                "id": "out_path"
+                "id": "out_path",
+                "call_arg_type": "str"
               },
               {
                 "kind": "Constant",
@@ -477,7 +478,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "1",
-                "value": 1
+                "value": 1,
+                "call_arg_type": "int64"
               },
               {
                 "kind": "Constant",
@@ -491,7 +493,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "3",
-                "value": 3
+                "value": 3,
+                "call_arg_type": "int64"
               },
               {
                 "kind": "Name",
@@ -505,7 +508,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "pixels",
-                "id": "pixels"
+                "id": "pixels",
+                "call_arg_type": "bytes"
               }
             ],
             "keywords": [],
@@ -629,7 +633,7 @@
               "end_lineno": 15,
               "end_col": 28
             },
-            "resolved_type": "list[unknown]",
+            "resolved_type": "list[bool]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "[]",
@@ -715,7 +719,7 @@
                   "end_lineno": 16,
                   "end_col": 86
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(int(msqrt(81.0)), 9, \"from math import sqrt as msqrt\")",
@@ -800,7 +804,8 @@
                             "casts": [],
                             "borrow_kind": "value",
                             "repr": "81.0",
-                            "value": 81.0
+                            "value": 81.0,
+                            "call_arg_type": "float64"
                           }
                         ],
                         "keywords": [],
@@ -808,7 +813,8 @@
                         "resolved_runtime_source": "import_symbol",
                         "runtime_module_id": "pytra.std.math",
                         "runtime_symbol": "sqrt",
-                        "runtime_call_adapter_kind": "math.float_args"
+                        "runtime_call_adapter_kind": "math.float_args",
+                        "call_arg_type": "Obj"
                       }
                     ],
                     "keywords": [],
@@ -818,7 +824,8 @@
                     "runtime_module_id": "pytra.core.py_runtime",
                     "runtime_symbol": "int",
                     "runtime_call_adapter_kind": "builtin",
-                    "semantic_tag": "cast.int"
+                    "semantic_tag": "cast.int",
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -832,7 +839,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "9",
-                    "value": 9
+                    "value": 9,
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -846,7 +854,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"from math import sqrt as msqrt\"",
-                    "value": "from math import sqrt as msqrt"
+                    "value": "from math import sqrt as msqrt",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -854,7 +863,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -938,7 +948,7 @@
                   "end_lineno": 17,
                   "end_col": 77
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(int(floor(3.9)), 3, \"from math import floor\")",
@@ -1023,7 +1033,8 @@
                             "casts": [],
                             "borrow_kind": "value",
                             "repr": "3.9",
-                            "value": 3.9
+                            "value": 3.9,
+                            "call_arg_type": "float64"
                           }
                         ],
                         "keywords": [],
@@ -1031,7 +1042,8 @@
                         "resolved_runtime_source": "import_symbol",
                         "runtime_module_id": "pytra.std.math",
                         "runtime_symbol": "floor",
-                        "runtime_call_adapter_kind": "math.float_args"
+                        "runtime_call_adapter_kind": "math.float_args",
+                        "call_arg_type": "Obj"
                       }
                     ],
                     "keywords": [],
@@ -1041,7 +1053,8 @@
                     "runtime_module_id": "pytra.core.py_runtime",
                     "runtime_symbol": "int",
                     "runtime_call_adapter_kind": "builtin",
-                    "semantic_tag": "cast.int"
+                    "semantic_tag": "cast.int",
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1055,7 +1068,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "3",
-                    "value": 3
+                    "value": 3,
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1069,7 +1083,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"from math import floor\"",
-                    "value": "from math import floor"
+                    "value": "from math import floor",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -1077,7 +1092,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -1161,7 +1177,7 @@
                   "end_lineno": 18,
                   "end_col": 76
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_true(t1 >= t0, \"from time import perf_counter\")",
@@ -1224,7 +1240,8 @@
                         "repr": "t0",
                         "id": "t0"
                       }
-                    ]
+                    ],
+                    "call_arg_type": "bool"
                   },
                   {
                     "kind": "Constant",
@@ -1238,7 +1255,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"from time import perf_counter\"",
-                    "value": "from time import perf_counter"
+                    "value": "from time import perf_counter",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -1246,7 +1264,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_true",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -1330,7 +1349,7 @@
                   "end_lineno": 19,
                   "end_col": 92
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(len(pixels), 9, \"from pytra.utils.png import write_rgb_png\")",
@@ -1388,7 +1407,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "pixels",
-                        "id": "pixels"
+                        "id": "pixels",
+                        "call_arg_type": "Obj"
                       }
                     ],
                     "keywords": [],
@@ -1398,7 +1418,8 @@
                     "runtime_module_id": "pytra.core.py_runtime",
                     "runtime_symbol": "len",
                     "runtime_call_adapter_kind": "builtin",
-                    "semantic_tag": "core.len"
+                    "semantic_tag": "core.len",
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1412,7 +1433,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "9",
-                    "value": 9
+                    "value": 9,
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -1426,7 +1448,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"from pytra.utils.png import write_rgb_png\"",
-                    "value": "from pytra.utils.png import write_rgb_png"
+                    "value": "from pytra.utils.png import write_rgb_png",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -1434,7 +1457,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -1504,7 +1528,7 @@
                   "end_lineno": 20,
                   "end_col": 55
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_all(results, \"from-import symbols\")",
@@ -1535,7 +1559,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "results",
-                    "id": "results"
+                    "id": "results",
+                    "call_arg_type": "list[bool]"
                   },
                   {
                     "kind": "Constant",
@@ -1549,7 +1574,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"from-import symbols\"",
-                    "value": "from-import symbols"
+                    "value": "from-import symbols",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],

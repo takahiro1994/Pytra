@@ -363,7 +363,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "target",
-                "id": "target"
+                "id": "target",
+                "call_arg_type": "ControllerState"
               },
               {
                 "kind": "List",
@@ -984,7 +985,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "t",
-                "id": "t"
+                "id": "t",
+                "call_arg_type": "ControllerState"
               },
               {
                 "kind": "Name",
@@ -998,7 +1000,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "a",
-                "id": "a"
+                "id": "a",
+                "call_arg_type": "ControllerState"
               },
               {
                 "kind": "Name",
@@ -1012,7 +1015,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "b",
-                "id": "b"
+                "id": "b",
+                "call_arg_type": "ControllerState"
               }
             ],
             "keywords": [],

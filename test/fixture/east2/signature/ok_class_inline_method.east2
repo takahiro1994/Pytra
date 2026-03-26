@@ -213,7 +213,7 @@
               "end_lineno": 11,
               "end_col": 26
             },
-            "resolved_type": "unknown",
+            "resolved_type": "str",
             "casts": [],
             "borrow_kind": "value",
             "repr": "type(v).__name__",

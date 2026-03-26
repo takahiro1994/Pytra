@@ -56,18 +56,54 @@
                 "end_col_offset": 19
               },
               "value": {
-                "kind": "Name",
+                "kind": "Box",
+                "resolved_type": "object",
+                "borrow_kind": "value",
+                "casts": [],
+                "value": {
+                  "kind": "Name",
+                  "source_span": {
+                    "lineno": 6,
+                    "col_offset": 15,
+                    "end_lineno": 6,
+                    "end_col_offset": 19
+                  },
+                  "resolved_type": "Value",
+                  "casts": [],
+                  "borrow_kind": "readonly_ref",
+                  "repr": "self",
+                  "id": "self"
+                },
                 "source_span": {
                   "lineno": 6,
                   "col_offset": 15,
                   "end_lineno": 6,
                   "end_col_offset": 19
                 },
-                "resolved_type": "Value",
-                "casts": [],
-                "borrow_kind": "readonly_ref",
                 "repr": "self",
-                "id": "self"
+                "type_expr_summary_v1": {
+                  "schema_version": 1,
+                  "kind": "DynamicType",
+                  "category": "dynamic",
+                  "mirror": "object",
+                  "dynamic_name": "object"
+                },
+                "bridge_lane_v1": {
+                  "schema_version": 1,
+                  "target": {
+                    "kind": "DynamicType",
+                    "category": "dynamic",
+                    "mirror": "object",
+                    "dynamic_name": "object"
+                  },
+                  "target_category": "dynamic",
+                  "value": {
+                    "kind": "NamedType",
+                    "category": "static",
+                    "mirror": "Value"
+                  },
+                  "value_category": "static"
+                }
               },
               "meta": {
                 "lifetime_node_id": "n0",
@@ -298,7 +334,7 @@
               "end_lineno": 11,
               "end_col_offset": 26
             },
-            "resolved_type": "unknown",
+            "resolved_type": "str",
             "casts": [],
             "borrow_kind": "value",
             "repr": "type(v).__name__",

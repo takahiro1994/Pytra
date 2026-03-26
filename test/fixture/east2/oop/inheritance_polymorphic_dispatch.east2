@@ -499,7 +499,7 @@
               "end_lineno": 26,
               "end_col": 58
             },
-            "resolved_type": "unknown",
+            "resolved_type": "bool",
             "casts": [],
             "borrow_kind": "value",
             "repr": "py_assert_stdout(['chihuahua bark'], _case_main)",
@@ -545,7 +545,8 @@
                     "repr": "'chihuahua bark'",
                     "value": "chihuahua bark"
                   }
-                ]
+                ],
+                "call_arg_type": "list[str]"
               },
               {
                 "kind": "Name",
@@ -559,7 +560,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "_case_main",
-                "id": "_case_main"
+                "id": "_case_main",
+                "call_arg_type": "object"
               }
             ],
             "keywords": [],

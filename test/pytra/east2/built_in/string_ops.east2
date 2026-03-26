@@ -437,7 +437,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "chars",
-                "id": "chars"
+                "id": "chars",
+                "call_arg_type": "Obj"
               }
             ],
             "keywords": [],
@@ -1202,7 +1203,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "parts",
-                "id": "parts"
+                "id": "parts",
+                "call_arg_type": "Obj"
               }
             ],
             "keywords": [],
@@ -1767,7 +1769,7 @@
               "end_lineno": 48,
               "end_col": 23
             },
-            "resolved_type": "list[unknown]",
+            "resolved_type": "list[str]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "[]",
@@ -1912,7 +1914,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "s",
-                    "id": "s"
+                    "id": "s",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -2106,7 +2109,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "s",
-                "id": "s"
+                "id": "s",
+                "call_arg_type": "Obj"
               }
             ],
             "keywords": [],
@@ -2183,7 +2187,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "sep",
-                "id": "sep"
+                "id": "sep",
+                "call_arg_type": "Obj"
               }
             ],
             "keywords": [],
@@ -2480,7 +2485,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "s",
-                    "id": "s"
+                    "id": "s",
+                    "call_arg_type": "str"
                   },
                   {
                     "kind": "Name",
@@ -2494,7 +2500,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "sep",
-                    "id": "sep"
+                    "id": "sep",
+                    "call_arg_type": "str"
                   },
                   {
                     "kind": "Name",
@@ -2508,7 +2515,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "pos",
-                    "id": "pos"
+                    "id": "pos",
+                    "call_arg_type": "int64"
                   },
                   {
                     "kind": "Name",
@@ -2522,10 +2530,13 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "n",
-                    "id": "n"
+                    "id": "n",
+                    "call_arg_type": "int64"
                   }
                 ],
-                "keywords": []
+                "keywords": [],
+                "lowered_kind": "BuiltinCall",
+                "builtin_name": "py_find_window"
               },
               "declare": true,
               "decl_type": "int64",
@@ -2747,7 +2758,8 @@
                       "borrow_kind": "readonly_ref",
                       "repr": "at",
                       "id": "at"
-                    }
+                    },
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -3020,7 +3032,8 @@
                   "borrow_kind": "readonly_ref",
                   "repr": "n",
                   "id": "n"
-                }
+                },
+                "call_arg_type": "str"
               }
             ],
             "keywords": [],
@@ -3168,7 +3181,7 @@
               "end_lineno": 72,
               "end_col": 23
             },
-            "resolved_type": "list[unknown]",
+            "resolved_type": "list[str]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "[]",
@@ -3258,7 +3271,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "s",
-                "id": "s"
+                "id": "s",
+                "call_arg_type": "Obj"
               }
             ],
             "keywords": [],
@@ -3728,7 +3742,8 @@
                           "borrow_kind": "readonly_ref",
                           "repr": "i",
                           "id": "i"
-                        }
+                        },
+                        "call_arg_type": "str"
                       }
                     ],
                     "keywords": [],
@@ -4383,7 +4398,8 @@
                       "borrow_kind": "readonly_ref",
                       "repr": "n",
                       "id": "n"
-                    }
+                    },
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -4740,7 +4756,8 @@
                             "casts": [],
                             "borrow_kind": "value",
                             "repr": "\"\"",
-                            "value": ""
+                            "value": "",
+                            "call_arg_type": "str"
                           }
                         ],
                         "keywords": [],
@@ -4965,7 +4982,8 @@
                       "casts": [],
                       "borrow_kind": "readonly_ref",
                       "repr": "s",
-                      "id": "s"
+                      "id": "s",
+                      "call_arg_type": "Obj"
                     }
                   ],
                   "keywords": [],
@@ -5138,7 +5156,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "s",
-                "id": "s"
+                "id": "s",
+                "call_arg_type": "Obj"
               }
             ],
             "keywords": [],
@@ -5215,7 +5234,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "needle",
-                "id": "needle"
+                "id": "needle",
+                "call_arg_type": "Obj"
               }
             ],
             "keywords": [],
@@ -5315,7 +5335,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "s",
-                    "id": "s"
+                    "id": "s",
+                    "call_arg_type": "str"
                   },
                   {
                     "kind": "Name",
@@ -5329,7 +5350,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "needle",
-                    "id": "needle"
+                    "id": "needle",
+                    "call_arg_type": "str"
                   },
                   {
                     "kind": "Name",
@@ -5343,7 +5365,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "pos",
-                    "id": "pos"
+                    "id": "pos",
+                    "call_arg_type": "int64"
                   },
                   {
                     "kind": "Name",
@@ -5357,10 +5380,13 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "n",
-                    "id": "n"
+                    "id": "n",
+                    "call_arg_type": "int64"
                   }
                 ],
-                "keywords": []
+                "keywords": [],
+                "lowered_kind": "BuiltinCall",
+                "builtin_name": "py_find_window"
               },
               "declare": true,
               "decl_type": "int64",
@@ -5706,7 +5732,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "s",
-                "id": "s"
+                "id": "s",
+                "call_arg_type": "Obj"
               }
             ],
             "keywords": [],
@@ -5856,10 +5883,13 @@
                       "borrow_kind": "readonly_ref",
                       "repr": "i",
                       "id": "i"
-                    }
+                    },
+                    "call_arg_type": "str"
                   }
                 ],
-                "keywords": []
+                "keywords": [],
+                "lowered_kind": "BuiltinCall",
+                "builtin_name": "_is_space"
               }
             ]
           },
@@ -6152,7 +6182,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "s",
-                "id": "s"
+                "id": "s",
+                "call_arg_type": "Obj"
               }
             ],
             "keywords": [],
@@ -6275,7 +6306,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "chars",
-                    "id": "chars"
+                    "id": "chars",
+                    "call_arg_type": "str"
                   },
                   {
                     "kind": "Subscript",
@@ -6316,10 +6348,13 @@
                       "borrow_kind": "readonly_ref",
                       "repr": "i",
                       "id": "i"
-                    }
+                    },
+                    "call_arg_type": "str"
                   }
                 ],
-                "keywords": []
+                "keywords": [],
+                "lowered_kind": "BuiltinCall",
+                "builtin_name": "_contains_char"
               }
             ]
           },
@@ -6572,7 +6607,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "s",
-                "id": "s"
+                "id": "s",
+                "call_arg_type": "Obj"
               }
             ],
             "keywords": [],
@@ -6790,10 +6826,13 @@
                       "borrow_kind": "readonly_ref",
                       "repr": "i",
                       "id": "i"
-                    }
+                    },
+                    "call_arg_type": "str"
                   }
                 ],
-                "keywords": []
+                "keywords": [],
+                "lowered_kind": "BuiltinCall",
+                "builtin_name": "_is_space"
               }
             ]
           },
@@ -7102,7 +7141,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "s",
-                "id": "s"
+                "id": "s",
+                "call_arg_type": "Obj"
               }
             ],
             "keywords": [],
@@ -7293,7 +7333,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "chars",
-                    "id": "chars"
+                    "id": "chars",
+                    "call_arg_type": "str"
                   },
                   {
                     "kind": "Subscript",
@@ -7334,10 +7375,13 @@
                       "borrow_kind": "readonly_ref",
                       "repr": "i",
                       "id": "i"
-                    }
+                    },
+                    "call_arg_type": "str"
                   }
                 ],
-                "keywords": []
+                "keywords": [],
+                "lowered_kind": "BuiltinCall",
+                "builtin_name": "_contains_char"
               }
             ]
           },
@@ -7659,13 +7703,19 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "s",
-                    "id": "s"
+                    "id": "s",
+                    "call_arg_type": "str"
                   }
                 ],
-                "keywords": []
+                "keywords": [],
+                "lowered_kind": "BuiltinCall",
+                "builtin_name": "py_lstrip",
+                "call_arg_type": "str"
               }
             ],
-            "keywords": []
+            "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "py_rstrip"
           }
         }
       ],
@@ -7789,7 +7839,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "s",
-                    "id": "s"
+                    "id": "s",
+                    "call_arg_type": "str"
                   },
                   {
                     "kind": "Name",
@@ -7803,10 +7854,14 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "chars",
-                    "id": "chars"
+                    "id": "chars",
+                    "call_arg_type": "str"
                   }
                 ],
-                "keywords": []
+                "keywords": [],
+                "lowered_kind": "BuiltinCall",
+                "builtin_name": "py_lstrip_chars",
+                "call_arg_type": "str"
               },
               {
                 "kind": "Name",
@@ -7820,10 +7875,13 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "chars",
-                "id": "chars"
+                "id": "chars",
+                "call_arg_type": "str"
               }
             ],
-            "keywords": []
+            "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "py_rstrip_chars"
           }
         }
       ],
@@ -7938,7 +7996,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "s",
-                "id": "s"
+                "id": "s",
+                "call_arg_type": "Obj"
               }
             ],
             "keywords": [],
@@ -8015,7 +8074,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "prefix",
-                "id": "prefix"
+                "id": "prefix",
+                "call_arg_type": "Obj"
               }
             ],
             "keywords": [],
@@ -8520,7 +8580,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "s",
-                "id": "s"
+                "id": "s",
+                "call_arg_type": "Obj"
               }
             ],
             "keywords": [],
@@ -8597,7 +8658,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "suffix",
-                "id": "suffix"
+                "id": "suffix",
+                "call_arg_type": "Obj"
               }
             ],
             "keywords": [],
@@ -9184,7 +9246,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "s",
-                "id": "s"
+                "id": "s",
+                "call_arg_type": "str"
               },
               {
                 "kind": "Name",
@@ -9198,7 +9261,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "needle",
-                "id": "needle"
+                "id": "needle",
+                "call_arg_type": "str"
               },
               {
                 "kind": "Constant",
@@ -9212,7 +9276,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "0",
-                "value": 0
+                "value": 0,
+                "call_arg_type": "int64"
               },
               {
                 "kind": "Call",
@@ -9253,7 +9318,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "s",
-                    "id": "s"
+                    "id": "s",
+                    "call_arg_type": "Obj"
                   }
                 ],
                 "keywords": [],
@@ -9263,10 +9329,13 @@
                 "runtime_module_id": "pytra.core.py_runtime",
                 "runtime_symbol": "len",
                 "runtime_call_adapter_kind": "builtin",
-                "semantic_tag": "core.len"
+                "semantic_tag": "core.len",
+                "call_arg_type": "int64"
               }
             ],
-            "keywords": []
+            "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "py_find_window"
           }
         }
       ],
@@ -9389,7 +9458,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "s",
-                "id": "s"
+                "id": "s",
+                "call_arg_type": "Obj"
               }
             ],
             "keywords": [],
@@ -9466,7 +9536,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "needle",
-                "id": "needle"
+                "id": "needle",
+                "call_arg_type": "Obj"
               }
             ],
             "keywords": [],
@@ -9543,7 +9614,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "start",
-                "id": "start"
+                "id": "start",
+                "call_arg_type": "int64"
               },
               {
                 "kind": "Name",
@@ -9557,10 +9629,13 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "n",
-                "id": "n"
+                "id": "n",
+                "call_arg_type": "int64"
               }
             ],
-            "keywords": []
+            "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "_normalize_index"
           },
           "declare": true,
           "decl_type": "int64",
@@ -9627,7 +9702,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "end",
-                "id": "end"
+                "id": "end",
+                "call_arg_type": "int64"
               },
               {
                 "kind": "Name",
@@ -9641,10 +9717,13 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "n",
-                "id": "n"
+                "id": "n",
+                "call_arg_type": "int64"
               }
             ],
-            "keywords": []
+            "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "_normalize_index"
           },
           "declare": true,
           "decl_type": "int64",
@@ -10605,7 +10684,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "s",
-                "id": "s"
+                "id": "s",
+                "call_arg_type": "str"
               },
               {
                 "kind": "Name",
@@ -10619,7 +10699,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "needle",
-                "id": "needle"
+                "id": "needle",
+                "call_arg_type": "str"
               },
               {
                 "kind": "Constant",
@@ -10633,7 +10714,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "0",
-                "value": 0
+                "value": 0,
+                "call_arg_type": "int64"
               },
               {
                 "kind": "Call",
@@ -10674,7 +10756,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "s",
-                    "id": "s"
+                    "id": "s",
+                    "call_arg_type": "Obj"
                   }
                 ],
                 "keywords": [],
@@ -10684,10 +10767,13 @@
                 "runtime_module_id": "pytra.core.py_runtime",
                 "runtime_symbol": "len",
                 "runtime_call_adapter_kind": "builtin",
-                "semantic_tag": "core.len"
+                "semantic_tag": "core.len",
+                "call_arg_type": "int64"
               }
             ],
-            "keywords": []
+            "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "py_rfind_window"
           }
         }
       ],
@@ -10810,7 +10896,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "s",
-                "id": "s"
+                "id": "s",
+                "call_arg_type": "Obj"
               }
             ],
             "keywords": [],
@@ -10887,7 +10974,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "needle",
-                "id": "needle"
+                "id": "needle",
+                "call_arg_type": "Obj"
               }
             ],
             "keywords": [],
@@ -10964,7 +11052,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "start",
-                "id": "start"
+                "id": "start",
+                "call_arg_type": "int64"
               },
               {
                 "kind": "Name",
@@ -10978,10 +11067,13 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "n",
-                "id": "n"
+                "id": "n",
+                "call_arg_type": "int64"
               }
             ],
-            "keywords": []
+            "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "_normalize_index"
           },
           "declare": true,
           "decl_type": "int64",
@@ -11048,7 +11140,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "end",
-                "id": "end"
+                "id": "end",
+                "call_arg_type": "int64"
               },
               {
                 "kind": "Name",
@@ -11062,10 +11155,13 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "n",
-                "id": "n"
+                "id": "n",
+                "call_arg_type": "int64"
               }
             ],
-            "keywords": []
+            "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "_normalize_index"
           },
           "declare": true,
           "decl_type": "int64",
@@ -12125,7 +12221,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "s",
-                "id": "s"
+                "id": "s",
+                "call_arg_type": "Obj"
               }
             ],
             "keywords": [],
@@ -12202,7 +12299,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "oldv",
-                "id": "oldv"
+                "id": "oldv",
+                "call_arg_type": "Obj"
               }
             ],
             "keywords": [],
@@ -12460,7 +12558,8 @@
                           "casts": [],
                           "borrow_kind": "readonly_ref",
                           "repr": "s",
-                          "id": "s"
+                          "id": "s",
+                          "call_arg_type": "str"
                         },
                         {
                           "kind": "Name",
@@ -12474,7 +12573,8 @@
                           "casts": [],
                           "borrow_kind": "readonly_ref",
                           "repr": "oldv",
-                          "id": "oldv"
+                          "id": "oldv",
+                          "call_arg_type": "str"
                         },
                         {
                           "kind": "Name",
@@ -12488,7 +12588,8 @@
                           "casts": [],
                           "borrow_kind": "readonly_ref",
                           "repr": "i",
-                          "id": "i"
+                          "id": "i",
+                          "call_arg_type": "int64"
                         },
                         {
                           "kind": "BinOp",
@@ -12530,10 +12631,13 @@
                             "borrow_kind": "readonly_ref",
                             "repr": "m",
                             "id": "m"
-                          }
+                          },
+                          "call_arg_type": "int64"
                         }
                       ],
-                      "keywords": []
+                      "keywords": [],
+                      "lowered_kind": "BuiltinCall",
+                      "builtin_name": "py_find_window"
                     },
                     "ops": [
                       "Eq"
@@ -13082,7 +13186,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "s",
-                "id": "s"
+                "id": "s",
+                "call_arg_type": "Obj"
               }
             ],
             "keywords": [],
@@ -13159,7 +13264,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "oldv",
-                "id": "oldv"
+                "id": "oldv",
+                "call_arg_type": "Obj"
               }
             ],
             "keywords": [],
@@ -13503,7 +13609,8 @@
                           "casts": [],
                           "borrow_kind": "readonly_ref",
                           "repr": "s",
-                          "id": "s"
+                          "id": "s",
+                          "call_arg_type": "str"
                         },
                         {
                           "kind": "Name",
@@ -13517,7 +13624,8 @@
                           "casts": [],
                           "borrow_kind": "readonly_ref",
                           "repr": "oldv",
-                          "id": "oldv"
+                          "id": "oldv",
+                          "call_arg_type": "str"
                         },
                         {
                           "kind": "Name",
@@ -13531,7 +13639,8 @@
                           "casts": [],
                           "borrow_kind": "readonly_ref",
                           "repr": "i",
-                          "id": "i"
+                          "id": "i",
+                          "call_arg_type": "int64"
                         },
                         {
                           "kind": "BinOp",
@@ -13573,10 +13682,13 @@
                             "borrow_kind": "readonly_ref",
                             "repr": "m",
                             "id": "m"
-                          }
+                          },
+                          "call_arg_type": "int64"
                         }
                       ],
-                      "keywords": []
+                      "keywords": [],
+                      "lowered_kind": "BuiltinCall",
+                      "builtin_name": "py_find_window"
                     },
                     "ops": [
                       "Eq"

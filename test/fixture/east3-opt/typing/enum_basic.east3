@@ -220,7 +220,13 @@
             "casts": [],
             "borrow_kind": "value",
             "repr": "[]",
-            "elements": []
+            "elements": [],
+            "type_expr_summary_v1": {
+              "schema_version": 1,
+              "kind": "GenericType",
+              "category": "static",
+              "mirror": "list[bool]"
+            }
           },
           "type_expr_summary_v1": {
             "schema_version": 1,
@@ -310,7 +316,7 @@
                   "end_lineno": 12,
                   "end_col_offset": 75
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(Color.RED == Color.RED, True, \"same_member\")",
@@ -330,80 +336,11 @@
                 },
                 "args": [
                   {
-                    "kind": "Compare",
-                    "source_span": {
-                      "lineno": 12,
-                      "col_offset": 31,
-                      "end_lineno": 12,
-                      "end_col_offset": 53
-                    },
-                    "resolved_type": "bool",
-                    "casts": [],
+                    "kind": "Box",
+                    "resolved_type": "object",
                     "borrow_kind": "value",
-                    "repr": "Color.RED == Color.RED",
-                    "left": {
-                      "kind": "Attribute",
-                      "source_span": {
-                        "lineno": 12,
-                        "col_offset": 31,
-                        "end_lineno": 12,
-                        "end_col_offset": 40
-                      },
-                      "resolved_type": "unknown",
-                      "casts": [],
-                      "borrow_kind": "value",
-                      "repr": "Color.RED",
-                      "value": {
-                        "kind": "Name",
-                        "source_span": {
-                          "lineno": 12,
-                          "col_offset": 31,
-                          "end_lineno": 12,
-                          "end_col_offset": 36
-                        },
-                        "resolved_type": "type",
-                        "casts": [],
-                        "borrow_kind": "value",
-                        "repr": "Color",
-                        "id": "Color"
-                      },
-                      "attr": "RED"
-                    },
-                    "ops": [
-                      "Eq"
-                    ],
-                    "comparators": [
-                      {
-                        "kind": "Attribute",
-                        "source_span": {
-                          "lineno": 12,
-                          "col_offset": 44,
-                          "end_lineno": 12,
-                          "end_col_offset": 53
-                        },
-                        "resolved_type": "unknown",
-                        "casts": [],
-                        "borrow_kind": "value",
-                        "repr": "Color.RED",
-                        "value": {
-                          "kind": "Name",
-                          "source_span": {
-                            "lineno": 12,
-                            "col_offset": 44,
-                            "end_lineno": 12,
-                            "end_col_offset": 49
-                          },
-                          "resolved_type": "type",
-                          "casts": [],
-                          "borrow_kind": "value",
-                          "repr": "Color",
-                          "id": "Color"
-                        },
-                        "attr": "RED"
-                      }
-                    ],
-                    "normalized_expr_version": "east3_expr_v1",
-                    "normalized_expr": {
+                    "casts": [],
+                    "value": {
                       "kind": "Compare",
                       "source_span": {
                         "lineno": 12,
@@ -475,22 +412,166 @@
                           },
                           "attr": "RED"
                         }
-                      ]
+                      ],
+                      "call_arg_type": "object",
+                      "normalized_expr_version": "east3_expr_v1",
+                      "normalized_expr": {
+                        "kind": "Compare",
+                        "source_span": {
+                          "lineno": 12,
+                          "col_offset": 31,
+                          "end_lineno": 12,
+                          "end_col_offset": 53
+                        },
+                        "resolved_type": "bool",
+                        "casts": [],
+                        "borrow_kind": "value",
+                        "repr": "Color.RED == Color.RED",
+                        "left": {
+                          "kind": "Attribute",
+                          "source_span": {
+                            "lineno": 12,
+                            "col_offset": 31,
+                            "end_lineno": 12,
+                            "end_col_offset": 40
+                          },
+                          "resolved_type": "unknown",
+                          "casts": [],
+                          "borrow_kind": "value",
+                          "repr": "Color.RED",
+                          "value": {
+                            "kind": "Name",
+                            "source_span": {
+                              "lineno": 12,
+                              "col_offset": 31,
+                              "end_lineno": 12,
+                              "end_col_offset": 36
+                            },
+                            "resolved_type": "type",
+                            "casts": [],
+                            "borrow_kind": "value",
+                            "repr": "Color",
+                            "id": "Color"
+                          },
+                          "attr": "RED"
+                        },
+                        "ops": [
+                          "Eq"
+                        ],
+                        "comparators": [
+                          {
+                            "kind": "Attribute",
+                            "source_span": {
+                              "lineno": 12,
+                              "col_offset": 44,
+                              "end_lineno": 12,
+                              "end_col_offset": 53
+                            },
+                            "resolved_type": "unknown",
+                            "casts": [],
+                            "borrow_kind": "value",
+                            "repr": "Color.RED",
+                            "value": {
+                              "kind": "Name",
+                              "source_span": {
+                                "lineno": 12,
+                                "col_offset": 44,
+                                "end_lineno": 12,
+                                "end_col_offset": 49
+                              },
+                              "resolved_type": "type",
+                              "casts": [],
+                              "borrow_kind": "value",
+                              "repr": "Color",
+                              "id": "Color"
+                            },
+                            "attr": "RED"
+                          }
+                        ],
+                        "call_arg_type": "object"
+                      }
+                    },
+                    "source_span": {
+                      "lineno": 12,
+                      "col_offset": 31,
+                      "end_lineno": 12,
+                      "end_col_offset": 53
+                    },
+                    "repr": "Color.RED == Color.RED",
+                    "type_expr_summary_v1": {
+                      "schema_version": 1,
+                      "kind": "DynamicType",
+                      "category": "dynamic",
+                      "mirror": "object",
+                      "dynamic_name": "object"
+                    },
+                    "bridge_lane_v1": {
+                      "schema_version": 1,
+                      "target": {
+                        "kind": "DynamicType",
+                        "category": "dynamic",
+                        "mirror": "object",
+                        "dynamic_name": "object"
+                      },
+                      "target_category": "dynamic",
+                      "value": {
+                        "kind": "NamedType",
+                        "category": "static",
+                        "mirror": "bool"
+                      },
+                      "value_category": "static"
                     }
                   },
                   {
-                    "kind": "Constant",
+                    "kind": "Box",
+                    "resolved_type": "object",
+                    "borrow_kind": "value",
+                    "casts": [],
+                    "value": {
+                      "kind": "Constant",
+                      "source_span": {
+                        "lineno": 12,
+                        "col_offset": 55,
+                        "end_lineno": 12,
+                        "end_col_offset": 59
+                      },
+                      "resolved_type": "bool",
+                      "casts": [],
+                      "borrow_kind": "value",
+                      "repr": "True",
+                      "value": true,
+                      "call_arg_type": "object"
+                    },
                     "source_span": {
                       "lineno": 12,
                       "col_offset": 55,
                       "end_lineno": 12,
                       "end_col_offset": 59
                     },
-                    "resolved_type": "bool",
-                    "casts": [],
-                    "borrow_kind": "value",
                     "repr": "True",
-                    "value": true
+                    "type_expr_summary_v1": {
+                      "schema_version": 1,
+                      "kind": "DynamicType",
+                      "category": "dynamic",
+                      "mirror": "object",
+                      "dynamic_name": "object"
+                    },
+                    "bridge_lane_v1": {
+                      "schema_version": 1,
+                      "target": {
+                        "kind": "DynamicType",
+                        "category": "dynamic",
+                        "mirror": "object",
+                        "dynamic_name": "object"
+                      },
+                      "target_category": "dynamic",
+                      "value": {
+                        "kind": "NamedType",
+                        "category": "static",
+                        "mirror": "bool"
+                      },
+                      "value_category": "static"
+                    }
                   },
                   {
                     "kind": "Constant",
@@ -504,7 +585,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"same_member\"",
-                    "value": "same_member"
+                    "value": "same_member",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -513,12 +595,12 @@
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
                 "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
-                  "kind": "DynamicType",
-                  "category": "dynamic",
-                  "mirror": "unknown",
-                  "dynamic_name": "unknown"
+                  "kind": "NamedType",
+                  "category": "static",
+                  "mirror": "bool"
                 }
               }
             ],
@@ -631,7 +713,7 @@
                   "end_lineno": 13,
                   "end_col_offset": 82
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(Color.RED == Color.BLUE, False, \"different_member\")",
@@ -651,80 +733,11 @@
                 },
                 "args": [
                   {
-                    "kind": "Compare",
-                    "source_span": {
-                      "lineno": 13,
-                      "col_offset": 31,
-                      "end_lineno": 13,
-                      "end_col_offset": 54
-                    },
-                    "resolved_type": "bool",
-                    "casts": [],
+                    "kind": "Box",
+                    "resolved_type": "object",
                     "borrow_kind": "value",
-                    "repr": "Color.RED == Color.BLUE",
-                    "left": {
-                      "kind": "Attribute",
-                      "source_span": {
-                        "lineno": 13,
-                        "col_offset": 31,
-                        "end_lineno": 13,
-                        "end_col_offset": 40
-                      },
-                      "resolved_type": "unknown",
-                      "casts": [],
-                      "borrow_kind": "value",
-                      "repr": "Color.RED",
-                      "value": {
-                        "kind": "Name",
-                        "source_span": {
-                          "lineno": 13,
-                          "col_offset": 31,
-                          "end_lineno": 13,
-                          "end_col_offset": 36
-                        },
-                        "resolved_type": "type",
-                        "casts": [],
-                        "borrow_kind": "value",
-                        "repr": "Color",
-                        "id": "Color"
-                      },
-                      "attr": "RED"
-                    },
-                    "ops": [
-                      "Eq"
-                    ],
-                    "comparators": [
-                      {
-                        "kind": "Attribute",
-                        "source_span": {
-                          "lineno": 13,
-                          "col_offset": 44,
-                          "end_lineno": 13,
-                          "end_col_offset": 54
-                        },
-                        "resolved_type": "unknown",
-                        "casts": [],
-                        "borrow_kind": "value",
-                        "repr": "Color.BLUE",
-                        "value": {
-                          "kind": "Name",
-                          "source_span": {
-                            "lineno": 13,
-                            "col_offset": 44,
-                            "end_lineno": 13,
-                            "end_col_offset": 49
-                          },
-                          "resolved_type": "type",
-                          "casts": [],
-                          "borrow_kind": "value",
-                          "repr": "Color",
-                          "id": "Color"
-                        },
-                        "attr": "BLUE"
-                      }
-                    ],
-                    "normalized_expr_version": "east3_expr_v1",
-                    "normalized_expr": {
+                    "casts": [],
+                    "value": {
                       "kind": "Compare",
                       "source_span": {
                         "lineno": 13,
@@ -796,22 +809,166 @@
                           },
                           "attr": "BLUE"
                         }
-                      ]
+                      ],
+                      "call_arg_type": "object",
+                      "normalized_expr_version": "east3_expr_v1",
+                      "normalized_expr": {
+                        "kind": "Compare",
+                        "source_span": {
+                          "lineno": 13,
+                          "col_offset": 31,
+                          "end_lineno": 13,
+                          "end_col_offset": 54
+                        },
+                        "resolved_type": "bool",
+                        "casts": [],
+                        "borrow_kind": "value",
+                        "repr": "Color.RED == Color.BLUE",
+                        "left": {
+                          "kind": "Attribute",
+                          "source_span": {
+                            "lineno": 13,
+                            "col_offset": 31,
+                            "end_lineno": 13,
+                            "end_col_offset": 40
+                          },
+                          "resolved_type": "unknown",
+                          "casts": [],
+                          "borrow_kind": "value",
+                          "repr": "Color.RED",
+                          "value": {
+                            "kind": "Name",
+                            "source_span": {
+                              "lineno": 13,
+                              "col_offset": 31,
+                              "end_lineno": 13,
+                              "end_col_offset": 36
+                            },
+                            "resolved_type": "type",
+                            "casts": [],
+                            "borrow_kind": "value",
+                            "repr": "Color",
+                            "id": "Color"
+                          },
+                          "attr": "RED"
+                        },
+                        "ops": [
+                          "Eq"
+                        ],
+                        "comparators": [
+                          {
+                            "kind": "Attribute",
+                            "source_span": {
+                              "lineno": 13,
+                              "col_offset": 44,
+                              "end_lineno": 13,
+                              "end_col_offset": 54
+                            },
+                            "resolved_type": "unknown",
+                            "casts": [],
+                            "borrow_kind": "value",
+                            "repr": "Color.BLUE",
+                            "value": {
+                              "kind": "Name",
+                              "source_span": {
+                                "lineno": 13,
+                                "col_offset": 44,
+                                "end_lineno": 13,
+                                "end_col_offset": 49
+                              },
+                              "resolved_type": "type",
+                              "casts": [],
+                              "borrow_kind": "value",
+                              "repr": "Color",
+                              "id": "Color"
+                            },
+                            "attr": "BLUE"
+                          }
+                        ],
+                        "call_arg_type": "object"
+                      }
+                    },
+                    "source_span": {
+                      "lineno": 13,
+                      "col_offset": 31,
+                      "end_lineno": 13,
+                      "end_col_offset": 54
+                    },
+                    "repr": "Color.RED == Color.BLUE",
+                    "type_expr_summary_v1": {
+                      "schema_version": 1,
+                      "kind": "DynamicType",
+                      "category": "dynamic",
+                      "mirror": "object",
+                      "dynamic_name": "object"
+                    },
+                    "bridge_lane_v1": {
+                      "schema_version": 1,
+                      "target": {
+                        "kind": "DynamicType",
+                        "category": "dynamic",
+                        "mirror": "object",
+                        "dynamic_name": "object"
+                      },
+                      "target_category": "dynamic",
+                      "value": {
+                        "kind": "NamedType",
+                        "category": "static",
+                        "mirror": "bool"
+                      },
+                      "value_category": "static"
                     }
                   },
                   {
-                    "kind": "Constant",
+                    "kind": "Box",
+                    "resolved_type": "object",
+                    "borrow_kind": "value",
+                    "casts": [],
+                    "value": {
+                      "kind": "Constant",
+                      "source_span": {
+                        "lineno": 13,
+                        "col_offset": 56,
+                        "end_lineno": 13,
+                        "end_col_offset": 61
+                      },
+                      "resolved_type": "bool",
+                      "casts": [],
+                      "borrow_kind": "value",
+                      "repr": "False",
+                      "value": false,
+                      "call_arg_type": "object"
+                    },
                     "source_span": {
                       "lineno": 13,
                       "col_offset": 56,
                       "end_lineno": 13,
                       "end_col_offset": 61
                     },
-                    "resolved_type": "bool",
-                    "casts": [],
-                    "borrow_kind": "value",
                     "repr": "False",
-                    "value": false
+                    "type_expr_summary_v1": {
+                      "schema_version": 1,
+                      "kind": "DynamicType",
+                      "category": "dynamic",
+                      "mirror": "object",
+                      "dynamic_name": "object"
+                    },
+                    "bridge_lane_v1": {
+                      "schema_version": 1,
+                      "target": {
+                        "kind": "DynamicType",
+                        "category": "dynamic",
+                        "mirror": "object",
+                        "dynamic_name": "object"
+                      },
+                      "target_category": "dynamic",
+                      "value": {
+                        "kind": "NamedType",
+                        "category": "static",
+                        "mirror": "bool"
+                      },
+                      "value_category": "static"
+                    }
                   },
                   {
                     "kind": "Constant",
@@ -825,7 +982,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"different_member\"",
-                    "value": "different_member"
+                    "value": "different_member",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -834,12 +992,12 @@
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
                 "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
-                  "kind": "DynamicType",
-                  "category": "dynamic",
-                  "mirror": "unknown",
-                  "dynamic_name": "unknown"
+                  "kind": "NamedType",
+                  "category": "static",
+                  "mirror": "bool"
                 }
               }
             ],
@@ -952,7 +1110,7 @@
                   "end_lineno": 14,
                   "end_col_offset": 82
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(Color.BLUE == Color.BLUE, True, \"same_member_blue\")",
@@ -972,80 +1130,11 @@
                 },
                 "args": [
                   {
-                    "kind": "Compare",
-                    "source_span": {
-                      "lineno": 14,
-                      "col_offset": 31,
-                      "end_lineno": 14,
-                      "end_col_offset": 55
-                    },
-                    "resolved_type": "bool",
-                    "casts": [],
+                    "kind": "Box",
+                    "resolved_type": "object",
                     "borrow_kind": "value",
-                    "repr": "Color.BLUE == Color.BLUE",
-                    "left": {
-                      "kind": "Attribute",
-                      "source_span": {
-                        "lineno": 14,
-                        "col_offset": 31,
-                        "end_lineno": 14,
-                        "end_col_offset": 41
-                      },
-                      "resolved_type": "unknown",
-                      "casts": [],
-                      "borrow_kind": "value",
-                      "repr": "Color.BLUE",
-                      "value": {
-                        "kind": "Name",
-                        "source_span": {
-                          "lineno": 14,
-                          "col_offset": 31,
-                          "end_lineno": 14,
-                          "end_col_offset": 36
-                        },
-                        "resolved_type": "type",
-                        "casts": [],
-                        "borrow_kind": "value",
-                        "repr": "Color",
-                        "id": "Color"
-                      },
-                      "attr": "BLUE"
-                    },
-                    "ops": [
-                      "Eq"
-                    ],
-                    "comparators": [
-                      {
-                        "kind": "Attribute",
-                        "source_span": {
-                          "lineno": 14,
-                          "col_offset": 45,
-                          "end_lineno": 14,
-                          "end_col_offset": 55
-                        },
-                        "resolved_type": "unknown",
-                        "casts": [],
-                        "borrow_kind": "value",
-                        "repr": "Color.BLUE",
-                        "value": {
-                          "kind": "Name",
-                          "source_span": {
-                            "lineno": 14,
-                            "col_offset": 45,
-                            "end_lineno": 14,
-                            "end_col_offset": 50
-                          },
-                          "resolved_type": "type",
-                          "casts": [],
-                          "borrow_kind": "value",
-                          "repr": "Color",
-                          "id": "Color"
-                        },
-                        "attr": "BLUE"
-                      }
-                    ],
-                    "normalized_expr_version": "east3_expr_v1",
-                    "normalized_expr": {
+                    "casts": [],
+                    "value": {
                       "kind": "Compare",
                       "source_span": {
                         "lineno": 14,
@@ -1117,22 +1206,166 @@
                           },
                           "attr": "BLUE"
                         }
-                      ]
+                      ],
+                      "call_arg_type": "object",
+                      "normalized_expr_version": "east3_expr_v1",
+                      "normalized_expr": {
+                        "kind": "Compare",
+                        "source_span": {
+                          "lineno": 14,
+                          "col_offset": 31,
+                          "end_lineno": 14,
+                          "end_col_offset": 55
+                        },
+                        "resolved_type": "bool",
+                        "casts": [],
+                        "borrow_kind": "value",
+                        "repr": "Color.BLUE == Color.BLUE",
+                        "left": {
+                          "kind": "Attribute",
+                          "source_span": {
+                            "lineno": 14,
+                            "col_offset": 31,
+                            "end_lineno": 14,
+                            "end_col_offset": 41
+                          },
+                          "resolved_type": "unknown",
+                          "casts": [],
+                          "borrow_kind": "value",
+                          "repr": "Color.BLUE",
+                          "value": {
+                            "kind": "Name",
+                            "source_span": {
+                              "lineno": 14,
+                              "col_offset": 31,
+                              "end_lineno": 14,
+                              "end_col_offset": 36
+                            },
+                            "resolved_type": "type",
+                            "casts": [],
+                            "borrow_kind": "value",
+                            "repr": "Color",
+                            "id": "Color"
+                          },
+                          "attr": "BLUE"
+                        },
+                        "ops": [
+                          "Eq"
+                        ],
+                        "comparators": [
+                          {
+                            "kind": "Attribute",
+                            "source_span": {
+                              "lineno": 14,
+                              "col_offset": 45,
+                              "end_lineno": 14,
+                              "end_col_offset": 55
+                            },
+                            "resolved_type": "unknown",
+                            "casts": [],
+                            "borrow_kind": "value",
+                            "repr": "Color.BLUE",
+                            "value": {
+                              "kind": "Name",
+                              "source_span": {
+                                "lineno": 14,
+                                "col_offset": 45,
+                                "end_lineno": 14,
+                                "end_col_offset": 50
+                              },
+                              "resolved_type": "type",
+                              "casts": [],
+                              "borrow_kind": "value",
+                              "repr": "Color",
+                              "id": "Color"
+                            },
+                            "attr": "BLUE"
+                          }
+                        ],
+                        "call_arg_type": "object"
+                      }
+                    },
+                    "source_span": {
+                      "lineno": 14,
+                      "col_offset": 31,
+                      "end_lineno": 14,
+                      "end_col_offset": 55
+                    },
+                    "repr": "Color.BLUE == Color.BLUE",
+                    "type_expr_summary_v1": {
+                      "schema_version": 1,
+                      "kind": "DynamicType",
+                      "category": "dynamic",
+                      "mirror": "object",
+                      "dynamic_name": "object"
+                    },
+                    "bridge_lane_v1": {
+                      "schema_version": 1,
+                      "target": {
+                        "kind": "DynamicType",
+                        "category": "dynamic",
+                        "mirror": "object",
+                        "dynamic_name": "object"
+                      },
+                      "target_category": "dynamic",
+                      "value": {
+                        "kind": "NamedType",
+                        "category": "static",
+                        "mirror": "bool"
+                      },
+                      "value_category": "static"
                     }
                   },
                   {
-                    "kind": "Constant",
+                    "kind": "Box",
+                    "resolved_type": "object",
+                    "borrow_kind": "value",
+                    "casts": [],
+                    "value": {
+                      "kind": "Constant",
+                      "source_span": {
+                        "lineno": 14,
+                        "col_offset": 57,
+                        "end_lineno": 14,
+                        "end_col_offset": 61
+                      },
+                      "resolved_type": "bool",
+                      "casts": [],
+                      "borrow_kind": "value",
+                      "repr": "True",
+                      "value": true,
+                      "call_arg_type": "object"
+                    },
                     "source_span": {
                       "lineno": 14,
                       "col_offset": 57,
                       "end_lineno": 14,
                       "end_col_offset": 61
                     },
-                    "resolved_type": "bool",
-                    "casts": [],
-                    "borrow_kind": "value",
                     "repr": "True",
-                    "value": true
+                    "type_expr_summary_v1": {
+                      "schema_version": 1,
+                      "kind": "DynamicType",
+                      "category": "dynamic",
+                      "mirror": "object",
+                      "dynamic_name": "object"
+                    },
+                    "bridge_lane_v1": {
+                      "schema_version": 1,
+                      "target": {
+                        "kind": "DynamicType",
+                        "category": "dynamic",
+                        "mirror": "object",
+                        "dynamic_name": "object"
+                      },
+                      "target_category": "dynamic",
+                      "value": {
+                        "kind": "NamedType",
+                        "category": "static",
+                        "mirror": "bool"
+                      },
+                      "value_category": "static"
+                    }
                   },
                   {
                     "kind": "Constant",
@@ -1146,7 +1379,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"same_member_blue\"",
-                    "value": "same_member_blue"
+                    "value": "same_member_blue",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -1155,12 +1389,12 @@
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
                 "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
-                  "kind": "DynamicType",
-                  "category": "dynamic",
-                  "mirror": "unknown",
-                  "dynamic_name": "unknown"
+                  "kind": "NamedType",
+                  "category": "static",
+                  "mirror": "bool"
                 }
               }
             ],
@@ -1273,7 +1507,7 @@
                   "end_lineno": 15,
                   "end_col_offset": 90
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(Color.BLUE == Color.RED, False, \"different_member_reverse\")",
@@ -1293,80 +1527,11 @@
                 },
                 "args": [
                   {
-                    "kind": "Compare",
-                    "source_span": {
-                      "lineno": 15,
-                      "col_offset": 31,
-                      "end_lineno": 15,
-                      "end_col_offset": 54
-                    },
-                    "resolved_type": "bool",
-                    "casts": [],
+                    "kind": "Box",
+                    "resolved_type": "object",
                     "borrow_kind": "value",
-                    "repr": "Color.BLUE == Color.RED",
-                    "left": {
-                      "kind": "Attribute",
-                      "source_span": {
-                        "lineno": 15,
-                        "col_offset": 31,
-                        "end_lineno": 15,
-                        "end_col_offset": 41
-                      },
-                      "resolved_type": "unknown",
-                      "casts": [],
-                      "borrow_kind": "value",
-                      "repr": "Color.BLUE",
-                      "value": {
-                        "kind": "Name",
-                        "source_span": {
-                          "lineno": 15,
-                          "col_offset": 31,
-                          "end_lineno": 15,
-                          "end_col_offset": 36
-                        },
-                        "resolved_type": "type",
-                        "casts": [],
-                        "borrow_kind": "value",
-                        "repr": "Color",
-                        "id": "Color"
-                      },
-                      "attr": "BLUE"
-                    },
-                    "ops": [
-                      "Eq"
-                    ],
-                    "comparators": [
-                      {
-                        "kind": "Attribute",
-                        "source_span": {
-                          "lineno": 15,
-                          "col_offset": 45,
-                          "end_lineno": 15,
-                          "end_col_offset": 54
-                        },
-                        "resolved_type": "unknown",
-                        "casts": [],
-                        "borrow_kind": "value",
-                        "repr": "Color.RED",
-                        "value": {
-                          "kind": "Name",
-                          "source_span": {
-                            "lineno": 15,
-                            "col_offset": 45,
-                            "end_lineno": 15,
-                            "end_col_offset": 50
-                          },
-                          "resolved_type": "type",
-                          "casts": [],
-                          "borrow_kind": "value",
-                          "repr": "Color",
-                          "id": "Color"
-                        },
-                        "attr": "RED"
-                      }
-                    ],
-                    "normalized_expr_version": "east3_expr_v1",
-                    "normalized_expr": {
+                    "casts": [],
+                    "value": {
                       "kind": "Compare",
                       "source_span": {
                         "lineno": 15,
@@ -1438,22 +1603,166 @@
                           },
                           "attr": "RED"
                         }
-                      ]
+                      ],
+                      "call_arg_type": "object",
+                      "normalized_expr_version": "east3_expr_v1",
+                      "normalized_expr": {
+                        "kind": "Compare",
+                        "source_span": {
+                          "lineno": 15,
+                          "col_offset": 31,
+                          "end_lineno": 15,
+                          "end_col_offset": 54
+                        },
+                        "resolved_type": "bool",
+                        "casts": [],
+                        "borrow_kind": "value",
+                        "repr": "Color.BLUE == Color.RED",
+                        "left": {
+                          "kind": "Attribute",
+                          "source_span": {
+                            "lineno": 15,
+                            "col_offset": 31,
+                            "end_lineno": 15,
+                            "end_col_offset": 41
+                          },
+                          "resolved_type": "unknown",
+                          "casts": [],
+                          "borrow_kind": "value",
+                          "repr": "Color.BLUE",
+                          "value": {
+                            "kind": "Name",
+                            "source_span": {
+                              "lineno": 15,
+                              "col_offset": 31,
+                              "end_lineno": 15,
+                              "end_col_offset": 36
+                            },
+                            "resolved_type": "type",
+                            "casts": [],
+                            "borrow_kind": "value",
+                            "repr": "Color",
+                            "id": "Color"
+                          },
+                          "attr": "BLUE"
+                        },
+                        "ops": [
+                          "Eq"
+                        ],
+                        "comparators": [
+                          {
+                            "kind": "Attribute",
+                            "source_span": {
+                              "lineno": 15,
+                              "col_offset": 45,
+                              "end_lineno": 15,
+                              "end_col_offset": 54
+                            },
+                            "resolved_type": "unknown",
+                            "casts": [],
+                            "borrow_kind": "value",
+                            "repr": "Color.RED",
+                            "value": {
+                              "kind": "Name",
+                              "source_span": {
+                                "lineno": 15,
+                                "col_offset": 45,
+                                "end_lineno": 15,
+                                "end_col_offset": 50
+                              },
+                              "resolved_type": "type",
+                              "casts": [],
+                              "borrow_kind": "value",
+                              "repr": "Color",
+                              "id": "Color"
+                            },
+                            "attr": "RED"
+                          }
+                        ],
+                        "call_arg_type": "object"
+                      }
+                    },
+                    "source_span": {
+                      "lineno": 15,
+                      "col_offset": 31,
+                      "end_lineno": 15,
+                      "end_col_offset": 54
+                    },
+                    "repr": "Color.BLUE == Color.RED",
+                    "type_expr_summary_v1": {
+                      "schema_version": 1,
+                      "kind": "DynamicType",
+                      "category": "dynamic",
+                      "mirror": "object",
+                      "dynamic_name": "object"
+                    },
+                    "bridge_lane_v1": {
+                      "schema_version": 1,
+                      "target": {
+                        "kind": "DynamicType",
+                        "category": "dynamic",
+                        "mirror": "object",
+                        "dynamic_name": "object"
+                      },
+                      "target_category": "dynamic",
+                      "value": {
+                        "kind": "NamedType",
+                        "category": "static",
+                        "mirror": "bool"
+                      },
+                      "value_category": "static"
                     }
                   },
                   {
-                    "kind": "Constant",
+                    "kind": "Box",
+                    "resolved_type": "object",
+                    "borrow_kind": "value",
+                    "casts": [],
+                    "value": {
+                      "kind": "Constant",
+                      "source_span": {
+                        "lineno": 15,
+                        "col_offset": 56,
+                        "end_lineno": 15,
+                        "end_col_offset": 61
+                      },
+                      "resolved_type": "bool",
+                      "casts": [],
+                      "borrow_kind": "value",
+                      "repr": "False",
+                      "value": false,
+                      "call_arg_type": "object"
+                    },
                     "source_span": {
                       "lineno": 15,
                       "col_offset": 56,
                       "end_lineno": 15,
                       "end_col_offset": 61
                     },
-                    "resolved_type": "bool",
-                    "casts": [],
-                    "borrow_kind": "value",
                     "repr": "False",
-                    "value": false
+                    "type_expr_summary_v1": {
+                      "schema_version": 1,
+                      "kind": "DynamicType",
+                      "category": "dynamic",
+                      "mirror": "object",
+                      "dynamic_name": "object"
+                    },
+                    "bridge_lane_v1": {
+                      "schema_version": 1,
+                      "target": {
+                        "kind": "DynamicType",
+                        "category": "dynamic",
+                        "mirror": "object",
+                        "dynamic_name": "object"
+                      },
+                      "target_category": "dynamic",
+                      "value": {
+                        "kind": "NamedType",
+                        "category": "static",
+                        "mirror": "bool"
+                      },
+                      "value_category": "static"
+                    }
                   },
                   {
                     "kind": "Constant",
@@ -1467,7 +1776,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"different_member_reverse\"",
-                    "value": "different_member_reverse"
+                    "value": "different_member_reverse",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -1476,12 +1786,12 @@
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
                 "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
-                  "kind": "DynamicType",
-                  "category": "dynamic",
-                  "mirror": "unknown",
-                  "dynamic_name": "unknown"
+                  "kind": "NamedType",
+                  "category": "static",
+                  "mirror": "bool"
                 }
               }
             ],
@@ -1554,7 +1864,7 @@
               "end_lineno": 16,
               "end_col_offset": 46
             },
-            "resolved_type": "unknown",
+            "resolved_type": "bool",
             "casts": [],
             "borrow_kind": "value",
             "repr": "py_assert_all(checks, \"enum_basic\")",
@@ -1585,7 +1895,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "checks",
-                "id": "checks"
+                "id": "checks",
+                "call_arg_type": "list[bool]"
               },
               {
                 "kind": "Constant",
@@ -1599,7 +1910,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "\"enum_basic\"",
-                "value": "enum_basic"
+                "value": "enum_basic",
+                "call_arg_type": "str"
               }
             ],
             "keywords": [],
@@ -1610,10 +1922,9 @@
             "runtime_call_adapter_kind": "extern_delegate",
             "type_expr_summary_v1": {
               "schema_version": 1,
-              "kind": "DynamicType",
-              "category": "dynamic",
-              "mirror": "unknown",
-              "dynamic_name": "unknown"
+              "kind": "NamedType",
+              "category": "static",
+              "mirror": "bool"
             }
           },
           "meta": {

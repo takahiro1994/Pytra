@@ -94,7 +94,7 @@
                 "end_lineno": 5,
                 "end_col": 15
               },
-              "resolved_type": "type",
+              "resolved_type": "callable",
               "casts": [],
               "borrow_kind": "value",
               "repr": "Path",
@@ -113,7 +113,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "raw",
-                "id": "raw"
+                "id": "raw",
+                "call_arg_type": "str"
               }
             ],
             "keywords": [],
@@ -174,7 +175,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "path",
-                "id": "path"
+                "id": "path",
+                "call_arg_type": "Obj"
               }
             ],
             "keywords": [],
@@ -296,7 +298,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"tmp/data.bin\"",
-                    "value": "tmp/data.bin"
+                    "value": "tmp/data.bin",
+                    "call_arg_type": "object"
                   }
                 ],
                 "keywords": []

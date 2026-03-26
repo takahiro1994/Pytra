@@ -180,7 +180,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "src",
-                "id": "src"
+                "id": "src",
+                "call_arg_type": "Obj"
               }
             ],
             "keywords": [],
@@ -731,7 +732,8 @@
                   "casts": [],
                   "borrow_kind": "readonly_ref",
                   "repr": "data",
-                  "id": "data"
+                  "id": "data",
+                  "call_arg_type": "Obj"
                 }
               ],
               "keywords": [],
@@ -1697,16 +1699,16 @@
               "end_lineno": 40,
               "end_col": 9
             },
-            "resolved_type": "unknown",
+            "resolved_type": "int64",
             "casts": [],
             "borrow_kind": "value",
             "repr": "v",
             "id": "v"
           },
-          "target_type": "unknown",
+          "target_type": "int64",
           "iter_mode": "static_fastpath",
           "iter_source_type": "bytes",
-          "iter_element_type": "unknown",
+          "iter_element_type": "int64",
           "iter": {
             "kind": "Name",
             "source_span": {
@@ -1722,7 +1724,7 @@
             "id": "data",
             "iterable_trait": "yes",
             "iter_protocol": "static_range",
-            "iter_element_type": "unknown"
+            "iter_element_type": "int64"
           },
           "body": [
             {
@@ -1768,9 +1770,9 @@
                     "end_lineno": 41,
                     "end_col": 23
                   },
-                  "resolved_type": "unknown",
+                  "resolved_type": "int64",
                   "casts": [],
-                  "borrow_kind": "value",
+                  "borrow_kind": "readonly_ref",
                   "repr": "v",
                   "id": "v"
                 },
@@ -3763,7 +3765,8 @@
                   "casts": [],
                   "borrow_kind": "readonly_ref",
                   "repr": "palette",
-                  "id": "palette"
+                  "id": "palette",
+                  "call_arg_type": "Obj"
                 }
               ],
               "keywords": [],
@@ -3963,7 +3966,7 @@
               "end_lineno": 94,
               "end_col": 37
             },
-            "resolved_type": "list[unknown]",
+            "resolved_type": "list[bytearray]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "[]",
@@ -4119,16 +4122,16 @@
                   "end_lineno": 97,
                   "end_col": 13
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "int64",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "v",
                 "id": "v"
               },
-              "target_type": "unknown",
+              "target_type": "int64",
               "iter_mode": "static_fastpath",
               "iter_source_type": "bytes",
-              "iter_element_type": "unknown",
+              "iter_element_type": "int64",
               "iter": {
                 "kind": "Name",
                 "source_span": {
@@ -4144,7 +4147,7 @@
                 "id": "fr",
                 "iterable_trait": "yes",
                 "iter_protocol": "static_range",
-                "iter_element_type": "unknown"
+                "iter_element_type": "int64"
               },
               "body": [
                 {
@@ -4231,17 +4234,18 @@
                               "end_lineno": 98,
                               "end_col": 31
                             },
-                            "resolved_type": "unknown",
+                            "resolved_type": "int64",
                             "casts": [],
-                            "borrow_kind": "value",
+                            "borrow_kind": "readonly_ref",
                             "repr": "v",
-                            "id": "v"
+                            "id": "v",
+                            "call_arg_type": "Obj"
                           }
                         ],
                         "keywords": [],
                         "lowered_kind": "BuiltinCall",
                         "builtin_name": "int",
-                        "runtime_call": "int",
+                        "runtime_call": "static_cast",
                         "runtime_module_id": "pytra.core.py_runtime",
                         "runtime_symbol": "int",
                         "runtime_call_adapter_kind": "builtin",
@@ -4313,7 +4317,8 @@
                       "casts": [],
                       "borrow_kind": "readonly_ref",
                       "repr": "fr_buf",
-                      "id": "fr_buf"
+                      "id": "fr_buf",
+                      "call_arg_type": "Obj"
                     }
                   ],
                   "keywords": [],
@@ -4499,7 +4504,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "fr_buf",
-                    "id": "fr_buf"
+                    "id": "fr_buf",
+                    "call_arg_type": "bytearray"
                   }
                 ],
                 "keywords": [],
@@ -4612,16 +4618,16 @@
               "end_lineno": 104,
               "end_col": 9
             },
-            "resolved_type": "unknown",
+            "resolved_type": "int64",
             "casts": [],
             "borrow_kind": "value",
             "repr": "v",
             "id": "v"
           },
-          "target_type": "unknown",
+          "target_type": "int64",
           "iter_mode": "static_fastpath",
           "iter_source_type": "bytes",
-          "iter_element_type": "unknown",
+          "iter_element_type": "int64",
           "iter": {
             "kind": "Name",
             "source_span": {
@@ -4637,7 +4643,7 @@
             "id": "palette",
             "iterable_trait": "yes",
             "iter_protocol": "static_range",
-            "iter_element_type": "unknown"
+            "iter_element_type": "int64"
           },
           "body": [
             {
@@ -4724,17 +4730,18 @@
                           "end_lineno": 105,
                           "end_col": 32
                         },
-                        "resolved_type": "unknown",
+                        "resolved_type": "int64",
                         "casts": [],
-                        "borrow_kind": "value",
+                        "borrow_kind": "readonly_ref",
                         "repr": "v",
-                        "id": "v"
+                        "id": "v",
+                        "call_arg_type": "Obj"
                       }
                     ],
                     "keywords": [],
                     "lowered_kind": "BuiltinCall",
                     "builtin_name": "int",
-                    "runtime_call": "int",
+                    "runtime_call": "static_cast",
                     "runtime_module_id": "pytra.core.py_runtime",
                     "runtime_symbol": "int",
                     "runtime_call_adapter_kind": "builtin",
@@ -4861,7 +4868,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "out",
-                "id": "out"
+                "id": "out",
+                "call_arg_type": "bytearray"
               },
               {
                 "kind": "Call",
@@ -4990,7 +4998,8 @@
                     ]
                   }
                 ],
-                "keywords": []
+                "keywords": [],
+                "call_arg_type": "bytearray"
               }
             ],
             "keywords": []
@@ -5043,7 +5052,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "out",
-                "id": "out"
+                "id": "out",
+                "call_arg_type": "bytearray"
               },
               {
                 "kind": "Call",
@@ -5084,10 +5094,12 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "width",
-                    "id": "width"
+                    "id": "width",
+                    "call_arg_type": "int64"
                   }
                 ],
-                "keywords": []
+                "keywords": [],
+                "call_arg_type": "bytearray"
               }
             ],
             "keywords": []
@@ -5140,7 +5152,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "out",
-                "id": "out"
+                "id": "out",
+                "call_arg_type": "bytearray"
               },
               {
                 "kind": "Call",
@@ -5181,10 +5194,12 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "height",
-                    "id": "height"
+                    "id": "height",
+                    "call_arg_type": "int64"
                   }
                 ],
-                "keywords": []
+                "keywords": [],
+                "call_arg_type": "bytearray"
               }
             ],
             "keywords": []
@@ -5438,7 +5453,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "out",
-                "id": "out"
+                "id": "out",
+                "call_arg_type": "bytearray"
               },
               {
                 "kind": "Name",
@@ -5452,7 +5468,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "palette_buf",
-                "id": "palette_buf"
+                "id": "palette_buf",
+                "call_arg_type": "bytearray"
               }
             ],
             "keywords": []
@@ -5505,7 +5522,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "out",
-                "id": "out"
+                "id": "out",
+                "call_arg_type": "bytearray"
               },
               {
                 "kind": "Call",
@@ -5774,7 +5792,8 @@
                     ]
                   }
                 ],
-                "keywords": []
+                "keywords": [],
+                "call_arg_type": "bytearray"
               }
             ],
             "keywords": []
@@ -5833,7 +5852,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "out",
-                "id": "out"
+                "id": "out",
+                "call_arg_type": "bytearray"
               },
               {
                 "kind": "Call",
@@ -5874,10 +5894,12 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "loop",
-                    "id": "loop"
+                    "id": "loop",
+                    "call_arg_type": "int64"
                   }
                 ],
-                "keywords": []
+                "keywords": [],
+                "call_arg_type": "bytearray"
               }
             ],
             "keywords": []
@@ -6041,7 +6063,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "out",
-                    "id": "out"
+                    "id": "out",
+                    "call_arg_type": "bytearray"
                   },
                   {
                     "kind": "Call",
@@ -6142,7 +6165,8 @@
                         ]
                       }
                     ],
-                    "keywords": []
+                    "keywords": [],
+                    "call_arg_type": "bytearray"
                   }
                 ],
                 "keywords": []
@@ -6195,7 +6219,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "out",
-                    "id": "out"
+                    "id": "out",
+                    "call_arg_type": "bytearray"
                   },
                   {
                     "kind": "Call",
@@ -6236,10 +6261,12 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "delay_cs",
-                        "id": "delay_cs"
+                        "id": "delay_cs",
+                        "call_arg_type": "int64"
                       }
                     ],
-                    "keywords": []
+                    "keywords": [],
+                    "call_arg_type": "bytearray"
                   }
                 ],
                 "keywords": []
@@ -6292,7 +6319,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "out",
-                    "id": "out"
+                    "id": "out",
+                    "call_arg_type": "bytearray"
                   },
                   {
                     "kind": "Call",
@@ -6365,7 +6393,8 @@
                         ]
                       }
                     ],
-                    "keywords": []
+                    "keywords": [],
+                    "call_arg_type": "bytearray"
                   }
                 ],
                 "keywords": []
@@ -6491,7 +6520,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "out",
-                    "id": "out"
+                    "id": "out",
+                    "call_arg_type": "bytearray"
                   },
                   {
                     "kind": "Call",
@@ -6532,10 +6562,12 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "0",
-                        "value": 0
+                        "value": 0,
+                        "call_arg_type": "int64"
                       }
                     ],
-                    "keywords": []
+                    "keywords": [],
+                    "call_arg_type": "bytearray"
                   }
                 ],
                 "keywords": []
@@ -6588,7 +6620,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "out",
-                    "id": "out"
+                    "id": "out",
+                    "call_arg_type": "bytearray"
                   },
                   {
                     "kind": "Call",
@@ -6629,10 +6662,12 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "0",
-                        "value": 0
+                        "value": 0,
+                        "call_arg_type": "int64"
                       }
                     ],
-                    "keywords": []
+                    "keywords": [],
+                    "call_arg_type": "bytearray"
                   }
                 ],
                 "keywords": []
@@ -6685,7 +6720,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "out",
-                    "id": "out"
+                    "id": "out",
+                    "call_arg_type": "bytearray"
                   },
                   {
                     "kind": "Call",
@@ -6726,10 +6762,12 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "width",
-                        "id": "width"
+                        "id": "width",
+                        "call_arg_type": "int64"
                       }
                     ],
-                    "keywords": []
+                    "keywords": [],
+                    "call_arg_type": "bytearray"
                   }
                 ],
                 "keywords": []
@@ -6782,7 +6820,8 @@
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "out",
-                    "id": "out"
+                    "id": "out",
+                    "call_arg_type": "bytearray"
                   },
                   {
                     "kind": "Call",
@@ -6823,10 +6862,12 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "height",
-                        "id": "height"
+                        "id": "height",
+                        "call_arg_type": "int64"
                       }
                     ],
-                    "keywords": []
+                    "keywords": [],
+                    "call_arg_type": "bytearray"
                   }
                 ],
                 "keywords": []
@@ -7057,7 +7098,8 @@
                         "id": "fr_buf"
                       }
                     ],
-                    "keywords": []
+                    "keywords": [],
+                    "call_arg_type": "bytes"
                   },
                   {
                     "kind": "Constant",
@@ -7071,7 +7113,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "8",
-                    "value": 8
+                    "value": 8,
+                    "call_arg_type": "int64"
                   }
                 ],
                 "keywords": []
@@ -7197,7 +7240,8 @@
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "compressed",
-                        "id": "compressed"
+                        "id": "compressed",
+                        "call_arg_type": "Obj"
                       }
                     ],
                     "keywords": [],
@@ -7285,7 +7329,8 @@
                           "casts": [],
                           "borrow_kind": "readonly_ref",
                           "repr": "compressed",
-                          "id": "compressed"
+                          "id": "compressed",
+                          "call_arg_type": "Obj"
                         }
                       ],
                       "keywords": [],
@@ -7959,6 +8004,7 @@
               "end_lineno": 147,
               "end_col": 25
             },
+            "resolved_type": "unknown",
             "casts": [],
             "borrow_kind": "value",
             "repr": "open(path, \"wb\")",
@@ -7970,6 +8016,7 @@
                 "end_lineno": 147,
                 "end_col": 13
               },
+              "resolved_type": "unknown",
               "casts": [],
               "borrow_kind": "value",
               "repr": "open",
@@ -7984,8 +8031,9 @@
                   "end_lineno": 147,
                   "end_col": 18
                 },
+                "resolved_type": "str",
                 "casts": [],
-                "borrow_kind": "value",
+                "borrow_kind": "readonly_ref",
                 "repr": "path",
                 "id": "path"
               },
@@ -7997,6 +8045,7 @@
                   "end_lineno": 147,
                   "end_col": 24
                 },
+                "resolved_type": "str",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "\"wb\"",

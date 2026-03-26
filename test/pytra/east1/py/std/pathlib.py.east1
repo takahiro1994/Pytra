@@ -4430,26 +4430,14 @@
                   }
                 },
                 {
-                  "kind": "Expr",
+                  "kind": "Return",
                   "source_span": {
                     "lineno": 102,
                     "col": 12,
                     "end_lineno": 102,
                     "end_col": 18
                   },
-                  "value": {
-                    "kind": "Name",
-                    "source_span": {
-                      "lineno": 102,
-                      "col": 12,
-                      "end_lineno": 102,
-                      "end_col": 18
-                    },
-                    "casts": [],
-                    "borrow_kind": "value",
-                    "repr": "return",
-                    "id": "return"
-                  }
+                  "value": null
                 }
               ],
               "orelse": []
@@ -4559,26 +4547,14 @@
               },
               "body": [
                 {
-                  "kind": "Expr",
+                  "kind": "Return",
                   "source_span": {
                     "lineno": 102,
                     "col": 12,
                     "end_lineno": 102,
                     "end_col": 18
                   },
-                  "value": {
-                    "kind": "Name",
-                    "source_span": {
-                      "lineno": 102,
-                      "col": 12,
-                      "end_lineno": 102,
-                      "end_col": 18
-                    },
-                    "casts": [],
-                    "borrow_kind": "value",
-                    "repr": "return",
-                    "id": "return"
-                  }
+                  "value": null
                 }
               ],
               "orelse": []
@@ -6057,6 +6033,14 @@
     "import_resolution": {
       "bindings": [
         {
+          "module_id": "pytra.typing",
+          "export_name": "cast",
+          "local_name": "cast",
+          "binding_kind": "symbol",
+          "source_file": "src/pytra/std/pathlib.py",
+          "source_line": 5
+        },
+        {
           "module_id": "pytra.std",
           "export_name": "glob",
           "local_name": "py_glob",
@@ -6083,6 +6067,11 @@
       ],
       "qualified_refs": [
         {
+          "module_id": "pytra.typing",
+          "symbol": "cast",
+          "local_name": "cast"
+        },
+        {
           "module_id": "pytra.std",
           "symbol": "glob",
           "local_name": "py_glob"
@@ -6100,6 +6089,14 @@
       ]
     },
     "import_bindings": [
+      {
+        "module_id": "pytra.typing",
+        "export_name": "cast",
+        "local_name": "cast",
+        "binding_kind": "symbol",
+        "source_file": "src/pytra/std/pathlib.py",
+        "source_line": 5
+      },
       {
         "module_id": "pytra.std",
         "export_name": "glob",
@@ -6127,6 +6124,11 @@
     ],
     "qualified_symbol_refs": [
       {
+        "module_id": "pytra.typing",
+        "symbol": "cast",
+        "local_name": "cast"
+      },
+      {
         "module_id": "pytra.std",
         "symbol": "glob",
         "local_name": "py_glob"
@@ -6144,6 +6146,10 @@
     ],
     "import_modules": {},
     "import_symbols": {
+      "cast": {
+        "module": "pytra.typing",
+        "name": "cast"
+      },
       "py_glob": {
         "module": "pytra.std",
         "name": "glob"

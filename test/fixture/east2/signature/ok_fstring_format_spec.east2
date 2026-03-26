@@ -288,7 +288,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "0",
-                "value": 0
+                "value": 0,
+                "call_arg_type": "int64"
               },
               {
                 "kind": "Constant",
@@ -302,7 +303,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "100",
-                "value": 100
+                "value": 100,
+                "call_arg_type": "int64"
               },
               {
                 "kind": "Constant",
@@ -316,7 +318,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "2.3456",
-                "value": 2.3456
+                "value": 2.3456,
+                "call_arg_type": "float64"
               }
             ],
             "keywords": []

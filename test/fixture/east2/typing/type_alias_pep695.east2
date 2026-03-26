@@ -41,7 +41,8 @@
         "end_lineno": 3,
         "end_col": 25
       },
-      "name": "Scalar"
+      "name": "Scalar",
+      "value": "int64 | float64"
     },
     {
       "kind": "FunctionDef",
@@ -54,8 +55,8 @@
       "name": "add_scalars",
       "original_name": "add_scalars",
       "arg_types": {
-        "a": "Scalar",
-        "b": "Scalar"
+        "a": "int64 | float64",
+        "b": "int64 | float64"
       },
       "arg_order": [
         "a",
@@ -131,11 +132,12 @@
                       "end_lineno": 7,
                       "end_col": 19
                     },
-                    "resolved_type": "Scalar",
+                    "resolved_type": "int64 | float64",
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "a",
-                    "id": "a"
+                    "id": "a",
+                    "call_arg_type": "Obj"
                   },
                   {
                     "kind": "Name",
@@ -145,11 +147,12 @@
                       "end_lineno": 7,
                       "end_col": 24
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "type",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "int",
-                    "id": "int"
+                    "id": "int",
+                    "call_arg_type": "type"
                   }
                 ],
                 "keywords": [],
@@ -192,11 +195,12 @@
                       "end_lineno": 7,
                       "end_col": 42
                     },
-                    "resolved_type": "Scalar",
+                    "resolved_type": "int64 | float64",
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "b",
-                    "id": "b"
+                    "id": "b",
+                    "call_arg_type": "Obj"
                   },
                   {
                     "kind": "Name",
@@ -206,11 +210,12 @@
                       "end_lineno": 7,
                       "end_col": 47
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "type",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "int",
-                    "id": "int"
+                    "id": "int",
+                    "call_arg_type": "type"
                   }
                 ],
                 "keywords": [],
@@ -237,7 +242,7 @@
                   "end_lineno": 8,
                   "end_col": 20
                 },
-                "resolved_type": "Scalar",
+                "resolved_type": "int64 | float64",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "a + b",
@@ -249,7 +254,7 @@
                     "end_lineno": 8,
                     "end_col": 16
                   },
-                  "resolved_type": "Scalar",
+                  "resolved_type": "int64 | float64",
                   "casts": [],
                   "borrow_kind": "readonly_ref",
                   "repr": "a",
@@ -264,7 +269,7 @@
                     "end_lineno": 8,
                     "end_col": 20
                   },
-                  "resolved_type": "Scalar",
+                  "resolved_type": "int64 | float64",
                   "casts": [],
                   "borrow_kind": "readonly_ref",
                   "repr": "b",
@@ -303,12 +308,30 @@
       "yield_value_type": "unknown",
       "arg_type_exprs": {
         "a": {
-          "kind": "NamedType",
-          "name": "Scalar"
+          "kind": "UnionType",
+          "types": [
+            {
+              "kind": "NamedType",
+              "name": "int64"
+            },
+            {
+              "kind": "NamedType",
+              "name": "float64"
+            }
+          ]
         },
         "b": {
-          "kind": "NamedType",
-          "name": "Scalar"
+          "kind": "UnionType",
+          "types": [
+            {
+              "kind": "NamedType",
+              "name": "int64"
+            },
+            {
+              "kind": "NamedType",
+              "name": "float64"
+            }
+          ]
         }
       },
       "return_type_expr": {
@@ -338,7 +361,7 @@
       "name": "identity_scalar",
       "original_name": "identity_scalar",
       "arg_types": {
-        "v": "Scalar"
+        "v": "int64 | float64"
       },
       "arg_order": [
         "v"
@@ -347,7 +370,7 @@
       "arg_index": {
         "v": 0
       },
-      "return_type": "Scalar",
+      "return_type": "int64 | float64",
       "arg_usage": {
         "v": "readonly"
       },
@@ -370,7 +393,7 @@
               "end_lineno": 13,
               "end_col": 12
             },
-            "resolved_type": "Scalar",
+            "resolved_type": "int64 | float64",
             "casts": [],
             "borrow_kind": "readonly_ref",
             "repr": "v",
@@ -382,13 +405,31 @@
       "yield_value_type": "unknown",
       "arg_type_exprs": {
         "v": {
-          "kind": "NamedType",
-          "name": "Scalar"
+          "kind": "UnionType",
+          "types": [
+            {
+              "kind": "NamedType",
+              "name": "int64"
+            },
+            {
+              "kind": "NamedType",
+              "name": "float64"
+            }
+          ]
         }
       },
       "return_type_expr": {
-        "kind": "NamedType",
-        "name": "Scalar"
+        "kind": "UnionType",
+        "types": [
+          {
+            "kind": "NamedType",
+            "name": "int64"
+          },
+          {
+            "kind": "NamedType",
+            "name": "float64"
+          }
+        ]
       },
       "leading_comments": [],
       "leading_trivia": []
@@ -453,7 +494,7 @@
               "end_lineno": 17,
               "end_col": 27
             },
-            "resolved_type": "list[unknown]",
+            "resolved_type": "list[bool]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "[]",
@@ -539,7 +580,7 @@
                   "end_lineno": 18,
                   "end_col": 63
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(add_scalars(1, 2), 3, \"int+int\")",
@@ -597,7 +638,8 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "1",
-                        "value": 1
+                        "value": 1,
+                        "call_arg_type": "int64 | float64"
                       },
                       {
                         "kind": "Constant",
@@ -611,10 +653,12 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "2",
-                        "value": 2
+                        "value": 2,
+                        "call_arg_type": "int64 | float64"
                       }
                     ],
-                    "keywords": []
+                    "keywords": [],
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -628,7 +672,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "3",
-                    "value": 3
+                    "value": 3,
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -642,7 +687,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"int+int\"",
-                    "value": "int+int"
+                    "value": "int+int",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -650,7 +696,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -734,7 +781,7 @@
                   "end_lineno": 19,
                   "end_col": 65
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(add_scalars(3, 4), 7, \"int+int 2\")",
@@ -792,7 +839,8 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "3",
-                        "value": 3
+                        "value": 3,
+                        "call_arg_type": "int64 | float64"
                       },
                       {
                         "kind": "Constant",
@@ -806,10 +854,12 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "4",
-                        "value": 4
+                        "value": 4,
+                        "call_arg_type": "int64 | float64"
                       }
                     ],
-                    "keywords": []
+                    "keywords": [],
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -823,7 +873,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "7",
-                    "value": 7
+                    "value": 7,
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -837,7 +888,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"int+int 2\"",
-                    "value": "int+int 2"
+                    "value": "int+int 2",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -845,7 +897,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -888,7 +941,7 @@
               "end_lineno": 20,
               "end_col": 53
             },
-            "resolved_type": "unknown",
+            "resolved_type": "bool",
             "casts": [],
             "borrow_kind": "value",
             "repr": "py_assert_all(checks, \"type_alias_pep695\")",
@@ -919,7 +972,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "checks",
-                "id": "checks"
+                "id": "checks",
+                "call_arg_type": "list[bool]"
               },
               {
                 "kind": "Constant",
@@ -933,7 +987,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "\"type_alias_pep695\"",
-                "value": "type_alias_pep695"
+                "value": "type_alias_pep695",
+                "call_arg_type": "str"
               }
             ],
             "keywords": [],

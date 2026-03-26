@@ -78,7 +78,7 @@
               "end_lineno": 5,
               "end_col": 46
             },
-            "resolved_type": "unknown",
+            "resolved_type": "str",
             "casts": [],
             "borrow_kind": "value",
             "repr": "os.path.join(\"alpha\", \"beta.txt\")",
@@ -90,7 +90,7 @@
                 "end_lineno": 5,
                 "end_col": 25
               },
-              "resolved_type": "unknown",
+              "resolved_type": "callable",
               "casts": [],
               "borrow_kind": "value",
               "repr": "os.path.join",
@@ -102,7 +102,7 @@
                   "end_lineno": 5,
                   "end_col": 20
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "module",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "os.path",
@@ -118,9 +118,11 @@
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "os",
-                  "id": "os"
+                  "id": "os",
+                  "runtime_module_id": "pytra.std.os"
                 },
-                "attr": "path"
+                "attr": "path",
+                "runtime_module_id": "pytra.std.os_path"
               },
               "attr": "join"
             },
@@ -137,7 +139,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "\"alpha\"",
-                "value": "alpha"
+                "value": "alpha",
+                "call_arg_type": "str"
               },
               {
                 "kind": "Constant",
@@ -151,12 +154,19 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "\"beta.txt\"",
-                "value": "beta.txt"
+                "value": "beta.txt",
+                "call_arg_type": "str"
               }
             ],
-            "keywords": []
+            "keywords": [],
+            "resolved_runtime_call": "path.join",
+            "resolved_runtime_source": "module_attr",
+            "runtime_module_id": "pytra.std.os_path",
+            "runtime_symbol": "join",
+            "semantic_tag": "stdlib.method.join"
           },
           "declare": true,
+          "decl_type": "str",
           "declare_init": true
         },
         {
@@ -188,7 +198,7 @@
                   "end_lineno": 6,
                   "end_col": 8
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "str",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "root",
@@ -202,7 +212,7 @@
                   "end_lineno": 6,
                   "end_col": 13
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "str",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "ext",
@@ -218,7 +228,7 @@
               "end_lineno": 6,
               "end_col": 40
             },
-            "resolved_type": "unknown",
+            "resolved_type": "tuple[str,str]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "os.path.splitext(joined)",
@@ -230,7 +240,7 @@
                 "end_lineno": 6,
                 "end_col": 32
               },
-              "resolved_type": "unknown",
+              "resolved_type": "callable",
               "casts": [],
               "borrow_kind": "value",
               "repr": "os.path.splitext",
@@ -242,7 +252,7 @@
                   "end_lineno": 6,
                   "end_col": 23
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "module",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "os.path",
@@ -258,9 +268,11 @@
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "os",
-                  "id": "os"
+                  "id": "os",
+                  "runtime_module_id": "pytra.std.os"
                 },
-                "attr": "path"
+                "attr": "path",
+                "runtime_module_id": "pytra.std.os_path"
               },
               "attr": "splitext"
             },
@@ -273,14 +285,20 @@
                   "end_lineno": 6,
                   "end_col": 39
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "str",
                 "casts": [],
-                "borrow_kind": "value",
+                "borrow_kind": "readonly_ref",
                 "repr": "joined",
-                "id": "joined"
+                "id": "joined",
+                "call_arg_type": "str"
               }
             ],
-            "keywords": []
+            "keywords": [],
+            "resolved_runtime_call": "path.splitext",
+            "resolved_runtime_source": "module_attr",
+            "runtime_module_id": "pytra.std.os_path",
+            "runtime_symbol": "splitext",
+            "semantic_tag": "stdlib.method.splitext"
           },
           "declare": false
         },
@@ -394,7 +412,7 @@
                     "end_lineno": 8,
                     "end_col": 41
                   },
-                  "resolved_type": "unknown",
+                  "resolved_type": "str",
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "os.path.basename(joined)",
@@ -406,7 +424,7 @@
                       "end_lineno": 8,
                       "end_col": 33
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "callable",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "os.path.basename",
@@ -418,7 +436,7 @@
                         "end_lineno": 8,
                         "end_col": 24
                       },
-                      "resolved_type": "unknown",
+                      "resolved_type": "module",
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "os.path",
@@ -434,9 +452,11 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "os",
-                        "id": "os"
+                        "id": "os",
+                        "runtime_module_id": "pytra.std.os"
                       },
-                      "attr": "path"
+                      "attr": "path",
+                      "runtime_module_id": "pytra.std.os_path"
                     },
                     "attr": "basename"
                   },
@@ -449,14 +469,20 @@
                         "end_lineno": 8,
                         "end_col": 40
                       },
-                      "resolved_type": "unknown",
+                      "resolved_type": "str",
                       "casts": [],
-                      "borrow_kind": "value",
+                      "borrow_kind": "readonly_ref",
                       "repr": "joined",
-                      "id": "joined"
+                      "id": "joined",
+                      "call_arg_type": "str"
                     }
                   ],
-                  "keywords": []
+                  "keywords": [],
+                  "resolved_runtime_call": "path.basename",
+                  "resolved_runtime_source": "module_attr",
+                  "runtime_module_id": "pytra.std.os_path",
+                  "runtime_symbol": "basename",
+                  "semantic_tag": "stdlib.method.basename"
                 },
                 "ops": [
                   "Eq"
@@ -554,9 +580,9 @@
                     "end_lineno": 9,
                     "end_col": 21
                   },
-                  "resolved_type": "unknown",
+                  "resolved_type": "str",
                   "casts": [],
-                  "borrow_kind": "value",
+                  "borrow_kind": "readonly_ref",
                   "repr": "root",
                   "id": "root"
                 },
@@ -656,9 +682,9 @@
                     "end_lineno": 10,
                     "end_col": 20
                   },
-                  "resolved_type": "unknown",
+                  "resolved_type": "str",
                   "casts": [],
-                  "borrow_kind": "value",
+                  "borrow_kind": "readonly_ref",
                   "repr": "ext",
                   "id": "ext"
                 },
@@ -758,7 +784,7 @@
                     "end_lineno": 11,
                     "end_col": 40
                   },
-                  "resolved_type": "unknown",
+                  "resolved_type": "str",
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "os.path.dirname(joined)",
@@ -770,7 +796,7 @@
                       "end_lineno": 11,
                       "end_col": 32
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "callable",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "os.path.dirname",
@@ -782,7 +808,7 @@
                         "end_lineno": 11,
                         "end_col": 24
                       },
-                      "resolved_type": "unknown",
+                      "resolved_type": "module",
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "os.path",
@@ -798,9 +824,11 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "os",
-                        "id": "os"
+                        "id": "os",
+                        "runtime_module_id": "pytra.std.os"
                       },
-                      "attr": "path"
+                      "attr": "path",
+                      "runtime_module_id": "pytra.std.os_path"
                     },
                     "attr": "dirname"
                   },
@@ -813,14 +841,20 @@
                         "end_lineno": 11,
                         "end_col": 39
                       },
-                      "resolved_type": "unknown",
+                      "resolved_type": "str",
                       "casts": [],
-                      "borrow_kind": "value",
+                      "borrow_kind": "readonly_ref",
                       "repr": "joined",
-                      "id": "joined"
+                      "id": "joined",
+                      "call_arg_type": "str"
                     }
                   ],
-                  "keywords": []
+                  "keywords": [],
+                  "resolved_runtime_call": "path.dirname",
+                  "resolved_runtime_source": "module_attr",
+                  "runtime_module_id": "pytra.std.os_path",
+                  "runtime_symbol": "dirname",
+                  "semantic_tag": "stdlib.method.dirname"
                 },
                 "ops": [
                   "Eq"
@@ -906,7 +940,7 @@
                   "end_lineno": 13,
                   "end_col": 35
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "os.path.exists(\".\")",
@@ -918,7 +952,7 @@
                     "end_lineno": 13,
                     "end_col": 30
                   },
-                  "resolved_type": "unknown",
+                  "resolved_type": "callable",
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "os.path.exists",
@@ -930,7 +964,7 @@
                       "end_lineno": 13,
                       "end_col": 23
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "module",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "os.path",
@@ -946,9 +980,11 @@
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "os",
-                      "id": "os"
+                      "id": "os",
+                      "runtime_module_id": "pytra.std.os"
                     },
-                    "attr": "path"
+                    "attr": "path",
+                    "runtime_module_id": "pytra.std.os_path"
                   },
                   "attr": "exists"
                 },
@@ -965,10 +1001,16 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\".\"",
-                    "value": "."
+                    "value": ".",
+                    "call_arg_type": "str"
                   }
                 ],
-                "keywords": []
+                "keywords": [],
+                "resolved_runtime_call": "path.exists",
+                "resolved_runtime_source": "module_attr",
+                "runtime_module_id": "pytra.std.os_path",
+                "runtime_symbol": "exists",
+                "semantic_tag": "stdlib.method.exists"
               }
             ]
           },
@@ -1110,7 +1152,8 @@
                           "casts": [],
                           "borrow_kind": "value",
                           "repr": "glob",
-                          "id": "glob"
+                          "id": "glob",
+                          "runtime_module_id": "pytra.std.glob"
                         },
                         "attr": "glob"
                       },
@@ -1127,7 +1170,8 @@
                           "casts": [],
                           "borrow_kind": "value",
                           "repr": "\"*.cpp\"",
-                          "value": "*.cpp"
+                          "value": "*.cpp",
+                          "call_arg_type": "str"
                         }
                       ],
                       "keywords": [],
@@ -1135,7 +1179,8 @@
                       "resolved_runtime_source": "module_attr",
                       "runtime_module_id": "pytra.std.glob",
                       "runtime_symbol": "glob",
-                      "semantic_tag": "stdlib.fn.glob"
+                      "semantic_tag": "stdlib.method.glob",
+                      "call_arg_type": "Obj"
                     }
                   ],
                   "keywords": [],

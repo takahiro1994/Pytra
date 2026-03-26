@@ -199,7 +199,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "main",
-                    "id": "main"
+                    "id": "main",
+                    "call_arg_type": "Callable"
                   }
                 ],
                 "keywords": []

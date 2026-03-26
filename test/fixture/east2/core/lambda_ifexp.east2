@@ -86,7 +86,7 @@
                 "kind": "arg",
                 "arg": "x",
                 "annotation": null,
-                "resolved_type": "unknown"
+                "resolved_type": "int64"
               }
             ],
             "body": {
@@ -121,9 +121,9 @@
                     "end_lineno": 6,
                     "end_col": 33
                   },
-                  "resolved_type": "unknown",
+                  "resolved_type": "int64",
                   "casts": [],
-                  "borrow_kind": "value",
+                  "borrow_kind": "readonly_ref",
                   "repr": "x",
                   "id": "x"
                 },
@@ -176,11 +176,17 @@
                 "value": "non-pos"
               }
             },
-            "return_type": "unknown",
-            "resolved_type": "callable[unknown]"
+            "return_type": "str",
+            "arg_order": [
+              "x"
+            ],
+            "arg_types": {
+              "x": "int64"
+            },
+            "resolved_type": "callable[[int64],str]"
           },
           "declare": true,
-          "decl_type": "callable[unknown]",
+          "decl_type": "callable[[int64],str]",
           "declare_init": true
         },
         {
@@ -224,7 +230,7 @@
               "end_lineno": 8,
               "end_col": 27
             },
-            "resolved_type": "list[unknown]",
+            "resolved_type": "list[bool]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "[]",
@@ -316,7 +322,7 @@
                   "end_lineno": 9,
                   "end_col": 61
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(choose(2), \"pos\", \"choose(2)\")",
@@ -343,7 +349,7 @@
                       "end_lineno": 9,
                       "end_col": 40
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "str",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "choose(2)",
@@ -355,7 +361,7 @@
                         "end_lineno": 9,
                         "end_col": 37
                       },
-                      "resolved_type": "unknown",
+                      "resolved_type": "callable[[int64],str]",
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "choose",
@@ -377,7 +383,8 @@
                         "value": 2
                       }
                     ],
-                    "keywords": []
+                    "keywords": [],
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -391,7 +398,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"pos\"",
-                    "value": "pos"
+                    "value": "pos",
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -405,7 +413,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"choose(2)\"",
-                    "value": "choose(2)"
+                    "value": "choose(2)",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -413,7 +422,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -497,7 +507,7 @@
                   "end_lineno": 10,
                   "end_col": 65
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(choose(0), \"non-pos\", \"choose(0)\")",
@@ -524,7 +534,7 @@
                       "end_lineno": 10,
                       "end_col": 40
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "str",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "choose(0)",
@@ -536,7 +546,7 @@
                         "end_lineno": 10,
                         "end_col": 37
                       },
-                      "resolved_type": "unknown",
+                      "resolved_type": "callable[[int64],str]",
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "choose",
@@ -558,7 +568,8 @@
                         "value": 0
                       }
                     ],
-                    "keywords": []
+                    "keywords": [],
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -572,7 +583,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"non-pos\"",
-                    "value": "non-pos"
+                    "value": "non-pos",
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -586,7 +598,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"choose(0)\"",
-                    "value": "choose(0)"
+                    "value": "choose(0)",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -594,7 +607,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -678,7 +692,7 @@
                   "end_lineno": 11,
                   "end_col": 67
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "bool",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "py_assert_eq(choose(-7), \"non-pos\", \"choose(-7)\")",
@@ -705,7 +719,7 @@
                       "end_lineno": 11,
                       "end_col": 41
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "str",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "choose(-7)",
@@ -717,7 +731,7 @@
                         "end_lineno": 11,
                         "end_col": 37
                       },
-                      "resolved_type": "unknown",
+                      "resolved_type": "callable[[int64],str]",
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "choose",
@@ -753,7 +767,8 @@
                         }
                       }
                     ],
-                    "keywords": []
+                    "keywords": [],
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -767,7 +782,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"non-pos\"",
-                    "value": "non-pos"
+                    "value": "non-pos",
+                    "call_arg_type": "object"
                   },
                   {
                     "kind": "Constant",
@@ -781,7 +797,8 @@
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "\"choose(-7)\"",
-                    "value": "choose(-7)"
+                    "value": "choose(-7)",
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
@@ -789,7 +806,8 @@
                 "resolved_runtime_source": "import_symbol",
                 "runtime_module_id": "pytra.utils.assertions",
                 "runtime_symbol": "py_assert_eq",
-                "runtime_call_adapter_kind": "extern_delegate"
+                "runtime_call_adapter_kind": "extern_delegate",
+                "call_arg_type": "bool"
               }
             ],
             "keywords": [],
@@ -832,7 +850,7 @@
               "end_lineno": 12,
               "end_col": 48
             },
-            "resolved_type": "unknown",
+            "resolved_type": "bool",
             "casts": [],
             "borrow_kind": "value",
             "repr": "py_assert_all(checks, \"lambda_ifexp\")",
@@ -863,7 +881,8 @@
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "checks",
-                "id": "checks"
+                "id": "checks",
+                "call_arg_type": "list[bool]"
               },
               {
                 "kind": "Constant",
@@ -877,7 +896,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "\"lambda_ifexp\"",
-                "value": "lambda_ifexp"
+                "value": "lambda_ifexp",
+                "call_arg_type": "str"
               }
             ],
             "keywords": [],

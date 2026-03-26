@@ -394,7 +394,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "\"A\"",
-                "value": "A"
+                "value": "A",
+                "call_arg_type": "str"
               }
             ],
             "keywords": [],
@@ -477,7 +478,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "\"B\"",
-                "value": "B"
+                "value": "B",
+                "call_arg_type": "str"
               }
             ],
             "keywords": [],
@@ -806,7 +808,7 @@
               "end_lineno": 31,
               "end_col_offset": 95
             },
-            "resolved_type": "unknown",
+            "resolved_type": "bool",
             "casts": [],
             "borrow_kind": "value",
             "repr": "py_assert_stdout(['before reassign', 'DEL A', 'after reassign', 'DEL B'], _case_main)",
@@ -894,7 +896,14 @@
                     "repr": "'DEL B'",
                     "value": "DEL B"
                   }
-                ]
+                ],
+                "call_arg_type": "list[str]",
+                "type_expr_summary_v1": {
+                  "schema_version": 1,
+                  "kind": "GenericType",
+                  "category": "static",
+                  "mirror": "list[str]"
+                }
               },
               {
                 "kind": "Name",
@@ -908,7 +917,8 @@
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "_case_main",
-                "id": "_case_main"
+                "id": "_case_main",
+                "call_arg_type": "object"
               }
             ],
             "keywords": [],
@@ -919,10 +929,9 @@
             "runtime_call_adapter_kind": "extern_delegate",
             "type_expr_summary_v1": {
               "schema_version": 1,
-              "kind": "DynamicType",
-              "category": "dynamic",
-              "mirror": "unknown",
-              "dynamic_name": "unknown"
+              "kind": "NamedType",
+              "category": "static",
+              "mirror": "bool"
             }
           }
         ],
