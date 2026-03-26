@@ -14,7 +14,7 @@
         "lineno": 1,
         "col": 0,
         "end_lineno": 1,
-        "end_col": 58
+        "end_col": 189
       },
       "value": {
         "kind": "Constant",
@@ -22,34 +22,12 @@
           "lineno": 1,
           "col": 0,
           "end_lineno": 1,
-          "end_col": 58
+          "end_col": 189
         },
         "casts": [],
         "borrow_kind": "value",
-        "repr": "\"\"\"pytra.std.random: minimal deterministic random helpers.",
-        "value": "pytra.std.random: minimal deterministic random helpe"
-      }
-    },
-    {
-      "kind": "Expr",
-      "source_span": {
-        "lineno": 5,
-        "col": 0,
-        "end_lineno": 5,
-        "end_col": 3
-      },
-      "value": {
-        "kind": "Constant",
-        "source_span": {
-          "lineno": 5,
-          "col": 0,
-          "end_lineno": 5,
-          "end_col": 3
-        },
-        "casts": [],
-        "borrow_kind": "value",
-        "repr": "\"\"\"",
-        "value": ""
+        "repr": "\"\"\"pytra.std.random: minimal deterministic random helpers.\\n\\nThis module is intentionally self-contained and avoids Python stdlib imports,\\nso it can be transpiled to target runtimes.\\n\"\"\"",
+        "value": "pytra.std.random: minimal deterministic random helpers.\n\nThis module is intentionally self-contained and avoids Python stdlib imports,\nso it can be transpiled to target runtimes.\n"
       }
     },
     {
@@ -118,6 +96,22 @@
       },
       "declare": true,
       "leading_trivia": [
+        {
+          "kind": "blank",
+          "count": 1
+        },
+        {
+          "kind": "blank",
+          "count": 1
+        },
+        {
+          "kind": "blank",
+          "count": 1
+        },
+        {
+          "kind": "blank",
+          "count": 1
+        },
         {
           "kind": "blank",
           "count": 1
@@ -1437,245 +1431,8 @@
       },
       "return_type": "list[int]",
       "renamed_symbols": {},
-      "docstring": null,
+      "docstring": "Return k sampled elements with replacement.\n\n    Supported call forms:\n    - choices(population, weights)\n    - choices(population, weights, k)\n    ",
       "body": [
-        {
-          "kind": "Expr",
-          "source_span": {
-            "lineno": 48,
-            "col": 4,
-            "end_lineno": 48,
-            "end_col": 50
-          },
-          "value": {
-            "kind": "Constant",
-            "source_span": {
-              "lineno": 48,
-              "col": 4,
-              "end_lineno": 48,
-              "end_col": 50
-            },
-            "casts": [],
-            "borrow_kind": "value",
-            "repr": "\"\"\"Return k sampled elements with replacement.",
-            "value": "Return k sampled elements with replaceme"
-          }
-        },
-        {
-          "kind": "Expr",
-          "source_span": {
-            "lineno": 50,
-            "col": 4,
-            "end_lineno": 50,
-            "end_col": 25
-          },
-          "value": {
-            "kind": "Name",
-            "source_span": {
-              "lineno": 50,
-              "col": 4,
-              "end_lineno": 50,
-              "end_col": 13
-            },
-            "casts": [],
-            "borrow_kind": "value",
-            "repr": "Supported",
-            "id": "Supported"
-          },
-          "leading_trivia": [
-            {
-              "kind": "blank",
-              "count": 1
-            }
-          ]
-        },
-        {
-          "kind": "Expr",
-          "source_span": {
-            "lineno": 51,
-            "col": 4,
-            "end_lineno": 51,
-            "end_col": 34
-          },
-          "value": {
-            "kind": "UnaryOp",
-            "source_span": {
-              "lineno": 51,
-              "col": 4,
-              "end_lineno": 51,
-              "end_col": 34
-            },
-            "casts": [],
-            "borrow_kind": "value",
-            "repr": "- choices(population, weights)",
-            "op": "USub",
-            "operand": {
-              "kind": "Call",
-              "source_span": {
-                "lineno": 51,
-                "col": 6,
-                "end_lineno": 51,
-                "end_col": 34
-              },
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "choices(population, weights)",
-              "func": {
-                "kind": "Name",
-                "source_span": {
-                  "lineno": 51,
-                  "col": 6,
-                  "end_lineno": 51,
-                  "end_col": 13
-                },
-                "casts": [],
-                "borrow_kind": "value",
-                "repr": "choices",
-                "id": "choices"
-              },
-              "args": [
-                {
-                  "kind": "Name",
-                  "source_span": {
-                    "lineno": 51,
-                    "col": 14,
-                    "end_lineno": 51,
-                    "end_col": 24
-                  },
-                  "casts": [],
-                  "borrow_kind": "value",
-                  "repr": "population",
-                  "id": "population"
-                },
-                {
-                  "kind": "Name",
-                  "source_span": {
-                    "lineno": 51,
-                    "col": 26,
-                    "end_lineno": 51,
-                    "end_col": 33
-                  },
-                  "casts": [],
-                  "borrow_kind": "value",
-                  "repr": "weights",
-                  "id": "weights"
-                }
-              ],
-              "keywords": []
-            }
-          }
-        },
-        {
-          "kind": "Expr",
-          "source_span": {
-            "lineno": 52,
-            "col": 4,
-            "end_lineno": 52,
-            "end_col": 37
-          },
-          "value": {
-            "kind": "UnaryOp",
-            "source_span": {
-              "lineno": 52,
-              "col": 4,
-              "end_lineno": 52,
-              "end_col": 37
-            },
-            "casts": [],
-            "borrow_kind": "value",
-            "repr": "- choices(population, weights, k)",
-            "op": "USub",
-            "operand": {
-              "kind": "Call",
-              "source_span": {
-                "lineno": 52,
-                "col": 6,
-                "end_lineno": 52,
-                "end_col": 37
-              },
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "choices(population, weights, k)",
-              "func": {
-                "kind": "Name",
-                "source_span": {
-                  "lineno": 52,
-                  "col": 6,
-                  "end_lineno": 52,
-                  "end_col": 13
-                },
-                "casts": [],
-                "borrow_kind": "value",
-                "repr": "choices",
-                "id": "choices"
-              },
-              "args": [
-                {
-                  "kind": "Name",
-                  "source_span": {
-                    "lineno": 52,
-                    "col": 14,
-                    "end_lineno": 52,
-                    "end_col": 24
-                  },
-                  "casts": [],
-                  "borrow_kind": "value",
-                  "repr": "population",
-                  "id": "population"
-                },
-                {
-                  "kind": "Name",
-                  "source_span": {
-                    "lineno": 52,
-                    "col": 26,
-                    "end_lineno": 52,
-                    "end_col": 33
-                  },
-                  "casts": [],
-                  "borrow_kind": "value",
-                  "repr": "weights",
-                  "id": "weights"
-                },
-                {
-                  "kind": "Name",
-                  "source_span": {
-                    "lineno": 52,
-                    "col": 35,
-                    "end_lineno": 52,
-                    "end_col": 36
-                  },
-                  "casts": [],
-                  "borrow_kind": "value",
-                  "repr": "k",
-                  "id": "k"
-                }
-              ],
-              "keywords": []
-            }
-          }
-        },
-        {
-          "kind": "Expr",
-          "source_span": {
-            "lineno": 53,
-            "col": 4,
-            "end_lineno": 53,
-            "end_col": 7
-          },
-          "value": {
-            "kind": "Constant",
-            "source_span": {
-              "lineno": 53,
-              "col": 4,
-              "end_lineno": 53,
-              "end_col": 7
-            },
-            "casts": [],
-            "borrow_kind": "value",
-            "repr": "\"\"\"",
-            "value": ""
-          }
-        },
         {
           "kind": "Assign",
           "source_span": {
@@ -1738,7 +1495,29 @@
             ],
             "keywords": []
           },
-          "declare": true
+          "declare": true,
+          "leading_trivia": [
+            {
+              "kind": "blank",
+              "count": 1
+            },
+            {
+              "kind": "blank",
+              "count": 1
+            },
+            {
+              "kind": "blank",
+              "count": 1
+            },
+            {
+              "kind": "blank",
+              "count": 1
+            },
+            {
+              "kind": "blank",
+              "count": 1
+            }
+          ]
         },
         {
           "kind": "If",

@@ -2089,6 +2089,139 @@ def _parse_block_lines(
         abs_ln = _find_abs_line(ctx.lines, ln, last_abs_ln)
         last_abs_ln = abs_ln
 
+        # Standalone string literal (function/class docstring or expression statement)
+        if (s_clean.startswith('"""') or s_clean.startswith("'''") or
+            (s_clean.startswith('"') and not s_clean.startswith('"""')) or
+            (s_clean.startswith("'") and not s_clean.startswith("'''"))):
+            expr = _parse_expr_text(ctx, s_clean, abs_ln, indent, name_types)
+            span = make_span(abs_ln, indent, abs_ln, indent + len(s_clean))
+            expr_stmt = ExprStmt(source_span=span, value=expr)
+            if len(pending_trivia) > 0:
+                expr_stmt.leading_trivia = list(pending_trivia)
+            if len(pending_comments) > 0:
+                expr_stmt.leading_comments = list(pending_comments)
+            stmts.append(expr_stmt)
+            i += 1
+            pending_trivia = []
+            pending_comments = []
+            continue
+
+        # Import: from X import Y
+        mod, names_text = _parse_from_import(s_clean)
+        if mod != "" and names_text != "":
+            aliases: list[ImportAlias] = []
+            for part in names_text.split(","):
+                part = part.strip()
+                if part == "":
+                    continue
+                asname: Optional[str] = None
+                name = part
+                if " as " in part:
+                    split = part.split(" as ")
+                    name = split[0].strip()
+                    asname = split[1].strip()
+                aliases.append(ImportAlias(name=name, asname=asname))
+            if mod in _TYPE_ONLY_IMPORT_MODULES:
+                if mod in ("typing", "pytra.typing"):
+                    for alias in aliases:
+                        if alias.name not in _TYPE_MODULE_VALUE_EXPORTS:
+                            continue
+                        local = alias.asname if alias.asname is not None else alias.name
+                        ctx.import_symbols[local] = {"module": mod, "name": alias.name}
+                        ctx.import_bindings.append(
+                            {
+                                "module_id": mod,
+                                "export_name": alias.name,
+                                "local_name": local,
+                                "binding_kind": "symbol",
+                                "source_file": ctx.filename,
+                                "source_line": abs_ln,
+                            }
+                        )
+                        ctx.qualified_refs.append(
+                            {
+                                "module_id": mod,
+                                "symbol": alias.name,
+                                "local_name": local,
+                            }
+                        )
+                i += 1
+                pending_trivia = []
+                pending_comments = []
+                continue
+            span = make_span(abs_ln, indent, abs_ln, indent + len(s_clean))
+            stmt = ImportFrom(source_span=span, module=mod, names=aliases, level=0)
+            if len(pending_trivia) > 0:
+                stmt.leading_trivia = list(pending_trivia)
+            if len(pending_comments) > 0:
+                stmt.leading_comments = list(pending_comments)
+            stmts.append(stmt)
+            for alias in aliases:
+                local = alias.asname if alias.asname is not None else alias.name
+                ctx.import_bindings.append(
+                    {
+                        "module_id": mod,
+                        "export_name": alias.name,
+                        "local_name": local,
+                        "binding_kind": "symbol",
+                        "source_file": ctx.filename,
+                        "source_line": abs_ln,
+                    }
+                )
+                ctx.qualified_refs.append(
+                    {
+                        "module_id": mod,
+                        "symbol": alias.name,
+                        "local_name": local,
+                    }
+                )
+            i += 1
+            pending_trivia = []
+            pending_comments = []
+            continue
+
+        # import MOD (not from)
+        imp_match = re.match(r"^import\s+(.+)$", s_clean)
+        if imp_match is not None:
+            imp_names_text = re.strip_group(imp_match, 1)
+            imp_aliases: list[ImportAlias] = []
+            for part in imp_names_text.split(","):
+                part = part.strip()
+                if part == "":
+                    continue
+                asname_i: Optional[str] = None
+                name_i = part
+                if " as " in part:
+                    split_i = part.split(" as ")
+                    name_i = split_i[0].strip()
+                    asname_i = split_i[1].strip()
+                imp_aliases.append(ImportAlias(name=name_i, asname=asname_i))
+                local_i = asname_i if asname_i is not None else name_i
+                ctx.import_modules[local_i] = name_i
+            span = make_span(abs_ln, indent, abs_ln, indent + len(s_clean))
+            stmt = Import(source_span=span, names=imp_aliases)
+            if len(pending_trivia) > 0:
+                stmt.leading_trivia = list(pending_trivia)
+            if len(pending_comments) > 0:
+                stmt.leading_comments = list(pending_comments)
+            stmts.append(stmt)
+            for alias in imp_aliases:
+                local = alias.asname if alias.asname is not None else alias.name
+                ctx.import_bindings.append(
+                    {
+                        "module_id": alias.name,
+                        "export_name": "",
+                        "local_name": local,
+                        "binding_kind": "module",
+                        "source_file": ctx.filename,
+                        "source_line": abs_ln,
+                    }
+                )
+            i += 1
+            pending_trivia = []
+            pending_comments = []
+            continue
+
         # return statement
         if s_clean == "return":
             span = make_span(abs_ln, indent, abs_ln, indent + len(s_clean))
@@ -3044,6 +3177,6 @@ def _extract_docstring(block_lines: list[str]) -> Optional[str]:
             # Simple single-line docstring
             quote = s[:3]
             if s.endswith(quote) and len(s) > 6:
-                return s[3:-3]
+                return _unescape_string(s[3:-3])
         break
     return None

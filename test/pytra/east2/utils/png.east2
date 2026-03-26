@@ -14,7 +14,7 @@
         "lineno": 1,
         "col": 0,
         "end_lineno": 1,
-        "end_col": 30
+        "end_col": 103
       },
       "value": {
         "kind": "Constant",
@@ -22,36 +22,13 @@
           "lineno": 1,
           "col": 0,
           "end_lineno": 1,
-          "end_col": 30
+          "end_col": 103
         },
         "resolved_type": "str",
         "casts": [],
         "borrow_kind": "value",
-        "repr": "\"\"\"PNG 書き出しユーティリティ（Python実行用）。",
-        "value": "PNG 書き出しユーティリティ（Python実行"
-      }
-    },
-    {
-      "kind": "Expr",
-      "source_span": {
-        "lineno": 5,
-        "col": 0,
-        "end_lineno": 5,
-        "end_col": 3
-      },
-      "value": {
-        "kind": "Constant",
-        "source_span": {
-          "lineno": 5,
-          "col": 0,
-          "end_lineno": 5,
-          "end_col": 3
-        },
-        "resolved_type": "str",
-        "casts": [],
-        "borrow_kind": "value",
-        "repr": "\"\"\"",
-        "value": ""
+        "repr": "\"\"\"PNG 書き出しユーティリティ（Python実行用）。\\n\\nこのモジュールは sample/py のスクリプトから利用し、\\nRGB 8bit バッファを PNG ファイルとして保存する。\\n\"\"\"",
+        "value": "PNG 書き出しユーティリティ（Python実行用）。\n\nこのモジュールは sample/py のスクリプトから利用し、\nRGB 8bit バッファを PNG ファイルとして保存する。\n"
       }
     },
     {
@@ -414,6 +391,22 @@
       },
       "leading_comments": [],
       "leading_trivia": [
+        {
+          "kind": "blank",
+          "count": 1
+        },
+        {
+          "kind": "blank",
+          "count": 1
+        },
+        {
+          "kind": "blank",
+          "count": 1
+        },
+        {
+          "kind": "blank",
+          "count": 1
+        },
         {
           "kind": "blank",
           "count": 1

@@ -492,11 +492,6 @@ def _emit_unbox(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
     source_gt = go_type(source_type) if source_type != "" else ""
     if isinstance(value_node, dict) and _str(value_node, "resolved_type") == target_type:
         return _emit_expr(ctx, value_node)
-    if isinstance(value_node, dict) and _str(value_node, "kind") == "Name":
-        value_name = _safe_go_ident(_str(value_node, "id"))
-        value_decl_type = ctx.var_types.get(value_name, "")
-        if value_decl_type != "" and go_type(value_decl_type) == target_gt:
-            return _emit_expr(ctx, value_node)
     if target_gt in ("any", "interface{}"):
         return _emit_expr(ctx, value_node)
     if target_gt != "" and target_gt != "any" and source_gt == target_gt:

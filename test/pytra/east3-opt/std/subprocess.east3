@@ -8,7 +8,7 @@
         "lineno": 1,
         "col_offset": 0,
         "end_lineno": 1,
-        "end_col_offset": 69
+        "end_col_offset": 195
       },
       "value": {
         "kind": "Constant",
@@ -16,36 +16,13 @@
           "lineno": 1,
           "col_offset": 0,
           "end_lineno": 1,
-          "end_col_offset": 69
+          "end_col_offset": 195
         },
         "resolved_type": "str",
         "casts": [],
         "borrow_kind": "value",
-        "repr": "\"\"\"pytra.std.subprocess: subprocess API with Python runtime fallback.",
-        "value": "pytra.std.subprocess: subprocess API with Python runtime fallba"
-      }
-    },
-    {
-      "kind": "Expr",
-      "source_span": {
-        "lineno": 5,
-        "col_offset": 0,
-        "end_lineno": 5,
-        "end_col_offset": 3
-      },
-      "value": {
-        "kind": "Constant",
-        "source_span": {
-          "lineno": 5,
-          "col_offset": 0,
-          "end_lineno": 5,
-          "end_col_offset": 3
-        },
-        "resolved_type": "str",
-        "casts": [],
-        "borrow_kind": "value",
-        "repr": "\"\"\"",
-        "value": ""
+        "repr": "\"\"\"pytra.std.subprocess: subprocess API with Python runtime fallback.\\n\\nProvides a minimal subprocess.run() that works in both Python host and\\nC++ selfhost (via std::system / posix_spawn).\\n\"\"\"",
+        "value": "pytra.std.subprocess: subprocess API with Python runtime fallback.\n\nProvides a minimal subprocess.run() that works in both Python host and\nC++ selfhost (via std::system / posix_spawn).\n"
       }
     },
     {
@@ -573,6 +550,22 @@
         {
           "kind": "blank",
           "count": 1
+        },
+        {
+          "kind": "blank",
+          "count": 1
+        },
+        {
+          "kind": "blank",
+          "count": 1
+        },
+        {
+          "kind": "blank",
+          "count": 1
+        },
+        {
+          "kind": "blank",
+          "count": 1
         }
       ]
     },
@@ -651,743 +644,32 @@
       },
       "return_type": "CompletedProcess",
       "arg_usage": {
-        "cmd": "reassigned",
-        "cwd": "reassigned",
-        "capture_output": "reassigned",
-        "env": "reassigned"
+        "cmd": "readonly",
+        "cwd": "readonly",
+        "capture_output": "readonly",
+        "env": "readonly"
       },
       "renamed_symbols": {},
-      "docstring": null,
+      "docstring": "Run a command as a subprocess.\n\n    Args:\n        cmd: Command and arguments.\n        cwd: Working directory (empty string = inherit).\n        capture_output: If True, capture stdout/stderr as strings.\n        env: Environment variables. Empty dict = inherit parent env.\n\n    Returns:\n        CompletedProcess with returncode and optional stdout/stderr.\n    ",
       "body": [
         {
-          "kind": "Expr",
-          "source_span": {
-            "lineno": 23,
-            "col_offset": 4,
-            "end_lineno": 23,
-            "end_col_offset": 37
-          },
-          "value": {
-            "kind": "Constant",
-            "source_span": {
-              "lineno": 23,
-              "col_offset": 4,
-              "end_lineno": 23,
-              "end_col_offset": 37
-            },
-            "resolved_type": "str",
-            "casts": [],
-            "borrow_kind": "value",
-            "repr": "\"\"\"Run a command as a subprocess.",
-            "value": "Run a command as a subproce"
-          },
-          "meta": {
-            "lifetime_node_id": "n31",
-            "lifetime_defs": [],
-            "lifetime_uses": [],
-            "lifetime_live_in": [
-              "Args",
-              "CompletedProcess",
-              "PYTRA_TID_STR",
-              "Returns",
-              "_os",
-              "_subprocess",
-              "dict",
-              "import",
-              "inherit",
-              "len"
-            ],
-            "lifetime_live_out": [
-              "Args",
-              "CompletedProcess",
-              "PYTRA_TID_STR",
-              "Returns",
-              "_os",
-              "_subprocess",
-              "dict",
-              "import",
-              "inherit",
-              "len"
-            ],
-            "lifetime_last_use_vars": []
-          }
-        },
-        {
-          "kind": "Expr",
-          "source_span": {
-            "lineno": 25,
-            "col_offset": 4,
-            "end_lineno": 25,
-            "end_col_offset": 9
-          },
-          "value": {
-            "kind": "Name",
-            "source_span": {
-              "lineno": 25,
-              "col_offset": 4,
-              "end_lineno": 25,
-              "end_col_offset": 8
-            },
-            "resolved_type": "unknown",
-            "casts": [],
-            "borrow_kind": "value",
-            "repr": "Args",
-            "id": "Args"
-          },
-          "leading_trivia": [
-            {
-              "kind": "blank",
-              "count": 1
-            }
-          ],
-          "meta": {
-            "lifetime_node_id": "n30",
-            "lifetime_defs": [],
-            "lifetime_uses": [
-              "Args"
-            ],
-            "lifetime_live_in": [
-              "Args",
-              "CompletedProcess",
-              "PYTRA_TID_STR",
-              "Returns",
-              "_os",
-              "_subprocess",
-              "dict",
-              "import",
-              "inherit",
-              "len"
-            ],
-            "lifetime_live_out": [
-              "CompletedProcess",
-              "PYTRA_TID_STR",
-              "Returns",
-              "_os",
-              "_subprocess",
-              "dict",
-              "import",
-              "inherit",
-              "len"
-            ],
-            "lifetime_last_use_vars": [
-              "Args"
-            ]
-          }
-        },
-        {
-          "kind": "AnnAssign",
-          "source_span": {
-            "lineno": 26,
-            "col_offset": 8,
-            "end_lineno": 26,
-            "end_col_offset": 35
-          },
-          "target": {
-            "kind": "Name",
-            "source_span": {
-              "lineno": 26,
-              "col_offset": 8,
-              "end_lineno": 26,
-              "end_col_offset": 11
-            },
-            "resolved_type": "Command and arguments.",
-            "casts": [],
-            "borrow_kind": "value",
-            "repr": "cmd",
-            "id": "cmd",
-            "type_expr": {
-              "kind": "NamedType",
-              "name": "Command and arguments."
-            }
-          },
-          "annotation": "Command and arguments.",
-          "declare": true,
-          "decl_type": "Command and arguments.",
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "Command and arguments."
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "Command and arguments."
-          },
-          "meta": {
-            "lifetime_node_id": "n29",
-            "lifetime_defs": [
-              "cmd"
-            ],
-            "lifetime_uses": [],
-            "lifetime_live_in": [
-              "CompletedProcess",
-              "PYTRA_TID_STR",
-              "Returns",
-              "_os",
-              "_subprocess",
-              "dict",
-              "import",
-              "inherit",
-              "len"
-            ],
-            "lifetime_live_out": [
-              "CompletedProcess",
-              "PYTRA_TID_STR",
-              "Returns",
-              "_os",
-              "_subprocess",
-              "cmd",
-              "dict",
-              "import",
-              "inherit",
-              "len"
-            ],
-            "lifetime_last_use_vars": []
-          }
-        },
-        {
-          "kind": "AnnAssign",
-          "source_span": {
-            "lineno": 27,
-            "col_offset": 8,
-            "end_lineno": 27,
-            "end_col_offset": 56
-          },
-          "target": {
-            "kind": "Name",
-            "source_span": {
-              "lineno": 27,
-              "col_offset": 8,
-              "end_lineno": 27,
-              "end_col_offset": 11
-            },
-            "resolved_type": "Working directory (empty string",
-            "casts": [],
-            "borrow_kind": "value",
-            "repr": "cwd",
-            "id": "cwd",
-            "type_expr": {
-              "kind": "NamedType",
-              "name": "Working directory (empty string"
-            }
-          },
-          "annotation": "Working directory (empty string",
-          "declare": true,
-          "decl_type": "Working directory (empty string",
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "Working directory (empty string"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "Working directory (empty string"
-          },
-          "value": {
-            "kind": "Unbox",
-            "resolved_type": "Working directory (empty string",
-            "borrow_kind": "value",
-            "casts": [],
-            "value": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 27,
-                "col_offset": 47,
-                "end_lineno": 27,
-                "end_col_offset": 54
-              },
-              "resolved_type": "unknown",
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "inherit",
-              "id": "inherit"
-            },
-            "source_span": {
-              "lineno": 27,
-              "col_offset": 47,
-              "end_lineno": 27,
-              "end_col_offset": 54
-            },
-            "repr": "inherit",
-            "type_expr_summary_v1": {
-              "schema_version": 1,
-              "kind": "NamedType",
-              "category": "static",
-              "mirror": "Working directory (empty string"
-            },
-            "target": "Working directory (empty string",
-            "on_fail": "raise",
-            "bridge_lane_v1": {
-              "schema_version": 1,
-              "target": {
-                "kind": "NamedType",
-                "category": "static",
-                "mirror": "Working directory (empty string"
-              },
-              "target_category": "static",
-              "value": {
-                "kind": "DynamicType",
-                "category": "dynamic",
-                "mirror": "unknown",
-                "dynamic_name": "unknown"
-              },
-              "value_category": "dynamic"
-            }
-          },
-          "type_expr_summary_v1": {
-            "schema_version": 1,
-            "kind": "NamedType",
-            "category": "static",
-            "mirror": "Working directory (empty string"
-          },
-          "meta": {
-            "lifetime_node_id": "n28",
-            "lifetime_defs": [
-              "cwd"
-            ],
-            "lifetime_uses": [
-              "inherit"
-            ],
-            "lifetime_live_in": [
-              "CompletedProcess",
-              "PYTRA_TID_STR",
-              "Returns",
-              "_os",
-              "_subprocess",
-              "cmd",
-              "dict",
-              "import",
-              "inherit",
-              "len"
-            ],
-            "lifetime_live_out": [
-              "CompletedProcess",
-              "PYTRA_TID_STR",
-              "Returns",
-              "_os",
-              "_subprocess",
-              "cmd",
-              "cwd",
-              "dict",
-              "import",
-              "inherit",
-              "len"
-            ],
-            "lifetime_last_use_vars": []
-          }
-        },
-        {
-          "kind": "AnnAssign",
-          "source_span": {
-            "lineno": 28,
-            "col_offset": 8,
-            "end_lineno": 28,
-            "end_col_offset": 66
-          },
-          "target": {
-            "kind": "Name",
-            "source_span": {
-              "lineno": 28,
-              "col_offset": 8,
-              "end_lineno": 28,
-              "end_col_offset": 22
-            },
-            "resolved_type": "If True, capture stdout/stderr as strings.",
-            "casts": [],
-            "borrow_kind": "value",
-            "repr": "capture_output",
-            "id": "capture_output",
-            "type_expr": {
-              "kind": "NamedType",
-              "name": "If True, capture stdout/stderr as strings."
-            }
-          },
-          "annotation": "If True, capture stdout/stderr as strings.",
-          "declare": true,
-          "decl_type": "If True, capture stdout/stderr as strings.",
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "If True, capture stdout/stderr as strings."
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "If True, capture stdout/stderr as strings."
-          },
-          "meta": {
-            "lifetime_node_id": "n27",
-            "lifetime_defs": [
-              "capture_output"
-            ],
-            "lifetime_uses": [],
-            "lifetime_live_in": [
-              "CompletedProcess",
-              "PYTRA_TID_STR",
-              "Returns",
-              "_os",
-              "_subprocess",
-              "cmd",
-              "cwd",
-              "dict",
-              "import",
-              "inherit",
-              "len"
-            ],
-            "lifetime_live_out": [
-              "CompletedProcess",
-              "PYTRA_TID_STR",
-              "Returns",
-              "_os",
-              "_subprocess",
-              "capture_output",
-              "cmd",
-              "cwd",
-              "dict",
-              "import",
-              "inherit",
-              "len"
-            ],
-            "lifetime_last_use_vars": []
-          }
-        },
-        {
-          "kind": "AnnAssign",
-          "source_span": {
-            "lineno": 29,
-            "col_offset": 8,
-            "end_lineno": 29,
-            "end_col_offset": 68
-          },
-          "target": {
-            "kind": "Name",
-            "source_span": {
-              "lineno": 29,
-              "col_offset": 8,
-              "end_lineno": 29,
-              "end_col_offset": 11
-            },
-            "resolved_type": "Environment variables. Empty dict",
-            "casts": [],
-            "borrow_kind": "value",
-            "repr": "env",
-            "id": "env",
-            "type_expr": {
-              "kind": "NamedType",
-              "name": "Environment variables. Empty dict"
-            }
-          },
-          "annotation": "Environment variables. Empty dict",
-          "declare": true,
-          "decl_type": "Environment variables. Empty dict",
-          "annotation_type_expr": {
-            "kind": "NamedType",
-            "name": "Environment variables. Empty dict"
-          },
-          "decl_type_expr": {
-            "kind": "NamedType",
-            "name": "Environment variables. Empty dict"
-          },
-          "value": {
-            "kind": "Unbox",
-            "resolved_type": "Environment variables. Empty dict",
-            "borrow_kind": "value",
-            "casts": [],
-            "value": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 29,
-                "col_offset": 49,
-                "end_lineno": 29,
-                "end_col_offset": 56
-              },
-              "resolved_type": "unknown",
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "inherit",
-              "id": "inherit"
-            },
-            "source_span": {
-              "lineno": 29,
-              "col_offset": 49,
-              "end_lineno": 29,
-              "end_col_offset": 56
-            },
-            "repr": "inherit",
-            "type_expr_summary_v1": {
-              "schema_version": 1,
-              "kind": "NamedType",
-              "category": "static",
-              "mirror": "Environment variables. Empty dict"
-            },
-            "target": "Environment variables. Empty dict",
-            "on_fail": "raise",
-            "bridge_lane_v1": {
-              "schema_version": 1,
-              "target": {
-                "kind": "NamedType",
-                "category": "static",
-                "mirror": "Environment variables. Empty dict"
-              },
-              "target_category": "static",
-              "value": {
-                "kind": "DynamicType",
-                "category": "dynamic",
-                "mirror": "unknown",
-                "dynamic_name": "unknown"
-              },
-              "value_category": "dynamic"
-            }
-          },
-          "type_expr_summary_v1": {
-            "schema_version": 1,
-            "kind": "NamedType",
-            "category": "static",
-            "mirror": "Environment variables. Empty dict"
-          },
-          "meta": {
-            "lifetime_node_id": "n26",
-            "lifetime_defs": [
-              "env"
-            ],
-            "lifetime_uses": [
-              "inherit"
-            ],
-            "lifetime_live_in": [
-              "CompletedProcess",
-              "PYTRA_TID_STR",
-              "Returns",
-              "_os",
-              "_subprocess",
-              "capture_output",
-              "cmd",
-              "cwd",
-              "dict",
-              "import",
-              "inherit",
-              "len"
-            ],
-            "lifetime_live_out": [
-              "CompletedProcess",
-              "PYTRA_TID_STR",
-              "Returns",
-              "_os",
-              "_subprocess",
-              "capture_output",
-              "cmd",
-              "cwd",
-              "dict",
-              "env",
-              "import",
-              "len"
-            ],
-            "lifetime_last_use_vars": [
-              "inherit"
-            ]
-          }
-        },
-        {
-          "kind": "Expr",
-          "source_span": {
-            "lineno": 31,
-            "col_offset": 4,
-            "end_lineno": 31,
-            "end_col_offset": 12
-          },
-          "value": {
-            "kind": "Name",
-            "source_span": {
-              "lineno": 31,
-              "col_offset": 4,
-              "end_lineno": 31,
-              "end_col_offset": 11
-            },
-            "resolved_type": "unknown",
-            "casts": [],
-            "borrow_kind": "value",
-            "repr": "Returns",
-            "id": "Returns"
-          },
-          "leading_trivia": [
-            {
-              "kind": "blank",
-              "count": 1
-            }
-          ],
-          "meta": {
-            "lifetime_node_id": "n25",
-            "lifetime_defs": [],
-            "lifetime_uses": [
-              "Returns"
-            ],
-            "lifetime_live_in": [
-              "CompletedProcess",
-              "PYTRA_TID_STR",
-              "Returns",
-              "_os",
-              "_subprocess",
-              "capture_output",
-              "cmd",
-              "cwd",
-              "dict",
-              "env",
-              "import",
-              "len"
-            ],
-            "lifetime_live_out": [
-              "CompletedProcess",
-              "PYTRA_TID_STR",
-              "_os",
-              "_subprocess",
-              "capture_output",
-              "cmd",
-              "cwd",
-              "dict",
-              "env",
-              "import",
-              "len"
-            ],
-            "lifetime_last_use_vars": [
-              "Returns"
-            ]
-          }
-        },
-        {
-          "kind": "Expr",
-          "source_span": {
-            "lineno": 32,
-            "col_offset": 8,
-            "end_lineno": 32,
-            "end_col_offset": 68
-          },
-          "value": {
-            "kind": "Name",
-            "source_span": {
-              "lineno": 32,
-              "col_offset": 8,
-              "end_lineno": 32,
-              "end_col_offset": 24
-            },
-            "resolved_type": "type",
-            "casts": [],
-            "borrow_kind": "value",
-            "repr": "CompletedProcess",
-            "id": "CompletedProcess",
-            "type_object_of": "CompletedProcess"
-          },
-          "meta": {
-            "lifetime_node_id": "n24",
-            "lifetime_defs": [],
-            "lifetime_uses": [
-              "CompletedProcess"
-            ],
-            "lifetime_live_in": [
-              "CompletedProcess",
-              "PYTRA_TID_STR",
-              "_os",
-              "_subprocess",
-              "capture_output",
-              "cmd",
-              "cwd",
-              "dict",
-              "env",
-              "import",
-              "len"
-            ],
-            "lifetime_live_out": [
-              "CompletedProcess",
-              "PYTRA_TID_STR",
-              "_os",
-              "_subprocess",
-              "capture_output",
-              "cmd",
-              "cwd",
-              "dict",
-              "env",
-              "import",
-              "len"
-            ],
-            "lifetime_last_use_vars": []
-          }
-        },
-        {
-          "kind": "Expr",
-          "source_span": {
-            "lineno": 33,
-            "col_offset": 4,
-            "end_lineno": 33,
-            "end_col_offset": 7
-          },
-          "value": {
-            "kind": "Constant",
-            "source_span": {
-              "lineno": 33,
-              "col_offset": 4,
-              "end_lineno": 33,
-              "end_col_offset": 7
-            },
-            "resolved_type": "str",
-            "casts": [],
-            "borrow_kind": "value",
-            "repr": "\"\"\"",
-            "value": ""
-          },
-          "meta": {
-            "lifetime_node_id": "n23",
-            "lifetime_defs": [],
-            "lifetime_uses": [],
-            "lifetime_live_in": [
-              "CompletedProcess",
-              "PYTRA_TID_STR",
-              "_os",
-              "_subprocess",
-              "capture_output",
-              "cmd",
-              "cwd",
-              "dict",
-              "env",
-              "import",
-              "len"
-            ],
-            "lifetime_live_out": [
-              "CompletedProcess",
-              "PYTRA_TID_STR",
-              "_os",
-              "_subprocess",
-              "capture_output",
-              "cmd",
-              "cwd",
-              "dict",
-              "env",
-              "import",
-              "len"
-            ],
-            "lifetime_last_use_vars": []
-          }
-        },
-        {
-          "kind": "Expr",
+          "kind": "Import",
           "source_span": {
             "lineno": 34,
             "col_offset": 4,
             "end_lineno": 34,
             "end_col_offset": 20
           },
-          "value": {
-            "kind": "Name",
-            "source_span": {
-              "lineno": 34,
-              "col_offset": 4,
-              "end_lineno": 34,
-              "end_col_offset": 10
-            },
-            "resolved_type": "unknown",
-            "casts": [],
-            "borrow_kind": "value",
-            "repr": "import",
-            "id": "import"
-          },
+          "names": [
+            {
+              "name": "os",
+              "asname": "_os"
+            }
+          ],
           "meta": {
             "lifetime_node_id": "n22",
             "lifetime_defs": [],
-            "lifetime_uses": [
-              "import"
-            ],
+            "lifetime_uses": [],
             "lifetime_live_in": [
               "CompletedProcess",
               "PYTRA_TID_STR",
@@ -1398,7 +680,6 @@
               "cwd",
               "dict",
               "env",
-              "import",
               "len"
             ],
             "lifetime_live_out": [
@@ -1413,9 +694,7 @@
               "env",
               "len"
             ],
-            "lifetime_last_use_vars": [
-              "import"
-            ]
+            "lifetime_last_use_vars": []
           }
         },
         {
@@ -1574,7 +853,7 @@
                 "end_lineno": 36,
                 "end_col_offset": 10
               },
-              "resolved_type": "Working directory (empty string",
+              "resolved_type": "str",
               "casts": [],
               "borrow_kind": "readonly_ref",
               "repr": "cwd",
@@ -1620,7 +899,7 @@
                   "end_lineno": 36,
                   "end_col_offset": 10
                 },
-                "resolved_type": "Working directory (empty string",
+                "resolved_type": "str",
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "cwd",
@@ -1699,7 +978,7 @@
                 }
               },
               "declare": true,
-              "decl_type": "Working directory (empty string",
+              "decl_type": "str",
               "declare_init": true,
               "value": {
                 "kind": "Name",
@@ -1709,7 +988,7 @@
                   "end_lineno": 37,
                   "end_col_offset": 19
                 },
-                "resolved_type": "Working directory (empty string",
+                "resolved_type": "str",
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "cwd",
@@ -1719,7 +998,7 @@
                 "schema_version": 1,
                 "kind": "NamedType",
                 "category": "static",
-                "mirror": "Working directory (empty string"
+                "mirror": "str"
               },
               "meta": {
                 "lifetime_node_id": "n20",
@@ -1810,7 +1089,7 @@
               "end_lineno": 38,
               "end_col_offset": 21
             },
-            "resolved_type": "If True, capture stdout/stderr as strings.",
+            "resolved_type": "bool",
             "casts": [],
             "borrow_kind": "readonly_ref",
             "repr": "capture_output",
@@ -2115,7 +1394,7 @@
                     "end_lineno": 41,
                     "end_col_offset": 14
                   },
-                  "resolved_type": "Environment variables. Empty dict",
+                  "resolved_type": "dict[str,str]",
                   "casts": [],
                   "borrow_kind": "readonly_ref",
                   "repr": "env",
@@ -2205,7 +1484,7 @@
                       "end_lineno": 41,
                       "end_col_offset": 14
                     },
-                    "resolved_type": "Environment variables. Empty dict",
+                    "resolved_type": "dict[str,str]",
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "env",
@@ -2322,11 +1601,12 @@
                         "end_lineno": 42,
                         "end_col_offset": 25
                       },
-                      "resolved_type": "unknown",
+                      "resolved_type": "module",
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "_os",
-                      "id": "_os"
+                      "id": "_os",
+                      "runtime_module_id": "pytra.std.os"
                     },
                     "attr": "environ"
                   }
@@ -2394,7 +1674,7 @@
                     "end_lineno": 43,
                     "end_col_offset": 31
                   },
-                  "resolved_type": "unknown",
+                  "resolved_type": "list[tuple[str,str]]",
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "env.items()",
@@ -2406,7 +1686,7 @@
                       "end_lineno": 43,
                       "end_col_offset": 29
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "callable",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "env.items",
@@ -2418,7 +1698,7 @@
                         "end_lineno": 43,
                         "end_col_offset": 23
                       },
-                      "resolved_type": "Environment variables. Empty dict",
+                      "resolved_type": "dict[str,str]",
                       "casts": [],
                       "borrow_kind": "readonly_ref",
                       "repr": "env",
@@ -2428,15 +1708,35 @@
                   },
                   "args": [],
                   "keywords": [],
+                  "lowered_kind": "BuiltinCall",
+                  "builtin_name": "items",
+                  "runtime_call": "dict.items",
+                  "runtime_module_id": "pytra.core.dict",
+                  "runtime_symbol": "dict.items",
+                  "runtime_call_adapter_kind": "builtin",
+                  "semantic_tag": "stdlib.method.items",
+                  "runtime_owner": {
+                    "kind": "Name",
+                    "source_span": {
+                      "lineno": 43,
+                      "col_offset": 20,
+                      "end_lineno": 43,
+                      "end_col_offset": 23
+                    },
+                    "resolved_type": "dict[str,str]",
+                    "casts": [],
+                    "borrow_kind": "readonly_ref",
+                    "repr": "env",
+                    "id": "env"
+                  },
                   "iterable_trait": "yes",
                   "iter_protocol": "static_range",
-                  "iter_element_type": "unknown",
+                  "iter_element_type": "tuple[str,str]",
                   "type_expr_summary_v1": {
                     "schema_version": 1,
-                    "kind": "DynamicType",
-                    "category": "dynamic",
-                    "mirror": "unknown",
-                    "dynamic_name": "unknown"
+                    "kind": "GenericType",
+                    "category": "static",
+                    "mirror": "list[tuple[str,str]]"
                   }
                 },
                 "dispatch_mode": "native",
@@ -2446,7 +1746,7 @@
               "target_plan": {
                 "kind": "NameTarget",
                 "id": "__iter_tmp_1",
-                "target_type": "",
+                "target_type": "tuple[str,str]",
                 "direct_unpack_names": [
                   "k",
                   "v"
@@ -2459,7 +1759,7 @@
                   "target": {
                     "kind": "Name",
                     "id": "k",
-                    "resolved_type": "unknown"
+                    "resolved_type": "str"
                   },
                   "value": {
                     "kind": "Subscript",
@@ -2473,9 +1773,9 @@
                       "value": 0,
                       "resolved_type": "int64"
                     },
-                    "resolved_type": "unknown"
+                    "resolved_type": "str"
                   },
-                  "decl_type": "unknown",
+                  "decl_type": "str",
                   "declare": true,
                   "unused": true,
                   "meta": {
@@ -2516,7 +1816,7 @@
                   "target": {
                     "kind": "Name",
                     "id": "v",
-                    "resolved_type": "unknown"
+                    "resolved_type": "str"
                   },
                   "value": {
                     "kind": "Subscript",
@@ -2530,9 +1830,9 @@
                       "value": 1,
                       "resolved_type": "int64"
                     },
-                    "resolved_type": "unknown"
+                    "resolved_type": "str"
                   },
-                  "decl_type": "unknown",
+                  "decl_type": "str",
                   "declare": true,
                   "meta": {
                     "lifetime_node_id": "n13",
@@ -2585,7 +1885,7 @@
                       "end_lineno": 44,
                       "end_col_offset": 21
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "str",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "merged[k]",
@@ -2611,14 +1911,15 @@
                         "end_lineno": 44,
                         "end_col_offset": 20
                       },
-                      "resolved_type": "unknown",
+                      "resolved_type": "str",
                       "casts": [],
-                      "borrow_kind": "value",
+                      "borrow_kind": "readonly_ref",
                       "repr": "k",
                       "id": "k"
                     }
                   },
                   "declare": true,
+                  "decl_type": "str",
                   "declare_init": true,
                   "value": {
                     "kind": "Name",
@@ -2628,18 +1929,17 @@
                       "end_lineno": 44,
                       "end_col_offset": 25
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "str",
                     "casts": [],
-                    "borrow_kind": "value",
+                    "borrow_kind": "readonly_ref",
                     "repr": "v",
                     "id": "v"
                   },
                   "type_expr_summary_v1": {
                     "schema_version": 1,
-                    "kind": "DynamicType",
-                    "category": "dynamic",
-                    "mirror": "unknown",
-                    "dynamic_name": "unknown"
+                    "kind": "NamedType",
+                    "category": "static",
+                    "mirror": "str"
                   },
                   "meta": {
                     "lifetime_node_id": "n12",
@@ -2926,7 +2226,7 @@
                   "end_lineno": 46,
                   "end_col_offset": 30
                 },
-                "resolved_type": "Command and arguments.",
+                "resolved_type": "list[str]",
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "cmd",
@@ -3197,7 +2497,7 @@
               "end_lineno": 38,
               "end_col_offset": 21
             },
-            "resolved_type": "If True, capture stdout/stderr as strings.",
+            "resolved_type": "bool",
             "casts": [],
             "borrow_kind": "readonly_ref",
             "repr": "capture_output",
@@ -3785,7 +3085,7 @@
           "schema_version": "east3_lifetime_v1",
           "status": "ok",
           "reason": "",
-          "entry_node": "n31",
+          "entry_node": "n22",
           "order": [
             "n0",
             "n1",
@@ -3809,16 +3109,7 @@
             "n19",
             "n20",
             "n21",
-            "n22",
-            "n23",
-            "n24",
-            "n25",
-            "n26",
-            "n27",
-            "n28",
-            "n29",
-            "n30",
-            "n31"
+            "n22"
           ],
           "cfg": [
             {
@@ -4089,112 +3380,11 @@
             },
             {
               "id": "n22",
-              "kind": "Expr",
+              "kind": "Import",
               "defs": [],
-              "uses": [
-                "import"
-              ],
+              "uses": [],
               "succ": [
                 "n21"
-              ]
-            },
-            {
-              "id": "n23",
-              "kind": "Expr",
-              "defs": [],
-              "uses": [],
-              "succ": [
-                "n22"
-              ]
-            },
-            {
-              "id": "n24",
-              "kind": "Expr",
-              "defs": [],
-              "uses": [
-                "CompletedProcess"
-              ],
-              "succ": [
-                "n23"
-              ]
-            },
-            {
-              "id": "n25",
-              "kind": "Expr",
-              "defs": [],
-              "uses": [
-                "Returns"
-              ],
-              "succ": [
-                "n24"
-              ]
-            },
-            {
-              "id": "n26",
-              "kind": "AnnAssign",
-              "defs": [
-                "env"
-              ],
-              "uses": [
-                "inherit"
-              ],
-              "succ": [
-                "n25"
-              ]
-            },
-            {
-              "id": "n27",
-              "kind": "AnnAssign",
-              "defs": [
-                "capture_output"
-              ],
-              "uses": [],
-              "succ": [
-                "n26"
-              ]
-            },
-            {
-              "id": "n28",
-              "kind": "AnnAssign",
-              "defs": [
-                "cwd"
-              ],
-              "uses": [
-                "inherit"
-              ],
-              "succ": [
-                "n27"
-              ]
-            },
-            {
-              "id": "n29",
-              "kind": "AnnAssign",
-              "defs": [
-                "cmd"
-              ],
-              "uses": [],
-              "succ": [
-                "n28"
-              ]
-            },
-            {
-              "id": "n30",
-              "kind": "Expr",
-              "defs": [],
-              "uses": [
-                "Args"
-              ],
-              "succ": [
-                "n29"
-              ]
-            },
-            {
-              "id": "n31",
-              "kind": "Expr",
-              "defs": [],
-              "uses": [],
-              "succ": [
-                "n30"
               ]
             }
           ],
@@ -4202,18 +3392,6 @@
             "defs": {
               "__iter_tmp_1": [
                 "n11"
-              ],
-              "capture_output": [
-                "n27"
-              ],
-              "cmd": [
-                "n29"
-              ],
-              "cwd": [
-                "n28"
-              ],
-              "env": [
-                "n26"
               ],
               "k": [
                 "n14"
@@ -4240,19 +3418,12 @@
               ]
             },
             "uses": {
-              "Args": [
-                "n30"
-              ],
               "CompletedProcess": [
-                "n0",
-                "n24"
+                "n0"
               ],
               "PYTRA_TID_STR": [
                 "n2",
                 "n4"
-              ],
-              "Returns": [
-                "n25"
               ],
               "__iter_tmp_1": [
                 "n13",
@@ -4282,13 +3453,6 @@
                 "n11",
                 "n9"
               ],
-              "import": [
-                "n22"
-              ],
-              "inherit": [
-                "n26",
-                "n28"
-              ],
               "kwargs": [
                 "n8"
               ],
@@ -4317,28 +3481,10 @@
             }
           },
           "variables": {
-            "Args": {
-              "def_nodes": [],
-              "use_nodes": [
-                "n30"
-              ],
-              "live_in_nodes": [
-                "n30",
-                "n31"
-              ],
-              "live_out_nodes": [
-                "n31"
-              ],
-              "last_use_nodes": [
-                "n30"
-              ],
-              "lifetime_class": "local_non_escape_candidate"
-            },
             "CompletedProcess": {
               "def_nodes": [],
               "use_nodes": [
-                "n0",
-                "n24"
+                "n0"
               ],
               "live_in_nodes": [
                 "n0",
@@ -4363,16 +3509,7 @@
                 "n19",
                 "n20",
                 "n21",
-                "n22",
-                "n23",
-                "n24",
-                "n25",
-                "n26",
-                "n27",
-                "n28",
-                "n29",
-                "n30",
-                "n31"
+                "n22"
               ],
               "live_out_nodes": [
                 "n1",
@@ -4396,16 +3533,7 @@
                 "n19",
                 "n20",
                 "n21",
-                "n22",
-                "n23",
-                "n24",
-                "n25",
-                "n26",
-                "n27",
-                "n28",
-                "n29",
-                "n30",
-                "n31"
+                "n22"
               ],
               "last_use_nodes": [
                 "n0"
@@ -4439,16 +3567,7 @@
                 "n19",
                 "n20",
                 "n21",
-                "n22",
-                "n23",
-                "n24",
-                "n25",
-                "n26",
-                "n27",
-                "n28",
-                "n29",
-                "n30",
-                "n31"
+                "n22"
               ],
               "live_out_nodes": [
                 "n1",
@@ -4470,46 +3589,10 @@
                 "n19",
                 "n20",
                 "n21",
-                "n22",
-                "n23",
-                "n24",
-                "n25",
-                "n26",
-                "n27",
-                "n28",
-                "n29",
-                "n30",
-                "n31"
+                "n22"
               ],
               "last_use_nodes": [
                 "n2"
-              ],
-              "lifetime_class": "local_non_escape_candidate"
-            },
-            "Returns": {
-              "def_nodes": [],
-              "use_nodes": [
-                "n25"
-              ],
-              "live_in_nodes": [
-                "n25",
-                "n26",
-                "n27",
-                "n28",
-                "n29",
-                "n30",
-                "n31"
-              ],
-              "live_out_nodes": [
-                "n26",
-                "n27",
-                "n28",
-                "n29",
-                "n30",
-                "n31"
-              ],
-              "last_use_nodes": [
-                "n25"
               ],
               "lifetime_class": "local_non_escape_candidate"
             },
@@ -4548,16 +3631,7 @@
                 "n19",
                 "n20",
                 "n21",
-                "n22",
-                "n23",
-                "n24",
-                "n25",
-                "n26",
-                "n27",
-                "n28",
-                "n29",
-                "n30",
-                "n31"
+                "n22"
               ],
               "live_out_nodes": [
                 "n9",
@@ -4567,16 +3641,7 @@
                 "n19",
                 "n20",
                 "n21",
-                "n22",
-                "n23",
-                "n24",
-                "n25",
-                "n26",
-                "n27",
-                "n28",
-                "n29",
-                "n30",
-                "n31"
+                "n22"
               ],
               "last_use_nodes": [
                 "n15"
@@ -4603,16 +3668,7 @@
                 "n19",
                 "n20",
                 "n21",
-                "n22",
-                "n23",
-                "n24",
-                "n25",
-                "n26",
-                "n27",
-                "n28",
-                "n29",
-                "n30",
-                "n31"
+                "n22"
               ],
               "live_out_nodes": [
                 "n9",
@@ -4628,16 +3684,7 @@
                 "n19",
                 "n20",
                 "n21",
-                "n22",
-                "n23",
-                "n24",
-                "n25",
-                "n26",
-                "n27",
-                "n28",
-                "n29",
-                "n30",
-                "n31"
+                "n22"
               ],
               "last_use_nodes": [
                 "n8"
@@ -4645,9 +3692,7 @@
               "lifetime_class": "local_non_escape_candidate"
             },
             "capture_output": {
-              "def_nodes": [
-                "n27"
-              ],
+              "def_nodes": [],
               "use_nodes": [
                 "n1",
                 "n16"
@@ -4670,11 +3715,7 @@
                 "n19",
                 "n20",
                 "n21",
-                "n22",
-                "n23",
-                "n24",
-                "n25",
-                "n26"
+                "n22"
               ],
               "live_out_nodes": [
                 "n6",
@@ -4693,12 +3734,7 @@
                 "n19",
                 "n20",
                 "n21",
-                "n22",
-                "n23",
-                "n24",
-                "n25",
-                "n26",
-                "n27"
+                "n22"
               ],
               "last_use_nodes": [
                 "n1"
@@ -4706,9 +3742,7 @@
               "lifetime_class": "escape_or_unknown"
             },
             "cmd": {
-              "def_nodes": [
-                "n29"
-              ],
+              "def_nodes": [],
               "use_nodes": [
                 "n8"
               ],
@@ -4727,13 +3761,7 @@
                 "n19",
                 "n20",
                 "n21",
-                "n22",
-                "n23",
-                "n24",
-                "n25",
-                "n26",
-                "n27",
-                "n28"
+                "n22"
               ],
               "live_out_nodes": [
                 "n9",
@@ -4749,14 +3777,7 @@
                 "n19",
                 "n20",
                 "n21",
-                "n22",
-                "n23",
-                "n24",
-                "n25",
-                "n26",
-                "n27",
-                "n28",
-                "n29"
+                "n22"
               ],
               "last_use_nodes": [
                 "n8"
@@ -4764,9 +3785,7 @@
               "lifetime_class": "escape_or_unknown"
             },
             "cwd": {
-              "def_nodes": [
-                "n28"
-              ],
+              "def_nodes": [],
               "use_nodes": [
                 "n19",
                 "n20"
@@ -4775,23 +3794,12 @@
                 "n19",
                 "n20",
                 "n21",
-                "n22",
-                "n23",
-                "n24",
-                "n25",
-                "n26",
-                "n27"
+                "n22"
               ],
               "live_out_nodes": [
                 "n19",
                 "n21",
-                "n22",
-                "n23",
-                "n24",
-                "n25",
-                "n26",
-                "n27",
-                "n28"
+                "n22"
               ],
               "last_use_nodes": [
                 "n20"
@@ -4812,16 +3820,7 @@
                 "n19",
                 "n20",
                 "n21",
-                "n22",
-                "n23",
-                "n24",
-                "n25",
-                "n26",
-                "n27",
-                "n28",
-                "n29",
-                "n30",
-                "n31"
+                "n22"
               ],
               "live_out_nodes": [
                 "n9",
@@ -4831,16 +3830,7 @@
                 "n19",
                 "n20",
                 "n21",
-                "n22",
-                "n23",
-                "n24",
-                "n25",
-                "n26",
-                "n27",
-                "n28",
-                "n29",
-                "n30",
-                "n31"
+                "n22"
               ],
               "last_use_nodes": [
                 "n15"
@@ -4848,9 +3838,7 @@
               "lifetime_class": "local_non_escape_candidate"
             },
             "env": {
-              "def_nodes": [
-                "n26"
-              ],
+              "def_nodes": [],
               "use_nodes": [
                 "n11",
                 "n9"
@@ -4868,10 +3856,7 @@
                 "n19",
                 "n20",
                 "n21",
-                "n22",
-                "n23",
-                "n24",
-                "n25"
+                "n22"
               ],
               "live_out_nodes": [
                 "n9",
@@ -4886,73 +3871,10 @@
                 "n19",
                 "n20",
                 "n21",
-                "n22",
-                "n23",
-                "n24",
-                "n25",
-                "n26"
+                "n22"
               ],
               "last_use_nodes": [],
               "lifetime_class": "escape_or_unknown"
-            },
-            "import": {
-              "def_nodes": [],
-              "use_nodes": [
-                "n22"
-              ],
-              "live_in_nodes": [
-                "n22",
-                "n23",
-                "n24",
-                "n25",
-                "n26",
-                "n27",
-                "n28",
-                "n29",
-                "n30",
-                "n31"
-              ],
-              "live_out_nodes": [
-                "n23",
-                "n24",
-                "n25",
-                "n26",
-                "n27",
-                "n28",
-                "n29",
-                "n30",
-                "n31"
-              ],
-              "last_use_nodes": [
-                "n22"
-              ],
-              "lifetime_class": "local_non_escape_candidate"
-            },
-            "inherit": {
-              "def_nodes": [],
-              "use_nodes": [
-                "n26",
-                "n28"
-              ],
-              "live_in_nodes": [
-                "n26",
-                "n27",
-                "n28",
-                "n29",
-                "n30",
-                "n31"
-              ],
-              "live_out_nodes": [
-                "n27",
-                "n28",
-                "n29",
-                "n30",
-                "n31"
-              ],
-              "last_use_nodes": [
-                "n26"
-              ],
-              "lifetime_class": "local_non_escape_candidate"
             },
             "k": {
               "def_nodes": [
@@ -5019,16 +3941,7 @@
                 "n19",
                 "n20",
                 "n21",
-                "n22",
-                "n23",
-                "n24",
-                "n25",
-                "n26",
-                "n27",
-                "n28",
-                "n29",
-                "n30",
-                "n31"
+                "n22"
               ],
               "live_out_nodes": [
                 "n16",
@@ -5037,16 +3950,7 @@
                 "n19",
                 "n20",
                 "n21",
-                "n22",
-                "n23",
-                "n24",
-                "n25",
-                "n26",
-                "n27",
-                "n28",
-                "n29",
-                "n30",
-                "n31"
+                "n22"
               ],
               "last_use_nodes": [
                 "n9"
@@ -5250,6 +4154,21 @@
           "runtime_semantic_tag": "stdlib.fn.extern"
         },
         {
+          "module_id": "os",
+          "export_name": "",
+          "local_name": "_os",
+          "binding_kind": "module",
+          "source_file": "src/pytra/std/subprocess.py",
+          "source_line": 34,
+          "source_module_id": "os",
+          "source_export_name": "",
+          "source_binding_kind": "module",
+          "runtime_module_id": "pytra.std.os",
+          "runtime_group": "std",
+          "resolved_binding_kind": "module",
+          "host_only": true
+        },
+        {
           "module_id": "pytra.core.py_runtime",
           "export_name": "",
           "local_name": "pytra.core.py_runtime",
@@ -5289,6 +4208,15 @@
         "source_line": 9
       },
       {
+        "module_id": "os",
+        "export_name": "",
+        "local_name": "_os",
+        "binding_kind": "module",
+        "source_file": "src/pytra/std/subprocess.py",
+        "source_line": 34,
+        "host_only": true
+      },
+      {
         "module_id": "pytra.core.py_runtime",
         "export_name": "",
         "local_name": "pytra.core.py_runtime",
@@ -5305,7 +4233,8 @@
       }
     ],
     "import_modules": {
-      "_subprocess": "subprocess"
+      "_subprocess": "subprocess",
+      "_os": "os"
     },
     "import_symbols": {
       "extern": {

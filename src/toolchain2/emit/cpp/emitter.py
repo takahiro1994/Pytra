@@ -324,9 +324,21 @@ def _emit_builtin_call(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
 
 
 def _emit_attribute(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
-    owner = _emit_expr(ctx, node.get("value"))
+    owner_node = node.get("value")
+    owner = _emit_expr(ctx, owner_node)
     attr = _str(node, "attr")
-    owner_id = _str(node.get("value", {}), "id") if isinstance(node.get("value"), dict) else ""
+    owner_id = _str(owner_node, "id") if isinstance(owner_node, dict) else ""
+    runtime_module_id = _str(node, "runtime_module_id")
+    runtime_symbol = _str(node, "runtime_symbol")
+    runtime_symbol_dispatch = _str(node, "runtime_symbol_dispatch")
+    if (
+        runtime_module_id != ""
+        and should_skip_module(runtime_module_id, ctx.mapping)
+        and runtime_symbol_dispatch == "value"
+    ):
+        if runtime_symbol == "":
+            runtime_symbol = attr
+        return ctx.mapping.builtin_prefix + runtime_symbol
     if owner_id == "math":
         if attr == "pi": return "M_PI"
         if attr == "e": return "M_E"
@@ -503,17 +515,17 @@ def _emit_assign(ctx: CppEmitContext, node: dict[str, JsonVal]) -> None:
     if tk == "Name" or tk == "NameTarget":
         name = _str(t, "id")
         if name == "": name = _str(t, "repr")
-        if name in ctx.var_types:
+        declare = _bool(node, "declare")
+        if name in ctx.var_types or not declare:
             _emit(ctx, name + " = " + val_code + ";")
         else:
             dt = _str(node, "decl_type")
-            if dt == "" or dt == "unknown":
-                dt = _str(t, "resolved_type")
-            if (dt == "" or dt == "unknown") and isinstance(value, dict):
-                dt = _str(value, "resolved_type")
             ctx.var_types[name] = dt
-            ct = cpp_type(dt)
-            _emit(ctx, ct + " " + name + " = " + val_code + ";")
+            if dt == "" or dt == "unknown":
+                _emit(ctx, "auto " + name + " = " + val_code + ";")
+            else:
+                ct = cpp_type(dt)
+                _emit(ctx, ct + " " + name + " = " + val_code + ";")
         if _bool(node, "unused") and _bool(node, "declare"):
             _emit(ctx, "(void)" + name + ";")
     elif tk == "Attribute":
@@ -582,6 +594,7 @@ def _emit_for_core(ctx: CppEmitContext, node: dict[str, JsonVal]) -> None:
                 start = _emit_expr(ctx, iter_plan.get("start")) if iter_plan.get("start") else "0"
                 stop = _emit_expr(ctx, iter_plan.get("stop")) if iter_plan.get("stop") else "0"
                 step = "1"
+                target_type = _str(target_plan, "target_type") if isinstance(target_plan, dict) else ""
                 step_node = iter_plan.get("step")
                 neg = False
                 if isinstance(step_node, dict) and _str(step_node, "kind") == "Constant":
@@ -589,11 +602,12 @@ def _emit_for_core(ctx: CppEmitContext, node: dict[str, JsonVal]) -> None:
                     if isinstance(sv, int): step = str(sv); neg = sv < 0
                 elif step_node is not None: step = _emit_expr(ctx, step_node)
                 cmp = " > " if neg else " < "
-                assign = " = " if t_name in ctx.var_types else " = "
-                decl = "" if t_name in ctx.var_types else "int64_t "
+                decl = ""
+                if t_name not in ctx.var_types:
+                    decl = (cpp_type(target_type) if target_type not in ("", "unknown") else "auto") + " "
                 _emit(ctx, "for (" + decl + t_name + " = " + start + "; " + t_name + cmp + stop + "; " + t_name + " += " + step + ") {")
                 ctx.indent_level += 1
-                ctx.var_types[t_name] = "int64"
+                ctx.var_types[t_name] = target_type
                 _emit_body(ctx, body)
                 ctx.indent_level -= 1
                 _emit(ctx, "}")

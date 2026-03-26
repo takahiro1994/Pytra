@@ -726,8 +726,8 @@ class Toolchain2LinkerSpecConform2Tests(unittest.TestCase):
         self.assertIn("func (self *Path) joinpath(", go_code)
         self.assertIn("join(", go_code)
         self.assertIn("dirname(", go_code)
-        self.assertIn("py_open(self._value, \"r\")", go_code)
-        self.assertIn("py_open(self._value, \"w\")", go_code)
+        self.assertIn("os.ReadFile(self._value)", go_code)
+        self.assertIn("os.WriteFile(self._value, []byte(text), 0644)", go_code)
         self.assertNotIn("// with f {", go_code)
         self.assertNotIn("py_Path(", go_code)
         self.assertNotIn("py_pathlib_write_text", go_code)
@@ -774,6 +774,49 @@ class Toolchain2LinkerSpecConform2Tests(unittest.TestCase):
 
         self.assertIn("return py_argv", go_code)
         self.assertNotIn("return py_argv()", go_code)
+
+    def test_cpp_emitter_reads_runtime_module_value_symbols_without_call(self) -> None:
+        doc = _module_doc(
+            "app.main",
+            body=[
+                {
+                    "kind": "FunctionDef",
+                    "name": "run",
+                    "arg_types": {},
+                    "arg_order": [],
+                    "arg_defaults": {},
+                    "arg_index": {},
+                    "return_type": "list[str]",
+                    "arg_usage": {},
+                    "renamed_symbols": {},
+                    "docstring": None,
+                    "body": [
+                        {
+                            "kind": "Return",
+                            "value": {
+                                "kind": "Attribute",
+                                "resolved_type": "list[str]",
+                                "value": {
+                                    "kind": "Name",
+                                    "id": "sys",
+                                    "resolved_type": "module",
+                                    "runtime_module_id": "pytra.std.sys",
+                                },
+                                "attr": "argv",
+                                "runtime_module_id": "pytra.std.sys",
+                                "runtime_symbol": "argv",
+                                "runtime_symbol_dispatch": "value",
+                            },
+                        }
+                    ],
+                }
+            ],
+        )
+
+        cpp_code = emit_cpp_module(doc)
+
+        self.assertIn("return py_argv;", cpp_code)
+        self.assertNotIn("return py_argv();", cpp_code)
 
     def test_go_emitter_uses_list_index_helper_for_list_receivers(self) -> None:
         doc = _module_doc(
@@ -840,7 +883,6 @@ class Toolchain2LinkerSpecConform2Tests(unittest.TestCase):
         modules = {module.module_id: module for module in result.linked_modules}
 
         self.assertIn("pytra.std.argparse", modules)
-        self.assertIn("pytra.built_in.string_ops", modules)
 
         runtime_go = emit_go_module(modules["pytra.std.argparse"].east_doc)
         entry_go = emit_go_module(next(module.east_doc for module in result.linked_modules if module.is_entry))
@@ -866,6 +908,11 @@ class Toolchain2LinkerSpecConform2Tests(unittest.TestCase):
         self.assertNotIn("[]*JsonVal", runtime_go)
         self.assertIn("map[string]interface{}", runtime_go)
         self.assertIn("[]interface{}", runtime_go)
+        self.assertNotIn("py_str(k).(string)", runtime_go)
+        self.assertNotIn("py_str(py_to_int64(v)).(string)", runtime_go)
+        self.assertNotIn("py_str(py_to_float64(v)).(string)", runtime_go)
+        self.assertNotIn("item_sep.(string)", runtime_go)
+        self.assertNotIn("key_sep.(string)", runtime_go)
 
     def test_go_emitter_keeps_comprehensions_as_iife_instead_of_placeholder(self) -> None:
         doc = _fixture_doc("test/fixture/east3-opt/collections/comprehension_dict_set.east3")
@@ -1027,6 +1074,49 @@ class Toolchain2LinkerSpecConform2Tests(unittest.TestCase):
 
         self.assertIn("for i := int32(0); i < int32(3); i += int32(1) {", go_code)
 
+    def test_cpp_emitter_uses_range_target_type_from_east3(self) -> None:
+        doc = _module_doc(
+            "app.main",
+            body=[
+                {
+                    "kind": "FunctionDef",
+                    "name": "run",
+                    "arg_types": {},
+                    "arg_order": [],
+                    "arg_defaults": {},
+                    "arg_index": {},
+                    "return_type": "None",
+                    "arg_usage": {},
+                    "renamed_symbols": {},
+                    "docstring": None,
+                    "body": [
+                        {
+                            "kind": "ForCore",
+                            "iter_mode": "static_fastpath",
+                            "iter_plan": {
+                                "kind": "StaticRangeForPlan",
+                                "start": {"kind": "Constant", "value": 0, "resolved_type": "int64"},
+                                "stop": {"kind": "Constant", "value": 3, "resolved_type": "int64"},
+                                "step": {"kind": "Constant", "value": 1, "resolved_type": "int64"},
+                            },
+                            "target_plan": {
+                                "kind": "NameTarget",
+                                "id": "i",
+                                "target_type": "int32",
+                            },
+                            "body": [],
+                            "orelse": [],
+                        }
+                    ],
+                }
+            ],
+        )
+
+        cpp_code = emit_cpp_module(doc)
+
+        self.assertIn("for (int32_t i = 0; i < 3; i += 1) {", cpp_code)
+        self.assertNotIn("for (int64_t i = 0; i < 3; i += 1) {", cpp_code)
+
     def test_go_emitter_does_not_invent_local_call_casts(self) -> None:
         doc = _module_doc(
             "app.main",
@@ -1171,6 +1261,79 @@ class Toolchain2LinkerSpecConform2Tests(unittest.TestCase):
 
         self.assertIn("n := 3", go_code)
         self.assertNotIn("var n int64 = 3", go_code)
+
+    def test_cpp_emitter_does_not_infer_assignment_decl_type_from_value(self) -> None:
+        doc = _module_doc(
+            "app.main",
+            body=[
+                {
+                    "kind": "FunctionDef",
+                    "name": "run",
+                    "arg_types": {},
+                    "arg_order": [],
+                    "arg_defaults": {},
+                    "arg_index": {},
+                    "return_type": "None",
+                    "arg_usage": {},
+                    "renamed_symbols": {},
+                    "docstring": None,
+                    "body": [
+                        {
+                            "kind": "Assign",
+                            "target": {"kind": "Name", "id": "n", "resolved_type": "unknown"},
+                            "value": {"kind": "Constant", "value": 3, "resolved_type": "int64"},
+                            "declare": True,
+                        }
+                    ],
+                }
+            ],
+        )
+
+        cpp_code = emit_cpp_module(doc)
+
+        self.assertIn("auto n = 3;", cpp_code)
+        self.assertNotIn("int64_t n = 3;", cpp_code)
+
+    def test_go_emitter_does_not_short_circuit_name_unbox_from_decl_type(self) -> None:
+        doc = _module_doc(
+            "app.main",
+            body=[
+                {
+                    "kind": "FunctionDef",
+                    "name": "run",
+                    "arg_types": {},
+                    "arg_order": [],
+                    "arg_defaults": {},
+                    "arg_index": {},
+                    "return_type": "str",
+                    "arg_usage": {},
+                    "renamed_symbols": {},
+                    "docstring": None,
+                    "body": [
+                        {
+                            "kind": "AnnAssign",
+                            "target": {"kind": "Name", "id": "text", "resolved_type": "str"},
+                            "decl_type": "str",
+                            "resolved_type": "str",
+                            "value": {"kind": "Constant", "value": "x", "resolved_type": "str"},
+                        },
+                        {
+                            "kind": "Return",
+                            "value": {
+                                "kind": "Unbox",
+                                "target": "str",
+                                "value": {"kind": "Name", "id": "text", "resolved_type": "unknown"},
+                            },
+                        },
+                    ],
+                }
+            ],
+        )
+
+        go_code = emit_go_module(doc)
+
+        self.assertIn("return text.(string)", go_code)
+        self.assertNotIn("\n\treturn text\n", go_code)
 
     def test_go_emitter_does_not_invent_dict_get_default_casts(self) -> None:
         doc = _module_doc(

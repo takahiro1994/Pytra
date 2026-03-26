@@ -8,7 +8,7 @@
         "lineno": 1,
         "col_offset": 0,
         "end_lineno": 1,
-        "end_col_offset": 62
+        "end_col_offset": 248
       },
       "value": {
         "kind": "Constant",
@@ -16,36 +16,13 @@
           "lineno": 1,
           "col_offset": 0,
           "end_lineno": 1,
-          "end_col_offset": 62
+          "end_col_offset": 248
         },
         "resolved_type": "str",
         "casts": [],
         "borrow_kind": "value",
-        "repr": "\"\"\"Pytra collections module — list-based deque implementation.",
-        "value": "Pytra collections module — list-based deque implementati"
-      }
-    },
-    {
-      "kind": "Expr",
-      "source_span": {
-        "lineno": 6,
-        "col_offset": 0,
-        "end_lineno": 6,
-        "end_col_offset": 3
-      },
-      "value": {
-        "kind": "Constant",
-        "source_span": {
-          "lineno": 6,
-          "col_offset": 0,
-          "end_lineno": 6,
-          "end_col_offset": 3
-        },
-        "resolved_type": "str",
-        "casts": [],
-        "borrow_kind": "value",
-        "repr": "\"\"\"",
-        "value": ""
+        "repr": "\"\"\"Pytra collections module — list-based deque implementation.\\n\\nProvides a deque compatible with all transpilation targets.\\nBackends with native deque (C++ std::deque, Rust VecDeque, etc.)\\ncan override this with emitter-level optimization.\\n\"\"\"",
+        "value": "Pytra collections module — list-based deque implementation.\n\nProvides a deque compatible with all transpilation targets.\nBackends with native deque (C++ std::deque, Rust VecDeque, etc.)\ncan override this with emitter-level optimization.\n"
       }
     },
     {
@@ -3040,6 +3017,26 @@
       "class_storage_hint": "ref",
       "leading_comments": [],
       "leading_trivia": [
+        {
+          "kind": "blank",
+          "count": 1
+        },
+        {
+          "kind": "blank",
+          "count": 1
+        },
+        {
+          "kind": "blank",
+          "count": 1
+        },
+        {
+          "kind": "blank",
+          "count": 1
+        },
+        {
+          "kind": "blank",
+          "count": 1
+        },
         {
           "kind": "blank",
           "count": 1

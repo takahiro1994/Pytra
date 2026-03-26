@@ -14,7 +14,7 @@
         "lineno": 1,
         "col": 0,
         "end_lineno": 1,
-        "end_col": 64
+        "end_col": 204
       },
       "value": {
         "kind": "Constant",
@@ -22,34 +22,12 @@
           "lineno": 1,
           "col": 0,
           "end_lineno": 1,
-          "end_col": 64
+          "end_col": 204
         },
         "casts": [],
         "borrow_kind": "value",
-        "repr": "\"\"\"Pytra typing module — re-exports from Python standard typing.",
-        "value": "Pytra typing module — re-exports from Python standard typi"
-      }
-    },
-    {
-      "kind": "Expr",
-      "source_span": {
-        "lineno": 5,
-        "col": 0,
-        "end_lineno": 5,
-        "end_col": 3
-      },
-      "value": {
-        "kind": "Constant",
-        "source_span": {
-          "lineno": 5,
-          "col": 0,
-          "end_lineno": 5,
-          "end_col": 3
-        },
-        "casts": [],
-        "borrow_kind": "value",
-        "repr": "\"\"\"",
-        "value": ""
+        "repr": "\"\"\"Pytra typing module — re-exports from Python standard typing.\\n\\nPython runtime: standard typing functions are available.\\nTranspiler: recognizes these type names natively for annotation purposes.\\n\"\"\"",
+        "value": "Pytra typing module — re-exports from Python standard typing.\n\nPython runtime: standard typing functions are available.\nTranspiler: recognizes these type names natively for annotation purposes.\n"
       }
     }
   ],

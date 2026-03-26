@@ -8,7 +8,7 @@
         "lineno": 1,
         "col_offset": 0,
         "end_lineno": 1,
-        "end_col_offset": 64
+        "end_col_offset": 204
       },
       "value": {
         "kind": "Constant",
@@ -16,36 +16,13 @@
           "lineno": 1,
           "col_offset": 0,
           "end_lineno": 1,
-          "end_col_offset": 64
+          "end_col_offset": 204
         },
         "resolved_type": "str",
         "casts": [],
         "borrow_kind": "value",
-        "repr": "\"\"\"Pytra typing module — re-exports from Python standard typing.",
-        "value": "Pytra typing module — re-exports from Python standard typi"
-      }
-    },
-    {
-      "kind": "Expr",
-      "source_span": {
-        "lineno": 5,
-        "col_offset": 0,
-        "end_lineno": 5,
-        "end_col_offset": 3
-      },
-      "value": {
-        "kind": "Constant",
-        "source_span": {
-          "lineno": 5,
-          "col_offset": 0,
-          "end_lineno": 5,
-          "end_col_offset": 3
-        },
-        "resolved_type": "str",
-        "casts": [],
-        "borrow_kind": "value",
-        "repr": "\"\"\"",
-        "value": ""
+        "repr": "\"\"\"Pytra typing module — re-exports from Python standard typing.\\n\\nPython runtime: standard typing functions are available.\\nTranspiler: recognizes these type names natively for annotation purposes.\\n\"\"\"",
+        "value": "Pytra typing module — re-exports from Python standard typing.\n\nPython runtime: standard typing functions are available.\nTranspiler: recognizes these type names natively for annotation purposes.\n"
       }
     }
   ],

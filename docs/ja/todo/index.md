@@ -38,7 +38,7 @@
 
 **フェーズ2: emit（workaround を剥がす）**
 
-7. [ ] [ID: P1-SPEC-CONFORM2-S7] `emit/go/emitter.py`: 型推論・型変更・cast 追加・ハードコードモジュール判定を除去
+7. [x] [ID: P1-SPEC-CONFORM2-S7] `emit/go/emitter.py`: 型推論・型変更・cast 追加・ハードコードモジュール判定を除去 — `_emit_unbox()` の `Name` fallback を削除し、runtime lane を toolchain2 生成へ同期して `json_extended` Go parity を維持
 8. [ ] [ID: P1-SPEC-CONFORM2-S8] `emit/cpp/emitter.py`: 同上
 9. [ ] [ID: P1-SPEC-CONFORM2-S9] `emit/common/code_emitter.py`: mapping.json のみで分岐するように整理
 

@@ -14,7 +14,7 @@
         "lineno": 1,
         "col": 0,
         "end_lineno": 1,
-        "end_col": 55
+        "end_col": 193
       },
       "value": {
         "kind": "Constant",
@@ -22,36 +22,13 @@
           "lineno": 1,
           "col": 0,
           "end_lineno": 1,
-          "end_col": 55
+          "end_col": 193
         },
         "resolved_type": "str",
         "casts": [],
         "borrow_kind": "value",
-        "repr": "\"\"\"Pytra scalar type aliases for Pylance compatibility.",
-        "value": "Pytra scalar type aliases for Pylance compatibili"
-      }
-    },
-    {
-      "kind": "Expr",
-      "source_span": {
-        "lineno": 5,
-        "col": 0,
-        "end_lineno": 5,
-        "end_col": 3
-      },
-      "value": {
-        "kind": "Constant",
-        "source_span": {
-          "lineno": 5,
-          "col": 0,
-          "end_lineno": 5,
-          "end_col": 3
-        },
-        "resolved_type": "str",
-        "casts": [],
-        "borrow_kind": "value",
-        "repr": "\"\"\"",
-        "value": ""
+        "repr": "\"\"\"Pytra scalar type aliases for Pylance compatibility.\\n\\nPython runtime: these are simply aliases to int/float.\\nTranspiler: recognizes these type names natively and ignores this import.\\n\"\"\"",
+        "value": "Pytra scalar type aliases for Pylance compatibility.\n\nPython runtime: these are simply aliases to int/float.\nTranspiler: recognizes these type names natively and ignores this import.\n"
       }
     },
     {
@@ -95,6 +72,22 @@
       "decl_type": "type",
       "declare_init": true,
       "leading_trivia": [
+        {
+          "kind": "blank",
+          "count": 1
+        },
+        {
+          "kind": "blank",
+          "count": 1
+        },
+        {
+          "kind": "blank",
+          "count": 1
+        },
+        {
+          "kind": "blank",
+          "count": 1
+        },
         {
           "kind": "blank",
           "count": 1

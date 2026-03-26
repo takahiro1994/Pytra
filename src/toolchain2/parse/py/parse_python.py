@@ -89,8 +89,14 @@ def _join_continuation_lines(source: str) -> str:
                 i += 1
                 if tq in nxt:
                     break
-            joined_tq: str = "\n".join(parts)
+            escaped_parts: list[str] = []
+            for part in parts:
+                escaped_parts.append(part.replace("\\", "\\\\"))
+            joined_tq: str = "\\n".join(escaped_parts)
             result.append(joined_tq)
+            skipped_tq: int = len(parts) - 1
+            for _ in range(skipped_tq):
+                result.append("")
             continue
 
         depth: int = _bracket_depth_str_aware(line)

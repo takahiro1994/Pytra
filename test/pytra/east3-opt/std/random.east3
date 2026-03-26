@@ -8,7 +8,7 @@
         "lineno": 1,
         "col_offset": 0,
         "end_lineno": 1,
-        "end_col_offset": 58
+        "end_col_offset": 189
       },
       "value": {
         "kind": "Constant",
@@ -16,36 +16,13 @@
           "lineno": 1,
           "col_offset": 0,
           "end_lineno": 1,
-          "end_col_offset": 58
+          "end_col_offset": 189
         },
         "resolved_type": "str",
         "casts": [],
         "borrow_kind": "value",
-        "repr": "\"\"\"pytra.std.random: minimal deterministic random helpers.",
-        "value": "pytra.std.random: minimal deterministic random helpe"
-      }
-    },
-    {
-      "kind": "Expr",
-      "source_span": {
-        "lineno": 5,
-        "col_offset": 0,
-        "end_lineno": 5,
-        "end_col_offset": 3
-      },
-      "value": {
-        "kind": "Constant",
-        "source_span": {
-          "lineno": 5,
-          "col_offset": 0,
-          "end_lineno": 5,
-          "end_col_offset": 3
-        },
-        "resolved_type": "str",
-        "casts": [],
-        "borrow_kind": "value",
-        "repr": "\"\"\"",
-        "value": ""
+        "repr": "\"\"\"pytra.std.random: minimal deterministic random helpers.\\n\\nThis module is intentionally self-contained and avoids Python stdlib imports,\\nso it can be transpiled to target runtimes.\\n\"\"\"",
+        "value": "pytra.std.random: minimal deterministic random helpers.\n\nThis module is intentionally self-contained and avoids Python stdlib imports,\nso it can be transpiled to target runtimes.\n"
       }
     },
     {
@@ -119,6 +96,22 @@
         ]
       },
       "leading_trivia": [
+        {
+          "kind": "blank",
+          "count": 1
+        },
+        {
+          "kind": "blank",
+          "count": 1
+        },
+        {
+          "kind": "blank",
+          "count": 1
+        },
+        {
+          "kind": "blank",
+          "count": 1
+        },
         {
           "kind": "blank",
           "count": 1
@@ -3361,435 +3354,8 @@
         "k": "readonly"
       },
       "renamed_symbols": {},
-      "docstring": null,
+      "docstring": "Return k sampled elements with replacement.\n\n    Supported call forms:\n    - choices(population, weights)\n    - choices(population, weights, k)\n    ",
       "body": [
-        {
-          "kind": "Expr",
-          "source_span": {
-            "lineno": 48,
-            "col_offset": 4,
-            "end_lineno": 48,
-            "end_col_offset": 50
-          },
-          "value": {
-            "kind": "Constant",
-            "source_span": {
-              "lineno": 48,
-              "col_offset": 4,
-              "end_lineno": 48,
-              "end_col_offset": 50
-            },
-            "resolved_type": "str",
-            "casts": [],
-            "borrow_kind": "value",
-            "repr": "\"\"\"Return k sampled elements with replacement.",
-            "value": "Return k sampled elements with replaceme"
-          },
-          "meta": {
-            "lifetime_node_id": "n37",
-            "lifetime_defs": [],
-            "lifetime_uses": [],
-            "lifetime_live_in": [
-              "Supported",
-              "break",
-              "choices",
-              "k",
-              "len",
-              "population",
-              "randint",
-              "random",
-              "weights"
-            ],
-            "lifetime_live_out": [
-              "Supported",
-              "break",
-              "choices",
-              "k",
-              "len",
-              "population",
-              "randint",
-              "random",
-              "weights"
-            ],
-            "lifetime_last_use_vars": []
-          }
-        },
-        {
-          "kind": "Expr",
-          "source_span": {
-            "lineno": 50,
-            "col_offset": 4,
-            "end_lineno": 50,
-            "end_col_offset": 25
-          },
-          "value": {
-            "kind": "Name",
-            "source_span": {
-              "lineno": 50,
-              "col_offset": 4,
-              "end_lineno": 50,
-              "end_col_offset": 13
-            },
-            "resolved_type": "unknown",
-            "casts": [],
-            "borrow_kind": "value",
-            "repr": "Supported",
-            "id": "Supported"
-          },
-          "leading_trivia": [
-            {
-              "kind": "blank",
-              "count": 1
-            }
-          ],
-          "meta": {
-            "lifetime_node_id": "n36",
-            "lifetime_defs": [],
-            "lifetime_uses": [
-              "Supported"
-            ],
-            "lifetime_live_in": [
-              "Supported",
-              "break",
-              "choices",
-              "k",
-              "len",
-              "population",
-              "randint",
-              "random",
-              "weights"
-            ],
-            "lifetime_live_out": [
-              "break",
-              "choices",
-              "k",
-              "len",
-              "population",
-              "randint",
-              "random",
-              "weights"
-            ],
-            "lifetime_last_use_vars": [
-              "Supported"
-            ]
-          }
-        },
-        {
-          "kind": "Expr",
-          "source_span": {
-            "lineno": 51,
-            "col_offset": 4,
-            "end_lineno": 51,
-            "end_col_offset": 34
-          },
-          "value": {
-            "kind": "UnaryOp",
-            "source_span": {
-              "lineno": 51,
-              "col_offset": 4,
-              "end_lineno": 51,
-              "end_col_offset": 34
-            },
-            "resolved_type": "list[int64]",
-            "casts": [],
-            "borrow_kind": "value",
-            "repr": "- choices(population, weights)",
-            "op": "USub",
-            "operand": {
-              "kind": "Call",
-              "source_span": {
-                "lineno": 51,
-                "col_offset": 6,
-                "end_lineno": 51,
-                "end_col_offset": 34
-              },
-              "resolved_type": "list[int64]",
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "choices(population, weights)",
-              "func": {
-                "kind": "Name",
-                "source_span": {
-                  "lineno": 51,
-                  "col_offset": 6,
-                  "end_lineno": 51,
-                  "end_col_offset": 13
-                },
-                "resolved_type": "callable",
-                "casts": [],
-                "borrow_kind": "value",
-                "repr": "choices",
-                "id": "choices"
-              },
-              "args": [
-                {
-                  "kind": "Name",
-                  "source_span": {
-                    "lineno": 51,
-                    "col_offset": 14,
-                    "end_lineno": 51,
-                    "end_col_offset": 24
-                  },
-                  "resolved_type": "list[int64]",
-                  "casts": [],
-                  "borrow_kind": "readonly_ref",
-                  "repr": "population",
-                  "id": "population",
-                  "call_arg_type": "list[int64]"
-                },
-                {
-                  "kind": "Name",
-                  "source_span": {
-                    "lineno": 51,
-                    "col_offset": 26,
-                    "end_lineno": 51,
-                    "end_col_offset": 33
-                  },
-                  "resolved_type": "list[float64]",
-                  "casts": [],
-                  "borrow_kind": "readonly_ref",
-                  "repr": "weights",
-                  "id": "weights",
-                  "call_arg_type": "list[float64]"
-                },
-                {
-                  "kind": "Constant",
-                  "source_span": {
-                    "lineno": 47,
-                    "col_offset": 66,
-                    "end_lineno": 47,
-                    "end_col_offset": 67
-                  },
-                  "resolved_type": "int64",
-                  "casts": [],
-                  "borrow_kind": "value",
-                  "repr": "1",
-                  "value": 1
-                }
-              ],
-              "keywords": [],
-              "type_expr_summary_v1": {
-                "schema_version": 1,
-                "kind": "GenericType",
-                "category": "static",
-                "mirror": "list[int64]"
-              }
-            }
-          },
-          "meta": {
-            "lifetime_node_id": "n35",
-            "lifetime_defs": [],
-            "lifetime_uses": [
-              "choices",
-              "population",
-              "weights"
-            ],
-            "lifetime_live_in": [
-              "break",
-              "choices",
-              "k",
-              "len",
-              "population",
-              "randint",
-              "random",
-              "weights"
-            ],
-            "lifetime_live_out": [
-              "break",
-              "choices",
-              "k",
-              "len",
-              "population",
-              "randint",
-              "random",
-              "weights"
-            ],
-            "lifetime_last_use_vars": []
-          }
-        },
-        {
-          "kind": "Expr",
-          "source_span": {
-            "lineno": 52,
-            "col_offset": 4,
-            "end_lineno": 52,
-            "end_col_offset": 37
-          },
-          "value": {
-            "kind": "UnaryOp",
-            "source_span": {
-              "lineno": 52,
-              "col_offset": 4,
-              "end_lineno": 52,
-              "end_col_offset": 37
-            },
-            "resolved_type": "list[int64]",
-            "casts": [],
-            "borrow_kind": "value",
-            "repr": "- choices(population, weights, k)",
-            "op": "USub",
-            "operand": {
-              "kind": "Call",
-              "source_span": {
-                "lineno": 52,
-                "col_offset": 6,
-                "end_lineno": 52,
-                "end_col_offset": 37
-              },
-              "resolved_type": "list[int64]",
-              "casts": [],
-              "borrow_kind": "value",
-              "repr": "choices(population, weights, k)",
-              "func": {
-                "kind": "Name",
-                "source_span": {
-                  "lineno": 52,
-                  "col_offset": 6,
-                  "end_lineno": 52,
-                  "end_col_offset": 13
-                },
-                "resolved_type": "callable",
-                "casts": [],
-                "borrow_kind": "value",
-                "repr": "choices",
-                "id": "choices"
-              },
-              "args": [
-                {
-                  "kind": "Name",
-                  "source_span": {
-                    "lineno": 52,
-                    "col_offset": 14,
-                    "end_lineno": 52,
-                    "end_col_offset": 24
-                  },
-                  "resolved_type": "list[int64]",
-                  "casts": [],
-                  "borrow_kind": "readonly_ref",
-                  "repr": "population",
-                  "id": "population",
-                  "call_arg_type": "list[int64]"
-                },
-                {
-                  "kind": "Name",
-                  "source_span": {
-                    "lineno": 52,
-                    "col_offset": 26,
-                    "end_lineno": 52,
-                    "end_col_offset": 33
-                  },
-                  "resolved_type": "list[float64]",
-                  "casts": [],
-                  "borrow_kind": "readonly_ref",
-                  "repr": "weights",
-                  "id": "weights",
-                  "call_arg_type": "list[float64]"
-                },
-                {
-                  "kind": "Name",
-                  "source_span": {
-                    "lineno": 52,
-                    "col_offset": 35,
-                    "end_lineno": 52,
-                    "end_col_offset": 36
-                  },
-                  "resolved_type": "int64",
-                  "casts": [],
-                  "borrow_kind": "readonly_ref",
-                  "repr": "k",
-                  "id": "k",
-                  "call_arg_type": "int64"
-                }
-              ],
-              "keywords": [],
-              "type_expr_summary_v1": {
-                "schema_version": 1,
-                "kind": "GenericType",
-                "category": "static",
-                "mirror": "list[int64]"
-              }
-            }
-          },
-          "meta": {
-            "lifetime_node_id": "n34",
-            "lifetime_defs": [],
-            "lifetime_uses": [
-              "choices",
-              "k",
-              "population",
-              "weights"
-            ],
-            "lifetime_live_in": [
-              "break",
-              "choices",
-              "k",
-              "len",
-              "population",
-              "randint",
-              "random",
-              "weights"
-            ],
-            "lifetime_live_out": [
-              "break",
-              "k",
-              "len",
-              "population",
-              "randint",
-              "random",
-              "weights"
-            ],
-            "lifetime_last_use_vars": [
-              "choices"
-            ]
-          }
-        },
-        {
-          "kind": "Expr",
-          "source_span": {
-            "lineno": 53,
-            "col_offset": 4,
-            "end_lineno": 53,
-            "end_col_offset": 7
-          },
-          "value": {
-            "kind": "Constant",
-            "source_span": {
-              "lineno": 53,
-              "col_offset": 4,
-              "end_lineno": 53,
-              "end_col_offset": 7
-            },
-            "resolved_type": "str",
-            "casts": [],
-            "borrow_kind": "value",
-            "repr": "\"\"\"",
-            "value": ""
-          },
-          "meta": {
-            "lifetime_node_id": "n33",
-            "lifetime_defs": [],
-            "lifetime_uses": [],
-            "lifetime_live_in": [
-              "break",
-              "k",
-              "len",
-              "population",
-              "randint",
-              "random",
-              "weights"
-            ],
-            "lifetime_live_out": [
-              "break",
-              "k",
-              "len",
-              "population",
-              "randint",
-              "random",
-              "weights"
-            ],
-            "lifetime_last_use_vars": []
-          }
-        },
         {
           "kind": "Assign",
           "source_span": {
@@ -3815,6 +3381,28 @@
           "declare": true,
           "decl_type": "int64",
           "declare_init": true,
+          "leading_trivia": [
+            {
+              "kind": "blank",
+              "count": 1
+            },
+            {
+              "kind": "blank",
+              "count": 1
+            },
+            {
+              "kind": "blank",
+              "count": 1
+            },
+            {
+              "kind": "blank",
+              "count": 1
+            },
+            {
+              "kind": "blank",
+              "count": 1
+            }
+          ],
           "value": {
             "kind": "Call",
             "source_span": {
@@ -7622,7 +7210,7 @@
           "schema_version": "east3_lifetime_v1",
           "status": "ok",
           "reason": "",
-          "entry_node": "n37",
+          "entry_node": "n32",
           "order": [
             "n0",
             "n1",
@@ -7656,12 +7244,7 @@
             "n29",
             "n30",
             "n31",
-            "n32",
-            "n33",
-            "n34",
-            "n35",
-            "n36",
-            "n37"
+            "n32"
           ],
           "cfg": [
             {
@@ -8068,62 +7651,6 @@
               "succ": [
                 "n30"
               ]
-            },
-            {
-              "id": "n33",
-              "kind": "Expr",
-              "defs": [],
-              "uses": [],
-              "succ": [
-                "n32"
-              ]
-            },
-            {
-              "id": "n34",
-              "kind": "Expr",
-              "defs": [],
-              "uses": [
-                "choices",
-                "k",
-                "population",
-                "weights"
-              ],
-              "succ": [
-                "n33"
-              ]
-            },
-            {
-              "id": "n35",
-              "kind": "Expr",
-              "defs": [],
-              "uses": [
-                "choices",
-                "population",
-                "weights"
-              ],
-              "succ": [
-                "n34"
-              ]
-            },
-            {
-              "id": "n36",
-              "kind": "Expr",
-              "defs": [],
-              "uses": [
-                "Supported"
-              ],
-              "succ": [
-                "n35"
-              ]
-            },
-            {
-              "id": "n37",
-              "kind": "Expr",
-              "defs": [],
-              "uses": [],
-              "succ": [
-                "n36"
-              ]
             }
           ],
           "def_use": {
@@ -8170,19 +7697,12 @@
               ]
             },
             "uses": {
-              "Supported": [
-                "n36"
-              ],
               "acc": [
                 "n13",
                 "n9"
               ],
               "break": [
                 "n10"
-              ],
-              "choices": [
-                "n34",
-                "n35"
               ],
               "draws": [
                 "n1",
@@ -8194,8 +7714,7 @@
                 "n14"
               ],
               "k": [
-                "n29",
-                "n34"
+                "n29"
               ],
               "len": [
                 "n3",
@@ -8220,8 +7739,6 @@
               "population": [
                 "n2",
                 "n32",
-                "n34",
-                "n35",
                 "n7"
               ],
               "r": [
@@ -8252,30 +7769,11 @@
                 "n3"
               ],
               "weights": [
-                "n23",
-                "n34",
-                "n35"
+                "n23"
               ]
             }
           },
           "variables": {
-            "Supported": {
-              "def_nodes": [],
-              "use_nodes": [
-                "n36"
-              ],
-              "live_in_nodes": [
-                "n36",
-                "n37"
-              ],
-              "live_out_nodes": [
-                "n37"
-              ],
-              "last_use_nodes": [
-                "n36"
-              ],
-              "lifetime_class": "local_non_escape_candidate"
-            },
             "_": {
               "def_nodes": [
                 "n1",
@@ -8353,12 +7851,7 @@
                 "n28",
                 "n29",
                 "n30",
-                "n32",
-                "n33",
-                "n34",
-                "n35",
-                "n36",
-                "n37"
+                "n32"
               ],
               "live_out_nodes": [
                 "n3",
@@ -8388,36 +7881,9 @@
                 "n28",
                 "n29",
                 "n30",
-                "n32",
-                "n33",
-                "n34",
-                "n35",
-                "n36",
-                "n37"
+                "n32"
               ],
               "last_use_nodes": [],
-              "lifetime_class": "local_non_escape_candidate"
-            },
-            "choices": {
-              "def_nodes": [],
-              "use_nodes": [
-                "n34",
-                "n35"
-              ],
-              "live_in_nodes": [
-                "n34",
-                "n35",
-                "n36",
-                "n37"
-              ],
-              "live_out_nodes": [
-                "n35",
-                "n36",
-                "n37"
-              ],
-              "last_use_nodes": [
-                "n34"
-              ],
               "lifetime_class": "local_non_escape_candidate"
             },
             "draws": {
@@ -8521,27 +7987,16 @@
             "k": {
               "def_nodes": [],
               "use_nodes": [
-                "n29",
-                "n34"
+                "n29"
               ],
               "live_in_nodes": [
                 "n29",
                 "n30",
-                "n32",
-                "n33",
-                "n34",
-                "n35",
-                "n36",
-                "n37"
+                "n32"
               ],
               "live_out_nodes": [
                 "n30",
-                "n32",
-                "n33",
-                "n34",
-                "n35",
-                "n36",
-                "n37"
+                "n32"
               ],
               "last_use_nodes": [
                 "n29"
@@ -8565,12 +8020,7 @@
                 "n28",
                 "n29",
                 "n30",
-                "n32",
-                "n33",
-                "n34",
-                "n35",
-                "n36",
-                "n37"
+                "n32"
               ],
               "live_out_nodes": [
                 "n22",
@@ -8582,12 +8032,7 @@
                 "n28",
                 "n29",
                 "n30",
-                "n32",
-                "n33",
-                "n34",
-                "n35",
-                "n36",
-                "n37"
+                "n32"
               ],
               "last_use_nodes": [
                 "n3"
@@ -8771,8 +8216,6 @@
               "use_nodes": [
                 "n2",
                 "n32",
-                "n34",
-                "n35",
                 "n7"
               ],
               "live_in_nodes": [
@@ -8805,12 +8248,7 @@
                 "n28",
                 "n29",
                 "n30",
-                "n32",
-                "n33",
-                "n34",
-                "n35",
-                "n36",
-                "n37"
+                "n32"
               ],
               "live_out_nodes": [
                 "n1",
@@ -8842,12 +8280,7 @@
                 "n28",
                 "n29",
                 "n30",
-                "n32",
-                "n33",
-                "n34",
-                "n35",
-                "n36",
-                "n37"
+                "n32"
               ],
               "last_use_nodes": [],
               "lifetime_class": "escape_or_unknown"
@@ -8908,12 +8341,7 @@
                 "n28",
                 "n29",
                 "n30",
-                "n32",
-                "n33",
-                "n34",
-                "n35",
-                "n36",
-                "n37"
+                "n32"
               ],
               "live_out_nodes": [
                 "n1",
@@ -8933,12 +8361,7 @@
                 "n28",
                 "n29",
                 "n30",
-                "n32",
-                "n33",
-                "n34",
-                "n35",
-                "n36",
-                "n37"
+                "n32"
               ],
               "last_use_nodes": [],
               "lifetime_class": "local_non_escape_candidate"
@@ -8976,12 +8399,7 @@
                 "n28",
                 "n29",
                 "n30",
-                "n32",
-                "n33",
-                "n34",
-                "n35",
-                "n36",
-                "n37"
+                "n32"
               ],
               "live_out_nodes": [
                 "n3",
@@ -9011,12 +8429,7 @@
                 "n28",
                 "n29",
                 "n30",
-                "n32",
-                "n33",
-                "n34",
-                "n35",
-                "n36",
-                "n37"
+                "n32"
               ],
               "last_use_nodes": [],
               "lifetime_class": "local_non_escape_candidate"
@@ -9170,9 +8583,7 @@
             "weights": {
               "def_nodes": [],
               "use_nodes": [
-                "n23",
-                "n34",
-                "n35"
+                "n23"
               ],
               "live_in_nodes": [
                 "n23",
@@ -9183,12 +8594,7 @@
                 "n28",
                 "n29",
                 "n30",
-                "n32",
-                "n33",
-                "n34",
-                "n35",
-                "n36",
-                "n37"
+                "n32"
               ],
               "live_out_nodes": [
                 "n23",
@@ -9199,12 +8605,7 @@
                 "n28",
                 "n29",
                 "n30",
-                "n32",
-                "n33",
-                "n34",
-                "n35",
-                "n36",
-                "n37"
+                "n32"
               ],
               "last_use_nodes": [],
               "lifetime_class": "escape_or_unknown"

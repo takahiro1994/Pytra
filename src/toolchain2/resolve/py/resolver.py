@@ -366,6 +366,52 @@ def _default_collection_hint(param_type: str) -> str:
     return ""
 
 
+def _tuple_assign_element_types(
+    tuple_target: dict[str, JsonVal],
+    value_type: str,
+    ctx: ResolveContext,
+) -> list[str]:
+    candidate_types: list[str] = []
+    norm_value_type = _ctx_normalize_type(value_type, ctx)
+    if norm_value_type != "":
+        candidate_types.append(norm_value_type)
+        if norm_value_type.endswith(" | None"):
+            candidate_types.append(norm_value_type[:-7].strip())
+        elif norm_value_type.endswith("|None"):
+            candidate_types.append(norm_value_type[:-6].strip())
+
+    target_type = tuple_target.get("resolved_type")
+    if isinstance(target_type, str) and target_type != "":
+        candidate_types.append(_ctx_normalize_type(target_type, ctx))
+
+    for candidate in candidate_types:
+        if candidate.startswith("tuple[") and candidate.endswith("]"):
+            return extract_type_args(candidate)
+
+    elems = tuple_target.get("elements")
+    if not isinstance(elems, list):
+        return []
+    elem_types: list[str] = []
+    any_known = False
+    for elem in elems:
+        elem_type = "unknown"
+        if isinstance(elem, dict):
+            if elem.get("kind") == "Name":
+                elem_name = elem.get("id")
+                if isinstance(elem_name, str) and elem_name != "":
+                    existing = ctx.scope.lookup(elem_name)
+                    if existing != "unknown":
+                        elem_type = existing
+            if elem_type == "unknown":
+                elem_resolved = elem.get("resolved_type")
+                if isinstance(elem_resolved, str) and elem_resolved != "":
+                    elem_type = elem_resolved
+        if elem_type != "unknown":
+            any_known = True
+        elem_types.append(elem_type)
+    return elem_types if any_known else []
+
+
 def _apply_default_annotation_type(default_node: dict[str, JsonVal], param_type: str, ctx: ResolveContext) -> None:
     hinted_type: str = _default_collection_hint(_ctx_normalize_type(param_type, ctx))
     if hinted_type == "":
@@ -2308,6 +2354,8 @@ def _resolve_stmt(stmt: dict[str, JsonVal], ctx: ResolveContext) -> None:
         value = stmt.get("value")
         if isinstance(value, dict):
             _resolve_expr(value, ctx)
+    elif kind == "Import":
+        pass  # Metadata already records imported module aliases.
     elif kind == "ImportFrom":
         pass  # Already processed during pre-scan
     elif kind == "Raise":
@@ -2353,6 +2401,7 @@ def _resolve_children(node: dict[str, JsonVal], ctx: ResolveContext) -> None:
                 # Check if it's an expression or statement
                 if kind_val in {"FunctionDef", "ClassDef", "Assign", "AnnAssign", "AugAssign",
                                 "Return", "Expr", "If", "While", "For", "ForRange", "Try", "With",
+                                "Import",
                                 "Break", "Continue", "Pass", "Yield", "ImportFrom", "Raise", "Delete"}:
                     _resolve_stmt(val, ctx)
                 else:
@@ -2364,7 +2413,7 @@ def _resolve_children(node: dict[str, JsonVal], ctx: ResolveContext) -> None:
                     if isinstance(kind_val2, str):
                         if kind_val2 in {"FunctionDef", "ClassDef", "Assign", "AnnAssign",
                                           "AugAssign", "Return", "Expr", "If", "While", "For",
-                                          "ForRange", "Try", "With", "Break", "Continue", "Pass",
+                                          "ForRange", "Try", "With", "Import", "Break", "Continue", "Pass",
                                           "Yield", "ImportFrom", "Raise", "Delete"}:
                             _resolve_stmt(item, ctx)
                         else:
@@ -2702,7 +2751,7 @@ def _resolve_assign(stmt: dict[str, JsonVal], ctx: ResolveContext) -> None:
                     # Define tuple element variables
                     elems = t.get("elements")
                     if isinstance(elems, list):
-                        tup_types: list[str] = extract_type_args(vt) if vt.startswith("tuple[") else []
+                        tup_types: list[str] = _tuple_assign_element_types(t, vt, ctx)
                         for idx_t, elem in enumerate(elems):
                             if isinstance(elem, dict) and elem.get("kind") == "Name":
                                 elem_name = elem.get("id")
@@ -2739,7 +2788,7 @@ def _resolve_assign(stmt: dict[str, JsonVal], ctx: ResolveContext) -> None:
                 _resolve_expr(target, ctx)
                 elems2 = target.get("elements")
                 if isinstance(elems2, list):
-                    tup_types2: list[str] = extract_type_args(vt) if vt.startswith("tuple[") else []
+                    tup_types2: list[str] = _tuple_assign_element_types(target, vt, ctx)
                     for idx_t2, elem2 in enumerate(elems2):
                         if isinstance(elem2, dict) and elem2.get("kind") == "Name":
                             elem_name2 = elem2.get("id")

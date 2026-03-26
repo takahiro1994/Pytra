@@ -73366,108 +73366,34 @@
                 "call_arg_type": "int64 | None"
               },
               {
-                "kind": "Unbox",
-                "resolved_type": "str",
-                "borrow_kind": "value",
-                "casts": [],
-                "value": {
-                  "kind": "Name",
-                  "source_span": {
-                    "lineno": 531,
-                    "col_offset": 55,
-                    "end_lineno": 531,
-                    "end_col_offset": 63
-                  },
-                  "resolved_type": "unknown",
-                  "casts": [],
-                  "borrow_kind": "value",
-                  "repr": "item_sep",
-                  "id": "item_sep",
-                  "call_arg_type": "str"
-                },
+                "kind": "Name",
                 "source_span": {
                   "lineno": 531,
                   "col_offset": 55,
                   "end_lineno": 531,
                   "end_col_offset": 63
                 },
+                "resolved_type": "str",
+                "casts": [],
+                "borrow_kind": "readonly_ref",
                 "repr": "item_sep",
-                "type_expr_summary_v1": {
-                  "schema_version": 1,
-                  "kind": "NamedType",
-                  "category": "static",
-                  "mirror": "str"
-                },
-                "target": "str",
-                "on_fail": "raise",
-                "bridge_lane_v1": {
-                  "schema_version": 1,
-                  "target": {
-                    "kind": "NamedType",
-                    "category": "static",
-                    "mirror": "str"
-                  },
-                  "target_category": "static",
-                  "value": {
-                    "kind": "DynamicType",
-                    "category": "dynamic",
-                    "mirror": "unknown",
-                    "dynamic_name": "unknown"
-                  },
-                  "value_category": "dynamic"
-                }
+                "id": "item_sep",
+                "call_arg_type": "str"
               },
               {
-                "kind": "Unbox",
-                "resolved_type": "str",
-                "borrow_kind": "value",
-                "casts": [],
-                "value": {
-                  "kind": "Name",
-                  "source_span": {
-                    "lineno": 531,
-                    "col_offset": 65,
-                    "end_lineno": 531,
-                    "end_col_offset": 72
-                  },
-                  "resolved_type": "unknown",
-                  "casts": [],
-                  "borrow_kind": "value",
-                  "repr": "key_sep",
-                  "id": "key_sep",
-                  "call_arg_type": "str"
-                },
+                "kind": "Name",
                 "source_span": {
                   "lineno": 531,
                   "col_offset": 65,
                   "end_lineno": 531,
                   "end_col_offset": 72
                 },
+                "resolved_type": "str",
+                "casts": [],
+                "borrow_kind": "readonly_ref",
                 "repr": "key_sep",
-                "type_expr_summary_v1": {
-                  "schema_version": 1,
-                  "kind": "NamedType",
-                  "category": "static",
-                  "mirror": "str"
-                },
-                "target": "str",
-                "on_fail": "raise",
-                "bridge_lane_v1": {
-                  "schema_version": 1,
-                  "target": {
-                    "kind": "NamedType",
-                    "category": "static",
-                    "mirror": "str"
-                  },
-                  "target_category": "static",
-                  "value": {
-                    "kind": "DynamicType",
-                    "category": "dynamic",
-                    "mirror": "unknown",
-                    "dynamic_name": "unknown"
-                  },
-                  "value_category": "dynamic"
-                }
+                "id": "key_sep",
+                "call_arg_type": "str"
               },
               {
                 "kind": "Constant",
@@ -74699,108 +74625,34 @@
                 "call_arg_type": "int64 | None"
               },
               {
-                "kind": "Unbox",
-                "resolved_type": "str",
-                "borrow_kind": "value",
-                "casts": [],
-                "value": {
-                  "kind": "Name",
-                  "source_span": {
-                    "lineno": 545,
-                    "col_offset": 54,
-                    "end_lineno": 545,
-                    "end_col_offset": 62
-                  },
-                  "resolved_type": "unknown",
-                  "casts": [],
-                  "borrow_kind": "value",
-                  "repr": "item_sep",
-                  "id": "item_sep",
-                  "call_arg_type": "str"
-                },
+                "kind": "Name",
                 "source_span": {
                   "lineno": 545,
                   "col_offset": 54,
                   "end_lineno": 545,
                   "end_col_offset": 62
                 },
+                "resolved_type": "str",
+                "casts": [],
+                "borrow_kind": "readonly_ref",
                 "repr": "item_sep",
-                "type_expr_summary_v1": {
-                  "schema_version": 1,
-                  "kind": "NamedType",
-                  "category": "static",
-                  "mirror": "str"
-                },
-                "target": "str",
-                "on_fail": "raise",
-                "bridge_lane_v1": {
-                  "schema_version": 1,
-                  "target": {
-                    "kind": "NamedType",
-                    "category": "static",
-                    "mirror": "str"
-                  },
-                  "target_category": "static",
-                  "value": {
-                    "kind": "DynamicType",
-                    "category": "dynamic",
-                    "mirror": "unknown",
-                    "dynamic_name": "unknown"
-                  },
-                  "value_category": "dynamic"
-                }
+                "id": "item_sep",
+                "call_arg_type": "str"
               },
               {
-                "kind": "Unbox",
-                "resolved_type": "str",
-                "borrow_kind": "value",
-                "casts": [],
-                "value": {
-                  "kind": "Name",
-                  "source_span": {
-                    "lineno": 545,
-                    "col_offset": 64,
-                    "end_lineno": 545,
-                    "end_col_offset": 71
-                  },
-                  "resolved_type": "unknown",
-                  "casts": [],
-                  "borrow_kind": "value",
-                  "repr": "key_sep",
-                  "id": "key_sep",
-                  "call_arg_type": "str"
-                },
+                "kind": "Name",
                 "source_span": {
                   "lineno": 545,
                   "col_offset": 64,
                   "end_lineno": 545,
                   "end_col_offset": 71
                 },
+                "resolved_type": "str",
+                "casts": [],
+                "borrow_kind": "readonly_ref",
                 "repr": "key_sep",
-                "type_expr_summary_v1": {
-                  "schema_version": 1,
-                  "kind": "NamedType",
-                  "category": "static",
-                  "mirror": "str"
-                },
-                "target": "str",
-                "on_fail": "raise",
-                "bridge_lane_v1": {
-                  "schema_version": 1,
-                  "target": {
-                    "kind": "NamedType",
-                    "category": "static",
-                    "mirror": "str"
-                  },
-                  "target_category": "static",
-                  "value": {
-                    "kind": "DynamicType",
-                    "category": "dynamic",
-                    "mirror": "unknown",
-                    "dynamic_name": "unknown"
-                  },
-                  "value_category": "dynamic"
-                }
+                "id": "key_sep",
+                "call_arg_type": "str"
               },
               {
                 "kind": "Constant",

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -17,6 +18,7 @@ from toolchain2.compile.jv import CompileContext
 from toolchain2.compile.lower import lower_east2_to_east3
 from toolchain2.compile.passes import apply_guard_narrowing
 from toolchain2.parse.py.parser import parse_python_source
+from toolchain2.parse.py.parse_python import parse_python_file
 from toolchain2.resolve.py.builtin_registry import BuiltinRegistry, load_builtin_registry
 from toolchain2.resolve.py.resolver import resolve_east1_to_east2
 from toolchain2.resolve.py.validate_east2 import validate_east2
@@ -102,6 +104,28 @@ def f(kwargs: dict[str, object]) -> None:
         self.assertEqual(keywords[0].get("value", {}).get("kind"), "Name")
         self.assertEqual(keywords[0].get("value", {}).get("id"), "kwargs")
 
+    def test_parse_python_file_keeps_multiline_function_docstring_as_docstring(self) -> None:
+        source = '''\
+def run() -> None:
+    """Run a command.
+
+    Args:
+        cwd: Working directory.
+    """
+    value = 1
+'''
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "doc.py"
+            path.write_text(source, encoding="utf-8")
+            east1 = parse_python_file(str(path))
+
+        fn = next(node for node in _walk(east1) if node.get("kind") == "FunctionDef" and node.get("name") == "run")
+        body = fn.get("body", [])
+
+        self.assertEqual(fn.get("docstring"), "Run a command.\n\n    Args:\n        cwd: Working directory.\n    ")
+        self.assertEqual(len(body), 1)
+        self.assertEqual(body[0].get("kind"), "Assign")
+
     def test_resolver_expands_type_aliases_by_east2(self) -> None:
         source = """
 type Scalar = int | float
@@ -123,6 +147,50 @@ def identity(value: Scalar) -> Scalar:
         self.assertEqual(fn.get("arg_types", {}).get("value"), "int64 | float64")
         self.assertEqual(fn.get("return_type"), "int64 | float64")
         self.assertEqual(ret_name.get("resolved_type"), "int64 | float64")
+
+    def test_resolver_preserves_existing_tuple_target_types_under_optional_tuple_reassign(self) -> None:
+        source = """
+def f(separators: tuple[str, str] | None) -> str:
+    item_sep = ","
+    key_sep = ":"
+    if separators is not None:
+        item_sep, key_sep = separators
+    return item_sep + key_sep
+"""
+        east2 = parse_python_source(source, "<mem>").to_jv()
+        resolve_east1_to_east2(east2, registry=_load_registry())
+
+        names = [
+            node for node in _walk(east2)
+            if node.get("kind") == "Name" and node.get("id") in {"item_sep", "key_sep"}
+        ]
+        return_names = [
+            node for node in names
+            if node.get("repr") in {"item_sep", "key_sep"} and node.get("borrow_kind") == "readonly_ref"
+        ]
+
+        self.assertTrue(return_names)
+        self.assertTrue(all(node.get("resolved_type") == "str" for node in return_names))
+
+    def test_resolver_supports_block_import_aliases(self) -> None:
+        source = """
+def f() -> str:
+    import os as _os
+    return _os.sep
+"""
+        east2 = parse_python_source(source, "<mem>").to_jv()
+        resolve_east1_to_east2(east2, registry=_load_registry())
+
+        fn = next(node for node in _walk(east2) if node.get("kind") == "FunctionDef" and node.get("name") == "f")
+        body = fn.get("body", [])
+        os_ref = next(
+            node
+            for node in _walk(fn)
+            if node.get("kind") == "Name" and node.get("id") == "_os" and node.get("repr") == "_os"
+        )
+
+        self.assertEqual(body[0].get("kind"), "Import")
+        self.assertEqual(os_ref.get("resolved_type"), "module")
 
     def test_resolver_treats_function_value_refs_as_callable(self) -> None:
         source = """

@@ -14,7 +14,7 @@
         "lineno": 1,
         "col": 0,
         "end_lineno": 1,
-        "end_col": 63
+        "end_col": 531
       },
       "value": {
         "kind": "Constant",
@@ -22,36 +22,13 @@
           "lineno": 1,
           "col": 0,
           "end_lineno": 1,
-          "end_col": 63
+          "end_col": 531
         },
         "resolved_type": "str",
         "casts": [],
         "borrow_kind": "value",
-        "repr": "\"\"\"Pure-Python format spec interpreter for f-string formatting.",
-        "value": "Pure-Python format spec interpreter for f-string formatti"
-      }
-    },
-    {
-      "kind": "Expr",
-      "source_span": {
-        "lineno": 13,
-        "col": 0,
-        "end_lineno": 13,
-        "end_col": 3
-      },
-      "value": {
-        "kind": "Constant",
-        "source_span": {
-          "lineno": 13,
-          "col": 0,
-          "end_lineno": 13,
-          "end_col": 3
-        },
-        "resolved_type": "str",
-        "casts": [],
-        "borrow_kind": "value",
-        "repr": "\"\"\"",
-        "value": ""
+        "repr": "\"\"\"Pure-Python format spec interpreter for f-string formatting.\\n\\nImplements a subset of Python's Format Specification Mini-Language:\\n  [[fill]align][sign][z][#][0][width][grouping_option][.precision][type]\\n\\nSupported types: d, f, e, E, g, G, x, X, o, b, s, n, %\\nSupported align: <, >, ^, =\\nSupported sign: +, -, space\\nSupported grouping: , (comma) and _ (underscore)\\n\\nThis module is the source-of-truth for all transpilation targets.\\nBackends with native format support can override with emitter-level optimization.\\n\"\"\"",
+        "value": "Pure-Python format spec interpreter for f-string formatting.\n\nImplements a subset of Python's Format Specification Mini-Language:\n  [[fill]align][sign][z][#][0][width][grouping_option][.precision][type]\n\nSupported types: d, f, e, E, g, G, x, X, o, b, s, n, %\nSupported align: <, >, ^, =\nSupported sign: +, -, space\nSupported grouping: , (comma) and _ (underscore)\n\nThis module is the source-of-truth for all transpilation targets.\nBackends with native format support can override with emitter-level optimization.\n"
       }
     },
     {
@@ -83,83 +60,8 @@
         "spec": "readonly"
       },
       "renamed_symbols": {},
-      "docstring": null,
+      "docstring": "Format *value* according to Python format spec *spec*.\n\n    Equivalent to ``format(value, spec)`` in Python.\n    ",
       "body": [
-        {
-          "kind": "Expr",
-          "source_span": {
-            "lineno": 17,
-            "col": 4,
-            "end_lineno": 17,
-            "end_col": 61
-          },
-          "value": {
-            "kind": "Constant",
-            "source_span": {
-              "lineno": 17,
-              "col": 4,
-              "end_lineno": 17,
-              "end_col": 61
-            },
-            "resolved_type": "str",
-            "casts": [],
-            "borrow_kind": "value",
-            "repr": "\"\"\"Format *value* according to Python format spec *spec*.",
-            "value": "Format *value* according to Python format spec *spe"
-          }
-        },
-        {
-          "kind": "Expr",
-          "source_span": {
-            "lineno": 19,
-            "col": 4,
-            "end_lineno": 19,
-            "end_col": 52
-          },
-          "value": {
-            "kind": "Name",
-            "source_span": {
-              "lineno": 19,
-              "col": 4,
-              "end_lineno": 19,
-              "end_col": 14
-            },
-            "resolved_type": "unknown",
-            "casts": [],
-            "borrow_kind": "value",
-            "repr": "Equivalent",
-            "id": "Equivalent"
-          },
-          "leading_trivia": [
-            {
-              "kind": "blank",
-              "count": 1
-            }
-          ]
-        },
-        {
-          "kind": "Expr",
-          "source_span": {
-            "lineno": 20,
-            "col": 4,
-            "end_lineno": 20,
-            "end_col": 7
-          },
-          "value": {
-            "kind": "Constant",
-            "source_span": {
-              "lineno": 20,
-              "col": 4,
-              "end_lineno": 20,
-              "end_col": 7
-            },
-            "resolved_type": "str",
-            "casts": [],
-            "borrow_kind": "value",
-            "repr": "\"\"\"",
-            "value": ""
-          }
-        },
         {
           "kind": "If",
           "source_span": {
@@ -272,7 +174,21 @@
               }
             }
           ],
-          "orelse": []
+          "orelse": [],
+          "leading_trivia": [
+            {
+              "kind": "blank",
+              "count": 1
+            },
+            {
+              "kind": "blank",
+              "count": 1
+            },
+            {
+              "kind": "blank",
+              "count": 1
+            }
+          ]
         },
         {
           "kind": "Assign",
@@ -525,6 +441,54 @@
       },
       "leading_comments": [],
       "leading_trivia": [
+        {
+          "kind": "blank",
+          "count": 1
+        },
+        {
+          "kind": "blank",
+          "count": 1
+        },
+        {
+          "kind": "blank",
+          "count": 1
+        },
+        {
+          "kind": "blank",
+          "count": 1
+        },
+        {
+          "kind": "blank",
+          "count": 1
+        },
+        {
+          "kind": "blank",
+          "count": 1
+        },
+        {
+          "kind": "blank",
+          "count": 1
+        },
+        {
+          "kind": "blank",
+          "count": 1
+        },
+        {
+          "kind": "blank",
+          "count": 1
+        },
+        {
+          "kind": "blank",
+          "count": 1
+        },
+        {
+          "kind": "blank",
+          "count": 1
+        },
+        {
+          "kind": "blank",
+          "count": 1
+        },
         {
           "kind": "blank",
           "count": 1
@@ -4616,83 +4580,8 @@
         "spec": "readonly"
       },
       "renamed_symbols": {},
-      "docstring": null,
+      "docstring": "Parse format spec into [fill, align, sign, width, grouping, precision, type_char].\n\n    Returns a list of 7 strings for selfhost compatibility (no dataclass).\n    ",
       "body": [
-        {
-          "kind": "Expr",
-          "source_span": {
-            "lineno": 109,
-            "col": 4,
-            "end_lineno": 109,
-            "end_col": 89
-          },
-          "value": {
-            "kind": "Constant",
-            "source_span": {
-              "lineno": 109,
-              "col": 4,
-              "end_lineno": 109,
-              "end_col": 89
-            },
-            "resolved_type": "str",
-            "casts": [],
-            "borrow_kind": "value",
-            "repr": "\"\"\"Parse format spec into [fill, align, sign, width, grouping, precision, type_char].",
-            "value": "Parse format spec into [fill, align, sign, width, grouping, precision, type_cha"
-          }
-        },
-        {
-          "kind": "Expr",
-          "source_span": {
-            "lineno": 111,
-            "col": 4,
-            "end_lineno": 111,
-            "end_col": 74
-          },
-          "value": {
-            "kind": "Name",
-            "source_span": {
-              "lineno": 111,
-              "col": 4,
-              "end_lineno": 111,
-              "end_col": 11
-            },
-            "resolved_type": "unknown",
-            "casts": [],
-            "borrow_kind": "value",
-            "repr": "Returns",
-            "id": "Returns"
-          },
-          "leading_trivia": [
-            {
-              "kind": "blank",
-              "count": 1
-            }
-          ]
-        },
-        {
-          "kind": "Expr",
-          "source_span": {
-            "lineno": 112,
-            "col": 4,
-            "end_lineno": 112,
-            "end_col": 7
-          },
-          "value": {
-            "kind": "Constant",
-            "source_span": {
-              "lineno": 112,
-              "col": 4,
-              "end_lineno": 112,
-              "end_col": 7
-            },
-            "resolved_type": "str",
-            "casts": [],
-            "borrow_kind": "value",
-            "repr": "\"\"\"",
-            "value": ""
-          }
-        },
         {
           "kind": "AnnAssign",
           "source_span": {
@@ -4743,7 +4632,21 @@
           "decl_type_expr": {
             "kind": "NamedType",
             "name": "str"
-          }
+          },
+          "leading_trivia": [
+            {
+              "kind": "blank",
+              "count": 1
+            },
+            {
+              "kind": "blank",
+              "count": 1
+            },
+            {
+              "kind": "blank",
+              "count": 1
+            }
+          ]
         },
         {
           "kind": "AnnAssign",

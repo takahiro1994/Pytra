@@ -14,7 +14,7 @@
         "lineno": 1,
         "col": 0,
         "end_lineno": 1,
-        "end_col": 69
+        "end_col": 195
       },
       "value": {
         "kind": "Constant",
@@ -22,34 +22,12 @@
           "lineno": 1,
           "col": 0,
           "end_lineno": 1,
-          "end_col": 69
+          "end_col": 195
         },
         "casts": [],
         "borrow_kind": "value",
-        "repr": "\"\"\"pytra.std.subprocess: subprocess API with Python runtime fallback.",
-        "value": "pytra.std.subprocess: subprocess API with Python runtime fallba"
-      }
-    },
-    {
-      "kind": "Expr",
-      "source_span": {
-        "lineno": 5,
-        "col": 0,
-        "end_lineno": 5,
-        "end_col": 3
-      },
-      "value": {
-        "kind": "Constant",
-        "source_span": {
-          "lineno": 5,
-          "col": 0,
-          "end_lineno": 5,
-          "end_col": 3
-        },
-        "casts": [],
-        "borrow_kind": "value",
-        "repr": "\"\"\"",
-        "value": ""
+        "repr": "\"\"\"pytra.std.subprocess: subprocess API with Python runtime fallback.\\n\\nProvides a minimal subprocess.run() that works in both Python host and\\nC++ selfhost (via std::system / posix_spawn).\\n\"\"\"",
+        "value": "pytra.std.subprocess: subprocess API with Python runtime fallback.\n\nProvides a minimal subprocess.run() that works in both Python host and\nC++ selfhost (via std::system / posix_spawn).\n"
       }
     },
     {
@@ -318,6 +296,22 @@
         {
           "kind": "blank",
           "count": 1
+        },
+        {
+          "kind": "blank",
+          "count": 1
+        },
+        {
+          "kind": "blank",
+          "count": 1
+        },
+        {
+          "kind": "blank",
+          "count": 1
+        },
+        {
+          "kind": "blank",
+          "count": 1
         }
       ]
     },
@@ -393,275 +387,22 @@
       },
       "return_type": "CompletedProcess",
       "renamed_symbols": {},
-      "docstring": null,
+      "docstring": "Run a command as a subprocess.\n\n    Args:\n        cmd: Command and arguments.\n        cwd: Working directory (empty string = inherit).\n        capture_output: If True, capture stdout/stderr as strings.\n        env: Environment variables. Empty dict = inherit parent env.\n\n    Returns:\n        CompletedProcess with returncode and optional stdout/stderr.\n    ",
       "body": [
         {
-          "kind": "Expr",
-          "source_span": {
-            "lineno": 23,
-            "col": 4,
-            "end_lineno": 23,
-            "end_col": 37
-          },
-          "value": {
-            "kind": "Constant",
-            "source_span": {
-              "lineno": 23,
-              "col": 4,
-              "end_lineno": 23,
-              "end_col": 37
-            },
-            "casts": [],
-            "borrow_kind": "value",
-            "repr": "\"\"\"Run a command as a subprocess.",
-            "value": "Run a command as a subproce"
-          }
-        },
-        {
-          "kind": "Expr",
-          "source_span": {
-            "lineno": 25,
-            "col": 4,
-            "end_lineno": 25,
-            "end_col": 9
-          },
-          "value": {
-            "kind": "Name",
-            "source_span": {
-              "lineno": 25,
-              "col": 4,
-              "end_lineno": 25,
-              "end_col": 8
-            },
-            "casts": [],
-            "borrow_kind": "value",
-            "repr": "Args",
-            "id": "Args"
-          },
-          "leading_trivia": [
-            {
-              "kind": "blank",
-              "count": 1
-            }
-          ]
-        },
-        {
-          "kind": "AnnAssign",
-          "source_span": {
-            "lineno": 26,
-            "col": 8,
-            "end_lineno": 26,
-            "end_col": 35
-          },
-          "target": {
-            "kind": "Name",
-            "source_span": {
-              "lineno": 26,
-              "col": 8,
-              "end_lineno": 26,
-              "end_col": 11
-            },
-            "casts": [],
-            "borrow_kind": "value",
-            "repr": "cmd",
-            "id": "cmd"
-          },
-          "annotation": "Command and arguments.",
-          "value": null,
-          "declare": true
-        },
-        {
-          "kind": "AnnAssign",
-          "source_span": {
-            "lineno": 27,
-            "col": 8,
-            "end_lineno": 27,
-            "end_col": 56
-          },
-          "target": {
-            "kind": "Name",
-            "source_span": {
-              "lineno": 27,
-              "col": 8,
-              "end_lineno": 27,
-              "end_col": 11
-            },
-            "casts": [],
-            "borrow_kind": "value",
-            "repr": "cwd",
-            "id": "cwd"
-          },
-          "annotation": "Working directory (empty string",
-          "value": {
-            "kind": "Name",
-            "source_span": {
-              "lineno": 27,
-              "col": 47,
-              "end_lineno": 27,
-              "end_col": 54
-            },
-            "casts": [],
-            "borrow_kind": "value",
-            "repr": "inherit",
-            "id": "inherit"
-          },
-          "declare": true
-        },
-        {
-          "kind": "AnnAssign",
-          "source_span": {
-            "lineno": 28,
-            "col": 8,
-            "end_lineno": 28,
-            "end_col": 66
-          },
-          "target": {
-            "kind": "Name",
-            "source_span": {
-              "lineno": 28,
-              "col": 8,
-              "end_lineno": 28,
-              "end_col": 22
-            },
-            "casts": [],
-            "borrow_kind": "value",
-            "repr": "capture_output",
-            "id": "capture_output"
-          },
-          "annotation": "If True, capture stdout/stderr as strings.",
-          "value": null,
-          "declare": true
-        },
-        {
-          "kind": "AnnAssign",
-          "source_span": {
-            "lineno": 29,
-            "col": 8,
-            "end_lineno": 29,
-            "end_col": 68
-          },
-          "target": {
-            "kind": "Name",
-            "source_span": {
-              "lineno": 29,
-              "col": 8,
-              "end_lineno": 29,
-              "end_col": 11
-            },
-            "casts": [],
-            "borrow_kind": "value",
-            "repr": "env",
-            "id": "env"
-          },
-          "annotation": "Environment variables. Empty dict",
-          "value": {
-            "kind": "Name",
-            "source_span": {
-              "lineno": 29,
-              "col": 49,
-              "end_lineno": 29,
-              "end_col": 56
-            },
-            "casts": [],
-            "borrow_kind": "value",
-            "repr": "inherit",
-            "id": "inherit"
-          },
-          "declare": true
-        },
-        {
-          "kind": "Expr",
-          "source_span": {
-            "lineno": 31,
-            "col": 4,
-            "end_lineno": 31,
-            "end_col": 12
-          },
-          "value": {
-            "kind": "Name",
-            "source_span": {
-              "lineno": 31,
-              "col": 4,
-              "end_lineno": 31,
-              "end_col": 11
-            },
-            "casts": [],
-            "borrow_kind": "value",
-            "repr": "Returns",
-            "id": "Returns"
-          },
-          "leading_trivia": [
-            {
-              "kind": "blank",
-              "count": 1
-            }
-          ]
-        },
-        {
-          "kind": "Expr",
-          "source_span": {
-            "lineno": 32,
-            "col": 8,
-            "end_lineno": 32,
-            "end_col": 68
-          },
-          "value": {
-            "kind": "Name",
-            "source_span": {
-              "lineno": 32,
-              "col": 8,
-              "end_lineno": 32,
-              "end_col": 24
-            },
-            "casts": [],
-            "borrow_kind": "value",
-            "repr": "CompletedProcess",
-            "id": "CompletedProcess"
-          }
-        },
-        {
-          "kind": "Expr",
-          "source_span": {
-            "lineno": 33,
-            "col": 4,
-            "end_lineno": 33,
-            "end_col": 7
-          },
-          "value": {
-            "kind": "Constant",
-            "source_span": {
-              "lineno": 33,
-              "col": 4,
-              "end_lineno": 33,
-              "end_col": 7
-            },
-            "casts": [],
-            "borrow_kind": "value",
-            "repr": "\"\"\"",
-            "value": ""
-          }
-        },
-        {
-          "kind": "Expr",
+          "kind": "Import",
           "source_span": {
             "lineno": 34,
             "col": 4,
             "end_lineno": 34,
             "end_col": 20
           },
-          "value": {
-            "kind": "Name",
-            "source_span": {
-              "lineno": 34,
-              "col": 4,
-              "end_lineno": 34,
-              "end_col": 10
-            },
-            "casts": [],
-            "borrow_kind": "value",
-            "repr": "import",
-            "id": "import"
-          }
+          "names": [
+            {
+              "name": "os",
+              "asname": "_os"
+            }
+          ]
         },
         {
           "kind": "AnnAssign",
@@ -1901,6 +1642,14 @@
           "binding_kind": "symbol",
           "source_file": "src/pytra/std/subprocess.py",
           "source_line": 9
+        },
+        {
+          "module_id": "os",
+          "export_name": "",
+          "local_name": "_os",
+          "binding_kind": "module",
+          "source_file": "src/pytra/std/subprocess.py",
+          "source_line": 34
         }
       ],
       "qualified_refs": [
@@ -1927,6 +1676,14 @@
         "binding_kind": "symbol",
         "source_file": "src/pytra/std/subprocess.py",
         "source_line": 9
+      },
+      {
+        "module_id": "os",
+        "export_name": "",
+        "local_name": "_os",
+        "binding_kind": "module",
+        "source_file": "src/pytra/std/subprocess.py",
+        "source_line": 34
       }
     ],
     "qualified_symbol_refs": [
@@ -1937,7 +1694,8 @@
       }
     ],
     "import_modules": {
-      "_subprocess": "subprocess"
+      "_subprocess": "subprocess",
+      "_os": "os"
     },
     "import_symbols": {
       "extern": {

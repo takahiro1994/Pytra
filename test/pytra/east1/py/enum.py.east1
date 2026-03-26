@@ -14,7 +14,7 @@
         "lineno": 1,
         "col": 0,
         "end_lineno": 1,
-        "end_col": 60
+        "end_col": 198
       },
       "value": {
         "kind": "Constant",
@@ -22,34 +22,12 @@
           "lineno": 1,
           "col": 0,
           "end_lineno": 1,
-          "end_col": 60
+          "end_col": 198
         },
         "casts": [],
         "borrow_kind": "value",
-        "repr": "\"\"\"Pytra enum module — re-exports from Python standard enum.",
-        "value": "Pytra enum module — re-exports from Python standard en"
-      }
-    },
-    {
-      "kind": "Expr",
-      "source_span": {
-        "lineno": 5,
-        "col": 0,
-        "end_lineno": 5,
-        "end_col": 3
-      },
-      "value": {
-        "kind": "Constant",
-        "source_span": {
-          "lineno": 5,
-          "col": 0,
-          "end_lineno": 5,
-          "end_col": 3
-        },
-        "casts": [],
-        "borrow_kind": "value",
-        "repr": "\"\"\"",
-        "value": ""
+        "repr": "\"\"\"Pytra enum module — re-exports from Python standard enum.\\n\\nPython runtime: standard Enum/IntEnum/IntFlag are available.\\nTranspiler: ignores this import (enum classes are parsed natively).\\n\"\"\"",
+        "value": "Pytra enum module — re-exports from Python standard enum.\n\nPython runtime: standard Enum/IntEnum/IntFlag are available.\nTranspiler: ignores this import (enum classes are parsed natively).\n"
       }
     },
     {

@@ -14,7 +14,7 @@
         "lineno": 1,
         "col": 0,
         "end_lineno": 1,
-        "end_col": 74
+        "end_col": 217
       },
       "value": {
         "kind": "Constant",
@@ -22,34 +22,12 @@
           "lineno": 1,
           "col": 0,
           "end_lineno": 1,
-          "end_col": 74
+          "end_col": 217
         },
         "casts": [],
         "borrow_kind": "value",
-        "repr": "\"\"\"Pytra dataclasses module — re-exports from Python standard dataclasses.",
-        "value": "Pytra dataclasses module — re-exports from Python standard dataclass"
-      }
-    },
-    {
-      "kind": "Expr",
-      "source_span": {
-        "lineno": 5,
-        "col": 0,
-        "end_lineno": 5,
-        "end_col": 3
-      },
-      "value": {
-        "kind": "Constant",
-        "source_span": {
-          "lineno": 5,
-          "col": 0,
-          "end_lineno": 5,
-          "end_col": 3
-        },
-        "casts": [],
-        "borrow_kind": "value",
-        "repr": "\"\"\"",
-        "value": ""
+        "repr": "\"\"\"Pytra dataclasses module — re-exports from Python standard dataclasses.\\n\\nPython runtime: standard dataclass/field are available.\\nTranspiler: ignores this import (dataclass decorator is recognized natively).\\n\"\"\"",
+        "value": "Pytra dataclasses module — re-exports from Python standard dataclasses.\n\nPython runtime: standard dataclass/field are available.\nTranspiler: ignores this import (dataclass decorator is recognized natively).\n"
       }
     }
   ],

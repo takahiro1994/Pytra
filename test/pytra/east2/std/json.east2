@@ -33807,7 +33807,7 @@
                       "end_lineno": 530,
                       "end_col": 16
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "str",
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "item_sep",
@@ -33821,7 +33821,7 @@
                       "end_lineno": 530,
                       "end_col": 25
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "str",
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "key_sep",
@@ -33936,9 +33936,9 @@
                   "end_lineno": 531,
                   "end_col": 63
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "str",
                 "casts": [],
-                "borrow_kind": "value",
+                "borrow_kind": "readonly_ref",
                 "repr": "item_sep",
                 "id": "item_sep",
                 "call_arg_type": "str"
@@ -33951,9 +33951,9 @@
                   "end_lineno": 531,
                   "end_col": 72
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "str",
                 "casts": [],
-                "borrow_kind": "value",
+                "borrow_kind": "readonly_ref",
                 "repr": "key_sep",
                 "id": "key_sep",
                 "call_arg_type": "str"
@@ -34381,7 +34381,7 @@
                       "end_lineno": 530,
                       "end_col": 16
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "str",
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "item_sep",
@@ -34395,7 +34395,7 @@
                       "end_lineno": 530,
                       "end_col": 25
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "str",
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "key_sep",
@@ -34510,9 +34510,9 @@
                   "end_lineno": 545,
                   "end_col": 62
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "str",
                 "casts": [],
-                "borrow_kind": "value",
+                "borrow_kind": "readonly_ref",
                 "repr": "item_sep",
                 "id": "item_sep",
                 "call_arg_type": "str"
@@ -34525,9 +34525,9 @@
                   "end_lineno": 545,
                   "end_col": 71
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "str",
                 "casts": [],
-                "borrow_kind": "value",
+                "borrow_kind": "readonly_ref",
                 "repr": "key_sep",
                 "id": "key_sep",
                 "call_arg_type": "str"
