@@ -1302,8 +1302,6 @@ def _emit_builtin_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
                     if len(parts) == 2 and result_type not in ("", "unknown", "Any", "object"):
                         result_gt = go_type(result_type)
                         default_code = arg_strs[1]
-                        if len(args) >= 2 and isinstance(args[1], dict):
-                            default_code = _coerce_to_type(default_code, result_gt, args[1])
                         return (
                             "func() " + result_gt + " {\n"
                             + "\tif __val, ok := " + owner + "[" + arg_strs[0] + "]; ok {\n"

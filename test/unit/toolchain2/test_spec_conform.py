@@ -564,6 +564,28 @@ def f() -> float:
         self.assertEqual(cast_value.get("resolved_type"), "float64")
         self.assertEqual(cast_value.get("args", [])[0].get("id"), "n")
 
+    def test_compile_inserts_static_cast_for_dict_get_default(self) -> None:
+        source = """
+def f(d: dict[str, float]) -> float:
+    return d.get("x", 0)
+"""
+        east2 = parse_python_source(source, "<mem>").to_jv()
+        resolve_east1_to_east2(east2, registry=_load_registry())
+        east3 = lower_east2_to_east3(east2)
+
+        dict_get = next(
+            node
+            for node in _walk(east3)
+            if node.get("kind") == "Call" and node.get("runtime_call") == "dict.get"
+        )
+        default_arg = dict_get.get("args", [])[1]
+
+        self.assertEqual(default_arg.get("kind"), "Call")
+        self.assertEqual(default_arg.get("lowered_kind"), "BuiltinCall")
+        self.assertEqual(default_arg.get("runtime_call"), "static_cast")
+        self.assertEqual(default_arg.get("resolved_type"), "float64")
+        self.assertEqual(default_arg.get("args", [])[0].get("value"), 0)
+
     def test_compile_narrows_union_names_inside_isinstance_guard(self) -> None:
         source = """
 type Scalar = int | float

@@ -906,6 +906,54 @@ class Toolchain2LinkerSpecConform2Tests(unittest.TestCase):
         self.assertNotIn("var x float64 = float64(n)", go_code)
         self.assertNotIn("x += float64(n)", go_code)
 
+    def test_go_emitter_does_not_invent_dict_get_default_casts(self) -> None:
+        doc = _module_doc(
+            "app.main",
+            body=[
+                {
+                    "kind": "FunctionDef",
+                    "name": "run",
+                    "arg_types": {"d": "dict[str,float64]"},
+                    "arg_order": ["d"],
+                    "arg_defaults": {},
+                    "arg_index": {"d": 0},
+                    "return_type": "float64",
+                    "arg_usage": {},
+                    "renamed_symbols": {},
+                    "docstring": None,
+                    "body": [
+                        {
+                            "kind": "Return",
+                            "value": {
+                                "kind": "Call",
+                                "resolved_type": "float64",
+                                "lowered_kind": "BuiltinCall",
+                                "builtin_name": "get",
+                                "runtime_call": "dict.get",
+                                "func": {
+                                    "kind": "Attribute",
+                                    "resolved_type": "callable",
+                                    "value": {"kind": "Name", "id": "d", "resolved_type": "dict[str,float64]"},
+                                    "attr": "get",
+                                },
+                                "args": [
+                                    {"kind": "Constant", "value": "x", "resolved_type": "str"},
+                                    {"kind": "Constant", "value": 0, "resolved_type": "int64"},
+                                ],
+                                "keywords": [],
+                            },
+                        }
+                    ],
+                }
+            ],
+        )
+
+        go_code = emit_go_module(doc)
+
+        self.assertIn("return func() float64 {", go_code)
+        self.assertIn("return 0", go_code)
+        self.assertNotIn("return float64(0)", go_code)
+
     def test_cpp_emitter_runtime_symbol_prefix_uses_skip_modules_without_pytra_hardcode(self) -> None:
         doc = _module_doc(
             "app.main",
