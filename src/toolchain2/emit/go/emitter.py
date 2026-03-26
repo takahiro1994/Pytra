@@ -1528,16 +1528,6 @@ def _emit_slice_bound(ctx: EmitContext, value: str, bound: JsonVal) -> str:
 def _emit_list_literal(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
     elements = _list(node, "elements")
     rt = _str(node, "resolved_type")
-    # If resolved_type contains "unknown", try decl_type or function return type
-    if "unknown" in rt or rt == "":
-        dt = _str(node, "call_arg_type")
-        if dt != "" and "unknown" not in dt:
-            rt = dt
-        dt = _str(node, "decl_type") if rt == "" or "unknown" in rt else rt
-        if dt != "" and "unknown" not in dt:
-            rt = dt
-        elif ctx.current_return_type != "" and ctx.current_return_type.startswith("list["):
-            rt = ctx.current_return_type
     gt = go_type(rt)
     parts = [_emit_expr(ctx, e) for e in elements]
     return gt + "{" + ", ".join(parts) + "}"
@@ -1545,9 +1535,6 @@ def _emit_list_literal(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
 
 def _emit_dict_literal(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
     rt = _str(node, "resolved_type")
-    decl_hint = _str(node, "decl_type")
-    if decl_hint != "" and decl_hint != rt and "Any" not in decl_hint:
-        rt = decl_hint
     gt = _go_signature_type(ctx, rt)
     parts: list[str] = []
     key_type = ""

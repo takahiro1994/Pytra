@@ -606,6 +606,26 @@ def f() -> dict[str, float]:
         self.assertEqual(entry_value.get("runtime_call"), "static_cast")
         self.assertEqual(entry_value.get("resolved_type"), "float64")
 
+    def test_compile_wraps_list_literal_elements_for_return_type(self) -> None:
+        source = """
+def f() -> list[float]:
+    return [0]
+"""
+        east2 = parse_python_source(source, "<mem>").to_jv()
+        resolve_east1_to_east2(east2, registry=_load_registry())
+        east3 = lower_east2_to_east3(east2)
+
+        return_stmt = next(node for node in _walk(east3) if node.get("kind") == "Return")
+        list_value = return_stmt.get("value", {})
+        element_value = list_value.get("elements", [])[0]
+
+        self.assertEqual(list_value.get("kind"), "List")
+        self.assertEqual(list_value.get("resolved_type"), "list[float64]")
+        self.assertEqual(element_value.get("kind"), "Call")
+        self.assertEqual(element_value.get("lowered_kind"), "BuiltinCall")
+        self.assertEqual(element_value.get("runtime_call"), "static_cast")
+        self.assertEqual(element_value.get("resolved_type"), "float64")
+
     def test_compile_inserts_static_cast_for_optional_return_inner_type(self) -> None:
         source = """
 def f(flag: bool) -> float | None:

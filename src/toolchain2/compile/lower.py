@@ -332,6 +332,34 @@ def _split_dict_types(type_name: str) -> tuple[str, str]:
     return parts[0], parts[1]
 
 
+def _list_inner_type(type_name: str) -> str:
+    norm = normalize_type_name(type_name)
+    if not (norm.startswith("list[") and norm.endswith("]")):
+        return ""
+    return norm[5:-1]
+
+
+def _wrap_list_literal_for_target_type(value_expr: JsonVal, target_type: str, *, ctx: CompileContext) -> JsonVal:
+    if not isinstance(value_expr, dict):
+        return value_expr
+    node: Node = value_expr
+    if node.get("kind") != LIST:
+        return value_expr
+    inner_type = _list_inner_type(target_type)
+    if inner_type == "":
+        return value_expr
+    out: Node = dict(node)
+    elems_obj = node.get("elements")
+    if isinstance(elems_obj, list):
+        out["elements"] = [
+            _wrap_value_for_target_type(item, inner_type, ctx=ctx) if isinstance(item, dict) else item
+            for item in elems_obj
+        ]
+    out["resolved_type"] = target_type
+    set_type_expr_summary(out, type_expr_summary_from_payload(ctx, None, target_type))
+    return out
+
+
 def _wrap_dict_literal_for_target_type(value_expr: JsonVal, target_type: str, *, ctx: CompileContext) -> JsonVal:
     if not isinstance(value_expr, dict):
         return value_expr
@@ -473,6 +501,9 @@ def _wrap_value_for_target_type(
     if _supports_static_scalar_cast(value_t, optional_inner):
         return _make_static_scalar_cast_expr(value_expr, optional_inner, ctx=ctx)
     if not is_dynamic_like_summary(target_summary):
+        wrapped_list = _wrap_list_literal_for_target_type(value_expr, target_t, ctx=ctx)
+        if wrapped_list is not value_expr:
+            return wrapped_list
         wrapped_dict = _wrap_dict_literal_for_target_type(value_expr, target_t, ctx=ctx)
         if wrapped_dict is not value_expr:
             return wrapped_dict
