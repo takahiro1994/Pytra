@@ -3378,6 +3378,44 @@ def has_key(env: dict[str, int], name: str) -> bool:
         with self.assertRaisesRegex(RuntimeError, "unsupported_stmt_kind"):
             emit_cpp_module(doc)
 
+    def test_cpp_emitter_fails_fast_on_unsupported_slice_shape(self) -> None:
+        doc = _module_doc(
+            "app.main",
+            body=[
+                {
+                    "kind": "Expr",
+                    "value": {
+                        "kind": "Subscript",
+                        "value": {"kind": "Name", "id": "obj", "resolved_type": "object"},
+                        "slice": {
+                            "kind": "Slice",
+                            "lower": {"kind": "Constant", "value": 0, "resolved_type": "int64"},
+                            "upper": {"kind": "Constant", "value": 1, "resolved_type": "int64"},
+                        },
+                        "resolved_type": "object",
+                    },
+                }
+            ],
+        )
+
+        with self.assertRaisesRegex(RuntimeError, "unsupported_slice_shape"):
+            emit_cpp_module(doc)
+
+    def test_cpp_emitter_fails_fast_on_unsupported_assign_target(self) -> None:
+        doc = _module_doc(
+            "app.main",
+            body=[
+                {
+                    "kind": "Assign",
+                    "targets": ["bad-target"],
+                    "value": {"kind": "Constant", "value": 1, "resolved_type": "int64"},
+                }
+            ],
+        )
+
+        with self.assertRaisesRegex(RuntimeError, "unsupported_assign_target"):
+            emit_cpp_module(doc)
+
 
 if __name__ == "__main__":
     unittest.main()

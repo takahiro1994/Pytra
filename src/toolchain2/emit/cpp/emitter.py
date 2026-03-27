@@ -1074,7 +1074,7 @@ def _emit_slice_expr(ctx: CppEmitContext, node: dict[str, JsonVal], value_expr: 
         return "py_str_slice(" + value_expr + ", " + lo_expr + ", " + up_expr + ")"
     if value_type.startswith("list[") or value_type in ("bytes", "bytearray"):
         return "py_list_slice_copy(" + value_expr + ", " + lo_expr + ", " + up_expr + ")"
-    return value_expr + " /* slice */"
+    _emit_fail(ctx, "unsupported_slice_shape", value_type if value_type != "" else "<unknown>")
 
 
 def _emit_ifexp(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
@@ -1204,7 +1204,7 @@ def _emit_assign(ctx: CppEmitContext, node: dict[str, JsonVal]) -> None:
     val_code = _emit_expr(ctx, value)
     t = targets[0]
     if not isinstance(t, dict):
-        _emit(ctx, "/* assign */ " + val_code + ";")
+        _emit_fail(ctx, "unsupported_assign_target", "non-dict target")
         return
 
     tk = _str(t, "kind")
@@ -1238,6 +1238,8 @@ def _emit_assign(ctx: CppEmitContext, node: dict[str, JsonVal]) -> None:
                 _emit(ctx, name + " = ::std::get<" + str(i) + ">(" + tmp_name + ");")
         else:
             _emit(ctx, "auto [" + ", ".join(names) + "] = " + val_code + ";")
+    else:
+        _emit_fail(ctx, "unsupported_assign_target", tk if tk != "" else "<unknown>")
 
 
 def _emit_aug_assign(ctx: CppEmitContext, node: dict[str, JsonVal]) -> None:
