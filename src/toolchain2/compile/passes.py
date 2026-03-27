@@ -911,14 +911,15 @@ def _collect_sig_node(node: Node, sigs: dict[str, Node], class_name: str) -> Non
                 if len(targets_list) == 1 and isinstance(targets_list[0], dict):
                     target = cast(dict[str, JsonVal], targets_list[0])
         value = node.get("value")
+        value_node2: Node = cast(dict[str, JsonVal], value) if isinstance(value, dict) else {}
         if (
             isinstance(target, dict)
             and target.get("kind") == NAME
             and isinstance(value, dict)
-            and value.get("kind") == "Lambda"
+            and value_node2.get("kind") == "Lambda"
         ):
             target_node: Node = cast(dict[str, JsonVal], target)
-            value_node: Node = cast(dict[str, JsonVal], value)
+            value_node: Node = value_node2
             lambda_name: str = jv_str(target_node.get("id", ""))
             args = value_node.get("args")
             if lambda_name != "" and isinstance(args, list):
@@ -954,13 +955,15 @@ def _expand_defaults_walk(node: JsonVal, sigs: dict[str, Node]) -> None:
         func = nd.get("func")
         cn = ""
         if isinstance(func, dict):
-            if func.get("kind") == NAME:
-                cn = jv_str(func.get("id", ""))
-            elif func.get("kind") == ATTRIBUTE:
-                attr = jv_str(func.get("attr", ""))
-                owner = func.get("value")
+            func_node: Node = cast(dict[str, JsonVal], func)
+            if func_node.get("kind") == NAME:
+                cn = jv_str(func_node.get("id", ""))
+            elif func_node.get("kind") == ATTRIBUTE:
+                attr: str = jv_str(func_node.get("attr", ""))
+                owner = func_node.get("value")
                 if isinstance(owner, dict):
-                    owner_type = jv_str(owner.get("resolved_type", ""))
+                    owner_node: Node = cast(dict[str, JsonVal], owner)
+                    owner_type: str = jv_str(owner_node.get("resolved_type", ""))
                     if owner_type != "" and owner_type != "unknown":
                         qualified = owner_type + "." + attr
                         if qualified in sigs:
@@ -975,38 +978,51 @@ def _expand_defaults_walk(node: JsonVal, sigs: dict[str, Node]) -> None:
             ad = sig.get("arg_defaults")
             args = nd.get("args")
             if isinstance(args, list) and isinstance(ao, list) and isinstance(ad, dict):
-                ep = [p for p in ao if isinstance(p, str) and p != "self"]
+                args_list: list[JsonVal] = cast(list[JsonVal], args)
+                ao_list: list[JsonVal] = cast(list[JsonVal], ao)
+                ad_node: Node = cast(dict[str, JsonVal], ad)
+                ep: list[str] = []
+                for p in ao_list:
+                    if isinstance(p, str) and p != "self":
+                        ep.append(p)
                 ne = len(ep)
                 kw_map: dict[str, JsonVal] = {}
                 kws = nd.get("keywords")
                 if isinstance(kws, list):
-                    for kw in kws:
+                    kw_list: list[JsonVal] = cast(list[JsonVal], kws)
+                    for kw in kw_list:
                         if isinstance(kw, dict):
-                            ka = jv_str(kw.get("arg", ""))
-                            kv = kw.get("value")
+                            kw_node: Node = cast(dict[str, JsonVal], kw)
+                            ka = jv_str(kw_node.get("arg", ""))
+                            kv = kw_node.get("value")
                             if ka != "":
                                 kw_map[ka] = kv
-                if len(args) < ne:
-                    for i in range(len(args), ne):
+                if len(args_list) < ne:
+                    for i in range(len(args_list), ne):
                         pn = ep[i]
                         if pn in kw_map:
                             kv2 = kw_map[pn]
-                            args.append(deep_copy_json(kv2) if isinstance(kv2, dict) else kv2)
-                        elif pn in ad:
-                            dn = ad[pn]
+                            args_list.append(deep_copy_json(kv2) if isinstance(kv2, dict) else kv2)
+                        elif pn in ad_node:
+                            dn = ad_node[pn]
                             if isinstance(dn, dict):
-                                args.append(deep_copy_json(dn))
+                                args_list.append(deep_copy_json(dn))
+                    nd["args"] = args_list
                     if isinstance(kws, list) and len(kw_map) > 0:
                         remaining: list[JsonVal] = []
-                        for kw in kws:
+                        kw_list2: list[JsonVal] = cast(list[JsonVal], kws)
+                        for kw in kw_list2:
                             if isinstance(kw, dict):
-                                ka = jv_str(kw.get("arg", ""))
+                                kw_node2: Node = cast(dict[str, JsonVal], kw)
+                                ka = jv_str(kw_node2.get("arg", ""))
                                 if ka in kw_map:
                                     continue
                             remaining.append(kw)
                         nd["keywords"] = remaining
     for v in nd.values():
-        if isinstance(v, (dict, list)):
+        if isinstance(v, dict):
+            _expand_defaults_walk(v, sigs)
+        elif isinstance(v, list):
             _expand_defaults_walk(v, sigs)
 
 
@@ -1022,12 +1038,20 @@ def expand_default_arguments(module: Node, ctx: CompileContext) -> Node:
 # ===========================================================================
 
 def _tte_subscript(owner: str, index: int, elem_type: str) -> Node:
-    return {
-        "kind": SUBSCRIPT,
-        "value": {"kind": NAME, "id": owner, "resolved_type": "tuple"},
-        "slice": {"kind": CONSTANT, "value": index, "resolved_type": "int64"},
-        "resolved_type": elem_type if elem_type != "" else "unknown",
-    }
+    value_node: Node = {}
+    value_node["kind"] = NAME
+    value_node["id"] = owner
+    value_node["resolved_type"] = "tuple"
+    slice_node: Node = {}
+    slice_node["kind"] = CONSTANT
+    slice_node["value"] = index
+    slice_node["resolved_type"] = "int64"
+    out: Node = {}
+    out["kind"] = SUBSCRIPT
+    out["value"] = value_node
+    out["slice"] = slice_node
+    out["resolved_type"] = elem_type if elem_type != "" else "unknown"
+    return out
 
 
 def _tte_walk(node: JsonVal, ctx: CompileContext) -> None:
@@ -1040,42 +1064,64 @@ def _tte_walk(node: JsonVal, ctx: CompileContext) -> None:
     nd: Node = node
     if nd.get("kind") == FOR_CORE:
         tp = nd.get("target_plan")
-        if isinstance(tp, dict) and tp.get("kind") == TUPLE_TARGET:
-            elements = tp.get("elements")
-            if isinstance(elements, list) and len(elements) >= 2:
-                tmp = ctx.next_tte_name()
-                assigns: list[JsonVal] = []
-                direct_names: list[JsonVal] = []
-                for i, elem in enumerate(elements):
-                    if not isinstance(elem, dict) or elem.get("kind") != NAME_TARGET:
-                        continue
-                    en = elem.get("id", "")
-                    et = elem.get("target_type", "")
-                    if not isinstance(en, str) or en == "":
-                        continue
-                    if not isinstance(et, str):
-                        et = ""
-                    assign: Node = {
-                        "kind": ASSIGN,
-                        "target": {"kind": NAME, "id": en, "resolved_type": et if et != "" else "unknown"},
-                        "value": _tte_subscript(tmp, i, et),
-                        "decl_type": et if et != "" else "unknown",
-                        "declare": True,
-                    }
-                    assigns.append(assign)
-                    direct_names.append(en)
-                nd["target_plan"] = {
-                    "kind": NAME_TARGET,
-                    "id": tmp,
-                    "target_type": tp.get("target_type", ""),
-                    "direct_unpack_names": direct_names,
-                    "tuple_expanded": True,
-                }
-                body = nd.get("body")
-                if isinstance(body, list):
-                    nd["body"] = assigns + body
+        if isinstance(tp, dict):
+            tp_node: Node = cast(dict[str, JsonVal], tp)
+            if tp_node.get("kind") != TUPLE_TARGET:
+                pass
+            else:
+                elements = tp_node.get("elements")
+                if isinstance(elements, list):
+                    elements_list: list[JsonVal] = cast(list[JsonVal], elements)
+                    if len(elements_list) < 2:
+                        pass
+                    else:
+                        tmp = ctx.next_tte_name()
+                        assigns: list[JsonVal] = []
+                        direct_names: list[JsonVal] = []
+                        for i, elem in enumerate(elements_list):
+                            if not isinstance(elem, dict):
+                                continue
+                            elem_node: Node = cast(dict[str, JsonVal], elem)
+                            if elem_node.get("kind") != NAME_TARGET:
+                                continue
+                            en = elem_node.get("id", "")
+                            et = elem_node.get("target_type", "")
+                            if not isinstance(en, str) or en == "":
+                                continue
+                            if not isinstance(et, str):
+                                et = ""
+                            target_node: Node = {}
+                            target_node["kind"] = NAME
+                            target_node["id"] = en
+                            target_node["resolved_type"] = et if et != "" else "unknown"
+                            assign: Node = {}
+                            assign["kind"] = ASSIGN
+                            assign["target"] = target_node
+                            assign["value"] = _tte_subscript(tmp, i, et)
+                            assign["decl_type"] = et if et != "" else "unknown"
+                            assign["declare"] = True
+                            assigns.append(assign)
+                            direct_names.append(en)
+                        tp_out: Node = {}
+                        tp_out["kind"] = NAME_TARGET
+                        tp_out["id"] = tmp
+                        tp_out["target_type"] = tp_node.get("target_type", "")
+                        tp_out["direct_unpack_names"] = direct_names
+                        tp_out["tuple_expanded"] = True
+                        nd["target_plan"] = tp_out
+                        body = nd.get("body")
+                        if isinstance(body, list):
+                            body_list: list[JsonVal] = cast(list[JsonVal], body)
+                            new_body: list[JsonVal] = []
+                            for stmt in assigns:
+                                new_body.append(stmt)
+                            for stmt in body_list:
+                                new_body.append(stmt)
+                            nd["body"] = new_body
     for v in nd.values():
-        if isinstance(v, (dict, list)):
+        if isinstance(v, dict):
+            _tte_walk(v, ctx)
+        elif isinstance(v, list):
             _tte_walk(v, ctx)
 
 
@@ -1125,27 +1171,32 @@ def _expand_tuple_unpack_in_stmts(stmts: list[JsonVal], ctx: CompileContext) -> 
         if not isinstance(target, dict) or target.get("kind") != TUPLE:
             result.append(stmt)
             continue
-        elements = target.get("elements")
-        if not isinstance(elements, list) or len(elements) == 0:
+        target_node: Node = cast(dict[str, JsonVal], target)
+        elements = target_node.get("elements")
+        if not isinstance(elements, list):
+            result.append(stmt)
+            continue
+        elements_list: list[JsonVal] = cast(list[JsonVal], elements)
+        if len(elements_list) == 0:
             result.append(stmt)
             continue
         value = stmt.get("value")
 
         # Detect swap pattern: a, b = b, a → Swap node
-        if isinstance(value, dict) and value.get("kind") == TUPLE and len(elements) == 2:
+        if isinstance(value, dict) and value.get("kind") == TUPLE and len(elements_list) == 2:
             val_elements = value.get("elements")
             if isinstance(val_elements, list) and len(val_elements) == 2:
-                le0 = elements[0] if isinstance(elements[0], dict) else {}
-                le1 = elements[1] if isinstance(elements[1], dict) else {}
-                re0 = val_elements[0] if isinstance(val_elements[0], dict) else {}
-                re1 = val_elements[1] if isinstance(val_elements[1], dict) else {}
+                val_elements_list: list[JsonVal] = cast(list[JsonVal], val_elements)
+                le0 = cast(dict[str, JsonVal], elements_list[0]) if isinstance(elements_list[0], dict) else {}
+                le1 = cast(dict[str, JsonVal], elements_list[1]) if isinstance(elements_list[1], dict) else {}
+                re0 = cast(dict[str, JsonVal], val_elements_list[0]) if isinstance(val_elements_list[0], dict) else {}
+                re1 = cast(dict[str, JsonVal], val_elements_list[1]) if isinstance(val_elements_list[1], dict) else {}
                 # Check if targets[0]=rhs[1] and targets[1]=rhs[0] (cross reference)
                 if _same_lvalue(le0, re1) and _same_lvalue(le1, re0):
-                    swap_node: Node = {
-                        "kind": SWAP,
-                        "left": deep_copy_json(le0),
-                        "right": deep_copy_json(le1),
-                    }
+                    swap_node: Node = {}
+                    swap_node["kind"] = SWAP
+                    swap_node["left"] = deep_copy_json(le0)
+                    swap_node["right"] = deep_copy_json(le1)
                     result.append(swap_node)
                     continue
 
@@ -1153,16 +1204,20 @@ def _expand_tuple_unpack_in_stmts(stmts: list[JsonVal], ctx: CompileContext) -> 
         tmp_name: str = ctx.next_tuple_tmp_name()
         val_rt = ""
         if isinstance(value, dict):
-            val_rt = jv_str(value.get("resolved_type"))
-        target_rt = jv_str(target.get("resolved_type"))
+            value_node: Node = cast(dict[str, JsonVal], value)
+            val_rt = jv_str(value_node.get("resolved_type"))
+        target_rt = jv_str(target_node.get("resolved_type"))
         tmp_value, tmp_rt = _make_tuple_unpack_source(value, val_rt, target_rt)
-        tmp_assign: Node = {
-            "kind": ASSIGN,
-            "target": {"kind": NAME, "id": tmp_name, "resolved_type": tmp_rt},
-            "value": tmp_value,
-            "declare": True,
-            "decl_type": tmp_rt,
-        }
+        tmp_target: Node = {}
+        tmp_target["kind"] = NAME
+        tmp_target["id"] = tmp_name
+        tmp_target["resolved_type"] = tmp_rt
+        tmp_assign: Node = {}
+        tmp_assign["kind"] = ASSIGN
+        tmp_assign["target"] = tmp_target
+        tmp_assign["value"] = tmp_value
+        tmp_assign["declare"] = True
+        tmp_assign["decl_type"] = tmp_rt
         result.append(tmp_assign)
 
         # Parse tuple element types from the effective tuple source.
@@ -1171,26 +1226,36 @@ def _expand_tuple_unpack_in_stmts(stmts: list[JsonVal], ctx: CompileContext) -> 
             elem_types = _parse_tuple_element_types(target_rt)
 
         # Generate: x = _tmp[0], y = _tmp[1], ...
-        for i, elem in enumerate(elements):
+        for i, elem in enumerate(elements_list):
             if not isinstance(elem, dict):
                 continue
             elem_name = elem.get("id")
             if not isinstance(elem_name, str) or elem_name == "":
                 continue
             elem_rt = elem_types[i] if i < len(elem_types) else "unknown"
-            idx_node: Node = {
-                "kind": SUBSCRIPT,
-                "value": {"kind": NAME, "id": tmp_name, "resolved_type": tmp_rt},
-                "slice": {"kind": CONSTANT, "value": i, "resolved_type": "int64"},
-                "resolved_type": elem_rt,
-            }
-            elem_assign: Node = {
-                "kind": ASSIGN,
-                "target": {"kind": NAME, "id": elem_name, "resolved_type": elem_rt},
-                "value": idx_node,
-                "declare": True,
-                "decl_type": elem_rt,
-            }
+            idx_value: Node = {}
+            idx_value["kind"] = NAME
+            idx_value["id"] = tmp_name
+            idx_value["resolved_type"] = tmp_rt
+            idx_slice: Node = {}
+            idx_slice["kind"] = CONSTANT
+            idx_slice["value"] = i
+            idx_slice["resolved_type"] = "int64"
+            idx_node: Node = {}
+            idx_node["kind"] = SUBSCRIPT
+            idx_node["value"] = idx_value
+            idx_node["slice"] = idx_slice
+            idx_node["resolved_type"] = elem_rt
+            elem_target: Node = {}
+            elem_target["kind"] = NAME
+            elem_target["id"] = elem_name
+            elem_target["resolved_type"] = elem_rt
+            elem_assign: Node = {}
+            elem_assign["kind"] = ASSIGN
+            elem_assign["target"] = elem_target
+            elem_assign["value"] = idx_node
+            elem_assign["declare"] = True
+            elem_assign["decl_type"] = elem_rt
             result.append(elem_assign)
 
     return result
