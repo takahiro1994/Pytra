@@ -1364,7 +1364,7 @@ def _emit_builtin_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
             if isinstance(arg0, dict) and _str(arg0, "kind") == "Name":
                 arg0_name = _safe_go_ident(_str(arg0, "id"))
                 scope_type = ctx.var_types.get(arg0_name, "")
-                if scope_type != "":
+                if scope_type != "" and arg0_rt in ("", "unknown"):
                     arg0_rt = scope_type
             if arg0_rt.startswith("list[") or arg0_rt.startswith("dict[") or arg0_rt.startswith("set["):
                 return "int64(len(" + arg_strs[0] + "))"

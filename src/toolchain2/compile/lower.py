@@ -574,8 +574,8 @@ def _wrap_value_for_target_type(
         and unbox_target != ""
         and storage_type != unbox_target
     ):
-        storage_summary = type_expr_summary_from_payload(ctx, None, storage_type)
-        unbox_summary = type_expr_summary_from_payload(ctx, None, unbox_target)
+        storage_summary: Node = type_expr_summary_from_payload(ctx, None, storage_type)
+        unbox_summary: Node = type_expr_summary_from_payload(ctx, None, unbox_target)
         out = _make_boundary_expr(
             kind="Unbox", value_key="value", value_node=value_expr,
             resolved_type=unbox_target, source_expr=value_expr,
@@ -587,7 +587,7 @@ def _wrap_value_for_target_type(
         set_type_expr_summary(out, unbox_summary)
         return out
     if storage_requires_runtime_unbox:
-        storage_summary = type_expr_summary_from_payload(ctx, None, storage_type)
+        storage_summary: Node = type_expr_summary_from_payload(ctx, None, storage_type)
         out = _make_boundary_expr(
             kind="Unbox", value_key="value", value_node=value_expr,
             resolved_type=target_t, source_expr=value_expr,
@@ -977,7 +977,7 @@ def _build_nominal_adt_ctor_meta(call: Node, ctx: CompileContext) -> JsonVal:
     decl_role = jv_str(decl["role"] if "role" in decl else "")
     if decl_role != "variant":
         return None
-    ps = jv_str(decl["payload_style"] if "payload_style" in decl else "")
+    ps: str = jv_str(decl["payload_style"] if "payload_style" in decl else "")
     if ps == "":
         ps = "unit"
     meta: Node = {}
@@ -1020,7 +1020,7 @@ def _decorate_nominal_adt_projection_attr(attr_expr: Node, ctx: CompileContext) 
     if decl_role != "variant":
         return attr_expr
     ft_obj = decl["field_types"] if "field_types" in decl else None
-    ft = ft_obj if isinstance(ft_obj, dict) else {}
+    ft: dict[str, JsonVal] = ft_obj if isinstance(ft_obj, dict) else {}
     field_type = normalize_type_name(ft.get(attr_name))
     if field_type == "unknown":
         return attr_expr
@@ -1031,7 +1031,7 @@ def _decorate_nominal_adt_projection_attr(attr_expr: Node, ctx: CompileContext) 
     meta["variant_name"] = variant_name
     meta["field_name"] = attr_name
     meta["field_type"] = field_type
-    ps = jv_str(decl["payload_style"] if "payload_style" in decl else "")
+    ps: str = jv_str(decl["payload_style"] if "payload_style" in decl else "")
     if ps != "":
         meta["payload_style"] = ps
     attr_expr["semantic_tag"] = "nominal_adt.variant_projection"
@@ -1048,9 +1048,10 @@ def _decorate_nominal_adt_variant_pattern(pattern: Node, ctx: CompileContext) ->
     variant_name = normalize_type_name(pattern.get("variant_name"))
     if variant_name == "unknown":
         return pattern
-    decl = lookup_nominal_adt_decl(ctx, variant_name)
-    if decl is None:
+    decl_obj = lookup_nominal_adt_decl(ctx, variant_name)
+    if decl_obj is None:
         return pattern
+    decl: Node = decl_obj
     decl_role = jv_str(decl.get("role", ""))
     if decl_role != "variant":
         return pattern
@@ -1060,7 +1061,7 @@ def _decorate_nominal_adt_variant_pattern(pattern: Node, ctx: CompileContext) ->
         family_name = decl_family
     elif decl_family != "" and family_name != decl_family:
         return pattern
-    ps = jv_str(decl.get("payload_style", ""))
+    ps: str = jv_str(decl.get("payload_style", ""))
     if ps == "":
         ps = "unit"
     subs_obj = pattern.get("subpatterns")
@@ -1083,7 +1084,7 @@ def _decorate_nominal_adt_variant_pattern(pattern: Node, ctx: CompileContext) ->
     pattern["semantic_tag"] = "nominal_adt.variant_pattern"
     pattern["nominal_adt_pattern_v1"] = meta
     ft_obj2 = decl.get("field_types")
-    ft2 = ft_obj2 if isinstance(ft_obj2, dict) else {}
+    ft2: dict[str, JsonVal] = ft_obj2 if isinstance(ft_obj2, dict) else {}
     field_entries = list(ft2.items())
     for idx in range(len(subs)):
         sp = subs[idx]
