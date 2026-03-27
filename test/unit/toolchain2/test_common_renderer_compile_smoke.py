@@ -38,6 +38,26 @@ def _emit_context_meta() -> dict[str, object]:
     return {"emit_context": {"module_id": "app", "is_entry": True}}
 
 
+def _fixture_case_source(rel_path: str) -> str:
+    source = (ROOT / rel_path).read_text(encoding="utf-8")
+    lines = source.splitlines()
+    out: list[str] = []
+    in_main_guard = False
+    for line in lines:
+        stripped = line.strip()
+        if stripped.startswith("from pytra.utils.assertions import py_assert_stdout"):
+            continue
+        if stripped == 'if __name__ == "__main__":':
+            in_main_guard = True
+            out.append(line)
+            out.append("    _case_main()")
+            continue
+        if in_main_guard:
+            continue
+        out.append(line)
+    return "\n".join(out) + "\n"
+
+
 SOURCE = """
 def f() -> int:
     x = 1
@@ -85,6 +105,8 @@ def f() -> int:
 if __name__ == "__main__":
     print(f())
 """
+
+FIXTURE_ADD_SOURCE = _fixture_case_source("test/fixture/source/py/core/add.py")
 
 
 def _assert_go_compiles(source: str) -> None:
@@ -351,6 +373,14 @@ class CommonRendererCompileSmokeTests(unittest.TestCase):
 
         self.assertEqual(go_stdout, "3\n")
         self.assertEqual(cpp_stdout, "3\n")
+        self.assertEqual(go_stdout, cpp_stdout)
+
+    def test_common_renderer_fixture_add_stdout_parity_between_go_and_cpp(self) -> None:
+        go_stdout = _run_go(FIXTURE_ADD_SOURCE)
+        cpp_stdout = _run_cpp(FIXTURE_ADD_SOURCE)
+
+        self.assertEqual(go_stdout, "7\n")
+        self.assertEqual(cpp_stdout, "7\n")
         self.assertEqual(go_stdout, cpp_stdout)
 
 
