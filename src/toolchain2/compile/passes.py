@@ -1276,16 +1276,32 @@ def _same_lvalue(a: Node, b: Node) -> bool:
         bv = b.get("value")
         asl = a.get("slice")
         bsl = b.get("slice")
-        return _same_lvalue(av, bv) and _same_lvalue(asl, bsl)
+        av_node: Node = cast(dict[str, JsonVal], av) if isinstance(av, dict) else {}
+        bv_node: Node = cast(dict[str, JsonVal], bv) if isinstance(bv, dict) else {}
+        asl_node: Node = cast(dict[str, JsonVal], asl) if isinstance(asl, dict) else {}
+        bsl_node: Node = cast(dict[str, JsonVal], bsl) if isinstance(bsl, dict) else {}
+        return _same_lvalue(av_node, bv_node) and _same_lvalue(asl_node, bsl_node)
     if ak == "Constant":
         return a.get("value") == b.get("value")
     if ak == ATTRIBUTE:
+        av = a.get("value")
+        bv = b.get("value")
+        av_node = cast(dict[str, JsonVal], av) if isinstance(av, dict) else {}
+        bv_node = cast(dict[str, JsonVal], bv) if isinstance(bv, dict) else {}
         return (a.get("attr", "") == b.get("attr", "") and
-                _same_lvalue(a.get("value"), b.get("value")))
+                _same_lvalue(av_node, bv_node))
     if ak == BIN_OP:
+        al = a.get("left")
+        bl = b.get("left")
+        ar = a.get("right")
+        br = b.get("right")
+        al_node = cast(dict[str, JsonVal], al) if isinstance(al, dict) else {}
+        bl_node = cast(dict[str, JsonVal], bl) if isinstance(bl, dict) else {}
+        ar_node = cast(dict[str, JsonVal], ar) if isinstance(ar, dict) else {}
+        br_node = cast(dict[str, JsonVal], br) if isinstance(br, dict) else {}
         return (a.get("op", "") == b.get("op", "") and
-                _same_lvalue(a.get("left"), b.get("left")) and
-                _same_lvalue(a.get("right"), b.get("right")))
+                _same_lvalue(al_node, bl_node) and
+                _same_lvalue(ar_node, br_node))
     return False
 
 
@@ -1316,26 +1332,26 @@ def _parse_tuple_element_types(rt: str) -> list[str]:
 
 
 def _make_tuple_unpack_source(value: JsonVal, source_type: str, target_type: str) -> tuple[JsonVal, str]:
-    normalized_source = normalize_type_name(source_type)
-    normalized_target = normalize_type_name(target_type)
+    normalized_source: str = normalize_type_name(source_type)
+    normalized_target: str = normalize_type_name(target_type)
     if normalized_target.startswith("tuple["):
         if normalized_source.startswith("tuple["):
             return value, normalized_source
         if "None" in normalized_source.split(" | "):
-            out: Node = {
-                "kind": UNBOX,
-                "value": deep_copy_json(value),
-                "resolved_type": normalized_target,
-                "borrow_kind": "value",
-                "casts": [],
-                "target": normalized_target,
-                "on_fail": "raise",
-            }
+            out: Node = {}
+            out["kind"] = UNBOX
+            out["value"] = deep_copy_json(value)
+            out["resolved_type"] = normalized_target
+            out["borrow_kind"] = "value"
+            out["casts"] = []
+            out["target"] = normalized_target
+            out["on_fail"] = "raise"
             if isinstance(value, dict):
-                span = value.get("source_span")
+                value_node: Node = cast(dict[str, JsonVal], value)
+                span = value_node.get("source_span")
                 if isinstance(span, dict):
                     out["source_span"] = span
-                repr_text = value.get("repr")
+                repr_text = value_node.get("repr")
                 if isinstance(repr_text, str) and repr_text != "":
                     out["repr"] = repr_text
             return out, normalized_target
@@ -1346,10 +1362,12 @@ def expand_tuple_unpack(module: Node, ctx: CompileContext) -> Node:
     """Expand all Assign(target=Tuple, ...) in the module."""
     body = module.get("body")
     if isinstance(body, list):
-        module["body"] = _expand_tuple_unpack_in_stmts(body, ctx)
+        body_list: list[JsonVal] = cast(list[JsonVal], body)
+        module["body"] = _expand_tuple_unpack_in_stmts(body_list, ctx)
     mg = module.get("main_guard_body")
     if isinstance(mg, list):
-        module["main_guard_body"] = _expand_tuple_unpack_in_stmts(mg, ctx)
+        mg_list: list[JsonVal] = cast(list[JsonVal], mg)
+        module["main_guard_body"] = _expand_tuple_unpack_in_stmts(mg_list, ctx)
     return module
 
 
@@ -1357,56 +1375,70 @@ def expand_tuple_unpack(module: Node, ctx: CompileContext) -> Node:
 # enumerate lowering
 # ===========================================================================
 
-def _try_lower_enum_forcore(stmt: Node, ctx: CompileContext) -> list[Node] | None:
+def _try_lower_enum_forcore(stmt: Node, ctx: CompileContext) -> JsonVal:
     ip = stmt.get("iter_plan")
-    if not isinstance(ip, dict) or ip.get("kind") != RUNTIME_ITER_FOR_PLAN:
+    if not isinstance(ip, dict):
         return None
-    ie = ip.get("iter_expr")
+    ip_node: Node = cast(dict[str, JsonVal], ip)
+    if ip_node.get("kind") != RUNTIME_ITER_FOR_PLAN:
+        return None
+    ie = ip_node.get("iter_expr")
     if not isinstance(ie, dict):
         return None
-    st = jv_str(ie.get("semantic_tag", "")).strip()
+    ie_node: Node = cast(dict[str, JsonVal], ie)
+    st: str = jv_str(ie_node.get("semantic_tag", ""))
     is_enum = st == "iter.enumerate"
     if not is_enum:
-        func = ie.get("func")
+        func = ie_node.get("func")
         if isinstance(func, dict):
-            is_enum = func.get("id") == "enumerate" or func.get("attr") == "enumerate"
+            func_node: Node = cast(dict[str, JsonVal], func)
+            is_enum = func_node.get("id") == "enumerate" or func_node.get("attr") == "enumerate"
     if not is_enum:
         return None
-    args = ie.get("args", [])
-    if not isinstance(args, list) or len(args) < 1:
+    args = ie_node.get("args", [])
+    if not isinstance(args, list):
         return None
-    iterable = args[0]
+    args_list: list[JsonVal] = cast(list[JsonVal], args)
+    if len(args_list) < 1:
+        return None
+    iterable = args_list[0]
     start_val = 0
-    if len(args) >= 2:
-        sa = args[1]
+    if len(args_list) >= 2:
+        sa = args_list[1]
         if isinstance(sa, dict) and sa.get("kind") == CONSTANT:
-            sv = sa.get("value")
+            sa_node: Node = cast(dict[str, JsonVal], sa)
+            sv = sa_node.get("value")
             if isinstance(sv, int):
                 start_val = sv
     tp = stmt.get("target_plan", {})
     if not isinstance(tp, dict):
         return None
+    tp_node: Node = cast(dict[str, JsonVal], tp)
     body = stmt.get("body", [])
     if not isinstance(body, list):
         return None
+    body_list: list[JsonVal] = cast(list[JsonVal], body)
     idx_name = ""
     val_name = ""
     remaining: list[JsonVal] = []
-    iter_tmp = jv_str(tp.get("id", "")).strip()
-    for s in body:
+    iter_tmp: str = jv_str(tp_node.get("id", ""))
+    for s in body_list:
         if not isinstance(s, dict):
             remaining.append(s)
             continue
-        if s.get("kind") == ASSIGN:
-            target = s.get("target")
-            value = s.get("value")
+        s_node: Node = cast(dict[str, JsonVal], s)
+        if s_node.get("kind") == ASSIGN:
+            target = s_node.get("target")
+            value = s_node.get("value")
             if isinstance(target, dict) and isinstance(value, dict) and value.get("kind") == SUBSCRIPT:
-                sl = value.get("slice", {})
+                target_node: Node = cast(dict[str, JsonVal], target)
+                value_node: Node = cast(dict[str, JsonVal], value)
+                sl = value_node.get("slice", {})
                 if isinstance(sl, dict) and sl.get("kind") == CONSTANT:
                     idx_v = sl.get("value")
-                    owner = value.get("value", {})
-                    if isinstance(owner, dict) and jv_str(owner.get("id", "")).strip() == iter_tmp:
-                        name = jv_str(target.get("id", "")).strip()
+                    owner = value_node.get("value", {})
+                    if isinstance(owner, dict) and jv_str(owner.get("id", "")) == iter_tmp:
+                        name: str = jv_str(target_node.get("id", ""))
                         if idx_v == 0 and name != "":
                             idx_name = name
                             continue
@@ -1417,45 +1449,80 @@ def _try_lower_enum_forcore(stmt: Node, ctx: CompileContext) -> list[Node] | Non
     if idx_name == "" or val_name == "":
         return None
     counter = ctx.next_enum_name()
-    init: Node = {
-        "kind": ASSIGN,
-        "target": {"kind": NAME, "id": counter, "resolved_type": "int64"},
-        "value": {"kind": CONSTANT, "value": start_val, "resolved_type": "int64"},
-        "decl_type": "int64", "declare": True,
-    }
-    raw_tt = jv_str(tp.get("target_type", "")).strip()
+    init_target: Node = {}
+    init_target["kind"] = NAME
+    init_target["id"] = counter
+    init_target["resolved_type"] = "int64"
+    init_value: Node = {}
+    init_value["kind"] = CONSTANT
+    init_value["value"] = start_val
+    init_value["resolved_type"] = "int64"
+    init: Node = {}
+    init["kind"] = ASSIGN
+    init["target"] = init_target
+    init["value"] = init_value
+    init["decl_type"] = "int64"
+    init["declare"] = True
+    raw_tt: str = jv_str(tp_node.get("target_type", ""))
     vtt = raw_tt
     if raw_tt.startswith("tuple[") and raw_tt.endswith("]"):
         inner = raw_tt[6:-1]
         parts = _split_comma_types(inner)
         if len(parts) >= 2:
             vtt = parts[1]
-    ntp: Node = {"kind": NAME_TARGET, "id": val_name, "target_type": vtt}
-    nip: Node = {
-        "kind": RUNTIME_ITER_FOR_PLAN,
-        "iter_expr": deep_copy_json(iterable),
-        "dispatch_mode": ip.get("dispatch_mode", "native"),
-        "init_op": "ObjIterInit", "next_op": "ObjIterNext",
-    }
-    assign_idx: Node = {
-        "kind": ASSIGN,
-        "target": {"kind": NAME, "id": idx_name, "resolved_type": "int64"},
-        "value": {"kind": NAME, "id": counter, "resolved_type": "int64"},
-        "decl_type": "int64", "declare": True,
-    }
-    increment: Node = {
-        "kind": AUG_ASSIGN,
-        "target": {"kind": NAME, "id": counter, "resolved_type": "int64"},
-        "op": "Add",
-        "value": {"kind": CONSTANT, "value": 1, "resolved_type": "int64"},
-    }
-    nb = [assign_idx] + remaining + [increment]
-    nf: Node = {
-        "kind": FOR_CORE, "iter_mode": stmt.get("iter_mode", "runtime_protocol"),
-        "iter_plan": nip, "target_plan": ntp,
-        "body": nb, "orelse": stmt.get("orelse", []),
-    }
-    return [init, nf]
+    ntp: Node = {}
+    ntp["kind"] = NAME_TARGET
+    ntp["id"] = val_name
+    ntp["target_type"] = vtt
+    nip: Node = {}
+    nip["kind"] = RUNTIME_ITER_FOR_PLAN
+    nip["iter_expr"] = deep_copy_json(iterable)
+    nip["dispatch_mode"] = ip_node.get("dispatch_mode", "native")
+    nip["init_op"] = "ObjIterInit"
+    nip["next_op"] = "ObjIterNext"
+    assign_target: Node = {}
+    assign_target["kind"] = NAME
+    assign_target["id"] = idx_name
+    assign_target["resolved_type"] = "int64"
+    assign_value: Node = {}
+    assign_value["kind"] = NAME
+    assign_value["id"] = counter
+    assign_value["resolved_type"] = "int64"
+    assign_idx: Node = {}
+    assign_idx["kind"] = ASSIGN
+    assign_idx["target"] = assign_target
+    assign_idx["value"] = assign_value
+    assign_idx["decl_type"] = "int64"
+    assign_idx["declare"] = True
+    increment_target: Node = {}
+    increment_target["kind"] = NAME
+    increment_target["id"] = counter
+    increment_target["resolved_type"] = "int64"
+    increment_value: Node = {}
+    increment_value["kind"] = CONSTANT
+    increment_value["value"] = 1
+    increment_value["resolved_type"] = "int64"
+    increment: Node = {}
+    increment["kind"] = AUG_ASSIGN
+    increment["target"] = increment_target
+    increment["op"] = "Add"
+    increment["value"] = increment_value
+    nb: list[JsonVal] = []
+    nb.append(assign_idx)
+    for item in remaining:
+        nb.append(item)
+    nb.append(increment)
+    nf: Node = {}
+    nf["kind"] = FOR_CORE
+    nf["iter_mode"] = stmt.get("iter_mode", "runtime_protocol")
+    nf["iter_plan"] = nip
+    nf["target_plan"] = ntp
+    nf["body"] = nb
+    nf["orelse"] = stmt.get("orelse", [])
+    out_nodes: list[JsonVal] = []
+    out_nodes.append(init)
+    out_nodes.append(nf)
+    return out_nodes
 
 
 def _enum_in_stmts(stmts: list[JsonVal], ctx: CompileContext) -> list[JsonVal]:
@@ -1467,8 +1534,10 @@ def _enum_in_stmts(stmts: list[JsonVal], ctx: CompileContext) -> list[JsonVal]:
         kind = stmt.get("kind", "")
         if kind == FOR_CORE:
             expanded = _try_lower_enum_forcore(stmt, ctx)
-            if expanded is not None:
-                result.extend(expanded)
+            if isinstance(expanded, list):
+                expanded_list: list[JsonVal] = cast(list[JsonVal], expanded)
+                for item in expanded_list:
+                    result.append(item)
                 continue
         for key in ("body", "orelse"):
             nested = stmt.get(key)
@@ -1481,7 +1550,8 @@ def _enum_in_stmts(stmts: list[JsonVal], ctx: CompileContext) -> list[JsonVal]:
 def lower_enumerate(module: Node, ctx: CompileContext) -> Node:
     body = module.get("body")
     if isinstance(body, list):
-        module["body"] = _enum_in_stmts(body, ctx)
+        body_list: list[JsonVal] = cast(list[JsonVal], body)
+        module["body"] = _enum_in_stmts(body_list, ctx)
     return module
 
 
