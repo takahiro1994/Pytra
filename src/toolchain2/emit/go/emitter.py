@@ -2318,6 +2318,8 @@ def _emit_stmt(ctx: EmitContext, node: JsonVal) -> None:
         _emit_var_decl(ctx, node)
     elif kind == "Swap":
         _emit_swap(ctx, node)
+    elif kind == "MultiAssign":
+        _emit_multi_assign(ctx, node)
     elif kind == "With":
         _emit_with(ctx, node)
     elif kind == "Try":
@@ -2562,6 +2564,38 @@ def _emit_assign(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
         _emit(ctx, "_ = " + val_code)
 
 
+def _emit_multi_assign(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
+    targets = _list(node, "targets")
+    target_types = _list(node, "target_types")
+    if len(targets) == 0:
+        return
+    lhs_parts: list[str] = []
+    for idx, target in enumerate(targets):
+        if not isinstance(target, dict):
+            continue
+        kind = _str(target, "kind")
+        if kind not in ("Name", "NameTarget"):
+            _emit(ctx, "// unsupported multi-assign target: " + kind)
+            return
+        name = _safe_go_ident(_str(target, "id"))
+        if name == "":
+            name = "_"
+        lhs_parts.append(name)
+        if name == "_":
+            continue
+        resolved_type = _str(target, "resolved_type")
+        if resolved_type in ("", "unknown") and idx < len(target_types):
+            type_obj = target_types[idx]
+            if isinstance(type_obj, str):
+                resolved_type = type_obj
+        if resolved_type not in ("", "unknown"):
+            ctx.var_types[name] = resolved_type
+    if len(lhs_parts) == 0:
+        return
+    assign_op = ":=" if _bool(node, "declare") else "="
+    _emit(ctx, ", ".join(lhs_parts) + " " + assign_op + " " + _emit_expr(ctx, node.get("value")))
+
+
 def _emit_aug_assign(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
     target = node.get("target")
     value = node.get("value")
@@ -2583,6 +2617,18 @@ def _emit_return(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
             return
         _emit(ctx, "return")
     else:
+        if (
+            ctx.current_return_type.startswith("multi_return[")
+            and isinstance(value, dict)
+            and _str(value, "kind") == "Tuple"
+        ):
+            elements = _list(value, "elements")
+            parts: list[str] = []
+            for elem in elements:
+                if isinstance(elem, dict):
+                    parts.append(_emit_expr(ctx, elem))
+            _emit(ctx, "return " + ", ".join(parts))
+            return
         value_code = _emit_expr(ctx, value)
         if isinstance(value, dict) and _str(value, "kind") == "Name":
             scope_name = _go_symbol_name(ctx, _str(value, "id"))

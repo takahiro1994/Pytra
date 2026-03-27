@@ -13,6 +13,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Union
 
+from toolchain2.emit.common.profile_loader import LoweringProfile, load_lowering_profile
+
 # common/ から共有ユーティリティを re-export
 from toolchain2.common.jv import deep_copy_json as deep_copy_json
 from toolchain2.common.types import normalize_type_name as normalize_type_name
@@ -36,6 +38,7 @@ class CompileContext:
 
     # legacy compat bridge フラグ (lower.py が参照)
     legacy_compat_bridge: bool = True
+    lowering_profile: LoweringProfile = field(default_factory=lambda: load_lowering_profile("core"))
 
     # passes.py のカウンター
     comp_counter: int = 0

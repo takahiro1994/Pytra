@@ -1,7 +1,7 @@
 """Language/lowering profile loader for toolchain2 emitters.
 
-Loads `toolchain2/emit/**/profiles/*.json` with include support and validates
-the lowering profile block used by EAST3 lowering.
+Loads canonical profiles from ``toolchain2/emit/profiles/*.json`` and
+validates the lowering profile block used by EAST3 lowering.
 """
 
 from __future__ import annotations
@@ -76,19 +76,14 @@ def _merge_profile_dict(base: dict[str, JsonVal], override: dict[str, JsonVal]) 
     return out
 
 
+def _profiles_root() -> Path:
+    return Path(__file__).resolve().parents[1] / "profiles"
+
+
 def load_profile_with_includes(profile_path: Path) -> dict[str, JsonVal]:
-    profile_root = profile_path.parent
-    merged = _load_json_dict(Path(__file__).resolve().parent / "profiles" / "core.json")
+    merged = _load_json_dict(_profiles_root().joinpath("core.json"))
     profile_doc = _load_json_dict(profile_path)
-    includes = profile_doc.get("include")
-    if isinstance(includes, list):
-        for rel in includes:
-            if not isinstance(rel, str) or rel == "" or rel.startswith("/"):
-                raise RuntimeError("profile include must be a relative path: " + str(rel))
-            piece = _load_json_dict(profile_root / rel)
-            merged = _merge_profile_dict(merged, piece)
-    merged = _merge_profile_dict(merged, profile_doc)
-    return merged
+    return _merge_profile_dict(merged, profile_doc)
 
 
 def _require_str(doc: dict[str, JsonVal], key: str) -> str:
@@ -151,6 +146,6 @@ def parse_lowering_profile(doc: dict[str, JsonVal]) -> LoweringProfile:
 def load_lowering_profile(language: str) -> LoweringProfile:
     if language == "":
         raise RuntimeError("language must not be empty")
-    profile_path = Path(__file__).resolve().parents[1] / language / "profiles" / "profile.json"
+    profile_path = _profiles_root().joinpath(language + ".json")
     doc = load_profile_with_includes(profile_path)
     return parse_lowering_profile(doc)

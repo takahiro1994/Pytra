@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "language": "cpp",
+
+  "types": {
+    "int8": "int8_t",
+    "uint8": "uint8_t",
+    "int16": "int16_t",
+    "uint16": "uint16_t",
+    "int32": "int32_t",
+    "uint32": "uint32_t",
+    "int64": "int64",
+    "uint64": "uint64",
+    "float32": "float",
+    "float64": "double",
+    "bool": "bool",
+    "str": "str",
+    "None": "void",
+    "Any": "object",
+    "Path": "str"
+  },
+
+  "generic_types": {
+    "list": "Object<list<{T}>>",
+    "dict": "Object<dict<{K}, {V}>>",
+    "set": "Object<set<{T}>>",
+    "tuple": "std::tuple<{...}>",
+    "optional": "std::optional<{T}>"
+  },
+
+  "operators": {
+    "bin": {
+      "FloorDiv": "__floordiv",
+      "Pow": "__pow"
+    },
+    "bool": {
+      "And": "&&",
+      "Or": "||"
+    }
+  },
+
+  "syntax": {
+    "if": "if ({cond}) {",
+    "elif": "} else if ({cond}) {",
+    "else": "} else {",
+    "while": "while ({cond}) {"
+  },
+
+  "lowering": {
+    "tuple_unpack_style": "structured_binding",
+    "container_covariance": false,
+    "closure_style": "closure_syntax",
+    "with_style": "raii",
+    "property_style": "method_call",
+    "swap_style": "std_swap",
+    "none_literal": "std::nullopt",
+    "bool_literals": ["true", "false"],
+    "self_keyword": "this",
+    "type_position": "prefix",
+    "condition_parens": true,
+    "block_braces": "braces",
+    "stmt_terminator": ";",
+    "string_type_owned": false,
+    "has_explicit_error_return": false
+  }
+}

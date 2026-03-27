@@ -31,6 +31,8 @@ WITH: str = "With"
 BREAK: str = "Break"
 CONTINUE: str = "Continue"
 SWAP: str = "Swap"
+TUPLE_UNPACK: str = "TupleUnpack"
+MULTI_ASSIGN: str = "MultiAssign"
 
 # --- expressions ---
 NAME: str = "Name"

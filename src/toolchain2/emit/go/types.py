@@ -5,10 +5,6 @@
 
 from __future__ import annotations
 
-from pytra.std.json import JsonVal
-from pytra.typing import cast
-
-
 # EAST3 resolved_type → Go type
 _TYPE_MAP: dict[str, str] = {
     "int": "int64",
@@ -50,16 +46,16 @@ _TYPE_MAP: dict[str, str] = {
 }
 
 
-def _parse_callable_signature(resolved_type: str) -> list[JsonVal]:
+def _parse_callable_signature(resolved_type: str) -> tuple[list[str], str]:
     if not (
         (resolved_type.startswith("callable[") or resolved_type.startswith("Callable["))
         and resolved_type.endswith("]")
     ):
-        return [[], "unknown"]
+        return ([], "unknown")
     prefix_len = len("Callable[") if resolved_type.startswith("Callable[") else len("callable[")
     inner = resolved_type[prefix_len:-1].strip()
     if inner == "":
-        return [[], "unknown"]
+        return ([], "unknown")
     if inner.startswith("["):
         depth = 0
         close_idx = -1
@@ -80,10 +76,7 @@ def _parse_callable_signature(resolved_type: str) -> list[JsonVal]:
             params: list[str] = []
             if params_text != "":
                 params = _split_generic_args(params_text)
-            params_json: list[JsonVal] = []
-            for param in params:
-                params_json.append(param)
-            return [params_json, ret_text if ret_text != "" else "unknown"]
+            return (params, ret_text if ret_text != "" else "unknown")
     arrow_idx = inner.find("->")
     if arrow_idx >= 0:
         params_text2 = inner[:arrow_idx].strip()
@@ -94,11 +87,8 @@ def _parse_callable_signature(resolved_type: str) -> list[JsonVal]:
                 item = part.strip()
                 if item != "":
                     params2.append(item)
-        params2_json: list[JsonVal] = []
-        for param2 in params2:
-            params2_json.append(param2)
-        return [params2_json, ret_text2 if ret_text2 != "" else "unknown"]
-    return [[], inner]
+        return (params2, ret_text2 if ret_text2 != "" else "unknown")
+    return ([], inner)
 
 
 def go_type(resolved_type: str) -> str:
@@ -107,14 +97,17 @@ def go_type(resolved_type: str) -> str:
         return "any"
 
     if (resolved_type.startswith("callable[") or resolved_type.startswith("Callable[")) and resolved_type.endswith("]"):
-        signature = _parse_callable_signature(resolved_type)
-        params = cast(list[str], signature[0])
-        ret = cast(str, signature[1])
+        params, ret = _parse_callable_signature(resolved_type)
         param_gts = [go_type(param) for param in params]
         ret_gt = go_type(ret)
         if ret_gt == "":
             return "func(" + ", ".join(param_gts) + ")"
         return "func(" + ", ".join(param_gts) + ") " + ret_gt
+
+    if resolved_type.startswith("multi_return[") and resolved_type.endswith("]"):
+        inner = resolved_type[len("multi_return["):-1]
+        parts = _split_generic_args(inner)
+        return "(" + ", ".join(go_type(part) for part in parts) + ")"
 
     # Direct mapping
     mapped = _TYPE_MAP.get(resolved_type, "")

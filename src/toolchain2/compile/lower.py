@@ -48,6 +48,7 @@ from toolchain2.compile.type_summary import (
     representative_json_contract_metadata,
     structured_type_expr_summary_from_node,
 )
+from toolchain2.emit.common.profile_loader import load_lowering_profile
 from toolchain2.compile.passes import (
     lower_yield_generators,
     lower_listcomp,
@@ -2166,7 +2167,7 @@ def _lower_node(node: JsonVal, *, dispatch_mode: str, ctx: CompileContext) -> Js
 # Main entry point
 # ---------------------------------------------------------------------------
 
-def lower_east2_to_east3(east_module: Node, object_dispatch_mode: str = "") -> Node:
+def lower_east2_to_east3(east_module: Node, object_dispatch_mode: str = "", target_language: str = "core") -> Node:
     """EAST2 Module を EAST3 へ lower する。"""
     if not isinstance(east_module, dict):
         return east_module
@@ -2186,6 +2187,7 @@ def lower_east2_to_east3(east_module: Node, object_dispatch_mode: str = "") -> N
         dispatch_mode = _normalize_dispatch_mode(md.get("dispatch_mode"))
 
     ctx: CompileContext = CompileContext()
+    ctx.lowering_profile = load_lowering_profile(target_language)
     ctx.nominal_adt_table = collect_nominal_adt_table(east_module)
     ctx.legacy_compat_bridge = True
     if isinstance(meta_obj, dict):

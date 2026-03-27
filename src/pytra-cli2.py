@@ -322,7 +322,7 @@ def _compile_one(input_path: Path, output_path: Path | None, pretty: bool) -> in
         return 1
 
     try:
-        east3_doc = lower_east2_to_east3(east2_doc)
+        east3_doc = lower_east2_to_east3(east2_doc, target_language="cpp")
     except Exception:
         print("error: compile failed: " + str(input_path))
         return 1
@@ -768,7 +768,7 @@ def _build_pipeline(inputs: list[str], output_dir_text: str, target: str) -> int
     # 3. Compile
     east3_docs: list[tuple[str, dict]] = []
     for inp, east2_doc in east2_docs:
-        east3_doc = lower_east2_to_east3(east2_doc)
+        east3_doc = lower_east2_to_east3(east2_doc, target_language=target)
         east3_docs.append((inp, east3_doc))
     print("build: compiled " + str(len(east3_docs)) + " files")
 

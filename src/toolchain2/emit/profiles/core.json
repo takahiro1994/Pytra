@@ -1,0 +1,111 @@
+{
+  "schema_version": 1,
+  "language": "core",
+
+  "types": {
+    "int8": "int8",
+    "uint8": "uint8",
+    "int16": "int16",
+    "uint16": "uint16",
+    "int32": "int32",
+    "uint32": "uint32",
+    "int64": "int64",
+    "uint64": "uint64",
+    "float32": "float32",
+    "float64": "float64",
+    "bool": "bool",
+    "str": "str",
+    "None": "None",
+    "Any": "any",
+    "Path": "Path"
+  },
+
+  "generic_types": {
+    "list": "list<{T}>",
+    "dict": "dict<{K}, {V}>",
+    "set": "set<{T}>",
+    "tuple": "tuple<{...}>",
+    "optional": "optional<{T}>"
+  },
+
+  "operators": {
+    "bin": {
+      "Add": "+",
+      "Sub": "-",
+      "Mult": "*",
+      "Div": "/",
+      "FloorDiv": "//",
+      "Mod": "%",
+      "Pow": "**",
+      "BitAnd": "&",
+      "BitOr": "|",
+      "BitXor": "^",
+      "LShift": "<<",
+      "RShift": ">>"
+    },
+    "cmp": {
+      "Eq": "==",
+      "NotEq": "!=",
+      "Lt": "<",
+      "LtE": "<=",
+      "Gt": ">",
+      "GtE": ">="
+    },
+    "bool": {
+      "And": "&&",
+      "Or": "||"
+    },
+    "unary": {
+      "USub": "-",
+      "UAdd": "+",
+      "Not": "!",
+      "Invert": "~"
+    },
+    "aug": {
+      "Add": "+=",
+      "Sub": "-=",
+      "Mult": "*=",
+      "Div": "/=",
+      "FloorDiv": "//=",
+      "Mod": "%=",
+      "BitAnd": "&=",
+      "BitOr": "|=",
+      "BitXor": "^=",
+      "LShift": "<<=",
+      "RShift": ">>="
+    }
+  },
+
+  "syntax": {
+    "if": "if ({cond}) {",
+    "elif": "} else if ({cond}) {",
+    "else": "} else {",
+    "while": "while ({cond}) {",
+    "block_close": "}",
+    "return": "return",
+    "break": "break",
+    "continue": "continue",
+    "pass": "",
+    "comment_prefix": "//",
+    "docstring_open": "/*",
+    "docstring_close": "*/"
+  },
+
+  "lowering": {
+    "tuple_unpack_style": "individual_temps",
+    "container_covariance": false,
+    "closure_style": "closure_syntax",
+    "with_style": "try_finally",
+    "property_style": "method_call",
+    "swap_style": "temp_var",
+    "none_literal": "null",
+    "bool_literals": ["true", "false"],
+    "self_keyword": "this",
+    "type_position": "prefix",
+    "condition_parens": true,
+    "block_braces": "braces",
+    "stmt_terminator": ";",
+    "string_type_owned": true,
+    "has_explicit_error_return": false
+  }
+}

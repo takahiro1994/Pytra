@@ -17,6 +17,7 @@ from toolchain2.common.kinds import (
     MODULE, FUNCTION_DEF, CLOSURE_DEF, CLASS_DEF, VAR_DECL,
     ASSIGN, ANN_ASSIGN, AUG_ASSIGN, EXPR, RETURN, YIELD,
     IF, WHILE, FOR, FOR_RANGE, FOR_CORE, TRY, WITH, SWAP,
+    TUPLE_UNPACK, MULTI_ASSIGN,
     NAME, CONSTANT, CALL, ATTRIBUTE, SUBSCRIPT,
     BIN_OP, UNARY_OP, COMPARE, IF_EXP, BOOL_OP,
     LIST, DICT, SET, TUPLE, LIST_COMP,
@@ -1200,13 +1201,25 @@ def _expand_tuple_unpack_in_stmts(stmts: list[JsonVal], ctx: CompileContext) -> 
                     result.append(swap_node)
                     continue
 
-        # Generate: _tmp = value
-        tmp_name: str = ctx.next_tuple_tmp_name()
         val_rt = ""
         if isinstance(value, dict):
             value_node: Node = cast(dict[str, JsonVal], value)
             val_rt = jv_str(value_node.get("resolved_type"))
         target_rt = jv_str(target_node.get("resolved_type"))
+        elem_types: list[str] = _parse_tuple_element_types(target_rt)
+        if len(elem_types) == 0:
+            elem_types = _parse_tuple_element_types(val_rt)
+
+        tuple_style = ctx.lowering_profile.tuple_unpack_style
+        if tuple_style == "structured_binding" or tuple_style == "pattern_match":
+            result.append(_make_tuple_unpack_high_level(TUPLE_UNPACK, elements_list, value, elem_types))
+            continue
+        if tuple_style == "multi_return":
+            result.append(_make_tuple_unpack_high_level(MULTI_ASSIGN, elements_list, value, elem_types))
+            continue
+
+        # Generate: _tmp = value
+        tmp_name: str = ctx.next_tuple_tmp_name()
         tmp_value, tmp_rt = _make_tuple_unpack_source(value, val_rt, target_rt)
         tmp_target: Node = {}
         tmp_target["kind"] = NAME
@@ -1221,7 +1234,7 @@ def _expand_tuple_unpack_in_stmts(stmts: list[JsonVal], ctx: CompileContext) -> 
         result.append(tmp_assign)
 
         # Parse tuple element types from the effective tuple source.
-        elem_types: list[str] = _parse_tuple_element_types(tmp_rt)
+        elem_types = _parse_tuple_element_types(tmp_rt)
         if len(elem_types) == 0:
             elem_types = _parse_tuple_element_types(target_rt)
 
@@ -1378,6 +1391,31 @@ def _make_tuple_unpack_source(value: JsonVal, source_type: str, target_type: str
     return value, normalized_source
 
 
+def _make_tuple_unpack_high_level(
+    style_kind: str,
+    elements_list: list[JsonVal],
+    value: JsonVal,
+    elem_types: list[str],
+) -> Node:
+    out: Node = {}
+    out["kind"] = style_kind
+    targets: list[JsonVal] = []
+    target_types: list[JsonVal] = []
+    for i, elem in enumerate(elements_list):
+        if not isinstance(elem, dict):
+            continue
+        targets.append(deep_copy_json(elem))
+        elem_rt = elem_types[i] if i < len(elem_types) else ""
+        if elem_rt in ("", "unknown"):
+            elem_rt = normalize_type_name(elem.get("resolved_type"))
+        target_types.append(elem_rt)
+    out["targets"] = targets
+    out["target_types"] = target_types
+    out["value"] = deep_copy_json(value)
+    out["declare"] = True
+    return out
+
+
 def expand_tuple_unpack(module: Node, ctx: CompileContext) -> Node:
     """Expand all Assign(target=Tuple, ...) in the module."""
     body = module.get("body")
@@ -1388,7 +1426,28 @@ def expand_tuple_unpack(module: Node, ctx: CompileContext) -> Node:
     if isinstance(mg, list):
         mg_list: list[JsonVal] = cast(list[JsonVal], mg)
         module["main_guard_body"] = _expand_tuple_unpack_in_stmts(mg_list, ctx)
+    if ctx.lowering_profile.tuple_unpack_style == "multi_return":
+        _rewrite_multi_return_function_types(module)
     return module
+
+
+def _rewrite_multi_return_function_types(node: JsonVal) -> None:
+    if isinstance(node, list):
+        for item in node:
+            _rewrite_multi_return_function_types(item)
+        return
+    if not isinstance(node, dict):
+        return
+    kind = _sk(node)
+    if kind == FUNCTION_DEF or kind == CLOSURE_DEF:
+        ret = node.get("return_type")
+        if isinstance(ret, str):
+            norm = normalize_type_name(ret)
+            if norm.startswith("tuple[") and norm.endswith("]"):
+                node["return_type"] = "multi_return[" + norm[6:]
+    for value in node.values():
+        if isinstance(value, dict) or isinstance(value, list):
+            _rewrite_multi_return_function_types(value)
 
 
 # ===========================================================================
