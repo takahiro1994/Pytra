@@ -2256,6 +2256,51 @@ def has_key(env: dict[str, int], name: str) -> bool:
         self.assertIn("return argv;", cpp_code)
         self.assertNotIn("return argv();", cpp_code)
 
+    def test_cpp_emitter_calls_property_getters_with_parens(self) -> None:
+        doc = _module_doc(
+            "app.main",
+            body=[
+                {
+                    "kind": "ClassDef",
+                    "name": "Thing",
+                    "body": [],
+                },
+                {
+                    "kind": "FunctionDef",
+                    "name": "read_prop",
+                    "arg_types": {"obj": "Thing"},
+                    "arg_order": ["obj"],
+                    "arg_defaults": {},
+                    "arg_index": {"obj": 0},
+                    "return_type": "int64",
+                    "arg_usage": {"obj": "readonly"},
+                    "renamed_symbols": {},
+                    "docstring": None,
+                    "body": [
+                        {
+                            "kind": "Return",
+                            "value": {
+                                "kind": "Attribute",
+                                "resolved_type": "int64",
+                                "attribute_access_kind": "property_getter",
+                                "value": {
+                                    "kind": "Name",
+                                    "id": "obj",
+                                    "resolved_type": "Thing",
+                                },
+                                "attr": "size",
+                            },
+                        }
+                    ],
+                },
+            ],
+        )
+
+        cpp_code = emit_cpp_module(doc)
+
+        self.assertIn("return obj.size();", cpp_code)
+        self.assertNotIn("return obj.size;", cpp_code)
+
     def test_go_emitter_uses_list_index_helper_for_list_receivers(self) -> None:
         doc = _module_doc(
             "app.main",

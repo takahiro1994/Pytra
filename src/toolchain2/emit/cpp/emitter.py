@@ -746,6 +746,7 @@ def _emit_attribute(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
     owner_node = node.get("value")
     owner = _emit_expr(ctx, owner_node)
     attr = _str(node, "attr")
+    access_kind = _str(node, "attribute_access_kind")
     owner_id = _str(owner_node, "id") if isinstance(owner_node, dict) else ""
     runtime_module_id = _str(node, "runtime_module_id")
     runtime_symbol = _str(node, "runtime_symbol")
@@ -785,9 +786,11 @@ def _emit_attribute(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
             runtime_call=_str(node, "runtime_call"),
         )
     if owner == "this":
-        return "this->" + attr
+        expr = "this->" + attr
+        return expr + "()" if access_kind == "property_getter" else expr
     member_sep = "->" if _uses_ref_container_storage(ctx, owner_node) else "."
-    return owner + member_sep + attr
+    expr = owner + member_sep + attr
+    return expr + "()" if access_kind == "property_getter" else expr
 
 
 def _emit_subscript_index(ctx: CppEmitContext, value: str, slice_node: JsonVal) -> str:

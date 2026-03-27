@@ -41,7 +41,7 @@
 12. [x] [ID: P1-EMIT-CPP-S12] C++ emitter の残存プレースホルダ出力を廃止し fail-fast を徹底する — `/* slice */` と `/* assign */` fallback を `unsupported_slice_shape` / `unsupported_assign_target` の `RuntimeError` に置換し、focused fail-fast test を追加
 13. [x] [ID: P1-EMIT-CPP-S13] C++ emitter の数値 cast 出力判定を `mapping.json` `implicit_promotions` 準拠に修正する — `RuntimeMapping` に `implicit_promotions` を追加し、C++ `mapping.json` の整数/float 昇格表に一致する `BinOp.casts` だけを省略。非該当 cast は従来どおり明示 `static_cast` を維持
 14. [x] [ID: P1-EMIT-CPP-S14] C++ backend helper の module/path ハードコードを shared metadata へ寄せる — `runtime_paths.py` の type-only module 知識を `link/dependencies.py` の helper へ移し、`pytra.core.*` helper skip も `runtime_discovery.py` の shared 判定へ移動。C++ backend helper から具体的 module ID 依存を削減
-15. [ ] [ID: P1-EMIT-CPP-S15] C++ emitter の `@property` 対応 — `_emit_attribute` が `attribute_access_kind == "property_getter"` を見て `obj.method()` と括弧付きで emit するよう修正する。現状は `obj.method`（括弧なし）を出力し g++ コンパイルエラーになる（`property_method_call.py` fixture で再現済み）
+15. [x] [ID: P1-EMIT-CPP-S15] C++ emitter の `@property` 対応 — `_emit_attribute` が `attribute_access_kind == "property_getter"` を見て `obj.method()` と括弧付きで emit するよう修正した。`property_method_call.py` の focused C++ parity を確認
 16. [ ] [ID: P1-EMIT-CPP-S16] fixture 132 件の C++ compile + run parity を通す — sample 18 件だけでなく `test/fixture/source/py/` 全 132 件で **emit + g++ compile + run + stdout 一致** を確認する。`property_method_call.py` 含むコンパイル失敗ケースを全て修正する
 
 ### P2-SELFHOST: toolchain2 自身の変換テスト
