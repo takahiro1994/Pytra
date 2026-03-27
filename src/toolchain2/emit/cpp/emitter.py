@@ -104,6 +104,15 @@ class _CppStmtCommonRenderer(CommonRenderer):
     def render_assign_stmt(self, node: dict[str, JsonVal]) -> str:
         raise RuntimeError("cpp common renderer assign hook is not used directly")
 
+    def emit_stmt(self, node: JsonVal) -> None:
+        kind = self._str(node, "kind")
+        if kind in ("Expr", "Return", "If", "While"):
+            super().emit_stmt(node)
+            self.ctx.indent_level = self.state.indent_level
+            return
+        if isinstance(node, dict):
+            self.emit_stmt_extension(node)
+
     def emit_stmt_extension(self, node: dict[str, JsonVal]) -> None:
         self.ctx.indent_level = self.state.indent_level
         _emit_stmt(self.ctx, node)

@@ -20,6 +20,7 @@ from toolchain2.emit.common.code_emitter import (
     should_skip_module, build_import_alias_map, build_runtime_import_map,
     resolve_runtime_symbol_name,
 )
+from toolchain2.emit.common.common_renderer import CommonRenderer
 from toolchain2.link.expand_defaults import expand_cross_module_defaults
 
 
@@ -69,6 +70,56 @@ class EmitContext:
     temp_counter: int = 0
     # Top-level private symbols emitted in this module; mangle to avoid package collisions.
     module_private_symbols: set[str] = field(default_factory=set)
+
+
+class _GoStmtCommonRenderer(CommonRenderer):
+    def __init__(self, ctx: EmitContext) -> None:
+        self.ctx = ctx
+        super().__init__("go")
+        self.state.lines = ctx.lines
+        self.state.indent_level = ctx.indent_level
+
+    def render_name(self, node: dict[str, JsonVal]) -> str:
+        return _emit_name(self.ctx, node)
+
+    def render_constant(self, node: dict[str, JsonVal]) -> str:
+        return _emit_constant(self.ctx, node)
+
+    def render_expr(self, node: JsonVal) -> str:
+        return _emit_expr(self.ctx, node)
+
+    def render_attribute(self, node: dict[str, JsonVal]) -> str:
+        return _emit_attribute(self.ctx, node)
+
+    def render_call(self, node: dict[str, JsonVal]) -> str:
+        return _emit_call(self.ctx, node)
+
+    def render_assign_stmt(self, node: dict[str, JsonVal]) -> str:
+        raise RuntimeError("go common renderer assign hook is not used directly")
+
+    def emit_stmt(self, node: JsonVal) -> None:
+        kind = self._str(node, "kind")
+        if kind in ("Expr", "Return", "If", "While"):
+            super().emit_stmt(node)
+            self.ctx.indent_level = self.state.indent_level
+            return
+        if isinstance(node, dict):
+            self.emit_stmt_extension(node)
+
+    def emit_stmt_extension(self, node: dict[str, JsonVal]) -> None:
+        self.ctx.indent_level = self.state.indent_level
+        _emit_stmt(self.ctx, node)
+        self.state.indent_level = self.ctx.indent_level
+
+
+def _emit_common_stmt_if_supported(ctx: EmitContext, node: dict[str, JsonVal]) -> bool:
+    kind = _str(node, "kind")
+    if kind not in ("Expr", "Return", "If", "While"):
+        return False
+    renderer = _GoStmtCommonRenderer(ctx)
+    renderer.emit_stmt(node)
+    ctx.indent_level = renderer.state.indent_level
+    return True
 
 
 # ---------------------------------------------------------------------------
@@ -2311,23 +2362,17 @@ def _emit_stmt(ctx: EmitContext, node: JsonVal) -> None:
     """Emit a statement node."""
     if not isinstance(node, dict):
         return
+    if _emit_common_stmt_if_supported(ctx, node):
+        return
 
     kind = _str(node, "kind")
 
-    if kind == "Expr":
-        _emit_expr_stmt(ctx, node)
-    elif kind == "AnnAssign":
+    if kind == "AnnAssign":
         _emit_ann_assign(ctx, node)
     elif kind == "Assign":
         _emit_assign(ctx, node)
     elif kind == "AugAssign":
         _emit_aug_assign(ctx, node)
-    elif kind == "Return":
-        _emit_return(ctx, node)
-    elif kind == "If":
-        _emit_if(ctx, node)
-    elif kind == "While":
-        _emit_while(ctx, node)
     elif kind == "ForCore":
         _emit_for_core(ctx, node)
     elif kind == "RuntimeIterForPlan":

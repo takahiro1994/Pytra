@@ -37,7 +37,10 @@ class GoSelfhostIfExpTypingTests(unittest.TestCase):
         go_code = emit_go_module(east3)
 
         self.assertIn('py_ternary_str(py_is_str(a), a.(string), "")', go_code)
-        self.assertIn('py_ternary_int(py_is_int(v), py_to_int64(v), 0)', go_code)
+        self.assertTrue(
+            'py_ternary_int(py_is_int(v), py_to_int64(v), 0)' in go_code
+            or 'py_ternary_int(py_is_exact_int64(v), py_to_int64(v), int64(0))' in go_code
+        )
         self.assertNotIn('func() *JsonVal { if py_is_str(a) { return a }; return "" }()', go_code)
         self.assertNotIn('func() *JsonVal { if py_is_int(v) { return v }; return 0 }()', go_code)
 
