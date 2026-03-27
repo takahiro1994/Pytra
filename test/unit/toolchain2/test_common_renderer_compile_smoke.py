@@ -54,6 +54,14 @@ def f(a: bool, b: bool) -> int:
     return x
 """
 
+COMPARE_SOURCE = """
+def f(x: int, y: int) -> int:
+    z = x + y
+    if z > 3 and x != y:
+        return z - 1
+    return z
+"""
+
 
 def _assert_go_compiles(source: str) -> None:
     east3 = _build_east3(source, target_language="go")
@@ -116,6 +124,12 @@ class CommonRendererCompileSmokeTests(unittest.TestCase):
 
     def test_cpp_emitted_bool_common_renderer_shapes_compile(self) -> None:
         _assert_cpp_compiles(BOOL_SOURCE)
+
+    def test_go_emitted_compare_common_renderer_shapes_compile(self) -> None:
+        _assert_go_compiles(COMPARE_SOURCE)
+
+    def test_cpp_emitted_compare_common_renderer_shapes_compile(self) -> None:
+        _assert_cpp_compiles(COMPARE_SOURCE)
 
 
 if __name__ == "__main__":
