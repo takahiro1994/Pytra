@@ -62,6 +62,15 @@ def f(x: int, y: int) -> int:
     return z
 """
 
+DOCSTRING_SOURCE = '''
+def f() -> int:
+    "common renderer docstring"
+    x = 1
+    if x == 1:
+        x = x + 2
+    return x
+'''
+
 
 def _assert_go_compiles(source: str) -> None:
     east3 = _build_east3(source, target_language="go")
@@ -130,6 +139,12 @@ class CommonRendererCompileSmokeTests(unittest.TestCase):
 
     def test_cpp_emitted_compare_common_renderer_shapes_compile(self) -> None:
         _assert_cpp_compiles(COMPARE_SOURCE)
+
+    def test_go_emitted_docstring_common_renderer_shapes_compile(self) -> None:
+        _assert_go_compiles(DOCSTRING_SOURCE)
+
+    def test_cpp_emitted_docstring_common_renderer_shapes_compile(self) -> None:
+        _assert_cpp_compiles(DOCSTRING_SOURCE)
 
 
 if __name__ == "__main__":
