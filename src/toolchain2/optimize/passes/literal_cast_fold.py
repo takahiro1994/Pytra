@@ -5,7 +5,21 @@ from __future__ import annotations
 from pytra.std.json import JsonVal
 
 from toolchain2.optimize.optimizer import East3OptimizerPass, PassContext, PassResult, make_pass_result
-from toolchain2.common.types import normalize_type_name
+
+
+def _normalize_type_name(value: JsonVal) -> str:
+    if isinstance(value, str):
+        text = value.strip()
+        if text != "":
+            return text
+    return "unknown"
+
+
+def _copy_node(node: dict[str, JsonVal]) -> dict[str, JsonVal]:
+    out: dict[str, JsonVal] = {}
+    for key, value in node.items():
+        out[key] = value
+    return out
 
 
 def _try_fold_literal_static_cast(call_node: dict[str, JsonVal]) -> dict[str, JsonVal] | None:
@@ -26,14 +40,14 @@ def _try_fold_literal_static_cast(call_node: dict[str, JsonVal]) -> dict[str, Js
     if arg.get("kind") != "Constant":
         return None
 
-    target_t = normalize_type_name(call_node.get("resolved_type"))
-    source_t = normalize_type_name(arg.get("resolved_type"))
+    target_t = _normalize_type_name(call_node.get("resolved_type"))
+    source_t = _normalize_type_name(arg.get("resolved_type"))
     if target_t == "unknown" or source_t == "unknown":
         return None
     if target_t != source_t:
         return None
 
-    folded = dict(arg)
+    folded = _copy_node(arg)
     span_obj = call_node.get("source_span")
     if isinstance(span_obj, dict):
         folded["source_span"] = span_obj
@@ -51,7 +65,7 @@ class LiteralCastFoldPass(East3OptimizerPass):
 
     def _rewrite(self, node: JsonVal) -> tuple[JsonVal, int]:
         if isinstance(node, list):
-            out = node
+            out: list[JsonVal] = list(node)
             changed = 0
             for i, item in enumerate(node):
                 new_item, delta = self._rewrite(item)
@@ -63,11 +77,11 @@ class LiteralCastFoldPass(East3OptimizerPass):
         if not isinstance(node, dict):
             return node, 0
 
-        out = node
+        out = _copy_node(node)
         changed = 0
         keys = list(node.keys())
         for key in keys:
-            value = node.get(key)
+            value = node[key]
             new_value, delta = self._rewrite(value)
             if new_value is not value:
                 out[key] = new_value
@@ -81,4 +95,5 @@ class LiteralCastFoldPass(East3OptimizerPass):
     def run(self, east3_doc: dict[str, JsonVal], context: PassContext) -> PassResult:
         _ = context
         _, change_count = self._rewrite(east3_doc)
-        return make_pass_result(changed=change_count > 0, change_count=change_count)
+        warnings: list[str] = []
+        return make_pass_result(change_count > 0, change_count, warnings, 0.0)

@@ -1015,6 +1015,17 @@ class ExprParser:
         if self.peek().value == ":":
             return self._parse_slice(None)
         first = self.parse_expr()
+        if self.peek().value == ",":
+            elements: list[Expr] = [first]
+            while self.peek().value == ",":
+                self.advance()
+                if self.peek().value == "]":
+                    break
+                elements.append(self.parse_expr())
+            if len(elements) > 1:
+                start = self._child_local_start(elements[0])
+                end = self._child_local_end(elements[-1])
+                return TupleExpr(base=self._base(start, end), elements=elements)
         # Check for slice
         if self.peek().value == ":":
             return self._parse_slice(first)

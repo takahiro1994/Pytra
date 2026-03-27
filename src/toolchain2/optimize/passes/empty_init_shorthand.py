@@ -5,18 +5,50 @@ from __future__ import annotations
 from pytra.std.json import JsonVal
 
 from toolchain2.optimize.optimizer import East3OptimizerPass, PassContext, PassResult, make_pass_result
-from toolchain2.common.types import normalize_type_name, split_generic_types
 
 _CPP_EMPTY_INIT_HINT_KEY = "cpp_empty_init_shorthand_v1"
 
 
+def _norm_text(value: JsonVal) -> str:
+    if isinstance(value, str):
+        return value.strip()
+    return ""
+
+
+def _split_generic_types(text: str) -> list[str]:
+    parts: list[str] = []
+    current: list[str] = []
+    depth = 0
+    for ch in text:
+        if ch == "[":
+            depth += 1
+            current.append(ch)
+            continue
+        if ch == "]":
+            if depth > 0:
+                depth -= 1
+            current.append(ch)
+            continue
+        if ch == "," and depth == 0:
+            part = "".join(current).strip()
+            if part != "":
+                parts.append(part)
+            current = []
+            continue
+        current.append(ch)
+    tail = "".join(current).strip()
+    if tail != "":
+        parts.append(tail)
+    return parts
+
+
 def _is_any_like(type_name: str) -> bool:
-    t = normalize_type_name(type_name)
+    t = _norm_text(type_name)
     return t == "" or t == "unknown" or t == "Any" or t == "object"
 
 
 def _container_kind_from_type(type_name: str) -> str:
-    t = normalize_type_name(type_name)
+    t = _norm_text(type_name)
     if t.startswith("list[") and t.endswith("]"):
         return "List"
     if t.startswith("dict[") and t.endswith("]"):
@@ -27,34 +59,34 @@ def _container_kind_from_type(type_name: str) -> str:
 
 
 def _safe_container_type(type_name: str, rhs_kind: str) -> bool:
-    t = normalize_type_name(type_name)
+    t = _norm_text(type_name)
     if _is_any_like(t) or "|" in t:
         return False
     kind = _container_kind_from_type(t)
     if kind == "" or kind != rhs_kind:
         return False
     if kind == "List":
-        elem_parts = split_generic_types(t[5:-1])
+        elem_parts = _split_generic_types(t[5:-1])
         if len(elem_parts) != 1:
             return False
-        elem_t = normalize_type_name(elem_parts[0])
+        elem_t = _norm_text(elem_parts[0])
         if _is_any_like(elem_t) or "|" in elem_t:
             return False
         return True
     if kind == "Set":
-        elem_parts = split_generic_types(t[4:-1])
+        elem_parts = _split_generic_types(t[4:-1])
         if len(elem_parts) != 1:
             return False
-        elem_t = normalize_type_name(elem_parts[0])
+        elem_t = _norm_text(elem_parts[0])
         if _is_any_like(elem_t) or "|" in elem_t:
             return False
         return True
     if kind == "Dict":
-        kv_parts = split_generic_types(t[5:-1])
+        kv_parts = _split_generic_types(t[5:-1])
         if len(kv_parts) != 2:
             return False
-        key_t = normalize_type_name(kv_parts[0])
-        val_t = normalize_type_name(kv_parts[1])
+        key_t = _norm_text(kv_parts[0])
+        val_t = _norm_text(kv_parts[1])
         if _is_any_like(key_t) or _is_any_like(val_t):
             return False
         if "|" in key_t or "|" in val_t:
@@ -64,23 +96,23 @@ def _safe_container_type(type_name: str, rhs_kind: str) -> bool:
 
 
 def _stmt_target_type(stmt: dict[str, JsonVal]) -> str:
-    decl_t = normalize_type_name(stmt.get("decl_type"))
+    decl_t = _norm_text(stmt.get("decl_type"))
     if decl_t != "unknown":
         return decl_t
-    ann_t = normalize_type_name(stmt.get("annotation"))
+    ann_t = _norm_text(stmt.get("annotation"))
     if ann_t != "unknown":
         return ann_t
     target_obj = stmt.get("target")
     target = target_obj if isinstance(target_obj, dict) else None
     if target is not None:
-        target_t = normalize_type_name(target.get("resolved_type"))
+        target_t = _norm_text(target.get("resolved_type"))
         if target_t != "unknown":
             return target_t
     return "unknown"
 
 
 def _empty_container_rhs_kind(value_node: dict[str, JsonVal]) -> str:
-    kind = normalize_type_name(value_node.get("kind"))
+    kind = _norm_text(value_node.get("kind"))
     if kind == "List":
         elems = value_node.get("elements")
         elem_list = elems if isinstance(elems, list) else []
@@ -108,6 +140,15 @@ class EmptyInitShorthandPass(East3OptimizerPass):
     name: str = "EmptyInitShorthandPass"
     min_opt_level: int = 1
 
+    def _same_hint(self, left: dict[str, JsonVal] | None, right: dict[str, JsonVal] | None) -> bool:
+        if left is None or right is None:
+            return left is None and right is None
+        return (
+            _norm_text(left.get("version")) == _norm_text(right.get("version"))
+            and _norm_text(left.get("target_type")) == _norm_text(right.get("target_type"))
+            and _norm_text(left.get("rhs_kind")) == _norm_text(right.get("rhs_kind"))
+        )
+
     def _set_hint(self, stmt: dict[str, JsonVal], hint: dict[str, JsonVal] | None) -> int:
         cur_val = stmt.get(_CPP_EMPTY_INIT_HINT_KEY)
         cur = cur_val if isinstance(cur_val, dict) else None
@@ -116,13 +157,13 @@ class EmptyInitShorthandPass(East3OptimizerPass):
                 stmt.pop(_CPP_EMPTY_INIT_HINT_KEY, None)
                 return 1
             return 0
-        if cur == hint:
+        if self._same_hint(cur, hint):
             return 0
         stmt[_CPP_EMPTY_INIT_HINT_KEY] = hint
         return 1
 
     def _try_tag_stmt(self, stmt: dict[str, JsonVal]) -> int:
-        kind = normalize_type_name(stmt.get("kind"))
+        kind = _norm_text(stmt.get("kind"))
         if kind != "Assign" and kind != "AnnAssign":
             return 0
         value_obj = stmt.get("value")
@@ -158,4 +199,5 @@ class EmptyInitShorthandPass(East3OptimizerPass):
     def run(self, east3_doc: dict[str, JsonVal], context: PassContext) -> PassResult:
         _ = context
         change_count = self._visit(east3_doc)
-        return make_pass_result(changed=change_count > 0, change_count=change_count)
+        warnings: list[str] = []
+        return make_pass_result(change_count > 0, change_count, warnings, 0.0)

@@ -12,7 +12,6 @@ from pytra.std.json import JsonVal
 from pytra.std.pathlib import Path
 from pytra.std import json
 
-from toolchain2.common.jv import deep_copy_json
 from toolchain2.link.runtime_discovery import discover_runtime_modules
 from toolchain2.link.runtime_discovery import resolve_runtime_east_path
 from toolchain2.link.type_id import build_type_id_table
@@ -28,6 +27,10 @@ from toolchain2.resolve.py.type_norm import normalize_type
 # ---------------------------------------------------------------------------
 
 LINK_OUTPUT_SCHEMA = "pytra.link_output.v1"
+
+_LINK_EXTERNAL_MODULE_PREFIXES: tuple[str, ...] = (
+    "pytra.",
+)
 
 
 # ---------------------------------------------------------------------------
@@ -68,14 +71,25 @@ def _module_id_from_doc(
         if isinstance(mid_val, str) and mid_val.strip() != "":
             return mid_val.strip()
 
+    source_path_val = east_doc.get("source_path")
+    if isinstance(source_path_val, str) and source_path_val.strip() != "":
+        source_path_norm = source_path_val.strip().replace("\\", "/")
+        if source_path_norm.startswith("src/toolchain2/") and source_path_norm.endswith(".py"):
+            rel = source_path_norm.replace("src/", "").replace(".py", "")
+            module_id = rel.replace("/", ".")
+            if module_id != "":
+                return module_id
+        if source_path_norm == "src/pytra-cli2.py":
+            return "pytra_cli2"
+
     # Runtime .east ファイルの場合はパスから導出
     resolved = Path(file_path).resolve()
     east_root = runtime_east_root.resolve()
     try:
-        rel = resolved.relative_to(east_root)
+        rel = str(resolved.relative_to(east_root))
         rel_str = str(rel).replace("\\", "/")
         if rel_str.endswith(".east"):
-            rel_str = rel_str[: -len(".east")]
+            rel_str = rel_str.replace(".east", "")
         module_id = "pytra." + rel_str.replace("/", ".")
         if module_id != "":
             return module_id
@@ -84,10 +98,16 @@ def _module_id_from_doc(
 
     # ファイル名から推測
     name = Path(file_path).name
-    for suffix in (".east3", ".east3.json", ".json", ".east2", ".east"):
-        if name.endswith(suffix):
-            name = name[: -len(suffix)]
-            break
+    if name.endswith(".east3.json"):
+        name = name.replace(".east3.json", "")
+    elif name.endswith(".east3"):
+        name = name.replace(".east3", "")
+    elif name.endswith(".east2"):
+        name = name.replace(".east2", "")
+    elif name.endswith(".east"):
+        name = name.replace(".east", "")
+    elif name.endswith(".json"):
+        name = name.replace(".json", "")
     name = name.replace("-", "_").strip()
     if name == "":
         raise RuntimeError("failed to infer module_id from path: " + file_path)
@@ -117,6 +137,17 @@ def _linked_output_path(module_id: str) -> str:
     return "east3/" + module_id.replace(".", "/") + ".east3.json"
 
 
+def _copy_json(val: JsonVal) -> JsonVal:
+    if isinstance(val, list):
+        return [_copy_json(item) for item in val]
+    if isinstance(val, dict):
+        out: dict[str, JsonVal] = {}
+        for key, value in val.items():
+            out[key] = _copy_json(value)
+        return out
+    return val
+
+
 def _program_id(
     target: str,
     dispatch_mode: str,
@@ -134,6 +165,183 @@ def _ensure_meta(doc: dict[str, JsonVal]) -> dict[str, JsonVal]:
     meta: dict[str, JsonVal] = {}
     doc["meta"] = meta
     return meta
+
+
+def _is_link_external_module(module_id: str) -> bool:
+    mid = module_id.strip()
+    if mid == "":
+        return True
+    for prefix in _LINK_EXTERNAL_MODULE_PREFIXES:
+        if mid.startswith(prefix):
+            return True
+    return False
+
+
+def _is_whitelisted_missing_dependency(module: LinkedModule, module_id: str) -> bool:
+    if _is_link_external_module(module_id):
+        return True
+    if module.module_kind == "runtime" and not module_id.startswith("toolchain2."):
+        return True
+    return False
+
+
+def _append_missing_importer(
+    missing: dict[str, list[str]],
+    module_id: str,
+    importer: str,
+) -> None:
+    if module_id == "":
+        return
+    if module_id not in missing:
+        missing[module_id] = [importer]
+        return
+    rows = missing[module_id]
+    if importer not in rows:
+        rows.append(importer)
+
+
+def _sorted_doc_map_keys(module_map: dict[str, dict[str, JsonVal]]) -> list[str]:
+    return sorted(list(module_map.keys()))
+
+
+def _sorted_str_map_keys(values: dict[str, JsonVal]) -> list[str]:
+    return sorted(list(values.keys()))
+
+
+def _sorted_modules_by_id(modules: list[LinkedModule]) -> list[LinkedModule]:
+    out = list(modules)
+    n = len(out)
+    i = 0
+    while i < n:
+        j = i + 1
+        while j < n:
+            if out[j].module_id < out[i].module_id:
+                cur = out[i]
+                out[i] = out[j]
+                out[j] = cur
+            j += 1
+        i += 1
+    return out
+
+
+def _dep_rows(dep_map: dict[str, list[str]], module_id: str) -> list[str]:
+    if module_id in dep_map:
+        return dep_map[module_id]
+    return []
+
+
+def _doc_map_get(module_map: dict[str, dict[str, JsonVal]], path_str: str) -> dict[str, JsonVal]:
+    return module_map[path_str]
+
+
+def _docs_as_json(copied_docs: list[tuple[LinkedModule, dict[str, JsonVal]]]) -> list[JsonVal]:
+    out: list[JsonVal] = []
+    for _, doc in copied_docs:
+        out.append(doc)
+    return out
+
+
+def _iter_declared_import_module_ids(doc: dict[str, JsonVal]) -> list[str]:
+    meta_val = doc.get("meta")
+    if not isinstance(meta_val, dict):
+        return []
+    out: list[str] = []
+    seen: set[str] = set()
+
+    bindings = meta_val.get("import_bindings")
+    saw_import_bindings = False
+    if isinstance(bindings, list):
+        saw_import_bindings = True
+        for binding in bindings:
+            if not isinstance(binding, dict):
+                continue
+            dep_id = _declared_import_dependency_module_id(binding)
+            if dep_id != "" and dep_id not in seen:
+                seen.add(dep_id)
+                out.append(dep_id)
+
+    if saw_import_bindings:
+        return out
+
+    import_modules = meta_val.get("import_modules")
+    if isinstance(import_modules, dict):
+        for value in import_modules.values():
+            if isinstance(value, str):
+                mid2 = value.strip()
+                if mid2 != "" and mid2 not in seen:
+                    seen.add(mid2)
+                    out.append(mid2)
+
+    import_symbols = meta_val.get("import_symbols")
+    if isinstance(import_symbols, dict):
+        for value2 in import_symbols.values():
+            if not isinstance(value2, dict):
+                continue
+            module_id2 = value2.get("module")
+            if isinstance(module_id2, str):
+                mid3 = module_id2.strip()
+                if mid3 != "" and mid3 not in seen:
+                    seen.add(mid3)
+                    out.append(mid3)
+
+    return out
+
+
+def _declared_import_dependency_module_id(binding: dict[str, JsonVal]) -> str:
+    runtime_module_id = binding.get("runtime_module_id")
+    module_id = binding.get("module_id")
+    host_only = binding.get("host_only") is True
+    binding_kind = binding.get("binding_kind")
+    resolved_kind = binding.get("resolved_binding_kind")
+
+    if isinstance(runtime_module_id, str):
+        runtime_mid = runtime_module_id.strip()
+        if runtime_mid != "":
+            if host_only:
+                if (binding_kind == "module" or resolved_kind == "module") and runtime_mid.startswith("pytra."):
+                    return runtime_mid
+                return ""
+            return runtime_mid
+
+    if host_only:
+        return ""
+
+    if isinstance(module_id, str):
+        mid = module_id.strip()
+        if mid != "":
+            return mid
+    return ""
+
+
+def _validate_link_input_completeness(modules: list[LinkedModule]) -> None:
+    provided: set[str] = set()
+    for module in modules:
+        provided.add(module.module_id)
+
+    missing: dict[str, list[str]] = {}
+    for module in modules:
+        importer_label = module.source_path if module.source_path != "" else module.module_id
+        for dep in _iter_declared_import_module_ids(module.east_doc):
+            if dep == module.module_id:
+                continue
+            if dep in provided or _is_whitelisted_missing_dependency(module, dep):
+                continue
+            _append_missing_importer(missing, dep, importer_label)
+
+    if len(missing) == 0:
+        return
+
+    lines: list[str] = ["link error: unresolved import dependency"]
+    for dep in sorted(missing.keys()):
+        importers = missing[dep]
+        for importer in importers:
+            lines.append("  " + importer + " imports " + dep)
+            lines.append("  but no link unit provides this module.")
+    lines.append("")
+    lines.append("  Missing modules:")
+    for dep2 in sorted(missing.keys()):
+        lines.append("    - " + dep2)
+    raise RuntimeError("\n".join(lines))
 
 
 _TYPE_STRING_KEYS: set[str] = {
@@ -182,10 +390,19 @@ def _default_collection_hint(type_name: str) -> str:
     return ""
 
 
+def _empty_alias_seen() -> set[str]:
+    seen: set[str] = set()
+    return seen
+
+
+def _normalize_type_alias(raw: str, aliases: dict[str, str]) -> str:
+    return normalize_type(raw, aliases, _empty_alias_seen())
+
+
 def _apply_collection_hint(node: JsonVal, target_type: str, aliases: dict[str, str]) -> None:
     if not isinstance(node, dict):
         return
-    hinted = _default_collection_hint(normalize_type(target_type, aliases))
+    hinted = _default_collection_hint(_normalize_type_alias(target_type, aliases))
     if hinted == "":
         return
     kind = node.get("kind")
@@ -212,18 +429,21 @@ def _normalize_runtime_type_aliases(node: JsonVal, aliases: dict[str, str]) -> N
 
     for key, value in list(node.items()):
         if key in _TYPE_STRING_KEYS and isinstance(value, str) and value != "":
-            node[key] = normalize_type(value, aliases)
+            node[key] = _normalize_type_alias(value, aliases)
             continue
         if key in _TYPE_MAP_KEYS and isinstance(value, dict):
             normalized_map: dict[str, JsonVal] = {}
             for k, v in value.items():
                 if isinstance(v, str):
-                    normalized_map[k] = normalize_type(v, aliases)
+                    normalized_map[k] = _normalize_type_alias(v, aliases)
                 else:
                     normalized_map[k] = v
             node[key] = normalized_map
             continue
-        if isinstance(value, (dict, list)):
+        if isinstance(value, dict):
+            _normalize_runtime_type_aliases(value, aliases)
+            continue
+        if isinstance(value, list):
             _normalize_runtime_type_aliases(value, aliases)
 
     kind = node.get("kind")
@@ -298,18 +518,18 @@ def link_modules(
         entry_resolved.add(str(Path(ep).resolve()))
 
     seen_ids: set[str] = set()
-    for path_str in sorted(module_map.keys()):
-        doc = module_map[path_str]
-        if not isinstance(doc, dict):
+    for path_str in _sorted_doc_map_keys(module_map):
+        doc_entry = _doc_map_get(module_map, path_str)
+        if not isinstance(doc_entry, dict):
             continue
 
-        module_id = _module_id_from_doc(doc, path_str, runtime_east_root)
+        module_id = _module_id_from_doc(doc_entry, path_str, runtime_east_root)
         if module_id in seen_ids:
             raise RuntimeError("duplicate module_id: " + module_id)
         seen_ids.add(module_id)
 
         # dispatch_mode 検証
-        doc_dm = _dispatch_mode_from_doc(doc)
+        doc_dm = _dispatch_mode_from_doc(doc_entry)
         if doc_dm != dispatch_mode:
             raise RuntimeError(
                 "dispatch_mode mismatch: expected "
@@ -321,7 +541,7 @@ def link_modules(
             )
 
         is_entry = path_str in entry_resolved
-        source_path = _source_path_from_doc(doc)
+        source_path = _source_path_from_doc(doc_entry)
 
         # runtime module かどうか判定
         module_kind = "user"
@@ -333,12 +553,15 @@ def link_modules(
             input_path=path_str,
             source_path=source_path,
             is_entry=is_entry,
-            east_doc=doc,
+            east_doc=doc_entry,
             module_kind=module_kind,
         ))
 
     # module_id でソート (決定的順序)
-    modules.sort(key=lambda m: m.module_id)
+    modules = _sorted_modules_by_id(modules)
+
+    # 3.5. import 解決の入力完全性検証
+    _validate_link_input_completeness(modules)
 
     entry_module_ids = sorted([m.module_id for m in modules if m.is_entry])
     if len(entry_module_ids) == 0:
@@ -360,7 +583,7 @@ def link_modules(
     # 8. Deep copy all modules
     copied_docs: list[tuple[LinkedModule, dict[str, JsonVal]]] = []
     for module in modules:
-        doc = deep_copy_json(module.east_doc)
+        doc = _copy_json(module.east_doc)
         if not isinstance(doc, dict):
             continue
         aliases = _collect_module_type_aliases(doc)
@@ -369,8 +592,7 @@ def link_modules(
         copied_docs.append((module, doc))
 
     # 9. Cross-module default argument expansion
-    all_docs_with_ids = [(module.module_id, doc) for module, doc in copied_docs]
-    expand_cross_module_defaults(all_docs_with_ids)
+    expand_cross_module_defaults([(module.module_id, doc) for module, doc in copied_docs])
 
     # 10. 各 module に linked_program_v1 を注入
     linked_modules: list[LinkedModule] = []
@@ -385,8 +607,8 @@ def link_modules(
             "type_id_resolved_v1": type_id_table,
             "type_id_base_map_v1": type_id_base_map,
             "type_info_table_v1": type_info_table,
-            "resolved_dependencies_v1": resolved_deps.get(module.module_id, []),
-            "user_module_dependencies_v1": user_deps.get(module.module_id, []),
+            "resolved_dependencies_v1": _dep_rows(resolved_deps, module.module_id),
+            "user_module_dependencies_v1": _dep_rows(user_deps, module.module_id),
             "non_escape_summary": {},
             "container_ownership_hints_v1": {},
         }
@@ -413,9 +635,10 @@ def link_modules(
         module_entries.append(me)
 
     # 9. call_graph dict 変換
+    call_graph_map: dict[str, JsonVal] = call_graph
     cg_dict: dict[str, JsonVal] = {}
-    for caller in sorted(call_graph.keys()):
-        callees = call_graph[caller]
+    for caller in _sorted_str_map_keys(call_graph_map):
+        callees = call_graph_map[caller]
         cg_dict[caller] = list(callees)
 
     sccs_list: list[JsonVal] = []

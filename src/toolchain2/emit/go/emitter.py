@@ -14,7 +14,7 @@ from dataclasses import field
 from pytra.std.json import JsonVal
 from pytra.std.pathlib import Path
 
-from toolchain2.emit.go.types import go_type, go_zero_value, _safe_go_ident, _split_generic_args
+from toolchain2.emit.go.types import go_type, go_zero_value, _safe_go_ident, _split_generic_args, _parse_callable_signature
 from toolchain2.emit.common.code_emitter import (
     RuntimeMapping, load_runtime_mapping, resolve_runtime_call,
     should_skip_module, build_import_alias_map, build_runtime_import_map,
@@ -31,6 +31,7 @@ from toolchain2.link.expand_defaults import expand_cross_module_defaults
 class EmitContext:
     """Per-module mutable state during emission."""
     module_id: str = ""
+    source_path: str = ""
     is_entry: bool = False
     indent_level: int = 0
     lines: list[str] = field(default_factory=list)
@@ -65,6 +66,8 @@ class EmitContext:
     bytearray_mutating_funcs: dict[str, str] = field(default_factory=dict)
     # Per-module expression temp counter for IIFE-based lowering.
     temp_counter: int = 0
+    # Top-level private symbols emitted in this module; mangle to avoid package collisions.
+    module_private_symbols: set[str] = field(default_factory=set)
 
 
 # ---------------------------------------------------------------------------
@@ -92,16 +95,33 @@ def _next_temp(ctx: EmitContext, prefix: str) -> str:
     return "__" + prefix + "_" + str(ctx.temp_counter)
 
 
-def _go_class_marker_method_name(type_name: str) -> str:
-    return "__pytra_is_" + _safe_go_ident(type_name)
+def _go_class_marker_method_name(ctx: EmitContext, type_name: str) -> str:
+    return "__pytra_is_" + _go_symbol_name(ctx, type_name)
 
 
-def _go_enum_const_name(type_name: str, member_name: str) -> str:
-    return _safe_go_ident(type_name + "_" + member_name)
+def _module_prefix(ctx: EmitContext) -> str:
+    if ctx.module_id == "":
+        return ""
+    return _safe_go_ident(ctx.module_id.replace(".", "_"))
 
 
-def _go_polymorphic_iface_name(type_name: str) -> str:
-    return "__pytra_iface_" + _safe_go_ident(type_name)
+def _go_symbol_name(ctx: EmitContext, name: str) -> str:
+    if name == "":
+        return ""
+    base = _safe_go_ident(name)
+    if name in ctx.module_private_symbols and name.startswith("_"):
+        prefix = _module_prefix(ctx)
+        if prefix != "":
+            return prefix + "__" + base.lstrip("_")
+    return base
+
+
+def _go_enum_const_name(ctx: EmitContext, type_name: str, member_name: str) -> str:
+    return _go_symbol_name(ctx, type_name + "_" + member_name)
+
+
+def _go_polymorphic_iface_name(ctx: EmitContext, type_name: str) -> str:
+    return "__pytra_iface_" + _go_symbol_name(ctx, type_name)
 
 
 def _is_polymorphic_class(ctx: EmitContext, type_name: str) -> bool:
@@ -110,12 +130,62 @@ def _is_polymorphic_class(ctx: EmitContext, type_name: str) -> bool:
 
 def _go_signature_type(ctx: EmitContext, resolved_type: str) -> str:
     if _is_polymorphic_class(ctx, resolved_type):
-        return _go_polymorphic_iface_name(resolved_type)
+        return _go_polymorphic_iface_name(ctx, resolved_type)
     if resolved_type in ctx.class_names:
-        return "*" + _safe_go_ident(resolved_type)
+        return "*" + _go_symbol_name(ctx, resolved_type)
     if resolved_type in ctx.enum_bases:
-        return _safe_go_ident(resolved_type)
-    return go_type(resolved_type)
+        return _go_symbol_name(ctx, resolved_type)
+    return _go_type_with_ctx(ctx, resolved_type)
+
+
+def _go_type_with_ctx(ctx: EmitContext, resolved_type: str) -> str:
+    if resolved_type == "" or resolved_type == "unknown":
+        return "any"
+
+    if (resolved_type.startswith("callable[") or resolved_type.startswith("Callable[")) and resolved_type.endswith("]"):
+        params, ret = _parse_callable_signature(resolved_type)
+        param_gts = [_go_type_with_ctx(ctx, param) for param in params]
+        ret_gt = _go_type_with_ctx(ctx, ret)
+        if ret_gt == "":
+            return "func(" + ", ".join(param_gts) + ")"
+        return "func(" + ", ".join(param_gts) + ") " + ret_gt
+
+    if resolved_type.startswith("list[") and resolved_type.endswith("]"):
+        inner = resolved_type[5:-1]
+        return "[]" + _go_type_with_ctx(ctx, inner)
+
+    if resolved_type.startswith("dict[") and resolved_type.endswith("]"):
+        inner2 = resolved_type[5:-1]
+        parts = _split_generic_args(inner2)
+        if len(parts) == 2:
+            return "map[" + _go_type_with_ctx(ctx, parts[0]) + "]" + _go_type_with_ctx(ctx, parts[1])
+
+    if resolved_type.startswith("set[") and resolved_type.endswith("]"):
+        inner3 = resolved_type[4:-1]
+        return "map[" + _go_type_with_ctx(ctx, inner3) + "]struct{}"
+
+    if resolved_type.startswith("tuple[") and resolved_type.endswith("]"):
+        return "[]any"
+
+    if resolved_type.endswith(" | None") or resolved_type.endswith("|None"):
+        inner4 = resolved_type[:-7] if resolved_type.endswith(" | None") else resolved_type[:-6]
+        gt = _go_type_with_ctx(ctx, inner4)
+        if gt.startswith("*") or gt == "interface{}" or gt == "any" or gt.startswith("[]") or gt.startswith("map[") or gt.startswith("func("):
+            return gt
+        return "*" + gt
+
+    if "|" in resolved_type:
+        parts2 = [part.strip() for part in resolved_type.split("|") if part.strip() != ""]
+        if len(parts2) > 1:
+            return "interface{}"
+
+    mapped = go_type(resolved_type)
+    if resolved_type in ("None", "none"):
+        return mapped
+    if mapped != "" and mapped != ("*" + _safe_go_ident(resolved_type)):
+        return mapped
+
+    return "*" + _go_symbol_name(ctx, resolved_type)
 
 
 def _is_zero_arg_super_call(node: JsonVal) -> bool:
@@ -273,6 +343,22 @@ def _emit_constant(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
     if isinstance(val, int):
         if rt in ("float64", "float32", "float"):
             return str(float(val))
+        if rt in ("int", "int64"):
+            return "int64(" + str(val) + ")"
+        if rt == "int32":
+            return "int32(" + str(val) + ")"
+        if rt == "int16":
+            return "int16(" + str(val) + ")"
+        if rt == "int8":
+            return "int8(" + str(val) + ")"
+        if rt == "uint8":
+            return "uint8(" + str(val) + ")"
+        if rt == "uint16":
+            return "uint16(" + str(val) + ")"
+        if rt == "uint32":
+            return "uint32(" + str(val) + ")"
+        if rt == "uint64":
+            return "uint64(" + str(val) + ")"
         return str(val)
     if isinstance(val, float):
         s = repr(val)
@@ -315,6 +401,8 @@ def _emit_name(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
     name = _str(node, "id")
     if name == "":
         name = _str(node, "repr")
+    if name == "__file__":
+        return _go_string_literal(ctx.source_path)
     if name == "True":
         return "true"
     if name == "False":
@@ -331,7 +419,15 @@ def _emit_name(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
     # Avoid collision with Go's main()
     if name == "main":
         return "__pytra_main"
-    safe_name = _safe_go_ident(name)
+    safe_name = _go_symbol_name(ctx, name)
+    resolved_type = _str(node, "resolved_type")
+    scope_type = ctx.var_types.get(safe_name, "")
+    if (
+        resolved_type != ""
+        and resolved_type != scope_type
+        and scope_type in ("JsonVal", "Any", "Obj", "object", "unknown")
+    ):
+        return _coerce_from_any(safe_name, resolved_type)
     if safe_name in ctx.list_alias_vars:
         return "(*" + safe_name + ")"
     return safe_name
@@ -345,6 +441,11 @@ def _emit_binop(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
     rt = _str(node, "resolved_type")
     left_rt = _str(node.get("left") if isinstance(node.get("left"), dict) else {}, "resolved_type")
     right_rt = _str(node.get("right") if isinstance(node.get("right"), dict) else {}, "resolved_type")
+
+    if op == "Div" and left_rt == "Path" and right_rt == "str":
+        return left_code + ".joinpath(" + right_code + ")"
+    if op == "BitOr" and left_rt == "set[str]" and right_rt == "set[str]":
+        return "py_set_union_str(" + left_code + ", " + right_code + ")"
 
     # Apply casts from EAST3
     casts = _list(node, "casts")
@@ -402,6 +503,10 @@ def _effective_resolved_type(ctx: EmitContext, node: JsonVal) -> str:
 
 def _coerce_from_any(val_code: str, target_type: str) -> str:
     target_gt = go_type(target_type)
+    if target_gt == "":
+        return val_code
+    if target_gt == "string" and val_code.startswith("py_repeat_string("):
+        return val_code
     if target_gt == "string":
         return val_code + ".(string)"
     if target_gt == "bool":
@@ -429,6 +534,58 @@ def _coerce_from_any(val_code: str, target_type: str) -> str:
     if target_gt == "any":
         return val_code
     return val_code + ".(" + target_gt + ")"
+
+
+def _maybe_coerce_expr_to_type(ctx: EmitContext, value_node: JsonVal, value_code: str, target_type: str) -> str:
+    if not isinstance(value_node, dict):
+        return value_code
+    source_type = _str(value_node, "resolved_type")
+    if _str(value_node, "kind") == "Call" and source_type in ("", "unknown"):
+        target_gt = go_type(target_type)
+        if target_gt != "" and target_gt != "any":
+            return value_code
+    if target_type == "str" and _str(value_node, "kind") == "BinOp":
+        return value_code
+    if source_type == "" or source_type == target_type:
+        return value_code
+    target_gt = go_type(target_type)
+    source_gt = go_type(source_type)
+    if target_gt == "" or target_gt == "any" or source_gt == target_gt:
+        return value_code
+    source_optional_inner = _optional_inner_type(source_type)
+    if source_optional_inner != "" and go_type(source_optional_inner) == target_gt and source_gt.startswith("*"):
+        return "(*(" + value_code + "))"
+    optional_inner = _optional_inner_type(target_type)
+    if optional_inner != "":
+        return _wrap_optional_value_code(ctx, _coerce_from_any(value_code, optional_inner), target_type, value_node)
+    if source_type in ("JsonVal", "Any", "Obj", "object", "unknown") or source_gt == "any":
+        return _coerce_from_any(value_code, target_type)
+    return value_code
+
+
+def _prefer_value_type_for_none_decl(decl_type: str, value: JsonVal) -> str:
+    if decl_type not in ("None", "none"):
+        return decl_type
+    if isinstance(value, dict):
+        if _str(value, "kind") == "Constant" and value.get("value") is None:
+            return decl_type
+        if _str(value, "kind") == "IfExp":
+            body_node = value.get("body")
+            orelse_node = value.get("orelse")
+            if isinstance(body_node, dict):
+                body_type = _str(body_node, "resolved_type")
+                if body_type not in ("", "None", "none"):
+                    return "any"
+            if isinstance(orelse_node, dict):
+                orelse_type = _str(orelse_node, "resolved_type")
+                if orelse_type not in ("", "None", "none"):
+                    return "any"
+            return "any"
+        value_type = _str(value, "resolved_type")
+        if value_type not in ("", "None", "none"):
+            return value_type
+        return "any"
+    return "any"
 
 
 def _optional_inner_type(resolved_type: str) -> str:
@@ -491,8 +648,15 @@ def _emit_unbox(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
     source_type = _str(value_node, "resolved_type") if isinstance(value_node, dict) else ""
     target_gt = go_type(target_type)
     source_gt = go_type(source_type) if source_type != "" else ""
+    if isinstance(value_node, dict) and _str(value_node, "kind") == "Call" and source_type in ("", "unknown") and target_gt != "" and target_gt != "any":
+        return _emit_expr(ctx, value_node)
     if isinstance(value_node, dict) and _str(value_node, "resolved_type") == target_type:
         return _emit_expr(ctx, value_node)
+    if isinstance(value_node, dict) and _str(value_node, "kind") == "Name":
+        scope_name = _go_symbol_name(ctx, _str(value_node, "id"))
+        scope_type = ctx.var_types.get(scope_name, "")
+        if scope_type == target_type or (scope_type != "" and go_type(scope_type) == target_gt):
+            return _emit_expr(ctx, value_node)
     if target_gt in ("any", "interface{}"):
         return _emit_expr(ctx, value_node)
     if target_gt != "" and target_gt != "any" and source_gt == target_gt:
@@ -500,6 +664,18 @@ def _emit_unbox(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
     source_optional_inner = _optional_inner_type(source_type)
     if source_optional_inner != "" and go_type(source_optional_inner) == target_gt and source_gt.startswith("*"):
         return "(*(" + _emit_expr(ctx, value_node) + "))"
+    if isinstance(value_node, dict):
+        if _str(value_node, "kind") == "Subscript" and target_type == "str":
+            return _emit_expr(ctx, value_node)
+        if _str(value_node, "kind") == "Name" and _str(value_node, "id") == "__file__" and target_type == "str":
+            return _emit_expr(ctx, value_node)
+        if _str(value_node, "kind") == "Constant" and isinstance(value_node.get("value"), str) and target_type == "str":
+            return _emit_expr(ctx, value_node)
+        if _str(value_node, "kind") == "Attribute":
+            owner_node = value_node.get("value")
+            owner_type = _str(owner_node, "resolved_type") if isinstance(owner_node, dict) else ""
+            if owner_type not in ("", "JsonVal", "Any", "Obj", "object", "unknown"):
+                return _emit_expr(ctx, value_node)
     if target_type in ctx.enum_bases:
         return _safe_go_ident(target_type) + "(" + _emit_expr(ctx, value_node) + ")"
     optional_inner = _optional_inner_type(target_type)
@@ -882,6 +1058,8 @@ def _emit_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
                     )
             if attr == "items" and (owner_rt.startswith("dict[") or owner_rt.startswith("map[")):
                 return "py_items(" + owner + ")"
+            if attr == "update" and owner_rt == "set[str]" and len(arg_strs) >= 1:
+                return "py_set_update_str(" + owner + ", " + arg_strs[0] + ")"
             if attr == "index" and owner_rt.startswith("list[") and len(arg_strs) >= 1:
                 return "py_list_index(" + owner + ", " + arg_strs[0] + ")"
             # str methods → runtime helper functions
@@ -949,6 +1127,11 @@ def _emit_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
                         adjusted_args[spread_index] = adjusted_args[spread_index] + "..."
                 call_arg_strs = adjusted_args
             if fn_name == "set":
+                if _str(node, "resolved_type") == "set[str]" and len(call_arg_strs) == 1:
+                    arg0_node = args[0] if len(args) >= 1 and isinstance(args[0], dict) else None
+                    if isinstance(arg0_node, dict) and _str(arg0_node, "resolved_type") == "set[str]":
+                        return call_arg_strs[0]
+                    return "py_set_str(" + call_arg_strs[0] + ")"
                 return "py_set(" + ", ".join(call_arg_strs) + ")"
             # bytearray/bytes constructor
             if fn_name in ("bytearray", "bytes"):
@@ -1026,10 +1209,10 @@ def _emit_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
                 return _safe_go_ident(runtime_symbol) + "(" + ", ".join(call_arg_strs) + ")"
             # Imported/declared class constructor: Path(...) → NewPath(...)
             if _str(func, "resolved_type") == "type" or (fn_name in ctx.import_alias_modules and fn_name[:1].isupper()):
-                return "New" + _safe_go_ident(fn_name) + "(" + ", ".join(call_arg_strs) + ")"
+                return "New" + _go_symbol_name(ctx, fn_name) + "(" + ", ".join(call_arg_strs) + ")"
             # Class constructor: ClassName(...) → NewClassName(...)
             if fn_name in ctx.class_names:
-                return "New" + _safe_go_ident(fn_name) + "(" + ", ".join(call_arg_strs) + ")"
+                return "New" + _go_symbol_name(ctx, fn_name) + "(" + ", ".join(call_arg_strs) + ")"
             # Imported runtime function: add prefix only if not already prefixed
             if fn_name in ctx.runtime_imports:
                 return _safe_go_ident(ctx.runtime_imports[fn_name]) + "(" + ", ".join(call_arg_strs) + ")"
@@ -1071,6 +1254,7 @@ def _emit_builtin_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
     rc = _str(node, "runtime_call")
     bn = _str(node, "builtin_name")
     args = _list(node, "args")
+    keywords = _list(node, "keywords")
     arg_strs = [_emit_expr(ctx, a) for a in args]
     func = node.get("func")
     method_owner = ""
@@ -1146,7 +1330,85 @@ def _emit_builtin_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
             result_gt = _go_signature_type(ctx, _str(node, "resolved_type"))
             if result_gt.startswith("map["):
                 return result_gt + "{}"
+        if _str(node, "resolved_type") == "set[str]" and len(arg_strs) == 1:
+            return "py_set_str(" + arg_strs[0] + ")"
         return "py_set(" + ", ".join(arg_strs) + ")"
+
+    if rc == "tuple_ctor":
+        if len(args) == 0:
+            return "[]any{}"
+        if len(args) >= 1 and isinstance(args[0], dict):
+            return _box_value_code(ctx, args[0], _str(node, "resolved_type"))
+        if len(arg_strs) >= 1:
+            return arg_strs[0]
+        return "[]any{}"
+
+    if rc == "py_sorted" or bn == "sorted":
+        if len(args) >= 1 and isinstance(args[0], dict):
+            src_node = args[0]
+            src_code = arg_strs[0]
+            src_rt = _str(src_node, "resolved_type")
+            if _str(src_node, "kind") == "Unbox":
+                inner = src_node.get("value")
+                if isinstance(inner, dict):
+                    inner_rt = _str(inner, "resolved_type")
+                    if "T" in src_rt or src_rt in ("unknown", "list[unknown]"):
+                        src_node = inner
+                        src_code = _emit_expr(ctx, inner)
+                        src_rt = inner_rt
+            result_type = _str(node, "resolved_type")
+            result_gt = _go_signature_type(ctx, result_type)
+            key_attr = ""
+            for kw in keywords:
+                if not isinstance(kw, dict) or _str(kw, "arg") != "key":
+                    continue
+                key_value = kw.get("value")
+                if isinstance(key_value, dict) and _str(key_value, "kind") == "Lambda":
+                    body = key_value.get("body")
+                    lam_args = _list(key_value, "args")
+                    lam_name = ""
+                    if len(lam_args) >= 1 and isinstance(lam_args[0], dict):
+                        lam_name = _str(lam_args[0], "arg")
+                    if isinstance(body, dict) and _str(body, "kind") == "Attribute":
+                        owner = body.get("value")
+                        if isinstance(owner, dict) and _str(owner, "kind") == "Name" and _str(owner, "id") == lam_name:
+                            key_attr = _safe_go_ident(_str(body, "attr"))
+                break
+            out_name = _next_temp(ctx, "sorted")
+            if src_rt == "set[str]":
+                ctx.imports_needed.add("sort")
+                key_name = _next_temp(ctx, "k")
+                return (
+                    "func() []string {\n"
+                    + "\t" + out_name + " := []string{}\n"
+                    + "\tfor " + key_name + " := range " + src_code + " {\n"
+                    + "\t\t" + out_name + " = append(" + out_name + ", " + key_name + ")\n"
+                    + "\t}\n"
+                    + "\tsort.Strings(" + out_name + ")\n"
+                    + "\treturn " + out_name + "\n"
+                    + "}()"
+                )
+            if src_rt == "list[str]" or result_gt == "[]string":
+                ctx.imports_needed.add("sort")
+                return (
+                    "func() []string {\n"
+                    + "\t" + out_name + " := append([]string{}, " + src_code + "...)\n"
+                    + "\tsort.Strings(" + out_name + ")\n"
+                    + "\treturn " + out_name + "\n"
+                    + "}()"
+                )
+            if src_rt.startswith("list[") and result_gt.startswith("[]") and key_attr != "":
+                ctx.imports_needed.add("sort")
+                return (
+                    "func() " + result_gt + " {\n"
+                    + "\t" + out_name + " := append(" + result_gt + "{}, " + src_code + "...)\n"
+                    + "\tsort.Slice(" + out_name + ", func(i int, j int) bool {\n"
+                    + "\t\treturn " + out_name + "[i]." + key_attr + " < " + out_name + "[j]." + key_attr + "\n"
+                    + "\t})\n"
+                    + "\treturn " + out_name + "\n"
+                    + "}()"
+                )
+        return "py_sorted(" + ", ".join(arg_strs) + ")"
 
     if rc == "list_ctor":
         if len(args) == 0:
@@ -1322,15 +1584,15 @@ def _emit_builtin_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
     if bn == "range":
         return "py_range(" + ", ".join(arg_strs) + ")"
 
-    # RuntimeError / exceptions → panic
+    # Exception constructor expression → message string
     if bn in ("RuntimeError", "ValueError", "TypeError", "IndexError", "KeyError"):
         if len(arg_strs) >= 1:
-            return "panic(" + arg_strs[0] + ")"
-        return "panic(\"" + bn + "\")"
-    if rc == "std::runtime_error" or rc.endswith("_error"):
+            return arg_strs[0]
+        return _go_string_literal(bn)
+    if rc == "std::runtime_error":
         if len(arg_strs) >= 1:
-            return "panic(" + arg_strs[0] + ")"
-        return "panic(\"runtime error\")"
+            return arg_strs[0]
+        return _go_string_literal("runtime error")
 
     # py_int_from_str / py_float_from_str
     if rc == "py_int_from_str" and len(arg_strs) >= 1:
@@ -1382,9 +1644,9 @@ def _emit_attribute(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
     owner = _emit_expr(ctx, owner_node)
     owner_id = _str(owner_node, "id") if isinstance(owner_node, dict) else ""
     if owner_id != "" and attr in ctx.enum_members.get(owner_id, {}):
-        return _go_enum_const_name(owner_id, attr)
+        return _go_enum_const_name(ctx, owner_id, attr)
     if owner_id != "" and attr in ctx.class_vars.get(owner_id, {}):
-        return _safe_go_ident(owner_id + "_" + attr)
+        return _go_symbol_name(ctx, owner_id + "_" + attr)
     if _str(node, "attribute_access_kind") == "property_getter":
         return owner + "." + _safe_go_ident(attr) + "()"
     owner_rt = _str(owner_node, "resolved_type") if isinstance(owner_node, dict) else ""
@@ -1435,6 +1697,8 @@ def _emit_subscript(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
                 return "py_to_float64(" + base + ")"
             if elem_rt == "str":
                 return base + ".(string)"
+            if elem_rt != "" and elem_rt != "unknown":
+                return _coerce_from_any(base, elem_rt)
             return base
 
     # Negative constant index: x[-1] → x[len(x)-1]
@@ -1575,13 +1839,17 @@ def _emit_tuple_literal(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
 
 
 def _emit_ifexp(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
-    test = _emit_expr(ctx, node.get("test"))
-    body = _emit_expr(ctx, node.get("body"))
-    orelse = _emit_expr(ctx, node.get("orelse"))
+    test_node = node.get("test")
+    body_node = node.get("body")
+    orelse_node = node.get("orelse")
+    test = _emit_expr(ctx, test_node)
+    body = _emit_expr(ctx, body_node)
+    orelse = _emit_expr(ctx, orelse_node)
     rt = _str(node, "resolved_type")
+    body = _maybe_coerce_expr_to_type(ctx, body_node, body, rt)
+    orelse = _maybe_coerce_expr_to_type(ctx, orelse_node, orelse, rt)
     if rt in ("int64", "int32", "int", "uint8"):
         # Ensure test is bool (int→bool: != 0)
-        test_node = node.get("test")
         test_rt = _str(test_node, "resolved_type") if isinstance(test_node, dict) else ""
         if test_rt in ("int64", "int32", "int", "uint8"):
             test = "(" + test + " != 0)"
@@ -1593,7 +1861,10 @@ def _emit_ifexp(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
     if rt == "str":
         return "py_ternary_str(" + test + ", " + body + ", " + orelse + ")"
     # Fallback: use func literal
-    return "func() " + go_type(rt) + " { if " + test + " { return " + body + " }; return " + orelse + " }()"
+    result_gt = go_type(rt)
+    if result_gt == "":
+        result_gt = "any"
+    return "func() " + result_gt + " { if " + test + " { return " + body + " }; return " + orelse + " }()"
 
 
 def _emit_fstring(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
@@ -1665,6 +1936,22 @@ def _emit_isinstance(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
         expected_name = _str(expected, "id")
         if expected_name == "":
             expected_name = _str(expected, "repr")
+    exact_pod_helpers: dict[str, str] = {
+        "bool": "py_is_bool_type",
+        "int8": "py_is_exact_int8",
+        "uint8": "py_is_exact_uint8",
+        "int16": "py_is_exact_int16",
+        "uint16": "py_is_exact_uint16",
+        "int32": "py_is_exact_int32",
+        "uint32": "py_is_exact_uint32",
+        "int64": "py_is_exact_int64",
+        "uint64": "py_is_exact_uint64",
+        "float32": "py_is_exact_float32",
+        "float64": "py_is_exact_float64",
+    }
+    exact_helper = exact_pod_helpers.get(expected_name, "")
+    if exact_helper != "":
+        return exact_helper + "(" + value + ")"
     builtin_tid_helpers: dict[str, str] = {
         "PYTRA_TID_NONE": "py_is_none",
         "PYTRA_TID_BOOL": "py_is_bool_type",
@@ -1679,7 +1966,7 @@ def _emit_isinstance(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
         return helper_name + "(" + value + ")"
     if expected_name == "":
         return "false"
-    marker_method = _go_class_marker_method_name(expected_name)
+    marker_method = _go_class_marker_method_name(ctx, expected_name)
     return "func() bool { _, ok := any(" + value + ").(interface{ " + marker_method + "() }); return ok }()"
 
 
@@ -1892,6 +2179,8 @@ def _emit_stmt(ctx: EmitContext, node: JsonVal) -> None:
         _emit_static_range_for(ctx, node)
     elif kind == "FunctionDef":
         _emit_function_def(ctx, node)
+    elif kind == "ClosureDef":
+        _emit_closure_def(ctx, node)
     elif kind == "ClassDef":
         _emit_class_def(ctx, node)
     elif kind == "ImportFrom" or kind == "Import":
@@ -1961,8 +2250,9 @@ def _emit_ann_assign(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
     rt = _str(node, "decl_type")
     if rt == "":
         rt = _str(node, "resolved_type")
-    gt = _go_signature_type(ctx, rt)
     value = node.get("value")
+    rt = _prefer_value_type_for_none_decl(rt, value)
+    gt = _go_signature_type(ctx, rt)
 
     # target can be a string, Name node, or Attribute node
     target_name = ""
@@ -1988,7 +2278,7 @@ def _emit_ann_assign(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
             _emit(ctx, lhs + " = " + _emit_expr(ctx, value))
         return
 
-    name = _safe_go_ident(target_name)
+    name = _go_symbol_name(ctx, target_name)
     declare_new = name not in ctx.var_types and not _bool(node, "is_reassign")
     if declare_new:
         ctx.var_types[name] = rt
@@ -1997,6 +2287,7 @@ def _emit_ann_assign(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
 
     if value is not None:
         val_code = _emit_expr(ctx, value)
+        val_code = _maybe_coerce_expr_to_type(ctx, value, val_code, rt)
         if not declare_new:
             _emit(ctx, name + " = " + val_code)
         else:
@@ -2043,7 +2334,7 @@ def _emit_assign(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
             name = _str(target_node, "id")
             if name == "":
                 name = _str(target_node, "repr")
-            gn = _safe_go_ident(name)
+            gn = _go_symbol_name(ctx, name)
             if gn == "_":
                 _emit(ctx, "_ = " + val_code)
                 return
@@ -2056,12 +2347,31 @@ def _emit_assign(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
                 decl_type = _str(node, "decl_type")
                 if decl_type == "" or decl_type == "unknown":
                     decl_type = _str(target_node, "resolved_type")
+                if decl_type == "" or decl_type == "unknown":
+                    decl_type = _str(value, "resolved_type") if isinstance(value, dict) else decl_type
+                if (
+                    (decl_type == "" or decl_type == "unknown")
+                    and isinstance(value, dict)
+                    and _str(value, "kind") == "Subscript"
+                ):
+                    tuple_owner = value.get("value")
+                    tuple_slice = value.get("slice")
+                    tuple_name = _str(tuple_owner, "id") if isinstance(tuple_owner, dict) else ""
+                    tuple_type = ctx.var_types.get(tuple_name, "")
+                    if tuple_type.startswith("tuple[") and tuple_type.endswith("]") and isinstance(tuple_slice, dict):
+                        idx_value = tuple_slice.get("value")
+                        if isinstance(idx_value, int):
+                            tuple_args = _split_generic_args(tuple_type[6:-1])
+                            if 0 <= idx_value < len(tuple_args):
+                                decl_type = tuple_args[idx_value]
+                decl_type = _prefer_value_type_for_none_decl(decl_type, value)
+                val_code = _maybe_coerce_expr_to_type(ctx, value, val_code, decl_type)
                 if (
                     isinstance(value, dict)
                     and _str(value, "kind") == "Name"
                     and decl_type.startswith("list[")
                 ):
-                    source_name = _safe_go_ident(_str(value, "id"))
+                    source_name = _go_symbol_name(ctx, _str(value, "id"))
                     source_type = ctx.var_types.get(source_name, _str(value, "resolved_type"))
                     if source_name != "" and source_type.startswith("list["):
                         ctx.var_types[gn] = decl_type
@@ -2267,6 +2577,13 @@ def _emit_for_core(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
                             ctx.var_types[t_name] = t_type
                         else:
                             ctx.var_types[t_name] = ""
+                elif iter_rt in ("JsonVal", "Any", "Obj", "object", "unknown"):
+                    _emit(ctx, "for _, " + t_name + " := range py_iter(" + iter_code + ") {")
+                    ctx.indent_level += 1
+                    if t_name != "_" and t_type not in ("", "unknown"):
+                        ctx.var_types[t_name] = t_type
+                    else:
+                        ctx.var_types[t_name] = ""
                 else:
                     _emit(ctx, "for _, " + t_name + " := range " + iter_code + " {")
                     ctx.indent_level += 1
@@ -2392,7 +2709,7 @@ def _emit_function_def(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
         if isinstance(d, str) and d == "extern":
             return
 
-    fn_name = _safe_go_ident(name)
+    fn_name = _go_symbol_name(ctx, name)
     go_ret = _go_signature_type(ctx, return_type)
     mutated_arg_name = ctx.bytearray_mutating_funcs.get(name, "")
     mutated_return = mutated_arg_name != "" and return_type == "None"
@@ -2431,14 +2748,14 @@ def _emit_function_def(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
 
     # Method vs function
     if ctx.current_class != "" and not is_staticmethod:
-        receiver = ctx.current_receiver + " *" + _safe_go_ident(ctx.current_class)
+        receiver = ctx.current_receiver + " *" + _go_symbol_name(ctx, ctx.current_class)
         ret_clause = " " + go_ret if go_ret != "" and return_type != "None" else ""
         _emit(ctx, "func (" + receiver + ") " + fn_name + "(" + ", ".join(params) + ")" + ret_clause + " {")
     else:
         ret_clause = " " + go_ret if go_ret != "" and (return_type != "None" or mutated_return) else ""
         emit_name = fn_name
         if ctx.current_class != "" and is_staticmethod:
-            emit_name = _safe_go_ident(ctx.current_class + "_" + name)
+            emit_name = _go_symbol_name(ctx, ctx.current_class + "_" + name)
         _emit(ctx, "func " + emit_name + "(" + ", ".join(params) + ")" + ret_clause + " {")
 
     saved_ret = ctx.current_return_type
@@ -2460,11 +2777,85 @@ def _emit_function_def(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
     ctx.current_return_type = saved_ret
 
 
+def _closure_signature_parts(
+    ctx: EmitContext,
+    node: dict[str, JsonVal],
+) -> tuple[list[str], str, dict[str, str]]:
+    arg_types = _dict(node, "arg_types")
+    arg_order = _list(node, "arg_order")
+    return_type = _str(node, "return_type")
+    params: list[str] = []
+    param_types: dict[str, str] = {}
+    saved_vars = dict(ctx.var_types)
+    for arg in arg_order:
+        arg_name = arg if isinstance(arg, str) else ""
+        if arg_name == "" or arg_name == "self":
+            continue
+        arg_type_val = arg_types.get(arg_name, "")
+        arg_type = arg_type_val if isinstance(arg_type_val, str) else ""
+        safe_name = _safe_go_ident(arg_name)
+        params.append(safe_name + " " + _go_signature_type(ctx, arg_type))
+        ctx.var_types[safe_name] = arg_type
+        param_types[safe_name] = arg_type
+    ret_clause = ""
+    go_ret = _go_signature_type(ctx, return_type)
+    if go_ret != "" and return_type != "None":
+        ret_clause = " " + go_ret
+    return params, ret_clause, saved_vars
+
+
+def _closure_callable_resolved_type(node: dict[str, JsonVal]) -> str:
+    arg_types = _dict(node, "arg_types")
+    arg_order = _list(node, "arg_order")
+    params: list[str] = []
+    for arg in arg_order:
+        arg_name = arg if isinstance(arg, str) else ""
+        if arg_name == "" or arg_name == "self":
+            continue
+        arg_type = arg_types.get(arg_name, "")
+        params.append(arg_type if isinstance(arg_type, str) and arg_type != "" else "unknown")
+    ret = _str(node, "return_type")
+    if ret == "":
+        ret = "unknown"
+    return "callable[[" + ",".join(params) + "]," + ret + "]"
+
+
+def _emit_closure_def(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
+    name = _str(node, "name")
+    if name == "":
+        return
+    body = _list(node, "body")
+    return_type = _str(node, "return_type")
+    safe_name = _go_symbol_name(ctx, name)
+    params, ret_clause, saved_vars = _closure_signature_parts(ctx, node)
+    closure_type = "func(" + ", ".join(params) + ")" + ret_clause
+    is_recursive = _bool(node, "is_recursive")
+    if is_recursive:
+        _emit(ctx, "var " + safe_name + " " + closure_type)
+        _emit(ctx, safe_name + " = func(" + ", ".join(params) + ")" + ret_clause + " {")
+    else:
+        _emit(ctx, safe_name + " := func(" + ", ".join(params) + ")" + ret_clause + " {")
+    saved_ret = ctx.current_return_type
+    ctx.current_return_type = return_type
+    ctx.indent_level += 1
+    _emit_body(ctx, body)
+    if return_type != "None" and len(body) > 0:
+        last_stmt = body[-1]
+        if isinstance(last_stmt, dict) and _str(last_stmt, "kind") == "While":
+            _emit(ctx, "panic(\"unreachable\")")
+            _emit(ctx, "return " + go_zero_value(return_type))
+    ctx.indent_level -= 1
+    _emit(ctx, "}")
+    ctx.var_types = saved_vars
+    ctx.var_types[safe_name] = _closure_callable_resolved_type(node)
+    ctx.current_return_type = saved_ret
+
+
 def _emit_class_def(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
     name = _str(node, "name")
     base = _str(node, "base")
     body = _list(node, "body")
-    gn = _safe_go_ident(name)
+    gn = _go_symbol_name(ctx, name)
     is_dataclass = _bool(node, "dataclass")
 
     ctx.class_names.add(name)
@@ -2489,7 +2880,7 @@ def _emit_class_def(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
                 value_code = "0"
                 if isinstance(value_node, dict):
                     value_code = _emit_expr(ctx, value_node)
-                _emit(ctx, _go_enum_const_name(name, member_name) + " " + gn + " = " + value_code)
+                _emit(ctx, _go_enum_const_name(ctx, name, member_name) + " " + gn + " = " + value_code)
             ctx.indent_level -= 1
             _emit(ctx, ")")
             _emit_blank(ctx)
@@ -2538,7 +2929,7 @@ def _emit_class_def(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
                     default_val = stmt.get("value")
                     if isinstance(default_val, dict):
                         field_defaults[ft_name] = default_val
-            elif sk == "FunctionDef" and _str(stmt, "name") == "__init__":
+            elif sk in ("FunctionDef", "ClosureDef") and _str(stmt, "name") == "__init__":
                 for init_stmt in _list(stmt, "body"):
                     if not isinstance(init_stmt, dict):
                         continue
@@ -2574,9 +2965,9 @@ def _emit_class_def(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
     saved_receiver = ctx.current_receiver
 
     if _is_polymorphic_class(ctx, name):
-        _emit(ctx, "type " + _go_polymorphic_iface_name(name) + " interface {")
+        _emit(ctx, "type " + _go_polymorphic_iface_name(ctx, name) + " interface {")
         ctx.indent_level += 1
-        _emit(ctx, _go_class_marker_method_name(name) + "()")
+        _emit(ctx, _go_class_marker_method_name(ctx, name) + "()")
         for method_node in _effective_instance_methods(ctx, name).values():
             sig = _interface_method_signature(ctx, method_node)
             if sig != "":
@@ -2589,13 +2980,13 @@ def _emit_class_def(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
     _emit(ctx, "type " + gn + " struct {")
     ctx.indent_level += 1
     if base != "" and base not in ("object", "Exception", "BaseException"):
-        _emit(ctx, _safe_go_ident(base))  # embed base
+        _emit(ctx, _go_symbol_name(ctx, base))  # embed base
     for fname, ftype in fields:
-        _emit(ctx, _safe_go_ident(fname) + " " + go_type(ftype))
+        _emit(ctx, _safe_go_ident(fname) + " " + _go_type_with_ctx(ctx, ftype))
     ctx.indent_level -= 1
     _emit(ctx, "}")
     _emit_blank(ctx)
-    _emit(ctx, "func (_ " + gn + ") " + _go_class_marker_method_name(name) + "() {}")
+    _emit(ctx, "func (_ " + gn + ") " + _go_class_marker_method_name(ctx, name) + "() {}")
     _emit_blank(ctx)
     for var_name, spec in class_vars.items():
         var_type = _str(spec, "type")
@@ -2603,7 +2994,7 @@ def _emit_class_def(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
         default_code = go_zero_value(var_type)
         if isinstance(default_node, dict):
             default_code = _emit_expr(ctx, default_node)
-        _emit(ctx, "var " + _safe_go_ident(name + "_" + var_name) + " " + go_type(var_type) + " = " + default_code)
+        _emit(ctx, "var " + _safe_go_ident(name + "_" + var_name) + " " + _go_type_with_ctx(ctx, var_type) + " = " + default_code)
     if len(class_vars) > 0:
         _emit_blank(ctx)
 
@@ -2612,7 +3003,7 @@ def _emit_class_def(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
     has_init = False
     init_body_stmts: list[JsonVal] = []
     for stmt in body:
-        if isinstance(stmt, dict) and _str(stmt, "kind") == "FunctionDef" and _str(stmt, "name") == "__init__":
+        if isinstance(stmt, dict) and _str(stmt, "kind") in ("FunctionDef", "ClosureDef") and _str(stmt, "name") == "__init__":
             has_init = True
             init_args = _dict(stmt, "arg_types")
             init_order = _list(stmt, "arg_order")
@@ -2639,7 +3030,7 @@ def _emit_class_def(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
     for i, (fname, ftype) in enumerate(ctor_params):
         if i >= first_default_index:
             break
-        ctor_sig_parts.append(_safe_go_ident(fname) + " " + go_type(ftype))
+        ctor_sig_parts.append(_safe_go_ident(fname) + " " + _go_type_with_ctx(ctx, ftype))
     if first_default_index < len(ctor_params):
         ctor_sig_parts.append("__opt_args ...any")
 
@@ -2666,9 +3057,9 @@ def _emit_class_def(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
                 default_node = field_defaults.get(fname)
                 default_code = go_zero_value(ftype)
                 if isinstance(default_node, dict):
-                    default_code = _emit_expr(ctx, default_node)
+                    default_code = _dataclass_default_code(ctx, default_node, ftype)
                 local_name = _safe_go_ident(fname)
-                _emit(ctx, "var " + local_name + " " + go_type(ftype) + " = " + default_code)
+                _emit(ctx, "var " + local_name + " " + _go_type_with_ctx(ctx, ftype) + " = " + default_code)
                 opt_index = i - first_default_index
                 _emit(ctx, "if len(__opt_args) > " + str(opt_index) + " {")
                 ctx.indent_level += 1
@@ -2686,7 +3077,7 @@ def _emit_class_def(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
     ctx.current_class = name
     ctx.current_receiver = "self"
     for stmt in body:
-        if isinstance(stmt, dict) and _str(stmt, "kind") == "FunctionDef":
+        if isinstance(stmt, dict) and _str(stmt, "kind") in ("FunctionDef", "ClosureDef"):
             fn_name = _str(stmt, "name")
             decorators = _list(stmt, "decorators")
             is_staticmethod = False
@@ -2711,9 +3102,9 @@ def _emit_var_decl(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
     rt = _str(node, "type")
     if rt == "":
         rt = _str(node, "resolved_type")
-    gn = _safe_go_ident(name)
+    gn = _go_symbol_name(ctx, name)
     # VarDecl with unknown type: emit as any but track for later upgrade
-    if rt == "" or rt == "unknown":
+    if rt == "" or rt == "unknown" or rt == "None" or rt == "none":
         ctx.var_types[gn] = "unknown"
         _emit(ctx, "var " + gn + " any")
         _emit(ctx, "_ = " + gn)
@@ -2722,6 +3113,33 @@ def _emit_var_decl(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
     ctx.var_types[gn] = rt
     _emit(ctx, "var " + gn + " " + gt)
     _emit(ctx, "_ = " + gn)
+
+
+def _dataclass_default_code(ctx: EmitContext, default_node: JsonVal, field_type: str) -> str:
+    if not isinstance(default_node, dict):
+        return go_zero_value(field_type)
+    if _str(default_node, "kind") == "Unbox":
+        inner = default_node.get("value")
+        if isinstance(inner, dict):
+            return _dataclass_default_code(ctx, inner, field_type)
+    if _str(default_node, "kind") != "Call":
+        return _emit_expr(ctx, default_node)
+    func = default_node.get("func")
+    if not isinstance(func, dict) or _str(func, "kind") != "Name" or _str(func, "id") != "field":
+        return _emit_expr(ctx, default_node)
+    for kw in _list(default_node, "keywords"):
+        if not isinstance(kw, dict) or _str(kw, "arg") != "default_factory":
+            continue
+        value = kw.get("value")
+        if not isinstance(value, dict) or _str(value, "kind") != "Name":
+            break
+        factory_name = _str(value, "id")
+        if factory_name in ("dict", "list", "set", "tuple"):
+            return go_zero_value(field_type)
+        if factory_name != "" and (factory_name in ctx.class_names or field_type == factory_name or field_type == "*" + factory_name):
+            return "New" + _safe_go_ident(factory_name) + "()"
+        return go_zero_value(field_type)
+    return _emit_expr(ctx, default_node)
 
 
 def _emit_swap(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
@@ -2926,7 +3344,40 @@ def _emit_raise(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
 
 def _emit_type_alias(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
     name = _str(node, "name")
-    _emit(ctx, "// type alias: " + name)
+    value = _str(node, "value")
+    go_name = _go_symbol_name(ctx, name)
+    go_value = _go_type_with_ctx(ctx, value)
+    if go_value == "" or go_value == "interface{}":
+        go_value = "any"
+    _emit(ctx, "type " + go_name + " = " + go_value)
+
+
+def _collect_module_private_symbols(body: list[JsonVal]) -> set[str]:
+    out: set[str] = set()
+    for stmt in body:
+        if not isinstance(stmt, dict):
+            continue
+        kind = _str(stmt, "kind")
+        if kind in ("FunctionDef", "ClassDef", "TypeAlias"):
+            name = _str(stmt, "name")
+            if name.startswith("_"):
+                out.add(name)
+            continue
+        if kind in ("AnnAssign", "Assign"):
+            target = stmt.get("target")
+            name2 = ""
+            if isinstance(target, dict):
+                name2 = _str(target, "id")
+            elif isinstance(target, str):
+                name2 = target
+            if name2.startswith("_"):
+                out.add(name2)
+            continue
+        if kind == "VarDecl":
+            name3 = _str(stmt, "name")
+            if name3.startswith("_"):
+                out.add(name3)
+    return out
 
 
 # ---------------------------------------------------------------------------
@@ -2967,12 +3418,14 @@ def emit_go_module(east3_doc: dict[str, JsonVal]) -> str:
 
     ctx = EmitContext(
         module_id=module_id,
+        source_path=_str(east3_doc, "source_path"),
         is_entry=_bool(emit_ctx_meta, "is_entry") if emit_ctx_meta else False,
         mapping=mapping,
     )
 
     body = _list(east3_doc, "body")
     main_guard = _list(east3_doc, "main_guard_body")
+    ctx.module_private_symbols = _collect_module_private_symbols(body)
 
     # Collect imported runtime symbols for native helper resolution.
     ctx.runtime_imports = build_runtime_import_map(meta, mapping)

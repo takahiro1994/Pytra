@@ -5,11 +5,16 @@ from __future__ import annotations
 from pytra.std.json import JsonVal
 
 from toolchain2.optimize.optimizer import East3OptimizerPass, PassContext, PassResult, make_pass_result
-from toolchain2.common.types import normalize_type_name
+
+
+def _norm_text(value: JsonVal) -> str:
+    if isinstance(value, str):
+        return value.strip()
+    return ""
 
 
 def _dict_key_type(owner_type: JsonVal) -> str:
-    owner_t = normalize_type_name(owner_type)
+    owner_t = _norm_text(owner_type)
     if not owner_t.startswith("dict[") or not owner_t.endswith("]"):
         return ""
     inner = owner_t[5:-1].strip()
@@ -32,7 +37,7 @@ def _dict_key_type(owner_type: JsonVal) -> str:
     if split_at < 0:
         return ""
     key_t = inner[:split_at].strip()
-    return normalize_type_name(key_t)
+    return _norm_text(key_t)
 
 
 class DictStrKeyNormalizationPass(East3OptimizerPass):
@@ -46,7 +51,7 @@ class DictStrKeyNormalizationPass(East3OptimizerPass):
         if key is None:
             return 0
         changed = 0
-        key_t = normalize_type_name(key.get("resolved_type"))
+        key_t = _norm_text(key.get("resolved_type"))
         if key_t == "" or key_t == "unknown":
             key["resolved_type"] = "str"
             changed += 1
@@ -64,29 +69,32 @@ class DictStrKeyNormalizationPass(East3OptimizerPass):
         if not isinstance(node, dict):
             return 0
 
-        kind = normalize_type_name(node.get("kind"))
+        kind = _norm_text(node.get("kind"))
         if kind == "Subscript":
             owner = node.get("value")
-            owner_node = owner if isinstance(owner, dict) else None
+            owner_node: dict[str, JsonVal] | None = None
+            if isinstance(owner, dict):
+                owner_node = owner
             if owner_node is not None and _dict_key_type(owner_node.get("resolved_type")) == "str":
                 changed += self._mark_key(node.get("slice"))
         elif kind == "DictGetMaybe" or kind == "DictGetDefault" or kind == "DictPop" or kind == "DictPopDefault":
             owner = node.get("owner")
-            owner_node = owner if isinstance(owner, dict) else None
+            owner_node = None
+            if isinstance(owner, dict):
+                owner_node = owner
             if owner_node is not None and _dict_key_type(owner_node.get("resolved_type")) == "str":
                 changed += self._mark_key(node.get("key"))
         elif kind == "Call":
-            runtime_call = normalize_type_name(node.get("runtime_call"))
+            runtime_call = _norm_text(node.get("runtime_call"))
             if runtime_call == "dict.get" or runtime_call == "dict.pop":
                 func_obj = node.get("func")
-                func = func_obj if isinstance(func_obj, dict) else None
-                owner = func.get("value") if isinstance(func, dict) else None
-                owner_node = owner if isinstance(owner, dict) else None
-                if owner_node is not None and _dict_key_type(owner_node.get("resolved_type")) == "str":
-                    args_obj = node.get("args")
-                    args = args_obj if isinstance(args_obj, list) else []
-                    if len(args) >= 1:
-                        changed += self._mark_key(args[0])
+                if isinstance(func_obj, dict):
+                    owner_obj = func_obj.get("value")
+                    if isinstance(owner_obj, dict) and _dict_key_type(owner_obj.get("resolved_type")) == "str":
+                        args_obj = node.get("args")
+                        args = args_obj if isinstance(args_obj, list) else []
+                        if len(args) >= 1:
+                            changed += self._mark_key(args[0])
 
         for value in node.values():
             changed += self._visit(value)
@@ -95,4 +103,5 @@ class DictStrKeyNormalizationPass(East3OptimizerPass):
     def run(self, east3_doc: dict[str, JsonVal], context: PassContext) -> PassResult:
         _ = context
         change_count = self._visit(east3_doc)
-        return make_pass_result(changed=change_count > 0, change_count=change_count)
+        warnings: list[str] = []
+        return make_pass_result(change_count > 0, change_count, warnings, 0.0)

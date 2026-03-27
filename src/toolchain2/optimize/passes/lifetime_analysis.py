@@ -152,7 +152,7 @@ def _stmt_defs_uses(stmt: dict[str, JsonVal]) -> tuple[set[str], set[str], bool]
         _collect_target_plan_defs(stmt.get("target_plan"), defs)
         _collect_name_uses(stmt.get("iter_plan"), uses)
         _collect_name_uses(stmt.get("iter"), uses)
-    elif kind == "FunctionDef":
+    elif kind == "FunctionDef" or kind == "ClosureDef":
         name = _safe_name(stmt.get("name"))
         if name != "":
             defs.add(name)
@@ -193,7 +193,7 @@ def _function_args(fn_node: dict[str, JsonVal]) -> list[str]:
 
 
 @dataclass
-class _CfgNode:
+class CfgNode:
     node_id: str
     stmt: dict[str, JsonVal]
     kind: str
@@ -202,26 +202,26 @@ class _CfgNode:
     succ: set[str]
 
 
-class _CfgBuilder:
+class CfgBuilder:
     def __init__(self) -> None:
         self._counter: int = 0
-        self.nodes: dict[str, _CfgNode] = {}
+        self.nodes: dict[str, CfgNode] = {}
         self.order: list[str] = []
         self.dynamic_name_access: bool = False
 
-    def _new_node(self, stmt: dict[str, JsonVal]) -> _CfgNode:
+    def _new_node(self, stmt: dict[str, JsonVal]) -> CfgNode:
         node_id = "n" + str(self._counter)
         self._counter += 1
         defs, uses, has_dyn = _stmt_defs_uses(stmt)
         if has_dyn:
             self.dynamic_name_access = True
-        node = _CfgNode(
+        node = CfgNode(
             node_id=node_id,
             stmt=stmt,
             kind=_safe_name(stmt.get("kind")),
             defs=set(defs),
             uses=set(uses),
-            succ=set(),
+            succ=_empty_str_set(),
         )
         self.nodes[node_id] = node
         self.order.append(node_id)
@@ -299,30 +299,67 @@ class _CfgBuilder:
 
 
 def _sorted_str_list(values: set[str]) -> list[str]:
-    return sorted([value for value in values if value != ""])
+    return sorted(values)
+
+
+def _sorted_set_map(values: dict[str, set[str]]) -> dict[str, list[str]]:
+    out: dict[str, list[str]] = {}
+    for name in sorted(values.keys()):
+        out[name] = _sorted_str_list(values[name])
+    return out
 
 
 def _merge_set_map(dst: dict[str, set[str]], key: str, values: set[str]) -> None:
     if key not in dst:
-        dst[key] = set()
+        dst[key] = _empty_str_set()
     dst[key].update(values)
 
 
-def _compute_liveness(nodes: dict[str, _CfgNode], order: list[str]) -> tuple[dict[str, set[str]], dict[str, set[str]]]:
-    live_in: dict[str, set[str]] = {node_id: set() for node_id in order}
-    live_out: dict[str, set[str]] = {node_id: set() for node_id in order}
+def _empty_str_set() -> set[str]:
+    out: set[str] = set()
+    return out
+
+
+def _set_minus(left: set[str], right: set[str]) -> set[str]:
+    out: set[str] = _empty_str_set()
+    for value in left:
+        if value not in right:
+            out.add(value)
+    return out
+
+
+def _policy_flag(context: PassContext, key: str, default: bool) -> bool:
+    if key in context.non_escape_policy:
+        return bool(context.non_escape_policy[key])
+    return default
+
+
+def _sets_equal(left: set[str], right: set[str]) -> bool:
+    if len(left) != len(right):
+        return False
+    for value in left:
+        if value not in right:
+            return False
+    return True
+
+
+def _compute_liveness(nodes: dict[str, CfgNode], order: list[str]) -> tuple[dict[str, set[str]], dict[str, set[str]]]:
+    live_in: dict[str, set[str]] = {node_id: _empty_str_set() for node_id in order}
+    live_out: dict[str, set[str]] = {node_id: _empty_str_set() for node_id in order}
     changed = True
     while changed:
         changed = False
         for node_id in reversed(order):
             node = nodes[node_id]
-            out_set: set[str] = set()
+            out_set: set[str] = _empty_str_set()
             for succ in node.succ:
                 if succ in live_in:
                     out_set.update(live_in[succ])
             in_set = set(node.uses)
-            in_set.update(out_set.difference(node.defs))
-            if out_set != live_out[node_id] or in_set != live_in[node_id]:
+            in_set.update(_set_minus(out_set, node.defs))
+            prev_out = live_out[node_id] if node_id in live_out else _empty_str_set()
+            prev_in = live_in[node_id] if node_id in live_in else _empty_str_set()
+            if (not _sets_equal(out_set, prev_out)) or (not _sets_equal(in_set, prev_in)):
                 live_out[node_id] = out_set
                 live_in[node_id] = in_set
                 changed = True
@@ -331,7 +368,7 @@ def _compute_liveness(nodes: dict[str, _CfgNode], order: list[str]) -> tuple[dic
 
 def _non_escape_arg_flags(fn_node: dict[str, JsonVal], context: PassContext) -> list[bool]:
     arg_names = _function_args(fn_node)
-    defaults = [bool(context.non_escape_policy.get("return_escape_by_default", True))] * len(arg_names)
+    defaults = [_policy_flag(context, "return_escape_by_default", True)] * len(arg_names)
     meta_val = fn_node.get("meta")
     meta = meta_val if isinstance(meta_val, dict) else {}
     summary_val = meta.get("escape_summary")
@@ -357,7 +394,7 @@ class LifetimeAnalysisPass(East3OptimizerPass):
 
     def _analyze_function(self, fn_node: dict[str, JsonVal], context: PassContext) -> bool:
         body = _iter_stmt_list(fn_node.get("body"))
-        builder = _CfgBuilder()
+        builder = CfgBuilder()
         entry_id = builder.build_block(body, "", None)
         order = list(builder.order)
         nodes = builder.nodes
@@ -387,8 +424,8 @@ class LifetimeAnalysisPass(East3OptimizerPass):
         variables: dict[str, JsonVal] = {}
         fail_closed = bool(builder.dynamic_name_access)
         for name in sorted(all_vars):
-            def_nodes = sorted(list(defs_index.get(name, set())))
-            use_nodes = sorted(list(uses_index.get(name, set())))
+            def_nodes = _sorted_str_list(defs_index.get(name, _empty_str_set()))
+            use_nodes = _sorted_str_list(uses_index.get(name, _empty_str_set()))
             live_in_nodes = [node_id for node_id in order if name in live_in.get(node_id, set())]
             live_out_nodes = [node_id for node_id in order if name in live_out.get(node_id, set())]
             last_use_nodes: list[str] = []
@@ -404,14 +441,14 @@ class LifetimeAnalysisPass(East3OptimizerPass):
                 arg_index = args.index(name)
                 if arg_index < len(arg_escape) and bool(arg_escape[arg_index]):
                     lifetime_class = "escape_or_unknown"
-            variables[name] = {
-                "def_nodes": def_nodes,
-                "use_nodes": use_nodes,
-                "live_in_nodes": live_in_nodes,
-                "live_out_nodes": live_out_nodes,
-                "last_use_nodes": sorted(last_use_nodes),
-                "lifetime_class": lifetime_class,
-            }
+            var_info: dict[str, JsonVal] = {}
+            var_info["def_nodes"] = def_nodes
+            var_info["use_nodes"] = use_nodes
+            var_info["live_in_nodes"] = live_in_nodes
+            var_info["live_out_nodes"] = live_out_nodes
+            var_info["last_use_nodes"] = sorted(last_use_nodes)
+            var_info["lifetime_class"] = lifetime_class
+            variables[name] = var_info
 
         changed = False
         for node_id in order:
@@ -433,13 +470,13 @@ class LifetimeAnalysisPass(East3OptimizerPass):
         node_summaries: list[JsonVal] = []
         for node_id in order:
             node = nodes[node_id]
-            node_summaries.append({
-                "id": node_id,
-                "kind": node.kind,
-                "defs": sorted(node.defs),
-                "uses": sorted(node.uses),
-                "succ": sorted(node.succ),
-            })
+            node_summary: dict[str, JsonVal] = {}
+            node_summary["id"] = node_id
+            node_summary["kind"] = node.kind
+            node_summary["defs"] = sorted(node.defs)
+            node_summary["uses"] = sorted(node.uses)
+            node_summary["succ"] = sorted(node.succ)
+            node_summaries.append(node_summary)
 
         fn_analysis: dict[str, JsonVal] = {
             "schema_version": "east3_lifetime_v1",
@@ -449,8 +486,8 @@ class LifetimeAnalysisPass(East3OptimizerPass):
             "order": list(order),
             "cfg": node_summaries,
             "def_use": {
-                "defs": {name: sorted(list(node_ids)) for name, node_ids in sorted(defs_index.items())},
-                "uses": {name: sorted(list(node_ids)) for name, node_ids in sorted(uses_index.items())},
+                "defs": _sorted_set_map(defs_index),
+                "uses": _sorted_set_map(uses_index),
             },
             "variables": variables,
             "arg_order": list(args),
@@ -472,7 +509,7 @@ class LifetimeAnalysisPass(East3OptimizerPass):
 
         kind = _safe_name(node.get("kind"))
         changed = 0
-        if kind == "FunctionDef":
+        if kind == "FunctionDef" or kind == "ClosureDef":
             if self._analyze_function(node, context):
                 changed += 1
             return changed
@@ -493,4 +530,5 @@ class LifetimeAnalysisPass(East3OptimizerPass):
         change_count = self._visit(east3_doc, context)
         if _set_meta_value(east3_doc, "lifetime_schema_version", "east3_lifetime_v1"):
             change_count += 1
-        return make_pass_result(changed=change_count > 0, change_count=change_count)
+        warnings: list[str] = []
+        return make_pass_result(change_count > 0, change_count, warnings, 0.0)

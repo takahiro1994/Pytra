@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import sys
 import tempfile
 import unittest
@@ -22,6 +23,8 @@ from toolchain2.emit.common.code_emitter import (
     build_runtime_import_map,
     resolve_runtime_symbol_name,
 )
+from toolchain2.link.linker import link_modules
+from toolchain2.optimize.optimizer import optimize_east3_document
 from toolchain2.optimize.optimizer import make_pass_context
 from toolchain2.optimize.passes.typed_enumerate_normalization import TypedEnumerateNormalizationPass
 from toolchain2.optimize.passes.typed_repeat_materialization import TypedRepeatMaterializationPass
@@ -220,6 +223,34 @@ type Scalar = int | float
         type_alias = next(node for node in _walk(east1) if node.get("kind") == "TypeAlias")
         self.assertEqual(type_alias.get("name"), "Scalar")
         self.assertEqual(type_alias.get("value"), "int | float")
+
+    def test_parse_python_file_accepts_stdlib_json_current_source(self) -> None:
+        east1 = parse_python_file(str(ROOT / "src" / "pytra" / "std" / "json.py"))
+        self.assertEqual(east1.get("kind"), "Module")
+        self.assertTrue(any(node.get("kind") == "ClassDef" and node.get("name") == "JsonValue" for node in _walk(east1)))
+
+    def test_stdlib_json_current_source_flows_through_full_pipeline(self) -> None:
+        east1 = parse_python_file(str(ROOT / "src" / "pytra" / "std" / "json.py"))
+
+        east2 = deep_copy_json(east1)
+        self.assertIsInstance(east2, dict)
+        resolve_east1_to_east2(east2, registry=_load_registry())
+        validate_east2(east2)
+
+        east3 = lower_east2_to_east3(deep_copy_json(east2))
+        self.assertEqual(east3.get("kind"), "Module")
+
+        east3_opt, _report = optimize_east3_document(deep_copy_json(east3), opt_level=1)
+        self.assertEqual(east3_opt.get("kind"), "Module")
+
+        with tempfile.TemporaryDirectory() as tmp:
+            east3_path = Path(tmp) / "json.east3"
+            east3_path.write_text(json.dumps(east3_opt, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+            linked = link_modules([str(east3_path)], target="go", dispatch_mode="native")
+
+        self.assertEqual(linked.manifest.get("schema"), "pytra.link_output.v1")
+        self.assertIn("json", [module.module_id for module in linked.linked_modules])
+        self.assertTrue(any(module.is_entry and module.module_id == "json" for module in linked.linked_modules))
 
     def test_parser_accepts_keyword_unpack_in_call(self) -> None:
         source = """
@@ -1218,7 +1249,57 @@ def add_scalars(a: Scalar, b: Scalar) -> int:
 
         guarded_return = module["body"][0]["body"][0]["body"][0]["value"]
         self.assertEqual(guarded_return.get("kind"), "Unbox")
-        self.assertEqual(guarded_return.get("target"), "list[JsonVal]")
+
+    def test_compile_lowers_pod_isinstance_to_exact_type_names(self) -> None:
+        source = """
+def f(x16: int16, x64: int64, f32: float32) -> None:
+    print(isinstance(x16, int16))
+    print(isinstance(x64, int))
+    print(isinstance(f32, float32))
+"""
+        east2 = parse_python_source(source, "<mem>").to_jv()
+        resolve_east1_to_east2(east2, registry=_load_registry())
+        east3 = lower_east2_to_east3(deep_copy_json(east2))
+
+        expected_names: list[str] = []
+        for node in _walk(east3):
+            if node.get("kind") != "IsInstance":
+                continue
+            expected = node.get("expected_type_id")
+            if isinstance(expected, dict):
+                expected_name = expected.get("id")
+                if isinstance(expected_name, str):
+                    expected_names.append(expected_name)
+
+        self.assertEqual(expected_names, ["int16", "int64", "float32"])
+
+    def test_guard_narrowing_uses_exact_pod_names(self) -> None:
+        module = {
+            "kind": "Module",
+            "body": [
+                {
+                    "kind": "If",
+                    "test": {
+                        "kind": "IsInstance",
+                        "value": {"kind": "Name", "id": "x", "resolved_type": "int16 | int64"},
+                        "expected_type_id": {"kind": "Name", "id": "int16"},
+                        "resolved_type": "bool",
+                    },
+                    "body": [
+                        {
+                            "kind": "Return",
+                            "value": {"kind": "Name", "id": "x", "resolved_type": "int16 | int64"},
+                        }
+                    ],
+                    "orelse": [],
+                }
+            ],
+        }
+
+        apply_guard_narrowing(module, CompileContext())
+
+        guarded_return = module["body"][0]["body"][0]["value"]
+        self.assertEqual(guarded_return.get("resolved_type"), "int16")
 
     def test_compile_boxes_imported_stdlib_alias_arguments(self) -> None:
         source = """

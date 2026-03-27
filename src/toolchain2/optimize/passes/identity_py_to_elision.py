@@ -5,7 +5,6 @@ from __future__ import annotations
 from pytra.std.json import JsonVal
 
 from toolchain2.optimize.optimizer import East3OptimizerPass, PassContext, PassResult, make_pass_result
-from toolchain2.common.types import normalize_type_name, is_any_like_type
 
 
 _RUNTIME_CALL_TARGETS: dict[str, str] = {
@@ -17,7 +16,9 @@ _RUNTIME_CALL_TARGETS: dict[str, str] = {
 
 
 def _canonical_type_name(value: JsonVal) -> str:
-    type_name = normalize_type_name(value)
+    type_name = ""
+    if isinstance(value, str):
+        type_name = value.strip()
     if type_name == "int":
         return "int64"
     if type_name == "float":
@@ -27,12 +28,17 @@ def _canonical_type_name(value: JsonVal) -> str:
     return type_name
 
 
+def _is_any_like_type(type_name: str) -> bool:
+    t = type_name.strip()
+    return t == "" or t == "unknown" or t == "Any" or t == "object" or t == "Obj"
+
+
 def _types_match(lhs: JsonVal, rhs: JsonVal) -> bool:
     left_t = _canonical_type_name(lhs)
     right_t = _canonical_type_name(rhs)
     if left_t == "" or left_t == "unknown" or right_t == "" or right_t == "unknown":
         return False
-    if is_any_like_type(left_t) or is_any_like_type(right_t):
+    if _is_any_like_type(left_t) or _is_any_like_type(right_t):
         return False
     return left_t == right_t
 
@@ -43,7 +49,7 @@ class IdentityPyToElisionPass(East3OptimizerPass):
     name: str = "IdentityPyToElisionPass"
     min_opt_level: int = 1
 
-    def _fold_call(self, node: dict[str, JsonVal]) -> dict[str, JsonVal] | None:
+    def _fold_call(self, node: dict[str, JsonVal]) -> JsonVal:
         if node.get("kind") != "Call":
             return None
         if node.get("lowered_kind") != "BuiltinCall":
@@ -56,7 +62,7 @@ class IdentityPyToElisionPass(East3OptimizerPass):
         if not isinstance(arg0, dict):
             return None
 
-        runtime_call = normalize_type_name(node.get("runtime_call"))
+        runtime_call = _canonical_type_name(node.get("runtime_call"))
         if runtime_call == "static_cast":
             target_t = _canonical_type_name(node.get("target"))
             if target_t == "" or target_t == "unknown":
@@ -70,7 +76,7 @@ class IdentityPyToElisionPass(East3OptimizerPass):
             return arg0
         return None
 
-    def _fold_unbox_like(self, node: dict[str, JsonVal]) -> dict[str, JsonVal] | None:
+    def _fold_unbox_like(self, node: dict[str, JsonVal]) -> JsonVal:
         kind = node.get("kind")
         if not isinstance(kind, str):
             return None
@@ -85,7 +91,7 @@ class IdentityPyToElisionPass(East3OptimizerPass):
             target_t = _canonical_type_name(node.get("resolved_type"))
         if target_t == "" or target_t == "unknown":
             return None
-        if is_any_like_type(target_t):
+        if _is_any_like_type(target_t):
             return None
         if _types_match(value.get("resolved_type"), target_t):
             return value
@@ -93,37 +99,38 @@ class IdentityPyToElisionPass(East3OptimizerPass):
 
     def _rewrite(self, node: JsonVal) -> tuple[JsonVal, int]:
         if isinstance(node, list):
-            out = node
+            list_out = node
             changed = 0
             for idx, item in enumerate(node):
                 new_item, delta = self._rewrite(item)
                 if new_item is not item:
-                    out[idx] = new_item
+                    list_out[idx] = new_item
                 changed += delta
-            return out, changed
+            return list_out, changed
 
         if not isinstance(node, dict):
             return node, 0
 
-        out = node
+        dict_out = node
         changed = 0
         keys = list(node.keys())
         for key in keys:
             value = node.get(key)
             new_value, delta = self._rewrite(value)
             if new_value is not value:
-                out[key] = new_value
+                dict_out[key] = new_value
             changed += delta
 
-        folded = self._fold_call(out)
+        folded = self._fold_call(dict_out)
         if folded is not None:
             return folded, changed + 1
-        folded = self._fold_unbox_like(out)
+        folded = self._fold_unbox_like(dict_out)
         if folded is not None:
             return folded, changed + 1
-        return out, changed
+        return dict_out, changed
 
     def run(self, east3_doc: dict[str, JsonVal], context: PassContext) -> PassResult:
         _ = context
         _, change_count = self._rewrite(east3_doc)
-        return make_pass_result(changed=change_count > 0, change_count=change_count)
+        warnings: list[str] = []
+        return make_pass_result(change_count > 0, change_count, warnings, 0.0)

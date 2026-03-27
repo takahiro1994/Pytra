@@ -31,7 +31,6 @@ class PassResult:
 
 
 def make_pass_result(
-    *,
     changed: bool = False,
     change_count: int = 0,
     warnings: list[str] | None = None,
