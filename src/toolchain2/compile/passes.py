@@ -3265,7 +3265,7 @@ def _tp_truediv(node: JsonVal) -> None:
             _tp_truediv(val)
 
 
-def _try_truediv(node: JsonVal) -> Node | None:
+def _try_truediv(node: JsonVal) -> JsonVal:
     if not isinstance(node, dict):
         return None
     node_obj: Node = cast(dict[str, JsonVal], node)
@@ -3324,13 +3324,14 @@ def _collect_fn_callable_types(module: Node) -> dict[str, str]:
                 at = stmt_node.get("arg_types")
                 if isinstance(ao, list) and isinstance(at, dict):
                     ao_list: list[JsonVal] = cast(list[JsonVal], ao)
+                    at_map: dict[str, JsonVal] = cast(dict[str, JsonVal], at)
                     params: list[str] = []
                     for p in ao_list:
                         if isinstance(p, str) and p != "self":
                             params.append(p)
                     pts: list[str] = []
                     for p in params:
-                        pts.append(_tp_safe(at.get(p)))
+                        pts.append(_tp_safe(at_map.get(p)))
                     ct = "callable[[" + ",".join(pts) + "]," + ret + "]"
                 else:
                     ct = "callable[[],"+ret+"]"
@@ -3452,7 +3453,8 @@ def apply_type_propagation(module: Node, ctx: CompileContext) -> Node:
 
 def _yd_walk(node: JsonVal) -> None:
     if isinstance(node, list):
-        for item in node:
+        node_list: list[JsonVal] = cast(list[JsonVal], node)
+        for item in node_list:
             _yd_walk(item)
         return
     if not isinstance(node, dict):
@@ -3464,17 +3466,19 @@ def _yd_walk(node: JsonVal) -> None:
     if kind == CALL:
         func = nd.get("func")
         if isinstance(func, dict):
-            fk = func.get("kind", "")
+            func_node: Node = cast(dict[str, JsonVal], func)
+            fk = func_node.get("kind", "")
             if fk == NAME:
-                cn = func.get("id", "")
+                cn = func_node.get("id", "")
                 if cn == "min" or cn == "max":
                     nd["yields_dynamic"] = True
             if fk == ATTRIBUTE:
-                attr = func.get("attr", "")
+                attr = func_node.get("attr", "")
                 if attr == "get":
-                    owner = func.get("value")
+                    owner = func_node.get("value")
                     if isinstance(owner, dict):
-                        ot = jv_str(owner.get("resolved_type", ""))
+                        owner_node: Node = cast(dict[str, JsonVal], owner)
+                        ot: str = jv_str(owner_node.get("resolved_type", ""))
                         if ot.startswith("dict["):
                             nd["yields_dynamic"] = True
     for v in nd.values():
@@ -3517,74 +3521,119 @@ def _swap_in_stmts(stmts: list[JsonVal], ctx: CompileContext) -> list[JsonVal]:
         if not isinstance(stmt, dict):
             result.append(stmt)
             continue
-        kind = stmt.get("kind", "")
+        stmt_node: Node = cast(dict[str, JsonVal], stmt)
+        kind = stmt_node.get("kind", "")
         if kind == ASSIGN:
-            target = stmt.get("target")
-            value = stmt.get("value")
-            if isinstance(target, dict) and target.get("kind") == TUPLE and isinstance(value, dict) and value.get("kind") == TUPLE:
-                te = target.get("elements", target.get("elts", []))
-                ve = value.get("elements", value.get("elts", []))
-                if isinstance(te, list) and isinstance(ve, list) and len(te) == 2 and len(ve) == 2:
-                    t0 = _expr_key(te[0])
-                    t1 = _expr_key(te[1])
-                    v0 = _expr_key(ve[0])
-                    v1 = _expr_key(ve[1])
-                    if t0 != "" and t1 != "" and t0 == v1 and t1 == v0:
-                        span = stmt.get("source_span")
-                        if isinstance(te[0], dict) and te[0].get("kind") == NAME and isinstance(te[1], dict) and te[1].get("kind") == NAME:
-                            swap: Node = {"kind": SWAP, "left": te[0], "right": te[1], "lhs": te[0], "rhs": te[1]}
-                            if isinstance(span, dict):
-                                swap["source_span"] = span
-                            result.append(swap)
+            target = stmt_node.get("target")
+            value = stmt_node.get("value")
+            if isinstance(target, dict) and isinstance(value, dict):
+                target_node: Node = cast(dict[str, JsonVal], target)
+                value_node: Node = cast(dict[str, JsonVal], value)
+                if target_node.get("kind") == TUPLE and value_node.get("kind") == TUPLE:
+                    te = target_node.get("elements")
+                    if not isinstance(te, list):
+                        te = target_node.get("elts", [])
+                    ve = value_node.get("elements")
+                    if not isinstance(ve, list):
+                        ve = value_node.get("elts", [])
+                    te_list: list[JsonVal] = []
+                    ve_list: list[JsonVal] = []
+                    if isinstance(te, list) and isinstance(ve, list):
+                        te_list = cast(list[JsonVal], te)
+                        ve_list = cast(list[JsonVal], ve)
+                    if len(te_list) == 2 and len(ve_list) == 2:
+                        t0 = _expr_key(te_list[0])
+                        t1 = _expr_key(te_list[1])
+                        v0 = _expr_key(ve_list[0])
+                        v1 = _expr_key(ve_list[1])
+                        if t0 != "" and t1 != "" and t0 == v1 and t1 == v0:
+                            span = stmt_node.get("source_span")
+                            if isinstance(te_list[0], dict) and isinstance(te_list[1], dict):
+                                left_node: Node = cast(dict[str, JsonVal], te_list[0])
+                                right_node: Node = cast(dict[str, JsonVal], te_list[1])
+                                if left_node.get("kind") == NAME and right_node.get("kind") == NAME:
+                                    swap: Node = {}
+                                    swap["kind"] = SWAP
+                                    swap["left"] = left_node
+                                    swap["right"] = right_node
+                                    swap["lhs"] = left_node
+                                    swap["rhs"] = right_node
+                                    if isinstance(span, dict):
+                                        swap["source_span"] = span
+                                    result.append(swap)
+                                    continue
+                            tmp = ctx.next_swap_name()
+                            bs: Node = cast(dict[str, JsonVal], span) if isinstance(span, dict) else {}
+                            tt: Node = {}
+                            tt["kind"] = NAME
+                            tt["id"] = tmp
+                            if bs:
+                                tt["source_span"] = bs
+                            a1: Node = {}
+                            a1["kind"] = ASSIGN
+                            a1["target"] = tt
+                            a1["value"] = te_list[0]
+                            a1["declare"] = True
+                            if bs:
+                                a1["source_span"] = bs
+                            a2: Node = {}
+                            a2["kind"] = ASSIGN
+                            a2["target"] = te_list[0]
+                            a2["value"] = te_list[1]
+                            if bs:
+                                a2["source_span"] = bs
+                            tr: Node = {}
+                            tr["kind"] = NAME
+                            tr["id"] = tmp
+                            if bs:
+                                tr["source_span"] = bs
+                            a3: Node = {}
+                            a3["kind"] = ASSIGN
+                            a3["target"] = te_list[1]
+                            a3["value"] = tr
+                            if bs:
+                                a3["source_span"] = bs
+                            result.append(a1)
+                            result.append(a2)
+                            result.append(a3)
                             continue
-                        # Subscript swap expansion
-                        tmp = ctx.next_swap_name()
-                        bs: Node = span if isinstance(span, dict) else {}
-                        tt: Node = {"kind": NAME, "id": tmp}
-                        if bs:
-                            tt["source_span"] = bs
-                        a1: Node = {"kind": ASSIGN, "target": tt, "value": te[0], "declare": True}
-                        if bs:
-                            a1["source_span"] = bs
-                        a2: Node = {"kind": ASSIGN, "target": te[0], "value": te[1]}
-                        if bs:
-                            a2["source_span"] = bs
-                        tr: Node = {"kind": NAME, "id": tmp}
-                        if bs:
-                            tr["source_span"] = bs
-                        a3: Node = {"kind": ASSIGN, "target": te[1], "value": tr}
-                        if bs:
-                            a3["source_span"] = bs
-                        result.extend([a1, a2, a3])
-                        continue
         for key in ("body", "orelse"):
-            nested = stmt.get(key)
+            key_name: str = key
+            nested = stmt_node.get(key_name)
             if isinstance(nested, list):
-                stmt[key] = _swap_in_stmts(nested, ctx)
+                nested_list: list[JsonVal] = cast(list[JsonVal], nested)
+                stmt_node[key_name] = _swap_in_stmts(nested_list, ctx)
         if _is_function_like_kind(kind) or kind == CLASS_DEF:
-            body = stmt.get("body")
+            body = stmt_node.get("body")
             if isinstance(body, list):
-                stmt["body"] = _swap_in_stmts(body, ctx)
+                body_list: list[JsonVal] = cast(list[JsonVal], body)
+                stmt_node["body"] = _swap_in_stmts(body_list, ctx)
         elif kind == TRY:
             for key in ("body", "orelse", "finalbody"):
-                nested = stmt.get(key)
+                key_name2: str = key
+                nested = stmt_node.get(key_name2)
                 if isinstance(nested, list):
-                    stmt[key] = _swap_in_stmts(nested, ctx)
-            hs = stmt.get("handlers")
+                    nested_list2: list[JsonVal] = cast(list[JsonVal], nested)
+                    stmt_node[key_name2] = _swap_in_stmts(nested_list2, ctx)
+            hs = stmt_node.get("handlers")
             if isinstance(hs, list):
-                for h in hs:
+                hs_list: list[JsonVal] = cast(list[JsonVal], hs)
+                for h in hs_list:
                     if isinstance(h, dict):
-                        hb = h.get("body")
+                        handler_node2: Node = cast(dict[str, JsonVal], h)
+                        hb = handler_node2.get("body")
                         if isinstance(hb, list):
-                            h["body"] = _swap_in_stmts(hb, ctx)
-        result.append(stmt)
+                            hb_list: list[JsonVal] = cast(list[JsonVal], hb)
+                            handler_node2["body"] = _swap_in_stmts(hb_list, ctx)
+        result.append(stmt_node)
     return result
 
 
 def detect_swap_patterns(module: Node, ctx: CompileContext) -> Node:
     body = module.get("body")
     if isinstance(body, list):
-        module["body"] = _swap_in_stmts(body, ctx)
+        body_list: list[JsonVal] = cast(list[JsonVal], body)
+        module["body"] = _swap_in_stmts(body_list, ctx)
     return module
 
 
@@ -3596,44 +3645,72 @@ def _is_self_attr(node: Node) -> bool:
     if node.get("kind") != ATTRIBUTE:
         return False
     value = node.get("value")
-    return isinstance(value, dict) and value.get("kind") == NAME and value.get("id") == "self"
+    if not isinstance(value, dict):
+        return False
+    value_node: Node = cast(dict[str, JsonVal], value)
+    return value_node.get("kind") == NAME and value_node.get("id") == "self"
 
 
 def _node_mutates(node: JsonVal) -> bool:
     if not isinstance(node, dict):
         return False
-    kind = node.get("kind", "")
+    node_obj: Node = cast(dict[str, JsonVal], node)
+    kind = node_obj.get("kind", "")
     if kind in (ASSIGN, ANN_ASSIGN, AUG_ASSIGN):
-        target = node.get("target")
+        target = node_obj.get("target")
         if isinstance(target, dict):
-            if _is_self_attr(target):
+            target_node: Node = cast(dict[str, JsonVal], target)
+            if _is_self_attr(target_node):
                 return True
-            if target.get("kind") == SUBSCRIPT:
-                val = target.get("value")
-                if isinstance(val, dict) and _is_self_attr(val):
-                    return True
+            if target_node.get("kind") == SUBSCRIPT:
+                val = target_node.get("value")
+                if isinstance(val, dict):
+                    val_node: Node = cast(dict[str, JsonVal], val)
+                    if _is_self_attr(val_node):
+                        return True
     if kind == EXPR:
-        value = node.get("value")
-        if isinstance(value, dict) and value.get("kind") == CALL:
-            func = value.get("func")
-            if isinstance(func, dict) and func.get("kind") == ATTRIBUTE:
-                owner = func.get("value")
-                if isinstance(owner, dict) and _is_self_attr(owner):
-                    return True
-    for key in ("body", "orelse", "finalbody"):
-        nested = node.get(key)
-        if isinstance(nested, list):
-            for item in nested:
-                if _node_mutates(item):
-                    return True
+        value = node_obj.get("value")
+        if isinstance(value, dict):
+            value_node: Node = cast(dict[str, JsonVal], value)
+            if value_node.get("kind") == CALL:
+                func = value_node.get("func")
+                if isinstance(func, dict):
+                    func_node: Node = cast(dict[str, JsonVal], func)
+                    if func_node.get("kind") == ATTRIBUTE:
+                        owner = func_node.get("value")
+                        if isinstance(owner, dict):
+                            owner_node: Node = cast(dict[str, JsonVal], owner)
+                            if _is_self_attr(owner_node):
+                                return True
+    nested = node_obj.get("body")
+    if isinstance(nested, list):
+        nested_list: list[JsonVal] = cast(list[JsonVal], nested)
+        for item in nested_list:
+            if _node_mutates(item):
+                return True
+    nested = node_obj.get("orelse")
+    if isinstance(nested, list):
+        nested_list2: list[JsonVal] = cast(list[JsonVal], nested)
+        for item in nested_list2:
+            if _node_mutates(item):
+                return True
+    nested = node_obj.get("finalbody")
+    if isinstance(nested, list):
+        nested_list3: list[JsonVal] = cast(list[JsonVal], nested)
+        for item in nested_list3:
+            if _node_mutates(item):
+                return True
     if kind == TRY:
-        hs = node.get("handlers")
+        hs = node_obj.get("handlers")
         if isinstance(hs, list):
-            for h in hs:
+            hs_list: list[JsonVal] = cast(list[JsonVal], hs)
+            for h in hs_list:
                 if isinstance(h, dict):
-                    hb = h.get("body")
+                    handler_node: Node = cast(dict[str, JsonVal], h)
+                    hb = handler_node.get("body")
                     if isinstance(hb, list):
-                        for item in hb:
+                        hb_list: list[JsonVal] = cast(list[JsonVal], hb)
+                        for item in hb_list:
                             if _node_mutates(item):
                                 return True
     return False
@@ -3641,47 +3718,63 @@ def _node_mutates(node: JsonVal) -> bool:
 
 def _collect_self_calls(node: JsonVal, out: set[str]) -> None:
     if isinstance(node, list):
-        for item in node:
+        node_list: list[JsonVal] = cast(list[JsonVal], node)
+        for item in node_list:
             _collect_self_calls(item, out)
         return
     if not isinstance(node, dict):
         return
-    if node.get("kind") == CALL:
-        func = node.get("func")
-        if isinstance(func, dict) and func.get("kind") == ATTRIBUTE:
-            owner = func.get("value")
-            if isinstance(owner, dict) and owner.get("kind") == NAME and owner.get("id") == "self":
-                mn = func.get("attr")
-                if isinstance(mn, str) and mn != "":
-                    out.add(mn)
-    for v in node.values():
-        if isinstance(v, (dict, list)):
-            _collect_self_calls(v, out)
+    node_obj: Node = cast(dict[str, JsonVal], node)
+    if node_obj.get("kind") == CALL:
+        func = node_obj.get("func")
+        if isinstance(func, dict):
+            func_node: Node = cast(dict[str, JsonVal], func)
+            if func_node.get("kind") == ATTRIBUTE:
+                owner = func_node.get("value")
+                if isinstance(owner, dict):
+                    owner_node: Node = cast(dict[str, JsonVal], owner)
+                    if owner_node.get("kind") == NAME and owner_node.get("id") == "self":
+                        mn = func_node.get("attr")
+                        if isinstance(mn, str) and mn != "":
+                            out.add(mn)
+    for v in node_obj.values():
+        if isinstance(v, dict):
+            v_node: Node = cast(dict[str, JsonVal], v)
+            _collect_self_calls(v_node, out)
+        elif isinstance(v, list):
+            v_list: list[JsonVal] = cast(list[JsonVal], v)
+            _collect_self_calls(v_list, out)
 
 
 def _detect_ms_class(cd: Node) -> None:
     body = cd.get("body")
     if not isinstance(body, list):
         return
+    body_list: list[JsonVal] = cast(list[JsonVal], body)
     methods: dict[str, Node] = {}
     direct: set[str] = set()
     cg: dict[str, set[str]] = {}
-    for stmt in body:
-        if not isinstance(stmt, dict) or not _is_function_like_kind(jv_str(stmt.get("kind", ""))):
+    for stmt in body_list:
+        if not isinstance(stmt, dict):
             continue
-        name = jv_str(stmt.get("name", ""))
+        stmt_node: Node = cast(dict[str, JsonVal], stmt)
+        if not _is_function_like_kind(jv_str(stmt_node.get("kind", ""))):
+            continue
+        name = jv_str(stmt_node.get("name", ""))
         if name == "":
             continue
-        methods[name] = stmt
-        mb = stmt.get("body")
+        methods[name] = stmt_node
+        mb = stmt_node.get("body")
         if isinstance(mb, list):
-            for s in mb:
+            mb_list: list[JsonVal] = cast(list[JsonVal], mb)
+            for s in mb_list:
                 if _node_mutates(s):
                     direct.add(name)
                     break
         sc: set[str] = set()
         if isinstance(mb, list):
-            _collect_self_calls(mb, sc)
+            mb_list2: list[JsonVal] = cast(list[JsonVal], mb)
+            _collect_self_calls(mb_list2, sc)
         cg[name] = sc
     mutators = set(direct)
     changed = True
@@ -3704,16 +3797,22 @@ def _detect_ms_class(cd: Node) -> None:
 
 def _ms_walk(node: JsonVal) -> None:
     if isinstance(node, list):
-        for item in node:
+        node_list: list[JsonVal] = cast(list[JsonVal], node)
+        for item in node_list:
             _ms_walk(item)
         return
     if not isinstance(node, dict):
         return
-    if node.get("kind") == CLASS_DEF:
-        _detect_ms_class(node)
-    for v in node.values():
-        if isinstance(v, (dict, list)):
-            _ms_walk(v)
+    node_obj: Node = cast(dict[str, JsonVal], node)
+    if node_obj.get("kind") == CLASS_DEF:
+        _detect_ms_class(node_obj)
+    for v in node_obj.values():
+        if isinstance(v, dict):
+            v_node: Node = cast(dict[str, JsonVal], v)
+            _ms_walk(v_node)
+        elif isinstance(v, list):
+            v_list: list[JsonVal] = cast(list[JsonVal], v)
+            _ms_walk(v_list)
 
 
 def detect_mutates_self(module: Node, ctx: CompileContext) -> Node:
@@ -3727,7 +3826,8 @@ def detect_mutates_self(module: Node, ctx: CompileContext) -> Node:
 
 def _uv_refs(node: JsonVal, out: set[str]) -> None:
     if isinstance(node, list):
-        for item in node:
+        node_list: list[JsonVal] = cast(list[JsonVal], node)
+        for item in node_list:
             _uv_refs(item, out)
         return
     if not isinstance(node, dict):
@@ -3740,32 +3840,45 @@ def _uv_refs(node: JsonVal, out: set[str]) -> None:
             out.add(n)
     elif kind in (ASSIGN, ANN_ASSIGN, AUG_ASSIGN):
         value = nd.get("value")
-        if isinstance(value, (dict, list)):
-            _uv_refs(value, out)
+        if isinstance(value, dict):
+            value_node: Node = cast(dict[str, JsonVal], value)
+            _uv_refs(value_node, out)
+        elif isinstance(value, list):
+            value_list: list[JsonVal] = cast(list[JsonVal], value)
+            _uv_refs(value_list, out)
         if kind == AUG_ASSIGN:
             target = nd.get("target")
-            if isinstance(target, dict) and target.get("kind") == NAME:
-                n = target.get("id")
+            if isinstance(target, dict):
+                target_node: Node = cast(dict[str, JsonVal], target)
+                if target_node.get("kind") != NAME:
+                    return
+                n = target_node.get("id")
                 if isinstance(n, str) and n != "":
                     out.add(n)
         return
     for v in nd.values():
-        if isinstance(v, (dict, list)):
-            _uv_refs(v, out)
+        if isinstance(v, dict):
+            v_node2: Node = cast(dict[str, JsonVal], v)
+            _uv_refs(v_node2, out)
+        elif isinstance(v, list):
+            v_list2: list[JsonVal] = cast(list[JsonVal], v)
+            _uv_refs(v_list2, out)
 
 
 def _uv_mark_fn(func: Node) -> None:
     body = func.get("body")
     if not isinstance(body, list):
         return
+    body_list: list[JsonVal] = cast(list[JsonVal], body)
     all_refs: set[str] = set()
-    _uv_refs(body, all_refs)
+    _uv_refs(body_list, all_refs)
     ao = func.get("arg_order")
     if isinstance(ao, list):
-        for arg in ao:
+        ao_list: list[JsonVal] = cast(list[JsonVal], ao)
+        for arg in ao_list:
             if isinstance(arg, str):
                 all_refs.add(arg)
-    _uv_mark_stmts(body, all_refs)
+    _uv_mark_stmts(body_list, all_refs)
 
 
 def _uv_mark_stmts(stmts: list[JsonVal], all_refs: set[str]) -> None:
@@ -3816,7 +3929,9 @@ def _uv_walk(node: JsonVal) -> None:
     if _is_function_like(nd):
         _uv_mark_fn(nd)
     for v in nd.values():
-        if isinstance(v, (dict, list)):
+        if isinstance(v, dict):
+            _uv_walk(v)
+        elif isinstance(v, list):
             _uv_walk(v)
 
 
@@ -3842,10 +3957,12 @@ def _mgd_stmts(stmts: list[JsonVal]) -> None:
 def mark_main_guard_discard(module: Node, ctx: CompileContext) -> Node:
     mg = module.get("main_guard_body")
     if isinstance(mg, list):
-        _mgd_stmts(mg)
+        mg_list: list[JsonVal] = cast(list[JsonVal], mg)
+        _mgd_stmts(mg_list)
     body = module.get("body")
     if isinstance(body, list):
-        for stmt in body:
+        body_list: list[JsonVal] = cast(list[JsonVal], body)
+        for stmt in body_list:
             if isinstance(stmt, dict) and _is_function_like(stmt):
                 name = stmt.get("name", "")
                 if name == "__pytra_main":

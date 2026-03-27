@@ -3709,7 +3709,7 @@ def emit_go_module(east3_doc: dict[str, JsonVal]) -> str:
         _emit_stmt(ctx, stmt)
 
     # Emit main guard
-    if len(main_guard) > 0:
+    if ctx.is_entry and len(main_guard) > 0:
         _emit_blank(ctx)
         _emit(ctx, "func _main_guard() {")
         ctx.indent_level += 1
@@ -3719,11 +3719,12 @@ def emit_go_module(east3_doc: dict[str, JsonVal]) -> str:
         _emit(ctx, "}")
 
     # Generate main() for entry module
-    if ctx.is_entry or len(main_guard) > 0:
+    if ctx.is_entry:
         _emit_blank(ctx)
         _emit(ctx, "func main() {")
         ctx.indent_level += 1
-        _emit(ctx, "_main_guard()")
+        if len(main_guard) > 0:
+            _emit(ctx, "_main_guard()")
         ctx.indent_level -= 1
         _emit(ctx, "}")
 

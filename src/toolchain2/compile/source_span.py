@@ -8,6 +8,8 @@ Removes Module-level source_span (which has null fields).
 
 from __future__ import annotations
 
+from pytra.typing import cast
+
 from toolchain2.compile.jv import JsonVal, Node, jv_is_dict, jv_is_list
 from toolchain2.common.kinds import MODULE
 
@@ -18,7 +20,9 @@ def normalize_source_span(span: JsonVal) -> JsonVal:
         return span
     d: Node = span
     out: Node = {}
-    for k, v in d.items():
+    for key in d.keys():
+        k = cast(str, key)
+        v = d[k]
         if k == "col":
             out["col_offset"] = v
         elif k == "end_col":
@@ -42,7 +46,9 @@ def walk_normalize_spans(node: JsonVal) -> JsonVal:
     d: Node = node
     kind = d.get("kind", "")
     out: Node = {}
-    for k, v in d.items():
+    for key in d.keys():
+        k = cast(str, key)
+        v = d[k]
         if k == "source_span":
             if kind == MODULE:
                 # Remove Module-level source_span
