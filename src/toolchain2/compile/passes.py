@@ -559,16 +559,19 @@ def _collect_function_scope_types(func: Node) -> dict[str, str]:
                 out[name] = value
     captures = func.get("captures")
     if isinstance(captures, list):
-        for capture in captures:
+        capture_list: list[JsonVal] = cast(list[JsonVal], captures)
+        for capture in capture_list:
             if not isinstance(capture, dict):
                 continue
-            name2 = jv_str(capture.get("name", ""))
-            type2 = jv_str(capture.get("type", ""))
+            capture_node: Node = cast(dict[str, JsonVal], capture)
+            name2 = jv_str(capture_node.get("name", ""))
+            type2 = jv_str(capture_node.get("type", ""))
             if name2 != "" and name2 not in out:
                 out[name2] = type2
     body = func.get("body")
     if isinstance(body, list):
-        _collect_function_locals(body, out)
+        body_list: list[JsonVal] = cast(list[JsonVal], body)
+        _collect_function_locals(body_list, out)
     return out
 
 
@@ -576,12 +579,14 @@ def _collect_function_reassigned_names(func: Node) -> set[str]:
     counts: dict[str, int] = {}
     body = func.get("body")
     if isinstance(body, list):
-        _collect_reassigned_lexical(body, counts)
+        body_list: list[JsonVal] = cast(list[JsonVal], body)
+        _collect_reassigned_lexical(body_list, counts)
     out: set[str] = set()
     arg_order = func.get("arg_order")
     param_names: set[str] = set()
     if isinstance(arg_order, list):
-        for arg in arg_order:
+        arg_order_list: list[JsonVal] = cast(list[JsonVal], arg_order)
+        for arg in arg_order_list:
             if isinstance(arg, str) and arg != "":
                 param_names.add(arg)
     for name, count in counts.items():
@@ -624,14 +629,18 @@ def _collect_reassigned_lexical(stmts: list[JsonVal], out: dict[str, int]) -> No
         for key in ("body", "orelse", "finalbody"):
             nested = stmt.get(key)
             if isinstance(nested, list):
-                _collect_reassigned_lexical(nested, out)
+                nested_list: list[JsonVal] = cast(list[JsonVal], nested)
+                _collect_reassigned_lexical(nested_list, out)
         handlers = stmt.get("handlers")
         if isinstance(handlers, list):
-            for handler in handlers:
+            handler_list: list[JsonVal] = cast(list[JsonVal], handlers)
+            for handler in handler_list:
                 if isinstance(handler, dict):
-                    hbody = handler.get("body")
+                    handler_node: Node = cast(dict[str, JsonVal], handler)
+                    hbody = handler_node.get("body")
                     if isinstance(hbody, list):
-                        _collect_reassigned_lexical(hbody, out)
+                        hbody_list: list[JsonVal] = cast(list[JsonVal], hbody)
+                        _collect_reassigned_lexical(hbody_list, out)
 
 
 def _collect_target_write_counts(target: JsonVal, out: dict[str, int]) -> None:
@@ -668,7 +677,8 @@ def _collect_target_plan_write_counts(target_plan: JsonVal, out: dict[str, int])
 
 def _collect_name_refs_lexical(node: JsonVal, out: set[str], *, descend_into_root: bool = True) -> None:
     if isinstance(node, list):
-        for item in node:
+        node_list: list[JsonVal] = cast(list[JsonVal], node)
+        for item in node_list:
             _collect_name_refs_lexical(item, out, descend_into_root=True)
         return
     if not isinstance(node, dict):
@@ -683,10 +693,13 @@ def _collect_name_refs_lexical(node: JsonVal, out: set[str], *, descend_into_roo
     for key, value in node.items():
         if key == "body" and (_is_function_like_kind(kind) or kind == CLASS_DEF):
             if descend_into_root and isinstance(value, list):
-                for item in value:
+                value_list: list[JsonVal] = cast(list[JsonVal], value)
+                for item in value_list:
                     _collect_name_refs_lexical(item, out, descend_into_root=False)
             continue
-        if isinstance(value, (dict, list)):
+        if isinstance(value, dict):
+            _collect_name_refs_lexical(value, out, descend_into_root=True)
+        elif isinstance(value, list):
             _collect_name_refs_lexical(value, out, descend_into_root=True)
 
 
@@ -695,12 +708,14 @@ def _closure_callable_type(node: Node) -> str:
     arg_types = node.get("arg_types")
     params: list[str] = []
     if isinstance(arg_order, list) and isinstance(arg_types, dict):
-        for arg in arg_order:
+        arg_order_list: list[JsonVal] = cast(list[JsonVal], arg_order)
+        arg_types_node: Node = cast(dict[str, JsonVal], arg_types)
+        for arg in arg_order_list:
             if not isinstance(arg, str) or arg == "":
                 continue
             if arg == "self":
                 continue
-            arg_type = arg_types.get(arg)
+            arg_type = arg_types_node.get(arg)
             params.append(arg_type if isinstance(arg_type, str) and arg_type != "" else "unknown")
     ret = jv_str(node.get("return_type", ""))
     if ret == "":
@@ -720,7 +735,8 @@ def _closure_capture_entries(
         _collect_name_refs_lexical(defaults, used_names, descend_into_root=True)
     body = func.get("body")
     if isinstance(body, list):
-        for stmt in body:
+        body_list: list[JsonVal] = cast(list[JsonVal], body)
+        for stmt in body_list:
             _collect_name_refs_lexical(stmt, used_names, descend_into_root=False)
     captures: list[Node] = []
     for name in sorted(used_names):
@@ -728,7 +744,11 @@ def _closure_capture_entries(
             continue
         capture_type = visible_types.get(name, "")
         capture_mode = "mutable" if name in visible_mutable else "readonly"
-        captures.append({"name": name, "mode": capture_mode, "type": capture_type})
+        capture: Node = {}
+        capture["name"] = name
+        capture["mode"] = capture_mode
+        capture["type"] = capture_type
+        captures.append(capture)
     return captures, jv_str(func.get("name", "")) in used_names
 
 
@@ -747,8 +767,16 @@ def _lower_closure_stmt_list(
             captures, is_recursive = _closure_capture_entries(visible_types, visible_mutable, stmt)
             stmt["kind"] = CLOSURE_DEF
             stmt["captures"] = captures
-            stmt["capture_types"] = {capture["name"]: capture["type"] for capture in captures}
-            stmt["capture_modes"] = {capture["name"]: capture["mode"] for capture in captures}
+            capture_types: dict[str, str] = {}
+            capture_modes: dict[str, str] = {}
+            for capture in captures:
+                capture_name = jv_str(capture.get("name", ""))
+                if capture_name == "":
+                    continue
+                capture_types[capture_name] = jv_str(capture.get("type", ""))
+                capture_modes[capture_name] = jv_str(capture.get("mode", ""))
+            stmt["capture_types"] = capture_types
+            stmt["capture_modes"] = capture_modes
             if is_recursive:
                 stmt["is_recursive"] = True
             _lower_closure_function(stmt, visible_types, visible_mutable)
@@ -757,11 +785,14 @@ def _lower_closure_stmt_list(
         if kind == CLASS_DEF:
             body = stmt.get("body")
             if isinstance(body, list):
-                class_visible = dict(visible_types)
+                body_list: list[JsonVal] = cast(list[JsonVal], body)
+                class_visible: dict[str, str] = {}
+                for name, value in visible_types.items():
+                    class_visible[name] = value
                 class_name = jv_str(stmt.get("name", ""))
                 if class_name != "":
                     class_visible[class_name] = class_name
-                stmt["body"] = _lower_closure_stmt_list(body, class_visible, visible_mutable)
+                stmt["body"] = _lower_closure_stmt_list(body_list, class_visible, visible_mutable)
             result.append(stmt)
             continue
         for key in ("body", "orelse", "finalbody"):
@@ -770,12 +801,15 @@ def _lower_closure_stmt_list(
                 stmt[key] = _lower_closure_stmt_list(nested, visible_types, visible_mutable)
         handlers = stmt.get("handlers")
         if isinstance(handlers, list):
-            for handler in handlers:
+            handler_list: list[JsonVal] = cast(list[JsonVal], handlers)
+            for handler in handler_list:
                 if not isinstance(handler, dict):
                     continue
-                hbody = handler.get("body")
+                handler_node: Node = cast(dict[str, JsonVal], handler)
+                hbody = handler_node.get("body")
                 if isinstance(hbody, list):
-                    handler["body"] = _lower_closure_stmt_list(hbody, visible_types, visible_mutable)
+                    hbody_list: list[JsonVal] = cast(list[JsonVal], hbody)
+                    handler_node["body"] = _lower_closure_stmt_list(hbody_list, visible_types, visible_mutable)
         result.append(stmt)
     return result
 
@@ -788,23 +822,29 @@ def _lower_closure_function(
     body = func.get("body")
     if not isinstance(body, list):
         return
-    current_visible = dict(outer_visible_types)
-    current_visible.update(_collect_function_scope_types(func))
+    body_list: list[JsonVal] = cast(list[JsonVal], body)
+    current_visible: dict[str, str] = {}
+    for name, value in outer_visible_types.items():
+        current_visible[name] = value
+    for name, value in _collect_function_scope_types(func).items():
+        current_visible[name] = value
     current_mutable = set(outer_visible_mutable)
     current_mutable.update(_collect_function_reassigned_names(func))
-    func["body"] = _lower_closure_stmt_list(body, current_visible, current_mutable)
+    func["body"] = _lower_closure_stmt_list(body_list, current_visible, current_mutable)
 
 
 def lower_nested_function_defs(module: Node, ctx: CompileContext) -> Node:
     body = module.get("body")
     if isinstance(body, list):
-        for stmt in body:
+        body_list: list[JsonVal] = cast(list[JsonVal], body)
+        for stmt in body_list:
             if isinstance(stmt, dict) and _is_function_like_kind(_sk(stmt)):
                 _lower_closure_function(stmt, {}, set())
             elif isinstance(stmt, dict) and _sk(stmt) == CLASS_DEF:
                 class_body = stmt.get("body")
                 if isinstance(class_body, list):
-                    stmt["body"] = _lower_closure_stmt_list(class_body, {}, set())
+                    class_body_list: list[JsonVal] = cast(list[JsonVal], class_body)
+                    stmt["body"] = _lower_closure_stmt_list(class_body_list, {}, set())
     return module
 
 
@@ -817,7 +857,8 @@ def _collect_fn_sigs(module: Node) -> dict[str, Node]:
     body = module.get("body")
     if not isinstance(body, list):
         return sigs
-    for stmt in body:
+    body_list: list[JsonVal] = cast(list[JsonVal], body)
+    for stmt in body_list:
         if isinstance(stmt, dict):
             _collect_sig_node(stmt, sigs, "")
     return sigs
@@ -826,37 +867,49 @@ def _collect_fn_sigs(module: Node) -> dict[str, Node]:
 def _collect_sig_node(node: Node, sigs: dict[str, Node], class_name: str) -> None:
     kind = node.get("kind", "")
     if _is_function_like_kind(kind):
-        name = jv_str(node.get("name", ""))
+        name: str = jv_str(node.get("name", ""))
         if name == "":
             return
         ao = node.get("arg_order")
         ad = node.get("arg_defaults")
         if not isinstance(ao, list):
             return
-        sig: Node = {"arg_order": ao, "arg_defaults": ad if isinstance(ad, dict) else {}}
-        full = class_name + "." + name if class_name != "" else name
+        ao_list: list[JsonVal] = cast(list[JsonVal], ao)
+        sig: Node = {}
+        sig["arg_order"] = ao_list
+        if isinstance(ad, dict):
+            sig["arg_defaults"] = cast(dict[str, JsonVal], ad)
+        else:
+            sig["arg_defaults"] = {}
+        full = name
+        if class_name != "":
+            full = class_name + "." + name
         if class_name == "":
             sigs[name] = sig
         if full != name:
             sigs[full] = sig
         body = node.get("body")
         if isinstance(body, list):
-            for s in body:
+            body_list: list[JsonVal] = cast(list[JsonVal], body)
+            for s in body_list:
                 if isinstance(s, dict):
                     _collect_sig_node(s, sigs, "")
     elif kind == CLASS_DEF:
-        cn = jv_str(node.get("name", ""))
+        cn: str = jv_str(node.get("name", ""))
         body = node.get("body")
         if isinstance(body, list):
-            for s in body:
+            body_list: list[JsonVal] = cast(list[JsonVal], body)
+            for s in body_list:
                 if isinstance(s, dict):
                     _collect_sig_node(s, sigs, cn)
     elif kind == ASSIGN or kind == ANN_ASSIGN:
         target: JsonVal = node.get("target")
         if not isinstance(target, dict):
             targets = node.get("targets")
-            if isinstance(targets, list) and len(targets) == 1 and isinstance(targets[0], dict):
-                target = targets[0]
+            if isinstance(targets, list):
+                targets_list: list[JsonVal] = cast(list[JsonVal], targets)
+                if len(targets_list) == 1 and isinstance(targets_list[0], dict):
+                    target = cast(dict[str, JsonVal], targets_list[0])
         value = node.get("value")
         if (
             isinstance(target, dict)
@@ -864,25 +917,29 @@ def _collect_sig_node(node: Node, sigs: dict[str, Node], class_name: str) -> Non
             and isinstance(value, dict)
             and value.get("kind") == "Lambda"
         ):
-            lambda_name = jv_str(target.get("id", ""))
-            args = value.get("args")
+            target_node: Node = cast(dict[str, JsonVal], target)
+            value_node: Node = cast(dict[str, JsonVal], value)
+            lambda_name: str = jv_str(target_node.get("id", ""))
+            args = value_node.get("args")
             if lambda_name != "" and isinstance(args, list):
                 arg_order: list[str] = []
                 arg_defaults: dict[str, JsonVal] = {}
-                for arg in args:
+                args_list: list[JsonVal] = cast(list[JsonVal], args)
+                for arg in args_list:
                     if not isinstance(arg, dict):
                         continue
-                    arg_name = jv_str(arg.get("arg", ""))
+                    arg_node: Node = cast(dict[str, JsonVal], arg)
+                    arg_name: str = jv_str(arg_node.get("arg", ""))
                     if arg_name == "":
                         continue
                     arg_order.append(arg_name)
-                    default_node = arg.get("default")
+                    default_node = arg_node.get("default")
                     if isinstance(default_node, dict):
                         arg_defaults[arg_name] = deep_copy_json(default_node)
-                sigs[lambda_name] = {
-                    "arg_order": arg_order,
-                    "arg_defaults": arg_defaults,
-                }
+                lambda_sig: Node = {}
+                lambda_sig["arg_order"] = arg_order
+                lambda_sig["arg_defaults"] = arg_defaults
+                sigs[lambda_name] = lambda_sig
 
 
 def _expand_defaults_walk(node: JsonVal, sigs: dict[str, Node]) -> None:
