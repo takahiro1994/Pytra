@@ -46,6 +46,7 @@ class CppEmitContext:
     class_names: set[str] = field(default_factory=set)
     class_field_types: dict[str, dict[str, str]] = field(default_factory=dict)
     class_bases: dict[str, str] = field(default_factory=dict)
+    enum_kinds: dict[str, str] = field(default_factory=dict)
     class_type_ids: dict[str, int] = field(default_factory=dict)
     class_type_info: dict[str, dict[str, int]] = field(default_factory=dict)
     class_symbol_fqcns: dict[str, str] = field(default_factory=dict)
@@ -593,6 +594,8 @@ def _emit_name(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
 def _emit_binop(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
     left = _emit_expr(ctx, node.get("left"))
     right = _emit_expr(ctx, node.get("right"))
+    left_type = _effective_resolved_type(node.get("left"))
+    right_type = _effective_resolved_type(node.get("right"))
     op = _str(node, "op")
     rt = _str(node, "resolved_type")
     # Apply casts
@@ -622,6 +625,10 @@ def _emit_binop(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
             return _wrap_container_value_expr(rt, repeated) if is_container_resolved_type(rt) else repeated
     if op == "FloorDiv": return "py_floordiv(" + left + ", " + right + ")"
     if op == "Pow": return "std::pow(static_cast<double>(" + left + "), static_cast<double>(" + right + "))"
+    if op in ("BitOr", "BitAnd", "BitXor") and left_type == right_type and _enum_kind(ctx, left_type) == "IntFlag":
+        enum_cpp = cpp_signature_type(left_type)
+        base_expr = "static_cast<int64>(" + left + ") " + {"BitOr": "|", "BitAnd": "&", "BitXor": "^"}[op] + " static_cast<int64>(" + right + ")"
+        return "static_cast<" + enum_cpp + ">(" + base_expr + ")"
     go_op = {"Add": "+", "Sub": "-", "Mult": "*", "Div": "/", "Mod": "%",
              "BitOr": "|", "BitAnd": "&", "BitXor": "^", "LShift": "<<", "RShift": ">>"}.get(op, "+")
     return "(" + left + " " + go_op + " " + right + ")"
@@ -674,7 +681,13 @@ def _emit_compare(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
                 parts.append("true")
             else:
                 cmp = {"Eq": "==", "NotEq": "!=", "Lt": "<", "LtE": "<=", "Gt": ">", "GtE": ">="}.get(op_str, "==")
-                parts.append("(" + prev + " " + cmp + " " + right + ")")
+                prev_cmp = prev
+                right_cmp = right
+                if _is_int_like_enum(ctx, prev_type) and comp_type in ("int", "int64"):
+                    prev_cmp = "static_cast<int64>(" + prev + ")"
+                elif _is_int_like_enum(ctx, comp_type) and prev_type in ("int", "int64"):
+                    right_cmp = "static_cast<int64>(" + right + ")"
+                parts.append("(" + prev_cmp + " " + cmp + " " + right_cmp + ")")
         prev = right
         prev_node = comp
     return "(" + " && ".join(parts) + ")" if len(parts) > 1 else parts[0]
@@ -1637,8 +1650,12 @@ def _emit_class_def(ctx: CppEmitContext, node: dict[str, JsonVal]) -> None:
     body = _list(node, "body")
     is_dc = _bool(node, "dataclass")
     is_trait = _is_trait_class(node)
+    enum_kind = base if base in ("Enum", "IntEnum", "IntFlag") else ""
     trait_names = _trait_simple_names(node)
-    ctx.class_names.add(name)
+    if enum_kind == "":
+        ctx.class_names.add(name)
+    else:
+        ctx.enum_kinds[name] = enum_kind
 
     fields: list[tuple[str, str]] = []
     ft = _dict(node, "field_types")
@@ -1652,6 +1669,32 @@ def _emit_class_def(ctx: CppEmitContext, node: dict[str, JsonVal]) -> None:
                 tr = _str(s, "decl_type")
                 if tr == "": tr = _str(s, "resolved_type")
                 if tn != "": fields.append((tn, tr))
+
+    if enum_kind != "":
+        entries: list[str] = []
+        for s in body:
+            if not isinstance(s, dict) or _str(s, "kind") != "Assign":
+                continue
+            target = s.get("target")
+            if not isinstance(target, dict) or _str(target, "kind") != "Name":
+                continue
+            member_name = _str(target, "id")
+            if member_name == "":
+                continue
+            value_node = s.get("value")
+            value_expr = _emit_expr(ctx, value_node)
+            entries.append(member_name + " = " + value_expr)
+        _emit(ctx, "enum class " + name + " : int64 {")
+        ctx.indent_level += 1
+        idx = 0
+        while idx < len(entries):
+            suffix = "," if idx + 1 < len(entries) else ""
+            _emit(ctx, entries[idx] + suffix)
+            idx += 1
+        ctx.indent_level -= 1
+        _emit(ctx, "};")
+        _emit_blank(ctx)
+        return
 
     if ctx.emit_class_decls:
         base_specs: list[str] = []
@@ -1975,7 +2018,15 @@ def _is_type_owner(ctx: CppEmitContext, owner_node: JsonVal) -> bool:
     if _str(owner_node, "type_object_of") != "":
         return True
     owner_id = _str(owner_node, "id")
-    return owner_id != "" and owner_id in ctx.class_names
+    return owner_id != "" and (owner_id in ctx.class_names or owner_id in ctx.enum_kinds)
+
+
+def _enum_kind(ctx: CppEmitContext, type_name: str) -> str:
+    return ctx.enum_kinds.get(type_name, "")
+
+
+def _is_int_like_enum(ctx: CppEmitContext, type_name: str) -> bool:
+    return _enum_kind(ctx, type_name) in ("IntEnum", "IntFlag")
 
 
 def _is_zero_arg_super_call(node: JsonVal) -> bool:
@@ -2144,8 +2195,11 @@ def emit_cpp_module(
     for s in body:
         if isinstance(s, dict) and _str(s, "kind") == "ClassDef":
             class_name = _str(s, "name")
-            ctx.class_names.add(class_name)
             base_name = _str(s, "base")
+            if base_name in ("Enum", "IntEnum", "IntFlag"):
+                ctx.enum_kinds[class_name] = base_name
+            else:
+                ctx.class_names.add(class_name)
             if base_name != "":
                 ctx.class_bases[class_name] = base_name
             ctx.class_field_types[class_name] = {

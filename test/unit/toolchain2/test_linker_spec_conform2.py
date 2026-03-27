@@ -3098,6 +3098,21 @@ def has_key(env: dict[str, int], name: str) -> bool:
         self.assertIn("Perm((Perm_READ | Perm_WRITE))", intflag_go)
         self.assertNotIn("IntFlag", intflag_go)
 
+    def test_cpp_emitter_lowers_enum_family_to_scoped_int_enums(self) -> None:
+        enum_cpp = emit_cpp_module(_fixture_doc("test/fixture/east3-opt/typing/enum_basic.east3"))
+        intenum_cpp = emit_cpp_module(_fixture_doc("test/fixture/east3-opt/typing/intenum_basic.east3"))
+        intflag_cpp = emit_cpp_module(_fixture_doc("test/fixture/east3-opt/typing/intflag_basic.east3"))
+
+        self.assertIn("enum class Color : int64 {", enum_cpp)
+        self.assertIn("RED = int64(1)", enum_cpp)
+        self.assertIn("BLUE = int64(2)", enum_cpp)
+        self.assertNotIn("class Color : public Enum", enum_cpp)
+        self.assertIn("enum class Status : int64 {", intenum_cpp)
+        self.assertIn("(static_cast<int64>(Status::OK) == int64(0))", intenum_cpp)
+        self.assertIn("enum class Perm : int64 {", intflag_cpp)
+        self.assertIn("static_cast<Perm>(static_cast<int64>(Perm::READ) | static_cast<int64>(Perm::WRITE))", intflag_cpp)
+        self.assertNotIn("class Perm : public IntFlag", intflag_cpp)
+
     def test_go_emitter_spreads_typed_varargs_and_keeps_plain_class_ctor_zero_arg(self) -> None:
         doc = _fixture_doc("test/fixture/east3-opt/signature/ok_typed_varargs_representative.east3")
 
