@@ -125,7 +125,7 @@ def _assert_cpp_compiles(source: str) -> None:
         raise AssertionError(f"{proc.stdout}\n{proc.stderr}")
 
 
-def _assert_go_runs_empty(source: str) -> None:
+def _run_go(source: str) -> str:
     east3 = _build_east3(source, target_language="go")
     go_code = emit_go_module(east3)
 
@@ -148,11 +148,10 @@ def _assert_go_runs_empty(source: str) -> None:
 
     if run.returncode != 0:
         raise AssertionError(f"{run.stdout}\n{run.stderr}")
-    if run.stdout != "":
-        raise AssertionError(run.stdout)
+    return run.stdout
 
 
-def _assert_cpp_runs_empty(source: str) -> None:
+def _run_cpp(source: str) -> str:
     east3 = _build_east3(source, target_language="cpp")
     cpp_code = emit_cpp_module(east3)
 
@@ -180,8 +179,19 @@ def _assert_cpp_runs_empty(source: str) -> None:
 
     if run.returncode != 0:
         raise AssertionError(f"{run.stdout}\n{run.stderr}")
-    if run.stdout != "":
-        raise AssertionError(run.stdout)
+    return run.stdout
+
+
+def _assert_go_runs_empty(source: str) -> None:
+    stdout = _run_go(source)
+    if stdout != "":
+        raise AssertionError(stdout)
+
+
+def _assert_cpp_runs_empty(source: str) -> None:
+    stdout = _run_cpp(source)
+    if stdout != "":
+        raise AssertionError(stdout)
 
 
 def _assert_go_doc_compiles(doc: dict) -> None:
@@ -315,6 +325,14 @@ class CommonRendererCompileSmokeTests(unittest.TestCase):
 
     def test_cpp_emitted_common_renderer_shapes_run(self) -> None:
         _assert_cpp_runs_empty(SOURCE)
+
+    def test_common_renderer_empty_stdout_parity_between_go_and_cpp(self) -> None:
+        go_stdout = _run_go(SOURCE)
+        cpp_stdout = _run_cpp(SOURCE)
+
+        self.assertEqual(go_stdout, "")
+        self.assertEqual(cpp_stdout, "")
+        self.assertEqual(go_stdout, cpp_stdout)
 
 
 if __name__ == "__main__":
