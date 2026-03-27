@@ -102,16 +102,25 @@ class _CppStmtCommonRenderer(CommonRenderer):
         return _emit_call(self.ctx, node)
 
     def render_assign_stmt(self, node: dict[str, JsonVal]) -> str:
-        raise RuntimeError("cpp common renderer assign hook is not used directly")
+        raise RuntimeError("cpp common renderer assign string hook is not used directly")
+
+    def emit_return_stmt(self, node: dict[str, JsonVal]) -> None:
+        self.ctx.indent_level = self.state.indent_level
+        _emit_return(ctx=self.ctx, node=node)
+        self.state.indent_level = self.ctx.indent_level
+
+    def emit_assign_stmt(self, node: dict[str, JsonVal]) -> None:
+        self.ctx.indent_level = self.state.indent_level
+        kind = self._str(node, "kind")
+        if kind == "AnnAssign":
+            _emit_ann_assign(self.ctx, node)
+        else:
+            _emit_assign(self.ctx, node)
+        self.state.indent_level = self.ctx.indent_level
 
     def emit_stmt(self, node: JsonVal) -> None:
         kind = self._str(node, "kind")
-        if kind == "Return" and isinstance(node, dict):
-            self.ctx.indent_level = self.state.indent_level
-            _emit_return(ctx=self.ctx, node=node)
-            self.state.indent_level = self.ctx.indent_level
-            return
-        if kind in ("Expr", "If", "While"):
+        if kind in ("Expr", "Return", "Assign", "AnnAssign", "If", "While"):
             super().emit_stmt(node)
             self.ctx.indent_level = self.state.indent_level
             return
@@ -162,7 +171,7 @@ class _CppExprCommonRenderer(CommonRenderer):
 
 def _emit_common_stmt_if_supported(ctx: CppEmitContext, node: dict[str, JsonVal]) -> bool:
     kind = _str(node, "kind")
-    if kind not in ("Expr", "Return", "If", "While"):
+    if kind not in ("Expr", "Return", "Assign", "AnnAssign", "If", "While"):
         return False
     renderer = _CppStmtCommonRenderer(ctx)
     renderer.emit_stmt(node)

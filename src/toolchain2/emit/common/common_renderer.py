@@ -139,6 +139,16 @@ class CommonRenderer(ABC):
     def render_assign_stmt(self, node: dict[str, JsonVal]) -> str:
         raise RuntimeError("common renderer requires assign override for " + self.language)
 
+    def emit_return_stmt(self, node: dict[str, JsonVal]) -> None:
+        value = node.get("value")
+        if isinstance(value, dict):
+            self._emit_stmt_line(self._syntax_text("return", "return") + " " + self.render_expr(value))
+        else:
+            self._emit_stmt_line(self._syntax_text("return", "return"))
+
+    def emit_assign_stmt(self, node: dict[str, JsonVal]) -> None:
+        self._emit_stmt_line(self.render_assign_stmt(node))
+
     def render_expr_extension(self, node: dict[str, JsonVal]) -> str:
         raise RuntimeError("unsupported expr kind in common renderer: " + self._str(node, "kind"))
 
@@ -233,14 +243,10 @@ class CommonRenderer(ABC):
             self._emit_stmt_line(self.render_expr(node.get("value")))
             return
         if kind == "Return":
-            value = node.get("value")
-            if isinstance(value, dict):
-                self._emit_stmt_line(self._syntax_text("return", "return") + " " + self.render_expr(value))
-            else:
-                self._emit_stmt_line(self._syntax_text("return", "return"))
+            self.emit_return_stmt(node)
             return
         if kind == "Assign" or kind == "AnnAssign":
-            self._emit_stmt_line(self.render_assign_stmt(node))
+            self.emit_assign_stmt(node)
             return
         if kind == "If":
             test = self._format_condition(self.render_expr(node.get("test")))
