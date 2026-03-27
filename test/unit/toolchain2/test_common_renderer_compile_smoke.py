@@ -116,6 +116,9 @@ FIXTURE_ADD_SOURCE = _fixture_case_source("test/fixture/source/py/core/add.py")
 FIXTURE_COMPARE_SOURCE = _fixture_case_source("test/fixture/source/py/core/compare.py")
 FIXTURE_DEFAULT_PARAM_SOURCE = _fixture_case_source("test/fixture/source/py/core/default_param.py")
 FIXTURE_IFEXP_BOOL_SOURCE = _fixture_case_source("test/fixture/source/py/control/ifexp_bool.py")
+FIXTURE_IFEXP_TERNARY_REGRESSION_SOURCE = _fixture_case_source(
+    "test/fixture/source/py/control/ifexp_ternary_regression.py"
+)
 FIXTURE_IF_ELSE_SOURCE = _fixture_case_source("test/fixture/source/py/control/if_else.py")
 FIXTURE_NOT_SOURCE = _fixture_case_source("test/fixture/source/py/control/not.py")
 
@@ -417,6 +420,15 @@ class CommonRendererCompileSmokeTests(unittest.TestCase):
 
         self.assertEqual(go_stdout, "10\n")
         self.assertEqual(cpp_stdout, "10\n")
+        self.assertEqual(go_stdout, cpp_stdout)
+
+    def test_common_renderer_fixture_ifexp_ternary_regression_stdout_parity_between_go_and_cpp(self) -> None:
+        go_stdout = _run_go(FIXTURE_IFEXP_TERNARY_REGRESSION_SOURCE)
+        cpp_stdout = _run_cpp(FIXTURE_IFEXP_TERNARY_REGRESSION_SOURCE)
+
+        expected = "10\n21\n30\n40\n2 3\n5\n"
+        self.assertEqual(go_stdout, expected)
+        self.assertEqual(cpp_stdout, expected)
         self.assertEqual(go_stdout, cpp_stdout)
 
     def test_common_renderer_fixture_if_else_stdout_parity_between_go_and_cpp(self) -> None:
