@@ -3310,19 +3310,27 @@ def _collect_fn_callable_types(module: Node) -> dict[str, str]:
     body = module.get("body")
     if not isinstance(body, list):
         return out
-    for stmt in body:
+    body_list: list[JsonVal] = cast(list[JsonVal], body)
+    for stmt in body_list:
         if not isinstance(stmt, dict):
             continue
-        kind = stmt.get("kind", "")
+        stmt_node: Node = cast(dict[str, JsonVal], stmt)
+        kind = stmt_node.get("kind", "")
         if _is_function_like_kind(kind):
-            name = _tp_safe(stmt.get("name"))
-            ret = _tp_safe(stmt.get("return_type"))
+            name = _tp_safe(stmt_node.get("name"))
+            ret = _tp_safe(stmt_node.get("return_type"))
             if name != "" and ret not in ("", "unknown"):
-                ao = stmt.get("arg_order")
-                at = stmt.get("arg_types")
+                ao = stmt_node.get("arg_order")
+                at = stmt_node.get("arg_types")
                 if isinstance(ao, list) and isinstance(at, dict):
-                    params = [p for p in ao if isinstance(p, str) and p != "self"]
-                    pts = [_tp_safe(at.get(p)) for p in params]
+                    ao_list: list[JsonVal] = cast(list[JsonVal], ao)
+                    params: list[str] = []
+                    for p in ao_list:
+                        if isinstance(p, str) and p != "self":
+                            params.append(p)
+                    pts: list[str] = []
+                    for p in params:
+                        pts.append(_tp_safe(at.get(p)))
                     ct = "callable[[" + ",".join(pts) + "]," + ret + "]"
                 else:
                     ct = "callable[[],"+ret+"]"
@@ -3330,13 +3338,15 @@ def _collect_fn_callable_types(module: Node) -> dict[str, str]:
                 if name in renamed:
                     out[renamed[name]] = ct
         elif kind == CLASS_DEF:
-            cb = stmt.get("body")
+            cb = stmt_node.get("body")
             if isinstance(cb, list):
-                for m in cb:
+                cb_list: list[JsonVal] = cast(list[JsonVal], cb)
+                for m in cb_list:
                     if isinstance(m, dict) and m.get("kind") == FUNCTION_DEF:
-                        mn = _tp_safe(m.get("name"))
+                        method_node: Node = cast(dict[str, JsonVal], m)
+                        mn = _tp_safe(method_node.get("name"))
                         if mn != "":
-                            ret = _tp_safe(m.get("return_type"))
+                            ret = _tp_safe(method_node.get("return_type"))
                             if ret not in ("", "unknown"):
                                 out[mn] = "callable"
     return out
@@ -3344,7 +3354,8 @@ def _collect_fn_callable_types(module: Node) -> dict[str, str]:
 
 def _tp_fn_refs(node: JsonVal, ft: dict[str, str]) -> None:
     if isinstance(node, list):
-        for item in node:
+        node_list: list[JsonVal] = cast(list[JsonVal], node)
+        for item in node_list:
             _tp_fn_refs(item, ft)
         return
     if not isinstance(node, dict):
@@ -3353,16 +3364,22 @@ def _tp_fn_refs(node: JsonVal, ft: dict[str, str]) -> None:
     if nd.get("kind") == CALL:
         args = nd.get("args")
         if isinstance(args, list):
-            for arg in args:
+            arg_list: list[JsonVal] = cast(list[JsonVal], args)
+            for arg in arg_list:
                 if isinstance(arg, dict) and arg.get("kind") == NAME:
-                    n = _tp_safe(arg.get("id"))
+                    arg_node: Node = cast(dict[str, JsonVal], arg)
+                    n = _tp_safe(arg_node.get("id"))
                     if n in ft:
-                        cur = _tp_safe(arg.get("resolved_type"))
+                        cur = _tp_safe(arg_node.get("resolved_type"))
                         if cur in ("", "unknown"):
-                            arg["resolved_type"] = ft[n]
+                            arg_node["resolved_type"] = ft[n]
     for v in nd.values():
-        if isinstance(v, (dict, list)):
-            _tp_fn_refs(v, ft)
+        if isinstance(v, dict):
+            v_node: Node = cast(dict[str, JsonVal], v)
+            _tp_fn_refs(v_node, ft)
+        elif isinstance(v, list):
+            v_list: list[JsonVal] = cast(list[JsonVal], v)
+            _tp_fn_refs(v_list, ft)
 
 
 _FLOAT_TAGS: set[str] = {
@@ -3376,7 +3393,8 @@ _INT_TYPES: set[str] = {"int8", "uint8", "int16", "uint16", "int32", "uint32", "
 
 def _tp_numeric_casts(node: JsonVal) -> None:
     if isinstance(node, list):
-        for item in node:
+        node_list: list[JsonVal] = cast(list[JsonVal], node)
+        for item in node_list:
             _tp_numeric_casts(item)
         return
     if not isinstance(node, dict):
@@ -3391,18 +3409,30 @@ def _tp_numeric_casts(node: JsonVal) -> None:
         if is_float:
             args = nd.get("args")
             if isinstance(args, list):
-                for arg in args:
+                arg_list: list[JsonVal] = cast(list[JsonVal], args)
+                for arg in arg_list:
                     if isinstance(arg, dict):
-                        at = _tp_safe(arg.get("resolved_type"))
+                        arg_node: Node = cast(dict[str, JsonVal], arg)
+                        at = _tp_safe(arg_node.get("resolved_type"))
                         if at in _INT_TYPES:
-                            ec = arg.get("casts")
+                            ec = arg_node.get("casts")
                             if not isinstance(ec, list):
                                 ec = []
-                            ec.append({"on": "body", "from": at, "to": "float64", "reason": "numeric_promotion"})
-                            arg["casts"] = ec
+                            cast_list: list[JsonVal] = cast(list[JsonVal], ec)
+                            cast_entry: Node = {}
+                            cast_entry["on"] = "body"
+                            cast_entry["from"] = at
+                            cast_entry["to"] = "float64"
+                            cast_entry["reason"] = "numeric_promotion"
+                            cast_list.append(cast_entry)
+                            arg_node["casts"] = cast_list
     for v in nd.values():
-        if isinstance(v, (dict, list)):
-            _tp_numeric_casts(v)
+        if isinstance(v, dict):
+            v_node2: Node = cast(dict[str, JsonVal], v)
+            _tp_numeric_casts(v_node2)
+        elif isinstance(v, list):
+            v_list2: list[JsonVal] = cast(list[JsonVal], v)
+            _tp_numeric_casts(v_list2)
 
 
 def apply_type_propagation(module: Node, ctx: CompileContext) -> Node:
