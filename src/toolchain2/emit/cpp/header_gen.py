@@ -14,6 +14,7 @@ def build_cpp_header_from_east3(
     *,
     rel_header_path: str,
     native_header_include: str = "",
+    prefer_native_header: bool = False,
 ) -> str:
     meta = east_doc.get("meta")
     meta_dict = meta if isinstance(meta, dict) else {}
@@ -28,6 +29,16 @@ def build_cpp_header_from_east3(
     ]
 
     seen: set[str] = {"core/py_runtime.h"}
+    if prefer_native_header and native_header_include != "":
+        if native_header_include not in seen:
+            lines.append('#include "' + native_header_include + '"')
+        lines.extend([
+            "",
+            "#endif  // " + guard,
+            "",
+        ])
+        return "\n".join(lines)
+
     for dep_id in dep_ids:
         include_path = cpp_include_for_module(dep_id)
         if include_path == "" or include_path in seen:

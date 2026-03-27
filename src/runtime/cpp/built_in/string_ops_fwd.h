@@ -9,10 +9,10 @@
 
 #include "core/py_types.h"
 
-list<str> py_split(const str& s, const str& sep, int64 maxsplit = -1);
-list<str> py_splitlines(const str& s);
+Object<list<str>> py_split(const str& s, const str& sep, int64 maxsplit = -1);
+Object<list<str>> py_splitlines(const str& s);
 int64 py_count(const str& s, const str& needle);
-str py_join(const str& sep, const list<str>& parts);
+str py_join(const str& sep, const Object<list<str>>& parts);
 str py_replace(const str& s, const str& oldv, const str& newv);
 str py_replace_n(const str& s, const str& oldv, const str& newv, int count);
 bool py_startswith(const str& s, const str& prefix);

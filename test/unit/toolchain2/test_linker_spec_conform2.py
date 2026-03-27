@@ -2301,6 +2301,171 @@ def has_key(env: dict[str, int], name: str) -> bool:
         self.assertIn("return obj.size();", cpp_code)
         self.assertNotIn("return obj.size;", cpp_code)
 
+    def test_cpp_emitter_uses_value_select_boolops_for_strings(self) -> None:
+        doc = _module_doc(
+            "app.main",
+            body=[
+                {
+                    "kind": "FunctionDef",
+                    "name": "choose",
+                    "arg_types": {"left": "str", "right": "str"},
+                    "arg_order": ["left", "right"],
+                    "arg_defaults": {},
+                    "arg_index": {"left": 0, "right": 1},
+                    "return_type": "str",
+                    "arg_usage": {"left": "readonly", "right": "readonly"},
+                    "renamed_symbols": {},
+                    "docstring": None,
+                    "body": [
+                        {
+                            "kind": "Return",
+                            "value": {
+                                "kind": "BoolOp",
+                                "op": "Or",
+                                "resolved_type": "str",
+                                "values": [
+                                    {"kind": "Name", "id": "left", "resolved_type": "str"},
+                                    {"kind": "Name", "id": "right", "resolved_type": "str"},
+                                ],
+                            },
+                        }
+                    ],
+                }
+            ],
+        )
+
+        cpp_code = emit_cpp_module(doc)
+
+        self.assertIn("return (left ? left : right);", cpp_code)
+        self.assertNotIn("left || right", cpp_code)
+
+    def test_cpp_emitter_uses_py_to_bool_for_container_boolop_value_select(self) -> None:
+        doc = _module_doc(
+            "pytra.built_in.string_ops",
+            meta_extra={"linked_program_v1": {"module_id": "pytra.built_in.string_ops"}},
+            body=[
+                {
+                    "kind": "FunctionDef",
+                    "name": "pick_parts",
+                    "arg_types": {"parts": "list[str]", "fallback": "list[str]"},
+                    "arg_order": ["parts", "fallback"],
+                    "arg_defaults": {},
+                    "arg_index": {"parts": 0, "fallback": 1},
+                    "return_type": "list[str]",
+                    "arg_usage": {"parts": "readonly", "fallback": "readonly"},
+                    "renamed_symbols": {},
+                    "docstring": None,
+                    "body": [
+                        {
+                            "kind": "Return",
+                            "value": {
+                                "kind": "BoolOp",
+                                "op": "Or",
+                                "resolved_type": "list[str]",
+                                "values": [
+                                    {"kind": "Name", "id": "parts", "resolved_type": "list[str]"},
+                                    {"kind": "Name", "id": "fallback", "resolved_type": "list[str]"},
+                                ],
+                            },
+                        }
+                    ],
+                }
+            ],
+        )
+
+        cpp_code = emit_cpp_module(doc, allow_runtime_module=True)
+
+        self.assertIn("return (py_to_bool(parts) ? parts : fallback);", cpp_code)
+
+    def test_cpp_emitter_ignores_type_alias_statements(self) -> None:
+        doc = _module_doc(
+            "pytra.std.argparse",
+            meta_extra={"linked_program_v1": {"module_id": "pytra.std.argparse"}},
+            body=[
+                {
+                    "kind": "TypeAlias",
+                    "name": "ArgValue",
+                    "value": {"kind": "Name", "id": "object", "resolved_type": "type"},
+                },
+                {
+                    "kind": "FunctionDef",
+                    "name": "identity",
+                    "arg_types": {"x": "str"},
+                    "arg_order": ["x"],
+                    "arg_defaults": {},
+                    "arg_index": {"x": 0},
+                    "return_type": "str",
+                    "arg_usage": {"x": "readonly"},
+                    "renamed_symbols": {},
+                    "docstring": None,
+                    "body": [{"kind": "Return", "value": {"kind": "Name", "id": "x", "resolved_type": "str"}}],
+                },
+            ],
+        )
+
+        cpp_code = emit_cpp_module(doc, allow_runtime_module=True)
+
+        self.assertIn("str identity(", cpp_code)
+        self.assertNotIn("TypeAlias", cpp_code)
+
+    def test_cpp_emitter_reorders_argparse_add_argument_keywords_into_positional_slots(self) -> None:
+        doc = _module_doc(
+            "app.main",
+            body=[
+                {
+                    "kind": "FunctionDef",
+                    "name": "setup",
+                    "arg_types": {"p": "ArgumentParser"},
+                    "arg_order": ["p"],
+                    "arg_defaults": {},
+                    "arg_index": {"p": 0},
+                    "return_type": "None",
+                    "arg_usage": {"p": "readonly"},
+                    "renamed_symbols": {},
+                    "docstring": None,
+                    "body": [
+                        {
+                            "kind": "Expr",
+                            "value": {
+                                "kind": "Call",
+                                "resolved_type": "None",
+                                "func": {
+                                    "kind": "Attribute",
+                                    "value": {"kind": "Name", "id": "p", "resolved_type": "ArgumentParser"},
+                                    "attr": "add_argument",
+                                },
+                                "args": [
+                                    {"kind": "Constant", "resolved_type": "str", "value": "-m"},
+                                    {"kind": "Constant", "resolved_type": "str", "value": "--mode"},
+                                ],
+                                "keywords": [
+                                    {
+                                        "arg": "choices",
+                                        "value": {
+                                            "kind": "List",
+                                            "resolved_type": "list[str]",
+                                            "elements": [
+                                                {"kind": "Constant", "resolved_type": "str", "value": "a"},
+                                                {"kind": "Constant", "resolved_type": "str", "value": "b"},
+                                            ],
+                                        },
+                                    },
+                                    {
+                                        "arg": "default",
+                                        "value": {"kind": "Constant", "resolved_type": "str", "value": "a"},
+                                    },
+                                ],
+                            },
+                        }
+                    ],
+                }
+            ],
+        )
+
+        cpp_code = emit_cpp_module(doc)
+
+        self.assertIn('p.add_argument(str("-m"), str("--mode"), str(""), str(""), str(""), str(""), rc_list_from_value(list<str>{str("a"), str("b")}), str("a"));', cpp_code)
+
     def test_cpp_emitter_boxes_any_dict_literals_with_object_values(self) -> None:
         doc = _module_doc(
             "app.main",

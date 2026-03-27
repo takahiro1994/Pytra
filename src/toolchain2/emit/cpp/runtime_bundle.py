@@ -255,6 +255,7 @@ def emit_runtime_module_artifacts(
         east_doc,
         rel_header_path=rel + ".h",
         native_header_include=native_include,
+        prefer_native_header=native_include != "",
     )
     if header_only_templates and cpp_text.strip() != "":
         header_text = _append_header_only_impls(header_text, cpp_text)

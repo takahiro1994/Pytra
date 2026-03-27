@@ -5,7 +5,7 @@
 #include "built_in/string_ops_fwd.h"
 
 inline list<str> str::split(const str& sep, int64 maxsplit) const {
-    return py_split(*this, sep, maxsplit);
+    return *py_split(*this, sep, maxsplit);
 }
 
 inline list<str> str::split(const str& sep) const {
@@ -13,7 +13,7 @@ inline list<str> str::split(const str& sep) const {
 }
 
 inline list<str> str::splitlines() const {
-    return py_splitlines(*this);
+    return *py_splitlines(*this);
 }
 
 inline int64 str::count(const str& needle) const {
@@ -21,7 +21,7 @@ inline int64 str::count(const str& needle) const {
 }
 
 inline str str::join(const list<str>& parts) const {
-    return py_join(*this, parts);
+    return py_join(*this, rc_list_from_value(parts));
 }
 
 #endif  // PYTRA_CORE_STR_METHODS_H

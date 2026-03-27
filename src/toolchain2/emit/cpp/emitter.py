@@ -637,31 +637,68 @@ def _emit_unaryop(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
 
 def _emit_compare(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
     left = _emit_expr(ctx, node.get("left"))
+    left_node = node.get("left")
     ops = _list(node, "ops")
     comparators = _list(node, "comparators")
     if len(ops) == 0: return left
     parts: list[str] = []
     prev = left
+    prev_node = left_node
     for i in range(len(ops)):
         op_str = ops[i] if isinstance(ops[i], str) else ""
         comp = comparators[i] if i < len(comparators) else None
         right = _emit_expr(ctx, comp)
+        prev_type = _expr_static_type(ctx, prev_node)
+        comp_type = _expr_static_type(ctx, comp)
+        prev_is_nominal = prev_type in ctx.class_names
+        comp_is_nominal = comp_type in ctx.class_names
+        prev_is_none = prev == "::std::nullopt" or prev_type == "None"
+        comp_is_none = right == "::std::nullopt" or comp_type == "None"
         if op_str == "In": parts.append("py_contains(" + right + ", " + prev + ")")
         elif op_str == "NotIn": parts.append("!py_contains(" + right + ", " + prev + ")")
-        elif op_str == "Is": parts.append("(" + prev + " == " + right + ")")
-        elif op_str == "IsNot": parts.append("(" + prev + " != " + right + ")")
+        elif op_str == "Is":
+            if (prev_is_nominal and comp_is_none) or (prev_is_none and comp_is_nominal):
+                parts.append("false")
+            else:
+                parts.append("(" + prev + " == " + right + ")")
+        elif op_str == "IsNot":
+            if (prev_is_nominal and comp_is_none) or (prev_is_none and comp_is_nominal):
+                parts.append("true")
+            else:
+                parts.append("(" + prev + " != " + right + ")")
         else:
-            cmp = {"Eq": "==", "NotEq": "!=", "Lt": "<", "LtE": "<=", "Gt": ">", "GtE": ">="}.get(op_str, "==")
-            parts.append("(" + prev + " " + cmp + " " + right + ")")
+            if op_str == "Eq" and ((prev_is_nominal and comp_is_none) or (prev_is_none and comp_is_nominal)):
+                parts.append("false")
+            elif op_str == "NotEq" and ((prev_is_nominal and comp_is_none) or (prev_is_none and comp_is_nominal)):
+                parts.append("true")
+            else:
+                cmp = {"Eq": "==", "NotEq": "!=", "Lt": "<", "LtE": "<=", "Gt": ">", "GtE": ">="}.get(op_str, "==")
+                parts.append("(" + prev + " " + cmp + " " + right + ")")
         prev = right
+        prev_node = comp
     return "(" + " && ".join(parts) + ")" if len(parts) > 1 else parts[0]
 
 
 def _emit_boolop(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
     op = _str(node, "op")
     values = _list(node, "values")
-    cpp_op = " && " if op == "And" else " || "
-    return "(" + cpp_op.join(_emit_expr(ctx, v) for v in values) + ")"
+    if len(values) == 0:
+        return "false"
+    expr = _emit_expr(ctx, values[0])
+    expr_type = _effective_resolved_type(values[0])
+    result_type = _str(node, "resolved_type")
+    for value in values[1:]:
+        right = _emit_expr(ctx, value)
+        cond = _emit_condition_code(expr, expr_type)
+        if op == "And":
+            expr = "(" + cond + " ? " + right + " : " + expr + ")"
+        else:
+            expr = "(" + cond + " ? " + expr + " : " + right + ")"
+        if result_type != "":
+            expr_type = result_type
+        else:
+            expr_type = _effective_resolved_type(value)
+    return expr
 
 
 def _emit_call(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
@@ -670,19 +707,20 @@ def _emit_call(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
     func = node.get("func")
     args = _list(node, "args")
     arg_strs = [_emit_expr(ctx, a) for a in args]
-    call_arg_strs = list(arg_strs)
+    keywords = _list(node, "keywords")
+    keyword_strs: list[str] = []
+    for kw in keywords:
+        if isinstance(kw, dict):
+            keyword_strs.append(_emit_expr(ctx, kw.get("value")))
+    call_arg_strs = list(arg_strs) + keyword_strs
     adapter = _str(node, "runtime_call_adapter_kind")
-    if adapter == "image.save_gif.keyword_defaults":
-        keywords = _list(node, "keywords")
-        for kw in keywords:
-            if isinstance(kw, dict):
-                call_arg_strs.append(_emit_expr(ctx, kw.get("value")))
     if isinstance(func, dict):
         fk = _str(func, "kind")
         if fk == "Attribute":
             owner = _emit_expr(ctx, func.get("value"))
             attr = _str(func, "attr")
             owner_node = func.get("value")
+            owner_type = _effective_resolved_type(owner_node)
             owner_id = _str(owner_node, "id") if isinstance(owner_node, dict) else ""
             owner_module = ctx.import_aliases.get(owner_id, "")
             runtime_module_id = _str(func, "runtime_module_id")
@@ -690,6 +728,8 @@ def _emit_call(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
             runtime_call = _str(node, "runtime_call")
             resolved_runtime_call = _str(node, "resolved_runtime_call")
             builtin_name = _str(node, "builtin_name")
+            if attr == "add_argument" and owner_type == "ArgumentParser":
+                call_arg_strs = _emit_argparse_add_argument_args(ctx, args, keywords)
             if _is_type_owner(ctx, owner_node):
                 return owner + "::" + attr + "(" + ", ".join(call_arg_strs) + ")"
             if owner_module != "":
@@ -753,11 +793,33 @@ def _emit_call(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
     return _emit_expr(ctx, func) + "(" + ", ".join(call_arg_strs) + ")"
 
 
-def _emit_condition_expr(ctx: CppEmitContext, node: JsonVal) -> str:
-    expr = _emit_expr(ctx, node)
-    if not isinstance(node, dict):
-        return expr
-    resolved_type = _str(node, "resolved_type")
+def _emit_argparse_add_argument_args(
+    ctx: CppEmitContext,
+    args: list[JsonVal],
+    keywords: list[JsonVal],
+) -> list[str]:
+    positional = [_emit_expr(ctx, arg) for arg in args[:4]]
+    while len(positional) < 4:
+        positional.append('str("")')
+
+    keyword_map: dict[str, str] = {}
+    for kw in keywords:
+        if not isinstance(kw, dict):
+            continue
+        name = _str(kw, "arg")
+        if name == "":
+            continue
+        keyword_map[name] = _emit_expr(ctx, kw.get("value"))
+
+    return positional + [
+        keyword_map.get("help", 'str("")'),
+        keyword_map.get("action", 'str("")'),
+        keyword_map.get("choices", "rc_list_from_value(list<str>{})"),
+        keyword_map.get("default", "object()"),
+    ]
+
+
+def _emit_condition_code(expr: str, resolved_type: str) -> str:
     if (
         resolved_type.startswith("list[")
         or resolved_type.startswith("dict[")
@@ -766,6 +828,13 @@ def _emit_condition_expr(ctx: CppEmitContext, node: JsonVal) -> str:
     ):
         return "py_to_bool(" + expr + ")"
     return expr
+
+
+def _emit_condition_expr(ctx: CppEmitContext, node: JsonVal) -> str:
+    expr = _emit_expr(ctx, node)
+    if not isinstance(node, dict):
+        return expr
+    return _emit_condition_code(expr, _str(node, "resolved_type"))
 
 
 def _emit_builtin_call(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
@@ -1226,7 +1295,7 @@ def _emit_slice_expr(ctx: CppEmitContext, node: dict[str, JsonVal], value_expr: 
 
 
 def _emit_ifexp(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
-    test = _emit_expr(ctx, node.get("test"))
+    test = _emit_condition_expr(ctx, node.get("test"))
     body = _emit_expr(ctx, node.get("body"))
     orelse = _emit_expr(ctx, node.get("orelse"))
     return "(" + test + " ? " + body + " : " + orelse + ")"
@@ -1282,7 +1351,7 @@ def _emit_stmt(ctx: CppEmitContext, node: JsonVal) -> None:
     elif kind == "FunctionDef": _emit_function_def(ctx, node)
     elif kind == "ClosureDef": _emit_closure_def(ctx, node)
     elif kind == "ClassDef": _emit_class_def(ctx, node)
-    elif kind == "ImportFrom" or kind == "Import": pass
+    elif kind == "ImportFrom" or kind == "Import" or kind == "TypeAlias": pass
     elif kind == "Pass": _emit(ctx, "// pass")
     elif kind == "VarDecl": _emit_var_decl(ctx, node)
     elif kind == "Swap": _emit_swap(ctx, node)
