@@ -2165,13 +2165,18 @@ def _int_promo_walk(node: JsonVal) -> None:
             if tt == "uint8":
                 tp_node["target_type"] = "int64"
     for v in nd.values():
-        if isinstance(v, (dict, list)):
-            _int_promo_walk(v)
+        if isinstance(v, dict):
+            v_node: Node = cast(dict[str, JsonVal], v)
+            _int_promo_walk(v_node)
+        elif isinstance(v, list):
+            v_list: list[JsonVal] = cast(list[JsonVal], v)
+            _int_promo_walk(v_list)
 
 
 def _narrowing_walk(node: JsonVal) -> None:
     if isinstance(node, list):
-        for item in node:
+        node_list: list[JsonVal] = cast(list[JsonVal], node)
+        for item in node_list:
             _narrowing_walk(item)
         return
     if not isinstance(node, dict):
@@ -2182,16 +2187,22 @@ def _narrowing_walk(node: JsonVal) -> None:
         target = nd.get("target")
         value = nd.get("value")
         if isinstance(target, dict) and isinstance(value, dict):
+            target_node: Node = cast(dict[str, JsonVal], target)
+            value_node: Node = cast(dict[str, JsonVal], value)
             tt = _nt(nd.get("decl_type"))
             if tt == "" or tt == "unknown":
                 tt = _nt(nd.get("annotation"))
             if tt == "" or tt == "unknown":
-                tt = _nt(target.get("resolved_type"))
+                tt = _nt(target_node.get("resolved_type"))
             if tt in _INT_WIDTH:
-                _narrow_value(value, tt)
+                _narrow_value(value_node, tt)
     for v in nd.values():
-        if isinstance(v, (dict, list)):
-            _narrowing_walk(v)
+        if isinstance(v, dict):
+            v_node2: Node = cast(dict[str, JsonVal], v)
+            _narrowing_walk(v_node2)
+        elif isinstance(v, list):
+            v_list2: list[JsonVal] = cast(list[JsonVal], v)
+            _narrowing_walk(v_list2)
 
 
 def _narrow_value(vn: Node, tt: str) -> None:
@@ -2206,15 +2217,24 @@ def _narrow_value(vn: Node, tt: str) -> None:
     if kind == BIN_OP:
         left = vn.get("left")
         right = vn.get("right")
-        lt2 = _nt(left.get("resolved_type")) if isinstance(left, dict) else ""
-        rt2 = _nt(right.get("resolved_type")) if isinstance(right, dict) else ""
+        lt2 = ""
+        rt2 = ""
+        if isinstance(left, dict):
+            left_node: Node = cast(dict[str, JsonVal], left)
+            lt2 = _nt(left_node.get("resolved_type"))
+        if isinstance(right, dict):
+            right_node: Node = cast(dict[str, JsonVal], right)
+            rt2 = _nt(right_node.get("resolved_type"))
         lw = _INT_WIDTH.get(lt2, 0) if lt2 in _INT_WIDTH else 0
         rw2 = _INT_WIDTH.get(rt2, 0) if rt2 in _INT_WIDTH else 0
         if lw > 0 and rw2 > 0 and tw >= lw and tw >= rw2:
             vn["resolved_type"] = tt
     elif kind == UNARY_OP:
         operand = vn.get("operand")
-        ot = _nt(operand.get("resolved_type")) if isinstance(operand, dict) else ""
+        ot = ""
+        if isinstance(operand, dict):
+            operand_node: Node = cast(dict[str, JsonVal], operand)
+            ot = _nt(operand_node.get("resolved_type"))
         ow = _INT_WIDTH.get(ot, 0) if ot in _INT_WIDTH else 0
         if ow > 0 and tw >= ow:
             vn["resolved_type"] = tt
@@ -2222,7 +2242,8 @@ def _narrow_value(vn: Node, tt: str) -> None:
 
 def _remove_redundant_unbox(node: JsonVal) -> None:
     if isinstance(node, list):
-        for item in node:
+        node_list: list[JsonVal] = cast(list[JsonVal], node)
+        for item in node_list:
             _remove_redundant_unbox(item)
         return
     if not isinstance(node, dict):
@@ -2231,16 +2252,25 @@ def _remove_redundant_unbox(node: JsonVal) -> None:
     kind = nd.get("kind")
     if kind in (ASSIGN, ANN_ASSIGN):
         value = nd.get("value")
-        if isinstance(value, dict) and value.get("kind") == UNBOX:
-            inner = value.get("value")
+        if isinstance(value, dict):
+            value_node: Node = cast(dict[str, JsonVal], value)
+            if value_node.get("kind") != UNBOX:
+                inner = None
+            else:
+                inner = value_node.get("value")
             if isinstance(inner, dict):
-                ut = _nt(value.get("target"))
-                it = _nt(inner.get("resolved_type"))
+                inner_node: Node = cast(dict[str, JsonVal], inner)
+                ut = _nt(value_node.get("target"))
+                it = _nt(inner_node.get("resolved_type"))
                 if ut != "" and ut == it:
                     nd["value"] = inner
     for v in nd.values():
-        if isinstance(v, (dict, list)):
-            _remove_redundant_unbox(v)
+        if isinstance(v, dict):
+            v_node: Node = cast(dict[str, JsonVal], v)
+            _remove_redundant_unbox(v_node)
+        elif isinstance(v, list):
+            v_list: list[JsonVal] = cast(list[JsonVal], v)
+            _remove_redundant_unbox(v_list)
 
 
 def apply_integer_promotion(module: Node, ctx: CompileContext) -> Node:
@@ -2293,8 +2323,8 @@ def _split_union_members(type_name: str) -> list[str]:
 
 
 def _type_matches_guard(type_name: str, guard_type: str) -> bool:
-    norm = normalize_type_name(type_name)
-    guard = normalize_type_name(guard_type)
+    norm: str = normalize_type_name(type_name)
+    guard: str = normalize_type_name(guard_type)
     if norm == "" or norm == "unknown" or guard == "" or guard == "unknown":
         return False
     if guard == "None":
@@ -2308,13 +2338,14 @@ def _type_matches_guard(type_name: str, guard_type: str) -> bool:
     if guard == "str":
         return norm == "str"
     if guard in ("list", "dict", "set", "tuple"):
-        return norm == guard or norm.startswith(guard + "[")
+        prefix = guard + "["
+        return norm == guard or norm.startswith(prefix)
     return norm == guard
 
 
 def _select_guard_target_type(source_type: str, expected_name: str) -> str:
-    src = normalize_type_name(source_type)
-    expected = normalize_type_name(expected_name)
+    src: str = normalize_type_name(source_type)
+    expected: str = normalize_type_name(expected_name)
     if src == "" or src == "unknown" or expected == "" or expected == "unknown":
         return ""
     guard_type = expected
@@ -2344,23 +2375,29 @@ def _guard_narrowing_from_expr(expr: JsonVal) -> dict[str, str]:
     nd: Node = expr
     kind = nd.get("kind", "")
     if kind == "IsInstance":
-        value = nd.get("value")
+        raw_value = nd.get("value")
         expected = nd.get("expected_type_id")
-        if isinstance(value, dict) and value.get("kind") == UNBOX:
-            inner = value.get("value")
-            if isinstance(inner, dict):
-                value = inner
-        if not isinstance(value, dict) or value.get("kind") != NAME:
+        if isinstance(raw_value, dict):
+            value_node0: Node = cast(dict[str, JsonVal], raw_value)
+            if value_node0.get("kind") == UNBOX:
+                inner = value_node0.get("value")
+                if isinstance(inner, dict):
+                    raw_value = inner
+        if not isinstance(raw_value, dict):
             return {}
-        name = _tp_safe(value.get("id"))
+        value_node: Node = cast(dict[str, JsonVal], raw_value)
+        if value_node.get("kind") != NAME:
+            return {}
+        name = _tp_safe(value_node.get("id"))
         if name == "":
             return {}
         expected_name = ""
         if isinstance(expected, dict):
-            expected_name = _tp_safe(expected.get("id"))
+            expected_node: Node = cast(dict[str, JsonVal], expected)
+            expected_name = _tp_safe(expected_node.get("id"))
             if expected_name == "":
-                expected_name = _tp_safe(expected.get("repr"))
-        target_type = _select_guard_target_type(_tp_safe(value.get("resolved_type")), expected_name)
+                expected_name = _tp_safe(expected_node.get("repr"))
+        target_type = _select_guard_target_type(_tp_safe(value_node.get("resolved_type")), expected_name)
         if target_type == "" or target_type == "unknown":
             return {}
         return {name: target_type}
@@ -2368,43 +2405,58 @@ def _guard_narrowing_from_expr(expr: JsonVal) -> dict[str, str]:
         left = nd.get("left")
         comparators = nd.get("comparators")
         ops = nd.get("ops")
-        if (
-            isinstance(left, dict)
-            and left.get("kind") == NAME
-            and isinstance(comparators, list)
-            and len(comparators) == 1
-            and isinstance(comparators[0], dict)
-            and comparators[0].get("kind") == CONSTANT
-            and comparators[0].get("value") is None
-            and isinstance(ops, list)
-            and len(ops) == 1
-        ):
-            name2 = _tp_safe(left.get("id"))
-            src_type = _tp_safe(left.get("resolved_type"))
-            if name2 == "" or src_type == "":
+        if not isinstance(left, dict):
+            return {}
+        left_node: Node = cast(dict[str, JsonVal], left)
+        if left_node.get("kind") != NAME:
+            return {}
+        if not isinstance(comparators, list):
+            return {}
+        comparator_list: list[JsonVal] = cast(list[JsonVal], comparators)
+        if len(comparator_list) != 1 or not isinstance(comparator_list[0], dict):
+            return {}
+        comp0: Node = cast(dict[str, JsonVal], comparator_list[0])
+        if comp0.get("kind") != CONSTANT or comp0.get("value") is not None:
+            return {}
+        if not isinstance(ops, list):
+            return {}
+        ops_list: list[JsonVal] = cast(list[JsonVal], ops)
+        if len(ops_list) != 1:
+            return {}
+        name2 = _tp_safe(left_node.get("id"))
+        src_type = _tp_safe(left_node.get("resolved_type"))
+        if name2 == "" or src_type == "":
+            return {}
+        members: list[str] = []
+        for member in _split_union_members(src_type):
+            if normalize_type_name(member) != "None":
+                members.append(member)
+        op = _tp_safe(ops_list[0])
+        if op == "IsNot":
+            if len(members) == 0:
                 return {}
-            members = [member for member in _split_union_members(src_type) if normalize_type_name(member) != "None"]
-            op = _tp_safe(ops[0])
-            if op == "IsNot":
-                if len(members) == 0:
-                    return {}
-                if len(members) == 1:
-                    return {name2: normalize_type_name(members[0])}
-                return {name2: " | ".join([normalize_type_name(member) for member in members])}
+            if len(members) == 1:
+                return {name2: normalize_type_name(members[0])}
+            member_names: list[str] = []
+            for member in members:
+                member_names.append(normalize_type_name(member))
+            return {name2: " | ".join(member_names)}
         return {}
     if kind == BOOL_OP and _tp_safe(nd.get("op")) == "And":
         merged: dict[str, str] = {}
         values = nd.get("values")
         if not isinstance(values, list):
             return merged
-        for value in values:
+        value_list: list[JsonVal] = cast(list[JsonVal], values)
+        for value in value_list:
             child = _guard_narrowing_from_expr(value)
             for name, target_type in child.items():
                 cur = merged.get(name, "")
                 if cur == "" or cur == target_type:
                     merged[name] = target_type
                 else:
-                    merged.pop(name, None)
+                    if name in merged:
+                        del merged[name]
         return merged
     return {}
 
@@ -2418,41 +2470,55 @@ def _invert_guard_narrowing_from_expr(expr: JsonVal) -> dict[str, str]:
         values = nd.get("values")
         if not isinstance(values, list):
             return merged
-        for value in values:
+        value_list: list[JsonVal] = cast(list[JsonVal], values)
+        for value in value_list:
             child = _invert_guard_narrowing_from_expr(value)
             for name, target_type in child.items():
                 cur = merged.get(name, "")
                 if cur == "" or cur == target_type:
                     merged[name] = target_type
                 else:
-                    merged.pop(name, None)
+                    if name in merged:
+                        del merged[name]
         return merged
     if nd.get("kind", "") != COMPARE:
         return {}
     left = nd.get("left")
     comparators = nd.get("comparators")
     ops = nd.get("ops")
-    if (
-        not isinstance(left, dict)
-        or left.get("kind") != NAME
-        or not isinstance(comparators, list)
-        or len(comparators) != 1
-        or not isinstance(comparators[0], dict)
-        or comparators[0].get("kind") != CONSTANT
-        or comparators[0].get("value") is not None
-        or not isinstance(ops, list)
-        or len(ops) != 1
-    ):
+    if not isinstance(left, dict):
         return {}
-    name = _tp_safe(left.get("id"))
-    src_type = _tp_safe(left.get("resolved_type"))
+    left_node: Node = cast(dict[str, JsonVal], left)
+    if left_node.get("kind") != NAME:
+        return {}
+    if not isinstance(comparators, list):
+        return {}
+    comparator_list: list[JsonVal] = cast(list[JsonVal], comparators)
+    if len(comparator_list) != 1 or not isinstance(comparator_list[0], dict):
+        return {}
+    comp0: Node = cast(dict[str, JsonVal], comparator_list[0])
+    if comp0.get("kind") != CONSTANT or comp0.get("value") is not None:
+        return {}
+    if not isinstance(ops, list):
+        return {}
+    ops_list: list[JsonVal] = cast(list[JsonVal], ops)
+    if len(ops_list) != 1:
+        return {}
+    name = _tp_safe(left_node.get("id"))
+    src_type = _tp_safe(left_node.get("resolved_type"))
     if name == "" or src_type == "":
         return {}
-    members = [member for member in _split_union_members(src_type) if normalize_type_name(member) != "None"]
+    members: list[str] = []
+    for member in _split_union_members(src_type):
+        if normalize_type_name(member) != "None":
+            members.append(member)
     if len(members) == 0:
         return {}
-    narrowed = members[0] if len(members) == 1 else " | ".join(members)
-    op = _tp_safe(ops[0])
+    member_names: list[str] = []
+    for member in members:
+        member_names.append(normalize_type_name(member))
+    narrowed = member_names[0] if len(member_names) == 1 else " | ".join(member_names)
+    op = _tp_safe(ops_list[0])
     if op == "Is":
         return {name: normalize_type_name(narrowed)}
     return {}
