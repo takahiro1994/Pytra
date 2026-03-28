@@ -17,6 +17,11 @@ type PyList[T any] struct {
 	items []T
 }
 
+type pyListView interface {
+	pyListLen() int
+	pyListItemAny(i int) any
+}
+
 func NewPyList[T any]() *PyList[T] {
 	return &PyList[T]{items: []T{}}
 }
@@ -25,6 +30,17 @@ func PyListFromSlice[T any](items []T) *PyList[T] {
 	out := make([]T, len(items))
 	copy(out, items)
 	return &PyList[T]{items: out}
+}
+
+func (p *PyList[T]) pyListLen() int {
+	if p == nil {
+		return 0
+	}
+	return len(p.items)
+}
+
+func (p *PyList[T]) pyListItemAny(i int) any {
+	return p.items[i]
 }
 
 func (p *PyList[T]) __str__() string {
@@ -834,14 +850,36 @@ func py_rfind(s, sub string) int64        { return py_str_rfind(s, sub) }
 func py_startswith(s, prefix string) bool { return py_str_startswith(s, prefix) }
 func py_endswith(s, suffix string) bool   { return py_str_endswith(s, suffix) }
 
-func py_enumerate[T any](seq []T, start ...int64) [][]any {
+func py_enumerate(seq any, start ...int64) *PyList[[]any] {
 	idx := int64(0)
 	if len(start) > 0 {
 		idx = start[0]
 	}
-	out := make([][]any, 0, len(seq))
-	for _, item := range seq {
-		out = append(out, []any{idx, item})
+	out := NewPyList[[]any]()
+	if listView, ok := seq.(pyListView); ok {
+		out.items = make([][]any, 0, listView.pyListLen())
+		for i := 0; i < listView.pyListLen(); i++ {
+			out.items = append(out.items, []any{idx, listView.pyListItemAny(i)})
+			idx += 1
+		}
+		return out
+	}
+	rv := goreflect.ValueOf(seq)
+	if rv.IsValid() && rv.Kind() == goreflect.Pointer && !rv.IsNil() {
+		elem := rv.Elem()
+		if elem.IsValid() && elem.Kind() == goreflect.Struct {
+			itemsField := elem.FieldByName("items")
+			if itemsField.IsValid() && (itemsField.Kind() == goreflect.Slice || itemsField.Kind() == goreflect.Array) {
+				rv = itemsField
+			}
+		}
+	}
+	if !rv.IsValid() || (rv.Kind() != goreflect.Slice && rv.Kind() != goreflect.Array) {
+		return out
+	}
+	out.items = make([][]any, 0, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		out.items = append(out.items, []any{idx, rv.Index(i).Interface()})
 		idx += 1
 	}
 	return out

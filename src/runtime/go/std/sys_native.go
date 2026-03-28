@@ -5,19 +5,19 @@ import (
 	"os"
 )
 
-var py_argv []string = append([]string{}, os.Args...)
-var py_path []string = []string{}
+var py_argv *PyList[string] = PyListFromSlice(append([]string{}, os.Args...))
+var py_path *PyList[string] = NewPyList[string]()
 
 func py_exit(code int64) {
 	os.Exit(int(code))
 }
 
 func py_set_argv(values []string) {
-	py_argv = append([]string{}, values...)
+	py_argv = PyListFromSlice(append([]string{}, values...))
 }
 
 func py_set_path(values []string) {
-	py_path = append([]string{}, values...)
+	py_path = PyListFromSlice(append([]string{}, values...))
 }
 
 func py_write_stderr(text string) {
