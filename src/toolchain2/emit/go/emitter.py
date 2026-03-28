@@ -5021,7 +5021,7 @@ def emit_go_module(east3_doc: dict[str, JsonVal]) -> str:
                 if not isinstance(class_stmt, dict):
                     continue
                 class_stmt_kind = _str(class_stmt, "kind")
-                if class_stmt_kind == "FunctionDef":
+                if class_stmt_kind in ("FunctionDef", "ClosureDef"):
                     fn_name = _str(class_stmt, "name")
                     decorators = _list(class_stmt, "decorators")
                     is_staticmethod = False
