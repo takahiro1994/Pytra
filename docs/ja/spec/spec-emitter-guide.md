@@ -25,6 +25,7 @@ emitter は EAST3 を忠実にレンダリングする。以下は禁止:
 | **for-range のループ変数の型を変更する** | EAST の型情報が正本 | resolve を修正する |
 | **mapping にない名前変換をハードコードする** | `mapping.json` が正本 | mapping.json に追加する |
 | **型推論を再実装する** | §12.1 参照 | EAST の型推論を修正する |
+| **戻り値型が未確定の FunctionDef を受理する** | 入力コードに型注釈がないのはユーザーのバグ | ソースに戻り値型の注釈を追加させる |
 
 emitter が許可されるのは:
 
@@ -36,6 +37,14 @@ emitter が許可されるのは:
 | 特殊マーカー（`__CAST__` 等）を言語固有の構文に展開する | §5 参照 |
 
 **EAST の情報が不足している場合は、emitter にワークアラウンドを書くのではなく、EAST（resolve/compile/optimize）を修正すること。**
+
+### 1.2 EAST3 の前提条件
+
+emitter に到達する EAST3 は以下を満たしていなければならない。満たさない場合は前段のバグであり、emitter で吸収してはならない。
+
+- 全ての `FunctionDef` / `ClosureDef` の `return_type` が確定していること。`unknown` や空文字は許容しない。**関数の戻り値型はソースの型注釈から取得する。注釈がない場合は resolve が `inference_failure` で停止する。emitter や resolver が Return 文の body を走査して戻り値型を推論してはならない。**
+- 全ての式ノードの `resolved_type` が確定していること（`unknown` はゼロ）。
+- `range()` が生の `Call` として残っていないこと（`ForRange` / `RangeExpr` に変換済み）。
 
 ### runtime_call_adapter_kind
 
