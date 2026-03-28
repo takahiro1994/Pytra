@@ -89,11 +89,11 @@ Pytra は Python のサブセットを変換します。主な制約:
 
 ## 次に読むページ
 
-1. [エラーの見方](./troubleshooting.md) — 詰まったときに
-2. [例外処理](./exception.md) — raise / try / except / finally の使い方
-3. [Trait（インターフェース）](./trait.md) — 複数の振る舞い契約を型に付与する
-4. [Union 型と isinstance ナローイング](./union-and-narrowing.md) — 複数の型を扱う方法と型の自動絞り込み
-5. [Python との違い](./python-differences.md) — 型注釈、import、使えない構文など
+1. [Python との違い](./python-differences.md) — 型注釈、import、使えない構文など
+2. [エラーの見方](./troubleshooting.md) — 詰まったときに
+3. [例外処理](./exception.md) — raise / try / except / finally の使い方
+4. [Trait（インターフェース）](./trait.md) — 複数の振る舞い契約を型に付与する
+5. [Union 型と isinstance ナローイング](./union-and-narrowing.md) — 複数の型を扱う方法と型の自動絞り込み
 
 ここから先は必要に応じて:
 

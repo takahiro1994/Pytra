@@ -37,12 +37,12 @@ To transpile to Rust instead:
 ## Reading Order
 
 1. [How to use](./how-to-use.md) — Execution steps, options, input constraints
-2. [Troubleshooting](./troubleshooting.md) — When you get stuck
-3. [Try the samples](./samples.md) — Try the 18 sample programs
-4. [Exception handling](./exception.md) — raise / try / except / finally
-5. [Traits (interfaces)](./trait.md) — Attaching multiple behavioral contracts to a type
-6. [Union types and isinstance narrowing](./union-and-narrowing.md) — Handling multiple types and automatic type refinement
-7. [Differences from Python](./python-differences.md) — Type annotations, imports, unsupported syntax
+2. [Differences from Python](./python-differences.md) — Type annotations, imports, unsupported syntax
+3. [Troubleshooting](./troubleshooting.md) — When you get stuck
+4. [Try the samples](./samples.md) — Try the 18 sample programs
+5. [Exception handling](./exception.md) — raise / try / except / finally
+6. [Traits (interfaces)](./trait.md) — Attaching multiple behavioral contracts to a type
+7. [Union types and isinstance narrowing](./union-and-narrowing.md) — Handling multiple types and automatic type refinement
 
 That should be enough to use Pytra. The following are for when you need them:
 

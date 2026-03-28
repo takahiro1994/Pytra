@@ -37,12 +37,12 @@ Rust に変換するなら:
 ## 読む順番
 
 1. [使い方](./how-to-use.md) — 実行手順、オプション、入力制約
-2. [エラーの見方](./troubleshooting.md) — 詰まったときに
-3. [サンプルを動かしてみる](./samples.md) — 18 件のサンプルプログラムで試す
-4. [例外処理](./exception.md) — raise / try / except / finally の使い方
-5. [Trait（インターフェース）](./trait.md) — 複数の振る舞い契約を型に付与する
-6. [Union 型と isinstance ナローイング](./union-and-narrowing.md) — 複数の型を扱う方法と型の自動絞り込み
-7. [Python との違い](./python-differences.md) — 型注釈、import、使えない構文など
+2. [Python との違い](./python-differences.md) — 型注釈、import、使えない構文など
+3. [エラーの見方](./troubleshooting.md) — 詰まったときに
+4. [サンプルを動かしてみる](./samples.md) — 18 件のサンプルプログラムで試す
+5. [例外処理](./exception.md) — raise / try / except / finally の使い方
+6. [Trait（インターフェース）](./trait.md) — 複数の振る舞い契約を型に付与する
+7. [Union 型と isinstance ナローイング](./union-and-narrowing.md) — 複数の型を扱う方法と型の自動絞り込み
 
 ここまで読めば普通に使えます。以下は必要に応じて:
 
