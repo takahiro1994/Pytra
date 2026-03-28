@@ -30,6 +30,7 @@
 3. [ ] [ID: P0-RTDEC-S3] `@extern_method` を廃止する（parser からの受理を停止）
 4. [ ] [ID: P0-RTDEC-S4] `@abi` を廃止する + spec-east.md の `meta.runtime_abi_v1` を廃止する
 5. [ ] [ID: P0-RTDEC-S5] チュートリアル・ガイド・emitter guide の `@abi` / `@extern_method` 言及を `@runtime` / `@extern` に更新する
+6. [ ] [ID: P0-RTDEC-S6] fixture の container 系テスト（list/dict/set の append/extend/get/items 等）が `@runtime` 記法で C++/Go の compile + run parity を通ることを確認する
 
 ### P2-SELFHOST: toolchain2 自身の変換テスト
 
