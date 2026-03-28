@@ -27,8 +27,8 @@
 
 ### P0-GO-PATHLIB-FIX: Go emitter の pathlib stdlib 署名崩れを修正する
 
-1. [ ] [ID: P0-GO-PATHLIB-S1] Go emitter が `pathlib.joinpath` / `pathlib.read_text` / `pathlib.write_text` の署名を正しく写像するよう修正する
-2. [ ] [ID: P0-GO-PATHLIB-S2] `pathlib_extended` fixture が Go で compile + run できることを確認する
+1. [x] [ID: P0-GO-PATHLIB-S1] Go emitter が `pathlib.joinpath` / `pathlib.read_text` / `pathlib.write_text` の署名を正しく写像するよう修正する
+2. [x] [ID: P0-GO-PATHLIB-S2] `pathlib_extended` fixture が Go で compile + run できることを確認する
 
 ### P1-INCLUDE-RUNTIME-MIGRATION: include/ の旧デコレータを @runtime / runtime_var に書き換える
 
