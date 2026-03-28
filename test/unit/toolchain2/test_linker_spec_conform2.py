@@ -3831,6 +3831,99 @@ def has_key(env: dict[str, int], name: str) -> bool:
         self.assertIn("return 0", go_code)
         self.assertNotIn("return float64(0)", go_code)
 
+    def test_go_emitter_uses_yields_dynamic_for_dict_get_assertion(self) -> None:
+        doc = _module_doc(
+            "app.main",
+            body=[
+                {
+                    "kind": "FunctionDef",
+                    "name": "run",
+                    "arg_types": {"d": "dict[str,int64]"},
+                    "arg_order": ["d"],
+                    "arg_defaults": {},
+                    "arg_index": {"d": 0},
+                    "return_type": "int64",
+                    "arg_usage": {},
+                    "renamed_symbols": {},
+                    "docstring": None,
+                    "body": [
+                        {
+                            "kind": "Return",
+                            "value": {
+                                "kind": "Call",
+                                "resolved_type": "int64",
+                                "yields_dynamic": True,
+                                "lowered_kind": "BuiltinCall",
+                                "builtin_name": "get",
+                                "runtime_call": "dict.get",
+                                "func": {
+                                    "kind": "Attribute",
+                                    "resolved_type": "callable",
+                                    "value": {"kind": "Name", "id": "d", "resolved_type": "dict[str,int64]"},
+                                    "attr": "get",
+                                },
+                                "args": [
+                                    {"kind": "Constant", "value": "x", "resolved_type": "str"},
+                                    {"kind": "Constant", "value": 0, "resolved_type": "int64"},
+                                ],
+                                "keywords": [],
+                            },
+                        }
+                    ],
+                }
+            ],
+        )
+
+        go_code = emit_go_module(doc)
+
+        self.assertIn("py_to_int64(py_dict_get(", go_code)
+        self.assertNotIn("return func() int64 {", go_code)
+
+    def test_go_emitter_uses_yields_dynamic_for_list_pop_assertion(self) -> None:
+        doc = _module_doc(
+            "app.main",
+            body=[
+                {
+                    "kind": "FunctionDef",
+                    "name": "run",
+                    "arg_types": {"xs": "list[int64]"},
+                    "arg_order": ["xs"],
+                    "arg_defaults": {},
+                    "arg_index": {"xs": 0},
+                    "return_type": "int64",
+                    "arg_usage": {},
+                    "renamed_symbols": {},
+                    "docstring": None,
+                    "body": [
+                        {
+                            "kind": "Return",
+                            "value": {
+                                "kind": "Call",
+                                "resolved_type": "int64",
+                                "yields_dynamic": True,
+                                "lowered_kind": "BuiltinCall",
+                                "builtin_name": "pop",
+                                "runtime_call": "list.pop",
+                                "func": {
+                                    "kind": "Attribute",
+                                    "resolved_type": "callable",
+                                    "value": {"kind": "Name", "id": "xs", "resolved_type": "list[int64]"},
+                                    "attr": "pop",
+                                },
+                                "args": [],
+                                "keywords": [],
+                            },
+                        }
+                    ],
+                }
+            ],
+        )
+
+        go_code = emit_go_module(doc)
+
+        self.assertIn("py_to_int64(py_list_pop(&xs))", go_code)
+        self.assertNotIn("func() int64 {", go_code)
+
     def test_go_emitter_does_not_invent_dict_literal_entry_casts(self) -> None:
         doc = _module_doc(
             "app.main",

@@ -1075,6 +1075,10 @@ def _prefer_value_type_for_none_decl(decl_type: str, value: JsonVal) -> str:
     return "any"
 
 
+def _call_yields_dynamic(node: dict[str, JsonVal]) -> bool:
+    return _bool(node, "yields_dynamic")
+
+
 def _optional_inner_type(resolved_type: str) -> str:
     parts: list[str] = []
     cur: list[str] = []
@@ -1582,8 +1586,15 @@ def _emit_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
             # dict.get → py_dict_get
             if attr == "get" and len(arg_strs) >= 1:
                 owner_rt = _str(func.get("value", {}), "resolved_type") if isinstance(func.get("value"), dict) else ""
+                result_type = _str(node, "resolved_type")
+                yields_dynamic = _call_yields_dynamic(node)
                 if owner_rt.startswith("dict[") or owner_rt.startswith("map[") or owner_rt in ("Node", "dict[str,Any]"):
                     if len(arg_strs) >= 2:
+                        if yields_dynamic:
+                            dynamic_code = "py_dict_get(" + owner + ", " + arg_strs[0] + ", " + arg_strs[1] + ")"
+                            if result_type not in ("", "unknown", "Any", "Obj", "object"):
+                                return _coerce_from_any(dynamic_code, result_type)
+                            return dynamic_code
                         return "py_dict_get(" + owner + ", " + arg_strs[0] + ", " + arg_strs[1] + ")"
                     return owner + "[" + arg_strs[0] + "]"
             return owner + "." + _safe_go_ident(attr) + "(" + ", ".join(call_arg_strs) + ")"
@@ -2027,6 +2038,16 @@ def _emit_builtin_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
             owner_node = func.get("value")
             owner_rt = _str(owner_node, "resolved_type") if isinstance(owner_node, dict) else ""
             result_gt = go_type(_str(node, "resolved_type"))
+            yields_dynamic = _call_yields_dynamic(node)
+            if yields_dynamic:
+                dynamic_code = "py_list_pop(&" + owner
+                if len(arg_strs) >= 1:
+                    dynamic_code += ", " + arg_strs[0]
+                dynamic_code += ")"
+                result_type = _str(node, "resolved_type")
+                if result_type not in ("", "unknown", "Any", "Obj", "object"):
+                    return _coerce_from_any(dynamic_code, result_type)
+                return dynamic_code
             if owner_rt.startswith("list[") and result_gt != "" and result_gt != "any":
                 idx_init = "len(" + owner + ") - 1"
                 idx_setup = "\t__idx := " + idx_init + "\n"
@@ -2060,10 +2081,16 @@ def _emit_builtin_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
             owner_node = func.get("value")
             owner = _emit_expr(ctx, owner_node)
             owner_rt = _str(owner_node, "resolved_type") if isinstance(owner_node, dict) else ""
+            result_type = _str(node, "resolved_type")
+            yields_dynamic = _call_yields_dynamic(node)
             if len(arg_strs) >= 2:
+                if yields_dynamic:
+                    dynamic_code = "py_dict_get(" + owner + ", " + arg_strs[0] + ", " + arg_strs[1] + ")"
+                    if result_type not in ("", "unknown", "Any", "Obj", "object"):
+                        return _coerce_from_any(dynamic_code, result_type)
+                    return dynamic_code
                 if owner_rt.startswith("dict[") and owner_rt.endswith("]"):
                     parts = _split_generic_args(owner_rt[5:-1])
-                    result_type = _str(node, "resolved_type")
                     if len(parts) == 2 and result_type not in ("", "unknown", "Any", "object"):
                         result_gt = go_type(result_type)
                         default_code = arg_strs[1]
@@ -2077,6 +2104,11 @@ def _emit_builtin_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
                         )
                 return "py_dict_get(" + owner + ", " + arg_strs[0] + ", " + arg_strs[1] + ")"
             if len(arg_strs) >= 1:
+                if yields_dynamic:
+                    dynamic_code2 = "py_dict_get(" + owner + ", " + arg_strs[0] + ", nil)"
+                    if result_type not in ("", "unknown", "Any", "Obj", "object"):
+                        return _coerce_from_any(dynamic_code2, result_type)
+                    return dynamic_code2
                 if owner_rt.startswith("dict[") and owner_rt.endswith("]"):
                     parts = _split_generic_args(owner_rt[5:-1])
                     if len(parts) == 2:
