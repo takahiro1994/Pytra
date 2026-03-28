@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fail when transpiler-related changes are missing required minor version bumps."""
+"""Fail when transpiler-related changes are missing required version bumps (patch or above)."""
 
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSIONS_FILE = ROOT / "src" / "toolchain" / "compiler" / "transpiler_versions.json"
+VERSIONS_FILE = ROOT / "src" / "toolchain" / "misc" / "transpiler_versions.json"
 VERSIONS_REL = VERSIONS_FILE.relative_to(ROOT).as_posix()
 
 LANGS = ["cpp", "rs", "cs", "js", "ts", "go", "java", "swift", "kotlin"]
@@ -169,12 +169,14 @@ def _collect_required_components(changed_files: list[str]) -> tuple[bool, set[st
     return touched_shared, touched_langs, touched_paths
 
 
-def _is_minor_or_major_bumped(old_ver: str, new_ver: str) -> bool:
-    old_mj, old_mn, _ = _parse_semver(old_ver)
-    new_mj, new_mn, _ = _parse_semver(new_ver)
+def _is_version_bumped(old_ver: str, new_ver: str) -> bool:
+    old_mj, old_mn, old_pt = _parse_semver(old_ver)
+    new_mj, new_mn, new_pt = _parse_semver(new_ver)
     if new_mj > old_mj:
         return True
     if new_mj == old_mj and new_mn > old_mn:
+        return True
+    if new_mj == old_mj and new_mn == old_mn and new_pt > old_pt:
         return True
     return False
 
@@ -241,18 +243,18 @@ def main() -> int:
     if touched_shared:
         old_shared = str(base_versions["shared"])
         new_shared = str(head_versions["shared"])
-        if _is_minor_or_major_bumped(old_shared, new_shared):
+        if _is_version_bumped(old_shared, new_shared):
             ok_components.append(f"shared {old_shared} -> {new_shared}")
         else:
-            missing.append(f"shared (need minor+ bump): {old_shared} -> {new_shared}")
+            missing.append(f"shared (need version bump): {old_shared} -> {new_shared}")
 
     for lang in sorted(touched_langs):
         old_ver = str(base_versions["languages"][lang])
         new_ver = str(head_versions["languages"][lang])
-        if _is_minor_or_major_bumped(old_ver, new_ver):
+        if _is_version_bumped(old_ver, new_ver):
             ok_components.append(f"{lang} {old_ver} -> {new_ver}")
         else:
-            missing.append(f"{lang} (need minor+ bump): {old_ver} -> {new_ver}")
+            missing.append(f"{lang} (need version bump): {old_ver} -> {new_ver}")
 
     if args.json:
         payload = {
