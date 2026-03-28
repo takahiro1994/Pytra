@@ -23,20 +23,26 @@ def _load_registry():
     )
 
 
-def _run_go(source: str) -> str:
-    run = _run_go_process(source)
+def _run_go(source: str, *, type_info_table: dict[str, object] | None = None) -> str:
+    run = _run_go_process(source, type_info_table=type_info_table)
     if run.returncode != 0:
         raise AssertionError(f"{run.stdout}\n{run.stderr}")
     return run.stdout
 
 
-def _run_go_process(source: str) -> subprocess.CompletedProcess[str]:
+def _run_go_process(
+    source: str,
+    *,
+    type_info_table: dict[str, object] | None = None,
+) -> subprocess.CompletedProcess[str]:
     east2 = parse_python_source(source, "<go-exception-smoke>").to_jv()
     resolve_east1_to_east2(east2, registry=_load_registry())
     east3 = lower_east2_to_east3(east2, target_language="go")
     meta = east3.setdefault("meta", {})
     assert isinstance(meta, dict)
     meta["emit_context"] = {"module_id": "app", "is_entry": True}
+    if type_info_table is not None:
+        meta["linked_program_v1"] = {"type_info_table_v1": type_info_table}
     go_code = emit_go_module(east3)
 
     with tempfile.TemporaryDirectory() as tmp:
@@ -95,6 +101,17 @@ if __name__ == "__main__":
         print("cleanup")
 """
 
+CUSTOM_EXCEPTION_SOURCE = """
+class ParseError(ValueError):
+    pass
+
+if __name__ == "__main__":
+    try:
+        raise ParseError("bad parse")
+    except ParseError as e:
+        print(e)
+"""
+
 
 class GoExceptionSmokeTests(unittest.TestCase):
     def test_go_emits_typed_value_error_catch_and_finally(self) -> None:
@@ -110,6 +127,15 @@ class GoExceptionSmokeTests(unittest.TestCase):
         self.assertNotEqual(run.returncode, 0)
         self.assertEqual(run.stdout, "cleanup\n")
         self.assertIn("boom", run.stderr)
+
+    def test_go_emits_exact_custom_exception_catch(self) -> None:
+        stdout = _run_go(
+            CUSTOM_EXCEPTION_SOURCE,
+            type_info_table={
+                "app.ParseError": {"id": 1000, "entry": 1000, "exit": 1001},
+            },
+        )
+        self.assertEqual(stdout, "bad parse\n")
 
 
 if __name__ == "__main__":

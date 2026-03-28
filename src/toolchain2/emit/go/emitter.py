@@ -72,6 +72,8 @@ class EmitContext:
     module_private_symbols: set[str] = field(default_factory=set)
     # Exception type bounds from linked_program_v1.type_info_table_v1.
     exception_type_bounds: dict[str, tuple[int, int]] = field(default_factory=dict)
+    # Exception type ids from linked_program_v1.type_info_table_v1.
+    exception_type_ids: dict[str, int] = field(default_factory=dict)
 
 
 class _GoStmtCommonRenderer(CommonRenderer):
@@ -285,6 +287,52 @@ def _handler_type_name(handler: dict[str, JsonVal]) -> str:
             return name
         return _str(type_node, "repr")
     return ""
+
+
+def _is_exception_type_name(ctx: EmitContext, type_name: str) -> bool:
+    short_name = _short_type_name(type_name)
+    if short_name in _BUILTIN_EXCEPTION_BOUNDS:
+        return True
+    seen: set[str] = set()
+    cur = short_name
+    while cur != "" and cur not in seen:
+        seen.add(cur)
+        if cur in _BUILTIN_EXCEPTION_BOUNDS:
+            return True
+        base = ctx.class_bases.get(cur, "")
+        if base == "":
+            return False
+        cur = _short_type_name(base)
+    return False
+
+
+def _exception_type_id(ctx: EmitContext, type_name: str) -> int:
+    short_name = _short_type_name(type_name)
+    if short_name in _BUILTIN_EXCEPTION_BOUNDS:
+        return _BUILTIN_EXCEPTION_BOUNDS[short_name][0]
+    exact = ctx.exception_type_ids.get(type_name)
+    if exact is not None:
+        return exact
+    for fqcn, type_id in ctx.exception_type_ids.items():
+        if _short_type_name(fqcn) == short_name:
+            return type_id
+    bounds = _exception_bounds(ctx, type_name)
+    return bounds[0]
+
+
+def _exception_struct_literal(ctx: EmitContext, type_name: str, message_code: str) -> str:
+    type_id = _exception_type_id(ctx, type_name)
+    bounds = _exception_bounds(ctx, type_name)
+    short_name = _short_type_name(type_name)
+    return (
+        "PytraError{"
+        + "TypeId: " + str(type_id)
+        + ", TypeMin: " + str(bounds[0])
+        + ", TypeMax: " + str(bounds[1])
+        + ", Name: " + _go_string_literal(short_name)
+        + ", Msg: " + message_code
+        + "}"
+    )
 
 
 def _go_enum_const_name(ctx: EmitContext, type_name: str, member_name: str) -> str:
@@ -3352,6 +3400,8 @@ def _emit_class_def(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
     saved_class = ctx.current_class
     saved_receiver = ctx.current_receiver
 
+    is_exception_class = _is_exception_type_name(ctx, name)
+
     if _is_polymorphic_class(ctx, name):
         _emit(ctx, "type " + _go_polymorphic_iface_name(ctx, name) + " interface {")
         ctx.indent_level += 1
@@ -3367,7 +3417,9 @@ def _emit_class_def(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
     # Struct definition
     _emit(ctx, "type " + gn + " struct {")
     ctx.indent_level += 1
-    if base != "" and base not in ("object", "Exception", "BaseException"):
+    if is_exception_class:
+        _emit(ctx, "PytraError")
+    elif base != "" and base not in ("object", "Exception", "BaseException"):
         _emit(ctx, _go_symbol_name(ctx, base))  # embed base
     for fname, ftype in fields:
         _emit(ctx, _safe_go_ident(fname) + " " + _go_type_with_ctx(ctx, ftype))
@@ -3375,6 +3427,8 @@ def _emit_class_def(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
     _emit(ctx, "}")
     _emit_blank(ctx)
     _emit(ctx, "func (_ " + gn + ") " + _go_class_marker_method_name(ctx, name) + "() {}")
+    if is_exception_class:
+        _emit(ctx, "func (e *" + gn + ") pytraErrorBase() *PytraError { return &e.PytraError }")
     _emit_blank(ctx)
     for var_name, spec in class_vars.items():
         var_type = _str(spec, "type")
@@ -3422,12 +3476,24 @@ def _emit_class_def(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
     if first_default_index < len(ctor_params):
         ctor_sig_parts.append("__opt_args ...any")
 
+    if is_exception_class and len(ctor_params) == 0 and not has_init:
+        ctor_sig_parts = ["__opt_args ...any"]
     _emit(ctx, "func New" + gn + "(" + ", ".join(ctor_sig_parts) + ") *" + gn + " {")
     ctx.indent_level += 1
 
-    if has_init and not is_dataclass:
+    if is_exception_class and len(ctor_params) == 0 and not has_init:
+        _emit(ctx, "msg := " + _go_string_literal(name))
+        _emit(ctx, "if len(__opt_args) > 0 {")
+        ctx.indent_level += 1
+        _emit(ctx, "msg = py_str(__opt_args[0])")
+        ctx.indent_level -= 1
+        _emit(ctx, "}")
+        _emit(ctx, "return &" + gn + "{PytraError: " + _exception_struct_literal(ctx, name, "msg") + "}")
+    elif has_init and not is_dataclass:
         # Emit __init__ body translated to Go (self.x = ... → obj.x = ...)
         _emit(ctx, "obj := &" + gn + "{}")
+        if is_exception_class:
+            _emit(ctx, "obj.PytraError = " + _exception_struct_literal(ctx, name, _go_string_literal(name)))
         saved_receiver = ctx.current_receiver
         saved_ctor_target = ctx.constructor_return_target
         saved_vars = dict(ctx.var_types)
@@ -3458,7 +3524,16 @@ def _emit_class_def(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
                 _emit(ctx, local_name + " = " + _coerce_from_any("__opt_args[" + str(opt_index) + "]", ftype))
                 ctx.indent_level -= 1
                 _emit(ctx, "}")
-        field_inits = ", ".join(_safe_go_ident(f) + ": " + _safe_go_ident(f) for f, _ in ctor_params)
+        field_init_parts: list[str] = []
+        if is_exception_class:
+            msg_expr = _go_string_literal(name)
+            if len(ctor_params) > 0:
+                first_param_name, _ = ctor_params[0]
+                msg_expr = "py_str(" + _safe_go_ident(first_param_name) + ")"
+            field_init_parts.append("PytraError: " + _exception_struct_literal(ctx, name, msg_expr))
+        for f, _ in ctor_params:
+            field_init_parts.append(_safe_go_ident(f) + ": " + _safe_go_ident(f))
+        field_inits = ", ".join(field_init_parts)
         _emit(ctx, "return &" + gn + "{" + field_inits + "}")
 
     ctx.indent_level -= 1
@@ -3925,8 +4000,11 @@ def emit_go_module(east3_doc: dict[str, JsonVal]) -> str:
         for fqcn, info in type_info_table.items():
             if not isinstance(fqcn, str) or not isinstance(info, dict):
                 continue
+            type_id_val = info.get("id")
             entry_val = info.get("entry")
             exit_val = info.get("exit")
+            if isinstance(type_id_val, int):
+                ctx.exception_type_ids[fqcn] = type_id_val
             if isinstance(entry_val, int) and isinstance(exit_val, int):
                 ctx.exception_type_bounds[fqcn] = (entry_val, exit_val - 1)
 

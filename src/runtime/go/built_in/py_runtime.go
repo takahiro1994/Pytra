@@ -215,6 +215,8 @@ func pytraEnsureRecoveredError(value any) *PytraError {
 	switch t := value.(type) {
 	case *PytraError:
 		return t
+	case interface{ pytraErrorBase() *PytraError }:
+		return t.pytraErrorBase()
 	case error:
 		return pytraNewRuntimeError(t.Error())
 	case string:
