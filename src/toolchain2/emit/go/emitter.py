@@ -633,6 +633,10 @@ def _is_nominal_type_name(ctx: EmitContext, type_name: str) -> bool:
     )
 
 
+def _is_builtin_exception_type_name(type_name: str) -> bool:
+    return _short_type_name(type_name) in _BUILTIN_EXCEPTION_BOUNDS
+
+
 def _exception_ctor_expr(type_name: str, message_code: str) -> str:
     short_name = _short_type_name(type_name)
     if short_name in (
@@ -752,6 +756,29 @@ def _is_exception_super_init_stmt(stmt: JsonVal) -> bool:
         return False
     super_func = owner.get("func")
     return isinstance(super_func, dict) and _str(super_func, "kind") == "Name" and _str(super_func, "id") == "super"
+
+
+def _exception_super_init_message_expr(
+    ctx: EmitContext,
+    body: list[JsonVal],
+    fallback_expr: str,
+) -> str:
+    for stmt in body:
+        if not _is_exception_super_init_stmt(stmt):
+            continue
+        if not isinstance(stmt, dict):
+            continue
+        value = stmt.get("value")
+        if not isinstance(value, dict):
+            continue
+        args = _list(value, "args")
+        if len(args) >= 1 and isinstance(args[0], dict):
+            if _str(args[0], "kind") == "Name":
+                arg_name = _str(args[0], "id")
+                if arg_name != "":
+                    return _safe_go_ident(arg_name)
+            return _emit_expr(ctx, args[0])
+    return fallback_expr
 
 
 def _is_exception_subtype_name(ctx: EmitContext, actual_type_name: str, expected_type_name: str) -> bool:
@@ -4397,7 +4424,9 @@ def _emit_class_def(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
         ctx.indent_level -= 1
         _emit(ctx, "}")
         embed_field = _exception_embed_field(ctx, name, base)
-        _emit(ctx, "return &" + gn + "{" + embed_field + ": " + _exception_embed_init_expr(ctx, name, base, "msg") + "}")
+        _emit(ctx, "obj := &" + gn + "{" + embed_field + ": " + _exception_embed_init_expr(ctx, name, base, "msg") + "}")
+        _emit(ctx, "obj." + embed_field + ".Value = obj")
+        _emit(ctx, "return obj")
     elif has_init and not is_dataclass:
         # Emit __init__ body translated to Go (self.x = ... → obj.x = ...)
         _emit(ctx, "obj := &" + gn + "{}")
@@ -4406,6 +4435,7 @@ def _emit_class_def(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
             if len(ctor_params) > 0:
                 first_param_name, _ = ctor_params[0]
                 msg_expr = "py_str(" + _safe_go_ident(first_param_name) + ")"
+            msg_expr = _exception_super_init_message_expr(ctx, init_body_stmts, msg_expr)
             embed_field = _exception_embed_field(ctx, name, base)
             _emit(ctx, "obj." + embed_field + " = " + _exception_embed_init_expr(ctx, name, base, msg_expr))
         saved_receiver = ctx.current_receiver
@@ -4420,6 +4450,9 @@ def _emit_class_def(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
             if is_exception_class and _is_exception_super_init_stmt(init_s):
                 continue
             _emit_stmt(ctx, init_s)
+        if is_exception_class:
+            embed_field = _exception_embed_field(ctx, name, base)
+            _emit(ctx, "obj." + embed_field + ".Value = obj")
         ctx.current_receiver = saved_receiver
         ctx.constructor_return_target = saved_ctor_target
         ctx.var_types = saved_vars
@@ -4446,12 +4479,17 @@ def _emit_class_def(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
             if len(ctor_params) > 0:
                 first_param_name, _ = ctor_params[0]
                 msg_expr = "py_str(" + _safe_go_ident(first_param_name) + ")"
+            msg_expr = _exception_super_init_message_expr(ctx, init_body_stmts, msg_expr)
             embed_field = _exception_embed_field(ctx, name, base)
             field_init_parts.append(embed_field + ": " + _exception_embed_init_expr(ctx, name, base, msg_expr))
         for f, _ in ctor_params:
             field_init_parts.append(_safe_go_ident(f) + ": " + _safe_go_ident(f))
         field_inits = ", ".join(field_init_parts)
-        _emit(ctx, "return &" + gn + "{" + field_inits + "}")
+        _emit(ctx, "obj := &" + gn + "{" + field_inits + "}")
+        if is_exception_class:
+            embed_field = _exception_embed_field(ctx, name, base)
+            _emit(ctx, "obj." + embed_field + ".Value = obj")
+        _emit(ctx, "return obj")
 
     ctx.indent_level -= 1
     _emit(ctx, "}")
@@ -4880,20 +4918,35 @@ def _emit_error_handlers(
     defer_context: bool = False,
 ) -> None:
     first = True
+    emitted_any = False
     for handler in handlers:
         if not isinstance(handler, dict):
             continue
         cond = _exception_match_condition(ctx, err_name, _handler_type_name(handler))
-        _emit(ctx, ("if " if first else "else if ") + cond + " {")
+        if first:
+            _emit(ctx, "if " + cond + " {")
+        else:
+            _emit(ctx, "} else if " + cond + " {")
         first = False
+        emitted_any = True
         ctx.indent_level += 1
         handler_name = _str(handler, "name")
         saved_type = ""
         if handler_name != "":
             safe_name = _safe_go_ident(handler_name)
             saved_type = ctx.var_types.get(safe_name, "")
-            _emit(ctx, safe_name + " := " + err_name)
-            ctx.var_types[safe_name] = "*PytraErrorCarrier"
+            handler_type_name = _handler_type_name(handler)
+            bound_type = "*PytraErrorCarrier"
+            if (
+                handler_type_name != ""
+                and _is_nominal_type_name(ctx, handler_type_name)
+                and not _is_builtin_exception_type_name(handler_type_name)
+            ):
+                bound_type = _go_signature_type(ctx, handler_type_name)
+                _emit(ctx, safe_name + " := " + err_name + ".Value.(" + bound_type + ")")
+            else:
+                _emit(ctx, safe_name + " := " + err_name)
+            ctx.var_types[safe_name] = bound_type
             _emit(ctx, "_ = " + safe_name)
         handler_body = _list(handler, "body")
         saved_exc_var = ctx.current_exception_var
@@ -4916,7 +4969,15 @@ def _emit_error_handlers(
         else:
             _emit_body(ctx, handler_body)
             ctx.current_exception_var = saved_exc_var
-            _emit(ctx, "return")
+            if result_sink != "":
+                if defer_context:
+                    _emit(ctx, "return")
+                else:
+                    _emit(ctx, "return " + result_sink)
+            elif ctx.current_return_type == "Exception":
+                _emit(ctx, "return nil")
+            else:
+                _emit(ctx, "return")
         if handler_name != "":
             safe_name2 = _safe_go_ident(handler_name)
             if saved_type != "":
@@ -4924,6 +4985,7 @@ def _emit_error_handlers(
             elif safe_name2 in ctx.var_types:
                 del ctx.var_types[safe_name2]
         ctx.indent_level -= 1
+    if emitted_any:
         _emit(ctx, "}")
     _emit(ctx, "panic(" + err_name + ")")
 

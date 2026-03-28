@@ -198,6 +198,7 @@ type PytraErrorCarrier struct {
 	Name    string
 	Msg     string
 	Cause   *PytraErrorCarrier
+	Value   any
 }
 
 func (e *PytraErrorCarrier) Error() string {
