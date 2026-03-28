@@ -321,15 +321,15 @@ def _go_ref_container_type(ctx: EmitContext, resolved_type: str) -> str:
         return "*PySet[any]"
     if resolved_type.startswith("list[") and resolved_type.endswith("]"):
         inner = resolved_type[5:-1]
-        return "*PyList[" + _go_type_with_ctx(ctx, inner) + "]"
+        return "*PyList[" + _go_signature_type(ctx, inner) + "]"
     if resolved_type.startswith("dict[") and resolved_type.endswith("]"):
         inner = resolved_type[5:-1]
         parts = _split_generic_args(inner)
         if len(parts) == 2:
-            return "*PyDict[" + _go_type_with_ctx(ctx, parts[0]) + ", " + _go_type_with_ctx(ctx, parts[1]) + "]"
+            return "*PyDict[" + _go_type_with_ctx(ctx, parts[0]) + ", " + _go_signature_type(ctx, parts[1]) + "]"
     if resolved_type.startswith("set[") and resolved_type.endswith("]"):
         inner = resolved_type[4:-1]
-        return "*PySet[" + _go_type_with_ctx(ctx, inner) + "]"
+        return "*PySet[" + _go_signature_type(ctx, inner) + "]"
     return go_type(resolved_type)
 
 
@@ -357,7 +357,7 @@ def _go_ref_container_ctor(ctx: EmitContext, resolved_type: str, literal_suffix:
         return "PyListFromSlice[any]([]any{})"
     if resolved_type.startswith("list[") and resolved_type.endswith("]"):
         inner = resolved_type[5:-1]
-        elem_gt = _go_type_with_ctx(ctx, inner)
+        elem_gt = _go_signature_type(ctx, inner)
         if literal_suffix == "[]":
             return "NewPyList[" + elem_gt + "]()"
         return "PyListFromSlice[" + elem_gt + "]([]" + elem_gt + literal_suffix + ")"
@@ -370,7 +370,7 @@ def _go_ref_container_ctor(ctx: EmitContext, resolved_type: str, literal_suffix:
         parts = _split_generic_args(inner2)
         if len(parts) == 2:
             key_gt = _go_type_with_ctx(ctx, parts[0])
-            val_gt = _go_type_with_ctx(ctx, parts[1])
+            val_gt = _go_signature_type(ctx, parts[1])
             if literal_suffix == "{}":
                 return "NewPyDict[" + key_gt + ", " + val_gt + "]()"
             return "PyDictFromMap[" + key_gt + ", " + val_gt + "](map[" + key_gt + "]" + val_gt + literal_suffix + ")"
@@ -380,7 +380,7 @@ def _go_ref_container_ctor(ctx: EmitContext, resolved_type: str, literal_suffix:
         return "PySetFromMap[any](map[any]struct{}{})"
     if resolved_type.startswith("set[") and resolved_type.endswith("]"):
         inner3 = resolved_type[4:-1]
-        elem_gt2 = _go_type_with_ctx(ctx, inner3)
+        elem_gt2 = _go_signature_type(ctx, inner3)
         if literal_suffix == "{}":
             return "NewPySet[" + elem_gt2 + "]()"
         return "PySetFromMap[" + elem_gt2 + "](map[" + elem_gt2 + "]struct{}" + literal_suffix + ")"
@@ -400,7 +400,7 @@ def _wrap_ref_container_value_code(ctx: EmitContext, value_code: str, resolved_t
         return "PyListFromSlice[any](" + value_code + ")"
     if resolved_type.startswith("list[") and resolved_type.endswith("]"):
         inner = resolved_type[5:-1]
-        elem_gt = _go_type_with_ctx(ctx, inner)
+        elem_gt = _go_signature_type(ctx, inner)
         if value_code == "[]" + elem_gt + "{}":
             return "NewPyList[" + elem_gt + "]()"
         return "PyListFromSlice[" + elem_gt + "](" + value_code + ")"
@@ -413,7 +413,7 @@ def _wrap_ref_container_value_code(ctx: EmitContext, value_code: str, resolved_t
         parts = _split_generic_args(inner2)
         if len(parts) == 2:
             key_gt = _go_type_with_ctx(ctx, parts[0])
-            val_gt = _go_type_with_ctx(ctx, parts[1])
+            val_gt = _go_signature_type(ctx, parts[1])
             if value_code == "map[" + key_gt + "]" + val_gt + "{}":
                 return "NewPyDict[" + key_gt + ", " + val_gt + "]()"
             return "PyDictFromMap[" + key_gt + ", " + val_gt + "](" + value_code + ")"
@@ -423,7 +423,7 @@ def _wrap_ref_container_value_code(ctx: EmitContext, value_code: str, resolved_t
         return "PySetFromMap[any](" + value_code + ")"
     if resolved_type.startswith("set[") and resolved_type.endswith("]"):
         inner3 = resolved_type[4:-1]
-        elem_gt2 = _go_type_with_ctx(ctx, inner3)
+        elem_gt2 = _go_signature_type(ctx, inner3)
         if value_code == "map[" + elem_gt2 + "]struct{}{}":
             return "NewPySet[" + elem_gt2 + "]()"
         return "PySetFromMap[" + elem_gt2 + "](" + value_code + ")"
@@ -470,6 +470,13 @@ def _wrapper_container_storage_expr(ctx: EmitContext, node: JsonVal, rendered: s
         if node_rt.startswith("set[") or node_rt == "set":
             return rendered + ".items"
     if _str(node, "kind") == "Attribute":
+        if node_rt.startswith("list[") or node_rt == "list":
+            return rendered + ".items"
+        if node_rt.startswith("dict[") or node_rt == "dict":
+            return rendered + ".items"
+        if node_rt.startswith("set[") or node_rt == "set":
+            return rendered + ".items"
+    if _str(node, "kind") == "Subscript":
         if node_rt.startswith("list[") or node_rt == "list":
             return rendered + ".items"
         if node_rt.startswith("dict[") or node_rt == "dict":
@@ -1106,13 +1113,15 @@ def _emit_name(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
 
 
 def _emit_binop(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
-    left_code = _emit_expr(ctx, node.get("left"))
-    right_code = _emit_expr(ctx, node.get("right"))
+    left_node = node.get("left")
+    right_node = node.get("right")
+    left_code = _emit_expr(ctx, left_node)
+    right_code = _emit_expr(ctx, right_node)
     op = _str(node, "op")
     go_op = _BINOP_MAP.get(op, "+")
     rt = _str(node, "resolved_type")
-    left_rt = _str(node.get("left") if isinstance(node.get("left"), dict) else {}, "resolved_type")
-    right_rt = _str(node.get("right") if isinstance(node.get("right"), dict) else {}, "resolved_type")
+    left_rt = _str(left_node if isinstance(left_node, dict) else {}, "resolved_type")
+    right_rt = _str(right_node if isinstance(right_node, dict) else {}, "resolved_type")
 
     if op == "Div" and left_rt == "Path" and right_rt == "str":
         return left_code + ".joinpath(" + right_code + ")"
@@ -1145,6 +1154,8 @@ def _emit_binop(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
 
     if op == "Add":
         if left_rt.startswith("list[") and right_rt.startswith("list["):
+            left_code = _wrapper_container_storage_expr(ctx, left_node, left_code)
+            right_code = _wrapper_container_storage_expr(ctx, right_node, right_code)
             return "py_concat_slice(" + left_code + ", " + right_code + ")"
 
     # Integer division
@@ -1784,7 +1795,8 @@ def _emit_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
             if attr == "update" and owner_rt == "set[str]" and len(arg_strs) >= 1:
                 return "py_set_update_str(" + owner + ", " + arg_strs[0] + ")"
             if attr == "index" and owner_rt.startswith("list[") and len(arg_strs) >= 1:
-                return "py_list_index(" + owner + ", " + arg_strs[0] + ")"
+                owner_storage = _wrapper_container_storage_expr(ctx, owner_node, owner)
+                return "py_list_index(" + owner_storage + ", " + arg_strs[0] + ")"
             # str methods → runtime helper functions
             if attr in _STR_METHOD_HELPERS and owner_rt == "str":
                 helper_args = [owner] + call_arg_strs
@@ -2472,6 +2484,7 @@ def _emit_builtin_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
         owner_rt = _str(owner_node, "resolved_type") if isinstance(owner_node, dict) else ""
         if owner_rt.startswith("list[") and len(arg_strs) >= 1:
             owner_code = _emit_expr(ctx, owner_node)
+            owner_code = _wrapper_container_storage_expr(ctx, owner_node, owner_code)
             return "py_list_index(" + owner_code + ", " + arg_strs[0] + ")"
         if owner_rt == "str" and len(arg_strs) >= 1:
             owner_code = _emit_expr(ctx, owner_node)
@@ -2676,6 +2689,8 @@ def _emit_list_literal(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
     elements = _list(node, "elements")
     rt = _str(node, "resolved_type")
     gt = go_type(rt)
+    if rt.startswith("list[") and rt.endswith("]"):
+        gt = "[]" + _go_signature_type(ctx, rt[5:-1])
     parts = [_emit_expr(ctx, e) for e in elements]
     literal = gt + "{" + ", ".join(parts) + "}"
     return literal

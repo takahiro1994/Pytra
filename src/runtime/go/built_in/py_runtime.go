@@ -27,6 +27,13 @@ func PyListFromSlice[T any](items []T) *PyList[T] {
 	return &PyList[T]{items: out}
 }
 
+func (p *PyList[T]) __str__() string {
+	if p == nil {
+		return "[]"
+	}
+	return py_format_sequence(p.items)
+}
+
 type PyDict[K comparable, V any] struct {
 	items map[K]V
 }
@@ -801,6 +808,15 @@ func py_str_index(s, sub string) int64 {
 }
 func py_list_index(seq any, needle any) int64 {
 	rv := goreflect.ValueOf(seq)
+	if rv.IsValid() && rv.Kind() == goreflect.Pointer && !rv.IsNil() {
+		elem := rv.Elem()
+		if elem.IsValid() && elem.Kind() == goreflect.Struct {
+			itemsField := elem.FieldByName("items")
+			if itemsField.IsValid() && (itemsField.Kind() == goreflect.Slice || itemsField.Kind() == goreflect.Array) {
+				rv = itemsField
+			}
+		}
+	}
 	if !rv.IsValid() || (rv.Kind() != goreflect.Slice && rv.Kind() != goreflect.Array) {
 		panic("value is not a list")
 	}
