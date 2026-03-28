@@ -1,7 +1,7 @@
 # P0-EXCEPTION-CPP: C++ backend の例外処理実装（CommonRenderer 連携）
 
 最終更新: 2026-03-28
-ステータス: 未着手
+ステータス: 完了
 
 ## 背景
 
@@ -38,3 +38,6 @@ C++ はネイティブ例外（throw/try-catch）を持つため、`exception_st
 ## 決定ログ
 
 - 2026-03-28: C++ は native_throw で実装。CommonRenderer の共通骨格を先に作り、C++ emitter は override のみとする方針。finally は RAII スコープガードで対応。
+- 2026-03-28: `src/pytra/built_in/error.py` を pure Python 正本として runtime EAST に流し、C++ でも `std::exception` を使わず Python 例外クラスをそのまま `throw/catch` する形に統一。
+- 2026-03-28: `error.h` の runtime header 生成を EAST3 の `base` に追従させ、`except ValueError` が user-defined 派生例外を自然に catch する C++ 継承を維持。
+- 2026-03-28: parity fixture `exception_user_defined_multi_handler.py` を追加。`try_raise` / `finally` / `exception_propagation_two_frames` / `exception_user_defined_multi_handler` の C++ build+run を確認。

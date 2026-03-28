@@ -152,6 +152,54 @@ class CommonRenderer(ABC):
     def emit_assign_stmt(self, node: dict[str, JsonVal]) -> None:
         self._emit_stmt_line(self.render_assign_stmt(node))
 
+    def render_raise_value(self, node: dict[str, JsonVal]) -> str:
+        raise RuntimeError("common renderer requires raise override for " + self.language)
+
+    def render_except_open(self, handler: dict[str, JsonVal]) -> str:
+        raise RuntimeError("common renderer requires except override for " + self.language)
+
+    def emit_try_setup(self, node: dict[str, JsonVal]) -> None:
+        return None
+
+    def emit_try_teardown(self, node: dict[str, JsonVal]) -> None:
+        return None
+
+    def emit_try_handler_body(self, handler: dict[str, JsonVal]) -> None:
+        self.emit_body(self._list(handler, "body"))
+
+    def emit_raise_stmt(self, node: dict[str, JsonVal]) -> None:
+        value = self.render_raise_value(node)
+        keyword = self._syntax_text("raise", "throw")
+        if value != "":
+            self._emit_stmt_line(keyword + " " + value)
+        else:
+            self._emit_stmt_line(keyword)
+
+    def emit_try_stmt(self, node: dict[str, JsonVal]) -> None:
+        if len(self._list(node, "orelse")) > 0:
+            raise RuntimeError("try/except/else is not supported in common renderer")
+        body = self._list(node, "body")
+        handlers = self._list(node, "handlers")
+        self.emit_try_setup(node)
+        if len(handlers) == 0:
+            self.emit_body(body)
+            self.emit_try_teardown(node)
+            return
+        self._emit(self._syntax_text("try", "try {"))
+        self.state.indent_level += 1
+        self.emit_body(body)
+        self.state.indent_level -= 1
+        self._emit(self._syntax_text("block_close", "}"))
+        for raw_handler in handlers:
+            if not isinstance(raw_handler, dict):
+                continue
+            self._emit(self.render_except_open(raw_handler))
+            self.state.indent_level += 1
+            self.emit_try_handler_body(raw_handler)
+            self.state.indent_level -= 1
+            self._emit(self._syntax_text("block_close", "}"))
+        self.emit_try_teardown(node)
+
     def emit_pass_stmt(self, node: dict[str, JsonVal]) -> None:
         self._emit("// pass")
 
@@ -264,6 +312,12 @@ class CommonRenderer(ABC):
             return
         if kind == "Pass":
             self.emit_pass_stmt(node)
+            return
+        if kind == "Raise":
+            self.emit_raise_stmt(node)
+            return
+        if kind == "Try":
+            self.emit_try_stmt(node)
             return
         if kind == "comment":
             self.emit_comment_stmt(node)

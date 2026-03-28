@@ -2316,6 +2316,204 @@ def has_key(env: dict[str, int], name: str) -> bool:
         self.assertIn("return obj.size();", cpp_code)
         self.assertNotIn("return obj.size;", cpp_code)
 
+    def test_cpp_emitter_lowers_raise_to_typed_throw(self) -> None:
+        doc = _module_doc(
+            "app.main",
+            body=[
+                {
+                    "kind": "FunctionDef",
+                    "name": "fail",
+                    "arg_types": {},
+                    "arg_order": [],
+                    "arg_defaults": {},
+                    "arg_index": {},
+                    "return_type": "None",
+                    "arg_usage": {},
+                    "renamed_symbols": {},
+                    "docstring": None,
+                    "body": [
+                        {
+                            "kind": "Raise",
+                            "exc": {
+                                "kind": "Call",
+                                "resolved_type": "Exception",
+                                "builtin_name": "Exception",
+                                "func": {"kind": "Name", "id": "Exception", "resolved_type": "callable"},
+                                "args": [{"kind": "Constant", "value": "boom", "resolved_type": "str"}],
+                                "keywords": [],
+                            },
+                            "cause": None,
+                        }
+                    ],
+                }
+            ],
+        )
+
+        cpp_code = emit_cpp_module(doc)
+
+        self.assertIn('throw Exception(str("boom"));', cpp_code)
+
+    def test_cpp_emitter_lowers_try_handlers_and_finally_via_common_renderer(self) -> None:
+        doc = _module_doc(
+            "app.main",
+            body=[
+                {
+                    "kind": "FunctionDef",
+                    "name": "handle",
+                    "arg_types": {"flag": "bool"},
+                    "arg_order": ["flag"],
+                    "arg_defaults": {},
+                    "arg_index": {"flag": 0},
+                    "return_type": "int64",
+                    "arg_usage": {"flag": "readonly"},
+                    "renamed_symbols": {},
+                    "docstring": None,
+                    "body": [
+                        {
+                            "kind": "Try",
+                            "body": [
+                                {
+                                    "kind": "If",
+                                    "test": {"kind": "Name", "id": "flag", "resolved_type": "bool"},
+                                    "body": [
+                                        {
+                                            "kind": "Raise",
+                                            "exc": {
+                                                "kind": "Call",
+                                                "resolved_type": "ValueError",
+                                                "builtin_name": "ValueError",
+                                                "func": {"kind": "Name", "id": "ValueError", "resolved_type": "callable"},
+                                                "args": [{"kind": "Constant", "value": "bad", "resolved_type": "str"}],
+                                                "keywords": [],
+                                            },
+                                            "cause": None,
+                                        }
+                                    ],
+                                    "orelse": [
+                                        {"kind": "Return", "value": {"kind": "Constant", "value": 1, "resolved_type": "int64"}}
+                                    ],
+                                }
+                            ],
+                            "handlers": [
+                                {
+                                    "kind": "ExceptHandler",
+                                    "type": {"kind": "Name", "id": "ValueError"},
+                                    "name": "err",
+                                    "body": [{"kind": "Return", "value": {"kind": "Constant", "value": 2, "resolved_type": "int64"}}],
+                                },
+                                {
+                                    "kind": "ExceptHandler",
+                                    "type": {"kind": "Name", "id": "Exception"},
+                                    "name": None,
+                                    "body": [{"kind": "Return", "value": {"kind": "Constant", "value": 3, "resolved_type": "int64"}}],
+                                },
+                            ],
+                            "finalbody": [
+                                {
+                                    "kind": "Expr",
+                                    "value": {
+                                        "kind": "Call",
+                                        "func": {"kind": "Name", "id": "cleanup"},
+                                        "args": [],
+                                        "keywords": [],
+                                    },
+                                }
+                            ],
+                            "orelse": [],
+                        }
+                    ],
+                }
+            ],
+        )
+
+        cpp_code = emit_cpp_module(doc)
+
+        self.assertIn("auto __finally", cpp_code)
+        self.assertIn("try {", cpp_code)
+        self.assertIn("catch (const ValueError& err) {", cpp_code)
+        self.assertIn("catch (const Exception&) {", cpp_code)
+        self.assertIn("cleanup();", cpp_code)
+
+    def test_cpp_emitter_preserves_exception_class_inheritance_and_super_init(self) -> None:
+        doc = _module_doc(
+            "pytra.built_in.error",
+            body=[
+                {
+                    "kind": "ClassDef",
+                    "name": "Exception",
+                    "base": "BaseException",
+                    "body": [
+                        {
+                            "kind": "ClosureDef",
+                            "name": "__init__",
+                            "arg_types": {"self": "Exception", "msg": "str"},
+                            "arg_order": ["self", "msg"],
+                            "arg_defaults": {},
+                            "arg_index": {"self": 0, "msg": 1},
+                            "return_type": "None",
+                            "arg_usage": {"self": "readonly", "msg": "readonly"},
+                            "renamed_symbols": {},
+                            "body": [
+                                {
+                                    "kind": "Expr",
+                                    "value": {
+                                        "kind": "Call",
+                                        "func": {
+                                            "kind": "Attribute",
+                                            "value": {"kind": "Call", "func": {"kind": "Name", "id": "super"}, "args": [], "keywords": []},
+                                            "attr": "__init__",
+                                        },
+                                        "args": [{"kind": "Name", "id": "msg", "resolved_type": "str"}],
+                                        "keywords": [],
+                                    },
+                                }
+                            ],
+                        }
+                    ],
+                },
+                {
+                    "kind": "ClassDef",
+                    "name": "ValueError",
+                    "base": "Exception",
+                    "body": [
+                        {
+                            "kind": "ClosureDef",
+                            "name": "__init__",
+                            "arg_types": {"self": "ValueError", "msg": "str"},
+                            "arg_order": ["self", "msg"],
+                            "arg_defaults": {},
+                            "arg_index": {"self": 0, "msg": 1},
+                            "return_type": "None",
+                            "arg_usage": {"self": "readonly", "msg": "readonly"},
+                            "renamed_symbols": {},
+                            "body": [
+                                {
+                                    "kind": "Expr",
+                                    "value": {
+                                        "kind": "Call",
+                                        "func": {
+                                            "kind": "Attribute",
+                                            "value": {"kind": "Call", "func": {"kind": "Name", "id": "super"}, "args": [], "keywords": []},
+                                            "attr": "__init__",
+                                        },
+                                        "args": [{"kind": "Name", "id": "msg", "resolved_type": "str"}],
+                                        "keywords": [],
+                                    },
+                                }
+                            ],
+                        }
+                    ],
+                },
+            ],
+        )
+
+        cpp_code = emit_cpp_module(doc)
+
+        self.assertIn("class Exception : public BaseException {", cpp_code)
+        self.assertIn("class ValueError : public Exception {", cpp_code)
+        self.assertIn("Exception::Exception(const str& msg) : BaseException(msg) {", cpp_code)
+        self.assertIn("ValueError::ValueError(const str& msg) : Exception(msg) {", cpp_code)
+
     def test_cpp_emitter_uses_value_select_boolops_for_strings(self) -> None:
         doc = _module_doc(
             "app.main",
@@ -3946,6 +4144,23 @@ def has_key(env: dict[str, int], name: str) -> bool:
         self.assertIn("struct JsonObj;", header_text)
         self.assertIn("struct JsonValue;", header_text)
         self.assertLess(header_text.index("struct JsonValue;"), header_text.index("struct JsonObj {"))
+
+    def test_cpp_header_gen_preserves_exception_class_inheritance(self) -> None:
+        doc = _module_doc(
+            "pytra.built_in.error",
+            body=[
+                {"kind": "ClassDef", "name": "PytraError", "field_types": {"msg": "str"}, "body": []},
+                {"kind": "ClassDef", "name": "BaseException", "base": "PytraError", "field_types": {}, "body": []},
+                {"kind": "ClassDef", "name": "Exception", "base": "BaseException", "field_types": {}, "body": []},
+                {"kind": "ClassDef", "name": "ValueError", "base": "Exception", "field_types": {}, "body": []},
+            ],
+        )
+
+        header_text = build_cpp_header_from_east3("pytra.built_in.error", doc, rel_header_path="built_in/error.h")
+
+        self.assertIn("struct BaseException : public PytraError {", header_text)
+        self.assertIn("struct Exception : public BaseException {", header_text)
+        self.assertIn("struct ValueError : public Exception {", header_text)
 
     def test_cpp_emitter_uses_py_str_slice_for_string_index(self) -> None:
         doc = _module_doc(

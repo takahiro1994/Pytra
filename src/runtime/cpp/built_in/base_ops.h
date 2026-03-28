@@ -97,10 +97,6 @@ static inline ::std::string py_to_string(const object& v) {
     return "<object>";
 }
 
-static inline ::std::string py_to_string(const ::std::exception& v) {
-    return ::std::string(v.what());
-}
-
 static inline ::std::string py_to_string(uint8 v) {
     return ::std::to_string(static_cast<int>(v));
 }

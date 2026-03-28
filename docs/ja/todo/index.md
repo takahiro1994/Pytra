@@ -36,11 +36,11 @@
 文脈: [docs/ja/plans/p0-exception-cpp.md](../plans/p0-exception-cpp.md)
 仕様: [docs/ja/spec/spec-exception.md](../spec/spec-exception.md)
 
-1. [ ] [ID: P0-EXCEPTION-CPP-S1] CommonRenderer に `emit_raise` / `emit_try` の共通骨格を実装する
-2. [ ] [ID: P0-EXCEPTION-CPP-S2] C++ emitter で `Raise` → `throw ExceptionType("msg")` の写像を override する
-3. [ ] [ID: P0-EXCEPTION-CPP-S3] C++ emitter で `Try` → `try { } catch (ExceptionType& e) { }` の写像を override する
-4. [ ] [ID: P0-EXCEPTION-CPP-S4] C++ emitter で `finally` を RAII スコープガードに写像する
-5. [ ] [ID: P0-EXCEPTION-CPP-S5] fixture 追加（raise/try/except/finally、ユーザー定義例外、複数 handler）+ C++ parity 確認
+1. [x] [ID: P0-EXCEPTION-CPP-S1] CommonRenderer に `emit_raise` / `emit_try` の共通骨格を実装する
+2. [x] [ID: P0-EXCEPTION-CPP-S2] C++ emitter で `Raise` → `throw ExceptionType("msg")` の写像を override する
+3. [x] [ID: P0-EXCEPTION-CPP-S3] C++ emitter で `Try` → `try { } catch (ExceptionType& e) { }` の写像を override する
+4. [x] [ID: P0-EXCEPTION-CPP-S4] C++ emitter で `finally` を RAII スコープガードに写像する
+5. [x] [ID: P0-EXCEPTION-CPP-S5] fixture 追加（raise/try/except/finally、ユーザー定義例外、複数 handler）+ C++ parity 確認
 
 ### P2-SELFHOST: toolchain2 自身の変換テスト
 

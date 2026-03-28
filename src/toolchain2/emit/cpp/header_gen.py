@@ -138,7 +138,20 @@ def _emit_class_decl(lines: list[str], node: dict[str, JsonVal]) -> None:
     name = _str(node, "name")
     if name == "":
         return
-    lines.append("struct " + name + " {")
+    base_specs: list[str] = []
+    base = _str(node, "base")
+    if base != "" and base != "object" and not _bool(node, "is_trait"):
+        base_specs.append("public " + base)
+    trait_names = node.get("trait_names")
+    if isinstance(trait_names, list):
+        for trait_name in trait_names:
+            if isinstance(trait_name, str) and trait_name != "":
+                base_specs.append("virtual public " + trait_name)
+    header = "struct " + name
+    if len(base_specs) > 0:
+        header += " : " + ", ".join(base_specs)
+    header += " {"
+    lines.append(header)
     field_types = node.get("field_types")
     if isinstance(field_types, dict):
         for field_name, field_type in field_types.items():

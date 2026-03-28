@@ -25,42 +25,65 @@ class PytraError:
     def __init__(self, msg: str) -> None:
         self.msg = msg
 
+    def __str__(self) -> str:
+        return self.msg
 
-class ValueError(PytraError):
+
+class BaseException(PytraError):
     def __init__(self, msg: str) -> None:
         super().__init__(msg)
 
 
-class RuntimeError(PytraError):
+class Exception(BaseException):
     def __init__(self, msg: str) -> None:
         super().__init__(msg)
 
 
-class FileNotFoundError(PytraError):
+class ValueError(Exception):
     def __init__(self, msg: str) -> None:
         super().__init__(msg)
 
 
-class PermissionError(PytraError):
+class RuntimeError(Exception):
     def __init__(self, msg: str) -> None:
         super().__init__(msg)
 
 
-class TypeError(PytraError):
+class FileNotFoundError(Exception):
     def __init__(self, msg: str) -> None:
         super().__init__(msg)
 
 
-class IndexError(PytraError):
+class PermissionError(Exception):
     def __init__(self, msg: str) -> None:
         super().__init__(msg)
 
 
-class KeyError(PytraError):
+class TypeError(Exception):
     def __init__(self, msg: str) -> None:
         super().__init__(msg)
 
 
-class OverflowError(PytraError):
+class IndexError(Exception):
+    def __init__(self, msg: str) -> None:
+        super().__init__(msg)
+
+
+class KeyError(Exception):
+    def __init__(self, msg: str) -> None:
+        super().__init__(msg)
+
+
+class NameError(Exception):
+    def __init__(self, msg: str) -> None:
+        super().__init__(msg)
+
+
+class NotImplementedError(RuntimeError):
+    def __init__(self, msg: str) -> None:
+        super().__init__(msg)
+
+
+class OverflowError(Exception):
     def __init__(self, msg: str) -> None:
         super().__init__(msg)

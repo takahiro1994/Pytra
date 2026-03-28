@@ -125,12 +125,58 @@ class _CppStmtCommonRenderer(CommonRenderer):
 
     def emit_stmt(self, node: JsonVal) -> None:
         kind = self._str(node, "kind")
-        if kind in ("Expr", "Return", "Assign", "AnnAssign", "Pass", "comment", "blank", "If", "While"):
+        if kind in ("Expr", "Return", "Assign", "AnnAssign", "Pass", "comment", "blank", "If", "While", "Raise", "Try"):
             super().emit_stmt(node)
             self.ctx.indent_level = self.state.indent_level
             return
         if isinstance(node, dict):
             self.emit_stmt_extension(node)
+
+    def render_raise_value(self, node: dict[str, JsonVal]) -> str:
+        return _render_raise_value(self.ctx, node)
+
+    def render_except_open(self, handler: dict[str, JsonVal]) -> str:
+        return _render_except_open(self.ctx, handler)
+
+    def emit_try_setup(self, node: dict[str, JsonVal]) -> None:
+        finalbody = self._list(node, "finalbody")
+        if len(finalbody) == 0:
+            return
+        finally_name = _next_temp(self.ctx, "__finally")
+        self._emit("{")
+        self.state.indent_level += 1
+        self.ctx.indent_level = self.state.indent_level
+        self._emit("auto " + finally_name + " = py_make_scope_exit([&]() {")
+        self.state.indent_level += 1
+        self.ctx.indent_level = self.state.indent_level
+        self.emit_body(finalbody)
+        self.state.indent_level -= 1
+        self.ctx.indent_level = self.state.indent_level
+        self._emit("});")
+
+    def emit_try_teardown(self, node: dict[str, JsonVal]) -> None:
+        if len(self._list(node, "finalbody")) == 0:
+            return
+        self.state.indent_level -= 1
+        self.ctx.indent_level = self.state.indent_level
+        self._emit("}")
+
+    def emit_try_handler_body(self, handler: dict[str, JsonVal]) -> None:
+        handler_name = self._str(handler, "name")
+        saved_type = ""
+        had_saved_type = False
+        if handler_name != "":
+            had_saved_type = handler_name in self.ctx.var_types
+            saved_type = self.ctx.var_types.get(handler_name, "")
+            self.ctx.var_types[handler_name] = _handler_type_name(handler)
+        self.ctx.indent_level = self.state.indent_level
+        self.emit_body(self._list(handler, "body"))
+        if handler_name != "":
+            if had_saved_type:
+                self.ctx.var_types[handler_name] = saved_type
+            elif handler_name in self.ctx.var_types:
+                del self.ctx.var_types[handler_name]
+        self.state.indent_level = self.ctx.indent_level
 
     def emit_stmt_extension(self, node: dict[str, JsonVal]) -> None:
         self.ctx.indent_level = self.state.indent_level
@@ -176,7 +222,7 @@ class _CppExprCommonRenderer(CommonRenderer):
 
 def _emit_common_stmt_if_supported(ctx: CppEmitContext, node: dict[str, JsonVal]) -> bool:
     kind = _str(node, "kind")
-    if kind not in ("Expr", "Return", "Assign", "AnnAssign", "Pass", "comment", "blank", "If", "While"):
+    if kind not in ("Expr", "Return", "Assign", "AnnAssign", "Pass", "comment", "blank", "If", "While", "Raise", "Try"):
         return False
     renderer = _CppStmtCommonRenderer(ctx)
     renderer.emit_stmt(node)
@@ -1019,6 +1065,11 @@ def _emit_builtin_call(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
         if len(args) >= 1 and isinstance(args[0], dict):
             arg_kind = _str(args[0], "kind")
             arg_type = _str(args[0], "resolved_type")
+            if arg_kind == "Unbox":
+                unbox_value = args[0].get("value")
+                unbox_storage_type = _expr_storage_type(ctx, unbox_value)
+                if unbox_storage_type not in ("", "unknown") and not _needs_object_cast(unbox_storage_type):
+                    return "str(py_to_string(" + _emit_expr(ctx, unbox_value) + "))"
             if arg_kind == "Unbox" and arg_type in ("Obj", "Any", "object", "unknown"):
                 return _emit_object_unbox(arg_strs[0], "str")
         return "str(py_to_string(" + arg_strs[0] + "))"
@@ -1244,6 +1295,12 @@ def _emit_unbox(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
         target = target_mirror
     if target == "" or target == "object":
         return value_expr
+    if (
+        target == "str"
+        and storage_type not in ("", "unknown")
+        and not _needs_object_cast(storage_type)
+    ):
+        return "str(py_to_string(" + value_expr + "))"
     bridge = _dict(node, "bridge_lane_v1")
     if _str(bridge, "value_category") == "optional":
         return "(*(" + value_expr + "))"
@@ -1865,7 +1922,7 @@ def _emit_class_def(ctx: CppEmitContext, node: dict[str, JsonVal]) -> None:
 
     if ctx.emit_class_decls:
         base_specs: list[str] = []
-        if base != "" and base not in ("object", "Exception", "BaseException") and not is_trait:
+        if base != "" and base != "object" and not is_trait:
             base_specs.append("public " + base)
         idx_trait = 0
         while idx_trait < len(trait_names):
@@ -1947,53 +2004,55 @@ def _emit_swap(ctx: CppEmitContext, node: dict[str, JsonVal]) -> None:
     _emit(ctx, "std::swap(" + left + ", " + right + ");")
 
 
-def _emit_try(ctx: CppEmitContext, node: dict[str, JsonVal]) -> None:
-    body = _list(node, "body")
-    handlers = _list(node, "handlers")
-    finalbody = _list(node, "finalbody")
-    if len(handlers) == 0 and len(finalbody) == 0:
-        _emit_body(ctx, body)
-        return
-    _emit(ctx, "{")
-    ctx.indent_level += 1
-    if len(finalbody) > 0:
-        finally_name = _next_temp(ctx, "__finally")
-        _emit(ctx, "auto " + finally_name + " = py_make_scope_exit([&]() {")
-        ctx.indent_level += 1
-        _emit_body(ctx, finalbody)
-        ctx.indent_level -= 1
-        _emit(ctx, "});")
-    if len(handlers) > 0:
-        _emit(ctx, "try {")
-        ctx.indent_level += 1
-        _emit_body(ctx, body)
-        ctx.indent_level -= 1
-        _emit(ctx, "} catch (...) {")
-        ctx.indent_level += 1
-        h = handlers[0]
-        if isinstance(h, dict):
-            _emit_body(ctx, _list(h, "body"))
-        ctx.indent_level -= 1
-        _emit(ctx, "}")
-    else:
-        _emit_body(ctx, body)
-    ctx.indent_level -= 1
-    _emit(ctx, "}")
+def _handler_type_name(handler: dict[str, JsonVal]) -> str:
+    handler_type = handler.get("type")
+    if isinstance(handler_type, dict):
+        kind = _str(handler_type, "kind")
+        if kind == "Name":
+            return _str(handler_type, "id")
+    return ""
 
 
-def _emit_raise(ctx: CppEmitContext, node: dict[str, JsonVal]) -> None:
+def _render_except_open(ctx: CppEmitContext, handler: dict[str, JsonVal]) -> str:
+    handler_type = _handler_type_name(handler)
+    handler_name = _str(handler, "name")
+    if handler_type == "":
+        return "catch (...) {"
+    catch_decl = "const " + handler_type + "&"
+    if handler_name != "":
+        catch_decl += " " + handler_name
+    return "catch (" + catch_decl + ") {"
+
+
+def _render_raise_value(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
     exc = node.get("exc")
     if isinstance(exc, dict):
         bn = _str(exc, "builtin_name")
         rc = _str(exc, "runtime_call")
-        if bn in ("RuntimeError", "ValueError", "TypeError") or rc == "std::runtime_error":
+        if bn in ("BaseException", "Exception", "RuntimeError", "ValueError", "TypeError", "IndexError", "KeyError") or rc == "std::runtime_error":
             ea = _list(exc, "args")
-            if len(ea) >= 1: _emit(ctx, "throw std::runtime_error(" + _emit_expr(ctx, ea[0]) + ");")
-            else: _emit(ctx, 'throw std::runtime_error("' + bn + '");')
+            if len(ea) >= 1:
+                ctor_name = bn if bn != "" else "RuntimeError"
+                return ctor_name + "(" + _emit_expr(ctx, ea[0]) + ")"
+            ctor_name2 = bn if bn != "" else "RuntimeError"
+            return ctor_name2 + "(" + _cpp_string(ctor_name2) + ")"
         else:
-            _emit(ctx, "throw " + _emit_expr(ctx, exc) + ";")
-    else:
-        _emit(ctx, "throw;")
+            return _emit_expr(ctx, exc)
+    if exc is None:
+        _emit_fail(ctx, "unsupported_raise", "bare raise is not supported")
+    return _emit_expr(ctx, exc)
+
+
+def _emit_try(ctx: CppEmitContext, node: dict[str, JsonVal]) -> None:
+    renderer = _CppStmtCommonRenderer(ctx)
+    renderer.emit_try_stmt(node)
+    ctx.indent_level = renderer.state.indent_level
+
+
+def _emit_raise(ctx: CppEmitContext, node: dict[str, JsonVal]) -> None:
+    renderer = _CppStmtCommonRenderer(ctx)
+    renderer.emit_raise_stmt(node)
+    ctx.indent_level = renderer.state.indent_level
 
 
 def _emit_with(ctx: CppEmitContext, node: dict[str, JsonVal]) -> None:
@@ -2044,7 +2103,8 @@ def _emit_function_def_impl(ctx: CppEmitContext, node: dict[str, JsonVal], owner
     template_prefix = _function_template_prefix(node)
     if template_prefix != "":
         _emit(ctx, template_prefix)
-    _emit(ctx, signature + " {")
+    init_list = _constructor_init_list(ctx, node, owner_name)
+    _emit(ctx, signature + init_list + " {")
     ctx.indent_level += 1
     _emit_body(ctx, _list(node, "body"))
     ctx.indent_level -= 1
@@ -2107,6 +2167,35 @@ def _function_template_prefix(node: dict[str, JsonVal]) -> str:
     if len(params) == 0:
         return ""
     return "template <" + ", ".join("class " + name for name in params) + ">"
+
+
+def _constructor_init_list(ctx: CppEmitContext, node: dict[str, JsonVal], owner_name: str) -> str:
+    if owner_name == "" or _str(node, "name") != "__init__":
+        return ""
+    base_name = ctx.class_bases.get(owner_name, "")
+    if base_name == "" or base_name == "object":
+        return ""
+    body = _list(node, "body")
+    if len(body) == 0:
+        return ""
+    first = body[0]
+    if not isinstance(first, dict) or _str(first, "kind") != "Expr":
+        return ""
+    value = first.get("value")
+    if not isinstance(value, dict) or _str(value, "kind") != "Call":
+        return ""
+    func = value.get("func")
+    if not isinstance(func, dict) or _str(func, "kind") != "Attribute" or _str(func, "attr") != "__init__":
+        return ""
+    owner = func.get("value")
+    if not _is_zero_arg_super_call(owner):
+        return ""
+    args = [_emit_expr(ctx, a) for a in _list(value, "args")]
+    keywords = _list(value, "keywords")
+    for kw in keywords:
+        if isinstance(kw, dict):
+            args.append(_emit_expr(ctx, kw.get("value")))
+    return " : " + base_name + "(" + ", ".join(args) + ")"
 
 
 def _function_template_params(node: dict[str, JsonVal]) -> list[str]:

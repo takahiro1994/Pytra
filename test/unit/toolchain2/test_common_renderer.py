@@ -25,6 +25,18 @@ class DummyRenderer(CommonRenderer):
             lhs = "<?>"
         return lhs + " = " + self.render_expr(node.get("value"))
 
+    def render_raise_value(self, node: dict) -> str:
+        exc = node.get("exc")
+        if isinstance(exc, dict):
+            return self.render_expr(exc)
+        return ""
+
+    def render_except_open(self, handler: dict) -> str:
+        name = self._str(handler, "name")
+        if name != "":
+            return "catch (" + name + ") {"
+        return "catch (...) {"
+
 
 class CommonRendererTests(unittest.TestCase):
     def test_profile_loader_returns_full_profile_doc(self) -> None:
@@ -173,6 +185,40 @@ class CommonRendererTests(unittest.TestCase):
         emit_cpp_stmt(ctx, {"kind": "blank"})
 
         self.assertEqual(ctx.lines, ["// pass", "// note", ""])
+
+    def test_common_renderer_emits_raise_and_try_skeleton_for_native_throw(self) -> None:
+        renderer = DummyRenderer("cpp")
+        renderer.emit_stmt(
+            {
+                "kind": "Try",
+                "body": [
+                    {
+                        "kind": "Raise",
+                        "exc": {
+                            "kind": "Call",
+                            "func": {"kind": "Name", "id": "ValueError"},
+                            "args": [{"kind": "Constant", "value": "boom"}],
+                        },
+                    }
+                ],
+                "handlers": [
+                    {
+                        "kind": "ExceptHandler",
+                        "name": "err",
+                        "body": [{"kind": "Return", "value": {"kind": "Constant", "value": 1}}],
+                    }
+                ],
+                "finalbody": [],
+                "orelse": [],
+            }
+        )
+
+        rendered = renderer.finish()
+
+        self.assertIn('throw ValueError("boom");', rendered)
+        self.assertIn("try {", rendered)
+        self.assertIn("catch (err) {", rendered)
+        self.assertIn("return 1;", rendered)
 
 
 if __name__ == "__main__":
