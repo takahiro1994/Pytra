@@ -26,10 +26,10 @@
 仕様: [docs/ja/spec/spec-exception.md](../spec/spec-exception.md)
 
 1. [ ] [ID: P0-EXCEPTION-GO-S1] Go runtime に `PytraError` / `PytraValueError` / `PytraRuntimeError` クラス階層を実装する — struct embedding + `pytraErrorIsInstance(err, tidMin, tidMax)` 関数
-2. [ ] [ID: P0-EXCEPTION-GO-S2] linker に `can_raise_v1` マーカーの推移的付与を実装する — call graph 走査で raise を含む関数を特定
-3. [ ] [ID: P0-EXCEPTION-GO-S3] EAST3 言語別 lowering で `Raise` → `ErrorReturn`、`ErrorCheck`、`ErrorCatch` ノードを生成する
-4. [ ] [ID: P0-EXCEPTION-GO-S4] Go emitter で `ErrorReturn` / `ErrorCheck` / `ErrorCatch` を写像する — `(T, *PytraError)` 戻り値、type_id range check isinstance、defer finally
-5. [ ] [ID: P0-EXCEPTION-GO-S5] fixture 追加（raise/try/except/finally、ユーザー定義例外、複数 handler）+ Go parity 確認
+2. [x] [ID: P0-EXCEPTION-GO-S2] linker に `can_raise_v1` マーカーの推移的付与を実装する — call graph 走査で raise を含む関数を特定
+3. [x] [ID: P0-EXCEPTION-GO-S3] EAST3 言語別 lowering で `Raise` → `ErrorReturn`、`ErrorCheck`、`ErrorCatch` ノードを生成する
+4. [x] [ID: P0-EXCEPTION-GO-S4] Go emitter で `ErrorReturn` / `ErrorCheck` / `ErrorCatch` を写像する — `(T, *PytraError)` 戻り値、type_id range check isinstance、defer finally
+5. [x] [ID: P0-EXCEPTION-GO-S5] fixture 追加（raise/try/except/finally、ユーザー定義例外、複数 handler）+ Go parity 確認
 
 ### P0-EXCEPTION-CPP: C++ backend の例外処理実装（CommonRenderer 連携）
 
@@ -85,5 +85,20 @@
 2. [ ] [ID: P4-INT32-S2] resolve の型正規化を修正
 3. [ ] [ID: P4-INT32-S3] sample 18 件のオーバーフロー確認 + 必要な箇所を `int64` に明示
 4. [ ] [ID: P4-INT32-S4] golden 再生成 + 全 emitter parity 確認
+
+### P10-REORG: tools/ と test/unit/ の棚卸し・統合・管理台帳
+
+文脈: [docs/ja/plans/p10-tools-test-reorg.md](../plans/p10-tools-test-reorg.md)
+
+前提: P0〜P4 の主要タスクが全て落ち着いてから着手。
+
+1. [ ] [ID: P10-REORG-S1] tools/ 全スクリプトの棚卸し
+2. [ ] [ID: P10-REORG-S2] tools/check/, tools/gen/, tools/run/ にフォルダ分け
+3. [ ] [ID: P10-REORG-S3] test/unit/ 全テストの棚卸し
+4. [ ] [ID: P10-REORG-S4] test/unit/ → tools/unittest/ に統合・再編
+5. [ ] [ID: P10-REORG-S5] 全パス参照の更新
+6. [ ] [ID: P10-REORG-S6] tools/README.md 管理台帳を作成
+7. [ ] [ID: P10-REORG-S7] CI で台帳突合チェックを追加
+8. [ ] [ID: P10-REORG-S8] AGENTS.md にファイル追加禁止ルールを追加
 
 注: 完了済みタスクは [アーカイブ](archive/index.md) に移動済み。
