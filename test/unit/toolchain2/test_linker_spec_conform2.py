@@ -438,6 +438,21 @@ def has_key(env: dict[str, int], name: str) -> bool:
         with self.assertRaisesRegex(RuntimeError, "inheritance cycle"):
             build_type_id_table(modules)
 
+    def test_type_id_builder_maps_exception_base_to_builtin_value_error(self) -> None:
+        modules = [
+            _linked_module(
+                "app.main",
+                [
+                    _class_def("ParseError", base="ValueError"),
+                ],
+            )
+        ]
+
+        type_id_table, type_id_base_map, _ = build_type_id_table(modules)
+
+        self.assertIn("app.main.ParseError", type_id_table)
+        self.assertEqual(type_id_base_map["app.main.ParseError"], 12)
+
     def test_runtime_discovery_rejects_missing_explicit_runtime_module(self) -> None:
         module_map = {
             "/tmp/app.main.east3.json": _module_doc(

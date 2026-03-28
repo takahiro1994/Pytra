@@ -48,6 +48,34 @@ def _tid_object() -> int:
     return 8
 
 
+def _tid_base_exception() -> int:
+    return 9
+
+
+def _tid_exception() -> int:
+    return 10
+
+
+def _tid_runtime_error() -> int:
+    return 11
+
+
+def _tid_value_error() -> int:
+    return 12
+
+
+def _tid_type_error() -> int:
+    return 13
+
+
+def _tid_index_error() -> int:
+    return 14
+
+
+def _tid_key_error() -> int:
+    return 15
+
+
 def _tid_user_base() -> int:
     return 1000
 
@@ -202,6 +230,13 @@ def _ensure_builtins() -> None:
     _register_type_node(_tid_list(), _tid_object())
     _register_type_node(_tid_dict(), _tid_object())
     _register_type_node(_tid_set(), _tid_object())
+    _register_type_node(_tid_base_exception(), _tid_object())
+    _register_type_node(_tid_exception(), _tid_base_exception())
+    _register_type_node(_tid_runtime_error(), _tid_exception())
+    _register_type_node(_tid_value_error(), _tid_exception())
+    _register_type_node(_tid_type_error(), _tid_exception())
+    _register_type_node(_tid_index_error(), _tid_exception())
+    _register_type_node(_tid_key_error(), _tid_exception())
     _recompute_type_ranges()
     _mark_type_ranges_clean()
 
@@ -280,6 +315,20 @@ def py_tid_runtime_type_id(value: Any) -> int:
         return _tid_dict()
     if isinstance(value, set):
         return _tid_set()
+    if isinstance(value, KeyError):
+        return _tid_key_error()
+    if isinstance(value, IndexError):
+        return _tid_index_error()
+    if isinstance(value, TypeError):
+        return _tid_type_error()
+    if isinstance(value, ValueError):
+        return _tid_value_error()
+    if isinstance(value, RuntimeError):
+        return _tid_runtime_error()
+    if isinstance(value, Exception):
+        return _tid_exception()
+    if isinstance(value, BaseException):
+        return _tid_base_exception()
     tagged = _try_runtime_tagged_type_id(value)
     if tagged >= 0:
         return tagged

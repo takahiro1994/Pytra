@@ -54,6 +54,13 @@ class PytraBuiltInTypeIdTest(unittest.TestCase):
         self.assertEqual(tid.py_tid_runtime_type_id([1]), tid._tid_list())
         self.assertEqual(tid.py_tid_runtime_type_id({"a": 1}), tid._tid_dict())
         self.assertEqual(tid.py_tid_runtime_type_id({1}), tid._tid_set())
+        self.assertEqual(tid.py_tid_runtime_type_id(ValueError("x")), tid._tid_value_error())
+
+    def test_builtin_exception_hierarchy_is_registered(self) -> None:
+        self.assertTrue(tid.py_tid_is_subtype(tid._tid_value_error(), tid._tid_exception()))
+        self.assertTrue(tid.py_tid_is_subtype(tid._tid_value_error(), tid._tid_base_exception()))
+        self.assertTrue(tid.py_tid_is_subtype(tid._tid_index_error(), tid._tid_exception()))
+        self.assertFalse(tid.py_tid_is_subtype(tid._tid_value_error(), tid._tid_index_error()))
 
     def test_runtime_type_id_and_isinstance_for_user_class(self) -> None:
         base = tid.py_tid_register_class_type(tid._tid_object())

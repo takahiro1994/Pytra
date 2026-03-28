@@ -32,6 +32,13 @@ _BUILTIN_TYPE_IDS: dict[str, int] = {
     "dict": 6,
     "set": 7,
     "object": 8,
+    "BaseException": 9,
+    "Exception": 10,
+    "RuntimeError": 11,
+    "ValueError": 12,
+    "TypeError": 13,
+    "IndexError": 14,
+    "KeyError": 15,
 }
 
 _ROOT_BASE_NAMES: set[str] = set(_BUILTIN_TYPE_IDS.keys()) | {
