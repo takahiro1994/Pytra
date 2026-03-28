@@ -807,7 +807,28 @@ func py_str_rstrip(s string, chars ...string) string {
 	}
 	return strings.TrimRight(s, " \t\r\n")
 }
-func py_str_join(sep string, items []string) string { return strings.Join(items, sep) }
+func py_str_join(sep string, items any) string {
+	switch seq := items.(type) {
+	case []string:
+		return strings.Join(seq, sep)
+	case *PyList[string]:
+		return strings.Join(seq.items, sep)
+	case []any:
+		parts := make([]string, 0, len(seq))
+		for _, item := range seq {
+			parts = append(parts, py_str(item))
+		}
+		return strings.Join(parts, sep)
+	case *PyList[any]:
+		parts := make([]string, 0, len(seq.items))
+		for _, item := range seq.items {
+			parts = append(parts, py_str(item))
+		}
+		return strings.Join(parts, sep)
+	default:
+		return strings.Join([]string{py_str(items)}, sep)
+	}
+}
 func py_str_replace(s, old, new_ string) string     { return strings.ReplaceAll(s, old, new_) }
 func py_str_split(s, sep string) []string           { return strings.Split(s, sep) }
 func py_str_startswith(s, prefix string) bool       { return strings.HasPrefix(s, prefix) }

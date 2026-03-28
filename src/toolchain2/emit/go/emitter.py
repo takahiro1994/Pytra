@@ -838,14 +838,14 @@ def _is_trait_class(node: dict[str, JsonVal]) -> bool:
 def _go_signature_type(ctx: EmitContext, resolved_type: str) -> str:
     if _is_container_resolved_type(resolved_type):
         return _go_ref_container_type(ctx, resolved_type)
+    if resolved_type in ctx.enum_bases:
+        return _go_symbol_name(ctx, resolved_type)
     if resolved_type in ctx.trait_names:
         return _go_symbol_name(ctx, resolved_type)
     if _is_polymorphic_class(ctx, resolved_type):
         return _go_polymorphic_iface_name(ctx, resolved_type)
     if resolved_type in ctx.class_names:
         return "*" + _go_symbol_name(ctx, resolved_type)
-    if resolved_type in ctx.enum_bases:
-        return _go_symbol_name(ctx, resolved_type)
     return _go_type_with_ctx(ctx, resolved_type)
 
 
@@ -882,6 +882,9 @@ def _go_type_with_ctx(ctx: EmitContext, resolved_type: str) -> str:
 
     if resolved_type.startswith("tuple[") and resolved_type.endswith("]"):
         return "[]any"
+
+    if resolved_type in ctx.enum_bases:
+        return _go_symbol_name(ctx, resolved_type)
 
     if resolved_type.endswith(" | None") or resolved_type.endswith("|None"):
         inner4 = resolved_type[:-7] if resolved_type.endswith(" | None") else resolved_type[:-6]
@@ -4250,8 +4253,17 @@ def _emit_class_def(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
                 value_node = spec.get("value")
                 value_code = "0"
                 if isinstance(value_node, dict):
-                    value_code = _emit_expr(ctx, value_node)
-                _emit(ctx, _go_enum_const_name(ctx, name, member_name) + " " + gn + " = " + value_code)
+                    if _str(value_node, "kind") == "Constant":
+                        raw_value = value_node.get("value")
+                        if isinstance(raw_value, bool):
+                            value_code = "true" if raw_value else "false"
+                        elif isinstance(raw_value, int):
+                            value_code = str(raw_value)
+                        else:
+                            value_code = _emit_expr(ctx, value_node)
+                    else:
+                        value_code = _emit_expr(ctx, value_node)
+                _emit(ctx, _go_enum_const_name(ctx, name, member_name) + " = " + value_code)
             ctx.indent_level -= 1
             _emit(ctx, ")")
             _emit_blank(ctx)
