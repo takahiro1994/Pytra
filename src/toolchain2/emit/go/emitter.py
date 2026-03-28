@@ -78,6 +78,7 @@ class EmitContext:
     current_function_scope: str = ""
     current_value_container_locals: set[str] = field(default_factory=set)
     container_value_locals_by_scope: dict[str, set[str]] = field(default_factory=dict)
+    ref_container_locals: set[str] = field(default_factory=set)
 
 
 class _GoStmtCommonRenderer(CommonRenderer):
@@ -420,6 +421,27 @@ def _assign_uses_ref_container_decl(
     if kind != "Call":
         return False
     return _str(value, "lowered_kind") == "BuiltinCall"
+
+
+def _wrapper_container_storage_expr(ctx: EmitContext, node: JsonVal, rendered: str) -> str:
+    if not isinstance(node, dict):
+        return rendered
+    if _str(node, "kind") != "Name":
+        return rendered
+    name = _str(node, "id")
+    if name == "":
+        return rendered
+    safe_name = _go_symbol_name(ctx, name)
+    if safe_name not in ctx.ref_container_locals:
+        return rendered
+    scope_type = ctx.var_types.get(safe_name, "")
+    if scope_type.startswith("list[") or scope_type == "list":
+        return rendered + ".items"
+    if scope_type.startswith("dict[") or scope_type == "dict":
+        return rendered + ".items"
+    if scope_type.startswith("set[") or scope_type == "set":
+        return rendered + ".items"
+    return rendered
 
 
 def _go_symbol_name(ctx: EmitContext, name: str) -> str:
@@ -1650,6 +1672,8 @@ def _emit_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
                     if idx < len(sig_order):
                         expected_type = sig_types.get(sig_order[idx], "")
                     if expected_type != "" and isinstance(arg_node, dict):
+                        arg_code = _wrapper_container_storage_expr(ctx, arg_node, arg_code)
+                    if expected_type != "" and isinstance(arg_node, dict):
                         actual_type = _effective_resolved_type(ctx, arg_node)
                         if go_type(actual_type) == go_type(expected_type):
                             adjusted_args.append(arg_code)
@@ -1663,6 +1687,8 @@ def _emit_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
                         kw_node = kw.get("value")
                         kw_code = _emit_expr(ctx, kw_node)
                         expected_type2 = sig_types.get(kw_name, "")
+                        if expected_type2 != "" and isinstance(kw_node, dict):
+                            kw_code = _wrapper_container_storage_expr(ctx, kw_node, kw_code)
                         if expected_type2 != "" and isinstance(kw_node, dict):
                             actual_type2 = _effective_resolved_type(ctx, kw_node)
                             if go_type(actual_type2) == go_type(expected_type2):
@@ -2045,6 +2071,7 @@ def _emit_builtin_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
     if dispatch == "__LIST_APPEND__":
         if isinstance(func, dict):
             owner = _emit_expr(ctx, func.get("value"))
+            owner = _wrapper_container_storage_expr(ctx, func.get("value"), owner)
             owner_node = func.get("value")
             owner_rt = _str(owner_node, "resolved_type") if isinstance(owner_node, dict) else ""
             if len(arg_strs) >= 1:
@@ -2063,6 +2090,7 @@ def _emit_builtin_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
     if dispatch == "__SET_ADD__":
         if isinstance(func, dict):
             owner = _emit_expr(ctx, func.get("value"))
+            owner = _wrapper_container_storage_expr(ctx, func.get("value"), owner)
             if len(arg_strs) >= 1:
                 return owner + "[" + arg_strs[0] + "] = struct{}{}"
 
@@ -2070,6 +2098,7 @@ def _emit_builtin_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
     if dispatch == "__LIST_POP__":
         if isinstance(func, dict):
             owner = _emit_expr(ctx, func.get("value"))
+            owner = _wrapper_container_storage_expr(ctx, func.get("value"), owner)
             owner_node = func.get("value")
             owner_rt = _str(owner_node, "resolved_type") if isinstance(owner_node, dict) else ""
             result_gt = go_type(_str(node, "resolved_type"))
@@ -2108,6 +2137,7 @@ def _emit_builtin_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
     if dispatch == "__LIST_CLEAR__":
         if isinstance(func, dict):
             owner = _emit_expr(ctx, func.get("value"))
+            owner = _wrapper_container_storage_expr(ctx, func.get("value"), owner)
             return owner + " = " + owner + "[:0]"
 
     # dict.get
@@ -2115,6 +2145,7 @@ def _emit_builtin_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
         if isinstance(func, dict):
             owner_node = func.get("value")
             owner = _emit_expr(ctx, owner_node)
+            owner = _wrapper_container_storage_expr(ctx, owner_node, owner)
             owner_rt = _str(owner_node, "resolved_type") if isinstance(owner_node, dict) else ""
             result_type = _str(node, "resolved_type")
             yields_dynamic = _call_yields_dynamic(node)
@@ -2160,9 +2191,11 @@ def _emit_builtin_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
                 return owner + "[" + arg_strs[0] + "]"
     if dispatch == "__DICT_ITEMS__" and isinstance(func, dict):
         owner = _emit_expr(ctx, func.get("value"))
+        owner = _wrapper_container_storage_expr(ctx, func.get("value"), owner)
         return "py_items(" + owner + ")"
     if dispatch in ("__DICT_KEYS__", "__DICT_VALUES__") and isinstance(func, dict):
         owner = _emit_expr(ctx, func.get("value"))
+        owner = _wrapper_container_storage_expr(ctx, func.get("value"), owner)
         owner_node = func.get("value")
         owner_rt = _str(owner_node, "resolved_type") if isinstance(owner_node, dict) else ""
         if owner_rt.startswith("dict[") and owner_rt.endswith("]"):
@@ -2314,6 +2347,7 @@ def _emit_attribute(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
 def _emit_subscript(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
     value_node = node.get("value")
     value = _emit_expr(ctx, value_node)
+    value = _wrapper_container_storage_expr(ctx, value_node, value)
     slice_node = node.get("slice")
     if isinstance(slice_node, dict) and _str(slice_node, "kind") == "Slice":
         return _emit_slice_access(ctx, value, slice_node)
@@ -2978,9 +3012,17 @@ def _emit_ann_assign(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
                 _emit(ctx, "var " + name + " any = " + val_code)
             else:
                 _emit(ctx, name + " := " + val_code)
+        if use_ref_decl:
+            ctx.ref_container_locals.add(name)
+        else:
+            ctx.ref_container_locals.discard(name)
     else:
         if declare_new:
             _emit(ctx, "var " + name + " " + gt + " = " + _decl_go_zero_value(ctx, rt, name))
+            if _is_container_resolved_type(rt) and not _prefer_value_container_local(ctx, name, rt):
+                ctx.ref_container_locals.add(name)
+            else:
+                ctx.ref_container_locals.discard(name)
     if is_suppressed_unused and name != "_" and not at_module_scope:
         _emit(ctx, "_ = " + name)
 
@@ -3062,6 +3104,10 @@ def _emit_assign(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
                             _emit(ctx, "_ = " + gn)
                         if gn.startswith("_") and gn != "_":
                             _emit(ctx, "_ = " + gn)
+                        if use_ref_decl:
+                            ctx.ref_container_locals.add(gn)
+                        else:
+                            ctx.ref_container_locals.discard(gn)
                         return
                 ctx.var_types[gn] = decl_type
                 if use_ref_decl:
@@ -3075,6 +3121,10 @@ def _emit_assign(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
                         _emit(ctx, "var " + gn + " any = " + val_code)
                     else:
                         _emit(ctx, gn + " := " + val_code)
+                if use_ref_decl:
+                    ctx.ref_container_locals.add(gn)
+                else:
+                    ctx.ref_container_locals.discard(gn)
                 if is_unused and not at_module_scope:
                     _emit(ctx, "_ = " + gn)
             if gn.startswith("_") and gn != "_" and not at_module_scope:
@@ -3087,7 +3137,13 @@ def _emit_assign(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
             sub_id = _str(sub_val, "id") if isinstance(sub_val, dict) else ""
             if sub_id in ctx.var_types and ctx.var_types[sub_id] in ("bytes", "bytearray"):
                 val_code = "byte(" + val_code + ")"
-            _emit(ctx, _emit_expr(ctx, target_node) + " = " + val_code)
+            store_value = _emit_expr(ctx, sub_val)
+            store_value = _wrapper_container_storage_expr(ctx, sub_val, store_value)
+            store_slice = target_node.get("slice")
+            if isinstance(store_slice, dict) and _str(store_slice, "kind") == "Slice":
+                _emit(ctx, _emit_expr(ctx, target_node) + " = " + val_code)
+            else:
+                _emit(ctx, store_value + "[" + _emit_expr(ctx, store_slice) + "] = " + val_code)
         elif t_kind == "Tuple":
             # Some precompiled EAST3 modules still carry tuple targets directly.
             # Go emitter models tuple values as []any, so unpack through a temp.
@@ -3197,6 +3253,8 @@ def _emit_return(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
             _emit(ctx, "return " + ", ".join(parts))
             return
         value_code = _emit_expr(ctx, value)
+        if _is_container_resolved_type(ctx.current_return_type):
+            value_code = _wrapper_container_storage_expr(ctx, value, value_code)
         if isinstance(value, dict) and _str(value, "kind") == "Name":
             scope_name = _go_symbol_name(ctx, _str(value, "id"))
             scope_type = ctx.var_types.get(scope_name, "")
@@ -3496,6 +3554,7 @@ def _emit_function_def(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
     saved_vars = dict(ctx.var_types)
     saved_scope = ctx.current_function_scope
     saved_scope_locals = set(ctx.current_value_container_locals)
+    saved_ref_locals = set(ctx.ref_container_locals)
     for a in arg_order:
         a_str = a if isinstance(a, str) else ""
         if a_str == "self":
@@ -3537,6 +3596,7 @@ def _emit_function_def(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
     owner_name = ctx.current_class if ctx.current_class != "" and not is_staticmethod else ""
     ctx.current_function_scope = _scope_key(ctx, name, owner_name)
     ctx.current_value_container_locals = _container_value_locals_for_scope(ctx, name, owner_name)
+    ctx.ref_container_locals = set()
     ctx.indent_level += 1
     _emit_body(ctx, body)
     if not mutated_return and return_type != "None" and len(body) > 0:
@@ -3554,6 +3614,7 @@ def _emit_function_def(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
     ctx.current_return_type = saved_ret
     ctx.current_function_scope = saved_scope
     ctx.current_value_container_locals = saved_scope_locals
+    ctx.ref_container_locals = saved_ref_locals
 
 
 def _closure_signature_parts(
@@ -3609,6 +3670,7 @@ def _emit_closure_def(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
     params, ret_clause, saved_vars = _closure_signature_parts(ctx, node)
     saved_scope = ctx.current_function_scope
     saved_scope_locals = set(ctx.current_value_container_locals)
+    saved_ref_locals = set(ctx.ref_container_locals)
     closure_type = "func(" + ", ".join(params) + ")" + ret_clause
     is_recursive = _bool(node, "is_recursive")
     if is_recursive:
@@ -3621,6 +3683,7 @@ def _emit_closure_def(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
     owner_name = ctx.current_class if ctx.current_class != "" else ""
     ctx.current_function_scope = _scope_key(ctx, name, owner_name)
     ctx.current_value_container_locals = _container_value_locals_for_scope(ctx, name, owner_name)
+    ctx.ref_container_locals = set()
     ctx.indent_level += 1
     _emit_body(ctx, body)
     if return_type != "None" and len(body) > 0:
@@ -3635,6 +3698,7 @@ def _emit_closure_def(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
     ctx.current_return_type = saved_ret
     ctx.current_function_scope = saved_scope
     ctx.current_value_container_locals = saved_scope_locals
+    ctx.ref_container_locals = saved_ref_locals
 
 
 def _emit_class_def(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
@@ -3958,6 +4022,10 @@ def _emit_var_decl(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
         return
     gt = _decl_go_type(ctx, rt, name)
     ctx.var_types[gn] = rt
+    if _is_container_resolved_type(rt) and not _prefer_value_container_local(ctx, gn, rt):
+        ctx.ref_container_locals.add(gn)
+    else:
+        ctx.ref_container_locals.discard(gn)
     _emit(ctx, "var " + gn + " " + gt + " = " + _decl_go_zero_value(ctx, rt, name))
     _emit(ctx, "_ = " + gn)
 

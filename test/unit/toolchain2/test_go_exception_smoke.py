@@ -219,6 +219,15 @@ if __name__ == "__main__":
 PROPAGATION_TWO_FRAMES_SOURCE = (
     FIXTURE_ROOT / "control" / "exception_propagation_two_frames.py"
 ).read_text(encoding="utf-8")
+PROPAGATION_RAISE_FROM_SOURCE = (
+    FIXTURE_ROOT / "control" / "exception_propagation_raise_from.py"
+).read_text(encoding="utf-8")
+BARE_RERAISE_FIXTURE_SOURCE = (
+    FIXTURE_ROOT / "control" / "exception_bare_reraise.py"
+).read_text(encoding="utf-8")
+FINALLY_ORDER_FIXTURE_SOURCE = (
+    FIXTURE_ROOT / "control" / "exception_finally_order.py"
+).read_text(encoding="utf-8")
 
 
 class GoExceptionSmokeTests(unittest.TestCase):
@@ -304,6 +313,20 @@ class GoExceptionSmokeTests(unittest.TestCase):
     def test_go_propagates_exception_two_frames_up(self) -> None:
         stdout = _run_go(PROPAGATION_TWO_FRAMES_SOURCE)
         self.assertEqual(stdout, "caught boom\n")
+
+    def test_go_propagates_raise_from_two_frames_up(self) -> None:
+        stdout = _run_go(PROPAGATION_RAISE_FROM_SOURCE)
+        self.assertEqual(stdout, "wrapped\n")
+
+    def test_go_bare_raise_fixture_rethrows_current_exception(self) -> None:
+        stdout = _run_go(BARE_RERAISE_FIXTURE_SOURCE)
+        self.assertEqual(stdout, "boom\n")
+
+    def test_go_finally_fixture_runs_before_unhandled_rethrow(self) -> None:
+        run = _run_go_process(FINALLY_ORDER_FIXTURE_SOURCE)
+        self.assertNotEqual(run.returncode, 0)
+        self.assertEqual(run.stdout, "cleanup\n")
+        self.assertIn("boom", run.stderr)
 
 
 if __name__ == "__main__":

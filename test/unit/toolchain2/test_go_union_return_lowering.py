@@ -15,6 +15,7 @@ from toolchain2.resolve.py.resolver import resolve_east1_to_east2
 
 
 ROOT = Path(__file__).resolve().parents[3]
+FIXTURE_ROOT = ROOT / "test" / "fixture" / "source" / "py"
 
 
 def _load_registry():
@@ -66,6 +67,10 @@ if __name__ == "__main__":
         print(err)
 """
 
+FIXTURE_SOURCE = (
+    FIXTURE_ROOT / "typing" / "union_return_errorcheck.py"
+).read_text(encoding="utf-8")
+
 
 class GoUnionReturnLoweringTests(unittest.TestCase):
     def test_lowering_rewrites_raise_try_and_can_raise_calls(self) -> None:
@@ -110,6 +115,53 @@ if __name__ == "__main__":
         print(err)
 """
         east2 = parse_python_source(source, "<go-union-run>").to_jv()
+        resolve_east1_to_east2(east2, registry=_load_registry())
+        east3 = lower_east2_to_east3(east2, target_language="go")
+        meta = east3.setdefault("meta", {})
+        assert isinstance(meta, dict)
+        meta["emit_context"] = {"module_id": "app", "is_entry": True}
+        go_code = emit_go_module(east3)
+        env = dict(os.environ)
+        env["PATH"] = "/home/node/.local/go/bin:" + env.get("PATH", "")
+        with tempfile.TemporaryDirectory() as tmp:
+            tmpdir = Path(tmp)
+            (tmpdir / "app.go").write_text(go_code, encoding="utf-8")
+            (tmpdir / "py_runtime.go").write_text(
+                (ROOT / "src" / "runtime" / "go" / "built_in" / "py_runtime.go").read_text(encoding="utf-8"),
+                encoding="utf-8",
+            )
+            (tmpdir / "pytra_built_in_error.go").write_text(_emit_builtin_error_go(), encoding="utf-8")
+            build = subprocess.run(
+                [
+                    "go",
+                    "build",
+                    "-o",
+                    str(tmpdir / "app"),
+                    str(tmpdir / "py_runtime.go"),
+                    str(tmpdir / "pytra_built_in_error.go"),
+                    str(tmpdir / "app.go"),
+                ],
+                cwd=tmp,
+                capture_output=True,
+                text=True,
+                env=env,
+            )
+            self.assertEqual(build.returncode, 0, build.stderr)
+            run = subprocess.run([str(tmpdir / "app")], cwd=tmp, capture_output=True, text=True, env=env)
+        self.assertEqual(run.returncode, 0, run.stderr)
+        self.assertEqual(run.stdout, "7\nbad\n")
+
+    def test_go_union_return_fixture_lowers_error_nodes(self) -> None:
+        east2 = parse_python_source(FIXTURE_SOURCE, "<go-union-fixture>").to_jv()
+        resolve_east1_to_east2(east2, registry=_load_registry())
+        east3 = lower_east2_to_east3(east2, target_language="go")
+        kinds = [str(node.get("kind", "")) for node in _walk(east3)]
+        self.assertIn("ErrorReturn", kinds)
+        self.assertIn("ErrorCheck", kinds)
+        self.assertIn("ErrorCatch", kinds)
+
+    def test_go_union_return_fixture_runs(self) -> None:
+        east2 = parse_python_source(FIXTURE_SOURCE, "<go-union-fixture-run>").to_jv()
         resolve_east1_to_east2(east2, registry=_load_registry())
         east3 = lower_east2_to_east3(east2, target_language="go")
         meta = east3.setdefault("meta", {})
