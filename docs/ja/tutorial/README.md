@@ -45,13 +45,12 @@ Rust に変換するなら:
 
 ここまで読めば普通に使えます。以下は必要に応じて:
 
-7. [アーキテクチャ](./architecture.md) — パイプラインの全体像と各段の役割
-8. [発展的な使い方](./advanced-usage.md) — `@extern`, `@abi`, `@template`, nominal ADT 等
-9. [仕様書トップ](../spec/index.md) — 言語仕様の正本
-10. [開発運用ガイド](./dev-operations.md) — parity check, local CI（開発者向け）
+7. [pylib モジュール一覧](../spec/spec-pylib-modules.md) — 使えるモジュールと関数の一覧
+8. [アーキテクチャ](./architecture.md) — パイプラインの全体像と各段の役割
+9. [発展的な使い方](./advanced-usage.md) — `@extern`, `@abi`, `@template`, nominal ADT 等
+10. [仕様書トップ](../spec/index.md) — 言語仕様の正本
+11. [開発運用ガイド](./dev-operations.md) — parity check, local CI（開発者向け）
 
 ## 関連リンク
 
-- [仕様書トップ](../spec/index.md)
-- [pylib モジュール一覧](../spec/spec-pylib-modules.md)
 - [サンプル一覧](../../sample/README-ja.md)

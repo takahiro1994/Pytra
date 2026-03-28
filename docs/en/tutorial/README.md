@@ -45,13 +45,12 @@ To transpile to Rust instead:
 
 That should be enough to use Pytra. The following are for when you need them:
 
-7. [Architecture](./architecture.md) — Pipeline overview and the role of each stage
-8. [Advanced usage](./advanced-usage.md) — `@extern`, `@abi`, `@template`, nominal ADT, etc.
-9. [Specification index](../spec/index.md) — The source of truth for language specifications
-10. [Development operations guide](./dev-operations.md) — Parity check, local CI (for developers)
+7. [pylib module list](../spec/spec-pylib-modules.md) — Available modules and functions
+8. [Architecture](./architecture.md) — Pipeline overview and the role of each stage
+9. [Advanced usage](./advanced-usage.md) — `@extern`, `@abi`, `@template`, nominal ADT, etc.
+10. [Specification index](../spec/index.md) — The source of truth for language specifications
+11. [Development operations guide](./dev-operations.md) — Parity check, local CI (for developers)
 
 ## Related Links
 
-- [Specification index](../spec/index.md)
-- [pylib module list](../spec/spec-pylib-modules.md)
 - [Sample list](../../sample/README.md)
