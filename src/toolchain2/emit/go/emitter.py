@@ -126,9 +126,25 @@ class _GoStmtCommonRenderer(CommonRenderer):
             _emit_assign(self.ctx, node)
         self.state.indent_level = self.ctx.indent_level
 
+    def render_raise_value(self, node: dict[str, JsonVal]) -> str:
+        raise RuntimeError("go common renderer raise value hook is not used directly")
+
+    def emit_raise_stmt(self, node: dict[str, JsonVal]) -> None:
+        self.ctx.indent_level = self.state.indent_level
+        _emit_raise(self.ctx, node)
+        self.state.indent_level = self.ctx.indent_level
+
+    def render_except_open(self, handler: dict[str, JsonVal]) -> str:
+        raise RuntimeError("go common renderer except hook is not used directly")
+
+    def emit_try_stmt(self, node: dict[str, JsonVal]) -> None:
+        self.ctx.indent_level = self.state.indent_level
+        _emit_try(self.ctx, node)
+        self.state.indent_level = self.ctx.indent_level
+
     def emit_stmt(self, node: JsonVal) -> None:
         kind = self._str(node, "kind")
-        if kind in ("Expr", "Return", "Assign", "AnnAssign", "Pass", "comment", "blank", "If", "While"):
+        if kind in ("Expr", "Return", "Assign", "AnnAssign", "Pass", "Raise", "Try", "comment", "blank", "If", "While"):
             super().emit_stmt(node)
             self.ctx.indent_level = self.state.indent_level
             return
@@ -179,7 +195,7 @@ class _GoExprCommonRenderer(CommonRenderer):
 
 def _emit_common_stmt_if_supported(ctx: EmitContext, node: dict[str, JsonVal]) -> bool:
     kind = _str(node, "kind")
-    if kind not in ("Expr", "Return", "Assign", "AnnAssign", "Pass", "comment", "blank", "If", "While"):
+    if kind not in ("Expr", "Return", "Assign", "AnnAssign", "Pass", "Raise", "Try", "comment", "blank", "If", "While"):
         return False
     renderer = _GoStmtCommonRenderer(ctx)
     renderer.emit_stmt(node)
@@ -1904,6 +1920,14 @@ def _emit_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
                 return "int64(" + arg0_code + ".__len__())"
             if fn_name == "print":
                 return "py_print(" + ", ".join(call_arg_strs) + ")"
+            if fn_name == "py_assert_stdout":
+                adjusted_args2 = list(call_arg_strs)
+                if len(args) >= 1 and isinstance(args[0], dict):
+                    arg0 = args[0]
+                    arg0_code = adjusted_args2[0] if len(adjusted_args2) >= 1 else ""
+                    if not _is_wrapper_container_expr(ctx, arg0, arg0_code):
+                        adjusted_args2[0] = _wrap_ref_container_value_code(ctx, arg0_code, "list[str]")
+                return "py_assert_stdout(" + ", ".join(adjusted_args2) + ")"
             if fn_name in ("BaseException", "Exception", "RuntimeError", "ValueError", "TypeError", "IndexError", "KeyError"):
                 if len(call_arg_strs) >= 1:
                     return _exception_ctor_expr(fn_name, call_arg_strs[0])

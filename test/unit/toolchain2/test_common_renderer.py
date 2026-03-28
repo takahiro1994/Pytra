@@ -5,6 +5,7 @@ import unittest
 from toolchain2.emit.common.common_renderer import CommonRenderer
 from toolchain2.emit.common.profile_loader import load_profile_doc
 from toolchain2.emit.cpp.emitter import _emit_expr as emit_cpp_expr, _emit_stmt as emit_cpp_stmt, CppEmitContext
+from toolchain2.emit.cpp.emitter import _emit_tuple_unpack as emit_cpp_tuple_unpack
 from toolchain2.emit.go.emitter import _emit_expr as emit_go_expr, _emit_stmt as emit_go_stmt, EmitContext
 
 
@@ -183,6 +184,55 @@ class CommonRendererTests(unittest.TestCase):
 
         self.assertEqual(rendered, "(static_cast<float64>(n) / static_cast<float64>(d))")
 
+    def test_cpp_emitter_mod_uses_python_semantics_helper(self) -> None:
+        rendered = emit_cpp_expr(
+            CppEmitContext(),
+            {
+                "kind": "BinOp",
+                "left": {"kind": "Name", "id": "x", "resolved_type": "int64"},
+                "op": "Mod",
+                "right": {"kind": "Constant", "value": 2, "resolved_type": "int64"},
+                "resolved_type": "int64",
+            },
+        )
+
+        self.assertEqual(rendered, "py_mod(x, int64(2))")
+
+    def test_cpp_tuple_unpack_reuses_existing_locals_instead_of_redeclaring(self) -> None:
+        ctx = CppEmitContext()
+        ctx.var_types["r"] = "float64"
+        ctx.var_types["g"] = "float64"
+        ctx.var_types["b"] = "float64"
+        ctx.visible_local_scopes = [{"r", "g", "b"}]
+        emit_cpp_tuple_unpack(
+            ctx,
+            {
+                "kind": "TupleUnpack",
+                "declare": True,
+                "targets": [
+                    {"kind": "Name", "id": "r", "resolved_type": "float64"},
+                    {"kind": "Name", "id": "g", "resolved_type": "float64"},
+                    {"kind": "Name", "id": "b", "resolved_type": "float64"},
+                ],
+                "target_types": ["float64", "float64", "float64"],
+                "value": {
+                    "kind": "Tuple",
+                    "resolved_type": "tuple[float64,float64,float64]",
+                    "elements": [
+                        {"kind": "Constant", "value": 1.0, "resolved_type": "float64"},
+                        {"kind": "Constant", "value": 2.0, "resolved_type": "float64"},
+                        {"kind": "Constant", "value": 3.0, "resolved_type": "float64"},
+                    ],
+                },
+            },
+        )
+
+        rendered = "\n".join(ctx.lines)
+        self.assertIn("r = ::std::get<0>(", rendered)
+        self.assertIn("g = ::std::get<1>(", rendered)
+        self.assertIn("b = ::std::get<2>(", rendered)
+        self.assertNotIn("float64 r =", rendered)
+
     def test_go_emitter_common_return_hook_preserves_multi_return(self) -> None:
         ctx = EmitContext(current_return_type="multi_return[int64, int64]")
         emit_go_stmt(
@@ -220,6 +270,60 @@ class CommonRendererTests(unittest.TestCase):
         emit_go_stmt(ctx, {"kind": "blank"})
 
         self.assertEqual(ctx.lines, ["// pass", "// note", ""])
+
+    def test_go_emitter_common_raise_hook_preserves_go_exception_emit(self) -> None:
+        ctx = EmitContext()
+        emit_go_stmt(
+            ctx,
+            {
+                "kind": "Raise",
+                "exc": {
+                    "kind": "Call",
+                    "func": {"kind": "Name", "id": "ValueError"},
+                    "args": [{"kind": "Constant", "value": "boom", "resolved_type": "str"}],
+                },
+            },
+        )
+
+        self.assertEqual(ctx.lines, ['panic(pytraEnsureRecoveredError(NewValueError("boom")))'])
+
+    def test_go_emitter_common_try_hook_preserves_go_exception_flow(self) -> None:
+        ctx = EmitContext()
+        emit_go_stmt(
+            ctx,
+            {
+                "kind": "Try",
+                "body": [
+                    {
+                        "kind": "Raise",
+                        "exc": {
+                            "kind": "Call",
+                            "func": {"kind": "Name", "id": "ValueError"},
+                            "args": [{"kind": "Constant", "value": "boom", "resolved_type": "str"}],
+                        },
+                    }
+                ],
+                "handlers": [
+                    {
+                        "kind": "ExceptHandler",
+                        "type": {"kind": "Name", "id": "ValueError"},
+                        "body": [
+                            {
+                                "kind": "Expr",
+                                "value": {"kind": "Call", "func": {"kind": "Name", "id": "print"}, "args": [{"kind": "Constant", "value": "caught", "resolved_type": "str"}]},
+                            }
+                        ],
+                    }
+                ],
+                "finalbody": [],
+                "orelse": [],
+            },
+        )
+
+        rendered = "\n".join(ctx.lines)
+        self.assertIn("defer func()", rendered)
+        self.assertIn('panic(pytraEnsureRecoveredError(NewValueError("boom")))', rendered)
+        self.assertIn('py_print("caught")', rendered)
 
     def test_cpp_emitter_common_misc_stmt_hooks_preserve_pass_comment_blank(self) -> None:
         ctx = CppEmitContext()
