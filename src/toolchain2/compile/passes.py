@@ -17,7 +17,7 @@ from toolchain2.common.kinds import (
     MODULE, FUNCTION_DEF, CLOSURE_DEF, CLASS_DEF, VAR_DECL,
     ASSIGN, ANN_ASSIGN, AUG_ASSIGN, EXPR, RETURN, YIELD,
     IF, WHILE, FOR, FOR_RANGE, FOR_CORE, TRY, WITH, SWAP,
-    TUPLE_UNPACK, MULTI_ASSIGN,
+    TUPLE_UNPACK, MULTI_ASSIGN, ERROR_RETURN, ERROR_CHECK, ERROR_CATCH,
     NAME, CONSTANT, CALL, ATTRIBUTE, SUBSCRIPT,
     BIN_OP, UNARY_OP, COMPARE, IF_EXP, BOOL_OP,
     LIST, DICT, SET, TUPLE, LIST_COMP,
@@ -3687,15 +3687,211 @@ def _apply_profile_expr(node: JsonVal, ctx: CompileContext) -> JsonVal:
     return _lower_covariant_copy(out, ctx)
 
 
-def _apply_profile_stmt(stmt: JsonVal, ctx: CompileContext) -> list[JsonVal]:
+def _union_return_type(return_type: str) -> str:
+    rt = normalize_type_name(return_type)
+    if rt in ("", "unknown", "None"):
+        return "Exception"
+    if rt.startswith("multi_return["):
+        return rt
+    return "multi_return[" + rt + ",Exception]"
+
+
+def _collect_local_can_raise_symbols(module: Node) -> set[str]:
+    funcs: dict[str, Node] = {}
+    for stmt in _node_list(module, "body"):
+        if isinstance(stmt, dict) and _sk(stmt) in (FUNCTION_DEF, CLOSURE_DEF):
+            name = _str(stmt, "name")
+            if name != "":
+                funcs[name] = cast(dict[str, JsonVal], stmt)
+
+    def _contains_raise(node: JsonVal) -> bool:
+        if isinstance(node, list):
+            for item in cast(list[JsonVal], node):
+                if _contains_raise(item):
+                    return True
+            return False
+        if not isinstance(node, dict):
+            return False
+        kind = _sk(node)
+        if kind == "Raise":
+            return True
+        if kind in (FUNCTION_DEF, CLOSURE_DEF, CLASS_DEF):
+            return False
+        for value in node.values():
+            if isinstance(value, dict) or isinstance(value, list):
+                if _contains_raise(value):
+                    return True
+        return False
+
+    def _contains_call_to(node: JsonVal, can_raise: set[str]) -> bool:
+        if isinstance(node, list):
+            for item in cast(list[JsonVal], node):
+                if _contains_call_to(item, can_raise):
+                    return True
+            return False
+        if not isinstance(node, dict):
+            return False
+        kind = _sk(node)
+        if kind == CALL:
+            func = node.get("func")
+            if isinstance(func, dict) and _sk(func) == NAME and _str(func, "id") in can_raise:
+                return True
+        if kind in (FUNCTION_DEF, CLOSURE_DEF, CLASS_DEF):
+            return False
+        for value in node.values():
+            if isinstance(value, dict) or isinstance(value, list):
+                if _contains_call_to(value, can_raise):
+                    return True
+        return False
+
+    can_raise: set[str] = set()
+    for name, fn in funcs.items():
+        if _contains_raise(_node_list(fn, "body")):
+            can_raise.add(name)
+    changed = True
+    while changed:
+        changed = False
+        for name, fn in funcs.items():
+            if name in can_raise:
+                continue
+            if _contains_call_to(_node_list(fn, "body"), can_raise):
+                can_raise.add(name)
+                changed = True
+    return can_raise
+
+
+def _raise_exception_type(stmt: Node) -> str:
+    exc = stmt.get("exc")
+    if isinstance(exc, dict):
+        if _sk(exc) == CALL:
+            func = exc.get("func")
+            if isinstance(func, dict) and _sk(func) == NAME:
+                name = _str(func, "id")
+                if name != "":
+                    return name
+        rt = _str(exc, "resolved_type")
+        if rt != "":
+            return rt
+    return "RuntimeError"
+
+
+def _is_can_raise_call(value: JsonVal, can_raise_symbols: set[str]) -> bool:
+    if not isinstance(value, dict) or _sk(value) != CALL:
+        return False
+    func = value.get("func")
+    return isinstance(func, dict) and _sk(func) == NAME and _str(func, "id") in can_raise_symbols
+
+
+def _make_error_check(call_node: Node, ok_target: JsonVal, ok_type: str, on_error: str) -> Node:
+    out: Node = {}
+    out["kind"] = ERROR_CHECK
+    out["call"] = call_node
+    out["ok_target"] = ok_target
+    out["ok_type"] = ok_type
+    out["on_error"] = on_error
+    return out
+
+
+def _apply_profile_stmt(
+    stmt: JsonVal,
+    ctx: CompileContext,
+    can_raise_symbols: set[str] | None = None,
+    *,
+    current_function_can_raise: bool = False,
+    catch_mode: bool = False,
+) -> list[JsonVal]:
     if not isinstance(stmt, dict):
         return [stmt]
     out = _apply_profile_expr(stmt, ctx)
     if not isinstance(out, dict):
         return [out]
+
+    if ctx.lowering_profile.exception_style == "union_return":
+        active_symbols = can_raise_symbols or set()
+        kind0 = _sk(out)
+        if kind0 in (FUNCTION_DEF, CLOSURE_DEF):
+            fn_name = _str(out, "name")
+            fn_can_raise = fn_name in active_symbols
+            out["body"] = _apply_profile_stmts(
+                _node_list(out, "body"),
+                ctx,
+                active_symbols,
+                current_function_can_raise=fn_can_raise,
+                catch_mode=False,
+            )
+            if fn_can_raise:
+                out["return_type"] = _union_return_type(_str(out, "return_type"))
+                meta = out.get("meta")
+                if not isinstance(meta, dict):
+                    meta = {}
+                    out["meta"] = meta
+                meta["can_raise_v1"] = {"schema_version": 1, "exception_types": []}
+            return [out]
+        if kind0 == CLASS_DEF:
+            out["body"] = _apply_profile_stmts(
+                _node_list(out, "body"),
+                ctx,
+                active_symbols,
+                current_function_can_raise=False,
+                catch_mode=False,
+            )
+            return [out]
+        if kind0 == "Raise":
+            err: Node = {}
+            err["kind"] = ERROR_RETURN
+            err["value"] = out.get("exc")
+            err["exception_type"] = _raise_exception_type(out)
+            return [err]
+        if kind0 == TRY:
+            err_catch: Node = {}
+            err_catch["kind"] = ERROR_CATCH
+            err_catch["body"] = _apply_profile_stmts(
+                _node_list(out, "body"),
+                ctx,
+                active_symbols,
+                current_function_can_raise=current_function_can_raise,
+                catch_mode=True,
+            )
+            handlers: list[JsonVal] = []
+            for handler in _node_list(out, "handlers"):
+                if isinstance(handler, dict):
+                    handler_out = cast(dict[str, JsonVal], _apply_profile_expr(handler, ctx))
+                    handler_out["body"] = _apply_profile_stmts(
+                        _node_list(handler_out, "body"),
+                        ctx,
+                        active_symbols,
+                        current_function_can_raise=current_function_can_raise,
+                        catch_mode=False,
+                    )
+                    handlers.append(handler_out)
+            err_catch["handlers"] = handlers
+            err_catch["finalbody"] = _apply_profile_stmts(
+                _node_list(out, "finalbody"),
+                ctx,
+                active_symbols,
+                current_function_can_raise=current_function_can_raise,
+                catch_mode=False,
+            )
+            return [err_catch]
+        if kind0 in (ASSIGN, ANN_ASSIGN):
+            value = out.get("value")
+            if _is_can_raise_call(value, active_symbols):
+                ok_target = out.get("target")
+                ok_type = ""
+                if isinstance(ok_target, dict):
+                    ok_type = _str(ok_target, "resolved_type")
+                if ok_type == "" and isinstance(value, dict):
+                    ok_type = _str(value, "resolved_type")
+                return [_make_error_check(cast(dict[str, JsonVal], value), ok_target, ok_type, "catch" if catch_mode else "propagate")]
+        if kind0 == EXPR:
+            value2 = out.get("value")
+            if _is_can_raise_call(value2, active_symbols):
+                ok_type2 = _str(cast(dict[str, JsonVal], value2), "resolved_type")
+                return [_make_error_check(cast(dict[str, JsonVal], value2), None, ok_type2, "catch" if catch_mode else "propagate")]
+
     kind = _sk(out)
     if kind == WITH:
-        out["body"] = _apply_profile_stmts(_node_list(out, "body"), ctx)
+        out["body"] = _apply_profile_stmts(_node_list(out, "body"), ctx, can_raise_symbols, current_function_can_raise=current_function_can_raise, catch_mode=catch_mode)
         style = ctx.lowering_profile.with_style
         out["with_lowering_style"] = style
         if style != "try_finally":
@@ -3725,7 +3921,7 @@ def _apply_profile_stmt(stmt: JsonVal, ctx: CompileContext) -> list[JsonVal]:
     for key in ("body", "orelse", "finalbody"):
         nested = out.get(key)
         if isinstance(nested, list):
-            out[key] = _apply_profile_stmts(cast(list[JsonVal], nested), ctx)
+            out[key] = _apply_profile_stmts(cast(list[JsonVal], nested), ctx, can_raise_symbols, current_function_can_raise=current_function_can_raise, catch_mode=catch_mode)
     handlers = out.get("handlers")
     if isinstance(handlers, list):
         new_handlers: list[JsonVal] = []
@@ -3735,7 +3931,7 @@ def _apply_profile_stmt(stmt: JsonVal, ctx: CompileContext) -> list[JsonVal]:
                 if isinstance(handler_out, dict):
                     hb = handler_out.get("body")
                     if isinstance(hb, list):
-                        handler_out["body"] = _apply_profile_stmts(cast(list[JsonVal], hb), ctx)
+                        handler_out["body"] = _apply_profile_stmts(cast(list[JsonVal], hb), ctx, can_raise_symbols, current_function_can_raise=current_function_can_raise, catch_mode=False)
                 new_handlers.append(handler_out)
             else:
                 new_handlers.append(handler)
@@ -3743,22 +3939,38 @@ def _apply_profile_stmt(stmt: JsonVal, ctx: CompileContext) -> list[JsonVal]:
     return [out]
 
 
-def _apply_profile_stmts(stmts: list[JsonVal], ctx: CompileContext) -> list[JsonVal]:
+def _apply_profile_stmts(
+    stmts: list[JsonVal],
+    ctx: CompileContext,
+    can_raise_symbols: set[str] | None = None,
+    *,
+    current_function_can_raise: bool = False,
+    catch_mode: bool = False,
+) -> list[JsonVal]:
     out: list[JsonVal] = []
     for stmt in stmts:
-        lowered = _apply_profile_stmt(stmt, ctx)
+        lowered = _apply_profile_stmt(
+            stmt,
+            ctx,
+            can_raise_symbols,
+            current_function_can_raise=current_function_can_raise,
+            catch_mode=catch_mode,
+        )
         for item in lowered:
             out.append(item)
     return out
 
 
 def apply_profile_lowering(module: Node, ctx: CompileContext) -> Node:
+    can_raise_symbols: set[str] | None = None
+    if ctx.lowering_profile.exception_style == "union_return":
+        can_raise_symbols = _collect_local_can_raise_symbols(module)
     body = module.get("body")
     if isinstance(body, list):
-        module["body"] = _apply_profile_stmts(cast(list[JsonVal], body), ctx)
+        module["body"] = _apply_profile_stmts(cast(list[JsonVal], body), ctx, can_raise_symbols)
     mg = module.get("main_guard_body")
     if isinstance(mg, list):
-        module["main_guard_body"] = _apply_profile_stmts(cast(list[JsonVal], mg), ctx)
+        module["main_guard_body"] = _apply_profile_stmts(cast(list[JsonVal], mg), ctx, can_raise_symbols)
     return module
 
 

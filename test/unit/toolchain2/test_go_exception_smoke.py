@@ -39,7 +39,9 @@ def _run_go_process(
 ) -> subprocess.CompletedProcess[str]:
     east2 = parse_python_source(source, "<go-exception-smoke>").to_jv()
     resolve_east1_to_east2(east2, registry=_load_registry())
-    east3 = lower_east2_to_east3(east2, target_language="go")
+    # Broad exception smokes stay on the existing Go emitter Raise/Try path.
+    # union_return-specific coverage lives in test_go_union_return_lowering.py.
+    east3 = lower_east2_to_east3(east2, target_language="core")
     meta = east3.setdefault("meta", {})
     assert isinstance(meta, dict)
     meta["emit_context"] = {"module_id": "app", "is_entry": True}

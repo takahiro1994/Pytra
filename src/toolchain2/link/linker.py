@@ -248,11 +248,139 @@ def _walk_nodes(node: JsonVal) -> list[dict[str, JsonVal]]:
     if isinstance(node, dict):
         out.append(node)
         for value in node.values():
-            out.extend(_walk_nodes(value))
+            for child in _walk_nodes(value):
+                out.append(child)
     elif isinstance(node, list):
         for item in node:
-            out.extend(_walk_nodes(item))
+            for child2 in _walk_nodes(item):
+                out.append(child2)
     return out
+
+
+def _raise_types_in_node(node: JsonVal) -> set[str]:
+    out: set[str] = set()
+    if isinstance(node, dict):
+        if node.get("kind") == "Raise":
+            exc = node.get("exc")
+            if isinstance(exc, dict):
+                if exc.get("kind") == "Call":
+                    func = exc.get("func")
+                    if isinstance(func, dict):
+                        func_id = func.get("id")
+                        if isinstance(func_id, str) and func_id != "":
+                            out.add(func_id)
+                rt = exc.get("resolved_type")
+                if isinstance(rt, str) and rt != "":
+                    out.add(rt)
+        if node.get("kind") in ("FunctionDef", "ClosureDef", "ClassDef"):
+            return out
+        for value in node.values():
+            child = _raise_types_in_node(value)
+            for item in child:
+                out.add(item)
+    elif isinstance(node, list):
+        for item2 in node:
+            child2 = _raise_types_in_node(item2)
+            for item3 in child2:
+                out.add(item3)
+    return out
+
+
+def _collect_direct_raise_markers(modules: list[LinkedModule]) -> dict[str, set[str]]:
+    out: dict[str, set[str]] = {}
+    for module in modules:
+        body = module.east_doc.get("body")
+        if isinstance(body, list):
+            for stmt in body:
+                if not isinstance(stmt, dict):
+                    continue
+                kind = stmt.get("kind")
+                if kind == "FunctionDef":
+                    name = stmt.get("name")
+                    if isinstance(name, str) and name != "":
+                        raised = _raise_types_in_node(stmt.get("body", []))
+                        if len(raised) > 0:
+                            out[module.module_id + "::" + name] = raised
+                elif kind == "ClassDef":
+                    class_name = stmt.get("name")
+                    class_body = stmt.get("body")
+                    if not isinstance(class_name, str) or not isinstance(class_body, list):
+                        continue
+                    for method in class_body:
+                        if not isinstance(method, dict) or method.get("kind") != "FunctionDef":
+                            continue
+                        method_name = method.get("name")
+                        if isinstance(method_name, str) and method_name != "":
+                            raised2 = _raise_types_in_node(method.get("body", []))
+                            if len(raised2) > 0:
+                                out[module.module_id + "::" + class_name + "." + method_name] = raised2
+        main_guard = module.east_doc.get("main_guard_body")
+        if isinstance(main_guard, list):
+            raised3 = _raise_types_in_node(main_guard)
+            if len(raised3) > 0:
+                out[module.module_id + "::__main__"] = raised3
+    return out
+
+
+def _propagate_can_raise(
+    graph: dict[str, set[str]],
+    direct: dict[str, set[str]],
+) -> dict[str, set[str]]:
+    out: dict[str, set[str]] = {}
+    for key, value in direct.items():
+        out[key] = set(value)
+    changed = True
+    while changed:
+        changed = False
+        for caller, callees in graph.items():
+            merged: set[str] = set(out.get(caller, set()))
+            for callee in callees:
+                for exc in out.get(callee, set()):
+                    merged.add(exc)
+            if caller not in out or merged != out.get(caller, set()):
+                out[caller] = merged
+                changed = True
+    return out
+
+
+def _attach_can_raise_markers(
+    copied_docs: list[tuple[LinkedModule, dict[str, JsonVal]]],
+    can_raise: dict[str, set[str]],
+) -> None:
+    for module, doc in copied_docs:
+        body = doc.get("body")
+        if isinstance(body, list):
+            for stmt in body:
+                if not isinstance(stmt, dict):
+                    continue
+                kind = stmt.get("kind")
+                if kind == "FunctionDef":
+                    name = stmt.get("name")
+                    if isinstance(name, str):
+                        qualified = module.module_id + "::" + name
+                        excs = can_raise.get(qualified, set())
+                        if len(excs) > 0:
+                            meta = _ensure_meta(stmt)
+                            meta["can_raise_v1"] = {"schema_version": 1, "exception_types": sorted(list(excs))}
+                elif kind == "ClassDef":
+                    class_name = stmt.get("name")
+                    class_body = stmt.get("body")
+                    if not isinstance(class_name, str) or not isinstance(class_body, list):
+                        continue
+                    for method in class_body:
+                        if not isinstance(method, dict) or method.get("kind") != "FunctionDef":
+                            continue
+                        method_name = method.get("name")
+                        if isinstance(method_name, str):
+                            qualified2 = module.module_id + "::" + class_name + "." + method_name
+                            excs2 = can_raise.get(qualified2, set())
+                            if len(excs2) > 0:
+                                meta2 = _ensure_meta(method)
+                                meta2["can_raise_v1"] = {"schema_version": 1, "exception_types": sorted(list(excs2))}
+        main_excs = can_raise.get(module.module_id + "::__main__", set())
+        if len(main_excs) > 0:
+            meta3 = _ensure_meta(doc)
+            meta3["can_raise_v1"] = {"schema_version": 1, "exception_types": sorted(list(main_excs))}
 
 
 def _link_resolve_trait_ref(
@@ -272,15 +400,25 @@ def _link_resolve_trait_ref(
         return local_traits[type_name]
     imported_symbol = import_symbols.get(type_name, "")
     if imported_symbol != "" and "::" in imported_symbol:
-        dep_module_id, export_name = imported_symbol.split("::", 1)
-        candidate = dep_module_id.strip() + "." + export_name.strip()
+        delim = imported_symbol.find("::")
+        dep_module_id = imported_symbol[:delim]
+        export_name = imported_symbol[delim + 2:]
+        candidate = dep_module_id + "." + export_name
         if candidate in all_traits:
             return candidate
     if "." in type_name:
-        owner_name, attr_name = type_name.rsplit(".", 1)
+        last_dot = -1
+        i = len(type_name) - 1
+        while i >= 0:
+            if type_name[i] == ".":
+                last_dot = i
+                break
+            i -= 1
+        owner_name = type_name[:last_dot]
+        attr_name = type_name[last_dot + 1:]
         imported_module = import_modules.get(owner_name, "")
         if imported_module != "":
-            candidate2 = imported_module + "." + attr_name.strip()
+            candidate2 = imported_module + "." + attr_name
             if candidate2 in all_traits:
                 return candidate2
     candidate3 = module_id + "." + type_name
@@ -295,7 +433,9 @@ def _fold_trait_predicates(
     all_traits: set[str],
     trait_impls: dict[str, set[str]],
 ) -> None:
-    import_modules, import_symbols = collect_import_maps(doc)
+    import_parts = cast(tuple[JsonVal, JsonVal], collect_import_maps(doc))
+    import_modules = cast(dict[str, str], import_parts[0])
+    import_symbols = cast(dict[str, str], import_parts[1])
     local_traits: dict[str, str] = {}
     body = doc.get("body")
     if isinstance(body, list):
@@ -356,7 +496,8 @@ def _fold_trait_predicates(
             raise RuntimeError("input_invalid: trait isinstance requires static nominal type: " + module_id + " -> " + expected_name)
         implemented = trait_impls.get(value_fqcn, set())
         folded = trait_fqcn in implemented
-        node.clear()
+        for key in list(node.keys()):
+            del node[key]
         node["kind"] = "Constant"
         node["value"] = folded
         node["resolved_type"] = "bool"
@@ -737,6 +878,11 @@ def link_modules(
     # 9. Cross-module default argument expansion
     all_docs = _docs_as_json(copied_docs)
     expand_cross_module_defaults(all_docs)
+
+    # 9.5 exception propagation markers
+    direct_raise_markers = _collect_direct_raise_markers(modules)
+    propagated_raise_markers = _propagate_can_raise(call_graph, direct_raise_markers)
+    _attach_can_raise_markers(copied_docs, propagated_raise_markers)
 
     # 10. 各 module に linked_program_v1 を注入
     linked_modules: list[LinkedModule] = []

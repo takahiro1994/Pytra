@@ -2593,6 +2593,12 @@ def _emit_stmt(ctx: EmitContext, node: JsonVal) -> None:
         _emit_try(ctx, node)
     elif kind == "Raise":
         _emit_raise(ctx, node)
+    elif kind == "ErrorReturn":
+        _emit_error_return(ctx, node)
+    elif kind == "ErrorCheck":
+        _emit_error_check(ctx, node)
+    elif kind == "ErrorCatch":
+        _emit_error_catch(ctx, node)
     elif kind == "TypeAlias":
         _emit_type_alias(ctx, node)
     elif kind == "comment":
@@ -2882,6 +2888,12 @@ def _emit_return(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
         if ctx.constructor_return_target != "":
             _emit(ctx, "return " + ctx.constructor_return_target)
             return
+        if ctx.current_return_type == "Exception":
+            _emit(ctx, "return nil")
+            return
+        if ctx.current_return_type.startswith("multi_return["):
+            _emit(ctx, "return " + _zero_return_values(ctx.current_return_type))
+            return
         _emit(ctx, "return")
     else:
         if (
@@ -2917,7 +2929,26 @@ def _emit_return(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
                 ):
                     value_code = _coerce_from_any(value_code, optional_inner)
             value_code = _wrap_optional_value_code(ctx, value_code, ctx.current_return_type, value)
+        if ctx.current_return_type == "Exception":
+            _emit(ctx, "return pytraEnsureRecoveredError(" + value_code + ")")
+            return
+        if ctx.current_return_type.startswith("multi_return["):
+            _emit(ctx, "return " + value_code + ", nil")
+            return
         _emit(ctx, "return " + value_code)
+
+
+def _zero_return_values(return_type: str) -> str:
+    if return_type == "Exception":
+        return "nil"
+    if return_type.startswith("multi_return[") and return_type.endswith("]"):
+        inner = return_type[len("multi_return["):-1]
+        parts = _split_generic_args(inner)
+        zeros: list[str] = []
+        for part in parts:
+            zeros.append(go_zero_value(part))
+        return ", ".join(zeros)
+    return go_zero_value(return_type)
 
 
 def _emit_if(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
@@ -3924,6 +3955,147 @@ def _extract_single_return_expr(body: list[JsonVal]) -> str:
     if not isinstance(value, dict):
         return ""
     return _emit_expr(EmitContext(), value)
+
+
+def _error_return_expr(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
+    value = node.get("value")
+    if isinstance(value, dict):
+        return "pytraEnsureRecoveredError(" + _emit_expr(ctx, value) + ")"
+    return "pytraNewRuntimeError(\"raise\")"
+
+
+def _emit_error_return(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
+    err_expr = _error_return_expr(ctx, node)
+    if ctx.current_return_type == "Exception":
+        _emit(ctx, "return " + err_expr)
+        return
+    if ctx.current_return_type.startswith("multi_return["):
+        zeros = _zero_return_values(ctx.current_return_type).split(", ")
+        if len(zeros) >= 2:
+            zeros[-1] = err_expr
+            _emit(ctx, "return " + ", ".join(zeros))
+            return
+    _emit(ctx, "panic(" + err_expr + ")")
+
+
+def _emit_error_check(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
+    call_node = node.get("call")
+    if not isinstance(call_node, dict):
+        return
+    ok_target = node.get("ok_target")
+    ok_type = _str(node, "ok_type")
+    on_error = _str(node, "on_error")
+    ok_tmp = _next_temp(ctx, "ok")
+    err_tmp = _next_temp(ctx, "err")
+    call_code = _emit_expr(ctx, call_node)
+    if ok_target is None or ok_type in ("", "None"):
+        _emit(ctx, err_tmp + " := " + call_code)
+    else:
+        _emit(ctx, ok_tmp + ", " + err_tmp + " := " + call_code)
+    _emit(ctx, "if " + err_tmp + " != nil {")
+    ctx.indent_level += 1
+    if on_error == "propagate":
+        if ctx.current_return_type == "Exception":
+            _emit(ctx, "return " + err_tmp)
+        elif ctx.current_return_type.startswith("multi_return["):
+            zeros = _zero_return_values(ctx.current_return_type).split(", ")
+            if len(zeros) >= 2:
+                zeros[-1] = err_tmp
+                _emit(ctx, "return " + ", ".join(zeros))
+            else:
+                _emit(ctx, "return " + err_tmp)
+        else:
+            _emit(ctx, "panic(" + err_tmp + ")")
+    else:
+        _emit(ctx, "panic(" + err_tmp + ")")
+    ctx.indent_level -= 1
+    _emit(ctx, "}")
+    if ok_target is not None and ok_type not in ("", "None"):
+        assign_node: dict[str, JsonVal] = {
+            "kind": "Assign",
+            "target": ok_target,
+            "value": {"kind": "Name", "id": ok_tmp, "resolved_type": ok_type},
+            "declare": True,
+        }
+        _emit_assign(ctx, assign_node)
+
+
+def _emit_error_handlers(ctx: EmitContext, err_name: str, handlers: list[JsonVal]) -> None:
+    first = True
+    for handler in handlers:
+        if not isinstance(handler, dict):
+            continue
+        cond = _exception_match_condition(ctx, err_name, _handler_type_name(handler))
+        _emit(ctx, ("if " if first else "else if ") + cond + " {")
+        first = False
+        ctx.indent_level += 1
+        handler_name = _str(handler, "name")
+        saved_type = ""
+        if handler_name != "":
+            safe_name = _safe_go_ident(handler_name)
+            saved_type = ctx.var_types.get(safe_name, "")
+            _emit(ctx, safe_name + " := " + err_name)
+            ctx.var_types[safe_name] = "*PytraError"
+        _emit_body(ctx, _list(handler, "body"))
+        _emit(ctx, "return")
+        if handler_name != "":
+            safe_name2 = _safe_go_ident(handler_name)
+            if saved_type != "":
+                ctx.var_types[safe_name2] = saved_type
+            elif safe_name2 in ctx.var_types:
+                del ctx.var_types[safe_name2]
+        ctx.indent_level -= 1
+        _emit(ctx, "}")
+    _emit(ctx, "panic(" + err_name + ")")
+
+
+def _emit_error_catch(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
+    _emit(ctx, "func() {")
+    ctx.indent_level += 1
+    finalbody = _list(node, "finalbody")
+    if len(finalbody) > 0:
+        _emit(ctx, "defer func() {")
+        ctx.indent_level += 1
+        _emit_body(ctx, finalbody)
+        ctx.indent_level -= 1
+        _emit(ctx, "}()")
+    handlers = _list(node, "handlers")
+    for stmt in _list(node, "body"):
+        if isinstance(stmt, dict) and _str(stmt, "kind") == "ErrorCheck" and _str(stmt, "on_error") == "catch":
+            call_node = stmt.get("call")
+            if not isinstance(call_node, dict):
+                continue
+            ok_target = stmt.get("ok_target")
+            ok_type = _str(stmt, "ok_type")
+            ok_tmp = _next_temp(ctx, "ok")
+            err_tmp = _next_temp(ctx, "err")
+            call_code = _emit_expr(ctx, call_node)
+            if ok_target is None or ok_type in ("", "None"):
+                _emit(ctx, err_tmp + " := " + call_code)
+            else:
+                _emit(ctx, ok_tmp + ", " + err_tmp + " := " + call_code)
+            _emit(ctx, "if " + err_tmp + " != nil {")
+            ctx.indent_level += 1
+            _emit_error_handlers(ctx, err_tmp, handlers)
+            ctx.indent_level -= 1
+            _emit(ctx, "}")
+            if ok_target is not None and ok_type not in ("", "None"):
+                assign_node: dict[str, JsonVal] = {
+                    "kind": "Assign",
+                    "target": ok_target,
+                    "value": {"kind": "Name", "id": ok_tmp, "resolved_type": ok_type},
+                    "declare": True,
+                }
+                _emit_assign(ctx, assign_node)
+            continue
+        if isinstance(stmt, dict) and _str(stmt, "kind") == "ErrorReturn":
+            err_tmp2 = _next_temp(ctx, "err")
+            _emit(ctx, err_tmp2 + " := " + _error_return_expr(ctx, stmt))
+            _emit_error_handlers(ctx, err_tmp2, handlers)
+            continue
+        _emit_stmt(ctx, stmt)
+    ctx.indent_level -= 1
+    _emit(ctx, "}()")
 
 
 def _emit_raise(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
