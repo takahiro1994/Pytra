@@ -20,6 +20,18 @@
 
 ## 未完了タスク
 
+### P0-TYPE-ID-TABLE: linker による type_id テーブル仮想モジュール生成
+
+文脈: [docs/ja/plans/p0-type-id-table.md](../plans/p0-type-id-table.md)
+仕様: [docs/ja/spec/spec-type_id.md](../spec/spec-type_id.md) §7、[docs/ja/spec/spec-linker.md](../spec/spec-linker.md) §6.4
+
+1. [ ] [ID: P0-TID-TABLE-S1] `pytra/built_in/` に `pytra_isinstance` 関数を pure Python で定義する
+2. [ ] [ID: P0-TID-TABLE-S2] linker に `pytra.built_in.type_id_table` 仮想モジュール生成を実装する（`id_table: list[int]` + TID 定数）
+3. [ ] [ID: P0-TID-TABLE-S3] linker が isinstance lower 時に対象モジュールへ import binding を挿入する
+4. [ ] [ID: P0-TID-TABLE-S4] C++ runtime の `g_type_table[4096]` ハードコードを撤廃する
+5. [ ] [ID: P0-TID-TABLE-S5] Go runtime の手書き TID 定数を撤廃する
+6. [ ] [ID: P0-TID-TABLE-S6] fixture + sample の C++/Go parity 確認
+
 ### P2-SELFHOST: toolchain2 自身の変換テスト
 
 文脈: `docs/ja/plans/plan-pipeline-redesign.md` §3.5
