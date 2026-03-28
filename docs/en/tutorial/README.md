@@ -28,12 +28,6 @@ Output:
 7
 ```
 
-To transpile to Rust instead:
-
-```bash
-./pytra add.py --target rs --output-dir out/rs_case
-```
-
 ## Reading Order
 
 1. [How to use](./how-to-use.md) — Build steps, supported languages, main options

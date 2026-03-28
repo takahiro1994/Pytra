@@ -28,12 +28,6 @@ if __name__ == "__main__":
 7
 ```
 
-Rust に変換するなら:
-
-```bash
-./pytra add.py --target rs --output-dir out/rs_case
-```
-
 ## 読む順番
 
 1. [使い方](./how-to-use.md) — ビルド手順、対応言語、主なオプション
