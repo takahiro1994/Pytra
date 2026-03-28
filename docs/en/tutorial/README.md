@@ -42,12 +42,13 @@ To transpile to Rust instead:
 4. [Troubleshooting](./troubleshooting.md) — When you get stuck
 5. [Union types and isinstance narrowing](./union-and-narrowing.md) — Handling multiple types and automatic type refinement
 6. [Traits (interfaces)](./trait.md) — Attaching multiple behavioral contracts to a type
+7. [Exception handling](./exception.md) — raise / try / except / finally
 
 That should be enough to use Pytra. The following are for when you need them:
 
-7. [Advanced usage](./advanced-usage.md) — `@extern`, `@abi`, `@template`, nominal ADT, etc.
-8. [Specification index](../spec/index.md) — The source of truth for language specifications
-9. [Development operations guide](./dev-operations.md) — Parity check, local CI (for developers)
+8. [Advanced usage](./advanced-usage.md) — `@extern`, `@abi`, `@template`, nominal ADT, etc.
+9. [Specification index](../spec/index.md) — The source of truth for language specifications
+10. [Development operations guide](./dev-operations.md) — Parity check, local CI (for developers)
 
 ## Related Links
 
