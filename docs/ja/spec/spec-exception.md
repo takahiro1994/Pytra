@@ -76,23 +76,32 @@ EAST3 ノード:
 
 例外型は Pytra の通常のクラスとして定義する。特別な型システムは導入しない。
 
-組み込み例外型（runtime 提供）:
+組み込み例外型（`src/pytra/built_in/error.py` に定義、import 不要で使える）:
 
 ```
 PytraError                  # 全例外の基底
-├── ValueError              # 値エラー
-├── RuntimeError            # 実行時エラー
-├── FileNotFoundError       # ファイル未検出
-└── PermissionError         # 権限エラー
+└── BaseException
+    └── Exception           # 一般例外の基底
+        ├── ValueError
+        ├── RuntimeError
+        │   └── NotImplementedError
+        ├── FileNotFoundError
+        ├── PermissionError
+        ├── TypeError
+        ├── IndexError
+        ├── KeyError
+        ├── NameError
+        └── OverflowError
 ```
 
-ユーザー定義例外:
+ユーザー定義例外（import なしでそのまま継承できる）:
 
 ```python
 class ParseError(ValueError):
+    line: int
     def __init__(self, line: int, msg: str) -> None:
+        super().__init__(msg)
         self.line = line
-        self.msg = msg
 ```
 
 例外型は通常のクラスと同じく:
@@ -105,36 +114,15 @@ class ParseError(ValueError):
 
 例外型は `src/pytra/built_in/error.py` に pure Python で定義する。これが通常のパイプライン（parse → resolve → compile → link → emit）を通って全ターゲット言語に自動変換される。言語ごとの手書き runtime 例外クラスは不要。
 
-```python
-# src/pytra/built_in/error.py
-class PytraError:
-    msg: str
-    def __init__(self, msg: str) -> None:
-        self.msg = msg
-
-class ValueError(PytraError):
-    def __init__(self, msg: str) -> None:
-        super().__init__(msg)
-
-class RuntimeError(PytraError):
-    def __init__(self, msg: str) -> None:
-        super().__init__(msg)
-
-class FileNotFoundError(PytraError):
-    def __init__(self, msg: str) -> None:
-        super().__init__(msg)
-
-class PermissionError(PytraError):
-    def __init__(self, msg: str) -> None:
-        super().__init__(msg)
-```
+正本は `src/pytra/built_in/error.py`。パイプライン（parse → resolve → compile → link → emit）で全ターゲット言語に自動変換される。言語ごとの手書き runtime 例外クラスは不要。
 
 設計原則:
 
 - 例外型はただのクラス。特別な基底クラス（`std::exception`、`error` interface 等）を継承しない。
+- `built_in` なので import 不要。`ValueError` 等はそのまま使える。
 - `type_id` は通常のクラスと同じ仕組みで linker が付与する。
 - `isinstance` は `type_id` range check で判定する（通常のクラスと同じ）。
-- ユーザー定義例外も同じファイルまたはユーザーコードで定義し、同じパイプラインで変換される。
+- ユーザー定義例外もユーザーコードで定義し、同じパイプラインで変換される。
 - 各言語固有のランタイムに例外クラスを手書きしてはならない。
 
 ### 5.3 linker のマーカー付与
