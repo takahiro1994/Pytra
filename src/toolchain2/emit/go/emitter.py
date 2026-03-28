@@ -274,6 +274,19 @@ def _exception_ctor_expr(type_name: str, message_code: str) -> str:
     return "pytraNewRuntimeError(" + message_code + ")"
 
 
+def _handler_type_name(handler: dict[str, JsonVal]) -> str:
+    type_name = _str(handler, "type")
+    if type_name != "":
+        return type_name
+    type_node = handler.get("type")
+    if isinstance(type_node, dict):
+        name = _str(type_node, "id")
+        if name != "":
+            return name
+        return _str(type_node, "repr")
+    return ""
+
+
 def _go_enum_const_name(ctx: EmitContext, type_name: str, member_name: str) -> str:
     return _go_symbol_name(ctx, type_name + "_" + member_name)
 
@@ -3624,7 +3637,7 @@ def _emit_try(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
         for handler in handlers:
             if not isinstance(handler, dict):
                 continue
-            handler_type = _str(handler, "type")
+            handler_type = _handler_type_name(handler)
             bounds = _exception_bounds(ctx, handler_type)
             cond = "__pytra_err != nil"
             if bounds != (0, 0):
@@ -3678,7 +3691,7 @@ def _emit_try(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
         for handler in handlers:
             if not isinstance(handler, dict):
                 continue
-            handler_type = _str(handler, "type")
+            handler_type = _handler_type_name(handler)
             bounds = _exception_bounds(ctx, handler_type)
             cond = "__pytra_err != nil"
             if bounds != (0, 0):
@@ -3740,7 +3753,7 @@ def _emit_try(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
     for handler in handlers:
         if not isinstance(handler, dict):
             continue
-        handler_type = _str(handler, "type")
+        handler_type = _handler_type_name(handler)
         bounds = _exception_bounds(ctx, handler_type)
         cond = "__pytra_err != nil"
         if bounds != (0, 0):

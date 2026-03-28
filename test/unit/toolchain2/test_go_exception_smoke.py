@@ -24,6 +24,13 @@ def _load_registry():
 
 
 def _run_go(source: str) -> str:
+    run = _run_go_process(source)
+    if run.returncode != 0:
+        raise AssertionError(f"{run.stdout}\n{run.stderr}")
+    return run.stdout
+
+
+def _run_go_process(source: str) -> subprocess.CompletedProcess[str]:
     east2 = parse_python_source(source, "<go-exception-smoke>").to_jv()
     resolve_east1_to_east2(east2, registry=_load_registry())
     east3 = lower_east2_to_east3(east2, target_language="go")
@@ -49,9 +56,7 @@ def _run_go(source: str) -> str:
             raise AssertionError(f"{build.stdout}\n{build.stderr}")
         run = subprocess.run([str(out_path)], cwd=tmp, capture_output=True, text=True)
 
-    if run.returncode != 0:
-        raise AssertionError(f"{run.stdout}\n{run.stderr}")
-    return run.stdout
+    return run
 
 
 SOURCE = """
@@ -70,11 +75,41 @@ if __name__ == "__main__":
         print("done")
 """
 
+MULTI_HANDLER_SOURCE = """
+if __name__ == "__main__":
+    try:
+        raise IndexError("idx")
+    except ValueError as e:
+        print("value", e)
+    except IndexError as e:
+        print("index", e)
+    finally:
+        print("done")
+"""
+
+FINALLY_ONLY_SOURCE = """
+if __name__ == "__main__":
+    try:
+        raise ValueError("boom")
+    finally:
+        print("cleanup")
+"""
+
 
 class GoExceptionSmokeTests(unittest.TestCase):
     def test_go_emits_typed_value_error_catch_and_finally(self) -> None:
         stdout = _run_go(SOURCE)
         self.assertEqual(stdout, "7\nbad\ndone\n")
+
+    def test_go_emits_multiple_exception_handlers(self) -> None:
+        stdout = _run_go(MULTI_HANDLER_SOURCE)
+        self.assertEqual(stdout, "index idx\ndone\n")
+
+    def test_go_finally_runs_before_unhandled_rethrow(self) -> None:
+        run = _run_go_process(FINALLY_ONLY_SOURCE)
+        self.assertNotEqual(run.returncode, 0)
+        self.assertEqual(run.stdout, "cleanup\n")
+        self.assertIn("boom", run.stderr)
 
 
 if __name__ == "__main__":
