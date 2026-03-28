@@ -70,6 +70,31 @@ class CommonRendererTests(unittest.TestCase):
         self.assertIn("return 1;", rendered)
         self.assertIn("}", rendered)
 
+    def test_cpp_profile_renders_elif_chain_from_common_renderer(self) -> None:
+        renderer = DummyRenderer("cpp")
+        renderer.emit_stmt(
+            {
+                "kind": "If",
+                "test": {"kind": "Name", "id": "a"},
+                "body": [{"kind": "Return", "value": {"kind": "Constant", "value": 1}}],
+                "orelse": [
+                    {
+                        "kind": "If",
+                        "test": {"kind": "Name", "id": "b"},
+                        "body": [{"kind": "Return", "value": {"kind": "Constant", "value": 2}}],
+                        "orelse": [{"kind": "Return", "value": {"kind": "Constant", "value": 3}}],
+                    }
+                ],
+            }
+        )
+
+        rendered = renderer.finish()
+
+        self.assertIn("if ((a)) {", rendered)
+        self.assertIn("} else if ((b)) {", rendered)
+        self.assertIn("} else {", rendered)
+        self.assertIn("return 3;", rendered)
+
     def test_go_profile_renders_while_without_condition_parens(self) -> None:
         renderer = DummyRenderer("go")
         renderer.emit_stmt(
@@ -185,6 +210,31 @@ class CommonRendererTests(unittest.TestCase):
         emit_cpp_stmt(ctx, {"kind": "blank"})
 
         self.assertEqual(ctx.lines, ["// pass", "// note", ""])
+
+    def test_cpp_emitter_stmt_dispatch_uses_common_renderer_for_elif_chain(self) -> None:
+        ctx = CppEmitContext()
+        emit_cpp_stmt(
+            ctx,
+            {
+                "kind": "If",
+                "test": {"kind": "Name", "id": "ready", "resolved_type": "bool"},
+                "body": [{"kind": "Return", "value": {"kind": "Constant", "value": 1, "resolved_type": "int64"}}],
+                "orelse": [
+                    {
+                        "kind": "If",
+                        "test": {"kind": "Name", "id": "retry", "resolved_type": "bool"},
+                        "body": [{"kind": "Return", "value": {"kind": "Constant", "value": 2, "resolved_type": "int64"}}],
+                        "orelse": [{"kind": "Return", "value": {"kind": "Constant", "value": 3, "resolved_type": "int64"}}],
+                    }
+                ],
+            },
+        )
+
+        rendered = "\n".join(ctx.lines)
+
+        self.assertIn("if ((ready)) {", rendered)
+        self.assertIn("} else if ((retry)) {", rendered)
+        self.assertIn("return int64(3);", rendered)
 
     def test_common_renderer_emits_raise_and_try_skeleton_for_native_throw(self) -> None:
         renderer = DummyRenderer("cpp")

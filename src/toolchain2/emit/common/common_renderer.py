@@ -297,6 +297,25 @@ class CommonRenderer(ABC):
         for stmt in body:
             self.emit_stmt(stmt)
 
+    def _emit_if_chain(self, node: dict[str, JsonVal], *, is_elif: bool = False) -> None:
+        test = self._format_condition(self.render_expr(node.get("test")))
+        syntax_key = "elif" if is_elif else "if"
+        default_open = "} else if ({cond}) {" if is_elif else "if ({cond}) {"
+        self._emit(self._syntax_text(syntax_key, default_open).replace("{cond}", test))
+        self.state.indent_level += 1
+        self.emit_body(self._list(node, "body"))
+        self.state.indent_level -= 1
+        orelse = self._list(node, "orelse")
+        if len(orelse) > 0:
+            if len(orelse) == 1 and isinstance(orelse[0], dict) and self._str(orelse[0], "kind") == "If":
+                self._emit_if_chain(orelse[0], is_elif=True)
+                return
+            self._emit(self._syntax_text("else", "} else {"))
+            self.state.indent_level += 1
+            self.emit_body(orelse)
+            self.state.indent_level -= 1
+        self._emit(self._syntax_text("block_close", "}"))
+
     def emit_stmt(self, node: JsonVal) -> None:
         if not isinstance(node, dict):
             return
@@ -326,18 +345,7 @@ class CommonRenderer(ABC):
             self.emit_blank_stmt(node)
             return
         if kind == "If":
-            test = self._format_condition(self.render_expr(node.get("test")))
-            self._emit(self._syntax_text("if", "if ({cond}) {").replace("{cond}", test))
-            self.state.indent_level += 1
-            self.emit_body(self._list(node, "body"))
-            self.state.indent_level -= 1
-            orelse = self._list(node, "orelse")
-            if len(orelse) > 0:
-                self._emit(self._syntax_text("else", "} else {"))
-                self.state.indent_level += 1
-                self.emit_body(orelse)
-                self.state.indent_level -= 1
-            self._emit(self._syntax_text("block_close", "}"))
+            self._emit_if_chain(node)
             return
         if kind == "While":
             test = self._format_condition(self.render_expr(node.get("test")))
