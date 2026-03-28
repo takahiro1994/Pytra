@@ -839,15 +839,35 @@ func py_reversed[T any](seq []T) []T {
 	return out
 }
 
-func py_discard[K comparable](s map[K]struct{}, key K) {
-	delete(s, key)
+func py_discard[K comparable](s any, key K) {
+	switch t := s.(type) {
+	case map[K]struct{}:
+		delete(t, key)
+	case *PySet[K]:
+		if t != nil {
+			delete(t.items, key)
+		}
+	}
 }
 
-func py_remove[K comparable](s map[K]struct{}, key K) {
-	if _, ok := s[key]; !ok {
+func py_remove[K comparable](s any, key K) {
+	switch t := s.(type) {
+	case map[K]struct{}:
+		if _, ok := t[key]; !ok {
+			panic("KeyError")
+		}
+		delete(t, key)
+	case *PySet[K]:
+		if t == nil {
+			panic("KeyError")
+		}
+		if _, ok := t.items[key]; !ok {
+			panic("KeyError")
+		}
+		delete(t.items, key)
+	default:
 		panic("KeyError")
 	}
-	delete(s, key)
 }
 
 // Dict
