@@ -13,21 +13,21 @@
 - `@runtime` と `@extern` の2つで、Pytra 内部の runtime 実装と外部ライブラリの実装を区別する。
 - 旧デコレータ（`@extern_method`, `@extern_fn`, `@extern_class`, `@abi`）を廃止し、統一する。
 
-## 2. 2つのデコレータ
+## 2. デコレータ / 宣言一覧
 
-| デコレータ | 意味 | rc | type_id | 用途 |
+| デコレータ / 宣言 | 意味 | rc | type_id | 用途 |
 |---|---|---|---|---|
 | `@runtime("namespace")` | Pytra runtime に実装がある | あり | あり | built_in / std のクラスと関数 |
 | `@extern` | 外部（Pytra の管轄外）に実装がある | なし | なし | SDL3 等の外部ライブラリ |
+| `runtime_var("namespace")` | Pytra runtime に実装がある変数 | — | — | `math.pi`, `sys.argv` 等 |
 
 ### 2.1 対象
 
-両方とも class と def に使える。
-
-| 対象 | `@extern` | `@runtime("ns")` |
-|---|---|---|
-| class | opaque 型（rc なし、boxing なし） | Pytra 組み込みクラス（rc あり） |
-| def | 外部関数 | Pytra runtime 関数 |
+| 対象 | `@extern` | `@runtime("ns")` | `runtime_var("ns")` |
+|---|---|---|---|
+| class | opaque 型（rc なし） | Pytra 組み込みクラス（rc あり） | — |
+| def | 外部関数 | Pytra runtime 関数 | — |
+| 変数 | — | — | Pytra runtime 変数 |
 
 ## 3. `@runtime` の仕様
 
@@ -92,7 +92,47 @@ def py_range(start: int, stop: int, step: int) -> list[int]: ...
 - コンテナ型（`list[T]`, `dict[K,V]`, `set[T]`）とクラスインスタンスは rc で包まれる
 - この判定は EAST3 の `resolved_type` から機械的に決まる。emitter の型写像テーブルによる
 
-## 4. `@extern` の仕様
+## 4. `runtime_var` の仕様
+
+モジュールレベルの変数（定数含む）を宣言する。デコレータではなく関数形式（Python の変数にデコレータは付けられないため）。
+
+```python
+from pytra.std import runtime_var
+
+pi: float = runtime_var("pytra.std.math")
+e: float = runtime_var("pytra.std.math")
+```
+
+- namespace は `runtime_var` の引数で指定
+- symbol は変数名から自動導出（`pi`）
+- tag は `stdlib.symbol.` + 変数名から自動導出（`stdlib.symbol.pi`）
+
+```python
+from pytra.std import runtime_var
+
+argv: list[str] = runtime_var("pytra.std.sys")
+path: list[str] = runtime_var("pytra.std.sys")
+```
+
+### EAST 表現
+
+```json
+{
+  "kind": "AnnAssign",
+  "target": {"kind": "Name", "id": "pi"},
+  "annotation": "float64",
+  "meta": {
+    "extern_var_v1": {
+      "schema_version": 1,
+      "module_id": "pytra.std.math",
+      "symbol": "pi",
+      "tag": "stdlib.symbol.pi"
+    }
+  }
+}
+```
+
+## 5. `@extern` の仕様
 
 ### 4.1 opaque クラス
 
@@ -144,7 +184,7 @@ src/include/py/pytra/
     sequence.py       — @runtime("pytra.built_in.sequence") def py_range, ...
   std/
     pathlib.py        — @runtime("pytra.std.pathlib") class Path
-    math.py           — @runtime("pytra.std.math") def sqrt, sin, cos, ...
+    math.py           — @runtime("pytra.std.math") def sqrt, sin, cos, ... + runtime_var("pytra.std.math") pi, e
     time.py           — @runtime("pytra.std.time") def perf_counter
     json.py           — @runtime("pytra.std.json") def loads, dumps
     sys.py            — @runtime("pytra.std.sys") ...
@@ -164,6 +204,7 @@ src/include/py/pytra/
 | `@extern_method(module=..., symbol=..., tag=...)` | `@runtime` クラス内のメソッド（自動導出） | P0-RUNTIME-DECORATOR で廃止 |
 | `@extern_fn(module=..., symbol=..., tag=...)` | `@runtime("ns") def ...` または `@extern def ...` | 同上 |
 | `@extern_class(module=..., symbol=..., tag=...)` | `@runtime("ns") class ...` または `@extern class ...` | 同上 |
+| `extern_var(module=..., symbol=..., tag=...)` | `runtime_var("ns")`（namespace + 変数名で自動導出） | 同上 |
 | `@abi(args={...})` | 廃止（arg mode 不要） | 同上 |
 
 parser は旧デコレータを受理した場合 fail-closed で停止する。
