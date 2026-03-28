@@ -180,8 +180,8 @@ def _inject_runtime_native_companion_include(header_text: str, module_id: str) -
     native_hdr = native_companion_header_path(module_id)
     if not native_hdr.exists():
         return header_text
-    rel = str(native_hdr.relative_to(_RUNTIME_CPP_ROOT.parent)).replace("\\", "/")
-    include_line = '#include "runtime/' + rel + '"'
+    rel = str(native_hdr.relative_to(_RUNTIME_CPP_ROOT)).replace("\\", "/")
+    include_line = '#include "' + rel + '"'
     if include_line in header_text:
         return header_text
     lines = header_text.splitlines()
@@ -249,7 +249,7 @@ def emit_runtime_module_artifacts(
     native_include = ""
     native_header = native_companion_header_path(module_id)
     if native_header.exists():
-        native_include = "runtime/" + str(native_header.relative_to(_RUNTIME_CPP_ROOT.parent)).replace("\\", "/")
+        native_include = str(native_header.relative_to(_RUNTIME_CPP_ROOT)).replace("\\", "/")
     header_text = build_cpp_header_from_east3(
         module_id,
         east_doc,

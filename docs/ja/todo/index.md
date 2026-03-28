@@ -22,8 +22,8 @@
 
 ### P0-CPP-INCLUDE-PATH-FIX: C++ emitter の runtime include パス不整合を修正する
 
-1. [ ] [ID: P0-CPP-INCPATH-S1] 生成された `built_in/*.h` が `runtime/cpp/built_in/*.h` を参照しているが、メインの `.cpp` は `core/py_runtime.h` を参照しており、include ルートが不整合。全生成ファイルで include パスを統一する
-2. [ ] [ID: P0-CPP-INCPATH-S2] `set_wrapper_methods` と `dict_wrapper_methods` が g++ で compile + run できることを確認する
+1. [x] [ID: P0-CPP-INCPATH-S1] 生成された `built_in/*.h` が `runtime/cpp/built_in/*.h` を参照しているが、メインの `.cpp` は `core/py_runtime.h` を参照しており、include ルートが不整合。全生成ファイルで include パスを統一する（完了: runtime_bundle.py の native_include パスを `_RUNTIME_CPP_ROOT` 基準に変更、py_runtime.h に `../built_in/contains.h` 等を相対パスで追加）
+2. [x] [ID: P0-CPP-INCPATH-S2] `set_wrapper_methods` と `dict_wrapper_methods` が g++ で compile + run できることを確認する（完了: runtime_parity_check.py で両ケース PASS）
 
 ### P0-GO-PATHLIB-FIX: Go emitter の pathlib stdlib 署名崩れを修正する
 

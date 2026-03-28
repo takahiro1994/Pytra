@@ -18,6 +18,11 @@
 #include "core/tagged_value.h"
 #include "core/rc_ops.h"
 #include "core/scope_exit.h"
+#include "../built_in/contains.h"
+#include "../built_in/io_ops.h"
+#include "../built_in/scalar_ops.h"
+#include "../built_in/iter_ops.h"
+#include "../built_in/sequence.h"
 
 // NOTE: built_in/string_ops.h と built_in/type_id.h は runtime/east/ から
 // emit パイプラインで生成されるヘッダー。ソースツリーには存在しない。

@@ -51,6 +51,8 @@ def _generate_runtime_cpp() -> Path:
         ns = ns_prefix + "::" + "::".join(parts[1:]) if len(parts) > 1 else ns_prefix
 
         east = json.loads(east_path.read_text(encoding="utf-8"))
+        if isinstance(east, list) and len(east) > 0 and isinstance(east[0], dict):
+            east = east[0]
         out_base = gen_dir / rel
 
         # Skip modules that produce uncompilable C++ due to Object<void> limitations
