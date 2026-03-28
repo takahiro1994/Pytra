@@ -44,15 +44,13 @@
 4. [ ] [ID: P2-LOWERING-GO-S4] Go の `property_style: "method_call"` を適用する
 5. [ ] [ID: P2-LOWERING-GO-S5] Go の既存 fixture + sample parity 維持確認
 
-### P3-COMMON-RENDERER: CommonRenderer 導入 + C++/Go emitter 移行 + fixture parity
+### P3-COMMON-RENDERER-CPP: C++ emitter の CommonRenderer 移行 + fixture parity
 
 文脈: [docs/ja/plans/p2-lowering-profile-common-renderer.md](../plans/p2-lowering-profile-common-renderer.md)
 仕様: [docs/ja/spec/spec-language-profile.md](../spec/spec-language-profile.md) §8
 
-1. [x] [ID: P3-COMMON-RENDERER-S1] CommonRenderer 基底クラスを実装する — If/While/BinOp/Call/Return/Assign/Constant/Compare/UnaryOp/BoolOp 等の共通ノード走査を、プロファイル JSON（type_map, operator_map, syntax, lowering）を参照して生成する共通基底。言語固有ノード（FunctionDef, ClassDef, ForCore 等）は abstract override として残す
-2. [ ] [ID: P3-COMMON-RENDERER-S2] C++ emitter を CommonRenderer + override 構成に移行する — `src/toolchain2/emit/profiles/cpp.json` のプロファイルに従い、CommonRenderer の共通ノード走査を使う構成にする。C++ 固有のノード（ClassDef, FunctionDef, ForCore, With 等）だけ override として残す
-3. [ ] [ID: P3-COMMON-RENDERER-S3] Go emitter を CommonRenderer + override 構成に移行する — `src/toolchain2/emit/profiles/go.json` のプロファイルに従い同様に移行する
-4. [ ] [ID: P3-COMMON-RENDERER-S4] fixture 132 件 + sample 18 件の C++/Go compile + run parity を通す — CommonRenderer 移行後に **emit + compile + run + stdout 一致** を全件確認する
+1. [ ] [ID: P3-CR-CPP-S1] C++ emitter を CommonRenderer + override 構成に移行する — `src/toolchain2/emit/profiles/cpp.json` のプロファイルに従い、CommonRenderer の共通ノード走査を使う構成にする。C++ 固有のノード（ClassDef, FunctionDef, ForCore, With 等）だけ override として残す
+2. [ ] [ID: P3-CR-CPP-S2] fixture 132 件 + sample 18 件の C++ compile + run parity を通す
 
 ### P4-INT32: int のデフォルトサイズを int64 → int32 に変更
 
@@ -64,6 +62,14 @@
 2. [ ] [ID: P4-INT32-S2] resolve の型正規化を修正
 3. [ ] [ID: P4-INT32-S3] sample 18 件のオーバーフロー確認 + 必要な箇所を `int64` に明示
 4. [ ] [ID: P4-INT32-S4] golden 再生成 + 全 emitter parity 確認
+
+### P5-COMMON-RENDERER-GO: Go emitter の CommonRenderer 移行 + fixture parity
+
+文脈: [docs/ja/plans/p2-lowering-profile-common-renderer.md](../plans/p2-lowering-profile-common-renderer.md)
+仕様: [docs/ja/spec/spec-language-profile.md](../spec/spec-language-profile.md) §8
+
+1. [ ] [ID: P5-CR-GO-S1] Go emitter を CommonRenderer + override 構成に移行する — `src/toolchain2/emit/profiles/go.json` のプロファイルに従い、CommonRenderer の共通ノード走査を使う構成にする。Go 固有のノード（FunctionDef のレシーバー、ForCore、multi_return 等）だけ override として残す
+2. [ ] [ID: P5-CR-GO-S2] fixture 132 件 + sample 18 件の Go compile + run parity を通す
 
 ### P10-REORG: tools/ と test/unit/ の棚卸し・統合・管理台帳
 
