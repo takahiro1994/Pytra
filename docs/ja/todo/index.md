@@ -25,7 +25,7 @@
 文脈: [docs/ja/plans/p0-exception-go.md](../plans/p0-exception-go.md)
 仕様: [docs/ja/spec/spec-exception.md](../spec/spec-exception.md)
 
-1. [ ] [ID: P0-EXCEPTION-GO-S1] Go runtime に `PytraError` / `PytraValueError` / `PytraRuntimeError` クラス階層を実装する — struct embedding + `pytraErrorIsInstance(err, tidMin, tidMax)` 関数
+1. [x] [ID: P0-EXCEPTION-GO-S1] Go runtime の例外 carrier と `pytraErrorIsInstance(err, tidMin, tidMax)` を整備し、builtin exception は `src/pytra/built_in/error.py` から emit する — `pytra.built_in.error` を native skip 対象から外し、Go smoke で generated `error.go` 同梱 compile/run を確認
 2. [x] [ID: P0-EXCEPTION-GO-S2] linker に `can_raise_v1` マーカーの推移的付与を実装する — call graph 走査で raise を含む関数を特定
 3. [x] [ID: P0-EXCEPTION-GO-S3] EAST3 言語別 lowering で `Raise` → `ErrorReturn`、`ErrorCheck`、`ErrorCatch` ノードを生成する
 4. [x] [ID: P0-EXCEPTION-GO-S4] Go emitter で `ErrorReturn` / `ErrorCheck` / `ErrorCatch` を写像する — `(T, *PytraError)` 戻り値、type_id range check isinstance、defer finally

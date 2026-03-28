@@ -5,6 +5,7 @@ import subprocess
 import tempfile
 import unittest
 from pathlib import Path
+from functools import lru_cache
 
 from toolchain2.compile.lower import lower_east2_to_east3
 from toolchain2.emit.go.emitter import emit_go_module
@@ -22,6 +23,18 @@ def _load_registry():
         ROOT / "test" / "include" / "east1" / "py" / "built_in" / "containers.py.east1",
         ROOT / "test" / "include" / "east1" / "py" / "std",
     )
+
+
+@lru_cache(maxsize=1)
+def _emit_builtin_error_go() -> str:
+    source = (ROOT / "src" / "pytra" / "built_in" / "error.py").read_text(encoding="utf-8")
+    east2 = parse_python_source(source, "<built-in-error>").to_jv()
+    resolve_east1_to_east2(east2, registry=_load_registry())
+    east3 = lower_east2_to_east3(east2, target_language="go")
+    meta = east3.setdefault("meta", {})
+    assert isinstance(meta, dict)
+    meta["emit_context"] = {"module_id": "pytra.built_in.error", "is_entry": False}
+    return emit_go_module(east3)
 
 
 def _walk(node: object) -> list[dict[str, object]]:
@@ -112,8 +125,17 @@ if __name__ == "__main__":
                 (ROOT / "src" / "runtime" / "go" / "built_in" / "py_runtime.go").read_text(encoding="utf-8"),
                 encoding="utf-8",
             )
+            (tmpdir / "pytra_built_in_error.go").write_text(_emit_builtin_error_go(), encoding="utf-8")
             build = subprocess.run(
-                ["go", "build", "-o", str(tmpdir / "app"), str(tmpdir / "py_runtime.go"), str(tmpdir / "app.go")],
+                [
+                    "go",
+                    "build",
+                    "-o",
+                    str(tmpdir / "app"),
+                    str(tmpdir / "py_runtime.go"),
+                    str(tmpdir / "pytra_built_in_error.go"),
+                    str(tmpdir / "app.go"),
+                ],
                 cwd=tmp,
                 capture_output=True,
                 text=True,

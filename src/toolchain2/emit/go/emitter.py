@@ -229,6 +229,7 @@ def _go_symbol_name(ctx: EmitContext, name: str) -> str:
 
 
 _BUILTIN_EXCEPTION_BOUNDS: dict[str, tuple[int, int]] = {
+    "PytraError": (9, 15),
     "BaseException": (9, 15),
     "Exception": (10, 15),
     "RuntimeError": (11, 11),
@@ -260,20 +261,22 @@ def _exception_bounds(ctx: EmitContext, type_name: str) -> tuple[int, int]:
 
 def _exception_ctor_expr(type_name: str, message_code: str) -> str:
     short_name = _short_type_name(type_name)
-    if short_name == "BaseException":
-        return "pytraNewBaseException(" + message_code + ")"
-    if short_name == "Exception":
-        return "pytraNewException(" + message_code + ")"
-    if short_name == "RuntimeError":
-        return "pytraNewRuntimeError(" + message_code + ")"
-    if short_name == "ValueError":
-        return "pytraNewValueError(" + message_code + ")"
-    if short_name == "TypeError":
-        return "pytraNewTypeError(" + message_code + ")"
-    if short_name == "IndexError":
-        return "pytraNewIndexError(" + message_code + ")"
-    if short_name == "KeyError":
-        return "pytraNewKeyError(" + message_code + ")"
+    if short_name in (
+        "PytraError",
+        "BaseException",
+        "Exception",
+        "RuntimeError",
+        "ValueError",
+        "TypeError",
+        "IndexError",
+        "KeyError",
+        "FileNotFoundError",
+        "PermissionError",
+        "NameError",
+        "NotImplementedError",
+        "OverflowError",
+    ):
+        return "New" + _safe_go_ident(short_name) + "(" + message_code + ")"
     return "pytraNewRuntimeError(" + message_code + ")"
 
 
@@ -292,6 +295,8 @@ def _handler_type_name(handler: dict[str, JsonVal]) -> str:
 
 def _is_exception_type_name(ctx: EmitContext, type_name: str) -> bool:
     short_name = _short_type_name(type_name)
+    if short_name == "PytraError":
+        return True
     if short_name in _BUILTIN_EXCEPTION_BOUNDS:
         return True
     seen: set[str] = set()
@@ -326,7 +331,7 @@ def _exception_struct_literal(ctx: EmitContext, type_name: str, message_code: st
     bounds = _exception_bounds(ctx, type_name)
     short_name = _short_type_name(type_name)
     return (
-        "PytraError{"
+        "PytraErrorCarrier{"
         + "TypeId: " + str(type_id)
         + ", TypeMin: " + str(bounds[0])
         + ", TypeMax: " + str(bounds[1])
@@ -334,6 +339,34 @@ def _exception_struct_literal(ctx: EmitContext, type_name: str, message_code: st
         + ", Msg: " + message_code
         + "}"
     )
+
+
+def _exception_embed_field(ctx: EmitContext, name: str, base: str) -> str:
+    return "PytraErrorCarrier"
+
+
+def _exception_embed_init_expr(ctx: EmitContext, name: str, base: str, message_code: str) -> str:
+    return _exception_struct_literal(ctx, name, message_code)
+
+
+def _is_exception_super_init_stmt(stmt: JsonVal) -> bool:
+    if not isinstance(stmt, dict) or _str(stmt, "kind") != "Expr":
+        return False
+    value = stmt.get("value")
+    if not isinstance(value, dict) or _str(value, "kind") != "Call":
+        return False
+    func = value.get("func")
+    if not isinstance(func, dict) or _str(func, "kind") != "Attribute":
+        return False
+    if _str(func, "attr") != "__init__":
+        return False
+    owner = func.get("value")
+    if not isinstance(owner, dict) or _str(owner, "kind") != "Call":
+        return False
+    if len(_list(owner, "args")) != 0:
+        return False
+    super_func = owner.get("func")
+    return isinstance(super_func, dict) and _str(super_func, "kind") == "Name" and _str(super_func, "id") == "super"
 
 
 def _is_exception_subtype_name(ctx: EmitContext, actual_type_name: str, expected_type_name: str) -> bool:
@@ -3487,7 +3520,7 @@ def _emit_class_def(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
     _emit(ctx, "type " + gn + " struct {")
     ctx.indent_level += 1
     if is_exception_class:
-        _emit(ctx, "PytraError")
+        _emit(ctx, _exception_embed_field(ctx, name, base))
     elif base != "" and base not in ("object", "Exception", "BaseException"):
         _emit(ctx, _go_symbol_name(ctx, base))  # embed base
     for fname, ftype in fields:
@@ -3497,7 +3530,7 @@ def _emit_class_def(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
     _emit_blank(ctx)
     _emit(ctx, "func (_ " + gn + ") " + _go_class_marker_method_name(ctx, name) + "() {}")
     if is_exception_class:
-        _emit(ctx, "func (e *" + gn + ") pytraErrorBase() *PytraError { return &e.PytraError }")
+        _emit(ctx, "func (e *" + gn + ") pytraErrorBase() *PytraErrorCarrier { return &e.PytraErrorCarrier }")
     _emit_blank(ctx)
     for var_name, spec in class_vars.items():
         var_type = _str(spec, "type")
@@ -3557,7 +3590,8 @@ def _emit_class_def(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
         _emit(ctx, "msg = py_str(__opt_args[0])")
         ctx.indent_level -= 1
         _emit(ctx, "}")
-        _emit(ctx, "return &" + gn + "{PytraError: " + _exception_struct_literal(ctx, name, "msg") + "}")
+        embed_field = _exception_embed_field(ctx, name, base)
+        _emit(ctx, "return &" + gn + "{" + embed_field + ": " + _exception_embed_init_expr(ctx, name, base, "msg") + "}")
     elif has_init and not is_dataclass:
         # Emit __init__ body translated to Go (self.x = ... → obj.x = ...)
         _emit(ctx, "obj := &" + gn + "{}")
@@ -3566,7 +3600,8 @@ def _emit_class_def(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
             if len(ctor_params) > 0:
                 first_param_name, _ = ctor_params[0]
                 msg_expr = "py_str(" + _safe_go_ident(first_param_name) + ")"
-            _emit(ctx, "obj.PytraError = " + _exception_struct_literal(ctx, name, msg_expr))
+            embed_field = _exception_embed_field(ctx, name, base)
+            _emit(ctx, "obj." + embed_field + " = " + _exception_embed_init_expr(ctx, name, base, msg_expr))
         saved_receiver = ctx.current_receiver
         saved_ctor_target = ctx.constructor_return_target
         saved_vars = dict(ctx.var_types)
@@ -3576,6 +3611,8 @@ def _emit_class_def(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
         for param_name, param_type in ctor_params:
             ctx.var_types[_safe_go_ident(param_name)] = param_type
         for init_s in init_body_stmts:
+            if is_exception_class and _is_exception_super_init_stmt(init_s):
+                continue
             _emit_stmt(ctx, init_s)
         ctx.current_receiver = saved_receiver
         ctx.constructor_return_target = saved_ctor_target
@@ -3603,7 +3640,8 @@ def _emit_class_def(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
             if len(ctor_params) > 0:
                 first_param_name, _ = ctor_params[0]
                 msg_expr = "py_str(" + _safe_go_ident(first_param_name) + ")"
-            field_init_parts.append("PytraError: " + _exception_struct_literal(ctx, name, msg_expr))
+            embed_field = _exception_embed_field(ctx, name, base)
+            field_init_parts.append(embed_field + ": " + _exception_embed_init_expr(ctx, name, base, msg_expr))
         for f, _ in ctor_params:
             field_init_parts.append(_safe_go_ident(f) + ": " + _safe_go_ident(f))
         field_inits = ", ".join(field_init_parts)
@@ -3849,7 +3887,7 @@ def _emit_try(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
                 safe_name = _safe_go_ident(handler_name)
                 saved_handler_type = ctx.var_types.get(safe_name, "")
                 _emit(ctx, safe_name + " := __pytra_err")
-                ctx.var_types[safe_name] = "*PytraError"
+                ctx.var_types[safe_name] = "*PytraErrorCarrier"
             _emit(ctx, "__handled = true")
             _emit(ctx, "__try_result = func() " + ret_type + " {")
             ctx.indent_level += 1
@@ -3911,7 +3949,7 @@ def _emit_try(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
             safe_name = _safe_go_ident(handler_name)
             saved_handler_type = ctx.var_types.get(safe_name, "")
             _emit(ctx, safe_name + " := __pytra_err")
-            ctx.var_types[safe_name] = "*PytraError"
+            ctx.var_types[safe_name] = "*PytraErrorCarrier"
         _emit(ctx, "__handled = true")
         saved_exc_var = ctx.current_exception_var
         ctx.current_exception_var = "__pytra_err"
@@ -4035,7 +4073,7 @@ def _emit_error_handlers(ctx: EmitContext, err_name: str, handlers: list[JsonVal
             safe_name = _safe_go_ident(handler_name)
             saved_type = ctx.var_types.get(safe_name, "")
             _emit(ctx, safe_name + " := " + err_name)
-            ctx.var_types[safe_name] = "*PytraError"
+            ctx.var_types[safe_name] = "*PytraErrorCarrier"
         _emit_body(ctx, _list(handler, "body"))
         _emit(ctx, "return")
         if handler_name != "":

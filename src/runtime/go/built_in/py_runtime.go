@@ -146,62 +146,62 @@ const (
 	PYTRA_TID_KEY_ERROR_MAX      int64 = 15
 )
 
-type PytraError struct {
+type PytraErrorCarrier struct {
 	TypeId  int64
 	TypeMin int64
 	TypeMax int64
 	Name    string
 	Msg     string
-	Cause   *PytraError
+	Cause   *PytraErrorCarrier
 }
 
-func (e *PytraError) Error() string {
+func (e *PytraErrorCarrier) Error() string {
 	if e == nil {
 		return ""
 	}
 	return e.Msg
 }
 
-func (e *PytraError) __str__() string {
+func (e *PytraErrorCarrier) __str__() string {
 	if e == nil {
 		return ""
 	}
 	return e.Msg
 }
 
-func pytraNewBaseException(msg string) *PytraError {
-	return &PytraError{TypeId: PYTRA_TID_BASE_EXCEPTION, TypeMin: PYTRA_TID_BASE_EXCEPTION_MIN, TypeMax: PYTRA_TID_BASE_EXCEPTION_MAX, Name: "BaseException", Msg: msg}
+func pytraNewBaseException(msg string) *PytraErrorCarrier {
+	return &PytraErrorCarrier{TypeId: PYTRA_TID_BASE_EXCEPTION, TypeMin: PYTRA_TID_BASE_EXCEPTION_MIN, TypeMax: PYTRA_TID_BASE_EXCEPTION_MAX, Name: "BaseException", Msg: msg}
 }
 
-func pytraNewException(msg string) *PytraError {
-	return &PytraError{TypeId: PYTRA_TID_EXCEPTION, TypeMin: PYTRA_TID_EXCEPTION_MIN, TypeMax: PYTRA_TID_EXCEPTION_MAX, Name: "Exception", Msg: msg}
+func pytraNewException(msg string) *PytraErrorCarrier {
+	return &PytraErrorCarrier{TypeId: PYTRA_TID_EXCEPTION, TypeMin: PYTRA_TID_EXCEPTION_MIN, TypeMax: PYTRA_TID_EXCEPTION_MAX, Name: "Exception", Msg: msg}
 }
 
-func pytraNewRuntimeError(msg string) *PytraError {
-	return &PytraError{TypeId: PYTRA_TID_RUNTIME_ERROR, TypeMin: PYTRA_TID_RUNTIME_ERROR_MIN, TypeMax: PYTRA_TID_RUNTIME_ERROR_MAX, Name: "RuntimeError", Msg: msg}
+func pytraNewRuntimeError(msg string) *PytraErrorCarrier {
+	return &PytraErrorCarrier{TypeId: PYTRA_TID_RUNTIME_ERROR, TypeMin: PYTRA_TID_RUNTIME_ERROR_MIN, TypeMax: PYTRA_TID_RUNTIME_ERROR_MAX, Name: "RuntimeError", Msg: msg}
 }
 
-func pytraNewValueError(msg string) *PytraError {
-	return &PytraError{TypeId: PYTRA_TID_VALUE_ERROR, TypeMin: PYTRA_TID_VALUE_ERROR_MIN, TypeMax: PYTRA_TID_VALUE_ERROR_MAX, Name: "ValueError", Msg: msg}
+func pytraNewValueError(msg string) *PytraErrorCarrier {
+	return &PytraErrorCarrier{TypeId: PYTRA_TID_VALUE_ERROR, TypeMin: PYTRA_TID_VALUE_ERROR_MIN, TypeMax: PYTRA_TID_VALUE_ERROR_MAX, Name: "ValueError", Msg: msg}
 }
 
-func pytraNewTypeError(msg string) *PytraError {
-	return &PytraError{TypeId: PYTRA_TID_TYPE_ERROR, TypeMin: PYTRA_TID_TYPE_ERROR_MIN, TypeMax: PYTRA_TID_TYPE_ERROR_MAX, Name: "TypeError", Msg: msg}
+func pytraNewTypeError(msg string) *PytraErrorCarrier {
+	return &PytraErrorCarrier{TypeId: PYTRA_TID_TYPE_ERROR, TypeMin: PYTRA_TID_TYPE_ERROR_MIN, TypeMax: PYTRA_TID_TYPE_ERROR_MAX, Name: "TypeError", Msg: msg}
 }
 
-func pytraNewIndexError(msg string) *PytraError {
-	return &PytraError{TypeId: PYTRA_TID_INDEX_ERROR, TypeMin: PYTRA_TID_INDEX_ERROR_MIN, TypeMax: PYTRA_TID_INDEX_ERROR_MAX, Name: "IndexError", Msg: msg}
+func pytraNewIndexError(msg string) *PytraErrorCarrier {
+	return &PytraErrorCarrier{TypeId: PYTRA_TID_INDEX_ERROR, TypeMin: PYTRA_TID_INDEX_ERROR_MIN, TypeMax: PYTRA_TID_INDEX_ERROR_MAX, Name: "IndexError", Msg: msg}
 }
 
-func pytraNewKeyError(msg string) *PytraError {
-	return &PytraError{TypeId: PYTRA_TID_KEY_ERROR, TypeMin: PYTRA_TID_KEY_ERROR_MIN, TypeMax: PYTRA_TID_KEY_ERROR_MAX, Name: "KeyError", Msg: msg}
+func pytraNewKeyError(msg string) *PytraErrorCarrier {
+	return &PytraErrorCarrier{TypeId: PYTRA_TID_KEY_ERROR, TypeMin: PYTRA_TID_KEY_ERROR_MIN, TypeMax: PYTRA_TID_KEY_ERROR_MAX, Name: "KeyError", Msg: msg}
 }
 
-func pytraEnsureRecoveredError(value any) *PytraError {
+func pytraEnsureRecoveredError(value any) *PytraErrorCarrier {
 	switch t := value.(type) {
-	case *PytraError:
+	case *PytraErrorCarrier:
 		return t
-	case interface{ pytraErrorBase() *PytraError }:
+	case interface{ pytraErrorBase() *PytraErrorCarrier }:
 		return t.pytraErrorBase()
 	case error:
 		return pytraNewRuntimeError(t.Error())
@@ -212,14 +212,14 @@ func pytraEnsureRecoveredError(value any) *PytraError {
 	}
 }
 
-func pytraErrorIsInstance(err *PytraError, tidMin int64, tidMax int64) bool {
+func pytraErrorIsInstance(err *PytraErrorCarrier, tidMin int64, tidMax int64) bool {
 	if err == nil {
 		return false
 	}
 	return err.TypeId >= tidMin && err.TypeId <= tidMax
 }
 
-func pytraAttachCause(err *PytraError, cause any) *PytraError {
+func pytraAttachCause(err *PytraErrorCarrier, cause any) *PytraErrorCarrier {
 	if err == nil {
 		return nil
 	}

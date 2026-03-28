@@ -5,6 +5,7 @@ import tempfile
 import unittest
 from pathlib import Path
 import os
+from functools import lru_cache
 
 from toolchain2.compile.lower import lower_east2_to_east3
 from toolchain2.emit.go.emitter import emit_go_module
@@ -23,6 +24,18 @@ def _load_registry():
         ROOT / "test" / "include" / "east1" / "py" / "built_in" / "containers.py.east1",
         ROOT / "test" / "include" / "east1" / "py" / "std",
     )
+
+
+@lru_cache(maxsize=1)
+def _emit_builtin_error_go() -> str:
+    source = (ROOT / "src" / "pytra" / "built_in" / "error.py").read_text(encoding="utf-8")
+    east2 = parse_python_source(source, "<built-in-error>").to_jv()
+    resolve_east1_to_east2(east2, registry=_load_registry())
+    east3 = lower_east2_to_east3(east2, target_language="go")
+    meta = east3.setdefault("meta", {})
+    assert isinstance(meta, dict)
+    meta["emit_context"] = {"module_id": "pytra.built_in.error", "is_entry": False}
+    return emit_go_module(east3)
 
 
 def _run_go(source: str, *, type_info_table: dict[str, object] | None = None) -> str:
@@ -53,13 +66,15 @@ def _run_go_process(
         go_path = Path(tmp) / "app.go"
         runtime_path = ROOT / "src" / "runtime" / "go" / "built_in" / "py_runtime.go"
         bundled_runtime = Path(tmp) / "py_runtime.go"
+        bundled_errors = Path(tmp) / "pytra_built_in_error.go"
         out_path = Path(tmp) / "app"
         env = dict(os.environ)
         env["PATH"] = "/home/node/.local/go/bin:" + env.get("PATH", "")
         go_path.write_text(go_code, encoding="utf-8")
         bundled_runtime.write_text(runtime_path.read_text(encoding="utf-8"), encoding="utf-8")
+        bundled_errors.write_text(_emit_builtin_error_go(), encoding="utf-8")
         build = subprocess.run(
-            ["go", "build", "-o", str(out_path), str(bundled_runtime), str(go_path)],
+            ["go", "build", "-o", str(out_path), str(bundled_runtime), str(bundled_errors), str(go_path)],
             cwd=tmp,
             capture_output=True,
             text=True,

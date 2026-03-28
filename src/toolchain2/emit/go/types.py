@@ -36,13 +36,13 @@ _TYPE_MAP: dict[str, str] = {
     "Node": "map[string]any",
     "Callable": "any",
     "callable": "any",
-    "Exception": "*PytraError",
-    "BaseException": "*PytraError",
-    "RuntimeError": "*PytraError",
-    "ValueError": "*PytraError",
-    "TypeError": "*PytraError",
-    "IndexError": "*PytraError",
-    "KeyError": "*PytraError",
+    "Exception": "*PytraErrorCarrier",
+    "BaseException": "*PytraErrorCarrier",
+    "RuntimeError": "*PytraErrorCarrier",
+    "ValueError": "*PytraErrorCarrier",
+    "TypeError": "*PytraErrorCarrier",
+    "IndexError": "*PytraErrorCarrier",
+    "KeyError": "*PytraErrorCarrier",
 }
 
 
