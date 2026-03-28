@@ -8,11 +8,9 @@ This page explains how to use exception handling (`raise` / `try` / `except` / `
 
 ## Basics: raise and try/except
 
-You can throw and catch errors using the same syntax as Python.
+You can throw and catch errors using the same syntax as Python. Built-in exceptions like `ValueError` can be used directly without import.
 
 ```python
-from pytra.built_in.error import ValueError
-
 def parse_int(s: str) -> int:
     if not s.isdigit():
         raise ValueError("not a number: " + s)
@@ -34,34 +32,39 @@ error: not a number: abc
 
 ## Available Exception Types
 
-Pytra's built-in exceptions are defined in `pytra.built_in.error`.
+The following built-in exceptions can be used without import (they are `built_in`).
 
-```python
-from pytra.built_in.error import (
-    PytraError,          # Base of all exceptions
-    ValueError,          # Value error
-    RuntimeError,        # Runtime error
-    FileNotFoundError,   # File not found
-    PermissionError,     # Permission denied
-    TypeError,           # Type error
-    IndexError,          # Index out of range
-    KeyError,            # Key not found
-    OverflowError,       # Overflow
-)
-```
+| Exception | Purpose |
+|---|---|
+| `PytraError` | Base of all exceptions |
+| `Exception` | Base of general exceptions |
+| `ValueError` | Value error |
+| `RuntimeError` | Runtime error |
+| `FileNotFoundError` | File not found |
+| `PermissionError` | Permission denied |
+| `TypeError` | Type error |
+| `IndexError` | Index out of range |
+| `KeyError` | Key not found |
+| `NameError` | Name undefined |
+| `NotImplementedError` | Not implemented |
+| `OverflowError` | Overflow |
 
 Hierarchy:
 
 ```
 PytraError
-├── ValueError
-├── RuntimeError
-├── FileNotFoundError
-├── PermissionError
-├── TypeError
-├── IndexError
-├── KeyError
-└── OverflowError
+└── BaseException
+    └── Exception
+        ├── ValueError
+        ├── RuntimeError
+        │   └── NotImplementedError
+        ├── FileNotFoundError
+        ├── PermissionError
+        ├── TypeError
+        ├── IndexError
+        ├── KeyError
+        ├── NameError
+        └── OverflowError
 ```
 
 ## Defining Your Own Exceptions
@@ -69,8 +72,6 @@ PytraError
 You can create custom exceptions by inheriting from built-in exceptions and adding fields.
 
 ```python
-from pytra.built_in.error import ValueError
-
 class ParseError(ValueError):
     line: int
 
@@ -110,8 +111,6 @@ except ValueError as e:      # catches ParseError too (it derives from ValueErro
 ## Multiple except Handlers
 
 ```python
-from pytra.built_in.error import ValueError, RuntimeError
-
 try:
     data = read_file(path)
 except FileNotFoundError as e:
@@ -181,7 +180,7 @@ Pytra's exception types are ordinary classes. There is no special mechanism.
 | Catch an error | `try: ... except ValueError as e: ...` |
 | Guarantee cleanup | `finally: cleanup()` |
 | Define your own exception | `class MyError(ValueError): ...` |
-| Import exceptions | `from pytra.built_in.error import ValueError` |
+| Use built-in exceptions | No import needed (`ValueError` etc. work directly) |
 
 For detailed specifications, see:
 - [Exception handling specification](../spec/spec-exception.md) — Conversion rules for each language, EAST nodes, union_return details
