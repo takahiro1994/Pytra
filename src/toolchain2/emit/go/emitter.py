@@ -674,6 +674,11 @@ def _go_type_with_ctx(ctx: EmitContext, resolved_type: str) -> str:
             return "func(" + ", ".join(param_gts) + ")"
         return "func(" + ", ".join(param_gts) + ") " + ret_gt
 
+    if resolved_type.startswith("multi_return[") and resolved_type.endswith("]"):
+        inner = resolved_type[len("multi_return["):-1]
+        parts = _split_generic_args(inner)
+        return "(" + ", ".join(_go_type_with_ctx(ctx, part) for part in parts) + ")"
+
     if resolved_type.startswith("list[") and resolved_type.endswith("]"):
         inner = resolved_type[5:-1]
         return "[]" + _go_type_with_ctx(ctx, inner)
@@ -3186,7 +3191,10 @@ def _emit_multi_assign(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
     target_types = _list(node, "target_types")
     if len(targets) == 0:
         return
+    value_node = node.get("value")
+    value_type = _str(value_node, "resolved_type") if isinstance(value_node, dict) else ""
     lhs_parts: list[str] = []
+    existing_targets: dict[str, bool] = {}
     for idx, target in enumerate(targets):
         if not isinstance(target, dict):
             continue
@@ -3200,6 +3208,7 @@ def _emit_multi_assign(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
         lhs_parts.append(name)
         if name == "_":
             continue
+        existing_targets[name] = name in ctx.var_types
         resolved_type = _str(target, "resolved_type")
         if resolved_type in ("", "unknown") and idx < len(target_types):
             type_obj = target_types[idx]
@@ -3208,6 +3217,35 @@ def _emit_multi_assign(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
         if resolved_type not in ("", "unknown"):
             ctx.var_types[name] = resolved_type
     if len(lhs_parts) == 0:
+        return
+    if not value_type.startswith("multi_return["):
+        tmp_name = _next_temp(ctx, "multi")
+        _emit(ctx, tmp_name + " := " + _emit_expr(ctx, value_node))
+        if value_type != "":
+            ctx.var_types[tmp_name] = value_type
+        for idx, target in enumerate(targets):
+            if not isinstance(target, dict):
+                continue
+            target_name = _safe_go_ident(_str(target, "id"))
+            declare_target = _bool(node, "declare") and not existing_targets.get(target_name, False)
+            resolved_type = _str(target, "resolved_type")
+            if resolved_type in ("", "unknown") and idx < len(target_types):
+                type_obj2 = target_types[idx]
+                if isinstance(type_obj2, str):
+                    resolved_type = type_obj2
+            value_expr: Node = {}
+            value_expr["kind"] = "Subscript"
+            value_expr["value"] = {"kind": "Name", "id": tmp_name, "resolved_type": value_type}
+            value_expr["slice"] = {"kind": "Constant", "value": idx, "resolved_type": "int64"}
+            value_expr["resolved_type"] = resolved_type
+            assign_node: Node = {}
+            assign_node["kind"] = "Assign"
+            assign_node["target"] = target
+            assign_node["value"] = value_expr
+            assign_node["declare"] = declare_target
+            if resolved_type not in ("", "unknown"):
+                assign_node["decl_type"] = resolved_type
+            _emit_assign(ctx, assign_node)
         return
     assign_op = ":=" if _bool(node, "declare") else "="
     _emit(ctx, ", ".join(lhs_parts) + " " + assign_op + " " + _emit_expr(ctx, node.get("value")))
@@ -4386,6 +4424,7 @@ def _emit_error_check(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
     ctx.indent_level -= 1
     _emit(ctx, "}")
     if ok_target is not None and ok_type not in ("", "None"):
+        ctx.var_types[ok_tmp] = ok_type
         assign_node: dict[str, JsonVal] = {
             "kind": "Assign",
             "target": ok_target,
@@ -4455,6 +4494,7 @@ def _emit_error_catch(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
             ctx.indent_level -= 1
             _emit(ctx, "}")
             if ok_target is not None and ok_type not in ("", "None"):
+                ctx.var_types[ok_tmp] = ok_type
                 assign_node: dict[str, JsonVal] = {
                     "kind": "Assign",
                     "target": ok_target,

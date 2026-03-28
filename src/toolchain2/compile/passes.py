@@ -3792,6 +3792,43 @@ def _make_error_check(call_node: Node, ok_target: JsonVal, ok_type: str, on_erro
     return out
 
 
+def _rewrite_expr_error_checks(
+    node: JsonVal,
+    ctx: CompileContext,
+    can_raise_symbols: set[str],
+    on_error: str,
+) -> tuple[list[JsonVal], JsonVal]:
+    if isinstance(node, list):
+        prefix: list[JsonVal] = []
+        items: list[JsonVal] = []
+        for item in cast(list[JsonVal], node):
+            item_prefix, item_out = _rewrite_expr_error_checks(item, ctx, can_raise_symbols, on_error)
+            prefix.extend(item_prefix)
+            items.append(item_out)
+        return prefix, items
+    if not isinstance(node, dict):
+        return [], node
+    out: Node = {}
+    prefix2: list[JsonVal] = []
+    for key, value in node.items():
+        key_s = key if isinstance(key, str) else ""
+        if key_s == "":
+            continue
+        if isinstance(value, dict) or isinstance(value, list):
+            value_prefix, value_out = _rewrite_expr_error_checks(value, ctx, can_raise_symbols, on_error)
+            prefix2.extend(value_prefix)
+            out[key_s] = value_out
+        else:
+            out[key_s] = value
+    if _is_can_raise_call(out, can_raise_symbols):
+        ok_type = _str(out, "resolved_type")
+        tmp_name = ctx.next_comp_name()
+        tmp_target = _make_name_ref(tmp_name, ok_type)
+        prefix2.append(_make_error_check(out, tmp_target, ok_type, on_error))
+        return prefix2, deep_copy_json(tmp_target)
+    return prefix2, out
+
+
 def _apply_profile_stmt(
     stmt: JsonVal,
     ctx: CompileContext,
@@ -3883,11 +3920,40 @@ def _apply_profile_stmt(
                 if ok_type == "" and isinstance(value, dict):
                     ok_type = _str(value, "resolved_type")
                 return [_make_error_check(cast(dict[str, JsonVal], value), ok_target, ok_type, "catch" if catch_mode else "propagate")]
+            value_prefix, value_out = _rewrite_expr_error_checks(value, ctx, active_symbols, "catch" if catch_mode else "propagate")
+            if len(value_prefix) != 0:
+                out["value"] = value_out
+                return value_prefix + [out]
+        if kind0 == RETURN:
+            value3 = out.get("value")
+            if isinstance(value3, dict) or isinstance(value3, list):
+                value_prefix2, value_out2 = _rewrite_expr_error_checks(value3, ctx, active_symbols, "catch" if catch_mode else "propagate")
+                if len(value_prefix2) != 0:
+                    out["value"] = value_out2
+                    return value_prefix2 + [out]
         if kind0 == EXPR:
             value2 = out.get("value")
             if _is_can_raise_call(value2, active_symbols):
                 ok_type2 = _str(cast(dict[str, JsonVal], value2), "resolved_type")
                 return [_make_error_check(cast(dict[str, JsonVal], value2), None, ok_type2, "catch" if catch_mode else "propagate")]
+            value_prefix3, value_out3 = _rewrite_expr_error_checks(value2, ctx, active_symbols, "catch" if catch_mode else "propagate")
+            if len(value_prefix3) != 0:
+                out["value"] = value_out3
+                return value_prefix3 + [out]
+        if kind0 in (IF, WHILE):
+            test = out.get("test")
+            if isinstance(test, dict) or isinstance(test, list):
+                test_prefix, test_out = _rewrite_expr_error_checks(test, ctx, active_symbols, "catch" if catch_mode else "propagate")
+                if len(test_prefix) != 0:
+                    out["test"] = test_out
+                    return test_prefix + [out]
+        if kind0 == WITH:
+            context_expr0 = out.get("context_expr")
+            if isinstance(context_expr0, dict) or isinstance(context_expr0, list):
+                expr_prefix, expr_out = _rewrite_expr_error_checks(context_expr0, ctx, active_symbols, "catch" if catch_mode else "propagate")
+                if len(expr_prefix) != 0:
+                    out["context_expr"] = expr_out
+                    return expr_prefix + [out]
 
     kind = _sk(out)
     if kind == WITH:

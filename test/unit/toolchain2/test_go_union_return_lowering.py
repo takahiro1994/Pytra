@@ -67,6 +67,23 @@ if __name__ == "__main__":
         print(err)
 """
 
+NESTED_RETURN_SOURCE = """
+def parse_int(s: str) -> int:
+    if not s.isdigit():
+        raise ValueError("bad")
+    return int(s)
+
+def as_chr(s: str) -> str:
+    return chr(parse_int(s))
+
+if __name__ == "__main__":
+    try:
+        print(as_chr("7"))
+        print(as_chr("x"))
+    except ValueError as err:
+        print(err)
+"""
+
 FIXTURE_SOURCE = (
     FIXTURE_ROOT / "typing" / "union_return_errorcheck.py"
 ).read_text(encoding="utf-8")
@@ -150,6 +167,58 @@ if __name__ == "__main__":
             run = subprocess.run([str(tmpdir / "app")], cwd=tmp, capture_output=True, text=True, env=env)
         self.assertEqual(run.returncode, 0, run.stderr)
         self.assertEqual(run.stdout, "7\nbad\n")
+
+    def test_lowering_hoists_error_check_for_nested_return_call(self) -> None:
+        east2 = parse_python_source(NESTED_RETURN_SOURCE, "<go-union-nested-return>").to_jv()
+        resolve_east1_to_east2(east2, registry=_load_registry())
+        east3 = lower_east2_to_east3(east2, target_language="go")
+        body = east3.get("body", [])
+        assert isinstance(body, list)
+        as_chr_fn = body[1]
+        assert isinstance(as_chr_fn, dict)
+        fn_body = as_chr_fn.get("body", [])
+        assert isinstance(fn_body, list)
+        self.assertGreaterEqual(len(fn_body), 2)
+        self.assertEqual(fn_body[0].get("kind"), "ErrorCheck")
+        self.assertEqual(fn_body[1].get("kind"), "Return")
+
+    def test_go_union_return_smoke_runs_for_nested_return_call(self) -> None:
+        east2 = parse_python_source(NESTED_RETURN_SOURCE, "<go-union-nested-run>").to_jv()
+        resolve_east1_to_east2(east2, registry=_load_registry())
+        east3 = lower_east2_to_east3(east2, target_language="go")
+        meta = east3.setdefault("meta", {})
+        assert isinstance(meta, dict)
+        meta["emit_context"] = {"module_id": "app", "is_entry": True}
+        go_code = emit_go_module(east3)
+        env = dict(os.environ)
+        env["PATH"] = "/home/node/.local/go/bin:" + env.get("PATH", "")
+        with tempfile.TemporaryDirectory() as tmp:
+            tmpdir = Path(tmp)
+            (tmpdir / "app.go").write_text(go_code, encoding="utf-8")
+            (tmpdir / "py_runtime.go").write_text(
+                (ROOT / "src" / "runtime" / "go" / "built_in" / "py_runtime.go").read_text(encoding="utf-8"),
+                encoding="utf-8",
+            )
+            (tmpdir / "pytra_built_in_error.go").write_text(_emit_builtin_error_go(), encoding="utf-8")
+            build = subprocess.run(
+                [
+                    "go",
+                    "build",
+                    "-o",
+                    str(tmpdir / "app"),
+                    str(tmpdir / "py_runtime.go"),
+                    str(tmpdir / "pytra_built_in_error.go"),
+                    str(tmpdir / "app.go"),
+                ],
+                cwd=tmp,
+                capture_output=True,
+                text=True,
+                env=env,
+            )
+            self.assertEqual(build.returncode, 0, build.stderr)
+            run = subprocess.run([str(tmpdir / "app")], cwd=tmp, capture_output=True, text=True, env=env)
+        self.assertEqual(run.returncode, 0, run.stderr)
+        self.assertEqual(run.stdout, "\x07\nbad\n")
 
     def test_go_union_return_fixture_lowers_error_nodes(self) -> None:
         east2 = parse_python_source(FIXTURE_SOURCE, "<go-union-fixture>").to_jv()
