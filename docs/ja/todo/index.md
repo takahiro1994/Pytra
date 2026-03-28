@@ -25,12 +25,12 @@
 文脈: [docs/ja/plans/p0-type-id-table.md](../plans/p0-type-id-table.md)
 仕様: [docs/ja/spec/spec-type_id.md](../spec/spec-type_id.md) §7、[docs/ja/spec/spec-linker.md](../spec/spec-linker.md) §6.4
 
-1. [ ] [ID: P0-TID-TABLE-S1] `pytra/built_in/` に `pytra_isinstance` 関数を pure Python で定義する
-2. [ ] [ID: P0-TID-TABLE-S2] linker に `pytra.built_in.type_id_table` 仮想モジュール生成を実装する（`id_table: list[int]` + TID 定数）
-3. [ ] [ID: P0-TID-TABLE-S3] linker が isinstance lower 時に対象モジュールへ import binding を挿入する
-4. [ ] [ID: P0-TID-TABLE-S4] C++ runtime の `g_type_table[4096]` ハードコードを撤廃する
-5. [ ] [ID: P0-TID-TABLE-S5] Go runtime の手書き TID 定数を撤廃する
-6. [ ] [ID: P0-TID-TABLE-S6] fixture + sample の C++/Go parity 確認
+1. [x] [ID: P0-TID-TABLE-S1] `pytra/built_in/` に `pytra_isinstance` 関数を pure Python で定義する
+2. [x] [ID: P0-TID-TABLE-S2] linker に `pytra.built_in.type_id_table` 仮想モジュール生成を実装する（`id_table: list[int]` + TID 定数）
+3. [x] [ID: P0-TID-TABLE-S3] linker が isinstance lower 時に対象モジュールへ import binding を挿入する
+4. [x] [ID: P0-TID-TABLE-S4] C++ runtime の `g_type_table[4096]` ハードコードを撤廃する
+5. [x] [ID: P0-TID-TABLE-S5] Go runtime の手書き TID 定数を撤廃する
+6. [x] [ID: P0-TID-TABLE-S6] fixture + sample の C++/Go parity 確認 — linker focused regression 3 件追加、Go fixture `exception_propagation_two_frames.py` は `pytra-cli2 -build` + `go build && ./app.out` で `caught boom`、C++ は clean emit で helper `built_in/type_id_table.h/.cpp` まで出力確認
 
 ### P2-SELFHOST: toolchain2 自身の変換テスト
 
@@ -88,5 +88,14 @@
 6. [ ] [ID: P10-REORG-S6] tools/README.md 管理台帳を作成
 7. [ ] [ID: P10-REORG-S7] CI で台帳突合チェックを追加
 8. [ ] [ID: P10-REORG-S8] AGENTS.md にファイル追加禁止ルールを追加
+
+### P11-VERSION-GATE: toolchain2 用バージョンチェッカーの新設
+
+前提: toolchain2 への完全移行後に着手。
+
+1. [ ] [ID: P11-VERGATE-S1] `src/toolchain2/` 向けの `transpiler_versions.json` を新設する（toolchain1 の `src/toolchain/misc/transpiler_versions.json` は廃止）
+2. [ ] [ID: P11-VERGATE-S2] toolchain2 のディレクトリ構成に合わせた shared / 言語別の依存パスを定義する
+3. [ ] [ID: P11-VERGATE-S3] バージョンチェッカーを新しく書く（PATCH 以上の bump で OK とする。MINOR/MAJOR はユーザーの明示指示がある場合のみ）
+4. [ ] [ID: P11-VERGATE-S4] 旧チェッカー（`tools/check_transpiler_version_gate.py`）と旧バージョンファイルを廃止する
 
 注: 完了済みタスクは [アーカイブ](archive/index.md) に移動済み。
