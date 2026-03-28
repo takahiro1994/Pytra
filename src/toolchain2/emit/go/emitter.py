@@ -70,6 +70,8 @@ class EmitContext:
     temp_counter: int = 0
     # Top-level private symbols emitted in this module; mangle to avoid package collisions.
     module_private_symbols: set[str] = field(default_factory=set)
+    # Exception type bounds from linked_program_v1.type_info_table_v1.
+    exception_type_bounds: dict[str, tuple[int, int]] = field(default_factory=dict)
 
 
 class _GoStmtCommonRenderer(CommonRenderer):
@@ -221,6 +223,55 @@ def _go_symbol_name(ctx: EmitContext, name: str) -> str:
         if prefix != "":
             return prefix + "__" + base.lstrip("_")
     return base
+
+
+_BUILTIN_EXCEPTION_BOUNDS: dict[str, tuple[int, int]] = {
+    "BaseException": (9, 15),
+    "Exception": (10, 15),
+    "RuntimeError": (11, 11),
+    "ValueError": (12, 12),
+    "TypeError": (13, 13),
+    "IndexError": (14, 14),
+    "KeyError": (15, 15),
+}
+
+
+def _short_type_name(type_name: str) -> str:
+    if "." in type_name:
+        return type_name.rsplit(".", 1)[-1]
+    return type_name
+
+
+def _exception_bounds(ctx: EmitContext, type_name: str) -> tuple[int, int]:
+    short_name = _short_type_name(type_name)
+    if short_name in _BUILTIN_EXCEPTION_BOUNDS:
+        return _BUILTIN_EXCEPTION_BOUNDS[short_name]
+    exact = ctx.exception_type_bounds.get(type_name)
+    if exact is not None:
+        return exact
+    for fqcn, bounds in ctx.exception_type_bounds.items():
+        if _short_type_name(fqcn) == short_name:
+            return bounds
+    return (0, 0)
+
+
+def _exception_ctor_expr(type_name: str, message_code: str) -> str:
+    short_name = _short_type_name(type_name)
+    if short_name == "BaseException":
+        return "pytraNewBaseException(" + message_code + ")"
+    if short_name == "Exception":
+        return "pytraNewException(" + message_code + ")"
+    if short_name == "RuntimeError":
+        return "pytraNewRuntimeError(" + message_code + ")"
+    if short_name == "ValueError":
+        return "pytraNewValueError(" + message_code + ")"
+    if short_name == "TypeError":
+        return "pytraNewTypeError(" + message_code + ")"
+    if short_name == "IndexError":
+        return "pytraNewIndexError(" + message_code + ")"
+    if short_name == "KeyError":
+        return "pytraNewKeyError(" + message_code + ")"
+    return "pytraNewRuntimeError(" + message_code + ")"
 
 
 def _go_enum_const_name(ctx: EmitContext, type_name: str, member_name: str) -> str:
@@ -1395,10 +1446,10 @@ def _emit_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
                 return "int64(" + call_arg_strs[0] + ".__len__())"
             if fn_name == "print":
                 return "py_print(" + ", ".join(call_arg_strs) + ")"
-            if fn_name in ("RuntimeError", "ValueError", "TypeError", "IndexError", "KeyError"):
+            if fn_name in ("BaseException", "Exception", "RuntimeError", "ValueError", "TypeError", "IndexError", "KeyError"):
                 if len(call_arg_strs) >= 1:
-                    return call_arg_strs[0]
-                return _go_string_literal(fn_name)
+                    return _exception_ctor_expr(fn_name, call_arg_strs[0])
+                return _exception_ctor_expr(fn_name, _go_string_literal(fn_name))
             runtime_module_id = _str(node, "runtime_module_id")
             runtime_symbol = _str(node, "runtime_symbol")
             if runtime_symbol != "":
@@ -1800,15 +1851,15 @@ def _emit_builtin_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
     if bn == "range":
         return "py_range(" + ", ".join(arg_strs) + ")"
 
-    # Exception constructor expression → message string
-    if bn in ("RuntimeError", "ValueError", "TypeError", "IndexError", "KeyError"):
+    # Exception constructor expression → typed runtime error value
+    if bn in ("BaseException", "Exception", "RuntimeError", "ValueError", "TypeError", "IndexError", "KeyError"):
         if len(arg_strs) >= 1:
-            return arg_strs[0]
-        return _go_string_literal(bn)
+            return _exception_ctor_expr(bn, arg_strs[0])
+        return _exception_ctor_expr(bn, _go_string_literal(bn))
     if rc == "std::runtime_error":
         if len(arg_strs) >= 1:
-            return arg_strs[0]
-        return _go_string_literal("runtime error")
+            return _exception_ctor_expr("RuntimeError", arg_strs[0])
+        return _exception_ctor_expr("RuntimeError", _go_string_literal("runtime error"))
 
     # py_int_from_str / py_float_from_str
     if rc == "py_int_from_str" and len(arg_strs) >= 1:
@@ -3565,9 +3616,37 @@ def _emit_try(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
         _emit(ctx, "__try_result := " + zero_value)
         _emit(ctx, "defer func() {")
         ctx.indent_level += 1
+        _emit(ctx, "__rethrow := any(nil)")
         _emit(ctx, "if r := recover(); r != nil {")
         ctx.indent_level += 1
-        _emit(ctx, "__try_result = " + handler_ret_expr)
+        _emit(ctx, "__pytra_err := pytraEnsureRecoveredError(r)")
+        _emit(ctx, "__handled := false")
+        for handler in handlers:
+            if not isinstance(handler, dict):
+                continue
+            handler_type = _str(handler, "type")
+            bounds = _exception_bounds(ctx, handler_type)
+            cond = "__pytra_err != nil"
+            if bounds != (0, 0):
+                cond = "pytraErrorIsInstance(__pytra_err, " + str(bounds[0]) + ", " + str(bounds[1]) + ")"
+            _emit(ctx, "if !__handled && " + cond + " {")
+            ctx.indent_level += 1
+            _emit(ctx, "__handled = true")
+            _emit(ctx, "__try_result = " + handler_ret_expr)
+            ctx.indent_level -= 1
+            _emit(ctx, "}")
+        _emit(ctx, "if !__handled {")
+        ctx.indent_level += 1
+        _emit(ctx, "__rethrow = __pytra_err")
+        ctx.indent_level -= 1
+        _emit(ctx, "}")
+        ctx.indent_level -= 1
+        _emit(ctx, "}")
+        for stmt in finalbody:
+            _emit_stmt(ctx, stmt)
+        _emit(ctx, "if __rethrow != nil {")
+        ctx.indent_level += 1
+        _emit(ctx, "panic(__rethrow)")
         ctx.indent_level -= 1
         _emit(ctx, "}")
         ctx.indent_level -= 1
@@ -3591,22 +3670,57 @@ def _emit_try(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
         ctx.indent_level += 1
         _emit(ctx, "defer func() {")
         ctx.indent_level += 1
-        if len(handlers) > 0:
-            _emit(ctx, "if r := recover(); r != nil {")
+        _emit(ctx, "__rethrow := any(nil)")
+        _emit(ctx, "if r := recover(); r != nil {")
+        ctx.indent_level += 1
+        _emit(ctx, "__pytra_err := pytraEnsureRecoveredError(r)")
+        _emit(ctx, "__handled := false")
+        for handler in handlers:
+            if not isinstance(handler, dict):
+                continue
+            handler_type = _str(handler, "type")
+            bounds = _exception_bounds(ctx, handler_type)
+            cond = "__pytra_err != nil"
+            if bounds != (0, 0):
+                cond = "pytraErrorIsInstance(__pytra_err, " + str(bounds[0]) + ", " + str(bounds[1]) + ")"
+            _emit(ctx, "if !__handled && " + cond + " {")
             ctx.indent_level += 1
-            handler = handlers[0]
-            if isinstance(handler, dict):
-                _emit(ctx, "__try_result = func() " + ret_type + " {")
-                ctx.indent_level += 1
-                _emit_body(ctx, _list(handler, "body"))
-                _emit(ctx, "return __try_result")
-                ctx.indent_level -= 1
-                _emit(ctx, "}()")
+            handler_name = _str(handler, "name")
+            saved_handler_type = ""
+            if handler_name != "":
+                safe_name = _safe_go_ident(handler_name)
+                saved_handler_type = ctx.var_types.get(safe_name, "")
+                _emit(ctx, safe_name + " := __pytra_err")
+                ctx.var_types[safe_name] = "*PytraError"
+            _emit(ctx, "__handled = true")
+            _emit(ctx, "__try_result = func() " + ret_type + " {")
+            ctx.indent_level += 1
+            _emit_body(ctx, _list(handler, "body"))
+            _emit(ctx, "return __try_result")
+            ctx.indent_level -= 1
+            _emit(ctx, "}()")
+            if handler_name != "":
+                safe_name2 = _safe_go_ident(handler_name)
+                if saved_handler_type != "":
+                    ctx.var_types[safe_name2] = saved_handler_type
+                elif safe_name2 in ctx.var_types:
+                    del ctx.var_types[safe_name2]
             ctx.indent_level -= 1
             _emit(ctx, "}")
+        _emit(ctx, "if !__handled {")
+        ctx.indent_level += 1
+        _emit(ctx, "__rethrow = __pytra_err")
+        ctx.indent_level -= 1
+        _emit(ctx, "}")
+        ctx.indent_level -= 1
+        _emit(ctx, "}")
         if len(finalbody) > 0:
             _emit_body(ctx, finalbody)
+        _emit(ctx, "if __rethrow != nil {")
+        ctx.indent_level += 1
+        _emit(ctx, "panic(__rethrow)")
         ctx.indent_level -= 1
+        _emit(ctx, "}")
         _emit(ctx, "}()")
         _emit_body(ctx, try_body)
         _emit(ctx, "return __try_result")
@@ -3618,21 +3732,56 @@ def _emit_try(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
     ctx.indent_level += 1
     _emit(ctx, "defer func() {")
     ctx.indent_level += 1
+    _emit(ctx, "__rethrow := any(nil)")
     _emit(ctx, "if r := recover(); r != nil {")
     ctx.indent_level += 1
-    if len(handlers) > 0:
-        handler = handlers[0]
-        if isinstance(handler, dict):
-            _emit_body(ctx, _list(handler, "body"))
+    _emit(ctx, "__pytra_err := pytraEnsureRecoveredError(r)")
+    _emit(ctx, "__handled := false")
+    for handler in handlers:
+        if not isinstance(handler, dict):
+            continue
+        handler_type = _str(handler, "type")
+        bounds = _exception_bounds(ctx, handler_type)
+        cond = "__pytra_err != nil"
+        if bounds != (0, 0):
+            cond = "pytraErrorIsInstance(__pytra_err, " + str(bounds[0]) + ", " + str(bounds[1]) + ")"
+        _emit(ctx, "if !__handled && " + cond + " {")
+        ctx.indent_level += 1
+        handler_name = _str(handler, "name")
+        saved_handler_type = ""
+        if handler_name != "":
+            safe_name = _safe_go_ident(handler_name)
+            saved_handler_type = ctx.var_types.get(safe_name, "")
+            _emit(ctx, safe_name + " := __pytra_err")
+            ctx.var_types[safe_name] = "*PytraError"
+        _emit(ctx, "__handled = true")
+        _emit_body(ctx, _list(handler, "body"))
+        if handler_name != "":
+            safe_name2 = _safe_go_ident(handler_name)
+            if saved_handler_type != "":
+                ctx.var_types[safe_name2] = saved_handler_type
+            elif safe_name2 in ctx.var_types:
+                del ctx.var_types[safe_name2]
+        ctx.indent_level -= 1
+        _emit(ctx, "}")
+    _emit(ctx, "if !__handled {")
+    ctx.indent_level += 1
+    _emit(ctx, "__rethrow = __pytra_err")
     ctx.indent_level -= 1
     _emit(ctx, "}")
     ctx.indent_level -= 1
+    _emit(ctx, "}")
+    if len(finalbody) > 0:
+        _emit_body(ctx, finalbody)
+    _emit(ctx, "if __rethrow != nil {")
+    ctx.indent_level += 1
+    _emit(ctx, "panic(__rethrow)")
+    ctx.indent_level -= 1
+    _emit(ctx, "}")
     _emit(ctx, "}()")
     _emit_body(ctx, try_body)
     ctx.indent_level -= 1
     _emit(ctx, "}()")
-    if len(finalbody) > 0:
-        _emit_body(ctx, finalbody)
 
 
 def _extract_single_return_expr(body: list[JsonVal]) -> str:
@@ -3652,18 +3801,19 @@ def _emit_raise(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
     if isinstance(exc, dict):
         bn = _str(exc, "builtin_name")
         rc = _str(exc, "runtime_call")
-        if bn in ("RuntimeError", "ValueError", "TypeError", "IndexError", "KeyError") or rc == "std::runtime_error":
+        if bn in ("BaseException", "Exception", "RuntimeError", "ValueError", "TypeError", "IndexError", "KeyError") or rc == "std::runtime_error":
             exc_args = _list(exc, "args")
             if len(exc_args) >= 1:
-                _emit(ctx, "panic(" + _emit_expr(ctx, exc_args[0]) + ")")
+                _emit(ctx, "panic(" + _exception_ctor_expr(bn if bn != "" else "RuntimeError", _emit_expr(ctx, exc_args[0])) + ")")
             else:
-                _emit(ctx, "panic(\"" + bn + "\")")
+                name = bn if bn != "" else "RuntimeError"
+                _emit(ctx, "panic(" + _exception_ctor_expr(name, _go_string_literal(name)) + ")")
         else:
-            _emit(ctx, "panic(" + _emit_expr(ctx, exc) + ")")
+            _emit(ctx, "panic(pytraEnsureRecoveredError(" + _emit_expr(ctx, exc) + "))")
     elif exc is not None:
-        _emit(ctx, "panic(" + _emit_expr(ctx, exc) + ")")
+        _emit(ctx, "panic(pytraEnsureRecoveredError(" + _emit_expr(ctx, exc) + "))")
     else:
-        _emit(ctx, "panic(nil)")
+        _emit(ctx, "panic(pytraNewRuntimeError(\"raise\"))")
     # Go requires unreachable return after panic in non-void functions
     if ctx.current_return_type != "" and ctx.current_return_type != "None":
         zv = go_zero_value(ctx.current_return_type)
@@ -3757,6 +3907,15 @@ def emit_go_module(east3_doc: dict[str, JsonVal]) -> str:
 
     # Collect imported runtime symbols for native helper resolution.
     ctx.runtime_imports = build_runtime_import_map(meta, mapping)
+    type_info_table = _dict(lp, "type_info_table_v1")
+    if len(type_info_table) > 0:
+        for fqcn, info in type_info_table.items():
+            if not isinstance(fqcn, str) or not isinstance(info, dict):
+                continue
+            entry_val = info.get("entry")
+            exit_val = info.get("exit")
+            if isinstance(entry_val, int) and isinstance(exit_val, int):
+                ctx.exception_type_bounds[fqcn] = (entry_val, exit_val - 1)
 
     # Build import alias → module_id map for module.attr call resolution
     ctx.import_alias_modules = build_import_alias_map(meta)

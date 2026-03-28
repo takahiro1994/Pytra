@@ -122,6 +122,115 @@ type PyFile struct {
 
 type SystemExit int64
 
+const (
+	PYTRA_TID_BASE_EXCEPTION     int64 = 9
+	PYTRA_TID_BASE_EXCEPTION_MIN int64 = 9
+	PYTRA_TID_BASE_EXCEPTION_MAX int64 = 15
+	PYTRA_TID_EXCEPTION          int64 = 10
+	PYTRA_TID_EXCEPTION_MIN      int64 = 10
+	PYTRA_TID_EXCEPTION_MAX      int64 = 15
+	PYTRA_TID_RUNTIME_ERROR      int64 = 11
+	PYTRA_TID_RUNTIME_ERROR_MIN  int64 = 11
+	PYTRA_TID_RUNTIME_ERROR_MAX  int64 = 11
+	PYTRA_TID_VALUE_ERROR        int64 = 12
+	PYTRA_TID_VALUE_ERROR_MIN    int64 = 12
+	PYTRA_TID_VALUE_ERROR_MAX    int64 = 12
+	PYTRA_TID_TYPE_ERROR         int64 = 13
+	PYTRA_TID_TYPE_ERROR_MIN     int64 = 13
+	PYTRA_TID_TYPE_ERROR_MAX     int64 = 13
+	PYTRA_TID_INDEX_ERROR        int64 = 14
+	PYTRA_TID_INDEX_ERROR_MIN    int64 = 14
+	PYTRA_TID_INDEX_ERROR_MAX    int64 = 14
+	PYTRA_TID_KEY_ERROR          int64 = 15
+	PYTRA_TID_KEY_ERROR_MIN      int64 = 15
+	PYTRA_TID_KEY_ERROR_MAX      int64 = 15
+)
+
+type PytraError struct {
+	TypeId  int64
+	TypeMin int64
+	TypeMax int64
+	Name    string
+	Msg     string
+}
+
+type PytraBaseException struct{ PytraError }
+type PytraException struct{ PytraError }
+type PytraRuntimeError struct{ PytraError }
+type PytraValueError struct{ PytraError }
+type PytraTypeError struct{ PytraError }
+type PytraIndexError struct{ PytraError }
+type PytraKeyError struct{ PytraError }
+
+func (e *PytraError) Error() string {
+	if e == nil {
+		return ""
+	}
+	return e.Msg
+}
+
+func (e *PytraError) __str__() string {
+	if e == nil {
+		return ""
+	}
+	return e.Msg
+}
+
+func pytraNewBaseException(msg string) *PytraError {
+	err := PytraBaseException{PytraError{TypeId: PYTRA_TID_BASE_EXCEPTION, TypeMin: PYTRA_TID_BASE_EXCEPTION_MIN, TypeMax: PYTRA_TID_BASE_EXCEPTION_MAX, Name: "BaseException", Msg: msg}}
+	return &err.PytraError
+}
+
+func pytraNewException(msg string) *PytraError {
+	err := PytraException{PytraError{TypeId: PYTRA_TID_EXCEPTION, TypeMin: PYTRA_TID_EXCEPTION_MIN, TypeMax: PYTRA_TID_EXCEPTION_MAX, Name: "Exception", Msg: msg}}
+	return &err.PytraError
+}
+
+func pytraNewRuntimeError(msg string) *PytraError {
+	err := PytraRuntimeError{PytraError{TypeId: PYTRA_TID_RUNTIME_ERROR, TypeMin: PYTRA_TID_RUNTIME_ERROR_MIN, TypeMax: PYTRA_TID_RUNTIME_ERROR_MAX, Name: "RuntimeError", Msg: msg}}
+	return &err.PytraError
+}
+
+func pytraNewValueError(msg string) *PytraError {
+	err := PytraValueError{PytraError{TypeId: PYTRA_TID_VALUE_ERROR, TypeMin: PYTRA_TID_VALUE_ERROR_MIN, TypeMax: PYTRA_TID_VALUE_ERROR_MAX, Name: "ValueError", Msg: msg}}
+	return &err.PytraError
+}
+
+func pytraNewTypeError(msg string) *PytraError {
+	err := PytraTypeError{PytraError{TypeId: PYTRA_TID_TYPE_ERROR, TypeMin: PYTRA_TID_TYPE_ERROR_MIN, TypeMax: PYTRA_TID_TYPE_ERROR_MAX, Name: "TypeError", Msg: msg}}
+	return &err.PytraError
+}
+
+func pytraNewIndexError(msg string) *PytraError {
+	err := PytraIndexError{PytraError{TypeId: PYTRA_TID_INDEX_ERROR, TypeMin: PYTRA_TID_INDEX_ERROR_MIN, TypeMax: PYTRA_TID_INDEX_ERROR_MAX, Name: "IndexError", Msg: msg}}
+	return &err.PytraError
+}
+
+func pytraNewKeyError(msg string) *PytraError {
+	err := PytraKeyError{PytraError{TypeId: PYTRA_TID_KEY_ERROR, TypeMin: PYTRA_TID_KEY_ERROR_MIN, TypeMax: PYTRA_TID_KEY_ERROR_MAX, Name: "KeyError", Msg: msg}}
+	return &err.PytraError
+}
+
+func pytraEnsureRecoveredError(value any) *PytraError {
+	switch t := value.(type) {
+	case *PytraError:
+		return t
+	case error:
+		return pytraNewRuntimeError(t.Error())
+	case string:
+		return pytraNewRuntimeError(t)
+	default:
+		return pytraNewRuntimeError(py_str(t))
+	}
+}
+
+func pytraErrorIsInstance(err *PytraError, tidMin int64, tidMax int64) bool {
+	if err == nil {
+		return false
+	}
+	return err.TypeId >= tidMin && err.TypeId <= tidMax
+}
+
 func py_open(path string, mode string, _kwargs ...any) *PyFile {
 	var flag int
 	switch mode {
