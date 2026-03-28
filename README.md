@@ -131,7 +131,7 @@ Legend: ✅ = Good / 🔶 = Partial / ❌ = Unsupported or difficult
 | | ![English](https://img.shields.io/badge/English-2563EB?style=flat-square) | ![日本語](https://img.shields.io/badge/日本語-DC2626?style=flat-square) |
 |---|---|---|
 | Getting started | [Tutorial](docs/en/tutorial/README.md) | [チュートリアル](docs/ja/tutorial/README.md) |
-| All docs | [English docs](docs/en/index.md) | [日本語ドキュメント](docs/ja/index.md) |
+| Specification | [Spec index](docs/en/spec/index.md) | [仕様書](docs/ja/spec/index.md) |
 
 ## Changelog
 
