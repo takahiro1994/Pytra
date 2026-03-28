@@ -77,23 +77,38 @@ def py_range(start: int, stop: int, step: int) -> list[int]: ...
 - 本体は `...`（シグネチャのみ）
 - クラスと同様、手書き runtime か pure Python かは区別しない
 
-### 3.3 自動導出ルール
+### 3.3 自動導出ルールとオプション引数
 
-`@runtime("pytra.core")` の `class list` の `extend` メソッドの場合:
+`@runtime` は第1引数（namespace）のみ必須。`symbol` と `tag` はオプションで、省略時は自動導出される。
 
-| 項目 | 導出元 | 結果 |
-|---|---|---|
-| module | namespace + class名 | `pytra.core.list` |
-| symbol | class名 + メソッド名 | `list.extend` |
-| tag | `stdlib.method.` + メソッド名 | `stdlib.method.extend` |
+```python
+# 自動導出で十分な場合（大半）
+@runtime("pytra.core")
+class list(Generic[T]):
+    def append(self, x: T) -> None: ...
+
+# symbol / tag を上書きしたい場合（Python 名と runtime 名が異なるとき）
+@runtime("pytra.built_in.sequence", symbol="py_range", tag="iter.range")
+def range(stop: int) -> list[int]: ...
+```
+
+自動導出ルール（`@runtime("pytra.core")` の `class list` の `extend` メソッドの場合）:
+
+| 項目 | 導出元 | 結果 | 上書き |
+|---|---|---|---|
+| module | namespace + class名 | `pytra.core.list` | 不可 |
+| symbol | class名 + メソッド名 | `list.extend` | `symbol=` で上書き可 |
+| tag | `stdlib.method.` + メソッド名 | `stdlib.method.extend` | `tag=` で上書き可 |
 
 `@runtime("pytra.built_in.sequence")` の `def py_range` の場合:
 
-| 項目 | 導出元 | 結果 |
-|---|---|---|
-| module | namespace | `pytra.built_in.sequence` |
-| symbol | 関数名 | `py_range` |
-| tag | `stdlib.fn.` + 関数名 | `stdlib.fn.py_range` |
+| 項目 | 導出元 | 結果 | 上書き |
+|---|---|---|---|
+| module | namespace | `pytra.built_in.sequence` | 不可 |
+| symbol | 関数名 | `py_range` | `symbol=` で上書き可 |
+| tag | `stdlib.fn.` + 関数名 | `stdlib.fn.py_range` | `tag=` で上書き可 |
+
+注: `tag`（`semantic_tag`）は将来廃止の可能性あり。`runtime_module_id` + `runtime_symbol` で呼び出し先が一意に決まるため、冗長かもしれない。現時点では互換のため残す。
 
 ### 3.4 引数の渡し方
 
