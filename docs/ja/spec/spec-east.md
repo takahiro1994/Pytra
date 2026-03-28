@@ -131,6 +131,7 @@
 
 - `arg_types`, `arg_type_exprs`, `return_type`, `return_type_expr`, `arg_usage`, `renamed_symbols`
 - `arg_type_exprs` / `return_type_expr` は `arg_types` / `return_type` の構造化正本。
+- **`return_type` はソースの型注釈から取得する。注釈がない場合は `inference_failure` で fail-closed とする。** Return 文の値から戻り値型を推論してはならない（body 走査による型推論は禁止）。
 - `decorators`（raw decorator 文字列の列）
 - `meta.runtime_abi_v1`（任意。`@abi` の canonical metadata）
 - `meta.template_v1`（任意。`@template` の canonical metadata）
