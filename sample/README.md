@@ -1,10 +1,10 @@
+<a href="README-ja.md">
+  <img alt="Read in Japanese" src="https://img.shields.io/badge/docs-日本語-DC2626?style=flat-square">
+</a>
+
 # Sample Index
 
 This directory contains reference Python samples and transpiled outputs for each target language.
-
-<a href="readme-ja.md">
-  <img alt="Read in Japanese" src="https://img.shields.io/badge/sample-日本語-2563EB?style=flat-square">
-</a>
 
 - Golden manifest: [`golden/manifest.json`](golden/manifest.json)
 

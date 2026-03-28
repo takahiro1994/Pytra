@@ -1,10 +1,10 @@
+<a href="README.md">
+  <img alt="Read in English" src="https://img.shields.io/badge/docs-English-2563EB?style=flat-square">
+</a>
+
 # サンプル一覧
 
 このディレクトリには、Python の元サンプルと各ターゲット言語への変換結果を配置しています。
-
-<a href="readme.md">
-  <img alt="Read in English" src="https://img.shields.io/badge/sample-English-2563EB?style=flat-square">
-</a>
 
 - ゴールデンマニフェスト: [`golden/manifest.json`](golden/manifest.json)
 
