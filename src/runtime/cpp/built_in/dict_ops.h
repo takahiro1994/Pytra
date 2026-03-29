@@ -156,8 +156,6 @@ static inline int64 py_index(const Object<list<T>>& v, const T& item) {
     return py_index(*v, item);
 }
 
-#endif  // PYTRA_BUILT_IN_DICT_OPS_H
-
 // py_at for tuple (runtime index → object conversion)
 template <class... Ts>
 static inline object py_at(const ::std::tuple<Ts...>& t, int64 idx) {
@@ -173,3 +171,5 @@ template <class... Ts>
 static inline object py_at(const ::std::tuple<Ts...>& t, int idx) {
     return py_at(t, static_cast<int64>(idx));
 }
+
+#endif  // PYTRA_BUILT_IN_DICT_OPS_H
