@@ -6,7 +6,7 @@
 
 > 領域別 TODO。全体索引は [index.md](./index.md) を参照。
 
-最終更新: 2026-03-30（P2-BENCH S1〜S5 完了）
+最終更新: 2026-03-30（P3-SAMPLE-AUTO-COPY 完了）
 
 ## 運用ルール
 
@@ -24,15 +24,18 @@
 
 文脈: [docs/ja/plans/p3-sample-auto-copy.md](../plans/p3-sample-auto-copy.md)
 
-1. [ ] [ID: P3-SAMPLE-COPY-S1] parity check（fast 版）で sample の parity PASS 時に、emit されたソースコードを `sample/<lang>/` にコピーするロジックを追加する — PASS したケースのみコピーし、FAIL のケースは既存ファイルを維持する
-2. [ ] [ID: P3-SAMPLE-COPY-S2] コピー先のファイル名が既存の `sample/<lang>/` の命名規則（`01_mandelbrot.cpp` 等）と一致することを確認する
-3. [ ] [ID: P3-SAMPLE-COPY-S3] `regenerate_samples.py` との責務整理 — parity check が自動コピーするなら `regenerate_samples.py` は不要になる可能性がある。廃止するか、手動再生成用として残すか判断する
+1. [x] [ID: P3-SAMPLE-COPY-S1] parity check（fast 版）で sample の parity PASS 時に、emit されたソースコードを `sample/<lang>/` にコピーするロジックを追加する — PASS したケースのみコピーし、FAIL のケースは既存ファイルを維持する
+   完了: `_SAMPLE_TARGET_MAP` + `_copy_sample_emit()` を `runtime_parity_check_fast.py` に追加。PASS の両分岐（テキスト／アーティファクト）で呼び出し。
+2. [x] [ID: P3-SAMPLE-COPY-S2] コピー先のファイル名が既存の `sample/<lang>/` の命名規則（`01_mandelbrot.cpp` 等）と一致することを確認する
+   完了: `case_stem + ext`（例: `01_mandelbrot.cpp`）でコピー。既存の命名規則と一致を確認。
+3. [x] [ID: P3-SAMPLE-COPY-S3] `regenerate_samples.py` との責務整理 — parity check が自動コピーするなら `regenerate_samples.py` は不要になる可能性がある。廃止するか、手動再生成用として残すか判断する
+   完了: 計画通り両方残す。parity check（Python 実行必須）と regenerate_samples.py（emit のみ、実行不要）は用途が異なる。
 
 ### P3-SELFHOST-PARITY: selfhost 済みコンパイラによる fixture/sample parity 検証
 
 文脈: [docs/ja/plans/p3-selfhost-parity.md](../plans/p3-selfhost-parity.md)
 
-前提: 各言語の selfhost ビルドタスク（P4-CPP-SELFHOST, P6-GO-SELFHOST 等）が完了してから着手。
+注: 各言語の selfhost ビルドが通るかは言語次第。スクリプトの骨格は先に作り、ビルドが通る言語から順に検証する。ビルドが通らない言語は `selfhost_<lang>.json` に `build: fail` が記録される。
 
 1. [ ] [ID: P3-SELFHOST-PARITY-S1] `tools/run/run_selfhost_parity.py` を作成する — selfhost バイナリのビルド → emit → compile + run → stdout 比較の一連のフローを実行する
 2. [ ] [ID: P3-SELFHOST-PARITY-S2] 結果を `.parity-results/selfhost_<lang>.json` に記録する — `gen_backend_progress.py` が読み取り selfhost マトリクスに反映

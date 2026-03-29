@@ -85,8 +85,8 @@ PASS 条件: `emit_targets.<lang>.fixture_fail == 0 && sample_fail == 0`
 
 ## 前提条件
 
-- 各言語の selfhost バイナリがビルドできること（P4-CPP-SELFHOST, P6-GO-SELFHOST 等が完了していること）
 - fixture/sample の parity check インフラが動作すること（P0-CLI2-RS-TS 等が完了済み）
+- 各言語の selfhost ビルドは前提ではない。スクリプトの骨格は先に作り、ビルドが通る言語から順に検証する。ビルドが通らない言語は `selfhost_<lang>.json` に `build: fail` が記録されるだけ
 
 ## 決定ログ
 
