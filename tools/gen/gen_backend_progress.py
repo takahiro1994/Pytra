@@ -28,8 +28,11 @@ FIXTURE_ROOT = ROOT / "test" / "fixture" / "source" / "py"
 SAMPLE_ROOT = ROOT / "sample" / "py"
 PARITY_DIR = ROOT / "work" / "parity-results"
 
-PARITY_LANGS = ["cpp", "go", "rs", "ts"]
-SELFHOST_LANGS = ["cpp", "go", "rs", "ts"]
+PARITY_LANGS = [
+    "cpp", "rs", "cs", "powershell", "js", "ts", "dart", "go", "java",
+    "swift", "kotlin", "ruby", "lua", "scala", "php", "nim", "julia", "zig",
+]
+SELFHOST_LANGS = PARITY_LANGS
 
 # ---------------------------------------------------------------------------
 # Icons — only PASS / FAIL / untested
@@ -233,7 +236,12 @@ def _build_parity_matrix_en(cases: list[tuple[str, str] | str], results: dict[st
 
 
 def _build_selfhost_matrix(selfhost_data: dict[str, dict[str, object]]) -> list[str]:
-    lang_labels = {"cpp": "C++", "go": "Go", "rs": "Rust", "ts": "TS"}
+    lang_labels = {
+        "cpp": "C++", "rs": "Rust", "cs": "C#", "powershell": "PowerShell",
+        "js": "JS", "ts": "TS", "dart": "Dart", "go": "Go", "java": "Java",
+        "swift": "Swift", "kotlin": "Kotlin", "ruby": "Ruby", "lua": "Lua",
+        "scala": "Scala3", "php": "PHP", "nim": "Nim", "julia": "Julia", "zig": "Zig",
+    }
     lines: list[str] = []
     emit_langs = PARITY_LANGS
     lines.append(f"| selfhost 言語 \\ emit 先 | {' | '.join(emit_langs)} |")
@@ -272,7 +280,12 @@ def _build_selfhost_matrix(selfhost_data: dict[str, dict[str, object]]) -> list[
 
 
 def _build_selfhost_matrix_en(selfhost_data: dict[str, dict[str, object]]) -> list[str]:
-    lang_labels = {"cpp": "C++", "go": "Go", "rs": "Rust", "ts": "TS"}
+    lang_labels = {
+        "cpp": "C++", "rs": "Rust", "cs": "C#", "powershell": "PowerShell",
+        "js": "JS", "ts": "TS", "dart": "Dart", "go": "Go", "java": "Java",
+        "swift": "Swift", "kotlin": "Kotlin", "ruby": "Ruby", "lua": "Lua",
+        "scala": "Scala3", "php": "PHP", "nim": "Nim", "julia": "Julia", "zig": "Zig",
+    }
     lines: list[str] = []
     emit_langs = PARITY_LANGS
     lines.append(f"| selfhost lang \\ emit target | {' | '.join(emit_langs)} |")
