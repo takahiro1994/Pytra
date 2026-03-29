@@ -133,7 +133,7 @@ EAST1 の式ノードは以下を持つ:
 - `decorators`: decorator 文字列リスト
 - `source_span`
 
-持たない: `arg_usage`, `arg_type_exprs`, `return_type_expr`, `meta.runtime_abi_v1`, `meta.template_v1`
+持たない: `arg_usage`, `arg_type_exprs`, `return_type_expr`, `meta.template_v1`
 
 ### ClassDef
 

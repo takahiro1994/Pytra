@@ -133,7 +133,6 @@
 - `arg_type_exprs` / `return_type_expr` は `arg_types` / `return_type` の構造化正本。
 - **`return_type` はソースの型注釈から取得する。注釈がない場合は `inference_failure` で fail-closed とする。** Return 文の値から戻り値型を推論してはならない（body 走査による型推論は禁止）。
 - `decorators`（raw decorator 文字列の列）
-- `meta.runtime_abi_v1`（任意。`@abi` の canonical metadata）
 - `meta.template_v1`（任意。`@template` の canonical metadata）
 - `meta.template_specialization_v1`（任意。linked-program が materialize した specialization metadata）
 - `ClosureDef` は上記に加えて `captures: [{name, mode, type_expr?}, ...]` を持つ。
@@ -148,17 +147,6 @@
 
 - `bases`, `decorators`
 - `meta.nominal_adt_v1`（任意。nominal ADT family / variant の canonical metadata）
-
-`FunctionDef.meta.runtime_abi_v1` の規則:
-
-- `schema_version: 1`
-- `args: {param_name: mode}`
-- `ret: mode`
-- canonical mode は `default`, `value`, `value_mut`
-- `ret` に許可される canonical mode は `default` または `value`
-- source surface で legacy `value_readonly` を受理しても、metadata では `value` へ正規化する
-- raw `decorators` は Python surface の保存用であり、backend / linker の正本は `meta.runtime_abi_v1`
-- linked-program 後もこの function-level metadata は保持し、`meta.linked_program_v1` で置き換えない
 
 `FunctionDef.meta.template_v1` の規則:
 
@@ -740,7 +728,6 @@ linked-program optimizer が生成した synthetic helper module は、上記に
 - linked module では `meta.linked_program_v1` を必須とする。
 - backend は `meta.linked_program_v1` と `link-output.v1` を読むことは許可されるが、同等情報を再計算してはならない。
 - function / call 単位の linked summary（例: `FunctionDef.meta.escape_summary`, `Call.meta.non_escape_callsite`）は linker が最終化してよい。
-- `FunctionDef.meta.runtime_abi_v1` のような parser/EAST build 由来 metadata は linked module でも保持必須であり、linker は上書きしてはならない。
 - `FunctionDef.meta.template_v1` も parser/EAST build 由来 metadata として linked module で保持必須であり、linker は上書きしてはならない。
 
 <a id="east-file-mapping"></a>

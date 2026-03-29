@@ -570,7 +570,7 @@ migration note:
 - `dict_get_*` / `py_dict_get_default` / object/`std::any` bridge のような low-level dynamic helper は、`generated/built_in` へ雑に移してはならない。lane 設計前は `native/core` 保留でよい。
 - `generated/built_in` に出す helper は `src/pytra/built_in/*.py` を唯一 SoT とし、`--emit-runtime-cpp` の正規導線でのみ checked-in artifact を更新する。
 - `generated/built_in/*.h` は stable `native/core/*.h` と、必要なら同名 module の `native/<bucket>/*.h` companion だけを参照する。`generated/built_in/*.cpp` は `runtime/cpp/native/core/py_runtime.h` と sibling generated header を include してよいが、legacy shim path や無関係な handwritten glue をぶら下げてはならない。
-- mutable container を helper 境界で value 受けしたい generated helper は、`@abi` などの明示契約を持たなければならない。C++ backend 内部の ref-first 表現を helper ABI として固定してはならない。
+- mutable container helper は runtime の既定参照表現をそのまま使う。C++ backend 内部の ref-first 表現を helper ABI として固定してはならない。
 - `generated/core` は low-level pure helper 専用の予約 lane であり、`built_in` semantics の逃がし先にしてはならない。checked-in `runtime/cpp/core/*.h` surface は持たない。
 
 制約:

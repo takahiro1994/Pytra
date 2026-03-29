@@ -171,7 +171,7 @@ C++ では追加で次を守る。
   - template-only module は header-only generated artifact を許容し、`compile_sources=[]` が canonical になりうる。`numeric_ops` / `zip_ops` のような helper のために空の `.cpp` をでっち上げてはならない。
   - `.h` は stable `native/core/*.h` と、必要なら同名 module の `native/<bucket>/*.h` companion だけを include してよい。legacy shim path や無関係な handwritten glue をぶら下げてはならない。
   - `.cpp` は `runtime/cpp/native/core/py_runtime.h` と sibling generated header を include してよいが、C++ 専用 handwritten glue を埋め込んではならない。
-  - mutable container を helper 境界で value 受けしたい場合は、`@abi` などの明示契約を使う。backend 内部の ref-first 表現を stable helper ABI として露出してはならない。
+  - mutable container helper の境界は runtime の既定参照表現に従う。backend 内部の ref-first 表現を ad-hoc な stable helper ABI として露出してはならない。
 - `generated/core`
   - SoT は pure Python で書ける low-level helper に限定し、`built_in` / `std` / `utils` module runtime の単なる移植先として使ってはならない。
   - checked-in `runtime/cpp/core/*.h` は持たず、include 面は `generated/core` または `native/core` の ownership lane に揃える。
