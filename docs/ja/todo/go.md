@@ -44,6 +44,11 @@
 2. [x] [ID: P5-CR-GO-S2] fixture 132 件 + sample 18 件の Go compile + run parity を通す
    - 完了: fixture 147 件全 PASS、sample 18 件全 PASS（P1-GO-CONTAINER-S4 で確認済み）
 
+### P0-GO-ENV-TARGET: Go emitter の extern_var インライン置換を修正する
+
+1. [ ] [ID: P0-GO-ENV-S1] Go emitter が `extern_var_v1` メタデータ付きの変数参照を、mapping.json の `calls` テーブルから値を取得してインラインリテラルとして出力するよう修正する — 現状は `env` をモジュールとして import しようとして `undefined: env` エラーになる
+2. [ ] [ID: P0-GO-ENV-S2] `pytra_runtime_png` fixture が Go で compile + run parity PASS することを確認する
+
 ### P6-GO-SELFHOST: Go emitter で toolchain2 を Go に変換し go build を通す
 
 前提: P1-GO-CONTAINER-WRAPPER 完了後に着手。
