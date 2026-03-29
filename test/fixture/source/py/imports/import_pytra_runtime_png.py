@@ -6,8 +6,8 @@ from pytra.utils.assertions import py_assert_all, py_assert_eq, py_assert_true
 
 
 def run_case() -> None:
-    os.makedirs("work/tmp/test_png_out", exist_ok=True)
-    out_path = "work/tmp/test_png_out/import_pytra_runtime_png.png"
+    os.makedirs("test_png_out", exist_ok=True)
+    out_path = "test_png_out/import_pytra_runtime_png.png"
     pixels = bytearray([
         255, 0, 0,
         0, 255, 0,

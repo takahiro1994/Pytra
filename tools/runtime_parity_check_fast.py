@@ -211,21 +211,26 @@ def _run_target(
     output_dir: Path,
     case_path: Path,
     *,
+    work_dir: Path,
     env: dict[str, str] | None = None,
     timeout_sec: int = 120,
 ) -> subprocess.CompletedProcess[str]:
-    """Compile and run the emitted code."""
+    """Compile and run the emitted code.
+
+    *work_dir* is the parity check working directory, used as cwd for all
+    target executions so that relative output paths match the Python run.
+    """
     emit_dir = output_dir / "emit"
 
     if target == "cpp":
-        return _run_cpp_emit_dir(emit_dir, cwd=ROOT, env=env, timeout_sec=timeout_sec)
+        return _run_cpp_emit_dir(emit_dir, cwd=work_dir, env=env, timeout_sec=timeout_sec)
 
     if target == "go":
         go_files = sorted(str(p) for p in emit_dir.rglob("*.go"))
         if len(go_files) == 0:
             return subprocess.CompletedProcess("", 1, "", "no .go files found")
         cmd = "go run " + " ".join(shlex.quote(f) for f in go_files)
-        return run_shell(cmd, cwd=emit_dir, env=env, timeout_sec=timeout_sec)
+        return run_shell(cmd, cwd=work_dir, env=env, timeout_sec=timeout_sec)
 
     return subprocess.CompletedProcess("", 1, "", f"unsupported target: {target}")
 
@@ -323,7 +328,7 @@ def check_case(
             # Compile + run (subprocess)
             _purge_case_artifacts(work, case_stem)
             _safe_unlink(expected_artifact_path)
-            rr = _run_target(target_name, out_dir, case_path, env=target_env, timeout_sec=cmd_timeout_sec)
+            rr = _run_target(target_name, out_dir, case_path, work_dir=work, env=target_env, timeout_sec=cmd_timeout_sec)
             if rr.returncode != 0:
                 msg = rr.stderr.strip()
                 mismatches.append(f"{case_stem}:{target_name}: run failed: {msg}")
