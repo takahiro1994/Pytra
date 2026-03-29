@@ -286,6 +286,8 @@ func py_runtime_object_type_id(value any) int64 {
 		if base != nil {
 			return base.TypeId
 		}
+	case interface{ __pytra_type_id() int64 }:
+		return t.__pytra_type_id()
 	}
 	return pytraEnsureRecoveredError(value).TypeId
 }

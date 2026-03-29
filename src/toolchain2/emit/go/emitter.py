@@ -86,6 +86,9 @@ class EmitContext:
     # Go variadic parameters (func(args ...T)): these are Go slices, NOT *PyList.
     # _wrapper_container_storage_expr must NOT append .items for these.
     go_vararg_params: set[str] = field(default_factory=set)
+    # When True, dynamic-dispatch calls (yields_dynamic) should NOT coerce the result
+    # to the Call's resolved_type. Used by _emit_unbox to get a raw `any` value for nil-check.
+    skip_any_coercion: bool = False
 
 
 def _sig_default_empty_list(elem_type: str) -> dict[str, JsonVal]:
@@ -1078,9 +1081,12 @@ def _emit_obj_type_id(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
     value = node.get("value")
     value_expr = _emit_expr(ctx, value)
     value_type = _str(value, "resolved_type") if isinstance(value, dict) else ""
+    # Only use __pytra_type_id() for concrete user classes (not object/any/exceptions).
     linked = _linked_type_id(ctx, value_type)
-    if linked is not None:
-        return "int64(" + str(linked) + ")"
+    value_gt = go_type(value_type)
+    if linked is not None and value_gt != "any" and not _is_exception_type_name(ctx, value_type):
+        # Call __pytra_type_id() on the expression so the variable is referenced in Go.
+        return value_expr + ".__pytra_type_id()"
     if _is_exception_type_name(ctx, value_type):
         return "int64(" + str(_exception_type_id(ctx, value_type)) + ")"
     return "py_runtime_object_type_id(" + value_expr + ")"
@@ -1405,6 +1411,10 @@ def _maybe_coerce_expr_to_type(ctx: EmitContext, value_node: JsonVal, value_code
         return _wrap_optional_value_code(ctx, value_code, target_type, value_node)
     if source_type in ("JsonVal", "Any", "Obj", "object", "unknown") or source_gt == "any":
         return _coerce_from_any(value_code, target_type)
+    # Scalar numeric widening: int64 → float64 etc.
+    _INT_GTS = ("int64", "int32", "int16", "int8", "uint8", "uint16", "uint32", "uint64")
+    if source_gt in _INT_GTS and target_gt in ("float64", "float32"):
+        return target_gt + "(" + value_code + ")"
     return value_code
 
 
@@ -1563,9 +1573,15 @@ def _emit_unbox(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
         inner_code = _coerce_from_any(tmp_name, optional_inner)
         wrapped = _wrap_optional_resolved_code(ctx, inner_code, optional_inner)
         target_gt = go_type(target_type)
+        # Emit value expression as raw `any` so the nil check is valid.
+        # dynamic-dispatch calls (yields_dynamic) coerce to a scalar type; skip that here.
+        old_skip = ctx.skip_any_coercion
+        ctx.skip_any_coercion = True
+        raw_value_expr = _emit_expr(ctx, value_node)
+        ctx.skip_any_coercion = old_skip
         return (
             "func() " + target_gt + " {\n"
-            + "\t" + tmp_name + " := " + _emit_expr(ctx, value_node) + "\n"
+            + "\t" + tmp_name + " := " + raw_value_expr + "\n"
             + "\tif " + tmp_name + " == nil {\n"
             + "\t\treturn nil\n"
             + "\t}\n"
@@ -1992,7 +2008,7 @@ def _emit_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
                     if len(arg_strs) >= 2:
                         if yields_dynamic:
                             dynamic_code = "py_dict_get(" + owner + ", " + arg_strs[0] + ", " + arg_strs[1] + ")"
-                            if result_type not in ("", "unknown", "Any", "Obj", "object"):
+                            if not ctx.skip_any_coercion and result_type not in ("", "unknown", "Any", "Obj", "object"):
                                 return _coerce_from_any(dynamic_code, result_type)
                             return dynamic_code
                         return "py_dict_get(" + owner + ", " + arg_strs[0] + ", " + arg_strs[1] + ")"
@@ -2009,6 +2025,14 @@ def _emit_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
                 builtin_like["runtime_call"] = fn_name
                 return _emit_builtin_call(ctx, builtin_like)
             local_sig = ctx.function_signatures.get(fn_name)
+            # For callable-typed variables (e.g. lambdas), get param types from the func node.
+            if local_sig is None and isinstance(func, dict):
+                func_rt = _str(func, "resolved_type")
+                if func_rt.startswith("callable[") or func_rt.startswith("Callable["):
+                    _callable_params, _ = _parse_callable_signature(func_rt)
+                    if len(_callable_params) > 0:
+                        _callable_sig_types = {str(i): t for i, t in enumerate(_callable_params)}
+                        local_sig = ([str(i) for i in range(len(_callable_params))], _callable_sig_types, {})
             if local_sig is not None:
                 sig_order, sig_types, sig_vararg = local_sig
                 adjusted_args: list[str] = []
@@ -2029,6 +2053,8 @@ def _emit_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
                             continue
                         if _optional_inner_type(expected_type) != "":
                             arg_code = _wrap_optional_value_code(ctx, arg_code, expected_type, arg_node)
+                        else:
+                            arg_code = _maybe_coerce_expr_to_type(ctx, arg_node, arg_code, expected_type)
                     adjusted_args.append(arg_code)
                 for kw in keywords:
                     if isinstance(kw, dict):
@@ -2553,7 +2579,7 @@ def _emit_builtin_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
             if len(arg_strs) >= 2:
                 if yields_dynamic:
                     dynamic_code = "py_dict_get(" + owner + ", " + arg_strs[0] + ", " + arg_strs[1] + ")"
-                    if result_type not in ("", "unknown", "Any", "Obj", "object"):
+                    if not ctx.skip_any_coercion and result_type not in ("", "unknown", "Any", "Obj", "object"):
                         return _coerce_from_any(dynamic_code, result_type)
                     return dynamic_code
                 if owner_rt.startswith("dict[") and owner_rt.endswith("]"):
@@ -2573,7 +2599,7 @@ def _emit_builtin_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
             if len(arg_strs) >= 1:
                 if yields_dynamic:
                     dynamic_code2 = "py_dict_get(" + owner + ", " + arg_strs[0] + ", nil)"
-                    if result_type not in ("", "unknown", "Any", "Obj", "object"):
+                    if not ctx.skip_any_coercion and result_type not in ("", "unknown", "Any", "Obj", "object"):
                         return _coerce_from_any(dynamic_code2, result_type)
                     return dynamic_code2
                 if owner_rt.startswith("dict[") and owner_rt.endswith("]"):
@@ -3988,6 +4014,11 @@ def _emit_for_core(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
                     scope_type = ctx.var_types.get(scope_name, "")
                     if scope_type != "" and _is_container_resolved_type(scope_type):
                         iter_rt = scope_type
+                # Look up var type for plain name references (e.g. Go variadic params)
+                if iter_rt in ("unknown", "", "Any", "Obj", "object", "JsonVal"):
+                    scope_type = ctx.var_types.get(iter_code, "")
+                    if scope_type != "" and _is_container_resolved_type(scope_type):
+                        iter_rt = scope_type
                 if iter_rt in ("bytearray", "bytes", "list[uint8]"):
                     _emit(ctx, "for _, _byte_ := range " + iter_code + " {")
                     ctx.indent_level += 1
@@ -4150,6 +4181,11 @@ def _emit_function_def(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
     vararg_name = _str(vararg_info, "vararg_name") if isinstance(vararg_info, dict) else ""
     vararg_elem_type = _str(vararg_info, "elem_type") if isinstance(vararg_info, dict) else ""
     vararg_list_type = _str(vararg_info, "list_type") if isinstance(vararg_info, dict) else ""
+    # Fall back to direct vararg_name/vararg_type fields when vararg_desugared_v1 is absent.
+    if vararg_name == "":
+        vararg_name = _str(node, "vararg_name")
+        vararg_elem_type = _str(node, "vararg_type")
+        vararg_list_type = ""
 
     # Skip extern declarations
     for d in decorators:
@@ -4194,6 +4230,18 @@ def _emit_function_def(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
             continue
         params.append(ga + " " + gt)
         ctx.var_types[ga] = a_type
+
+    # If vararg param is NOT in arg_order (EAST3 desugars it separately), add it now.
+    if vararg_name != "" and not any(
+        (a if isinstance(a, str) else "") == vararg_name for a in arg_order
+    ):
+        ga_v = _safe_go_ident(vararg_name)
+        vararg_gt = _go_signature_type(ctx, vararg_elem_type) if vararg_elem_type != "" else "any"
+        params.append(ga_v + " ..." + vararg_gt)
+        ctx.go_vararg_params.add(ga_v)
+        ctx.var_types[ga_v] = (
+            "list[" + vararg_elem_type + "]" if vararg_elem_type != "" else "list"
+        )
 
     if mutated_return:
         mutated_arg_type = arg_types.get(mutated_arg_name, "")
@@ -4497,6 +4545,10 @@ def _emit_class_def(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
     _emit(ctx, "func (_ " + gn + ") " + _go_class_marker_method_name(ctx, name) + "() {}")
     if is_exception_class:
         _emit(ctx, "func (e *" + gn + ") pytraErrorBase() *PytraErrorCarrier { return &e.PytraErrorCarrier }")
+    else:
+        linked_tid = _linked_type_id(ctx, name)
+        if linked_tid is not None:
+            _emit(ctx, "func (_ *" + gn + ") __pytra_type_id() int64 { return int64(" + str(linked_tid) + ") }")
     _emit_blank(ctx)
     for var_name, spec in class_vars.items():
         var_type = _str(spec, "type")
@@ -5460,10 +5512,15 @@ def emit_go_module(east3_doc: dict[str, JsonVal]) -> str:
         if isinstance(stmt, dict) and _str(stmt, "kind") == "FunctionDef":
             fn_name = _str(stmt, "name")
             if fn_name != "":
+                _vd = _dict(stmt, "vararg_desugared_v1")
+                if not _vd.get("vararg_name"):
+                    _direct_vn = _str(stmt, "vararg_name")
+                    if _direct_vn:
+                        _vd = {"vararg_name": _direct_vn, "elem_type": _str(stmt, "vararg_type"), "list_type": ""}
                 ctx.function_signatures[fn_name] = (
                     _list(stmt, "arg_order"),
                     _dict(stmt, "arg_types"),
-                    _dict(stmt, "vararg_desugared_v1"),
+                    _vd,
                 )
         if isinstance(stmt, dict) and _str(stmt, "kind") == "ClassDef":
             class_name = _str(stmt, "name")
