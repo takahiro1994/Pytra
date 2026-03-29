@@ -1,0 +1,37 @@
+<a href="../../en/todo/go.md">
+  <img alt="Read in English" src="https://img.shields.io/badge/docs-English-2563EB?style=flat-square">
+</a>
+
+# TODO — Go backend
+
+> 領域別 TODO。全体索引は [index.md](./index.md) を参照。
+
+最終更新: 2026-03-29
+
+## 未完了タスク
+
+### P1-GO-CONTAINER-WRAPPER: Go emitter の container 既定表現を spec 準拠に修正する
+
+文脈: `docs/ja/spec/spec-emitter-guide.md` §10
+
+1. [ ] [ID: P1-GO-CONTAINER-S1] Go emitter の全コードパス（リテラル生成、関数引数、戻り値、ループ変数、代入等）で list/dict/set を既定で参照型ラッパー（`*PyList[T]`, `*PyDict[K,V]`, `*PySet[T]`）にする。値型（`[]T`, `map[K]V`）が混在している箇所を全て修正する
+2. [ ] [ID: P1-GO-CONTAINER-S2] `meta.linked_program_v1.container_ownership_hints_v1.container_value_locals_v1` ヒントがある局所変数のみ値型縮退を許可する
+3. [ ] [ID: P1-GO-CONTAINER-S3] Go runtime ヘルパー（`PyListConcat`, `PyListExtend` 等）が全て `*PyList[T]` を受け取る形に統一する
+4. [ ] [ID: P1-GO-CONTAINER-S4] fixture 132 件 + sample 18 件の Go compile + run parity を通す
+
+### P5-COMMON-RENDERER-GO: Go emitter の CommonRenderer 移行 + fixture parity
+
+文脈: [docs/ja/plans/p2-lowering-profile-common-renderer.md](../plans/p2-lowering-profile-common-renderer.md)
+仕様: [docs/ja/spec/spec-language-profile.md](../spec/spec-language-profile.md) §8
+
+1. [ ] [ID: P5-CR-GO-S1] Go emitter を CommonRenderer + override 構成に移行する — `src/toolchain2/emit/profiles/go.json` のプロファイルに従い、CommonRenderer の共通ノード走査を使う構成にする。Go 固有のノード（FunctionDef のレシーバー、ForCore、multi_return 等）だけ override として残す
+2. [ ] [ID: P5-CR-GO-S2] fixture 132 件 + sample 18 件の Go compile + run parity を通す
+
+### P6-GO-SELFHOST: Go emitter で toolchain2 を Go に変換し go build を通す
+
+前提: P1-GO-CONTAINER-WRAPPER 完了後に着手。
+
+1. [ ] [ID: P6-GO-SELFHOST-S0] selfhost 対象コード（`src/toolchain2/` 全 .py）で戻り値型の注釈が欠けている関数に型注釈を追加する — resolve が `inference_failure` にならない状態にする
+2. [ ] [ID: P6-GO-SELFHOST-S1] toolchain2 全 .py を Go に emit し、go build が通ることを確認する
+3. [ ] [ID: P6-GO-SELFHOST-S2] go build 失敗ケースを emitter/runtime の修正で解消する（EAST の workaround 禁止）
+4. [ ] [ID: P6-GO-SELFHOST-S3] selfhost 用 Go golden を配置し、回帰テストとして維持する
