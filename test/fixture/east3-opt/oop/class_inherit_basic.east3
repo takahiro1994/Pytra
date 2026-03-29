@@ -15,6 +15,7 @@
       "base": null,
       "dataclass": false,
       "field_types": {},
+      "decorators": [],
       "body": [
         {
           "kind": "ClosureDef",
@@ -79,7 +80,8 @@
       ],
       "class_storage_hint": "value",
       "leading_comments": [],
-      "leading_trivia": []
+      "leading_trivia": [],
+      "meta": {}
     },
     {
       "kind": "ClassDef",
@@ -94,6 +96,7 @@
       "base": "Base",
       "dataclass": false,
       "field_types": {},
+      "decorators": [],
       "body": [
         {
           "kind": "ClosureDef",
@@ -156,7 +159,8 @@
           "mutates_self": false
         }
       ],
-      "class_storage_hint": "ref"
+      "class_storage_hint": "ref",
+      "meta": {}
     }
   ],
   "main_guard_body": [
@@ -613,7 +617,17 @@
                 "kind": "NamedType",
                 "category": "static",
                 "mirror": "Child"
-              }
+              },
+              "predicate_category": "nominal_adt",
+              "family_name": "Base",
+              "predicate_kind": "variant",
+              "variant_name": "Base"
+            },
+            "nominal_adt_test_v1": {
+              "schema_version": 1,
+              "family_name": "Base",
+              "predicate_kind": "variant",
+              "variant_name": "Base"
             }
           }
         ],

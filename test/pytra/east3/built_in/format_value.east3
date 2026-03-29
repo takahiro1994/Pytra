@@ -163,8 +163,6 @@
                   }
                 ],
                 "keywords": [],
-                "lowered_kind": "BuiltinCall",
-                "builtin_name": "_to_str",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -259,8 +257,6 @@
               }
             ],
             "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "_parse_format_spec",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "GenericType",
@@ -359,8 +355,6 @@
               }
             ],
             "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "_format_core",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",
@@ -442,8 +436,6 @@
               }
             ],
             "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "_apply_align",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",
@@ -668,8 +660,6 @@
                   }
                 ],
                 "keywords": [],
-                "lowered_kind": "BuiltinCall",
-                "builtin_name": "_to_str",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -788,8 +778,6 @@
                   }
                 ],
                 "keywords": [],
-                "lowered_kind": "BuiltinCall",
-                "builtin_name": "_repr_value",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -908,8 +896,6 @@
                   }
                 ],
                 "keywords": [],
-                "lowered_kind": "BuiltinCall",
-                "builtin_name": "_repr_value",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -973,8 +959,6 @@
               }
             ],
             "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "_to_str",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",
@@ -1153,7 +1137,17 @@
                 "category": "dynamic",
                 "mirror": "object",
                 "dynamic_name": "object"
-              }
+              },
+              "predicate_category": "nominal_adt",
+              "family_name": "str",
+              "predicate_kind": "variant",
+              "variant_name": "str"
+            },
+            "nominal_adt_test_v1": {
+              "schema_version": 1,
+              "family_name": "str",
+              "predicate_kind": "variant",
+              "variant_name": "str"
             }
           },
           "body": [
@@ -1180,7 +1174,7 @@
                 "id": "v"
               },
               "declare": true,
-              "decl_type": "object",
+              "decl_type": "str",
               "declare_init": true,
               "value": {
                 "kind": "Unbox",
@@ -1192,7 +1186,7 @@
                     "end_lineno": 42,
                     "end_col_offset": 17
                   },
-                  "resolved_type": "object",
+                  "resolved_type": "str",
                   "casts": [],
                   "borrow_kind": "readonly_ref",
                   "repr": "value",
@@ -1213,10 +1207,9 @@
               },
               "type_expr_summary_v1": {
                 "schema_version": 1,
-                "kind": "DynamicType",
-                "category": "dynamic",
-                "mirror": "object",
-                "dynamic_name": "object"
+                "kind": "NamedType",
+                "category": "static",
+                "mirror": "str"
               }
             }
           ],
@@ -1251,11 +1244,11 @@
                 },
                 "expected_type_id": {
                   "kind": "Name",
-                  "id": "PYTRA_TID_BOOL",
-                  "resolved_type": "int64",
+                  "id": "bool",
+                  "resolved_type": "unknown",
                   "borrow_kind": "value",
                   "casts": [],
-                  "repr": "PYTRA_TID_BOOL",
+                  "repr": "bool",
                   "source_span": {
                     "lineno": 43,
                     "col_offset": 27,
@@ -1285,7 +1278,17 @@
                     "category": "dynamic",
                     "mirror": "object",
                     "dynamic_name": "object"
-                  }
+                  },
+                  "predicate_category": "nominal_adt",
+                  "family_name": "bool",
+                  "predicate_kind": "variant",
+                  "variant_name": "bool"
+                },
+                "nominal_adt_test_v1": {
+                  "schema_version": 1,
+                  "family_name": "bool",
+                  "predicate_kind": "variant",
+                  "variant_name": "bool"
                 }
               },
               "body": [
@@ -1307,7 +1310,7 @@
                         "end_lineno": 44,
                         "end_col_offset": 16
                       },
-                      "resolved_type": "object",
+                      "resolved_type": "bool",
                       "casts": [],
                       "borrow_kind": "readonly_ref",
                       "repr": "value",
@@ -1343,7 +1346,7 @@
                           "end_lineno": 45,
                           "end_col_offset": 13
                         },
-                        "resolved_type": "object",
+                        "resolved_type": "str",
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "v",
@@ -1455,11 +1458,11 @@
                     },
                     "expected_type_id": {
                       "kind": "Name",
-                      "id": "PYTRA_TID_INT",
-                      "resolved_type": "int64",
+                      "id": "int64",
+                      "resolved_type": "unknown",
                       "borrow_kind": "value",
                       "casts": [],
-                      "repr": "PYTRA_TID_INT",
+                      "repr": "int64",
                       "source_span": {
                         "lineno": 48,
                         "col_offset": 27,
@@ -1489,7 +1492,17 @@
                         "category": "dynamic",
                         "mirror": "object",
                         "dynamic_name": "object"
-                      }
+                      },
+                      "predicate_category": "nominal_adt",
+                      "family_name": "int",
+                      "predicate_kind": "variant",
+                      "variant_name": "int"
+                    },
+                    "nominal_adt_test_v1": {
+                      "schema_version": 1,
+                      "family_name": "int",
+                      "predicate_kind": "variant",
+                      "variant_name": "int"
                     }
                   },
                   "body": [
@@ -1558,7 +1571,7 @@
                                 "end_lineno": 49,
                                 "end_col_offset": 29
                               },
-                              "resolved_type": "object",
+                              "resolved_type": "int64",
                               "casts": [],
                               "borrow_kind": "readonly_ref",
                               "repr": "value",
@@ -1599,8 +1612,6 @@
                           }
                         ],
                         "keywords": [],
-                        "lowered_kind": "BuiltinCall",
-                        "builtin_name": "_int_to_str",
                         "type_expr_summary_v1": {
                           "schema_version": 1,
                           "kind": "NamedType",
@@ -1647,11 +1658,11 @@
                         },
                         "expected_type_id": {
                           "kind": "Name",
-                          "id": "PYTRA_TID_FLOAT",
-                          "resolved_type": "int64",
+                          "id": "float64",
+                          "resolved_type": "unknown",
                           "borrow_kind": "value",
                           "casts": [],
-                          "repr": "PYTRA_TID_FLOAT",
+                          "repr": "float64",
                           "source_span": {
                             "lineno": 50,
                             "col_offset": 27,
@@ -1681,7 +1692,17 @@
                             "category": "dynamic",
                             "mirror": "object",
                             "dynamic_name": "object"
-                          }
+                          },
+                          "predicate_category": "nominal_adt",
+                          "family_name": "float",
+                          "predicate_kind": "variant",
+                          "variant_name": "float"
+                        },
+                        "nominal_adt_test_v1": {
+                          "schema_version": 1,
+                          "family_name": "float",
+                          "predicate_kind": "variant",
+                          "variant_name": "float"
                         }
                       },
                       "body": [
@@ -1750,7 +1771,7 @@
                                     "end_lineno": 51,
                                     "end_col_offset": 31
                                   },
-                                  "resolved_type": "object",
+                                  "resolved_type": "float64",
                                   "casts": [],
                                   "borrow_kind": "readonly_ref",
                                   "repr": "value",
@@ -1791,8 +1812,6 @@
                               }
                             ],
                             "keywords": [],
-                            "lowered_kind": "BuiltinCall",
-                            "builtin_name": "_float_to_str",
                             "type_expr_summary_v1": {
                               "schema_version": 1,
                               "kind": "NamedType",
@@ -2075,7 +2094,17 @@
                 "category": "dynamic",
                 "mirror": "object",
                 "dynamic_name": "object"
-              }
+              },
+              "predicate_category": "nominal_adt",
+              "family_name": "str",
+              "predicate_kind": "variant",
+              "variant_name": "str"
+            },
+            "nominal_adt_test_v1": {
+              "schema_version": 1,
+              "family_name": "str",
+              "predicate_kind": "variant",
+              "variant_name": "str"
             }
           },
           "body": [
@@ -2136,7 +2165,7 @@
                         "end_lineno": 59,
                         "end_col_offset": 26
                       },
-                      "resolved_type": "object",
+                      "resolved_type": "str",
                       "casts": [],
                       "borrow_kind": "readonly_ref",
                       "repr": "value",
@@ -2228,8 +2257,6 @@
               }
             ],
             "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "_to_str",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",
@@ -2430,8 +2457,6 @@
                     }
                   ],
                   "keywords": [],
-                  "lowered_kind": "BuiltinCall",
-                  "builtin_name": "_int_to_str",
                   "type_expr_summary_v1": {
                     "schema_version": 1,
                     "kind": "NamedType",
@@ -10678,8 +10703,6 @@
               }
             ],
             "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "_spec_type",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",
@@ -10775,8 +10798,6 @@
               }
             ],
             "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "_spec_sign",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",
@@ -10872,8 +10893,6 @@
               }
             ],
             "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "_spec_precision",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",
@@ -10969,8 +10988,6 @@
               }
             ],
             "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "_spec_grouping",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",
@@ -11169,7 +11186,17 @@
                         "category": "dynamic",
                         "mirror": "object",
                         "dynamic_name": "object"
-                      }
+                      },
+                      "predicate_category": "nominal_adt",
+                      "family_name": "str",
+                      "predicate_kind": "variant",
+                      "variant_name": "str"
+                    },
+                    "nominal_adt_test_v1": {
+                      "schema_version": 1,
+                      "family_name": "str",
+                      "predicate_kind": "variant",
+                      "variant_name": "str"
                     }
                   }
                 ]
@@ -11258,8 +11285,6 @@
                   }
                 ],
                 "keywords": [],
-                "lowered_kind": "BuiltinCall",
-                "builtin_name": "_to_str",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -11410,8 +11435,6 @@
                       }
                     ],
                     "keywords": [],
-                    "lowered_kind": "BuiltinCall",
-                    "builtin_name": "_str_to_int",
                     "type_expr_summary_v1": {
                       "schema_version": 1,
                       "kind": "NamedType",
@@ -11701,11 +11724,11 @@
                 },
                 "expected_type_id": {
                   "kind": "Name",
-                  "id": "PYTRA_TID_INT",
-                  "resolved_type": "int64",
+                  "id": "int64",
+                  "resolved_type": "unknown",
                   "borrow_kind": "value",
                   "casts": [],
-                  "repr": "PYTRA_TID_INT",
+                  "repr": "int64",
                   "source_span": {
                     "lineno": 219,
                     "col_offset": 25,
@@ -11735,7 +11758,17 @@
                     "category": "dynamic",
                     "mirror": "object",
                     "dynamic_name": "object"
-                  }
+                  },
+                  "predicate_category": "nominal_adt",
+                  "family_name": "int",
+                  "predicate_kind": "variant",
+                  "variant_name": "int"
+                },
+                "nominal_adt_test_v1": {
+                  "schema_version": 1,
+                  "family_name": "int",
+                  "predicate_kind": "variant",
+                  "variant_name": "int"
                 }
               },
               {
@@ -11764,7 +11797,7 @@
                       "end_lineno": 219,
                       "end_col_offset": 54
                     },
-                    "resolved_type": "object",
+                    "resolved_type": "int64",
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "value",
@@ -11773,11 +11806,11 @@
                   },
                   "expected_type_id": {
                     "kind": "Name",
-                    "id": "PYTRA_TID_BOOL",
-                    "resolved_type": "int64",
+                    "id": "bool",
+                    "resolved_type": "unknown",
                     "borrow_kind": "value",
                     "casts": [],
-                    "repr": "PYTRA_TID_BOOL",
+                    "repr": "bool",
                     "source_span": {
                       "lineno": 219,
                       "col_offset": 56,
@@ -11794,20 +11827,28 @@
                   "repr": "isinstance(value, bool)",
                   "type_expr_summary_v1": {
                     "schema_version": 1,
-                    "kind": "DynamicType",
-                    "category": "dynamic",
-                    "mirror": "object",
-                    "dynamic_name": "object"
+                    "kind": "NamedType",
+                    "category": "static",
+                    "mirror": "int64"
                   },
                   "narrowing_lane_v1": {
                     "schema_version": 1,
-                    "source_category": "dynamic",
+                    "source_category": "static",
                     "source_type": {
-                      "kind": "DynamicType",
-                      "category": "dynamic",
-                      "mirror": "object",
-                      "dynamic_name": "object"
-                    }
+                      "kind": "NamedType",
+                      "category": "static",
+                      "mirror": "int64"
+                    },
+                    "predicate_category": "nominal_adt",
+                    "family_name": "bool",
+                    "predicate_kind": "variant",
+                    "variant_name": "bool"
+                  },
+                  "nominal_adt_test_v1": {
+                    "schema_version": 1,
+                    "family_name": "bool",
+                    "predicate_kind": "variant",
+                    "variant_name": "bool"
                   }
                 }
               }
@@ -11862,7 +11903,7 @@
                         "end_lineno": 220,
                         "end_col_offset": 32
                       },
-                      "resolved_type": "object",
+                      "resolved_type": "int64",
                       "casts": [],
                       "borrow_kind": "readonly_ref",
                       "repr": "value",
@@ -11948,8 +11989,6 @@
                   }
                 ],
                 "keywords": [],
-                "lowered_kind": "BuiltinCall",
-                "builtin_name": "_format_int",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -11991,11 +12030,11 @@
             },
             "expected_type_id": {
               "kind": "Name",
-              "id": "PYTRA_TID_FLOAT",
-              "resolved_type": "int64",
+              "id": "float64",
+              "resolved_type": "unknown",
               "borrow_kind": "value",
               "casts": [],
-              "repr": "PYTRA_TID_FLOAT",
+              "repr": "float64",
               "source_span": {
                 "lineno": 222,
                 "col_offset": 25,
@@ -12025,7 +12064,17 @@
                 "category": "dynamic",
                 "mirror": "object",
                 "dynamic_name": "object"
-              }
+              },
+              "predicate_category": "nominal_adt",
+              "family_name": "float",
+              "predicate_kind": "variant",
+              "variant_name": "float"
+            },
+            "nominal_adt_test_v1": {
+              "schema_version": 1,
+              "family_name": "float",
+              "predicate_kind": "variant",
+              "variant_name": "float"
             }
           },
           "body": [
@@ -12077,7 +12126,7 @@
                         "end_lineno": 223,
                         "end_col_offset": 34
                       },
-                      "resolved_type": "object",
+                      "resolved_type": "float64",
                       "casts": [],
                       "borrow_kind": "readonly_ref",
                       "repr": "value",
@@ -12178,8 +12227,6 @@
                   }
                 ],
                 "keywords": [],
-                "lowered_kind": "BuiltinCall",
-                "builtin_name": "_format_float",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -12243,8 +12290,6 @@
               }
             ],
             "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "_to_str",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",
@@ -12819,8 +12864,6 @@
                   }
                 ],
                 "keywords": [],
-                "lowered_kind": "BuiltinCall",
-                "builtin_name": "_int_to_str",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -12976,8 +13019,6 @@
                       }
                     ],
                     "keywords": [],
-                    "lowered_kind": "BuiltinCall",
-                    "builtin_name": "_int_to_hex",
                     "type_expr_summary_v1": {
                       "schema_version": 1,
                       "kind": "NamedType",
@@ -13133,8 +13174,6 @@
                           }
                         ],
                         "keywords": [],
-                        "lowered_kind": "BuiltinCall",
-                        "builtin_name": "_int_to_hex",
                         "type_expr_summary_v1": {
                           "schema_version": 1,
                           "kind": "NamedType",
@@ -13275,8 +13314,6 @@
                               }
                             ],
                             "keywords": [],
-                            "lowered_kind": "BuiltinCall",
-                            "builtin_name": "_int_to_oct",
                             "type_expr_summary_v1": {
                               "schema_version": 1,
                               "kind": "NamedType",
@@ -13417,8 +13454,6 @@
                                   }
                                 ],
                                 "keywords": [],
-                                "lowered_kind": "BuiltinCall",
-                                "builtin_name": "_int_to_bin",
                                 "type_expr_summary_v1": {
                                   "schema_version": 1,
                                   "kind": "NamedType",
@@ -13862,8 +13897,6 @@
                                       }
                                     ],
                                     "keywords": [],
-                                    "lowered_kind": "BuiltinCall",
-                                    "builtin_name": "_format_float",
                                     "type_expr_summary_v1": {
                                       "schema_version": 1,
                                       "kind": "NamedType",
@@ -13943,8 +13976,6 @@
                                       }
                                     ],
                                     "keywords": [],
-                                    "lowered_kind": "BuiltinCall",
-                                    "builtin_name": "_int_to_str",
                                     "type_expr_summary_v1": {
                                       "schema_version": 1,
                                       "kind": "NamedType",
@@ -14125,8 +14156,6 @@
                   }
                 ],
                 "keywords": [],
-                "lowered_kind": "BuiltinCall",
-                "builtin_name": "_insert_grouping",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -14414,8 +14443,6 @@
                           }
                         ],
                         "keywords": [],
-                        "lowered_kind": "BuiltinCall",
-                        "builtin_name": "_insert_grouping",
                         "type_expr_summary_v1": {
                           "schema_version": 1,
                           "kind": "NamedType",
@@ -14586,8 +14613,6 @@
                               }
                             ],
                             "keywords": [],
-                            "lowered_kind": "BuiltinCall",
-                            "builtin_name": "_insert_grouping",
                             "type_expr_summary_v1": {
                               "schema_version": 1,
                               "kind": "NamedType",
@@ -14758,8 +14783,6 @@
                                   }
                                 ],
                                 "keywords": [],
-                                "lowered_kind": "BuiltinCall",
-                                "builtin_name": "_insert_grouping",
                                 "type_expr_summary_v1": {
                                   "schema_version": 1,
                                   "kind": "NamedType",
@@ -14875,8 +14898,6 @@
                                   }
                                 ],
                                 "keywords": [],
-                                "lowered_kind": "BuiltinCall",
-                                "builtin_name": "_insert_grouping",
                                 "type_expr_summary_v1": {
                                   "schema_version": 1,
                                   "kind": "NamedType",
@@ -14984,8 +15005,6 @@
               }
             ],
             "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "_apply_sign",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",
@@ -15248,8 +15267,6 @@
                   }
                 ],
                 "keywords": [],
-                "lowered_kind": "BuiltinCall",
-                "builtin_name": "_str_to_int",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -15782,8 +15799,6 @@
                   }
                 ],
                 "keywords": [],
-                "lowered_kind": "BuiltinCall",
-                "builtin_name": "_float_fixed",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -15954,8 +15969,6 @@
                       }
                     ],
                     "keywords": [],
-                    "lowered_kind": "BuiltinCall",
-                    "builtin_name": "_float_exp",
                     "type_expr_summary_v1": {
                       "schema_version": 1,
                       "kind": "NamedType",
@@ -16126,8 +16139,6 @@
                           }
                         ],
                         "keywords": [],
-                        "lowered_kind": "BuiltinCall",
-                        "builtin_name": "_float_exp",
                         "type_expr_summary_v1": {
                           "schema_version": 1,
                           "kind": "NamedType",
@@ -16360,8 +16371,6 @@
                               }
                             ],
                             "keywords": [],
-                            "lowered_kind": "BuiltinCall",
-                            "builtin_name": "_float_general",
                             "type_expr_summary_v1": {
                               "schema_version": 1,
                               "kind": "NamedType",
@@ -16557,8 +16566,6 @@
                                     }
                                   ],
                                   "keywords": [],
-                                  "lowered_kind": "BuiltinCall",
-                                  "builtin_name": "_float_fixed",
                                   "type_expr_summary_v1": {
                                     "schema_version": 1,
                                     "kind": "NamedType",
@@ -16792,8 +16799,6 @@
                                       }
                                     ],
                                     "keywords": [],
-                                    "lowered_kind": "BuiltinCall",
-                                    "builtin_name": "_float_fixed",
                                     "type_expr_summary_v1": {
                                       "schema_version": 1,
                                       "kind": "NamedType",
@@ -16894,8 +16899,6 @@
                                       }
                                     ],
                                     "keywords": [],
-                                    "lowered_kind": "BuiltinCall",
-                                    "builtin_name": "_float_fixed",
                                     "type_expr_summary_v1": {
                                       "schema_version": 1,
                                       "kind": "NamedType",
@@ -17084,7 +17087,7 @@
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "find",
                 "runtime_call": "str.find",
-                "runtime_module_id": "pytra.core.str",
+                "runtime_module_id": "pytra.built_in.string_ops",
                 "runtime_symbol": "str.find",
                 "runtime_call_adapter_kind": "builtin",
                 "semantic_tag": "stdlib.method.find",
@@ -17494,8 +17497,6 @@
                         }
                       ],
                       "keywords": [],
-                      "lowered_kind": "BuiltinCall",
-                      "builtin_name": "_insert_grouping",
                       "type_expr_summary_v1": {
                         "schema_version": 1,
                         "kind": "NamedType",
@@ -17626,7 +17627,7 @@
                     "lowered_kind": "BuiltinCall",
                     "builtin_name": "find",
                     "runtime_call": "str.find",
-                    "runtime_module_id": "pytra.core.str",
+                    "runtime_module_id": "pytra.built_in.string_ops",
                     "runtime_symbol": "str.find",
                     "runtime_call_adapter_kind": "builtin",
                     "semantic_tag": "stdlib.method.find",
@@ -17872,8 +17873,6 @@
                             }
                           ],
                           "keywords": [],
-                          "lowered_kind": "BuiltinCall",
-                          "builtin_name": "_insert_grouping",
                           "type_expr_summary_v1": {
                             "schema_version": 1,
                             "kind": "NamedType",
@@ -18005,8 +18004,6 @@
                           }
                         ],
                         "keywords": [],
-                        "lowered_kind": "BuiltinCall",
-                        "builtin_name": "_insert_grouping",
                         "type_expr_summary_v1": {
                           "schema_version": 1,
                           "kind": "NamedType",
@@ -18110,8 +18107,6 @@
               }
             ],
             "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "_apply_sign",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",
@@ -19792,8 +19787,6 @@
                       }
                     ],
                     "keywords": [],
-                    "lowered_kind": "BuiltinCall",
-                    "builtin_name": "_int_to_str",
                     "call_arg_type": "str",
                     "type_expr_summary_v1": {
                       "schema_version": 1,
@@ -21757,8 +21750,6 @@
                   }
                 ],
                 "keywords": [],
-                "lowered_kind": "BuiltinCall",
-                "builtin_name": "_int_to_str",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -22597,8 +22588,6 @@
               }
             ],
             "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "_int_to_str",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",
@@ -22865,8 +22854,6 @@
                   }
                 ],
                 "keywords": [],
-                "lowered_kind": "BuiltinCall",
-                "builtin_name": "_int_to_str",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -24087,8 +24074,6 @@
               }
             ],
             "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "_float_fixed",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",
@@ -24462,8 +24447,6 @@
               }
             ],
             "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "_int_to_str",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",
@@ -25133,8 +25116,6 @@
                     }
                   ],
                   "keywords": [],
-                  "lowered_kind": "BuiltinCall",
-                  "builtin_name": "_float_fixed",
                   "type_expr_summary_v1": {
                     "schema_version": 1,
                     "kind": "NamedType",
@@ -26592,8 +26573,6 @@
                   }
                 ],
                 "keywords": [],
-                "lowered_kind": "BuiltinCall",
-                "builtin_name": "_float_fixed",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -26732,7 +26711,7 @@
                     "lowered_kind": "BuiltinCall",
                     "builtin_name": "endswith",
                     "runtime_call": "str.endswith",
-                    "runtime_module_id": "pytra.core.str",
+                    "runtime_module_id": "pytra.built_in.string_ops",
                     "runtime_symbol": "str.endswith",
                     "runtime_call_adapter_kind": "builtin",
                     "semantic_tag": "stdlib.method.endswith",
@@ -26952,7 +26931,7 @@
                     "lowered_kind": "BuiltinCall",
                     "builtin_name": "endswith",
                     "runtime_call": "str.endswith",
-                    "runtime_module_id": "pytra.core.str",
+                    "runtime_module_id": "pytra.built_in.string_ops",
                     "runtime_symbol": "str.endswith",
                     "runtime_call_adapter_kind": "builtin",
                     "semantic_tag": "stdlib.method.endswith",
@@ -27251,8 +27230,6 @@
               }
             ],
             "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "_float_exp",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",
@@ -27776,8 +27753,6 @@
               }
             ],
             "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "_spec_width",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",
@@ -27954,8 +27929,6 @@
               }
             ],
             "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "_str_to_int",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",
@@ -28176,8 +28149,6 @@
               }
             ],
             "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "_spec_fill",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",
@@ -28377,8 +28348,6 @@
               }
             ],
             "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "_spec_align",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",
@@ -29795,8 +29764,6 @@
               }
             ],
             "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "_spec_type",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",
@@ -32977,6 +32944,18 @@
       "schema_version": 1,
       "bindings": [
         {
+          "module_id": "pytra.built_in.contains",
+          "export_name": "",
+          "local_name": "pytra.built_in.contains",
+          "binding_kind": "implicit_builtin",
+          "source_file": "src/pytra/built_in/format_value.py",
+          "source_line": 0,
+          "source_module_id": "pytra.built_in.contains",
+          "source_binding_kind": "implicit_builtin",
+          "runtime_module_id": "pytra.built_in.contains",
+          "runtime_group": "built_in"
+        },
+        {
           "module_id": "pytra.core.py_runtime",
           "export_name": "",
           "local_name": "pytra.core.py_runtime",
@@ -32993,12 +32972,28 @@
     },
     "import_bindings": [
       {
+        "module_id": "pytra.built_in.contains",
+        "export_name": "",
+        "local_name": "pytra.built_in.contains",
+        "binding_kind": "implicit_builtin",
+        "source_file": "src/pytra/built_in/format_value.py",
+        "source_line": 0,
+        "source_module_id": "pytra.built_in.contains",
+        "source_binding_kind": "implicit_builtin",
+        "runtime_module_id": "pytra.built_in.contains",
+        "runtime_group": "built_in"
+      },
+      {
         "module_id": "pytra.core.py_runtime",
         "export_name": "",
         "local_name": "pytra.core.py_runtime",
         "binding_kind": "implicit_builtin",
         "source_file": "src/pytra/built_in/format_value.py",
-        "source_line": 0
+        "source_line": 0,
+        "source_module_id": "pytra.core.py_runtime",
+        "source_binding_kind": "implicit_builtin",
+        "runtime_module_id": "pytra.core.py_runtime",
+        "runtime_group": "core"
       }
     ],
     "qualified_symbol_refs": [],

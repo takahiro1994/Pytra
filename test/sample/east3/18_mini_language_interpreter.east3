@@ -54,6 +54,9 @@
         "pos": "int64",
         "number_value": "int64"
       },
+      "decorators": [
+        "dataclass"
+      ],
       "body": [
         {
           "kind": "AnnAssign",
@@ -217,7 +220,8 @@
           "kind": "comment",
           "text": "Tokens for lexical analysis."
         }
-      ]
+      ],
+      "meta": {}
     },
     {
       "kind": "ClassDef",
@@ -241,6 +245,9 @@
         "kind_tag": "int64",
         "op_tag": "int64"
       },
+      "decorators": [
+        "dataclass"
+      ],
       "body": [
         {
           "kind": "AnnAssign",
@@ -547,7 +554,8 @@
           }
         }
       ],
-      "class_storage_hint": "ref"
+      "class_storage_hint": "ref",
+      "meta": {}
     },
     {
       "kind": "ClassDef",
@@ -567,6 +575,9 @@
         "expr_index": "int64",
         "kind_tag": "int64"
       },
+      "decorators": [
+        "dataclass"
+      ],
       "body": [
         {
           "kind": "AnnAssign",
@@ -721,7 +732,8 @@
           }
         }
       ],
-      "class_storage_hint": "ref"
+      "class_storage_hint": "ref",
+      "meta": {}
     },
     {
       "kind": "FunctionDef",
@@ -4625,7 +4637,8 @@
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "RuntimeError",
-                      "id": "RuntimeError"
+                      "id": "RuntimeError",
+                      "runtime_module_id": "pytra.built_in.error"
                     },
                     "args": [
                       {
@@ -4868,17 +4881,12 @@
                           "borrow_kind": "readonly_ref",
                           "repr": "ch",
                           "id": "ch"
-                        }
+                        },
+                        "call_arg_type": "str"
                       }
                     ],
                     "keywords": [],
-                    "lowered_kind": "BuiltinCall",
-                    "builtin_name": "RuntimeError",
-                    "runtime_call": "std::runtime_error",
-                    "runtime_module_id": "pytra.core.py_runtime",
-                    "runtime_symbol": "RuntimeError",
-                    "runtime_call_adapter_kind": "builtin",
-                    "semantic_tag": "error.raise_ctor",
+                    "runtime_module_id": "pytra.built_in.error",
                     "type_expr_summary_v1": {
                       "schema_version": 1,
                       "kind": "NamedType",
@@ -5367,9 +5375,10 @@
         "pos": "int64",
         "expr_nodes": "list[ExprNode]"
       },
+      "decorators": [],
       "body": [
         {
-          "kind": "FunctionDef",
+          "kind": "ClosureDef",
           "source_span": {
             "lineno": 102,
             "col_offset": 4,
@@ -5428,11 +5437,14 @@
           "is_generator": 0,
           "yield_value_type": "unknown",
           "decorators": [],
+          "captures": [],
+          "capture_types": {},
+          "capture_modes": {},
           "returns": "list[ExprNode]",
           "mutates_self": false
         },
         {
-          "kind": "FunctionDef",
+          "kind": "ClosureDef",
           "source_span": {
             "lineno": 105,
             "col_offset": 4,
@@ -5456,7 +5468,7 @@
           },
           "return_type": "None",
           "arg_usage": {
-            "self": "readonly",
+            "self": "reassigned",
             "tokens": "readonly"
           },
           "renamed_symbols": {},
@@ -5753,11 +5765,14 @@
           "is_generator": 0,
           "yield_value_type": "unknown",
           "decorators": [],
+          "captures": [],
+          "capture_types": {},
+          "capture_modes": {},
           "returns": "None",
           "mutates_self": true
         },
         {
-          "kind": "FunctionDef",
+          "kind": "ClosureDef",
           "source_span": {
             "lineno": 110,
             "col_offset": 4,
@@ -5865,11 +5880,14 @@
           "is_generator": 0,
           "yield_value_type": "unknown",
           "decorators": [],
+          "captures": [],
+          "capture_types": {},
+          "capture_modes": {},
           "returns": "Token",
           "mutates_self": false
         },
         {
-          "kind": "FunctionDef",
+          "kind": "ClosureDef",
           "source_span": {
             "lineno": 113,
             "col_offset": 4,
@@ -6005,11 +6023,14 @@
           "is_generator": 0,
           "yield_value_type": "unknown",
           "decorators": [],
+          "captures": [],
+          "capture_types": {},
+          "capture_modes": {},
           "returns": "Token",
           "mutates_self": false
         },
         {
-          "kind": "FunctionDef",
+          "kind": "ClosureDef",
           "source_span": {
             "lineno": 116,
             "col_offset": 4,
@@ -6111,11 +6132,14 @@
           "is_generator": 0,
           "yield_value_type": "unknown",
           "decorators": [],
+          "captures": [],
+          "capture_types": {},
+          "capture_modes": {},
           "returns": "str",
           "mutates_self": false
         },
         {
-          "kind": "FunctionDef",
+          "kind": "ClosureDef",
           "source_span": {
             "lineno": 119,
             "col_offset": 4,
@@ -6139,7 +6163,7 @@
           },
           "return_type": "bool",
           "arg_usage": {
-            "self": "readonly",
+            "self": "reassigned",
             "kind": "readonly"
           },
           "renamed_symbols": {},
@@ -6348,11 +6372,14 @@
           "is_generator": 0,
           "yield_value_type": "unknown",
           "decorators": [],
+          "captures": [],
+          "capture_types": {},
+          "capture_modes": {},
           "returns": "bool",
           "mutates_self": true
         },
         {
-          "kind": "FunctionDef",
+          "kind": "ClosureDef",
           "source_span": {
             "lineno": 125,
             "col_offset": 4,
@@ -6376,7 +6403,7 @@
           },
           "return_type": "Token",
           "arg_usage": {
-            "self": "readonly",
+            "self": "reassigned",
             "kind": "readonly"
           },
           "renamed_symbols": {},
@@ -6576,7 +6603,8 @@
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "RuntimeError",
-                      "id": "RuntimeError"
+                      "id": "RuntimeError",
+                      "runtime_module_id": "pytra.built_in.error"
                     },
                     "args": [
                       {
@@ -6803,17 +6831,12 @@
                             "id": "token"
                           },
                           "attr": "kind"
-                        }
+                        },
+                        "call_arg_type": "str"
                       }
                     ],
                     "keywords": [],
-                    "lowered_kind": "BuiltinCall",
-                    "builtin_name": "RuntimeError",
-                    "runtime_call": "std::runtime_error",
-                    "runtime_module_id": "pytra.core.py_runtime",
-                    "runtime_symbol": "RuntimeError",
-                    "runtime_call_adapter_kind": "builtin",
-                    "semantic_tag": "error.raise_ctor",
+                    "runtime_module_id": "pytra.built_in.error",
                     "type_expr_summary_v1": {
                       "schema_version": 1,
                       "kind": "NamedType",
@@ -6913,11 +6936,14 @@
           "is_generator": 0,
           "yield_value_type": "unknown",
           "decorators": [],
+          "captures": [],
+          "capture_types": {},
+          "capture_modes": {},
           "returns": "Token",
           "mutates_self": true
         },
         {
-          "kind": "FunctionDef",
+          "kind": "ClosureDef",
           "source_span": {
             "lineno": 132,
             "col_offset": 4,
@@ -7033,11 +7059,14 @@
           "is_generator": 0,
           "yield_value_type": "unknown",
           "decorators": [],
+          "captures": [],
+          "capture_types": {},
+          "capture_modes": {},
           "returns": "None",
           "mutates_self": true
         },
         {
-          "kind": "FunctionDef",
+          "kind": "ClosureDef",
           "source_span": {
             "lineno": 136,
             "col_offset": 4,
@@ -7061,7 +7090,7 @@
           },
           "return_type": "int64",
           "arg_usage": {
-            "self": "readonly",
+            "self": "reassigned",
             "node": "readonly"
           },
           "renamed_symbols": {},
@@ -7303,11 +7332,14 @@
           "is_generator": 0,
           "yield_value_type": "unknown",
           "decorators": [],
+          "captures": [],
+          "capture_types": {},
+          "capture_modes": {},
           "returns": "int64",
           "mutates_self": true
         },
         {
-          "kind": "FunctionDef",
+          "kind": "ClosureDef",
           "source_span": {
             "lineno": 140,
             "col_offset": 4,
@@ -7839,11 +7871,14 @@
           "is_generator": 0,
           "yield_value_type": "unknown",
           "decorators": [],
+          "captures": [],
+          "capture_types": {},
+          "capture_modes": {},
           "returns": "list[StmtNode]",
           "mutates_self": true
         },
         {
-          "kind": "FunctionDef",
+          "kind": "ClosureDef",
           "source_span": {
             "lineno": 149,
             "col_offset": 4,
@@ -9003,11 +9038,14 @@
           "is_generator": 0,
           "yield_value_type": "unknown",
           "decorators": [],
+          "captures": [],
+          "capture_types": {},
+          "capture_modes": {},
           "returns": "StmtNode",
           "mutates_self": true
         },
         {
-          "kind": "FunctionDef",
+          "kind": "ClosureDef",
           "source_span": {
             "lineno": 165,
             "col_offset": 4,
@@ -9095,11 +9133,14 @@
           "is_generator": 0,
           "yield_value_type": "unknown",
           "decorators": [],
+          "captures": [],
+          "capture_types": {},
+          "capture_modes": {},
           "returns": "int64",
           "mutates_self": true
         },
         {
-          "kind": "FunctionDef",
+          "kind": "ClosureDef",
           "source_span": {
             "lineno": 168,
             "col_offset": 4,
@@ -10137,11 +10178,14 @@
           "is_generator": 0,
           "yield_value_type": "unknown",
           "decorators": [],
+          "captures": [],
+          "capture_types": {},
+          "capture_modes": {},
           "returns": "int64",
           "mutates_self": true
         },
         {
-          "kind": "FunctionDef",
+          "kind": "ClosureDef",
           "source_span": {
             "lineno": 182,
             "col_offset": 4,
@@ -11179,11 +11223,14 @@
           "is_generator": 0,
           "yield_value_type": "unknown",
           "decorators": [],
+          "captures": [],
+          "capture_types": {},
+          "capture_modes": {},
           "returns": "int64",
           "mutates_self": true
         },
         {
-          "kind": "FunctionDef",
+          "kind": "ClosureDef",
           "source_span": {
             "lineno": 196,
             "col_offset": 4,
@@ -11663,11 +11710,14 @@
           "is_generator": 0,
           "yield_value_type": "unknown",
           "decorators": [],
+          "captures": [],
+          "capture_types": {},
+          "capture_modes": {},
           "returns": "int64",
           "mutates_self": true
         },
         {
-          "kind": "FunctionDef",
+          "kind": "ClosureDef",
           "source_span": {
             "lineno": 202,
             "col_offset": 4,
@@ -12913,7 +12963,8 @@
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "RuntimeError",
-                  "id": "RuntimeError"
+                  "id": "RuntimeError",
+                  "runtime_module_id": "pytra.built_in.error"
                 },
                 "args": [
                   {
@@ -13084,17 +13135,12 @@
                         "id": "t"
                       },
                       "attr": "kind"
-                    }
+                    },
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
-                "lowered_kind": "BuiltinCall",
-                "builtin_name": "RuntimeError",
-                "runtime_call": "std::runtime_error",
-                "runtime_module_id": "pytra.core.py_runtime",
-                "runtime_symbol": "RuntimeError",
-                "runtime_call_adapter_kind": "builtin",
-                "semantic_tag": "error.raise_ctor",
+                "runtime_module_id": "pytra.built_in.error",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -13108,11 +13154,15 @@
           "is_generator": 0,
           "yield_value_type": "unknown",
           "decorators": [],
+          "captures": [],
+          "capture_types": {},
+          "capture_modes": {},
           "returns": "int64",
           "mutates_self": true
         }
       ],
-      "class_storage_hint": "ref"
+      "class_storage_hint": "ref",
+      "meta": {}
     },
     {
       "kind": "FunctionDef",
@@ -13533,7 +13583,8 @@
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "RuntimeError",
-                      "id": "RuntimeError"
+                      "id": "RuntimeError",
+                      "runtime_module_id": "pytra.built_in.error"
                     },
                     "args": [
                       {
@@ -13590,17 +13641,12 @@
                             "id": "node"
                           },
                           "attr": "name"
-                        }
+                        },
+                        "call_arg_type": "str"
                       }
                     ],
                     "keywords": [],
-                    "lowered_kind": "BuiltinCall",
-                    "builtin_name": "RuntimeError",
-                    "runtime_call": "std::runtime_error",
-                    "runtime_module_id": "pytra.core.py_runtime",
-                    "runtime_symbol": "RuntimeError",
-                    "runtime_call_adapter_kind": "builtin",
-                    "semantic_tag": "error.raise_ctor",
+                    "runtime_module_id": "pytra.built_in.error",
                     "type_expr_summary_v1": {
                       "schema_version": 1,
                       "kind": "NamedType",
@@ -14742,7 +14788,8 @@
                           "casts": [],
                           "borrow_kind": "value",
                           "repr": "RuntimeError",
-                          "id": "RuntimeError"
+                          "id": "RuntimeError",
+                          "runtime_module_id": "pytra.built_in.error"
                         },
                         "args": [
                           {
@@ -14757,17 +14804,12 @@
                             "casts": [],
                             "borrow_kind": "value",
                             "repr": "\"division by zero\"",
-                            "value": "division by zero"
+                            "value": "division by zero",
+                            "call_arg_type": "str"
                           }
                         ],
                         "keywords": [],
-                        "lowered_kind": "BuiltinCall",
-                        "builtin_name": "RuntimeError",
-                        "runtime_call": "std::runtime_error",
-                        "runtime_module_id": "pytra.core.py_runtime",
-                        "runtime_symbol": "RuntimeError",
-                        "runtime_call_adapter_kind": "builtin",
-                        "semantic_tag": "error.raise_ctor",
+                        "runtime_module_id": "pytra.built_in.error",
                         "type_expr_summary_v1": {
                           "schema_version": 1,
                           "kind": "NamedType",
@@ -14866,7 +14908,8 @@
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "RuntimeError",
-                  "id": "RuntimeError"
+                  "id": "RuntimeError",
+                  "runtime_module_id": "pytra.built_in.error"
                 },
                 "args": [
                   {
@@ -14923,17 +14966,12 @@
                         "id": "node"
                       },
                       "attr": "op"
-                    }
+                    },
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
-                "lowered_kind": "BuiltinCall",
-                "builtin_name": "RuntimeError",
-                "runtime_call": "std::runtime_error",
-                "runtime_module_id": "pytra.core.py_runtime",
-                "runtime_symbol": "RuntimeError",
-                "runtime_call_adapter_kind": "builtin",
-                "semantic_tag": "error.raise_ctor",
+                "runtime_module_id": "pytra.built_in.error",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -14978,7 +15016,8 @@
               "casts": [],
               "borrow_kind": "value",
               "repr": "RuntimeError",
-              "id": "RuntimeError"
+              "id": "RuntimeError",
+              "runtime_module_id": "pytra.built_in.error"
             },
             "args": [
               {
@@ -15035,17 +15074,12 @@
                     "id": "node"
                   },
                   "attr": "kind"
-                }
+                },
+                "call_arg_type": "str"
               }
             ],
             "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "RuntimeError",
-            "runtime_call": "std::runtime_error",
-            "runtime_module_id": "pytra.core.py_runtime",
-            "runtime_symbol": "RuntimeError",
-            "runtime_call_adapter_kind": "builtin",
-            "semantic_tag": "error.raise_ctor",
+            "runtime_module_id": "pytra.built_in.error",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",
@@ -15821,7 +15855,8 @@
                           "casts": [],
                           "borrow_kind": "value",
                           "repr": "RuntimeError",
-                          "id": "RuntimeError"
+                          "id": "RuntimeError",
+                          "runtime_module_id": "pytra.built_in.error"
                         },
                         "args": [
                           {
@@ -15878,17 +15913,12 @@
                                 "id": "stmt"
                               },
                               "attr": "name"
-                            }
+                            },
+                            "call_arg_type": "str"
                           }
                         ],
                         "keywords": [],
-                        "lowered_kind": "BuiltinCall",
-                        "builtin_name": "RuntimeError",
-                        "runtime_call": "std::runtime_error",
-                        "runtime_module_id": "pytra.core.py_runtime",
-                        "runtime_symbol": "RuntimeError",
-                        "runtime_call_adapter_kind": "builtin",
-                        "semantic_tag": "error.raise_ctor",
+                        "runtime_module_id": "pytra.built_in.error",
                         "type_expr_summary_v1": {
                           "schema_version": 1,
                           "kind": "NamedType",
@@ -22379,6 +22409,18 @@
           "runtime_semantic_tag": "stdlib.fn.perf_counter"
         },
         {
+          "module_id": "pytra.built_in.contains",
+          "export_name": "",
+          "local_name": "pytra.built_in.contains",
+          "binding_kind": "implicit_builtin",
+          "source_file": "sample/py/18_mini_language_interpreter.py",
+          "source_line": 0,
+          "source_module_id": "pytra.built_in.contains",
+          "source_binding_kind": "implicit_builtin",
+          "runtime_module_id": "pytra.built_in.contains",
+          "runtime_group": "built_in"
+        },
+        {
           "module_id": "pytra.built_in.io_ops",
           "export_name": "",
           "local_name": "pytra.built_in.io_ops",
@@ -22435,7 +22477,17 @@
         "local_name": "Path",
         "binding_kind": "symbol",
         "source_file": "sample/py/18_mini_language_interpreter.py",
-        "source_line": 1
+        "source_line": 1,
+        "source_module_id": "pathlib",
+        "source_export_name": "Path",
+        "source_binding_kind": "symbol",
+        "runtime_module_id": "pytra.std.pathlib",
+        "runtime_group": "std",
+        "resolved_binding_kind": "symbol",
+        "runtime_symbol": "Path",
+        "runtime_symbol_kind": "class",
+        "runtime_symbol_dispatch": "ctor",
+        "runtime_semantic_tag": "stdlib.symbol.Path"
       },
       {
         "module_id": "pytra.std.time",
@@ -22443,7 +22495,29 @@
         "local_name": "perf_counter",
         "binding_kind": "symbol",
         "source_file": "sample/py/18_mini_language_interpreter.py",
-        "source_line": 3
+        "source_line": 3,
+        "source_module_id": "pytra.std.time",
+        "source_export_name": "perf_counter",
+        "source_binding_kind": "symbol",
+        "runtime_module_id": "pytra.std.time",
+        "runtime_group": "std",
+        "resolved_binding_kind": "symbol",
+        "runtime_symbol": "perf_counter",
+        "runtime_symbol_kind": "function",
+        "runtime_symbol_dispatch": "function",
+        "runtime_semantic_tag": "stdlib.fn.perf_counter"
+      },
+      {
+        "module_id": "pytra.built_in.contains",
+        "export_name": "",
+        "local_name": "pytra.built_in.contains",
+        "binding_kind": "implicit_builtin",
+        "source_file": "sample/py/18_mini_language_interpreter.py",
+        "source_line": 0,
+        "source_module_id": "pytra.built_in.contains",
+        "source_binding_kind": "implicit_builtin",
+        "runtime_module_id": "pytra.built_in.contains",
+        "runtime_group": "built_in"
       },
       {
         "module_id": "pytra.built_in.io_ops",
@@ -22451,7 +22525,11 @@
         "local_name": "pytra.built_in.io_ops",
         "binding_kind": "implicit_builtin",
         "source_file": "sample/py/18_mini_language_interpreter.py",
-        "source_line": 0
+        "source_line": 0,
+        "source_module_id": "pytra.built_in.io_ops",
+        "source_binding_kind": "implicit_builtin",
+        "runtime_module_id": "pytra.built_in.io_ops",
+        "runtime_group": "built_in"
       },
       {
         "module_id": "pytra.built_in.iter_ops",
@@ -22459,7 +22537,11 @@
         "local_name": "pytra.built_in.iter_ops",
         "binding_kind": "implicit_builtin",
         "source_file": "sample/py/18_mini_language_interpreter.py",
-        "source_line": 0
+        "source_line": 0,
+        "source_module_id": "pytra.built_in.iter_ops",
+        "source_binding_kind": "implicit_builtin",
+        "runtime_module_id": "pytra.built_in.iter_ops",
+        "runtime_group": "built_in"
       },
       {
         "module_id": "pytra.core.py_runtime",
@@ -22467,7 +22549,11 @@
         "local_name": "pytra.core.py_runtime",
         "binding_kind": "implicit_builtin",
         "source_file": "sample/py/18_mini_language_interpreter.py",
-        "source_line": 0
+        "source_line": 0,
+        "source_module_id": "pytra.core.py_runtime",
+        "source_binding_kind": "implicit_builtin",
+        "runtime_module_id": "pytra.core.py_runtime",
+        "runtime_group": "core"
       }
     ],
     "qualified_symbol_refs": [

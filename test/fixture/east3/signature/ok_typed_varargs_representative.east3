@@ -17,6 +17,7 @@
       "field_types": {
         "pressed": "bool"
       },
+      "decorators": [],
       "body": [
         {
           "kind": "AnnAssign",
@@ -59,7 +60,8 @@
       ],
       "class_storage_hint": "value",
       "leading_comments": [],
-      "leading_trivia": []
+      "leading_trivia": [],
+      "meta": {}
     },
     {
       "kind": "FunctionDef",
@@ -76,8 +78,7 @@
         "states": "list[ControllerState]"
       },
       "arg_order": [
-        "target",
-        "states"
+        "target"
       ],
       "arg_defaults": {},
       "arg_index": {
@@ -273,11 +274,11 @@
       },
       "leading_comments": [],
       "leading_trivia": [],
-      "vararg_desugared_v1": {
-        "n_fixed": 1,
-        "elem_type": "ControllerState",
-        "vararg_name": "states",
-        "list_type": "list[ControllerState]"
+      "vararg_name": "states",
+      "vararg_type": "ControllerState",
+      "vararg_type_expr": {
+        "kind": "NamedType",
+        "name": "ControllerState"
       },
       "returns": "None"
     },

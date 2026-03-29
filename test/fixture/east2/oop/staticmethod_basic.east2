@@ -21,6 +21,7 @@
       "base": null,
       "dataclass": false,
       "field_types": {},
+      "decorators": [],
       "body": [
         {
           "kind": "FunctionDef",
@@ -195,7 +196,8 @@
       ],
       "class_storage_hint": "value",
       "leading_comments": [],
-      "leading_trivia": []
+      "leading_trivia": [],
+      "meta": {}
     }
   ],
   "main_guard_body": [

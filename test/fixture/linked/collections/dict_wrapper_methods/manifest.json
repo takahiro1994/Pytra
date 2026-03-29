@@ -31,25 +31,38 @@
       "module_kind": "runtime"
     },
     {
-      "module_id": "pytra.built_in.scalar_ops",
-      "input": "/workspace/Pytra/src/runtime/east/built_in/scalar_ops.east",
-      "output": "east3/pytra/built_in/scalar_ops.east3.json",
-      "source_path": "/workspace/Pytra/src/pytra/built_in/scalar_ops.py",
+      "module_id": "pytra.built_in.type_id_table",
+      "input": "__linked_helper__/pytra/built_in/type_id_table.east3.json",
+      "output": "east3/pytra/built_in/type_id_table.east3.json",
+      "source_path": "src/pytra/built_in/type_id_table.py",
       "is_entry": false,
-      "module_kind": "runtime"
-    },
-    {
-      "module_id": "pytra.built_in.sequence",
-      "input": "/workspace/Pytra/src/runtime/east/built_in/sequence.east",
-      "output": "east3/pytra/built_in/sequence.east3.json",
-      "source_path": "/workspace/Pytra/src/pytra/built_in/sequence.py",
-      "is_entry": false,
-      "module_kind": "runtime"
+      "module_kind": "helper",
+      "helper_id": "pytra.built_in.type_id_table",
+      "owner_module_id": "",
+      "generated_by": "linked_optimizer"
     }
   ],
   "global": {
-    "type_id_table": {},
-    "type_id_base_map": {},
+    "type_id_table": {
+      "BaseException": 9,
+      "Exception": 10,
+      "IndexError": 14,
+      "KeyError": 15,
+      "RuntimeError": 11,
+      "TypeError": 13,
+      "ValueError": 12,
+      "object": 8
+    },
+    "type_id_base_map": {
+      "BaseException": 8,
+      "Exception": 9,
+      "IndexError": 10,
+      "KeyError": 10,
+      "RuntimeError": 10,
+      "TypeError": 10,
+      "ValueError": 10,
+      "object": 8
+    },
     "call_graph": {
       "dict_wrapper_methods::__main__": [
         "dict_wrapper_methods::run_case"
@@ -59,12 +72,7 @@
       "pytra.built_in.contains::py_contains_list_object": [],
       "pytra.built_in.contains::py_contains_set_object": [],
       "pytra.built_in.contains::py_contains_str_object": [],
-      "pytra.built_in.io_ops::py_print": [],
-      "pytra.built_in.scalar_ops::py_chr": [],
-      "pytra.built_in.scalar_ops::py_ord": [],
-      "pytra.built_in.scalar_ops::py_to_int64_base": [],
-      "pytra.built_in.sequence::py_range": [],
-      "pytra.built_in.sequence::py_repeat": []
+      "pytra.built_in.io_ops::py_print": []
     },
     "sccs": [
       [
@@ -87,21 +95,6 @@
       ],
       [
         "pytra.built_in.io_ops::py_print"
-      ],
-      [
-        "pytra.built_in.scalar_ops::py_chr"
-      ],
-      [
-        "pytra.built_in.scalar_ops::py_ord"
-      ],
-      [
-        "pytra.built_in.scalar_ops::py_to_int64_base"
-      ],
-      [
-        "pytra.built_in.sequence::py_range"
-      ],
-      [
-        "pytra.built_in.sequence::py_repeat"
       ]
     ],
     "non_escape_summary": {},

@@ -35,6 +35,9 @@
         "x": "int64",
         "y": "int64"
       },
+      "decorators": [
+        "dataclass"
+      ],
       "body": [
         {
           "kind": "AnnAssign",
@@ -276,7 +279,8 @@
           "kind": "blank",
           "count": 1
         }
-      ]
+      ],
+      "meta": {}
     },
     {
       "kind": "FunctionDef",

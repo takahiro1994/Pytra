@@ -109,6 +109,9 @@
           "declare": true
         }
       ],
+      "decorators": [
+        "dataclass"
+      ],
       "leading_comments": [],
       "leading_trivia": []
     },
@@ -179,6 +182,9 @@
           "value": null,
           "declare": true
         }
+      ],
+      "decorators": [
+        "dataclass"
       ]
     },
     {

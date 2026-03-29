@@ -168,7 +168,8 @@
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "Exception",
-                      "id": "Exception"
+                      "id": "Exception",
+                      "runtime_module_id": "pytra.built_in.error"
                     },
                     "args": [
                       {
@@ -187,13 +188,7 @@
                       }
                     ],
                     "keywords": [],
-                    "lowered_kind": "BuiltinCall",
-                    "builtin_name": "Exception",
-                    "runtime_call": "std::runtime_error",
-                    "runtime_module_id": "pytra.core.py_runtime",
-                    "runtime_symbol": "Exception",
-                    "runtime_call_adapter_kind": "builtin",
-                    "semantic_tag": "error.raise_ctor"
+                    "runtime_module_id": "pytra.built_in.error"
                   },
                   "cause": null
                 }
@@ -252,11 +247,12 @@
                   "end_lineno": 13,
                   "end_col": 20
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "Exception",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "Exception",
-                "id": "Exception"
+                "id": "Exception",
+                "runtime_module_id": "pytra.built_in.error"
               },
               "name": "ex",
               "body": [

@@ -275,6 +275,9 @@
           "count": 1
         }
       ],
+      "decorators": [
+        "extern"
+      ],
       "returns": "str",
       "meta": {
         "lifetime_analysis": {
@@ -552,6 +555,9 @@
       },
       "leading_comments": [],
       "leading_trivia": [],
+      "decorators": [
+        "extern"
+      ],
       "returns": "str",
       "meta": {
         "lifetime_analysis": {
@@ -809,6 +815,9 @@
       },
       "leading_comments": [],
       "leading_trivia": [],
+      "decorators": [
+        "extern"
+      ],
       "returns": "str",
       "meta": {
         "lifetime_analysis": {
@@ -1076,6 +1085,9 @@
       },
       "leading_comments": [],
       "leading_trivia": [],
+      "decorators": [
+        "extern"
+      ],
       "returns": "tuple[str,str]",
       "meta": {
         "lifetime_analysis": {
@@ -1333,6 +1345,9 @@
       },
       "leading_comments": [],
       "leading_trivia": [],
+      "decorators": [
+        "extern"
+      ],
       "returns": "str",
       "meta": {
         "lifetime_analysis": {
@@ -1590,6 +1605,9 @@
       },
       "leading_comments": [],
       "leading_trivia": [],
+      "decorators": [
+        "extern"
+      ],
       "returns": "bool",
       "meta": {
         "lifetime_analysis": {
@@ -1721,6 +1739,12 @@
         "binding_kind": "module",
         "source_file": "src/pytra/std/os_path.py",
         "source_line": 4,
+        "source_module_id": "os.path",
+        "source_export_name": "",
+        "source_binding_kind": "module",
+        "runtime_module_id": "os.path",
+        "runtime_group": "",
+        "resolved_binding_kind": "module",
         "host_only": true
       },
       {
@@ -1729,7 +1753,17 @@
         "local_name": "extern",
         "binding_kind": "symbol",
         "source_file": "src/pytra/std/os_path.py",
-        "source_line": 6
+        "source_line": 6,
+        "source_module_id": "pytra.std",
+        "source_export_name": "extern",
+        "source_binding_kind": "symbol",
+        "runtime_module_id": "pytra.std",
+        "runtime_group": "std",
+        "resolved_binding_kind": "symbol",
+        "runtime_symbol": "extern",
+        "runtime_symbol_kind": "function",
+        "runtime_symbol_dispatch": "function",
+        "runtime_semantic_tag": "stdlib.fn.extern"
       }
     ],
     "qualified_symbol_refs": [

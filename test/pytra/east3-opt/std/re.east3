@@ -114,6 +114,7 @@
         "_text": "str",
         "_groups": "list[str]"
       },
+      "decorators": [],
       "body": [
         {
           "kind": "Expr",
@@ -139,7 +140,7 @@
           }
         },
         {
-          "kind": "FunctionDef",
+          "kind": "ClosureDef",
           "source_span": {
             "lineno": 13,
             "col_offset": 4,
@@ -166,7 +167,7 @@
           },
           "return_type": "None",
           "arg_usage": {
-            "self": "readonly",
+            "self": "reassigned",
             "text": "readonly",
             "groups": "readonly"
           },
@@ -231,23 +232,6 @@
                 "kind": "NamedType",
                 "category": "static",
                 "mirror": "str"
-              },
-              "meta": {
-                "lifetime_node_id": "n1",
-                "lifetime_defs": [],
-                "lifetime_uses": [
-                  "text"
-                ],
-                "lifetime_live_in": [
-                  "groups",
-                  "text"
-                ],
-                "lifetime_live_out": [
-                  "groups"
-                ],
-                "lifetime_last_use_vars": [
-                  "text"
-                ]
               }
             },
             {
@@ -308,128 +292,20 @@
                 "kind": "GenericType",
                 "category": "static",
                 "mirror": "list[str]"
-              },
-              "meta": {
-                "lifetime_node_id": "n0",
-                "lifetime_defs": [],
-                "lifetime_uses": [
-                  "groups"
-                ],
-                "lifetime_live_in": [
-                  "groups"
-                ],
-                "lifetime_live_out": [],
-                "lifetime_last_use_vars": [
-                  "groups"
-                ]
               }
             }
           ],
           "is_generator": 0,
           "yield_value_type": "unknown",
           "decorators": [],
+          "captures": [],
+          "capture_types": {},
+          "capture_modes": {},
           "returns": "None",
-          "mutates_self": true,
-          "meta": {
-            "lifetime_analysis": {
-              "schema_version": "east3_lifetime_v1",
-              "status": "ok",
-              "reason": "",
-              "entry_node": "n1",
-              "order": [
-                "n0",
-                "n1"
-              ],
-              "cfg": [
-                {
-                  "id": "n0",
-                  "kind": "Assign",
-                  "defs": [],
-                  "uses": [
-                    "groups"
-                  ],
-                  "succ": []
-                },
-                {
-                  "id": "n1",
-                  "kind": "Assign",
-                  "defs": [],
-                  "uses": [
-                    "text"
-                  ],
-                  "succ": [
-                    "n0"
-                  ]
-                }
-              ],
-              "def_use": {
-                "defs": {},
-                "uses": {
-                  "groups": [
-                    "n0"
-                  ],
-                  "text": [
-                    "n1"
-                  ]
-                }
-              },
-              "variables": {
-                "groups": {
-                  "def_nodes": [],
-                  "use_nodes": [
-                    "n0"
-                  ],
-                  "live_in_nodes": [
-                    "n0",
-                    "n1"
-                  ],
-                  "live_out_nodes": [
-                    "n1"
-                  ],
-                  "last_use_nodes": [
-                    "n0"
-                  ],
-                  "lifetime_class": "escape_or_unknown"
-                },
-                "self": {
-                  "def_nodes": [],
-                  "use_nodes": [],
-                  "live_in_nodes": [],
-                  "live_out_nodes": [],
-                  "last_use_nodes": [],
-                  "lifetime_class": "escape_or_unknown"
-                },
-                "text": {
-                  "def_nodes": [],
-                  "use_nodes": [
-                    "n1"
-                  ],
-                  "live_in_nodes": [
-                    "n1"
-                  ],
-                  "live_out_nodes": [],
-                  "last_use_nodes": [
-                    "n1"
-                  ],
-                  "lifetime_class": "escape_or_unknown"
-                }
-              },
-              "arg_order": [
-                "self",
-                "text",
-                "groups"
-              ],
-              "arg_escape": [
-                true,
-                true,
-                true
-              ],
-              "has_dynamic_name_access": false
-            }
-          }
+          "mutates_self": true
         },
         {
-          "kind": "FunctionDef",
+          "kind": "ClosureDef",
           "source_span": {
             "lineno": 17,
             "col_offset": 4,
@@ -611,44 +487,10 @@
                       "id": "self"
                     },
                     "attr": "_text"
-                  },
-                  "meta": {
-                    "lifetime_node_id": "n4",
-                    "lifetime_defs": [],
-                    "lifetime_uses": [
-                      "self"
-                    ],
-                    "lifetime_live_in": [
-                      "self"
-                    ],
-                    "lifetime_live_out": [],
-                    "lifetime_last_use_vars": [
-                      "self"
-                    ]
                   }
                 }
               ],
-              "orelse": [],
-              "meta": {
-                "lifetime_node_id": "n3",
-                "lifetime_defs": [],
-                "lifetime_uses": [
-                  "idx"
-                ],
-                "lifetime_live_in": [
-                  "IndexError",
-                  "idx",
-                  "len",
-                  "self"
-                ],
-                "lifetime_live_out": [
-                  "IndexError",
-                  "idx",
-                  "len",
-                  "self"
-                ],
-                "lifetime_last_use_vars": []
-              }
+              "orelse": []
             },
             {
               "kind": "If",
@@ -1009,7 +851,8 @@
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "IndexError",
-                      "id": "IndexError"
+                      "id": "IndexError",
+                      "runtime_module_id": "pytra.built_in.error"
                     },
                     "args": [
                       {
@@ -1024,17 +867,12 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "\"group index out of range\"",
-                        "value": "group index out of range"
+                        "value": "group index out of range",
+                        "call_arg_type": "str"
                       }
                     ],
                     "keywords": [],
-                    "lowered_kind": "BuiltinCall",
-                    "builtin_name": "IndexError",
-                    "runtime_call": "std::runtime_error",
-                    "runtime_module_id": "pytra.core.py_runtime",
-                    "runtime_symbol": "IndexError",
-                    "runtime_call_adapter_kind": "builtin",
-                    "semantic_tag": "error.raise_ctor",
+                    "runtime_module_id": "pytra.built_in.error",
                     "type_expr_summary_v1": {
                       "schema_version": 1,
                       "kind": "NamedType",
@@ -1042,52 +880,10 @@
                       "mirror": "IndexError"
                     }
                   },
-                  "cause": null,
-                  "meta": {
-                    "lifetime_node_id": "n2",
-                    "lifetime_defs": [],
-                    "lifetime_uses": [
-                      "IndexError"
-                    ],
-                    "lifetime_live_in": [
-                      "IndexError",
-                      "idx",
-                      "self"
-                    ],
-                    "lifetime_live_out": [
-                      "idx",
-                      "self"
-                    ],
-                    "lifetime_last_use_vars": [
-                      "IndexError"
-                    ]
-                  }
+                  "cause": null
                 }
               ],
-              "orelse": [],
-              "meta": {
-                "lifetime_node_id": "n1",
-                "lifetime_defs": [],
-                "lifetime_uses": [
-                  "idx",
-                  "len",
-                  "self"
-                ],
-                "lifetime_live_in": [
-                  "IndexError",
-                  "idx",
-                  "len",
-                  "self"
-                ],
-                "lifetime_live_out": [
-                  "IndexError",
-                  "idx",
-                  "self"
-                ],
-                "lifetime_last_use_vars": [
-                  "len"
-                ]
-              }
+              "orelse": []
             },
             {
               "kind": "Return",
@@ -1222,220 +1018,17 @@
                     }
                   }
                 }
-              },
-              "meta": {
-                "lifetime_node_id": "n0",
-                "lifetime_defs": [],
-                "lifetime_uses": [
-                  "idx",
-                  "self"
-                ],
-                "lifetime_live_in": [
-                  "idx",
-                  "self"
-                ],
-                "lifetime_live_out": [],
-                "lifetime_last_use_vars": [
-                  "idx",
-                  "self"
-                ]
               }
             }
           ],
           "is_generator": 0,
           "yield_value_type": "unknown",
           "decorators": [],
+          "captures": [],
+          "capture_types": {},
+          "capture_modes": {},
           "returns": "str",
-          "mutates_self": false,
-          "meta": {
-            "lifetime_analysis": {
-              "schema_version": "east3_lifetime_v1",
-              "status": "ok",
-              "reason": "",
-              "entry_node": "n3",
-              "order": [
-                "n0",
-                "n1",
-                "n2",
-                "n3",
-                "n4"
-              ],
-              "cfg": [
-                {
-                  "id": "n0",
-                  "kind": "Return",
-                  "defs": [],
-                  "uses": [
-                    "idx",
-                    "self"
-                  ],
-                  "succ": []
-                },
-                {
-                  "id": "n1",
-                  "kind": "If",
-                  "defs": [],
-                  "uses": [
-                    "idx",
-                    "len",
-                    "self"
-                  ],
-                  "succ": [
-                    "n0",
-                    "n2"
-                  ]
-                },
-                {
-                  "id": "n2",
-                  "kind": "Raise",
-                  "defs": [],
-                  "uses": [
-                    "IndexError"
-                  ],
-                  "succ": [
-                    "n0"
-                  ]
-                },
-                {
-                  "id": "n3",
-                  "kind": "If",
-                  "defs": [],
-                  "uses": [
-                    "idx"
-                  ],
-                  "succ": [
-                    "n1",
-                    "n4"
-                  ]
-                },
-                {
-                  "id": "n4",
-                  "kind": "Return",
-                  "defs": [],
-                  "uses": [
-                    "self"
-                  ],
-                  "succ": []
-                }
-              ],
-              "def_use": {
-                "defs": {},
-                "uses": {
-                  "IndexError": [
-                    "n2"
-                  ],
-                  "idx": [
-                    "n0",
-                    "n1",
-                    "n3"
-                  ],
-                  "len": [
-                    "n1"
-                  ],
-                  "self": [
-                    "n0",
-                    "n1",
-                    "n4"
-                  ]
-                }
-              },
-              "variables": {
-                "IndexError": {
-                  "def_nodes": [],
-                  "use_nodes": [
-                    "n2"
-                  ],
-                  "live_in_nodes": [
-                    "n1",
-                    "n2",
-                    "n3"
-                  ],
-                  "live_out_nodes": [
-                    "n1",
-                    "n3"
-                  ],
-                  "last_use_nodes": [
-                    "n2"
-                  ],
-                  "lifetime_class": "local_non_escape_candidate"
-                },
-                "idx": {
-                  "def_nodes": [],
-                  "use_nodes": [
-                    "n0",
-                    "n1",
-                    "n3"
-                  ],
-                  "live_in_nodes": [
-                    "n0",
-                    "n1",
-                    "n2",
-                    "n3"
-                  ],
-                  "live_out_nodes": [
-                    "n1",
-                    "n2",
-                    "n3"
-                  ],
-                  "last_use_nodes": [
-                    "n0"
-                  ],
-                  "lifetime_class": "escape_or_unknown"
-                },
-                "len": {
-                  "def_nodes": [],
-                  "use_nodes": [
-                    "n1"
-                  ],
-                  "live_in_nodes": [
-                    "n1",
-                    "n3"
-                  ],
-                  "live_out_nodes": [
-                    "n3"
-                  ],
-                  "last_use_nodes": [
-                    "n1"
-                  ],
-                  "lifetime_class": "local_non_escape_candidate"
-                },
-                "self": {
-                  "def_nodes": [],
-                  "use_nodes": [
-                    "n0",
-                    "n1",
-                    "n4"
-                  ],
-                  "live_in_nodes": [
-                    "n0",
-                    "n1",
-                    "n2",
-                    "n3",
-                    "n4"
-                  ],
-                  "live_out_nodes": [
-                    "n1",
-                    "n2",
-                    "n3"
-                  ],
-                  "last_use_nodes": [
-                    "n0",
-                    "n4"
-                  ],
-                  "lifetime_class": "escape_or_unknown"
-                }
-              },
-              "arg_order": [
-                "self",
-                "idx"
-              ],
-              "arg_escape": [
-                true,
-                true
-              ],
-              "has_dynamic_name_access": false
-            }
-          }
+          "mutates_self": false
         }
       ],
       "class_storage_hint": "ref",
@@ -1449,7 +1042,8 @@
           "kind": "blank",
           "count": 1
         }
-      ]
+      ],
+      "meta": {}
     },
     {
       "kind": "FunctionDef",
@@ -1687,33 +1281,18 @@
             "name": "Match"
           },
           "value": {
-            "kind": "Unbox",
-            "value": {
-              "kind": "Name",
-              "source_span": {
-                "lineno": 29,
-                "col_offset": 4,
-                "end_lineno": 29,
-                "end_col_offset": 5
-              },
-              "resolved_type": "Match | None",
-              "casts": [],
-              "borrow_kind": "readonly_ref",
-              "repr": "m",
-              "id": "m"
-            },
-            "resolved_type": "Match",
-            "borrow_kind": "value",
-            "casts": [],
-            "target": "Match",
-            "on_fail": "raise",
+            "kind": "Name",
             "source_span": {
               "lineno": 29,
               "col_offset": 4,
               "end_lineno": 29,
               "end_col_offset": 5
             },
-            "repr": "m"
+            "resolved_type": "Match",
+            "casts": [],
+            "borrow_kind": "readonly_ref",
+            "repr": "m",
+            "id": "m"
           },
           "type_expr_summary_v1": {
             "schema_version": 1,
@@ -2151,7 +1730,7 @@
             "lowered_kind": "BuiltinCall",
             "builtin_name": "strip",
             "runtime_call": "str.strip",
-            "runtime_module_id": "pytra.core.str",
+            "runtime_module_id": "pytra.built_in.string_ops",
             "runtime_symbol": "str.strip",
             "runtime_call_adapter_kind": "builtin",
             "semantic_tag": "stdlib.method.strip",
@@ -5947,7 +5526,7 @@
             "lowered_kind": "BuiltinCall",
             "builtin_name": "rstrip",
             "runtime_call": "str.rstrip",
-            "runtime_module_id": "pytra.core.str",
+            "runtime_module_id": "pytra.built_in.string_ops",
             "runtime_symbol": "str.rstrip",
             "runtime_call_adapter_kind": "builtin",
             "semantic_tag": "stdlib.method.rstrip",
@@ -9769,7 +9348,7 @@
                   "lowered_kind": "BuiltinCall",
                   "builtin_name": "endswith",
                   "runtime_call": "str.endswith",
-                  "runtime_module_id": "pytra.core.str",
+                  "runtime_module_id": "pytra.built_in.string_ops",
                   "runtime_symbol": "str.endswith",
                   "runtime_call_adapter_kind": "builtin",
                   "semantic_tag": "stdlib.method.endswith",
@@ -9934,7 +9513,7 @@
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "find",
                 "runtime_call": "str.find",
-                "runtime_module_id": "pytra.core.str",
+                "runtime_module_id": "pytra.built_in.string_ops",
                 "runtime_symbol": "str.find",
                 "runtime_call_adapter_kind": "builtin",
                 "semantic_tag": "stdlib.method.find",
@@ -11508,7 +11087,7 @@
                   "lowered_kind": "BuiltinCall",
                   "builtin_name": "startswith",
                   "runtime_call": "str.startswith",
-                  "runtime_module_id": "pytra.core.str",
+                  "runtime_module_id": "pytra.built_in.string_ops",
                   "runtime_symbol": "str.startswith",
                   "runtime_call_adapter_kind": "builtin",
                   "semantic_tag": "stdlib.method.startswith",
@@ -14336,7 +13915,7 @@
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "rfind",
                 "runtime_call": "str.rfind",
-                "runtime_module_id": "pytra.core.str",
+                "runtime_module_id": "pytra.built_in.string_ops",
                 "runtime_symbol": "str.rfind",
                 "runtime_call_adapter_kind": "builtin",
                 "semantic_tag": "stdlib.method.rfind",
@@ -15130,7 +14709,7 @@
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "strip",
                 "runtime_call": "str.strip",
-                "runtime_module_id": "pytra.core.str",
+                "runtime_module_id": "pytra.built_in.string_ops",
                 "runtime_symbol": "str.strip",
                 "runtime_call_adapter_kind": "builtin",
                 "semantic_tag": "stdlib.method.strip",
@@ -15738,7 +15317,7 @@
                   "lowered_kind": "BuiltinCall",
                   "builtin_name": "startswith",
                   "runtime_call": "str.startswith",
-                  "runtime_module_id": "pytra.core.str",
+                  "runtime_module_id": "pytra.built_in.string_ops",
                   "runtime_symbol": "str.startswith",
                   "runtime_call_adapter_kind": "builtin",
                   "semantic_tag": "stdlib.method.startswith",
@@ -15951,7 +15530,7 @@
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "strip",
                 "runtime_call": "str.strip",
-                "runtime_module_id": "pytra.core.str",
+                "runtime_module_id": "pytra.built_in.string_ops",
                 "runtime_symbol": "str.strip",
                 "runtime_call_adapter_kind": "builtin",
                 "semantic_tag": "stdlib.method.strip",
@@ -16742,7 +16321,7 @@
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "find",
                 "runtime_call": "str.find",
-                "runtime_module_id": "pytra.core.str",
+                "runtime_module_id": "pytra.built_in.string_ops",
                 "runtime_symbol": "str.find",
                 "runtime_call_adapter_kind": "builtin",
                 "semantic_tag": "stdlib.method.find",
@@ -17070,7 +16649,7 @@
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "strip",
                 "runtime_call": "str.strip",
-                "runtime_module_id": "pytra.core.str",
+                "runtime_module_id": "pytra.built_in.string_ops",
                 "runtime_symbol": "str.strip",
                 "runtime_call_adapter_kind": "builtin",
                 "semantic_tag": "stdlib.method.strip",
@@ -17654,7 +17233,7 @@
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "find",
                 "runtime_call": "str.find",
-                "runtime_module_id": "pytra.core.str",
+                "runtime_module_id": "pytra.built_in.string_ops",
                 "runtime_symbol": "str.find",
                 "runtime_call_adapter_kind": "builtin",
                 "semantic_tag": "stdlib.method.find",
@@ -17882,7 +17461,7 @@
                     "lowered_kind": "BuiltinCall",
                     "builtin_name": "strip",
                     "runtime_call": "str.strip",
-                    "runtime_module_id": "pytra.core.str",
+                    "runtime_module_id": "pytra.built_in.string_ops",
                     "runtime_symbol": "str.strip",
                     "runtime_call_adapter_kind": "builtin",
                     "semantic_tag": "stdlib.method.strip",
@@ -18385,7 +17964,7 @@
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "strip",
                 "runtime_call": "str.strip",
-                "runtime_module_id": "pytra.core.str",
+                "runtime_module_id": "pytra.built_in.string_ops",
                 "runtime_symbol": "str.strip",
                 "runtime_call_adapter_kind": "builtin",
                 "semantic_tag": "stdlib.method.strip",
@@ -18752,7 +18331,7 @@
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "strip",
                 "runtime_call": "str.strip",
-                "runtime_module_id": "pytra.core.str",
+                "runtime_module_id": "pytra.built_in.string_ops",
                 "runtime_symbol": "str.strip",
                 "runtime_call_adapter_kind": "builtin",
                 "semantic_tag": "stdlib.method.strip",
@@ -20856,7 +20435,7 @@
                   "lowered_kind": "BuiltinCall",
                   "builtin_name": "startswith",
                   "runtime_call": "str.startswith",
-                  "runtime_module_id": "pytra.core.str",
+                  "runtime_module_id": "pytra.built_in.string_ops",
                   "runtime_symbol": "str.startswith",
                   "runtime_call_adapter_kind": "builtin",
                   "semantic_tag": "stdlib.method.startswith",
@@ -22789,7 +22368,7 @@
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "strip",
                 "runtime_call": "str.strip",
-                "runtime_module_id": "pytra.core.str",
+                "runtime_module_id": "pytra.built_in.string_ops",
                 "runtime_symbol": "str.strip",
                 "runtime_call_adapter_kind": "builtin",
                 "semantic_tag": "stdlib.method.strip",
@@ -23251,7 +22830,7 @@
                       "lowered_kind": "BuiltinCall",
                       "builtin_name": "startswith",
                       "runtime_call": "str.startswith",
-                      "runtime_module_id": "pytra.core.str",
+                      "runtime_module_id": "pytra.built_in.string_ops",
                       "runtime_symbol": "str.startswith",
                       "runtime_call_adapter_kind": "builtin",
                       "semantic_tag": "stdlib.method.startswith",
@@ -23337,7 +22916,7 @@
                       "lowered_kind": "BuiltinCall",
                       "builtin_name": "endswith",
                       "runtime_call": "str.endswith",
-                      "runtime_module_id": "pytra.core.str",
+                      "runtime_module_id": "pytra.built_in.string_ops",
                       "runtime_symbol": "str.endswith",
                       "runtime_call_adapter_kind": "builtin",
                       "semantic_tag": "stdlib.method.endswith",
@@ -23606,7 +23185,7 @@
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "strip",
                 "runtime_call": "str.strip",
-                "runtime_module_id": "pytra.core.str",
+                "runtime_module_id": "pytra.built_in.string_ops",
                 "runtime_symbol": "str.strip",
                 "runtime_call_adapter_kind": "builtin",
                 "semantic_tag": "stdlib.method.strip",
@@ -24253,7 +23832,7 @@
                     "lowered_kind": "BuiltinCall",
                     "builtin_name": "startswith",
                     "runtime_call": "str.startswith",
-                    "runtime_module_id": "pytra.core.str",
+                    "runtime_module_id": "pytra.built_in.string_ops",
                     "runtime_symbol": "str.startswith",
                     "runtime_call_adapter_kind": "builtin",
                     "semantic_tag": "stdlib.method.startswith",
@@ -24339,7 +23918,7 @@
                     "lowered_kind": "BuiltinCall",
                     "builtin_name": "endswith",
                     "runtime_call": "str.endswith",
-                    "runtime_module_id": "pytra.core.str",
+                    "runtime_module_id": "pytra.built_in.string_ops",
                     "runtime_symbol": "str.endswith",
                     "runtime_call_adapter_kind": "builtin",
                     "semantic_tag": "stdlib.method.endswith",
@@ -24882,7 +24461,7 @@
                     "lowered_kind": "BuiltinCall",
                     "builtin_name": "startswith",
                     "runtime_call": "str.startswith",
-                    "runtime_module_id": "pytra.core.str",
+                    "runtime_module_id": "pytra.built_in.string_ops",
                     "runtime_symbol": "str.startswith",
                     "runtime_call_adapter_kind": "builtin",
                     "semantic_tag": "stdlib.method.startswith",
@@ -24968,7 +24547,7 @@
                     "lowered_kind": "BuiltinCall",
                     "builtin_name": "endswith",
                     "runtime_call": "str.endswith",
-                    "runtime_module_id": "pytra.core.str",
+                    "runtime_module_id": "pytra.built_in.string_ops",
                     "runtime_symbol": "str.endswith",
                     "runtime_call_adapter_kind": "builtin",
                     "semantic_tag": "stdlib.method.endswith",
@@ -25753,7 +25332,7 @@
                       "lowered_kind": "BuiltinCall",
                       "builtin_name": "startswith",
                       "runtime_call": "str.startswith",
-                      "runtime_module_id": "pytra.core.str",
+                      "runtime_module_id": "pytra.built_in.string_ops",
                       "runtime_symbol": "str.startswith",
                       "runtime_call_adapter_kind": "builtin",
                       "semantic_tag": "stdlib.method.startswith",
@@ -25839,7 +25418,7 @@
                       "lowered_kind": "BuiltinCall",
                       "builtin_name": "endswith",
                       "runtime_call": "str.endswith",
-                      "runtime_module_id": "pytra.core.str",
+                      "runtime_module_id": "pytra.built_in.string_ops",
                       "runtime_symbol": "str.endswith",
                       "runtime_call_adapter_kind": "builtin",
                       "semantic_tag": "stdlib.method.endswith",
@@ -26106,7 +25685,7 @@
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "strip",
                 "runtime_call": "str.strip",
-                "runtime_module_id": "pytra.core.str",
+                "runtime_module_id": "pytra.built_in.string_ops",
                 "runtime_symbol": "str.strip",
                 "runtime_call_adapter_kind": "builtin",
                 "semantic_tag": "stdlib.method.strip",
@@ -26501,7 +26080,7 @@
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "find",
                 "runtime_call": "str.find",
-                "runtime_module_id": "pytra.core.str",
+                "runtime_module_id": "pytra.built_in.string_ops",
                 "runtime_symbol": "str.find",
                 "runtime_call_adapter_kind": "builtin",
                 "semantic_tag": "stdlib.method.find",
@@ -26857,7 +26436,7 @@
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "strip",
                 "runtime_call": "str.strip",
-                "runtime_module_id": "pytra.core.str",
+                "runtime_module_id": "pytra.built_in.string_ops",
                 "runtime_symbol": "str.strip",
                 "runtime_call_adapter_kind": "builtin",
                 "semantic_tag": "stdlib.method.strip",
@@ -27530,7 +27109,7 @@
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "find",
                 "runtime_call": "str.find",
-                "runtime_module_id": "pytra.core.str",
+                "runtime_module_id": "pytra.built_in.string_ops",
                 "runtime_symbol": "str.find",
                 "runtime_call_adapter_kind": "builtin",
                 "semantic_tag": "stdlib.method.find",
@@ -27886,7 +27465,7 @@
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "strip",
                 "runtime_call": "str.strip",
-                "runtime_module_id": "pytra.core.str",
+                "runtime_module_id": "pytra.built_in.string_ops",
                 "runtime_symbol": "str.strip",
                 "runtime_call_adapter_kind": "builtin",
                 "semantic_tag": "stdlib.method.strip",
@@ -28446,7 +28025,7 @@
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "strip",
                 "runtime_call": "str.strip",
-                "runtime_module_id": "pytra.core.str",
+                "runtime_module_id": "pytra.built_in.string_ops",
                 "runtime_symbol": "str.strip",
                 "runtime_call_adapter_kind": "builtin",
                 "semantic_tag": "stdlib.method.strip",
@@ -29833,7 +29412,7 @@
                       "lowered_kind": "BuiltinCall",
                       "builtin_name": "startswith",
                       "runtime_call": "str.startswith",
-                      "runtime_module_id": "pytra.core.str",
+                      "runtime_module_id": "pytra.built_in.string_ops",
                       "runtime_symbol": "str.startswith",
                       "runtime_call_adapter_kind": "builtin",
                       "semantic_tag": "stdlib.method.startswith",
@@ -30044,7 +29623,7 @@
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "strip",
                 "runtime_call": "str.strip",
-                "runtime_module_id": "pytra.core.str",
+                "runtime_module_id": "pytra.built_in.string_ops",
                 "runtime_symbol": "str.strip",
                 "runtime_call_adapter_kind": "builtin",
                 "semantic_tag": "stdlib.method.strip",
@@ -30244,7 +29823,7 @@
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "find",
                 "runtime_call": "str.find",
-                "runtime_module_id": "pytra.core.str",
+                "runtime_module_id": "pytra.built_in.string_ops",
                 "runtime_symbol": "str.find",
                 "runtime_call_adapter_kind": "builtin",
                 "semantic_tag": "stdlib.method.find",
@@ -30583,7 +30162,7 @@
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "strip",
                 "runtime_call": "str.strip",
-                "runtime_module_id": "pytra.core.str",
+                "runtime_module_id": "pytra.built_in.string_ops",
                 "runtime_symbol": "str.strip",
                 "runtime_call_adapter_kind": "builtin",
                 "semantic_tag": "stdlib.method.strip",
@@ -30960,7 +30539,7 @@
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "strip",
                 "runtime_call": "str.strip",
-                "runtime_module_id": "pytra.core.str",
+                "runtime_module_id": "pytra.built_in.string_ops",
                 "runtime_symbol": "str.strip",
                 "runtime_call_adapter_kind": "builtin",
                 "semantic_tag": "stdlib.method.strip",
@@ -32039,7 +31618,7 @@
                       "lowered_kind": "BuiltinCall",
                       "builtin_name": "startswith",
                       "runtime_call": "str.startswith",
-                      "runtime_module_id": "pytra.core.str",
+                      "runtime_module_id": "pytra.built_in.string_ops",
                       "runtime_symbol": "str.startswith",
                       "runtime_call_adapter_kind": "builtin",
                       "semantic_tag": "stdlib.method.startswith",
@@ -32252,7 +31831,7 @@
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "strip",
                 "runtime_call": "str.strip",
-                "runtime_module_id": "pytra.core.str",
+                "runtime_module_id": "pytra.built_in.string_ops",
                 "runtime_symbol": "str.strip",
                 "runtime_call_adapter_kind": "builtin",
                 "semantic_tag": "stdlib.method.strip",
@@ -32454,7 +32033,7 @@
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "rfind",
                 "runtime_call": "str.rfind",
-                "runtime_module_id": "pytra.core.str",
+                "runtime_module_id": "pytra.built_in.string_ops",
                 "runtime_symbol": "str.rfind",
                 "runtime_call_adapter_kind": "builtin",
                 "semantic_tag": "stdlib.method.rfind",
@@ -32797,7 +32376,7 @@
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "strip",
                 "runtime_call": "str.strip",
-                "runtime_module_id": "pytra.core.str",
+                "runtime_module_id": "pytra.built_in.string_ops",
                 "runtime_symbol": "str.strip",
                 "runtime_call_adapter_kind": "builtin",
                 "semantic_tag": "stdlib.method.strip",
@@ -33175,7 +32754,7 @@
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "strip",
                 "runtime_call": "str.strip",
-                "runtime_module_id": "pytra.core.str",
+                "runtime_module_id": "pytra.built_in.string_ops",
                 "runtime_symbol": "str.strip",
                 "runtime_call_adapter_kind": "builtin",
                 "semantic_tag": "stdlib.method.strip",
@@ -34231,7 +33810,7 @@
                       "lowered_kind": "BuiltinCall",
                       "builtin_name": "startswith",
                       "runtime_call": "str.startswith",
-                      "runtime_module_id": "pytra.core.str",
+                      "runtime_module_id": "pytra.built_in.string_ops",
                       "runtime_symbol": "str.startswith",
                       "runtime_call_adapter_kind": "builtin",
                       "semantic_tag": "stdlib.method.startswith",
@@ -34444,7 +34023,7 @@
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "strip",
                 "runtime_call": "str.strip",
-                "runtime_module_id": "pytra.core.str",
+                "runtime_module_id": "pytra.built_in.string_ops",
                 "runtime_symbol": "str.strip",
                 "runtime_call_adapter_kind": "builtin",
                 "semantic_tag": "stdlib.method.strip",
@@ -34646,7 +34225,7 @@
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "rfind",
                 "runtime_call": "str.rfind",
-                "runtime_module_id": "pytra.core.str",
+                "runtime_module_id": "pytra.built_in.string_ops",
                 "runtime_symbol": "str.rfind",
                 "runtime_call_adapter_kind": "builtin",
                 "semantic_tag": "stdlib.method.rfind",
@@ -34989,7 +34568,7 @@
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "strip",
                 "runtime_call": "str.strip",
-                "runtime_module_id": "pytra.core.str",
+                "runtime_module_id": "pytra.built_in.string_ops",
                 "runtime_symbol": "str.strip",
                 "runtime_call_adapter_kind": "builtin",
                 "semantic_tag": "stdlib.method.strip",
@@ -35367,7 +34946,7 @@
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "strip",
                 "runtime_call": "str.strip",
-                "runtime_module_id": "pytra.core.str",
+                "runtime_module_id": "pytra.built_in.string_ops",
                 "runtime_symbol": "str.strip",
                 "runtime_call_adapter_kind": "builtin",
                 "semantic_tag": "stdlib.method.strip",
@@ -36421,7 +36000,7 @@
                       "lowered_kind": "BuiltinCall",
                       "builtin_name": "startswith",
                       "runtime_call": "str.startswith",
-                      "runtime_module_id": "pytra.core.str",
+                      "runtime_module_id": "pytra.built_in.string_ops",
                       "runtime_symbol": "str.startswith",
                       "runtime_call_adapter_kind": "builtin",
                       "semantic_tag": "stdlib.method.startswith",
@@ -36632,7 +36211,7 @@
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "strip",
                 "runtime_call": "str.strip",
-                "runtime_module_id": "pytra.core.str",
+                "runtime_module_id": "pytra.built_in.string_ops",
                 "runtime_symbol": "str.strip",
                 "runtime_call_adapter_kind": "builtin",
                 "semantic_tag": "stdlib.method.strip",
@@ -37253,7 +36832,7 @@
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "find",
                 "runtime_call": "str.find",
-                "runtime_module_id": "pytra.core.str",
+                "runtime_module_id": "pytra.built_in.string_ops",
                 "runtime_symbol": "str.find",
                 "runtime_call_adapter_kind": "builtin",
                 "semantic_tag": "stdlib.method.find",
@@ -37592,7 +37171,7 @@
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "strip",
                 "runtime_call": "str.strip",
-                "runtime_module_id": "pytra.core.str",
+                "runtime_module_id": "pytra.built_in.string_ops",
                 "runtime_symbol": "str.strip",
                 "runtime_call_adapter_kind": "builtin",
                 "semantic_tag": "stdlib.method.strip",
@@ -37969,7 +37548,7 @@
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "strip",
                 "runtime_call": "str.strip",
-                "runtime_module_id": "pytra.core.str",
+                "runtime_module_id": "pytra.built_in.string_ops",
                 "runtime_symbol": "str.strip",
                 "runtime_call_adapter_kind": "builtin",
                 "semantic_tag": "stdlib.method.strip",
@@ -38810,7 +38389,7 @@
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "find",
                 "runtime_call": "str.find",
-                "runtime_module_id": "pytra.core.str",
+                "runtime_module_id": "pytra.built_in.string_ops",
                 "runtime_symbol": "str.find",
                 "runtime_call_adapter_kind": "builtin",
                 "semantic_tag": "stdlib.method.find",
@@ -39149,7 +38728,7 @@
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "strip",
                 "runtime_call": "str.strip",
-                "runtime_module_id": "pytra.core.str",
+                "runtime_module_id": "pytra.built_in.string_ops",
                 "runtime_symbol": "str.strip",
                 "runtime_call_adapter_kind": "builtin",
                 "semantic_tag": "stdlib.method.strip",
@@ -39626,7 +39205,7 @@
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "find",
                 "runtime_call": "str.find",
-                "runtime_module_id": "pytra.core.str",
+                "runtime_module_id": "pytra.built_in.string_ops",
                 "runtime_symbol": "str.find",
                 "runtime_call_adapter_kind": "builtin",
                 "semantic_tag": "stdlib.method.find",
@@ -39973,7 +39552,7 @@
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "strip",
                 "runtime_call": "str.strip",
-                "runtime_module_id": "pytra.core.str",
+                "runtime_module_id": "pytra.built_in.string_ops",
                 "runtime_symbol": "str.strip",
                 "runtime_call_adapter_kind": "builtin",
                 "semantic_tag": "stdlib.method.strip",
@@ -40353,7 +39932,7 @@
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "strip",
                 "runtime_call": "str.strip",
-                "runtime_module_id": "pytra.core.str",
+                "runtime_module_id": "pytra.built_in.string_ops",
                 "runtime_symbol": "str.strip",
                 "runtime_call_adapter_kind": "builtin",
                 "semantic_tag": "stdlib.method.strip",
@@ -41755,7 +41334,7 @@
                     "lowered_kind": "BuiltinCall",
                     "builtin_name": "find",
                     "runtime_call": "str.find",
-                    "runtime_module_id": "pytra.core.str",
+                    "runtime_module_id": "pytra.built_in.string_ops",
                     "runtime_symbol": "str.find",
                     "runtime_call_adapter_kind": "builtin",
                     "semantic_tag": "stdlib.method.find",
@@ -42654,7 +42233,7 @@
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "strip",
                 "runtime_call": "str.strip",
-                "runtime_module_id": "pytra.core.str",
+                "runtime_module_id": "pytra.built_in.string_ops",
                 "runtime_symbol": "str.strip",
                 "runtime_call_adapter_kind": "builtin",
                 "semantic_tag": "stdlib.method.strip",
@@ -43210,7 +42789,7 @@
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "strip",
                 "runtime_call": "str.strip",
-                "runtime_module_id": "pytra.core.str",
+                "runtime_module_id": "pytra.built_in.string_ops",
                 "runtime_symbol": "str.strip",
                 "runtime_call_adapter_kind": "builtin",
                 "semantic_tag": "stdlib.method.strip",
@@ -44264,7 +43843,7 @@
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "find",
                 "runtime_call": "str.find",
-                "runtime_module_id": "pytra.core.str",
+                "runtime_module_id": "pytra.built_in.string_ops",
                 "runtime_symbol": "str.find",
                 "runtime_call_adapter_kind": "builtin",
                 "semantic_tag": "stdlib.method.find",
@@ -44875,7 +44454,7 @@
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "strip",
                 "runtime_call": "str.strip",
-                "runtime_module_id": "pytra.core.str",
+                "runtime_module_id": "pytra.built_in.string_ops",
                 "runtime_symbol": "str.strip",
                 "runtime_call_adapter_kind": "builtin",
                 "semantic_tag": "stdlib.method.strip",
@@ -45380,7 +44959,7 @@
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "find",
                 "runtime_call": "str.find",
-                "runtime_module_id": "pytra.core.str",
+                "runtime_module_id": "pytra.built_in.string_ops",
                 "runtime_symbol": "str.find",
                 "runtime_call_adapter_kind": "builtin",
                 "semantic_tag": "stdlib.method.find",
@@ -45727,7 +45306,7 @@
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "strip",
                 "runtime_call": "str.strip",
-                "runtime_module_id": "pytra.core.str",
+                "runtime_module_id": "pytra.built_in.string_ops",
                 "runtime_symbol": "str.strip",
                 "runtime_call_adapter_kind": "builtin",
                 "semantic_tag": "stdlib.method.strip",
@@ -46107,7 +45686,7 @@
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "strip",
                 "runtime_call": "str.strip",
-                "runtime_module_id": "pytra.core.str",
+                "runtime_module_id": "pytra.built_in.string_ops",
                 "runtime_symbol": "str.strip",
                 "runtime_call_adapter_kind": "builtin",
                 "semantic_tag": "stdlib.method.strip",
@@ -47085,7 +46664,7 @@
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "find",
                 "runtime_call": "str.find",
-                "runtime_module_id": "pytra.core.str",
+                "runtime_module_id": "pytra.built_in.string_ops",
                 "runtime_symbol": "str.find",
                 "runtime_call_adapter_kind": "builtin",
                 "semantic_tag": "stdlib.method.find",
@@ -49353,7 +48932,7 @@
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "strip",
                 "runtime_call": "str.strip",
-                "runtime_module_id": "pytra.core.str",
+                "runtime_module_id": "pytra.built_in.string_ops",
                 "runtime_symbol": "str.strip",
                 "runtime_call_adapter_kind": "builtin",
                 "semantic_tag": "stdlib.method.strip",
@@ -49729,7 +49308,7 @@
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "strip",
                 "runtime_call": "str.strip",
-                "runtime_module_id": "pytra.core.str",
+                "runtime_module_id": "pytra.built_in.string_ops",
                 "runtime_symbol": "str.strip",
                 "runtime_call_adapter_kind": "builtin",
                 "semantic_tag": "stdlib.method.strip",
@@ -50383,7 +49962,7 @@
                     "lowered_kind": "BuiltinCall",
                     "builtin_name": "endswith",
                     "runtime_call": "str.endswith",
-                    "runtime_module_id": "pytra.core.str",
+                    "runtime_module_id": "pytra.built_in.string_ops",
                     "runtime_symbol": "str.endswith",
                     "runtime_call_adapter_kind": "builtin",
                     "semantic_tag": "stdlib.method.endswith",
@@ -51155,7 +50734,7 @@
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "find",
                 "runtime_call": "str.find",
-                "runtime_module_id": "pytra.core.str",
+                "runtime_module_id": "pytra.built_in.string_ops",
                 "runtime_symbol": "str.find",
                 "runtime_call_adapter_kind": "builtin",
                 "semantic_tag": "stdlib.method.find",
@@ -53422,7 +53001,7 @@
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "strip",
                 "runtime_call": "str.strip",
-                "runtime_module_id": "pytra.core.str",
+                "runtime_module_id": "pytra.built_in.string_ops",
                 "runtime_symbol": "str.strip",
                 "runtime_call_adapter_kind": "builtin",
                 "semantic_tag": "stdlib.method.strip",
@@ -53800,7 +53379,7 @@
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "strip",
                 "runtime_call": "str.strip",
-                "runtime_module_id": "pytra.core.str",
+                "runtime_module_id": "pytra.built_in.string_ops",
                 "runtime_symbol": "str.strip",
                 "runtime_call_adapter_kind": "builtin",
                 "semantic_tag": "stdlib.method.strip",
@@ -54437,7 +54016,7 @@
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "split",
                 "runtime_call": "str.split",
-                "runtime_module_id": "pytra.core.str",
+                "runtime_module_id": "pytra.built_in.string_ops",
                 "runtime_symbol": "str.split",
                 "runtime_call_adapter_kind": "builtin",
                 "semantic_tag": "stdlib.method.split",
@@ -54621,7 +54200,7 @@
                           "lowered_kind": "BuiltinCall",
                           "builtin_name": "strip",
                           "runtime_call": "str.strip",
-                          "runtime_module_id": "pytra.core.str",
+                          "runtime_module_id": "pytra.built_in.string_ops",
                           "runtime_symbol": "str.strip",
                           "runtime_call_adapter_kind": "builtin",
                           "semantic_tag": "stdlib.method.strip",
@@ -55202,7 +54781,8 @@
               "casts": [],
               "borrow_kind": "value",
               "repr": "ValueError",
-              "id": "ValueError"
+              "id": "ValueError",
+              "runtime_module_id": "pytra.built_in.error"
             },
             "args": [
               {
@@ -55248,17 +54828,12 @@
                     "resolved_type": "str"
                   }
                 ],
-                "resolved_type": "str"
+                "resolved_type": "str",
+                "call_arg_type": "str"
               }
             ],
             "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "ValueError",
-            "runtime_call": "std::runtime_error",
-            "runtime_module_id": "pytra.core.py_runtime",
-            "runtime_symbol": "ValueError",
-            "runtime_call_adapter_kind": "builtin",
-            "semantic_tag": "error.raise_ctor",
+            "runtime_module_id": "pytra.built_in.error",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",
@@ -63175,6 +62750,7 @@
         "_pattern": "str",
         "_flags": "int64"
       },
+      "decorators": [],
       "body": [
         {
           "kind": "Expr",
@@ -63282,7 +62858,7 @@
           }
         },
         {
-          "kind": "FunctionDef",
+          "kind": "ClosureDef",
           "source_span": {
             "lineno": 560,
             "col_offset": 4,
@@ -63324,7 +62900,7 @@
           },
           "return_type": "None",
           "arg_usage": {
-            "self": "readonly",
+            "self": "reassigned",
             "pattern": "readonly",
             "flags": "readonly"
           },
@@ -63389,23 +62965,6 @@
                 "kind": "NamedType",
                 "category": "static",
                 "mirror": "str"
-              },
-              "meta": {
-                "lifetime_node_id": "n1",
-                "lifetime_defs": [],
-                "lifetime_uses": [
-                  "pattern"
-                ],
-                "lifetime_live_in": [
-                  "flags",
-                  "pattern"
-                ],
-                "lifetime_live_out": [
-                  "flags"
-                ],
-                "lifetime_last_use_vars": [
-                  "pattern"
-                ]
               }
             },
             {
@@ -63466,128 +63025,20 @@
                 "kind": "NamedType",
                 "category": "static",
                 "mirror": "int64"
-              },
-              "meta": {
-                "lifetime_node_id": "n0",
-                "lifetime_defs": [],
-                "lifetime_uses": [
-                  "flags"
-                ],
-                "lifetime_live_in": [
-                  "flags"
-                ],
-                "lifetime_live_out": [],
-                "lifetime_last_use_vars": [
-                  "flags"
-                ]
               }
             }
           ],
           "is_generator": 0,
           "yield_value_type": "unknown",
           "decorators": [],
+          "captures": [],
+          "capture_types": {},
+          "capture_modes": {},
           "returns": "None",
-          "mutates_self": true,
-          "meta": {
-            "lifetime_analysis": {
-              "schema_version": "east3_lifetime_v1",
-              "status": "ok",
-              "reason": "",
-              "entry_node": "n1",
-              "order": [
-                "n0",
-                "n1"
-              ],
-              "cfg": [
-                {
-                  "id": "n0",
-                  "kind": "Assign",
-                  "defs": [],
-                  "uses": [
-                    "flags"
-                  ],
-                  "succ": []
-                },
-                {
-                  "id": "n1",
-                  "kind": "Assign",
-                  "defs": [],
-                  "uses": [
-                    "pattern"
-                  ],
-                  "succ": [
-                    "n0"
-                  ]
-                }
-              ],
-              "def_use": {
-                "defs": {},
-                "uses": {
-                  "flags": [
-                    "n0"
-                  ],
-                  "pattern": [
-                    "n1"
-                  ]
-                }
-              },
-              "variables": {
-                "flags": {
-                  "def_nodes": [],
-                  "use_nodes": [
-                    "n0"
-                  ],
-                  "live_in_nodes": [
-                    "n0",
-                    "n1"
-                  ],
-                  "live_out_nodes": [
-                    "n1"
-                  ],
-                  "last_use_nodes": [
-                    "n0"
-                  ],
-                  "lifetime_class": "escape_or_unknown"
-                },
-                "pattern": {
-                  "def_nodes": [],
-                  "use_nodes": [
-                    "n1"
-                  ],
-                  "live_in_nodes": [
-                    "n1"
-                  ],
-                  "live_out_nodes": [],
-                  "last_use_nodes": [
-                    "n1"
-                  ],
-                  "lifetime_class": "escape_or_unknown"
-                },
-                "self": {
-                  "def_nodes": [],
-                  "use_nodes": [],
-                  "live_in_nodes": [],
-                  "live_out_nodes": [],
-                  "last_use_nodes": [],
-                  "lifetime_class": "escape_or_unknown"
-                }
-              },
-              "arg_order": [
-                "self",
-                "pattern",
-                "flags"
-              ],
-              "arg_escape": [
-                true,
-                true,
-                true
-              ],
-              "has_dynamic_name_access": false
-            }
-          }
+          "mutates_self": true
         },
         {
-          "kind": "FunctionDef",
+          "kind": "ClosureDef",
           "source_span": {
             "lineno": 564,
             "col_offset": 4,
@@ -63732,130 +63183,25 @@
                   "kind": "OptionalType",
                   "category": "optional",
                   "mirror": "Match | None",
+                  "inner_mirror": "Match",
                   "inner_category": "static"
                 }
-              },
-              "meta": {
-                "lifetime_node_id": "n0",
-                "lifetime_defs": [],
-                "lifetime_uses": [
-                  "match",
-                  "self",
-                  "text"
-                ],
-                "lifetime_live_in": [
-                  "match",
-                  "self",
-                  "text"
-                ],
-                "lifetime_live_out": [],
-                "lifetime_last_use_vars": [
-                  "match",
-                  "self",
-                  "text"
-                ]
               }
             }
           ],
           "is_generator": 0,
           "yield_value_type": "unknown",
           "decorators": [],
+          "captures": [],
+          "capture_types": {},
+          "capture_modes": {},
+          "is_recursive": true,
           "returns": "Match | None",
-          "mutates_self": false,
-          "meta": {
-            "lifetime_analysis": {
-              "schema_version": "east3_lifetime_v1",
-              "status": "ok",
-              "reason": "",
-              "entry_node": "n0",
-              "order": [
-                "n0"
-              ],
-              "cfg": [
-                {
-                  "id": "n0",
-                  "kind": "Return",
-                  "defs": [],
-                  "uses": [
-                    "match",
-                    "self",
-                    "text"
-                  ],
-                  "succ": []
-                }
-              ],
-              "def_use": {
-                "defs": {},
-                "uses": {
-                  "match": [
-                    "n0"
-                  ],
-                  "self": [
-                    "n0"
-                  ],
-                  "text": [
-                    "n0"
-                  ]
-                }
-              },
-              "variables": {
-                "match": {
-                  "def_nodes": [],
-                  "use_nodes": [
-                    "n0"
-                  ],
-                  "live_in_nodes": [
-                    "n0"
-                  ],
-                  "live_out_nodes": [],
-                  "last_use_nodes": [
-                    "n0"
-                  ],
-                  "lifetime_class": "escape_or_unknown"
-                },
-                "self": {
-                  "def_nodes": [],
-                  "use_nodes": [
-                    "n0"
-                  ],
-                  "live_in_nodes": [
-                    "n0"
-                  ],
-                  "live_out_nodes": [],
-                  "last_use_nodes": [
-                    "n0"
-                  ],
-                  "lifetime_class": "escape_or_unknown"
-                },
-                "text": {
-                  "def_nodes": [],
-                  "use_nodes": [
-                    "n0"
-                  ],
-                  "live_in_nodes": [
-                    "n0"
-                  ],
-                  "live_out_nodes": [],
-                  "last_use_nodes": [
-                    "n0"
-                  ],
-                  "lifetime_class": "escape_or_unknown"
-                }
-              },
-              "arg_order": [
-                "self",
-                "text"
-              ],
-              "arg_escape": [
-                true,
-                true
-              ],
-              "has_dynamic_name_access": false
-            }
-          }
+          "mutates_self": false
         }
       ],
-      "class_storage_hint": "ref"
+      "class_storage_hint": "ref",
+      "meta": {}
     },
     {
       "kind": "FunctionDef",
@@ -65127,7 +64473,7 @@
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "join",
                 "runtime_call": "str.join",
-                "runtime_module_id": "pytra.core.str",
+                "runtime_module_id": "pytra.built_in.string_ops",
                 "runtime_symbol": "str.join",
                 "runtime_call_adapter_kind": "builtin",
                 "semantic_tag": "stdlib.method.join",
@@ -67705,7 +67051,7 @@
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "join",
                 "runtime_call": "str.join",
-                "runtime_module_id": "pytra.core.str",
+                "runtime_module_id": "pytra.built_in.string_ops",
                 "runtime_symbol": "str.join",
                 "runtime_call_adapter_kind": "builtin",
                 "semantic_tag": "stdlib.method.join",
@@ -67800,7 +67146,8 @@
               "casts": [],
               "borrow_kind": "value",
               "repr": "ValueError",
-              "id": "ValueError"
+              "id": "ValueError",
+              "runtime_module_id": "pytra.built_in.error"
             },
             "args": [
               {
@@ -67846,17 +67193,12 @@
                     "resolved_type": "str"
                   }
                 ],
-                "resolved_type": "str"
+                "resolved_type": "str",
+                "call_arg_type": "str"
               }
             ],
             "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "ValueError",
-            "runtime_call": "std::runtime_error",
-            "runtime_module_id": "pytra.core.py_runtime",
-            "runtime_symbol": "ValueError",
-            "runtime_call_adapter_kind": "builtin",
-            "semantic_tag": "error.raise_ctor",
+            "runtime_module_id": "pytra.built_in.error",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",
@@ -68854,6 +68196,18 @@
       "schema_version": 1,
       "bindings": [
         {
+          "module_id": "pytra.built_in.contains",
+          "export_name": "",
+          "local_name": "pytra.built_in.contains",
+          "binding_kind": "implicit_builtin",
+          "source_file": "src/pytra/std/re.py",
+          "source_line": 0,
+          "source_module_id": "pytra.built_in.contains",
+          "source_binding_kind": "implicit_builtin",
+          "runtime_module_id": "pytra.built_in.contains",
+          "runtime_group": "built_in"
+        },
+        {
           "module_id": "pytra.core.py_runtime",
           "export_name": "",
           "local_name": "pytra.core.py_runtime",
@@ -68870,12 +68224,28 @@
     },
     "import_bindings": [
       {
+        "module_id": "pytra.built_in.contains",
+        "export_name": "",
+        "local_name": "pytra.built_in.contains",
+        "binding_kind": "implicit_builtin",
+        "source_file": "src/pytra/std/re.py",
+        "source_line": 0,
+        "source_module_id": "pytra.built_in.contains",
+        "source_binding_kind": "implicit_builtin",
+        "runtime_module_id": "pytra.built_in.contains",
+        "runtime_group": "built_in"
+      },
+      {
         "module_id": "pytra.core.py_runtime",
         "export_name": "",
         "local_name": "pytra.core.py_runtime",
         "binding_kind": "implicit_builtin",
         "source_file": "src/pytra/std/re.py",
-        "source_line": 0
+        "source_line": 0,
+        "source_module_id": "pytra.core.py_runtime",
+        "source_binding_kind": "implicit_builtin",
+        "runtime_module_id": "pytra.core.py_runtime",
+        "runtime_group": "core"
       }
     ],
     "qualified_symbol_refs": [],

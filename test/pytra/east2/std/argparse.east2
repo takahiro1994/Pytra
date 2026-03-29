@@ -91,6 +91,7 @@
       "field_types": {
         "values": "dict[str,str | bool | None]"
       },
+      "decorators": [],
       "body": [
         {
           "kind": "Expr",
@@ -269,7 +270,7 @@
           },
           "return_type": "None",
           "arg_usage": {
-            "self": "readonly",
+            "self": "reassigned",
             "values": "readonly"
           },
           "renamed_symbols": {},
@@ -442,14 +443,14 @@
                   "end_lineno": 21,
                   "end_col": 19
                 },
-                "resolved_type": "dict[str,str | bool | None] | None",
+                "resolved_type": "dict[str,str | bool | None]",
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "values",
                 "id": "values"
               },
               "declare": true,
-              "decl_type": "dict[str,str | bool | None] | None",
+              "decl_type": "dict[str,str | bool | None]",
               "declare_init": true
             }
           ],
@@ -469,7 +470,8 @@
           "kind": "blank",
           "count": 1
         }
-      ]
+      ],
+      "meta": {}
     },
     {
       "kind": "ClassDef",
@@ -492,6 +494,7 @@
         "is_optional": "bool",
         "dest": "str"
       },
+      "decorators": [],
       "body": [
         {
           "kind": "AnnAssign",
@@ -935,7 +938,7 @@
           },
           "return_type": "None",
           "arg_usage": {
-            "self": "readonly",
+            "self": "reassigned",
             "names": "readonly",
             "action": "readonly",
             "choices": "readonly",
@@ -1471,7 +1474,7 @@
                     "lowered_kind": "BuiltinCall",
                     "builtin_name": "startswith",
                     "runtime_call": "str.startswith",
-                    "runtime_module_id": "pytra.core.str",
+                    "runtime_module_id": "pytra.built_in.string_ops",
                     "runtime_symbol": "str.startswith",
                     "runtime_call_adapter_kind": "builtin",
                     "semantic_tag": "stdlib.method.startswith",
@@ -1707,7 +1710,7 @@
                         "lowered_kind": "BuiltinCall",
                         "builtin_name": "lstrip",
                         "runtime_call": "str.lstrip",
-                        "runtime_module_id": "pytra.core.str",
+                        "runtime_module_id": "pytra.built_in.string_ops",
                         "runtime_symbol": "str.lstrip",
                         "runtime_call_adapter_kind": "builtin",
                         "semantic_tag": "stdlib.method.lstrip",
@@ -1805,7 +1808,7 @@
                     "lowered_kind": "BuiltinCall",
                     "builtin_name": "replace",
                     "runtime_call": "str.replace",
-                    "runtime_module_id": "pytra.core.str",
+                    "runtime_module_id": "pytra.built_in.string_ops",
                     "runtime_symbol": "str.replace",
                     "runtime_call_adapter_kind": "builtin",
                     "semantic_tag": "stdlib.method.replace",
@@ -1910,7 +1913,7 @@
                       "lowered_kind": "BuiltinCall",
                       "builtin_name": "lstrip",
                       "runtime_call": "str.lstrip",
-                      "runtime_module_id": "pytra.core.str",
+                      "runtime_module_id": "pytra.built_in.string_ops",
                       "runtime_symbol": "str.lstrip",
                       "runtime_call_adapter_kind": "builtin",
                       "semantic_tag": "stdlib.method.lstrip",
@@ -2120,7 +2123,8 @@
           "decorators": []
         }
       ],
-      "class_storage_hint": "ref"
+      "class_storage_hint": "ref",
+      "meta": {}
     },
     {
       "kind": "ClassDef",
@@ -2138,6 +2142,7 @@
         "description": "str",
         "_specs": "list[_ArgSpec]"
       },
+      "decorators": [],
       "body": [
         {
           "kind": "Expr",
@@ -2304,7 +2309,7 @@
           },
           "return_type": "None",
           "arg_usage": {
-            "self": "readonly",
+            "self": "reassigned",
             "description": "readonly"
           },
           "renamed_symbols": {},
@@ -2598,7 +2603,7 @@
           },
           "return_type": "None",
           "arg_usage": {
-            "self": "readonly",
+            "self": "reassigned",
             "name0": "readonly",
             "name1": "readonly",
             "name2": "readonly",
@@ -3436,7 +3441,8 @@
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "ValueError",
-                      "id": "ValueError"
+                      "id": "ValueError",
+                      "runtime_module_id": "pytra.built_in.error"
                     },
                     "args": [
                       {
@@ -3451,17 +3457,12 @@
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "\"add_argument requires at least one name\"",
-                        "value": "add_argument requires at least one name"
+                        "value": "add_argument requires at least one name",
+                        "call_arg_type": "str"
                       }
                     ],
                     "keywords": [],
-                    "lowered_kind": "BuiltinCall",
-                    "builtin_name": "ValueError",
-                    "runtime_call": "std::runtime_error",
-                    "runtime_module_id": "pytra.core.py_runtime",
-                    "runtime_symbol": "ValueError",
-                    "runtime_call_adapter_kind": "builtin",
-                    "semantic_tag": "error.raise_ctor"
+                    "runtime_module_id": "pytra.built_in.error"
                   },
                   "cause": null
                 }
@@ -4296,7 +4297,7 @@
                       "end_lineno": 100,
                       "end_col": 29
                     },
-                    "resolved_type": "list[str] | None",
+                    "resolved_type": "list[str]",
                     "casts": [],
                     "borrow_kind": "value",
                     "repr": "list(argv)",
@@ -4323,7 +4324,7 @@
                           "end_lineno": 100,
                           "end_col": 28
                         },
-                        "resolved_type": "list[str] | None",
+                        "resolved_type": "list[str]",
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "argv",
@@ -4340,7 +4341,7 @@
                     "semantic_tag": "core.list_ctor"
                   },
                   "declare": true,
-                  "decl_type": "list[str] | None",
+                  "decl_type": "list[str]",
                   "declare_init": true
                 }
               ]
@@ -5537,11 +5538,15 @@
                                   "end_lineno": 120,
                                   "end_col": 46
                                 },
-                                "resolved_type": "type",
+                                "resolved_type": "bool",
                                 "casts": [],
                                 "borrow_kind": "value",
                                 "repr": "bool",
                                 "id": "bool",
+                                "type_expr": {
+                                  "kind": "NamedType",
+                                  "name": "bool"
+                                },
                                 "type_object_of": "bool"
                               },
                               {
@@ -5570,7 +5575,8 @@
                                   "repr": "s",
                                   "id": "s"
                                 },
-                                "attr": "default"
+                                "attr": "default",
+                                "call_arg_type": "bool"
                               }
                             ],
                             "keywords": []
@@ -6073,7 +6079,7 @@
                           "end_lineno": 130,
                           "end_col": 26
                         },
-                        "resolved_type": "list[str] | None",
+                        "resolved_type": "list[str]",
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "args",
@@ -6140,7 +6146,7 @@
                         "end_lineno": 131,
                         "end_col": 27
                       },
-                      "resolved_type": "list[str] | None",
+                      "resolved_type": "list[str]",
                       "casts": [],
                       "borrow_kind": "readonly_ref",
                       "repr": "args",
@@ -6241,7 +6247,7 @@
                     "lowered_kind": "BuiltinCall",
                     "builtin_name": "startswith",
                     "runtime_call": "str.startswith",
-                    "runtime_module_id": "pytra.core.str",
+                    "runtime_module_id": "pytra.built_in.string_ops",
                     "runtime_symbol": "str.startswith",
                     "runtime_call_adapter_kind": "builtin",
                     "semantic_tag": "stdlib.method.startswith",
@@ -6829,7 +6835,7 @@
                                   "end_lineno": 140,
                                   "end_col": 36
                                 },
-                                "resolved_type": "list[str] | None",
+                                "resolved_type": "list[str]",
                                 "casts": [],
                                 "borrow_kind": "readonly_ref",
                                 "repr": "args",
@@ -6998,7 +7004,7 @@
                             "end_lineno": 142,
                             "end_col": 31
                           },
-                          "resolved_type": "list[str] | None",
+                          "resolved_type": "list[str]",
                           "casts": [],
                           "borrow_kind": "readonly_ref",
                           "repr": "args",
@@ -8211,7 +8217,8 @@
           "decorators": []
         }
       ],
-      "class_storage_hint": "ref"
+      "class_storage_hint": "ref",
+      "meta": {}
     }
   ],
   "main_guard_body": [],
@@ -8263,6 +8270,18 @@
           "host_only": true
         },
         {
+          "module_id": "pytra.built_in.contains",
+          "export_name": "",
+          "local_name": "pytra.built_in.contains",
+          "binding_kind": "implicit_builtin",
+          "source_file": "src/pytra/std/argparse.py",
+          "source_line": 0,
+          "source_module_id": "pytra.built_in.contains",
+          "source_binding_kind": "implicit_builtin",
+          "runtime_module_id": "pytra.built_in.contains",
+          "runtime_group": "built_in"
+        },
+        {
           "module_id": "pytra.core.py_runtime",
           "export_name": "",
           "local_name": "pytra.core.py_runtime",
@@ -8300,7 +8319,12 @@
         "local_name": "cast",
         "binding_kind": "symbol",
         "source_file": "src/pytra/std/argparse.py",
-        "source_line": 4
+        "source_line": 4,
+        "source_module_id": "pytra.typing",
+        "source_export_name": "cast",
+        "source_binding_kind": "symbol",
+        "runtime_module_id": "pytra.typing",
+        "runtime_group": ""
       },
       {
         "module_id": "pytra.types",
@@ -8308,7 +8332,12 @@
         "local_name": "int64",
         "binding_kind": "symbol",
         "source_file": "src/pytra/std/argparse.py",
-        "source_line": 6
+        "source_line": 6,
+        "source_module_id": "pytra.types",
+        "source_export_name": "int64",
+        "source_binding_kind": "symbol",
+        "runtime_module_id": "pytra.types",
+        "runtime_group": ""
       },
       {
         "module_id": "pytra.std",
@@ -8316,7 +8345,26 @@
         "local_name": "sys",
         "binding_kind": "symbol",
         "source_file": "src/pytra/std/argparse.py",
-        "source_line": 7
+        "source_line": 7,
+        "source_module_id": "pytra.std",
+        "source_export_name": "sys",
+        "source_binding_kind": "symbol",
+        "runtime_module_id": "pytra.std.sys",
+        "runtime_group": "std",
+        "resolved_binding_kind": "module",
+        "host_only": true
+      },
+      {
+        "module_id": "pytra.built_in.contains",
+        "export_name": "",
+        "local_name": "pytra.built_in.contains",
+        "binding_kind": "implicit_builtin",
+        "source_file": "src/pytra/std/argparse.py",
+        "source_line": 0,
+        "source_module_id": "pytra.built_in.contains",
+        "source_binding_kind": "implicit_builtin",
+        "runtime_module_id": "pytra.built_in.contains",
+        "runtime_group": "built_in"
       },
       {
         "module_id": "pytra.core.py_runtime",
@@ -8324,7 +8372,11 @@
         "local_name": "pytra.core.py_runtime",
         "binding_kind": "implicit_builtin",
         "source_file": "src/pytra/std/argparse.py",
-        "source_line": 0
+        "source_line": 0,
+        "source_module_id": "pytra.core.py_runtime",
+        "source_binding_kind": "implicit_builtin",
+        "runtime_module_id": "pytra.core.py_runtime",
+        "runtime_group": "core"
       }
     ],
     "qualified_symbol_refs": [

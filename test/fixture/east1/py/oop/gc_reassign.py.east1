@@ -228,6 +228,7 @@
           "decorators": []
         }
       ],
+      "decorators": [],
       "leading_comments": [
         "This file contains test/implementation code for `test/fixtures/gc_reassign.py`.",
         "Verify that reassignment `a = b` destroys the object whose reference was dropped.",

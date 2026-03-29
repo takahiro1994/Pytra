@@ -121,7 +121,17 @@
                   "kind": "NamedType",
                   "category": "static",
                   "mirror": "JsonVal"
-                }
+                },
+                "predicate_category": "nominal_adt",
+                "family_name": "dict",
+                "predicate_kind": "variant",
+                "variant_name": "dict"
+              },
+              "nominal_adt_test_v1": {
+                "schema_version": 1,
+                "family_name": "dict",
+                "predicate_kind": "variant",
+                "variant_name": "dict"
               }
             }
           },
@@ -396,7 +406,17 @@
                     "kind": "NamedType",
                     "category": "static",
                     "mirror": "JsonVal"
-                  }
+                  },
+                  "predicate_category": "nominal_adt",
+                  "family_name": "str",
+                  "predicate_kind": "variant",
+                  "variant_name": "str"
+                },
+                "nominal_adt_test_v1": {
+                  "schema_version": 1,
+                  "family_name": "str",
+                  "predicate_kind": "variant",
+                  "variant_name": "str"
                 }
               },
               {
@@ -1313,7 +1333,17 @@
                   "kind": "NamedType",
                   "category": "static",
                   "mirror": "JsonVal"
-                }
+                },
+                "predicate_category": "nominal_adt",
+                "family_name": "list",
+                "predicate_kind": "variant",
+                "variant_name": "list"
+              },
+              "nominal_adt_test_v1": {
+                "schema_version": 1,
+                "family_name": "list",
+                "predicate_kind": "variant",
+                "variant_name": "list"
               }
             }
           },
@@ -1491,7 +1521,17 @@
                       "kind": "NamedType",
                       "category": "static",
                       "mirror": "JsonVal"
-                    }
+                    },
+                    "predicate_category": "nominal_adt",
+                    "family_name": "dict",
+                    "predicate_kind": "variant",
+                    "variant_name": "dict"
+                  },
+                  "nominal_adt_test_v1": {
+                    "schema_version": 1,
+                    "family_name": "dict",
+                    "predicate_kind": "variant",
+                    "variant_name": "dict"
                   }
                 }
               },
@@ -2105,7 +2145,17 @@
                     "kind": "NamedType",
                     "category": "static",
                     "mirror": "JsonVal"
-                  }
+                  },
+                  "predicate_category": "nominal_adt",
+                  "family_name": "str",
+                  "predicate_kind": "variant",
+                  "variant_name": "str"
+                },
+                "nominal_adt_test_v1": {
+                  "schema_version": 1,
+                  "family_name": "str",
+                  "predicate_kind": "variant",
+                  "variant_name": "str"
                 }
               },
               "body": [
@@ -2984,7 +3034,17 @@
                   "kind": "NamedType",
                   "category": "static",
                   "mirror": "JsonVal"
-                }
+                },
+                "predicate_category": "nominal_adt",
+                "family_name": "dict",
+                "predicate_kind": "variant",
+                "variant_name": "dict"
+              },
+              "nominal_adt_test_v1": {
+                "schema_version": 1,
+                "family_name": "dict",
+                "predicate_kind": "variant",
+                "variant_name": "dict"
               }
             },
             "body": {
@@ -3022,6 +3082,7 @@
             "kind": "OptionalType",
             "category": "optional",
             "mirror": "dict[str,JsonVal] | None",
+            "inner_mirror": "dict[str,JsonVal]",
             "inner_category": "static"
           },
           "meta": {
@@ -3414,7 +3475,17 @@
                   "kind": "NamedType",
                   "category": "static",
                   "mirror": "JsonVal"
-                }
+                },
+                "predicate_category": "nominal_adt",
+                "family_name": "str",
+                "predicate_kind": "variant",
+                "variant_name": "str"
+              },
+              "nominal_adt_test_v1": {
+                "schema_version": 1,
+                "family_name": "str",
+                "predicate_kind": "variant",
+                "variant_name": "str"
               }
             },
             "body": {
@@ -3773,7 +3844,17 @@
                 "kind": "NamedType",
                 "category": "static",
                 "mirror": "JsonVal"
-              }
+              },
+              "predicate_category": "nominal_adt",
+              "family_name": "dict",
+              "predicate_kind": "variant",
+              "variant_name": "dict"
+            },
+            "nominal_adt_test_v1": {
+              "schema_version": 1,
+              "family_name": "dict",
+              "predicate_kind": "variant",
+              "variant_name": "dict"
             }
           },
           "body": [
@@ -4053,7 +4134,17 @@
                     "kind": "NamedType",
                     "category": "static",
                     "mirror": "JsonVal"
-                  }
+                  },
+                  "predicate_category": "nominal_adt",
+                  "family_name": "dict",
+                  "predicate_kind": "variant",
+                  "variant_name": "dict"
+                },
+                "nominal_adt_test_v1": {
+                  "schema_version": 1,
+                  "family_name": "dict",
+                  "predicate_kind": "variant",
+                  "variant_name": "dict"
                 }
               },
               "body": [
@@ -4261,7 +4352,17 @@
                         "kind": "NamedType",
                         "category": "static",
                         "mirror": "JsonVal"
-                      }
+                      },
+                      "predicate_category": "nominal_adt",
+                      "family_name": "str",
+                      "predicate_kind": "variant",
+                      "variant_name": "str"
+                    },
+                    "nominal_adt_test_v1": {
+                      "schema_version": 1,
+                      "family_name": "str",
+                      "predicate_kind": "variant",
+                      "variant_name": "str"
                     }
                   },
                   "body": [
@@ -4423,7 +4524,17 @@
                       "kind": "NamedType",
                       "category": "static",
                       "mirror": "JsonVal"
-                    }
+                    },
+                    "predicate_category": "nominal_adt",
+                    "family_name": "str",
+                    "predicate_kind": "variant",
+                    "variant_name": "str"
+                  },
+                  "nominal_adt_test_v1": {
+                    "schema_version": 1,
+                    "family_name": "str",
+                    "predicate_kind": "variant",
+                    "variant_name": "str"
                   }
                 },
                 "body": {

@@ -26,11 +26,28 @@
       }
     },
     {
+      "kind": "ImportFrom",
+      "source_span": {
+        "lineno": 8,
+        "col_offset": 0,
+        "end_lineno": 8,
+        "end_col_offset": 43
+      },
+      "module": "pytra.built_in.error",
+      "names": [
+        {
+          "name": "IndexError",
+          "asname": null
+        }
+      ],
+      "level": 0
+    },
+    {
       "kind": "ClassDef",
       "source_span": {
-        "lineno": 10,
+        "lineno": 11,
         "col_offset": 0,
-        "end_lineno": 43,
+        "end_lineno": 44,
         "end_col_offset": 0
       },
       "name": "deque",
@@ -40,21 +57,22 @@
       "field_types": {
         "_items": "list[int64]"
       },
+      "decorators": [],
       "body": [
         {
           "kind": "Expr",
           "source_span": {
-            "lineno": 11,
+            "lineno": 12,
             "col_offset": 4,
-            "end_lineno": 11,
+            "end_lineno": 12,
             "end_col_offset": 46
           },
           "value": {
             "kind": "Constant",
             "source_span": {
-              "lineno": 11,
+              "lineno": 12,
               "col_offset": 4,
-              "end_lineno": 11,
+              "end_lineno": 12,
               "end_col_offset": 46
             },
             "resolved_type": "str",
@@ -67,17 +85,17 @@
         {
           "kind": "AnnAssign",
           "source_span": {
-            "lineno": 13,
+            "lineno": 14,
             "col_offset": 4,
-            "end_lineno": 13,
+            "end_lineno": 14,
             "end_col_offset": 21
           },
           "target": {
             "kind": "Name",
             "source_span": {
-              "lineno": 13,
+              "lineno": 14,
               "col_offset": 4,
-              "end_lineno": 13,
+              "end_lineno": 14,
               "end_col_offset": 10
             },
             "resolved_type": "list[int64]",
@@ -127,11 +145,11 @@
           ]
         },
         {
-          "kind": "FunctionDef",
+          "kind": "ClosureDef",
           "source_span": {
-            "lineno": 15,
+            "lineno": 16,
             "col_offset": 4,
-            "end_lineno": 16,
+            "end_lineno": 17,
             "end_col_offset": 35
           },
           "name": "__init__",
@@ -148,7 +166,7 @@
           },
           "return_type": "None",
           "arg_usage": {
-            "self": "readonly"
+            "self": "reassigned"
           },
           "renamed_symbols": {},
           "docstring": null,
@@ -156,17 +174,17 @@
             {
               "kind": "AnnAssign",
               "source_span": {
-                "lineno": 16,
+                "lineno": 17,
                 "col_offset": 8,
-                "end_lineno": 16,
+                "end_lineno": 17,
                 "end_col_offset": 35
               },
               "target": {
                 "kind": "Attribute",
                 "source_span": {
-                  "lineno": 16,
+                  "lineno": 17,
                   "col_offset": 8,
-                  "end_lineno": 16,
+                  "end_lineno": 17,
                   "end_col_offset": 19
                 },
                 "resolved_type": "list[int64]",
@@ -176,9 +194,9 @@
                 "value": {
                   "kind": "Name",
                   "source_span": {
-                    "lineno": 16,
+                    "lineno": 17,
                     "col_offset": 8,
-                    "end_lineno": 16,
+                    "end_lineno": 17,
                     "end_col_offset": 12
                   },
                   "resolved_type": "deque",
@@ -225,9 +243,9 @@
               "value": {
                 "kind": "List",
                 "source_span": {
-                  "lineno": 16,
+                  "lineno": 17,
                   "col_offset": 33,
-                  "end_lineno": 16,
+                  "end_lineno": 17,
                   "end_col_offset": 35
                 },
                 "resolved_type": "list[int64]",
@@ -252,70 +270,24 @@
                 "version": "1",
                 "target_type": "list[int64]",
                 "rhs_kind": "List"
-              },
-              "meta": {
-                "lifetime_node_id": "n0",
-                "lifetime_defs": [],
-                "lifetime_uses": [],
-                "lifetime_live_in": [],
-                "lifetime_live_out": [],
-                "lifetime_last_use_vars": []
               }
             }
           ],
           "is_generator": 0,
           "yield_value_type": "unknown",
           "decorators": [],
+          "captures": [],
+          "capture_types": {},
+          "capture_modes": {},
           "returns": "None",
-          "mutates_self": true,
-          "meta": {
-            "lifetime_analysis": {
-              "schema_version": "east3_lifetime_v1",
-              "status": "ok",
-              "reason": "",
-              "entry_node": "n0",
-              "order": [
-                "n0"
-              ],
-              "cfg": [
-                {
-                  "id": "n0",
-                  "kind": "AnnAssign",
-                  "defs": [],
-                  "uses": [],
-                  "succ": []
-                }
-              ],
-              "def_use": {
-                "defs": {},
-                "uses": {}
-              },
-              "variables": {
-                "self": {
-                  "def_nodes": [],
-                  "use_nodes": [],
-                  "live_in_nodes": [],
-                  "live_out_nodes": [],
-                  "last_use_nodes": [],
-                  "lifetime_class": "escape_or_unknown"
-                }
-              },
-              "arg_order": [
-                "self"
-              ],
-              "arg_escape": [
-                true
-              ],
-              "has_dynamic_name_access": false
-            }
-          }
+          "mutates_self": true
         },
         {
-          "kind": "FunctionDef",
+          "kind": "ClosureDef",
           "source_span": {
-            "lineno": 18,
+            "lineno": 19,
             "col_offset": 4,
-            "end_lineno": 19,
+            "end_lineno": 20,
             "end_col_offset": 33
           },
           "name": "append",
@@ -335,7 +307,7 @@
           },
           "return_type": "None",
           "arg_usage": {
-            "self": "readonly",
+            "self": "reassigned",
             "value": "readonly"
           },
           "renamed_symbols": {},
@@ -344,17 +316,17 @@
             {
               "kind": "Expr",
               "source_span": {
-                "lineno": 19,
+                "lineno": 20,
                 "col_offset": 8,
-                "end_lineno": 19,
+                "end_lineno": 20,
                 "end_col_offset": 33
               },
               "value": {
                 "kind": "Call",
                 "source_span": {
-                  "lineno": 19,
+                  "lineno": 20,
                   "col_offset": 8,
-                  "end_lineno": 19,
+                  "end_lineno": 20,
                   "end_col_offset": 33
                 },
                 "resolved_type": "None",
@@ -364,9 +336,9 @@
                 "func": {
                   "kind": "Attribute",
                   "source_span": {
-                    "lineno": 19,
+                    "lineno": 20,
                     "col_offset": 8,
-                    "end_lineno": 19,
+                    "end_lineno": 20,
                     "end_col_offset": 26
                   },
                   "resolved_type": "callable",
@@ -376,9 +348,9 @@
                   "value": {
                     "kind": "Attribute",
                     "source_span": {
-                      "lineno": 19,
+                      "lineno": 20,
                       "col_offset": 8,
-                      "end_lineno": 19,
+                      "end_lineno": 20,
                       "end_col_offset": 19
                     },
                     "resolved_type": "list[int64]",
@@ -388,9 +360,9 @@
                     "value": {
                       "kind": "Name",
                       "source_span": {
-                        "lineno": 19,
+                        "lineno": 20,
                         "col_offset": 8,
-                        "end_lineno": 19,
+                        "end_lineno": 20,
                         "end_col_offset": 12
                       },
                       "resolved_type": "deque",
@@ -407,9 +379,9 @@
                   {
                     "kind": "Name",
                     "source_span": {
-                      "lineno": 19,
+                      "lineno": 20,
                       "col_offset": 27,
-                      "end_lineno": 19,
+                      "end_lineno": 20,
                       "end_col_offset": 32
                     },
                     "resolved_type": "int64",
@@ -431,9 +403,9 @@
                 "runtime_owner": {
                   "kind": "Attribute",
                   "source_span": {
-                    "lineno": 19,
+                    "lineno": 20,
                     "col_offset": 8,
-                    "end_lineno": 19,
+                    "end_lineno": 20,
                     "end_col_offset": 19
                   },
                   "resolved_type": "list[int64]",
@@ -443,9 +415,9 @@
                   "value": {
                     "kind": "Name",
                     "source_span": {
-                      "lineno": 19,
+                      "lineno": 20,
                       "col_offset": 8,
-                      "end_lineno": 19,
+                      "end_lineno": 20,
                       "end_col_offset": 12
                     },
                     "resolved_type": "deque",
@@ -462,111 +434,24 @@
                   "category": "static",
                   "mirror": "None"
                 }
-              },
-              "meta": {
-                "lifetime_node_id": "n0",
-                "lifetime_defs": [],
-                "lifetime_uses": [
-                  "self",
-                  "value"
-                ],
-                "lifetime_live_in": [
-                  "self",
-                  "value"
-                ],
-                "lifetime_live_out": [],
-                "lifetime_last_use_vars": [
-                  "self",
-                  "value"
-                ]
               }
             }
           ],
           "is_generator": 0,
           "yield_value_type": "unknown",
           "decorators": [],
+          "captures": [],
+          "capture_types": {},
+          "capture_modes": {},
           "returns": "None",
-          "mutates_self": true,
-          "meta": {
-            "lifetime_analysis": {
-              "schema_version": "east3_lifetime_v1",
-              "status": "ok",
-              "reason": "",
-              "entry_node": "n0",
-              "order": [
-                "n0"
-              ],
-              "cfg": [
-                {
-                  "id": "n0",
-                  "kind": "Expr",
-                  "defs": [],
-                  "uses": [
-                    "self",
-                    "value"
-                  ],
-                  "succ": []
-                }
-              ],
-              "def_use": {
-                "defs": {},
-                "uses": {
-                  "self": [
-                    "n0"
-                  ],
-                  "value": [
-                    "n0"
-                  ]
-                }
-              },
-              "variables": {
-                "self": {
-                  "def_nodes": [],
-                  "use_nodes": [
-                    "n0"
-                  ],
-                  "live_in_nodes": [
-                    "n0"
-                  ],
-                  "live_out_nodes": [],
-                  "last_use_nodes": [
-                    "n0"
-                  ],
-                  "lifetime_class": "escape_or_unknown"
-                },
-                "value": {
-                  "def_nodes": [],
-                  "use_nodes": [
-                    "n0"
-                  ],
-                  "live_in_nodes": [
-                    "n0"
-                  ],
-                  "live_out_nodes": [],
-                  "last_use_nodes": [
-                    "n0"
-                  ],
-                  "lifetime_class": "escape_or_unknown"
-                }
-              },
-              "arg_order": [
-                "self",
-                "value"
-              ],
-              "arg_escape": [
-                true,
-                true
-              ],
-              "has_dynamic_name_access": false
-            }
-          }
+          "mutates_self": true
         },
         {
-          "kind": "FunctionDef",
+          "kind": "ClosureDef",
           "source_span": {
-            "lineno": 21,
+            "lineno": 22,
             "col_offset": 4,
-            "end_lineno": 25,
+            "end_lineno": 26,
             "end_col_offset": 31
           },
           "name": "appendleft",
@@ -586,7 +471,7 @@
           },
           "return_type": "None",
           "arg_usage": {
-            "self": "readonly",
+            "self": "reassigned",
             "value": "readonly"
           },
           "renamed_symbols": {},
@@ -595,17 +480,17 @@
             {
               "kind": "AnnAssign",
               "source_span": {
-                "lineno": 22,
+                "lineno": 23,
                 "col_offset": 8,
-                "end_lineno": 22,
+                "end_lineno": 23,
                 "end_col_offset": 38
               },
               "target": {
                 "kind": "Name",
                 "source_span": {
-                  "lineno": 22,
+                  "lineno": 23,
                   "col_offset": 8,
-                  "end_lineno": 22,
+                  "end_lineno": 23,
                   "end_col_offset": 17
                 },
                 "resolved_type": "list[int64]",
@@ -650,9 +535,9 @@
               "value": {
                 "kind": "List",
                 "source_span": {
-                  "lineno": 22,
+                  "lineno": 23,
                   "col_offset": 31,
-                  "end_lineno": 22,
+                  "end_lineno": 23,
                   "end_col_offset": 38
                 },
                 "resolved_type": "list[int64]",
@@ -663,9 +548,9 @@
                   {
                     "kind": "Name",
                     "source_span": {
-                      "lineno": 22,
+                      "lineno": 23,
                       "col_offset": 32,
-                      "end_lineno": 22,
+                      "end_lineno": 23,
                       "end_col_offset": 37
                     },
                     "resolved_type": "int64",
@@ -687,26 +572,6 @@
                 "kind": "GenericType",
                 "category": "static",
                 "mirror": "list[int64]"
-              },
-              "meta": {
-                "lifetime_node_id": "n3",
-                "lifetime_defs": [
-                  "new_items"
-                ],
-                "lifetime_uses": [
-                  "value"
-                ],
-                "lifetime_live_in": [
-                  "self",
-                  "value"
-                ],
-                "lifetime_live_out": [
-                  "new_items",
-                  "self"
-                ],
-                "lifetime_last_use_vars": [
-                  "value"
-                ]
               }
             },
             {
@@ -717,9 +582,9 @@
                 "iter_expr": {
                   "kind": "Attribute",
                   "source_span": {
-                    "lineno": 23,
+                    "lineno": 24,
                     "col_offset": 20,
-                    "end_lineno": 23,
+                    "end_lineno": 24,
                     "end_col_offset": 31
                   },
                   "resolved_type": "list[int64]",
@@ -729,9 +594,9 @@
                   "value": {
                     "kind": "Name",
                     "source_span": {
-                      "lineno": 23,
+                      "lineno": 24,
                       "col_offset": 20,
-                      "end_lineno": 23,
+                      "end_lineno": 24,
                       "end_col_offset": 24
                     },
                     "resolved_type": "deque",
@@ -758,17 +623,17 @@
                 {
                   "kind": "Expr",
                   "source_span": {
-                    "lineno": 24,
+                    "lineno": 25,
                     "col_offset": 12,
-                    "end_lineno": 24,
+                    "end_lineno": 25,
                     "end_col_offset": 34
                   },
                   "value": {
                     "kind": "Call",
                     "source_span": {
-                      "lineno": 24,
+                      "lineno": 25,
                       "col_offset": 12,
-                      "end_lineno": 24,
+                      "end_lineno": 25,
                       "end_col_offset": 34
                     },
                     "resolved_type": "None",
@@ -778,9 +643,9 @@
                     "func": {
                       "kind": "Attribute",
                       "source_span": {
-                        "lineno": 24,
+                        "lineno": 25,
                         "col_offset": 12,
-                        "end_lineno": 24,
+                        "end_lineno": 25,
                         "end_col_offset": 28
                       },
                       "resolved_type": "callable",
@@ -790,9 +655,9 @@
                       "value": {
                         "kind": "Name",
                         "source_span": {
-                          "lineno": 24,
+                          "lineno": 25,
                           "col_offset": 12,
-                          "end_lineno": 24,
+                          "end_lineno": 25,
                           "end_col_offset": 21
                         },
                         "resolved_type": "list[int64]",
@@ -807,9 +672,9 @@
                       {
                         "kind": "Name",
                         "source_span": {
-                          "lineno": 24,
+                          "lineno": 25,
                           "col_offset": 29,
-                          "end_lineno": 24,
+                          "end_lineno": 25,
                           "end_col_offset": 33
                         },
                         "resolved_type": "int64",
@@ -831,9 +696,9 @@
                     "runtime_owner": {
                       "kind": "Name",
                       "source_span": {
-                        "lineno": 24,
+                        "lineno": 25,
                         "col_offset": 12,
-                        "end_lineno": 24,
+                        "end_lineno": 25,
                         "end_col_offset": 21
                       },
                       "resolved_type": "list[int64]",
@@ -848,70 +713,31 @@
                       "category": "static",
                       "mirror": "None"
                     }
-                  },
-                  "meta": {
-                    "lifetime_node_id": "n2",
-                    "lifetime_defs": [],
-                    "lifetime_uses": [
-                      "item",
-                      "new_items"
-                    ],
-                    "lifetime_live_in": [
-                      "item",
-                      "new_items",
-                      "self"
-                    ],
-                    "lifetime_live_out": [
-                      "new_items",
-                      "self"
-                    ],
-                    "lifetime_last_use_vars": [
-                      "item"
-                    ]
                   }
                 }
               ],
               "orelse": [],
               "source_span": {
-                "lineno": 23,
+                "lineno": 24,
                 "col_offset": 0,
-                "end_lineno": 24,
+                "end_lineno": 25,
                 "end_col_offset": 34
-              },
-              "meta": {
-                "lifetime_node_id": "n1",
-                "lifetime_defs": [
-                  "item"
-                ],
-                "lifetime_uses": [
-                  "self"
-                ],
-                "lifetime_live_in": [
-                  "new_items",
-                  "self"
-                ],
-                "lifetime_live_out": [
-                  "item",
-                  "new_items",
-                  "self"
-                ],
-                "lifetime_last_use_vars": []
               }
             },
             {
               "kind": "Assign",
               "source_span": {
-                "lineno": 25,
+                "lineno": 26,
                 "col_offset": 8,
-                "end_lineno": 25,
+                "end_lineno": 26,
                 "end_col_offset": 31
               },
               "target": {
                 "kind": "Attribute",
                 "source_span": {
-                  "lineno": 25,
+                  "lineno": 26,
                   "col_offset": 8,
-                  "end_lineno": 25,
+                  "end_lineno": 26,
                   "end_col_offset": 19
                 },
                 "resolved_type": "list[int64]",
@@ -921,9 +747,9 @@
                 "value": {
                   "kind": "Name",
                   "source_span": {
-                    "lineno": 25,
+                    "lineno": 26,
                     "col_offset": 8,
-                    "end_lineno": 25,
+                    "end_lineno": 26,
                     "end_col_offset": 12
                   },
                   "resolved_type": "deque",
@@ -940,9 +766,9 @@
               "value": {
                 "kind": "Name",
                 "source_span": {
-                  "lineno": 25,
+                  "lineno": 26,
                   "col_offset": 22,
-                  "end_lineno": 25,
+                  "end_lineno": 26,
                   "end_col_offset": 31
                 },
                 "resolved_type": "list[int64]",
@@ -956,208 +782,24 @@
                 "kind": "GenericType",
                 "category": "static",
                 "mirror": "list[int64]"
-              },
-              "meta": {
-                "lifetime_node_id": "n0",
-                "lifetime_defs": [],
-                "lifetime_uses": [
-                  "new_items"
-                ],
-                "lifetime_live_in": [
-                  "new_items"
-                ],
-                "lifetime_live_out": [],
-                "lifetime_last_use_vars": [
-                  "new_items"
-                ]
               }
             }
           ],
           "is_generator": 0,
           "yield_value_type": "unknown",
           "decorators": [],
+          "captures": [],
+          "capture_types": {},
+          "capture_modes": {},
           "returns": "None",
-          "mutates_self": true,
-          "meta": {
-            "lifetime_analysis": {
-              "schema_version": "east3_lifetime_v1",
-              "status": "ok",
-              "reason": "",
-              "entry_node": "n3",
-              "order": [
-                "n0",
-                "n1",
-                "n2",
-                "n3"
-              ],
-              "cfg": [
-                {
-                  "id": "n0",
-                  "kind": "Assign",
-                  "defs": [],
-                  "uses": [
-                    "new_items"
-                  ],
-                  "succ": []
-                },
-                {
-                  "id": "n1",
-                  "kind": "ForCore",
-                  "defs": [
-                    "item"
-                  ],
-                  "uses": [
-                    "self"
-                  ],
-                  "succ": [
-                    "n0",
-                    "n2"
-                  ]
-                },
-                {
-                  "id": "n2",
-                  "kind": "Expr",
-                  "defs": [],
-                  "uses": [
-                    "item",
-                    "new_items"
-                  ],
-                  "succ": [
-                    "n1"
-                  ]
-                },
-                {
-                  "id": "n3",
-                  "kind": "AnnAssign",
-                  "defs": [
-                    "new_items"
-                  ],
-                  "uses": [
-                    "value"
-                  ],
-                  "succ": [
-                    "n1"
-                  ]
-                }
-              ],
-              "def_use": {
-                "defs": {
-                  "item": [
-                    "n1"
-                  ],
-                  "new_items": [
-                    "n3"
-                  ]
-                },
-                "uses": {
-                  "item": [
-                    "n2"
-                  ],
-                  "new_items": [
-                    "n0",
-                    "n2"
-                  ],
-                  "self": [
-                    "n1"
-                  ],
-                  "value": [
-                    "n3"
-                  ]
-                }
-              },
-              "variables": {
-                "item": {
-                  "def_nodes": [
-                    "n1"
-                  ],
-                  "use_nodes": [
-                    "n2"
-                  ],
-                  "live_in_nodes": [
-                    "n2"
-                  ],
-                  "live_out_nodes": [
-                    "n1"
-                  ],
-                  "last_use_nodes": [
-                    "n2"
-                  ],
-                  "lifetime_class": "local_non_escape_candidate"
-                },
-                "new_items": {
-                  "def_nodes": [
-                    "n3"
-                  ],
-                  "use_nodes": [
-                    "n0",
-                    "n2"
-                  ],
-                  "live_in_nodes": [
-                    "n0",
-                    "n1",
-                    "n2"
-                  ],
-                  "live_out_nodes": [
-                    "n1",
-                    "n2",
-                    "n3"
-                  ],
-                  "last_use_nodes": [
-                    "n0"
-                  ],
-                  "lifetime_class": "local_non_escape_candidate"
-                },
-                "self": {
-                  "def_nodes": [],
-                  "use_nodes": [
-                    "n1"
-                  ],
-                  "live_in_nodes": [
-                    "n1",
-                    "n2",
-                    "n3"
-                  ],
-                  "live_out_nodes": [
-                    "n1",
-                    "n2",
-                    "n3"
-                  ],
-                  "last_use_nodes": [],
-                  "lifetime_class": "escape_or_unknown"
-                },
-                "value": {
-                  "def_nodes": [],
-                  "use_nodes": [
-                    "n3"
-                  ],
-                  "live_in_nodes": [
-                    "n3"
-                  ],
-                  "live_out_nodes": [],
-                  "last_use_nodes": [
-                    "n3"
-                  ],
-                  "lifetime_class": "escape_or_unknown"
-                }
-              },
-              "arg_order": [
-                "self",
-                "value"
-              ],
-              "arg_escape": [
-                true,
-                true
-              ],
-              "has_dynamic_name_access": false
-            }
-          }
+          "mutates_self": true
         },
         {
-          "kind": "FunctionDef",
+          "kind": "ClosureDef",
           "source_span": {
-            "lineno": 27,
+            "lineno": 28,
             "col_offset": 4,
-            "end_lineno": 30,
+            "end_lineno": 31,
             "end_col_offset": 32
           },
           "name": "pop",
@@ -1182,17 +824,17 @@
             {
               "kind": "If",
               "source_span": {
-                "lineno": 28,
+                "lineno": 29,
                 "col_offset": 8,
-                "end_lineno": 29,
+                "end_lineno": 30,
                 "end_col_offset": 52
               },
               "test": {
                 "kind": "Compare",
                 "source_span": {
-                  "lineno": 28,
+                  "lineno": 29,
                   "col_offset": 11,
-                  "end_lineno": 28,
+                  "end_lineno": 29,
                   "end_col_offset": 32
                 },
                 "resolved_type": "bool",
@@ -1202,9 +844,9 @@
                 "left": {
                   "kind": "Call",
                   "source_span": {
-                    "lineno": 28,
+                    "lineno": 29,
                     "col_offset": 11,
-                    "end_lineno": 28,
+                    "end_lineno": 29,
                     "end_col_offset": 27
                   },
                   "resolved_type": "int64",
@@ -1214,9 +856,9 @@
                   "func": {
                     "kind": "Name",
                     "source_span": {
-                      "lineno": 28,
+                      "lineno": 29,
                       "col_offset": 11,
-                      "end_lineno": 28,
+                      "end_lineno": 29,
                       "end_col_offset": 14
                     },
                     "resolved_type": "callable",
@@ -1229,9 +871,9 @@
                     {
                       "kind": "Attribute",
                       "source_span": {
-                        "lineno": 28,
+                        "lineno": 29,
                         "col_offset": 15,
-                        "end_lineno": 28,
+                        "end_lineno": 29,
                         "end_col_offset": 26
                       },
                       "resolved_type": "list[int64]",
@@ -1241,9 +883,9 @@
                       "value": {
                         "kind": "Name",
                         "source_span": {
-                          "lineno": 28,
+                          "lineno": 29,
                           "col_offset": 15,
-                          "end_lineno": 28,
+                          "end_lineno": 29,
                           "end_col_offset": 19
                         },
                         "resolved_type": "deque",
@@ -1278,9 +920,9 @@
                   {
                     "kind": "Constant",
                     "source_span": {
-                      "lineno": 28,
+                      "lineno": 29,
                       "col_offset": 31,
-                      "end_lineno": 28,
+                      "end_lineno": 29,
                       "end_col_offset": 32
                     },
                     "resolved_type": "int64",
@@ -1294,9 +936,9 @@
                 "normalized_expr": {
                   "kind": "Compare",
                   "source_span": {
-                    "lineno": 28,
+                    "lineno": 29,
                     "col_offset": 11,
-                    "end_lineno": 28,
+                    "end_lineno": 29,
                     "end_col_offset": 32
                   },
                   "resolved_type": "bool",
@@ -1306,9 +948,9 @@
                   "left": {
                     "kind": "Call",
                     "source_span": {
-                      "lineno": 28,
+                      "lineno": 29,
                       "col_offset": 11,
-                      "end_lineno": 28,
+                      "end_lineno": 29,
                       "end_col_offset": 27
                     },
                     "resolved_type": "int64",
@@ -1318,9 +960,9 @@
                     "func": {
                       "kind": "Name",
                       "source_span": {
-                        "lineno": 28,
+                        "lineno": 29,
                         "col_offset": 11,
-                        "end_lineno": 28,
+                        "end_lineno": 29,
                         "end_col_offset": 14
                       },
                       "resolved_type": "callable",
@@ -1333,9 +975,9 @@
                       {
                         "kind": "Attribute",
                         "source_span": {
-                          "lineno": 28,
+                          "lineno": 29,
                           "col_offset": 15,
-                          "end_lineno": 28,
+                          "end_lineno": 29,
                           "end_col_offset": 26
                         },
                         "resolved_type": "list[int64]",
@@ -1345,9 +987,9 @@
                         "value": {
                           "kind": "Name",
                           "source_span": {
-                            "lineno": 28,
+                            "lineno": 29,
                             "col_offset": 15,
-                            "end_lineno": 28,
+                            "end_lineno": 29,
                             "end_col_offset": 19
                           },
                           "resolved_type": "deque",
@@ -1382,9 +1024,9 @@
                     {
                       "kind": "Constant",
                       "source_span": {
-                        "lineno": 28,
+                        "lineno": 29,
                         "col_offset": 31,
-                        "end_lineno": 28,
+                        "end_lineno": 29,
                         "end_col_offset": 32
                       },
                       "resolved_type": "int64",
@@ -1400,17 +1042,17 @@
                 {
                   "kind": "Raise",
                   "source_span": {
-                    "lineno": 29,
+                    "lineno": 30,
                     "col_offset": 12,
-                    "end_lineno": 29,
+                    "end_lineno": 30,
                     "end_col_offset": 52
                   },
                   "exc": {
                     "kind": "Call",
                     "source_span": {
-                      "lineno": 29,
+                      "lineno": 30,
                       "col_offset": 18,
-                      "end_lineno": 29,
+                      "end_lineno": 30,
                       "end_col_offset": 52
                     },
                     "resolved_type": "IndexError",
@@ -1420,9 +1062,9 @@
                     "func": {
                       "kind": "Name",
                       "source_span": {
-                        "lineno": 29,
+                        "lineno": 30,
                         "col_offset": 18,
-                        "end_lineno": 29,
+                        "end_lineno": 30,
                         "end_col_offset": 28
                       },
                       "resolved_type": "type",
@@ -1435,26 +1077,20 @@
                       {
                         "kind": "Constant",
                         "source_span": {
-                          "lineno": 29,
+                          "lineno": 30,
                           "col_offset": 29,
-                          "end_lineno": 29,
+                          "end_lineno": 30,
                           "end_col_offset": 51
                         },
                         "resolved_type": "str",
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "\"pop from empty deque\"",
-                        "value": "pop from empty deque"
+                        "value": "pop from empty deque",
+                        "call_arg_type": "str"
                       }
                     ],
                     "keywords": [],
-                    "lowered_kind": "BuiltinCall",
-                    "builtin_name": "IndexError",
-                    "runtime_call": "std::runtime_error",
-                    "runtime_module_id": "pytra.core.py_runtime",
-                    "runtime_symbol": "IndexError",
-                    "runtime_call_adapter_kind": "builtin",
-                    "semantic_tag": "error.raise_ctor",
                     "type_expr_summary_v1": {
                       "schema_version": 1,
                       "kind": "NamedType",
@@ -1462,62 +1098,25 @@
                       "mirror": "IndexError"
                     }
                   },
-                  "cause": null,
-                  "meta": {
-                    "lifetime_node_id": "n2",
-                    "lifetime_defs": [],
-                    "lifetime_uses": [
-                      "IndexError"
-                    ],
-                    "lifetime_live_in": [
-                      "IndexError",
-                      "self"
-                    ],
-                    "lifetime_live_out": [
-                      "self"
-                    ],
-                    "lifetime_last_use_vars": [
-                      "IndexError"
-                    ]
-                  }
+                  "cause": null
                 }
               ],
-              "orelse": [],
-              "meta": {
-                "lifetime_node_id": "n1",
-                "lifetime_defs": [],
-                "lifetime_uses": [
-                  "len",
-                  "self"
-                ],
-                "lifetime_live_in": [
-                  "IndexError",
-                  "len",
-                  "self"
-                ],
-                "lifetime_live_out": [
-                  "IndexError",
-                  "self"
-                ],
-                "lifetime_last_use_vars": [
-                  "len"
-                ]
-              }
+              "orelse": []
             },
             {
               "kind": "Return",
               "source_span": {
-                "lineno": 30,
+                "lineno": 31,
                 "col_offset": 8,
-                "end_lineno": 30,
+                "end_lineno": 31,
                 "end_col_offset": 32
               },
               "value": {
                 "kind": "Call",
                 "source_span": {
-                  "lineno": 30,
+                  "lineno": 31,
                   "col_offset": 15,
-                  "end_lineno": 30,
+                  "end_lineno": 31,
                   "end_col_offset": 32
                 },
                 "resolved_type": "int64",
@@ -1527,9 +1126,9 @@
                 "func": {
                   "kind": "Attribute",
                   "source_span": {
-                    "lineno": 30,
+                    "lineno": 31,
                     "col_offset": 15,
-                    "end_lineno": 30,
+                    "end_lineno": 31,
                     "end_col_offset": 30
                   },
                   "resolved_type": "callable",
@@ -1539,9 +1138,9 @@
                   "value": {
                     "kind": "Attribute",
                     "source_span": {
-                      "lineno": 30,
+                      "lineno": 31,
                       "col_offset": 15,
-                      "end_lineno": 30,
+                      "end_lineno": 31,
                       "end_col_offset": 26
                     },
                     "resolved_type": "list[int64]",
@@ -1551,9 +1150,9 @@
                     "value": {
                       "kind": "Name",
                       "source_span": {
-                        "lineno": 30,
+                        "lineno": 31,
                         "col_offset": 15,
-                        "end_lineno": 30,
+                        "end_lineno": 31,
                         "end_col_offset": 19
                       },
                       "resolved_type": "deque",
@@ -1578,9 +1177,9 @@
                 "runtime_owner": {
                   "kind": "Attribute",
                   "source_span": {
-                    "lineno": 30,
+                    "lineno": 31,
                     "col_offset": 15,
-                    "end_lineno": 30,
+                    "end_lineno": 31,
                     "end_col_offset": 26
                   },
                   "resolved_type": "list[int64]",
@@ -1590,9 +1189,9 @@
                   "value": {
                     "kind": "Name",
                     "source_span": {
-                      "lineno": 30,
+                      "lineno": 31,
                       "col_offset": 15,
-                      "end_lineno": 30,
+                      "end_lineno": 31,
                       "end_col_offset": 19
                     },
                     "resolved_type": "deque",
@@ -1610,158 +1209,24 @@
                   "category": "static",
                   "mirror": "int64"
                 }
-              },
-              "meta": {
-                "lifetime_node_id": "n0",
-                "lifetime_defs": [],
-                "lifetime_uses": [
-                  "self"
-                ],
-                "lifetime_live_in": [
-                  "self"
-                ],
-                "lifetime_live_out": [],
-                "lifetime_last_use_vars": [
-                  "self"
-                ]
               }
             }
           ],
           "is_generator": 0,
           "yield_value_type": "unknown",
           "decorators": [],
+          "captures": [],
+          "capture_types": {},
+          "capture_modes": {},
           "returns": "int64",
-          "mutates_self": false,
-          "meta": {
-            "lifetime_analysis": {
-              "schema_version": "east3_lifetime_v1",
-              "status": "ok",
-              "reason": "",
-              "entry_node": "n1",
-              "order": [
-                "n0",
-                "n1",
-                "n2"
-              ],
-              "cfg": [
-                {
-                  "id": "n0",
-                  "kind": "Return",
-                  "defs": [],
-                  "uses": [
-                    "self"
-                  ],
-                  "succ": []
-                },
-                {
-                  "id": "n1",
-                  "kind": "If",
-                  "defs": [],
-                  "uses": [
-                    "len",
-                    "self"
-                  ],
-                  "succ": [
-                    "n0",
-                    "n2"
-                  ]
-                },
-                {
-                  "id": "n2",
-                  "kind": "Raise",
-                  "defs": [],
-                  "uses": [
-                    "IndexError"
-                  ],
-                  "succ": [
-                    "n0"
-                  ]
-                }
-              ],
-              "def_use": {
-                "defs": {},
-                "uses": {
-                  "IndexError": [
-                    "n2"
-                  ],
-                  "len": [
-                    "n1"
-                  ],
-                  "self": [
-                    "n0",
-                    "n1"
-                  ]
-                }
-              },
-              "variables": {
-                "IndexError": {
-                  "def_nodes": [],
-                  "use_nodes": [
-                    "n2"
-                  ],
-                  "live_in_nodes": [
-                    "n1",
-                    "n2"
-                  ],
-                  "live_out_nodes": [
-                    "n1"
-                  ],
-                  "last_use_nodes": [
-                    "n2"
-                  ],
-                  "lifetime_class": "local_non_escape_candidate"
-                },
-                "len": {
-                  "def_nodes": [],
-                  "use_nodes": [
-                    "n1"
-                  ],
-                  "live_in_nodes": [
-                    "n1"
-                  ],
-                  "live_out_nodes": [],
-                  "last_use_nodes": [
-                    "n1"
-                  ],
-                  "lifetime_class": "local_non_escape_candidate"
-                },
-                "self": {
-                  "def_nodes": [],
-                  "use_nodes": [
-                    "n0",
-                    "n1"
-                  ],
-                  "live_in_nodes": [
-                    "n0",
-                    "n1",
-                    "n2"
-                  ],
-                  "live_out_nodes": [
-                    "n1",
-                    "n2"
-                  ],
-                  "last_use_nodes": [
-                    "n0"
-                  ],
-                  "lifetime_class": "escape_or_unknown"
-                }
-              },
-              "arg_order": [
-                "self"
-              ],
-              "arg_escape": [
-                true
-              ],
-              "has_dynamic_name_access": false
-            }
-          }
+          "mutates_self": false
         },
         {
-          "kind": "FunctionDef",
+          "kind": "ClosureDef",
           "source_span": {
-            "lineno": 32,
+            "lineno": 33,
             "col_offset": 4,
-            "end_lineno": 37,
+            "end_lineno": 38,
             "end_col_offset": 19
           },
           "name": "popleft",
@@ -1778,7 +1243,7 @@
           },
           "return_type": "int64",
           "arg_usage": {
-            "self": "readonly"
+            "self": "reassigned"
           },
           "renamed_symbols": {},
           "docstring": null,
@@ -1786,17 +1251,17 @@
             {
               "kind": "If",
               "source_span": {
-                "lineno": 28,
+                "lineno": 29,
                 "col_offset": 8,
-                "end_lineno": 29,
+                "end_lineno": 30,
                 "end_col_offset": 52
               },
               "test": {
                 "kind": "Compare",
                 "source_span": {
-                  "lineno": 28,
+                  "lineno": 29,
                   "col_offset": 11,
-                  "end_lineno": 28,
+                  "end_lineno": 29,
                   "end_col_offset": 32
                 },
                 "resolved_type": "bool",
@@ -1806,9 +1271,9 @@
                 "left": {
                   "kind": "Call",
                   "source_span": {
-                    "lineno": 28,
+                    "lineno": 29,
                     "col_offset": 11,
-                    "end_lineno": 28,
+                    "end_lineno": 29,
                     "end_col_offset": 27
                   },
                   "resolved_type": "int64",
@@ -1818,9 +1283,9 @@
                   "func": {
                     "kind": "Name",
                     "source_span": {
-                      "lineno": 28,
+                      "lineno": 29,
                       "col_offset": 11,
-                      "end_lineno": 28,
+                      "end_lineno": 29,
                       "end_col_offset": 14
                     },
                     "resolved_type": "callable",
@@ -1833,9 +1298,9 @@
                     {
                       "kind": "Attribute",
                       "source_span": {
-                        "lineno": 28,
+                        "lineno": 29,
                         "col_offset": 15,
-                        "end_lineno": 28,
+                        "end_lineno": 29,
                         "end_col_offset": 26
                       },
                       "resolved_type": "list[int64]",
@@ -1845,9 +1310,9 @@
                       "value": {
                         "kind": "Name",
                         "source_span": {
-                          "lineno": 28,
+                          "lineno": 29,
                           "col_offset": 15,
-                          "end_lineno": 28,
+                          "end_lineno": 29,
                           "end_col_offset": 19
                         },
                         "resolved_type": "deque",
@@ -1882,9 +1347,9 @@
                   {
                     "kind": "Constant",
                     "source_span": {
-                      "lineno": 28,
+                      "lineno": 29,
                       "col_offset": 31,
-                      "end_lineno": 28,
+                      "end_lineno": 29,
                       "end_col_offset": 32
                     },
                     "resolved_type": "int64",
@@ -1898,9 +1363,9 @@
                 "normalized_expr": {
                   "kind": "Compare",
                   "source_span": {
-                    "lineno": 28,
+                    "lineno": 29,
                     "col_offset": 11,
-                    "end_lineno": 28,
+                    "end_lineno": 29,
                     "end_col_offset": 32
                   },
                   "resolved_type": "bool",
@@ -1910,9 +1375,9 @@
                   "left": {
                     "kind": "Call",
                     "source_span": {
-                      "lineno": 28,
+                      "lineno": 29,
                       "col_offset": 11,
-                      "end_lineno": 28,
+                      "end_lineno": 29,
                       "end_col_offset": 27
                     },
                     "resolved_type": "int64",
@@ -1922,9 +1387,9 @@
                     "func": {
                       "kind": "Name",
                       "source_span": {
-                        "lineno": 28,
+                        "lineno": 29,
                         "col_offset": 11,
-                        "end_lineno": 28,
+                        "end_lineno": 29,
                         "end_col_offset": 14
                       },
                       "resolved_type": "callable",
@@ -1937,9 +1402,9 @@
                       {
                         "kind": "Attribute",
                         "source_span": {
-                          "lineno": 28,
+                          "lineno": 29,
                           "col_offset": 15,
-                          "end_lineno": 28,
+                          "end_lineno": 29,
                           "end_col_offset": 26
                         },
                         "resolved_type": "list[int64]",
@@ -1949,9 +1414,9 @@
                         "value": {
                           "kind": "Name",
                           "source_span": {
-                            "lineno": 28,
+                            "lineno": 29,
                             "col_offset": 15,
-                            "end_lineno": 28,
+                            "end_lineno": 29,
                             "end_col_offset": 19
                           },
                           "resolved_type": "deque",
@@ -1986,9 +1451,9 @@
                     {
                       "kind": "Constant",
                       "source_span": {
-                        "lineno": 28,
+                        "lineno": 29,
                         "col_offset": 31,
-                        "end_lineno": 28,
+                        "end_lineno": 29,
                         "end_col_offset": 32
                       },
                       "resolved_type": "int64",
@@ -2004,17 +1469,17 @@
                 {
                   "kind": "Raise",
                   "source_span": {
-                    "lineno": 29,
+                    "lineno": 30,
                     "col_offset": 12,
-                    "end_lineno": 29,
+                    "end_lineno": 30,
                     "end_col_offset": 52
                   },
                   "exc": {
                     "kind": "Call",
                     "source_span": {
-                      "lineno": 29,
+                      "lineno": 30,
                       "col_offset": 18,
-                      "end_lineno": 29,
+                      "end_lineno": 30,
                       "end_col_offset": 52
                     },
                     "resolved_type": "IndexError",
@@ -2024,9 +1489,9 @@
                     "func": {
                       "kind": "Name",
                       "source_span": {
-                        "lineno": 29,
+                        "lineno": 30,
                         "col_offset": 18,
-                        "end_lineno": 29,
+                        "end_lineno": 30,
                         "end_col_offset": 28
                       },
                       "resolved_type": "type",
@@ -2039,26 +1504,20 @@
                       {
                         "kind": "Constant",
                         "source_span": {
-                          "lineno": 29,
+                          "lineno": 30,
                           "col_offset": 29,
-                          "end_lineno": 29,
+                          "end_lineno": 30,
                           "end_col_offset": 51
                         },
                         "resolved_type": "str",
                         "casts": [],
                         "borrow_kind": "value",
                         "repr": "\"pop from empty deque\"",
-                        "value": "pop from empty deque"
+                        "value": "pop from empty deque",
+                        "call_arg_type": "str"
                       }
                     ],
                     "keywords": [],
-                    "lowered_kind": "BuiltinCall",
-                    "builtin_name": "IndexError",
-                    "runtime_call": "std::runtime_error",
-                    "runtime_module_id": "pytra.core.py_runtime",
-                    "runtime_symbol": "IndexError",
-                    "runtime_call_adapter_kind": "builtin",
-                    "semantic_tag": "error.raise_ctor",
                     "type_expr_summary_v1": {
                       "schema_version": 1,
                       "kind": "NamedType",
@@ -2066,62 +1525,25 @@
                       "mirror": "IndexError"
                     }
                   },
-                  "cause": null,
-                  "meta": {
-                    "lifetime_node_id": "n4",
-                    "lifetime_defs": [],
-                    "lifetime_uses": [
-                      "IndexError"
-                    ],
-                    "lifetime_live_in": [
-                      "IndexError",
-                      "self"
-                    ],
-                    "lifetime_live_out": [
-                      "self"
-                    ],
-                    "lifetime_last_use_vars": [
-                      "IndexError"
-                    ]
-                  }
+                  "cause": null
                 }
               ],
-              "orelse": [],
-              "meta": {
-                "lifetime_node_id": "n3",
-                "lifetime_defs": [],
-                "lifetime_uses": [
-                  "len",
-                  "self"
-                ],
-                "lifetime_live_in": [
-                  "IndexError",
-                  "len",
-                  "self"
-                ],
-                "lifetime_live_out": [
-                  "IndexError",
-                  "self"
-                ],
-                "lifetime_last_use_vars": [
-                  "len"
-                ]
-              }
+              "orelse": []
             },
             {
               "kind": "AnnAssign",
               "source_span": {
-                "lineno": 35,
+                "lineno": 36,
                 "col_offset": 8,
-                "end_lineno": 35,
+                "end_lineno": 36,
                 "end_col_offset": 34
               },
               "target": {
                 "kind": "Name",
                 "source_span": {
-                  "lineno": 35,
+                  "lineno": 36,
                   "col_offset": 8,
-                  "end_lineno": 35,
+                  "end_lineno": 36,
                   "end_col_offset": 12
                 },
                 "resolved_type": "int64",
@@ -2148,9 +1570,9 @@
               "value": {
                 "kind": "Subscript",
                 "source_span": {
-                  "lineno": 35,
+                  "lineno": 36,
                   "col_offset": 20,
-                  "end_lineno": 35,
+                  "end_lineno": 36,
                   "end_col_offset": 34
                 },
                 "resolved_type": "int64",
@@ -2160,9 +1582,9 @@
                 "value": {
                   "kind": "Attribute",
                   "source_span": {
-                    "lineno": 35,
+                    "lineno": 36,
                     "col_offset": 20,
-                    "end_lineno": 35,
+                    "end_lineno": 36,
                     "end_col_offset": 31
                   },
                   "resolved_type": "list[int64]",
@@ -2172,9 +1594,9 @@
                   "value": {
                     "kind": "Name",
                     "source_span": {
-                      "lineno": 35,
+                      "lineno": 36,
                       "col_offset": 20,
-                      "end_lineno": 35,
+                      "end_lineno": 36,
                       "end_col_offset": 24
                     },
                     "resolved_type": "deque",
@@ -2188,9 +1610,9 @@
                 "slice": {
                   "kind": "Constant",
                   "source_span": {
-                    "lineno": 35,
+                    "lineno": 36,
                     "col_offset": 32,
-                    "end_lineno": 35,
+                    "end_lineno": 36,
                     "end_col_offset": 33
                   },
                   "resolved_type": "int64",
@@ -2205,39 +1627,22 @@
                 "kind": "NamedType",
                 "category": "static",
                 "mirror": "int64"
-              },
-              "meta": {
-                "lifetime_node_id": "n2",
-                "lifetime_defs": [
-                  "item"
-                ],
-                "lifetime_uses": [
-                  "self"
-                ],
-                "lifetime_live_in": [
-                  "self"
-                ],
-                "lifetime_live_out": [
-                  "item",
-                  "self"
-                ],
-                "lifetime_last_use_vars": []
               }
             },
             {
               "kind": "Assign",
               "source_span": {
-                "lineno": 36,
+                "lineno": 37,
                 "col_offset": 8,
-                "end_lineno": 36,
+                "end_lineno": 37,
                 "end_col_offset": 37
               },
               "target": {
                 "kind": "Attribute",
                 "source_span": {
-                  "lineno": 36,
+                  "lineno": 37,
                   "col_offset": 8,
-                  "end_lineno": 36,
+                  "end_lineno": 37,
                   "end_col_offset": 19
                 },
                 "resolved_type": "list[int64]",
@@ -2247,9 +1652,9 @@
                 "value": {
                   "kind": "Name",
                   "source_span": {
-                    "lineno": 36,
+                    "lineno": 37,
                     "col_offset": 8,
-                    "end_lineno": 36,
+                    "end_lineno": 37,
                     "end_col_offset": 12
                   },
                   "resolved_type": "deque",
@@ -2266,9 +1671,9 @@
               "value": {
                 "kind": "Subscript",
                 "source_span": {
-                  "lineno": 36,
+                  "lineno": 37,
                   "col_offset": 22,
-                  "end_lineno": 36,
+                  "end_lineno": 37,
                   "end_col_offset": 37
                 },
                 "resolved_type": "list[int64]",
@@ -2278,9 +1683,9 @@
                 "value": {
                   "kind": "Attribute",
                   "source_span": {
-                    "lineno": 36,
+                    "lineno": 37,
                     "col_offset": 22,
-                    "end_lineno": 36,
+                    "end_lineno": 37,
                     "end_col_offset": 33
                   },
                   "resolved_type": "list[int64]",
@@ -2290,9 +1695,9 @@
                   "value": {
                     "kind": "Name",
                     "source_span": {
-                      "lineno": 36,
+                      "lineno": 37,
                       "col_offset": 22,
-                      "end_lineno": 36,
+                      "end_lineno": 37,
                       "end_col_offset": 26
                     },
                     "resolved_type": "deque",
@@ -2308,9 +1713,9 @@
                   "lower": {
                     "kind": "Constant",
                     "source_span": {
-                      "lineno": 36,
+                      "lineno": 37,
                       "col_offset": 34,
-                      "end_lineno": 36,
+                      "end_lineno": 37,
                       "end_col_offset": 35
                     },
                     "resolved_type": "int64",
@@ -2326,9 +1731,9 @@
                 "lower": {
                   "kind": "Constant",
                   "source_span": {
-                    "lineno": 36,
+                    "lineno": 37,
                     "col_offset": 34,
-                    "end_lineno": 36,
+                    "end_lineno": 37,
                     "end_col_offset": 35
                   },
                   "resolved_type": "int64",
@@ -2344,39 +1749,22 @@
                 "kind": "GenericType",
                 "category": "static",
                 "mirror": "list[int64]"
-              },
-              "meta": {
-                "lifetime_node_id": "n1",
-                "lifetime_defs": [],
-                "lifetime_uses": [
-                  "self"
-                ],
-                "lifetime_live_in": [
-                  "item",
-                  "self"
-                ],
-                "lifetime_live_out": [
-                  "item"
-                ],
-                "lifetime_last_use_vars": [
-                  "self"
-                ]
               }
             },
             {
               "kind": "Return",
               "source_span": {
-                "lineno": 37,
+                "lineno": 38,
                 "col_offset": 8,
-                "end_lineno": 37,
+                "end_lineno": 38,
                 "end_col_offset": 19
               },
               "value": {
                 "kind": "Name",
                 "source_span": {
-                  "lineno": 37,
+                  "lineno": 38,
                   "col_offset": 15,
-                  "end_lineno": 37,
+                  "end_lineno": 38,
                   "end_col_offset": 19
                 },
                 "resolved_type": "int64",
@@ -2384,215 +1772,24 @@
                 "borrow_kind": "readonly_ref",
                 "repr": "item",
                 "id": "item"
-              },
-              "meta": {
-                "lifetime_node_id": "n0",
-                "lifetime_defs": [],
-                "lifetime_uses": [
-                  "item"
-                ],
-                "lifetime_live_in": [
-                  "item"
-                ],
-                "lifetime_live_out": [],
-                "lifetime_last_use_vars": [
-                  "item"
-                ]
               }
             }
           ],
           "is_generator": 0,
           "yield_value_type": "unknown",
           "decorators": [],
+          "captures": [],
+          "capture_types": {},
+          "capture_modes": {},
           "returns": "int64",
-          "mutates_self": true,
-          "meta": {
-            "lifetime_analysis": {
-              "schema_version": "east3_lifetime_v1",
-              "status": "ok",
-              "reason": "",
-              "entry_node": "n3",
-              "order": [
-                "n0",
-                "n1",
-                "n2",
-                "n3",
-                "n4"
-              ],
-              "cfg": [
-                {
-                  "id": "n0",
-                  "kind": "Return",
-                  "defs": [],
-                  "uses": [
-                    "item"
-                  ],
-                  "succ": []
-                },
-                {
-                  "id": "n1",
-                  "kind": "Assign",
-                  "defs": [],
-                  "uses": [
-                    "self"
-                  ],
-                  "succ": [
-                    "n0"
-                  ]
-                },
-                {
-                  "id": "n2",
-                  "kind": "AnnAssign",
-                  "defs": [
-                    "item"
-                  ],
-                  "uses": [
-                    "self"
-                  ],
-                  "succ": [
-                    "n1"
-                  ]
-                },
-                {
-                  "id": "n3",
-                  "kind": "If",
-                  "defs": [],
-                  "uses": [
-                    "len",
-                    "self"
-                  ],
-                  "succ": [
-                    "n2",
-                    "n4"
-                  ]
-                },
-                {
-                  "id": "n4",
-                  "kind": "Raise",
-                  "defs": [],
-                  "uses": [
-                    "IndexError"
-                  ],
-                  "succ": [
-                    "n2"
-                  ]
-                }
-              ],
-              "def_use": {
-                "defs": {
-                  "item": [
-                    "n2"
-                  ]
-                },
-                "uses": {
-                  "IndexError": [
-                    "n4"
-                  ],
-                  "item": [
-                    "n0"
-                  ],
-                  "len": [
-                    "n3"
-                  ],
-                  "self": [
-                    "n1",
-                    "n2",
-                    "n3"
-                  ]
-                }
-              },
-              "variables": {
-                "IndexError": {
-                  "def_nodes": [],
-                  "use_nodes": [
-                    "n4"
-                  ],
-                  "live_in_nodes": [
-                    "n3",
-                    "n4"
-                  ],
-                  "live_out_nodes": [
-                    "n3"
-                  ],
-                  "last_use_nodes": [
-                    "n4"
-                  ],
-                  "lifetime_class": "local_non_escape_candidate"
-                },
-                "item": {
-                  "def_nodes": [
-                    "n2"
-                  ],
-                  "use_nodes": [
-                    "n0"
-                  ],
-                  "live_in_nodes": [
-                    "n0",
-                    "n1"
-                  ],
-                  "live_out_nodes": [
-                    "n1",
-                    "n2"
-                  ],
-                  "last_use_nodes": [
-                    "n0"
-                  ],
-                  "lifetime_class": "escape_or_unknown"
-                },
-                "len": {
-                  "def_nodes": [],
-                  "use_nodes": [
-                    "n3"
-                  ],
-                  "live_in_nodes": [
-                    "n3"
-                  ],
-                  "live_out_nodes": [],
-                  "last_use_nodes": [
-                    "n3"
-                  ],
-                  "lifetime_class": "local_non_escape_candidate"
-                },
-                "self": {
-                  "def_nodes": [],
-                  "use_nodes": [
-                    "n1",
-                    "n2",
-                    "n3"
-                  ],
-                  "live_in_nodes": [
-                    "n1",
-                    "n2",
-                    "n3",
-                    "n4"
-                  ],
-                  "live_out_nodes": [
-                    "n2",
-                    "n3",
-                    "n4"
-                  ],
-                  "last_use_nodes": [
-                    "n1"
-                  ],
-                  "lifetime_class": "escape_or_unknown"
-                }
-              },
-              "arg_order": [
-                "self"
-              ],
-              "arg_escape": [
-                true
-              ],
-              "has_dynamic_name_access": false
-            }
-          }
+          "mutates_self": true
         },
         {
-          "kind": "FunctionDef",
+          "kind": "ClosureDef",
           "source_span": {
-            "lineno": 39,
+            "lineno": 40,
             "col_offset": 4,
-            "end_lineno": 40,
+            "end_lineno": 41,
             "end_col_offset": 31
           },
           "name": "__len__",
@@ -2617,17 +1814,17 @@
             {
               "kind": "Return",
               "source_span": {
-                "lineno": 40,
+                "lineno": 41,
                 "col_offset": 8,
-                "end_lineno": 40,
+                "end_lineno": 41,
                 "end_col_offset": 31
               },
               "value": {
                 "kind": "Call",
                 "source_span": {
-                  "lineno": 40,
+                  "lineno": 41,
                   "col_offset": 15,
-                  "end_lineno": 40,
+                  "end_lineno": 41,
                   "end_col_offset": 31
                 },
                 "resolved_type": "int64",
@@ -2637,9 +1834,9 @@
                 "func": {
                   "kind": "Name",
                   "source_span": {
-                    "lineno": 40,
+                    "lineno": 41,
                     "col_offset": 15,
-                    "end_lineno": 40,
+                    "end_lineno": 41,
                     "end_col_offset": 18
                   },
                   "resolved_type": "callable",
@@ -2652,9 +1849,9 @@
                   {
                     "kind": "Attribute",
                     "source_span": {
-                      "lineno": 40,
+                      "lineno": 41,
                       "col_offset": 19,
-                      "end_lineno": 40,
+                      "end_lineno": 41,
                       "end_col_offset": 30
                     },
                     "resolved_type": "list[int64]",
@@ -2664,9 +1861,9 @@
                     "value": {
                       "kind": "Name",
                       "source_span": {
-                        "lineno": 40,
+                        "lineno": 41,
                         "col_offset": 19,
-                        "end_lineno": 40,
+                        "end_lineno": 41,
                         "end_col_offset": 23
                       },
                       "resolved_type": "deque",
@@ -2693,109 +1890,24 @@
                   "category": "static",
                   "mirror": "int64"
                 }
-              },
-              "meta": {
-                "lifetime_node_id": "n0",
-                "lifetime_defs": [],
-                "lifetime_uses": [
-                  "len",
-                  "self"
-                ],
-                "lifetime_live_in": [
-                  "len",
-                  "self"
-                ],
-                "lifetime_live_out": [],
-                "lifetime_last_use_vars": [
-                  "len",
-                  "self"
-                ]
               }
             }
           ],
           "is_generator": 0,
           "yield_value_type": "unknown",
           "decorators": [],
+          "captures": [],
+          "capture_types": {},
+          "capture_modes": {},
           "returns": "int64",
-          "mutates_self": false,
-          "meta": {
-            "lifetime_analysis": {
-              "schema_version": "east3_lifetime_v1",
-              "status": "ok",
-              "reason": "",
-              "entry_node": "n0",
-              "order": [
-                "n0"
-              ],
-              "cfg": [
-                {
-                  "id": "n0",
-                  "kind": "Return",
-                  "defs": [],
-                  "uses": [
-                    "len",
-                    "self"
-                  ],
-                  "succ": []
-                }
-              ],
-              "def_use": {
-                "defs": {},
-                "uses": {
-                  "len": [
-                    "n0"
-                  ],
-                  "self": [
-                    "n0"
-                  ]
-                }
-              },
-              "variables": {
-                "len": {
-                  "def_nodes": [],
-                  "use_nodes": [
-                    "n0"
-                  ],
-                  "live_in_nodes": [
-                    "n0"
-                  ],
-                  "live_out_nodes": [],
-                  "last_use_nodes": [
-                    "n0"
-                  ],
-                  "lifetime_class": "escape_or_unknown"
-                },
-                "self": {
-                  "def_nodes": [],
-                  "use_nodes": [
-                    "n0"
-                  ],
-                  "live_in_nodes": [
-                    "n0"
-                  ],
-                  "live_out_nodes": [],
-                  "last_use_nodes": [
-                    "n0"
-                  ],
-                  "lifetime_class": "escape_or_unknown"
-                }
-              },
-              "arg_order": [
-                "self"
-              ],
-              "arg_escape": [
-                true
-              ],
-              "has_dynamic_name_access": false
-            }
-          }
+          "mutates_self": false
         },
         {
-          "kind": "FunctionDef",
+          "kind": "ClosureDef",
           "source_span": {
-            "lineno": 42,
+            "lineno": 43,
             "col_offset": 4,
-            "end_lineno": 43,
+            "end_lineno": 44,
             "end_col_offset": 37
           },
           "name": "clear",
@@ -2812,7 +1924,7 @@
           },
           "return_type": "None",
           "arg_usage": {
-            "self": "readonly"
+            "self": "reassigned"
           },
           "renamed_symbols": {},
           "docstring": null,
@@ -2820,17 +1932,17 @@
             {
               "kind": "Assign",
               "source_span": {
-                "lineno": 43,
+                "lineno": 44,
                 "col_offset": 8,
-                "end_lineno": 43,
+                "end_lineno": 44,
                 "end_col_offset": 37
               },
               "target": {
                 "kind": "Attribute",
                 "source_span": {
-                  "lineno": 43,
+                  "lineno": 44,
                   "col_offset": 8,
-                  "end_lineno": 43,
+                  "end_lineno": 44,
                   "end_col_offset": 19
                 },
                 "resolved_type": "list[int64]",
@@ -2840,9 +1952,9 @@
                 "value": {
                   "kind": "Name",
                   "source_span": {
-                    "lineno": 43,
+                    "lineno": 44,
                     "col_offset": 8,
-                    "end_lineno": 43,
+                    "end_lineno": 44,
                     "end_col_offset": 12
                   },
                   "resolved_type": "deque",
@@ -2859,9 +1971,9 @@
               "value": {
                 "kind": "Subscript",
                 "source_span": {
-                  "lineno": 43,
+                  "lineno": 44,
                   "col_offset": 22,
-                  "end_lineno": 43,
+                  "end_lineno": 44,
                   "end_col_offset": 37
                 },
                 "resolved_type": "list[int64]",
@@ -2871,9 +1983,9 @@
                 "value": {
                   "kind": "Attribute",
                   "source_span": {
-                    "lineno": 43,
+                    "lineno": 44,
                     "col_offset": 22,
-                    "end_lineno": 43,
+                    "end_lineno": 44,
                     "end_col_offset": 33
                   },
                   "resolved_type": "list[int64]",
@@ -2883,9 +1995,9 @@
                   "value": {
                     "kind": "Name",
                     "source_span": {
-                      "lineno": 43,
+                      "lineno": 44,
                       "col_offset": 22,
-                      "end_lineno": 43,
+                      "end_lineno": 44,
                       "end_col_offset": 26
                     },
                     "resolved_type": "deque",
@@ -2902,9 +2014,9 @@
                   "upper": {
                     "kind": "Constant",
                     "source_span": {
-                      "lineno": 43,
+                      "lineno": 44,
                       "col_offset": 35,
-                      "end_lineno": 43,
+                      "end_lineno": 44,
                       "end_col_offset": 36
                     },
                     "resolved_type": "int64",
@@ -2920,9 +2032,9 @@
                 "upper": {
                   "kind": "Constant",
                   "source_span": {
-                    "lineno": 43,
+                    "lineno": 44,
                     "col_offset": 35,
-                    "end_lineno": 43,
+                    "end_lineno": 44,
                     "end_col_offset": 36
                   },
                   "resolved_type": "int64",
@@ -2937,81 +2049,17 @@
                 "kind": "GenericType",
                 "category": "static",
                 "mirror": "list[int64]"
-              },
-              "meta": {
-                "lifetime_node_id": "n0",
-                "lifetime_defs": [],
-                "lifetime_uses": [
-                  "self"
-                ],
-                "lifetime_live_in": [
-                  "self"
-                ],
-                "lifetime_live_out": [],
-                "lifetime_last_use_vars": [
-                  "self"
-                ]
               }
             }
           ],
           "is_generator": 0,
           "yield_value_type": "unknown",
           "decorators": [],
+          "captures": [],
+          "capture_types": {},
+          "capture_modes": {},
           "returns": "None",
-          "mutates_self": true,
-          "meta": {
-            "lifetime_analysis": {
-              "schema_version": "east3_lifetime_v1",
-              "status": "ok",
-              "reason": "",
-              "entry_node": "n0",
-              "order": [
-                "n0"
-              ],
-              "cfg": [
-                {
-                  "id": "n0",
-                  "kind": "Assign",
-                  "defs": [],
-                  "uses": [
-                    "self"
-                  ],
-                  "succ": []
-                }
-              ],
-              "def_use": {
-                "defs": {},
-                "uses": {
-                  "self": [
-                    "n0"
-                  ]
-                }
-              },
-              "variables": {
-                "self": {
-                  "def_nodes": [],
-                  "use_nodes": [
-                    "n0"
-                  ],
-                  "live_in_nodes": [
-                    "n0"
-                  ],
-                  "live_out_nodes": [],
-                  "last_use_nodes": [
-                    "n0"
-                  ],
-                  "lifetime_class": "escape_or_unknown"
-                }
-              },
-              "arg_order": [
-                "self"
-              ],
-              "arg_escape": [
-                true
-              ],
-              "has_dynamic_name_access": false
-            }
-          }
+          "mutates_self": true
         }
       ],
       "class_storage_hint": "ref",
@@ -3040,16 +2088,9 @@
         {
           "kind": "blank",
           "count": 1
-        },
-        {
-          "kind": "blank",
-          "count": 1
-        },
-        {
-          "kind": "blank",
-          "count": 1
         }
-      ]
+      ],
+      "meta": {}
     }
   ],
   "main_guard_body": [],
@@ -3059,6 +2100,19 @@
     "import_resolution": {
       "schema_version": 1,
       "bindings": [
+        {
+          "module_id": "pytra.built_in.error",
+          "export_name": "IndexError",
+          "local_name": "IndexError",
+          "binding_kind": "symbol",
+          "source_file": "src/pytra/std/collections.py",
+          "source_line": 8,
+          "source_module_id": "pytra.built_in.error",
+          "source_export_name": "IndexError",
+          "source_binding_kind": "symbol",
+          "runtime_module_id": "pytra.built_in.error",
+          "runtime_group": ""
+        },
         {
           "module_id": "pytra.core.py_runtime",
           "export_name": "",
@@ -3072,21 +2126,55 @@
           "runtime_group": "core"
         }
       ],
-      "qualified_refs": []
+      "qualified_refs": [
+        {
+          "module_id": "pytra.built_in.error",
+          "symbol": "IndexError",
+          "local_name": "IndexError"
+        }
+      ]
     },
     "import_bindings": [
+      {
+        "module_id": "pytra.built_in.error",
+        "export_name": "IndexError",
+        "local_name": "IndexError",
+        "binding_kind": "symbol",
+        "source_file": "src/pytra/std/collections.py",
+        "source_line": 8,
+        "source_module_id": "pytra.built_in.error",
+        "source_export_name": "IndexError",
+        "source_binding_kind": "symbol",
+        "runtime_module_id": "pytra.built_in.error",
+        "runtime_group": ""
+      },
       {
         "module_id": "pytra.core.py_runtime",
         "export_name": "",
         "local_name": "pytra.core.py_runtime",
         "binding_kind": "implicit_builtin",
         "source_file": "src/pytra/std/collections.py",
-        "source_line": 0
+        "source_line": 0,
+        "source_module_id": "pytra.core.py_runtime",
+        "source_binding_kind": "implicit_builtin",
+        "runtime_module_id": "pytra.core.py_runtime",
+        "runtime_group": "core"
       }
     ],
-    "qualified_symbol_refs": [],
+    "qualified_symbol_refs": [
+      {
+        "module_id": "pytra.built_in.error",
+        "symbol": "IndexError",
+        "local_name": "IndexError"
+      }
+    ],
     "import_modules": {},
-    "import_symbols": {},
+    "import_symbols": {
+      "IndexError": {
+        "module": "pytra.built_in.error",
+        "name": "IndexError"
+      }
+    },
     "dispatch_mode": "native",
     "lifetime_schema_version": "east3_lifetime_v1"
   },

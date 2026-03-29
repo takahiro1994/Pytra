@@ -15,6 +15,7 @@
       "base": null,
       "dataclass": false,
       "field_types": {},
+      "decorators": [],
       "body": [
         {
           "kind": "ClosureDef",
@@ -134,7 +135,8 @@
           "kind": "blank",
           "count": 1
         }
-      ]
+      ],
+      "meta": {}
     }
   ],
   "main_guard_body": [

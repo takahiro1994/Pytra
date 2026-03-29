@@ -41,6 +41,7 @@
         "x": "int64",
         "y": "int64"
       },
+      "decorators": [],
       "body": [
         {
           "kind": "FunctionDef",
@@ -329,7 +330,8 @@
           "kind": "blank",
           "count": 1
         }
-      ]
+      ],
+      "meta": {}
     },
     {
       "kind": "FunctionDef",

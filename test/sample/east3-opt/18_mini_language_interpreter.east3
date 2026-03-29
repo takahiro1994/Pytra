@@ -54,6 +54,9 @@
         "pos": "int64",
         "number_value": "int64"
       },
+      "decorators": [
+        "dataclass"
+      ],
       "body": [
         {
           "kind": "AnnAssign",
@@ -217,7 +220,8 @@
           "kind": "comment",
           "text": "Tokens for lexical analysis."
         }
-      ]
+      ],
+      "meta": {}
     },
     {
       "kind": "ClassDef",
@@ -241,6 +245,9 @@
         "kind_tag": "int64",
         "op_tag": "int64"
       },
+      "decorators": [
+        "dataclass"
+      ],
       "body": [
         {
           "kind": "AnnAssign",
@@ -547,7 +554,8 @@
           }
         }
       ],
-      "class_storage_hint": "ref"
+      "class_storage_hint": "ref",
+      "meta": {}
     },
     {
       "kind": "ClassDef",
@@ -567,6 +575,9 @@
         "expr_index": "int64",
         "kind_tag": "int64"
       },
+      "decorators": [
+        "dataclass"
+      ],
       "body": [
         {
           "kind": "AnnAssign",
@@ -721,7 +732,8 @@
           }
         }
       ],
-      "class_storage_hint": "ref"
+      "class_storage_hint": "ref",
+      "meta": {}
     },
     {
       "kind": "FunctionDef",
@@ -6735,7 +6747,8 @@
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "RuntimeError",
-                      "id": "RuntimeError"
+                      "id": "RuntimeError",
+                      "runtime_module_id": "pytra.built_in.error"
                     },
                     "args": [
                       {
@@ -7583,6 +7596,7 @@
                           "repr": "ch",
                           "id": "ch"
                         },
+                        "call_arg_type": "str",
                         "normalized_expr_version": "east3_expr_v1",
                         "normalized_expr": {
                           "kind": "BinOp",
@@ -7824,18 +7838,13 @@
                             "borrow_kind": "readonly_ref",
                             "repr": "ch",
                             "id": "ch"
-                          }
+                          },
+                          "call_arg_type": "str"
                         }
                       }
                     ],
                     "keywords": [],
-                    "lowered_kind": "BuiltinCall",
-                    "builtin_name": "RuntimeError",
-                    "runtime_call": "std::runtime_error",
-                    "runtime_module_id": "pytra.core.py_runtime",
-                    "runtime_symbol": "RuntimeError",
-                    "runtime_call_adapter_kind": "builtin",
-                    "semantic_tag": "error.raise_ctor",
+                    "runtime_module_id": "pytra.built_in.error",
                     "type_expr_summary_v1": {
                       "schema_version": 1,
                       "kind": "NamedType",
@@ -10926,9 +10935,10 @@
         "pos": "int64",
         "expr_nodes": "list[ExprNode]"
       },
+      "decorators": [],
       "body": [
         {
-          "kind": "FunctionDef",
+          "kind": "ClosureDef",
           "source_span": {
             "lineno": 102,
             "col_offset": 4,
@@ -10981,66 +10991,20 @@
                   "category": "static",
                   "mirror": "list[ExprNode]"
                 }
-              },
-              "meta": {
-                "lifetime_node_id": "n0",
-                "lifetime_defs": [],
-                "lifetime_uses": [],
-                "lifetime_live_in": [],
-                "lifetime_live_out": [],
-                "lifetime_last_use_vars": []
               }
             }
           ],
           "is_generator": 0,
           "yield_value_type": "unknown",
           "decorators": [],
+          "captures": [],
+          "capture_types": {},
+          "capture_modes": {},
           "returns": "list[ExprNode]",
-          "mutates_self": false,
-          "meta": {
-            "lifetime_analysis": {
-              "schema_version": "east3_lifetime_v1",
-              "status": "ok",
-              "reason": "",
-              "entry_node": "n0",
-              "order": [
-                "n0"
-              ],
-              "cfg": [
-                {
-                  "id": "n0",
-                  "kind": "Return",
-                  "defs": [],
-                  "uses": [],
-                  "succ": []
-                }
-              ],
-              "def_use": {
-                "defs": {},
-                "uses": {}
-              },
-              "variables": {
-                "self": {
-                  "def_nodes": [],
-                  "use_nodes": [],
-                  "live_in_nodes": [],
-                  "live_out_nodes": [],
-                  "last_use_nodes": [],
-                  "lifetime_class": "escape_or_unknown"
-                }
-              },
-              "arg_order": [
-                "self"
-              ],
-              "arg_escape": [
-                true
-              ],
-              "has_dynamic_name_access": false
-            }
-          }
+          "mutates_self": false
         },
         {
-          "kind": "FunctionDef",
+          "kind": "ClosureDef",
           "source_span": {
             "lineno": 105,
             "col_offset": 4,
@@ -11064,7 +11028,7 @@
           },
           "return_type": "None",
           "arg_usage": {
-            "self": "readonly",
+            "self": "reassigned",
             "tokens": "readonly"
           },
           "renamed_symbols": {},
@@ -11158,23 +11122,6 @@
                 "kind": "GenericType",
                 "category": "static",
                 "mirror": "list[Token]"
-              },
-              "meta": {
-                "lifetime_node_id": "n2",
-                "lifetime_defs": [],
-                "lifetime_uses": [
-                  "tokens"
-                ],
-                "lifetime_live_in": [
-                  "self",
-                  "tokens"
-                ],
-                "lifetime_live_out": [
-                  "self"
-                ],
-                "lifetime_last_use_vars": [
-                  "tokens"
-                ]
               }
             },
             {
@@ -11247,18 +11194,6 @@
                 "kind": "NamedType",
                 "category": "static",
                 "mirror": "int64"
-              },
-              "meta": {
-                "lifetime_node_id": "n1",
-                "lifetime_defs": [],
-                "lifetime_uses": [],
-                "lifetime_live_in": [
-                  "self"
-                ],
-                "lifetime_live_out": [
-                  "self"
-                ],
-                "lifetime_last_use_vars": []
               }
             },
             {
@@ -11384,130 +11319,20 @@
                 "kind": "GenericType",
                 "category": "static",
                 "mirror": "list[ExprNode]"
-              },
-              "meta": {
-                "lifetime_node_id": "n0",
-                "lifetime_defs": [],
-                "lifetime_uses": [
-                  "self"
-                ],
-                "lifetime_live_in": [
-                  "self"
-                ],
-                "lifetime_live_out": [],
-                "lifetime_last_use_vars": [
-                  "self"
-                ]
               }
             }
           ],
           "is_generator": 0,
           "yield_value_type": "unknown",
           "decorators": [],
+          "captures": [],
+          "capture_types": {},
+          "capture_modes": {},
           "returns": "None",
-          "mutates_self": true,
-          "meta": {
-            "lifetime_analysis": {
-              "schema_version": "east3_lifetime_v1",
-              "status": "ok",
-              "reason": "",
-              "entry_node": "n2",
-              "order": [
-                "n0",
-                "n1",
-                "n2"
-              ],
-              "cfg": [
-                {
-                  "id": "n0",
-                  "kind": "AnnAssign",
-                  "defs": [],
-                  "uses": [
-                    "self"
-                  ],
-                  "succ": []
-                },
-                {
-                  "id": "n1",
-                  "kind": "AnnAssign",
-                  "defs": [],
-                  "uses": [],
-                  "succ": [
-                    "n0"
-                  ]
-                },
-                {
-                  "id": "n2",
-                  "kind": "AnnAssign",
-                  "defs": [],
-                  "uses": [
-                    "tokens"
-                  ],
-                  "succ": [
-                    "n1"
-                  ]
-                }
-              ],
-              "def_use": {
-                "defs": {},
-                "uses": {
-                  "self": [
-                    "n0"
-                  ],
-                  "tokens": [
-                    "n2"
-                  ]
-                }
-              },
-              "variables": {
-                "self": {
-                  "def_nodes": [],
-                  "use_nodes": [
-                    "n0"
-                  ],
-                  "live_in_nodes": [
-                    "n0",
-                    "n1",
-                    "n2"
-                  ],
-                  "live_out_nodes": [
-                    "n1",
-                    "n2"
-                  ],
-                  "last_use_nodes": [
-                    "n0"
-                  ],
-                  "lifetime_class": "escape_or_unknown"
-                },
-                "tokens": {
-                  "def_nodes": [],
-                  "use_nodes": [
-                    "n2"
-                  ],
-                  "live_in_nodes": [
-                    "n2"
-                  ],
-                  "live_out_nodes": [],
-                  "last_use_nodes": [
-                    "n2"
-                  ],
-                  "lifetime_class": "escape_or_unknown"
-                }
-              },
-              "arg_order": [
-                "self",
-                "tokens"
-              ],
-              "arg_escape": [
-                true,
-                true
-              ],
-              "has_dynamic_name_access": false
-            }
-          }
+          "mutates_self": true
         },
         {
-          "kind": "FunctionDef",
+          "kind": "ClosureDef",
           "source_span": {
             "lineno": 110,
             "col_offset": 4,
@@ -11609,84 +11434,20 @@
                   },
                   "attr": "pos"
                 }
-              },
-              "meta": {
-                "lifetime_node_id": "n0",
-                "lifetime_defs": [],
-                "lifetime_uses": [
-                  "self"
-                ],
-                "lifetime_live_in": [
-                  "self"
-                ],
-                "lifetime_live_out": [],
-                "lifetime_last_use_vars": [
-                  "self"
-                ]
               }
             }
           ],
           "is_generator": 0,
           "yield_value_type": "unknown",
           "decorators": [],
+          "captures": [],
+          "capture_types": {},
+          "capture_modes": {},
           "returns": "Token",
-          "mutates_self": false,
-          "meta": {
-            "lifetime_analysis": {
-              "schema_version": "east3_lifetime_v1",
-              "status": "ok",
-              "reason": "",
-              "entry_node": "n0",
-              "order": [
-                "n0"
-              ],
-              "cfg": [
-                {
-                  "id": "n0",
-                  "kind": "Return",
-                  "defs": [],
-                  "uses": [
-                    "self"
-                  ],
-                  "succ": []
-                }
-              ],
-              "def_use": {
-                "defs": {},
-                "uses": {
-                  "self": [
-                    "n0"
-                  ]
-                }
-              },
-              "variables": {
-                "self": {
-                  "def_nodes": [],
-                  "use_nodes": [
-                    "n0"
-                  ],
-                  "live_in_nodes": [
-                    "n0"
-                  ],
-                  "live_out_nodes": [],
-                  "last_use_nodes": [
-                    "n0"
-                  ],
-                  "lifetime_class": "escape_or_unknown"
-                }
-              },
-              "arg_order": [
-                "self"
-              ],
-              "arg_escape": [
-                true
-              ],
-              "has_dynamic_name_access": false
-            }
-          }
+          "mutates_self": false
         },
         {
-          "kind": "FunctionDef",
+          "kind": "ClosureDef",
           "source_span": {
             "lineno": 113,
             "col_offset": 4,
@@ -11873,84 +11634,20 @@
                     }
                   }
                 }
-              },
-              "meta": {
-                "lifetime_node_id": "n0",
-                "lifetime_defs": [],
-                "lifetime_uses": [
-                  "self"
-                ],
-                "lifetime_live_in": [
-                  "self"
-                ],
-                "lifetime_live_out": [],
-                "lifetime_last_use_vars": [
-                  "self"
-                ]
               }
             }
           ],
           "is_generator": 0,
           "yield_value_type": "unknown",
           "decorators": [],
+          "captures": [],
+          "capture_types": {},
+          "capture_modes": {},
           "returns": "Token",
-          "mutates_self": false,
-          "meta": {
-            "lifetime_analysis": {
-              "schema_version": "east3_lifetime_v1",
-              "status": "ok",
-              "reason": "",
-              "entry_node": "n0",
-              "order": [
-                "n0"
-              ],
-              "cfg": [
-                {
-                  "id": "n0",
-                  "kind": "Return",
-                  "defs": [],
-                  "uses": [
-                    "self"
-                  ],
-                  "succ": []
-                }
-              ],
-              "def_use": {
-                "defs": {},
-                "uses": {
-                  "self": [
-                    "n0"
-                  ]
-                }
-              },
-              "variables": {
-                "self": {
-                  "def_nodes": [],
-                  "use_nodes": [
-                    "n0"
-                  ],
-                  "live_in_nodes": [
-                    "n0"
-                  ],
-                  "live_out_nodes": [],
-                  "last_use_nodes": [
-                    "n0"
-                  ],
-                  "lifetime_class": "escape_or_unknown"
-                }
-              },
-              "arg_order": [
-                "self"
-              ],
-              "arg_escape": [
-                true
-              ],
-              "has_dynamic_name_access": false
-            }
-          }
+          "mutates_self": false
         },
         {
-          "kind": "FunctionDef",
+          "kind": "ClosureDef",
           "source_span": {
             "lineno": 116,
             "col_offset": 4,
@@ -12046,84 +11743,20 @@
                   }
                 },
                 "attr": "kind"
-              },
-              "meta": {
-                "lifetime_node_id": "n0",
-                "lifetime_defs": [],
-                "lifetime_uses": [
-                  "self"
-                ],
-                "lifetime_live_in": [
-                  "self"
-                ],
-                "lifetime_live_out": [],
-                "lifetime_last_use_vars": [
-                  "self"
-                ]
               }
             }
           ],
           "is_generator": 0,
           "yield_value_type": "unknown",
           "decorators": [],
+          "captures": [],
+          "capture_types": {},
+          "capture_modes": {},
           "returns": "str",
-          "mutates_self": false,
-          "meta": {
-            "lifetime_analysis": {
-              "schema_version": "east3_lifetime_v1",
-              "status": "ok",
-              "reason": "",
-              "entry_node": "n0",
-              "order": [
-                "n0"
-              ],
-              "cfg": [
-                {
-                  "id": "n0",
-                  "kind": "Return",
-                  "defs": [],
-                  "uses": [
-                    "self"
-                  ],
-                  "succ": []
-                }
-              ],
-              "def_use": {
-                "defs": {},
-                "uses": {
-                  "self": [
-                    "n0"
-                  ]
-                }
-              },
-              "variables": {
-                "self": {
-                  "def_nodes": [],
-                  "use_nodes": [
-                    "n0"
-                  ],
-                  "live_in_nodes": [
-                    "n0"
-                  ],
-                  "live_out_nodes": [],
-                  "last_use_nodes": [
-                    "n0"
-                  ],
-                  "lifetime_class": "escape_or_unknown"
-                }
-              },
-              "arg_order": [
-                "self"
-              ],
-              "arg_escape": [
-                true
-              ],
-              "has_dynamic_name_access": false
-            }
-          }
+          "mutates_self": false
         },
         {
-          "kind": "FunctionDef",
+          "kind": "ClosureDef",
           "source_span": {
             "lineno": 119,
             "col_offset": 4,
@@ -12147,7 +11780,7 @@
           },
           "return_type": "bool",
           "arg_usage": {
-            "self": "readonly",
+            "self": "reassigned",
             "kind": "readonly"
           },
           "renamed_symbols": {},
@@ -12383,20 +12016,6 @@
                     "kind": "NamedType",
                     "category": "static",
                     "mirror": "int64"
-                  },
-                  "meta": {
-                    "lifetime_node_id": "n3",
-                    "lifetime_defs": [],
-                    "lifetime_uses": [
-                      "self"
-                    ],
-                    "lifetime_live_in": [
-                      "self"
-                    ],
-                    "lifetime_live_out": [],
-                    "lifetime_last_use_vars": [
-                      "self"
-                    ]
                   }
                 },
                 {
@@ -12420,36 +12039,10 @@
                     "borrow_kind": "value",
                     "repr": "True",
                     "value": true
-                  },
-                  "meta": {
-                    "lifetime_node_id": "n2",
-                    "lifetime_defs": [],
-                    "lifetime_uses": [],
-                    "lifetime_live_in": [],
-                    "lifetime_live_out": [],
-                    "lifetime_last_use_vars": []
                   }
                 }
               ],
-              "orelse": [],
-              "meta": {
-                "lifetime_node_id": "n1",
-                "lifetime_defs": [],
-                "lifetime_uses": [
-                  "kind",
-                  "self"
-                ],
-                "lifetime_live_in": [
-                  "kind",
-                  "self"
-                ],
-                "lifetime_live_out": [
-                  "self"
-                ],
-                "lifetime_last_use_vars": [
-                  "kind"
-                ]
-              }
+              "orelse": []
             },
             {
               "kind": "Return",
@@ -12472,134 +12065,20 @@
                 "borrow_kind": "value",
                 "repr": "False",
                 "value": false
-              },
-              "meta": {
-                "lifetime_node_id": "n0",
-                "lifetime_defs": [],
-                "lifetime_uses": [],
-                "lifetime_live_in": [],
-                "lifetime_live_out": [],
-                "lifetime_last_use_vars": []
               }
             }
           ],
           "is_generator": 0,
           "yield_value_type": "unknown",
           "decorators": [],
+          "captures": [],
+          "capture_types": {},
+          "capture_modes": {},
           "returns": "bool",
-          "mutates_self": true,
-          "meta": {
-            "lifetime_analysis": {
-              "schema_version": "east3_lifetime_v1",
-              "status": "ok",
-              "reason": "",
-              "entry_node": "n1",
-              "order": [
-                "n0",
-                "n1",
-                "n2",
-                "n3"
-              ],
-              "cfg": [
-                {
-                  "id": "n0",
-                  "kind": "Return",
-                  "defs": [],
-                  "uses": [],
-                  "succ": []
-                },
-                {
-                  "id": "n1",
-                  "kind": "If",
-                  "defs": [],
-                  "uses": [
-                    "kind",
-                    "self"
-                  ],
-                  "succ": [
-                    "n0",
-                    "n3"
-                  ]
-                },
-                {
-                  "id": "n2",
-                  "kind": "Return",
-                  "defs": [],
-                  "uses": [],
-                  "succ": []
-                },
-                {
-                  "id": "n3",
-                  "kind": "AugAssign",
-                  "defs": [],
-                  "uses": [
-                    "self"
-                  ],
-                  "succ": [
-                    "n2"
-                  ]
-                }
-              ],
-              "def_use": {
-                "defs": {},
-                "uses": {
-                  "kind": [
-                    "n1"
-                  ],
-                  "self": [
-                    "n1",
-                    "n3"
-                  ]
-                }
-              },
-              "variables": {
-                "kind": {
-                  "def_nodes": [],
-                  "use_nodes": [
-                    "n1"
-                  ],
-                  "live_in_nodes": [
-                    "n1"
-                  ],
-                  "live_out_nodes": [],
-                  "last_use_nodes": [
-                    "n1"
-                  ],
-                  "lifetime_class": "escape_or_unknown"
-                },
-                "self": {
-                  "def_nodes": [],
-                  "use_nodes": [
-                    "n1",
-                    "n3"
-                  ],
-                  "live_in_nodes": [
-                    "n1",
-                    "n3"
-                  ],
-                  "live_out_nodes": [
-                    "n1"
-                  ],
-                  "last_use_nodes": [
-                    "n3"
-                  ],
-                  "lifetime_class": "escape_or_unknown"
-                }
-              },
-              "arg_order": [
-                "self",
-                "kind"
-              ],
-              "arg_escape": [
-                true,
-                true
-              ],
-              "has_dynamic_name_access": false
-            }
-          }
+          "mutates_self": true
         },
         {
-          "kind": "FunctionDef",
+          "kind": "ClosureDef",
           "source_span": {
             "lineno": 125,
             "col_offset": 4,
@@ -12623,7 +12102,7 @@
           },
           "return_type": "Token",
           "arg_usage": {
-            "self": "readonly",
+            "self": "reassigned",
             "kind": "readonly"
           },
           "renamed_symbols": {},
@@ -12720,29 +12199,6 @@
                 "kind": "NamedType",
                 "category": "static",
                 "mirror": "Token"
-              },
-              "meta": {
-                "lifetime_node_id": "n4",
-                "lifetime_defs": [
-                  "token"
-                ],
-                "lifetime_uses": [
-                  "self"
-                ],
-                "lifetime_live_in": [
-                  "RuntimeError",
-                  "kind",
-                  "self",
-                  "str"
-                ],
-                "lifetime_live_out": [
-                  "RuntimeError",
-                  "kind",
-                  "self",
-                  "str",
-                  "token"
-                ],
-                "lifetime_last_use_vars": []
               }
             },
             {
@@ -12907,7 +12363,8 @@
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "RuntimeError",
-                      "id": "RuntimeError"
+                      "id": "RuntimeError",
+                      "runtime_module_id": "pytra.built_in.error"
                     },
                     "args": [
                       {
@@ -13707,6 +13164,7 @@
                           },
                           "attr": "kind"
                         },
+                        "call_arg_type": "str",
                         "normalized_expr_version": "east3_expr_v1",
                         "normalized_expr": {
                           "kind": "BinOp",
@@ -13932,18 +13390,13 @@
                               "id": "token"
                             },
                             "attr": "kind"
-                          }
+                          },
+                          "call_arg_type": "str"
                         }
                       }
                     ],
                     "keywords": [],
-                    "lowered_kind": "BuiltinCall",
-                    "builtin_name": "RuntimeError",
-                    "runtime_call": "std::runtime_error",
-                    "runtime_module_id": "pytra.core.py_runtime",
-                    "runtime_symbol": "RuntimeError",
-                    "runtime_call_adapter_kind": "builtin",
-                    "semantic_tag": "error.raise_ctor",
+                    "runtime_module_id": "pytra.built_in.error",
                     "type_expr_summary_v1": {
                       "schema_version": 1,
                       "kind": "NamedType",
@@ -13951,59 +13404,10 @@
                       "mirror": "RuntimeError"
                     }
                   },
-                  "cause": null,
-                  "meta": {
-                    "lifetime_node_id": "n3",
-                    "lifetime_defs": [],
-                    "lifetime_uses": [
-                      "RuntimeError",
-                      "kind",
-                      "str",
-                      "token"
-                    ],
-                    "lifetime_live_in": [
-                      "RuntimeError",
-                      "kind",
-                      "self",
-                      "str",
-                      "token"
-                    ],
-                    "lifetime_live_out": [
-                      "self",
-                      "token"
-                    ],
-                    "lifetime_last_use_vars": [
-                      "RuntimeError",
-                      "kind",
-                      "str"
-                    ]
-                  }
+                  "cause": null
                 }
               ],
-              "orelse": [],
-              "meta": {
-                "lifetime_node_id": "n2",
-                "lifetime_defs": [],
-                "lifetime_uses": [
-                  "kind",
-                  "token"
-                ],
-                "lifetime_live_in": [
-                  "RuntimeError",
-                  "kind",
-                  "self",
-                  "str",
-                  "token"
-                ],
-                "lifetime_live_out": [
-                  "RuntimeError",
-                  "kind",
-                  "self",
-                  "str",
-                  "token"
-                ],
-                "lifetime_last_use_vars": []
-              }
+              "orelse": []
             },
             {
               "kind": "AugAssign",
@@ -14063,23 +13467,6 @@
                 "kind": "NamedType",
                 "category": "static",
                 "mirror": "int64"
-              },
-              "meta": {
-                "lifetime_node_id": "n1",
-                "lifetime_defs": [],
-                "lifetime_uses": [
-                  "self"
-                ],
-                "lifetime_live_in": [
-                  "self",
-                  "token"
-                ],
-                "lifetime_live_out": [
-                  "token"
-                ],
-                "lifetime_last_use_vars": [
-                  "self"
-                ]
               }
             },
             {
@@ -14103,253 +13490,20 @@
                 "borrow_kind": "readonly_ref",
                 "repr": "token",
                 "id": "token"
-              },
-              "meta": {
-                "lifetime_node_id": "n0",
-                "lifetime_defs": [],
-                "lifetime_uses": [
-                  "token"
-                ],
-                "lifetime_live_in": [
-                  "token"
-                ],
-                "lifetime_live_out": [],
-                "lifetime_last_use_vars": [
-                  "token"
-                ]
               }
             }
           ],
           "is_generator": 0,
           "yield_value_type": "unknown",
           "decorators": [],
+          "captures": [],
+          "capture_types": {},
+          "capture_modes": {},
           "returns": "Token",
-          "mutates_self": true,
-          "meta": {
-            "lifetime_analysis": {
-              "schema_version": "east3_lifetime_v1",
-              "status": "ok",
-              "reason": "",
-              "entry_node": "n4",
-              "order": [
-                "n0",
-                "n1",
-                "n2",
-                "n3",
-                "n4"
-              ],
-              "cfg": [
-                {
-                  "id": "n0",
-                  "kind": "Return",
-                  "defs": [],
-                  "uses": [
-                    "token"
-                  ],
-                  "succ": []
-                },
-                {
-                  "id": "n1",
-                  "kind": "AugAssign",
-                  "defs": [],
-                  "uses": [
-                    "self"
-                  ],
-                  "succ": [
-                    "n0"
-                  ]
-                },
-                {
-                  "id": "n2",
-                  "kind": "If",
-                  "defs": [],
-                  "uses": [
-                    "kind",
-                    "token"
-                  ],
-                  "succ": [
-                    "n1",
-                    "n3"
-                  ]
-                },
-                {
-                  "id": "n3",
-                  "kind": "Raise",
-                  "defs": [],
-                  "uses": [
-                    "RuntimeError",
-                    "kind",
-                    "str",
-                    "token"
-                  ],
-                  "succ": [
-                    "n1"
-                  ]
-                },
-                {
-                  "id": "n4",
-                  "kind": "AnnAssign",
-                  "defs": [
-                    "token"
-                  ],
-                  "uses": [
-                    "self"
-                  ],
-                  "succ": [
-                    "n2"
-                  ]
-                }
-              ],
-              "def_use": {
-                "defs": {
-                  "token": [
-                    "n4"
-                  ]
-                },
-                "uses": {
-                  "RuntimeError": [
-                    "n3"
-                  ],
-                  "kind": [
-                    "n2",
-                    "n3"
-                  ],
-                  "self": [
-                    "n1",
-                    "n4"
-                  ],
-                  "str": [
-                    "n3"
-                  ],
-                  "token": [
-                    "n0",
-                    "n2",
-                    "n3"
-                  ]
-                }
-              },
-              "variables": {
-                "RuntimeError": {
-                  "def_nodes": [],
-                  "use_nodes": [
-                    "n3"
-                  ],
-                  "live_in_nodes": [
-                    "n2",
-                    "n3",
-                    "n4"
-                  ],
-                  "live_out_nodes": [
-                    "n2",
-                    "n4"
-                  ],
-                  "last_use_nodes": [
-                    "n3"
-                  ],
-                  "lifetime_class": "local_non_escape_candidate"
-                },
-                "kind": {
-                  "def_nodes": [],
-                  "use_nodes": [
-                    "n2",
-                    "n3"
-                  ],
-                  "live_in_nodes": [
-                    "n2",
-                    "n3",
-                    "n4"
-                  ],
-                  "live_out_nodes": [
-                    "n2",
-                    "n4"
-                  ],
-                  "last_use_nodes": [
-                    "n3"
-                  ],
-                  "lifetime_class": "escape_or_unknown"
-                },
-                "self": {
-                  "def_nodes": [],
-                  "use_nodes": [
-                    "n1",
-                    "n4"
-                  ],
-                  "live_in_nodes": [
-                    "n1",
-                    "n2",
-                    "n3",
-                    "n4"
-                  ],
-                  "live_out_nodes": [
-                    "n2",
-                    "n3",
-                    "n4"
-                  ],
-                  "last_use_nodes": [
-                    "n1"
-                  ],
-                  "lifetime_class": "escape_or_unknown"
-                },
-                "str": {
-                  "def_nodes": [],
-                  "use_nodes": [
-                    "n3"
-                  ],
-                  "live_in_nodes": [
-                    "n2",
-                    "n3",
-                    "n4"
-                  ],
-                  "live_out_nodes": [
-                    "n2",
-                    "n4"
-                  ],
-                  "last_use_nodes": [
-                    "n3"
-                  ],
-                  "lifetime_class": "local_non_escape_candidate"
-                },
-                "token": {
-                  "def_nodes": [
-                    "n4"
-                  ],
-                  "use_nodes": [
-                    "n0",
-                    "n2",
-                    "n3"
-                  ],
-                  "live_in_nodes": [
-                    "n0",
-                    "n1",
-                    "n2",
-                    "n3"
-                  ],
-                  "live_out_nodes": [
-                    "n1",
-                    "n2",
-                    "n3",
-                    "n4"
-                  ],
-                  "last_use_nodes": [
-                    "n0"
-                  ],
-                  "lifetime_class": "escape_or_unknown"
-                }
-              },
-              "arg_order": [
-                "self",
-                "kind"
-              ],
-              "arg_escape": [
-                true,
-                true
-              ],
-              "has_dynamic_name_access": false
-            }
-          }
+          "mutates_self": true
         },
         {
-          "kind": "FunctionDef",
+          "kind": "ClosureDef",
           "source_span": {
             "lineno": 132,
             "col_offset": 4,
@@ -14456,113 +13610,23 @@
                     "col_offset": 0,
                     "end_lineno": 134,
                     "end_col_offset": 16
-                  },
-                  "meta": {
-                    "lifetime_node_id": "n1",
-                    "lifetime_defs": [],
-                    "lifetime_uses": [],
-                    "lifetime_live_in": [
-                      "self"
-                    ],
-                    "lifetime_live_out": [
-                      "self"
-                    ],
-                    "lifetime_last_use_vars": []
                   }
                 }
               ],
-              "orelse": [],
-              "meta": {
-                "lifetime_node_id": "n0",
-                "lifetime_defs": [],
-                "lifetime_uses": [
-                  "self"
-                ],
-                "lifetime_live_in": [
-                  "self"
-                ],
-                "lifetime_live_out": [
-                  "self"
-                ],
-                "lifetime_last_use_vars": []
-              }
+              "orelse": []
             }
           ],
           "is_generator": 0,
           "yield_value_type": "unknown",
           "decorators": [],
+          "captures": [],
+          "capture_types": {},
+          "capture_modes": {},
           "returns": "None",
-          "mutates_self": true,
-          "meta": {
-            "lifetime_analysis": {
-              "schema_version": "east3_lifetime_v1",
-              "status": "ok",
-              "reason": "",
-              "entry_node": "n0",
-              "order": [
-                "n0",
-                "n1"
-              ],
-              "cfg": [
-                {
-                  "id": "n0",
-                  "kind": "While",
-                  "defs": [],
-                  "uses": [
-                    "self"
-                  ],
-                  "succ": [
-                    "n1"
-                  ]
-                },
-                {
-                  "id": "n1",
-                  "kind": "Pass",
-                  "defs": [],
-                  "uses": [],
-                  "succ": [
-                    "n0"
-                  ]
-                }
-              ],
-              "def_use": {
-                "defs": {},
-                "uses": {
-                  "self": [
-                    "n0"
-                  ]
-                }
-              },
-              "variables": {
-                "self": {
-                  "def_nodes": [],
-                  "use_nodes": [
-                    "n0"
-                  ],
-                  "live_in_nodes": [
-                    "n0",
-                    "n1"
-                  ],
-                  "live_out_nodes": [
-                    "n0",
-                    "n1"
-                  ],
-                  "last_use_nodes": [],
-                  "lifetime_class": "escape_or_unknown"
-                }
-              },
-              "arg_order": [
-                "self"
-              ],
-              "arg_escape": [
-                true
-              ],
-              "has_dynamic_name_access": false
-            }
-          }
+          "mutates_self": true
         },
         {
-          "kind": "FunctionDef",
+          "kind": "ClosureDef",
           "source_span": {
             "lineno": 136,
             "col_offset": 4,
@@ -14586,7 +13650,7 @@
           },
           "return_type": "int64",
           "arg_usage": {
-            "self": "readonly",
+            "self": "reassigned",
             "node": "readonly"
           },
           "renamed_symbols": {},
@@ -14713,26 +13777,6 @@
                   "category": "static",
                   "mirror": "None"
                 }
-              },
-              "meta": {
-                "lifetime_node_id": "n1",
-                "lifetime_defs": [],
-                "lifetime_uses": [
-                  "node",
-                  "self"
-                ],
-                "lifetime_live_in": [
-                  "len",
-                  "node",
-                  "self"
-                ],
-                "lifetime_live_out": [
-                  "len",
-                  "self"
-                ],
-                "lifetime_last_use_vars": [
-                  "node"
-                ]
               }
             },
             {
@@ -14943,145 +13987,20 @@
                     "value": 1
                   }
                 }
-              },
-              "meta": {
-                "lifetime_node_id": "n0",
-                "lifetime_defs": [],
-                "lifetime_uses": [
-                  "len",
-                  "self"
-                ],
-                "lifetime_live_in": [
-                  "len",
-                  "self"
-                ],
-                "lifetime_live_out": [],
-                "lifetime_last_use_vars": [
-                  "len",
-                  "self"
-                ]
               }
             }
           ],
           "is_generator": 0,
           "yield_value_type": "unknown",
           "decorators": [],
+          "captures": [],
+          "capture_types": {},
+          "capture_modes": {},
           "returns": "int64",
-          "mutates_self": true,
-          "meta": {
-            "lifetime_analysis": {
-              "schema_version": "east3_lifetime_v1",
-              "status": "ok",
-              "reason": "",
-              "entry_node": "n1",
-              "order": [
-                "n0",
-                "n1"
-              ],
-              "cfg": [
-                {
-                  "id": "n0",
-                  "kind": "Return",
-                  "defs": [],
-                  "uses": [
-                    "len",
-                    "self"
-                  ],
-                  "succ": []
-                },
-                {
-                  "id": "n1",
-                  "kind": "Expr",
-                  "defs": [],
-                  "uses": [
-                    "node",
-                    "self"
-                  ],
-                  "succ": [
-                    "n0"
-                  ]
-                }
-              ],
-              "def_use": {
-                "defs": {},
-                "uses": {
-                  "len": [
-                    "n0"
-                  ],
-                  "node": [
-                    "n1"
-                  ],
-                  "self": [
-                    "n0",
-                    "n1"
-                  ]
-                }
-              },
-              "variables": {
-                "len": {
-                  "def_nodes": [],
-                  "use_nodes": [
-                    "n0"
-                  ],
-                  "live_in_nodes": [
-                    "n0",
-                    "n1"
-                  ],
-                  "live_out_nodes": [
-                    "n1"
-                  ],
-                  "last_use_nodes": [
-                    "n0"
-                  ],
-                  "lifetime_class": "escape_or_unknown"
-                },
-                "node": {
-                  "def_nodes": [],
-                  "use_nodes": [
-                    "n1"
-                  ],
-                  "live_in_nodes": [
-                    "n1"
-                  ],
-                  "live_out_nodes": [],
-                  "last_use_nodes": [
-                    "n1"
-                  ],
-                  "lifetime_class": "escape_or_unknown"
-                },
-                "self": {
-                  "def_nodes": [],
-                  "use_nodes": [
-                    "n0",
-                    "n1"
-                  ],
-                  "live_in_nodes": [
-                    "n0",
-                    "n1"
-                  ],
-                  "live_out_nodes": [
-                    "n1"
-                  ],
-                  "last_use_nodes": [
-                    "n0"
-                  ],
-                  "lifetime_class": "escape_or_unknown"
-                }
-              },
-              "arg_order": [
-                "self",
-                "node"
-              ],
-              "arg_escape": [
-                true,
-                true
-              ],
-              "has_dynamic_name_access": false
-            }
-          }
+          "mutates_self": true
         },
         {
-          "kind": "FunctionDef",
+          "kind": "ClosureDef",
           "source_span": {
             "lineno": 140,
             "col_offset": 4,
@@ -15192,21 +14111,6 @@
                 "version": "1",
                 "target_type": "list[StmtNode]",
                 "rhs_kind": "List"
-              },
-              "meta": {
-                "lifetime_node_id": "n6",
-                "lifetime_defs": [
-                  "stmts"
-                ],
-                "lifetime_uses": [],
-                "lifetime_live_in": [
-                  "self"
-                ],
-                "lifetime_live_out": [
-                  "self",
-                  "stmts"
-                ],
-                "lifetime_last_use_vars": []
               }
             },
             {
@@ -15265,22 +14169,6 @@
                   "category": "static",
                   "mirror": "None"
                 }
-              },
-              "meta": {
-                "lifetime_node_id": "n5",
-                "lifetime_defs": [],
-                "lifetime_uses": [
-                  "self"
-                ],
-                "lifetime_live_in": [
-                  "self",
-                  "stmts"
-                ],
-                "lifetime_live_out": [
-                  "self",
-                  "stmts"
-                ],
-                "lifetime_last_use_vars": []
               }
             },
             {
@@ -15546,25 +14434,6 @@
                     "kind": "NamedType",
                     "category": "static",
                     "mirror": "StmtNode"
-                  },
-                  "meta": {
-                    "lifetime_node_id": "n4",
-                    "lifetime_defs": [
-                      "stmt"
-                    ],
-                    "lifetime_uses": [
-                      "self"
-                    ],
-                    "lifetime_live_in": [
-                      "self",
-                      "stmts"
-                    ],
-                    "lifetime_live_out": [
-                      "self",
-                      "stmt",
-                      "stmts"
-                    ],
-                    "lifetime_last_use_vars": []
                   }
                 },
                 {
@@ -15660,26 +14529,6 @@
                       "category": "static",
                       "mirror": "None"
                     }
-                  },
-                  "meta": {
-                    "lifetime_node_id": "n3",
-                    "lifetime_defs": [],
-                    "lifetime_uses": [
-                      "stmt",
-                      "stmts"
-                    ],
-                    "lifetime_live_in": [
-                      "self",
-                      "stmt",
-                      "stmts"
-                    ],
-                    "lifetime_live_out": [
-                      "self",
-                      "stmts"
-                    ],
-                    "lifetime_last_use_vars": [
-                      "stmt"
-                    ]
                   }
                 },
                 {
@@ -15738,42 +14587,10 @@
                       "category": "static",
                       "mirror": "None"
                     }
-                  },
-                  "meta": {
-                    "lifetime_node_id": "n2",
-                    "lifetime_defs": [],
-                    "lifetime_uses": [
-                      "self"
-                    ],
-                    "lifetime_live_in": [
-                      "self",
-                      "stmts"
-                    ],
-                    "lifetime_live_out": [
-                      "self",
-                      "stmts"
-                    ],
-                    "lifetime_last_use_vars": []
                   }
                 }
               ],
-              "orelse": [],
-              "meta": {
-                "lifetime_node_id": "n1",
-                "lifetime_defs": [],
-                "lifetime_uses": [
-                  "self"
-                ],
-                "lifetime_live_in": [
-                  "self",
-                  "stmts"
-                ],
-                "lifetime_live_out": [
-                  "self",
-                  "stmts"
-                ],
-                "lifetime_last_use_vars": []
-              }
+              "orelse": []
             },
             {
               "kind": "Return",
@@ -15796,237 +14613,20 @@
                 "borrow_kind": "readonly_ref",
                 "repr": "stmts",
                 "id": "stmts"
-              },
-              "meta": {
-                "lifetime_node_id": "n0",
-                "lifetime_defs": [],
-                "lifetime_uses": [
-                  "stmts"
-                ],
-                "lifetime_live_in": [
-                  "stmts"
-                ],
-                "lifetime_live_out": [],
-                "lifetime_last_use_vars": [
-                  "stmts"
-                ]
               }
             }
           ],
           "is_generator": 0,
           "yield_value_type": "unknown",
           "decorators": [],
+          "captures": [],
+          "capture_types": {},
+          "capture_modes": {},
           "returns": "list[StmtNode]",
-          "mutates_self": true,
-          "meta": {
-            "lifetime_analysis": {
-              "schema_version": "east3_lifetime_v1",
-              "status": "ok",
-              "reason": "",
-              "entry_node": "n6",
-              "order": [
-                "n0",
-                "n1",
-                "n2",
-                "n3",
-                "n4",
-                "n5",
-                "n6"
-              ],
-              "cfg": [
-                {
-                  "id": "n0",
-                  "kind": "Return",
-                  "defs": [],
-                  "uses": [
-                    "stmts"
-                  ],
-                  "succ": []
-                },
-                {
-                  "id": "n1",
-                  "kind": "While",
-                  "defs": [],
-                  "uses": [
-                    "self"
-                  ],
-                  "succ": [
-                    "n0",
-                    "n4"
-                  ]
-                },
-                {
-                  "id": "n2",
-                  "kind": "Expr",
-                  "defs": [],
-                  "uses": [
-                    "self"
-                  ],
-                  "succ": [
-                    "n1"
-                  ]
-                },
-                {
-                  "id": "n3",
-                  "kind": "Expr",
-                  "defs": [],
-                  "uses": [
-                    "stmt",
-                    "stmts"
-                  ],
-                  "succ": [
-                    "n2"
-                  ]
-                },
-                {
-                  "id": "n4",
-                  "kind": "AnnAssign",
-                  "defs": [
-                    "stmt"
-                  ],
-                  "uses": [
-                    "self"
-                  ],
-                  "succ": [
-                    "n3"
-                  ]
-                },
-                {
-                  "id": "n5",
-                  "kind": "Expr",
-                  "defs": [],
-                  "uses": [
-                    "self"
-                  ],
-                  "succ": [
-                    "n1"
-                  ]
-                },
-                {
-                  "id": "n6",
-                  "kind": "AnnAssign",
-                  "defs": [
-                    "stmts"
-                  ],
-                  "uses": [],
-                  "succ": [
-                    "n5"
-                  ]
-                }
-              ],
-              "def_use": {
-                "defs": {
-                  "stmt": [
-                    "n4"
-                  ],
-                  "stmts": [
-                    "n6"
-                  ]
-                },
-                "uses": {
-                  "self": [
-                    "n1",
-                    "n2",
-                    "n4",
-                    "n5"
-                  ],
-                  "stmt": [
-                    "n3"
-                  ],
-                  "stmts": [
-                    "n0",
-                    "n3"
-                  ]
-                }
-              },
-              "variables": {
-                "self": {
-                  "def_nodes": [],
-                  "use_nodes": [
-                    "n1",
-                    "n2",
-                    "n4",
-                    "n5"
-                  ],
-                  "live_in_nodes": [
-                    "n1",
-                    "n2",
-                    "n3",
-                    "n4",
-                    "n5",
-                    "n6"
-                  ],
-                  "live_out_nodes": [
-                    "n1",
-                    "n2",
-                    "n3",
-                    "n4",
-                    "n5",
-                    "n6"
-                  ],
-                  "last_use_nodes": [],
-                  "lifetime_class": "escape_or_unknown"
-                },
-                "stmt": {
-                  "def_nodes": [
-                    "n4"
-                  ],
-                  "use_nodes": [
-                    "n3"
-                  ],
-                  "live_in_nodes": [
-                    "n3"
-                  ],
-                  "live_out_nodes": [
-                    "n4"
-                  ],
-                  "last_use_nodes": [
-                    "n3"
-                  ],
-                  "lifetime_class": "local_non_escape_candidate"
-                },
-                "stmts": {
-                  "def_nodes": [
-                    "n6"
-                  ],
-                  "use_nodes": [
-                    "n0",
-                    "n3"
-                  ],
-                  "live_in_nodes": [
-                    "n0",
-                    "n1",
-                    "n2",
-                    "n3",
-                    "n4",
-                    "n5"
-                  ],
-                  "live_out_nodes": [
-                    "n1",
-                    "n2",
-                    "n3",
-                    "n4",
-                    "n5",
-                    "n6"
-                  ],
-                  "last_use_nodes": [
-                    "n0"
-                  ],
-                  "lifetime_class": "escape_or_unknown"
-                }
-              },
-              "arg_order": [
-                "self"
-              ],
-              "arg_escape": [
-                true
-              ],
-              "has_dynamic_name_access": false
-            }
-          }
+          "mutates_self": true
         },
         {
-          "kind": "FunctionDef",
+          "kind": "ClosureDef",
           "source_span": {
             "lineno": 149,
             "col_offset": 4,
@@ -16247,25 +14847,6 @@
                     "kind": "NamedType",
                     "category": "static",
                     "mirror": "str"
-                  },
-                  "meta": {
-                    "lifetime_node_id": "n11",
-                    "lifetime_defs": [
-                      "let_name"
-                    ],
-                    "lifetime_uses": [
-                      "self"
-                    ],
-                    "lifetime_live_in": [
-                      "StmtNode",
-                      "self"
-                    ],
-                    "lifetime_live_out": [
-                      "StmtNode",
-                      "let_name",
-                      "self"
-                    ],
-                    "lifetime_last_use_vars": []
                   }
                 },
                 {
@@ -16340,24 +14921,6 @@
                       "category": "static",
                       "mirror": "Token"
                     }
-                  },
-                  "meta": {
-                    "lifetime_node_id": "n10",
-                    "lifetime_defs": [],
-                    "lifetime_uses": [
-                      "self"
-                    ],
-                    "lifetime_live_in": [
-                      "StmtNode",
-                      "let_name",
-                      "self"
-                    ],
-                    "lifetime_live_out": [
-                      "StmtNode",
-                      "let_name",
-                      "self"
-                    ],
-                    "lifetime_last_use_vars": []
                   }
                 },
                 {
@@ -16451,28 +15014,6 @@
                     "kind": "NamedType",
                     "category": "static",
                     "mirror": "int64"
-                  },
-                  "meta": {
-                    "lifetime_node_id": "n9",
-                    "lifetime_defs": [
-                      "let_expr_index"
-                    ],
-                    "lifetime_uses": [
-                      "self"
-                    ],
-                    "lifetime_live_in": [
-                      "StmtNode",
-                      "let_name",
-                      "self"
-                    ],
-                    "lifetime_live_out": [
-                      "StmtNode",
-                      "let_expr_index",
-                      "let_name"
-                    ],
-                    "lifetime_last_use_vars": [
-                      "self"
-                    ]
                   }
                 },
                 {
@@ -16574,46 +15115,10 @@
                       "category": "static",
                       "mirror": "StmtNode"
                     }
-                  },
-                  "meta": {
-                    "lifetime_node_id": "n8",
-                    "lifetime_defs": [],
-                    "lifetime_uses": [
-                      "StmtNode",
-                      "let_expr_index",
-                      "let_name"
-                    ],
-                    "lifetime_live_in": [
-                      "StmtNode",
-                      "let_expr_index",
-                      "let_name"
-                    ],
-                    "lifetime_live_out": [],
-                    "lifetime_last_use_vars": [
-                      "StmtNode",
-                      "let_expr_index",
-                      "let_name"
-                    ]
                   }
                 }
               ],
-              "orelse": [],
-              "meta": {
-                "lifetime_node_id": "n7",
-                "lifetime_defs": [],
-                "lifetime_uses": [
-                  "self"
-                ],
-                "lifetime_live_in": [
-                  "StmtNode",
-                  "self"
-                ],
-                "lifetime_live_out": [
-                  "StmtNode",
-                  "self"
-                ],
-                "lifetime_last_use_vars": []
-              }
+              "orelse": []
             },
             {
               "kind": "If",
@@ -16780,26 +15285,6 @@
                     "kind": "NamedType",
                     "category": "static",
                     "mirror": "int64"
-                  },
-                  "meta": {
-                    "lifetime_node_id": "n6",
-                    "lifetime_defs": [
-                      "print_expr_index"
-                    ],
-                    "lifetime_uses": [
-                      "self"
-                    ],
-                    "lifetime_live_in": [
-                      "StmtNode",
-                      "self"
-                    ],
-                    "lifetime_live_out": [
-                      "StmtNode",
-                      "print_expr_index"
-                    ],
-                    "lifetime_last_use_vars": [
-                      "self"
-                    ]
                   }
                 },
                 {
@@ -16901,43 +15386,10 @@
                       "category": "static",
                       "mirror": "StmtNode"
                     }
-                  },
-                  "meta": {
-                    "lifetime_node_id": "n5",
-                    "lifetime_defs": [],
-                    "lifetime_uses": [
-                      "StmtNode",
-                      "print_expr_index"
-                    ],
-                    "lifetime_live_in": [
-                      "StmtNode",
-                      "print_expr_index"
-                    ],
-                    "lifetime_live_out": [],
-                    "lifetime_last_use_vars": [
-                      "StmtNode",
-                      "print_expr_index"
-                    ]
                   }
                 }
               ],
-              "orelse": [],
-              "meta": {
-                "lifetime_node_id": "n4",
-                "lifetime_defs": [],
-                "lifetime_uses": [
-                  "self"
-                ],
-                "lifetime_live_in": [
-                  "StmtNode",
-                  "self"
-                ],
-                "lifetime_live_out": [
-                  "StmtNode",
-                  "self"
-                ],
-                "lifetime_last_use_vars": []
-              }
+              "orelse": []
             },
             {
               "kind": "AnnAssign",
@@ -17060,25 +15512,6 @@
                 "kind": "NamedType",
                 "category": "static",
                 "mirror": "str"
-              },
-              "meta": {
-                "lifetime_node_id": "n3",
-                "lifetime_defs": [
-                  "assign_name"
-                ],
-                "lifetime_uses": [
-                  "self"
-                ],
-                "lifetime_live_in": [
-                  "StmtNode",
-                  "self"
-                ],
-                "lifetime_live_out": [
-                  "StmtNode",
-                  "assign_name",
-                  "self"
-                ],
-                "lifetime_last_use_vars": []
               }
             },
             {
@@ -17153,24 +15586,6 @@
                   "category": "static",
                   "mirror": "Token"
                 }
-              },
-              "meta": {
-                "lifetime_node_id": "n2",
-                "lifetime_defs": [],
-                "lifetime_uses": [
-                  "self"
-                ],
-                "lifetime_live_in": [
-                  "StmtNode",
-                  "assign_name",
-                  "self"
-                ],
-                "lifetime_live_out": [
-                  "StmtNode",
-                  "assign_name",
-                  "self"
-                ],
-                "lifetime_last_use_vars": []
               }
             },
             {
@@ -17264,28 +15679,6 @@
                 "kind": "NamedType",
                 "category": "static",
                 "mirror": "int64"
-              },
-              "meta": {
-                "lifetime_node_id": "n1",
-                "lifetime_defs": [
-                  "assign_expr_index"
-                ],
-                "lifetime_uses": [
-                  "self"
-                ],
-                "lifetime_live_in": [
-                  "StmtNode",
-                  "assign_name",
-                  "self"
-                ],
-                "lifetime_live_out": [
-                  "StmtNode",
-                  "assign_expr_index",
-                  "assign_name"
-                ],
-                "lifetime_last_use_vars": [
-                  "self"
-                ]
               }
             },
             {
@@ -17387,441 +15780,20 @@
                   "category": "static",
                   "mirror": "StmtNode"
                 }
-              },
-              "meta": {
-                "lifetime_node_id": "n0",
-                "lifetime_defs": [],
-                "lifetime_uses": [
-                  "StmtNode",
-                  "assign_expr_index",
-                  "assign_name"
-                ],
-                "lifetime_live_in": [
-                  "StmtNode",
-                  "assign_expr_index",
-                  "assign_name"
-                ],
-                "lifetime_live_out": [],
-                "lifetime_last_use_vars": [
-                  "StmtNode",
-                  "assign_expr_index",
-                  "assign_name"
-                ]
               }
             }
           ],
           "is_generator": 0,
           "yield_value_type": "unknown",
           "decorators": [],
+          "captures": [],
+          "capture_types": {},
+          "capture_modes": {},
           "returns": "StmtNode",
-          "mutates_self": true,
-          "meta": {
-            "lifetime_analysis": {
-              "schema_version": "east3_lifetime_v1",
-              "status": "ok",
-              "reason": "",
-              "entry_node": "n7",
-              "order": [
-                "n0",
-                "n1",
-                "n2",
-                "n3",
-                "n4",
-                "n5",
-                "n6",
-                "n7",
-                "n8",
-                "n9",
-                "n10",
-                "n11"
-              ],
-              "cfg": [
-                {
-                  "id": "n0",
-                  "kind": "Return",
-                  "defs": [],
-                  "uses": [
-                    "StmtNode",
-                    "assign_expr_index",
-                    "assign_name"
-                  ],
-                  "succ": []
-                },
-                {
-                  "id": "n1",
-                  "kind": "AnnAssign",
-                  "defs": [
-                    "assign_expr_index"
-                  ],
-                  "uses": [
-                    "self"
-                  ],
-                  "succ": [
-                    "n0"
-                  ]
-                },
-                {
-                  "id": "n2",
-                  "kind": "Expr",
-                  "defs": [],
-                  "uses": [
-                    "self"
-                  ],
-                  "succ": [
-                    "n1"
-                  ]
-                },
-                {
-                  "id": "n3",
-                  "kind": "AnnAssign",
-                  "defs": [
-                    "assign_name"
-                  ],
-                  "uses": [
-                    "self"
-                  ],
-                  "succ": [
-                    "n2"
-                  ]
-                },
-                {
-                  "id": "n4",
-                  "kind": "If",
-                  "defs": [],
-                  "uses": [
-                    "self"
-                  ],
-                  "succ": [
-                    "n3",
-                    "n6"
-                  ]
-                },
-                {
-                  "id": "n5",
-                  "kind": "Return",
-                  "defs": [],
-                  "uses": [
-                    "StmtNode",
-                    "print_expr_index"
-                  ],
-                  "succ": []
-                },
-                {
-                  "id": "n6",
-                  "kind": "AnnAssign",
-                  "defs": [
-                    "print_expr_index"
-                  ],
-                  "uses": [
-                    "self"
-                  ],
-                  "succ": [
-                    "n5"
-                  ]
-                },
-                {
-                  "id": "n7",
-                  "kind": "If",
-                  "defs": [],
-                  "uses": [
-                    "self"
-                  ],
-                  "succ": [
-                    "n11",
-                    "n4"
-                  ]
-                },
-                {
-                  "id": "n8",
-                  "kind": "Return",
-                  "defs": [],
-                  "uses": [
-                    "StmtNode",
-                    "let_expr_index",
-                    "let_name"
-                  ],
-                  "succ": []
-                },
-                {
-                  "id": "n9",
-                  "kind": "AnnAssign",
-                  "defs": [
-                    "let_expr_index"
-                  ],
-                  "uses": [
-                    "self"
-                  ],
-                  "succ": [
-                    "n8"
-                  ]
-                },
-                {
-                  "id": "n10",
-                  "kind": "Expr",
-                  "defs": [],
-                  "uses": [
-                    "self"
-                  ],
-                  "succ": [
-                    "n9"
-                  ]
-                },
-                {
-                  "id": "n11",
-                  "kind": "AnnAssign",
-                  "defs": [
-                    "let_name"
-                  ],
-                  "uses": [
-                    "self"
-                  ],
-                  "succ": [
-                    "n10"
-                  ]
-                }
-              ],
-              "def_use": {
-                "defs": {
-                  "assign_expr_index": [
-                    "n1"
-                  ],
-                  "assign_name": [
-                    "n3"
-                  ],
-                  "let_expr_index": [
-                    "n9"
-                  ],
-                  "let_name": [
-                    "n11"
-                  ],
-                  "print_expr_index": [
-                    "n6"
-                  ]
-                },
-                "uses": {
-                  "StmtNode": [
-                    "n0",
-                    "n5",
-                    "n8"
-                  ],
-                  "assign_expr_index": [
-                    "n0"
-                  ],
-                  "assign_name": [
-                    "n0"
-                  ],
-                  "let_expr_index": [
-                    "n8"
-                  ],
-                  "let_name": [
-                    "n8"
-                  ],
-                  "print_expr_index": [
-                    "n5"
-                  ],
-                  "self": [
-                    "n1",
-                    "n10",
-                    "n11",
-                    "n2",
-                    "n3",
-                    "n4",
-                    "n6",
-                    "n7",
-                    "n9"
-                  ]
-                }
-              },
-              "variables": {
-                "StmtNode": {
-                  "def_nodes": [],
-                  "use_nodes": [
-                    "n0",
-                    "n5",
-                    "n8"
-                  ],
-                  "live_in_nodes": [
-                    "n0",
-                    "n1",
-                    "n2",
-                    "n3",
-                    "n4",
-                    "n5",
-                    "n6",
-                    "n7",
-                    "n8",
-                    "n9",
-                    "n10",
-                    "n11"
-                  ],
-                  "live_out_nodes": [
-                    "n1",
-                    "n2",
-                    "n3",
-                    "n4",
-                    "n6",
-                    "n7",
-                    "n9",
-                    "n10",
-                    "n11"
-                  ],
-                  "last_use_nodes": [
-                    "n0",
-                    "n5",
-                    "n8"
-                  ],
-                  "lifetime_class": "escape_or_unknown"
-                },
-                "assign_expr_index": {
-                  "def_nodes": [
-                    "n1"
-                  ],
-                  "use_nodes": [
-                    "n0"
-                  ],
-                  "live_in_nodes": [
-                    "n0"
-                  ],
-                  "live_out_nodes": [
-                    "n1"
-                  ],
-                  "last_use_nodes": [
-                    "n0"
-                  ],
-                  "lifetime_class": "escape_or_unknown"
-                },
-                "assign_name": {
-                  "def_nodes": [
-                    "n3"
-                  ],
-                  "use_nodes": [
-                    "n0"
-                  ],
-                  "live_in_nodes": [
-                    "n0",
-                    "n1",
-                    "n2"
-                  ],
-                  "live_out_nodes": [
-                    "n1",
-                    "n2",
-                    "n3"
-                  ],
-                  "last_use_nodes": [
-                    "n0"
-                  ],
-                  "lifetime_class": "escape_or_unknown"
-                },
-                "let_expr_index": {
-                  "def_nodes": [
-                    "n9"
-                  ],
-                  "use_nodes": [
-                    "n8"
-                  ],
-                  "live_in_nodes": [
-                    "n8"
-                  ],
-                  "live_out_nodes": [
-                    "n9"
-                  ],
-                  "last_use_nodes": [
-                    "n8"
-                  ],
-                  "lifetime_class": "escape_or_unknown"
-                },
-                "let_name": {
-                  "def_nodes": [
-                    "n11"
-                  ],
-                  "use_nodes": [
-                    "n8"
-                  ],
-                  "live_in_nodes": [
-                    "n8",
-                    "n9",
-                    "n10"
-                  ],
-                  "live_out_nodes": [
-                    "n9",
-                    "n10",
-                    "n11"
-                  ],
-                  "last_use_nodes": [
-                    "n8"
-                  ],
-                  "lifetime_class": "escape_or_unknown"
-                },
-                "print_expr_index": {
-                  "def_nodes": [
-                    "n6"
-                  ],
-                  "use_nodes": [
-                    "n5"
-                  ],
-                  "live_in_nodes": [
-                    "n5"
-                  ],
-                  "live_out_nodes": [
-                    "n6"
-                  ],
-                  "last_use_nodes": [
-                    "n5"
-                  ],
-                  "lifetime_class": "escape_or_unknown"
-                },
-                "self": {
-                  "def_nodes": [],
-                  "use_nodes": [
-                    "n1",
-                    "n10",
-                    "n11",
-                    "n2",
-                    "n3",
-                    "n4",
-                    "n6",
-                    "n7",
-                    "n9"
-                  ],
-                  "live_in_nodes": [
-                    "n1",
-                    "n2",
-                    "n3",
-                    "n4",
-                    "n6",
-                    "n7",
-                    "n9",
-                    "n10",
-                    "n11"
-                  ],
-                  "live_out_nodes": [
-                    "n2",
-                    "n3",
-                    "n4",
-                    "n7",
-                    "n10",
-                    "n11"
-                  ],
-                  "last_use_nodes": [
-                    "n1",
-                    "n6",
-                    "n9"
-                  ],
-                  "lifetime_class": "escape_or_unknown"
-                }
-              },
-              "arg_order": [
-                "self"
-              ],
-              "arg_escape": [
-                true
-              ],
-              "has_dynamic_name_access": false
-            }
-          }
+          "mutates_self": true
         },
         {
-          "kind": "FunctionDef",
+          "kind": "ClosureDef",
           "source_span": {
             "lineno": 165,
             "col_offset": 4,
@@ -17903,84 +15875,20 @@
                   "category": "static",
                   "mirror": "int64"
                 }
-              },
-              "meta": {
-                "lifetime_node_id": "n0",
-                "lifetime_defs": [],
-                "lifetime_uses": [
-                  "self"
-                ],
-                "lifetime_live_in": [
-                  "self"
-                ],
-                "lifetime_live_out": [],
-                "lifetime_last_use_vars": [
-                  "self"
-                ]
               }
             }
           ],
           "is_generator": 0,
           "yield_value_type": "unknown",
           "decorators": [],
+          "captures": [],
+          "capture_types": {},
+          "capture_modes": {},
           "returns": "int64",
-          "mutates_self": true,
-          "meta": {
-            "lifetime_analysis": {
-              "schema_version": "east3_lifetime_v1",
-              "status": "ok",
-              "reason": "",
-              "entry_node": "n0",
-              "order": [
-                "n0"
-              ],
-              "cfg": [
-                {
-                  "id": "n0",
-                  "kind": "Return",
-                  "defs": [],
-                  "uses": [
-                    "self"
-                  ],
-                  "succ": []
-                }
-              ],
-              "def_use": {
-                "defs": {},
-                "uses": {
-                  "self": [
-                    "n0"
-                  ]
-                }
-              },
-              "variables": {
-                "self": {
-                  "def_nodes": [],
-                  "use_nodes": [
-                    "n0"
-                  ],
-                  "live_in_nodes": [
-                    "n0"
-                  ],
-                  "live_out_nodes": [],
-                  "last_use_nodes": [
-                    "n0"
-                  ],
-                  "lifetime_class": "escape_or_unknown"
-                }
-              },
-              "arg_order": [
-                "self"
-              ],
-              "arg_escape": [
-                true
-              ],
-              "has_dynamic_name_access": false
-            }
-          }
+          "mutates_self": true
         },
         {
-          "kind": "FunctionDef",
+          "kind": "ClosureDef",
           "source_span": {
             "lineno": 168,
             "col_offset": 4,
@@ -18097,29 +16005,6 @@
                 "kind": "NamedType",
                 "category": "static",
                 "mirror": "int64"
-              },
-              "meta": {
-                "lifetime_node_id": "n12",
-                "lifetime_defs": [
-                  "left"
-                ],
-                "lifetime_uses": [
-                  "self"
-                ],
-                "lifetime_live_in": [
-                  "ExprNode",
-                  "break",
-                  "continue",
-                  "self"
-                ],
-                "lifetime_live_out": [
-                  "ExprNode",
-                  "break",
-                  "continue",
-                  "left",
-                  "self"
-                ],
-                "lifetime_last_use_vars": []
               }
             },
             {
@@ -18149,27 +16034,7 @@
                   "kind": "VarDecl",
                   "name": "right",
                   "type": "int64",
-                  "hoisted": true,
-                  "meta": {
-                    "lifetime_node_id": "n11",
-                    "lifetime_defs": [],
-                    "lifetime_uses": [],
-                    "lifetime_live_in": [
-                      "ExprNode",
-                      "break",
-                      "continue",
-                      "left",
-                      "self"
-                    ],
-                    "lifetime_live_out": [
-                      "ExprNode",
-                      "break",
-                      "continue",
-                      "left",
-                      "self"
-                    ],
-                    "lifetime_last_use_vars": []
-                  }
+                  "hoisted": true
                 },
                 {
                   "kind": "If",
@@ -18337,32 +16202,7 @@
                         "category": "static",
                         "mirror": "int64"
                       },
-                      "is_reassign": true,
-                      "meta": {
-                        "lifetime_node_id": "n10",
-                        "lifetime_defs": [
-                          "right"
-                        ],
-                        "lifetime_uses": [
-                          "self"
-                        ],
-                        "lifetime_live_in": [
-                          "ExprNode",
-                          "break",
-                          "continue",
-                          "left",
-                          "self"
-                        ],
-                        "lifetime_live_out": [
-                          "ExprNode",
-                          "break",
-                          "continue",
-                          "left",
-                          "right",
-                          "self"
-                        ],
-                        "lifetime_last_use_vars": []
-                      }
+                      "is_reassign": true
                     },
                     {
                       "kind": "Assign",
@@ -18593,36 +16433,6 @@
                         "kind": "NamedType",
                         "category": "static",
                         "mirror": "int64"
-                      },
-                      "meta": {
-                        "lifetime_node_id": "n9",
-                        "lifetime_defs": [
-                          "left"
-                        ],
-                        "lifetime_uses": [
-                          "ExprNode",
-                          "left",
-                          "right",
-                          "self"
-                        ],
-                        "lifetime_live_in": [
-                          "ExprNode",
-                          "break",
-                          "continue",
-                          "left",
-                          "right",
-                          "self"
-                        ],
-                        "lifetime_live_out": [
-                          "ExprNode",
-                          "break",
-                          "continue",
-                          "left",
-                          "self"
-                        ],
-                        "lifetime_last_use_vars": [
-                          "right"
-                        ]
                       }
                     },
                     {
@@ -18646,54 +16456,10 @@
                         "borrow_kind": "value",
                         "repr": "continue",
                         "id": "continue"
-                      },
-                      "meta": {
-                        "lifetime_node_id": "n8",
-                        "lifetime_defs": [],
-                        "lifetime_uses": [
-                          "continue"
-                        ],
-                        "lifetime_live_in": [
-                          "ExprNode",
-                          "break",
-                          "continue",
-                          "left",
-                          "self"
-                        ],
-                        "lifetime_live_out": [
-                          "ExprNode",
-                          "break",
-                          "continue",
-                          "left",
-                          "self"
-                        ],
-                        "lifetime_last_use_vars": []
                       }
                     }
                   ],
-                  "orelse": [],
-                  "meta": {
-                    "lifetime_node_id": "n7",
-                    "lifetime_defs": [],
-                    "lifetime_uses": [
-                      "self"
-                    ],
-                    "lifetime_live_in": [
-                      "ExprNode",
-                      "break",
-                      "continue",
-                      "left",
-                      "self"
-                    ],
-                    "lifetime_live_out": [
-                      "ExprNode",
-                      "break",
-                      "continue",
-                      "left",
-                      "self"
-                    ],
-                    "lifetime_last_use_vars": []
-                  }
+                  "orelse": []
                 },
                 {
                   "kind": "If",
@@ -18848,31 +16614,6 @@
                         "kind": "NamedType",
                         "category": "static",
                         "mirror": "int64"
-                      },
-                      "meta": {
-                        "lifetime_node_id": "n6",
-                        "lifetime_defs": [
-                          "right"
-                        ],
-                        "lifetime_uses": [
-                          "self"
-                        ],
-                        "lifetime_live_in": [
-                          "ExprNode",
-                          "break",
-                          "continue",
-                          "left",
-                          "self"
-                        ],
-                        "lifetime_live_out": [
-                          "ExprNode",
-                          "break",
-                          "continue",
-                          "left",
-                          "right",
-                          "self"
-                        ],
-                        "lifetime_last_use_vars": []
                       }
                     },
                     {
@@ -19104,36 +16845,6 @@
                         "kind": "NamedType",
                         "category": "static",
                         "mirror": "int64"
-                      },
-                      "meta": {
-                        "lifetime_node_id": "n5",
-                        "lifetime_defs": [
-                          "left"
-                        ],
-                        "lifetime_uses": [
-                          "ExprNode",
-                          "left",
-                          "right",
-                          "self"
-                        ],
-                        "lifetime_live_in": [
-                          "ExprNode",
-                          "break",
-                          "continue",
-                          "left",
-                          "right",
-                          "self"
-                        ],
-                        "lifetime_live_out": [
-                          "ExprNode",
-                          "break",
-                          "continue",
-                          "left",
-                          "self"
-                        ],
-                        "lifetime_last_use_vars": [
-                          "right"
-                        ]
                       }
                     },
                     {
@@ -19157,54 +16868,10 @@
                         "borrow_kind": "value",
                         "repr": "continue",
                         "id": "continue"
-                      },
-                      "meta": {
-                        "lifetime_node_id": "n4",
-                        "lifetime_defs": [],
-                        "lifetime_uses": [
-                          "continue"
-                        ],
-                        "lifetime_live_in": [
-                          "ExprNode",
-                          "break",
-                          "continue",
-                          "left",
-                          "self"
-                        ],
-                        "lifetime_live_out": [
-                          "ExprNode",
-                          "break",
-                          "continue",
-                          "left",
-                          "self"
-                        ],
-                        "lifetime_last_use_vars": []
                       }
                     }
                   ],
-                  "orelse": [],
-                  "meta": {
-                    "lifetime_node_id": "n3",
-                    "lifetime_defs": [],
-                    "lifetime_uses": [
-                      "self"
-                    ],
-                    "lifetime_live_in": [
-                      "ExprNode",
-                      "break",
-                      "continue",
-                      "left",
-                      "self"
-                    ],
-                    "lifetime_live_out": [
-                      "ExprNode",
-                      "break",
-                      "continue",
-                      "left",
-                      "self"
-                    ],
-                    "lifetime_last_use_vars": []
-                  }
+                  "orelse": []
                 },
                 {
                   "kind": "Expr",
@@ -19227,52 +16894,10 @@
                     "borrow_kind": "value",
                     "repr": "break",
                     "id": "break"
-                  },
-                  "meta": {
-                    "lifetime_node_id": "n2",
-                    "lifetime_defs": [],
-                    "lifetime_uses": [
-                      "break"
-                    ],
-                    "lifetime_live_in": [
-                      "ExprNode",
-                      "break",
-                      "continue",
-                      "left",
-                      "self"
-                    ],
-                    "lifetime_live_out": [
-                      "ExprNode",
-                      "break",
-                      "continue",
-                      "left",
-                      "self"
-                    ],
-                    "lifetime_last_use_vars": []
                   }
                 }
               ],
-              "orelse": [],
-              "meta": {
-                "lifetime_node_id": "n1",
-                "lifetime_defs": [],
-                "lifetime_uses": [],
-                "lifetime_live_in": [
-                  "ExprNode",
-                  "break",
-                  "continue",
-                  "left",
-                  "self"
-                ],
-                "lifetime_live_out": [
-                  "ExprNode",
-                  "break",
-                  "continue",
-                  "left",
-                  "self"
-                ],
-                "lifetime_last_use_vars": []
-              }
+              "orelse": []
             },
             {
               "kind": "Return",
@@ -19295,484 +16920,20 @@
                 "borrow_kind": "readonly_ref",
                 "repr": "left",
                 "id": "left"
-              },
-              "meta": {
-                "lifetime_node_id": "n0",
-                "lifetime_defs": [],
-                "lifetime_uses": [
-                  "left"
-                ],
-                "lifetime_live_in": [
-                  "left"
-                ],
-                "lifetime_live_out": [],
-                "lifetime_last_use_vars": [
-                  "left"
-                ]
               }
             }
           ],
           "is_generator": 0,
           "yield_value_type": "unknown",
           "decorators": [],
+          "captures": [],
+          "capture_types": {},
+          "capture_modes": {},
           "returns": "int64",
-          "mutates_self": true,
-          "meta": {
-            "lifetime_analysis": {
-              "schema_version": "east3_lifetime_v1",
-              "status": "ok",
-              "reason": "",
-              "entry_node": "n12",
-              "order": [
-                "n0",
-                "n1",
-                "n2",
-                "n3",
-                "n4",
-                "n5",
-                "n6",
-                "n7",
-                "n8",
-                "n9",
-                "n10",
-                "n11",
-                "n12"
-              ],
-              "cfg": [
-                {
-                  "id": "n0",
-                  "kind": "Return",
-                  "defs": [],
-                  "uses": [
-                    "left"
-                  ],
-                  "succ": []
-                },
-                {
-                  "id": "n1",
-                  "kind": "While",
-                  "defs": [],
-                  "uses": [],
-                  "succ": [
-                    "n0",
-                    "n11"
-                  ]
-                },
-                {
-                  "id": "n2",
-                  "kind": "Expr",
-                  "defs": [],
-                  "uses": [
-                    "break"
-                  ],
-                  "succ": [
-                    "n1"
-                  ]
-                },
-                {
-                  "id": "n3",
-                  "kind": "If",
-                  "defs": [],
-                  "uses": [
-                    "self"
-                  ],
-                  "succ": [
-                    "n2",
-                    "n6"
-                  ]
-                },
-                {
-                  "id": "n4",
-                  "kind": "Expr",
-                  "defs": [],
-                  "uses": [
-                    "continue"
-                  ],
-                  "succ": [
-                    "n2"
-                  ]
-                },
-                {
-                  "id": "n5",
-                  "kind": "Assign",
-                  "defs": [
-                    "left"
-                  ],
-                  "uses": [
-                    "ExprNode",
-                    "left",
-                    "right",
-                    "self"
-                  ],
-                  "succ": [
-                    "n4"
-                  ]
-                },
-                {
-                  "id": "n6",
-                  "kind": "Assign",
-                  "defs": [
-                    "right"
-                  ],
-                  "uses": [
-                    "self"
-                  ],
-                  "succ": [
-                    "n5"
-                  ]
-                },
-                {
-                  "id": "n7",
-                  "kind": "If",
-                  "defs": [],
-                  "uses": [
-                    "self"
-                  ],
-                  "succ": [
-                    "n10",
-                    "n3"
-                  ]
-                },
-                {
-                  "id": "n8",
-                  "kind": "Expr",
-                  "defs": [],
-                  "uses": [
-                    "continue"
-                  ],
-                  "succ": [
-                    "n3"
-                  ]
-                },
-                {
-                  "id": "n9",
-                  "kind": "Assign",
-                  "defs": [
-                    "left"
-                  ],
-                  "uses": [
-                    "ExprNode",
-                    "left",
-                    "right",
-                    "self"
-                  ],
-                  "succ": [
-                    "n8"
-                  ]
-                },
-                {
-                  "id": "n10",
-                  "kind": "AnnAssign",
-                  "defs": [
-                    "right"
-                  ],
-                  "uses": [
-                    "self"
-                  ],
-                  "succ": [
-                    "n9"
-                  ]
-                },
-                {
-                  "id": "n11",
-                  "kind": "VarDecl",
-                  "defs": [],
-                  "uses": [],
-                  "succ": [
-                    "n7"
-                  ]
-                },
-                {
-                  "id": "n12",
-                  "kind": "AnnAssign",
-                  "defs": [
-                    "left"
-                  ],
-                  "uses": [
-                    "self"
-                  ],
-                  "succ": [
-                    "n1"
-                  ]
-                }
-              ],
-              "def_use": {
-                "defs": {
-                  "left": [
-                    "n12",
-                    "n5",
-                    "n9"
-                  ],
-                  "right": [
-                    "n10",
-                    "n6"
-                  ]
-                },
-                "uses": {
-                  "ExprNode": [
-                    "n5",
-                    "n9"
-                  ],
-                  "break": [
-                    "n2"
-                  ],
-                  "continue": [
-                    "n4",
-                    "n8"
-                  ],
-                  "left": [
-                    "n0",
-                    "n5",
-                    "n9"
-                  ],
-                  "right": [
-                    "n5",
-                    "n9"
-                  ],
-                  "self": [
-                    "n10",
-                    "n12",
-                    "n3",
-                    "n5",
-                    "n6",
-                    "n7",
-                    "n9"
-                  ]
-                }
-              },
-              "variables": {
-                "ExprNode": {
-                  "def_nodes": [],
-                  "use_nodes": [
-                    "n5",
-                    "n9"
-                  ],
-                  "live_in_nodes": [
-                    "n1",
-                    "n2",
-                    "n3",
-                    "n4",
-                    "n5",
-                    "n6",
-                    "n7",
-                    "n8",
-                    "n9",
-                    "n10",
-                    "n11",
-                    "n12"
-                  ],
-                  "live_out_nodes": [
-                    "n1",
-                    "n2",
-                    "n3",
-                    "n4",
-                    "n5",
-                    "n6",
-                    "n7",
-                    "n8",
-                    "n9",
-                    "n10",
-                    "n11",
-                    "n12"
-                  ],
-                  "last_use_nodes": [],
-                  "lifetime_class": "local_non_escape_candidate"
-                },
-                "break": {
-                  "def_nodes": [],
-                  "use_nodes": [
-                    "n2"
-                  ],
-                  "live_in_nodes": [
-                    "n1",
-                    "n2",
-                    "n3",
-                    "n4",
-                    "n5",
-                    "n6",
-                    "n7",
-                    "n8",
-                    "n9",
-                    "n10",
-                    "n11",
-                    "n12"
-                  ],
-                  "live_out_nodes": [
-                    "n1",
-                    "n2",
-                    "n3",
-                    "n4",
-                    "n5",
-                    "n6",
-                    "n7",
-                    "n8",
-                    "n9",
-                    "n10",
-                    "n11",
-                    "n12"
-                  ],
-                  "last_use_nodes": [],
-                  "lifetime_class": "local_non_escape_candidate"
-                },
-                "continue": {
-                  "def_nodes": [],
-                  "use_nodes": [
-                    "n4",
-                    "n8"
-                  ],
-                  "live_in_nodes": [
-                    "n1",
-                    "n2",
-                    "n3",
-                    "n4",
-                    "n5",
-                    "n6",
-                    "n7",
-                    "n8",
-                    "n9",
-                    "n10",
-                    "n11",
-                    "n12"
-                  ],
-                  "live_out_nodes": [
-                    "n1",
-                    "n2",
-                    "n3",
-                    "n4",
-                    "n5",
-                    "n6",
-                    "n7",
-                    "n8",
-                    "n9",
-                    "n10",
-                    "n11",
-                    "n12"
-                  ],
-                  "last_use_nodes": [],
-                  "lifetime_class": "local_non_escape_candidate"
-                },
-                "left": {
-                  "def_nodes": [
-                    "n12",
-                    "n5",
-                    "n9"
-                  ],
-                  "use_nodes": [
-                    "n0",
-                    "n5",
-                    "n9"
-                  ],
-                  "live_in_nodes": [
-                    "n0",
-                    "n1",
-                    "n2",
-                    "n3",
-                    "n4",
-                    "n5",
-                    "n6",
-                    "n7",
-                    "n8",
-                    "n9",
-                    "n10",
-                    "n11"
-                  ],
-                  "live_out_nodes": [
-                    "n1",
-                    "n2",
-                    "n3",
-                    "n4",
-                    "n5",
-                    "n6",
-                    "n7",
-                    "n8",
-                    "n9",
-                    "n10",
-                    "n11",
-                    "n12"
-                  ],
-                  "last_use_nodes": [
-                    "n0"
-                  ],
-                  "lifetime_class": "escape_or_unknown"
-                },
-                "right": {
-                  "def_nodes": [
-                    "n10",
-                    "n6"
-                  ],
-                  "use_nodes": [
-                    "n5",
-                    "n9"
-                  ],
-                  "live_in_nodes": [
-                    "n5",
-                    "n9"
-                  ],
-                  "live_out_nodes": [
-                    "n6",
-                    "n10"
-                  ],
-                  "last_use_nodes": [
-                    "n5",
-                    "n9"
-                  ],
-                  "lifetime_class": "local_non_escape_candidate"
-                },
-                "self": {
-                  "def_nodes": [],
-                  "use_nodes": [
-                    "n10",
-                    "n12",
-                    "n3",
-                    "n5",
-                    "n6",
-                    "n7",
-                    "n9"
-                  ],
-                  "live_in_nodes": [
-                    "n1",
-                    "n2",
-                    "n3",
-                    "n4",
-                    "n5",
-                    "n6",
-                    "n7",
-                    "n8",
-                    "n9",
-                    "n10",
-                    "n11",
-                    "n12"
-                  ],
-                  "live_out_nodes": [
-                    "n1",
-                    "n2",
-                    "n3",
-                    "n4",
-                    "n5",
-                    "n6",
-                    "n7",
-                    "n8",
-                    "n9",
-                    "n10",
-                    "n11",
-                    "n12"
-                  ],
-                  "last_use_nodes": [],
-                  "lifetime_class": "escape_or_unknown"
-                }
-              },
-              "arg_order": [
-                "self"
-              ],
-              "arg_escape": [
-                true
-              ],
-              "has_dynamic_name_access": false
-            }
-          }
+          "mutates_self": true
         },
         {
-          "kind": "FunctionDef",
+          "kind": "ClosureDef",
           "source_span": {
             "lineno": 182,
             "col_offset": 4,
@@ -19889,29 +17050,6 @@
                 "kind": "NamedType",
                 "category": "static",
                 "mirror": "int64"
-              },
-              "meta": {
-                "lifetime_node_id": "n12",
-                "lifetime_defs": [
-                  "left"
-                ],
-                "lifetime_uses": [
-                  "self"
-                ],
-                "lifetime_live_in": [
-                  "ExprNode",
-                  "break",
-                  "continue",
-                  "self"
-                ],
-                "lifetime_live_out": [
-                  "ExprNode",
-                  "break",
-                  "continue",
-                  "left",
-                  "self"
-                ],
-                "lifetime_last_use_vars": []
               }
             },
             {
@@ -19941,27 +17079,7 @@
                   "kind": "VarDecl",
                   "name": "right",
                   "type": "int64",
-                  "hoisted": true,
-                  "meta": {
-                    "lifetime_node_id": "n11",
-                    "lifetime_defs": [],
-                    "lifetime_uses": [],
-                    "lifetime_live_in": [
-                      "ExprNode",
-                      "break",
-                      "continue",
-                      "left",
-                      "self"
-                    ],
-                    "lifetime_live_out": [
-                      "ExprNode",
-                      "break",
-                      "continue",
-                      "left",
-                      "self"
-                    ],
-                    "lifetime_last_use_vars": []
-                  }
+                  "hoisted": true
                 },
                 {
                   "kind": "If",
@@ -20129,32 +17247,7 @@
                         "category": "static",
                         "mirror": "int64"
                       },
-                      "is_reassign": true,
-                      "meta": {
-                        "lifetime_node_id": "n10",
-                        "lifetime_defs": [
-                          "right"
-                        ],
-                        "lifetime_uses": [
-                          "self"
-                        ],
-                        "lifetime_live_in": [
-                          "ExprNode",
-                          "break",
-                          "continue",
-                          "left",
-                          "self"
-                        ],
-                        "lifetime_live_out": [
-                          "ExprNode",
-                          "break",
-                          "continue",
-                          "left",
-                          "right",
-                          "self"
-                        ],
-                        "lifetime_last_use_vars": []
-                      }
+                      "is_reassign": true
                     },
                     {
                       "kind": "Assign",
@@ -20385,36 +17478,6 @@
                         "kind": "NamedType",
                         "category": "static",
                         "mirror": "int64"
-                      },
-                      "meta": {
-                        "lifetime_node_id": "n9",
-                        "lifetime_defs": [
-                          "left"
-                        ],
-                        "lifetime_uses": [
-                          "ExprNode",
-                          "left",
-                          "right",
-                          "self"
-                        ],
-                        "lifetime_live_in": [
-                          "ExprNode",
-                          "break",
-                          "continue",
-                          "left",
-                          "right",
-                          "self"
-                        ],
-                        "lifetime_live_out": [
-                          "ExprNode",
-                          "break",
-                          "continue",
-                          "left",
-                          "self"
-                        ],
-                        "lifetime_last_use_vars": [
-                          "right"
-                        ]
                       }
                     },
                     {
@@ -20438,54 +17501,10 @@
                         "borrow_kind": "value",
                         "repr": "continue",
                         "id": "continue"
-                      },
-                      "meta": {
-                        "lifetime_node_id": "n8",
-                        "lifetime_defs": [],
-                        "lifetime_uses": [
-                          "continue"
-                        ],
-                        "lifetime_live_in": [
-                          "ExprNode",
-                          "break",
-                          "continue",
-                          "left",
-                          "self"
-                        ],
-                        "lifetime_live_out": [
-                          "ExprNode",
-                          "break",
-                          "continue",
-                          "left",
-                          "self"
-                        ],
-                        "lifetime_last_use_vars": []
                       }
                     }
                   ],
-                  "orelse": [],
-                  "meta": {
-                    "lifetime_node_id": "n7",
-                    "lifetime_defs": [],
-                    "lifetime_uses": [
-                      "self"
-                    ],
-                    "lifetime_live_in": [
-                      "ExprNode",
-                      "break",
-                      "continue",
-                      "left",
-                      "self"
-                    ],
-                    "lifetime_live_out": [
-                      "ExprNode",
-                      "break",
-                      "continue",
-                      "left",
-                      "self"
-                    ],
-                    "lifetime_last_use_vars": []
-                  }
+                  "orelse": []
                 },
                 {
                   "kind": "If",
@@ -20640,31 +17659,6 @@
                         "kind": "NamedType",
                         "category": "static",
                         "mirror": "int64"
-                      },
-                      "meta": {
-                        "lifetime_node_id": "n6",
-                        "lifetime_defs": [
-                          "right"
-                        ],
-                        "lifetime_uses": [
-                          "self"
-                        ],
-                        "lifetime_live_in": [
-                          "ExprNode",
-                          "break",
-                          "continue",
-                          "left",
-                          "self"
-                        ],
-                        "lifetime_live_out": [
-                          "ExprNode",
-                          "break",
-                          "continue",
-                          "left",
-                          "right",
-                          "self"
-                        ],
-                        "lifetime_last_use_vars": []
                       }
                     },
                     {
@@ -20896,36 +17890,6 @@
                         "kind": "NamedType",
                         "category": "static",
                         "mirror": "int64"
-                      },
-                      "meta": {
-                        "lifetime_node_id": "n5",
-                        "lifetime_defs": [
-                          "left"
-                        ],
-                        "lifetime_uses": [
-                          "ExprNode",
-                          "left",
-                          "right",
-                          "self"
-                        ],
-                        "lifetime_live_in": [
-                          "ExprNode",
-                          "break",
-                          "continue",
-                          "left",
-                          "right",
-                          "self"
-                        ],
-                        "lifetime_live_out": [
-                          "ExprNode",
-                          "break",
-                          "continue",
-                          "left",
-                          "self"
-                        ],
-                        "lifetime_last_use_vars": [
-                          "right"
-                        ]
                       }
                     },
                     {
@@ -20949,54 +17913,10 @@
                         "borrow_kind": "value",
                         "repr": "continue",
                         "id": "continue"
-                      },
-                      "meta": {
-                        "lifetime_node_id": "n4",
-                        "lifetime_defs": [],
-                        "lifetime_uses": [
-                          "continue"
-                        ],
-                        "lifetime_live_in": [
-                          "ExprNode",
-                          "break",
-                          "continue",
-                          "left",
-                          "self"
-                        ],
-                        "lifetime_live_out": [
-                          "ExprNode",
-                          "break",
-                          "continue",
-                          "left",
-                          "self"
-                        ],
-                        "lifetime_last_use_vars": []
                       }
                     }
                   ],
-                  "orelse": [],
-                  "meta": {
-                    "lifetime_node_id": "n3",
-                    "lifetime_defs": [],
-                    "lifetime_uses": [
-                      "self"
-                    ],
-                    "lifetime_live_in": [
-                      "ExprNode",
-                      "break",
-                      "continue",
-                      "left",
-                      "self"
-                    ],
-                    "lifetime_live_out": [
-                      "ExprNode",
-                      "break",
-                      "continue",
-                      "left",
-                      "self"
-                    ],
-                    "lifetime_last_use_vars": []
-                  }
+                  "orelse": []
                 },
                 {
                   "kind": "Expr",
@@ -21019,52 +17939,10 @@
                     "borrow_kind": "value",
                     "repr": "break",
                     "id": "break"
-                  },
-                  "meta": {
-                    "lifetime_node_id": "n2",
-                    "lifetime_defs": [],
-                    "lifetime_uses": [
-                      "break"
-                    ],
-                    "lifetime_live_in": [
-                      "ExprNode",
-                      "break",
-                      "continue",
-                      "left",
-                      "self"
-                    ],
-                    "lifetime_live_out": [
-                      "ExprNode",
-                      "break",
-                      "continue",
-                      "left",
-                      "self"
-                    ],
-                    "lifetime_last_use_vars": []
                   }
                 }
               ],
-              "orelse": [],
-              "meta": {
-                "lifetime_node_id": "n1",
-                "lifetime_defs": [],
-                "lifetime_uses": [],
-                "lifetime_live_in": [
-                  "ExprNode",
-                  "break",
-                  "continue",
-                  "left",
-                  "self"
-                ],
-                "lifetime_live_out": [
-                  "ExprNode",
-                  "break",
-                  "continue",
-                  "left",
-                  "self"
-                ],
-                "lifetime_last_use_vars": []
-              }
+              "orelse": []
             },
             {
               "kind": "Return",
@@ -21087,484 +17965,20 @@
                 "borrow_kind": "readonly_ref",
                 "repr": "left",
                 "id": "left"
-              },
-              "meta": {
-                "lifetime_node_id": "n0",
-                "lifetime_defs": [],
-                "lifetime_uses": [
-                  "left"
-                ],
-                "lifetime_live_in": [
-                  "left"
-                ],
-                "lifetime_live_out": [],
-                "lifetime_last_use_vars": [
-                  "left"
-                ]
               }
             }
           ],
           "is_generator": 0,
           "yield_value_type": "unknown",
           "decorators": [],
+          "captures": [],
+          "capture_types": {},
+          "capture_modes": {},
           "returns": "int64",
-          "mutates_self": true,
-          "meta": {
-            "lifetime_analysis": {
-              "schema_version": "east3_lifetime_v1",
-              "status": "ok",
-              "reason": "",
-              "entry_node": "n12",
-              "order": [
-                "n0",
-                "n1",
-                "n2",
-                "n3",
-                "n4",
-                "n5",
-                "n6",
-                "n7",
-                "n8",
-                "n9",
-                "n10",
-                "n11",
-                "n12"
-              ],
-              "cfg": [
-                {
-                  "id": "n0",
-                  "kind": "Return",
-                  "defs": [],
-                  "uses": [
-                    "left"
-                  ],
-                  "succ": []
-                },
-                {
-                  "id": "n1",
-                  "kind": "While",
-                  "defs": [],
-                  "uses": [],
-                  "succ": [
-                    "n0",
-                    "n11"
-                  ]
-                },
-                {
-                  "id": "n2",
-                  "kind": "Expr",
-                  "defs": [],
-                  "uses": [
-                    "break"
-                  ],
-                  "succ": [
-                    "n1"
-                  ]
-                },
-                {
-                  "id": "n3",
-                  "kind": "If",
-                  "defs": [],
-                  "uses": [
-                    "self"
-                  ],
-                  "succ": [
-                    "n2",
-                    "n6"
-                  ]
-                },
-                {
-                  "id": "n4",
-                  "kind": "Expr",
-                  "defs": [],
-                  "uses": [
-                    "continue"
-                  ],
-                  "succ": [
-                    "n2"
-                  ]
-                },
-                {
-                  "id": "n5",
-                  "kind": "Assign",
-                  "defs": [
-                    "left"
-                  ],
-                  "uses": [
-                    "ExprNode",
-                    "left",
-                    "right",
-                    "self"
-                  ],
-                  "succ": [
-                    "n4"
-                  ]
-                },
-                {
-                  "id": "n6",
-                  "kind": "Assign",
-                  "defs": [
-                    "right"
-                  ],
-                  "uses": [
-                    "self"
-                  ],
-                  "succ": [
-                    "n5"
-                  ]
-                },
-                {
-                  "id": "n7",
-                  "kind": "If",
-                  "defs": [],
-                  "uses": [
-                    "self"
-                  ],
-                  "succ": [
-                    "n10",
-                    "n3"
-                  ]
-                },
-                {
-                  "id": "n8",
-                  "kind": "Expr",
-                  "defs": [],
-                  "uses": [
-                    "continue"
-                  ],
-                  "succ": [
-                    "n3"
-                  ]
-                },
-                {
-                  "id": "n9",
-                  "kind": "Assign",
-                  "defs": [
-                    "left"
-                  ],
-                  "uses": [
-                    "ExprNode",
-                    "left",
-                    "right",
-                    "self"
-                  ],
-                  "succ": [
-                    "n8"
-                  ]
-                },
-                {
-                  "id": "n10",
-                  "kind": "AnnAssign",
-                  "defs": [
-                    "right"
-                  ],
-                  "uses": [
-                    "self"
-                  ],
-                  "succ": [
-                    "n9"
-                  ]
-                },
-                {
-                  "id": "n11",
-                  "kind": "VarDecl",
-                  "defs": [],
-                  "uses": [],
-                  "succ": [
-                    "n7"
-                  ]
-                },
-                {
-                  "id": "n12",
-                  "kind": "AnnAssign",
-                  "defs": [
-                    "left"
-                  ],
-                  "uses": [
-                    "self"
-                  ],
-                  "succ": [
-                    "n1"
-                  ]
-                }
-              ],
-              "def_use": {
-                "defs": {
-                  "left": [
-                    "n12",
-                    "n5",
-                    "n9"
-                  ],
-                  "right": [
-                    "n10",
-                    "n6"
-                  ]
-                },
-                "uses": {
-                  "ExprNode": [
-                    "n5",
-                    "n9"
-                  ],
-                  "break": [
-                    "n2"
-                  ],
-                  "continue": [
-                    "n4",
-                    "n8"
-                  ],
-                  "left": [
-                    "n0",
-                    "n5",
-                    "n9"
-                  ],
-                  "right": [
-                    "n5",
-                    "n9"
-                  ],
-                  "self": [
-                    "n10",
-                    "n12",
-                    "n3",
-                    "n5",
-                    "n6",
-                    "n7",
-                    "n9"
-                  ]
-                }
-              },
-              "variables": {
-                "ExprNode": {
-                  "def_nodes": [],
-                  "use_nodes": [
-                    "n5",
-                    "n9"
-                  ],
-                  "live_in_nodes": [
-                    "n1",
-                    "n2",
-                    "n3",
-                    "n4",
-                    "n5",
-                    "n6",
-                    "n7",
-                    "n8",
-                    "n9",
-                    "n10",
-                    "n11",
-                    "n12"
-                  ],
-                  "live_out_nodes": [
-                    "n1",
-                    "n2",
-                    "n3",
-                    "n4",
-                    "n5",
-                    "n6",
-                    "n7",
-                    "n8",
-                    "n9",
-                    "n10",
-                    "n11",
-                    "n12"
-                  ],
-                  "last_use_nodes": [],
-                  "lifetime_class": "local_non_escape_candidate"
-                },
-                "break": {
-                  "def_nodes": [],
-                  "use_nodes": [
-                    "n2"
-                  ],
-                  "live_in_nodes": [
-                    "n1",
-                    "n2",
-                    "n3",
-                    "n4",
-                    "n5",
-                    "n6",
-                    "n7",
-                    "n8",
-                    "n9",
-                    "n10",
-                    "n11",
-                    "n12"
-                  ],
-                  "live_out_nodes": [
-                    "n1",
-                    "n2",
-                    "n3",
-                    "n4",
-                    "n5",
-                    "n6",
-                    "n7",
-                    "n8",
-                    "n9",
-                    "n10",
-                    "n11",
-                    "n12"
-                  ],
-                  "last_use_nodes": [],
-                  "lifetime_class": "local_non_escape_candidate"
-                },
-                "continue": {
-                  "def_nodes": [],
-                  "use_nodes": [
-                    "n4",
-                    "n8"
-                  ],
-                  "live_in_nodes": [
-                    "n1",
-                    "n2",
-                    "n3",
-                    "n4",
-                    "n5",
-                    "n6",
-                    "n7",
-                    "n8",
-                    "n9",
-                    "n10",
-                    "n11",
-                    "n12"
-                  ],
-                  "live_out_nodes": [
-                    "n1",
-                    "n2",
-                    "n3",
-                    "n4",
-                    "n5",
-                    "n6",
-                    "n7",
-                    "n8",
-                    "n9",
-                    "n10",
-                    "n11",
-                    "n12"
-                  ],
-                  "last_use_nodes": [],
-                  "lifetime_class": "local_non_escape_candidate"
-                },
-                "left": {
-                  "def_nodes": [
-                    "n12",
-                    "n5",
-                    "n9"
-                  ],
-                  "use_nodes": [
-                    "n0",
-                    "n5",
-                    "n9"
-                  ],
-                  "live_in_nodes": [
-                    "n0",
-                    "n1",
-                    "n2",
-                    "n3",
-                    "n4",
-                    "n5",
-                    "n6",
-                    "n7",
-                    "n8",
-                    "n9",
-                    "n10",
-                    "n11"
-                  ],
-                  "live_out_nodes": [
-                    "n1",
-                    "n2",
-                    "n3",
-                    "n4",
-                    "n5",
-                    "n6",
-                    "n7",
-                    "n8",
-                    "n9",
-                    "n10",
-                    "n11",
-                    "n12"
-                  ],
-                  "last_use_nodes": [
-                    "n0"
-                  ],
-                  "lifetime_class": "escape_or_unknown"
-                },
-                "right": {
-                  "def_nodes": [
-                    "n10",
-                    "n6"
-                  ],
-                  "use_nodes": [
-                    "n5",
-                    "n9"
-                  ],
-                  "live_in_nodes": [
-                    "n5",
-                    "n9"
-                  ],
-                  "live_out_nodes": [
-                    "n6",
-                    "n10"
-                  ],
-                  "last_use_nodes": [
-                    "n5",
-                    "n9"
-                  ],
-                  "lifetime_class": "local_non_escape_candidate"
-                },
-                "self": {
-                  "def_nodes": [],
-                  "use_nodes": [
-                    "n10",
-                    "n12",
-                    "n3",
-                    "n5",
-                    "n6",
-                    "n7",
-                    "n9"
-                  ],
-                  "live_in_nodes": [
-                    "n1",
-                    "n2",
-                    "n3",
-                    "n4",
-                    "n5",
-                    "n6",
-                    "n7",
-                    "n8",
-                    "n9",
-                    "n10",
-                    "n11",
-                    "n12"
-                  ],
-                  "live_out_nodes": [
-                    "n1",
-                    "n2",
-                    "n3",
-                    "n4",
-                    "n5",
-                    "n6",
-                    "n7",
-                    "n8",
-                    "n9",
-                    "n10",
-                    "n11",
-                    "n12"
-                  ],
-                  "last_use_nodes": [],
-                  "lifetime_class": "escape_or_unknown"
-                }
-              },
-              "arg_order": [
-                "self"
-              ],
-              "arg_escape": [
-                true
-              ],
-              "has_dynamic_name_access": false
-            }
-          }
+          "mutates_self": true
         },
         {
-          "kind": "FunctionDef",
+          "kind": "ClosureDef",
           "source_span": {
             "lineno": 196,
             "col_offset": 4,
@@ -21755,25 +18169,6 @@
                     "kind": "NamedType",
                     "category": "static",
                     "mirror": "int64"
-                  },
-                  "meta": {
-                    "lifetime_node_id": "n3",
-                    "lifetime_defs": [
-                      "child"
-                    ],
-                    "lifetime_uses": [
-                      "self"
-                    ],
-                    "lifetime_live_in": [
-                      "ExprNode",
-                      "self"
-                    ],
-                    "lifetime_live_out": [
-                      "ExprNode",
-                      "child",
-                      "self"
-                    ],
-                    "lifetime_last_use_vars": []
                   }
                 },
                 {
@@ -21996,46 +18391,10 @@
                       "category": "static",
                       "mirror": "int64"
                     }
-                  },
-                  "meta": {
-                    "lifetime_node_id": "n2",
-                    "lifetime_defs": [],
-                    "lifetime_uses": [
-                      "ExprNode",
-                      "child",
-                      "self"
-                    ],
-                    "lifetime_live_in": [
-                      "ExprNode",
-                      "child",
-                      "self"
-                    ],
-                    "lifetime_live_out": [],
-                    "lifetime_last_use_vars": [
-                      "ExprNode",
-                      "child",
-                      "self"
-                    ]
                   }
                 }
               ],
-              "orelse": [],
-              "meta": {
-                "lifetime_node_id": "n1",
-                "lifetime_defs": [],
-                "lifetime_uses": [
-                  "self"
-                ],
-                "lifetime_live_in": [
-                  "ExprNode",
-                  "self"
-                ],
-                "lifetime_live_out": [
-                  "ExprNode",
-                  "self"
-                ],
-                "lifetime_last_use_vars": []
-              }
+              "orelse": []
             },
             {
               "kind": "Return",
@@ -22093,183 +18452,20 @@
                   "category": "static",
                   "mirror": "int64"
                 }
-              },
-              "meta": {
-                "lifetime_node_id": "n0",
-                "lifetime_defs": [],
-                "lifetime_uses": [
-                  "self"
-                ],
-                "lifetime_live_in": [
-                  "self"
-                ],
-                "lifetime_live_out": [],
-                "lifetime_last_use_vars": [
-                  "self"
-                ]
               }
             }
           ],
           "is_generator": 0,
           "yield_value_type": "unknown",
           "decorators": [],
+          "captures": [],
+          "capture_types": {},
+          "capture_modes": {},
           "returns": "int64",
-          "mutates_self": true,
-          "meta": {
-            "lifetime_analysis": {
-              "schema_version": "east3_lifetime_v1",
-              "status": "ok",
-              "reason": "",
-              "entry_node": "n1",
-              "order": [
-                "n0",
-                "n1",
-                "n2",
-                "n3"
-              ],
-              "cfg": [
-                {
-                  "id": "n0",
-                  "kind": "Return",
-                  "defs": [],
-                  "uses": [
-                    "self"
-                  ],
-                  "succ": []
-                },
-                {
-                  "id": "n1",
-                  "kind": "If",
-                  "defs": [],
-                  "uses": [
-                    "self"
-                  ],
-                  "succ": [
-                    "n0",
-                    "n3"
-                  ]
-                },
-                {
-                  "id": "n2",
-                  "kind": "Return",
-                  "defs": [],
-                  "uses": [
-                    "ExprNode",
-                    "child",
-                    "self"
-                  ],
-                  "succ": []
-                },
-                {
-                  "id": "n3",
-                  "kind": "AnnAssign",
-                  "defs": [
-                    "child"
-                  ],
-                  "uses": [
-                    "self"
-                  ],
-                  "succ": [
-                    "n2"
-                  ]
-                }
-              ],
-              "def_use": {
-                "defs": {
-                  "child": [
-                    "n3"
-                  ]
-                },
-                "uses": {
-                  "ExprNode": [
-                    "n2"
-                  ],
-                  "child": [
-                    "n2"
-                  ],
-                  "self": [
-                    "n0",
-                    "n1",
-                    "n2",
-                    "n3"
-                  ]
-                }
-              },
-              "variables": {
-                "ExprNode": {
-                  "def_nodes": [],
-                  "use_nodes": [
-                    "n2"
-                  ],
-                  "live_in_nodes": [
-                    "n1",
-                    "n2",
-                    "n3"
-                  ],
-                  "live_out_nodes": [
-                    "n1",
-                    "n3"
-                  ],
-                  "last_use_nodes": [
-                    "n2"
-                  ],
-                  "lifetime_class": "escape_or_unknown"
-                },
-                "child": {
-                  "def_nodes": [
-                    "n3"
-                  ],
-                  "use_nodes": [
-                    "n2"
-                  ],
-                  "live_in_nodes": [
-                    "n2"
-                  ],
-                  "live_out_nodes": [
-                    "n3"
-                  ],
-                  "last_use_nodes": [
-                    "n2"
-                  ],
-                  "lifetime_class": "escape_or_unknown"
-                },
-                "self": {
-                  "def_nodes": [],
-                  "use_nodes": [
-                    "n0",
-                    "n1",
-                    "n2",
-                    "n3"
-                  ],
-                  "live_in_nodes": [
-                    "n0",
-                    "n1",
-                    "n2",
-                    "n3"
-                  ],
-                  "live_out_nodes": [
-                    "n1",
-                    "n3"
-                  ],
-                  "last_use_nodes": [
-                    "n0",
-                    "n2"
-                  ],
-                  "lifetime_class": "escape_or_unknown"
-                }
-              },
-              "arg_order": [
-                "self"
-              ],
-              "arg_escape": [
-                true
-              ],
-              "has_dynamic_name_access": false
-            }
-          }
+          "mutates_self": true
         },
         {
-          "kind": "FunctionDef",
+          "kind": "ClosureDef",
           "source_span": {
             "lineno": 202,
             "col_offset": 4,
@@ -22460,25 +18656,6 @@
                     "kind": "NamedType",
                     "category": "static",
                     "mirror": "Token"
-                  },
-                  "meta": {
-                    "lifetime_node_id": "n11",
-                    "lifetime_defs": [
-                      "token_num"
-                    ],
-                    "lifetime_uses": [
-                      "self"
-                    ],
-                    "lifetime_live_in": [
-                      "ExprNode",
-                      "self"
-                    ],
-                    "lifetime_live_out": [
-                      "ExprNode",
-                      "self",
-                      "token_num"
-                    ],
-                    "lifetime_last_use_vars": []
                   }
                 },
                 {
@@ -22729,50 +18906,10 @@
                       "category": "static",
                       "mirror": "int64"
                     }
-                  },
-                  "meta": {
-                    "lifetime_node_id": "n10",
-                    "lifetime_defs": [],
-                    "lifetime_uses": [
-                      "ExprNode",
-                      "self",
-                      "token_num"
-                    ],
-                    "lifetime_live_in": [
-                      "ExprNode",
-                      "self",
-                      "token_num"
-                    ],
-                    "lifetime_live_out": [],
-                    "lifetime_last_use_vars": [
-                      "ExprNode",
-                      "self",
-                      "token_num"
-                    ]
                   }
                 }
               ],
-              "orelse": [],
-              "meta": {
-                "lifetime_node_id": "n9",
-                "lifetime_defs": [],
-                "lifetime_uses": [
-                  "self"
-                ],
-                "lifetime_live_in": [
-                  "ExprNode",
-                  "RuntimeError",
-                  "self",
-                  "str"
-                ],
-                "lifetime_live_out": [
-                  "ExprNode",
-                  "RuntimeError",
-                  "self",
-                  "str"
-                ],
-                "lifetime_last_use_vars": []
-              }
+              "orelse": []
             },
             {
               "kind": "If",
@@ -22939,25 +19076,6 @@
                     "kind": "NamedType",
                     "category": "static",
                     "mirror": "Token"
-                  },
-                  "meta": {
-                    "lifetime_node_id": "n8",
-                    "lifetime_defs": [
-                      "token_ident"
-                    ],
-                    "lifetime_uses": [
-                      "self"
-                    ],
-                    "lifetime_live_in": [
-                      "ExprNode",
-                      "self"
-                    ],
-                    "lifetime_live_out": [
-                      "ExprNode",
-                      "self",
-                      "token_ident"
-                    ],
-                    "lifetime_last_use_vars": []
                   }
                 },
                 {
@@ -23208,50 +19326,10 @@
                       "category": "static",
                       "mirror": "int64"
                     }
-                  },
-                  "meta": {
-                    "lifetime_node_id": "n7",
-                    "lifetime_defs": [],
-                    "lifetime_uses": [
-                      "ExprNode",
-                      "self",
-                      "token_ident"
-                    ],
-                    "lifetime_live_in": [
-                      "ExprNode",
-                      "self",
-                      "token_ident"
-                    ],
-                    "lifetime_live_out": [],
-                    "lifetime_last_use_vars": [
-                      "ExprNode",
-                      "self",
-                      "token_ident"
-                    ]
                   }
                 }
               ],
-              "orelse": [],
-              "meta": {
-                "lifetime_node_id": "n6",
-                "lifetime_defs": [],
-                "lifetime_uses": [
-                  "self"
-                ],
-                "lifetime_live_in": [
-                  "ExprNode",
-                  "RuntimeError",
-                  "self",
-                  "str"
-                ],
-                "lifetime_live_out": [
-                  "ExprNode",
-                  "RuntimeError",
-                  "self",
-                  "str"
-                ],
-                "lifetime_last_use_vars": []
-              }
+              "orelse": []
             },
             {
               "kind": "If",
@@ -23418,23 +19496,6 @@
                     "kind": "NamedType",
                     "category": "static",
                     "mirror": "int64"
-                  },
-                  "meta": {
-                    "lifetime_node_id": "n5",
-                    "lifetime_defs": [
-                      "expr_index"
-                    ],
-                    "lifetime_uses": [
-                      "self"
-                    ],
-                    "lifetime_live_in": [
-                      "self"
-                    ],
-                    "lifetime_live_out": [
-                      "expr_index",
-                      "self"
-                    ],
-                    "lifetime_last_use_vars": []
                   }
                 },
                 {
@@ -23509,23 +19570,6 @@
                       "category": "static",
                       "mirror": "Token"
                     }
-                  },
-                  "meta": {
-                    "lifetime_node_id": "n4",
-                    "lifetime_defs": [],
-                    "lifetime_uses": [
-                      "self"
-                    ],
-                    "lifetime_live_in": [
-                      "expr_index",
-                      "self"
-                    ],
-                    "lifetime_live_out": [
-                      "expr_index"
-                    ],
-                    "lifetime_last_use_vars": [
-                      "self"
-                    ]
                   }
                 },
                 {
@@ -23549,42 +19593,10 @@
                     "borrow_kind": "readonly_ref",
                     "repr": "expr_index",
                     "id": "expr_index"
-                  },
-                  "meta": {
-                    "lifetime_node_id": "n3",
-                    "lifetime_defs": [],
-                    "lifetime_uses": [
-                      "expr_index"
-                    ],
-                    "lifetime_live_in": [
-                      "expr_index"
-                    ],
-                    "lifetime_live_out": [],
-                    "lifetime_last_use_vars": [
-                      "expr_index"
-                    ]
                   }
                 }
               ],
-              "orelse": [],
-              "meta": {
-                "lifetime_node_id": "n2",
-                "lifetime_defs": [],
-                "lifetime_uses": [
-                  "self"
-                ],
-                "lifetime_live_in": [
-                  "RuntimeError",
-                  "self",
-                  "str"
-                ],
-                "lifetime_live_out": [
-                  "RuntimeError",
-                  "self",
-                  "str"
-                ],
-                "lifetime_last_use_vars": []
-              }
+              "orelse": []
             },
             {
               "kind": "Assign",
@@ -23665,28 +19677,6 @@
                 "kind": "NamedType",
                 "category": "static",
                 "mirror": "Token"
-              },
-              "meta": {
-                "lifetime_node_id": "n1",
-                "lifetime_defs": [
-                  "t"
-                ],
-                "lifetime_uses": [
-                  "self"
-                ],
-                "lifetime_live_in": [
-                  "RuntimeError",
-                  "self",
-                  "str"
-                ],
-                "lifetime_live_out": [
-                  "RuntimeError",
-                  "str",
-                  "t"
-                ],
-                "lifetime_last_use_vars": [
-                  "self"
-                ]
               }
             },
             {
@@ -23721,7 +19711,8 @@
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "RuntimeError",
-                  "id": "RuntimeError"
+                  "id": "RuntimeError",
+                  "runtime_module_id": "pytra.built_in.error"
                 },
                 "args": [
                   {
@@ -24123,6 +20114,7 @@
                       },
                       "attr": "kind"
                     },
+                    "call_arg_type": "str",
                     "normalized_expr_version": "east3_expr_v1",
                     "normalized_expr": {
                       "kind": "BinOp",
@@ -24292,18 +20284,13 @@
                           "id": "t"
                         },
                         "attr": "kind"
-                      }
+                      },
+                      "call_arg_type": "str"
                     }
                   }
                 ],
                 "keywords": [],
-                "lowered_kind": "BuiltinCall",
-                "builtin_name": "RuntimeError",
-                "runtime_call": "std::runtime_error",
-                "runtime_module_id": "pytra.core.py_runtime",
-                "runtime_symbol": "RuntimeError",
-                "runtime_call_adapter_kind": "builtin",
-                "semantic_tag": "error.raise_ctor",
+                "runtime_module_id": "pytra.built_in.error",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -24311,451 +20298,21 @@
                   "mirror": "RuntimeError"
                 }
               },
-              "cause": null,
-              "meta": {
-                "lifetime_node_id": "n0",
-                "lifetime_defs": [],
-                "lifetime_uses": [
-                  "RuntimeError",
-                  "str",
-                  "t"
-                ],
-                "lifetime_live_in": [
-                  "RuntimeError",
-                  "str",
-                  "t"
-                ],
-                "lifetime_live_out": [],
-                "lifetime_last_use_vars": [
-                  "RuntimeError",
-                  "str",
-                  "t"
-                ]
-              }
+              "cause": null
             }
           ],
           "is_generator": 0,
           "yield_value_type": "unknown",
           "decorators": [],
+          "captures": [],
+          "capture_types": {},
+          "capture_modes": {},
           "returns": "int64",
-          "mutates_self": true,
-          "meta": {
-            "lifetime_analysis": {
-              "schema_version": "east3_lifetime_v1",
-              "status": "ok",
-              "reason": "",
-              "entry_node": "n9",
-              "order": [
-                "n0",
-                "n1",
-                "n2",
-                "n3",
-                "n4",
-                "n5",
-                "n6",
-                "n7",
-                "n8",
-                "n9",
-                "n10",
-                "n11"
-              ],
-              "cfg": [
-                {
-                  "id": "n0",
-                  "kind": "Raise",
-                  "defs": [],
-                  "uses": [
-                    "RuntimeError",
-                    "str",
-                    "t"
-                  ],
-                  "succ": []
-                },
-                {
-                  "id": "n1",
-                  "kind": "Assign",
-                  "defs": [
-                    "t"
-                  ],
-                  "uses": [
-                    "self"
-                  ],
-                  "succ": [
-                    "n0"
-                  ]
-                },
-                {
-                  "id": "n2",
-                  "kind": "If",
-                  "defs": [],
-                  "uses": [
-                    "self"
-                  ],
-                  "succ": [
-                    "n1",
-                    "n5"
-                  ]
-                },
-                {
-                  "id": "n3",
-                  "kind": "Return",
-                  "defs": [],
-                  "uses": [
-                    "expr_index"
-                  ],
-                  "succ": []
-                },
-                {
-                  "id": "n4",
-                  "kind": "Expr",
-                  "defs": [],
-                  "uses": [
-                    "self"
-                  ],
-                  "succ": [
-                    "n3"
-                  ]
-                },
-                {
-                  "id": "n5",
-                  "kind": "AnnAssign",
-                  "defs": [
-                    "expr_index"
-                  ],
-                  "uses": [
-                    "self"
-                  ],
-                  "succ": [
-                    "n4"
-                  ]
-                },
-                {
-                  "id": "n6",
-                  "kind": "If",
-                  "defs": [],
-                  "uses": [
-                    "self"
-                  ],
-                  "succ": [
-                    "n2",
-                    "n8"
-                  ]
-                },
-                {
-                  "id": "n7",
-                  "kind": "Return",
-                  "defs": [],
-                  "uses": [
-                    "ExprNode",
-                    "self",
-                    "token_ident"
-                  ],
-                  "succ": []
-                },
-                {
-                  "id": "n8",
-                  "kind": "AnnAssign",
-                  "defs": [
-                    "token_ident"
-                  ],
-                  "uses": [
-                    "self"
-                  ],
-                  "succ": [
-                    "n7"
-                  ]
-                },
-                {
-                  "id": "n9",
-                  "kind": "If",
-                  "defs": [],
-                  "uses": [
-                    "self"
-                  ],
-                  "succ": [
-                    "n11",
-                    "n6"
-                  ]
-                },
-                {
-                  "id": "n10",
-                  "kind": "Return",
-                  "defs": [],
-                  "uses": [
-                    "ExprNode",
-                    "self",
-                    "token_num"
-                  ],
-                  "succ": []
-                },
-                {
-                  "id": "n11",
-                  "kind": "AnnAssign",
-                  "defs": [
-                    "token_num"
-                  ],
-                  "uses": [
-                    "self"
-                  ],
-                  "succ": [
-                    "n10"
-                  ]
-                }
-              ],
-              "def_use": {
-                "defs": {
-                  "expr_index": [
-                    "n5"
-                  ],
-                  "t": [
-                    "n1"
-                  ],
-                  "token_ident": [
-                    "n8"
-                  ],
-                  "token_num": [
-                    "n11"
-                  ]
-                },
-                "uses": {
-                  "ExprNode": [
-                    "n10",
-                    "n7"
-                  ],
-                  "RuntimeError": [
-                    "n0"
-                  ],
-                  "expr_index": [
-                    "n3"
-                  ],
-                  "self": [
-                    "n1",
-                    "n10",
-                    "n11",
-                    "n2",
-                    "n4",
-                    "n5",
-                    "n6",
-                    "n7",
-                    "n8",
-                    "n9"
-                  ],
-                  "str": [
-                    "n0"
-                  ],
-                  "t": [
-                    "n0"
-                  ],
-                  "token_ident": [
-                    "n7"
-                  ],
-                  "token_num": [
-                    "n10"
-                  ]
-                }
-              },
-              "variables": {
-                "ExprNode": {
-                  "def_nodes": [],
-                  "use_nodes": [
-                    "n10",
-                    "n7"
-                  ],
-                  "live_in_nodes": [
-                    "n6",
-                    "n7",
-                    "n8",
-                    "n9",
-                    "n10",
-                    "n11"
-                  ],
-                  "live_out_nodes": [
-                    "n6",
-                    "n8",
-                    "n9",
-                    "n11"
-                  ],
-                  "last_use_nodes": [
-                    "n10",
-                    "n7"
-                  ],
-                  "lifetime_class": "escape_or_unknown"
-                },
-                "RuntimeError": {
-                  "def_nodes": [],
-                  "use_nodes": [
-                    "n0"
-                  ],
-                  "live_in_nodes": [
-                    "n0",
-                    "n1",
-                    "n2",
-                    "n6",
-                    "n9"
-                  ],
-                  "live_out_nodes": [
-                    "n1",
-                    "n2",
-                    "n6",
-                    "n9"
-                  ],
-                  "last_use_nodes": [
-                    "n0"
-                  ],
-                  "lifetime_class": "local_non_escape_candidate"
-                },
-                "expr_index": {
-                  "def_nodes": [
-                    "n5"
-                  ],
-                  "use_nodes": [
-                    "n3"
-                  ],
-                  "live_in_nodes": [
-                    "n3",
-                    "n4"
-                  ],
-                  "live_out_nodes": [
-                    "n4",
-                    "n5"
-                  ],
-                  "last_use_nodes": [
-                    "n3"
-                  ],
-                  "lifetime_class": "escape_or_unknown"
-                },
-                "self": {
-                  "def_nodes": [],
-                  "use_nodes": [
-                    "n1",
-                    "n10",
-                    "n11",
-                    "n2",
-                    "n4",
-                    "n5",
-                    "n6",
-                    "n7",
-                    "n8",
-                    "n9"
-                  ],
-                  "live_in_nodes": [
-                    "n1",
-                    "n2",
-                    "n4",
-                    "n5",
-                    "n6",
-                    "n7",
-                    "n8",
-                    "n9",
-                    "n10",
-                    "n11"
-                  ],
-                  "live_out_nodes": [
-                    "n2",
-                    "n5",
-                    "n6",
-                    "n8",
-                    "n9",
-                    "n11"
-                  ],
-                  "last_use_nodes": [
-                    "n1",
-                    "n10",
-                    "n4",
-                    "n7"
-                  ],
-                  "lifetime_class": "escape_or_unknown"
-                },
-                "str": {
-                  "def_nodes": [],
-                  "use_nodes": [
-                    "n0"
-                  ],
-                  "live_in_nodes": [
-                    "n0",
-                    "n1",
-                    "n2",
-                    "n6",
-                    "n9"
-                  ],
-                  "live_out_nodes": [
-                    "n1",
-                    "n2",
-                    "n6",
-                    "n9"
-                  ],
-                  "last_use_nodes": [
-                    "n0"
-                  ],
-                  "lifetime_class": "local_non_escape_candidate"
-                },
-                "t": {
-                  "def_nodes": [
-                    "n1"
-                  ],
-                  "use_nodes": [
-                    "n0"
-                  ],
-                  "live_in_nodes": [
-                    "n0"
-                  ],
-                  "live_out_nodes": [
-                    "n1"
-                  ],
-                  "last_use_nodes": [
-                    "n0"
-                  ],
-                  "lifetime_class": "local_non_escape_candidate"
-                },
-                "token_ident": {
-                  "def_nodes": [
-                    "n8"
-                  ],
-                  "use_nodes": [
-                    "n7"
-                  ],
-                  "live_in_nodes": [
-                    "n7"
-                  ],
-                  "live_out_nodes": [
-                    "n8"
-                  ],
-                  "last_use_nodes": [
-                    "n7"
-                  ],
-                  "lifetime_class": "escape_or_unknown"
-                },
-                "token_num": {
-                  "def_nodes": [
-                    "n11"
-                  ],
-                  "use_nodes": [
-                    "n10"
-                  ],
-                  "live_in_nodes": [
-                    "n10"
-                  ],
-                  "live_out_nodes": [
-                    "n11"
-                  ],
-                  "last_use_nodes": [
-                    "n10"
-                  ],
-                  "lifetime_class": "escape_or_unknown"
-                }
-              },
-              "arg_order": [
-                "self"
-              ],
-              "arg_escape": [
-                true
-              ],
-              "has_dynamic_name_access": false
-            }
-          }
+          "mutates_self": true
         }
       ],
-      "class_storage_hint": "ref"
+      "class_storage_hint": "ref",
+      "meta": {}
     },
     {
       "kind": "FunctionDef",
@@ -25422,7 +20979,8 @@
                       "casts": [],
                       "borrow_kind": "value",
                       "repr": "RuntimeError",
-                      "id": "RuntimeError"
+                      "id": "RuntimeError",
+                      "runtime_module_id": "pytra.built_in.error"
                     },
                     "args": [
                       {
@@ -25480,6 +21038,7 @@
                           },
                           "attr": "name"
                         },
+                        "call_arg_type": "str",
                         "normalized_expr_version": "east3_expr_v1",
                         "normalized_expr": {
                           "kind": "BinOp",
@@ -25535,18 +21094,13 @@
                               "id": "node"
                             },
                             "attr": "name"
-                          }
+                          },
+                          "call_arg_type": "str"
                         }
                       }
                     ],
                     "keywords": [],
-                    "lowered_kind": "BuiltinCall",
-                    "builtin_name": "RuntimeError",
-                    "runtime_call": "std::runtime_error",
-                    "runtime_module_id": "pytra.core.py_runtime",
-                    "runtime_symbol": "RuntimeError",
-                    "runtime_call_adapter_kind": "builtin",
-                    "semantic_tag": "error.raise_ctor",
+                    "runtime_module_id": "pytra.built_in.error",
                     "type_expr_summary_v1": {
                       "schema_version": 1,
                       "kind": "NamedType",
@@ -27524,7 +23078,8 @@
                           "casts": [],
                           "borrow_kind": "value",
                           "repr": "RuntimeError",
-                          "id": "RuntimeError"
+                          "id": "RuntimeError",
+                          "runtime_module_id": "pytra.built_in.error"
                         },
                         "args": [
                           {
@@ -27539,17 +23094,12 @@
                             "casts": [],
                             "borrow_kind": "value",
                             "repr": "\"division by zero\"",
-                            "value": "division by zero"
+                            "value": "division by zero",
+                            "call_arg_type": "str"
                           }
                         ],
                         "keywords": [],
-                        "lowered_kind": "BuiltinCall",
-                        "builtin_name": "RuntimeError",
-                        "runtime_call": "std::runtime_error",
-                        "runtime_module_id": "pytra.core.py_runtime",
-                        "runtime_symbol": "RuntimeError",
-                        "runtime_call_adapter_kind": "builtin",
-                        "semantic_tag": "error.raise_ctor",
+                        "runtime_module_id": "pytra.built_in.error",
                         "type_expr_summary_v1": {
                           "schema_version": 1,
                           "kind": "NamedType",
@@ -27765,7 +23315,8 @@
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "RuntimeError",
-                  "id": "RuntimeError"
+                  "id": "RuntimeError",
+                  "runtime_module_id": "pytra.built_in.error"
                 },
                 "args": [
                   {
@@ -27823,6 +23374,7 @@
                       },
                       "attr": "op"
                     },
+                    "call_arg_type": "str",
                     "normalized_expr_version": "east3_expr_v1",
                     "normalized_expr": {
                       "kind": "BinOp",
@@ -27878,18 +23430,13 @@
                           "id": "node"
                         },
                         "attr": "op"
-                      }
+                      },
+                      "call_arg_type": "str"
                     }
                   }
                 ],
                 "keywords": [],
-                "lowered_kind": "BuiltinCall",
-                "builtin_name": "RuntimeError",
-                "runtime_call": "std::runtime_error",
-                "runtime_module_id": "pytra.core.py_runtime",
-                "runtime_symbol": "RuntimeError",
-                "runtime_call_adapter_kind": "builtin",
-                "semantic_tag": "error.raise_ctor",
+                "runtime_module_id": "pytra.built_in.error",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -27973,7 +23520,8 @@
               "casts": [],
               "borrow_kind": "value",
               "repr": "RuntimeError",
-              "id": "RuntimeError"
+              "id": "RuntimeError",
+              "runtime_module_id": "pytra.built_in.error"
             },
             "args": [
               {
@@ -28031,6 +23579,7 @@
                   },
                   "attr": "kind"
                 },
+                "call_arg_type": "str",
                 "normalized_expr_version": "east3_expr_v1",
                 "normalized_expr": {
                   "kind": "BinOp",
@@ -28086,18 +23635,13 @@
                       "id": "node"
                     },
                     "attr": "kind"
-                  }
+                  },
+                  "call_arg_type": "str"
                 }
               }
             ],
             "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "RuntimeError",
-            "runtime_call": "std::runtime_error",
-            "runtime_module_id": "pytra.core.py_runtime",
-            "runtime_symbol": "RuntimeError",
-            "runtime_call_adapter_kind": "builtin",
-            "semantic_tag": "error.raise_ctor",
+            "runtime_module_id": "pytra.built_in.error",
             "type_expr_summary_v1": {
               "schema_version": 1,
               "kind": "NamedType",
@@ -29990,7 +25534,8 @@
                           "casts": [],
                           "borrow_kind": "value",
                           "repr": "RuntimeError",
-                          "id": "RuntimeError"
+                          "id": "RuntimeError",
+                          "runtime_module_id": "pytra.built_in.error"
                         },
                         "args": [
                           {
@@ -30048,6 +25593,7 @@
                               },
                               "attr": "name"
                             },
+                            "call_arg_type": "str",
                             "normalized_expr_version": "east3_expr_v1",
                             "normalized_expr": {
                               "kind": "BinOp",
@@ -30103,18 +25649,13 @@
                                   "id": "stmt"
                                 },
                                 "attr": "name"
-                              }
+                              },
+                              "call_arg_type": "str"
                             }
                           }
                         ],
                         "keywords": [],
-                        "lowered_kind": "BuiltinCall",
-                        "builtin_name": "RuntimeError",
-                        "runtime_call": "std::runtime_error",
-                        "runtime_module_id": "pytra.core.py_runtime",
-                        "runtime_symbol": "RuntimeError",
-                        "runtime_call_adapter_kind": "builtin",
-                        "semantic_tag": "error.raise_ctor",
+                        "runtime_module_id": "pytra.built_in.error",
                         "type_expr_summary_v1": {
                           "schema_version": 1,
                           "kind": "NamedType",
@@ -48322,6 +43863,18 @@
           "runtime_semantic_tag": "stdlib.fn.perf_counter"
         },
         {
+          "module_id": "pytra.built_in.contains",
+          "export_name": "",
+          "local_name": "pytra.built_in.contains",
+          "binding_kind": "implicit_builtin",
+          "source_file": "sample/py/18_mini_language_interpreter.py",
+          "source_line": 0,
+          "source_module_id": "pytra.built_in.contains",
+          "source_binding_kind": "implicit_builtin",
+          "runtime_module_id": "pytra.built_in.contains",
+          "runtime_group": "built_in"
+        },
+        {
           "module_id": "pytra.built_in.io_ops",
           "export_name": "",
           "local_name": "pytra.built_in.io_ops",
@@ -48378,7 +43931,17 @@
         "local_name": "Path",
         "binding_kind": "symbol",
         "source_file": "sample/py/18_mini_language_interpreter.py",
-        "source_line": 1
+        "source_line": 1,
+        "source_module_id": "pathlib",
+        "source_export_name": "Path",
+        "source_binding_kind": "symbol",
+        "runtime_module_id": "pytra.std.pathlib",
+        "runtime_group": "std",
+        "resolved_binding_kind": "symbol",
+        "runtime_symbol": "Path",
+        "runtime_symbol_kind": "class",
+        "runtime_symbol_dispatch": "ctor",
+        "runtime_semantic_tag": "stdlib.symbol.Path"
       },
       {
         "module_id": "pytra.std.time",
@@ -48386,7 +43949,29 @@
         "local_name": "perf_counter",
         "binding_kind": "symbol",
         "source_file": "sample/py/18_mini_language_interpreter.py",
-        "source_line": 3
+        "source_line": 3,
+        "source_module_id": "pytra.std.time",
+        "source_export_name": "perf_counter",
+        "source_binding_kind": "symbol",
+        "runtime_module_id": "pytra.std.time",
+        "runtime_group": "std",
+        "resolved_binding_kind": "symbol",
+        "runtime_symbol": "perf_counter",
+        "runtime_symbol_kind": "function",
+        "runtime_symbol_dispatch": "function",
+        "runtime_semantic_tag": "stdlib.fn.perf_counter"
+      },
+      {
+        "module_id": "pytra.built_in.contains",
+        "export_name": "",
+        "local_name": "pytra.built_in.contains",
+        "binding_kind": "implicit_builtin",
+        "source_file": "sample/py/18_mini_language_interpreter.py",
+        "source_line": 0,
+        "source_module_id": "pytra.built_in.contains",
+        "source_binding_kind": "implicit_builtin",
+        "runtime_module_id": "pytra.built_in.contains",
+        "runtime_group": "built_in"
       },
       {
         "module_id": "pytra.built_in.io_ops",
@@ -48394,7 +43979,11 @@
         "local_name": "pytra.built_in.io_ops",
         "binding_kind": "implicit_builtin",
         "source_file": "sample/py/18_mini_language_interpreter.py",
-        "source_line": 0
+        "source_line": 0,
+        "source_module_id": "pytra.built_in.io_ops",
+        "source_binding_kind": "implicit_builtin",
+        "runtime_module_id": "pytra.built_in.io_ops",
+        "runtime_group": "built_in"
       },
       {
         "module_id": "pytra.built_in.iter_ops",
@@ -48402,7 +43991,11 @@
         "local_name": "pytra.built_in.iter_ops",
         "binding_kind": "implicit_builtin",
         "source_file": "sample/py/18_mini_language_interpreter.py",
-        "source_line": 0
+        "source_line": 0,
+        "source_module_id": "pytra.built_in.iter_ops",
+        "source_binding_kind": "implicit_builtin",
+        "runtime_module_id": "pytra.built_in.iter_ops",
+        "runtime_group": "built_in"
       },
       {
         "module_id": "pytra.core.py_runtime",
@@ -48410,7 +44003,11 @@
         "local_name": "pytra.core.py_runtime",
         "binding_kind": "implicit_builtin",
         "source_file": "sample/py/18_mini_language_interpreter.py",
-        "source_line": 0
+        "source_line": 0,
+        "source_module_id": "pytra.core.py_runtime",
+        "source_binding_kind": "implicit_builtin",
+        "runtime_module_id": "pytra.core.py_runtime",
+        "runtime_group": "core"
       }
     ],
     "qualified_symbol_refs": [

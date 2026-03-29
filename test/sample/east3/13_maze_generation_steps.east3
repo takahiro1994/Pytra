@@ -2374,12 +2374,41 @@
           },
           "body": [
             {
-              "kind": "Assign",
-              "target": {
-                "kind": "Name",
-                "id": "__tup_1",
-                "resolved_type": "tuple[int64,int64]"
-              },
+              "kind": "TupleUnpack",
+              "targets": [
+                {
+                  "kind": "Name",
+                  "source_span": {
+                    "lineno": 40,
+                    "col_offset": 8,
+                    "end_lineno": 40,
+                    "end_col_offset": 9
+                  },
+                  "resolved_type": "int64",
+                  "casts": [],
+                  "borrow_kind": "value",
+                  "repr": "x",
+                  "id": "x"
+                },
+                {
+                  "kind": "Name",
+                  "source_span": {
+                    "lineno": 40,
+                    "col_offset": 11,
+                    "end_lineno": 40,
+                    "end_col_offset": 12
+                  },
+                  "resolved_type": "int64",
+                  "casts": [],
+                  "borrow_kind": "value",
+                  "repr": "y",
+                  "id": "y"
+                }
+              ],
+              "target_types": [
+                "int64",
+                "int64"
+              ],
               "value": {
                 "kind": "Subscript",
                 "source_span": {
@@ -2435,56 +2464,7 @@
                   }
                 }
               },
-              "declare": true,
-              "decl_type": "tuple[int64,int64]"
-            },
-            {
-              "kind": "Assign",
-              "target": {
-                "kind": "Name",
-                "id": "x",
-                "resolved_type": "int64"
-              },
-              "value": {
-                "kind": "Subscript",
-                "value": {
-                  "kind": "Name",
-                  "id": "__tup_1",
-                  "resolved_type": "tuple[int64,int64]"
-                },
-                "slice": {
-                  "kind": "Constant",
-                  "value": 0,
-                  "resolved_type": "int64"
-                },
-                "resolved_type": "int64"
-              },
-              "declare": true,
-              "decl_type": "int64"
-            },
-            {
-              "kind": "Assign",
-              "target": {
-                "kind": "Name",
-                "id": "y",
-                "resolved_type": "int64"
-              },
-              "value": {
-                "kind": "Subscript",
-                "value": {
-                  "kind": "Name",
-                  "id": "__tup_1",
-                  "resolved_type": "tuple[int64,int64]"
-                },
-                "slice": {
-                  "kind": "Constant",
-                  "value": 1,
-                  "resolved_type": "int64"
-                },
-                "resolved_type": "int64"
-              },
-              "declare": true,
-              "decl_type": "int64"
+              "declare": true
             },
             {
               "kind": "AnnAssign",
@@ -2689,12 +2669,41 @@
               },
               "body": [
                 {
-                  "kind": "Assign",
-                  "target": {
-                    "kind": "Name",
-                    "id": "__tup_2",
-                    "resolved_type": "tuple[int64,int64]"
-                  },
+                  "kind": "TupleUnpack",
+                  "targets": [
+                    {
+                      "kind": "Name",
+                      "source_span": {
+                        "lineno": 43,
+                        "col_offset": 12,
+                        "end_lineno": 43,
+                        "end_col_offset": 14
+                      },
+                      "resolved_type": "int64",
+                      "casts": [],
+                      "borrow_kind": "value",
+                      "repr": "dx",
+                      "id": "dx"
+                    },
+                    {
+                      "kind": "Name",
+                      "source_span": {
+                        "lineno": 43,
+                        "col_offset": 16,
+                        "end_lineno": 43,
+                        "end_col_offset": 18
+                      },
+                      "resolved_type": "int64",
+                      "casts": [],
+                      "borrow_kind": "value",
+                      "repr": "dy",
+                      "id": "dy"
+                    }
+                  ],
+                  "target_types": [
+                    "int64",
+                    "int64"
+                  ],
                   "value": {
                     "kind": "Subscript",
                     "source_span": {
@@ -2736,56 +2745,7 @@
                       "id": "k"
                     }
                   },
-                  "declare": true,
-                  "decl_type": "tuple[int64,int64]"
-                },
-                {
-                  "kind": "Assign",
-                  "target": {
-                    "kind": "Name",
-                    "id": "dx",
-                    "resolved_type": "int64"
-                  },
-                  "value": {
-                    "kind": "Subscript",
-                    "value": {
-                      "kind": "Name",
-                      "id": "__tup_2",
-                      "resolved_type": "tuple[int64,int64]"
-                    },
-                    "slice": {
-                      "kind": "Constant",
-                      "value": 0,
-                      "resolved_type": "int64"
-                    },
-                    "resolved_type": "int64"
-                  },
-                  "declare": true,
-                  "decl_type": "int64"
-                },
-                {
-                  "kind": "Assign",
-                  "target": {
-                    "kind": "Name",
-                    "id": "dy",
-                    "resolved_type": "int64"
-                  },
-                  "value": {
-                    "kind": "Subscript",
-                    "value": {
-                      "kind": "Name",
-                      "id": "__tup_2",
-                      "resolved_type": "tuple[int64,int64]"
-                    },
-                    "slice": {
-                      "kind": "Constant",
-                      "value": 1,
-                      "resolved_type": "int64"
-                    },
-                    "resolved_type": "int64"
-                  },
-                  "declare": true,
-                  "decl_type": "int64"
+                  "declare": true
                 },
                 {
                   "kind": "Assign",
@@ -4736,12 +4696,71 @@
                   }
                 },
                 {
-                  "kind": "Assign",
-                  "target": {
-                    "kind": "Name",
-                    "id": "__tup_3",
-                    "resolved_type": "tuple[int64,int64,int64,int64]"
-                  },
+                  "kind": "TupleUnpack",
+                  "targets": [
+                    {
+                      "kind": "Name",
+                      "source_span": {
+                        "lineno": 60,
+                        "col_offset": 12,
+                        "end_lineno": 60,
+                        "end_col_offset": 14
+                      },
+                      "resolved_type": "int64",
+                      "casts": [],
+                      "borrow_kind": "readonly_ref",
+                      "repr": "nx",
+                      "id": "nx"
+                    },
+                    {
+                      "kind": "Name",
+                      "source_span": {
+                        "lineno": 60,
+                        "col_offset": 16,
+                        "end_lineno": 60,
+                        "end_col_offset": 18
+                      },
+                      "resolved_type": "int64",
+                      "casts": [],
+                      "borrow_kind": "readonly_ref",
+                      "repr": "ny",
+                      "id": "ny"
+                    },
+                    {
+                      "kind": "Name",
+                      "source_span": {
+                        "lineno": 60,
+                        "col_offset": 20,
+                        "end_lineno": 60,
+                        "end_col_offset": 22
+                      },
+                      "resolved_type": "int64",
+                      "casts": [],
+                      "borrow_kind": "value",
+                      "repr": "wx",
+                      "id": "wx"
+                    },
+                    {
+                      "kind": "Name",
+                      "source_span": {
+                        "lineno": 60,
+                        "col_offset": 24,
+                        "end_lineno": 60,
+                        "end_col_offset": 26
+                      },
+                      "resolved_type": "int64",
+                      "casts": [],
+                      "borrow_kind": "value",
+                      "repr": "wy",
+                      "id": "wy"
+                    }
+                  ],
+                  "target_types": [
+                    "int64",
+                    "int64",
+                    "int64",
+                    "int64"
+                  ],
                   "value": {
                     "kind": "Name",
                     "source_span": {
@@ -4756,106 +4775,7 @@
                     "repr": "sel",
                     "id": "sel"
                   },
-                  "declare": true,
-                  "decl_type": "tuple[int64,int64,int64,int64]"
-                },
-                {
-                  "kind": "Assign",
-                  "target": {
-                    "kind": "Name",
-                    "id": "nx",
-                    "resolved_type": "int64"
-                  },
-                  "value": {
-                    "kind": "Subscript",
-                    "value": {
-                      "kind": "Name",
-                      "id": "__tup_3",
-                      "resolved_type": "tuple[int64,int64,int64,int64]"
-                    },
-                    "slice": {
-                      "kind": "Constant",
-                      "value": 0,
-                      "resolved_type": "int64"
-                    },
-                    "resolved_type": "int64"
-                  },
-                  "declare": true,
-                  "decl_type": "int64"
-                },
-                {
-                  "kind": "Assign",
-                  "target": {
-                    "kind": "Name",
-                    "id": "ny",
-                    "resolved_type": "int64"
-                  },
-                  "value": {
-                    "kind": "Subscript",
-                    "value": {
-                      "kind": "Name",
-                      "id": "__tup_3",
-                      "resolved_type": "tuple[int64,int64,int64,int64]"
-                    },
-                    "slice": {
-                      "kind": "Constant",
-                      "value": 1,
-                      "resolved_type": "int64"
-                    },
-                    "resolved_type": "int64"
-                  },
-                  "declare": true,
-                  "decl_type": "int64"
-                },
-                {
-                  "kind": "Assign",
-                  "target": {
-                    "kind": "Name",
-                    "id": "wx",
-                    "resolved_type": "int64"
-                  },
-                  "value": {
-                    "kind": "Subscript",
-                    "value": {
-                      "kind": "Name",
-                      "id": "__tup_3",
-                      "resolved_type": "tuple[int64,int64,int64,int64]"
-                    },
-                    "slice": {
-                      "kind": "Constant",
-                      "value": 2,
-                      "resolved_type": "int64"
-                    },
-                    "resolved_type": "int64"
-                  },
-                  "declare": true,
-                  "decl_type": "int64",
-                  "unused": true
-                },
-                {
-                  "kind": "Assign",
-                  "target": {
-                    "kind": "Name",
-                    "id": "wy",
-                    "resolved_type": "int64"
-                  },
-                  "value": {
-                    "kind": "Subscript",
-                    "value": {
-                      "kind": "Name",
-                      "id": "__tup_3",
-                      "resolved_type": "tuple[int64,int64,int64,int64]"
-                    },
-                    "slice": {
-                      "kind": "Constant",
-                      "value": 3,
-                      "resolved_type": "int64"
-                    },
-                    "resolved_type": "int64"
-                  },
-                  "declare": true,
-                  "decl_type": "int64",
-                  "unused": true
+                  "declare": true
                 },
                 {
                   "kind": "Assign",
@@ -6471,7 +6391,17 @@
         "local_name": "perf_counter",
         "binding_kind": "symbol",
         "source_file": "sample/py/13_maze_generation_steps.py",
-        "source_line": 4
+        "source_line": 4,
+        "source_module_id": "pytra.std.time",
+        "source_export_name": "perf_counter",
+        "source_binding_kind": "symbol",
+        "runtime_module_id": "pytra.std.time",
+        "runtime_group": "std",
+        "resolved_binding_kind": "symbol",
+        "runtime_symbol": "perf_counter",
+        "runtime_symbol_kind": "function",
+        "runtime_symbol_dispatch": "function",
+        "runtime_semantic_tag": "stdlib.fn.perf_counter"
       },
       {
         "module_id": "pytra.utils.gif",
@@ -6479,7 +6409,17 @@
         "local_name": "grayscale_palette",
         "binding_kind": "symbol",
         "source_file": "sample/py/13_maze_generation_steps.py",
-        "source_line": 5
+        "source_line": 5,
+        "source_module_id": "pytra.utils.gif",
+        "source_export_name": "grayscale_palette",
+        "source_binding_kind": "symbol",
+        "runtime_module_id": "pytra.utils.gif",
+        "runtime_group": "utils",
+        "resolved_binding_kind": "symbol",
+        "runtime_symbol": "grayscale_palette",
+        "runtime_symbol_kind": "function",
+        "runtime_symbol_dispatch": "function",
+        "runtime_semantic_tag": "stdlib.fn.grayscale_palette"
       },
       {
         "module_id": "pytra.utils.gif",
@@ -6487,7 +6427,18 @@
         "local_name": "save_gif",
         "binding_kind": "symbol",
         "source_file": "sample/py/13_maze_generation_steps.py",
-        "source_line": 5
+        "source_line": 5,
+        "source_module_id": "pytra.utils.gif",
+        "source_export_name": "save_gif",
+        "source_binding_kind": "symbol",
+        "runtime_module_id": "pytra.utils.gif",
+        "runtime_group": "utils",
+        "resolved_binding_kind": "symbol",
+        "runtime_symbol": "save_gif",
+        "runtime_symbol_kind": "function",
+        "runtime_symbol_dispatch": "function",
+        "runtime_semantic_tag": "stdlib.fn.save_gif",
+        "runtime_call_adapter_kind": "image.save_gif.keyword_defaults"
       },
       {
         "module_id": "pytra.built_in.io_ops",
@@ -6495,7 +6446,11 @@
         "local_name": "pytra.built_in.io_ops",
         "binding_kind": "implicit_builtin",
         "source_file": "sample/py/13_maze_generation_steps.py",
-        "source_line": 0
+        "source_line": 0,
+        "source_module_id": "pytra.built_in.io_ops",
+        "source_binding_kind": "implicit_builtin",
+        "runtime_module_id": "pytra.built_in.io_ops",
+        "runtime_group": "built_in"
       },
       {
         "module_id": "pytra.core.py_runtime",
@@ -6503,7 +6458,11 @@
         "local_name": "pytra.core.py_runtime",
         "binding_kind": "implicit_builtin",
         "source_file": "sample/py/13_maze_generation_steps.py",
-        "source_line": 0
+        "source_line": 0,
+        "source_module_id": "pytra.core.py_runtime",
+        "source_binding_kind": "implicit_builtin",
+        "runtime_module_id": "pytra.core.py_runtime",
+        "runtime_group": "core"
       }
     ],
     "qualified_symbol_refs": [

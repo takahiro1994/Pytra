@@ -377,6 +377,7 @@
               "kind": "OptionalType",
               "category": "optional",
               "mirror": "int64 | None",
+              "inner_mirror": "int64",
               "inner_category": "static"
             }
           },
@@ -385,6 +386,7 @@
             "kind": "OptionalType",
             "category": "optional",
             "mirror": "int64 | None",
+            "inner_mirror": "int64",
             "inner_category": "static"
           },
           "meta": {
@@ -506,6 +508,7 @@
               "kind": "OptionalType",
               "category": "optional",
               "mirror": "int64 | None",
+              "inner_mirror": "int64",
               "inner_category": "static"
             }
           },
@@ -514,6 +517,7 @@
             "kind": "OptionalType",
             "category": "optional",
             "mirror": "int64 | None",
+            "inner_mirror": "int64",
             "inner_category": "static"
           },
           "meta": {
@@ -739,7 +743,7 @@
           },
           "value": {
             "kind": "Unbox",
-            "resolved_type": "int64 | None",
+            "resolved_type": "int64|None",
             "borrow_kind": "value",
             "casts": [],
             "value": {
@@ -842,9 +846,10 @@
               "kind": "OptionalType",
               "category": "optional",
               "mirror": "int64 | None",
+              "inner_mirror": "int64",
               "inner_category": "static"
             },
-            "target": "int64 | None",
+            "target": "int64|None",
             "on_fail": "raise",
             "bridge_lane_v1": {
               "schema_version": 1,
@@ -852,6 +857,7 @@
                 "kind": "OptionalType",
                 "category": "optional",
                 "mirror": "int64 | None",
+                "inner_mirror": "int64",
                 "inner_category": "static"
               },
               "target_category": "optional",
@@ -868,6 +874,7 @@
             "kind": "OptionalType",
             "category": "optional",
             "mirror": "int64 | None",
+            "inner_mirror": "int64",
             "inner_category": "static"
           },
           "meta": {
@@ -946,7 +953,7 @@
           },
           "value": {
             "kind": "Unbox",
-            "resolved_type": "int64 | None",
+            "resolved_type": "int64|None",
             "borrow_kind": "value",
             "casts": [],
             "value": {
@@ -1049,9 +1056,10 @@
               "kind": "OptionalType",
               "category": "optional",
               "mirror": "int64 | None",
+              "inner_mirror": "int64",
               "inner_category": "static"
             },
-            "target": "int64 | None",
+            "target": "int64|None",
             "on_fail": "raise",
             "bridge_lane_v1": {
               "schema_version": 1,
@@ -1059,6 +1067,7 @@
                 "kind": "OptionalType",
                 "category": "optional",
                 "mirror": "int64 | None",
+                "inner_mirror": "int64",
                 "inner_category": "static"
               },
               "target_category": "optional",
@@ -1075,6 +1084,7 @@
             "kind": "OptionalType",
             "category": "optional",
             "mirror": "int64 | None",
+            "inner_mirror": "int64",
             "inner_category": "static"
           },
           "meta": {
@@ -1345,6 +1355,7 @@
                         "kind": "OptionalType",
                         "category": "optional",
                         "mirror": "int64 | None",
+                        "inner_mirror": "int64",
                         "inner_category": "static"
                       },
                       "value_category": "optional"
@@ -1616,6 +1627,7 @@
                         "kind": "OptionalType",
                         "category": "optional",
                         "mirror": "int64 | None",
+                        "inner_mirror": "int64",
                         "inner_category": "static"
                       },
                       "value_category": "optional"

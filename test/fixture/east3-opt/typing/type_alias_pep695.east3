@@ -147,7 +147,17 @@
                     "category": "general_union",
                     "mirror": "int64|float64",
                     "union_mode": "general"
-                  }
+                  },
+                  "predicate_category": "nominal_adt",
+                  "family_name": "int",
+                  "predicate_kind": "variant",
+                  "variant_name": "int"
+                },
+                "nominal_adt_test_v1": {
+                  "schema_version": 1,
+                  "family_name": "int",
+                  "predicate_kind": "variant",
+                  "variant_name": "int"
                 }
               },
               {
@@ -206,7 +216,17 @@
                     "category": "general_union",
                     "mirror": "int64|float64",
                     "union_mode": "general"
-                  }
+                  },
+                  "predicate_category": "nominal_adt",
+                  "family_name": "int",
+                  "predicate_kind": "variant",
+                  "variant_name": "int"
+                },
+                "nominal_adt_test_v1": {
+                  "schema_version": 1,
+                  "family_name": "int",
+                  "predicate_kind": "variant",
+                  "variant_name": "int"
                 }
               }
             ]

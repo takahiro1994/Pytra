@@ -1,6 +1,6 @@
 {
   "kind": "Module",
-  "source_path": "/workspace/Pytra/test/fixture/source/py/typing/isinstance_pod_exact.py",
+  "source_path": "test/fixture/source/py/typing/isinstance_pod_exact.py",
   "source_span": {
     "lineno": null,
     "col": null,
@@ -1683,7 +1683,7 @@
           "export_name": "py_assert_stdout",
           "local_name": "py_assert_stdout",
           "binding_kind": "symbol",
-          "source_file": "/workspace/Pytra/test/fixture/source/py/typing/isinstance_pod_exact.py",
+          "source_file": "test/fixture/source/py/typing/isinstance_pod_exact.py",
           "source_line": 5
         }
       ],
@@ -1701,7 +1701,7 @@
         "export_name": "py_assert_stdout",
         "local_name": "py_assert_stdout",
         "binding_kind": "symbol",
-        "source_file": "/workspace/Pytra/test/fixture/source/py/typing/isinstance_pod_exact.py",
+        "source_file": "test/fixture/source/py/typing/isinstance_pod_exact.py",
         "source_line": 5
       }
     ],

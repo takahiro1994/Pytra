@@ -168,9 +168,7 @@
                     "call_arg_type": "object"
                   }
                 ],
-                "keywords": [],
-                "lowered_kind": "BuiltinCall",
-                "builtin_name": "_to_str"
+                "keywords": []
               }
             }
           ],
@@ -255,9 +253,7 @@
                 "call_arg_type": "str"
               }
             ],
-            "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "_parse_format_spec"
+            "keywords": []
           },
           "declare": true,
           "decl_type": "list[str]",
@@ -343,9 +339,7 @@
                 "call_arg_type": "list[str]"
               }
             ],
-            "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "_format_core"
+            "keywords": []
           },
           "declare": true,
           "decl_type": "str",
@@ -417,9 +411,7 @@
                 "call_arg_type": "list[str]"
               }
             ],
-            "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "_apply_align"
+            "keywords": []
           }
         }
       ],
@@ -636,9 +628,7 @@
                     "call_arg_type": "object"
                   }
                 ],
-                "keywords": [],
-                "lowered_kind": "BuiltinCall",
-                "builtin_name": "_to_str"
+                "keywords": []
               }
             }
           ],
@@ -750,9 +740,7 @@
                     "call_arg_type": "object"
                   }
                 ],
-                "keywords": [],
-                "lowered_kind": "BuiltinCall",
-                "builtin_name": "_repr_value"
+                "keywords": []
               }
             }
           ],
@@ -864,9 +852,7 @@
                     "call_arg_type": "object"
                   }
                 ],
-                "keywords": [],
-                "lowered_kind": "BuiltinCall",
-                "builtin_name": "_repr_value"
+                "keywords": []
               }
             }
           ],
@@ -923,9 +909,7 @@
                 "call_arg_type": "object"
               }
             ],
-            "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "_to_str"
+            "keywords": []
           }
         }
       ],
@@ -1130,14 +1114,14 @@
                   "end_lineno": 42,
                   "end_col": 17
                 },
-                "resolved_type": "object",
+                "resolved_type": "str",
                 "casts": [],
                 "borrow_kind": "readonly_ref",
                 "repr": "value",
                 "id": "value"
               },
               "declare": true,
-              "decl_type": "object",
+              "decl_type": "str",
               "declare_init": true
             }
           ],
@@ -1231,7 +1215,7 @@
                       "end_lineno": 44,
                       "end_col": 16
                     },
-                    "resolved_type": "object",
+                    "resolved_type": "bool",
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "value",
@@ -1254,7 +1238,7 @@
                           "end_lineno": 45,
                           "end_col": 13
                         },
-                        "resolved_type": "object",
+                        "resolved_type": "str",
                         "casts": [],
                         "borrow_kind": "readonly_ref",
                         "repr": "v",
@@ -1454,7 +1438,7 @@
                               "end_lineno": 49,
                               "end_col": 29
                             },
-                            "resolved_type": "object",
+                            "resolved_type": "int64",
                             "casts": [],
                             "borrow_kind": "readonly_ref",
                             "repr": "value",
@@ -1462,9 +1446,7 @@
                             "call_arg_type": "int64"
                           }
                         ],
-                        "keywords": [],
-                        "lowered_kind": "BuiltinCall",
-                        "builtin_name": "_int_to_str"
+                        "keywords": []
                       },
                       "declare": true,
                       "decl_type": "str",
@@ -1602,7 +1584,7 @@
                                   "end_lineno": 51,
                                   "end_col": 31
                                 },
-                                "resolved_type": "object",
+                                "resolved_type": "float64",
                                 "casts": [],
                                 "borrow_kind": "readonly_ref",
                                 "repr": "value",
@@ -1610,9 +1592,7 @@
                                 "call_arg_type": "float64"
                               }
                             ],
-                            "keywords": [],
-                            "lowered_kind": "BuiltinCall",
-                            "builtin_name": "_float_to_str"
+                            "keywords": []
                           },
                           "declare": true,
                           "decl_type": "str",
@@ -1900,7 +1880,7 @@
                       "end_lineno": 59,
                       "end_col": 26
                     },
-                    "resolved_type": "object",
+                    "resolved_type": "str",
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "value",
@@ -1978,9 +1958,7 @@
                 "call_arg_type": "object"
               }
             ],
-            "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "_to_str"
+            "keywords": []
           }
         }
       ],
@@ -2173,9 +2151,7 @@
                       "call_arg_type": "int64"
                     }
                   ],
-                  "keywords": [],
-                  "lowered_kind": "BuiltinCall",
-                  "builtin_name": "_int_to_str"
+                  "keywords": []
                 }
               }
             }
@@ -10071,9 +10047,7 @@
                 "call_arg_type": "list[str]"
               }
             ],
-            "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "_spec_type"
+            "keywords": []
           },
           "declare": true,
           "decl_type": "str",
@@ -10156,9 +10130,7 @@
                 "call_arg_type": "list[str]"
               }
             ],
-            "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "_spec_sign"
+            "keywords": []
           },
           "declare": true,
           "decl_type": "str",
@@ -10241,9 +10213,7 @@
                 "call_arg_type": "list[str]"
               }
             ],
-            "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "_spec_precision"
+            "keywords": []
           },
           "declare": true,
           "decl_type": "str",
@@ -10326,9 +10296,7 @@
                 "call_arg_type": "list[str]"
               }
             ],
-            "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "_spec_grouping"
+            "keywords": []
           },
           "declare": true,
           "decl_type": "str",
@@ -10608,9 +10576,7 @@
                     "call_arg_type": "object"
                   }
                 ],
-                "keywords": [],
-                "lowered_kind": "BuiltinCall",
-                "builtin_name": "_to_str"
+                "keywords": []
               },
               "declare": true,
               "decl_type": "str",
@@ -10748,9 +10714,7 @@
                         "call_arg_type": "str"
                       }
                     ],
-                    "keywords": [],
-                    "lowered_kind": "BuiltinCall",
-                    "builtin_name": "_str_to_int"
+                    "keywords": []
                   },
                   "declare": true,
                   "decl_type": "int64",
@@ -11116,7 +11080,7 @@
                         "end_lineno": 219,
                         "end_col": 54
                       },
-                      "resolved_type": "object",
+                      "resolved_type": "int64",
                       "casts": [],
                       "borrow_kind": "readonly_ref",
                       "repr": "value",
@@ -11192,7 +11156,7 @@
                       "end_lineno": 220,
                       "end_col": 32
                     },
-                    "resolved_type": "object",
+                    "resolved_type": "int64",
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "value",
@@ -11245,9 +11209,7 @@
                     "call_arg_type": "str"
                   }
                 ],
-                "keywords": [],
-                "lowered_kind": "BuiltinCall",
-                "builtin_name": "_format_int"
+                "keywords": []
               }
             }
           ],
@@ -11369,7 +11331,7 @@
                       "end_lineno": 223,
                       "end_col": 34
                     },
-                    "resolved_type": "object",
+                    "resolved_type": "float64",
                     "casts": [],
                     "borrow_kind": "readonly_ref",
                     "repr": "value",
@@ -11437,9 +11399,7 @@
                     "call_arg_type": "str"
                   }
                 ],
-                "keywords": [],
-                "lowered_kind": "BuiltinCall",
-                "builtin_name": "_format_float"
+                "keywords": []
               }
             }
           ],
@@ -11496,9 +11456,7 @@
                 "call_arg_type": "object"
               }
             ],
-            "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "_to_str"
+            "keywords": []
           }
         }
       ],
@@ -12043,9 +12001,7 @@
                     "call_arg_type": "int64"
                   }
                 ],
-                "keywords": [],
-                "lowered_kind": "BuiltinCall",
-                "builtin_name": "_int_to_str"
+                "keywords": []
               },
               "declare": true,
               "decl_type": "str",
@@ -12188,9 +12144,7 @@
                         "call_arg_type": "bool"
                       }
                     ],
-                    "keywords": [],
-                    "lowered_kind": "BuiltinCall",
-                    "builtin_name": "_int_to_hex"
+                    "keywords": []
                   },
                   "declare": true,
                   "decl_type": "str",
@@ -12333,9 +12287,7 @@
                             "call_arg_type": "bool"
                           }
                         ],
-                        "keywords": [],
-                        "lowered_kind": "BuiltinCall",
-                        "builtin_name": "_int_to_hex"
+                        "keywords": []
                       },
                       "declare": true,
                       "decl_type": "str",
@@ -12463,9 +12415,7 @@
                                 "call_arg_type": "int64"
                               }
                             ],
-                            "keywords": [],
-                            "lowered_kind": "BuiltinCall",
-                            "builtin_name": "_int_to_oct"
+                            "keywords": []
                           },
                           "declare": true,
                           "decl_type": "str",
@@ -12593,9 +12543,7 @@
                                     "call_arg_type": "int64"
                                   }
                                 ],
-                                "keywords": [],
-                                "lowered_kind": "BuiltinCall",
-                                "builtin_name": "_int_to_bin"
+                                "keywords": []
                               },
                               "declare": true,
                               "decl_type": "str",
@@ -13007,9 +12955,7 @@
                                         "call_arg_type": "str"
                                       }
                                     ],
-                                    "keywords": [],
-                                    "lowered_kind": "BuiltinCall",
-                                    "builtin_name": "_format_float"
+                                    "keywords": []
                                   },
                                   "leading_trivia": [
                                     {
@@ -13088,9 +13034,7 @@
                                         "call_arg_type": "int64"
                                       }
                                     ],
-                                    "keywords": [],
-                                    "lowered_kind": "BuiltinCall",
-                                    "builtin_name": "_int_to_str"
+                                    "keywords": []
                                   },
                                   "declare": true,
                                   "decl_type": "str",
@@ -13258,9 +13202,7 @@
                     "call_arg_type": "int64"
                   }
                 ],
-                "keywords": [],
-                "lowered_kind": "BuiltinCall",
-                "builtin_name": "_insert_grouping"
+                "keywords": []
               },
               "declare": true,
               "decl_type": "str",
@@ -13535,9 +13477,7 @@
                             "call_arg_type": "int64"
                           }
                         ],
-                        "keywords": [],
-                        "lowered_kind": "BuiltinCall",
-                        "builtin_name": "_insert_grouping"
+                        "keywords": []
                       },
                       "declare": true,
                       "decl_type": "str",
@@ -13695,9 +13635,7 @@
                                 "call_arg_type": "int64"
                               }
                             ],
-                            "keywords": [],
-                            "lowered_kind": "BuiltinCall",
-                            "builtin_name": "_insert_grouping"
+                            "keywords": []
                           },
                           "declare": true,
                           "decl_type": "str",
@@ -13855,9 +13793,7 @@
                                     "call_arg_type": "int64"
                                   }
                                 ],
-                                "keywords": [],
-                                "lowered_kind": "BuiltinCall",
-                                "builtin_name": "_insert_grouping"
+                                "keywords": []
                               },
                               "declare": true,
                               "decl_type": "str",
@@ -13960,9 +13896,7 @@
                                     "call_arg_type": "int64"
                                   }
                                 ],
-                                "keywords": [],
-                                "lowered_kind": "BuiltinCall",
-                                "builtin_name": "_insert_grouping"
+                                "keywords": []
                               },
                               "declare": true,
                               "decl_type": "str",
@@ -14060,9 +13994,7 @@
                 "call_arg_type": "str"
               }
             ],
-            "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "_apply_sign"
+            "keywords": []
           }
         }
       ],
@@ -14308,9 +14240,7 @@
                     "call_arg_type": "str"
                   }
                 ],
-                "keywords": [],
-                "lowered_kind": "BuiltinCall",
-                "builtin_name": "_str_to_int"
+                "keywords": []
               },
               "declare": true,
               "decl_type": "int64",
@@ -14811,9 +14741,7 @@
                     "call_arg_type": "int64"
                   }
                 ],
-                "keywords": [],
-                "lowered_kind": "BuiltinCall",
-                "builtin_name": "_float_fixed"
+                "keywords": []
               },
               "declare": true,
               "decl_type": "str",
@@ -14971,9 +14899,7 @@
                         "call_arg_type": "str"
                       }
                     ],
-                    "keywords": [],
-                    "lowered_kind": "BuiltinCall",
-                    "builtin_name": "_float_exp"
+                    "keywords": []
                   },
                   "declare": true,
                   "decl_type": "str",
@@ -15131,9 +15057,7 @@
                             "call_arg_type": "str"
                           }
                         ],
-                        "keywords": [],
-                        "lowered_kind": "BuiltinCall",
-                        "builtin_name": "_float_exp"
+                        "keywords": []
                       },
                       "declare": true,
                       "decl_type": "str",
@@ -15353,9 +15277,7 @@
                                 "call_arg_type": "str"
                               }
                             ],
-                            "keywords": [],
-                            "lowered_kind": "BuiltinCall",
-                            "builtin_name": "_float_general"
+                            "keywords": []
                           },
                           "declare": true,
                           "decl_type": "str",
@@ -15538,9 +15460,7 @@
                                       "call_arg_type": "int64"
                                     }
                                   ],
-                                  "keywords": [],
-                                  "lowered_kind": "BuiltinCall",
-                                  "builtin_name": "_float_fixed"
+                                  "keywords": []
                                 },
                                 "op": "Add",
                                 "right": {
@@ -15761,9 +15681,7 @@
                                         "call_arg_type": "int64"
                                       }
                                     ],
-                                    "keywords": [],
-                                    "lowered_kind": "BuiltinCall",
-                                    "builtin_name": "_float_fixed"
+                                    "keywords": []
                                   },
                                   "declare": true,
                                   "decl_type": "str",
@@ -15851,9 +15769,7 @@
                                         "call_arg_type": "int64"
                                       }
                                     ],
-                                    "keywords": [],
-                                    "lowered_kind": "BuiltinCall",
-                                    "builtin_name": "_float_fixed"
+                                    "keywords": []
                                   },
                                   "declare": true,
                                   "decl_type": "str",
@@ -16014,7 +15930,7 @@
                 "lowered_kind": "BuiltinCall",
                 "builtin_name": "find",
                 "runtime_call": "str.find",
-                "runtime_module_id": "pytra.core.str",
+                "runtime_module_id": "pytra.built_in.string_ops",
                 "runtime_symbol": "str.find",
                 "runtime_call_adapter_kind": "builtin",
                 "semantic_tag": "stdlib.method.find",
@@ -16415,9 +16331,7 @@
                           "call_arg_type": "int64"
                         }
                       ],
-                      "keywords": [],
-                      "lowered_kind": "BuiltinCall",
-                      "builtin_name": "_insert_grouping"
+                      "keywords": []
                     },
                     "op": "Add",
                     "right": {
@@ -16529,7 +16443,7 @@
                     "lowered_kind": "BuiltinCall",
                     "builtin_name": "find",
                     "runtime_call": "str.find",
-                    "runtime_module_id": "pytra.core.str",
+                    "runtime_module_id": "pytra.built_in.string_ops",
                     "runtime_symbol": "str.find",
                     "runtime_call_adapter_kind": "builtin",
                     "semantic_tag": "stdlib.method.find",
@@ -16769,9 +16683,7 @@
                               "call_arg_type": "int64"
                             }
                           ],
-                          "keywords": [],
-                          "lowered_kind": "BuiltinCall",
-                          "builtin_name": "_insert_grouping"
+                          "keywords": []
                         },
                         "op": "Add",
                         "right": {
@@ -16890,9 +16802,7 @@
                             "call_arg_type": "int64"
                           }
                         ],
-                        "keywords": [],
-                        "lowered_kind": "BuiltinCall",
-                        "builtin_name": "_insert_grouping"
+                        "keywords": []
                       },
                       "declare": true,
                       "decl_type": "str",
@@ -16986,9 +16896,7 @@
                 "call_arg_type": "str"
               }
             ],
-            "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "_apply_sign"
+            "keywords": []
           }
         }
       ],
@@ -18564,8 +18472,6 @@
                       }
                     ],
                     "keywords": [],
-                    "lowered_kind": "BuiltinCall",
-                    "builtin_name": "_int_to_str",
                     "call_arg_type": "str"
                   }
                 ],
@@ -20400,9 +20306,7 @@
                     "call_arg_type": "int64"
                   }
                 ],
-                "keywords": [],
-                "lowered_kind": "BuiltinCall",
-                "builtin_name": "_int_to_str"
+                "keywords": []
               }
             }
           ],
@@ -21158,9 +21062,7 @@
                 "call_arg_type": "int64"
               }
             ],
-            "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "_int_to_str"
+            "keywords": []
           },
           "declare": true,
           "decl_type": "str",
@@ -21418,9 +21320,7 @@
                     "call_arg_type": "int64"
                   }
                 ],
-                "keywords": [],
-                "lowered_kind": "BuiltinCall",
-                "builtin_name": "_int_to_str"
+                "keywords": []
               },
               "op": "Add",
               "right": {
@@ -22575,9 +22475,7 @@
                 "call_arg_type": "int64"
               }
             ],
-            "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "_float_fixed"
+            "keywords": []
           },
           "declare": true,
           "decl_type": "str",
@@ -22924,9 +22822,7 @@
                 "call_arg_type": "int64"
               }
             ],
-            "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "_int_to_str"
+            "keywords": []
           },
           "declare": true,
           "decl_type": "str",
@@ -23574,9 +23470,7 @@
                       "call_arg_type": "int64"
                     }
                   ],
-                  "keywords": [],
-                  "lowered_kind": "BuiltinCall",
-                  "builtin_name": "_float_fixed"
+                  "keywords": []
                 },
                 "orelse": {
                   "kind": "Constant",
@@ -24954,9 +24848,7 @@
                     "call_arg_type": "int64"
                   }
                 ],
-                "keywords": [],
-                "lowered_kind": "BuiltinCall",
-                "builtin_name": "_float_fixed"
+                "keywords": []
               },
               "declare": true,
               "decl_type": "str",
@@ -25093,7 +24985,7 @@
                     "lowered_kind": "BuiltinCall",
                     "builtin_name": "endswith",
                     "runtime_call": "str.endswith",
-                    "runtime_module_id": "pytra.core.str",
+                    "runtime_module_id": "pytra.built_in.string_ops",
                     "runtime_symbol": "str.endswith",
                     "runtime_call_adapter_kind": "builtin",
                     "semantic_tag": "stdlib.method.endswith",
@@ -25301,7 +25193,7 @@
                     "lowered_kind": "BuiltinCall",
                     "builtin_name": "endswith",
                     "runtime_call": "str.endswith",
-                    "runtime_module_id": "pytra.core.str",
+                    "runtime_module_id": "pytra.built_in.string_ops",
                     "runtime_symbol": "str.endswith",
                     "runtime_call_adapter_kind": "builtin",
                     "semantic_tag": "stdlib.method.endswith",
@@ -25587,9 +25479,7 @@
                 "call_arg_type": "str"
               }
             ],
-            "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "_float_exp"
+            "keywords": []
           }
         }
       ],
@@ -26094,9 +25984,7 @@
                 "call_arg_type": "list[str]"
               }
             ],
-            "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "_spec_width"
+            "keywords": []
           },
           "declare": true,
           "decl_type": "str",
@@ -26260,9 +26148,7 @@
                 "call_arg_type": "str"
               }
             ],
-            "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "_str_to_int"
+            "keywords": []
           },
           "declare": true,
           "decl_type": "int64",
@@ -26464,9 +26350,7 @@
                 "call_arg_type": "list[str]"
               }
             ],
-            "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "_spec_fill"
+            "keywords": []
           },
           "declare": true,
           "decl_type": "str",
@@ -26647,9 +26531,7 @@
                 "call_arg_type": "list[str]"
               }
             ],
-            "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "_spec_align"
+            "keywords": []
           },
           "declare": true,
           "decl_type": "str",
@@ -28017,9 +27899,7 @@
                 "call_arg_type": "list[str]"
               }
             ],
-            "keywords": [],
-            "lowered_kind": "BuiltinCall",
-            "builtin_name": "_spec_type"
+            "keywords": []
           },
           "declare": true,
           "decl_type": "str",
@@ -31009,6 +30889,18 @@
       "schema_version": 1,
       "bindings": [
         {
+          "module_id": "pytra.built_in.contains",
+          "export_name": "",
+          "local_name": "pytra.built_in.contains",
+          "binding_kind": "implicit_builtin",
+          "source_file": "src/pytra/built_in/format_value.py",
+          "source_line": 0,
+          "source_module_id": "pytra.built_in.contains",
+          "source_binding_kind": "implicit_builtin",
+          "runtime_module_id": "pytra.built_in.contains",
+          "runtime_group": "built_in"
+        },
+        {
           "module_id": "pytra.core.py_runtime",
           "export_name": "",
           "local_name": "pytra.core.py_runtime",
@@ -31025,12 +30917,28 @@
     },
     "import_bindings": [
       {
+        "module_id": "pytra.built_in.contains",
+        "export_name": "",
+        "local_name": "pytra.built_in.contains",
+        "binding_kind": "implicit_builtin",
+        "source_file": "src/pytra/built_in/format_value.py",
+        "source_line": 0,
+        "source_module_id": "pytra.built_in.contains",
+        "source_binding_kind": "implicit_builtin",
+        "runtime_module_id": "pytra.built_in.contains",
+        "runtime_group": "built_in"
+      },
+      {
         "module_id": "pytra.core.py_runtime",
         "export_name": "",
         "local_name": "pytra.core.py_runtime",
         "binding_kind": "implicit_builtin",
         "source_file": "src/pytra/built_in/format_value.py",
-        "source_line": 0
+        "source_line": 0,
+        "source_module_id": "pytra.core.py_runtime",
+        "source_binding_kind": "implicit_builtin",
+        "runtime_module_id": "pytra.core.py_runtime",
+        "runtime_group": "core"
       }
     ],
     "qualified_symbol_refs": [],

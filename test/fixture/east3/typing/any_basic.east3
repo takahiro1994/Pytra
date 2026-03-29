@@ -2474,7 +2474,17 @@
                         "category": "dynamic",
                         "mirror": "Any",
                         "dynamic_name": "Any"
-                      }
+                      },
+                      "predicate_category": "nominal_adt",
+                      "family_name": "dict",
+                      "predicate_kind": "variant",
+                      "variant_name": "dict"
+                    },
+                    "nominal_adt_test_v1": {
+                      "schema_version": 1,
+                      "family_name": "dict",
+                      "predicate_kind": "variant",
+                      "variant_name": "dict"
                     }
                   },
                   {

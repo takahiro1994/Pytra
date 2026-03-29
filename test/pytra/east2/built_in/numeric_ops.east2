@@ -37,14 +37,10 @@
         "lineno": 4,
         "col": 0,
         "end_lineno": 4,
-        "end_col": 35
+        "end_col": 30
       },
       "module": "pytra.std",
       "names": [
-        {
-          "name": "abi",
-          "asname": null
-        },
         {
           "name": "template",
           "asname": null
@@ -55,9 +51,9 @@
     {
       "kind": "FunctionDef",
       "source_span": {
-        "lineno": 9,
+        "lineno": 8,
         "col": 0,
-        "end_lineno": 18,
+        "end_lineno": 17,
         "end_col": 14
       },
       "name": "sum",
@@ -82,17 +78,17 @@
         {
           "kind": "If",
           "source_span": {
-            "lineno": 10,
+            "lineno": 9,
             "col": 4,
-            "end_lineno": 11,
+            "end_lineno": 10,
             "end_col": 16
           },
           "test": {
             "kind": "Compare",
             "source_span": {
-              "lineno": 10,
+              "lineno": 9,
               "col": 7,
-              "end_lineno": 10,
+              "end_lineno": 9,
               "end_col": 23
             },
             "resolved_type": "bool",
@@ -102,9 +98,9 @@
             "left": {
               "kind": "Call",
               "source_span": {
-                "lineno": 10,
+                "lineno": 9,
                 "col": 7,
-                "end_lineno": 10,
+                "end_lineno": 9,
                 "end_col": 18
               },
               "resolved_type": "int64",
@@ -114,9 +110,9 @@
               "func": {
                 "kind": "Name",
                 "source_span": {
-                  "lineno": 10,
+                  "lineno": 9,
                   "col": 7,
-                  "end_lineno": 10,
+                  "end_lineno": 9,
                   "end_col": 10
                 },
                 "resolved_type": "callable",
@@ -129,9 +125,9 @@
                 {
                   "kind": "Name",
                   "source_span": {
-                    "lineno": 10,
+                    "lineno": 9,
                     "col": 11,
-                    "end_lineno": 10,
+                    "end_lineno": 9,
                     "end_col": 17
                   },
                   "resolved_type": "list[T]",
@@ -158,9 +154,9 @@
               {
                 "kind": "Constant",
                 "source_span": {
-                  "lineno": 10,
+                  "lineno": 9,
                   "col": 22,
-                  "end_lineno": 10,
+                  "end_lineno": 9,
                   "end_col": 23
                 },
                 "resolved_type": "int64",
@@ -175,17 +171,17 @@
             {
               "kind": "Return",
               "source_span": {
-                "lineno": 11,
+                "lineno": 10,
                 "col": 8,
-                "end_lineno": 11,
+                "end_lineno": 10,
                 "end_col": 16
               },
               "value": {
                 "kind": "Constant",
                 "source_span": {
-                  "lineno": 11,
+                  "lineno": 10,
                   "col": 15,
-                  "end_lineno": 11,
+                  "end_lineno": 10,
                   "end_col": 16
                 },
                 "resolved_type": "int64",
@@ -201,17 +197,17 @@
         {
           "kind": "Assign",
           "source_span": {
-            "lineno": 12,
+            "lineno": 11,
             "col": 4,
-            "end_lineno": 12,
+            "end_lineno": 11,
             "end_col": 31
           },
           "target": {
             "kind": "Name",
             "source_span": {
-              "lineno": 12,
+              "lineno": 11,
               "col": 4,
-              "end_lineno": 12,
+              "end_lineno": 11,
               "end_col": 7
             },
             "resolved_type": "unknown",
@@ -223,9 +219,9 @@
           "value": {
             "kind": "BinOp",
             "source_span": {
-              "lineno": 12,
+              "lineno": 11,
               "col": 10,
-              "end_lineno": 12,
+              "end_lineno": 11,
               "end_col": 31
             },
             "resolved_type": "T",
@@ -235,9 +231,9 @@
             "left": {
               "kind": "Subscript",
               "source_span": {
-                "lineno": 12,
+                "lineno": 11,
                 "col": 10,
-                "end_lineno": 12,
+                "end_lineno": 11,
                 "end_col": 19
               },
               "resolved_type": "T",
@@ -247,9 +243,9 @@
               "value": {
                 "kind": "Name",
                 "source_span": {
-                  "lineno": 12,
+                  "lineno": 11,
                   "col": 10,
-                  "end_lineno": 12,
+                  "end_lineno": 11,
                   "end_col": 16
                 },
                 "resolved_type": "list[T]",
@@ -261,9 +257,9 @@
               "slice": {
                 "kind": "Constant",
                 "source_span": {
-                  "lineno": 12,
+                  "lineno": 11,
                   "col": 17,
-                  "end_lineno": 12,
+                  "end_lineno": 11,
                   "end_col": 18
                 },
                 "resolved_type": "int64",
@@ -277,9 +273,9 @@
             "right": {
               "kind": "Subscript",
               "source_span": {
-                "lineno": 12,
+                "lineno": 11,
                 "col": 22,
-                "end_lineno": 12,
+                "end_lineno": 11,
                 "end_col": 31
               },
               "resolved_type": "T",
@@ -289,9 +285,9 @@
               "value": {
                 "kind": "Name",
                 "source_span": {
-                  "lineno": 12,
+                  "lineno": 11,
                   "col": 22,
-                  "end_lineno": 12,
+                  "end_lineno": 11,
                   "end_col": 28
                 },
                 "resolved_type": "list[T]",
@@ -303,9 +299,9 @@
               "slice": {
                 "kind": "Constant",
                 "source_span": {
-                  "lineno": 12,
+                  "lineno": 11,
                   "col": 29,
-                  "end_lineno": 12,
+                  "end_lineno": 11,
                   "end_col": 30
                 },
                 "resolved_type": "int64",
@@ -323,17 +319,17 @@
         {
           "kind": "Assign",
           "source_span": {
-            "lineno": 13,
+            "lineno": 12,
             "col": 4,
-            "end_lineno": 13,
+            "end_lineno": 12,
             "end_col": 9
           },
           "target": {
             "kind": "Name",
             "source_span": {
-              "lineno": 13,
+              "lineno": 12,
               "col": 4,
-              "end_lineno": 13,
+              "end_lineno": 12,
               "end_col": 5
             },
             "resolved_type": "unknown",
@@ -345,9 +341,9 @@
           "value": {
             "kind": "Constant",
             "source_span": {
-              "lineno": 13,
+              "lineno": 12,
               "col": 8,
-              "end_lineno": 13,
+              "end_lineno": 12,
               "end_col": 9
             },
             "resolved_type": "int64",
@@ -363,17 +359,17 @@
         {
           "kind": "Assign",
           "source_span": {
-            "lineno": 14,
+            "lineno": 13,
             "col": 4,
-            "end_lineno": 14,
+            "end_lineno": 13,
             "end_col": 19
           },
           "target": {
             "kind": "Name",
             "source_span": {
-              "lineno": 14,
+              "lineno": 13,
               "col": 4,
-              "end_lineno": 14,
+              "end_lineno": 13,
               "end_col": 5
             },
             "resolved_type": "unknown",
@@ -385,9 +381,9 @@
           "value": {
             "kind": "Call",
             "source_span": {
-              "lineno": 14,
+              "lineno": 13,
               "col": 8,
-              "end_lineno": 14,
+              "end_lineno": 13,
               "end_col": 19
             },
             "resolved_type": "int64",
@@ -397,9 +393,9 @@
             "func": {
               "kind": "Name",
               "source_span": {
-                "lineno": 14,
+                "lineno": 13,
                 "col": 8,
-                "end_lineno": 14,
+                "end_lineno": 13,
                 "end_col": 11
               },
               "resolved_type": "callable",
@@ -412,9 +408,9 @@
               {
                 "kind": "Name",
                 "source_span": {
-                  "lineno": 14,
+                  "lineno": 13,
                   "col": 12,
-                  "end_lineno": 14,
+                  "end_lineno": 13,
                   "end_col": 18
                 },
                 "resolved_type": "list[T]",
@@ -441,17 +437,17 @@
         {
           "kind": "While",
           "source_span": {
-            "lineno": 15,
+            "lineno": 14,
             "col": 4,
-            "end_lineno": 17,
+            "end_lineno": 16,
             "end_col": 14
           },
           "test": {
             "kind": "Compare",
             "source_span": {
-              "lineno": 15,
+              "lineno": 14,
               "col": 10,
-              "end_lineno": 15,
+              "end_lineno": 14,
               "end_col": 15
             },
             "resolved_type": "bool",
@@ -461,9 +457,9 @@
             "left": {
               "kind": "Name",
               "source_span": {
-                "lineno": 15,
+                "lineno": 14,
                 "col": 10,
-                "end_lineno": 15,
+                "end_lineno": 14,
                 "end_col": 11
               },
               "resolved_type": "int64",
@@ -479,9 +475,9 @@
               {
                 "kind": "Name",
                 "source_span": {
-                  "lineno": 15,
+                  "lineno": 14,
                   "col": 14,
-                  "end_lineno": 15,
+                  "end_lineno": 14,
                   "end_col": 15
                 },
                 "resolved_type": "int64",
@@ -496,17 +492,17 @@
             {
               "kind": "AugAssign",
               "source_span": {
-                "lineno": 16,
+                "lineno": 15,
                 "col": 8,
-                "end_lineno": 16,
+                "end_lineno": 15,
                 "end_col": 24
               },
               "target": {
                 "kind": "Name",
                 "source_span": {
-                  "lineno": 16,
+                  "lineno": 15,
                   "col": 8,
-                  "end_lineno": 16,
+                  "end_lineno": 15,
                   "end_col": 11
                 },
                 "resolved_type": "T",
@@ -519,9 +515,9 @@
               "value": {
                 "kind": "Subscript",
                 "source_span": {
-                  "lineno": 16,
+                  "lineno": 15,
                   "col": 15,
-                  "end_lineno": 16,
+                  "end_lineno": 15,
                   "end_col": 24
                 },
                 "resolved_type": "T",
@@ -531,9 +527,9 @@
                 "value": {
                   "kind": "Name",
                   "source_span": {
-                    "lineno": 16,
+                    "lineno": 15,
                     "col": 15,
-                    "end_lineno": 16,
+                    "end_lineno": 15,
                     "end_col": 21
                   },
                   "resolved_type": "list[T]",
@@ -545,9 +541,9 @@
                 "slice": {
                   "kind": "Name",
                   "source_span": {
-                    "lineno": 16,
+                    "lineno": 15,
                     "col": 22,
-                    "end_lineno": 16,
+                    "end_lineno": 15,
                     "end_col": 23
                   },
                   "resolved_type": "int64",
@@ -563,17 +559,17 @@
             {
               "kind": "AugAssign",
               "source_span": {
-                "lineno": 17,
+                "lineno": 16,
                 "col": 8,
-                "end_lineno": 17,
+                "end_lineno": 16,
                 "end_col": 14
               },
               "target": {
                 "kind": "Name",
                 "source_span": {
-                  "lineno": 17,
+                  "lineno": 16,
                   "col": 8,
-                  "end_lineno": 17,
+                  "end_lineno": 16,
                   "end_col": 9
                 },
                 "resolved_type": "int64",
@@ -586,9 +582,9 @@
               "value": {
                 "kind": "Constant",
                 "source_span": {
-                  "lineno": 17,
+                  "lineno": 16,
                   "col": 13,
-                  "end_lineno": 17,
+                  "end_lineno": 16,
                   "end_col": 14
                 },
                 "resolved_type": "int64",
@@ -606,17 +602,17 @@
         {
           "kind": "Return",
           "source_span": {
-            "lineno": 18,
+            "lineno": 17,
             "col": 4,
-            "end_lineno": 18,
+            "end_lineno": 17,
             "end_col": 14
           },
           "value": {
             "kind": "Name",
             "source_span": {
-              "lineno": 18,
+              "lineno": 17,
               "col": 11,
-              "end_lineno": 18,
+              "end_lineno": 17,
               "end_col": 14
             },
             "resolved_type": "T",
@@ -655,14 +651,17 @@
           "kind": "blank",
           "count": 1
         }
+      ],
+      "decorators": [
+        "template(\"T\")"
       ]
     },
     {
       "kind": "FunctionDef",
       "source_span": {
-        "lineno": 22,
+        "lineno": 21,
         "col": 0,
-        "end_lineno": 25,
+        "end_lineno": 24,
         "end_col": 12
       },
       "name": "py_min",
@@ -691,17 +690,17 @@
         {
           "kind": "If",
           "source_span": {
-            "lineno": 23,
+            "lineno": 22,
             "col": 4,
-            "end_lineno": 24,
+            "end_lineno": 23,
             "end_col": 16
           },
           "test": {
             "kind": "Compare",
             "source_span": {
-              "lineno": 23,
+              "lineno": 22,
               "col": 7,
-              "end_lineno": 23,
+              "end_lineno": 22,
               "end_col": 12
             },
             "resolved_type": "bool",
@@ -711,9 +710,9 @@
             "left": {
               "kind": "Name",
               "source_span": {
-                "lineno": 23,
+                "lineno": 22,
                 "col": 7,
-                "end_lineno": 23,
+                "end_lineno": 22,
                 "end_col": 8
               },
               "resolved_type": "T",
@@ -729,9 +728,9 @@
               {
                 "kind": "Name",
                 "source_span": {
-                  "lineno": 23,
+                  "lineno": 22,
                   "col": 11,
-                  "end_lineno": 23,
+                  "end_lineno": 22,
                   "end_col": 12
                 },
                 "resolved_type": "T",
@@ -746,17 +745,17 @@
             {
               "kind": "Return",
               "source_span": {
-                "lineno": 24,
+                "lineno": 23,
                 "col": 8,
-                "end_lineno": 24,
+                "end_lineno": 23,
                 "end_col": 16
               },
               "value": {
                 "kind": "Name",
                 "source_span": {
-                  "lineno": 24,
+                  "lineno": 23,
                   "col": 15,
-                  "end_lineno": 24,
+                  "end_lineno": 23,
                   "end_col": 16
                 },
                 "resolved_type": "T",
@@ -772,17 +771,17 @@
         {
           "kind": "Return",
           "source_span": {
-            "lineno": 25,
+            "lineno": 24,
             "col": 4,
-            "end_lineno": 25,
+            "end_lineno": 24,
             "end_col": 12
           },
           "value": {
             "kind": "Name",
             "source_span": {
-              "lineno": 25,
+              "lineno": 24,
               "col": 11,
-              "end_lineno": 25,
+              "end_lineno": 24,
               "end_col": 12
             },
             "resolved_type": "T",
@@ -810,14 +809,17 @@
         "name": "T"
       },
       "leading_comments": [],
-      "leading_trivia": []
+      "leading_trivia": [],
+      "decorators": [
+        "template(\"T\")"
+      ]
     },
     {
       "kind": "FunctionDef",
       "source_span": {
-        "lineno": 29,
+        "lineno": 28,
         "col": 0,
-        "end_lineno": 32,
+        "end_lineno": 31,
         "end_col": 12
       },
       "name": "py_max",
@@ -846,17 +848,17 @@
         {
           "kind": "If",
           "source_span": {
-            "lineno": 30,
+            "lineno": 29,
             "col": 4,
-            "end_lineno": 24,
+            "end_lineno": 23,
             "end_col": 16
           },
           "test": {
             "kind": "Compare",
             "source_span": {
-              "lineno": 30,
+              "lineno": 29,
               "col": 7,
-              "end_lineno": 30,
+              "end_lineno": 29,
               "end_col": 12
             },
             "resolved_type": "bool",
@@ -866,9 +868,9 @@
             "left": {
               "kind": "Name",
               "source_span": {
-                "lineno": 30,
+                "lineno": 29,
                 "col": 7,
-                "end_lineno": 30,
+                "end_lineno": 29,
                 "end_col": 8
               },
               "resolved_type": "T",
@@ -884,9 +886,9 @@
               {
                 "kind": "Name",
                 "source_span": {
-                  "lineno": 30,
+                  "lineno": 29,
                   "col": 11,
-                  "end_lineno": 30,
+                  "end_lineno": 29,
                   "end_col": 12
                 },
                 "resolved_type": "T",
@@ -901,17 +903,17 @@
             {
               "kind": "Return",
               "source_span": {
-                "lineno": 24,
+                "lineno": 23,
                 "col": 8,
-                "end_lineno": 24,
+                "end_lineno": 23,
                 "end_col": 16
               },
               "value": {
                 "kind": "Name",
                 "source_span": {
-                  "lineno": 24,
+                  "lineno": 23,
                   "col": 15,
-                  "end_lineno": 24,
+                  "end_lineno": 23,
                   "end_col": 16
                 },
                 "resolved_type": "T",
@@ -927,17 +929,17 @@
         {
           "kind": "Return",
           "source_span": {
-            "lineno": 32,
+            "lineno": 31,
             "col": 4,
-            "end_lineno": 32,
+            "end_lineno": 31,
             "end_col": 12
           },
           "value": {
             "kind": "Name",
             "source_span": {
-              "lineno": 32,
+              "lineno": 31,
               "col": 11,
-              "end_lineno": 32,
+              "end_lineno": 31,
               "end_col": 12
             },
             "resolved_type": "T",
@@ -965,7 +967,10 @@
         "name": "T"
       },
       "leading_comments": [],
-      "leading_trivia": []
+      "leading_trivia": [],
+      "decorators": [
+        "template(\"T\")"
+      ]
     }
   ],
   "main_guard_body": [],
@@ -975,24 +980,6 @@
     "import_resolution": {
       "schema_version": 1,
       "bindings": [
-        {
-          "module_id": "pytra.std",
-          "export_name": "abi",
-          "local_name": "abi",
-          "binding_kind": "symbol",
-          "source_file": "src/pytra/built_in/numeric_ops.py",
-          "source_line": 4,
-          "source_module_id": "pytra.std",
-          "source_export_name": "abi",
-          "source_binding_kind": "symbol",
-          "runtime_module_id": "pytra.std",
-          "runtime_group": "std",
-          "resolved_binding_kind": "symbol",
-          "runtime_symbol": "abi",
-          "runtime_symbol_kind": "function",
-          "runtime_symbol_dispatch": "function",
-          "runtime_semantic_tag": "stdlib.fn.abi"
-        },
         {
           "module_id": "pytra.std",
           "export_name": "template",
@@ -1024,11 +1011,6 @@
       "qualified_refs": [
         {
           "module_id": "pytra.std",
-          "symbol": "abi",
-          "local_name": "abi"
-        },
-        {
-          "module_id": "pytra.std",
           "symbol": "template",
           "local_name": "template"
         }
@@ -1037,19 +1019,18 @@
     "import_bindings": [
       {
         "module_id": "pytra.std",
-        "export_name": "abi",
-        "local_name": "abi",
-        "binding_kind": "symbol",
-        "source_file": "src/pytra/built_in/numeric_ops.py",
-        "source_line": 4
-      },
-      {
-        "module_id": "pytra.std",
         "export_name": "template",
         "local_name": "template",
         "binding_kind": "symbol",
         "source_file": "src/pytra/built_in/numeric_ops.py",
-        "source_line": 4
+        "source_line": 4,
+        "source_module_id": "pytra.std",
+        "source_export_name": "template",
+        "source_binding_kind": "symbol",
+        "runtime_module_id": "pytra.std.template",
+        "runtime_group": "std",
+        "resolved_binding_kind": "module",
+        "host_only": true
       },
       {
         "module_id": "pytra.core.py_runtime",
@@ -1057,15 +1038,14 @@
         "local_name": "pytra.core.py_runtime",
         "binding_kind": "implicit_builtin",
         "source_file": "src/pytra/built_in/numeric_ops.py",
-        "source_line": 0
+        "source_line": 0,
+        "source_module_id": "pytra.core.py_runtime",
+        "source_binding_kind": "implicit_builtin",
+        "runtime_module_id": "pytra.core.py_runtime",
+        "runtime_group": "core"
       }
     ],
     "qualified_symbol_refs": [
-      {
-        "module_id": "pytra.std",
-        "symbol": "abi",
-        "local_name": "abi"
-      },
       {
         "module_id": "pytra.std",
         "symbol": "template",
@@ -1074,10 +1054,6 @@
     ],
     "import_modules": {},
     "import_symbols": {
-      "abi": {
-        "module": "pytra.std",
-        "name": "abi"
-      },
       "template": {
         "module": "pytra.std",
         "name": "template"

@@ -147,7 +147,17 @@
                     "category": "general_union",
                     "mirror": "int64|float64",
                     "union_mode": "general"
-                  }
+                  },
+                  "predicate_category": "nominal_adt",
+                  "family_name": "int",
+                  "predicate_kind": "variant",
+                  "variant_name": "int"
+                },
+                "nominal_adt_test_v1": {
+                  "schema_version": 1,
+                  "family_name": "int",
+                  "predicate_kind": "variant",
+                  "variant_name": "int"
                 }
               },
               {
@@ -206,7 +216,17 @@
                     "category": "general_union",
                     "mirror": "int64|float64",
                     "union_mode": "general"
-                  }
+                  },
+                  "predicate_category": "nominal_adt",
+                  "family_name": "int",
+                  "predicate_kind": "variant",
+                  "variant_name": "int"
+                },
+                "nominal_adt_test_v1": {
+                  "schema_version": 1,
+                  "family_name": "int",
+                  "predicate_kind": "variant",
+                  "variant_name": "int"
                 }
               }
             ]
@@ -233,33 +253,63 @@
                 "borrow_kind": "value",
                 "repr": "a + b",
                 "left": {
-                  "kind": "Name",
+                  "kind": "Unbox",
+                  "value": {
+                    "kind": "Name",
+                    "source_span": {
+                      "lineno": 8,
+                      "col_offset": 15,
+                      "end_lineno": 8,
+                      "end_col_offset": 16
+                    },
+                    "resolved_type": "int64",
+                    "casts": [],
+                    "borrow_kind": "readonly_ref",
+                    "repr": "a",
+                    "id": "a"
+                  },
+                  "resolved_type": "int64",
+                  "borrow_kind": "value",
+                  "casts": [],
+                  "target": "int64",
+                  "on_fail": "raise",
                   "source_span": {
                     "lineno": 8,
                     "col_offset": 15,
                     "end_lineno": 8,
                     "end_col_offset": 16
                   },
-                  "resolved_type": "int64",
-                  "casts": [],
-                  "borrow_kind": "readonly_ref",
-                  "repr": "a",
-                  "id": "a"
+                  "repr": "a"
                 },
                 "op": "Add",
                 "right": {
-                  "kind": "Name",
+                  "kind": "Unbox",
+                  "value": {
+                    "kind": "Name",
+                    "source_span": {
+                      "lineno": 8,
+                      "col_offset": 19,
+                      "end_lineno": 8,
+                      "end_col_offset": 20
+                    },
+                    "resolved_type": "int64",
+                    "casts": [],
+                    "borrow_kind": "readonly_ref",
+                    "repr": "b",
+                    "id": "b"
+                  },
+                  "resolved_type": "int64",
+                  "borrow_kind": "value",
+                  "casts": [],
+                  "target": "int64",
+                  "on_fail": "raise",
                   "source_span": {
                     "lineno": 8,
                     "col_offset": 19,
                     "end_lineno": 8,
                     "end_col_offset": 20
                   },
-                  "resolved_type": "int64",
-                  "casts": [],
-                  "borrow_kind": "readonly_ref",
-                  "repr": "b",
-                  "id": "b"
+                  "repr": "b"
                 }
               }
             }

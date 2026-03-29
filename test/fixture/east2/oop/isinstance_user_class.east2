@@ -21,6 +21,7 @@
       "base": null,
       "dataclass": false,
       "field_types": {},
+      "decorators": [],
       "body": [
         {
           "kind": "Pass",
@@ -34,7 +35,8 @@
       ],
       "class_storage_hint": "value",
       "leading_comments": [],
-      "leading_trivia": []
+      "leading_trivia": [],
+      "meta": {}
     },
     {
       "kind": "ClassDef",
@@ -49,6 +51,7 @@
       "base": "Base",
       "dataclass": false,
       "field_types": {},
+      "decorators": [],
       "body": [
         {
           "kind": "Pass",
@@ -60,7 +63,8 @@
           }
         }
       ],
-      "class_storage_hint": "ref"
+      "class_storage_hint": "ref",
+      "meta": {}
     },
     {
       "kind": "FunctionDef",

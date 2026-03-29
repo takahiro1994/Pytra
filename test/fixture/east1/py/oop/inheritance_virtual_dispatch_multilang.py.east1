@@ -91,6 +91,7 @@
           "decorators": []
         }
       ],
+      "decorators": [],
       "leading_comments": [
         "This file contains test/implementation code for `test/fixtures/oop/inheritance_virtual_dispatch_multilang.py`."
       ],
@@ -170,7 +171,8 @@
           "yield_value_type": "unknown",
           "decorators": []
         }
-      ]
+      ],
+      "decorators": []
     },
     {
       "kind": "ClassDef",
@@ -304,7 +306,8 @@
           "yield_value_type": "unknown",
           "decorators": []
         }
-      ]
+      ],
+      "decorators": []
     },
     {
       "kind": "FunctionDef",

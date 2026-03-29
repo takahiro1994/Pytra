@@ -15,6 +15,7 @@
       "base": null,
       "dataclass": false,
       "field_types": {},
+      "decorators": [],
       "body": [
         {
           "kind": "Pass",
@@ -28,7 +29,8 @@
       ],
       "class_storage_hint": "value",
       "leading_comments": [],
-      "leading_trivia": []
+      "leading_trivia": [],
+      "meta": {}
     },
     {
       "kind": "ClassDef",
@@ -43,6 +45,7 @@
       "base": "Base",
       "dataclass": false,
       "field_types": {},
+      "decorators": [],
       "body": [
         {
           "kind": "Pass",
@@ -54,7 +57,8 @@
           }
         }
       ],
-      "class_storage_hint": "ref"
+      "class_storage_hint": "ref",
+      "meta": {}
     },
     {
       "kind": "FunctionDef",
@@ -149,7 +153,17 @@
                 "category": "dynamic",
                 "mirror": "object",
                 "dynamic_name": "object"
-              }
+              },
+              "predicate_category": "nominal_adt",
+              "family_name": "Base",
+              "predicate_kind": "variant",
+              "variant_name": "Base"
+            },
+            "nominal_adt_test_v1": {
+              "schema_version": 1,
+              "family_name": "Base",
+              "predicate_kind": "variant",
+              "variant_name": "Base"
             }
           }
         }
@@ -701,7 +715,17 @@
                 "kind": "NamedType",
                 "category": "static",
                 "mirror": "Child"
-              }
+              },
+              "predicate_category": "nominal_adt",
+              "family_name": "Child",
+              "predicate_kind": "variant",
+              "variant_name": "Child"
+            },
+            "nominal_adt_test_v1": {
+              "schema_version": 1,
+              "family_name": "Child",
+              "predicate_kind": "variant",
+              "variant_name": "Child"
             }
           }
         ],

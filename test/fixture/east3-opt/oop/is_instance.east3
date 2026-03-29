@@ -32,6 +32,7 @@
       "base": null,
       "dataclass": false,
       "field_types": {},
+      "decorators": [],
       "body": [
         {
           "kind": "Pass",
@@ -70,7 +71,8 @@
           "kind": "blank",
           "count": 1
         }
-      ]
+      ],
+      "meta": {}
     },
     {
       "kind": "ClassDef",
@@ -85,6 +87,7 @@
       "base": "Animal",
       "dataclass": false,
       "field_types": {},
+      "decorators": [],
       "body": [
         {
           "kind": "Pass",
@@ -96,7 +99,8 @@
           }
         }
       ],
-      "class_storage_hint": "ref"
+      "class_storage_hint": "ref",
+      "meta": {}
     },
     {
       "kind": "ClassDef",
@@ -111,6 +115,7 @@
       "base": "Animal",
       "dataclass": false,
       "field_types": {},
+      "decorators": [],
       "body": [
         {
           "kind": "Pass",
@@ -122,7 +127,8 @@
           }
         }
       ],
-      "class_storage_hint": "ref"
+      "class_storage_hint": "ref",
+      "meta": {}
     },
     {
       "kind": "FunctionDef",
@@ -416,7 +422,17 @@
                     "kind": "NamedType",
                     "category": "static",
                     "mirror": "Cat"
-                  }
+                  },
+                  "predicate_category": "nominal_adt",
+                  "family_name": "Dog",
+                  "predicate_kind": "variant",
+                  "variant_name": "Dog"
+                },
+                "nominal_adt_test_v1": {
+                  "schema_version": 1,
+                  "family_name": "Dog",
+                  "predicate_kind": "variant",
+                  "variant_name": "Dog"
                 }
               }
             ],
@@ -554,7 +570,17 @@
                     "kind": "NamedType",
                     "category": "static",
                     "mirror": "Cat"
-                  }
+                  },
+                  "predicate_category": "nominal_adt",
+                  "family_name": "Animal",
+                  "predicate_kind": "variant",
+                  "variant_name": "Animal"
+                },
+                "nominal_adt_test_v1": {
+                  "schema_version": 1,
+                  "family_name": "Animal",
+                  "predicate_kind": "variant",
+                  "variant_name": "Animal"
                 }
               }
             ],
@@ -690,7 +716,17 @@
                     "kind": "NamedType",
                     "category": "static",
                     "mirror": "Dog"
-                  }
+                  },
+                  "predicate_category": "nominal_adt",
+                  "family_name": "Cat",
+                  "predicate_kind": "variant",
+                  "variant_name": "Cat"
+                },
+                "nominal_adt_test_v1": {
+                  "schema_version": 1,
+                  "family_name": "Cat",
+                  "predicate_kind": "variant",
+                  "variant_name": "Cat"
                 }
               }
             ],
@@ -824,7 +860,17 @@
                     "kind": "NamedType",
                     "category": "static",
                     "mirror": "Dog"
-                  }
+                  },
+                  "predicate_category": "nominal_adt",
+                  "family_name": "Animal",
+                  "predicate_kind": "variant",
+                  "variant_name": "Animal"
+                },
+                "nominal_adt_test_v1": {
+                  "schema_version": 1,
+                  "family_name": "Animal",
+                  "predicate_kind": "variant",
+                  "variant_name": "Animal"
                 }
               }
             ],

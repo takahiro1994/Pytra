@@ -1528,7 +1528,17 @@
                     "kind": "NamedType",
                     "category": "static",
                     "mirror": "Circle"
-                  }
+                  },
+                  "predicate_category": "nominal_adt",
+                  "family_name": "Drawable",
+                  "predicate_kind": "variant",
+                  "variant_name": "Drawable"
+                },
+                "nominal_adt_test_v1": {
+                  "schema_version": 1,
+                  "family_name": "Drawable",
+                  "predicate_kind": "variant",
+                  "variant_name": "Drawable"
                 }
               }
             ],
@@ -1639,7 +1649,17 @@
                     "kind": "NamedType",
                     "category": "static",
                     "mirror": "Circle"
-                  }
+                  },
+                  "predicate_category": "nominal_adt",
+                  "family_name": "ShapeLike",
+                  "predicate_kind": "variant",
+                  "variant_name": "ShapeLike"
+                },
+                "nominal_adt_test_v1": {
+                  "schema_version": 1,
+                  "family_name": "ShapeLike",
+                  "predicate_kind": "variant",
+                  "variant_name": "ShapeLike"
                 }
               }
             ],
@@ -1750,7 +1770,17 @@
                     "kind": "NamedType",
                     "category": "static",
                     "mirror": "Circle"
-                  }
+                  },
+                  "predicate_category": "nominal_adt",
+                  "family_name": "Named",
+                  "predicate_kind": "variant",
+                  "variant_name": "Named"
+                },
+                "nominal_adt_test_v1": {
+                  "schema_version": 1,
+                  "family_name": "Named",
+                  "predicate_kind": "variant",
+                  "variant_name": "Named"
                 }
               }
             ],

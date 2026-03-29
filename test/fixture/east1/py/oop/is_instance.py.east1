@@ -49,6 +49,7 @@
           }
         }
       ],
+      "decorators": [],
       "leading_comments": [
         "This file contains test/implementation code for `test/fixtures/oop/is_instance.py`.",
         "Reader-facing comments are added to make roles easier to understand.",
@@ -100,7 +101,8 @@
             "end_col": 8
           }
         }
-      ]
+      ],
+      "decorators": []
     },
     {
       "kind": "ClassDef",
@@ -125,7 +127,8 @@
             "end_col": 8
           }
         }
-      ]
+      ],
+      "decorators": []
     },
     {
       "kind": "FunctionDef",

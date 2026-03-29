@@ -677,6 +677,9 @@
           "count": 1
         }
       ],
+      "decorators": [
+        "extern"
+      ],
       "returns": "None"
     },
     {
@@ -942,6 +945,9 @@
       },
       "leading_comments": [],
       "leading_trivia": [],
+      "decorators": [
+        "extern"
+      ],
       "returns": "None"
     },
     {
@@ -1207,6 +1213,9 @@
       },
       "leading_comments": [],
       "leading_trivia": [],
+      "decorators": [
+        "extern"
+      ],
       "returns": "None"
     },
     {
@@ -1344,6 +1353,9 @@
       },
       "leading_comments": [],
       "leading_trivia": [],
+      "decorators": [
+        "extern"
+      ],
       "returns": "None"
     },
     {
@@ -1481,6 +1493,9 @@
       },
       "leading_comments": [],
       "leading_trivia": [],
+      "decorators": [
+        "extern"
+      ],
       "returns": "None"
     }
   ],
@@ -1541,6 +1556,12 @@
         "binding_kind": "module",
         "source_file": "src/pytra/std/sys.py",
         "source_line": 4,
+        "source_module_id": "sys",
+        "source_export_name": "",
+        "source_binding_kind": "module",
+        "runtime_module_id": "pytra.std.sys",
+        "runtime_group": "std",
+        "resolved_binding_kind": "module",
         "host_only": true
       },
       {
@@ -1549,7 +1570,17 @@
         "local_name": "extern",
         "binding_kind": "symbol",
         "source_file": "src/pytra/std/sys.py",
-        "source_line": 6
+        "source_line": 6,
+        "source_module_id": "pytra.std",
+        "source_export_name": "extern",
+        "source_binding_kind": "symbol",
+        "runtime_module_id": "pytra.std",
+        "runtime_group": "std",
+        "resolved_binding_kind": "symbol",
+        "runtime_symbol": "extern",
+        "runtime_symbol_kind": "function",
+        "runtime_symbol_dispatch": "function",
+        "runtime_semantic_tag": "stdlib.fn.extern"
       }
     ],
     "qualified_symbol_refs": [

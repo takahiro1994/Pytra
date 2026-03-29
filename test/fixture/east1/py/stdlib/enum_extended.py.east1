@@ -116,6 +116,7 @@
           "declare": true
         }
       ],
+      "decorators": [],
       "leading_comments": [],
       "leading_trivia": []
     },
@@ -205,7 +206,8 @@
           },
           "declare": true
         }
-      ]
+      ],
+      "decorators": []
     },
     {
       "kind": "ClassDef",
@@ -329,7 +331,8 @@
           },
           "declare": true
         }
-      ]
+      ],
+      "decorators": []
     },
     {
       "kind": "FunctionDef",

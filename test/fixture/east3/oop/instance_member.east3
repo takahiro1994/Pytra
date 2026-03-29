@@ -35,6 +35,7 @@
         "x": "int64",
         "y": "int64"
       },
+      "decorators": [],
       "body": [
         {
           "kind": "ClosureDef",
@@ -345,7 +346,8 @@
           "kind": "blank",
           "count": 1
         }
-      ]
+      ],
+      "meta": {}
     },
     {
       "kind": "FunctionDef",

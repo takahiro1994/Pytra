@@ -31,14 +31,10 @@
         "lineno": 4,
         "col_offset": 0,
         "end_lineno": 4,
-        "end_col_offset": 35
+        "end_col_offset": 30
       },
       "module": "pytra.std",
       "names": [
-        {
-          "name": "abi",
-          "asname": null
-        },
         {
           "name": "template",
           "asname": null
@@ -49,9 +45,9 @@
     {
       "kind": "FunctionDef",
       "source_span": {
-        "lineno": 9,
+        "lineno": 8,
         "col_offset": 0,
-        "end_lineno": 18,
+        "end_lineno": 17,
         "end_col_offset": 14
       },
       "name": "zip",
@@ -80,17 +76,17 @@
         {
           "kind": "AnnAssign",
           "source_span": {
-            "lineno": 10,
+            "lineno": 9,
             "col_offset": 4,
-            "end_lineno": 10,
+            "end_lineno": 9,
             "end_col_offset": 31
           },
           "target": {
             "kind": "Name",
             "source_span": {
-              "lineno": 10,
+              "lineno": 9,
               "col_offset": 4,
-              "end_lineno": 10,
+              "end_lineno": 9,
               "end_col_offset": 7
             },
             "resolved_type": "list[tuple[A,B]]",
@@ -165,9 +161,9 @@
           "value": {
             "kind": "List",
             "source_span": {
-              "lineno": 10,
+              "lineno": 9,
               "col_offset": 29,
-              "end_lineno": 10,
+              "end_lineno": 9,
               "end_col_offset": 31
             },
             "resolved_type": "list[tuple[A,B]]",
@@ -192,17 +188,17 @@
         {
           "kind": "Assign",
           "source_span": {
-            "lineno": 11,
+            "lineno": 10,
             "col_offset": 4,
-            "end_lineno": 11,
+            "end_lineno": 10,
             "end_col_offset": 9
           },
           "target": {
             "kind": "Name",
             "source_span": {
-              "lineno": 11,
+              "lineno": 10,
               "col_offset": 4,
-              "end_lineno": 11,
+              "end_lineno": 10,
               "end_col_offset": 5
             },
             "resolved_type": "int64",
@@ -217,9 +213,9 @@
           "value": {
             "kind": "Constant",
             "source_span": {
-              "lineno": 11,
+              "lineno": 10,
               "col_offset": 8,
-              "end_lineno": 11,
+              "end_lineno": 10,
               "end_col_offset": 9
             },
             "resolved_type": "int64",
@@ -238,17 +234,17 @@
         {
           "kind": "Assign",
           "source_span": {
-            "lineno": 12,
+            "lineno": 11,
             "col_offset": 4,
-            "end_lineno": 12,
+            "end_lineno": 11,
             "end_col_offset": 16
           },
           "target": {
             "kind": "Name",
             "source_span": {
-              "lineno": 12,
+              "lineno": 11,
               "col_offset": 4,
-              "end_lineno": 12,
+              "end_lineno": 11,
               "end_col_offset": 5
             },
             "resolved_type": "int64",
@@ -263,9 +259,9 @@
           "value": {
             "kind": "Call",
             "source_span": {
-              "lineno": 12,
+              "lineno": 11,
               "col_offset": 8,
-              "end_lineno": 12,
+              "end_lineno": 11,
               "end_col_offset": 16
             },
             "resolved_type": "int64",
@@ -275,9 +271,9 @@
             "func": {
               "kind": "Name",
               "source_span": {
-                "lineno": 12,
+                "lineno": 11,
                 "col_offset": 8,
-                "end_lineno": 12,
+                "end_lineno": 11,
                 "end_col_offset": 11
               },
               "resolved_type": "callable",
@@ -290,9 +286,9 @@
               {
                 "kind": "Name",
                 "source_span": {
-                  "lineno": 12,
+                  "lineno": 11,
                   "col_offset": 12,
-                  "end_lineno": 12,
+                  "end_lineno": 11,
                   "end_col_offset": 15
                 },
                 "resolved_type": "list[A]",
@@ -328,17 +324,17 @@
         {
           "kind": "If",
           "source_span": {
-            "lineno": 13,
+            "lineno": 12,
             "col_offset": 4,
-            "end_lineno": 14,
+            "end_lineno": 13,
             "end_col_offset": 20
           },
           "test": {
             "kind": "Compare",
             "source_span": {
-              "lineno": 13,
+              "lineno": 12,
               "col_offset": 7,
-              "end_lineno": 13,
+              "end_lineno": 12,
               "end_col_offset": 19
             },
             "resolved_type": "bool",
@@ -348,9 +344,9 @@
             "left": {
               "kind": "Call",
               "source_span": {
-                "lineno": 13,
+                "lineno": 12,
                 "col_offset": 7,
-                "end_lineno": 13,
+                "end_lineno": 12,
                 "end_col_offset": 15
               },
               "resolved_type": "int64",
@@ -360,9 +356,9 @@
               "func": {
                 "kind": "Name",
                 "source_span": {
-                  "lineno": 13,
+                  "lineno": 12,
                   "col_offset": 7,
-                  "end_lineno": 13,
+                  "end_lineno": 12,
                   "end_col_offset": 10
                 },
                 "resolved_type": "callable",
@@ -375,9 +371,9 @@
                 {
                   "kind": "Name",
                   "source_span": {
-                    "lineno": 13,
+                    "lineno": 12,
                     "col_offset": 11,
-                    "end_lineno": 13,
+                    "end_lineno": 12,
                     "end_col_offset": 14
                   },
                   "resolved_type": "list[B]",
@@ -410,9 +406,9 @@
               {
                 "kind": "Name",
                 "source_span": {
-                  "lineno": 13,
+                  "lineno": 12,
                   "col_offset": 18,
-                  "end_lineno": 13,
+                  "end_lineno": 12,
                   "end_col_offset": 19
                 },
                 "resolved_type": "int64",
@@ -427,17 +423,17 @@
             {
               "kind": "Assign",
               "source_span": {
-                "lineno": 14,
+                "lineno": 13,
                 "col_offset": 8,
-                "end_lineno": 14,
+                "end_lineno": 13,
                 "end_col_offset": 20
               },
               "target": {
                 "kind": "Name",
                 "source_span": {
-                  "lineno": 14,
+                  "lineno": 13,
                   "col_offset": 8,
-                  "end_lineno": 14,
+                  "end_lineno": 13,
                   "end_col_offset": 9
                 },
                 "resolved_type": "int64",
@@ -452,9 +448,9 @@
               "value": {
                 "kind": "Call",
                 "source_span": {
-                  "lineno": 14,
+                  "lineno": 13,
                   "col_offset": 12,
-                  "end_lineno": 14,
+                  "end_lineno": 13,
                   "end_col_offset": 20
                 },
                 "resolved_type": "int64",
@@ -464,9 +460,9 @@
                 "func": {
                   "kind": "Name",
                   "source_span": {
-                    "lineno": 14,
+                    "lineno": 13,
                     "col_offset": 12,
-                    "end_lineno": 14,
+                    "end_lineno": 13,
                     "end_col_offset": 15
                   },
                   "resolved_type": "callable",
@@ -479,9 +475,9 @@
                   {
                     "kind": "Name",
                     "source_span": {
-                      "lineno": 14,
+                      "lineno": 13,
                       "col_offset": 16,
-                      "end_lineno": 14,
+                      "end_lineno": 13,
                       "end_col_offset": 19
                     },
                     "resolved_type": "list[B]",
@@ -520,17 +516,17 @@
         {
           "kind": "While",
           "source_span": {
-            "lineno": 15,
+            "lineno": 14,
             "col_offset": 4,
-            "end_lineno": 17,
+            "end_lineno": 16,
             "end_col_offset": 14
           },
           "test": {
             "kind": "Compare",
             "source_span": {
-              "lineno": 15,
+              "lineno": 14,
               "col_offset": 10,
-              "end_lineno": 15,
+              "end_lineno": 14,
               "end_col_offset": 15
             },
             "resolved_type": "bool",
@@ -540,9 +536,9 @@
             "left": {
               "kind": "Name",
               "source_span": {
-                "lineno": 15,
+                "lineno": 14,
                 "col_offset": 10,
-                "end_lineno": 15,
+                "end_lineno": 14,
                 "end_col_offset": 11
               },
               "resolved_type": "int64",
@@ -558,9 +554,9 @@
               {
                 "kind": "Name",
                 "source_span": {
-                  "lineno": 15,
+                  "lineno": 14,
                   "col_offset": 14,
-                  "end_lineno": 15,
+                  "end_lineno": 14,
                   "end_col_offset": 15
                 },
                 "resolved_type": "int64",
@@ -575,17 +571,17 @@
             {
               "kind": "Expr",
               "source_span": {
-                "lineno": 16,
+                "lineno": 15,
                 "col_offset": 8,
-                "end_lineno": 16,
+                "end_lineno": 15,
                 "end_col_offset": 36
               },
               "value": {
                 "kind": "Call",
                 "source_span": {
-                  "lineno": 16,
+                  "lineno": 15,
                   "col_offset": 8,
-                  "end_lineno": 16,
+                  "end_lineno": 15,
                   "end_col_offset": 36
                 },
                 "resolved_type": "None",
@@ -595,9 +591,9 @@
                 "func": {
                   "kind": "Attribute",
                   "source_span": {
-                    "lineno": 16,
+                    "lineno": 15,
                     "col_offset": 8,
-                    "end_lineno": 16,
+                    "end_lineno": 15,
                     "end_col_offset": 18
                   },
                   "resolved_type": "callable",
@@ -607,9 +603,9 @@
                   "value": {
                     "kind": "Name",
                     "source_span": {
-                      "lineno": 16,
+                      "lineno": 15,
                       "col_offset": 8,
-                      "end_lineno": 16,
+                      "end_lineno": 15,
                       "end_col_offset": 11
                     },
                     "resolved_type": "list[tuple[A,B]]",
@@ -624,9 +620,9 @@
                   {
                     "kind": "Tuple",
                     "source_span": {
-                      "lineno": 16,
+                      "lineno": 15,
                       "col_offset": 19,
-                      "end_lineno": 16,
+                      "end_lineno": 15,
                       "end_col_offset": 35
                     },
                     "resolved_type": "tuple[A, B]",
@@ -637,9 +633,9 @@
                       {
                         "kind": "Subscript",
                         "source_span": {
-                          "lineno": 16,
+                          "lineno": 15,
                           "col_offset": 20,
-                          "end_lineno": 16,
+                          "end_lineno": 15,
                           "end_col_offset": 26
                         },
                         "resolved_type": "A",
@@ -649,9 +645,9 @@
                         "value": {
                           "kind": "Name",
                           "source_span": {
-                            "lineno": 16,
+                            "lineno": 15,
                             "col_offset": 20,
-                            "end_lineno": 16,
+                            "end_lineno": 15,
                             "end_col_offset": 23
                           },
                           "resolved_type": "list[A]",
@@ -663,9 +659,9 @@
                         "slice": {
                           "kind": "Name",
                           "source_span": {
-                            "lineno": 16,
+                            "lineno": 15,
                             "col_offset": 24,
-                            "end_lineno": 16,
+                            "end_lineno": 15,
                             "end_col_offset": 25
                           },
                           "resolved_type": "int64",
@@ -678,9 +674,9 @@
                       {
                         "kind": "Subscript",
                         "source_span": {
-                          "lineno": 16,
+                          "lineno": 15,
                           "col_offset": 28,
-                          "end_lineno": 16,
+                          "end_lineno": 15,
                           "end_col_offset": 34
                         },
                         "resolved_type": "B",
@@ -690,9 +686,9 @@
                         "value": {
                           "kind": "Name",
                           "source_span": {
-                            "lineno": 16,
+                            "lineno": 15,
                             "col_offset": 28,
-                            "end_lineno": 16,
+                            "end_lineno": 15,
                             "end_col_offset": 31
                           },
                           "resolved_type": "list[B]",
@@ -704,9 +700,9 @@
                         "slice": {
                           "kind": "Name",
                           "source_span": {
-                            "lineno": 16,
+                            "lineno": 15,
                             "col_offset": 32,
-                            "end_lineno": 16,
+                            "end_lineno": 15,
                             "end_col_offset": 33
                           },
                           "resolved_type": "int64",
@@ -731,9 +727,9 @@
                 "runtime_owner": {
                   "kind": "Name",
                   "source_span": {
-                    "lineno": 16,
+                    "lineno": 15,
                     "col_offset": 8,
-                    "end_lineno": 16,
+                    "end_lineno": 15,
                     "end_col_offset": 11
                   },
                   "resolved_type": "list[tuple[A,B]]",
@@ -753,17 +749,17 @@
             {
               "kind": "AugAssign",
               "source_span": {
-                "lineno": 17,
+                "lineno": 16,
                 "col_offset": 8,
-                "end_lineno": 17,
+                "end_lineno": 16,
                 "end_col_offset": 14
               },
               "target": {
                 "kind": "Name",
                 "source_span": {
-                  "lineno": 17,
+                  "lineno": 16,
                   "col_offset": 8,
-                  "end_lineno": 17,
+                  "end_lineno": 16,
                   "end_col_offset": 9
                 },
                 "resolved_type": "int64",
@@ -778,9 +774,9 @@
               "value": {
                 "kind": "Constant",
                 "source_span": {
-                  "lineno": 17,
+                  "lineno": 16,
                   "col_offset": 13,
-                  "end_lineno": 17,
+                  "end_lineno": 16,
                   "end_col_offset": 14
                 },
                 "resolved_type": "int64",
@@ -802,17 +798,17 @@
         {
           "kind": "Return",
           "source_span": {
-            "lineno": 18,
+            "lineno": 17,
             "col_offset": 4,
-            "end_lineno": 18,
+            "end_lineno": 17,
             "end_col_offset": 14
           },
           "value": {
             "kind": "Name",
             "source_span": {
-              "lineno": 18,
+              "lineno": 17,
               "col_offset": 11,
-              "end_lineno": 18,
+              "end_lineno": 17,
               "end_col_offset": 14
             },
             "resolved_type": "list[tuple[A,B]]",
@@ -878,6 +874,9 @@
           "count": 1
         }
       ],
+      "decorators": [
+        "template(\"A\", \"B\")"
+      ],
       "returns": "list[tuple[A,B]]"
     }
   ],
@@ -888,24 +887,6 @@
     "import_resolution": {
       "schema_version": 1,
       "bindings": [
-        {
-          "module_id": "pytra.std",
-          "export_name": "abi",
-          "local_name": "abi",
-          "binding_kind": "symbol",
-          "source_file": "src/pytra/built_in/zip_ops.py",
-          "source_line": 4,
-          "source_module_id": "pytra.std",
-          "source_export_name": "abi",
-          "source_binding_kind": "symbol",
-          "runtime_module_id": "pytra.std",
-          "runtime_group": "std",
-          "resolved_binding_kind": "symbol",
-          "runtime_symbol": "abi",
-          "runtime_symbol_kind": "function",
-          "runtime_symbol_dispatch": "function",
-          "runtime_semantic_tag": "stdlib.fn.abi"
-        },
         {
           "module_id": "pytra.std",
           "export_name": "template",
@@ -937,11 +918,6 @@
       "qualified_refs": [
         {
           "module_id": "pytra.std",
-          "symbol": "abi",
-          "local_name": "abi"
-        },
-        {
-          "module_id": "pytra.std",
           "symbol": "template",
           "local_name": "template"
         }
@@ -950,19 +926,18 @@
     "import_bindings": [
       {
         "module_id": "pytra.std",
-        "export_name": "abi",
-        "local_name": "abi",
-        "binding_kind": "symbol",
-        "source_file": "src/pytra/built_in/zip_ops.py",
-        "source_line": 4
-      },
-      {
-        "module_id": "pytra.std",
         "export_name": "template",
         "local_name": "template",
         "binding_kind": "symbol",
         "source_file": "src/pytra/built_in/zip_ops.py",
-        "source_line": 4
+        "source_line": 4,
+        "source_module_id": "pytra.std",
+        "source_export_name": "template",
+        "source_binding_kind": "symbol",
+        "runtime_module_id": "pytra.std.template",
+        "runtime_group": "std",
+        "resolved_binding_kind": "module",
+        "host_only": true
       },
       {
         "module_id": "pytra.core.py_runtime",
@@ -970,15 +945,14 @@
         "local_name": "pytra.core.py_runtime",
         "binding_kind": "implicit_builtin",
         "source_file": "src/pytra/built_in/zip_ops.py",
-        "source_line": 0
+        "source_line": 0,
+        "source_module_id": "pytra.core.py_runtime",
+        "source_binding_kind": "implicit_builtin",
+        "runtime_module_id": "pytra.core.py_runtime",
+        "runtime_group": "core"
       }
     ],
     "qualified_symbol_refs": [
-      {
-        "module_id": "pytra.std",
-        "symbol": "abi",
-        "local_name": "abi"
-      },
       {
         "module_id": "pytra.std",
         "symbol": "template",
@@ -987,10 +961,6 @@
     ],
     "import_modules": {},
     "import_symbols": {
-      "abi": {
-        "module": "pytra.std",
-        "name": "abi"
-      },
       "template": {
         "module": "pytra.std",
         "name": "template"

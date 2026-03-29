@@ -34,6 +34,7 @@
       "field_types": {
         "value": "int64"
       },
+      "decorators": [],
       "body": [
         {
           "kind": "ClosureDef",
@@ -147,7 +148,8 @@
       ],
       "class_storage_hint": "ref",
       "leading_comments": [],
-      "leading_trivia": []
+      "leading_trivia": [],
+      "meta": {}
     },
     {
       "kind": "ClassDef",
@@ -162,6 +164,7 @@
       "base": "Base",
       "dataclass": false,
       "field_types": {},
+      "decorators": [],
       "body": [
         {
           "kind": "ClosureDef",
@@ -416,7 +419,8 @@
           "mutates_self": false
         }
       ],
-      "class_storage_hint": "ref"
+      "class_storage_hint": "ref",
+      "meta": {}
     },
     {
       "kind": "FunctionDef",

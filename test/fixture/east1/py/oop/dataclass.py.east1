@@ -208,6 +208,9 @@
           "decorators": []
         }
       ],
+      "decorators": [
+        "dataclass"
+      ],
       "leading_comments": [
         "This file contains test/implementation code for `test/fixtures/dataclass.py`.",
         "Reader-facing comments are added to make roles easier to understand.",

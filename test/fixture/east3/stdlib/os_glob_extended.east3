@@ -176,12 +176,41 @@
           }
         },
         {
-          "kind": "Assign",
-          "target": {
-            "kind": "Name",
-            "id": "__tup_1",
-            "resolved_type": "tuple[str,str]"
-          },
+          "kind": "TupleUnpack",
+          "targets": [
+            {
+              "kind": "Name",
+              "source_span": {
+                "lineno": 6,
+                "col_offset": 4,
+                "end_lineno": 6,
+                "end_col_offset": 8
+              },
+              "resolved_type": "str",
+              "casts": [],
+              "borrow_kind": "value",
+              "repr": "root",
+              "id": "root"
+            },
+            {
+              "kind": "Name",
+              "source_span": {
+                "lineno": 6,
+                "col_offset": 10,
+                "end_lineno": 6,
+                "end_col_offset": 13
+              },
+              "resolved_type": "str",
+              "casts": [],
+              "borrow_kind": "value",
+              "repr": "ext",
+              "id": "ext"
+            }
+          ],
+          "target_types": [
+            "str",
+            "str"
+          ],
           "value": {
             "kind": "Call",
             "source_span": {
@@ -268,56 +297,7 @@
               "mirror": "tuple[str,str]"
             }
           },
-          "declare": true,
-          "decl_type": "tuple[str,str]"
-        },
-        {
-          "kind": "Assign",
-          "target": {
-            "kind": "Name",
-            "id": "root",
-            "resolved_type": "str"
-          },
-          "value": {
-            "kind": "Subscript",
-            "value": {
-              "kind": "Name",
-              "id": "__tup_1",
-              "resolved_type": "tuple[str,str]"
-            },
-            "slice": {
-              "kind": "Constant",
-              "value": 0,
-              "resolved_type": "int64"
-            },
-            "resolved_type": "str"
-          },
-          "declare": true,
-          "decl_type": "str"
-        },
-        {
-          "kind": "Assign",
-          "target": {
-            "kind": "Name",
-            "id": "ext",
-            "resolved_type": "str"
-          },
-          "value": {
-            "kind": "Subscript",
-            "value": {
-              "kind": "Name",
-              "id": "__tup_1",
-              "resolved_type": "tuple[str,str]"
-            },
-            "slice": {
-              "kind": "Constant",
-              "value": 1,
-              "resolved_type": "int64"
-            },
-            "resolved_type": "str"
-          },
-          "declare": true,
-          "decl_type": "str"
+          "declare": true
         },
         {
           "kind": "Assign",

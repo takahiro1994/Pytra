@@ -17,6 +17,7 @@
       "field_types": {
         "value": "int64"
       },
+      "decorators": [],
       "body": [
         {
           "kind": "ClosureDef",
@@ -130,7 +131,8 @@
       ],
       "class_storage_hint": "ref",
       "leading_comments": [],
-      "leading_trivia": []
+      "leading_trivia": [],
+      "meta": {}
     },
     {
       "kind": "FunctionDef",

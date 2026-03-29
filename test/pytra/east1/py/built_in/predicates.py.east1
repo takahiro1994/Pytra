@@ -209,6 +209,9 @@
       ],
       "is_generator": 0,
       "yield_value_type": "unknown",
+      "decorators": [
+        "template(\"T\")"
+      ],
       "leading_comments": [],
       "leading_trivia": [
         {
@@ -392,6 +395,9 @@
       ],
       "is_generator": 0,
       "yield_value_type": "unknown",
+      "decorators": [
+        "template(\"T\")"
+      ],
       "leading_comments": [],
       "leading_trivia": []
     }

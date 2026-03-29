@@ -9,28 +9,11 @@
   },
   "body": [
     {
-      "kind": "ImportFrom",
+      "kind": "FunctionDef",
       "source_span": {
         "lineno": 2,
         "col": 0,
-        "end_lineno": 2,
-        "end_col": 25
-      },
-      "module": "pytra.std",
-      "names": [
-        {
-          "name": "abi",
-          "asname": null
-        }
-      ],
-      "level": 0
-    },
-    {
-      "kind": "FunctionDef",
-      "source_span": {
-        "lineno": 5,
-        "col": 0,
-        "end_lineno": 9,
+        "end_lineno": 6,
         "end_col": 33
       },
       "name": "_eq_any",
@@ -59,26 +42,26 @@
         {
           "kind": "Try",
           "source_span": {
-            "lineno": 6,
+            "lineno": 3,
             "col": 4,
-            "end_lineno": 9,
+            "end_lineno": 6,
             "end_col": 33
           },
           "body": [
             {
               "kind": "Return",
               "source_span": {
-                "lineno": 7,
+                "lineno": 4,
                 "col": 8,
-                "end_lineno": 7,
+                "end_lineno": 4,
                 "end_col": 61
               },
               "value": {
                 "kind": "Compare",
                 "source_span": {
-                  "lineno": 7,
+                  "lineno": 4,
                   "col": 15,
-                  "end_lineno": 7,
+                  "end_lineno": 4,
                   "end_col": 61
                 },
                 "resolved_type": "bool",
@@ -88,9 +71,9 @@
                 "left": {
                   "kind": "Call",
                   "source_span": {
-                    "lineno": 7,
+                    "lineno": 4,
                     "col": 15,
-                    "end_lineno": 7,
+                    "end_lineno": 4,
                     "end_col": 35
                   },
                   "resolved_type": "unknown",
@@ -100,9 +83,9 @@
                   "func": {
                     "kind": "Name",
                     "source_span": {
-                      "lineno": 7,
+                      "lineno": 4,
                       "col": 15,
-                      "end_lineno": 7,
+                      "end_lineno": 4,
                       "end_col": 27
                     },
                     "resolved_type": "unknown",
@@ -115,9 +98,9 @@
                     {
                       "kind": "Name",
                       "source_span": {
-                        "lineno": 7,
+                        "lineno": 4,
                         "col": 28,
-                        "end_lineno": 7,
+                        "end_lineno": 4,
                         "end_col": 34
                       },
                       "resolved_type": "object",
@@ -136,9 +119,9 @@
                   {
                     "kind": "Call",
                     "source_span": {
-                      "lineno": 7,
+                      "lineno": 4,
                       "col": 39,
-                      "end_lineno": 7,
+                      "end_lineno": 4,
                       "end_col": 61
                     },
                     "resolved_type": "unknown",
@@ -148,9 +131,9 @@
                     "func": {
                       "kind": "Name",
                       "source_span": {
-                        "lineno": 7,
+                        "lineno": 4,
                         "col": 39,
-                        "end_lineno": 7,
+                        "end_lineno": 4,
                         "end_col": 51
                       },
                       "resolved_type": "unknown",
@@ -163,9 +146,9 @@
                       {
                         "kind": "Name",
                         "source_span": {
-                          "lineno": 7,
+                          "lineno": 4,
                           "col": 52,
-                          "end_lineno": 7,
+                          "end_lineno": 4,
                           "end_col": 60
                         },
                         "resolved_type": "object",
@@ -187,33 +170,34 @@
               "type": {
                 "kind": "Name",
                 "source_span": {
-                  "lineno": 8,
+                  "lineno": 5,
                   "col": 11,
-                  "end_lineno": 8,
+                  "end_lineno": 5,
                   "end_col": 20
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "NameError",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "NameError",
-                "id": "NameError"
+                "id": "NameError",
+                "runtime_module_id": "pytra.built_in.error"
               },
               "name": null,
               "body": [
                 {
                   "kind": "Return",
                   "source_span": {
-                    "lineno": 9,
+                    "lineno": 6,
                     "col": 8,
-                    "end_lineno": 9,
+                    "end_lineno": 6,
                     "end_col": 33
                   },
                   "value": {
                     "kind": "Compare",
                     "source_span": {
-                      "lineno": 9,
+                      "lineno": 6,
                       "col": 15,
-                      "end_lineno": 9,
+                      "end_lineno": 6,
                       "end_col": 33
                     },
                     "resolved_type": "bool",
@@ -223,9 +207,9 @@
                     "left": {
                       "kind": "Name",
                       "source_span": {
-                        "lineno": 9,
+                        "lineno": 6,
                         "col": 15,
-                        "end_lineno": 9,
+                        "end_lineno": 6,
                         "end_col": 21
                       },
                       "resolved_type": "object",
@@ -241,9 +225,9 @@
                       {
                         "kind": "Name",
                         "source_span": {
-                          "lineno": 9,
+                          "lineno": 6,
                           "col": 25,
-                          "end_lineno": 9,
+                          "end_lineno": 6,
                           "end_col": 33
                         },
                         "resolved_type": "object",
@@ -284,9 +268,9 @@
     {
       "kind": "FunctionDef",
       "source_span": {
-        "lineno": 12,
+        "lineno": 9,
         "col": 0,
-        "end_lineno": 19,
+        "end_lineno": 16,
         "end_col": 16
       },
       "name": "py_assert_true",
@@ -303,9 +287,9 @@
         "label": {
           "kind": "Constant",
           "source_span": {
-            "lineno": 12,
+            "lineno": 9,
             "col": 44,
-            "end_lineno": 12,
+            "end_lineno": 9,
             "end_col": 46
           },
           "resolved_type": "str",
@@ -330,17 +314,17 @@
         {
           "kind": "If",
           "source_span": {
-            "lineno": 13,
+            "lineno": 10,
             "col": 4,
-            "end_lineno": 14,
+            "end_lineno": 11,
             "end_col": 19
           },
           "test": {
             "kind": "Name",
             "source_span": {
-              "lineno": 13,
+              "lineno": 10,
               "col": 7,
-              "end_lineno": 13,
+              "end_lineno": 10,
               "end_col": 11
             },
             "resolved_type": "bool",
@@ -353,17 +337,17 @@
             {
               "kind": "Return",
               "source_span": {
-                "lineno": 14,
+                "lineno": 11,
                 "col": 8,
-                "end_lineno": 14,
+                "end_lineno": 11,
                 "end_col": 19
               },
               "value": {
                 "kind": "Constant",
                 "source_span": {
-                  "lineno": 14,
+                  "lineno": 11,
                   "col": 15,
-                  "end_lineno": 14,
+                  "end_lineno": 11,
                   "end_col": 19
                 },
                 "resolved_type": "bool",
@@ -379,17 +363,17 @@
         {
           "kind": "If",
           "source_span": {
-            "lineno": 15,
+            "lineno": 12,
             "col": 4,
-            "end_lineno": 18,
+            "end_lineno": 15,
             "end_col": 36
           },
           "test": {
             "kind": "Compare",
             "source_span": {
-              "lineno": 15,
+              "lineno": 12,
               "col": 7,
-              "end_lineno": 15,
+              "end_lineno": 12,
               "end_col": 18
             },
             "resolved_type": "bool",
@@ -399,9 +383,9 @@
             "left": {
               "kind": "Name",
               "source_span": {
-                "lineno": 15,
+                "lineno": 12,
                 "col": 7,
-                "end_lineno": 15,
+                "end_lineno": 12,
                 "end_col": 12
               },
               "resolved_type": "str",
@@ -417,9 +401,9 @@
               {
                 "kind": "Constant",
                 "source_span": {
-                  "lineno": 15,
+                  "lineno": 12,
                   "col": 16,
-                  "end_lineno": 15,
+                  "end_lineno": 12,
                   "end_col": 18
                 },
                 "resolved_type": "str",
@@ -434,17 +418,17 @@
             {
               "kind": "Expr",
               "source_span": {
-                "lineno": 16,
+                "lineno": 13,
                 "col": 8,
-                "end_lineno": 16,
+                "end_lineno": 13,
                 "end_col": 46
               },
               "value": {
                 "kind": "Call",
                 "source_span": {
-                  "lineno": 16,
+                  "lineno": 13,
                   "col": 8,
-                  "end_lineno": 16,
+                  "end_lineno": 13,
                   "end_col": 46
                 },
                 "resolved_type": "None",
@@ -454,9 +438,9 @@
                 "func": {
                   "kind": "Name",
                   "source_span": {
-                    "lineno": 16,
+                    "lineno": 13,
                     "col": 8,
-                    "end_lineno": 16,
+                    "end_lineno": 13,
                     "end_col": 13
                   },
                   "resolved_type": "callable",
@@ -469,9 +453,9 @@
                   {
                     "kind": "JoinedStr",
                     "source_span": {
-                      "lineno": 16,
+                      "lineno": 13,
                       "col": 14,
-                      "end_lineno": 16,
+                      "end_lineno": 13,
                       "end_col": 45
                     },
                     "casts": [],
@@ -481,9 +465,9 @@
                       {
                         "kind": "Constant",
                         "source_span": {
-                          "lineno": 16,
+                          "lineno": 13,
                           "col": 14,
-                          "end_lineno": 16,
+                          "end_lineno": 13,
                           "end_col": 45
                         },
                         "resolved_type": "str",
@@ -495,9 +479,9 @@
                         "value": {
                           "kind": "Name",
                           "source_span": {
-                            "lineno": 16,
+                            "lineno": 13,
                             "col": 29,
-                            "end_lineno": 16,
+                            "end_lineno": 13,
                             "end_col": 34
                           },
                           "resolved_type": "str",
@@ -511,9 +495,9 @@
                       {
                         "kind": "Constant",
                         "source_span": {
-                          "lineno": 16,
+                          "lineno": 13,
                           "col": 14,
-                          "end_lineno": 16,
+                          "end_lineno": 13,
                           "end_col": 45
                         },
                         "resolved_type": "str",
@@ -539,17 +523,17 @@
             {
               "kind": "Expr",
               "source_span": {
-                "lineno": 18,
+                "lineno": 15,
                 "col": 8,
-                "end_lineno": 18,
+                "end_lineno": 15,
                 "end_col": 36
               },
               "value": {
                 "kind": "Call",
                 "source_span": {
-                  "lineno": 18,
+                  "lineno": 15,
                   "col": 8,
-                  "end_lineno": 18,
+                  "end_lineno": 15,
                   "end_col": 36
                 },
                 "resolved_type": "None",
@@ -559,9 +543,9 @@
                 "func": {
                   "kind": "Name",
                   "source_span": {
-                    "lineno": 18,
+                    "lineno": 15,
                     "col": 8,
-                    "end_lineno": 18,
+                    "end_lineno": 15,
                     "end_col": 13
                   },
                   "resolved_type": "callable",
@@ -574,9 +558,9 @@
                   {
                     "kind": "Constant",
                     "source_span": {
-                      "lineno": 18,
+                      "lineno": 15,
                       "col": 14,
-                      "end_lineno": 18,
+                      "end_lineno": 15,
                       "end_col": 35
                     },
                     "resolved_type": "str",
@@ -601,17 +585,17 @@
         {
           "kind": "Return",
           "source_span": {
-            "lineno": 19,
+            "lineno": 16,
             "col": 4,
-            "end_lineno": 19,
+            "end_lineno": 16,
             "end_col": 16
           },
           "value": {
             "kind": "Constant",
             "source_span": {
-              "lineno": 19,
+              "lineno": 16,
               "col": 11,
-              "end_lineno": 19,
+              "end_lineno": 16,
               "end_col": 16
             },
             "resolved_type": "bool",
@@ -644,9 +628,9 @@
     {
       "kind": "FunctionDef",
       "source_span": {
-        "lineno": 22,
+        "lineno": 19,
         "col": 0,
-        "end_lineno": 30,
+        "end_lineno": 27,
         "end_col": 16
       },
       "name": "py_assert_eq",
@@ -665,9 +649,9 @@
         "label": {
           "kind": "Constant",
           "source_span": {
-            "lineno": 22,
+            "lineno": 19,
             "col": 64,
-            "end_lineno": 22,
+            "end_lineno": 19,
             "end_col": 66
           },
           "resolved_type": "str",
@@ -694,17 +678,17 @@
         {
           "kind": "Assign",
           "source_span": {
-            "lineno": 23,
+            "lineno": 20,
             "col": 4,
-            "end_lineno": 23,
+            "end_lineno": 20,
             "end_col": 34
           },
           "target": {
             "kind": "Name",
             "source_span": {
-              "lineno": 23,
+              "lineno": 20,
               "col": 4,
-              "end_lineno": 23,
+              "end_lineno": 20,
               "end_col": 6
             },
             "resolved_type": "unknown",
@@ -716,9 +700,9 @@
           "value": {
             "kind": "Call",
             "source_span": {
-              "lineno": 23,
+              "lineno": 20,
               "col": 9,
-              "end_lineno": 23,
+              "end_lineno": 20,
               "end_col": 34
             },
             "resolved_type": "bool",
@@ -728,9 +712,9 @@
             "func": {
               "kind": "Name",
               "source_span": {
-                "lineno": 23,
+                "lineno": 20,
                 "col": 9,
-                "end_lineno": 23,
+                "end_lineno": 20,
                 "end_col": 16
               },
               "resolved_type": "callable",
@@ -743,9 +727,9 @@
               {
                 "kind": "Name",
                 "source_span": {
-                  "lineno": 23,
+                  "lineno": 20,
                   "col": 17,
-                  "end_lineno": 23,
+                  "end_lineno": 20,
                   "end_col": 23
                 },
                 "resolved_type": "object",
@@ -758,9 +742,9 @@
               {
                 "kind": "Name",
                 "source_span": {
-                  "lineno": 23,
+                  "lineno": 20,
                   "col": 25,
-                  "end_lineno": 23,
+                  "end_lineno": 20,
                   "end_col": 33
                 },
                 "resolved_type": "object",
@@ -780,17 +764,17 @@
         {
           "kind": "If",
           "source_span": {
-            "lineno": 24,
+            "lineno": 21,
             "col": 4,
-            "end_lineno": 14,
+            "end_lineno": 11,
             "end_col": 19
           },
           "test": {
             "kind": "Name",
             "source_span": {
-              "lineno": 24,
+              "lineno": 21,
               "col": 7,
-              "end_lineno": 24,
+              "end_lineno": 21,
               "end_col": 9
             },
             "resolved_type": "bool",
@@ -803,17 +787,17 @@
             {
               "kind": "Return",
               "source_span": {
-                "lineno": 14,
+                "lineno": 11,
                 "col": 8,
-                "end_lineno": 14,
+                "end_lineno": 11,
                 "end_col": 19
               },
               "value": {
                 "kind": "Constant",
                 "source_span": {
-                  "lineno": 14,
+                  "lineno": 11,
                   "col": 15,
-                  "end_lineno": 14,
+                  "end_lineno": 11,
                   "end_col": 19
                 },
                 "resolved_type": "bool",
@@ -829,17 +813,17 @@
         {
           "kind": "If",
           "source_span": {
-            "lineno": 15,
+            "lineno": 12,
             "col": 4,
-            "end_lineno": 29,
+            "end_lineno": 26,
             "end_col": 66
           },
           "test": {
             "kind": "Compare",
             "source_span": {
-              "lineno": 15,
+              "lineno": 12,
               "col": 7,
-              "end_lineno": 15,
+              "end_lineno": 12,
               "end_col": 18
             },
             "resolved_type": "bool",
@@ -849,9 +833,9 @@
             "left": {
               "kind": "Name",
               "source_span": {
-                "lineno": 15,
+                "lineno": 12,
                 "col": 7,
-                "end_lineno": 15,
+                "end_lineno": 12,
                 "end_col": 12
               },
               "resolved_type": "str",
@@ -867,9 +851,9 @@
               {
                 "kind": "Constant",
                 "source_span": {
-                  "lineno": 15,
+                  "lineno": 12,
                   "col": 16,
-                  "end_lineno": 15,
+                  "end_lineno": 12,
                   "end_col": 18
                 },
                 "resolved_type": "str",
@@ -884,17 +868,17 @@
             {
               "kind": "Expr",
               "source_span": {
-                "lineno": 27,
+                "lineno": 24,
                 "col": 8,
-                "end_lineno": 27,
+                "end_lineno": 24,
                 "end_col": 75
               },
               "value": {
                 "kind": "Call",
                 "source_span": {
-                  "lineno": 27,
+                  "lineno": 24,
                   "col": 8,
-                  "end_lineno": 27,
+                  "end_lineno": 24,
                   "end_col": 75
                 },
                 "resolved_type": "None",
@@ -904,9 +888,9 @@
                 "func": {
                   "kind": "Name",
                   "source_span": {
-                    "lineno": 27,
+                    "lineno": 24,
                     "col": 8,
-                    "end_lineno": 27,
+                    "end_lineno": 24,
                     "end_col": 13
                   },
                   "resolved_type": "callable",
@@ -919,9 +903,9 @@
                   {
                     "kind": "JoinedStr",
                     "source_span": {
-                      "lineno": 27,
+                      "lineno": 24,
                       "col": 14,
-                      "end_lineno": 27,
+                      "end_lineno": 24,
                       "end_col": 74
                     },
                     "casts": [],
@@ -931,9 +915,9 @@
                       {
                         "kind": "Constant",
                         "source_span": {
-                          "lineno": 27,
+                          "lineno": 24,
                           "col": 14,
-                          "end_lineno": 27,
+                          "end_lineno": 24,
                           "end_col": 74
                         },
                         "resolved_type": "str",
@@ -945,9 +929,9 @@
                         "value": {
                           "kind": "Name",
                           "source_span": {
-                            "lineno": 27,
+                            "lineno": 24,
                             "col": 27,
-                            "end_lineno": 27,
+                            "end_lineno": 24,
                             "end_col": 32
                           },
                           "resolved_type": "str",
@@ -961,9 +945,9 @@
                       {
                         "kind": "Constant",
                         "source_span": {
-                          "lineno": 27,
+                          "lineno": 24,
                           "col": 14,
-                          "end_lineno": 27,
+                          "end_lineno": 24,
                           "end_col": 74
                         },
                         "resolved_type": "str",
@@ -975,9 +959,9 @@
                         "value": {
                           "kind": "Name",
                           "source_span": {
-                            "lineno": 27,
+                            "lineno": 24,
                             "col": 43,
-                            "end_lineno": 27,
+                            "end_lineno": 24,
                             "end_col": 49
                           },
                           "resolved_type": "object",
@@ -991,9 +975,9 @@
                       {
                         "kind": "Constant",
                         "source_span": {
-                          "lineno": 27,
+                          "lineno": 24,
                           "col": 14,
-                          "end_lineno": 27,
+                          "end_lineno": 24,
                           "end_col": 74
                         },
                         "resolved_type": "str",
@@ -1005,9 +989,9 @@
                         "value": {
                           "kind": "Name",
                           "source_span": {
-                            "lineno": 27,
+                            "lineno": 24,
                             "col": 62,
-                            "end_lineno": 27,
+                            "end_lineno": 24,
                             "end_col": 70
                           },
                           "resolved_type": "object",
@@ -1037,17 +1021,17 @@
             {
               "kind": "Expr",
               "source_span": {
-                "lineno": 29,
+                "lineno": 26,
                 "col": 8,
-                "end_lineno": 29,
+                "end_lineno": 26,
                 "end_col": 66
               },
               "value": {
                 "kind": "Call",
                 "source_span": {
-                  "lineno": 29,
+                  "lineno": 26,
                   "col": 8,
-                  "end_lineno": 29,
+                  "end_lineno": 26,
                   "end_col": 66
                 },
                 "resolved_type": "None",
@@ -1057,9 +1041,9 @@
                 "func": {
                   "kind": "Name",
                   "source_span": {
-                    "lineno": 29,
+                    "lineno": 26,
                     "col": 8,
-                    "end_lineno": 29,
+                    "end_lineno": 26,
                     "end_col": 13
                   },
                   "resolved_type": "callable",
@@ -1072,9 +1056,9 @@
                   {
                     "kind": "JoinedStr",
                     "source_span": {
-                      "lineno": 29,
+                      "lineno": 26,
                       "col": 14,
-                      "end_lineno": 29,
+                      "end_lineno": 26,
                       "end_col": 65
                     },
                     "casts": [],
@@ -1084,9 +1068,9 @@
                       {
                         "kind": "Constant",
                         "source_span": {
-                          "lineno": 29,
+                          "lineno": 26,
                           "col": 14,
-                          "end_lineno": 29,
+                          "end_lineno": 26,
                           "end_col": 65
                         },
                         "resolved_type": "str",
@@ -1098,9 +1082,9 @@
                         "value": {
                           "kind": "Name",
                           "source_span": {
-                            "lineno": 29,
+                            "lineno": 26,
                             "col": 34,
-                            "end_lineno": 29,
+                            "end_lineno": 26,
                             "end_col": 40
                           },
                           "resolved_type": "object",
@@ -1114,9 +1098,9 @@
                       {
                         "kind": "Constant",
                         "source_span": {
-                          "lineno": 29,
+                          "lineno": 26,
                           "col": 14,
-                          "end_lineno": 29,
+                          "end_lineno": 26,
                           "end_col": 65
                         },
                         "resolved_type": "str",
@@ -1128,9 +1112,9 @@
                         "value": {
                           "kind": "Name",
                           "source_span": {
-                            "lineno": 29,
+                            "lineno": 26,
                             "col": 53,
-                            "end_lineno": 29,
+                            "end_lineno": 26,
                             "end_col": 61
                           },
                           "resolved_type": "object",
@@ -1160,17 +1144,17 @@
         {
           "kind": "Return",
           "source_span": {
-            "lineno": 30,
+            "lineno": 27,
             "col": 4,
-            "end_lineno": 30,
+            "end_lineno": 27,
             "end_col": 16
           },
           "value": {
             "kind": "Constant",
             "source_span": {
-              "lineno": 30,
+              "lineno": 27,
               "col": 11,
-              "end_lineno": 30,
+              "end_lineno": 27,
               "end_col": 16
             },
             "resolved_type": "bool",
@@ -1207,9 +1191,9 @@
     {
       "kind": "FunctionDef",
       "source_span": {
-        "lineno": 34,
+        "lineno": 30,
         "col": 0,
-        "end_lineno": 42,
+        "end_lineno": 38,
         "end_col": 15
       },
       "name": "py_assert_all",
@@ -1226,9 +1210,9 @@
         "label": {
           "kind": "Constant",
           "source_span": {
-            "lineno": 34,
+            "lineno": 30,
             "col": 52,
-            "end_lineno": 34,
+            "end_lineno": 30,
             "end_col": 54
           },
           "resolved_type": "str",
@@ -1253,17 +1237,17 @@
         {
           "kind": "For",
           "source_span": {
-            "lineno": 35,
+            "lineno": 31,
             "col": 0,
-            "end_lineno": 41,
+            "end_lineno": 37,
             "end_col": 24
           },
           "target": {
             "kind": "Name",
             "source_span": {
-              "lineno": 35,
+              "lineno": 31,
               "col": 8,
-              "end_lineno": 35,
+              "end_lineno": 31,
               "end_col": 9
             },
             "resolved_type": "bool",
@@ -1279,9 +1263,9 @@
           "iter": {
             "kind": "Name",
             "source_span": {
-              "lineno": 35,
+              "lineno": 31,
               "col": 13,
-              "end_lineno": 35,
+              "end_lineno": 31,
               "end_col": 20
             },
             "resolved_type": "list[bool]",
@@ -1297,17 +1281,17 @@
             {
               "kind": "If",
               "source_span": {
-                "lineno": 36,
+                "lineno": 32,
                 "col": 8,
-                "end_lineno": 41,
+                "end_lineno": 37,
                 "end_col": 24
               },
               "test": {
                 "kind": "UnaryOp",
                 "source_span": {
-                  "lineno": 36,
+                  "lineno": 32,
                   "col": 11,
-                  "end_lineno": 36,
+                  "end_lineno": 32,
                   "end_col": 16
                 },
                 "resolved_type": "bool",
@@ -1318,9 +1302,9 @@
                 "operand": {
                   "kind": "Name",
                   "source_span": {
-                    "lineno": 36,
+                    "lineno": 32,
                     "col": 15,
-                    "end_lineno": 36,
+                    "end_lineno": 32,
                     "end_col": 16
                   },
                   "resolved_type": "bool",
@@ -1334,17 +1318,17 @@
                 {
                   "kind": "If",
                   "source_span": {
-                    "lineno": 37,
+                    "lineno": 33,
                     "col": 12,
-                    "end_lineno": 40,
+                    "end_lineno": 36,
                     "end_col": 43
                   },
                   "test": {
                     "kind": "Compare",
                     "source_span": {
-                      "lineno": 37,
+                      "lineno": 33,
                       "col": 15,
-                      "end_lineno": 37,
+                      "end_lineno": 33,
                       "end_col": 26
                     },
                     "resolved_type": "bool",
@@ -1354,9 +1338,9 @@
                     "left": {
                       "kind": "Name",
                       "source_span": {
-                        "lineno": 37,
+                        "lineno": 33,
                         "col": 15,
-                        "end_lineno": 37,
+                        "end_lineno": 33,
                         "end_col": 20
                       },
                       "resolved_type": "str",
@@ -1372,9 +1356,9 @@
                       {
                         "kind": "Constant",
                         "source_span": {
-                          "lineno": 37,
+                          "lineno": 33,
                           "col": 24,
-                          "end_lineno": 37,
+                          "end_lineno": 33,
                           "end_col": 26
                         },
                         "resolved_type": "str",
@@ -1389,17 +1373,17 @@
                     {
                       "kind": "Expr",
                       "source_span": {
-                        "lineno": 38,
+                        "lineno": 34,
                         "col": 16,
-                        "end_lineno": 38,
+                        "end_lineno": 34,
                         "end_col": 53
                       },
                       "value": {
                         "kind": "Call",
                         "source_span": {
-                          "lineno": 38,
+                          "lineno": 34,
                           "col": 16,
-                          "end_lineno": 38,
+                          "end_lineno": 34,
                           "end_col": 53
                         },
                         "resolved_type": "None",
@@ -1409,9 +1393,9 @@
                         "func": {
                           "kind": "Name",
                           "source_span": {
-                            "lineno": 38,
+                            "lineno": 34,
                             "col": 16,
-                            "end_lineno": 38,
+                            "end_lineno": 34,
                             "end_col": 21
                           },
                           "resolved_type": "callable",
@@ -1424,9 +1408,9 @@
                           {
                             "kind": "JoinedStr",
                             "source_span": {
-                              "lineno": 38,
+                              "lineno": 34,
                               "col": 22,
-                              "end_lineno": 38,
+                              "end_lineno": 34,
                               "end_col": 52
                             },
                             "casts": [],
@@ -1436,9 +1420,9 @@
                               {
                                 "kind": "Constant",
                                 "source_span": {
-                                  "lineno": 38,
+                                  "lineno": 34,
                                   "col": 22,
-                                  "end_lineno": 38,
+                                  "end_lineno": 34,
                                   "end_col": 52
                                 },
                                 "resolved_type": "str",
@@ -1450,9 +1434,9 @@
                                 "value": {
                                   "kind": "Name",
                                   "source_span": {
-                                    "lineno": 38,
+                                    "lineno": 34,
                                     "col": 36,
-                                    "end_lineno": 38,
+                                    "end_lineno": 34,
                                     "end_col": 41
                                   },
                                   "resolved_type": "str",
@@ -1466,9 +1450,9 @@
                               {
                                 "kind": "Constant",
                                 "source_span": {
-                                  "lineno": 38,
+                                  "lineno": 34,
                                   "col": 22,
-                                  "end_lineno": 38,
+                                  "end_lineno": 34,
                                   "end_col": 52
                                 },
                                 "resolved_type": "str",
@@ -1494,17 +1478,17 @@
                     {
                       "kind": "Expr",
                       "source_span": {
-                        "lineno": 40,
+                        "lineno": 36,
                         "col": 16,
-                        "end_lineno": 40,
+                        "end_lineno": 36,
                         "end_col": 43
                       },
                       "value": {
                         "kind": "Call",
                         "source_span": {
-                          "lineno": 40,
+                          "lineno": 36,
                           "col": 16,
-                          "end_lineno": 40,
+                          "end_lineno": 36,
                           "end_col": 43
                         },
                         "resolved_type": "None",
@@ -1514,9 +1498,9 @@
                         "func": {
                           "kind": "Name",
                           "source_span": {
-                            "lineno": 40,
+                            "lineno": 36,
                             "col": 16,
-                            "end_lineno": 40,
+                            "end_lineno": 36,
                             "end_col": 21
                           },
                           "resolved_type": "callable",
@@ -1529,9 +1513,9 @@
                           {
                             "kind": "Constant",
                             "source_span": {
-                              "lineno": 40,
+                              "lineno": 36,
                               "col": 22,
-                              "end_lineno": 40,
+                              "end_lineno": 36,
                               "end_col": 42
                             },
                             "resolved_type": "str",
@@ -1556,17 +1540,17 @@
                 {
                   "kind": "Return",
                   "source_span": {
-                    "lineno": 41,
+                    "lineno": 37,
                     "col": 12,
-                    "end_lineno": 41,
+                    "end_lineno": 37,
                     "end_col": 24
                   },
                   "value": {
                     "kind": "Constant",
                     "source_span": {
-                      "lineno": 41,
+                      "lineno": 37,
                       "col": 19,
-                      "end_lineno": 41,
+                      "end_lineno": 37,
                       "end_col": 24
                     },
                     "resolved_type": "bool",
@@ -1585,17 +1569,17 @@
         {
           "kind": "Return",
           "source_span": {
-            "lineno": 42,
+            "lineno": 38,
             "col": 4,
-            "end_lineno": 42,
+            "end_lineno": 38,
             "end_col": 15
           },
           "value": {
             "kind": "Constant",
             "source_span": {
-              "lineno": 42,
+              "lineno": 38,
               "col": 11,
-              "end_lineno": 42,
+              "end_lineno": 38,
               "end_col": 15
             },
             "resolved_type": "bool",
@@ -1634,9 +1618,9 @@
     {
       "kind": "FunctionDef",
       "source_span": {
-        "lineno": 46,
+        "lineno": 41,
         "col": 0,
-        "end_lineno": 48,
+        "end_lineno": 43,
         "end_col": 15
       },
       "name": "py_assert_stdout",
@@ -1665,17 +1649,17 @@
         {
           "kind": "Return",
           "source_span": {
-            "lineno": 48,
+            "lineno": 43,
             "col": 4,
-            "end_lineno": 48,
+            "end_lineno": 43,
             "end_col": 15
           },
           "value": {
             "kind": "Constant",
             "source_span": {
-              "lineno": 48,
+              "lineno": 43,
               "col": 11,
-              "end_lineno": 48,
+              "end_lineno": 43,
               "end_col": 15
             },
             "resolved_type": "bool",
@@ -1729,24 +1713,6 @@
       "schema_version": 1,
       "bindings": [
         {
-          "module_id": "pytra.std",
-          "export_name": "abi",
-          "local_name": "abi",
-          "binding_kind": "symbol",
-          "source_file": "src/pytra/utils/assertions.py",
-          "source_line": 2,
-          "source_module_id": "pytra.std",
-          "source_export_name": "abi",
-          "source_binding_kind": "symbol",
-          "runtime_module_id": "pytra.std",
-          "runtime_group": "std",
-          "resolved_binding_kind": "symbol",
-          "runtime_symbol": "abi",
-          "runtime_symbol_kind": "function",
-          "runtime_symbol_dispatch": "function",
-          "runtime_semantic_tag": "stdlib.fn.abi"
-        },
-        {
           "module_id": "pytra.built_in.io_ops",
           "export_name": "",
           "local_name": "pytra.built_in.io_ops",
@@ -1759,46 +1725,25 @@
           "runtime_group": "built_in"
         }
       ],
-      "qualified_refs": [
-        {
-          "module_id": "pytra.std",
-          "symbol": "abi",
-          "local_name": "abi"
-        }
-      ]
+      "qualified_refs": []
     },
     "import_bindings": [
-      {
-        "module_id": "pytra.std",
-        "export_name": "abi",
-        "local_name": "abi",
-        "binding_kind": "symbol",
-        "source_file": "src/pytra/utils/assertions.py",
-        "source_line": 2
-      },
       {
         "module_id": "pytra.built_in.io_ops",
         "export_name": "",
         "local_name": "pytra.built_in.io_ops",
         "binding_kind": "implicit_builtin",
         "source_file": "src/pytra/utils/assertions.py",
-        "source_line": 0
+        "source_line": 0,
+        "source_module_id": "pytra.built_in.io_ops",
+        "source_binding_kind": "implicit_builtin",
+        "runtime_module_id": "pytra.built_in.io_ops",
+        "runtime_group": "built_in"
       }
     ],
-    "qualified_symbol_refs": [
-      {
-        "module_id": "pytra.std",
-        "symbol": "abi",
-        "local_name": "abi"
-      }
-    ],
+    "qualified_symbol_refs": [],
     "import_modules": {},
-    "import_symbols": {
-      "abi": {
-        "module": "pytra.std",
-        "name": "abi"
-      }
-    },
+    "import_symbols": {},
     "dispatch_mode": "native"
   },
   "east_stage": 2,

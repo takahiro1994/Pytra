@@ -40,6 +40,7 @@
       "field_types": {
         "name": "str"
       },
+      "decorators": [],
       "body": [
         {
           "kind": "FunctionDef",
@@ -299,7 +300,8 @@
           "kind": "blank",
           "count": 1
         }
-      ]
+      ],
+      "meta": {}
     },
     {
       "kind": "FunctionDef",

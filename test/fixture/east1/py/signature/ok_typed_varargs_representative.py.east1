@@ -50,6 +50,7 @@
           "declare": true
         }
       ],
+      "decorators": [],
       "leading_comments": [],
       "leading_trivia": []
     },

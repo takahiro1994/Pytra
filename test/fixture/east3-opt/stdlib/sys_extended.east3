@@ -766,7 +766,17 @@
                         "kind": "GenericType",
                         "category": "static",
                         "mirror": "list[str]"
-                      }
+                      },
+                      "predicate_category": "nominal_adt",
+                      "family_name": "list",
+                      "predicate_kind": "variant",
+                      "variant_name": "list"
+                    },
+                    "nominal_adt_test_v1": {
+                      "schema_version": 1,
+                      "family_name": "list",
+                      "predicate_kind": "variant",
+                      "variant_name": "list"
                     }
                   },
                   {
@@ -1059,7 +1069,17 @@
                         "kind": "GenericType",
                         "category": "static",
                         "mirror": "list[str]"
-                      }
+                      },
+                      "predicate_category": "nominal_adt",
+                      "family_name": "list",
+                      "predicate_kind": "variant",
+                      "variant_name": "list"
+                    },
+                    "nominal_adt_test_v1": {
+                      "schema_version": 1,
+                      "family_name": "list",
+                      "predicate_kind": "variant",
+                      "variant_name": "list"
                     }
                   },
                   {

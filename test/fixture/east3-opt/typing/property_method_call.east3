@@ -38,6 +38,7 @@
       "field_types": {
         "_mapper_value": "int64"
       },
+      "decorators": [],
       "body": [
         {
           "kind": "ClosureDef",
@@ -518,7 +519,8 @@
           "kind": "blank",
           "count": 1
         }
-      ]
+      ],
+      "meta": {}
     },
     {
       "kind": "FunctionDef",

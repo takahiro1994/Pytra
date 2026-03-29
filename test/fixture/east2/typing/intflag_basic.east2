@@ -46,6 +46,7 @@
         "WRITE": "Perm",
         "EXEC": "Perm"
       },
+      "decorators": [],
       "body": [
         {
           "kind": "Assign",
@@ -170,7 +171,8 @@
       ],
       "class_storage_hint": "value",
       "leading_comments": [],
-      "leading_trivia": []
+      "leading_trivia": [],
+      "meta": {}
     },
     {
       "kind": "FunctionDef",

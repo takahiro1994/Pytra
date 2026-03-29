@@ -355,6 +355,7 @@
           "decorators": []
         }
       ],
+      "decorators": [],
       "leading_comments": [],
       "leading_trivia": [
         {
@@ -1472,7 +1473,8 @@
           "yield_value_type": "unknown",
           "decorators": []
         }
-      ]
+      ],
+      "decorators": []
     },
     {
       "kind": "ClassDef",
@@ -6533,7 +6535,8 @@
           "yield_value_type": "unknown",
           "decorators": []
         }
-      ]
+      ],
+      "decorators": []
     }
   ],
   "main_guard_body": [],

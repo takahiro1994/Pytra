@@ -162,6 +162,9 @@
           "declare": true
         }
       ],
+      "decorators": [
+        "dataclass"
+      ],
       "leading_comments": [
         "Tokens for lexical analysis."
       ],
@@ -395,6 +398,9 @@
           "value": null,
           "declare": true
         }
+      ],
+      "decorators": [
+        "dataclass"
       ]
     },
     {
@@ -516,6 +522,9 @@
           "value": null,
           "declare": true
         }
+      ],
+      "decorators": [
+        "dataclass"
       ]
     },
     {
@@ -10325,7 +10334,8 @@
           "yield_value_type": "unknown",
           "decorators": []
         }
-      ]
+      ],
+      "decorators": []
     },
     {
       "kind": "FunctionDef",

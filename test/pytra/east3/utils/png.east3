@@ -50,7 +50,7 @@
       },
       "return_type": "None",
       "arg_usage": {
-        "dst": "readonly",
+        "dst": "reassigned",
         "src": "readonly"
       },
       "renamed_symbols": {},
@@ -5470,7 +5470,8 @@
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "ValueError",
-                  "id": "ValueError"
+                  "id": "ValueError",
+                  "runtime_module_id": "pytra.built_in.error"
                 },
                 "args": [
                   {
@@ -5701,17 +5702,12 @@
                         "category": "static",
                         "mirror": "str"
                       }
-                    }
+                    },
+                    "call_arg_type": "str"
                   }
                 ],
                 "keywords": [],
-                "lowered_kind": "BuiltinCall",
-                "builtin_name": "ValueError",
-                "runtime_call": "std::runtime_error",
-                "runtime_module_id": "pytra.core.py_runtime",
-                "runtime_symbol": "ValueError",
-                "runtime_call_adapter_kind": "builtin",
-                "semantic_tag": "error.raise_ctor",
+                "runtime_module_id": "pytra.built_in.error",
                 "type_expr_summary_v1": {
                   "schema_version": 1,
                   "kind": "NamedType",
@@ -8132,7 +8128,7 @@
               "end_lineno": 123,
               "end_col_offset": 25
             },
-            "resolved_type": "unknown",
+            "resolved_type": "PyFile",
             "casts": [],
             "borrow_kind": "value",
             "repr": "open(path, \"wb\")",
@@ -8144,7 +8140,7 @@
                 "end_lineno": 123,
                 "end_col_offset": 13
               },
-              "resolved_type": "unknown",
+              "resolved_type": "callable",
               "casts": [],
               "borrow_kind": "value",
               "repr": "open",
@@ -8181,12 +8177,18 @@
               }
             ],
             "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "open",
+            "runtime_call": "open",
+            "runtime_module_id": "pytra.core.py_runtime",
+            "runtime_symbol": "open",
+            "runtime_call_adapter_kind": "builtin",
+            "semantic_tag": "core.open",
             "type_expr_summary_v1": {
               "schema_version": 1,
-              "kind": "DynamicType",
-              "category": "dynamic",
-              "mirror": "unknown",
-              "dynamic_name": "unknown"
+              "kind": "NamedType",
+              "category": "static",
+              "mirror": "PyFile"
             }
           },
           "var_name": "f",
@@ -8207,7 +8209,7 @@
                   "end_lineno": 124,
                   "end_col_offset": 27
                 },
-                "resolved_type": "unknown",
+                "resolved_type": "int64",
                 "casts": [],
                 "borrow_kind": "value",
                 "repr": "f.write(bytes(png))",
@@ -8219,7 +8221,7 @@
                     "end_lineno": 124,
                     "end_col_offset": 15
                   },
-                  "resolved_type": "unknown",
+                  "resolved_type": "callable",
                   "casts": [],
                   "borrow_kind": "value",
                   "repr": "f.write",
@@ -8231,9 +8233,9 @@
                       "end_lineno": 124,
                       "end_col_offset": 9
                     },
-                    "resolved_type": "unknown",
+                    "resolved_type": "PyFile",
                     "casts": [],
-                    "borrow_kind": "value",
+                    "borrow_kind": "readonly_ref",
                     "repr": "f",
                     "id": "f"
                   },
@@ -8294,14 +8296,14 @@
                 "keywords": [],
                 "type_expr_summary_v1": {
                   "schema_version": 1,
-                  "kind": "DynamicType",
-                  "category": "dynamic",
-                  "mirror": "unknown",
-                  "dynamic_name": "unknown"
+                  "kind": "NamedType",
+                  "category": "static",
+                  "mirror": "int64"
                 }
               }
             }
-          ]
+          ],
+          "with_lowering_style": "raii"
         }
       ],
       "is_generator": 0,
@@ -8362,7 +8364,11 @@
         "local_name": "pytra.core.py_runtime",
         "binding_kind": "implicit_builtin",
         "source_file": "src/pytra/utils/png.py",
-        "source_line": 0
+        "source_line": 0,
+        "source_module_id": "pytra.core.py_runtime",
+        "source_binding_kind": "implicit_builtin",
+        "runtime_module_id": "pytra.core.py_runtime",
+        "runtime_group": "core"
       }
     ],
     "qualified_symbol_refs": [],

@@ -91,6 +91,7 @@
           "decorators": []
         }
       ],
+      "decorators": [],
       "leading_comments": [
         "Test candidate for value-type optimization (no instance state)."
       ],

@@ -15,18 +15,18 @@
       "module_kind": "user"
     },
     {
-      "module_id": "pytra.built_in.scalar_ops",
-      "input": "/workspace/Pytra/src/runtime/east/built_in/scalar_ops.east",
-      "output": "east3/pytra/built_in/scalar_ops.east3.json",
-      "source_path": "/workspace/Pytra/src/pytra/built_in/scalar_ops.py",
+      "module_id": "pytra.built_in.contains",
+      "input": "/workspace/Pytra/src/runtime/east/built_in/contains.east",
+      "output": "east3/pytra/built_in/contains.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/built_in/contains.py",
       "is_entry": false,
       "module_kind": "runtime"
     },
     {
-      "module_id": "pytra.built_in.sequence",
-      "input": "/workspace/Pytra/src/runtime/east/built_in/sequence.east",
-      "output": "east3/pytra/built_in/sequence.east3.json",
-      "source_path": "/workspace/Pytra/src/pytra/built_in/sequence.py",
+      "module_id": "pytra.built_in.error",
+      "input": "/workspace/Pytra/src/runtime/east/built_in/error.east",
+      "output": "east3/pytra/built_in/error.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/built_in/error.py",
       "is_entry": false,
       "module_kind": "runtime"
     },
@@ -39,37 +39,81 @@
       "module_kind": "runtime"
     },
     {
-      "module_id": "pytra.std.json",
-      "input": "/workspace/Pytra/src/runtime/east/std/json.east",
-      "output": "east3/pytra/std/json.east3.json",
-      "source_path": "/workspace/Pytra/src/pytra/std/json.py",
+      "module_id": "pytra.built_in.type_id",
+      "input": "/workspace/Pytra/src/runtime/east/built_in/type_id.east",
+      "output": "east3/pytra/built_in/type_id.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/built_in/type_id.py",
       "is_entry": false,
       "module_kind": "runtime"
+    },
+    {
+      "module_id": "pytra.built_in.type_id_table",
+      "input": "__linked_helper__/pytra/built_in/type_id_table.east3.json",
+      "output": "east3/pytra/built_in/type_id_table.east3.json",
+      "source_path": "src/pytra/built_in/type_id_table.py",
+      "is_entry": false,
+      "module_kind": "helper",
+      "helper_id": "pytra.built_in.type_id_table",
+      "owner_module_id": "",
+      "generated_by": "linked_optimizer"
     }
   ],
   "global": {
     "type_id_table": {
-      "pytra.std.json.JsonArr": 1000,
-      "pytra.std.json.JsonObj": 1001,
-      "pytra.std.json.JsonValue": 1002,
-      "pytra.std.json._JsonParser": 1003
+      "BaseException": 9,
+      "Exception": 10,
+      "IndexError": 14,
+      "KeyError": 15,
+      "RuntimeError": 11,
+      "TypeError": 13,
+      "ValueError": 12,
+      "object": 8,
+      "pytra.built_in.error.BaseException": 1012,
+      "pytra.built_in.error.Exception": 1010,
+      "pytra.built_in.error.FileNotFoundError": 1001,
+      "pytra.built_in.error.IndexError": 1002,
+      "pytra.built_in.error.KeyError": 1003,
+      "pytra.built_in.error.NameError": 1004,
+      "pytra.built_in.error.NotImplementedError": 1000,
+      "pytra.built_in.error.OverflowError": 1005,
+      "pytra.built_in.error.PermissionError": 1006,
+      "pytra.built_in.error.PytraError": 1011,
+      "pytra.built_in.error.RuntimeError": 1007,
+      "pytra.built_in.error.TypeError": 1008,
+      "pytra.built_in.error.ValueError": 1009
     },
     "type_id_base_map": {
-      "pytra.std.json.JsonArr": 8,
-      "pytra.std.json.JsonObj": 8,
-      "pytra.std.json.JsonValue": 8,
-      "pytra.std.json._JsonParser": 8
+      "BaseException": 8,
+      "Exception": 9,
+      "IndexError": 10,
+      "KeyError": 10,
+      "RuntimeError": 10,
+      "TypeError": 10,
+      "ValueError": 10,
+      "object": 8,
+      "pytra.built_in.error.BaseException": 1011,
+      "pytra.built_in.error.Exception": 9,
+      "pytra.built_in.error.FileNotFoundError": 10,
+      "pytra.built_in.error.IndexError": 10,
+      "pytra.built_in.error.KeyError": 10,
+      "pytra.built_in.error.NameError": 10,
+      "pytra.built_in.error.NotImplementedError": 11,
+      "pytra.built_in.error.OverflowError": 10,
+      "pytra.built_in.error.PermissionError": 10,
+      "pytra.built_in.error.PytraError": 8,
+      "pytra.built_in.error.RuntimeError": 10,
+      "pytra.built_in.error.TypeError": 10,
+      "pytra.built_in.error.ValueError": 10
     },
     "call_graph": {
       "isinstance_narrowing::collect_names": [],
       "isinstance_narrowing::owner_name": [],
       "isinstance_narrowing::read_kind": [],
       "isinstance_narrowing::reassign_then_check": [],
-      "pytra.built_in.scalar_ops::py_chr": [],
-      "pytra.built_in.scalar_ops::py_ord": [],
-      "pytra.built_in.scalar_ops::py_to_int64_base": [],
-      "pytra.built_in.sequence::py_range": [],
-      "pytra.built_in.sequence::py_repeat": [],
+      "pytra.built_in.contains::py_contains_dict_object": [],
+      "pytra.built_in.contains::py_contains_list_object": [],
+      "pytra.built_in.contains::py_contains_set_object": [],
+      "pytra.built_in.contains::py_contains_str_object": [],
       "pytra.built_in.string_ops::_contains_char": [],
       "pytra.built_in.string_ops::_is_space": [],
       "pytra.built_in.string_ops::_normalize_index": [],
@@ -121,97 +165,128 @@
         "pytra.built_in.string_ops::py_lstrip_chars",
         "pytra.built_in.string_ops::py_rstrip_chars"
       ],
-      "pytra.std.json::JsonArr.__init__": [],
-      "pytra.std.json::JsonArr.get": [],
-      "pytra.std.json::JsonArr.get_arr": [],
-      "pytra.std.json::JsonArr.get_bool": [],
-      "pytra.std.json::JsonArr.get_float": [],
-      "pytra.std.json::JsonArr.get_int": [],
-      "pytra.std.json::JsonArr.get_obj": [],
-      "pytra.std.json::JsonArr.get_str": [],
-      "pytra.std.json::JsonObj.__init__": [],
-      "pytra.std.json::JsonObj.get": [
-        "pytra.std.json::_jv_obj_require"
+      "pytra.built_in.type_id::_assign_type_ranges_dfs": [
+        "pytra.built_in.type_id::_assign_type_ranges_dfs",
+        "pytra.built_in.type_id::_sorted_child_type_ids"
       ],
-      "pytra.std.json::JsonObj.get_arr": [
-        "pytra.std.json::_jv_obj_require"
+      "pytra.built_in.type_id::_collect_root_type_ids": [
+        "pytra.built_in.type_id::_sorted_ints"
       ],
-      "pytra.std.json::JsonObj.get_bool": [
-        "pytra.std.json::_jv_obj_require"
+      "pytra.built_in.type_id::_contains_int": [],
+      "pytra.built_in.type_id::_copy_int_list": [],
+      "pytra.built_in.type_id::_ensure_builtins": [
+        "pytra.built_in.type_id::_mark_type_ranges_clean",
+        "pytra.built_in.type_id::_recompute_type_ranges",
+        "pytra.built_in.type_id::_register_type_node",
+        "pytra.built_in.type_id::_tid_base_exception",
+        "pytra.built_in.type_id::_tid_bool",
+        "pytra.built_in.type_id::_tid_dict",
+        "pytra.built_in.type_id::_tid_exception",
+        "pytra.built_in.type_id::_tid_float",
+        "pytra.built_in.type_id::_tid_index_error",
+        "pytra.built_in.type_id::_tid_int",
+        "pytra.built_in.type_id::_tid_key_error",
+        "pytra.built_in.type_id::_tid_list",
+        "pytra.built_in.type_id::_tid_none",
+        "pytra.built_in.type_id::_tid_object",
+        "pytra.built_in.type_id::_tid_runtime_error",
+        "pytra.built_in.type_id::_tid_set",
+        "pytra.built_in.type_id::_tid_str",
+        "pytra.built_in.type_id::_tid_type_error",
+        "pytra.built_in.type_id::_tid_user_base",
+        "pytra.built_in.type_id::_tid_value_error"
       ],
-      "pytra.std.json::JsonObj.get_float": [
-        "pytra.std.json::_jv_obj_require"
+      "pytra.built_in.type_id::_ensure_type_ranges": [
+        "pytra.built_in.type_id::_is_type_ranges_dirty",
+        "pytra.built_in.type_id::_mark_type_ranges_clean",
+        "pytra.built_in.type_id::_recompute_type_ranges"
       ],
-      "pytra.std.json::JsonObj.get_int": [
-        "pytra.std.json::_jv_obj_require"
+      "pytra.built_in.type_id::_is_type_ranges_dirty": [],
+      "pytra.built_in.type_id::_make_int_list_0": [],
+      "pytra.built_in.type_id::_make_int_list_1": [],
+      "pytra.built_in.type_id::_mark_type_ranges_clean": [],
+      "pytra.built_in.type_id::_mark_type_ranges_dirty": [],
+      "pytra.built_in.type_id::_normalize_base_type_id": [
+        "pytra.built_in.type_id::_ensure_builtins"
       ],
-      "pytra.std.json::JsonObj.get_obj": [
-        "pytra.std.json::_jv_obj_require"
+      "pytra.built_in.type_id::_py_reset_type_registry_for_test": [
+        "pytra.built_in.type_id::_ensure_builtins",
+        "pytra.built_in.type_id::_tid_user_base"
       ],
-      "pytra.std.json::JsonObj.get_str": [
-        "pytra.std.json::_jv_obj_require"
+      "pytra.built_in.type_id::_recompute_type_ranges": [
+        "pytra.built_in.type_id::_assign_type_ranges_dfs",
+        "pytra.built_in.type_id::_collect_root_type_ids",
+        "pytra.built_in.type_id::_sorted_ints"
       ],
-      "pytra.std.json::JsonValue.__init__": [],
-      "pytra.std.json::JsonValue.as_arr": [],
-      "pytra.std.json::JsonValue.as_bool": [],
-      "pytra.std.json::JsonValue.as_float": [],
-      "pytra.std.json::JsonValue.as_int": [],
-      "pytra.std.json::JsonValue.as_obj": [],
-      "pytra.std.json::JsonValue.as_str": [],
-      "pytra.std.json::_JsonParser.__init__": [],
-      "pytra.std.json::_JsonParser._parse_array": [],
-      "pytra.std.json::_JsonParser._parse_number": [
-        "pytra.std.json::_is_digit"
+      "pytra.built_in.type_id::_register_type_node": [
+        "pytra.built_in.type_id::_contains_int",
+        "pytra.built_in.type_id::_make_int_list_0"
       ],
-      "pytra.std.json::_JsonParser._parse_object": [],
-      "pytra.std.json::_JsonParser._parse_string": [
-        "pytra.std.json::_int_from_hex4",
-        "pytra.std.json::_join_strs"
+      "pytra.built_in.type_id::_sorted_child_type_ids": [
+        "pytra.built_in.type_id::_make_int_list_0",
+        "pytra.built_in.type_id::_sorted_ints"
       ],
-      "pytra.std.json::_JsonParser._parse_value": [],
-      "pytra.std.json::_JsonParser._skip_ws": [
-        "pytra.std.json::_is_ws"
+      "pytra.built_in.type_id::_sorted_ints": [
+        "pytra.built_in.type_id::_copy_int_list"
       ],
-      "pytra.std.json::_JsonParser.parse": [],
-      "pytra.std.json::_dump_json_dict": [
-        "pytra.std.json::_dump_json_value",
-        "pytra.std.json::_escape_str",
-        "pytra.std.json::_join_strs",
-        "pytra.std.json::_json_indent_value"
+      "pytra.built_in.type_id::_tid_base_exception": [],
+      "pytra.built_in.type_id::_tid_bool": [],
+      "pytra.built_in.type_id::_tid_dict": [],
+      "pytra.built_in.type_id::_tid_exception": [],
+      "pytra.built_in.type_id::_tid_float": [],
+      "pytra.built_in.type_id::_tid_index_error": [],
+      "pytra.built_in.type_id::_tid_int": [],
+      "pytra.built_in.type_id::_tid_key_error": [],
+      "pytra.built_in.type_id::_tid_list": [],
+      "pytra.built_in.type_id::_tid_none": [],
+      "pytra.built_in.type_id::_tid_object": [],
+      "pytra.built_in.type_id::_tid_runtime_error": [],
+      "pytra.built_in.type_id::_tid_set": [],
+      "pytra.built_in.type_id::_tid_str": [],
+      "pytra.built_in.type_id::_tid_type_error": [],
+      "pytra.built_in.type_id::_tid_user_base": [],
+      "pytra.built_in.type_id::_tid_value_error": [],
+      "pytra.built_in.type_id::_try_runtime_tagged_type_id": [],
+      "pytra.built_in.type_id::py_tid_is_subtype": [
+        "pytra.built_in.type_id::_ensure_builtins",
+        "pytra.built_in.type_id::_ensure_type_ranges"
       ],
-      "pytra.std.json::_dump_json_list": [
-        "pytra.std.json::_dump_json_value",
-        "pytra.std.json::_join_strs",
-        "pytra.std.json::_json_indent_value"
+      "pytra.built_in.type_id::py_tid_isinstance": [],
+      "pytra.built_in.type_id::py_tid_issubclass": [],
+      "pytra.built_in.type_id::py_tid_register_class_type": [
+        "pytra.built_in.type_id::_ensure_builtins",
+        "pytra.built_in.type_id::_mark_type_ranges_dirty",
+        "pytra.built_in.type_id::_normalize_base_type_id",
+        "pytra.built_in.type_id::_register_type_node"
       ],
-      "pytra.std.json::_dump_json_value": [
-        "pytra.std.json::_dump_json_dict",
-        "pytra.std.json::_dump_json_list",
-        "pytra.std.json::_escape_str"
+      "pytra.built_in.type_id::py_tid_register_known_class_type": [
+        "pytra.built_in.type_id::_ensure_builtins",
+        "pytra.built_in.type_id::_mark_type_ranges_dirty",
+        "pytra.built_in.type_id::_normalize_base_type_id",
+        "pytra.built_in.type_id::_register_type_node",
+        "pytra.built_in.type_id::_tid_user_base"
       ],
-      "pytra.std.json::_escape_str": [
-        "pytra.std.json::_hex4",
-        "pytra.std.json::_join_strs"
+      "pytra.built_in.type_id::py_tid_runtime_type_id": [
+        "pytra.built_in.type_id::_ensure_builtins",
+        "pytra.built_in.type_id::_tid_base_exception",
+        "pytra.built_in.type_id::_tid_bool",
+        "pytra.built_in.type_id::_tid_dict",
+        "pytra.built_in.type_id::_tid_exception",
+        "pytra.built_in.type_id::_tid_float",
+        "pytra.built_in.type_id::_tid_index_error",
+        "pytra.built_in.type_id::_tid_int",
+        "pytra.built_in.type_id::_tid_key_error",
+        "pytra.built_in.type_id::_tid_list",
+        "pytra.built_in.type_id::_tid_none",
+        "pytra.built_in.type_id::_tid_object",
+        "pytra.built_in.type_id::_tid_runtime_error",
+        "pytra.built_in.type_id::_tid_set",
+        "pytra.built_in.type_id::_tid_str",
+        "pytra.built_in.type_id::_tid_type_error",
+        "pytra.built_in.type_id::_tid_value_error",
+        "pytra.built_in.type_id::_try_runtime_tagged_type_id"
       ],
-      "pytra.std.json::_hex4": [],
-      "pytra.std.json::_hex_value": [],
-      "pytra.std.json::_int_from_hex4": [
-        "pytra.std.json::_hex_value"
-      ],
-      "pytra.std.json::_is_digit": [],
-      "pytra.std.json::_is_ws": [],
-      "pytra.std.json::_join_strs": [],
-      "pytra.std.json::_json_indent_value": [],
-      "pytra.std.json::_jv_obj_require": [],
-      "pytra.std.json::dumps": [
-        "pytra.std.json::_dump_json_value"
-      ],
-      "pytra.std.json::dumps_jv": [
-        "pytra.std.json::_dump_json_value"
-      ],
-      "pytra.std.json::loads": [],
-      "pytra.std.json::loads_arr": [],
-      "pytra.std.json::loads_obj": []
+      "pytra.built_in.type_id::pytra_isinstance": []
     },
     "sccs": [
       [
@@ -227,19 +302,16 @@
         "isinstance_narrowing::reassign_then_check"
       ],
       [
-        "pytra.built_in.scalar_ops::py_chr"
+        "pytra.built_in.contains::py_contains_dict_object"
       ],
       [
-        "pytra.built_in.scalar_ops::py_ord"
+        "pytra.built_in.contains::py_contains_list_object"
       ],
       [
-        "pytra.built_in.scalar_ops::py_to_int64_base"
+        "pytra.built_in.contains::py_contains_set_object"
       ],
       [
-        "pytra.built_in.sequence::py_range"
-      ],
-      [
-        "pytra.built_in.sequence::py_repeat"
+        "pytra.built_in.contains::py_contains_str_object"
       ],
       [
         "pytra.built_in.string_ops::_contains_char"
@@ -305,144 +377,130 @@
         "pytra.built_in.string_ops::py_strip_chars"
       ],
       [
-        "pytra.std.json::JsonArr.__init__"
+        "pytra.built_in.type_id::_make_int_list_0"
       ],
       [
-        "pytra.std.json::JsonArr.get"
+        "pytra.built_in.type_id::_copy_int_list"
       ],
       [
-        "pytra.std.json::JsonArr.get_arr"
+        "pytra.built_in.type_id::_sorted_ints"
       ],
       [
-        "pytra.std.json::JsonArr.get_bool"
+        "pytra.built_in.type_id::_sorted_child_type_ids"
       ],
       [
-        "pytra.std.json::JsonArr.get_float"
+        "pytra.built_in.type_id::_assign_type_ranges_dfs"
       ],
       [
-        "pytra.std.json::JsonArr.get_int"
+        "pytra.built_in.type_id::_collect_root_type_ids"
       ],
       [
-        "pytra.std.json::JsonArr.get_obj"
+        "pytra.built_in.type_id::_contains_int"
       ],
       [
-        "pytra.std.json::JsonArr.get_str"
+        "pytra.built_in.type_id::_mark_type_ranges_clean"
       ],
       [
-        "pytra.std.json::JsonObj.__init__"
+        "pytra.built_in.type_id::_recompute_type_ranges"
       ],
       [
-        "pytra.std.json::_jv_obj_require"
+        "pytra.built_in.type_id::_register_type_node"
       ],
       [
-        "pytra.std.json::JsonObj.get"
+        "pytra.built_in.type_id::_tid_base_exception"
       ],
       [
-        "pytra.std.json::JsonObj.get_arr"
+        "pytra.built_in.type_id::_tid_bool"
       ],
       [
-        "pytra.std.json::JsonObj.get_bool"
+        "pytra.built_in.type_id::_tid_dict"
       ],
       [
-        "pytra.std.json::JsonObj.get_float"
+        "pytra.built_in.type_id::_tid_exception"
       ],
       [
-        "pytra.std.json::JsonObj.get_int"
+        "pytra.built_in.type_id::_tid_float"
       ],
       [
-        "pytra.std.json::JsonObj.get_obj"
+        "pytra.built_in.type_id::_tid_index_error"
       ],
       [
-        "pytra.std.json::JsonObj.get_str"
+        "pytra.built_in.type_id::_tid_int"
       ],
       [
-        "pytra.std.json::JsonValue.__init__"
+        "pytra.built_in.type_id::_tid_key_error"
       ],
       [
-        "pytra.std.json::JsonValue.as_arr"
+        "pytra.built_in.type_id::_tid_list"
       ],
       [
-        "pytra.std.json::JsonValue.as_bool"
+        "pytra.built_in.type_id::_tid_none"
       ],
       [
-        "pytra.std.json::JsonValue.as_float"
+        "pytra.built_in.type_id::_tid_object"
       ],
       [
-        "pytra.std.json::JsonValue.as_int"
+        "pytra.built_in.type_id::_tid_runtime_error"
       ],
       [
-        "pytra.std.json::JsonValue.as_obj"
+        "pytra.built_in.type_id::_tid_set"
       ],
       [
-        "pytra.std.json::JsonValue.as_str"
+        "pytra.built_in.type_id::_tid_str"
       ],
       [
-        "pytra.std.json::_JsonParser.__init__"
+        "pytra.built_in.type_id::_tid_type_error"
       ],
       [
-        "pytra.std.json::_JsonParser._parse_array"
+        "pytra.built_in.type_id::_tid_user_base"
       ],
       [
-        "pytra.std.json::_is_digit"
+        "pytra.built_in.type_id::_tid_value_error"
       ],
       [
-        "pytra.std.json::_JsonParser._parse_number"
+        "pytra.built_in.type_id::_ensure_builtins"
       ],
       [
-        "pytra.std.json::_JsonParser._parse_object"
+        "pytra.built_in.type_id::_is_type_ranges_dirty"
       ],
       [
-        "pytra.std.json::_hex_value"
+        "pytra.built_in.type_id::_ensure_type_ranges"
       ],
       [
-        "pytra.std.json::_int_from_hex4"
+        "pytra.built_in.type_id::_make_int_list_1"
       ],
       [
-        "pytra.std.json::_join_strs"
+        "pytra.built_in.type_id::_mark_type_ranges_dirty"
       ],
       [
-        "pytra.std.json::_JsonParser._parse_string"
+        "pytra.built_in.type_id::_normalize_base_type_id"
       ],
       [
-        "pytra.std.json::_JsonParser._parse_value"
+        "pytra.built_in.type_id::_py_reset_type_registry_for_test"
       ],
       [
-        "pytra.std.json::_is_ws"
+        "pytra.built_in.type_id::_try_runtime_tagged_type_id"
       ],
       [
-        "pytra.std.json::_JsonParser._skip_ws"
+        "pytra.built_in.type_id::py_tid_is_subtype"
       ],
       [
-        "pytra.std.json::_JsonParser.parse"
+        "pytra.built_in.type_id::py_tid_isinstance"
       ],
       [
-        "pytra.std.json::_json_indent_value"
+        "pytra.built_in.type_id::py_tid_issubclass"
       ],
       [
-        "pytra.std.json::_hex4"
+        "pytra.built_in.type_id::py_tid_register_class_type"
       ],
       [
-        "pytra.std.json::_escape_str"
+        "pytra.built_in.type_id::py_tid_register_known_class_type"
       ],
       [
-        "pytra.std.json::_dump_json_dict",
-        "pytra.std.json::_dump_json_list",
-        "pytra.std.json::_dump_json_value"
+        "pytra.built_in.type_id::py_tid_runtime_type_id"
       ],
       [
-        "pytra.std.json::dumps"
-      ],
-      [
-        "pytra.std.json::dumps_jv"
-      ],
-      [
-        "pytra.std.json::loads"
-      ],
-      [
-        "pytra.std.json::loads_arr"
-      ],
-      [
-        "pytra.std.json::loads_obj"
+        "pytra.built_in.type_id::pytra_isinstance"
       ]
     ],
     "non_escape_summary": {},

@@ -23,6 +23,7 @@
       "field_types": {
         "pressed": "bool"
       },
+      "decorators": [],
       "body": [
         {
           "kind": "AnnAssign",
@@ -66,7 +67,8 @@
       ],
       "class_storage_hint": "value",
       "leading_comments": [],
-      "leading_trivia": []
+      "leading_trivia": [],
+      "meta": {}
     },
     {
       "kind": "FunctionDef",

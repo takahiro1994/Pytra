@@ -91,6 +91,7 @@
           "decorators": []
         }
       ],
+      "decorators": [],
       "leading_comments": [
         "This file contains test/implementation code for `test/fixtures/oop/inheritance_polymorphic_dispatch.py`.",
         "Reader-facing comments are added to make roles easier to understand.",
@@ -184,7 +185,8 @@
           "yield_value_type": "unknown",
           "decorators": []
         }
-      ]
+      ],
+      "decorators": []
     },
     {
       "kind": "ClassDef",
@@ -251,7 +253,8 @@
           "yield_value_type": "unknown",
           "decorators": []
         }
-      ]
+      ],
+      "decorators": []
     },
     {
       "kind": "FunctionDef",

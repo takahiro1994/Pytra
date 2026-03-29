@@ -38,9 +38,7 @@
       "arg_types": {
         "params": "list[unknown]"
       },
-      "arg_order": [
-        "params"
-      ],
+      "arg_order": [],
       "arg_defaults": {},
       "arg_index": {},
       "return_type": "None",
@@ -49,7 +47,7 @@
       "docstring": null,
       "body": [
         {
-          "kind": "FunctionDef",
+          "kind": "ClosureDef",
           "source_span": {
             "lineno": 5,
             "col_offset": 4,
@@ -113,6 +111,9 @@
           },
           "leading_comments": [],
           "leading_trivia": [],
+          "captures": [],
+          "capture_types": {},
+          "capture_modes": {},
           "returns": "None"
         },
         {
@@ -168,11 +169,11 @@
           "count": 1
         }
       ],
-      "vararg_desugared_v1": {
-        "n_fixed": 0,
-        "elem_type": "unknown",
-        "vararg_name": "params",
-        "list_type": "list[unknown]"
+      "vararg_name": "params",
+      "vararg_type": "unknown",
+      "vararg_type_expr": {
+        "kind": "NamedType",
+        "name": "unknown"
       },
       "returns": "None"
     }

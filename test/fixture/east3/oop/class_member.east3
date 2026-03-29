@@ -34,6 +34,7 @@
       "field_types": {
         "value": "int64"
       },
+      "decorators": [],
       "body": [
         {
           "kind": "AnnAssign",
@@ -257,7 +258,8 @@
           "kind": "blank",
           "count": 1
         }
-      ]
+      ],
+      "meta": {}
     },
     {
       "kind": "FunctionDef",

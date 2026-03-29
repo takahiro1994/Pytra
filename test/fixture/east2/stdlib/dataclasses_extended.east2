@@ -45,6 +45,9 @@
         "x": "int64",
         "y": "int64"
       },
+      "decorators": [
+        "dataclass"
+      ],
       "body": [
         {
           "kind": "AnnAssign",
@@ -140,7 +143,8 @@
       ],
       "class_storage_hint": "ref",
       "leading_comments": [],
-      "leading_trivia": []
+      "leading_trivia": [],
+      "meta": {}
     },
     {
       "kind": "ClassDef",
@@ -158,6 +162,9 @@
         "category": "str",
         "summary": "str"
       },
+      "decorators": [
+        "dataclass"
+      ],
       "body": [
         {
           "kind": "AnnAssign",
@@ -238,7 +245,8 @@
           }
         }
       ],
-      "class_storage_hint": "ref"
+      "class_storage_hint": "ref",
+      "meta": {}
     },
     {
       "kind": "FunctionDef",

@@ -15,6 +15,7 @@
       "base": null,
       "dataclass": false,
       "field_types": {},
+      "decorators": [],
       "body": [
         {
           "kind": "Pass",
@@ -28,7 +29,8 @@
       ],
       "class_storage_hint": "value",
       "leading_comments": [],
-      "leading_trivia": []
+      "leading_trivia": [],
+      "meta": {}
     },
     {
       "kind": "ClassDef",
@@ -43,6 +45,7 @@
       "base": null,
       "dataclass": false,
       "field_types": {},
+      "decorators": [],
       "body": [
         {
           "kind": "Pass",
@@ -54,7 +57,8 @@
           }
         }
       ],
-      "class_storage_hint": "value"
+      "class_storage_hint": "value",
+      "meta": {}
     },
     {
       "kind": "FunctionDef",
@@ -152,7 +156,17 @@
                     "category": "dynamic",
                     "mirror": "object",
                     "dynamic_name": "object"
-                  }
+                  },
+                  "predicate_category": "nominal_adt",
+                  "family_name": "Cat",
+                  "predicate_kind": "variant",
+                  "variant_name": "Cat"
+                },
+                "nominal_adt_test_v1": {
+                  "schema_version": 1,
+                  "family_name": "Cat",
+                  "predicate_kind": "variant",
+                  "variant_name": "Cat"
                 }
               },
               {
@@ -212,7 +226,17 @@
                     "category": "dynamic",
                     "mirror": "object",
                     "dynamic_name": "object"
-                  }
+                  },
+                  "predicate_category": "nominal_adt",
+                  "family_name": "Dog",
+                  "predicate_kind": "variant",
+                  "variant_name": "Dog"
+                },
+                "nominal_adt_test_v1": {
+                  "schema_version": 1,
+                  "family_name": "Dog",
+                  "predicate_kind": "variant",
+                  "variant_name": "Dog"
                 }
               }
             ],

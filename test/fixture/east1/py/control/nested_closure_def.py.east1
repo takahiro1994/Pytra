@@ -1,6 +1,6 @@
 {
   "kind": "Module",
-  "source_path": "/workspace/Pytra/test/fixtures/control/nested_closure_def.py",
+  "source_path": "test/fixture/source/py/control/nested_closure_def.py",
   "source_span": {
     "lineno": null,
     "col": null,
@@ -9,11 +9,28 @@
   },
   "body": [
     {
-      "kind": "FunctionDef",
+      "kind": "ImportFrom",
       "source_span": {
         "lineno": 1,
         "col": 0,
-        "end_lineno": 14,
+        "end_lineno": 1,
+        "end_col": 51
+      },
+      "module": "pytra.utils.assertions",
+      "names": [
+        {
+          "name": "py_assert_stdout",
+          "asname": null
+        }
+      ],
+      "level": 0
+    },
+    {
+      "kind": "FunctionDef",
+      "source_span": {
+        "lineno": 4,
+        "col": 0,
+        "end_lineno": 17,
         "end_col": 28
       },
       "name": "outer",
@@ -38,17 +55,17 @@
         {
           "kind": "AnnAssign",
           "source_span": {
-            "lineno": 2,
+            "lineno": 5,
             "col": 4,
-            "end_lineno": 2,
+            "end_lineno": 5,
             "end_col": 17
           },
           "target": {
             "kind": "Name",
             "source_span": {
-              "lineno": 2,
+              "lineno": 5,
               "col": 4,
-              "end_lineno": 2,
+              "end_lineno": 5,
               "end_col": 5
             },
             "casts": [],
@@ -60,9 +77,9 @@
           "value": {
             "kind": "Name",
             "source_span": {
-              "lineno": 2,
+              "lineno": 5,
               "col": 13,
-              "end_lineno": 2,
+              "end_lineno": 5,
               "end_col": 17
             },
             "casts": [],
@@ -75,17 +92,17 @@
         {
           "kind": "AnnAssign",
           "source_span": {
-            "lineno": 3,
+            "lineno": 6,
             "col": 4,
-            "end_lineno": 3,
+            "end_lineno": 6,
             "end_col": 18
           },
           "target": {
             "kind": "Name",
             "source_span": {
-              "lineno": 3,
+              "lineno": 6,
               "col": 4,
-              "end_lineno": 3,
+              "end_lineno": 6,
               "end_col": 9
             },
             "casts": [],
@@ -97,9 +114,9 @@
           "value": {
             "kind": "Constant",
             "source_span": {
-              "lineno": 3,
+              "lineno": 6,
               "col": 17,
-              "end_lineno": 3,
+              "end_lineno": 6,
               "end_col": 18
             },
             "casts": [],
@@ -112,9 +129,9 @@
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 5,
+            "lineno": 8,
             "col": 4,
-            "end_lineno": 6,
+            "end_lineno": 9,
             "end_col": 28
           },
           "name": "inner",
@@ -136,17 +153,17 @@
             {
               "kind": "Return",
               "source_span": {
-                "lineno": 6,
+                "lineno": 9,
                 "col": 8,
-                "end_lineno": 6,
+                "end_lineno": 9,
                 "end_col": 28
               },
               "value": {
                 "kind": "BinOp",
                 "source_span": {
-                  "lineno": 6,
+                  "lineno": 9,
                   "col": 15,
-                  "end_lineno": 6,
+                  "end_lineno": 9,
                   "end_col": 28
                 },
                 "casts": [],
@@ -155,9 +172,9 @@
                 "left": {
                   "kind": "BinOp",
                   "source_span": {
-                    "lineno": 6,
+                    "lineno": 9,
                     "col": 15,
-                    "end_lineno": 6,
+                    "end_lineno": 9,
                     "end_col": 24
                   },
                   "casts": [],
@@ -166,9 +183,9 @@
                   "left": {
                     "kind": "Name",
                     "source_span": {
-                      "lineno": 6,
+                      "lineno": 9,
                       "col": 15,
-                      "end_lineno": 6,
+                      "end_lineno": 9,
                       "end_col": 16
                     },
                     "casts": [],
@@ -180,9 +197,9 @@
                   "right": {
                     "kind": "Name",
                     "source_span": {
-                      "lineno": 6,
+                      "lineno": 9,
                       "col": 19,
-                      "end_lineno": 6,
+                      "end_lineno": 9,
                       "end_col": 24
                     },
                     "casts": [],
@@ -195,9 +212,9 @@
                 "right": {
                   "kind": "Name",
                   "source_span": {
-                    "lineno": 6,
+                    "lineno": 9,
                     "col": 27,
-                    "end_lineno": 6,
+                    "end_lineno": 9,
                     "end_col": 28
                   },
                   "casts": [],
@@ -221,9 +238,9 @@
         {
           "kind": "FunctionDef",
           "source_span": {
-            "lineno": 8,
+            "lineno": 11,
             "col": 4,
-            "end_lineno": 11,
+            "end_lineno": 14,
             "end_col": 32
           },
           "name": "rec",
@@ -245,17 +262,17 @@
             {
               "kind": "If",
               "source_span": {
-                "lineno": 9,
+                "lineno": 12,
                 "col": 8,
-                "end_lineno": 10,
+                "end_lineno": 13,
                 "end_col": 20
               },
               "test": {
                 "kind": "Compare",
                 "source_span": {
-                  "lineno": 9,
+                  "lineno": 12,
                   "col": 11,
-                  "end_lineno": 9,
+                  "end_lineno": 12,
                   "end_col": 17
                 },
                 "casts": [],
@@ -264,9 +281,9 @@
                 "left": {
                   "kind": "Name",
                   "source_span": {
-                    "lineno": 9,
+                    "lineno": 12,
                     "col": 11,
-                    "end_lineno": 9,
+                    "end_lineno": 12,
                     "end_col": 12
                   },
                   "casts": [],
@@ -281,9 +298,9 @@
                   {
                     "kind": "Constant",
                     "source_span": {
-                      "lineno": 9,
+                      "lineno": 12,
                       "col": 16,
-                      "end_lineno": 9,
+                      "end_lineno": 12,
                       "end_col": 17
                     },
                     "casts": [],
@@ -297,17 +314,17 @@
                 {
                   "kind": "Return",
                   "source_span": {
-                    "lineno": 10,
+                    "lineno": 13,
                     "col": 12,
-                    "end_lineno": 10,
+                    "end_lineno": 13,
                     "end_col": 20
                   },
                   "value": {
                     "kind": "Constant",
                     "source_span": {
-                      "lineno": 10,
+                      "lineno": 13,
                       "col": 19,
-                      "end_lineno": 10,
+                      "end_lineno": 13,
                       "end_col": 20
                     },
                     "casts": [],
@@ -322,17 +339,17 @@
             {
               "kind": "Return",
               "source_span": {
-                "lineno": 11,
+                "lineno": 14,
                 "col": 8,
-                "end_lineno": 11,
+                "end_lineno": 14,
                 "end_col": 32
               },
               "value": {
                 "kind": "BinOp",
                 "source_span": {
-                  "lineno": 11,
+                  "lineno": 14,
                   "col": 15,
-                  "end_lineno": 11,
+                  "end_lineno": 14,
                   "end_col": 32
                 },
                 "casts": [],
@@ -341,9 +358,9 @@
                 "left": {
                   "kind": "Call",
                   "source_span": {
-                    "lineno": 11,
+                    "lineno": 14,
                     "col": 15,
-                    "end_lineno": 11,
+                    "end_lineno": 14,
                     "end_col": 25
                   },
                   "casts": [],
@@ -352,9 +369,9 @@
                   "func": {
                     "kind": "Name",
                     "source_span": {
-                      "lineno": 11,
+                      "lineno": 14,
                       "col": 15,
-                      "end_lineno": 11,
+                      "end_lineno": 14,
                       "end_col": 18
                     },
                     "casts": [],
@@ -366,9 +383,9 @@
                     {
                       "kind": "BinOp",
                       "source_span": {
-                        "lineno": 11,
+                        "lineno": 14,
                         "col": 19,
-                        "end_lineno": 11,
+                        "end_lineno": 14,
                         "end_col": 24
                       },
                       "casts": [],
@@ -377,9 +394,9 @@
                       "left": {
                         "kind": "Name",
                         "source_span": {
-                          "lineno": 11,
+                          "lineno": 14,
                           "col": 19,
-                          "end_lineno": 11,
+                          "end_lineno": 14,
                           "end_col": 20
                         },
                         "casts": [],
@@ -391,9 +408,9 @@
                       "right": {
                         "kind": "Constant",
                         "source_span": {
-                          "lineno": 11,
+                          "lineno": 14,
                           "col": 23,
-                          "end_lineno": 11,
+                          "end_lineno": 14,
                           "end_col": 24
                         },
                         "casts": [],
@@ -409,9 +426,9 @@
                 "right": {
                   "kind": "Name",
                   "source_span": {
-                    "lineno": 11,
+                    "lineno": 14,
                     "col": 28,
-                    "end_lineno": 11,
+                    "end_lineno": 14,
                     "end_col": 32
                   },
                   "casts": [],
@@ -430,17 +447,17 @@
         {
           "kind": "Assign",
           "source_span": {
-            "lineno": 13,
+            "lineno": 16,
             "col": 4,
-            "end_lineno": 13,
+            "end_lineno": 16,
             "end_col": 16
           },
           "target": {
             "kind": "Name",
             "source_span": {
-              "lineno": 13,
+              "lineno": 16,
               "col": 4,
-              "end_lineno": 13,
+              "end_lineno": 16,
               "end_col": 5
             },
             "casts": [],
@@ -451,9 +468,9 @@
           "value": {
             "kind": "BinOp",
             "source_span": {
-              "lineno": 13,
+              "lineno": 16,
               "col": 8,
-              "end_lineno": 13,
+              "end_lineno": 16,
               "end_col": 16
             },
             "casts": [],
@@ -462,9 +479,9 @@
             "left": {
               "kind": "Name",
               "source_span": {
-                "lineno": 13,
+                "lineno": 16,
                 "col": 8,
-                "end_lineno": 13,
+                "end_lineno": 16,
                 "end_col": 9
               },
               "casts": [],
@@ -476,9 +493,9 @@
             "right": {
               "kind": "Name",
               "source_span": {
-                "lineno": 13,
+                "lineno": 16,
                 "col": 12,
-                "end_lineno": 13,
+                "end_lineno": 16,
                 "end_col": 16
               },
               "casts": [],
@@ -492,17 +509,17 @@
         {
           "kind": "Return",
           "source_span": {
-            "lineno": 14,
+            "lineno": 17,
             "col": 4,
-            "end_lineno": 14,
+            "end_lineno": 17,
             "end_col": 28
           },
           "value": {
             "kind": "BinOp",
             "source_span": {
-              "lineno": 14,
+              "lineno": 17,
               "col": 11,
-              "end_lineno": 14,
+              "end_lineno": 17,
               "end_col": 28
             },
             "casts": [],
@@ -511,9 +528,9 @@
             "left": {
               "kind": "Call",
               "source_span": {
-                "lineno": 14,
+                "lineno": 17,
                 "col": 11,
-                "end_lineno": 14,
+                "end_lineno": 17,
                 "end_col": 19
               },
               "casts": [],
@@ -522,9 +539,9 @@
               "func": {
                 "kind": "Name",
                 "source_span": {
-                  "lineno": 14,
+                  "lineno": 17,
                   "col": 11,
-                  "end_lineno": 14,
+                  "end_lineno": 17,
                   "end_col": 16
                 },
                 "casts": [],
@@ -536,9 +553,9 @@
                 {
                   "kind": "Constant",
                   "source_span": {
-                    "lineno": 14,
+                    "lineno": 17,
                     "col": 17,
-                    "end_lineno": 14,
+                    "end_lineno": 17,
                     "end_col": 18
                   },
                   "casts": [],
@@ -553,9 +570,9 @@
             "right": {
               "kind": "Call",
               "source_span": {
-                "lineno": 14,
+                "lineno": 17,
                 "col": 22,
-                "end_lineno": 14,
+                "end_lineno": 17,
                 "end_col": 28
               },
               "casts": [],
@@ -564,9 +581,9 @@
               "func": {
                 "kind": "Name",
                 "source_span": {
-                  "lineno": 14,
+                  "lineno": 17,
                   "col": 22,
-                  "end_lineno": 14,
+                  "end_lineno": 17,
                   "end_col": 25
                 },
                 "casts": [],
@@ -578,9 +595,9 @@
                 {
                   "kind": "Constant",
                   "source_span": {
-                    "lineno": 14,
+                    "lineno": 17,
                     "col": 26,
-                    "end_lineno": 14,
+                    "end_lineno": 17,
                     "end_col": 27
                   },
                   "casts": [],
@@ -598,19 +615,275 @@
       "yield_value_type": "unknown",
       "leading_comments": [],
       "leading_trivia": []
+    },
+    {
+      "kind": "FunctionDef",
+      "source_span": {
+        "lineno": 20,
+        "col": 0,
+        "end_lineno": 21,
+        "end_col": 23
+      },
+      "name": "_case_main",
+      "original_name": "_case_main",
+      "arg_types": {},
+      "arg_order": [],
+      "arg_defaults": {},
+      "arg_index": {},
+      "return_type": "None",
+      "renamed_symbols": {},
+      "docstring": null,
+      "body": [
+        {
+          "kind": "Expr",
+          "source_span": {
+            "lineno": 21,
+            "col": 4,
+            "end_lineno": 21,
+            "end_col": 23
+          },
+          "value": {
+            "kind": "Call",
+            "source_span": {
+              "lineno": 21,
+              "col": 4,
+              "end_lineno": 21,
+              "end_col": 23
+            },
+            "casts": [],
+            "borrow_kind": "value",
+            "repr": "print(outer(10, 5))",
+            "func": {
+              "kind": "Name",
+              "source_span": {
+                "lineno": 21,
+                "col": 4,
+                "end_lineno": 21,
+                "end_col": 9
+              },
+              "casts": [],
+              "borrow_kind": "value",
+              "repr": "print",
+              "id": "print"
+            },
+            "args": [
+              {
+                "kind": "Call",
+                "source_span": {
+                  "lineno": 21,
+                  "col": 10,
+                  "end_lineno": 21,
+                  "end_col": 22
+                },
+                "casts": [],
+                "borrow_kind": "value",
+                "repr": "outer(10, 5)",
+                "func": {
+                  "kind": "Name",
+                  "source_span": {
+                    "lineno": 21,
+                    "col": 10,
+                    "end_lineno": 21,
+                    "end_col": 15
+                  },
+                  "casts": [],
+                  "borrow_kind": "value",
+                  "repr": "outer",
+                  "id": "outer"
+                },
+                "args": [
+                  {
+                    "kind": "Constant",
+                    "source_span": {
+                      "lineno": 21,
+                      "col": 16,
+                      "end_lineno": 21,
+                      "end_col": 18
+                    },
+                    "casts": [],
+                    "borrow_kind": "value",
+                    "repr": "10",
+                    "value": 10
+                  },
+                  {
+                    "kind": "Constant",
+                    "source_span": {
+                      "lineno": 21,
+                      "col": 20,
+                      "end_lineno": 21,
+                      "end_col": 21
+                    },
+                    "casts": [],
+                    "borrow_kind": "value",
+                    "repr": "5",
+                    "value": 5
+                  }
+                ],
+                "keywords": []
+              }
+            ],
+            "keywords": []
+          }
+        }
+      ],
+      "is_generator": 0,
+      "yield_value_type": "unknown",
+      "leading_comments": [],
+      "leading_trivia": []
     }
   ],
-  "main_guard_body": [],
+  "main_guard_body": [
+    {
+      "kind": "Expr",
+      "source_span": {
+        "lineno": 25,
+        "col": 4,
+        "end_lineno": 25,
+        "end_col": 47
+      },
+      "value": {
+        "kind": "Call",
+        "source_span": {
+          "lineno": 25,
+          "col": 4,
+          "end_lineno": 25,
+          "end_col": 47
+        },
+        "casts": [],
+        "borrow_kind": "value",
+        "repr": "print(py_assert_stdout(['30'], _case_main))",
+        "func": {
+          "kind": "Name",
+          "source_span": {
+            "lineno": 25,
+            "col": 4,
+            "end_lineno": 25,
+            "end_col": 9
+          },
+          "casts": [],
+          "borrow_kind": "value",
+          "repr": "print",
+          "id": "print"
+        },
+        "args": [
+          {
+            "kind": "Call",
+            "source_span": {
+              "lineno": 25,
+              "col": 10,
+              "end_lineno": 25,
+              "end_col": 46
+            },
+            "casts": [],
+            "borrow_kind": "value",
+            "repr": "py_assert_stdout(['30'], _case_main)",
+            "func": {
+              "kind": "Name",
+              "source_span": {
+                "lineno": 25,
+                "col": 10,
+                "end_lineno": 25,
+                "end_col": 26
+              },
+              "casts": [],
+              "borrow_kind": "value",
+              "repr": "py_assert_stdout",
+              "id": "py_assert_stdout"
+            },
+            "args": [
+              {
+                "kind": "List",
+                "source_span": {
+                  "lineno": 25,
+                  "col": 27,
+                  "end_lineno": 25,
+                  "end_col": 33
+                },
+                "casts": [],
+                "borrow_kind": "value",
+                "repr": "['30']",
+                "elements": [
+                  {
+                    "kind": "Constant",
+                    "source_span": {
+                      "lineno": 25,
+                      "col": 28,
+                      "end_lineno": 25,
+                      "end_col": 32
+                    },
+                    "casts": [],
+                    "borrow_kind": "value",
+                    "repr": "'30'",
+                    "value": "30"
+                  }
+                ]
+              },
+              {
+                "kind": "Name",
+                "source_span": {
+                  "lineno": 25,
+                  "col": 35,
+                  "end_lineno": 25,
+                  "end_col": 45
+                },
+                "casts": [],
+                "borrow_kind": "value",
+                "repr": "_case_main",
+                "id": "_case_main"
+              }
+            ],
+            "keywords": []
+          }
+        ],
+        "keywords": []
+      }
+    }
+  ],
   "renamed_symbols": {},
   "meta": {
     "import_resolution": {
-      "bindings": [],
-      "qualified_refs": []
+      "bindings": [
+        {
+          "module_id": "pytra.utils.assertions",
+          "export_name": "py_assert_stdout",
+          "local_name": "py_assert_stdout",
+          "binding_kind": "symbol",
+          "source_file": "test/fixture/source/py/control/nested_closure_def.py",
+          "source_line": 1
+        }
+      ],
+      "qualified_refs": [
+        {
+          "module_id": "pytra.utils.assertions",
+          "symbol": "py_assert_stdout",
+          "local_name": "py_assert_stdout"
+        }
+      ]
     },
-    "import_bindings": [],
-    "qualified_symbol_refs": [],
+    "import_bindings": [
+      {
+        "module_id": "pytra.utils.assertions",
+        "export_name": "py_assert_stdout",
+        "local_name": "py_assert_stdout",
+        "binding_kind": "symbol",
+        "source_file": "test/fixture/source/py/control/nested_closure_def.py",
+        "source_line": 1
+      }
+    ],
+    "qualified_symbol_refs": [
+      {
+        "module_id": "pytra.utils.assertions",
+        "symbol": "py_assert_stdout",
+        "local_name": "py_assert_stdout"
+      }
+    ],
     "import_modules": {},
-    "import_symbols": {}
+    "import_symbols": {
+      "py_assert_stdout": {
+        "module": "pytra.utils.assertions",
+        "name": "py_assert_stdout"
+      }
+    }
   },
   "east_stage": 1
 }

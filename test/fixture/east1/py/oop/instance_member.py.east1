@@ -279,6 +279,7 @@
           "decorators": []
         }
       ],
+      "decorators": [],
       "leading_comments": [
         "This file contains test/implementation code for `test/fixtures/instance_member.py`.",
         "Reader-facing comments are added to make roles easier to understand.",

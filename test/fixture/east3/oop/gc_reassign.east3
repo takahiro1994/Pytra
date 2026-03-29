@@ -34,6 +34,7 @@
       "field_types": {
         "name": "str"
       },
+      "decorators": [],
       "body": [
         {
           "kind": "ClosureDef",
@@ -315,7 +316,8 @@
           "kind": "blank",
           "count": 1
         }
-      ]
+      ],
+      "meta": {}
     },
     {
       "kind": "FunctionDef",

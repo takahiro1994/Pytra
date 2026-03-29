@@ -123,6 +123,7 @@
           "decorators": []
         }
       ],
+      "decorators": [],
       "leading_comments": [
         "Test for sharing the same instance.",
         "If reference semantics break, values in a and b diverge."

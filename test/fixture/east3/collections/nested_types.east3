@@ -130,7 +130,7 @@
               "end_lineno": 8,
               "end_col_offset": 52
             },
-            "resolved_type": "dict[str,str | None]",
+            "resolved_type": "dict[str,str|None]",
             "casts": [],
             "borrow_kind": "value",
             "repr": "{\"a\": \"x\", \"b\": None}",

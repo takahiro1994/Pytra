@@ -318,6 +318,9 @@
       ],
       "is_generator": 0,
       "yield_value_type": "unknown",
+      "decorators": [
+        "extern"
+      ],
       "leading_comments": [],
       "leading_trivia": [
         {
@@ -416,6 +419,9 @@
       ],
       "is_generator": 0,
       "yield_value_type": "unknown",
+      "decorators": [
+        "extern"
+      ],
       "leading_comments": [],
       "leading_trivia": []
     },
@@ -509,6 +515,9 @@
       ],
       "is_generator": 0,
       "yield_value_type": "unknown",
+      "decorators": [
+        "extern"
+      ],
       "leading_comments": [],
       "leading_trivia": []
     },
@@ -602,6 +611,9 @@
       ],
       "is_generator": 0,
       "yield_value_type": "unknown",
+      "decorators": [
+        "extern"
+      ],
       "leading_comments": [],
       "leading_trivia": []
     },
@@ -695,6 +707,9 @@
       ],
       "is_generator": 0,
       "yield_value_type": "unknown",
+      "decorators": [
+        "extern"
+      ],
       "leading_comments": [],
       "leading_trivia": []
     },
@@ -788,6 +803,9 @@
       ],
       "is_generator": 0,
       "yield_value_type": "unknown",
+      "decorators": [
+        "extern"
+      ],
       "leading_comments": [],
       "leading_trivia": []
     },
@@ -881,6 +899,9 @@
       ],
       "is_generator": 0,
       "yield_value_type": "unknown",
+      "decorators": [
+        "extern"
+      ],
       "leading_comments": [],
       "leading_trivia": []
     },
@@ -974,6 +995,9 @@
       ],
       "is_generator": 0,
       "yield_value_type": "unknown",
+      "decorators": [
+        "extern"
+      ],
       "leading_comments": [],
       "leading_trivia": []
     },
@@ -1067,6 +1091,9 @@
       ],
       "is_generator": 0,
       "yield_value_type": "unknown",
+      "decorators": [
+        "extern"
+      ],
       "leading_comments": [],
       "leading_trivia": []
     },
@@ -1160,6 +1187,9 @@
       ],
       "is_generator": 0,
       "yield_value_type": "unknown",
+      "decorators": [
+        "extern"
+      ],
       "leading_comments": [],
       "leading_trivia": []
     },
@@ -1269,6 +1299,9 @@
       ],
       "is_generator": 0,
       "yield_value_type": "unknown",
+      "decorators": [
+        "extern"
+      ],
       "leading_comments": [],
       "leading_trivia": []
     }

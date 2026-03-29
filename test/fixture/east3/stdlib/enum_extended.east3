@@ -39,6 +39,7 @@
         "RED": "Color",
         "BLUE": "Color"
       },
+      "decorators": [],
       "body": [
         {
           "kind": "Assign",
@@ -135,7 +136,8 @@
       ],
       "class_storage_hint": "value",
       "leading_comments": [],
-      "leading_trivia": []
+      "leading_trivia": [],
+      "meta": {}
     },
     {
       "kind": "ClassDef",
@@ -153,6 +155,7 @@
         "OK": "Status",
         "ERROR": "Status"
       },
+      "decorators": [],
       "body": [
         {
           "kind": "Assign",
@@ -247,7 +250,8 @@
           }
         }
       ],
-      "class_storage_hint": "value"
+      "class_storage_hint": "value",
+      "meta": {}
     },
     {
       "kind": "ClassDef",
@@ -266,6 +270,7 @@
         "WRITE": "Perm",
         "EXEC": "Perm"
       },
+      "decorators": [],
       "body": [
         {
           "kind": "Assign",
@@ -406,7 +411,8 @@
           }
         }
       ],
-      "class_storage_hint": "value"
+      "class_storage_hint": "value",
+      "meta": {}
     },
     {
       "kind": "FunctionDef",
