@@ -68,6 +68,24 @@ class EmitContext:
 
 
 # ---------------------------------------------------------------------------
+# Built-in runtime symbols exported by py_runtime.ts
+# ---------------------------------------------------------------------------
+
+# All symbols exported by src/runtime/ts/built_in/py_runtime.ts
+_BUILTIN_RUNTIME_SYMBOLS: set[str] = {
+    "PY_TYPE_NONE", "PY_TYPE_BOOL", "PY_TYPE_NUMBER", "PY_TYPE_STRING",
+    "PY_TYPE_ARRAY", "PY_TYPE_MAP", "PY_TYPE_SET", "PY_TYPE_OBJECT",
+    "PYTRA_TYPE_ID", "PYTRA_TRUTHY", "PYTRA_TRY_LEN", "PYTRA_STR",
+    "pyRegisterType", "pyRegisterClassType", "pyIsSubtype", "pyIsInstance",
+    "pyTypeId", "pyTruthy", "pyTryLen", "pyStr", "pyToString",
+    "pyPrint", "pyLen", "pyBool", "pyRange", "pyFloorDiv", "pyMod",
+    "pyIn", "pySlice", "pyOrd", "pyChr", "pyBytearray", "pyBytes",
+}
+
+_BUILTIN_RUNTIME_MODULE: str = "pytra_built_in_py_runtime"
+
+
+# ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
 
@@ -1462,9 +1480,12 @@ def _emit_import_stmt(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
 
 
 def _module_id_to_path(module_id: str) -> str:
-    """Convert a module ID like 'pytra.std.math' to a relative import path."""
-    parts = module_id.split(".")
-    return "./" + "/".join(parts)
+    """Convert a module ID like 'pytra.std.math' to a relative import path.
+
+    Emitted files are named with underscores (pytra_std_math.ts), so import
+    paths use underscores to match the flat output directory structure.
+    """
+    return "./" + module_id.replace(".", "_")
 
 
 # ---------------------------------------------------------------------------
@@ -1497,7 +1518,15 @@ def _emit_function_def(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
             elif d == "property":
                 is_property = True
 
-    fn_name = _safe_ts_ident(name)
+    # Translate Python special method names to TypeScript equivalents
+    if name == "__init__" and ctx.current_class != "":
+        fn_name = "constructor"
+    elif name == "__str__" and ctx.current_class != "":
+        fn_name = "toString"
+    elif name == "__len__" and ctx.current_class != "":
+        fn_name = "length"
+    else:
+        fn_name = _safe_ts_ident(name)
     saved_vars = dict(ctx.var_types)
     saved_ret = ctx.current_return_type
     ctx.current_return_type = return_type
@@ -1515,8 +1544,11 @@ def _emit_function_def(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
         ann = _type_annotation(ctx, a_type)
         params.append(safe_a + ann)
 
-    # Return type annotation
-    ret_ann = _return_type_annotation(ctx, return_type)
+    # Return type annotation (constructor has no return type annotation in TS)
+    if fn_name == "constructor":
+        ret_ann = ""
+    else:
+        ret_ann = _return_type_annotation(ctx, return_type)
 
     # Method in class context
     if ctx.current_class != "" and not is_staticmethod and not is_classmethod:
@@ -1558,14 +1590,13 @@ def _collect_class_fields(ctx: EmitContext, node: dict[str, JsonVal]) -> list[tu
             if isinstance(fname, str) and isinstance(ftype, str) and fname != "":
                 fields.append((fname, ftype))
         return fields
-    # Scan AnnAssign in class body (dataclass style)
-    is_dataclass = _bool(node, "dataclass")
+    # Scan AnnAssign in class body (dataclass and regular classes)
     body = _list(node, "body")
     for stmt in body:
         if not isinstance(stmt, dict):
             continue
         sk = _str(stmt, "kind")
-        if sk == "AnnAssign" and is_dataclass:
+        if sk == "AnnAssign":
             target_val = stmt.get("target")
             ft_name = ""
             if isinstance(target_val, dict):
@@ -1642,8 +1673,8 @@ def _emit_class_def(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
         sk = _str(stmt, "kind")
         if sk in ("FunctionDef", "ClosureDef"):
             _emit_function_def(ctx, stmt)
-        elif sk == "AnnAssign" and is_dataclass:
-            # Skip - fields already emitted above
+        elif sk == "AnnAssign":
+            # Class-level annotations are emitted as field declarations above; skip here
             pass
         elif sk in ("comment", "blank"):
             _emit_stmt(ctx, stmt)
@@ -1820,5 +1851,25 @@ def emit_ts_module(east3_doc: dict[str, JsonVal], *, strip_types: bool = False) 
         _emit(ctx, "// main")
         _emit_body(ctx, main_guard)
 
-    output = "\n".join(ctx.lines).rstrip() + "\n"
+    # Detect built-in runtime symbols used in the output and prepend import
+    body_text = "\n".join(ctx.lines)
+    used_builtins: list[str] = []
+    for sym in sorted(_BUILTIN_RUNTIME_SYMBOLS):
+        if sym + "(" in body_text or sym + ";" in body_text or sym + "," in body_text:
+            used_builtins.append(sym)
+
+    preamble_lines: list[str] = []
+    if len(used_builtins) > 0 and not ctx.strip_types:
+        preamble_lines.append(
+            "import { " + ", ".join(used_builtins) + " } from \"./" + _BUILTIN_RUNTIME_MODULE + "\";"
+        )
+    elif len(used_builtins) > 0 and ctx.strip_types:
+        preamble_lines.append(
+            "const { " + ", ".join(used_builtins) + " } = require(\"./" + _BUILTIN_RUNTIME_MODULE + "\");"
+        )
+
+    if len(preamble_lines) > 0:
+        output = "\n".join(preamble_lines) + "\n" + body_text.rstrip() + "\n"
+    else:
+        output = body_text.rstrip() + "\n"
     return output

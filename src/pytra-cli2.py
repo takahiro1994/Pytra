@@ -709,6 +709,17 @@ def _emit_rs(manifest_path: Path, output_dir: Path) -> int:
     return 0
 
 
+def _copy_ts_runtime_files(output_dir: Path) -> int:
+    """Copy the TS built-in runtime file to the output directory."""
+    root = _repo_root()
+    runtime_src = root.joinpath("src").joinpath("runtime").joinpath("ts").joinpath("built_in").joinpath("py_runtime.ts")
+    if not runtime_src.exists():
+        return 0
+    dst = output_dir.joinpath("pytra_built_in_py_runtime.ts")
+    dst.write_text(runtime_src.read_text(encoding="utf-8"), encoding="utf-8")
+    return 1
+
+
 def _emit_ts(manifest_path: Path, output_dir: Path, *, strip_types: bool = False) -> int:
     """TypeScript/JavaScript emit: linked output → TS/JS source files."""
     manifest_doc, linked_modules = load_linked_output(manifest_path)
@@ -725,6 +736,9 @@ def _emit_ts(manifest_path: Path, output_dir: Path, *, strip_types: bool = False
         out_path = output_dir.joinpath(fname)
         out_path.write_text(code, encoding="utf-8")
         written += 1
+
+    # Copy the built-in runtime file
+    _copy_ts_runtime_files(output_dir)
 
     lang = "JS" if strip_types else "TS"
     print("emitted: " + str(output_dir) + " (" + str(written) + " " + lang + " files)")
@@ -933,6 +947,8 @@ def _build_pipeline(inputs: list[str], output_dir_text: str, target: str) -> int
                 continue
             output_dir.joinpath(m.module_id.replace(".", "_") + ext).write_text(code, encoding="utf-8")
             written += 1
+        # Copy the built-in runtime file
+        _copy_ts_runtime_files(output_dir)
     elif target == "cpp":
         for m in link_result.linked_modules:
             if m.module_kind == "runtime":

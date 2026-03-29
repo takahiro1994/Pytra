@@ -3,6 +3,7 @@
   "calls": {
     "py_print": "pyPrint",
     "py_len": "pyLen",
+    "len": "pyLen",
     "py_to_string": "pyStr",
     "static_cast": "__CAST__",
     "py_int_from_str": "parseInt",
