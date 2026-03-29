@@ -5,7 +5,7 @@
 # Sample parity matrix
 
 > Machine-generated file. Run `python3 tools/gen/gen_backend_progress.py` to update.
-> Generated at: 2026-03-30T06:56:24
+> Generated at: 2026-03-30T08:06:06
 > [Links](./index.md)
 
 | Icon | Meaning |
@@ -36,3 +36,4 @@
 | 18_mini_language_interpreter | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
 | **🟩 PASS** | — | — | — | — | — | — | — | 18 | — | — | — | — | — | — | — | — | — | — |
 | **🟥 FAIL** | — | — | — | — | — | — | — | 0 | — | — | — | — | — | — | — | — | — | — |
+| **⬜ Untested** | 18 | 18 | 18 | 18 | 18 | 18 | 18 | — | 18 | 18 | 18 | 18 | 18 | 18 | 18 | 18 | 18 | 18 |

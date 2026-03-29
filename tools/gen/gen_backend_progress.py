@@ -168,9 +168,11 @@ def _build_parity_matrix(cases: list[tuple[str, str] | str], results: dict[str, 
                     cells.append(_case_icon(str(entry.get("category", ""))))
             lines.append(f"| {stem} | {' | '.join(cells)} |")
 
-    # Summary row
+    # Summary rows
+    total_cases = len(cases)
     ok_cells = []
     fail_cells = []
+    untested_cells = []
     for lang in lang_list:
         ok_count = 0
         fail_count = 0
@@ -180,19 +182,24 @@ def _build_parity_matrix(cases: list[tuple[str, str] | str], results: dict[str, 
                 ok_count += 1
             else:
                 fail_count += 1
+        untested_count = total_cases - ok_count - fail_count
         if ok_count + fail_count == 0:
             ok_cells.append("—")
             fail_cells.append("—")
+            untested_cells.append(str(total_cases))
         else:
             ok_cells.append(str(ok_count))
             fail_cells.append(str(fail_count))
+            untested_cells.append(str(untested_count) if untested_count > 0 else "—")
 
     if case_root == "fixture":
         lines.append(f"| | **🟩 PASS** | {' | '.join(ok_cells)} |")
         lines.append(f"| | **🟥 FAIL** | {' | '.join(fail_cells)} |")
+        lines.append(f"| | **⬜ 未実行** | {' | '.join(untested_cells)} |")
     else:
         lines.append(f"| **🟩 PASS** | {' | '.join(ok_cells)} |")
         lines.append(f"| **🟥 FAIL** | {' | '.join(fail_cells)} |")
+        lines.append(f"| **⬜ 未実行** | {' | '.join(untested_cells)} |")
 
     return lines
 
@@ -229,8 +236,10 @@ def _build_parity_matrix_en(cases: list[tuple[str, str] | str], results: dict[st
                     cells.append(_case_icon(str(entry.get("category", ""))))
             lines.append(f"| {stem} | {' | '.join(cells)} |")
 
+    total_cases = len(cases)
     ok_cells = []
     fail_cells = []
+    untested_cells = []
     for lang in lang_list:
         ok_count = 0
         fail_count = 0
@@ -240,19 +249,24 @@ def _build_parity_matrix_en(cases: list[tuple[str, str] | str], results: dict[st
                 ok_count += 1
             else:
                 fail_count += 1
+        untested_count = total_cases - ok_count - fail_count
         if ok_count + fail_count == 0:
             ok_cells.append("—")
             fail_cells.append("—")
+            untested_cells.append(str(total_cases))
         else:
             ok_cells.append(str(ok_count))
             fail_cells.append(str(fail_count))
+            untested_cells.append(str(untested_count) if untested_count > 0 else "—")
 
     if case_root == "fixture":
         lines.append(f"| | **🟩 PASS** | {' | '.join(ok_cells)} |")
         lines.append(f"| | **🟥 FAIL** | {' | '.join(fail_cells)} |")
+        lines.append(f"| | **⬜ Untested** | {' | '.join(untested_cells)} |")
     else:
         lines.append(f"| **🟩 PASS** | {' | '.join(ok_cells)} |")
         lines.append(f"| **🟥 FAIL** | {' | '.join(fail_cells)} |")
+        lines.append(f"| **⬜ Untested** | {' | '.join(untested_cells)} |")
 
     return lines
 
