@@ -371,6 +371,11 @@ def _go_ref_container_type(ctx: EmitContext, resolved_type: str) -> str:
     if resolved_type.startswith("set[") and resolved_type.endswith("]"):
         inner = resolved_type[4:-1]
         return "*PySet[" + _go_signature_type(ctx, inner) + "]"
+    # Optional container: dict[K,V] | None → *PyDict[K,V] (nil encodes None)
+    if resolved_type.endswith(" | None") or resolved_type.endswith("|None"):
+        inner4 = resolved_type[:-7].strip() if resolved_type.endswith(" | None") else resolved_type[:-5].strip()
+        if _is_container_resolved_type(inner4):
+            return _go_ref_container_type(ctx, inner4)
     return go_type(resolved_type)
 
 
@@ -381,6 +386,9 @@ def _decl_go_type(ctx: EmitContext, resolved_type: str, name: str = "") -> str:
 
 
 def _decl_go_zero_value(ctx: EmitContext, resolved_type: str, name: str = "") -> str:
+    # Optional container types (e.g. dict[K,V] | None) have nil as zero value, not a ctor.
+    if resolved_type.endswith(" | None") or resolved_type.endswith("|None"):
+        return go_zero_value(resolved_type)
     if _is_container_resolved_type(resolved_type) and not _prefer_value_container_local(ctx, name, resolved_type):
         if resolved_type == "list" or resolved_type.startswith("list["):
             return _go_ref_container_ctor(ctx, resolved_type, "[]")
@@ -441,6 +449,16 @@ def _wrap_ref_container_value_code(ctx: EmitContext, value_code: str, resolved_t
         if source_type == resolved_type and _is_container_resolved_type(source_type):
             if stripped in ctx.ref_container_locals or not _prefer_value_container_local(ctx, stripped, source_type):
                 return stripped
+        # Optional container variable (e.g. list[T] | None → *PyList[T] in Go).
+        # The variable already holds a *PyList/*PyDict/*PySet, so nil encodes None — return directly.
+        opt_inner2 = _optional_inner_type(source_type)
+        if opt_inner2 == resolved_type and _is_container_resolved_type(resolved_type):
+            return stripped
+    # Optional container resolved_type (e.g. list[T] | None): wrap the value for the inner type.
+    # The parameter/field expects *PyList/*PyDict/*PySet (nil encodes None).
+    opt_inner = _optional_inner_type(resolved_type)
+    if opt_inner != "" and _is_container_resolved_type(opt_inner) and value_code != "nil":
+        return _wrap_ref_container_value_code(ctx, value_code, opt_inner)
     if value_code.startswith("NewPyList[") or value_code.startswith("PyListFromSlice["):
         return value_code
     if value_code.startswith("NewPyDict[") or value_code.startswith("PyDictFromMap["):
@@ -523,6 +541,14 @@ def _wrapper_container_storage_expr(ctx: EmitContext, node: JsonVal, rendered: s
         return rendered + ".items"
     if rendered.startswith("NewPyDict[") or rendered.startswith("PyDictFromMap["):
         return rendered + ".items"
+    # Type assertions to wrapper types need .items to get the underlying native slice/map.
+    if not rendered.endswith(".items"):
+        if ".(*PyList[" in rendered:
+            return rendered + ".items"
+        if ".(*PyDict[" in rendered:
+            return rendered + ".items"
+        if ".(*PySet[" in rendered:
+            return rendered + ".items"
     if rendered.startswith("NewPySet[") or rendered.startswith("PySetFromMap["):
         return rendered + ".items"
     if not isinstance(node, dict):
@@ -1477,7 +1503,8 @@ def _optional_inner_type(resolved_type: str) -> str:
 
 def _wrap_optional_resolved_code(ctx: EmitContext, value_code: str, inner_type: str) -> str:
     inner_gt = go_type(inner_type)
-    if inner_gt == "" or inner_gt == "any" or inner_gt.startswith("*"):
+    # Container types (*PyList, *PyDict, *PySet) are already pointers — nil encodes None.
+    if inner_gt == "" or inner_gt == "any" or inner_gt.startswith("*") or _is_container_resolved_type(inner_type):
         return value_code
     temp_name = _next_temp(ctx, "opt")
     return (
@@ -2013,7 +2040,8 @@ def _emit_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
                             return dynamic_code
                         return "py_dict_get(" + owner + ", " + arg_strs[0] + ", " + arg_strs[1] + ")"
                     return owner + "[" + arg_strs[0] + "]"
-            return owner + "." + _safe_go_ident(attr) + "(" + ", ".join(call_arg_strs) + ")"
+            wrapped_method_args = _wrap_container_call_args(ctx, args, call_arg_strs)
+            return owner + "." + _safe_go_ident(attr) + "(" + ", ".join(wrapped_method_args) + ")"
         if func_kind == "Name":
             fn_name = _str(func, "id")
             if fn_name == "":
@@ -2483,7 +2511,8 @@ def _emit_builtin_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
             result_type = _str(node, "resolved_type")
             result_gt = go_type(result_type)
             if src_type == result_type and result_gt.startswith("[]"):
-                return "append(" + result_gt + "{}, " + arg_strs[0] + "...)"
+                src_code = _wrapper_container_storage_expr(ctx, args[0], arg_strs[0])
+                return "append(" + result_gt + "{}, " + src_code + "...)"
         if len(arg_strs) >= 1:
             return arg_strs[0]
         return "[]any{}"
@@ -4170,6 +4199,27 @@ def _emit_static_range_for(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
     _emit_runtime_iter_for(ctx, node)
 
 
+def _scan_body_for_return_type(body: list) -> str:
+    """Find the resolved_type of the first Return-with-value in body (shallow recursion)."""
+    for stmt in body:
+        if not isinstance(stmt, dict):
+            continue
+        kind = _str(stmt, "kind")
+        if kind == "Return":
+            val = stmt.get("value")
+            if isinstance(val, dict):
+                rt = _str(val, "resolved_type")
+                if rt not in ("", "None", "NoneType"):
+                    return rt
+        elif kind in ("If", "Try"):
+            for subkey in ("body", "orelse", "handlers", "finalbody"):
+                sub = _list(stmt, subkey)
+                rt = _scan_body_for_return_type(sub)
+                if rt != "":
+                    return rt
+    return ""
+
+
 def _emit_function_def(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
     name = _str(node, "name")
     arg_types = _dict(node, "arg_types")
@@ -4193,8 +4243,13 @@ def _emit_function_def(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
             return
 
     fn_name = _go_symbol_name(ctx, name)
-    go_ret = _go_signature_type(ctx, return_type)
+    # If function has no annotation (return_type="None") but body returns a value, infer it.
     mutated_arg_name = ctx.bytearray_mutating_funcs.get(name, "")
+    if return_type in ("None", "") and not mutated_arg_name:
+        inferred = _scan_body_for_return_type(body)
+        if inferred not in ("", "None", "NoneType"):
+            return_type = inferred
+    go_ret = _go_signature_type(ctx, return_type)
     mutated_return = mutated_arg_name != "" and return_type == "None"
     is_staticmethod = False
     for d in decorators:
