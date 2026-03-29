@@ -5,21 +5,20 @@
 # Selfhost matrix
 
 > Machine-generated file. Run `python3 tools/gen/gen_backend_progress.py` to update.
-> Generated at: 2026-03-30T05:26:02
+> Generated at: 2026-03-30T05:29:22
 > [Links](./progress.md)
 
 Transpile toolchain2 to each language and verify the resulting compiler can emit all targets.
 
 | Icon | Meaning |
 |---|---|
-| ⬜ | Not started |
-| 🟨 | emit OK |
-| 🟧 | build OK |
-| 🟩 | parity PASS |
+| 🟩 | PASS (emit + build + parity match) |
+| 🟥 | FAIL |
+| ⬜ | Not run |
 
 | selfhost lang \ emit target | cpp | go | rs | ts |
 |---|---|---|---|---|
-| Python (source) | 🟩 | 🟩 | 🟨 | 🟨 |
+| Python (source) | 🟩 | 🟩 | 🟥 | 🟥 |
 | C++ selfhost | ⬜ | ⬜ | ⬜ | ⬜ |
 | Go selfhost | ⬜ | ⬜ | ⬜ | ⬜ |
 | Rust selfhost | ⬜ | ⬜ | ⬜ | ⬜ |

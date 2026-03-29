@@ -244,26 +244,23 @@ def _build_selfhost_matrix(selfhost_data: dict[str, dict[str, object]]) -> list[
         emit_targets = doc.get("emit_targets", {})
         if not stages and not emit_targets:
             return "⬜"
-        # Check emit_targets for this specific emit lang
         et = emit_targets.get(emit_lang, {}) if isinstance(emit_targets, dict) else {}
         et_status = str(et.get("status", "")) if isinstance(et, dict) else ""
         if et_status == "not_tested" or et_status == "":
             return "⬜"
-        if et_status == "fail":
+        # PASS only if emit + build + parity all OK
+        if not isinstance(stages, dict):
             return "🟥"
-        # emit OK — check build/parity of overall stages
-        build = stages.get("build", {}) if isinstance(stages, dict) else {}
-        build_status = str(build.get("status", "")) if isinstance(build, dict) else ""
-        if build_status == "ok":
-            parity = stages.get("parity", {}) if isinstance(stages, dict) else {}
-            parity_status = str(parity.get("status", "")) if isinstance(parity, dict) else ""
-            if parity_status == "ok":
-                return "🟩"
-            return "🟧"
-        return "🟨"
+        build = stages.get("build", {})
+        parity = stages.get("parity", {})
+        build_ok = isinstance(build, dict) and str(build.get("status", "")) == "ok"
+        parity_ok = isinstance(parity, dict) and str(parity.get("status", "")) == "ok"
+        if build_ok and parity_ok:
+            return "🟩"
+        return "🟥"
 
     # Python (source)
-    cells = ["🟩" if lang in ("cpp", "go") else "🟨" for lang in emit_langs]
+    cells = ["🟩" if lang in ("cpp", "go") else "🟥" for lang in emit_langs]
     lines.append(f"| Python (原本) | {' | '.join(cells)} |")
 
     for sh_lang in SELFHOST_LANGS:
@@ -290,19 +287,17 @@ def _build_selfhost_matrix_en(selfhost_data: dict[str, dict[str, object]]) -> li
         et_status = str(et.get("status", "")) if isinstance(et, dict) else ""
         if et_status == "not_tested" or et_status == "":
             return "⬜"
-        if et_status == "fail":
+        if not isinstance(stages, dict):
             return "🟥"
-        build = stages.get("build", {}) if isinstance(stages, dict) else {}
-        build_status = str(build.get("status", "")) if isinstance(build, dict) else ""
-        if build_status == "ok":
-            parity = stages.get("parity", {}) if isinstance(stages, dict) else {}
-            parity_status = str(parity.get("status", "")) if isinstance(parity, dict) else ""
-            if parity_status == "ok":
-                return "🟩"
-            return "🟧"
-        return "🟨"
+        build = stages.get("build", {})
+        parity = stages.get("parity", {})
+        build_ok = isinstance(build, dict) and str(build.get("status", "")) == "ok"
+        parity_ok = isinstance(parity, dict) and str(parity.get("status", "")) == "ok"
+        if build_ok and parity_ok:
+            return "🟩"
+        return "🟥"
 
-    cells = ["🟩" if lang in ("cpp", "go") else "🟨" for lang in emit_langs]
+    cells = ["🟩" if lang in ("cpp", "go") else "🟥" for lang in emit_langs]
     lines.append(f"| Python (source) | {' | '.join(cells)} |")
 
     for sh_lang in SELFHOST_LANGS:
@@ -396,10 +391,9 @@ def _render_ja_selfhost(selfhost_data: dict, generated_at: str) -> str:
         "",
         "| アイコン | 意味 |",
         "|---|---|",
-        "| ⬜ | 未着手 |",
-        "| 🟨 | emit OK |",
-        "| 🟧 | build OK |",
-        "| 🟩 | parity PASS |",
+        "| 🟩 | PASS（emit + build + parity 一致） |",
+        "| 🟥 | FAIL |",
+        "| ⬜ | 未実行 |",
         "",
     ]
     lines += _build_selfhost_matrix(selfhost_data)
@@ -486,10 +480,9 @@ def _render_en_selfhost(selfhost_data: dict, generated_at: str) -> str:
         "",
         "| Icon | Meaning |",
         "|---|---|",
-        "| ⬜ | Not started |",
-        "| 🟨 | emit OK |",
-        "| 🟧 | build OK |",
-        "| 🟩 | parity PASS |",
+        "| 🟩 | PASS (emit + build + parity match) |",
+        "| 🟥 | FAIL |",
+        "| ⬜ | Not run |",
         "",
     ]
     lines += _build_selfhost_matrix_en(selfhost_data)
