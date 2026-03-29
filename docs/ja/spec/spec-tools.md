@@ -28,10 +28,7 @@
 | `run_local_ci.py` | ローカル最小 CI 一括実行 |
 | `check_todo_priority.py` | TODO 優先度逸脱の検証 |
 | `check_jsonvalue_decode_boundaries.py` | JSON artifact 境界の正本検証 |
-| `check_runtime_cpp_layout.py` | C++ runtime レイアウト検証 |
 | `check_py2x_transpile.py` | 全言語統一 transpile チェック |
-| `check_yanesdk_py2cpp_smoke.py` | Yanesdk C++ smoke |
-| `check_microgpt_original_py2cpp_regression.py` | microgpt 回帰検知 |
 | `check_transpiler_version_gate.py` | バージョン更新検証 |
 | `check_east3_golden.py` | EAST3 golden スナップショット |
 | `verify_image_runtime_parity.py` | 画像 runtime 一致確認 |
@@ -40,9 +37,7 @@
 | `check_runtime_pytra_gen_naming.py` | generated 命名検証 |
 | `check_emitter_runtimecall_guardrails.py` | emitter runtime-call 直書きガード |
 | `check_emitter_forbidden_runtime_symbols.py` | emitter 禁止シンボルガード |
-| `build_multi_cpp.py` | multi-file C++ ビルド |
 | `gen_makefile_from_manifest.py` | manifest → Makefile 生成 |
-| `verify_multi_file_outputs.py` | multi-file 出力検証 |
 | `regenerate_samples.py` | sample 再生成 |
 | `run_regen_on_version_bump.py` | バージョン bump 時の再生成 |
 | `sync_todo_history_translation.py` | TODO アーカイブ翻訳同期 |
@@ -55,9 +50,7 @@
 | `runtime_parity_check.py` | 多言語 runtime parity チェック（`--category` でカテゴリ絞り込み可） |
 | `check_all_target_sample_parity.py` | 全 target sample parity 確定 |
 | `check_noncpp_backend_health.py` | non-C++ backend health gate |
-| `check_noncpp_runtime_generated_cpp_baseline_contract.py` | generated baseline 検証 |
 | `export_backend_test_matrix.py` | backend test matrix 再生成 |
-| `check_scala_parity.py` | Scala3 parity |
 
 ### selfhost
 

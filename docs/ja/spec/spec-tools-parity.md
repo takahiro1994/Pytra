@@ -22,13 +22,8 @@
 - `tools/check_noncpp_backend_health.py`
   - 目的: linked-program 後の non-C++ backend health gate を family 単位で集約し、`primary_failure` / `toolchain_missing` / family の broken/green を 1 コマンドで確認する。
   - 主要オプション: `--family`, `--targets`, `--skip-parity`, `--summary-json`
-- `tools/check_noncpp_runtime_generated_cpp_baseline_contract.py`
-  - 目的: `cpp/generated/{built_in,std,utils}` 由来の 25-module baseline と、legacy rollout inventory / active runtime policy wording の同期を検証する。
 - `tools/export_backend_test_matrix.py`
   - 目的: `test/unit/toolchain/emit/**` と shared starred smoke を実行し、JA/EN の backend test matrix docs を再生成する。
-- `tools/check_scala_parity.py`
-  - 目的: Scala3 向けに `sample` 全件 + fixture 正例マニフェストの parity を一括実行し、再実行導線を固定する。
-  - 主要オプション: `--skip-fixture`, `--fixture-manifest`, `--east3-opt-level`, `--summary-dir`
 
 ## 2. smoke テスト運用（`py2x` 共通化後）
 

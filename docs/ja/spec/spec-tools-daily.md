@@ -14,17 +14,10 @@
   - 目的: `docs/ja/todo/index.md` / `docs/ja/plans/*.md` の差分に追加した進捗 `ID` が、未完了の最上位 `ID`（またはその子 `ID`）と一致するかを検証し、優先度逸脱を防止する。`plans` 側は `決定ログ`（`- YYYY-MM-DD: ...`）行のみを進捗判定対象にし、構造整理の ID 列挙は対象外とする。
 - `tools/check_jsonvalue_decode_boundaries.py`
   - 目的: `pytra-cli.py` / `east2x.py` / `toolchain/compile/east_io.py` / `toolchain/link/*` の JSON artifact 境界で `json.loads_obj(...)` が正本であることを検証し、raw `json.loads(...)` への再侵入を fail-fast に止める。
-- `tools/check_runtime_cpp_layout.py`
-  - 目的: `src/runtime/cpp/{built_in,std,utils}` の legacy-closed 維持、`generated/native/pytra` の ownership 境界、`core` compatibility surface と `generated/core` / `native/core` の split 前提を同一 guard で検証する。あわせて `generated/core` / `native/core` lane の存在を要求し、`runtime/cpp/native/core/...` の直接 include を `core/*.h` forwarder 以外で禁止する。
-  - 補足: `generated/built_in` / `generated/core` は plain naming と generated marker を必須とし、`native` / `core` への ownership 混在を fail させる。
 - `tools/check_py2x_transpile.py`
   - 目的: `test/fixtures/` と `sample/py` を `pytra-cli.py --target <lang>` で一括変換し、失敗ケースを検出する。全言語統一の transpile チェッカー。
   - 主要オプション: `--target <lang>`（`cpp`, `rs`, `js`, `cs`, `go`, `java`, `ts`, `swift`, `kotlin`, `scala` 等）
   - 補足: 旧言語別スクリプト（`check_py2cpp_transpile.py` 等 10 件）は廃止し `tools/unregistered/` に退避済み。
-- `tools/check_yanesdk_py2cpp_smoke.py`
-  - 目的: Yanesdk canonical 対象（`library 1本 + game 7本`）が `pytra-cli.py --target cpp` を通るか確認する。
-- `tools/check_microgpt_original_py2cpp_regression.py`
-  - 目的: 原本 `materials/refs/microgpt/microgpt-20260222.py` を固定入力にし、`py2cpp` の失敗ステージ（A〜F）または成功を検査して再発を検知する。
 - `tools/check_transpiler_version_gate.py`
   - 目的: 変換器関連ファイルが変更されたとき、`src/toolchain/misc/transpiler_versions.json` の対応コンポーネント（`shared` / 言語別）で minor 以上のバージョン更新が行われているかを検証する。
 - `tools/check_east3_golden.py`
@@ -58,12 +51,8 @@
 
 ## 3. ビルド・生成
 
-- `tools/build_multi_cpp.py`
-  - 目的: `pytra-cli.py --target cpp --multi-file` が出力した `manifest.json` を読み、関連 `*.cpp` と runtime をまとめてビルドする。
 - `tools/gen_makefile_from_manifest.py`
   - 目的: `manifest.json` を受け取り、`all`, `run`, `clean` を含む `Makefile` を生成する。
-- `tools/verify_multi_file_outputs.py`
-  - 目的: `sample/py` の multi-file 出力をビルド・実行し、単一ファイル出力との実行結果一致を確認する。
 - `tools/regenerate_samples.py`
   - 目的: `sample/py` から各 `sample/<lang>` を再生成し、`src/toolchain/misc/transpiler_versions.json` のバージョン・トークンが変わらない限り再生成を skip する。
   - 主要オプション: `--verify-cpp-on-diff`（C++ 生成差分が出たケースだけ `runtime_parity_check.py --targets cpp` で compile/run 検証）
