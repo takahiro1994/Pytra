@@ -5,7 +5,7 @@
 # Fixture parity matrix
 
 > Machine-generated file. Run `python3 tools/gen/gen_backend_progress.py` to update.
-> Generated at: 2026-03-30T05:49:57
+> Generated at: 2026-03-30T05:53:52
 > [Links](./index.md)
 
 | Icon | Meaning |
@@ -14,7 +14,7 @@
 | 🟥 | FAIL |
 | ⬜ | Not run |
 
-| Category | Case | cpp | rs | cs | powershell | js | ts | dart | go | java | swift | kotlin | ruby | lua | scala | php | nim | julia | zig |
+| Category | Case | cpp | rs | cs | ps1 | js | ts | dart | go | java | swift | kotlin | ruby | lua | scala | php | nim | julia | zig |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | collections | boolop_value_select | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
 | collections | comprehension | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |

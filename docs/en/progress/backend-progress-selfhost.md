@@ -5,7 +5,7 @@
 # Selfhost matrix
 
 > Machine-generated file. Run `python3 tools/gen/gen_backend_progress.py` to update.
-> Generated at: 2026-03-30T05:49:57
+> Generated at: 2026-03-30T05:53:52
 > [Links](./index.md)
 
 Transpile toolchain2 to each language and verify the resulting compiler can emit all targets.
@@ -16,7 +16,7 @@ Transpile toolchain2 to each language and verify the resulting compiler can emit
 | 🟥 | FAIL |
 | ⬜ | Not run |
 
-| selfhost lang \ emit target | cpp | rs | cs | powershell | js | ts | dart | go | java | swift | kotlin | ruby | lua | scala | php | nim | julia | zig |
+| selfhost lang \ emit target | cpp | rs | cs | ps1 | js | ts | dart | go | java | swift | kotlin | ruby | lua | scala | php | nim | julia | zig |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | Python (source) | 🟩 | 🟥 | 🟥 | 🟥 | 🟥 | 🟥 | 🟥 | 🟩 | 🟥 | 🟥 | 🟥 | 🟥 | 🟥 | 🟥 | 🟥 | 🟥 | 🟥 | 🟥 |
 | C++ selfhost | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |

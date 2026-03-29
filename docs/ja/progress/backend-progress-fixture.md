@@ -5,7 +5,7 @@
 # fixture parity マトリクス
 
 > 機械生成ファイル。`python3 tools/gen/gen_backend_progress.py` で更新する。
-> 生成日時: 2026-03-30T05:49:57
+> 生成日時: 2026-03-30T05:53:52
 > [関連リンク](./index.md)
 
 | アイコン | 意味 |
@@ -14,7 +14,7 @@
 | 🟥 | FAIL |
 | ⬜ | 未実行 |
 
-| カテゴリ | ケース | cpp | rs | cs | powershell | js | ts | dart | go | java | swift | kotlin | ruby | lua | scala | php | nim | julia | zig |
+| カテゴリ | ケース | cpp | rs | cs | ps1 | js | ts | dart | go | java | swift | kotlin | ruby | lua | scala | php | nim | julia | zig |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | collections | boolop_value_select | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
 | collections | comprehension | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |

@@ -34,6 +34,16 @@ PARITY_LANGS = [
 ]
 SELFHOST_LANGS = PARITY_LANGS
 
+# Short display names for table headers (keep columns narrow)
+_LANG_SHORT: dict[str, str] = {
+    "powershell": "ps1",
+}
+
+
+def _col_name(lang: str) -> str:
+    return _LANG_SHORT.get(lang, lang)
+
+
 # ---------------------------------------------------------------------------
 # Icons — only PASS / FAIL / untested
 # ---------------------------------------------------------------------------
@@ -132,7 +142,7 @@ def _build_parity_matrix(cases: list[tuple[str, str] | str], results: dict[str, 
     lang_list = PARITY_LANGS
 
     if case_root == "fixture":
-        lines.append(f"| カテゴリ | ケース | {' | '.join(lang_list)} |")
+        lines.append(f"| カテゴリ | ケース | {' | '.join(_col_name(l) for l in lang_list)} |")
         lines.append(f"|{'|'.join(['---'] * (len(lang_list) + 2))}|")
         for item in cases:
             cat, stem = item  # type: ignore[misc]
@@ -142,12 +152,10 @@ def _build_parity_matrix(cases: list[tuple[str, str] | str], results: dict[str, 
                 if entry is None:
                     cells.append("⬜")
                 else:
-                    icon = _case_icon(str(entry.get("category", "")))
-                    stale = _is_stale(str(entry.get("timestamp", "")))
-                    cells.append(icon + (" ⚠" if stale else ""))
+                    cells.append(_case_icon(str(entry.get("category", ""))))
             lines.append(f"| {cat} | {stem} | {' | '.join(cells)} |")
     else:
-        lines.append(f"| ケース | {' | '.join(lang_list)} |")
+        lines.append(f"| ケース | {' | '.join(_col_name(l) for l in lang_list)} |")
         lines.append(f"|{'|'.join(['---'] * (len(lang_list) + 1))}|")
         for item in cases:
             stem = item  # type: ignore[assignment]
@@ -157,9 +165,7 @@ def _build_parity_matrix(cases: list[tuple[str, str] | str], results: dict[str, 
                 if entry is None:
                     cells.append("⬜")
                 else:
-                    icon = _case_icon(str(entry.get("category", "")))
-                    stale = _is_stale(str(entry.get("timestamp", "")))
-                    cells.append(icon + (" ⚠" if stale else ""))
+                    cells.append(_case_icon(str(entry.get("category", ""))))
             lines.append(f"| {stem} | {' | '.join(cells)} |")
 
     # Summary row
@@ -187,7 +193,7 @@ def _build_parity_matrix_en(cases: list[tuple[str, str] | str], results: dict[st
     lang_list = PARITY_LANGS
 
     if case_root == "fixture":
-        lines.append(f"| Category | Case | {' | '.join(lang_list)} |")
+        lines.append(f"| Category | Case | {' | '.join(_col_name(l) for l in lang_list)} |")
         lines.append(f"|{'|'.join(['---'] * (len(lang_list) + 2))}|")
         for item in cases:
             cat, stem = item  # type: ignore[misc]
@@ -197,12 +203,10 @@ def _build_parity_matrix_en(cases: list[tuple[str, str] | str], results: dict[st
                 if entry is None:
                     cells.append("⬜")
                 else:
-                    icon = _case_icon(str(entry.get("category", "")))
-                    stale = _is_stale(str(entry.get("timestamp", "")))
-                    cells.append(icon + (" ⚠" if stale else ""))
+                    cells.append(_case_icon(str(entry.get("category", ""))))
             lines.append(f"| {cat} | {stem} | {' | '.join(cells)} |")
     else:
-        lines.append(f"| Case | {' | '.join(lang_list)} |")
+        lines.append(f"| Case | {' | '.join(_col_name(l) for l in lang_list)} |")
         lines.append(f"|{'|'.join(['---'] * (len(lang_list) + 1))}|")
         for item in cases:
             stem = item  # type: ignore[assignment]
@@ -212,9 +216,7 @@ def _build_parity_matrix_en(cases: list[tuple[str, str] | str], results: dict[st
                 if entry is None:
                     cells.append("⬜")
                 else:
-                    icon = _case_icon(str(entry.get("category", "")))
-                    stale = _is_stale(str(entry.get("timestamp", "")))
-                    cells.append(icon + (" ⚠" if stale else ""))
+                    cells.append(_case_icon(str(entry.get("category", ""))))
             lines.append(f"| {stem} | {' | '.join(cells)} |")
 
     summary_cells = []
@@ -244,7 +246,7 @@ def _build_selfhost_matrix(selfhost_data: dict[str, dict[str, object]]) -> list[
     }
     lines: list[str] = []
     emit_langs = PARITY_LANGS
-    lines.append(f"| selfhost 言語 \\ emit 先 | {' | '.join(emit_langs)} |")
+    lines.append(f"| selfhost 言語 \\ emit 先 | {' | '.join(_col_name(l) for l in emit_langs)} |")
     lines.append(f"|{'|'.join(['---'] * (len(emit_langs) + 1))}|")
 
     def _stage_icon(doc: dict[str, object], emit_lang: str) -> str:
@@ -288,7 +290,7 @@ def _build_selfhost_matrix_en(selfhost_data: dict[str, dict[str, object]]) -> li
     }
     lines: list[str] = []
     emit_langs = PARITY_LANGS
-    lines.append(f"| selfhost lang \\ emit target | {' | '.join(emit_langs)} |")
+    lines.append(f"| selfhost lang \\ emit target | {' | '.join(_col_name(l) for l in emit_langs)} |")
     lines.append(f"|{'|'.join(['---'] * (len(emit_langs) + 1))}|")
 
     def _stage_icon(doc: dict[str, object], emit_lang: str) -> str:

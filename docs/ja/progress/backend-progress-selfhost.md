@@ -5,7 +5,7 @@
 # selfhost マトリクス
 
 > 機械生成ファイル。`python3 tools/gen/gen_backend_progress.py` で更新する。
-> 生成日時: 2026-03-30T05:49:57
+> 生成日時: 2026-03-30T05:53:52
 > [関連リンク](./index.md)
 
 toolchain2 を各言語に変換し、変換後のコンパイラで全言語の emit ができるか。
@@ -16,7 +16,7 @@ toolchain2 を各言語に変換し、変換後のコンパイラで全言語の
 | 🟥 | FAIL |
 | ⬜ | 未実行 |
 
-| selfhost 言語 \ emit 先 | cpp | rs | cs | powershell | js | ts | dart | go | java | swift | kotlin | ruby | lua | scala | php | nim | julia | zig |
+| selfhost 言語 \ emit 先 | cpp | rs | cs | ps1 | js | ts | dart | go | java | swift | kotlin | ruby | lua | scala | php | nim | julia | zig |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 | Python (原本) | 🟩 | 🟥 | 🟥 | 🟥 | 🟥 | 🟥 | 🟥 | 🟩 | 🟥 | 🟥 | 🟥 | 🟥 | 🟥 | 🟥 | 🟥 | 🟥 | 🟥 | 🟥 |
 | C++ selfhost | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
