@@ -1,11 +1,11 @@
-<a href="../../en/language/backend-progress-sample.md">
+<a href="../../en/progress/backend-progress-sample.md">
   <img alt="Read in English" src="https://img.shields.io/badge/docs-English-2563EB?style=flat-square">
 </a>
 
 # sample parity マトリクス
 
 > 機械生成ファイル。`python3 tools/gen/gen_backend_progress.py` で更新する。
-> 生成日時: 2026-03-30T05:38:09
+> 生成日時: 2026-03-30T05:46:04
 > [関連リンク](./index.md)
 
 | アイコン | 意味 |

@@ -1,11 +1,11 @@
-<a href="../../ja/language/backend-progress-sample.md">
+<a href="../../ja/progress/backend-progress-sample.md">
   <img alt="日本語で読む" src="https://img.shields.io/badge/docs-日本語-DC2626?style=flat-square">
 </a>
 
 # Sample parity matrix
 
 > Machine-generated file. Run `python3 tools/gen/gen_backend_progress.py` to update.
-> Generated at: 2026-03-30T05:38:09
+> Generated at: 2026-03-30T05:46:04
 > [Links](./index.md)
 
 | Icon | Meaning |

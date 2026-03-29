@@ -329,7 +329,7 @@ def _render_ja(
 
 def _render_ja_fixture(fixture_cases: list[tuple[str, str]], fixture_results: dict, generated_at: str) -> str:
     lines: list[str] = [
-        '<a href="../../en/language/backend-progress-fixture.md">',
+        '<a href="../../en/progress/backend-progress-fixture.md">',
         '  <img alt="Read in English" src="https://img.shields.io/badge/docs-English-2563EB?style=flat-square">',
         "</a>",
         "",
@@ -353,7 +353,7 @@ def _render_ja_fixture(fixture_cases: list[tuple[str, str]], fixture_results: di
 
 def _render_ja_sample(sample_cases: list[str], sample_results: dict, generated_at: str) -> str:
     lines: list[str] = [
-        '<a href="../../en/language/backend-progress-sample.md">',
+        '<a href="../../en/progress/backend-progress-sample.md">',
         '  <img alt="Read in English" src="https://img.shields.io/badge/docs-English-2563EB?style=flat-square">',
         "</a>",
         "",
@@ -377,7 +377,7 @@ def _render_ja_sample(sample_cases: list[str], sample_results: dict, generated_a
 
 def _render_ja_selfhost(selfhost_data: dict, generated_at: str) -> str:
     lines: list[str] = [
-        '<a href="../../en/language/backend-progress-selfhost.md">',
+        '<a href="../../en/progress/backend-progress-selfhost.md">',
         '  <img alt="Read in English" src="https://img.shields.io/badge/docs-English-2563EB?style=flat-square">',
         "</a>",
         "",
@@ -418,7 +418,7 @@ def _render_en(
 
 def _render_en_fixture(fixture_cases: list[tuple[str, str]], fixture_results: dict, generated_at: str) -> str:
     lines: list[str] = [
-        '<a href="../../ja/language/backend-progress-fixture.md">',
+        '<a href="../../ja/progress/backend-progress-fixture.md">',
         '  <img alt="日本語で読む" src="https://img.shields.io/badge/docs-日本語-DC2626?style=flat-square">',
         "</a>",
         "",
@@ -442,7 +442,7 @@ def _render_en_fixture(fixture_cases: list[tuple[str, str]], fixture_results: di
 
 def _render_en_sample(sample_cases: list[str], sample_results: dict, generated_at: str) -> str:
     lines: list[str] = [
-        '<a href="../../ja/language/backend-progress-sample.md">',
+        '<a href="../../ja/progress/backend-progress-sample.md">',
         '  <img alt="日本語で読む" src="https://img.shields.io/badge/docs-日本語-DC2626?style=flat-square">',
         "</a>",
         "",
@@ -466,7 +466,7 @@ def _render_en_sample(sample_cases: list[str], sample_results: dict, generated_a
 
 def _render_en_selfhost(selfhost_data: dict, generated_at: str) -> str:
     lines: list[str] = [
-        '<a href="../../ja/language/backend-progress-selfhost.md">',
+        '<a href="../../ja/progress/backend-progress-selfhost.md">',
         '  <img alt="日本語で読む" src="https://img.shields.io/badge/docs-日本語-DC2626?style=flat-square">',
         "</a>",
         "",
