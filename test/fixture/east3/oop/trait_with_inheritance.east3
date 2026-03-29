@@ -1,0 +1,3052 @@
+{
+  "kind": "Module",
+  "source_path": "test/fixture/source/py/oop/trait_with_inheritance.py",
+  "body": [
+    {
+      "kind": "ImportFrom",
+      "source_span": {
+        "lineno": 6,
+        "col_offset": 0,
+        "end_lineno": 6,
+        "end_col_offset": 51
+      },
+      "module": "pytra.utils.assertions",
+      "names": [
+        {
+          "name": "py_assert_stdout",
+          "asname": null
+        }
+      ],
+      "level": 0
+    },
+    {
+      "kind": "ClassDef",
+      "source_span": {
+        "lineno": 9,
+        "col_offset": 0,
+        "end_lineno": 13,
+        "end_col_offset": 0
+      },
+      "name": "_IdentityDecorator",
+      "original_name": "_IdentityDecorator",
+      "base": null,
+      "dataclass": false,
+      "field_types": {},
+      "decorators": [],
+      "body": [
+        {
+          "kind": "ClosureDef",
+          "source_span": {
+            "lineno": 10,
+            "col_offset": 4,
+            "end_lineno": 11,
+            "end_col_offset": 18
+          },
+          "name": "__call__",
+          "original_name": "__call__",
+          "arg_types": {
+            "self": "_IdentityDecorator",
+            "cls": "object"
+          },
+          "arg_order": [
+            "self",
+            "cls"
+          ],
+          "arg_defaults": {},
+          "arg_index": {
+            "self": 0,
+            "cls": 1
+          },
+          "return_type": "object",
+          "arg_usage": {
+            "self": "readonly",
+            "cls": "readonly"
+          },
+          "renamed_symbols": {},
+          "docstring": null,
+          "body": [
+            {
+              "kind": "Return",
+              "source_span": {
+                "lineno": 11,
+                "col_offset": 8,
+                "end_lineno": 11,
+                "end_col_offset": 18
+              },
+              "value": {
+                "kind": "Name",
+                "source_span": {
+                  "lineno": 11,
+                  "col_offset": 15,
+                  "end_lineno": 11,
+                  "end_col_offset": 18
+                },
+                "resolved_type": "object",
+                "casts": [],
+                "borrow_kind": "readonly_ref",
+                "repr": "cls",
+                "id": "cls"
+              }
+            }
+          ],
+          "is_generator": 0,
+          "yield_value_type": "unknown",
+          "decorators": [],
+          "captures": [],
+          "capture_types": {},
+          "capture_modes": {},
+          "returns": "object",
+          "mutates_self": false
+        }
+      ],
+      "class_storage_hint": "value",
+      "leading_comments": [
+        "Test: trait + class inheritance combination.",
+        "Circle inherits from Shape (single inheritance) and implements",
+        "Drawable + Serializable (trait). Tests upcast to both parent class",
+        "and trait types."
+      ],
+      "leading_trivia": [
+        {
+          "kind": "comment",
+          "text": "Test: trait + class inheritance combination."
+        },
+        {
+          "kind": "comment",
+          "text": "Circle inherits from Shape (single inheritance) and implements"
+        },
+        {
+          "kind": "comment",
+          "text": "Drawable + Serializable (trait). Tests upcast to both parent class"
+        },
+        {
+          "kind": "comment",
+          "text": "and trait types."
+        },
+        {
+          "kind": "blank",
+          "count": 1
+        }
+      ],
+      "meta": {}
+    },
+    {
+      "kind": "ClassDef",
+      "source_span": {
+        "lineno": 14,
+        "col_offset": 0,
+        "end_lineno": 18,
+        "end_col_offset": 0
+      },
+      "name": "_ImplementsFactory",
+      "original_name": "_ImplementsFactory",
+      "base": null,
+      "dataclass": false,
+      "field_types": {},
+      "decorators": [],
+      "body": [
+        {
+          "kind": "ClosureDef",
+          "source_span": {
+            "lineno": 15,
+            "col_offset": 4,
+            "end_lineno": 16,
+            "end_col_offset": 35
+          },
+          "name": "__call__",
+          "original_name": "__call__",
+          "arg_types": {
+            "self": "_ImplementsFactory",
+            "_traits": "list[object]"
+          },
+          "arg_order": [
+            "self"
+          ],
+          "arg_defaults": {},
+          "arg_index": {
+            "self": 0
+          },
+          "return_type": "object",
+          "arg_usage": {
+            "self": "readonly"
+          },
+          "renamed_symbols": {},
+          "docstring": null,
+          "body": [
+            {
+              "kind": "Return",
+              "source_span": {
+                "lineno": 16,
+                "col_offset": 8,
+                "end_lineno": 16,
+                "end_col_offset": 35
+              },
+              "value": {
+                "kind": "Box",
+                "resolved_type": "object",
+                "borrow_kind": "value",
+                "casts": [],
+                "value": {
+                  "kind": "Call",
+                  "source_span": {
+                    "lineno": 16,
+                    "col_offset": 15,
+                    "end_lineno": 16,
+                    "end_col_offset": 35
+                  },
+                  "resolved_type": "_IdentityDecorator",
+                  "casts": [],
+                  "borrow_kind": "value",
+                  "repr": "_IdentityDecorator()",
+                  "func": {
+                    "kind": "Name",
+                    "source_span": {
+                      "lineno": 16,
+                      "col_offset": 15,
+                      "end_lineno": 16,
+                      "end_col_offset": 33
+                    },
+                    "resolved_type": "type",
+                    "casts": [],
+                    "borrow_kind": "value",
+                    "repr": "_IdentityDecorator",
+                    "id": "_IdentityDecorator"
+                  },
+                  "args": [],
+                  "keywords": [],
+                  "type_expr_summary_v1": {
+                    "schema_version": 1,
+                    "kind": "NamedType",
+                    "category": "static",
+                    "mirror": "_IdentityDecorator"
+                  }
+                },
+                "source_span": {
+                  "lineno": 16,
+                  "col_offset": 15,
+                  "end_lineno": 16,
+                  "end_col_offset": 35
+                },
+                "repr": "_IdentityDecorator()",
+                "type_expr_summary_v1": {
+                  "schema_version": 1,
+                  "kind": "DynamicType",
+                  "category": "dynamic",
+                  "mirror": "object",
+                  "dynamic_name": "object"
+                },
+                "bridge_lane_v1": {
+                  "schema_version": 1,
+                  "target": {
+                    "kind": "DynamicType",
+                    "category": "dynamic",
+                    "mirror": "object",
+                    "dynamic_name": "object"
+                  },
+                  "target_category": "dynamic",
+                  "value": {
+                    "kind": "NamedType",
+                    "category": "static",
+                    "mirror": "_IdentityDecorator"
+                  },
+                  "value_category": "static"
+                }
+              }
+            }
+          ],
+          "is_generator": 0,
+          "yield_value_type": "unknown",
+          "vararg_name": "_traits",
+          "vararg_type": "object",
+          "decorators": [],
+          "vararg_type_expr": {
+            "kind": "DynamicType",
+            "name": "object"
+          },
+          "captures": [],
+          "capture_types": {},
+          "capture_modes": {},
+          "returns": "object",
+          "mutates_self": false
+        }
+      ],
+      "class_storage_hint": "value",
+      "meta": {}
+    },
+    {
+      "kind": "Assign",
+      "source_span": {
+        "lineno": 19,
+        "col_offset": 0,
+        "end_lineno": 19,
+        "end_col_offset": 28
+      },
+      "target": {
+        "kind": "Name",
+        "source_span": {
+          "lineno": 19,
+          "col_offset": 0,
+          "end_lineno": 19,
+          "end_col_offset": 5
+        },
+        "resolved_type": "_IdentityDecorator",
+        "casts": [],
+        "borrow_kind": "value",
+        "repr": "trait",
+        "id": "trait"
+      },
+      "declare": true,
+      "decl_type": "_IdentityDecorator",
+      "declare_init": true,
+      "value": {
+        "kind": "Call",
+        "source_span": {
+          "lineno": 19,
+          "col_offset": 8,
+          "end_lineno": 19,
+          "end_col_offset": 28
+        },
+        "resolved_type": "_IdentityDecorator",
+        "casts": [],
+        "borrow_kind": "value",
+        "repr": "_IdentityDecorator()",
+        "func": {
+          "kind": "Name",
+          "source_span": {
+            "lineno": 19,
+            "col_offset": 8,
+            "end_lineno": 19,
+            "end_col_offset": 26
+          },
+          "resolved_type": "type",
+          "casts": [],
+          "borrow_kind": "value",
+          "repr": "_IdentityDecorator",
+          "id": "_IdentityDecorator"
+        },
+        "args": [],
+        "keywords": [],
+        "type_expr_summary_v1": {
+          "schema_version": 1,
+          "kind": "NamedType",
+          "category": "static",
+          "mirror": "_IdentityDecorator"
+        }
+      },
+      "type_expr_summary_v1": {
+        "schema_version": 1,
+        "kind": "NamedType",
+        "category": "static",
+        "mirror": "_IdentityDecorator"
+      }
+    },
+    {
+      "kind": "Assign",
+      "source_span": {
+        "lineno": 20,
+        "col_offset": 0,
+        "end_lineno": 20,
+        "end_col_offset": 33
+      },
+      "target": {
+        "kind": "Name",
+        "source_span": {
+          "lineno": 20,
+          "col_offset": 0,
+          "end_lineno": 20,
+          "end_col_offset": 10
+        },
+        "resolved_type": "_ImplementsFactory",
+        "casts": [],
+        "borrow_kind": "value",
+        "repr": "implements",
+        "id": "implements"
+      },
+      "declare": true,
+      "decl_type": "_ImplementsFactory",
+      "declare_init": true,
+      "value": {
+        "kind": "Call",
+        "source_span": {
+          "lineno": 20,
+          "col_offset": 13,
+          "end_lineno": 20,
+          "end_col_offset": 33
+        },
+        "resolved_type": "_ImplementsFactory",
+        "casts": [],
+        "borrow_kind": "value",
+        "repr": "_ImplementsFactory()",
+        "func": {
+          "kind": "Name",
+          "source_span": {
+            "lineno": 20,
+            "col_offset": 13,
+            "end_lineno": 20,
+            "end_col_offset": 31
+          },
+          "resolved_type": "type",
+          "casts": [],
+          "borrow_kind": "value",
+          "repr": "_ImplementsFactory",
+          "id": "_ImplementsFactory"
+        },
+        "args": [],
+        "keywords": [],
+        "type_expr_summary_v1": {
+          "schema_version": 1,
+          "kind": "NamedType",
+          "category": "static",
+          "mirror": "_ImplementsFactory"
+        }
+      },
+      "type_expr_summary_v1": {
+        "schema_version": 1,
+        "kind": "NamedType",
+        "category": "static",
+        "mirror": "_ImplementsFactory"
+      }
+    },
+    {
+      "kind": "ClassDef",
+      "source_span": {
+        "lineno": 23,
+        "col_offset": 0,
+        "end_lineno": 27,
+        "end_col_offset": 0
+      },
+      "name": "Shape",
+      "original_name": "Shape",
+      "base": null,
+      "dataclass": false,
+      "field_types": {},
+      "decorators": [],
+      "body": [
+        {
+          "kind": "ClosureDef",
+          "source_span": {
+            "lineno": 24,
+            "col_offset": 4,
+            "end_lineno": 25,
+            "end_col_offset": 22
+          },
+          "name": "kind",
+          "original_name": "kind",
+          "arg_types": {
+            "self": "Shape"
+          },
+          "arg_order": [
+            "self"
+          ],
+          "arg_defaults": {},
+          "arg_index": {
+            "self": 0
+          },
+          "return_type": "str",
+          "arg_usage": {
+            "self": "readonly"
+          },
+          "renamed_symbols": {},
+          "docstring": null,
+          "body": [
+            {
+              "kind": "Return",
+              "source_span": {
+                "lineno": 25,
+                "col_offset": 8,
+                "end_lineno": 25,
+                "end_col_offset": 22
+              },
+              "value": {
+                "kind": "Constant",
+                "source_span": {
+                  "lineno": 25,
+                  "col_offset": 15,
+                  "end_lineno": 25,
+                  "end_col_offset": 22
+                },
+                "resolved_type": "str",
+                "casts": [],
+                "borrow_kind": "value",
+                "repr": "\"shape\"",
+                "value": "shape"
+              }
+            }
+          ],
+          "is_generator": 0,
+          "yield_value_type": "unknown",
+          "decorators": [],
+          "captures": [],
+          "capture_types": {},
+          "capture_modes": {},
+          "returns": "str",
+          "mutates_self": false
+        }
+      ],
+      "class_storage_hint": "value",
+      "leading_comments": [],
+      "leading_trivia": [
+        {
+          "kind": "blank",
+          "count": 1
+        },
+        {
+          "kind": "blank",
+          "count": 1
+        }
+      ],
+      "meta": {}
+    },
+    {
+      "kind": "ClassDef",
+      "source_span": {
+        "lineno": 29,
+        "col_offset": 0,
+        "end_lineno": 32,
+        "end_col_offset": 0
+      },
+      "name": "Drawable",
+      "original_name": "Drawable",
+      "base": null,
+      "dataclass": false,
+      "field_types": {},
+      "decorators": [
+        "trait"
+      ],
+      "body": [
+        {
+          "kind": "ClosureDef",
+          "source_span": {
+            "lineno": 30,
+            "col_offset": 4,
+            "end_lineno": 30,
+            "end_col_offset": 0
+          },
+          "name": "draw",
+          "original_name": "draw",
+          "arg_types": {
+            "self": "Drawable"
+          },
+          "arg_order": [
+            "self"
+          ],
+          "arg_defaults": {},
+          "arg_index": {
+            "self": 0
+          },
+          "return_type": "str",
+          "arg_usage": {
+            "self": "readonly"
+          },
+          "renamed_symbols": {},
+          "docstring": null,
+          "body": [],
+          "is_generator": 0,
+          "yield_value_type": "unknown",
+          "decorators": [],
+          "captures": [],
+          "capture_types": {},
+          "capture_modes": {},
+          "returns": "str",
+          "mutates_self": false
+        }
+      ],
+      "class_storage_hint": "value",
+      "meta": {
+        "trait_v1": {
+          "schema_version": 1,
+          "methods": [
+            {
+              "name": "draw",
+              "args": [
+                "self"
+              ],
+              "param_types": [],
+              "return_type": "str"
+            }
+          ],
+          "extends_traits": []
+        }
+      }
+    },
+    {
+      "kind": "ClassDef",
+      "source_span": {
+        "lineno": 34,
+        "col_offset": 0,
+        "end_lineno": 37,
+        "end_col_offset": 0
+      },
+      "name": "Serializable",
+      "original_name": "Serializable",
+      "base": null,
+      "dataclass": false,
+      "field_types": {},
+      "decorators": [
+        "trait"
+      ],
+      "body": [
+        {
+          "kind": "ClosureDef",
+          "source_span": {
+            "lineno": 35,
+            "col_offset": 4,
+            "end_lineno": 35,
+            "end_col_offset": 0
+          },
+          "name": "serialize",
+          "original_name": "serialize",
+          "arg_types": {
+            "self": "Serializable"
+          },
+          "arg_order": [
+            "self"
+          ],
+          "arg_defaults": {},
+          "arg_index": {
+            "self": 0
+          },
+          "return_type": "str",
+          "arg_usage": {
+            "self": "readonly"
+          },
+          "renamed_symbols": {},
+          "docstring": null,
+          "body": [],
+          "is_generator": 0,
+          "yield_value_type": "unknown",
+          "decorators": [],
+          "captures": [],
+          "capture_types": {},
+          "capture_modes": {},
+          "returns": "str",
+          "mutates_self": false
+        }
+      ],
+      "class_storage_hint": "value",
+      "meta": {
+        "trait_v1": {
+          "schema_version": 1,
+          "methods": [
+            {
+              "name": "serialize",
+              "args": [
+                "self"
+              ],
+              "param_types": [],
+              "return_type": "str"
+            }
+          ],
+          "extends_traits": []
+        }
+      }
+    },
+    {
+      "kind": "ClassDef",
+      "source_span": {
+        "lineno": 39,
+        "col_offset": 0,
+        "end_lineno": 49,
+        "end_col_offset": 0
+      },
+      "name": "Circle",
+      "original_name": "Circle",
+      "base": "Shape",
+      "dataclass": false,
+      "field_types": {
+        "radius": "int64"
+      },
+      "decorators": [
+        "implements(Drawable, Serializable)"
+      ],
+      "body": [
+        {
+          "kind": "ClosureDef",
+          "source_span": {
+            "lineno": 40,
+            "col_offset": 4,
+            "end_lineno": 41,
+            "end_col_offset": 28
+          },
+          "name": "__init__",
+          "original_name": "__init__",
+          "arg_types": {
+            "self": "Circle",
+            "r": "int64"
+          },
+          "arg_order": [
+            "self",
+            "r"
+          ],
+          "arg_defaults": {},
+          "arg_index": {
+            "self": 0,
+            "r": 1
+          },
+          "return_type": "None",
+          "arg_usage": {
+            "self": "reassigned",
+            "r": "readonly"
+          },
+          "renamed_symbols": {},
+          "docstring": null,
+          "body": [
+            {
+              "kind": "AnnAssign",
+              "source_span": {
+                "lineno": 41,
+                "col_offset": 8,
+                "end_lineno": 41,
+                "end_col_offset": 28
+              },
+              "target": {
+                "kind": "Attribute",
+                "source_span": {
+                  "lineno": 41,
+                  "col_offset": 8,
+                  "end_lineno": 41,
+                  "end_col_offset": 19
+                },
+                "resolved_type": "int64",
+                "casts": [],
+                "borrow_kind": "value",
+                "repr": "self.radius",
+                "value": {
+                  "kind": "Name",
+                  "source_span": {
+                    "lineno": 41,
+                    "col_offset": 8,
+                    "end_lineno": 41,
+                    "end_col_offset": 12
+                  },
+                  "resolved_type": "Circle",
+                  "casts": [],
+                  "borrow_kind": "readonly_ref",
+                  "repr": "self",
+                  "id": "self"
+                },
+                "attr": "radius",
+                "type_expr": {
+                  "kind": "NamedType",
+                  "name": "int64"
+                }
+              },
+              "annotation": "int64",
+              "declare": true,
+              "decl_type": "int64",
+              "annotation_type_expr": {
+                "kind": "NamedType",
+                "name": "int64"
+              },
+              "decl_type_expr": {
+                "kind": "NamedType",
+                "name": "int64"
+              },
+              "value": {
+                "kind": "Name",
+                "source_span": {
+                  "lineno": 41,
+                  "col_offset": 13,
+                  "end_lineno": 41,
+                  "end_col_offset": 14
+                },
+                "resolved_type": "int64",
+                "casts": [],
+                "borrow_kind": "readonly_ref",
+                "repr": "r",
+                "id": "r"
+              },
+              "type_expr_summary_v1": {
+                "schema_version": 1,
+                "kind": "NamedType",
+                "category": "static",
+                "mirror": "int64"
+              }
+            }
+          ],
+          "is_generator": 0,
+          "yield_value_type": "unknown",
+          "decorators": [],
+          "captures": [],
+          "capture_types": {},
+          "capture_modes": {},
+          "returns": "None",
+          "mutates_self": true
+        },
+        {
+          "kind": "ClosureDef",
+          "source_span": {
+            "lineno": 43,
+            "col_offset": 4,
+            "end_lineno": 44,
+            "end_col_offset": 45
+          },
+          "name": "draw",
+          "original_name": "draw",
+          "arg_types": {
+            "self": "Circle"
+          },
+          "arg_order": [
+            "self"
+          ],
+          "arg_defaults": {},
+          "arg_index": {
+            "self": 0
+          },
+          "return_type": "str",
+          "arg_usage": {
+            "self": "readonly"
+          },
+          "renamed_symbols": {},
+          "docstring": null,
+          "body": [
+            {
+              "kind": "Return",
+              "source_span": {
+                "lineno": 44,
+                "col_offset": 8,
+                "end_lineno": 44,
+                "end_col_offset": 45
+              },
+              "value": {
+                "kind": "BinOp",
+                "source_span": {
+                  "lineno": 44,
+                  "col_offset": 15,
+                  "end_lineno": 44,
+                  "end_col_offset": 45
+                },
+                "resolved_type": "str",
+                "casts": [],
+                "borrow_kind": "value",
+                "repr": "\"circle r=\" + str(self.radius)",
+                "left": {
+                  "kind": "Constant",
+                  "source_span": {
+                    "lineno": 44,
+                    "col_offset": 15,
+                    "end_lineno": 44,
+                    "end_col_offset": 26
+                  },
+                  "resolved_type": "str",
+                  "casts": [],
+                  "borrow_kind": "value",
+                  "repr": "\"circle r=\"",
+                  "value": "circle r="
+                },
+                "op": "Add",
+                "right": {
+                  "kind": "Call",
+                  "source_span": {
+                    "lineno": 44,
+                    "col_offset": 29,
+                    "end_lineno": 44,
+                    "end_col_offset": 45
+                  },
+                  "resolved_type": "str",
+                  "casts": [],
+                  "borrow_kind": "value",
+                  "repr": "str(self.radius)",
+                  "func": {
+                    "kind": "Name",
+                    "source_span": {
+                      "lineno": 44,
+                      "col_offset": 29,
+                      "end_lineno": 44,
+                      "end_col_offset": 32
+                    },
+                    "resolved_type": "callable",
+                    "casts": [],
+                    "borrow_kind": "value",
+                    "repr": "str",
+                    "id": "str"
+                  },
+                  "args": [
+                    {
+                      "kind": "Attribute",
+                      "source_span": {
+                        "lineno": 44,
+                        "col_offset": 33,
+                        "end_lineno": 44,
+                        "end_col_offset": 44
+                      },
+                      "resolved_type": "int64",
+                      "casts": [],
+                      "borrow_kind": "value",
+                      "repr": "self.radius",
+                      "value": {
+                        "kind": "Name",
+                        "source_span": {
+                          "lineno": 44,
+                          "col_offset": 33,
+                          "end_lineno": 44,
+                          "end_col_offset": 37
+                        },
+                        "resolved_type": "Circle",
+                        "casts": [],
+                        "borrow_kind": "readonly_ref",
+                        "repr": "self",
+                        "id": "self"
+                      },
+                      "attr": "radius",
+                      "call_arg_type": "Obj"
+                    }
+                  ],
+                  "keywords": [],
+                  "lowered_kind": "BuiltinCall",
+                  "builtin_name": "str",
+                  "runtime_call": "py_to_string",
+                  "runtime_module_id": "pytra.core.py_runtime",
+                  "runtime_symbol": "str",
+                  "runtime_call_adapter_kind": "builtin",
+                  "semantic_tag": "cast.str",
+                  "type_expr_summary_v1": {
+                    "schema_version": 1,
+                    "kind": "NamedType",
+                    "category": "static",
+                    "mirror": "str"
+                  }
+                }
+              }
+            }
+          ],
+          "is_generator": 0,
+          "yield_value_type": "unknown",
+          "decorators": [],
+          "meta": {
+            "trait_impl_v1": {
+              "schema_version": 1,
+              "trait_name": "Drawable",
+              "method_name": "draw"
+            }
+          },
+          "captures": [],
+          "capture_types": {},
+          "capture_modes": {},
+          "returns": "str",
+          "mutates_self": false
+        },
+        {
+          "kind": "ClosureDef",
+          "source_span": {
+            "lineno": 46,
+            "col_offset": 4,
+            "end_lineno": 47,
+            "end_col_offset": 43
+          },
+          "name": "serialize",
+          "original_name": "serialize",
+          "arg_types": {
+            "self": "Circle"
+          },
+          "arg_order": [
+            "self"
+          ],
+          "arg_defaults": {},
+          "arg_index": {
+            "self": 0
+          },
+          "return_type": "str",
+          "arg_usage": {
+            "self": "readonly"
+          },
+          "renamed_symbols": {},
+          "docstring": null,
+          "body": [
+            {
+              "kind": "Return",
+              "source_span": {
+                "lineno": 47,
+                "col_offset": 8,
+                "end_lineno": 47,
+                "end_col_offset": 43
+              },
+              "value": {
+                "kind": "BinOp",
+                "source_span": {
+                  "lineno": 47,
+                  "col_offset": 15,
+                  "end_lineno": 47,
+                  "end_col_offset": 43
+                },
+                "resolved_type": "str",
+                "casts": [],
+                "borrow_kind": "value",
+                "repr": "\"circle:\" + str(self.radius)",
+                "left": {
+                  "kind": "Constant",
+                  "source_span": {
+                    "lineno": 47,
+                    "col_offset": 15,
+                    "end_lineno": 47,
+                    "end_col_offset": 24
+                  },
+                  "resolved_type": "str",
+                  "casts": [],
+                  "borrow_kind": "value",
+                  "repr": "\"circle:\"",
+                  "value": "circle:"
+                },
+                "op": "Add",
+                "right": {
+                  "kind": "Call",
+                  "source_span": {
+                    "lineno": 47,
+                    "col_offset": 27,
+                    "end_lineno": 47,
+                    "end_col_offset": 43
+                  },
+                  "resolved_type": "str",
+                  "casts": [],
+                  "borrow_kind": "value",
+                  "repr": "str(self.radius)",
+                  "func": {
+                    "kind": "Name",
+                    "source_span": {
+                      "lineno": 47,
+                      "col_offset": 27,
+                      "end_lineno": 47,
+                      "end_col_offset": 30
+                    },
+                    "resolved_type": "callable",
+                    "casts": [],
+                    "borrow_kind": "value",
+                    "repr": "str",
+                    "id": "str"
+                  },
+                  "args": [
+                    {
+                      "kind": "Attribute",
+                      "source_span": {
+                        "lineno": 47,
+                        "col_offset": 31,
+                        "end_lineno": 47,
+                        "end_col_offset": 42
+                      },
+                      "resolved_type": "int64",
+                      "casts": [],
+                      "borrow_kind": "value",
+                      "repr": "self.radius",
+                      "value": {
+                        "kind": "Name",
+                        "source_span": {
+                          "lineno": 47,
+                          "col_offset": 31,
+                          "end_lineno": 47,
+                          "end_col_offset": 35
+                        },
+                        "resolved_type": "Circle",
+                        "casts": [],
+                        "borrow_kind": "readonly_ref",
+                        "repr": "self",
+                        "id": "self"
+                      },
+                      "attr": "radius",
+                      "call_arg_type": "Obj"
+                    }
+                  ],
+                  "keywords": [],
+                  "lowered_kind": "BuiltinCall",
+                  "builtin_name": "str",
+                  "runtime_call": "py_to_string",
+                  "runtime_module_id": "pytra.core.py_runtime",
+                  "runtime_symbol": "str",
+                  "runtime_call_adapter_kind": "builtin",
+                  "semantic_tag": "cast.str",
+                  "type_expr_summary_v1": {
+                    "schema_version": 1,
+                    "kind": "NamedType",
+                    "category": "static",
+                    "mirror": "str"
+                  }
+                }
+              }
+            }
+          ],
+          "is_generator": 0,
+          "yield_value_type": "unknown",
+          "decorators": [],
+          "meta": {
+            "trait_impl_v1": {
+              "schema_version": 1,
+              "trait_name": "Serializable",
+              "method_name": "serialize"
+            }
+          },
+          "captures": [],
+          "capture_types": {},
+          "capture_modes": {},
+          "returns": "str",
+          "mutates_self": false
+        }
+      ],
+      "class_storage_hint": "ref",
+      "meta": {
+        "implements_v1": {
+          "schema_version": 1,
+          "traits": [
+            "Drawable",
+            "Serializable"
+          ]
+        }
+      }
+    },
+    {
+      "kind": "ClassDef",
+      "source_span": {
+        "lineno": 51,
+        "col_offset": 0,
+        "end_lineno": 59,
+        "end_col_offset": 0
+      },
+      "name": "Square",
+      "original_name": "Square",
+      "base": "Shape",
+      "dataclass": false,
+      "field_types": {
+        "side": "int64"
+      },
+      "decorators": [
+        "implements(Drawable)"
+      ],
+      "body": [
+        {
+          "kind": "ClosureDef",
+          "source_span": {
+            "lineno": 52,
+            "col_offset": 4,
+            "end_lineno": 53,
+            "end_col_offset": 26
+          },
+          "name": "__init__",
+          "original_name": "__init__",
+          "arg_types": {
+            "self": "Square",
+            "s": "int64"
+          },
+          "arg_order": [
+            "self",
+            "s"
+          ],
+          "arg_defaults": {},
+          "arg_index": {
+            "self": 0,
+            "s": 1
+          },
+          "return_type": "None",
+          "arg_usage": {
+            "self": "reassigned",
+            "s": "readonly"
+          },
+          "renamed_symbols": {},
+          "docstring": null,
+          "body": [
+            {
+              "kind": "AnnAssign",
+              "source_span": {
+                "lineno": 53,
+                "col_offset": 8,
+                "end_lineno": 53,
+                "end_col_offset": 26
+              },
+              "target": {
+                "kind": "Attribute",
+                "source_span": {
+                  "lineno": 53,
+                  "col_offset": 8,
+                  "end_lineno": 53,
+                  "end_col_offset": 17
+                },
+                "resolved_type": "int64",
+                "casts": [],
+                "borrow_kind": "value",
+                "repr": "self.side",
+                "value": {
+                  "kind": "Name",
+                  "source_span": {
+                    "lineno": 53,
+                    "col_offset": 8,
+                    "end_lineno": 53,
+                    "end_col_offset": 12
+                  },
+                  "resolved_type": "Square",
+                  "casts": [],
+                  "borrow_kind": "readonly_ref",
+                  "repr": "self",
+                  "id": "self"
+                },
+                "attr": "side",
+                "type_expr": {
+                  "kind": "NamedType",
+                  "name": "int64"
+                }
+              },
+              "annotation": "int64",
+              "declare": true,
+              "decl_type": "int64",
+              "annotation_type_expr": {
+                "kind": "NamedType",
+                "name": "int64"
+              },
+              "decl_type_expr": {
+                "kind": "NamedType",
+                "name": "int64"
+              },
+              "value": {
+                "kind": "Name",
+                "source_span": {
+                  "lineno": 53,
+                  "col_offset": 8,
+                  "end_lineno": 53,
+                  "end_col_offset": 9
+                },
+                "resolved_type": "int64",
+                "casts": [],
+                "borrow_kind": "readonly_ref",
+                "repr": "s",
+                "id": "s"
+              },
+              "type_expr_summary_v1": {
+                "schema_version": 1,
+                "kind": "NamedType",
+                "category": "static",
+                "mirror": "int64"
+              }
+            }
+          ],
+          "is_generator": 0,
+          "yield_value_type": "unknown",
+          "decorators": [],
+          "captures": [],
+          "capture_types": {},
+          "capture_modes": {},
+          "returns": "None",
+          "mutates_self": true
+        },
+        {
+          "kind": "ClosureDef",
+          "source_span": {
+            "lineno": 55,
+            "col_offset": 4,
+            "end_lineno": 59,
+            "end_col_offset": 24
+          },
+          "name": "draw",
+          "original_name": "draw",
+          "arg_types": {
+            "self": "Square"
+          },
+          "arg_order": [
+            "self"
+          ],
+          "arg_defaults": {},
+          "arg_index": {
+            "self": 0
+          },
+          "return_type": "str",
+          "arg_usage": {
+            "self": "readonly"
+          },
+          "renamed_symbols": {},
+          "docstring": null,
+          "body": [
+            {
+              "kind": "Return",
+              "source_span": {
+                "lineno": 56,
+                "col_offset": 8,
+                "end_lineno": 56,
+                "end_col_offset": 43
+              },
+              "value": {
+                "kind": "BinOp",
+                "source_span": {
+                  "lineno": 56,
+                  "col_offset": 15,
+                  "end_lineno": 56,
+                  "end_col_offset": 43
+                },
+                "resolved_type": "str",
+                "casts": [],
+                "borrow_kind": "value",
+                "repr": "\"square s=\" + str(self.side)",
+                "left": {
+                  "kind": "Constant",
+                  "source_span": {
+                    "lineno": 56,
+                    "col_offset": 15,
+                    "end_lineno": 56,
+                    "end_col_offset": 26
+                  },
+                  "resolved_type": "str",
+                  "casts": [],
+                  "borrow_kind": "value",
+                  "repr": "\"square s=\"",
+                  "value": "square s="
+                },
+                "op": "Add",
+                "right": {
+                  "kind": "Call",
+                  "source_span": {
+                    "lineno": 56,
+                    "col_offset": 29,
+                    "end_lineno": 56,
+                    "end_col_offset": 43
+                  },
+                  "resolved_type": "str",
+                  "casts": [],
+                  "borrow_kind": "value",
+                  "repr": "str(self.side)",
+                  "func": {
+                    "kind": "Name",
+                    "source_span": {
+                      "lineno": 56,
+                      "col_offset": 29,
+                      "end_lineno": 56,
+                      "end_col_offset": 32
+                    },
+                    "resolved_type": "callable",
+                    "casts": [],
+                    "borrow_kind": "value",
+                    "repr": "str",
+                    "id": "str"
+                  },
+                  "args": [
+                    {
+                      "kind": "Attribute",
+                      "source_span": {
+                        "lineno": 56,
+                        "col_offset": 33,
+                        "end_lineno": 56,
+                        "end_col_offset": 42
+                      },
+                      "resolved_type": "int64",
+                      "casts": [],
+                      "borrow_kind": "value",
+                      "repr": "self.side",
+                      "value": {
+                        "kind": "Name",
+                        "source_span": {
+                          "lineno": 56,
+                          "col_offset": 33,
+                          "end_lineno": 56,
+                          "end_col_offset": 37
+                        },
+                        "resolved_type": "Square",
+                        "casts": [],
+                        "borrow_kind": "readonly_ref",
+                        "repr": "self",
+                        "id": "self"
+                      },
+                      "attr": "side",
+                      "call_arg_type": "Obj"
+                    }
+                  ],
+                  "keywords": [],
+                  "lowered_kind": "BuiltinCall",
+                  "builtin_name": "str",
+                  "runtime_call": "py_to_string",
+                  "runtime_module_id": "pytra.core.py_runtime",
+                  "runtime_symbol": "str",
+                  "runtime_call_adapter_kind": "builtin",
+                  "semantic_tag": "cast.str",
+                  "type_expr_summary_v1": {
+                    "schema_version": 1,
+                    "kind": "NamedType",
+                    "category": "static",
+                    "mirror": "str"
+                  }
+                }
+              }
+            }
+          ],
+          "is_generator": 0,
+          "yield_value_type": "unknown",
+          "decorators": [],
+          "meta": {
+            "trait_impl_v1": {
+              "schema_version": 1,
+              "trait_name": "Drawable",
+              "method_name": "draw"
+            }
+          },
+          "captures": [],
+          "capture_types": {},
+          "capture_modes": {},
+          "returns": "str",
+          "mutates_self": false
+        }
+      ],
+      "class_storage_hint": "ref",
+      "meta": {
+        "implements_v1": {
+          "schema_version": 1,
+          "traits": [
+            "Drawable"
+          ]
+        }
+      }
+    },
+    {
+      "kind": "FunctionDef",
+      "source_span": {
+        "lineno": 60,
+        "col_offset": 0,
+        "end_lineno": 64,
+        "end_col_offset": 17
+      },
+      "name": "describe_shape",
+      "original_name": "describe_shape",
+      "arg_types": {
+        "s": "Shape"
+      },
+      "arg_order": [
+        "s"
+      ],
+      "arg_defaults": {},
+      "arg_index": {
+        "s": 0
+      },
+      "return_type": "str",
+      "arg_usage": {
+        "s": "readonly"
+      },
+      "renamed_symbols": {},
+      "docstring": null,
+      "body": [
+        {
+          "kind": "Return",
+          "source_span": {
+            "lineno": 61,
+            "col_offset": 4,
+            "end_lineno": 61,
+            "end_col_offset": 19
+          },
+          "value": {
+            "kind": "Call",
+            "source_span": {
+              "lineno": 61,
+              "col_offset": 11,
+              "end_lineno": 61,
+              "end_col_offset": 19
+            },
+            "resolved_type": "str",
+            "casts": [],
+            "borrow_kind": "value",
+            "repr": "s.kind()",
+            "func": {
+              "kind": "Attribute",
+              "source_span": {
+                "lineno": 61,
+                "col_offset": 11,
+                "end_lineno": 61,
+                "end_col_offset": 17
+              },
+              "resolved_type": "callable",
+              "casts": [],
+              "borrow_kind": "value",
+              "repr": "s.kind",
+              "value": {
+                "kind": "Name",
+                "source_span": {
+                  "lineno": 61,
+                  "col_offset": 11,
+                  "end_lineno": 61,
+                  "end_col_offset": 12
+                },
+                "resolved_type": "Shape",
+                "casts": [],
+                "borrow_kind": "readonly_ref",
+                "repr": "s",
+                "id": "s"
+              },
+              "attr": "kind"
+            },
+            "args": [],
+            "keywords": [],
+            "type_expr_summary_v1": {
+              "schema_version": 1,
+              "kind": "NamedType",
+              "category": "static",
+              "mirror": "str"
+            }
+          }
+        }
+      ],
+      "is_generator": 0,
+      "yield_value_type": "unknown",
+      "arg_type_exprs": {
+        "s": {
+          "kind": "NamedType",
+          "name": "Shape"
+        }
+      },
+      "return_type_expr": {
+        "kind": "NamedType",
+        "name": "str"
+      },
+      "leading_comments": [],
+      "leading_trivia": [],
+      "returns": "str"
+    },
+    {
+      "kind": "FunctionDef",
+      "source_span": {
+        "lineno": 65,
+        "col_offset": 0,
+        "end_lineno": 69,
+        "end_col_offset": 25
+      },
+      "name": "render",
+      "original_name": "render",
+      "arg_types": {
+        "d": "Drawable"
+      },
+      "arg_order": [
+        "d"
+      ],
+      "arg_defaults": {},
+      "arg_index": {
+        "d": 0
+      },
+      "return_type": "str",
+      "arg_usage": {
+        "d": "readonly"
+      },
+      "renamed_symbols": {},
+      "docstring": null,
+      "body": [
+        {
+          "kind": "Return",
+          "source_span": {
+            "lineno": 66,
+            "col_offset": 4,
+            "end_lineno": 66,
+            "end_col_offset": 19
+          },
+          "value": {
+            "kind": "Call",
+            "source_span": {
+              "lineno": 66,
+              "col_offset": 11,
+              "end_lineno": 66,
+              "end_col_offset": 19
+            },
+            "resolved_type": "str",
+            "casts": [],
+            "borrow_kind": "value",
+            "repr": "d.draw()",
+            "func": {
+              "kind": "Attribute",
+              "source_span": {
+                "lineno": 66,
+                "col_offset": 11,
+                "end_lineno": 66,
+                "end_col_offset": 17
+              },
+              "resolved_type": "callable",
+              "casts": [],
+              "borrow_kind": "value",
+              "repr": "d.draw",
+              "value": {
+                "kind": "Name",
+                "source_span": {
+                  "lineno": 66,
+                  "col_offset": 11,
+                  "end_lineno": 66,
+                  "end_col_offset": 12
+                },
+                "resolved_type": "Drawable",
+                "casts": [],
+                "borrow_kind": "readonly_ref",
+                "repr": "d",
+                "id": "d"
+              },
+              "attr": "draw"
+            },
+            "args": [],
+            "keywords": [],
+            "type_expr_summary_v1": {
+              "schema_version": 1,
+              "kind": "NamedType",
+              "category": "static",
+              "mirror": "str"
+            }
+          }
+        }
+      ],
+      "is_generator": 0,
+      "yield_value_type": "unknown",
+      "arg_type_exprs": {
+        "d": {
+          "kind": "NamedType",
+          "name": "Drawable"
+        }
+      },
+      "return_type_expr": {
+        "kind": "NamedType",
+        "name": "str"
+      },
+      "leading_comments": [],
+      "leading_trivia": [],
+      "returns": "str"
+    },
+    {
+      "kind": "FunctionDef",
+      "source_span": {
+        "lineno": 70,
+        "col_offset": 0,
+        "end_lineno": 71,
+        "end_col_offset": 24
+      },
+      "name": "save",
+      "original_name": "save",
+      "arg_types": {
+        "s": "Serializable"
+      },
+      "arg_order": [
+        "s"
+      ],
+      "arg_defaults": {},
+      "arg_index": {
+        "s": 0
+      },
+      "return_type": "str",
+      "arg_usage": {
+        "s": "readonly"
+      },
+      "renamed_symbols": {},
+      "docstring": null,
+      "body": [
+        {
+          "kind": "Return",
+          "source_span": {
+            "lineno": 71,
+            "col_offset": 4,
+            "end_lineno": 71,
+            "end_col_offset": 24
+          },
+          "value": {
+            "kind": "Call",
+            "source_span": {
+              "lineno": 71,
+              "col_offset": 11,
+              "end_lineno": 71,
+              "end_col_offset": 24
+            },
+            "resolved_type": "str",
+            "casts": [],
+            "borrow_kind": "value",
+            "repr": "s.serialize()",
+            "func": {
+              "kind": "Attribute",
+              "source_span": {
+                "lineno": 71,
+                "col_offset": 11,
+                "end_lineno": 71,
+                "end_col_offset": 22
+              },
+              "resolved_type": "callable",
+              "casts": [],
+              "borrow_kind": "value",
+              "repr": "s.serialize",
+              "value": {
+                "kind": "Name",
+                "source_span": {
+                  "lineno": 71,
+                  "col_offset": 11,
+                  "end_lineno": 71,
+                  "end_col_offset": 12
+                },
+                "resolved_type": "Serializable",
+                "casts": [],
+                "borrow_kind": "readonly_ref",
+                "repr": "s",
+                "id": "s"
+              },
+              "attr": "serialize"
+            },
+            "args": [],
+            "keywords": [],
+            "type_expr_summary_v1": {
+              "schema_version": 1,
+              "kind": "NamedType",
+              "category": "static",
+              "mirror": "str"
+            }
+          }
+        }
+      ],
+      "is_generator": 0,
+      "yield_value_type": "unknown",
+      "arg_type_exprs": {
+        "s": {
+          "kind": "NamedType",
+          "name": "Serializable"
+        }
+      },
+      "return_type_expr": {
+        "kind": "NamedType",
+        "name": "str"
+      },
+      "leading_comments": [],
+      "leading_trivia": [],
+      "returns": "str"
+    },
+    {
+      "kind": "FunctionDef",
+      "source_span": {
+        "lineno": 74,
+        "col_offset": 0,
+        "end_lineno": 91,
+        "end_col_offset": 19
+      },
+      "name": "_case_main",
+      "original_name": "_case_main",
+      "arg_types": {},
+      "arg_order": [],
+      "arg_defaults": {},
+      "arg_index": {},
+      "return_type": "None",
+      "arg_usage": {},
+      "renamed_symbols": {},
+      "docstring": null,
+      "body": [
+        {
+          "kind": "AnnAssign",
+          "source_span": {
+            "lineno": 75,
+            "col_offset": 4,
+            "end_lineno": 75,
+            "end_col_offset": 25
+          },
+          "target": {
+            "kind": "Name",
+            "source_span": {
+              "lineno": 75,
+              "col_offset": 4,
+              "end_lineno": 75,
+              "end_col_offset": 5
+            },
+            "resolved_type": "Circle",
+            "casts": [],
+            "borrow_kind": "value",
+            "repr": "c",
+            "id": "c",
+            "type_expr": {
+              "kind": "NamedType",
+              "name": "Circle"
+            }
+          },
+          "annotation": "Circle",
+          "declare": true,
+          "decl_type": "Circle",
+          "annotation_type_expr": {
+            "kind": "NamedType",
+            "name": "Circle"
+          },
+          "decl_type_expr": {
+            "kind": "NamedType",
+            "name": "Circle"
+          },
+          "value": {
+            "kind": "Call",
+            "source_span": {
+              "lineno": 75,
+              "col_offset": 16,
+              "end_lineno": 75,
+              "end_col_offset": 25
+            },
+            "resolved_type": "Circle",
+            "casts": [],
+            "borrow_kind": "value",
+            "repr": "Circle(5)",
+            "func": {
+              "kind": "Name",
+              "source_span": {
+                "lineno": 75,
+                "col_offset": 16,
+                "end_lineno": 75,
+                "end_col_offset": 22
+              },
+              "resolved_type": "type",
+              "casts": [],
+              "borrow_kind": "value",
+              "repr": "Circle",
+              "id": "Circle"
+            },
+            "args": [
+              {
+                "kind": "Constant",
+                "source_span": {
+                  "lineno": 75,
+                  "col_offset": 23,
+                  "end_lineno": 75,
+                  "end_col_offset": 24
+                },
+                "resolved_type": "int64",
+                "casts": [],
+                "borrow_kind": "value",
+                "repr": "5",
+                "value": 5,
+                "call_arg_type": "int64"
+              }
+            ],
+            "keywords": [],
+            "type_expr_summary_v1": {
+              "schema_version": 1,
+              "kind": "NamedType",
+              "category": "static",
+              "mirror": "Circle"
+            }
+          },
+          "type_expr_summary_v1": {
+            "schema_version": 1,
+            "kind": "NamedType",
+            "category": "static",
+            "mirror": "Circle"
+          }
+        },
+        {
+          "kind": "AnnAssign",
+          "source_span": {
+            "lineno": 76,
+            "col_offset": 4,
+            "end_lineno": 76,
+            "end_col_offset": 26
+          },
+          "target": {
+            "kind": "Name",
+            "source_span": {
+              "lineno": 76,
+              "col_offset": 4,
+              "end_lineno": 76,
+              "end_col_offset": 6
+            },
+            "resolved_type": "Square",
+            "casts": [],
+            "borrow_kind": "value",
+            "repr": "sq",
+            "id": "sq",
+            "type_expr": {
+              "kind": "NamedType",
+              "name": "Square"
+            }
+          },
+          "annotation": "Square",
+          "declare": true,
+          "decl_type": "Square",
+          "annotation_type_expr": {
+            "kind": "NamedType",
+            "name": "Square"
+          },
+          "decl_type_expr": {
+            "kind": "NamedType",
+            "name": "Square"
+          },
+          "value": {
+            "kind": "Call",
+            "source_span": {
+              "lineno": 76,
+              "col_offset": 17,
+              "end_lineno": 76,
+              "end_col_offset": 26
+            },
+            "resolved_type": "Square",
+            "casts": [],
+            "borrow_kind": "value",
+            "repr": "Square(3)",
+            "func": {
+              "kind": "Name",
+              "source_span": {
+                "lineno": 76,
+                "col_offset": 17,
+                "end_lineno": 76,
+                "end_col_offset": 23
+              },
+              "resolved_type": "type",
+              "casts": [],
+              "borrow_kind": "value",
+              "repr": "Square",
+              "id": "Square"
+            },
+            "args": [
+              {
+                "kind": "Constant",
+                "source_span": {
+                  "lineno": 76,
+                  "col_offset": 24,
+                  "end_lineno": 76,
+                  "end_col_offset": 25
+                },
+                "resolved_type": "int64",
+                "casts": [],
+                "borrow_kind": "value",
+                "repr": "3",
+                "value": 3,
+                "call_arg_type": "int64"
+              }
+            ],
+            "keywords": [],
+            "type_expr_summary_v1": {
+              "schema_version": 1,
+              "kind": "NamedType",
+              "category": "static",
+              "mirror": "Square"
+            }
+          },
+          "type_expr_summary_v1": {
+            "schema_version": 1,
+            "kind": "NamedType",
+            "category": "static",
+            "mirror": "Square"
+          }
+        },
+        {
+          "kind": "Expr",
+          "source_span": {
+            "lineno": 79,
+            "col_offset": 4,
+            "end_lineno": 79,
+            "end_col_offset": 28
+          },
+          "value": {
+            "kind": "Call",
+            "source_span": {
+              "lineno": 79,
+              "col_offset": 4,
+              "end_lineno": 79,
+              "end_col_offset": 28
+            },
+            "resolved_type": "None",
+            "casts": [],
+            "borrow_kind": "value",
+            "repr": "print(describe_shape(c))",
+            "func": {
+              "kind": "Name",
+              "source_span": {
+                "lineno": 79,
+                "col_offset": 4,
+                "end_lineno": 79,
+                "end_col_offset": 9
+              },
+              "resolved_type": "callable",
+              "casts": [],
+              "borrow_kind": "value",
+              "repr": "print",
+              "id": "print"
+            },
+            "args": [
+              {
+                "kind": "Call",
+                "source_span": {
+                  "lineno": 79,
+                  "col_offset": 10,
+                  "end_lineno": 79,
+                  "end_col_offset": 27
+                },
+                "resolved_type": "str",
+                "casts": [],
+                "borrow_kind": "value",
+                "repr": "describe_shape(c)",
+                "func": {
+                  "kind": "Name",
+                  "source_span": {
+                    "lineno": 79,
+                    "col_offset": 10,
+                    "end_lineno": 79,
+                    "end_col_offset": 24
+                  },
+                  "resolved_type": "callable",
+                  "casts": [],
+                  "borrow_kind": "value",
+                  "repr": "describe_shape",
+                  "id": "describe_shape"
+                },
+                "args": [
+                  {
+                    "kind": "Name",
+                    "source_span": {
+                      "lineno": 79,
+                      "col_offset": 25,
+                      "end_lineno": 79,
+                      "end_col_offset": 26
+                    },
+                    "resolved_type": "Circle",
+                    "casts": [],
+                    "borrow_kind": "readonly_ref",
+                    "repr": "c",
+                    "id": "c",
+                    "call_arg_type": "Shape"
+                  }
+                ],
+                "keywords": [],
+                "type_expr_summary_v1": {
+                  "schema_version": 1,
+                  "kind": "NamedType",
+                  "category": "static",
+                  "mirror": "str"
+                }
+              }
+            ],
+            "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "print",
+            "runtime_call": "py_print",
+            "runtime_module_id": "pytra.built_in.io_ops",
+            "runtime_symbol": "py_print",
+            "runtime_call_adapter_kind": "builtin",
+            "semantic_tag": "core.print",
+            "type_expr_summary_v1": {
+              "schema_version": 1,
+              "kind": "NamedType",
+              "category": "static",
+              "mirror": "None"
+            }
+          },
+          "leading_trivia": [
+            {
+              "kind": "blank",
+              "count": 1
+            },
+            {
+              "kind": "comment",
+              "text": "Inheritance upcast: Circle/Square -> Shape"
+            }
+          ],
+          "leading_comments": [
+            "Inheritance upcast: Circle/Square -> Shape"
+          ]
+        },
+        {
+          "kind": "Expr",
+          "source_span": {
+            "lineno": 80,
+            "col_offset": 4,
+            "end_lineno": 80,
+            "end_col_offset": 29
+          },
+          "value": {
+            "kind": "Call",
+            "source_span": {
+              "lineno": 80,
+              "col_offset": 4,
+              "end_lineno": 80,
+              "end_col_offset": 29
+            },
+            "resolved_type": "None",
+            "casts": [],
+            "borrow_kind": "value",
+            "repr": "print(describe_shape(sq))",
+            "func": {
+              "kind": "Name",
+              "source_span": {
+                "lineno": 80,
+                "col_offset": 4,
+                "end_lineno": 80,
+                "end_col_offset": 9
+              },
+              "resolved_type": "callable",
+              "casts": [],
+              "borrow_kind": "value",
+              "repr": "print",
+              "id": "print"
+            },
+            "args": [
+              {
+                "kind": "Call",
+                "source_span": {
+                  "lineno": 80,
+                  "col_offset": 10,
+                  "end_lineno": 80,
+                  "end_col_offset": 28
+                },
+                "resolved_type": "str",
+                "casts": [],
+                "borrow_kind": "value",
+                "repr": "describe_shape(sq)",
+                "func": {
+                  "kind": "Name",
+                  "source_span": {
+                    "lineno": 80,
+                    "col_offset": 10,
+                    "end_lineno": 80,
+                    "end_col_offset": 24
+                  },
+                  "resolved_type": "callable",
+                  "casts": [],
+                  "borrow_kind": "value",
+                  "repr": "describe_shape",
+                  "id": "describe_shape"
+                },
+                "args": [
+                  {
+                    "kind": "Name",
+                    "source_span": {
+                      "lineno": 80,
+                      "col_offset": 25,
+                      "end_lineno": 80,
+                      "end_col_offset": 27
+                    },
+                    "resolved_type": "Square",
+                    "casts": [],
+                    "borrow_kind": "readonly_ref",
+                    "repr": "sq",
+                    "id": "sq",
+                    "call_arg_type": "Shape"
+                  }
+                ],
+                "keywords": [],
+                "type_expr_summary_v1": {
+                  "schema_version": 1,
+                  "kind": "NamedType",
+                  "category": "static",
+                  "mirror": "str"
+                }
+              }
+            ],
+            "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "print",
+            "runtime_call": "py_print",
+            "runtime_module_id": "pytra.built_in.io_ops",
+            "runtime_symbol": "py_print",
+            "runtime_call_adapter_kind": "builtin",
+            "semantic_tag": "core.print",
+            "type_expr_summary_v1": {
+              "schema_version": 1,
+              "kind": "NamedType",
+              "category": "static",
+              "mirror": "None"
+            }
+          }
+        },
+        {
+          "kind": "Expr",
+          "source_span": {
+            "lineno": 83,
+            "col_offset": 4,
+            "end_lineno": 83,
+            "end_col_offset": 20
+          },
+          "value": {
+            "kind": "Call",
+            "source_span": {
+              "lineno": 83,
+              "col_offset": 4,
+              "end_lineno": 83,
+              "end_col_offset": 20
+            },
+            "resolved_type": "None",
+            "casts": [],
+            "borrow_kind": "value",
+            "repr": "print(render(c))",
+            "func": {
+              "kind": "Name",
+              "source_span": {
+                "lineno": 83,
+                "col_offset": 4,
+                "end_lineno": 83,
+                "end_col_offset": 9
+              },
+              "resolved_type": "callable",
+              "casts": [],
+              "borrow_kind": "value",
+              "repr": "print",
+              "id": "print"
+            },
+            "args": [
+              {
+                "kind": "Call",
+                "source_span": {
+                  "lineno": 83,
+                  "col_offset": 10,
+                  "end_lineno": 83,
+                  "end_col_offset": 19
+                },
+                "resolved_type": "str",
+                "casts": [],
+                "borrow_kind": "value",
+                "repr": "render(c)",
+                "func": {
+                  "kind": "Name",
+                  "source_span": {
+                    "lineno": 83,
+                    "col_offset": 10,
+                    "end_lineno": 83,
+                    "end_col_offset": 16
+                  },
+                  "resolved_type": "callable",
+                  "casts": [],
+                  "borrow_kind": "value",
+                  "repr": "render",
+                  "id": "render"
+                },
+                "args": [
+                  {
+                    "kind": "Name",
+                    "source_span": {
+                      "lineno": 83,
+                      "col_offset": 17,
+                      "end_lineno": 83,
+                      "end_col_offset": 18
+                    },
+                    "resolved_type": "Circle",
+                    "casts": [],
+                    "borrow_kind": "readonly_ref",
+                    "repr": "c",
+                    "id": "c",
+                    "call_arg_type": "Drawable"
+                  }
+                ],
+                "keywords": [],
+                "type_expr_summary_v1": {
+                  "schema_version": 1,
+                  "kind": "NamedType",
+                  "category": "static",
+                  "mirror": "str"
+                }
+              }
+            ],
+            "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "print",
+            "runtime_call": "py_print",
+            "runtime_module_id": "pytra.built_in.io_ops",
+            "runtime_symbol": "py_print",
+            "runtime_call_adapter_kind": "builtin",
+            "semantic_tag": "core.print",
+            "type_expr_summary_v1": {
+              "schema_version": 1,
+              "kind": "NamedType",
+              "category": "static",
+              "mirror": "None"
+            }
+          },
+          "leading_trivia": [
+            {
+              "kind": "blank",
+              "count": 1
+            },
+            {
+              "kind": "comment",
+              "text": "Trait upcast: Circle/Square -> Drawable"
+            }
+          ],
+          "leading_comments": [
+            "Trait upcast: Circle/Square -> Drawable"
+          ]
+        },
+        {
+          "kind": "Expr",
+          "source_span": {
+            "lineno": 84,
+            "col_offset": 4,
+            "end_lineno": 84,
+            "end_col_offset": 21
+          },
+          "value": {
+            "kind": "Call",
+            "source_span": {
+              "lineno": 84,
+              "col_offset": 4,
+              "end_lineno": 84,
+              "end_col_offset": 21
+            },
+            "resolved_type": "None",
+            "casts": [],
+            "borrow_kind": "value",
+            "repr": "print(render(sq))",
+            "func": {
+              "kind": "Name",
+              "source_span": {
+                "lineno": 84,
+                "col_offset": 4,
+                "end_lineno": 84,
+                "end_col_offset": 9
+              },
+              "resolved_type": "callable",
+              "casts": [],
+              "borrow_kind": "value",
+              "repr": "print",
+              "id": "print"
+            },
+            "args": [
+              {
+                "kind": "Call",
+                "source_span": {
+                  "lineno": 84,
+                  "col_offset": 10,
+                  "end_lineno": 84,
+                  "end_col_offset": 20
+                },
+                "resolved_type": "str",
+                "casts": [],
+                "borrow_kind": "value",
+                "repr": "render(sq)",
+                "func": {
+                  "kind": "Name",
+                  "source_span": {
+                    "lineno": 84,
+                    "col_offset": 10,
+                    "end_lineno": 84,
+                    "end_col_offset": 16
+                  },
+                  "resolved_type": "callable",
+                  "casts": [],
+                  "borrow_kind": "value",
+                  "repr": "render",
+                  "id": "render"
+                },
+                "args": [
+                  {
+                    "kind": "Name",
+                    "source_span": {
+                      "lineno": 84,
+                      "col_offset": 17,
+                      "end_lineno": 84,
+                      "end_col_offset": 19
+                    },
+                    "resolved_type": "Square",
+                    "casts": [],
+                    "borrow_kind": "readonly_ref",
+                    "repr": "sq",
+                    "id": "sq",
+                    "call_arg_type": "Drawable"
+                  }
+                ],
+                "keywords": [],
+                "type_expr_summary_v1": {
+                  "schema_version": 1,
+                  "kind": "NamedType",
+                  "category": "static",
+                  "mirror": "str"
+                }
+              }
+            ],
+            "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "print",
+            "runtime_call": "py_print",
+            "runtime_module_id": "pytra.built_in.io_ops",
+            "runtime_symbol": "py_print",
+            "runtime_call_adapter_kind": "builtin",
+            "semantic_tag": "core.print",
+            "type_expr_summary_v1": {
+              "schema_version": 1,
+              "kind": "NamedType",
+              "category": "static",
+              "mirror": "None"
+            }
+          }
+        },
+        {
+          "kind": "Expr",
+          "source_span": {
+            "lineno": 87,
+            "col_offset": 4,
+            "end_lineno": 87,
+            "end_col_offset": 18
+          },
+          "value": {
+            "kind": "Call",
+            "source_span": {
+              "lineno": 87,
+              "col_offset": 4,
+              "end_lineno": 87,
+              "end_col_offset": 18
+            },
+            "resolved_type": "None",
+            "casts": [],
+            "borrow_kind": "value",
+            "repr": "print(save(c))",
+            "func": {
+              "kind": "Name",
+              "source_span": {
+                "lineno": 87,
+                "col_offset": 4,
+                "end_lineno": 87,
+                "end_col_offset": 9
+              },
+              "resolved_type": "callable",
+              "casts": [],
+              "borrow_kind": "value",
+              "repr": "print",
+              "id": "print"
+            },
+            "args": [
+              {
+                "kind": "Call",
+                "source_span": {
+                  "lineno": 87,
+                  "col_offset": 10,
+                  "end_lineno": 87,
+                  "end_col_offset": 17
+                },
+                "resolved_type": "str",
+                "casts": [],
+                "borrow_kind": "value",
+                "repr": "save(c)",
+                "func": {
+                  "kind": "Name",
+                  "source_span": {
+                    "lineno": 87,
+                    "col_offset": 10,
+                    "end_lineno": 87,
+                    "end_col_offset": 14
+                  },
+                  "resolved_type": "callable",
+                  "casts": [],
+                  "borrow_kind": "value",
+                  "repr": "save",
+                  "id": "save"
+                },
+                "args": [
+                  {
+                    "kind": "Name",
+                    "source_span": {
+                      "lineno": 87,
+                      "col_offset": 15,
+                      "end_lineno": 87,
+                      "end_col_offset": 16
+                    },
+                    "resolved_type": "Circle",
+                    "casts": [],
+                    "borrow_kind": "readonly_ref",
+                    "repr": "c",
+                    "id": "c",
+                    "call_arg_type": "Serializable"
+                  }
+                ],
+                "keywords": [],
+                "type_expr_summary_v1": {
+                  "schema_version": 1,
+                  "kind": "NamedType",
+                  "category": "static",
+                  "mirror": "str"
+                }
+              }
+            ],
+            "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "print",
+            "runtime_call": "py_print",
+            "runtime_module_id": "pytra.built_in.io_ops",
+            "runtime_symbol": "py_print",
+            "runtime_call_adapter_kind": "builtin",
+            "semantic_tag": "core.print",
+            "type_expr_summary_v1": {
+              "schema_version": 1,
+              "kind": "NamedType",
+              "category": "static",
+              "mirror": "None"
+            }
+          },
+          "leading_trivia": [
+            {
+              "kind": "blank",
+              "count": 1
+            },
+            {
+              "kind": "comment",
+              "text": "Trait upcast: Circle -> Serializable"
+            }
+          ],
+          "leading_comments": [
+            "Trait upcast: Circle -> Serializable"
+          ]
+        },
+        {
+          "kind": "Expr",
+          "source_span": {
+            "lineno": 90,
+            "col_offset": 4,
+            "end_lineno": 90,
+            "end_col_offset": 19
+          },
+          "value": {
+            "kind": "Call",
+            "source_span": {
+              "lineno": 90,
+              "col_offset": 4,
+              "end_lineno": 90,
+              "end_col_offset": 19
+            },
+            "resolved_type": "None",
+            "casts": [],
+            "borrow_kind": "value",
+            "repr": "print(c.kind())",
+            "func": {
+              "kind": "Name",
+              "source_span": {
+                "lineno": 90,
+                "col_offset": 4,
+                "end_lineno": 90,
+                "end_col_offset": 9
+              },
+              "resolved_type": "callable",
+              "casts": [],
+              "borrow_kind": "value",
+              "repr": "print",
+              "id": "print"
+            },
+            "args": [
+              {
+                "kind": "Call",
+                "source_span": {
+                  "lineno": 90,
+                  "col_offset": 10,
+                  "end_lineno": 90,
+                  "end_col_offset": 18
+                },
+                "resolved_type": "str",
+                "casts": [],
+                "borrow_kind": "value",
+                "repr": "c.kind()",
+                "func": {
+                  "kind": "Attribute",
+                  "source_span": {
+                    "lineno": 90,
+                    "col_offset": 10,
+                    "end_lineno": 90,
+                    "end_col_offset": 16
+                  },
+                  "resolved_type": "callable",
+                  "casts": [],
+                  "borrow_kind": "value",
+                  "repr": "c.kind",
+                  "value": {
+                    "kind": "Name",
+                    "source_span": {
+                      "lineno": 90,
+                      "col_offset": 10,
+                      "end_lineno": 90,
+                      "end_col_offset": 11
+                    },
+                    "resolved_type": "Circle",
+                    "casts": [],
+                    "borrow_kind": "readonly_ref",
+                    "repr": "c",
+                    "id": "c"
+                  },
+                  "attr": "kind"
+                },
+                "args": [],
+                "keywords": [],
+                "type_expr_summary_v1": {
+                  "schema_version": 1,
+                  "kind": "NamedType",
+                  "category": "static",
+                  "mirror": "str"
+                }
+              }
+            ],
+            "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "print",
+            "runtime_call": "py_print",
+            "runtime_module_id": "pytra.built_in.io_ops",
+            "runtime_symbol": "py_print",
+            "runtime_call_adapter_kind": "builtin",
+            "semantic_tag": "core.print",
+            "type_expr_summary_v1": {
+              "schema_version": 1,
+              "kind": "NamedType",
+              "category": "static",
+              "mirror": "None"
+            }
+          },
+          "leading_trivia": [
+            {
+              "kind": "blank",
+              "count": 1
+            },
+            {
+              "kind": "comment",
+              "text": "Direct method call"
+            }
+          ],
+          "leading_comments": [
+            "Direct method call"
+          ]
+        },
+        {
+          "kind": "Expr",
+          "source_span": {
+            "lineno": 91,
+            "col_offset": 4,
+            "end_lineno": 91,
+            "end_col_offset": 19
+          },
+          "value": {
+            "kind": "Call",
+            "source_span": {
+              "lineno": 91,
+              "col_offset": 4,
+              "end_lineno": 91,
+              "end_col_offset": 19
+            },
+            "resolved_type": "None",
+            "casts": [],
+            "borrow_kind": "value",
+            "repr": "print(c.radius)",
+            "func": {
+              "kind": "Name",
+              "source_span": {
+                "lineno": 91,
+                "col_offset": 4,
+                "end_lineno": 91,
+                "end_col_offset": 9
+              },
+              "resolved_type": "callable",
+              "casts": [],
+              "borrow_kind": "value",
+              "repr": "print",
+              "id": "print"
+            },
+            "args": [
+              {
+                "kind": "Attribute",
+                "source_span": {
+                  "lineno": 91,
+                  "col_offset": 10,
+                  "end_lineno": 91,
+                  "end_col_offset": 18
+                },
+                "resolved_type": "int64",
+                "casts": [],
+                "borrow_kind": "value",
+                "repr": "c.radius",
+                "value": {
+                  "kind": "Name",
+                  "source_span": {
+                    "lineno": 91,
+                    "col_offset": 10,
+                    "end_lineno": 91,
+                    "end_col_offset": 11
+                  },
+                  "resolved_type": "Circle",
+                  "casts": [],
+                  "borrow_kind": "readonly_ref",
+                  "repr": "c",
+                  "id": "c"
+                },
+                "attr": "radius"
+              }
+            ],
+            "keywords": [],
+            "lowered_kind": "BuiltinCall",
+            "builtin_name": "print",
+            "runtime_call": "py_print",
+            "runtime_module_id": "pytra.built_in.io_ops",
+            "runtime_symbol": "py_print",
+            "runtime_call_adapter_kind": "builtin",
+            "semantic_tag": "core.print",
+            "type_expr_summary_v1": {
+              "schema_version": 1,
+              "kind": "NamedType",
+              "category": "static",
+              "mirror": "None"
+            }
+          }
+        }
+      ],
+      "is_generator": 0,
+      "yield_value_type": "unknown",
+      "arg_type_exprs": {},
+      "return_type_expr": {
+        "kind": "NamedType",
+        "name": "None"
+      },
+      "leading_comments": [],
+      "leading_trivia": [],
+      "returns": "None"
+    }
+  ],
+  "main_guard_body": [
+    {
+      "kind": "Expr",
+      "source_span": {
+        "lineno": 95,
+        "col_offset": 4,
+        "end_lineno": 95,
+        "end_col_offset": 116
+      },
+      "value": {
+        "kind": "Call",
+        "source_span": {
+          "lineno": 95,
+          "col_offset": 4,
+          "end_lineno": 95,
+          "end_col_offset": 116
+        },
+        "resolved_type": "None",
+        "casts": [],
+        "borrow_kind": "value",
+        "repr": "print(py_assert_stdout([ \"shape\", \"shape\", \"circle r=5\", \"square s=3\", \"circle:5\", \"shape\", \"5\", ], _case_main))",
+        "func": {
+          "kind": "Name",
+          "source_span": {
+            "lineno": 95,
+            "col_offset": 4,
+            "end_lineno": 95,
+            "end_col_offset": 9
+          },
+          "resolved_type": "callable",
+          "casts": [],
+          "borrow_kind": "value",
+          "repr": "print",
+          "id": "print"
+        },
+        "args": [
+          {
+            "kind": "Call",
+            "source_span": {
+              "lineno": 95,
+              "col_offset": 10,
+              "end_lineno": 95,
+              "end_col_offset": 115
+            },
+            "resolved_type": "bool",
+            "casts": [],
+            "borrow_kind": "value",
+            "repr": "py_assert_stdout([ \"shape\", \"shape\", \"circle r=5\", \"square s=3\", \"circle:5\", \"shape\", \"5\", ], _case_main)",
+            "func": {
+              "kind": "Name",
+              "source_span": {
+                "lineno": 95,
+                "col_offset": 10,
+                "end_lineno": 95,
+                "end_col_offset": 26
+              },
+              "resolved_type": "callable",
+              "casts": [],
+              "borrow_kind": "value",
+              "repr": "py_assert_stdout",
+              "id": "py_assert_stdout"
+            },
+            "args": [
+              {
+                "kind": "List",
+                "source_span": {
+                  "lineno": 95,
+                  "col_offset": 27,
+                  "end_lineno": 95,
+                  "end_col_offset": 102
+                },
+                "resolved_type": "list[str]",
+                "casts": [],
+                "borrow_kind": "value",
+                "repr": "[ \"shape\", \"shape\", \"circle r=5\", \"square s=3\", \"circle:5\", \"shape\", \"5\", ]",
+                "elements": [
+                  {
+                    "kind": "Constant",
+                    "source_span": {
+                      "lineno": 95,
+                      "col_offset": 29,
+                      "end_lineno": 95,
+                      "end_col_offset": 36
+                    },
+                    "resolved_type": "str",
+                    "casts": [],
+                    "borrow_kind": "value",
+                    "repr": "\"shape\"",
+                    "value": "shape"
+                  },
+                  {
+                    "kind": "Constant",
+                    "source_span": {
+                      "lineno": 95,
+                      "col_offset": 38,
+                      "end_lineno": 95,
+                      "end_col_offset": 45
+                    },
+                    "resolved_type": "str",
+                    "casts": [],
+                    "borrow_kind": "value",
+                    "repr": "\"shape\"",
+                    "value": "shape"
+                  },
+                  {
+                    "kind": "Constant",
+                    "source_span": {
+                      "lineno": 95,
+                      "col_offset": 47,
+                      "end_lineno": 95,
+                      "end_col_offset": 59
+                    },
+                    "resolved_type": "str",
+                    "casts": [],
+                    "borrow_kind": "value",
+                    "repr": "\"circle r=5\"",
+                    "value": "circle r=5"
+                  },
+                  {
+                    "kind": "Constant",
+                    "source_span": {
+                      "lineno": 95,
+                      "col_offset": 61,
+                      "end_lineno": 95,
+                      "end_col_offset": 73
+                    },
+                    "resolved_type": "str",
+                    "casts": [],
+                    "borrow_kind": "value",
+                    "repr": "\"square s=3\"",
+                    "value": "square s=3"
+                  },
+                  {
+                    "kind": "Constant",
+                    "source_span": {
+                      "lineno": 95,
+                      "col_offset": 75,
+                      "end_lineno": 95,
+                      "end_col_offset": 85
+                    },
+                    "resolved_type": "str",
+                    "casts": [],
+                    "borrow_kind": "value",
+                    "repr": "\"circle:5\"",
+                    "value": "circle:5"
+                  },
+                  {
+                    "kind": "Constant",
+                    "source_span": {
+                      "lineno": 95,
+                      "col_offset": 87,
+                      "end_lineno": 95,
+                      "end_col_offset": 94
+                    },
+                    "resolved_type": "str",
+                    "casts": [],
+                    "borrow_kind": "value",
+                    "repr": "\"shape\"",
+                    "value": "shape"
+                  },
+                  {
+                    "kind": "Constant",
+                    "source_span": {
+                      "lineno": 95,
+                      "col_offset": 96,
+                      "end_lineno": 95,
+                      "end_col_offset": 99
+                    },
+                    "resolved_type": "str",
+                    "casts": [],
+                    "borrow_kind": "value",
+                    "repr": "\"5\"",
+                    "value": "5"
+                  }
+                ],
+                "call_arg_type": "list[str]",
+                "type_expr_summary_v1": {
+                  "schema_version": 1,
+                  "kind": "GenericType",
+                  "category": "static",
+                  "mirror": "list[str]"
+                }
+              },
+              {
+                "kind": "Box",
+                "resolved_type": "object",
+                "borrow_kind": "value",
+                "casts": [],
+                "value": {
+                  "kind": "Name",
+                  "source_span": {
+                    "lineno": 95,
+                    "col_offset": 104,
+                    "end_lineno": 95,
+                    "end_col_offset": 114
+                  },
+                  "resolved_type": "Callable",
+                  "casts": [],
+                  "borrow_kind": "value",
+                  "repr": "_case_main",
+                  "id": "_case_main",
+                  "call_arg_type": "object"
+                },
+                "source_span": {
+                  "lineno": 95,
+                  "col_offset": 104,
+                  "end_lineno": 95,
+                  "end_col_offset": 114
+                },
+                "repr": "_case_main",
+                "type_expr_summary_v1": {
+                  "schema_version": 1,
+                  "kind": "DynamicType",
+                  "category": "dynamic",
+                  "mirror": "object",
+                  "dynamic_name": "object"
+                },
+                "bridge_lane_v1": {
+                  "schema_version": 1,
+                  "target": {
+                    "kind": "DynamicType",
+                    "category": "dynamic",
+                    "mirror": "object",
+                    "dynamic_name": "object"
+                  },
+                  "target_category": "dynamic",
+                  "value": {
+                    "kind": "NamedType",
+                    "category": "static",
+                    "mirror": "Callable"
+                  },
+                  "value_category": "static"
+                }
+              }
+            ],
+            "keywords": [],
+            "resolved_runtime_call": "py_assert_stdout",
+            "resolved_runtime_source": "import_symbol",
+            "runtime_module_id": "pytra.utils.assertions",
+            "runtime_symbol": "py_assert_stdout",
+            "runtime_call_adapter_kind": "extern_delegate",
+            "type_expr_summary_v1": {
+              "schema_version": 1,
+              "kind": "NamedType",
+              "category": "static",
+              "mirror": "bool"
+            }
+          }
+        ],
+        "keywords": [],
+        "lowered_kind": "BuiltinCall",
+        "builtin_name": "print",
+        "runtime_call": "py_print",
+        "runtime_module_id": "pytra.built_in.io_ops",
+        "runtime_symbol": "py_print",
+        "runtime_call_adapter_kind": "builtin",
+        "semantic_tag": "core.print",
+        "type_expr_summary_v1": {
+          "schema_version": 1,
+          "kind": "NamedType",
+          "category": "static",
+          "mirror": "None"
+        }
+      },
+      "discard_result": true
+    }
+  ],
+  "renamed_symbols": {},
+  "meta": {
+    "parser_backend": "self_hosted",
+    "import_resolution": {
+      "schema_version": 1,
+      "bindings": [
+        {
+          "module_id": "pytra.utils.assertions",
+          "export_name": "py_assert_stdout",
+          "local_name": "py_assert_stdout",
+          "binding_kind": "symbol",
+          "source_file": "test/fixture/source/py/oop/trait_with_inheritance.py",
+          "source_line": 6,
+          "source_module_id": "pytra.utils.assertions",
+          "source_export_name": "py_assert_stdout",
+          "source_binding_kind": "symbol",
+          "runtime_module_id": "pytra.utils.assertions",
+          "runtime_group": "utils",
+          "resolved_binding_kind": "symbol",
+          "runtime_symbol": "py_assert_stdout",
+          "runtime_symbol_kind": "function",
+          "runtime_symbol_dispatch": "function",
+          "runtime_semantic_tag": "stdlib.fn.py_assert_stdout"
+        },
+        {
+          "module_id": "pytra.built_in.io_ops",
+          "export_name": "",
+          "local_name": "pytra.built_in.io_ops",
+          "binding_kind": "implicit_builtin",
+          "source_file": "test/fixture/source/py/oop/trait_with_inheritance.py",
+          "source_line": 0,
+          "source_module_id": "pytra.built_in.io_ops",
+          "source_binding_kind": "implicit_builtin",
+          "runtime_module_id": "pytra.built_in.io_ops",
+          "runtime_group": "built_in"
+        },
+        {
+          "module_id": "pytra.core.py_runtime",
+          "export_name": "",
+          "local_name": "pytra.core.py_runtime",
+          "binding_kind": "implicit_builtin",
+          "source_file": "test/fixture/source/py/oop/trait_with_inheritance.py",
+          "source_line": 0,
+          "source_module_id": "pytra.core.py_runtime",
+          "source_binding_kind": "implicit_builtin",
+          "runtime_module_id": "pytra.core.py_runtime",
+          "runtime_group": "core"
+        }
+      ],
+      "qualified_refs": [
+        {
+          "module_id": "pytra.utils.assertions",
+          "symbol": "py_assert_stdout",
+          "local_name": "py_assert_stdout"
+        }
+      ]
+    },
+    "import_bindings": [
+      {
+        "module_id": "pytra.utils.assertions",
+        "export_name": "py_assert_stdout",
+        "local_name": "py_assert_stdout",
+        "binding_kind": "symbol",
+        "source_file": "test/fixture/source/py/oop/trait_with_inheritance.py",
+        "source_line": 6,
+        "source_module_id": "pytra.utils.assertions",
+        "source_export_name": "py_assert_stdout",
+        "source_binding_kind": "symbol",
+        "runtime_module_id": "pytra.utils.assertions",
+        "runtime_group": "utils",
+        "resolved_binding_kind": "symbol",
+        "runtime_symbol": "py_assert_stdout",
+        "runtime_symbol_kind": "function",
+        "runtime_symbol_dispatch": "function",
+        "runtime_semantic_tag": "stdlib.fn.py_assert_stdout"
+      },
+      {
+        "module_id": "pytra.built_in.io_ops",
+        "export_name": "",
+        "local_name": "pytra.built_in.io_ops",
+        "binding_kind": "implicit_builtin",
+        "source_file": "test/fixture/source/py/oop/trait_with_inheritance.py",
+        "source_line": 0,
+        "source_module_id": "pytra.built_in.io_ops",
+        "source_binding_kind": "implicit_builtin",
+        "runtime_module_id": "pytra.built_in.io_ops",
+        "runtime_group": "built_in"
+      },
+      {
+        "module_id": "pytra.core.py_runtime",
+        "export_name": "",
+        "local_name": "pytra.core.py_runtime",
+        "binding_kind": "implicit_builtin",
+        "source_file": "test/fixture/source/py/oop/trait_with_inheritance.py",
+        "source_line": 0,
+        "source_module_id": "pytra.core.py_runtime",
+        "source_binding_kind": "implicit_builtin",
+        "runtime_module_id": "pytra.core.py_runtime",
+        "runtime_group": "core"
+      }
+    ],
+    "qualified_symbol_refs": [
+      {
+        "module_id": "pytra.utils.assertions",
+        "symbol": "py_assert_stdout",
+        "local_name": "py_assert_stdout"
+      }
+    ],
+    "import_modules": {},
+    "import_symbols": {
+      "py_assert_stdout": {
+        "module": "pytra.utils.assertions",
+        "name": "py_assert_stdout"
+      }
+    },
+    "dispatch_mode": "native"
+  },
+  "east_stage": 3,
+  "schema_version": 1
+}

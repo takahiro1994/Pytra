@@ -271,6 +271,72 @@ class Circle:
         self.assertEqual(drawable.get("decorators"), ["trait"])
         self.assertEqual(circle.get("decorators"), ["implements(Drawable)"])
 
+    def test_parser_derives_runtime_class_and_method_extern_metadata(self) -> None:
+        source = """
+from pytra.std import runtime
+
+@runtime("pytra.core")
+class list:
+    def __len__(self) -> int: ...
+    def append(self, x: int) -> None: ...
+"""
+        east1 = parse_python_source(source, "<mem>").to_jv()
+        cls = next(
+            node for node in _walk(east1)
+            if node.get("kind") == "ClassDef" and node.get("name") == "list"
+        )
+        methods = {
+            node.get("name"): node
+            for node in _walk(cls)
+            if node.get("kind") == "FunctionDef"
+        }
+
+        self.assertEqual(cls.get("meta", {}).get("runtime_v1"), {"schema_version": 1, "namespace": "pytra.core"})
+        self.assertEqual(
+            cls.get("meta", {}).get("extern_v2"),
+            {"module": "pytra.core.list", "symbol": "list", "tag": "container.list"},
+        )
+        self.assertEqual(
+            methods["__len__"].get("meta", {}).get("extern_v2"),
+            {
+                "module": "pytra.core.list",
+                "symbol": "list.__len__",
+                "tag": "dunder.len",
+                "kind": "method",
+            },
+        )
+        self.assertEqual(
+            methods["append"].get("meta", {}).get("extern_v2"),
+            {
+                "module": "pytra.core.list",
+                "symbol": "list.append",
+                "tag": "stdlib.method.append",
+                "kind": "method",
+            },
+        )
+
+    def test_parser_rejects_extern_method_decorator(self) -> None:
+        source = """
+from pytra.std import extern_method
+
+class Path:
+    @extern_method(module="pytra.std.pathlib", symbol="pathlib.read_text", tag="stdlib.method.read_text")
+    def read_text(self) -> str: ...
+"""
+        with self.assertRaisesRegex(RuntimeError, "extern_method is removed"):
+            parse_python_source(source, "<mem>").to_jv()
+
+    def test_parser_rejects_abi_decorator(self) -> None:
+        source = """
+from pytra.std import abi
+
+@abi(ret="value")
+def f() -> int:
+    return 1
+"""
+        with self.assertRaisesRegex(RuntimeError, "abi decorator is removed"):
+            parse_python_source(source, "<mem>").to_jv()
+
     def test_resolver_adds_trait_metadata_and_trait_impl_markers(self) -> None:
         source = """
 @trait

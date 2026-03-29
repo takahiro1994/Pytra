@@ -1,3 +1,6 @@
+from pytra.utils.assertions import py_assert_stdout
+
+
 def outer(seed: int, bump: int) -> int:
     x: int = seed
     scale: int = 2
@@ -14,4 +17,9 @@ def outer(seed: int, bump: int) -> int:
     return inner(3) + rec(2)
 
 
-print(outer(10, 5))
+def _case_main() -> None:
+    print(outer(10, 5))
+
+
+if __name__ == "__main__":
+    print(py_assert_stdout(['30'], _case_main))
