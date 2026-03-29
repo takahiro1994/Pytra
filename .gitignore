@@ -16,6 +16,7 @@ __pycache__/
 /out/
 /selfhost/
 /tmp/
+/test_png_out/
 
 # user materials (read-only for Codex)
 /materials/
