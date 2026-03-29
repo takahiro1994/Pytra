@@ -30,21 +30,6 @@
 4. [ ] [ID: P2-BENCH-S4] 計測プロトコルを既存の計測条件（warmup=1, repeat=5, 中央値）に合わせるか、新しいプロトコルを定義する
 5. [ ] [ID: P2-BENCH-S5] parity check の末尾で、前回生成から10分以上経過していれば `gen_sample_benchmark.py` を自動実行する（進捗マトリクスと同じ仕組み）
 
-### P6-EMITTER-LINT: emitter 責務違反チェッカーの新設
-
-文脈: [docs/ja/plans/p6-emitter-lint.md](../plans/p6-emitter-lint.md)
-
-1. [x] [ID: P6-EMITTER-LINT-S1] `tools/check/check_emitter_hardcode_lint.py` を作成する（6カテゴリ grep チェック実装済み、現在 50 件の違反を検出）
-2. ~~[ID: P6-EMITTER-LINT-S2] allowlist 機構を用意する~~ — **削除**: toolchain2 の C++ emitter は書き直しのため歴史的負債がなく、allowlist 不要。
-3. [x] [ID: P6-EMITTER-LINT-S3] 結果を言語 × カテゴリのマトリクスとして stdout 出力（--verbose / --lang / --category オプション付き）
-4. [x] [ID: P6-EMITTER-LINT-S4] 単独手動実行スクリプトとして完結（exit code 常に 0、他スクリプトへの組み込みなし）
-5. [ ] [ID: P6-EMITTER-LINT-S5] 誤検知を減らすための除外ルールを追加する:
-   - `mapping.json` ファイル自体を検査対象から除外する
-   - `code_emitter.py`（mapping 読み込み共通基盤）を検査対象から除外する
-   - `types.py`（型写像テーブル。`"Exception": "Error"` 等は正当）を検査対象から除外する
-   - コメント行（`#` で始まる行）を除外する
-   - `🟩0` を `🟩` に短縮する（0 件なら数字は冗長）
-
 ### P11-VERSION-GATE: toolchain2 用バージョンチェッカーの新設
 
 前提: toolchain2 への完全移行後に着手。
