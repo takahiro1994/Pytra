@@ -168,20 +168,36 @@ def _build_parity_matrix(cases: list[tuple[str, str] | str], results: dict[str, 
                     cells.append(_case_icon(str(entry.get("category", ""))))
             lines.append(f"| {stem} | {' | '.join(cells)} |")
 
-    # Summary rows
+    # Summary rows — count only cases in the fixture/sample list
     total_cases = len(cases)
+    case_stems: set[str] = set()
+    for item in cases:
+        if case_root == "fixture":
+            case_stems.add(item[1])  # type: ignore[index]
+        else:
+            case_stems.add(item)  # type: ignore[arg-type]
+
     ok_cells = []
     fail_cells = []
     untested_cells = []
+    stale_keys: dict[str, list[str]] = {}
     for lang in lang_list:
         ok_count = 0
         fail_count = 0
-        for entry in results.get(lang, {}).values():
+        lang_results = results.get(lang, {})
+        for stem in case_stems:
+            entry = lang_results.get(stem)
+            if entry is None:
+                continue
             cat = str(entry.get("category", "")) if isinstance(entry, dict) else ""
             if _case_icon(cat) == "🟩":
                 ok_count += 1
             else:
                 fail_count += 1
+        # Detect stale keys (in JSON but not in fixture list)
+        extra = set(lang_results.keys()) - case_stems
+        if len(extra) > 0:
+            stale_keys[lang] = sorted(extra)
         untested_count = total_cases - ok_count - fail_count
         if ok_count + fail_count == 0:
             ok_cells.append("—")
@@ -237,13 +253,24 @@ def _build_parity_matrix_en(cases: list[tuple[str, str] | str], results: dict[st
             lines.append(f"| {stem} | {' | '.join(cells)} |")
 
     total_cases = len(cases)
+    case_stems_en: set[str] = set()
+    for item in cases:
+        if case_root == "fixture":
+            case_stems_en.add(item[1])  # type: ignore[index]
+        else:
+            case_stems_en.add(item)  # type: ignore[arg-type]
+
     ok_cells = []
     fail_cells = []
     untested_cells = []
     for lang in lang_list:
         ok_count = 0
         fail_count = 0
-        for entry in results.get(lang, {}).values():
+        lang_results = results.get(lang, {})
+        for stem in case_stems_en:
+            entry = lang_results.get(stem)
+            if entry is None:
+                continue
             cat = str(entry.get("category", "")) if isinstance(entry, dict) else ""
             if _case_icon(cat) == "🟩":
                 ok_count += 1
@@ -567,6 +594,16 @@ def main() -> int:
     for key in ("fixture", "sample", "selfhost"):
         print(f"[OK] {ja_dir / f'backend-progress-{key}.md'}")
         print(f"[OK] {en_dir / f'backend-progress-{key}.md'}")
+
+    # Warn about stale keys in parity results
+    fixture_stems = {stem for _, stem in fixture_cases}
+    sample_stems = set(sample_cases)
+    for label, stems, res in (("fixture", fixture_stems, fixture_results), ("sample", sample_stems, sample_results)):
+        for lang, lang_data in res.items():
+            extra = set(lang_data.keys()) - stems
+            if len(extra) > 0:
+                print(f"[WARN] {lang}_{label}.json has {len(extra)} stale keys not in current {label} list: {', '.join(sorted(extra)[:5])}{'...' if len(extra) > 5 else ''}")
+
     return 0
 
 

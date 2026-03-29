@@ -5,7 +5,7 @@
 # Sample parity matrix
 
 > Machine-generated file. Run `python3 tools/gen/gen_backend_progress.py` to update.
-> Generated at: 2026-03-30T08:24:08
+> Generated at: 2026-03-30T08:28:02
 > [Links](./index.md)
 
 | Icon | Meaning |
@@ -33,7 +33,7 @@
 | 15_wave_interference_loop | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
 | 16_glass_sculpture_chaos | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
 | 17_monte_carlo_pi | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| 18_mini_language_interpreter | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| 18_mini_language_interpreter | 🟥 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
 | **🟩 PASS** | — | — | — | — | — | — | — | 18 | — | — | — | — | — | — | — | — | — | — |
-| **🟥 FAIL** | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — |
-| **⬜ Untested** | 18 | 18 | 18 | 18 | 18 | 18 | 18 | — | 18 | 18 | 18 | 18 | 18 | 18 | 18 | 18 | 18 | 18 |
+| **🟥 FAIL** | 1 | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — | — |
+| **⬜ Untested** | 17 | 18 | 18 | 18 | 18 | 18 | 18 | — | 18 | 18 | 18 | 18 | 18 | 18 | 18 | 18 | 18 | 18 |

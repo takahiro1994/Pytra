@@ -5,7 +5,7 @@
 # Selfhost matrix
 
 > Machine-generated file. Run `python3 tools/gen/gen_backend_progress.py` to update.
-> Generated at: 2026-03-30T08:24:08
+> Generated at: 2026-03-30T08:28:02
 > [Links](./index.md)
 
 Transpile toolchain2 to each language and verify the resulting compiler can emit all targets.
