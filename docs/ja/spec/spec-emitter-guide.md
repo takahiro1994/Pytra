@@ -595,6 +595,35 @@ def _transpile(east_doc: dict) -> str:
 
 **正式仕様: [spec-runtime-mapping.md](./spec-runtime-mapping.md)**
 
+### 7.1 `calls` テーブルの用途
+
+`calls` テーブルは関数呼び出しだけでなく、定数・変数の写像にも使われる。
+
+| 用途 | 例（キー → 値） | 出力形式 |
+|---|---|---|
+| 関数呼び出し | `"py_len"` → `"py_len"` | 関数名としてそのまま出力 |
+| 外部関数 | `"math.sqrt"` → `"std::sqrt"` | 外部ライブラリの関数名に置換 |
+| 定数 | `"math.pi"` → `"M_PI"` | ターゲット言語の定数名に置換 |
+| 特殊マーカー | `"static_cast"` → `"__CAST__"` | emitter が専用ロジックで展開 |
+
+定数（`math.pi` → `M_PI`）は `extern_var_v1` メタデータが付いた `AnnAssign` ノードに対して解決される。emitter は `calls` テーブルの値をそのまま出力するため、ターゲット言語で有効な式でなければならない。
+
+### 7.2 文字列リテラル定数の写像
+
+ターゲット言語のマクロ定数ではなく、文字列リテラルそのものを埋め込みたい場合（例: `env.target` → `"cpp"`）は、値にクォートを含めて記述する:
+
+```json
+{
+  "calls": {
+    "env.target": "\"cpp\""
+  }
+}
+```
+
+emitter は `calls` の値を式としてそのまま出力するので、`"\"cpp\""` は C++/Go のソースコードに `"cpp"` として埋め込まれる。
+
+この仕組みにより、`runtime_var` で宣言されたコンパイル時定数を mapping.json だけで言語ごとに定義できる。emitter に個別ロジックを追加する必要はない。
+
 ## 8. 共通ユーティリティ（`code_emitter.py` スタンドアロン関数）
 
 `CodeEmitter` を継承しない emitter でも使える関数:
