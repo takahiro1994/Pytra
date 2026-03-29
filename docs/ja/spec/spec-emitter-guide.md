@@ -624,6 +624,32 @@ emitter は `calls` の値を式としてそのまま出力するので、`"\"cp
 
 この仕組みにより、`runtime_var` で宣言されたコンパイル時定数を mapping.json だけで言語ごとに定義できる。emitter に個別ロジックを追加する必要はない。
 
+### 7.3 全言語必須エントリ
+
+以下のエントリは全ての `mapping.json` に必須とする。新しい emitter を追加する際は忘れずに定義すること。
+
+| キー | 値 | 説明 |
+|---|---|---|
+| `env.target` | `"\"<lang>\""` | 実行中のターゲット言語名。`pytra.std.env.target` の写像先 |
+
+例:
+
+```json
+// src/runtime/cpp/mapping.json
+"env.target": "\"cpp\""
+
+// src/runtime/go/mapping.json
+"env.target": "\"go\""
+
+// src/runtime/rs/mapping.json
+"env.target": "\"rs\""
+
+// src/runtime/ts/mapping.json
+"env.target": "\"ts\""
+```
+
+Python で直接実行する場合は mapping.json を経由しないため、`pytra.std.env` モジュール側で `"python"` をデフォルト値として返す。
+
 ## 8. 共通ユーティリティ（`code_emitter.py` スタンドアロン関数）
 
 `CodeEmitter` を継承しない emitter でも使える関数:
