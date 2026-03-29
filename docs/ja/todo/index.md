@@ -28,23 +28,4 @@
 | TS/JS backend | [ts.md](./ts.md) | P8-TS-EMITTER |
 | インフラ・ツール | [infra.md](./infra.md) | P10-REORG, P11-VERSION-GATE, P20-INT32 |
 
-## 全タスク優先度一覧
-
-各領域内の優先度順を示す。
-
-| 優先度 | ID | 領域 | 概要 |
-|---|---|---|---|
-| P1 | P1-GO-CONTAINER-WRAPPER | Go | container 既定表現を spec 準拠に |
-| P3 | P3-COMMON-RENDERER-CPP | C++ | CommonRenderer 移行 + fixture parity |
-| P4 | P4-CPP-SELFHOST | C++ | toolchain2 → C++ 変換 + g++ build |
-| P5 | P5-COMMON-RENDERER-GO | Go | CommonRenderer 移行 + fixture parity |
-| P6 | P6-GO-SELFHOST | Go | toolchain2 → Go 変換 + go build |
-| P7 | P7-RS-EMITTER | Rust | Rust emitter を toolchain2 に新規実装 |
-| P8 | P8-TS-EMITTER | TS/JS | TS/JS emitter を toolchain2 に新規実装 |
-| P9 | P9-RS-SELFHOST | Rust | toolchain2 → Rust 変換 + cargo build |
-| P10 | P10-REORG | インフラ | tools/ と test/unit/ の棚卸し |
-| P11 | P11-VERSION-GATE | インフラ | toolchain2 用バージョンチェッカー |
-| P12 | P12-TS-SELFHOST | TS/JS | toolchain2 → TS 変換 + tsc build |
-| P20 | P20-INT32 | インフラ | int のデフォルトサイズ int64 → int32 |
-
 注: 完了済みタスクは [アーカイブ](archive/index.md) に移動済み。
