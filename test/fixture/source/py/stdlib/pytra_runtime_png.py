@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+import pytra.std.os as os
 import pytra.utils.png as png
 from pytra.utils.assertions import py_assert_all, py_assert_eq, py_assert_true
 
 
 def run_case() -> None:
-    out_path = "out/import_pytra_runtime_png.png"
+    os.makedirs("work/tmp/test_png_out", exist_ok=True)
+    out_path = "work/tmp/test_png_out/pytra_runtime_png.png"
     pixels = bytearray([
         255, 0, 0,
         0, 255, 0,
