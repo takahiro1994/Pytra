@@ -632,7 +632,26 @@ emitter は `calls` の値を式としてそのまま出力するので、`"\"cp
 |---|---|---|
 | `env.target` | `"\"<lang>\""` | 実行中のターゲット言語名。`pytra.std.env.target` の写像先 |
 
-例:
+#### `env.target` とは
+
+`pytra.std.env.target` は、現在のコードがどのターゲット言語で実行されているかを返すコンパイル時定数。ユーザーコードからは以下のように参照する:
+
+```python
+import pytra.std.env as env
+
+if env.target == "python":
+    # Python で直接実行している
+    ...
+elif env.target == "cpp":
+    # C++ に変換されて実行している
+    ...
+```
+
+emitter は mapping.json の `calls["env.target"]` を参照し、文字列リテラルとしてソースに埋め込む。runtime 関数の呼び出しは発生しない。
+
+宣言は `include/py/pytra/std/env.py` に `runtime_var("pytra.std.env")` として置く。Python で直接実行する場合は mapping.json を経由しないため、モジュール側で `"python"` をデフォルト値として返す。
+
+#### 各言語の定義例
 
 ```json
 // src/runtime/cpp/mapping.json
@@ -648,7 +667,7 @@ emitter は `calls` の値を式としてそのまま出力するので、`"\"cp
 "env.target": "\"ts\""
 ```
 
-Python で直接実行する場合は mapping.json を経由しないため、`pytra.std.env` モジュール側で `"python"` をデフォルト値として返す。
+妥当性検証: `tools/check_mapping_json.py`（全 mapping.json に `env.target` が定義されているか等を検証）
 
 ## 8. 共通ユーティリティ（`code_emitter.py` スタンドアロン関数）
 

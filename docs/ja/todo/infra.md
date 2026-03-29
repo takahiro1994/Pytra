@@ -35,11 +35,13 @@
 
 ### P10.5-MAPPING-VALIDATE: mapping.json 妥当性チェッカーの新設
 
+仕様: [docs/ja/spec/spec-emitter-guide.md](../spec/spec-emitter-guide.md) §7.1〜7.3
+
 1. [ ] [ID: P10.5-MAPVAL-S1] `tools/check_mapping_json.py` を作成する — 全言語の `src/runtime/<lang>/mapping.json` を対象に以下を検証する:
    - valid JSON であること
    - `calls` キーが存在すること
    - `builtin_prefix` が定義されていること
-   - 必須エントリ（`env.target`）が `calls` に存在すること
+   - 必須エントリ（`env.target`）が `calls` に存在すること（spec-emitter-guide §7.3）
    - `calls` の値に空文字がないこと
 2. [ ] [ID: P10.5-MAPVAL-S2] `tools/run_local_ci.py` に組み込む
 3. [ ] [ID: P10.5-MAPVAL-S3] 既存の全 mapping.json に `env.target` エントリを追加する
