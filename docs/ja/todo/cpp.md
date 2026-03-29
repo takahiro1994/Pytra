@@ -35,7 +35,8 @@
 仕様: [docs/ja/spec/spec-language-profile.md](../spec/spec-language-profile.md) §8
 
 1. [ ] [ID: P3-CR-CPP-S1] C++ emitter を CommonRenderer + override 構成に移行する — `src/toolchain2/emit/profiles/cpp.json` のプロファイルに従い、CommonRenderer の共通ノード走査を使う構成にする。C++ 固有のノード（ClassDef, FunctionDef, ForCore, With 等）だけ override として残す
-2. [x] [ID: P3-CR-CPP-S2] fixture 132 件 + sample 18 件の C++ compile + run parity を通す — oop 18/18, typing 22/22, signature 13/13 (うち stdlib の一部は複雑な依存のため残)
+2. [x] [ID: P3-CR-CPP-S2] fixture 132 件 + sample 18 件の C++ compile + run parity を通す — collections 20/20, imports 7/7, stdlib 16/16 を含む全カテゴリ通過
+   - 完了: commit 6e4ff3b1c — ヘッダシャドウイング修正、sys.h Object<list<str>>型修正、emitter :: 修飾、JsonValue IsNot None 修正、str.isalnum/str.index 追加、float 精度修正
 3. [x] [ID: P3-CR-CPP-S3] C++ runtime の dict_ops.h インクルードガード外コードを修正する — タプル用 `py_at` の実装が `#endif` の外に置かれており、多重インクルードで再定義エラーになる
    - 完了: commit 51447a04f — `py_at` for tuple を `#endif` の内側に移動
 4. [x] [ID: P3-CR-CPP-S4] C++ runtime の py_types.h 例外安全性を修正する — `PyBoxedValue` と `ControlBlock` の2段階 `new` で例外安全にする。実用上 bad_alloc はリカバー不可能だが、変換器が生成するコードの品質として例外安全を保証する
