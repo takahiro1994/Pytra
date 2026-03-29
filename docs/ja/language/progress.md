@@ -6,6 +6,14 @@
 
 Pytra の開発状況を一覧できるページです。各ターゲット言語のテスト結果、タスク、更新履歴、ドキュメントへのリンクをまとめています。
 
+## フロントエンド（言語共通パイプライン）
+
+[EAST 統合仕様](../spec/spec-east.md)
+— Python ソースから言語非依存の中間表現（EAST1 → EAST2 → EAST3）を生成するパイプライン。型解決、構文正規化、boxing/unboxing、反復計画を前段で確定させる。全ターゲット言語で共通。
+
+[EAST1](../spec/spec-east1.md) / [EAST2](../spec/spec-east2.md) / [EAST3 Optimizer](../spec/spec-east3-optimizer.md) / [Linker](../spec/spec-linker.md)
+— 各段の出力契約。
+
 ## バックエンドサポート状況
 
 [fixture マトリクス](./backend-progress-fixture.md)
