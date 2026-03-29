@@ -34,6 +34,19 @@
 2. [ ] [ID: P0-RS-TYPEMAP-S2] Rust emitter の型名ハードコード（`types.py` 含む）を `resolve_type()` 呼び出しに置換する
 3. [ ] [ID: P0-RS-TYPEMAP-S3] fixture emit に影響がないことを確認する
 
+### P0-RS-LINT-FIX: Rust emitter のハードコード違反を修正する
+
+仕様: [spec-emitter-guide.md](../spec/spec-emitter-guide.md) §1, §7
+
+違反一覧（`check_emitter_hardcode_lint.py` 検出）:
+- module_name 2件: `"math": "math_native.rs"`, `"time": "time_native.rs"` — native ファイル名のハードコード。runtime manifest から導出すべき
+- runtime_symbol 3件: `mapped == "py_len"`, `mapped == "py_print"` — mapping.json 経由で解決済みの値を再度文字列マッチしている
+- class_name 1件: `"Exception": "Box<dyn std::error::Error>"` — P0-RS-TYPE-MAPPING で解消予定
+
+1. [ ] [ID: P0-RS-LINT-S1] module_name 違反を修正する — `emitter.py` の native ファイル名テーブルを runtime manifest または mapping.json から導出する
+2. [ ] [ID: P0-RS-LINT-S2] runtime_symbol 違反を修正する — `py_len` / `py_print` の文字列マッチを除去し、mapping.json の解決結果をそのまま使う
+3. [ ] [ID: P0-RS-LINT-S3] `check_emitter_hardcode_lint.py` で Rust の違反が 0 件になることを確認する
+
 ### P7-RS-EMITTER: Rust emitter を toolchain2 に新規実装する
 
 前提: Go emitter（参照実装）と CommonRenderer が安定してから着手。
