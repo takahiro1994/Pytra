@@ -38,6 +38,11 @@ tools/
 EAST3 最適化レベルやコード生成オプションをグループ別に設定して呼び出す。
 全言語の sample parity を一コマンドで確定させるためのラッパー。
 
+### `check_emitter_hardcode_lint.py`
+`src/toolchain2/emit/*/` 配下の emitter ソースを grep し、モジュール名・runtime 関数名・ターゲット定数・クラス名等のハードコードを検出する（P6-EMITTER-LINT）。
+違反は言語 × カテゴリのマトリクスとして stdout に出力する（exit code は常に 0、違反でも fail しない）。
+オプション: `--verbose`（詳細表示）/ `--lang <lang>`（言語絞り込み）/ `--category <cat>`（カテゴリ絞り込み）
+
 ### `check_east3_golden.py`
 EAST3 スナップショットテスト（`test/east3_fixtures/` の golden file と EAST3 出力の差分チェック）。
 `--check-runtime-east` で `src/runtime/east/` の `.east` ファイルの鮮度チェックも行う。

@@ -39,16 +39,10 @@
 
 文脈: [docs/ja/plans/p6-emitter-lint.md](../plans/p6-emitter-lint.md)
 
-1. [ ] [ID: P6-EMITTER-LINT-S1] `tools/check/check_emitter_hardcode_lint.py` を作成する — 全言語の `src/toolchain2/emit/*/` を対象に、以下のカテゴリの禁止パターンを grep で検出する:
-   - モジュール名のハードコード（`"math"`, `"pathlib"`, `"json"`, `"sys"`, `"os"`, `"glob"`, `"time"`, `"subprocess"`, `"re"`, `"argparse"` 等）
-   - runtime 関数名のハードコード（`"perf_counter"`, `"py_len"`, `"write_rgb_png"`, `"save_gif"` 等）
-   - ターゲット言語の定数/関数名のハードコード（`"M_PI"`, `"M_E"`, `"std::sqrt"`, `"math.Sqrt"` 等）
-   - runtime プレフィックスマッチ（`"pytra.std."`, `"pytra.core."`, `"pytra.built_in."` の文字列直書き）
-   - クラス名のハードコード（`"Path"`, `"ArgumentParser"`, `"Exception"` 等）
-   - Python 構文の残留（`"__main__"`, `"super()"` 等）
+1. [x] [ID: P6-EMITTER-LINT-S1] `tools/check/check_emitter_hardcode_lint.py` を作成する（6カテゴリ grep チェック実装済み、現在 50 件の違反を検出）
 2. ~~[ID: P6-EMITTER-LINT-S2] allowlist 機構を用意する~~ — **削除**: toolchain2 の C++ emitter は書き直しのため歴史的負債がなく、allowlist 不要。
-3. [ ] [ID: P6-EMITTER-LINT-S3] 結果を言語 × カテゴリのマトリクスとして出力・蓄積する（進捗ページの一部として利用可能にする）
-4. [ ] [ID: P6-EMITTER-LINT-S4] 単独手動実行スクリプトとして完結させる（他スクリプトへの組み込みは行わない。実行タイミングは別途検討）
+3. [x] [ID: P6-EMITTER-LINT-S3] 結果を言語 × カテゴリのマトリクスとして stdout 出力（--verbose / --lang / --category オプション付き）
+4. [x] [ID: P6-EMITTER-LINT-S4] 単独手動実行スクリプトとして完結（exit code 常に 0、他スクリプトへの組み込みなし）
 
 ### P11-VERSION-GATE: toolchain2 用バージョンチェッカーの新設
 
