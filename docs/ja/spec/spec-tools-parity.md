@@ -52,6 +52,8 @@ parity check で CLI サブプロセスの代わりにこれらの API を直接
 2. compile + run 段は引き続きサブプロセス（`g++`, `go run` 等）を使う（ターゲット言語のコンパイラはプロセス外）
 3. `--cli-mode` フラグで従来の CLI 経由実行も残し、API 呼び出しとの結果一致を検証可能にする
 
+実装: `tools/runtime_parity_check_fast.py`（registry を1回だけロードし、全ケースで共有する高速版）
+
 参照: `docs/ja/plans/plan-pipeline-redesign.md` §3.5「パフォーマンスノウハウ: インメモリパイプライン」
 
 ## 3. smoke テスト運用

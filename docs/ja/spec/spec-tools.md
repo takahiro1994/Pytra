@@ -48,6 +48,7 @@
 | ツール | 目的 |
 |---|---|
 | `runtime_parity_check.py` | 多言語 runtime parity チェック（`--category` でカテゴリ絞り込み可） |
+| `runtime_parity_check_fast.py` | 同上の高速版（transpile 段をインメモリ API で実行） |
 | `check_all_target_sample_parity.py` | 全 target sample parity 確定 |
 | `check_noncpp_backend_health.py` | non-C++ backend health gate |
 | `export_backend_test_matrix.py` | backend test matrix 再生成 |
