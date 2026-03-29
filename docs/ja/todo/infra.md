@@ -37,6 +37,8 @@
 
 ### P2-SAMPLE-BENCHMARK: sample parity check で実行時間を自動計測し README に反映する
 
+文脈: [docs/ja/plans/p2-sample-benchmark.md](../plans/p2-sample-benchmark.md)
+
 1. [ ] [ID: P2-BENCH-S1] parity check（fast 版）の sample 実行時に、Python と各ターゲットの実行時間（秒）を計測し `.parity-results/<target>_sample.json` の各ケースに `elapsed_sec` フィールドとして記録する
 2. [ ] [ID: P2-BENCH-S2] Python 実行の計測結果を `.parity-results/python_sample.json` に記録する（比較基準）
 3. [ ] [ID: P2-BENCH-S3] `tools/gen/gen_sample_benchmark.py` を作成する — `.parity-results/*_sample.json` を読み、`sample/README-ja.md` と `sample/README.md` の「実行速度の比較」テーブルを自動更新する（日英同時生成）
