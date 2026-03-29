@@ -6,11 +6,8 @@
 
 各ターゲット言語の個別仕様をまとめた入口です。
 
-- 共通 language feature:
-  - nominal ADT v1 の canonical surface と staged rollout: [nominal ADT v1 ガイド](./nominal-adt-v1.md)
-  - feature × backend の support state と rollout handoff: [Backend Parity Matrix](./backend-parity-matrix.md)
-  - feature × required_lane × backend の bundle-based coverage seed と ownership: [Backend Coverage Matrix](./backend-coverage-matrix.md)
-  - backend-owned test suite の実測 green 状態: [Backend Test Matrix](./backend-test-matrix.md)
+- [プロジェクト進捗](./progress.md) — バックエンドサポート状況、タスク一覧、更新履歴
+- 旧マトリクス: [archive/](./archive/) に退役済み
 - C++:
   - サポート状況（テスト根拠つき）: [py2cpp サポートマトリクス](./cpp/spec-support.md)
 - Julia:
