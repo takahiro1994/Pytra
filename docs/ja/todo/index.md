@@ -43,6 +43,15 @@
 7. [ ] [ID: P3-CR-CPP-S7] `rc_list_from_value` / `rc_dict_from_value` 等の型別 RC 化関数を汎用 `rc_from_value<T>` に一本化する — emitter は「非 POD → `rc_from_value(...)` で包む」だけで済むようにし、型ごとの関数名分岐を emitter から除去する
 8. [ ] [ID: P3-CR-CPP-S8] C++ emitter に `_safe_cpp_ident` を追加する — C++ 予約語（`double`, `class`, `int`, `float`, `namespace`, `template` 等）と衝突する関数名・メソッド名・変数名に末尾 `_` を付与する（Go emitter の `_safe_go_ident` と同等）
 
+### P4-CPP-SELFHOST: C++ emitter で toolchain2 を C++ に変換し g++ build を通す
+
+前提: P3-COMMON-RENDERER-CPP 完了後に着手。
+
+1. [ ] [ID: P4-CPP-SELFHOST-S0] selfhost 対象コード（`src/toolchain2/` 全 .py）で戻り値型の注釈が欠けている関数に型注釈を追加する — resolve が `inference_failure` にならない状態にする（P6-GO-SELFHOST-S0 と共通。先に完了した側の成果を共有）
+2. [ ] [ID: P4-CPP-SELFHOST-S1] toolchain2 全 .py を C++ に emit し、g++ build が通ることを確認する
+3. [ ] [ID: P4-CPP-SELFHOST-S2] g++ build 失敗ケースを emitter/runtime の修正で解消する（EAST の workaround 禁止）
+4. [ ] [ID: P4-CPP-SELFHOST-S3] selfhost 用 C++ golden を配置し、回帰テストとして維持する
+
 ### P5-COMMON-RENDERER-GO: Go emitter の CommonRenderer 移行 + fixture parity
 
 文脈: [docs/ja/plans/p2-lowering-profile-common-renderer.md](../plans/p2-lowering-profile-common-renderer.md)
