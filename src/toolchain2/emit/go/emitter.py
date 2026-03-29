@@ -3501,7 +3501,7 @@ def _emit_stmt(ctx: EmitContext, node: JsonVal) -> None:
         _emit_var_decl(ctx, node)
     elif kind == "Swap":
         _emit_swap(ctx, node)
-    elif kind == "MultiAssign":
+    elif kind in ("MultiAssign", "TupleUnpack"):
         _emit_multi_assign(ctx, node)
     elif kind == "With":
         _emit_with(ctx, node)
@@ -3841,7 +3841,10 @@ def _emit_multi_assign(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
             if isinstance(type_obj, str):
                 resolved_type = type_obj
         if resolved_type not in ("", "unknown"):
-            ctx.var_types[name] = resolved_type
+            # Only pre-register if already declared; new variable declarations are
+            # registered by _emit_assign itself (pre-registering prevents var declaration).
+            if existing_targets[name]:
+                ctx.var_types[name] = resolved_type
     if len(lhs_parts) == 0:
         return
     if not value_type.startswith("multi_return["):
@@ -3875,6 +3878,20 @@ def _emit_multi_assign(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
         return
     assign_op = ":=" if _bool(node, "declare") else "="
     _emit(ctx, ", ".join(lhs_parts) + " " + assign_op + " " + _emit_expr(ctx, node.get("value")))
+    # Register newly-declared variables in var_types for subsequent statements.
+    for idx2, target2 in enumerate(targets):
+        if not isinstance(target2, dict):
+            continue
+        tname2 = _safe_go_ident(_str(target2, "id"))
+        if tname2 in ("", "_") or existing_targets.get(tname2, True):
+            continue
+        rt2 = _str(target2, "resolved_type")
+        if rt2 in ("", "unknown") and idx2 < len(target_types):
+            to2 = target_types[idx2]
+            if isinstance(to2, str):
+                rt2 = to2
+        if rt2 not in ("", "unknown"):
+            ctx.var_types[tname2] = rt2
 
 
 def _emit_aug_assign(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
