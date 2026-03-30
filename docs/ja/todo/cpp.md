@@ -54,7 +54,7 @@
 
 ### P4-CPP-SELFHOST: C++ emitter で toolchain2 を C++ に変換し g++ build を通す
 
-前提: P3-COMMON-RENDERER-CPP 完了後に着手。
+文脈: [docs/ja/plans/p4-cpp-selfhost.md](../plans/p4-cpp-selfhost.md)
 
 1. [ ] [ID: P4-CPP-SELFHOST-S0] selfhost 対象コード（`src/toolchain2/` 全 .py）で戻り値型の注釈が欠けている関数に型注釈を追加する — resolve が `inference_failure` にならない状態にする（P6-GO-SELFHOST-S0 と共通。先に完了した側の成果を共有）
 2. [x] [ID: P4-CPP-SELFHOST-S1] toolchain2 全 .py を C++ に emit し、g++ build が通ることを確認する
