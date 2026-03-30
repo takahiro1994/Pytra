@@ -81,6 +81,20 @@ Go selfhost（P2-SELFHOST）完了後に着手する。
 4. sample でオーバーフローが発生しないこと（必要箇所は `int64` 明示済み）
 5. selfhost の golden が再生成済みであること
 
+## 整数範囲外リテラル代入の警告
+
+P20 とは独立して対処すべき問題。現在の仕様でも発生する。
+
+現状: `x: int32 = 10000000000` のように、整数リテラルが宣言された型の範囲に収まらない場合、resolve が黙って `static_cast` を挿入し、C++ では値が切り捨てられる。
+
+対処方針:
+- resolve 段で整数リテラルと宣言型の範囲を比較し、収まらない場合は **警告** を出す（エラーではない）
+- 全整数型が対象: `int8`/`uint8`/`int16`/`uint16`/`int32`/`uint32`/`int64`/`uint64`
+- 例: `x: int8 = 256` → warning: literal 256 overflows int8 (max 127)
+- 例: `x: int32 = 10000000000` → warning: literal 10000000000 overflows int32 (max 2147483647)
+- fixture にこのケースのテスト（`test/fixture/source/py/typing/` に追加）が必要
+
 ## 決定ログ
 
 - 2026-03-26: `len()` の戻り値型について議論。C++ の `size_t`（uint64）に倣うのではなく `int32`（signed）を採用する方針を確認。理由: unsigned は算術 underflow の罠があり、大半のターゲット言語（Java/C#/Kotlin/Go/Swift）が signed を採用している。
+- 2026-03-30: `x: int32 = 10000000000` で黙って切り捨てが起きることを確認。resolve 段で整数リテラルの範囲外代入に警告を出す方針に決定（エラーではなく警告）。P20 とは独立して対処可能。
