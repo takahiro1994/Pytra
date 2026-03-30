@@ -29,9 +29,28 @@ __pycache__/
 /app.o
 /*.out
 
-# Linked golden east3 files (regenerable from manifest.json + east3-opt inputs)
-test/fixture/linked/**/east3/
-test/sample/linked/**/east3/
+# Golden files — regenerable by: python3 tools/gen/regenerate_golden.py
+# Do NOT commit these. Run regenerate_golden.py to recreate locally.
+/test/fixture/east1/
+/test/fixture/east2/
+/test/fixture/east3/
+/test/fixture/east3-opt/
+/test/fixture/linked/
+/test/sample/east1/
+/test/sample/east2/
+/test/sample/east3/
+/test/sample/east3-opt/
+/test/sample/linked/
+/test/stdlib/east1/
+/test/stdlib/east2/
+/test/stdlib/east3/
+/test/stdlib/east3-opt/
+/test/stdlib/linked/
+/test/pytra/east1/
+/test/pytra/east2/
+/test/pytra/east3/
+/test/pytra/east3-opt/
+/test/selfhost/
 
 # Deprecated generated runtime directory (must not be used)
 src/runtime/cpp/generated/
