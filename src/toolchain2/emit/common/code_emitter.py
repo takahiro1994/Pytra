@@ -294,6 +294,10 @@ def build_runtime_import_map(
                 or should_skip_module(full_module_id, mapping)
             )
         )
+        if is_runtime_namespace and not is_native_runtime:
+            # pytra.* module that has its own compiled output file (not provided by py_runtime).
+            # Skip from runtime_imports so _emit_import_stmt generates a proper module import.
+            continue
         if is_native_runtime:
             if module_id in mapping.non_native_modules:
                 # Module has its own compiled output file (not provided by py_runtime).

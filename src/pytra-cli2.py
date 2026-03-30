@@ -28,6 +28,8 @@ from toolchain2.emit.cpp.emitter import emit_cpp_module
 from toolchain2.emit.cpp.header_gen import build_cpp_header_from_east3
 from toolchain2.emit.cpp.runtime_bundle import emit_runtime_module_artifacts
 from toolchain2.emit.go.emitter import emit_go_module
+from toolchain2.emit.java.emitter import emit_java_module
+from toolchain2.emit.java.types import java_module_class_name
 from toolchain2.emit.rs.emitter import emit_rs_module
 from toolchain2.emit.ts.emitter import emit_ts_module
 from toolchain2.link.linker import LinkResult
@@ -85,6 +87,23 @@ def _copy_cs_runtime_files(output_dir: Path) -> int:
         dst.parent.mkdir(parents=True, exist_ok=True)
         dst.write_text(cs_file.read_text(encoding="utf-8"), encoding="utf-8")
         copied += 1
+    return copied
+
+
+def _copy_java_runtime_files(output_dir: Path) -> int:
+    """Copy Java runtime files into the flat emit directory."""
+    runtime_root = _repo_root().joinpath("src").joinpath("runtime").joinpath("java")
+    copied = 0
+    if not runtime_root.exists():
+        return copied
+    for bucket in ("built_in", "std"):
+        bucket_dir = runtime_root.joinpath(bucket)
+        if not bucket_dir.exists():
+            continue
+        for java_file in bucket_dir.glob("*.java"):
+            dst = output_dir.joinpath(java_file.name)
+            dst.write_text(java_file.read_text(encoding="utf-8"), encoding="utf-8")
+            copied += 1
     return copied
 
 
@@ -639,6 +658,29 @@ def _emit_cs(manifest_path: Path, output_dir: Path) -> int:
     return 0
 
 
+def _emit_java(manifest_path: Path, output_dir: Path) -> int:
+    """Java emit: linked output -> Java source files."""
+    manifest_doc, linked_modules = load_linked_output(manifest_path)
+    _ = manifest_doc
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    written = 0
+    for module in linked_modules:
+        if module.module_kind == "runtime":
+            continue
+        code = emit_java_module(module.east_doc)
+        if code.strip() == "":
+            continue
+        fname = java_module_class_name(module.module_id) + ".java"
+        out_path = output_dir.joinpath(fname)
+        out_path.write_text(code, encoding="utf-8")
+        written += 1
+    written += _copy_java_runtime_files(output_dir)
+
+    print("emitted: " + str(output_dir) + " (" + str(written) + " Java files)")
+    return 0
+
+
 def cmd_emit(args: list[str]) -> int:
     """emit サブコマンド: linked output → target code (暫定: 現行 toolchain/emit/ への橋渡し)"""
     input_text = ""
@@ -712,10 +754,13 @@ def cmd_emit(args: list[str]) -> int:
     if target == "cs":
         return _emit_cs(manifest_path, Path(output_dir_text))
 
+    if target == "java":
+        return _emit_java(manifest_path, Path(output_dir_text))
+
     if target == "ts" or target == "js":
         return _emit_ts(manifest_path, Path(output_dir_text), strip_types=(target == "js"))
 
-    print("error: unsupported target: " + target + " (available: cpp, go, rs, cs, ts, js)")
+    print("error: unsupported target: " + target + " (available: cpp, go, rs, cs, java, ts, js)")
     return 1
 
 
@@ -909,8 +954,8 @@ def cmd_build(args: list[str]) -> int:
         print("error: at least one input .py file is required")
         return 1
 
-    if target not in ("cpp", "go", "rs", "cs", "ts", "js"):
-        print("error: unsupported target: " + target + " (available: cpp, go, rs, cs, ts, js)")
+    if target not in ("cpp", "go", "rs", "cs", "java", "ts", "js"):
+        print("error: unsupported target: " + target + " (available: cpp, go, rs, cs, java, ts, js)")
         return 1
 
     try:
@@ -961,7 +1006,15 @@ def _build_pipeline(inputs: list[str], output_dir_text: str, target: str) -> int
 
     east3_opt_paths: list[str] = []
     for inp, east3_opt_doc in east3_opt_docs:
-        stem = Path(inp).stem
+        # Use source_path-derived name to avoid collisions (e.g. two types.py in different dirs)
+        source_path_val = east3_opt_doc.get("source_path", "")
+        if isinstance(source_path_val, str) and "/src/toolchain2/" in source_path_val:
+            idx = source_path_val.index("/src/toolchain2/")
+            stem = source_path_val[idx + len("/src/"):].replace("/", ".").replace(".py", "")
+        elif isinstance(source_path_val, str) and source_path_val.startswith("src/toolchain2/"):
+            stem = source_path_val.replace("src/", "").replace("/", ".").replace(".py", "")
+        else:
+            stem = Path(inp).stem
         out_path = east3_opt_dir.joinpath(stem + ".east3")
         out_path.write_text(
             json.dumps(east3_opt_doc, ensure_ascii=False, indent=2) + "\n",
@@ -999,6 +1052,16 @@ def _build_pipeline(inputs: list[str], output_dir_text: str, target: str) -> int
             output_dir.joinpath(m.module_id.replace(".", "_") + ".go").write_text(code, encoding="utf-8")
             written += 1
         written += _copy_go_runtime_files(output_dir)
+    elif target == "java":
+        for m in link_result.linked_modules:
+            if m.module_kind == "runtime":
+                continue
+            code = emit_java_module(m.east_doc)
+            if code.strip() == "":
+                continue
+            output_dir.joinpath(java_module_class_name(m.module_id) + ".java").write_text(code, encoding="utf-8")
+            written += 1
+        written += _copy_java_runtime_files(output_dir)
     elif target == "cs":
         for m in link_result.linked_modules:
             code = emit_cs_module(m.east_doc)

@@ -1,5 +1,7 @@
 // Java ネイティブ変換向け Python 互換ランタイム補助。
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.charset.Charset;
@@ -12,24 +14,134 @@ import java.util.Map;
 import java.util.StringJoiner;
 
 final class PyRuntime {
+    private static final long __PYTRA_NONE_TID = 0L;
+    private static final long __PYTRA_BOOL_TID = 1L;
+    private static final long __PYTRA_INT_TID = 2L;
+    private static final long __PYTRA_FLOAT_TID = 3L;
+    private static final long __PYTRA_STR_TID = 4L;
+    private static final long __PYTRA_LIST_TID = 5L;
+    private static final long __PYTRA_DICT_TID = 6L;
+    private static final long __PYTRA_SET_TID = 7L;
+    private static final long __PYTRA_OBJECT_TID = 8L;
+
+    static ArrayList<String> __pytra_argv = new ArrayList<>();
+    static ArrayList<String> __pytra_path = new ArrayList<>();
+
     private PyRuntime() {
+    }
+
+    static long pyRuntimeValueTypeId(Object value) {
+        if (value == null) {
+            return __pytra_tid("NONE_TID", __PYTRA_NONE_TID);
+        }
+        if (value instanceof Boolean) {
+            return __pytra_tid("BOOL_TID", __PYTRA_BOOL_TID);
+        }
+        if (value instanceof Integer || value instanceof Long || value instanceof Short || value instanceof Byte) {
+            return __pytra_tid("INT_TID", __PYTRA_INT_TID);
+        }
+        if (value instanceof Float || value instanceof Double) {
+            return __pytra_tid("FLOAT_TID", __PYTRA_FLOAT_TID);
+        }
+        if (value instanceof String) {
+            return __pytra_tid("STR_TID", __PYTRA_STR_TID);
+        }
+        if (value instanceof Map<?, ?>) {
+            return __pytra_tid("DICT_TID", __PYTRA_DICT_TID);
+        }
+        if (value instanceof java.util.Set<?>) {
+            return __pytra_tid("SET_TID", __PYTRA_SET_TID);
+        }
+        if (value instanceof List<?> || value instanceof byte[]) {
+            return __pytra_tid("LIST_TID", __PYTRA_LIST_TID);
+        }
+        Long userTid = __pytra_user_type_id(value);
+        if (userTid != null) {
+            return userTid.longValue();
+        }
+        return __pytra_tid("OBJECT_TID", __PYTRA_OBJECT_TID);
+    }
+
+    static boolean pytraIsinstance(long actualTypeId, long tid) {
+        long[] span = __pytra_type_span(tid);
+        long minTid = span[0];
+        long maxTid = span[1];
+        return minTid <= actualTypeId && actualTypeId <= maxTid;
+    }
+
+    private static long __pytra_tid(String fieldName, long fallback) {
+        try {
+            Class<?> cls = Class.forName("pytra_built_in_type_id_table");
+            java.lang.reflect.Field field = cls.getField(fieldName);
+            Object value = field.get(null);
+            if (value instanceof Number) {
+                return ((Number) value).longValue();
+            }
+        } catch (ReflectiveOperationException _err) {
+        }
+        return fallback;
+    }
+
+    private static Long __pytra_user_type_id(Object value) {
+        try {
+            java.lang.reflect.Method method = value.getClass().getMethod("__pytra_type_id");
+            Object out = method.invoke(value);
+            return Long.valueOf(pyToLong(out));
+        } catch (ReflectiveOperationException _err) {
+            return null;
+        }
+    }
+
+    private static long[] __pytra_type_span(long tid) {
+        try {
+            Class<?> cls = Class.forName("pytra_built_in_type_id_table");
+            java.lang.reflect.Field field = cls.getField("id_table");
+            Object tableObj = field.get(null);
+            if (tableObj instanceof java.util.List<?>) {
+                java.util.List<?> table = (java.util.List<?>) tableObj;
+                int base = (int) (tid * 2L);
+                if (base >= 0 && (base + 1) < table.size()) {
+                    Object lo = table.get(base);
+                    Object hi = table.get(base + 1);
+                    if (lo instanceof Number && hi instanceof Number) {
+                        return new long[] { ((Number) lo).longValue(), ((Number) hi).longValue() };
+                    }
+                }
+            }
+        } catch (ReflectiveOperationException _err) {
+        }
+        return new long[] { tid, tid };
     }
 
     static String pyToString(Object v) {
         if (v == null) {
             return "None";
         }
-        if (v instanceof Boolean b) {
+        if (v instanceof Throwable) {
+            Throwable err = (Throwable) v;
+            String message = err.getMessage();
+            if (message != null && !message.isEmpty()) {
+                return message;
+            }
+            return err.getClass().getSimpleName();
+        }
+        if (v instanceof Boolean) {
+            Boolean b = (Boolean) v;
             return b ? "True" : "False";
         }
-        if (v instanceof List<?> list) {
+        if (v instanceof Double || v instanceof Float) {
+            return String.valueOf(v).replace("E", "e");
+        }
+        if (v instanceof List<?>) {
+            List<?> list = (List<?>) v;
             StringJoiner sj = new StringJoiner(", ", "[", "]");
             for (Object it : list) {
                 sj.add(pyToString(it));
             }
             return sj.toString();
         }
-        if (v instanceof Map<?, ?> map) {
+        if (v instanceof Map<?, ?>) {
+            Map<?, ?> map = (Map<?, ?>) v;
             StringJoiner sj = new StringJoiner(", ", "{", "}");
             for (Map.Entry<?, ?> e : map.entrySet()) {
                 sj.add(pyToString(e.getKey()) + ": " + pyToString(e.getValue()));
@@ -51,42 +163,61 @@ final class PyRuntime {
         if (v == null) {
             return false;
         }
-        if (v instanceof Boolean b) {
+        if (v instanceof Boolean) {
+            Boolean b = (Boolean) v;
             return b;
         }
-        if (v instanceof Integer i) {
+        if (v instanceof Integer) {
+            Integer i = (Integer) v;
             return i != 0;
         }
-        if (v instanceof Long i) {
+        if (v instanceof Long) {
+            Long i = (Long) v;
             return i != 0L;
         }
-        if (v instanceof Double d) {
+        if (v instanceof Double) {
+            Double d = (Double) v;
             return d != 0.0;
         }
-        if (v instanceof String s) {
+        if (v instanceof String) {
+            String s = (String) v;
             return !s.isEmpty();
         }
-        if (v instanceof List<?> list) {
+        if (v instanceof List<?>) {
+            List<?> list = (List<?>) v;
             return !list.isEmpty();
         }
-        if (v instanceof Map<?, ?> map) {
+        if (v instanceof Map<?, ?>) {
+            Map<?, ?> map = (Map<?, ?>) v;
             return !map.isEmpty();
+        }
+        if (v instanceof java.util.Collection<?>) {
+            java.util.Collection<?> collection = (java.util.Collection<?>) v;
+            return !collection.isEmpty();
         }
         return true;
     }
 
     static int pyLen(Object v) {
-        if (v instanceof String s) {
+        if (v instanceof String) {
+            String s = (String) v;
             return s.length();
         }
-        if (v instanceof List<?> list) {
+        if (v instanceof List<?>) {
+            List<?> list = (List<?>) v;
             return list.size();
         }
-        if (v instanceof byte[] bytes) {
+        if (v instanceof byte[]) {
+            byte[] bytes = (byte[]) v;
             return bytes.length;
         }
-        if (v instanceof Map<?, ?> map) {
+        if (v instanceof Map<?, ?>) {
+            Map<?, ?> map = (Map<?, ?>) v;
             return map.size();
+        }
+        if (v instanceof java.util.Collection<?>) {
+            java.util.Collection<?> collection = (java.util.Collection<?>) v;
+            return collection.size();
         }
         throw new RuntimeException("len() unsupported type");
     }
@@ -108,50 +239,168 @@ final class PyRuntime {
         return out;
     }
 
+    static ArrayList<Object> pyReversed(Object value) {
+        ArrayList<Object> out = new ArrayList<>();
+        if (value instanceof List<?>) {
+            List<?> items = (List<?>) value;
+            for (int i = items.size() - 1; i >= 0; i--) {
+                out.add(items.get(i));
+            }
+            return out;
+        }
+        throw new RuntimeException("reversed() unsupported type");
+    }
+
+    static ArrayList<Object> pyEnumerate(Object value) {
+        return pyEnumerate(value, 0L);
+    }
+
+    static ArrayList<Object> pyEnumerate(Object value, Object startValue) {
+        ArrayList<Object> out = new ArrayList<>();
+        List<Object> items = pyIter(value);
+        long i = pyToLong(startValue);
+        int index = 0;
+        while (index < items.size()) {
+            ArrayList<Object> pair = new ArrayList<>(2);
+            pair.add(i);
+            pair.add(items.get(index));
+            out.add(pair);
+            i += 1L;
+            index += 1;
+        }
+        return out;
+    }
+
+    static String pyTypeName(Object value) {
+        if (value == null) {
+            return "NoneType";
+        }
+        return value.getClass().getSimpleName();
+    }
+
+    static long pyListIndex(Object listObj, Object needle) {
+        List<Object> items = pyIter(listObj);
+        int index = 0;
+        while (index < items.size()) {
+            if (pyEq(items.get(index), needle)) {
+                return index;
+            }
+            index += 1;
+        }
+        throw new RuntimeException("list.index missing value");
+    }
+
+    static ArrayList<Object> pyZip(Object lhs, Object rhs) {
+        ArrayList<Object> out = new ArrayList<>();
+        List<Object> leftItems = pyIter(lhs);
+        List<Object> rightItems = pyIter(rhs);
+        int n = Math.min(leftItems.size(), rightItems.size());
+        int i = 0;
+        while (i < n) {
+            ArrayList<Object> pair = new ArrayList<>(2);
+            pair.add(leftItems.get(i));
+            pair.add(rightItems.get(i));
+            out.add(pair);
+            i += 1;
+        }
+        return out;
+    }
+
+    static double pySum(Object iterable) {
+        List<Object> items = pyIter(iterable);
+        double total = 0.0;
+        for (Object item : items) {
+            total += pyToFloat(item);
+        }
+        return total;
+    }
+
+    static String pyFormat(Object value, String spec) {
+        if (spec == null || spec.isEmpty()) {
+            return pyToString(value);
+        }
+        if (spec.endsWith("%")) {
+            String javaSpec = "%" + _pyFormatFlags(spec.substring(0, spec.length() - 1)) + "f";
+            return String.format(java.util.Locale.US, javaSpec, pyToFloat(value) * 100.0) + "%";
+        }
+        char kind = spec.charAt(spec.length() - 1);
+        String flags = _pyFormatFlags(spec.substring(0, spec.length() - 1));
+        String javaSpec = "%" + flags + kind;
+        if (kind == 'd' || kind == 'x' || kind == 'X') {
+            return String.format(java.util.Locale.US, javaSpec, pyToLong(value));
+        }
+        if (kind == 'f') {
+            return String.format(java.util.Locale.US, javaSpec, pyToFloat(value));
+        }
+        if (kind == 's') {
+            return String.format(java.util.Locale.US, javaSpec, pyToString(value));
+        }
+        return pyToString(value);
+    }
+
+    private static String _pyFormatFlags(String spec) {
+        if (spec.indexOf('<') >= 0) {
+            return spec.replace("<", "-");
+        }
+        return spec;
+    }
+
     static double pyToFloat(Object v) {
-        if (v instanceof Integer i) {
+        if (v instanceof Integer) {
+            Integer i = (Integer) v;
             return i;
         }
-        if (v instanceof Long i) {
+        if (v instanceof Long) {
+            Long i = (Long) v;
             return i;
         }
-        if (v instanceof Double d) {
+        if (v instanceof Double) {
+            Double d = (Double) v;
             return d;
         }
-        if (v instanceof Boolean b) {
+        if (v instanceof Boolean) {
+            Boolean b = (Boolean) v;
             return b ? 1.0 : 0.0;
         }
         throw new RuntimeException("cannot convert to float");
     }
 
     static int pyToInt(Object v) {
-        if (v instanceof Integer i) {
+        if (v instanceof Integer) {
+            Integer i = (Integer) v;
             return i;
         }
-        if (v instanceof Long i) {
+        if (v instanceof Long) {
+            Long i = (Long) v;
             return (int) i.longValue();
         }
-        if (v instanceof Double d) {
+        if (v instanceof Double) {
+            Double d = (Double) v;
             // Python の int() は小数部切り捨て（0方向）なので Java のキャストで合わせる。
             return (int) d.doubleValue();
         }
-        if (v instanceof Boolean b) {
+        if (v instanceof Boolean) {
+            Boolean b = (Boolean) v;
             return b ? 1 : 0;
         }
         throw new RuntimeException("cannot convert to int");
     }
 
     static long pyToLong(Object v) {
-        if (v instanceof Integer i) {
+        if (v instanceof Integer) {
+            Integer i = (Integer) v;
             return i.longValue();
         }
-        if (v instanceof Long i) {
+        if (v instanceof Long) {
+            Long i = (Long) v;
             return i.longValue();
         }
-        if (v instanceof Double d) {
+        if (v instanceof Double) {
+            Double d = (Double) v;
             return (long) d.doubleValue();
         }
-        if (v instanceof Boolean b) {
+        if (v instanceof Boolean) {
+            Boolean b = (Boolean) v;
             return b ? 1L : 0L;
         }
         throw new RuntimeException("cannot convert to long");
@@ -242,6 +491,26 @@ final class PyRuntime {
         return out;
     }
 
+    static Object __pytra_py_min(Object a, Object b) {
+        return pyMin(a, b);
+    }
+
+    static long __pytra_py_min(long a, long b) {
+        return pyToLong(pyMin(a, b));
+    }
+
+    static double __pytra_py_min(double a, double b) {
+        return pyToFloat(pyMin(a, b));
+    }
+
+    static double __pytra_py_min(long a, double b) {
+        return pyToFloat(pyMin(a, b));
+    }
+
+    static double __pytra_py_min(double a, long b) {
+        return pyToFloat(pyMin(a, b));
+    }
+
     static Object pyMax(Object... values) {
         if (values.length == 0) {
             throw new RuntimeException("max() arg is empty");
@@ -265,6 +534,26 @@ final class PyRuntime {
             }
         }
         return out;
+    }
+
+    static Object __pytra_py_max(Object a, Object b) {
+        return pyMax(a, b);
+    }
+
+    static long __pytra_py_max(long a, long b) {
+        return pyToLong(pyMax(a, b));
+    }
+
+    static double __pytra_py_max(double a, double b) {
+        return pyToFloat(pyMax(a, b));
+    }
+
+    static double __pytra_py_max(long a, double b) {
+        return pyToFloat(pyMax(a, b));
+    }
+
+    static double __pytra_py_max(double a, long b) {
+        return pyToFloat(pyMax(a, b));
     }
 
     static Object pyLShift(Object a, Object b) {
@@ -319,10 +608,12 @@ final class PyRuntime {
     }
 
     static boolean pyIn(Object item, Object container) {
-        if (container instanceof String s) {
+        if (container instanceof String) {
+            String s = (String) container;
             return s.contains(pyToString(item));
         }
-        if (container instanceof List<?> list) {
+        if (container instanceof List<?>) {
+            List<?> list = (List<?>) container;
             for (Object v : list) {
                 if (pyEq(v, item)) {
                     return true;
@@ -330,32 +621,50 @@ final class PyRuntime {
             }
             return false;
         }
-        if (container instanceof Map<?, ?> map) {
+        if (container instanceof Map<?, ?>) {
+            Map<?, ?> map = (Map<?, ?>) container;
             return map.containsKey(item);
+        }
+        if (container instanceof java.util.Collection<?>) {
+            java.util.Collection<?> collection = (java.util.Collection<?>) container;
+            for (Object value : collection) {
+                if (pyEq(value, item)) {
+                    return true;
+                }
+            }
+            return false;
         }
         return false;
     }
 
     static List<Object> pyIter(Object value) {
-        if (value instanceof List<?> list) {
+        if (value instanceof List<?>) {
+            List<?> list = (List<?>) value;
             return new ArrayList<>((List<Object>) list);
         }
-        if (value instanceof byte[] arr) {
+        if (value instanceof byte[]) {
+            byte[] arr = (byte[]) value;
             List<Object> out = new ArrayList<>();
             for (byte b : arr) {
                 out.add((int) (b & 0xff));
             }
             return out;
         }
-        if (value instanceof String s) {
+        if (value instanceof String) {
+            String s = (String) value;
             List<Object> out = new ArrayList<>();
             for (int i = 0; i < s.length(); i++) {
                 out.add(String.valueOf(s.charAt(i)));
             }
             return out;
         }
-        if (value instanceof Map<?, ?> map) {
+        if (value instanceof Map<?, ?>) {
+            Map<?, ?> map = (Map<?, ?>) value;
             return new ArrayList<>(((Map<Object, Object>) map).keySet());
+        }
+        if (value instanceof java.util.Collection<?>) {
+            java.util.Collection<?> collection = (java.util.Collection<?>) value;
+            return new ArrayList<>(collection);
         }
         throw new RuntimeException("iter unsupported");
     }
@@ -369,7 +678,8 @@ final class PyRuntime {
     }
 
     static Object pySlice(Object value, Object start, Object end) {
-        if (value instanceof String s) {
+        if (value instanceof String) {
+            String s = (String) value;
             int n = s.length();
             int st = (start == null) ? 0 : pyToInt(start);
             int ed = (end == null) ? n : pyToInt(end);
@@ -389,7 +699,8 @@ final class PyRuntime {
                 st = ed;
             return s.substring(st, ed);
         }
-        if (value instanceof List<?> list) {
+        if (value instanceof List<?>) {
+            List<?> list = (List<?>) value;
             int n = list.size();
             int st = (start == null) ? 0 : pyToInt(start);
             int ed = (end == null) ? n : pyToInt(end);
@@ -413,16 +724,19 @@ final class PyRuntime {
     }
 
     static Object pyGet(Object value, Object key) {
-        if (value instanceof List<?> list) {
+        if (value instanceof List<?>) {
+            List<?> list = (List<?>) value;
             int i = pyToInt(key);
             if (i < 0)
                 i += list.size();
             return list.get(i);
         }
-        if (value instanceof Map<?, ?> map) {
+        if (value instanceof Map<?, ?>) {
+            Map<?, ?> map = (Map<?, ?>) value;
             return ((Map<Object, Object>) map).get(key);
         }
-        if (value instanceof String s) {
+        if (value instanceof String) {
+            String s = (String) value;
             int i = pyToInt(key);
             if (i < 0)
                 i += s.length();
@@ -432,7 +746,8 @@ final class PyRuntime {
     }
 
     static void pySet(Object value, Object key, Object newValue) {
-        if (value instanceof List<?> list) {
+        if (value instanceof List<?>) {
+            List<?> list = (List<?>) value;
             int i = pyToInt(key);
             List<Object> l = (List<Object>) list;
             if (i < 0)
@@ -440,7 +755,8 @@ final class PyRuntime {
             l.set(i, newValue);
             return;
         }
-        if (value instanceof Map<?, ?> map) {
+        if (value instanceof Map<?, ?>) {
+            Map<?, ?> map = (Map<?, ?>) value;
             ((Map<Object, Object>) map).put(key, newValue);
             return;
         }
@@ -448,7 +764,8 @@ final class PyRuntime {
     }
 
     static Object pyPop(Object value, Object idx) {
-        if (value instanceof List<?> list) {
+        if (value instanceof List<?>) {
+            List<?> list = (List<?>) value;
             List<Object> l = (List<Object>) list;
             int i = (idx == null) ? (l.size() - 1) : pyToInt(idx);
             if (i < 0)
@@ -458,6 +775,10 @@ final class PyRuntime {
             return out;
         }
         throw new RuntimeException("pop unsupported");
+    }
+
+    static Object pyPop(Object value) {
+        return pyPop(value, null);
     }
 
     static Object pyOrd(Object v) {
@@ -480,6 +801,483 @@ final class PyRuntime {
 
     static Object pyBytes(Object v) {
         return v;
+    }
+
+    static String pyStrJoin(String sep, List<?> items) {
+        StringJoiner sj = new StringJoiner(sep);
+        for (Object item : items) {
+            sj.add(String.valueOf(item));
+        }
+        return sj.toString();
+    }
+
+    static String pyStrStrip(String value) {
+        return value.trim();
+    }
+
+    static String pyStrRStrip(String value) {
+        int end = value.length();
+        while (end > 0 && Character.isWhitespace(value.charAt(end - 1))) {
+            end -= 1;
+        }
+        return value.substring(0, end);
+    }
+
+    static boolean pyStrStartswith(String value, String prefix) {
+        return value.startsWith(prefix);
+    }
+
+    static boolean pyStrEndswith(String value, String suffix) {
+        return value.endsWith(suffix);
+    }
+
+    static String pyStrReplace(String value, String oldValue, String newValue) {
+        return value.replace(oldValue, newValue);
+    }
+
+    static ArrayList<Object> pyDictKeys(Object value) {
+        if (value instanceof Map<?, ?>) {
+            Map<?, ?> map = (Map<?, ?>) value;
+            return new ArrayList<>(((Map<Object, Object>) map).keySet());
+        }
+        throw new RuntimeException("dict.keys unsupported");
+    }
+
+    static ArrayList<Object> pyDictValues(Object value) {
+        if (value instanceof Map<?, ?>) {
+            Map<?, ?> map = (Map<?, ?>) value;
+            return new ArrayList<>(((Map<Object, Object>) map).values());
+        }
+        throw new RuntimeException("dict.values unsupported");
+    }
+
+    static ArrayList<Object> pyDictItems(Object value) {
+        if (value instanceof Map<?, ?>) {
+            Map<?, ?> map = (Map<?, ?>) value;
+            ArrayList<Object> out = new ArrayList<>();
+            for (Map.Entry<?, ?> entry : map.entrySet()) {
+                ArrayList<Object> pair = new ArrayList<>(2);
+                pair.add(entry.getKey());
+                pair.add(entry.getValue());
+                out.add(pair);
+            }
+            return out;
+        }
+        throw new RuntimeException("dict.items unsupported");
+    }
+
+    static void pyMakedirs(String path, boolean existOk) {
+        try {
+            java.nio.file.Path dir = Paths.get(path);
+            if (!existOk && Files.exists(dir)) {
+                throw new RuntimeException("Directory already exists: " + path);
+            }
+            Files.createDirectories(dir);
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    static void __pytra_set_argv(ArrayList<String> args) {
+        __pytra_argv = new ArrayList<>(args);
+    }
+
+    static void __pytra_set_path(ArrayList<String> paths) {
+        __pytra_path = new ArrayList<>(paths);
+    }
+
+    static String __pytra_join(String... parts) {
+        if (parts.length == 0) {
+            return "";
+        }
+        String result = parts[0];
+        int i = 1;
+        while (i < parts.length) {
+            String part = parts[i];
+            if (part.startsWith("/")) {
+                result = part;
+            } else if (result.endsWith("/")) {
+                result = result + part;
+            } else {
+                result = result + "/" + part;
+            }
+            i += 1;
+        }
+        return result;
+    }
+
+    static ArrayList<Object> __pytra_splitext(String path) {
+        int slash = Math.max(path.lastIndexOf('/'), path.lastIndexOf('\\'));
+        int dot = path.lastIndexOf('.');
+        String root = path;
+        String ext = "";
+        if (dot > slash && dot >= 0) {
+            root = path.substring(0, dot);
+            ext = path.substring(dot);
+        }
+        return new ArrayList<>(java.util.Arrays.asList(root, ext));
+    }
+
+    static String __pytra_basename(String path) {
+        String trimmed = (path.endsWith("/") || path.endsWith("\\")) ? path.substring(0, path.length() - 1) : path;
+        int slash = Math.max(trimmed.lastIndexOf('/'), trimmed.lastIndexOf('\\'));
+        if (slash < 0) {
+            return trimmed;
+        }
+        return trimmed.substring(slash + 1);
+    }
+
+    static String __pytra_dirname(String path) {
+        String trimmed = (path.endsWith("/") || path.endsWith("\\")) ? path.substring(0, path.length() - 1) : path;
+        int slash = Math.max(trimmed.lastIndexOf('/'), trimmed.lastIndexOf('\\'));
+        if (slash < 0) {
+            return "";
+        }
+        if (slash == 0) {
+            return "/";
+        }
+        return trimmed.substring(0, slash);
+    }
+
+    static boolean __pytra_exists(String path) {
+        try {
+            return Files.exists(Paths.get(path));
+        } catch (RuntimeException _err) {
+            return false;
+        }
+    }
+
+    static ArrayList<String> __pytra_glob(String pattern) {
+        ArrayList<String> out = new ArrayList<>();
+        try {
+            String dir = __pytra_dirname(pattern);
+            if (dir.equals("")) {
+                dir = ".";
+            }
+            String base = __pytra_basename(pattern);
+            final String dirText = dir;
+            String regex = base
+                .replace("\\", "\\\\")
+                .replace(".", "\\.")
+                .replace("+", "\\+")
+                .replace("^", "\\^")
+                .replace("$", "\\$")
+                .replace("{", "\\{")
+                .replace("}", "\\}")
+                .replace("(", "\\(")
+                .replace(")", "\\)")
+                .replace("|", "\\|")
+                .replace("[", "\\[")
+                .replace("]", "\\]")
+                .replace("*", ".*")
+                .replace("?", ".");
+            java.util.regex.Pattern compiled = java.util.regex.Pattern.compile("^" + regex + "$");
+            java.nio.file.Path dirPath = Paths.get(dir);
+            try (java.nio.file.DirectoryStream<java.nio.file.Path> stream = Files.newDirectoryStream(dirPath)) {
+                for (java.nio.file.Path path : stream) {
+                    String name = path.getFileName().toString();
+                    if (compiled.matcher(name).matches()) {
+                        out.add(dirText.equals(".") ? name : dirText + "/" + name);
+                    }
+                }
+            }
+        } catch (IOException _err) {
+            return out;
+        }
+        return out;
+    }
+
+    static String __pytra_re_sub(String pattern, String repl, String text, long count) {
+        java.util.regex.Pattern compiled = java.util.regex.Pattern.compile(pattern);
+        if (count == 0L) {
+            return compiled.matcher(text).replaceAll(repl);
+        }
+        String result = text;
+        long i = 0L;
+        while (i < count) {
+            java.util.regex.Matcher matcher = compiled.matcher(result);
+            if (!matcher.find()) {
+                return result;
+            }
+            result = matcher.replaceFirst(repl);
+            i += 1L;
+        }
+        return result;
+    }
+
+    static String __pytra_re_sub(String pattern, String repl, String text) {
+        return __pytra_re_sub(pattern, repl, text, 0L);
+    }
+
+    static final class __pytra_str {
+        private __pytra_str() {
+        }
+
+        static boolean isalpha(String value) {
+            return __pytra_str_isalpha(value);
+        }
+
+        static boolean isdigit(String value) {
+            return __pytra_str_isdigit(value);
+        }
+    }
+
+    private static void __pytra_gif_append(ArrayList<Long> dst, List<?> src) {
+        int i = 0;
+        while (i < src.size()) {
+            Object value = src.get(i);
+            dst.add(Long.valueOf(pyToLong(value) & 0xffL));
+            i += 1;
+        }
+    }
+
+    private static ArrayList<Long> __pytra_gif_u16le(long value) {
+        ArrayList<Long> out = new ArrayList<>();
+        out.add(Long.valueOf(value & 0xffL));
+        out.add(Long.valueOf((value >> 8) & 0xffL));
+        return out;
+    }
+
+    private static ArrayList<Long> __pytra_lzw_encode(List<?> data, long minCodeSize) {
+        if (data.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        long clearCode = 1L << minCodeSize;
+        long endCode = clearCode + 1L;
+        long codeSize = minCodeSize + 1L;
+        ArrayList<Long> out = new ArrayList<>();
+        long bitBuffer = clearCode;
+        long bitCount = codeSize;
+        while (bitCount >= 8L) {
+            out.add(Long.valueOf(bitBuffer & 0xffL));
+            bitBuffer >>= 8;
+            bitCount -= 8L;
+        }
+        codeSize = minCodeSize + 1L;
+
+        int index = 0;
+        while (index < data.size()) {
+            long value = pyToLong(data.get(index));
+
+            bitBuffer |= value << bitCount;
+            bitCount += codeSize;
+            while (bitCount >= 8L) {
+                out.add(Long.valueOf(bitBuffer & 0xffL));
+                bitBuffer >>= 8;
+                bitCount -= 8L;
+            }
+
+            bitBuffer |= clearCode << bitCount;
+            bitCount += codeSize;
+            while (bitCount >= 8L) {
+                out.add(Long.valueOf(bitBuffer & 0xffL));
+                bitBuffer >>= 8;
+                bitCount -= 8L;
+            }
+
+            codeSize = minCodeSize + 1L;
+            index += 1;
+        }
+
+        bitBuffer |= endCode << bitCount;
+        bitCount += codeSize;
+        while (bitCount >= 8L) {
+            out.add(Long.valueOf(bitBuffer & 0xffL));
+            bitBuffer >>= 8;
+            bitCount -= 8L;
+        }
+        if (bitCount > 0L) {
+            out.add(Long.valueOf(bitBuffer & 0xffL));
+        }
+        return out;
+    }
+
+    private static byte[] __pytra_bytes(List<?> data) {
+        byte[] out = new byte[data.size()];
+        int i = 0;
+        while (i < data.size()) {
+            out[i] = (byte) (pyToLong(data.get(i)) & 0xffL);
+            i += 1;
+        }
+        return out;
+    }
+
+    static ArrayList<Long> __pytra_grayscale_palette() {
+        ArrayList<Long> out = new ArrayList<>();
+        long i = 0L;
+        while (i < 256L) {
+            out.add(Long.valueOf(i));
+            out.add(Long.valueOf(i));
+            out.add(Long.valueOf(i));
+            i += 1L;
+        }
+        return out;
+    }
+
+    static void __pytra_save_gif(String path, long width, long height, List<?> frames, Object palette, long delayCs, long loop) {
+        List<?> paletteList;
+        if (palette instanceof List<?>) {
+            paletteList = (List<?>) palette;
+        } else {
+            paletteList = pyIter(palette);
+        }
+        if (paletteList.size() != (256 * 3)) {
+            throw new RuntimeException("palette must be 256*3 bytes");
+        }
+
+        long frameSize = width * height;
+        ArrayList<Long> out = new ArrayList<>();
+        __pytra_gif_append(out, java.util.Arrays.asList(71L, 73L, 70L, 56L, 57L, 97L));
+        __pytra_gif_append(out, __pytra_gif_u16le(width));
+        __pytra_gif_append(out, __pytra_gif_u16le(height));
+        __pytra_gif_append(out, java.util.Arrays.asList(0xF7L, 0L, 0L));
+        __pytra_gif_append(out, paletteList);
+        __pytra_gif_append(
+            out,
+            java.util.Arrays.asList(0x21L, 0xFFL, 0x0BL, 78L, 69L, 84L, 83L, 67L, 65L, 80L, 69L, 50L, 46L, 48L, 0x03L, 0x01L)
+        );
+        __pytra_gif_append(out, __pytra_gif_u16le(loop));
+        out.add(0L);
+
+        int frameIndex = 0;
+        while (frameIndex < frames.size()) {
+            Object frameObj = frames.get(frameIndex);
+            List<?> frameList = frameObj instanceof List<?> ? (List<?>) frameObj : pyIter(frameObj);
+            if (frameList.size() != frameSize) {
+                throw new RuntimeException("frame size mismatch");
+            }
+            __pytra_gif_append(out, java.util.Arrays.asList(0x21L, 0xF9L, 0x04L, 0x00L));
+            __pytra_gif_append(out, __pytra_gif_u16le(delayCs));
+            __pytra_gif_append(out, java.util.Arrays.asList(0x00L, 0x00L));
+            out.add(0x2CL);
+            __pytra_gif_append(out, __pytra_gif_u16le(0L));
+            __pytra_gif_append(out, __pytra_gif_u16le(0L));
+            __pytra_gif_append(out, __pytra_gif_u16le(width));
+            __pytra_gif_append(out, __pytra_gif_u16le(height));
+            out.add(0L);
+            out.add(8L);
+
+            ArrayList<Long> compressed = __pytra_lzw_encode(frameList, 8L);
+            int pos = 0;
+            while (pos < compressed.size()) {
+                int remain = compressed.size() - pos;
+                int chunkLen = remain > 255 ? 255 : remain;
+                out.add(Long.valueOf(chunkLen));
+                int i = 0;
+                while (i < chunkLen) {
+                    out.add(compressed.get(pos + i));
+                    i += 1;
+                }
+                pos += chunkLen;
+            }
+            out.add(0L);
+            frameIndex += 1;
+        }
+
+        out.add(0x3BL);
+        try {
+            java.nio.file.Path outPath = Paths.get(path);
+            java.nio.file.Path parent = outPath.getParent();
+            if (parent != null) {
+                Files.createDirectories(parent);
+            }
+            Files.write(outPath, __pytra_bytes(out));
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+
+    static void __pytra_save_gif(String path, long width, long height, List<?> frames, Object palette, long delayCs) {
+        __pytra_save_gif(path, width, height, frames, palette, delayCs, 0L);
+    }
+
+    static void __pytra_save_gif(String path, long width, long height, List<?> frames, Object palette) {
+        __pytra_save_gif(path, width, height, frames, palette, 4L, 0L);
+    }
+
+    static boolean __pytra_str_isalpha(String value) {
+        if (value == null || value.isEmpty()) {
+            return false;
+        }
+        int i = 0;
+        while (i < value.length()) {
+            if (!Character.isLetter(value.charAt(i))) {
+                return false;
+            }
+            i += 1;
+        }
+        return true;
+    }
+
+    static json.JsonValue __pytra_loads(String text) {
+        return json.loads(text);
+    }
+
+    static json.JsonArr __pytra_loads_arr(String text) {
+        return json.loads_arr(text);
+    }
+
+    static json.JsonObj __pytra_loads_obj(String text) {
+        return json.loads_obj(text);
+    }
+
+    static String __pytra_dumps(Object value, boolean ensureAscii, Object indent, Object separators) {
+        return json.dumps(value, ensureAscii, indent, separators);
+    }
+
+    static boolean pyAssertTrue(boolean cond, String label) {
+        if (cond) {
+            return true;
+        }
+        pyPrint(label.isEmpty() ? "[assert_true] False" : "[assert_true] " + label + ": False");
+        return false;
+    }
+
+    static boolean pyAssertEq(Object actual, Object expected, String label) {
+        boolean ok = pyToString(actual).equals(pyToString(expected));
+        if (ok) {
+            return true;
+        }
+        String detail = "actual=" + pyToString(actual) + ", expected=" + pyToString(expected);
+        pyPrint(label.isEmpty() ? "[assert_eq] " + detail : "[assert_eq] " + label + ": " + detail);
+        return false;
+    }
+
+    static boolean pyAssertAll(List<?> results, String label) {
+        for (Object value : results) {
+            if (!pyBool(value)) {
+                pyPrint(label.isEmpty() ? "[assert_all] False" : "[assert_all] " + label + ": False");
+                return false;
+            }
+        }
+        return true;
+    }
+
+    static String pyAssertStdout(List<?> expected, Runnable fn) {
+        PrintStream original = System.out;
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        PrintStream capture = new PrintStream(buffer);
+        System.setOut(capture);
+        try {
+            fn.run();
+        } finally {
+            capture.flush();
+            System.setOut(original);
+        }
+        String actualText = buffer.toString().replace("\r\n", "\n");
+        if (actualText.endsWith("\n")) {
+            actualText = actualText.substring(0, actualText.length() - 1);
+        }
+        StringJoiner expectedJoin = new StringJoiner("\n");
+        for (Object item : expected) {
+            expectedJoin.add(String.valueOf(item));
+        }
+        String expectedText = expectedJoin.toString();
+        if (!actualText.equals(expectedText)) {
+            return "[assert_stdout] FAIL\n  expected: " + expected.toString() + "\n  actual:   [" + actualText + "]";
+        }
+        return "True";
     }
 
     static boolean pyIsDigit(Object v) {
@@ -637,6 +1435,9 @@ final class PyRuntime {
         if (value instanceof java.util.List<?>) {
             return ((java.util.List<?>) value).size();
         }
+        if (value instanceof java.util.Collection<?>) {
+            return ((java.util.Collection<?>) value).size();
+        }
         return 0L;
     }
 
@@ -725,6 +1526,54 @@ final class PyRuntime {
         return out;
     }
 
+    static java.util.ArrayList<Long> __pytra_bytearray() {
+        return __pytra_bytearray(0L);
+    }
+
+    static final class deque extends java.util.ArrayList<Object> {
+        deque() {
+            super();
+        }
+
+        deque(Object init) {
+            super();
+            if (init == null) {
+                return;
+            }
+            addAll(PyRuntime.pyIter(init));
+        }
+
+        boolean append(Object value) {
+            return add(value);
+        }
+
+        void appendleft(Object value) {
+            add(0, value);
+        }
+
+        Object popleft() {
+            if (isEmpty()) {
+                throw new RuntimeException("pop from an empty deque");
+            }
+            return remove(0);
+        }
+
+        public Object pop() {
+            if (isEmpty()) {
+                throw new RuntimeException("pop from an empty deque");
+            }
+            return remove(size() - 1);
+        }
+    }
+
+    static deque deque() {
+        return new deque();
+    }
+
+    static deque deque(Object init) {
+        return new deque(init);
+    }
+
     static <T> java.util.ArrayList<T> __pytra_list_concat(java.util.List<? extends T> left, java.util.List<? extends T> right) {
         java.util.ArrayList<T> out = new java.util.ArrayList<T>(left.size() + right.size());
         out.addAll(left);
@@ -795,6 +1644,134 @@ final class PyRuntime {
             i += 1L;
         }
         return out;
+    }
+
+    static <T> java.util.ArrayList<T> __pytra_repeat_list(java.util.List<? extends T> items, long count) {
+        java.util.ArrayList<T> out = new java.util.ArrayList<T>();
+        if (count <= 0L || items.isEmpty()) {
+            return out;
+        }
+        long i = 0L;
+        while (i < count) {
+            out.addAll(items);
+            i += 1L;
+        }
+        return out;
+    }
+
+    private static void _pngAppendList(java.util.ArrayList<Long> dst, java.util.List<Long> src) {
+        dst.addAll(src);
+    }
+
+    private static long _crc32(java.util.List<Long> data) {
+        java.util.zip.CRC32 crc = new java.util.zip.CRC32();
+        int i = 0;
+        while (i < data.size()) {
+            crc.update((int) (data.get(i) & 0xFFL));
+            i += 1;
+        }
+        return crc.getValue() & 0xFFFFFFFFL;
+    }
+
+    private static long _adler32(java.util.List<Long> data) {
+        java.util.zip.Adler32 adler = new java.util.zip.Adler32();
+        int i = 0;
+        while (i < data.size()) {
+            adler.update((int) (data.get(i) & 0xFFL));
+            i += 1;
+        }
+        return adler.getValue() & 0xFFFFFFFFL;
+    }
+
+    private static java.util.ArrayList<Long> _pngU16le(long value) {
+        java.util.ArrayList<Long> out = new java.util.ArrayList<Long>();
+        out.add(value & 0xFFL);
+        out.add((value >> 8) & 0xFFL);
+        return out;
+    }
+
+    private static java.util.ArrayList<Long> _pngU32be(long value) {
+        java.util.ArrayList<Long> out = new java.util.ArrayList<Long>();
+        out.add((value >> 24) & 0xFFL);
+        out.add((value >> 16) & 0xFFL);
+        out.add((value >> 8) & 0xFFL);
+        out.add(value & 0xFFL);
+        return out;
+    }
+
+    private static java.util.ArrayList<Long> _zlibDeflateStore(java.util.ArrayList<Long> data) {
+        java.util.ArrayList<Long> out = new java.util.ArrayList<Long>();
+        _pngAppendList(out, new java.util.ArrayList<Long>(java.util.Arrays.asList(0x78L, 0x01L)));
+        long n = data.size();
+        long pos = 0L;
+        while (pos < n) {
+            long remain = n - pos;
+            long chunkLen = remain > 65535L ? 65535L : remain;
+            long isFinal = (pos + chunkLen) >= n ? 1L : 0L;
+            out.add(isFinal);
+            _pngAppendList(out, _pngU16le(chunkLen));
+            _pngAppendList(out, _pngU16le(0xFFFFL ^ chunkLen));
+            long i = pos;
+            long end = pos + chunkLen;
+            while (i < end) {
+                out.add(data.get((int) i));
+                i += 1L;
+            }
+            pos += chunkLen;
+        }
+        _pngAppendList(out, _pngU32be(_adler32(data)));
+        return out;
+    }
+
+    private static java.util.ArrayList<Long> _pngChunk(java.util.List<Long> chunkType, java.util.ArrayList<Long> data) {
+        java.util.ArrayList<Long> crcInput = new java.util.ArrayList<Long>();
+        _pngAppendList(crcInput, chunkType);
+        _pngAppendList(crcInput, data);
+        long crc = _crc32(crcInput);
+        java.util.ArrayList<Long> out = new java.util.ArrayList<Long>();
+        _pngAppendList(out, _pngU32be(data.size()));
+        _pngAppendList(out, chunkType);
+        _pngAppendList(out, data);
+        _pngAppendList(out, _pngU32be(crc));
+        return out;
+    }
+
+    static void pyWriteRgbPng(String path, long width, long height, java.util.List<Long> pixels) {
+        java.util.ArrayList<Long> raw = new java.util.ArrayList<Long>(pixels);
+        long expected = width * height * 3L;
+        if (raw.size() != expected) {
+            throw new RuntimeException("pixels length mismatch: got=" + raw.size() + " expected=" + expected);
+        }
+        java.util.ArrayList<Long> scanlines = new java.util.ArrayList<Long>();
+        long rowBytes = width * 3L;
+        long y = 0L;
+        while (y < height) {
+            scanlines.add(0L);
+            long start = y * rowBytes;
+            long end = start + rowBytes;
+            long i = start;
+            while (i < end) {
+                scanlines.add(raw.get((int) i));
+                i += 1L;
+            }
+            y += 1L;
+        }
+        java.util.ArrayList<Long> ihdr = new java.util.ArrayList<Long>();
+        _pngAppendList(ihdr, _pngU32be(width));
+        _pngAppendList(ihdr, _pngU32be(height));
+        _pngAppendList(ihdr, new java.util.ArrayList<Long>(java.util.Arrays.asList(8L, 2L, 0L, 0L, 0L)));
+        java.util.ArrayList<Long> idat = _zlibDeflateStore(scanlines);
+        java.util.ArrayList<Long> png = new java.util.ArrayList<Long>();
+        _pngAppendList(png, new java.util.ArrayList<Long>(java.util.Arrays.asList(137L, 80L, 78L, 71L, 13L, 10L, 26L, 10L)));
+        _pngAppendList(png, _pngChunk(new java.util.ArrayList<Long>(java.util.Arrays.asList(73L, 72L, 68L, 82L)), ihdr));
+        _pngAppendList(png, _pngChunk(new java.util.ArrayList<Long>(java.util.Arrays.asList(73L, 68L, 65L, 84L)), idat));
+        _pngAppendList(png, _pngChunk(new java.util.ArrayList<Long>(java.util.Arrays.asList(73L, 69L, 78L, 68L)), new java.util.ArrayList<Long>()));
+        PyFile file = open(path, "wb");
+        try {
+            file.write(png);
+        } finally {
+            file.close();
+        }
     }
 
     static java.util.ArrayList<Object> __pytra_enumerate(Object value) {

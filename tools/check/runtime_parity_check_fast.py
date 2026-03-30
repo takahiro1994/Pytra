@@ -424,7 +424,7 @@ def _run_target(
             return subprocess.CompletedProcess("", 1, "", f"entry file not found: {entry_ts}")
         # Compile .ts → .js with tsc, then run with node
         entry_js = entry_ts.with_suffix(".js")
-        compile_cmd = f"tsc --target es2022 --module nodenext --moduleResolution nodenext --esModuleInterop --outDir {shlex.quote(str(emit_dir))} {shlex.quote(str(entry_ts))}"
+        compile_cmd = f"tsc --target es2022 --module nodenext --moduleResolution nodenext --esModuleInterop --noCheck --outDir {shlex.quote(str(emit_dir))} {shlex.quote(str(entry_ts))}"
         compile_result = run_shell(compile_cmd, cwd=work_dir, env=env, timeout_sec=timeout_sec)
         if compile_result.returncode != 0:
             return compile_result

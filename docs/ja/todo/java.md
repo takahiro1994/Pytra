@@ -36,16 +36,21 @@
    完了メモ: 2026-03-30 toolchain2 用の `emit/java/` を追加し、`pytra-cli2 --target java` の emit/build 配線と smoke test を実装
 2. [x] [ID: P1-JAVA-EMITTER-S2] `src/runtime/java/mapping.json` を作成し、runtime_call の写像を定義する。`types` テーブルも含める（spec-runtime-mapping.md §7）。`env.target` 必須エントリも忘れないこと
    完了メモ: 2026-03-30 `src/runtime/java/mapping.json` を追加し、`env.target` / builtins / 基本型写像を定義
-3. [ ] [ID: P1-JAVA-EMITTER-S3] fixture 全件の Java emit 成功を確認する
-4. [ ] [ID: P1-JAVA-EMITTER-S4] Java runtime を toolchain2 の emit 出力と整合させる（旧 runtime の引き継ぎ or 再実装）
-5. [ ] [ID: P1-JAVA-EMITTER-S5] fixture + sample の Java compile + run parity を通す（`javac` + `java`）
-6. [ ] [ID: P1-JAVA-EMITTER-S6] stdlib の Java parity を通す（`--case-root stdlib`）
+3. [x] [ID: P1-JAVA-EMITTER-S3] fixture 全件の Java emit 成功を確認する
+   完了メモ: 2026-03-30 `PYTHONPATH=src:tools/check python3 tools/check/runtime_parity_check_fast.py --targets java` で fixture 131/131 PASS
+4. [x] [ID: P1-JAVA-EMITTER-S4] Java runtime を toolchain2 の emit 出力と整合させる（旧 runtime の引き継ぎ or 再実装）
+   完了メモ: 2026-03-30 `PyRuntime.java` / `pathlib.java` / `argparse.java` / `json.java` / `mapping.json` を toolchain2 出力に合わせ、type-id helper・GIF helper・pathlib/runtime helper を整合
+5. [x] [ID: P1-JAVA-EMITTER-S5] fixture + sample の Java compile + run parity を通す（`javac` + `java`）
+   完了メモ: 2026-03-30 `PYTHONPATH=src:tools/check python3 tools/check/runtime_parity_check_fast.py --targets java --case-root sample` で sample 18/18 PASS
+6. [x] [ID: P1-JAVA-EMITTER-S6] stdlib の Java parity を通す（`--case-root stdlib`）
+   完了メモ: 2026-03-30 `PYTHONPATH=src:tools/check python3 tools/check/runtime_parity_check_fast.py --targets java --case-root stdlib` で stdlib 16/16 PASS
 
 ### P2-JAVA-LINT-FIX: Java emitter のハードコード違反を修正する
 
 仕様: [spec-emitter-guide.md](../spec/spec-emitter-guide.md) §1, §7
 
-1. [ ] [ID: P2-JAVA-LINT-S1] `check_emitter_hardcode_lint.py` で Java の違反が 0 件になることを確認する
+1. [x] [ID: P2-JAVA-LINT-S1] `check_emitter_hardcode_lint.py` で Java の違反が 0 件になることを確認する
+   完了メモ: 2026-03-31 `python3 tools/check/check_emitter_hardcode_lint.py` で Java の違反 0 件を確認
 
 ### P3-JAVA-SELFHOST: Java emitter で toolchain2 を Java に変換し build を通す
 

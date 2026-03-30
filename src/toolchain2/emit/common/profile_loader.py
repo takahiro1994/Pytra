@@ -12,6 +12,8 @@ from pathlib import Path
 from pytra.std import json
 from pytra.std.json import JsonVal
 
+_PROFILES_ROOT: Path | None = None
+_PROFILE_DOC_CACHE: dict[str, dict[str, JsonVal]] = {}
 
 _VALID_TUPLE_UNPACK_STYLES: set[str] = {
     "subscript",
@@ -82,7 +84,10 @@ def _merge_profile_dict(base: dict[str, JsonVal], override: dict[str, JsonVal]) 
 
 
 def _profiles_root() -> Path:
-    return Path(__file__).resolve().parents[1] / "profiles"
+    global _PROFILES_ROOT
+    if _PROFILES_ROOT is None:
+        _PROFILES_ROOT = Path(__file__).resolve().parents[1] / "profiles"
+    return _PROFILES_ROOT
 
 
 def load_profile_with_includes(profile_path: Path) -> dict[str, JsonVal]:
@@ -164,4 +169,9 @@ def load_lowering_profile(language: str) -> LoweringProfile:
 def load_profile_doc(language: str) -> dict[str, JsonVal]:
     if language == "":
         raise RuntimeError("language must not be empty")
-    return load_profile_with_includes(_profiles_root().joinpath(language + ".json"))
+    cached = _PROFILE_DOC_CACHE.get(language)
+    if cached is not None:
+        return cached
+    loaded = load_profile_with_includes(_profiles_root().joinpath(language + ".json"))
+    _PROFILE_DOC_CACHE[language] = loaded
+    return loaded

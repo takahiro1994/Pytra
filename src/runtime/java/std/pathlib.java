@@ -8,6 +8,18 @@ public final class pathlib {
     private pathlib() {
     }
 
+    public static Path Path() {
+        return new Path();
+    }
+
+    public static Path Path(String p) {
+        return new Path(p);
+    }
+
+    public static Path Path(Path other) {
+        return new Path(other);
+    }
+
     public static class Path {
         public String _path;
 
@@ -40,6 +52,10 @@ public final class pathlib {
                 return new Path(other);
             }
             return new Path(_path + "/" + other);
+        }
+
+        public Path joinpath(String other) {
+            return __truediv__(other);
         }
 
         public Path parent() {
@@ -115,7 +131,12 @@ public final class pathlib {
 
         public void write_text(String content, String encoding) {
             try {
-                Files.write(Paths.get(_path), content.getBytes(encoding));
+                java.nio.file.Path path = Paths.get(_path);
+                java.nio.file.Path parent = path.getParent();
+                if (parent != null) {
+                    Files.createDirectories(parent);
+                }
+                Files.write(path, content.getBytes(encoding));
             } catch (java.io.IOException e) {
                 throw new RuntimeException(e);
             }
