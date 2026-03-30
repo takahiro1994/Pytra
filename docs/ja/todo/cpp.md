@@ -20,6 +20,13 @@
 
 ## 未完了タスク
 
+### P0-CPP-LITERAL-CAST: 整数リテラルの冗長キャストを除去する
+
+`_emit_constant` が `int64` 等の整数リテラルを常に `int64(0)` のようにキャスト付きで出力している（`emitter.py:1026-1027`）。C++ では `0` は `int64_t` に暗黙変換されるため、デフォルト幅の `int64` / `float64` はキャスト不要。`int8` / `uint16` 等の非デフォルト幅だけキャストを付ければ十分。
+
+1. [ ] [ID: P0-CPP-LITERAL-S1] `_emit_constant` で `int64` のリテラルはキャストなしの素の数値として出力する — `int8`/`uint8`/`int16`/`uint16`/`int32`/`uint32`/`uint64` は narrowing が必要なのでキャストを維持
+2. [ ] [ID: P0-CPP-LITERAL-S2] fixture + sample parity に影響がないことを確認する
+
 ### P5-CPP-PARENS: C++ emitter に演算子優先順位テーブルを追加する
 
 
