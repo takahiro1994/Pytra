@@ -427,13 +427,18 @@ def _run_target(
         if not entry_rs.exists():
             return subprocess.CompletedProcess("", 1, "", f"entry file not found: {entry_rs}")
         exe_path = emit_dir / (stem + "_rs.out")
+        rs_env = dict(env or {})
+        rs_env["RUSTUP_HOME"] = "/usr/local/rustup"
+        rs_env["CARGO_HOME"] = "/usr/local/cargo"
+        current_path = rs_env.get("PATH") or os.environ.get("PATH", "")
+        rs_env["PATH"] = "/usr/local/cargo/bin" + (os.pathsep + current_path if current_path != "" else "")
         build = run_shell(
-            f"rustc -O {shlex.quote(str(entry_rs))} -o {shlex.quote(str(exe_path))}",
-            cwd=work_dir, env=env, timeout_sec=timeout_sec,
+            f"/usr/local/cargo/bin/rustc -O {shlex.quote(str(entry_rs))} -o {shlex.quote(str(exe_path))}",
+            cwd=work_dir, env=rs_env, timeout_sec=timeout_sec,
         )
         if build.returncode != 0:
             return build
-        return run_shell(shlex.quote(str(exe_path)), cwd=work_dir, env=env, timeout_sec=timeout_sec)
+        return run_shell(shlex.quote(str(exe_path)), cwd=work_dir, env=rs_env, timeout_sec=timeout_sec)
 
     if target == "java":
         stem = case_path.stem
@@ -599,7 +604,7 @@ def _save_python_results(records: list[CheckRecord], case_root: str) -> None:
 
 
 # ---------------------------------------------------------------------------
-# Sample auto-copy: copy PASS-verified emit files to sample/<lang>/
+# Sample auto-copy: copy PASS-verified emit files to sample-preview/<lang>/
 # ---------------------------------------------------------------------------
 
 # target_name → (sample_dir_name, file_extension)
@@ -626,14 +631,14 @@ _SAMPLE_TARGET_MAP: dict[str, tuple[str, str]] = {
 
 
 def _copy_sample_emit(target: str, emit_dir: Path, case_stem: str) -> None:
-    """Copy entry file from emit_dir to sample/<lang>/ after parity PASS."""
+    """Copy entry file from emit_dir to sample-preview/<lang>/ after parity PASS."""
     if target not in _SAMPLE_TARGET_MAP:
         return
     sample_dir_name, ext = _SAMPLE_TARGET_MAP[target]
     src = emit_dir / (case_stem + ext)
     if not src.exists():
         return
-    dest_dir = ROOT / "sample" / sample_dir_name
+    dest_dir = ROOT / "sample-preview" / sample_dir_name
     dest_dir.mkdir(parents=True, exist_ok=True)
     shutil.copy2(src, dest_dir / src.name)
 
@@ -674,14 +679,14 @@ def _release_gen_lock() -> None:
 
 
 def _maybe_refresh_selfhost_python() -> None:
-    """Auto-re-aggregate selfhost_python.json if >30 minutes since last update.
+    """Auto-re-aggregate selfhost_python.json if >15 minutes since last update.
 
     Reads existing .parity-results/*.json and writes selfhost_python.json so
     that gen_backend_progress.py always has up-to-date selfhost matrix data.
     [P0-SELFHOST-REFRESH-S1]
     """
     marker = ROOT / ".parity-results" / "selfhost_python.json"
-    if marker.exists() and (time.time() - marker.stat().st_mtime) < 1800:
+    if marker.exists() and (time.time() - marker.stat().st_mtime) < 900:
         return
     run_script = ROOT / "tools" / "run" / "run_selfhost_parity.py"
     if not run_script.exists():
@@ -724,13 +729,13 @@ def _maybe_regenerate_benchmark() -> None:
 
 
 def _maybe_run_emitter_lint() -> None:
-    """Auto-run check_emitter_hardcode_lint.py if >1 hour since last run.
+    """Auto-run check_emitter_hardcode_lint.py if >10 minutes since last run.
 
     Updates emitter-hardcode-lint.md and .parity-results/emitter_lint.json.
     [P0-PROGRESS-SUMMARY-S4]
     """
-    marker = ROOT / "docs" / "ja" / "progress" / "emitter-hardcode-lint.md"
-    if marker.exists() and (time.time() - marker.stat().st_mtime) < 3600:
+    marker = ROOT / "docs" / "ja" / "progress-preview" / "emitter-hardcode-lint.md"
+    if marker.exists() and (time.time() - marker.stat().st_mtime) < 600:
         return
     lint_script = ROOT / "tools" / "check" / "check_emitter_hardcode_lint.py"
     if not lint_script.exists():

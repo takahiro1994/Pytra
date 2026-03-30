@@ -302,7 +302,7 @@ def _render_md(
     badge_text  = "English" if is_ja else "日本語"
 
     lines: list[str] = []
-    lines.append(f'<a href="../../{other_lang}/progress/emitter-hardcode-lint.md">')
+    lines.append(f'<a href="../../{other_lang}/progress-preview/emitter-hardcode-lint.md">')
     lines.append(f'  <img alt="{badge_label}" src="https://img.shields.io/badge/docs-{badge_text}-{badge_color}?style=flat-square">')
     lines.append("</a>")
     lines.append("")
@@ -396,7 +396,7 @@ def write_progress_pages(
     now: str,
 ) -> None:
     for lang_code in ("ja", "en"):
-        out_path = ROOT / "docs" / lang_code / "progress" / "emitter-hardcode-lint.md"
+        out_path = ROOT / "docs" / lang_code / "progress-preview" / "emitter-hardcode-lint.md"
         out_path.parent.mkdir(parents=True, exist_ok=True)
         content = _render_md(mat, hits, langs, now, lang_code)
         out_path.write_text(content, encoding="utf-8")

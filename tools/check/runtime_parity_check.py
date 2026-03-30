@@ -30,6 +30,8 @@ STDLIB_ROOT = ROOT / "test" / "stdlib" / "source" / "py"
 ARTIFACT_OPTIONAL_TARGETS: set[str] = set()
 _LOCAL_TOOL_FALLBACKS: dict[str, tuple[Path, ...]] = {
     "go": (ROOT / "work" / "tmp" / "go-toolchain" / "bin" / "go",),
+    "rustc": (Path("/usr/local/cargo/bin/rustc"),),
+    "cargo": (Path("/usr/local/cargo/bin/cargo"),),
 }
 
 # Skip list abolished — all fixtures run for all languages.
@@ -162,6 +164,8 @@ def _normalize_output_for_compare(stdout_text: str, target_name: str = "") -> st
         if low.startswith("build:"):
             continue
         if low.startswith("generated:"):
+            continue
+        if low.startswith("emitted:"):
             continue
         if target_name == "nim" and "warning:" in low:
             continue
@@ -841,9 +845,9 @@ def main() -> int:
 
 
 def _maybe_regenerate_progress() -> None:
-    """Regenerate backend progress pages if the last generation was more than 10 minutes ago."""
-    marker = ROOT / "docs" / "ja" / "progress" / "backend-progress-fixture.md"
-    if marker.exists() and (time.time() - marker.stat().st_mtime) < 600:
+    """Regenerate backend progress pages if the last generation was more than 3 minutes ago."""
+    marker = ROOT / "docs" / "ja" / "progress-preview" / "backend-progress-fixture.md"
+    if marker.exists() and (time.time() - marker.stat().st_mtime) < 180:
         return
     gen_script = ROOT / "tools" / "gen" / "gen_backend_progress.py"
     if not gen_script.exists():
