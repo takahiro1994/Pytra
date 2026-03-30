@@ -1912,9 +1912,7 @@ def transpile_to_ruby(east3_doc: dict[str, JsonVal]) -> str:
     if should_skip_module(module_id, mapping):
         return ""
 
-    # built_in modules are provided by py_runtime; skip emit
-    if module_id.startswith("pytra.built_in."):
-        return ""
+    # built_in modules are provided by py_runtime; skip_modules in mapping handles this
 
     # Load module-level renamed symbols
     renamed_symbols_raw = east3_doc.get("renamed_symbols")
