@@ -227,6 +227,12 @@ fixture / sample で出力ディレクトリが分かれる。
 各段の出力で既存の golden file を上書きする。
 fixture / sample / pytra ごとに異なるソース・出力ディレクトリ構成を持つ。
 
+### `regenerate_selfhost_golden.py`
+`test/selfhost/east3-opt/` に格納済みの east3-opt golden ファイルを各ターゲット言語に emit し、
+`test/selfhost/<lang>/` に配置する。既存ファイルとの差分（追加・削除・変更）を報告した上でファイルを書き換える。
+モジュール単位でサブプロセスを起動し、タイムアウトしたモジュール（大規模 east3-opt 等）はスキップする。
+主要オプション: `--target cpp,go,rs,ts`（デフォルト: 全言語） / `--dry-run`（書き込みなし） / `--timeout`（秒、デフォルト 30）
+
 ### `regenerate_samples.py`
 `sample/py` から各 `sample/<lang>` を再生成する。
 `src/toolchain/misc/transpiler_versions.json` のバージョン・トークンが変わらない限り再生成をスキップする。
@@ -245,6 +251,12 @@ EAST1 golden file から型解決情報（`resolved_type` / `runtime_module_id` 
 ローカル最小 CI（version gate / TODO 優先度ガード / runtime 層分離ガード / non-C++ emitter ガード / backend health gate / transpile 回帰 / unit test / selfhost build / diff）を一括実行する。
 60 以上のステップを固定順序で実行し、全体品質を一コマンドで検証できる。
 `tools/check/` / `tools/unregistered/` / `tools/unittest/` 各種を統合してオーケストレーションする。
+
+### `run_selfhost_parity.py`
+selfhost parity チェックを実行し、結果を `.parity-results/selfhost_<lang>.json` に記録する。
+`--selfhost-lang python` では既存の `.parity-results/*.json` を集計して `selfhost_python.json` を生成する。
+コンパイル済み selfhost（go/rs/cpp/ts）は selfhost バイナリ経由で east3-opt モジュールを transpile し、Python 正本と出力比較を行う。
+主要オプション: `--selfhost-lang`（python/go/rs/cpp/ts） / `--emit-target`（cpp 等） / `--case-root`（fixture/sample） / `--dry-run`
 
 ### `run_regen_on_version_bump.py`
 `transpiler_versions.json` の MINOR 以上の更新を検出したときだけ `regenerate_samples.py` を起動する。

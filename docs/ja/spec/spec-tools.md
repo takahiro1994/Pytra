@@ -61,3 +61,10 @@
 旧 selfhost ツール群（`build_selfhost.py`, `prepare_selfhost_source.py`, `check_selfhost_*.py` 等）は `tools/unregistered/` に退避済み。
 
 新パイプライン（`toolchain2/`）では selfhost は通常のビルドパイプライン（`pytra-cli2 -build --target=cpp`）で完結する設計とし、専用ツールを不要にする。詳細は `docs/ja/plans/plan-pipeline-redesign.md` を参照。
+
+#### selfhost golden（P0-SELFHOST-GOLDEN-UNIFIED）
+
+| ツール | 目的 |
+|---|---|
+| `tools/gen/regenerate_selfhost_golden.py` | east3-opt golden から全言語の selfhost golden を一括生成。`test/selfhost/<lang>/` に配置する |
+| `tools/unittest/selfhost/test_selfhost_golden.py` | golden ファイルと最新 emit 結果の一致を検証する回帰テスト |

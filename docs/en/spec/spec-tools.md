@@ -88,6 +88,20 @@ The old selfhost tool set (`build_selfhost.py`, `prepare_selfhost_source.py`, `c
 
 In the new pipeline (`toolchain2/`), selfhost is designed to complete within the normal build pipeline (`pytra-cli2 -build --target=cpp`), making dedicated tools unnecessary. See `docs/ja/plans/plan-pipeline-redesign.md` for details.
 
+### 2.1 Selfhost Golden (P0-SELFHOST-GOLDEN-UNIFIED)
+
+| Tool | Purpose |
+|---|---|
+| `tools/gen/regenerate_selfhost_golden.py` | Emit all toolchain2 modules from east3-opt golden to each target language and write results to `test/selfhost/<lang>/`. Reports added/removed/changed files. |
+| `tools/unittest/selfhost/test_selfhost_golden.py` | Regression test: verify golden files match current emitter output. Skips modules that time out (large east3-opt files). |
+
+Usage:
+```bash
+python3 tools/gen/regenerate_selfhost_golden.py                  # all targets
+python3 tools/gen/regenerate_selfhost_golden.py --target go,rs   # specific targets
+python3 -m pytest tools/unittest/selfhost/test_selfhost_golden.py
+```
+
 ## 3. Cross-Language Verification
 
 - `tools/check/runtime_parity_check.py`

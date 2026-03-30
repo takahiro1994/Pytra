@@ -1,0 +1,235 @@
+#!/usr/bin/env python3
+"""Regenerate selfhost golden files from east3-opt golden.
+
+For each module in test/selfhost/east3-opt/, emits to the target language
+and writes the result to test/selfhost/<lang>/.  Modules that time out or
+fail are skipped (printed as warnings).  Also copies runtime support files.
+
+The golden captures "what the current emitter produces for each selfhost
+module."  It is used by test_selfhost_golden.py to detect emitter regressions.
+
+Usage:
+    python3 tools/gen/regenerate_selfhost_golden.py
+    python3 tools/gen/regenerate_selfhost_golden.py --target go,rs
+    python3 tools/gen/regenerate_selfhost_golden.py --target go --dry-run
+    python3 tools/gen/regenerate_selfhost_golden.py --target go --timeout 60
+
+[P0-SELFHOST-GOLDEN-UNIFIED S1]
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import shutil
+import subprocess
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[2]
+
+EAST3_OPT_DIR = ROOT / "test" / "selfhost" / "east3-opt"
+SELFHOST_GOLDEN_ROOT = ROOT / "test" / "selfhost"
+
+SUPPORTED_TARGETS = ["go", "cpp", "rs", "ts"]
+
+# Emit helper script: run once per module in a child process
+_EMIT_HELPER = """
+import sys, json
+sys.path.insert(0, sys.argv[1])   # src/ root
+target = sys.argv[2]
+east3_path = sys.argv[3]
+doc = json.loads(open(east3_path, encoding='utf-8').read())
+if target == 'go':
+    from toolchain2.emit.go.emitter import emit_go_module
+    print(emit_go_module(doc), end='')
+elif target == 'rs':
+    from toolchain2.emit.rs.emitter import emit_rs_module
+    print(emit_rs_module(doc), end='')
+elif target == 'ts':
+    from toolchain2.emit.ts.emitter import emit_ts_module
+    print(emit_ts_module(doc), end='')
+elif target == 'cpp':
+    from toolchain2.emit.cpp.emitter import emit_cpp_module
+    print(emit_cpp_module(doc), end='')
+else:
+    raise ValueError('unsupported target: ' + target)
+"""
+
+
+def _ext(target: str) -> str:
+    return {"go": ".go", "rs": ".rs", "ts": ".ts", "cpp": ".cpp"}[target]
+
+
+def collect_east3_opt_entries() -> list[tuple[Path, str]]:
+    """Return [(east3_path, module_id), ...] for all selfhost modules."""
+    entries = []
+    for p in sorted(EAST3_OPT_DIR.rglob("*.east3")):
+        doc_snippet = json.loads(p.read_text(encoding="utf-8"))
+        sp = doc_snippet.get("source_path", "")
+        if not sp.startswith("src/toolchain2/"):
+            continue
+        rel = sp.removeprefix("src/toolchain2/")
+        module_id = rel.replace("/", ".").removesuffix(".py")
+        entries.append((p, module_id))
+    return entries
+
+
+def emit_module(target: str, east3_path: Path, timeout: int) -> tuple[str | None, str]:
+    """Emit one east3-opt module via subprocess.
+
+    Returns (code, error_msg).  code is None on failure/timeout.
+    """
+    try:
+        result = subprocess.run(
+            [sys.executable, "-c", _EMIT_HELPER,
+             str(ROOT / "src"), target, str(east3_path)],
+            capture_output=True, text=True, timeout=timeout,
+        )
+        if result.returncode != 0:
+            return None, result.stderr.strip()[:200]
+        return result.stdout, ""
+    except subprocess.TimeoutExpired:
+        return None, f"timeout ({timeout}s)"
+
+
+def copy_runtime(target: str, out_dir: Path) -> list[str]:
+    """Copy runtime support files into golden dir. Returns list of filenames."""
+    copied = []
+    if target == "go":
+        go_runtime = ROOT / "src" / "runtime" / "go"
+        for bucket in ("built_in", "std"):
+            for f in sorted((go_runtime / bucket).glob("*.go") if (go_runtime / bucket).exists() else []):
+                shutil.copy2(f, out_dir / f.name)
+                copied.append(f.name)
+        # go.mod
+        gomod = out_dir / "go.mod"
+        if not gomod.exists():
+            gomod.write_text("module pytra_selfhost_go\n\ngo 1.22\n", encoding="utf-8")
+        copied.append("go.mod")
+    elif target == "rs":
+        rs_runtime = ROOT / "src" / "runtime" / "rs"
+        for bucket in ("built_in", "std"):
+            for f in sorted((rs_runtime / bucket).glob("*.rs") if (rs_runtime / bucket).exists() else []):
+                shutil.copy2(f, out_dir / f.name)
+                copied.append(f.name)
+    elif target == "ts":
+        ts_src = ROOT / "src" / "runtime" / "ts" / "built_in" / "py_runtime.ts"
+        if ts_src.exists():
+            shutil.copy2(ts_src, out_dir / "pytra_built_in_py_runtime.ts")
+            copied.append("pytra_built_in_py_runtime.ts")
+    return copied
+
+
+def regenerate(target: str, timeout: int, dry_run: bool) -> int:
+    """Regenerate golden for one target. Returns 0 on success."""
+    if target not in SUPPORTED_TARGETS:
+        print(f"[ERROR] unsupported target: {target}")
+        return 1
+
+    entries = collect_east3_opt_entries()
+    if not entries:
+        print(f"[ERROR] no east3-opt files in {EAST3_OPT_DIR}")
+        return 1
+
+    ext = _ext(target)
+    out_dir = SELFHOST_GOLDEN_ROOT / target
+
+    # Emit all modules
+    ok_count = skip_count = fail_count = 0
+    new_files: dict[str, str] = {}
+
+    for east3_path, module_id in entries:
+        fname = module_id.replace(".", "_") + ext
+        code, err = emit_module(target, east3_path, timeout)
+        if code is None:
+            if err.startswith("timeout"):
+                print(f"  [skip-timeout] {module_id}: {err}")
+            else:
+                print(f"  [skip-error]   {module_id}: {err}")
+            skip_count += 1
+            continue
+        if not code.strip():
+            skip_count += 1
+            continue
+        new_files[fname] = code
+        ok_count += 1
+
+    # Add runtime files to new_files map (for diff tracking)
+    if not dry_run:
+        out_dir.mkdir(parents=True, exist_ok=True)
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp_str:
+            tmp_dir = Path(tmp_str)
+            for name, content in new_files.items():
+                (tmp_dir / name).write_text(content, encoding="utf-8")
+            runtime_names = copy_runtime(target, tmp_dir)
+            for name in runtime_names:
+                p = tmp_dir / name
+                if p.exists():
+                    new_files[name] = p.read_text(encoding="utf-8")
+
+    # Diff report
+    existing = {f.name for f in out_dir.iterdir() if f.is_file()} if out_dir.exists() else set()
+    new_names = set(new_files.keys())
+    added   = sorted(new_names - existing)
+    removed = sorted(existing - new_names)
+    changed = sorted(n for n in new_names & existing
+                     if (out_dir / n).read_text(encoding="utf-8") != new_files[n])
+
+    if added or removed or changed:
+        print(f"[{target}] {len(added)} added, {len(removed)} removed, {len(changed)} changed")
+        for n in added:   print(f"  + {n}")
+        for n in removed: print(f"  - {n}")
+        for n in changed: print(f"  ~ {n}")
+    else:
+        print(f"[{target}] no changes ({ok_count} modules)")
+
+    print(f"[{target}] emitted={ok_count} skipped={skip_count} failed={fail_count}")
+
+    if dry_run:
+        return 0
+
+    out_dir.mkdir(parents=True, exist_ok=True)
+    # Remove stale files not in new set
+    for f in list(out_dir.iterdir()):
+        if f.is_file() and f.name not in new_files:
+            f.unlink()
+    # Write new/changed files
+    for name, content in new_files.items():
+        dest = out_dir / name
+        if not dest.exists() or dest.read_text(encoding="utf-8") != content:
+            dest.write_text(content, encoding="utf-8")
+
+    # Copy runtime files to actual out_dir
+    copy_runtime(target, out_dir)
+
+    print(f"[{target}] wrote to {out_dir.relative_to(ROOT)}")
+    return 0
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(
+        description="Regenerate selfhost golden files from east3-opt golden"
+    )
+    parser.add_argument(
+        "--target",
+        default=",".join(SUPPORTED_TARGETS),
+        help=f"Comma-separated targets (default: {','.join(SUPPORTED_TARGETS)})"
+    )
+    parser.add_argument("--dry-run", action="store_true",
+                        help="Show what would change without writing")
+    parser.add_argument("--timeout", default=30, type=int,
+                        help="Per-module emit timeout in seconds (default: 30)")
+    args = parser.parse_args()
+
+    targets = [t.strip() for t in args.target.split(",") if t.strip()]
+    exit_code = 0
+    for target in targets:
+        code = regenerate(target, timeout=args.timeout, dry_run=args.dry_run)
+        if code != 0:
+            exit_code = code
+    return exit_code
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
