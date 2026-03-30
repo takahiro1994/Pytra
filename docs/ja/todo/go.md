@@ -6,7 +6,7 @@
 
 > 領域別 TODO。全体索引は [index.md](./index.md) を参照。
 
-最終更新: 2026-03-30
+最終更新: 2026-03-31 (P3-GO-LINT-FIX 完了)
 
 ## 運用ルール
 
@@ -66,16 +66,25 @@ Review 指摘: `py_splitext` を多値返却にした後、emitter の `_emit_as
 - runtime_symbol 2件: `dispatch == "py_print"` / `"py_len"` — mapping.json 経由の値を再度文字列マッチ
 - class_name 19件: `"Exception"` / `"Path"` / `"ArgumentParser"` 等 — P0-GO-TYPE-MAPPING で一部解消済み、残りを除去
 
-1. [ ] [ID: P3-GO-LINT-S1] module_name 違反を修正する — native import を runtime manifest または mapping.json から導出する
-2. [ ] [ID: P3-GO-LINT-S2] runtime_symbol 違反を修正する — `py_print` / `py_len` の文字列マッチを除去
-3. [ ] [ID: P3-GO-LINT-S3] class_name 違反を修正する — `types` テーブル or EAST3 の型情報から解決する
-4. [ ] [ID: P3-GO-LINT-S4] `check_emitter_hardcode_lint.py` で Go の違反が 0 件になることを確認する
+1. [x] [ID: P3-GO-LINT-S1] module_name 違反を修正する — native import を runtime manifest または mapping.json から導出する — mapping.json に go_pkg_imports 追加、ctx.go_pkg_math / ctx.go_pkg_os 経由に変更
+2. [x] [ID: P3-GO-LINT-S2] runtime_symbol 違反を修正する — `py_print` / `py_len` の文字列マッチを除去 — mapping.json に go_builtin_dispatch 追加、ctx.dispatch_print / ctx.dispatch_len 経由に変更
+3. [x] [ID: P3-GO-LINT-S3] class_name 違反を修正する — `types` テーブル or EAST3 の型情報から解決する — mapping.json に go_class_names 追加、_BUILTIN_EXCEPTION_BOUNDS を ctx.builtin_exc_bounds へ、ArgumentParser / Path を ctx フィールドへ移動
+4. [x] [ID: P3-GO-LINT-S4] `check_emitter_hardcode_lint.py` で Go の違反が 0 件になることを確認する — 全 7 カテゴリ 🟩 PASS
 
 ### P6-GO-SELFHOST: Go emitter で toolchain2 を Go に変換し go build を通す
 
 文脈: [docs/ja/plans/p6-go-selfhost.md](../plans/p6-go-selfhost.md)
 
-1. [ ] [ID: P6-GO-SELFHOST-S0] selfhost 対象コード（`src/toolchain2/` 全 .py）で戻り値型の注釈が欠けている関数に型注釈を追加する — resolve が `inference_failure` にならない状態にする
-2. [ ] [ID: P6-GO-SELFHOST-S1] toolchain2 全 .py を Go に emit し、go build が通ることを確認する
-3. [ ] [ID: P6-GO-SELFHOST-S2] go build 失敗ケースを emitter/runtime の修正で解消する（EAST の workaround 禁止）
-4. [ ] [ID: P6-GO-SELFHOST-S3] selfhost 用 Go golden を配置し、回帰テストとして維持する
+1. [x] [ID: P6-GO-SELFHOST-S0] selfhost 対象コード（`src/toolchain2/` 全 .py）で戻り値型の注釈が欠けている関数に型注釈を追加する — resolve が `inference_failure` にならない状態にする — 全関数に戻り値型注釈済み、east3-opt に inference_failure ゼロ
+2. [x] [ID: P6-GO-SELFHOST-S1] toolchain2 全 .py を Go に emit し、go build が通ることを確認する
+3. [x] [ID: P6-GO-SELFHOST-S2] go build 失敗ケースを emitter/runtime の修正で解消する（EAST の workaround 禁止）
+4. [x] [ID: P6-GO-SELFHOST-S3] selfhost 用 Go golden を配置し、回帰テストとして維持する — test_selfhost_golden.py -k go: 5 passed, 2 skipped
+
+### P7-GO-SELFHOST-RUNTIME: Go selfhost バイナリを実際に動かして parity PASS する
+
+P6 で go build は通ったが、selfhost バイナリが実際に fixture/sample/stdlib を変換して parity PASS するにはまだギャップがある。
+
+1. [ ] [ID: P7-GO-SELFHOST-RT-S1] linker の type_id 割り当てで外部ベースクラス（CommonRenderer(ABC) 等）の階層解決を修正する — object にフォールバックする
+2. [ ] [ID: P7-GO-SELFHOST-RT-S2] Go emitter 自身の Go 翻訳を selfhost golden に含める — 循環依存除外の見直し。`emit/go/` を golden に含められるようにする
+3. [ ] [ID: P7-GO-SELFHOST-RT-S3] CLI wrapper（`main.go`）を追加する — EAST3 JSON を読んで Go コードを emit する最小エントリポイント
+4. [ ] [ID: P7-GO-SELFHOST-RT-S4] `python3 tools/run/run_selfhost_parity.py --selfhost-lang go` を実行し、fixture + sample + stdlib の parity PASS を確認する
