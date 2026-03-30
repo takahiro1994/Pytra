@@ -1,8 +1,19 @@
 // Python 互換ランタイム（TypeScript版）の共通関数群。
 // 将来的な Python -> TypeScript ネイティブ変換コードから利用する。
 
-import { writeFileSync, mkdirSync } from "node:fs";
-import { dirname } from "node:path";
+// Minimal OS-glue declarations — no @types/node required.
+declare function require(id: string): any;
+declare const process: { hrtime?: () => [number, number] };
+declare const performance: { now(): number } | undefined;
+declare const console: { log(...args: unknown[]): void };
+declare const __dirname: string;
+
+// Lazy-loaded fs/path — avoids top-level import so the module is loadable
+// in environments without node:fs (e.g. browser-based test runners).
+let _fs: any = null;
+let _path: any = null;
+function _getfs(): any { if (!_fs) _fs = require("fs"); return _fs; }
+function _getpath(): any { if (!_path) _path = require("path"); return _path; }
 
 export const PY_TYPE_NONE = 0;
 export const PY_TYPE_BOOL = 1;
@@ -728,8 +739,8 @@ export function pyReversed<T>(items: T[]): T[] {
 }
 export function pySorted<T>(items: T[], key?: (x: T) => unknown, reverse = false): T[] {
   const sorted = items.slice().sort((a, b) => {
-    const ka = key ? key(a) : a;
-    const kb = key ? key(b) : b;
+    const ka: any = key ? key(a) : a;
+    const kb: any = key ? key(b) : b;
     if (ka < kb) return reverse ? 1 : -1;
     if (ka > kb) return reverse ? -1 : 1;
     return 0;
@@ -925,9 +936,9 @@ export function pyFmt(value: unknown, spec: string): string {
 
 /** Python の open 相当（バイナリ書き込み専用）。 */
 export function open(filePath: string, _mode?: string): { write(data: number[]): void; close(): void } {
-  const dir = dirname(filePath);
+  const dir = _getpath().dirname(filePath);
   if (dir !== "" && dir !== ".") {
-    mkdirSync(dir, { recursive: true });
+    _getfs().mkdirSync(dir, { recursive: true });
   }
   const chunks: Uint8Array[] = [];
   return {
@@ -949,7 +960,7 @@ export function open(filePath: string, _mode?: string): { write(data: number[]):
       const out = new Uint8Array(totalLen);
       let offset = 0;
       for (const chunk of chunks) { out.set(chunk, offset); offset += chunk.length; }
-      writeFileSync(filePath, Buffer.from(out.buffer, out.byteOffset, out.byteLength));
+      _getfs().writeFileSync(filePath, out);
     },
   };
 }
@@ -1182,14 +1193,14 @@ export class PyPath {
   }
   joinpath(other: string): PyPath { return new PyPath(this._p + "/" + other); }
   toString(): string { return this._p; }
-  exists(): boolean { try { return require("fs").existsSync(this._p); } catch { return false; } }
+  exists(): boolean { try { return _getfs().existsSync(this._p); } catch { return false; } }
   mkdir(parents: boolean = false, exist_ok: boolean = false): void {
-    try { require("fs").mkdirSync(this._p, { recursive: parents }); } catch (e: unknown) {
+    try { _getfs().mkdirSync(this._p, { recursive: parents }); } catch (e: unknown) {
       if (!exist_ok) throw e;
     }
   }
-  write_text(data: string): void { require("fs").writeFileSync(this._p, data, "utf8"); }
-  read_text(encoding: string = "utf8"): string { return require("fs").readFileSync(this._p, "utf8"); }
+  write_text(data: string): void { _getfs().writeFileSync(this._p, data, "utf8"); }
+  read_text(encoding: string = "utf8"): string { return _getfs().readFileSync(this._p, "utf8"); }
 }
 
 export function Path(p: string | PyPath): PyPath {
@@ -1234,22 +1245,15 @@ export function pydirname(p: string): string {
 }
 
 export function pyexists(p: string): boolean {
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    return require("fs").existsSync(p);
-  } catch { return false; }
+  try { return _getfs().existsSync(p); } catch { return false; }
 }
 
 export function pyisfile(p: string): boolean {
-  try {
-    return require("fs").statSync(p).isFile();
-  } catch { return false; }
+  try { return _getfs().statSync(p).isFile(); } catch { return false; }
 }
 
 export function pyisdir(p: string): boolean {
-  try {
-    return require("fs").statSync(p).isDirectory();
-  } catch { return false; }
+  try { return _getfs().statSync(p).isDirectory(); } catch { return false; }
 }
 
 // ---------------------------------------------------------------------------
@@ -1257,7 +1261,7 @@ export function pyisdir(p: string): boolean {
 // ---------------------------------------------------------------------------
 export function perf_counter(): number {
   if (typeof performance !== "undefined") return performance.now() / 1000;
-  try { const [s, ns] = process.hrtime(); return s + ns / 1e9; } catch { return Date.now() / 1000; }
+  return Date.now() / 1000;
 }
 
 // ---------------------------------------------------------------------------
@@ -1373,7 +1377,7 @@ export function ArgumentParser(description: string = ""): _ArgumentParser {
 // os.makedirs
 // ---------------------------------------------------------------------------
 export function pymakedirs(path: string, exist_ok: boolean = false): void {
-  try { require("fs").mkdirSync(path, { recursive: true }); } catch (e: unknown) {
+  try { _getfs().mkdirSync(path, { recursive: true }); } catch (e: unknown) {
     if (!exist_ok) throw e;
   }
 }
@@ -1384,9 +1388,8 @@ export function pymakedirs(path: string, exist_ok: boolean = false): void {
 export function pywrite_rgb_png(path: string, width: number, height: number, pixels: number[]): void {
   // Minimal PNG writer: writes a valid PNG file
   try {
-    const fs = require("fs");
     const data = _encode_png(width, height, pixels);
-    fs.writeFileSync(path, Buffer.from(data));
+    _getfs().writeFileSync(path, new Uint8Array(data));
   } catch { /* ignore if fs not available */ }
 }
 
@@ -1444,14 +1447,13 @@ function _crc32(data: number[]): number {
 // ---------------------------------------------------------------------------
 export function pyglob(pattern: string): string[] {
   try {
-    const fs = require("fs");
-    const path = require("path");
-    const dir = path.dirname(pattern) || ".";
-    const base = path.basename(pattern);
+    const p = _getpath();
+    const dir = p.dirname(pattern) || ".";
+    const base = p.basename(pattern);
     // Convert glob pattern to regex
     const regexStr = base.replace(/[.+^${}()|[\]\\]/g, "\\$&").replace(/\*/g, ".*").replace(/\?/g, ".");
     const re = new RegExp("^" + regexStr + "$");
-    const entries: string[] = fs.readdirSync(dir);
+    const entries: string[] = _getfs().readdirSync(dir);
     return entries.filter((e: string) => re.test(e)).map((e: string) => dir === "." ? e : dir + "/" + e);
   } catch { return []; }
 }

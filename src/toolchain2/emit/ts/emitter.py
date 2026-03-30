@@ -778,6 +778,11 @@ def _emit_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
                     a_s = arg_strs[i] if i < len(arg_strs) else ""
                     wrapped_bc.append(_wrap_pyprint_arg(a_s, a_node))
                 return "pyPrint(" + ", ".join(wrapped_bc + kw_strs) + ")"
+            # extern_delegate with Attribute func: emit as method call owner.method(args)
+            # instead of free function call method(owner, args)
+            attr_name = _str(func, "attr") if isinstance(func, dict) else ""
+            if method_owner != "" and attr_name != "" and fn_name == attr_name:
+                return method_owner + "." + _safe_ts_ident(fn_name) + "(" + ", ".join(all_arg_strs) + ")"
             fn_name_safe = fn_name if "." in fn_name else _safe_ts_ident(fn_name)
             return fn_name_safe + "(" + ", ".join(builtin_arg_strs) + ")"
         if fn_name == "__CAST__":
@@ -1643,6 +1648,26 @@ def _emit_assign(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
                 export_prefix = "export " if is_top_level_public else ""
                 _emit(ctx, export_prefix + kw + " " + name + ann + " = " + val_code + ";")
             return
+        if t_kind == "Tuple":
+            # Tuple unpacking: fwd_x, fwd_y, fwd_z = normalize(...)
+            val_code = _emit_expr(ctx, value)
+            elements = _list(target_node, "elements")
+            names: list[str] = []
+            all_declared = True
+            for elem in elements:
+                if isinstance(elem, dict) and _str(elem, "kind") in ("Name", "NameTarget"):
+                    n = _ts_symbol_name(ctx, _str(elem, "id") or _str(elem, "repr"))
+                    names.append(n)
+                    if n not in ctx.var_types:
+                        all_declared = False
+                        ctx.var_types[n] = _str(elem, "resolved_type")
+                else:
+                    names.append("_")
+            if all_declared:
+                _emit(ctx, "[" + ", ".join(names) + "] = " + val_code + ";")
+            else:
+                _emit(ctx, "let [" + ", ".join(names) + "] = " + val_code + ";")
+            return
         val_code = _emit_expr(ctx, value)
         if t_kind == "Attribute":
             lhs = _emit_expr(ctx, target_node)
@@ -1777,11 +1802,17 @@ def _collect_assigns_from_block(stmts: list[JsonVal], out: list[tuple[str, dict]
                 if not isinstance(t, dict):
                     continue
                 t_kind = _str(t, "kind")
-                if t_kind not in ("Name", "NameTarget"):
-                    continue
-                name_raw = _str(t, "id") or _str(t, "repr")
-                if name_raw:
-                    out.append((name_raw, stmt))
+                if t_kind in ("Name", "NameTarget"):
+                    name_raw = _str(t, "id") or _str(t, "repr")
+                    if name_raw:
+                        out.append((name_raw, stmt))
+                elif t_kind == "Tuple":
+                    # Tuple unpacking: fwd_x, fwd_y, fwd_z = normalize(...)
+                    for elem in _list(t, "elements"):
+                        if isinstance(elem, dict) and _str(elem, "kind") in ("Name", "NameTarget"):
+                            name_raw = _str(elem, "id") or _str(elem, "repr")
+                            if name_raw:
+                                out.append((name_raw, elem))
         elif kind == "VarDecl":
             name_raw = _str(stmt, "name")
             if name_raw:
@@ -2647,6 +2678,14 @@ def _emit_class_def(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
                     fname = target_val
                 if fname != "":
                     dataclass_defaults[fname] = stmt.get("value")
+
+    # Emit PYTRA_TYPE_ID field declaration if this class has a type ID
+    fqcn_check = ctx.module_id + "." + name
+    class_tid_check = ctx.class_type_ids.get(fqcn_check)
+    if class_tid_check is None:
+        class_tid_check = ctx.class_type_ids.get(name)
+    if class_tid_check is not None and not ctx.strip_types:
+        _emit(ctx, "[PYTRA_TYPE_ID]!: number;")
 
     # Emit instance field declarations (skip static ones)
     if not ctx.strip_types and len(fields) > 0:

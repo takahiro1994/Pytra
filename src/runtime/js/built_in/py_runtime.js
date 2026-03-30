@@ -1,7 +1,7 @@
 // Python 互換ランタイム（JavaScript版）の共通関数群。
 // 将来的な Python -> JavaScript ネイティブ変換コードから利用する。
 
-import { writeFileSync, mkdirSync } from "node:fs";
+import { writeFileSync, mkdirSync, readFileSync, statSync } from "node:fs";
 import { dirname } from "node:path";
 
 const PY_TYPE_NONE = 0;
@@ -499,6 +499,89 @@ function open(filePath, _mode) {
   };
 }
 
+const pyopen = open;
+
+// ---------------------------------------------------------------------------
+// math module
+// ---------------------------------------------------------------------------
+const py_math_pi = Math.PI;
+function pyexp(x) { return Math.exp(x); }
+function pysqrt(x) { return Math.sqrt(x); }
+function pysin(x) { return Math.sin(x); }
+function pycos(x) { return Math.cos(x); }
+function pyfloor(x) { return Math.floor(x); }
+
+// ---------------------------------------------------------------------------
+// float / int helpers
+// ---------------------------------------------------------------------------
+function pyFloatStr(n) {
+  if (!isFinite(n)) return String(n);
+  if (Number.isInteger(n)) return n.toString() + ".0";
+  return String(n);
+}
+const int = Number;
+const float = Number;
+const str = String;
+
+// ---------------------------------------------------------------------------
+// time module
+// ---------------------------------------------------------------------------
+function perf_counter() {
+  if (typeof performance !== "undefined") return performance.now() / 1000;
+  return Date.now() / 1000;
+}
+
+// ---------------------------------------------------------------------------
+// re module
+// ---------------------------------------------------------------------------
+function match(pattern, s) {
+  return s.match(new RegExp("^" + pattern));
+}
+
+// ---------------------------------------------------------------------------
+// pathlib module
+// ---------------------------------------------------------------------------
+class PyPath {
+  constructor(p) {
+    this._p = typeof p === "string" ? p : p._p;
+  }
+  toString() { return this._p; }
+  get name() { const parts = this._p.split("/"); return parts[parts.length - 1] || ""; }
+  get stem() { const n = this.name; const i = n.lastIndexOf("."); return i > 0 ? n.slice(0, i) : n; }
+  get suffix() { const n = this.name; const i = n.lastIndexOf("."); return i > 0 ? n.slice(i) : ""; }
+  get parent() { const i = this._p.lastIndexOf("/"); return new PyPath(i >= 0 ? this._p.slice(0, i) : "."); }
+  joinpath(...parts) { return new PyPath(this._p + "/" + parts.map(p => typeof p === "string" ? p : p._p).join("/")); }
+  exists() { try { statSync(this._p); return true; } catch { return false; } }
+  read_text() { return readFileSync(this._p, "utf-8"); }
+  write_text(t) { mkdirSync(dirname(this._p), { recursive: true }); writeFileSync(this._p, t, "utf-8"); }
+  mkdir(opts) { mkdirSync(this._p, { recursive: !!(opts && opts.parents) }); }
+}
+function Path(p) { return new PyPath(p); }
+
+// ---------------------------------------------------------------------------
+// string helpers
+// ---------------------------------------------------------------------------
+function pyStrJoin(sep, items) { return items.join(sep); }
+function pyStrIsdigit(s) { return s.length > 0 && /^\d+$/.test(s); }
+function pyStrIsalpha(s) { return s.length > 0 && /^[a-zA-Z]+$/.test(s); }
+function pyStrStartswith(s, prefix) { return s.startsWith(prefix); }
+function pyStrEndswith(s, suffix) { return s.endsWith(suffix); }
+function pyStrReplace(s, old, rep, count) {
+  if (count === undefined || count < 0) return s.split(old).join(rep);
+  let result = s;
+  for (let i = 0; i < count; i++) {
+    const idx = result.indexOf(old);
+    if (idx === -1) break;
+    result = result.slice(0, idx) + rep + result.slice(idx + old.length);
+  }
+  return result;
+}
+function pyStrStrip(s, chars) {
+  if (!chars) return s.trim();
+  const re = new RegExp("^[" + chars.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&") + "]+|[" + chars.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&") + "]+$", "g");
+  return s.replace(re, "");
+}
+
 export {
   PY_TYPE_NONE,
   PY_TYPE_BOOL,
@@ -536,4 +619,26 @@ export {
   pyIsDigit,
   pyIsAlpha,
   open,
+  py_math_pi,
+  pyexp,
+  pysqrt,
+  pysin,
+  pycos,
+  pyfloor,
+  pyFloatStr,
+  int,
+  float,
+  str,
+  perf_counter,
+  match,
+  Path,
+  PyPath,
+  pyStrJoin,
+  pyStrIsdigit,
+  pyStrIsalpha,
+  pyStrStartswith,
+  pyStrEndswith,
+  pyStrReplace,
+  pyStrStrip,
+  pyopen,
 };
