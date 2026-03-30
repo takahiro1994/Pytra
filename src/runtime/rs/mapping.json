@@ -43,6 +43,8 @@
     "env.target": "\"rs\"",
     "py_print": "py_print",
     "py_len": "py_len",
+    "py_open": "open",
+    "open": "open",
     "py_to_string": "py_str",
     "static_cast": "__CAST__",
     "py_int_from_str": "py_str_to_i64",
@@ -111,7 +113,18 @@
     "e": "math_e",
     "math.e": "math_e",
     "perf_counter": "perf_counter",
-    "pytra_isinstance": "py_is_subtype"
+    "pytra_isinstance": "py_is_subtype",
+    "png.write_rgb_png": "write_rgb_png",
+    "gif.save_gif": "save_gif"
+  },
+  "module_native_files": {
+    "pytra.std.math": "math_native.rs",
+    "pytra.std.time": "time_native.rs"
+  },
+  "call_adapters": {
+    "py_print": "multi_arg_print",
+    "py_len": "ref_arg",
+    "open": "first_ref_arg"
   },
   "skip_modules": [
     "pytra.built_in.",
@@ -121,6 +134,7 @@
     "pytra.std.os_path",
     "pytra.std.random",
     "pytra.std.sys",
+    "pytra.std.env",
     "pytra.std.time",
     "pytra.core."
   ]

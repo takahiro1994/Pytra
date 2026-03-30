@@ -218,6 +218,58 @@ def _build_cpp_via_toolchain2(
     return result.returncode
 
 
+def _build_rs_via_toolchain2(
+    input_file: str, output_dir: str, emit_dir: str,
+    exe_name: str, do_build: bool, do_run: bool, single_output: str,
+) -> int:
+    """Build Rust target via toolchain2 pipeline."""
+    import os as _os
+    src_dir = _find_src_dir()
+    cli2 = src_dir + "/pytra-cli2.py"
+
+    build_cmd = [_python(), cli2, "-build", input_file, "--target", "rs", "-o", emit_dir]
+    result = _run(build_cmd)
+    if result.returncode != 0:
+        return result.returncode
+
+    entry_stem = Path(input_file).stem
+    generated = Path(emit_dir) / (entry_stem + ".rs")
+    if single_output != "" and generated.exists():
+        so_path = Path(single_output)
+        so_path.parent.mkdir(parents=True, exist_ok=True)
+        so_path.write_text(generated.read_text(encoding="utf-8"), encoding="utf-8")
+
+    if not do_build and not do_run:
+        return 0
+
+    if not generated.exists():
+        _fatal("missing Rust entry file: " + str(generated))
+
+    rs_exe = emit_dir + "/" + exe_name
+    rustc_path = "/usr/local/cargo/bin/rustc"
+    cargo_bin = "/usr/local/cargo/bin"
+    compile_cmd = [
+        "env",
+        "RUSTUP_HOME=/usr/local/rustup",
+        "CARGO_HOME=/usr/local/cargo",
+        "PATH=" + cargo_bin + ":" + _os.environ.get("PATH", ""),
+        rustc_path,
+        "-O",
+        str(generated),
+        "-o",
+        rs_exe,
+    ]
+    result = _run(compile_cmd)
+    if result.returncode != 0:
+        return result.returncode
+
+    if not do_run:
+        return 0
+
+    result = _run([rs_exe])
+    return result.returncode
+
+
 # ---------- build ----------
 
 def cmd_build(argv: list[str], *, default_build: bool = True) -> int:
@@ -287,6 +339,8 @@ def cmd_build(argv: list[str], *, default_build: bool = True) -> int:
         return _build_go_via_toolchain2(input_file, output_dir, emit_dir, exe_name, do_build, do_run, single_output)
     if target == "cpp":
         return _build_cpp_via_toolchain2(input_file, output_dir, emit_dir, exe_name, do_build, do_run, single_output)
+    if target == "rs":
+        return _build_rs_via_toolchain2(input_file, output_dir, emit_dir, exe_name, do_build, do_run, single_output)
 
     # Stage 1: compile + link (writes manifest.json + east3/ into output_dir)
     link_cmd = [

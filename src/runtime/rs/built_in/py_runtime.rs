@@ -344,6 +344,20 @@ impl<T> PyBool for PyList<T> {
         !self.is_empty()
     }
 }
+impl PyBool for PyAny {
+    fn py_bool(&self) -> bool {
+        match self {
+            PyAny::None => false,
+            PyAny::Bool(v) => *v,
+            PyAny::Int(v) => *v != 0,
+            PyAny::Float(v) => *v != 0.0,
+            PyAny::Str(v) => !v.is_empty(),
+            PyAny::List(v) => !v.is_empty(),
+            PyAny::Dict(v) => !v.is_empty(),
+            PyAny::Set(v) => !v.is_empty(),
+        }
+    }
+}
 impl<K, V> PyBool for HashMap<K, V> {
     fn py_bool(&self) -> bool {
         !self.is_empty()
@@ -601,6 +615,42 @@ impl<T> PyLen for VecDeque<T> {
     fn py_len(&self) -> usize { self.len() }
 }
 
+pub trait PyDequeCompat {
+    fn append(&mut self, value: i64);
+    fn appendleft(&mut self, value: i64);
+    fn popleft(&mut self) -> i64;
+    fn pop(&mut self) -> i64;
+    fn __len__(&self) -> usize;
+}
+
+impl PyDequeCompat for VecDeque<PyAny> {
+    fn append(&mut self, value: i64) {
+        self.push_back(PyAny::Int(value));
+    }
+
+    fn appendleft(&mut self, value: i64) {
+        self.push_front(PyAny::Int(value));
+    }
+
+    fn popleft(&mut self) -> i64 {
+        match self.pop_front() {
+            Some(value) => py_int(&value),
+            None => panic!("pop from empty deque"),
+        }
+    }
+
+    fn pop(&mut self) -> i64 {
+        match self.pop_back() {
+            Some(value) => py_int(&value),
+            None => panic!("pop from empty deque"),
+        }
+    }
+
+    fn __len__(&self) -> usize {
+        self.len()
+    }
+}
+
 pub fn py_in<C, K: ?Sized>(container: &C, key: &K) -> bool
 where
     C: PyContains<K>,
@@ -650,7 +700,7 @@ pub fn py_len<T: PyLen>(value: &T) -> usize {
     value.py_len()
 }
 
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, PartialEq)]
 pub enum PyAny {
     Int(i64),
     Float(f64),
@@ -661,6 +711,36 @@ pub enum PyAny {
     Set(Vec<PyAny>),
     #[default]
     None,
+}
+
+impl PartialEq<String> for PyAny {
+    fn eq(&self, other: &String) -> bool {
+        match self {
+            PyAny::Str(s) => s == other,
+            _ => false,
+        }
+    }
+}
+
+impl PartialEq<PyAny> for String {
+    fn eq(&self, other: &PyAny) -> bool {
+        other == self
+    }
+}
+
+impl PartialEq<&str> for PyAny {
+    fn eq(&self, other: &&str) -> bool {
+        match self {
+            PyAny::Str(s) => s == *other,
+            _ => false,
+        }
+    }
+}
+
+impl PartialEq<PyAny> for &str {
+    fn eq(&self, other: &PyAny) -> bool {
+        other == self
+    }
 }
 
 pub fn py_any_as_dict(v: PyAny) -> BTreeMap<String, PyAny> {
@@ -711,7 +791,37 @@ impl PyAnyToI64Arg for i64 {
         *self
     }
 }
+impl PyAnyToI64Arg for i8 {
+    fn py_any_to_i64_arg(&self) -> i64 {
+        *self as i64
+    }
+}
+impl PyAnyToI64Arg for i16 {
+    fn py_any_to_i64_arg(&self) -> i64 {
+        *self as i64
+    }
+}
 impl PyAnyToI64Arg for i32 {
+    fn py_any_to_i64_arg(&self) -> i64 {
+        *self as i64
+    }
+}
+impl PyAnyToI64Arg for u8 {
+    fn py_any_to_i64_arg(&self) -> i64 {
+        *self as i64
+    }
+}
+impl PyAnyToI64Arg for u16 {
+    fn py_any_to_i64_arg(&self) -> i64 {
+        *self as i64
+    }
+}
+impl PyAnyToI64Arg for u32 {
+    fn py_any_to_i64_arg(&self) -> i64 {
+        *self as i64
+    }
+}
+impl PyAnyToI64Arg for u64 {
     fn py_any_to_i64_arg(&self) -> i64 {
         *self as i64
     }
@@ -1326,6 +1436,42 @@ impl PyPath {
     }
 }
 
+pub fn py_getcwd() -> String {
+    std::env::current_dir()
+        .expect("cwd")
+        .to_string_lossy()
+        .to_string()
+}
+
+pub fn py_format_grouped_int(value: i64) -> String {
+    let negative = value < 0;
+    let digits = value.abs().to_string();
+    let mut out = String::new();
+    for (idx, ch) in digits.chars().rev().enumerate() {
+        if idx > 0 && idx % 3 == 0 {
+            out.push(',');
+        }
+        out.push(ch);
+    }
+    let mut grouped: String = out.chars().rev().collect();
+    if negative {
+        grouped.insert(0, '-');
+    }
+    grouped
+}
+
+pub fn py_format_percent(value: f64, precision: usize) -> String {
+    format!("{:.*}%", precision, value * 100.0)
+}
+
+pub fn py_mkdir(path: String, exist_ok: bool) {
+    PyPath::new(&path).mkdir(false, exist_ok);
+}
+
+pub fn py_makedirs(path: String, exist_ok: bool) {
+    PyPath::new(&path).mkdir(true, exist_ok);
+}
+
 impl std::fmt::Display for PyPath {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}", self.value)
@@ -1367,6 +1513,13 @@ impl PyFileWritable for Vec<i64> {
 impl PyFileWritable for Vec<u8> {
     fn write_to_file(&self, file: &mut fs::File) {
         file.write_all(self).expect("write failed");
+    }
+}
+
+impl PyFileWritable for PyList<i64> {
+    fn write_to_file(&self, file: &mut fs::File) {
+        let bytes: Vec<u8> = self.py_borrow().iter().map(|v| (*v & 0xFF) as u8).collect();
+        file.write_all(&bytes).expect("write failed");
     }
 }
 
