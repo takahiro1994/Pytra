@@ -47,6 +47,8 @@
 
 ### P3-JAVA-SELFHOST: Java emitter で toolchain2 を Java に変換し build を通す
 
+文脈: [docs/ja/plans/p3-java-selfhost.md](../plans/p3-java-selfhost.md)
+
 1. [ ] [ID: P3-JAVA-SELFHOST-S0] selfhost 対象コード（`src/toolchain2/` 全 .py）で戻り値型の注釈が欠けている関数に型注釈を追加する — resolve が `inference_failure` にならない状態にする（他言語と共通。先に完了した側の成果を共有）
 2. [ ] [ID: P3-JAVA-SELFHOST-S1] toolchain2 全 .py を Java に emit し、build が通ることを確認する
 3. [ ] [ID: P3-JAVA-SELFHOST-S2] build 失敗ケースを emitter/runtime の修正で解消する（EAST の workaround 禁止）
