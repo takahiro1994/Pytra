@@ -160,7 +160,7 @@ def _transpile_in_memory(
             _copy_go_runtime(emit_dir)
         elif target == "java":
             for m in link_result.linked_modules:
-                if m.module_kind in ("runtime", "helper"):
+                if m.module_kind == "runtime":
                     continue
                 code = emit_java_module(m.east_doc)
                 if code.strip() == "":
@@ -204,6 +204,10 @@ def _transpile_in_memory(
                     code, encoding="utf-8"
                 )
             _copy_js_runtime(emit_dir)
+            # ESM imports require "type": "module" in package.json for .js files
+            pkg_json = emit_dir / "package.json"
+            if not pkg_json.exists():
+                pkg_json.write_text('{"type":"module"}\n', encoding="utf-8")
         elif target == "cpp":
             for m in link_result.linked_modules:
                 if m.module_kind == "runtime":
@@ -418,11 +422,15 @@ def _run_target(
         entry_ts = emit_dir / (stem + ".ts")
         if not entry_ts.exists():
             return subprocess.CompletedProcess("", 1, "", f"entry file not found: {entry_ts}")
-        ts_env = dict(env) if env else {}
-        ts_env.setdefault("npm_config_cache", "/tmp/npm-cache")
+        # Compile .ts → .js with tsc, then run with node
+        entry_js = entry_ts.with_suffix(".js")
+        compile_cmd = f"tsc --target es2022 --module nodenext --moduleResolution nodenext --esModuleInterop --outDir {shlex.quote(str(emit_dir))} {shlex.quote(str(entry_ts))}"
+        compile_result = run_shell(compile_cmd, cwd=work_dir, env=env, timeout_sec=timeout_sec)
+        if compile_result.returncode != 0:
+            return compile_result
         return run_shell(
-            f"npx -y tsx {shlex.quote(str(entry_ts))}",
-            cwd=work_dir, env=ts_env, timeout_sec=timeout_sec,
+            f"node {shlex.quote(str(entry_js))}",
+            cwd=work_dir, env=env, timeout_sec=timeout_sec,
         )
 
     if target == "js":
