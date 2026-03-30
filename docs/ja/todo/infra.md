@@ -6,7 +6,7 @@
 
 > 領域別 TODO。全体索引は [index.md](./index.md) を参照。
 
-最終更新: 2026-03-30（P3-SAMPLE-AUTO-COPY 完了）
+最終更新: 2026-03-30（P3-SELFHOST-PARITY 完了）
 
 ## 運用ルール
 
@@ -19,17 +19,6 @@
 完了済みタスクは [アーカイブ](archive/20260330.md) / [P10-REORG アーカイブ](archive/20260330-p10reorg.md) を参照。
 
 ## 未完了タスク
-
-### P3-SELFHOST-PARITY: selfhost 済みコンパイラによる fixture/sample parity 検証
-
-文脈: [docs/ja/plans/p3-selfhost-parity.md](../plans/p3-selfhost-parity.md)
-
-注: 各言語の selfhost ビルドが通るかは言語次第。スクリプトの骨格は先に作り、ビルドが通る言語から順に検証する。ビルドが通らない言語は `selfhost_<lang>.json` に `build: fail` が記録される。
-
-1. [ ] [ID: P3-SELFHOST-PARITY-S1] `tools/run/run_selfhost_parity.py` を作成する — selfhost バイナリのビルド → emit → compile + run → stdout 比較の一連のフローを実行する
-2. [ ] [ID: P3-SELFHOST-PARITY-S2] 結果を `.parity-results/selfhost_<lang>.json` に記録する — `gen_backend_progress.py` が読み取り selfhost マトリクスに反映
-3. [ ] [ID: P3-SELFHOST-PARITY-S3] Python 行のハードコードを廃止し、`.parity-results/selfhost_python.json` から読む形に移行する
-4. [ ] [ID: P3-SELFHOST-PARITY-S4] selfhost マトリクスの PASS 条件を「fixture + sample の全件 parity PASS」に確定する
 
 ### P20-INT32: int のデフォルトサイズを int64 → int32 に変更
 
