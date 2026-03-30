@@ -8,7 +8,7 @@
 
 ## 1. golden / テスト生成
 
-- **golden ファイル（east1/east2/east3/east3-opt/linked）は `python3 tools/gen/regenerate_golden.py` でのみ生成すること。** `pytra-cli2` を直接叩いて手動で出力先を指定してはならない。手動生成はパスの間違い（`test/fixtures/` や `test/pytra/east1/built_in/` のような誤ったディレクトリ）の原因になる。
+- **golden ファイル（east1/east2/east3/east3-opt/linked/selfhost）は git 管理しない（`.gitignore` 対象）。** `python3 tools/gen/regenerate_golden.py` でローカルに再生成して使う。golden をコミットしてはならない。手動編集も禁止。
 - **sample の再生成は `python3 tools/gen/regenerate_samples.py` でのみ行うこと。**
 
 ## 2. tools/ 配置ルール
