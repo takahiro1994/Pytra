@@ -82,6 +82,8 @@ Review 指摘: `py_splitext` を多値返却にした後、emitter の `_emit_as
 
 ### P7-GO-SELFHOST-RUNTIME: Go selfhost バイナリを実際に動かして parity PASS する
 
+文脈: [docs/ja/plans/p7-go-selfhost-runtime.md](../plans/p7-go-selfhost-runtime.md)
+
 P6 で go build は通ったが、selfhost バイナリが実際に fixture/sample/stdlib を変換して parity PASS するにはまだギャップがある。
 
 1. [ ] [ID: P7-GO-SELFHOST-RT-S1] linker の type_id 割り当てで外部ベースクラス（CommonRenderer(ABC) 等）の階層解決を修正する — object にフォールバックする
