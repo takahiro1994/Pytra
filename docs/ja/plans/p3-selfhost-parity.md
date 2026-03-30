@@ -77,7 +77,7 @@ python3 tools/run/run_selfhost_parity.py \
 
 `gen_backend_progress.py` は既に `.parity-results/selfhost_<lang>.json` を読む仕組みがある。本スクリプトがこの JSON を書き出せば、selfhost マトリクスに自動反映される。
 
-PASS 条件: `emit_targets.<lang>.fixture_fail == 0 && sample_fail == 0`
+PASS 条件: `emit_targets.<lang>.fixture_fail == 0 && sample_fail == 0 && stdlib_fail == 0`（fixture + sample + stdlib の全てが PASS）
 
 ### Python 行のハードコード廃止
 

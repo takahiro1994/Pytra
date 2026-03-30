@@ -25,8 +25,11 @@ An overview of Pytra's development status. Links to test results, tasks, changel
 [Sample matrix](./backend-progress-sample.md)
 — Real applications. Mandelbrot set, ray tracing, Game of Life, etc. Run in each language and verify identical output to Python. See [samples list](../tutorial/samples.md).
 
+[Stdlib matrix](./backend-progress-stdlib.md)
+— Verify Python standard library compatible modules (math, json, pathlib, etc.) work in each language, per module.
+
 [Selfhost matrix](./backend-progress-selfhost.md)
-— Transpile Pytra's own compiler (toolchain2) to each language and verify the resulting compiler can emit all targets.
+— Transpile Pytra's own compiler (toolchain2) to each language and verify the resulting compiler can emit all targets. The Python row requires fixture + sample + stdlib all PASS to be marked PASS.
 
 [Emitter hardcode violation matrix](./emitter-hardcode-lint.md)
 — Counts grep-detected violations where emitters hardcode module names, runtime symbols, or class names instead of using EAST3 data.
