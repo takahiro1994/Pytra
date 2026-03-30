@@ -217,11 +217,6 @@ C++ ランタイムソースと依存関係を `manifest.json` と `cpp_runtime_
 `toolchain2/` の自前実装が golden file と一致するかを検証するための正解データを作る。
 主要オプション: `--stage={east1,east2,east3,east3-opt}` / `-o OUTPUT_DIR` / `--from=python` / `--sample-dir`
 
-### `generate_golden_linked.py`
-linked ステージ（east3-opt → linked manifest + east3）の golden file を生成する。
-`toolchain2/link/` を使ってリンク処理を実行し、`manifest.json` と linked east3 ファイルを出力する。
-fixture / sample で出力ディレクトリが分かれる。
-
 ### `regenerate_golden.py`
 `toolchain2` パイプラインで golden file を全段（parse→resolve→compile→optimize）再生成する。
 各段の出力で既存の golden file を上書きする。
