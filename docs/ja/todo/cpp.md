@@ -6,7 +6,7 @@
 
 > 領域別 TODO。全体索引は [index.md](./index.md) を参照。
 
-最終更新: 2026-03-29
+最終更新: 2026-03-31
 
 ## 運用ルール
 
@@ -20,52 +20,23 @@
 
 ## 未完了タスク
 
-### P0-CPP-GIF-TRANSPILE: pytra.utils.gif をトランスパイル対象にする
-
-`src/runtime/cpp/generated/utils/gif.cpp` が撤去済み（toolchain2 移行時に `generated/` ごと削除）。`mapping.json` の `skip_modules` に `pytra.utils.` が含まれているため `pytra.utils.gif` がトランスパイルされず、`py_save_gif` が未定義でリンクエラーになる。TS の PNG 修正（`skip_modules` から `pytra.utils.png` を外した）と同じ構造。
-
-1. [ ] [ID: P0-CPP-GIF-S1] `src/runtime/cpp/mapping.json` の `skip_modules` を修正する — `pytra.utils.gif` と `pytra.utils.png` をスキップ対象から外し、トランスパイル対象にする。`pyopen` / `PyFile` の OS glue が C++ runtime に必要なら追加する
-2. [ ] [ID: P0-CPP-GIF-S2] sample の GIF 出力ケース（05〜16）が C++ で compile + run parity PASS することを確認する
-
-### P0-CPP-TYPE-MAPPING: C++ emitter の型写像を mapping.json に移行する
-
-仕様: [spec-runtime-mapping.md](../spec/spec-runtime-mapping.md) §7
-
-1. [x] [ID: P0-CPP-TYPEMAP-S1] `src/runtime/cpp/mapping.json` に `types` テーブルを追加する — POD 型（`int64` → `int64_t` 等）とクラス型（`Exception` → `std::runtime_error` 等）の全写像を定義する
-   - 完了: POD 型・クラス型・エイリアス型の全 23 エントリを追加
-2. [x] [ID: P0-CPP-TYPEMAP-S2] `CodeEmitter` 基底クラスに `resolve_type()` メソッドを追加する — `types` テーブルから型名を解決する共通 API
-   - 完了: 既存実装（code_emitter.py:340 の `resolve_type()`）を確認
-3. [x] [ID: P0-CPP-TYPEMAP-S3] C++ emitter の型名ハードコード（`types.py` 含む）を `resolve_type()` 呼び出しに置換する
-   - 完了: `init_types_mapping()` を types.py に追加、emitter.py で mapping.types を注入。`cpp_type()` が mapping.json の `types` テーブルを優先参照するよう変更
-4. [x] [ID: P0-CPP-TYPEMAP-S4] fixture parity に影響がないことを確認する
-   - 完了: control/for_range, stdlib/math_extended が OK
-
-### P3-COMMON-RENDERER-CPP: C++ emitter の CommonRenderer 移行 + fixture parity
-
-文脈: [docs/ja/plans/p2-lowering-profile-common-renderer.md](../plans/p2-lowering-profile-common-renderer.md)
-仕様: [docs/ja/spec/spec-language-profile.md](../spec/spec-language-profile.md) §8
-
-1. [x] [ID: P3-CR-CPP-S1] C++ emitter を CommonRenderer + override 構成に移行する — `src/toolchain2/emit/profiles/cpp.json` のプロファイルに従い、CommonRenderer の共通ノード走査を使う構成にする。C++ 固有のノード（ClassDef, FunctionDef, ForCore, With 等）だけ override として残す
-   - 完了: emit_stmt_extension を直接ディスパッチに変更、_emit_body/_emit_stmt を renderer 経由に統一、_emit_common_stmt_if_supported 削除、dead code (_emit_if/_emit_while) 削除。parity: for_range/if_else/exception/dataclass OK
-2. [x] [ID: P3-CR-CPP-S2] fixture 132 件 + sample 18 件の C++ compile + run parity を通す — collections 20/20, imports 7/7, stdlib 16/16 を含む全カテゴリ通過
-   - 完了: commit 6e4ff3b1c — ヘッダシャドウイング修正、sys.h Object<list<str>>型修正、emitter :: 修飾、JsonValue IsNot None 修正、str.isalnum/str.index 追加、float 精度修正
-3. [x] [ID: P3-CR-CPP-S3] C++ runtime の dict_ops.h インクルードガード外コードを修正する — タプル用 `py_at` の実装が `#endif` の外に置かれており、多重インクルードで再定義エラーになる
-   - 完了: commit 51447a04f — `py_at` for tuple を `#endif` の内側に移動
-4. [x] [ID: P3-CR-CPP-S4] C++ runtime の py_types.h 例外安全性を修正する — `PyBoxedValue` と `ControlBlock` の2段階 `new` で例外安全にする。実用上 bad_alloc はリカバー不可能だが、変換器が生成するコードの品質として例外安全を保証する
-   - 完了: commit 678317b7e / 51447a04f — `make_unique` に移行
-5. [x] [ID: P3-CR-CPP-S5] CommonRenderer の list/dict/tuple 出力で `source_span.lineno` を参照し、元ソースの改行を再現する
-   - 完了: 前セッションで実装済み
-6. [x] [ID: P3-CR-CPP-S6] isinstance を `pytra_isinstance` に一本化する — プリミティブ型（`str`, `list`, `dict`, `set` 等）の isinstance 判定を `type_id_support.h` の `py_runtime_object_isinstance` + `PYTRA_TID_*` から linker 生成の `pytra_isinstance` に移行する。`type_id_support.h` の旧 isinstance 関数群（`py_tid_is_subtype`, `py_tid_isinstance`, `py_runtime_value_type_id`）を削除する。注: `g_type_table` は destructor dispatch に使われており、本タスクのスコープ外。`g_type_table` の撤去は P10-CPP-TYPETABLE-REDESIGN で別途対応する
-   - 完了: type_id.py の `_BUILTIN_CLASS_IDS` に全プリミティブ leaf 型 (None/bool/int/float/str/list/dict/set) を追加。linker が isinstance を pytra_isinstance に自動リライト。emitter.py の throw セミコロン欠落 (pre-existing bug) も同時修正
-7. [x] [ID: P3-CR-CPP-S7] `rc_list_from_value` / `rc_dict_from_value` 等の型別 RC 化関数を汎用 `rc_from_value<T>` に一本化する — emitter は「非 POD → `rc_from_value(...)` で包む」だけで済むようにし、型ごとの関数名分岐を emitter から除去する
-   - 完了: py_types.h に rc_from_value オーバーロード群を追加、emitter.py の _wrap_container_value_expr を rc_from_value に統一。parity: for_range/comprehension/argparse_extended OK
-8. [x] [ID: P3-CR-CPP-S8] C++ emitter に `_safe_cpp_ident` を追加する — C++ 予約語（`double`, `class`, `int`, `float`, `namespace`, `template` 等）と衝突する関数名・メソッド名・変数名に末尾 `_` を付与する（Go emitter の `_safe_go_ident` と同等）
-
 ### P5-CPP-PARENS: C++ emitter に演算子優先順位テーブルを追加する
 
 
-1. [ ] [ID: P5-CPP-PARENS-S1] C++ の演算子優先順位テーブルを定義し、CommonRenderer に渡す
-2. [ ] [ID: P5-CPP-PARENS-S2] C++ fixture + sample parity に影響がないことを確認する
+1. [x] [ID: P5-CPP-PARENS-S1] C++ の演算子優先順位テーブルを定義し、CommonRenderer に渡す
+   - 完了: `src/toolchain2/emit/profiles/cpp.json` に `operators.precedence` を追加し、`CommonRenderer` が profile から優先順位表を読み込んで `BinOp` / `UnaryOp` / `Compare` の括弧要否を判定するよう更新。C++ emitter はこの共通ロジックを使う形へ寄せ、`if ((count > 0))` のような冗長括弧を削減した
+2. [x] [ID: P5-CPP-PARENS-S2] C++ fixture + sample parity に影響がないことを確認する
+   - 完了: sample は `python3 tools/check/runtime_parity_check.py --targets cpp --case-root sample --east3-opt-level 2 --cpp-codegen-opt 3` で 18/18 PASS。fixture は `PYTHONPATH=src:tools python3 tools/check/runtime_parity_check_fast.py --targets cpp --case-root fixture --east3-opt-level 2` で `131 cases / 126 pass / 5 fail`。fail case は `any_none`, `integer_promotion`, `nested_closure_def`, `ok_generator_tuple_target`, `ok_typed_varargs_representative` の既知 5 件で、`docs/ja/progress/backend-progress-fixture.md` の C++ 赤ケースと一致し、新規 failure は増えていないことを確認
+
+### P6-CPP-FIXPAR: fixture parity 失敗 5 件を解消する
+
+文脈: [docs/ja/plans/p6-cpp-fixture-parity-failures.md](../plans/p6-cpp-fixture-parity-failures.md)
+
+1. [ ] [ID: P6-CPP-FIXPAR-S1] `any_none` の `output mismatch` を解消する
+2. [ ] [ID: P6-CPP-FIXPAR-S2] `integer_promotion` の `output mismatch` を解消する
+3. [ ] [ID: P6-CPP-FIXPAR-S3] `nested_closure_def` の closure 参照解決を修正する
+4. [ ] [ID: P6-CPP-FIXPAR-S4] `ok_generator_tuple_target` の `py_zip` / `py_sum` 再定義を解消する
+5. [ ] [ID: P6-CPP-FIXPAR-S5] `ok_typed_varargs_representative` の const 修飾不整合を解消する
 
 ### P10-CPP-TYPETABLE-REDESIGN: g_type_table と destructor dispatch の再設計
 
