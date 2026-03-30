@@ -590,8 +590,7 @@ def _emit_isinstance(ctx: RsEmitContext, node: dict[str, JsonVal]) -> str:
             # User-defined class: encoded as PyAny::Int(type_id) — check via py_is_subtype
             if expected_id in ctx.class_names:
                 tid_const = ctx.module_prefix.upper() + safe_rs_ident(expected_id).upper() + "_TID"
-                return ("(if let PyAny::Int(__tid) = &" + val_str +
-                        " { py_is_subtype(*__tid, " + tid_const + ") } else { false })")
+                return "(if let PyAny::Int(__tid) = &" + val_str + " { py_is_subtype(*__tid, " + tid_const + ") } else { false })"
             return "false"
         # For Box<dyn Any> (union types) — use downcast_ref
         ref_val = "&" + val_str if not val_str.startswith("&") else val_str
@@ -728,7 +727,7 @@ def _emit_attribute(ctx: RsEmitContext, node: dict[str, JsonVal]) -> str:
         if cls != "" and attr in ctx.class_property_methods.get(cls, set()):
             return obj + "." + safe_rs_ident(attr) + "()"
     # PyPath string fields must be cloned when accessed (String is not Copy)
-    if obj_type == "Path" and attr in ("name", "stem", "suffix"):
+    if rs_type(obj_type) == "PyPath" and attr in ("name", "stem", "suffix"):
         return obj + "." + safe_rs_ident(attr) + ".clone()"
     return obj + "." + safe_rs_ident(attr)
 
