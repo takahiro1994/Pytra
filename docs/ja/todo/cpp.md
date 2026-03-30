@@ -22,14 +22,11 @@
 
 ### P0-CPP-LITERAL-CAST: 整数リテラルの冗長キャストを除去する
 
-`_emit_constant` が `int64` 等の整数リテラルを常に `int64(0)` のようにキャスト付きで出力している（`emitter.py:1026-1027`）。C++ の整数リテラルは値に応じて `int` → `long` → `long long` と型が決まり、代入先の型に暗黙変換される。リテラル値が代入先の型の表現範囲内に収まる場合はキャスト不要。
+文脈: [docs/ja/plans/plan-cpp-literal-cast.md](../plans/plan-cpp-literal-cast.md)
 
-判定基準: リテラル値が C++ の `int` 範囲（-2^31 〜 2^31-1）に収まり、かつ代入先の型が符号付き整数型（`int32`, `int64`）であればキャストを省略できる。以下はキャストが必要:
-- `uint8`/`uint16`/`uint32`/`uint64` への代入（符号なし型への暗黙変換で意図しない promotion が起き得る）
-- `int8`/`int16` への代入（narrowing conversion）
-- `int` 範囲を超える大きなリテラル値
+`_emit_constant` が整数リテラルを常に `int64(0)` のようにキャスト付きで出力している。C++ の integer promotion 規則を考慮し、安全な場合のみキャストを省略する。
 
-1. [ ] [ID: P0-CPP-LITERAL-S1] `_emit_constant` でリテラル値と代入先型を考慮し、安全な場合のみキャストを省略する
+1. [ ] [ID: P0-CPP-LITERAL-S1] `_emit_constant` でリテラル値と代入先型を考慮し、安全な場合のみキャストを省略する — `int32`/`int64` かつ `int` 範囲内は省略、それ以外（`int8`/`int16`/`uint*`/大きな値）は維持
 2. [ ] [ID: P0-CPP-LITERAL-S2] fixture + sample parity に影響がないことを確認する
 
 ### P5-CPP-PARENS: C++ emitter に演算子優先順位テーブルを追加する
