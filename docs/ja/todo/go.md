@@ -59,7 +59,7 @@ Review 指摘: `py_splitext` を多値返却にした後、emitter の `_emit_as
 
 ### P6-GO-SELFHOST: Go emitter で toolchain2 を Go に変換し go build を通す
 
-前提: P1-GO-CONTAINER-WRAPPER 完了後に着手。
+文脈: [docs/ja/plans/p6-go-selfhost.md](../plans/p6-go-selfhost.md)
 
 1. [ ] [ID: P6-GO-SELFHOST-S0] selfhost 対象コード（`src/toolchain2/` 全 .py）で戻り値型の注釈が欠けている関数に型注釈を追加する — resolve が `inference_failure` にならない状態にする
 2. [ ] [ID: P6-GO-SELFHOST-S1] toolchain2 全 .py を Go に emit し、go build が通ることを確認する
