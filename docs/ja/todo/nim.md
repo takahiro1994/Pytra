@@ -30,6 +30,8 @@
 
 ### P1-NIM-EMITTER: Nim emitter を toolchain2 に新規実装する
 
+文脈: [docs/ja/plans/p1-nim-emitter.md](../plans/p1-nim-emitter.md)
+
 1. [ ] [ID: P1-NIM-EMITTER-S1] `src/toolchain2/emit/nim/` に Nim emitter を新規実装する — CommonRenderer + override 構成。旧 `src/toolchain/emit/nim/` と TS emitter を参考にする。Nim 固有（インデントベース構文、`var`/`let`/`const`、`proc`/`func` 等）だけ override
 2. [ ] [ID: P1-NIM-EMITTER-S2] `src/runtime/nim/mapping.json` を作成する — `calls`, `types`, `env.target`, `builtin_prefix`, `implicit_promotions` を定義
 3. [ ] [ID: P1-NIM-EMITTER-S3] fixture 全件の Nim emit 成功を確認する

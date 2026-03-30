@@ -30,6 +30,8 @@
 
 ### P1-PHP-EMITTER: PHP emitter を toolchain2 に新規実装する
 
+文脈: [docs/ja/plans/p1-php-emitter.md](../plans/p1-php-emitter.md)
+
 1. [ ] [ID: P1-PHP-EMITTER-S1] `src/toolchain2/emit/php/` に PHP emitter を新規実装する — CommonRenderer + override 構成。旧 `src/toolchain/emit/php/` と TS emitter を参考にする。PHP 固有（`$` 変数、`->` アクセス、`array()` 等）だけ override
 2. [ ] [ID: P1-PHP-EMITTER-S2] `src/runtime/php/mapping.json` を作成する — `calls`, `types`, `env.target`, `builtin_prefix`, `implicit_promotions` を定義
 3. [ ] [ID: P1-PHP-EMITTER-S3] fixture 全件の PHP emit 成功を確認する

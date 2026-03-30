@@ -30,6 +30,8 @@
 
 ### P1-LUA-EMITTER: Lua emitter を toolchain2 に新規実装する
 
+文脈: [docs/ja/plans/p1-lua-emitter.md](../plans/p1-lua-emitter.md)
+
 1. [ ] [ID: P1-LUA-EMITTER-S1] `src/toolchain2/emit/lua/` に Lua emitter を新規実装する — CommonRenderer + override 構成。旧 `src/toolchain/emit/lua/` と TS emitter を参考にする。Lua 固有（1-based index、nil、metatables 等）だけ override
 2. [ ] [ID: P1-LUA-EMITTER-S2] `src/runtime/lua/mapping.json` を作成する — `calls`, `types`, `env.target`, `builtin_prefix`, `implicit_promotions` を定義
 3. [ ] [ID: P1-LUA-EMITTER-S3] fixture 全件の Lua emit 成功を確認する

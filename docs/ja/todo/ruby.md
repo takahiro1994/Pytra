@@ -30,6 +30,8 @@
 
 ### P1-RUBY-EMITTER: Ruby emitter を toolchain2 に新規実装する
 
+文脈: [docs/ja/plans/p1-ruby-emitter.md](../plans/p1-ruby-emitter.md)
+
 1. [ ] [ID: P1-RUBY-EMITTER-S1] `src/toolchain2/emit/rb/` に Ruby emitter を新規実装する — CommonRenderer + override 構成。旧 `src/toolchain/emit/rb/` と TS emitter を参考にする
 2. [ ] [ID: P1-RUBY-EMITTER-S2] `src/runtime/ruby/mapping.json` を作成する — `calls`, `types`, `env.target`, `builtin_prefix`, `implicit_promotions` を定義
 3. [ ] [ID: P1-RUBY-EMITTER-S3] fixture 全件の Ruby emit 成功を確認する
