@@ -133,15 +133,31 @@ def _load_results(case_root: str) -> dict[str, dict[str, dict[str, object]]]:
     return data
 
 
-def _load_lint_results() -> dict[str, int | None]:
-    """Return {lang: total_violations | None}. None = not implemented."""
+def _load_lint_results() -> dict[str, dict[str, int | None] | None]:
+    """Return {lang: {"violations": N, "pass_cats": N, "total_cats": N} | None}.
+
+    None value means not implemented. Supports both old (int) and new (dict) JSON format.
+    """
     path = PARITY_DIR / "emitter_lint.json"
     if not path.exists():
         return {}
     try:
         doc = json.loads(path.read_text(encoding="utf-8"))
         langs = doc.get("langs", {})
-        return {k: (None if v is None else int(v)) for k, v in langs.items()}
+        result: dict[str, dict[str, int | None] | None] = {}
+        for k, v in langs.items():
+            if v is None:
+                result[k] = None
+            elif isinstance(v, dict):
+                result[k] = {
+                    "violations": v.get("violations"),
+                    "pass_cats": v.get("pass_cats"),
+                    "total_cats": v.get("total_cats"),
+                }
+            else:
+                # 旧フォーマット（int）後方互換
+                result[k] = {"violations": int(v), "pass_cats": None, "total_cats": None}
+        return result
     except Exception:
         return {}
 
@@ -470,8 +486,41 @@ def _build_selfhost_matrix_en(selfhost_data: dict[str, dict[str, object]]) -> li
     return lines
 
 
+def _selfhost_summary_cell(selfhost_data: dict[str, dict[str, object]], emit_lang: str) -> str:
+    """Cell for selfhost row in summary: '🟩<br>P/T' or '🟥<br>P/T' or '⬜'.
+
+    Counts PASS/FAIL across all selfhost source rows (Python + SELFHOST_LANGS)
+    for the given emit language — matches the totals row in backend-progress-selfhost.md.
+    """
+    source_langs = ["python"] + list(SELFHOST_LANGS)
+    icons = [_selfhost_stage_icon(selfhost_data.get(sl, {}), emit_lang) for sl in source_langs]
+    tested = [ic for ic in icons if ic != "⬜"]
+    if not tested:
+        return "⬜<br>&nbsp;"
+    passed = tested.count("🟩")
+    total = len(icons)  # PASS + FAIL + 未実行
+    icon = "🟩" if passed == total else "🟥"
+    return f"{icon}<br>{passed}/{total}"
+
+
+def _parity_summary_cells(results: dict[str, dict[str, dict[str, object]]], lang: str, case_stems: set[str]) -> tuple[str, str]:
+    """Two cells (icon, number) for one parity area in the summary table.
+
+    Returns (icon_cell, number_cell) where icon_cell is '🟩'/'🟥'/'⬜'
+    and number_cell is 'N/T' or '' (empty when no data).
+    """
+    lang_data = results.get(lang, {})
+    total = len(case_stems)
+    tested = {s: lang_data[s] for s in case_stems if s in lang_data}
+    if not tested:
+        return "⬜", ""
+    ok_count = sum(1 for e in tested.values() if _case_icon(str(e.get("category", ""))) == "🟩")
+    icon = "🟩" if ok_count == total else "🟥"
+    return icon, f"{ok_count}/{total}"
+
+
 def _parity_summary_cell(results: dict[str, dict[str, dict[str, object]]], lang: str, case_stems: set[str]) -> str:
-    """Cell for one parity column in the summary: '🟩 N/T', '🟥 N/T', or '⬜'.
+    """Cell for one parity row in the summary: '🟩<br>N/T', '🟥<br>N/T', or '⬜'.
 
     N = PASS count, T = total cases in the canonical list.
     ⬜ when no parity data exists for any case in this language.
@@ -481,18 +530,33 @@ def _parity_summary_cell(results: dict[str, dict[str, dict[str, object]]], lang:
     total = len(case_stems)
     tested = {s: lang_data[s] for s in case_stems if s in lang_data}
     if not tested:
-        return "⬜"
+        return "⬜<br>&nbsp;"
     ok_count = sum(1 for e in tested.values() if _case_icon(str(e.get("category", ""))) == "🟩")
     icon = "🟩" if ok_count == total else "🟥"
-    return f"{icon} {ok_count}/{total}"
+    return f"{icon}<br>{ok_count}/{total}"
 
 
-def _lint_cell(violations: int | None) -> str:
-    """Cell for emitter lint column: '🟩 0', '🟥 N', or '⬜'."""
+def _lint_cells(violations: int | None) -> tuple[str, str]:
+    """Two cells (icon, number) for emitter lint column."""
     if violations is None:
-        return "⬜"
+        return "⬜", ""
     icon = "🟩" if violations == 0 else "🟥"
-    return f"{icon} {violations}"
+    return icon, str(violations)
+
+
+def _lint_cell(data: dict[str, int | None] | None) -> str:
+    """Cell for emitter lint row in summary: '🟩<br>P/T', '🟥<br>P/T', or '⬜<br>'."""
+    if data is None:
+        return "⬜<br>&nbsp;"
+    violations = data.get("violations")
+    pass_cats = data.get("pass_cats")
+    total_cats = data.get("total_cats")
+    if violations is None:
+        return "⬜<br>&nbsp;"
+    icon = "🟩" if violations == 0 else "🟥"
+    if pass_cats is not None and total_cats is not None:
+        return f"{icon}<br>{pass_cats}/{total_cats}"
+    return f"{icon}<br>&nbsp;"
 
 
 def _build_summary_matrix(
@@ -505,28 +569,32 @@ def _build_summary_matrix(
     selfhost_data: dict[str, dict[str, object]],
     lint_results: dict[str, int | None],
 ) -> list[str]:
-    """Build JA summary matrix: each language × {fixture, sample, stdlib, selfhost, lint}.
+    """Build JA summary matrix: rows=area, cols=language.
 
-    fixture/sample/stdlib cells show '🟩 N/T' or '🟥 N/T' with pass/total counts.
-    selfhost shows icon only (from Python selfhost row). lint shows '🟩 0' / '🟥 N'.
+    fixture/sample/stdlib cells show '🟩 N/T' or '🟥 N/T'.
+    selfhost shows icon only. lint shows '🟩 0' / '🟥 N'.
     [P0-PROGRESS-SUMMARY-S5]
     """
     fixture_stems = {stem for _, stem in fixture_cases}
     sample_stems = set(sample_cases)
     stdlib_stems = {stem for _, stem in stdlib_cases}
-    python_doc = selfhost_data.get("python", {})
+
+    lang_names = [_col_name(l) for l in PARITY_LANGS]
+    sep_cols = " | ".join(["---:"] * len(PARITY_LANGS))
 
     lines: list[str] = []
-    lines.append("| 言語 | fixture | sample | stdlib | selfhost | emitter lint |")
-    lines.append("|---|:---:|:---:|:---:|:---:|:---:|")
+    lines.append("| | " + " | ".join(lang_names) + " |")
+    lines.append("|---| " + sep_cols + " |")
 
-    for lang in PARITY_LANGS:
-        fix_cell  = _parity_summary_cell(fixture_results, lang, fixture_stems)
-        smp_cell  = _parity_summary_cell(sample_results, lang, sample_stems)
-        std_cell  = _parity_summary_cell(stdlib_results, lang, stdlib_stems)
-        sh_icon   = _selfhost_stage_icon(python_doc, lang)
-        lint_cell = _lint_cell(lint_results.get(lang))
-        lines.append(f"| {_col_name(lang)} | {fix_cell} | {smp_cell} | {std_cell} | {sh_icon} | {lint_cell} |")
+    areas = [
+        ("fixture",      [_parity_summary_cell(fixture_results, l, fixture_stems) for l in PARITY_LANGS]),
+        ("sample",       [_parity_summary_cell(sample_results,  l, sample_stems)  for l in PARITY_LANGS]),
+        ("stdlib",       [_parity_summary_cell(stdlib_results,  l, stdlib_stems)  for l in PARITY_LANGS]),
+        ("selfhost",     [_selfhost_summary_cell(selfhost_data, l)                for l in PARITY_LANGS]),
+        ("emitter lint", [_lint_cell(lint_results.get(l))                         for l in PARITY_LANGS]),
+    ]
+    for label, cells in areas:
+        lines.append(f"| **{label}** | " + " | ".join(cells) + " |")
 
     return lines
 
@@ -545,19 +613,23 @@ def _build_summary_matrix_en(
     fixture_stems = {stem for _, stem in fixture_cases}
     sample_stems = set(sample_cases)
     stdlib_stems = {stem for _, stem in stdlib_cases}
-    python_doc = selfhost_data.get("python", {})
+
+    lang_names = [_col_name(l) for l in PARITY_LANGS]
+    sep_cols = " | ".join(["---:"] * len(PARITY_LANGS))
 
     lines: list[str] = []
-    lines.append("| Lang | fixture | sample | stdlib | selfhost | emitter lint |")
-    lines.append("|---|:---:|:---:|:---:|:---:|:---:|")
+    lines.append("| | " + " | ".join(lang_names) + " |")
+    lines.append("|---| " + sep_cols + " |")
 
-    for lang in PARITY_LANGS:
-        fix_cell  = _parity_summary_cell(fixture_results, lang, fixture_stems)
-        smp_cell  = _parity_summary_cell(sample_results, lang, sample_stems)
-        std_cell  = _parity_summary_cell(stdlib_results, lang, stdlib_stems)
-        sh_icon   = _selfhost_stage_icon(python_doc, lang)
-        lint_cell = _lint_cell(lint_results.get(lang))
-        lines.append(f"| {_col_name(lang)} | {fix_cell} | {smp_cell} | {std_cell} | {sh_icon} | {lint_cell} |")
+    areas = [
+        ("fixture",      [_parity_summary_cell(fixture_results, l, fixture_stems) for l in PARITY_LANGS]),
+        ("sample",       [_parity_summary_cell(sample_results,  l, sample_stems)  for l in PARITY_LANGS]),
+        ("stdlib",       [_parity_summary_cell(stdlib_results,  l, stdlib_stems)  for l in PARITY_LANGS]),
+        ("selfhost",     [_selfhost_summary_cell(selfhost_data, l)                for l in PARITY_LANGS]),
+        ("emitter lint", [_lint_cell(lint_results.get(l))                         for l in PARITY_LANGS]),
+    ]
+    for label, cells in areas:
+        lines.append(f"| **{label}** | " + " | ".join(cells) + " |")
 
     return lines
 

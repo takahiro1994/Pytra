@@ -44,6 +44,9 @@ ALL_LANGS_ORDERED: list[tuple[str, str]] = [
 ]
 ALL_LANG_KEYS = [k for k, _ in ALL_LANGS_ORDERED]
 
+# JS は独自 emitter を持たず TS emitter を共用する
+LANG_EMITTER_ALIAS: dict[str, str] = {"js": "ts"}
+
 # ---------------------------------------------------------------------------
 # 検出カテゴリ定義
 # ---------------------------------------------------------------------------
@@ -167,13 +170,15 @@ def collect_hits(
 # ---------------------------------------------------------------------------
 
 def implemented_langs() -> set[str]:
-    """toolchain2/emit/ に実際にディレクトリが存在する言語キーの集合。"""
+    """toolchain2/emit/ に実際にディレクトリが存在する言語キー + エイリアス先が実装済みの言語キーの集合。"""
     dir_to_key = {d: k for k, d in ALL_LANGS_ORDERED}
-    return {
+    direct = {
         dir_to_key[p.name]
         for p in EMIT_DIR.iterdir()
         if p.is_dir() and p.name in dir_to_key
     }
+    aliased = {lang for lang, target in LANG_EMITTER_ALIAS.items() if target in direct}
+    return direct | aliased
 
 
 def build_matrix(
@@ -189,6 +194,11 @@ def build_matrix(
     for lang, cat, _f, _ln, _line in hits:
         if cat in mat and lang in mat[cat]:
             mat[cat][lang] = (mat[cat][lang] or 0) + 1
+    # エイリアス言語はターゲットの結果をそのままコピー
+    for alias, target in LANG_EMITTER_ALIAS.items():
+        if alias in langs and target in langs:
+            for cat in mat:
+                mat[cat][alias] = mat[cat][target]
     return mat
 
 
@@ -209,6 +219,32 @@ def lang_total(mat: dict[str, dict[str, int | None]], lang: str) -> int | None:
     return total
 
 
+def _lang_pass_count(mat: dict[str, dict[str, int | None]], lang: str) -> int | None:
+    """Number of categories with 0 violations. None if unimplemented."""
+    if lang_total(mat, lang) is None:
+        return None
+    return sum(1 for cat_data in mat.values() if cat_data.get(lang) == 0)
+
+
+def _lang_fail_count(mat: dict[str, dict[str, int | None]], lang: str) -> int | None:
+    """Number of categories with >0 violations. None if unimplemented."""
+    if lang_total(mat, lang) is None:
+        return None
+    return sum(1 for cat_data in mat.values() if (cat_data.get(lang) or 0) > 0)
+
+
+def _lang_unimpl_count(mat: dict[str, dict[str, int | None]], lang: str) -> int | None:
+    """Total category count if lang is unimplemented, else None."""
+    if lang_total(mat, lang) is not None:
+        return None
+    return len(mat)
+
+
+def _count_cell(n: int | None) -> str:
+    """Format a count for totals rows: number or '—'."""
+    return "—" if n is None or n == 0 else str(n)
+
+
 def print_matrix(mat: dict[str, dict[str, int | None]], langs: list[str]) -> None:
     header = "| カテゴリ           | " + " | ".join(langs) + " |"
     sep    = "|" + "-" * (len(header) - 2) + "|"
@@ -217,10 +253,13 @@ def print_matrix(mat: dict[str, dict[str, int | None]], langs: list[str]) -> Non
     for cat, label in CATEGORY_LABELS.items():
         cells = [_cell(mat[cat][l]) for l in langs]
         print(f"| {label} | " + " | ".join(cells) + " |")
-    # Totals row
-    totals = [lang_total(mat, l) for l in langs]
-    total_cells = [_cell(t) for t in totals]
-    print(f"| **🟩 PASS / 🟥 FAIL** | " + " | ".join(total_cells) + " |")
+    # Totals rows
+    pass_cells  = [_count_cell(_lang_pass_count(mat, l))  for l in langs]
+    fail_cells  = [_count_cell(_lang_fail_count(mat, l))  for l in langs]
+    unimpl_cells = [_count_cell(_lang_unimpl_count(mat, l)) for l in langs]
+    print(f"| **🟩 PASS** | " + " | ".join(pass_cells) + " |")
+    print(f"| **🟥 FAIL** | " + " | ".join(fail_cells) + " |")
+    print(f"| **⬜ 未実装** | " + " | ".join(unimpl_cells) + " |")
 
 
 def print_verbose(
@@ -276,6 +315,8 @@ def _render_md(
         lines.append("| 🟥 | 違反あり（詳細は下の表を参照） |")
         lines.append("| ⬜ | 未実装（toolchain2 に emitter なし） |")
         lines.append("")
+        lines.append("> **js** は独自 emitter を持たず **ts** emitter を共用するため、js 列は ts と同一の結果を表示する。")
+        lines.append("")
         cat_header = "| カテゴリ"
         cat_sep    = "|---"
     else:
@@ -294,22 +335,27 @@ def _render_md(
         lines.append("| 🟥 | Violations found (see details below) |")
         lines.append("| ⬜ | Not implemented (no emitter in toolchain2) |")
         lines.append("")
+        lines.append("> **js** shares the **ts** emitter and has no separate implementation; the js column mirrors ts results.")
+        lines.append("")
         cat_header = "| Category"
         cat_sep    = "|---"
 
     # マトリクステーブル
     header = cat_header + " | " + " | ".join(langs) + " |"
-    sep    = cat_sep + " | " + " | ".join(["---"] * len(langs)) + " |"
+    sep    = cat_sep + " | " + " | ".join(["---:"] * len(langs)) + " |"
     lines.append(header)
     lines.append(sep)
     for cat, label in CATEGORY_LABELS.items():
         cells = [_cell(mat[cat][l]) for l in langs]
         lines.append(f"| {label.strip()} | " + " | ".join(cells) + " |")
-    # Totals row [P0-PROGRESS-SUMMARY-S3]
-    pass_label = "**🟩 PASS / 🟥 FAIL**" if is_ja else "**🟩 PASS / 🟥 FAIL**"
-    totals = [lang_total(mat, l) for l in langs]
-    total_cells = [_cell(t) for t in totals]
-    lines.append(f"| {pass_label} | " + " | ".join(total_cells) + " |")
+    # Totals rows [P0-PROGRESS-SUMMARY-S3]
+    pass_cells   = [_count_cell(_lang_pass_count(mat, l))   for l in langs]
+    fail_cells   = [_count_cell(_lang_fail_count(mat, l))   for l in langs]
+    unimpl_cells = [_count_cell(_lang_unimpl_count(mat, l)) for l in langs]
+    unimpl_label = "**⬜ 未実装**" if is_ja else "**⬜ Not impl.**"
+    lines.append(f"| **🟩 PASS** | " + " | ".join(pass_cells) + " |")
+    lines.append(f"| **🟥 FAIL** | " + " | ".join(fail_cells) + " |")
+    lines.append(f"| {unimpl_label} | " + " | ".join(unimpl_cells) + " |")
     lines.append("")
 
     # 詳細セクション
@@ -352,10 +398,15 @@ def write_progress_pages(
     parity_dir = ROOT / ".parity-results"
     parity_dir.mkdir(parents=True, exist_ok=True)
     json_path = parity_dir / "emitter_lint.json"
+    total_cats = len(CATEGORIES)
     json_data = {
         "timestamp": now,
         "langs": {
-            lang: lang_total(mat, lang)
+            lang: {
+                "violations": lang_total(mat, lang),
+                "pass_cats": _lang_pass_count(mat, lang),
+                "total_cats": total_cats if lang_total(mat, lang) is not None else None,
+            }
             for lang in langs
         },
     }

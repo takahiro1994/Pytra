@@ -5,7 +5,7 @@
 # Backend overall summary
 
 > Machine-generated file. Run `python3 tools/gen/gen_backend_progress.py` to update.
-> Generated at: 2026-03-30T12:17:18
+> Generated at: 2026-03-30T13:25:15
 > [Links](./index.md)
 
 Overview of fixture / sample / stdlib / selfhost / emitter lint status per language.
@@ -16,23 +16,10 @@ Overview of fixture / sample / stdlib / selfhost / emitter lint status per langu
 | 🟥 | FAIL (at least one) |
 | ⬜ | Not run |
 
-| Lang | fixture | sample | stdlib | selfhost | emitter lint |
-|---|:---:|:---:|:---:|:---:|:---:|
-| cpp | 🟥 129/132 | 🟥 2/18 | ⬜ | 🟥 | 🟥 4 |
-| rs | 🟥 83/132 | ⬜ | ⬜ | 🟥 | 🟩 0 |
-| cs | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| ps1 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| js | 🟥 131/132 | ⬜ | 🟥 2/15 | 🟥 | ⬜ |
-| ts | 🟩 132/132 | ⬜ | ⬜ | 🟥 | 🟩 0 |
-| dart | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| go | 🟩 132/132 | 🟩 18/18 | 🟩 15/15 | 🟩 | 🟥 27 |
-| java | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| swift | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| kotlin | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| ruby | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| lua | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| scala | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| php | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| nim | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| julia | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| zig | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| | cpp | rs | cs | ps1 | js | ts | dart | go | java | swift | kotlin | ruby | lua | scala | php | nim | julia | zig |
+|---| ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| **fixture** | 🟥<br>128/131 | 🟥<br>84/131 | ⬜<br>&nbsp; | ⬜<br>&nbsp; | 🟩<br>131/131 | 🟩<br>131/131 | ⬜<br>&nbsp; | 🟩<br>131/131 | ⬜<br>&nbsp; | ⬜<br>&nbsp; | ⬜<br>&nbsp; | ⬜<br>&nbsp; | ⬜<br>&nbsp; | ⬜<br>&nbsp; | ⬜<br>&nbsp; | ⬜<br>&nbsp; | ⬜<br>&nbsp; | ⬜<br>&nbsp; |
+| **sample** | 🟥<br>2/18 | ⬜<br>&nbsp; | ⬜<br>&nbsp; | ⬜<br>&nbsp; | 🟥<br>1/18 | 🟥<br>1/18 | ⬜<br>&nbsp; | 🟩<br>18/18 | ⬜<br>&nbsp; | ⬜<br>&nbsp; | ⬜<br>&nbsp; | ⬜<br>&nbsp; | ⬜<br>&nbsp; | ⬜<br>&nbsp; | ⬜<br>&nbsp; | ⬜<br>&nbsp; | ⬜<br>&nbsp; | ⬜<br>&nbsp; |
+| **stdlib** | 🟩<br>16/16 | ⬜<br>&nbsp; | ⬜<br>&nbsp; | ⬜<br>&nbsp; | 🟩<br>16/16 | 🟩<br>16/16 | ⬜<br>&nbsp; | 🟩<br>16/16 | ⬜<br>&nbsp; | ⬜<br>&nbsp; | ⬜<br>&nbsp; | ⬜<br>&nbsp; | ⬜<br>&nbsp; | ⬜<br>&nbsp; | ⬜<br>&nbsp; | ⬜<br>&nbsp; | ⬜<br>&nbsp; | ⬜<br>&nbsp; |
+| **selfhost** | 🟥<br>0/19 | 🟥<br>0/19 | ⬜<br>&nbsp; | ⬜<br>&nbsp; | 🟥<br>0/19 | 🟥<br>0/19 | ⬜<br>&nbsp; | 🟥<br>1/19 | ⬜<br>&nbsp; | ⬜<br>&nbsp; | ⬜<br>&nbsp; | ⬜<br>&nbsp; | ⬜<br>&nbsp; | ⬜<br>&nbsp; | ⬜<br>&nbsp; | ⬜<br>&nbsp; | ⬜<br>&nbsp; | ⬜<br>&nbsp; |
+| **emitter lint** | 🟥<br>4/6 | 🟩<br>6/6 | ⬜<br>&nbsp; | ⬜<br>&nbsp; | 🟩<br>6/6 | 🟩<br>6/6 | ⬜<br>&nbsp; | 🟥<br>3/6 | ⬜<br>&nbsp; | ⬜<br>&nbsp; | ⬜<br>&nbsp; | ⬜<br>&nbsp; | ⬜<br>&nbsp; | ⬜<br>&nbsp; | ⬜<br>&nbsp; | ⬜<br>&nbsp; | ⬜<br>&nbsp; | ⬜<br>&nbsp; |
