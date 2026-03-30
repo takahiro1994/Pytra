@@ -1137,6 +1137,8 @@ PYTHONPATH=src python3 tools/gen/regenerate_golden.py
 
 これで fixture / sample / stdlib / pytra の全段 golden が生成される。parity check はこの golden に依存するため、先に実行すること。
 
+**注意: golden が既に存在する場合は再生成してはならない。** 他の agent が作業中に再生成すると golden が上書きされ、テスト結果が変わる。再生成が必要な場合はユーザーの指示を受けること。
+
 ### 正本ツール
 
 **`tools/check/runtime_parity_check_fast.py` が全言語共通の parity check 正本ツール** である。以下は全て禁止:
