@@ -57,7 +57,7 @@
 - `PYTHONPATH=src python3 -m unittest discover -s tools/unittest/emit/cpp -p 'test_cpp_runtime_iterable.py' -v`
 - `PYTHONPATH=src python3 -m unittest discover -s tools/unittest/emit/cpp -p 'test_py2cpp_features.py' -v`
 - `python3 tools/check/runtime_parity_check.py --targets cpp --case-root fixture`
-- `python3 tools/check/runtime_parity_check.py --targets cpp --case-root sample --all-samples`
+- `python3 tools/check/runtime_parity_check.py --targets cpp --case-root sample`
 
 ## 1. 基本方針
 

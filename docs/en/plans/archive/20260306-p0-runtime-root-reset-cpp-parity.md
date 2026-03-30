@@ -40,13 +40,13 @@ Acceptance criteria:
 - `src/runtime/cpp/` uses only `core/` and `gen/`, with no active `pytra/` shim.
 - C++ runtime references are unified on `runtime/cpp/core` plus `runtime/cpp/gen`.
 - `tools/check/runtime_parity_check.py --targets cpp --case-root fixture` passes.
-- `tools/check/runtime_parity_check.py --targets cpp --case-root sample --all-samples` passes.
+- `tools/check/runtime_parity_check.py --targets cpp --case-root sample` passes.
 
 Validation commands:
 - `python3 tools/check/check_todo_priority.py`
 - `rg -n "runtime/cpp/pytra|src/runtime2" src/backends/cpp src/toolchain tools`
 - `python3 tools/check/runtime_parity_check.py --targets cpp --case-root fixture`
-- `python3 tools/check/runtime_parity_check.py --targets cpp --case-root sample --all-samples`
+- `python3 tools/check/runtime_parity_check.py --targets cpp --case-root sample`
 
 ## Breakdown
 

@@ -35,12 +35,12 @@
 - PHP 実行で `sample/01`（PNG）と `sample/06`（GIF）が実際に artifact を生成する。
 - `sample/16` が PHP で実行完了し、`output:` と `elapsed_sec:` を出力する。
 - parity で `sample` ケース実行前に stale artifact が必ず削除される（コードで担保）。
-- `runtime_parity_check --case-root sample --targets php --all-samples` の結果が、少なくとも artifact 偽陽性なしで評価される。
+- `runtime_parity_check --case-root sample --targets php` の結果が、少なくとも artifact 偽陽性なしで評価される。
 
 確認コマンド（予定）:
 - `python3 tools/check/check_todo_priority.py`
 - `python3 tools/gen/regenerate_samples.py --langs php --force`
-- `python3 tools/check/runtime_parity_check.py --case-root sample --targets php --all-samples`
+- `python3 tools/check/runtime_parity_check.py --case-root sample --targets php`
 - `python3 tools/check/check_py2php_transpile.py`
 
 決定ログ:

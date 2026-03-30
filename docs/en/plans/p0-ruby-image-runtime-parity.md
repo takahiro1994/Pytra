@@ -32,11 +32,11 @@ Acceptance criteria:
 - Running Ruby actually generates PNG for `sample/01`.
 - For `sample/01`, PNG bytes from Python execution and Ruby execution are identical.
 - A representative GIF case (`sample/06`, etc.) also confirms Python/Ruby GIF byte equality (or differences are formalized as spec rationale).
-- `runtime_parity_check --targets ruby --all-samples` passes without regression.
+- `runtime_parity_check --targets ruby` passes without regression.
 
 Verification commands (planned):
 - `python3 tools/check/check_todo_priority.py`
-- `python3 tools/check/runtime_parity_check.py --case-root sample --targets ruby --all-samples --ignore-unstable-stdout`
+- `python3 tools/check/runtime_parity_check.py --case-root sample --targets ruby --ignore-unstable-stdout`
 - `python3 tools/gen/regenerate_samples.py --langs ruby --force`
 - `PYTHONPATH=src python3 -m unittest discover -s test/unit -p 'test_py2rb_smoke.py' -v`
 - `python3 tools/check/check_py2rb_transpile.py`
@@ -46,7 +46,7 @@ Decision log:
 - 2026-02-28: Adopted implementation policy to switch Ruby emitter lowering for `save_gif` / `write_rgb_png` / `grayscale_palette` from `__pytra_noop` / `[]` to concrete runtime calls, and map `save_gif` keywords (`delay_cs`/`loop`) into positional args.
 - 2026-02-28: Added implementations in `src/runtime/ruby/pytra/py_runtime.rb` for PNG (CRC32/Adler32/zlib store) and GIF (LZW/palette) output, enabling image generation in standalone Ruby.
 - 2026-02-28: Added and ran `tools/verify_ruby_sample_artifact_parity.py --samples 01_mandelbrot 06_julia_parameter_sweep`, and confirmed Python vs Ruby byte equality for PNG/GIF.
-- 2026-02-28: Ran `runtime_parity_check --case-root sample --targets ruby --all-samples --ignore-unstable-stdout`, and confirmed 18/18 case pass.
+- 2026-02-28: Ran `runtime_parity_check --case-root sample --targets ruby --ignore-unstable-stdout`, and confirmed 18/18 case pass.
 
 ## Breakdown
 

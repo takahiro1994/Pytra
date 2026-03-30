@@ -39,7 +39,7 @@ Verification commands (planned):
 - `python3 tools/check/check_todo_priority.py`
 - `python3 tools/check/check_py2lua_transpile.py`
 - `python3 -m unittest discover -s test/unit -p 'test_py2lua_smoke.py' -v`
-- `python3 tools/check/runtime_parity_check.py --case-root sample --targets lua --all-samples --ignore-unstable-stdout`
+- `python3 tools/check/runtime_parity_check.py --case-root sample --targets lua --ignore-unstable-stdout`
 
 Decision log:
 - 2026-02-28: By user instruction, policy was fixed to start Lua backend addition as highest priority (P0).

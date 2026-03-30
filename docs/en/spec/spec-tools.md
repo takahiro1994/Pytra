@@ -135,13 +135,13 @@ In the new pipeline (`toolchain2/`), selfhost is designed to complete within the
 ### 3.3 Full-Target Sample Parity Completion Condition
 
 - The canonical parity target order is `cpp,rs,cs,js,ruby,lua,php,ts,go,java,swift,kotlin,scala,nim`. This must match the return order of `list_parity_targets()`.
-- "All-target parity green" means that when running `python3 tools/check/runtime_parity_check.py --targets cpp,rs,cs,js,ruby,lua,php,ts,go,java,swift,kotlin,scala,nim --case-root sample --all-samples --ignore-unstable-stdout --east3-opt-level 2 --cpp-codegen-opt 3`, every target and all 18 sample cases finish as `ok` only.
+- "All-target parity green" means that when running `python3 tools/check/runtime_parity_check.py --targets cpp,rs,cs,js,ruby,lua,php,ts,go,java,swift,kotlin,scala,nim --case-root sample --ignore-unstable-stdout --east3-opt-level 2 --cpp-codegen-opt 3`, every target and all 18 sample cases finish as `ok` only.
 - In the full-green judgment, `toolchain_missing` is not treated as an exception. The following must all be zero: `case_missing`, `python_failed`, `python_artifact_missing`, `toolchain_missing`, `transpile_failed`, `run_failed`, `output_mismatch`, `artifact_presence_mismatch`, `artifact_missing`, `artifact_size_mismatch`, `artifact_crc32_mismatch`.
 - Even when checking target groups separately, the criterion stays the same.
-  - baseline target: `python3 tools/check/runtime_parity_check.py --targets cpp --case-root sample --all-samples --east3-opt-level 2 --cpp-codegen-opt 3`
-  - JS/TS: `python3 tools/check/runtime_parity_check.py --targets js,ts --case-root sample --all-samples --ignore-unstable-stdout --east3-opt-level 2`
-  - compiled targets: `python3 tools/check/runtime_parity_check.py --targets rs,cs,go,java,kotlin,swift,scala --case-root sample --all-samples --ignore-unstable-stdout --east3-opt-level 2`
-  - scripting / mixed targets: `python3 tools/check/runtime_parity_check.py --targets ruby,lua,php,nim --case-root sample --all-samples --ignore-unstable-stdout --east3-opt-level 2`
+  - baseline target: `python3 tools/check/runtime_parity_check.py --targets cpp --case-root sample --east3-opt-level 2 --cpp-codegen-opt 3`
+  - JS/TS: `python3 tools/check/runtime_parity_check.py --targets js,ts --case-root sample --ignore-unstable-stdout --east3-opt-level 2`
+  - compiled targets: `python3 tools/check/runtime_parity_check.py --targets rs,cs,go,java,kotlin,swift,scala --case-root sample --ignore-unstable-stdout --east3-opt-level 2`
+  - scripting / mixed targets: `python3 tools/check/runtime_parity_check.py --targets ruby,lua,php,nim --case-root sample --ignore-unstable-stdout --east3-opt-level 2`
 - The canonical wrapper for daily full-target reruns is `python3 tools/check/check_all_target_sample_parity.py --summary-dir work/logs/all_target_sample_parity`. The wrapper runs the four groups above in order and writes the merged result to `all-target-summary.json`.
 
 ### 3.4 Debian 12 Parity Bootstrap Snapshot

@@ -10,7 +10,7 @@ Related TODO:
 - `ID: P0-PHP-S13-PARITY-INVEST-01` in `docs/ja/todo/index.md`
 
 Background:
-- In the latest run of `tools/check/runtime_parity_check.py --case-root sample --all-samples --targets ruby,lua,scala,php`, only one failure remained: PHP on `sample/13`.
+- In the latest run of `tools/check/runtime_parity_check.py --case-root sample --targets ruby,lua,scala,php`, only one failure remained: PHP on `sample/13`.
 - The failure is stdout mismatch: expected Python value `frames: 147` vs observed PHP value `frames: 2`.
 - PHP execution for `sample/16` / `sample/18` passes, so this is likely not a broad PHP backend outage but a conversion-path mismatch specific to `sample/13`.
 

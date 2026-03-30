@@ -54,7 +54,7 @@
 - `PYTHONPATH=src python3 -m unittest discover -s tools/unittest/emit/cpp -v`
 - `python3 tools/check/check_py2cpp_transpile.py`
 - `python3 tools/build_selfhost.py`
-- `python3 tools/check/runtime_parity_check.py --targets cpp --all-samples`
+- `python3 tools/check/runtime_parity_check.py --targets cpp`
 
 ---
 

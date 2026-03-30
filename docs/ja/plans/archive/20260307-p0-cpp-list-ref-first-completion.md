@@ -195,7 +195,7 @@
 - emitter に「typed list だから value を優先する」分岐が残らない。
 - `python3 -m unittest discover -s tools/unittest/emit/cpp -p 'test_*.py'` が通る。
 - `python3 tools/check/runtime_parity_check.py --targets cpp --case-root fixture` が通る。
-- `python3 tools/check/runtime_parity_check.py --targets cpp --case-root sample --all-samples` が通る。
+- `python3 tools/check/runtime_parity_check.py --targets cpp --case-root sample` が通る。
 - `optimizer off` 相当でも correctness が壊れない。
 - `sample/18` を含む representative case で list alias が Python と一致する。
 
@@ -204,7 +204,7 @@
 - `python3 tools/check/check_todo_priority.py`
 - `PYTHONPATH=src python3 -m unittest discover -s tools/unittest/emit/cpp -p 'test_*.py'`
 - `python3 tools/check/runtime_parity_check.py --targets cpp --case-root fixture`
-- `python3 tools/check/runtime_parity_check.py --targets cpp --case-root sample --all-samples`
+- `python3 tools/check/runtime_parity_check.py --targets cpp --case-root sample`
 - `PYTHONPATH=src python3 tools/unittest/emit/cpp/test_py2cpp_list_pyobj_model.py`
 
 ## 分解
@@ -263,5 +263,5 @@
 - 2026-03-07: `ID: P0-CPP-LIST-REFFIRST-01-S5-02` では opt0 representative parity で露出した nested list 問題を修正した。`_render_pyobj_alias_list_value(...)` は object-returning list comprehension を `py_to<rc<list<T>>>(...)` 経由へ倒し、nested mutable subscript lvalue は `py_list_at_ref(py_at(...), ...)` を使うようにした。runtime 側も `py_to(const object&)` に plain `list<T>` 復元を追加し、nested typed list の object roundtrip を `test_cpp_runtime_iterable.py` で固定した。
 - 2026-03-07: `ID: P0-CPP-LIST-REFFIRST-01-S5-02` の検証として `test_py2cpp_codegen_issues.py`, `test_cpp_non_escape_bridge.py`, `test_cpp_runtime_iterable.py`, `test_cpp_runtime_boxing.py` を実行し通過した。representative parity は `tools/check/runtime_parity_check.py --targets cpp --case-root fixture --east3-opt-level 0 collections/list_alias_shared_mutation stdlib/os_glob_extended` と `tools/check/runtime_parity_check.py --targets cpp --case-root sample --east3-opt-level 0 08_langtons_ant 12_sort_visualizer 13_maze_generation_steps 18_mini_language_interpreter` を実行し、どちらも全件通過した。
 - 2026-03-07: `ID: P0-CPP-LIST-REFFIRST-01-S6-01` として、runtime module list signature の repo-root 依存と `random.choices` / `dict.keys` / `dict.values` の list unbox adapter を修正し、nested list append では `py_append(out, rc_list_copy_value(row))` を使うようにした。fresh rerun の `PYTHONPATH=/workspace/Pytra:/workspace/Pytra/src python3 -m unittest discover -s /workspace/Pytra/tools/unittest/emit/cpp -p 'test_*.py'` は `Ran 505 tests in 1091.285s` で `OK` を確認した。
-- 2026-03-07: `ID: P0-CPP-LIST-REFFIRST-01-S6-02` として、`python3 tools/check/runtime_parity_check.py --targets cpp --case-root fixture` は `cases=3 pass=3 fail=0`、`python3 tools/check/runtime_parity_check.py --targets cpp --case-root sample --all-samples` は `cases=18 pass=18 fail=0` を確認した。sample parity 中に露出した `07_game_of_life_loop` の nested list append 退行も `ID: P0-CPP-LIST-REFFIRST-01-S6-02` 内で修正し、単体 parity を通した上で全 sample rerun を完了している。
+- 2026-03-07: `ID: P0-CPP-LIST-REFFIRST-01-S6-02` として、`python3 tools/check/runtime_parity_check.py --targets cpp --case-root fixture` は `cases=3 pass=3 fail=0`、`python3 tools/check/runtime_parity_check.py --targets cpp --case-root sample` は `cases=18 pass=18 fail=0` を確認した。sample parity 中に露出した `07_game_of_life_loop` の nested list append 退行も `ID: P0-CPP-LIST-REFFIRST-01-S6-02` 内で修正し、単体 parity を通した上で全 sample rerun を完了している。
 - 2026-03-07: `ID: P0-CPP-LIST-REFFIRST-01-S6-03` として、plan を `docs/ja/plans/archive/20260307-p0-cpp-list-ref-first-completion.md` へ移し、`docs/ja/todo/archive/20260307.md` / `docs/ja/todo/archive/index.md` / `docs/ja/todo/index.md` を更新して ref-first 契約を完了扱いで閉じた。

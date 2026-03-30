@@ -786,12 +786,12 @@ sample/py の全 18 ケースについて、Python 実行結果（stdout + artif
 
 ```bash
 # sample parity（単一言語）
-python3 tools/check/runtime_parity_check.py --targets <lang> --case-root sample --all-samples
+python3 tools/check/runtime_parity_check.py --targets <lang> --case-root sample
 
 # sample parity（全言語一括）
 python3 tools/check/runtime_parity_check.py \
   --targets cpp,rs,cs,js,ts,go,java,kotlin,swift,ruby,lua,php,scala,nim \
-  --case-root sample --all-samples
+  --case-root sample
 ```
 
 ### fixture parity check
@@ -800,12 +800,12 @@ python3 tools/check/runtime_parity_check.py \
 
 ```bash
 # fixture parity（単一言語）
-python3 tools/check/runtime_parity_check.py --targets <lang> --case-root fixture --all-samples
+python3 tools/check/runtime_parity_check.py --targets <lang> --case-root fixture
 
 # fixture parity（全言語一括）
 python3 tools/check/runtime_parity_check.py \
   --targets cpp,rs,cs,js,ts,go,java,kotlin,swift,ruby,lua,php,scala,nim \
-  --case-root fixture --all-samples
+  --case-root fixture
 ```
 
 emitter 開発時は **sample と fixture の両方** で parity check を実行すること。sample は実用的な大きいプログラム（18 件）、fixture は言語機能の網羅テスト（128 件）。
@@ -874,5 +874,5 @@ emit だけ成功してもプレースホルダーコード（`nil /* list compr
 - [ ] コンテナ（list/dict/set）が参照型ラッパーで保持されている（§10）
 - [ ] `yields_dynamic: true` の Call ノードで型アサーションを生成している（§11）
 - [ ] emitter 側に型推論のワークアラウンド（math 戻り型判定、VarDecl 先読み等）がない（§12）
-- [ ] `runtime_parity_check.py --targets <lang> --case-root sample --all-samples` で sample 検証している（§13）
-- [ ] `runtime_parity_check.py --targets <lang> --case-root fixture --all-samples` で fixture 検証している（§13）
+- [ ] `runtime_parity_check.py --targets <lang> --case-root sample` で sample 検証している（§13）
+- [ ] `runtime_parity_check.py --targets <lang> --case-root fixture` で fixture 検証している（§13）

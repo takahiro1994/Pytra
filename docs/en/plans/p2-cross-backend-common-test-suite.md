@@ -18,7 +18,7 @@
 
 ## 前提条件（更新 2026-03-23）
 
-- `runtime_parity_check.py` が fixture 対応済み（`--case-root fixture --all-samples`）
+- `runtime_parity_check.py` が fixture 対応済み（`--case-root fixture`）
 - `test/fixtures/` の 128 fixture が全言語の parity check 対象として使用可能
 - emitter guide §13 に parity check の正本ツールとして明記済み
 
@@ -31,12 +31,12 @@
 ```bash
 # 全 fixture × 全言語の共通テスト
 python3 tools/check/runtime_parity_check.py \
-  --case-root fixture --all-samples \
+  --case-root fixture \
   --targets cpp,rs,cs,js,ts,go,java,kotlin,swift,ruby,lua,php,scala,nim
 
 # 全 sample × 全言語の parity check
 python3 tools/check/runtime_parity_check.py \
-  --case-root sample --all-samples \
+  --case-root sample \
   --targets cpp,rs,cs,js,ts,go,java,kotlin,swift,ruby,lua,php,scala,nim
 ```
 
@@ -78,7 +78,7 @@ _LANG_UNSUPPORTED_FIXTURES: dict[str, set[str]] = {
 
 ### S1: 共通テスト基盤 — 完了
 
-`runtime_parity_check.py` の `--case-root fixture --all-samples` で 128 fixture を全言語で実行可能。`ng_*` は自動スキップ。
+`runtime_parity_check.py` の `--case-root fixture` で 128 fixture を全言語で実行可能。`ng_*` は自動スキップ。
 
 ### S2: 言語ごとの unsupported fixture skip 登録
 

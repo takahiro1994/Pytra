@@ -40,7 +40,7 @@ Acceptance criteria:
 Planned verification:
 - `python3 -m unittest discover -s tools/unittest/tooling -p 'test_pytra_cli.py'`
 - `python3 -m unittest discover -s tools/unittest/tooling -p 'test_runtime_parity_check_cli.py'`
-- `python3 tools/check/runtime_parity_check.py --targets cpp --case-root sample --all-samples --cpp-codegen-opt 3 --east3-opt-level 2`
+- `python3 tools/check/runtime_parity_check.py --targets cpp --case-root sample --cpp-codegen-opt 3 --east3-opt-level 2`
 
 ## Phases
 

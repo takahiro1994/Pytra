@@ -35,7 +35,7 @@ Acceptance criteria:
 Verification commands:
 - `python3 tools/check/check_todo_priority.py`
 - `python3 tools/gen/regenerate_samples.py --langs ruby --force`
-- `python3 tools/check/runtime_parity_check.py --case-root sample --targets ruby --all-samples --ignore-unstable-stdout`
+- `python3 tools/check/runtime_parity_check.py --case-root sample --targets ruby --ignore-unstable-stdout`
 - `python3 -m unittest discover -s test/unit -p 'test_py2rb_smoke.py' -v`
 
 Decision log:

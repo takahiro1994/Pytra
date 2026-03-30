@@ -29,12 +29,12 @@
 受け入れ基準:
 - Python 実行時の `output:` で得た artifact 実ファイルサイズを基準に、各 backend でサイズ不一致を検知できる。
 - artifact が未生成・欠落・出力行欠落のケースを `runtime_parity_check` で fail できる。
-- `runtime_parity_check --case-root sample --all-samples` が既存 pass 範囲で非退行。
+- `runtime_parity_check --case-root sample` が既存 pass 範囲で非退行。
 
 確認コマンド（予定）:
 - `python3 tools/check/check_todo_priority.py`
 - `PYTHONPATH=src python3 -m unittest discover -s test/unit -p 'test_runtime_parity_check_cli.py' -v`
-- `python3 tools/check/runtime_parity_check.py --case-root sample --targets ruby --all-samples --ignore-unstable-stdout`
+- `python3 tools/check/runtime_parity_check.py --case-root sample --targets ruby --ignore-unstable-stdout`
 - `python3 tools/check/runtime_parity_check.py --case-root sample --targets cpp 01_mandelbrot --ignore-unstable-stdout`
 
 決定ログ:

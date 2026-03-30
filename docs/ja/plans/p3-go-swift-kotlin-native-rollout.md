@@ -39,7 +39,7 @@
 - `python3 tools/check/check_py2go_transpile.py`
 - `python3 tools/check/check_py2swift_transpile.py`
 - `python3 tools/check/check_py2kotlin_transpile.py`
-- `python3 tools/check/runtime_parity_check.py --case-root sample --targets go,swift,kotlin --all-samples --ignore-unstable-stdout`
+- `python3 tools/check/runtime_parity_check.py --case-root sample --targets go,swift,kotlin --ignore-unstable-stdout`
 
 決定ログ:
 - 2026-02-26: 初版作成。Go/Swift/Kotlin sidecar backend を低優先で native 化する移行計画を追加。

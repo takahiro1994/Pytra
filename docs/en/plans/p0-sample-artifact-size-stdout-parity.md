@@ -29,12 +29,12 @@ Out of scope:
 Acceptance criteria:
 - Using actual artifact file size from Python execution `output:` as baseline, each backend can detect size mismatches.
 - Cases with non-generated/missing artifacts or missing output lines can fail in `runtime_parity_check`.
-- `runtime_parity_check --case-root sample --all-samples` remains non-regressive in existing pass scope.
+- `runtime_parity_check --case-root sample` remains non-regressive in existing pass scope.
 
 Verification commands (planned):
 - `python3 tools/check/check_todo_priority.py`
 - `PYTHONPATH=src python3 -m unittest discover -s test/unit -p 'test_runtime_parity_check_cli.py' -v`
-- `python3 tools/check/runtime_parity_check.py --case-root sample --targets ruby --all-samples --ignore-unstable-stdout`
+- `python3 tools/check/runtime_parity_check.py --case-root sample --targets ruby --ignore-unstable-stdout`
 - `python3 tools/check/runtime_parity_check.py --case-root sample --targets cpp 01_mandelbrot --ignore-unstable-stdout`
 
 Decision log:

@@ -33,16 +33,16 @@ Out of scope:
 - Backend changes outside PHP
 
 Acceptance criteria:
-- `python3 tools/check/runtime_parity_check.py --case-root sample --targets php --all-samples --summary-json work/logs/runtime_parity_sample_php_all_pass_20260304.json` yields `case_pass=18`, `case_fail=0`.
+- `python3 tools/check/runtime_parity_check.py --case-root sample --targets php --summary-json work/logs/runtime_parity_sample_php_all_pass_20260304.json` yields `case_pass=18`, `case_fail=0`.
 - In that log, `category_counts` contains only `ok` (`output_mismatch` / `artifact_*` / `run_failed` are 0).
 - Minimal regression checks corresponding to the fixes (unit or parity path) are added so the same class of regression is detectable.
 
 Verification commands (planned):
 - `python3 tools/check/check_todo_priority.py`
 - `python3 tools/gen/regenerate_samples.py --langs php --force`
-- `python3 tools/check/runtime_parity_check.py --case-root sample --targets php --all-samples --summary-json work/logs/runtime_parity_sample_php_rebaseline_20260304.json`
+- `python3 tools/check/runtime_parity_check.py --case-root sample --targets php --summary-json work/logs/runtime_parity_sample_php_rebaseline_20260304.json`
 - `python3 tools/check/runtime_parity_check.py --case-root sample --targets php 05_mandelbrot_zoom 06_julia_parameter_sweep 08_langtons_ant 10_plasma_effect 11_lissajous_particles 12_sorting_visualization 14_simple_raymarching 16_glass_sculpture_chaos --summary-json work/logs/runtime_parity_sample_php_crc_focus_20260304.json`
-- `python3 tools/check/runtime_parity_check.py --case-root sample --targets php --all-samples --summary-json work/logs/runtime_parity_sample_php_all_pass_20260304.json`
+- `python3 tools/check/runtime_parity_check.py --case-root sample --targets php --summary-json work/logs/runtime_parity_sample_php_all_pass_20260304.json`
 
 Decision log:
 - 2026-03-04: Per user instruction, reopened as P0 to complete PHP parity for all samples. Adopted unmet items in existing logs (`artifact_crc32_mismatch` in 8 cases) as the baseline.
@@ -55,6 +55,6 @@ Decision log:
 - [ ] [ID: P0-PHP-SAMPLE-PARITY-COMPLETE-01-S2-02] Revalidate PHP PNG runtime (chunk construction/compression path/CRC calculation) and fix necessary diffs.
 - [ ] [ID: P0-PHP-SAMPLE-PARITY-COMPLETE-01-S2-03] Correct PHP lower/emitter image-output inputs (palette/frame/list/bytes path) and remove data diffs passed to runtime.
 - [ ] [ID: P0-PHP-SAMPLE-PARITY-COMPLETE-01-S2-04] Verify whether `sample/13` stdout mismatch recurs; if unresolved, fix at root cause.
-- [ ] [ID: P0-PHP-SAMPLE-PARITY-COMPLETE-01-S3-01] Re-run `--targets php --all-samples` and confirm `case_pass=18` / `case_fail=0`.
+- [ ] [ID: P0-PHP-SAMPLE-PARITY-COMPLETE-01-S3-01] Re-run `--targets php` and confirm `case_pass=18` / `case_fail=0`.
 - [ ] [ID: P0-PHP-SAMPLE-PARITY-COMPLETE-01-S3-02] Add regression tests corresponding to fixes (unit or parity check) and lock recurrence prevention.
 - [ ] [ID: P0-PHP-SAMPLE-PARITY-COMPLETE-01-S3-03] Record generated logs and decisions in this plan, and make completion criteria explicit so the TODO can be closed.

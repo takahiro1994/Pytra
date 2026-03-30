@@ -44,7 +44,7 @@
 - `python3 tools/check/check_todo_priority.py`
 - `python3 tools/check/check_py2rb_transpile.py`
 - `python3 -m unittest discover -s test/unit -p 'test_py2rb_smoke.py' -v`
-- `python3 tools/check/runtime_parity_check.py --case-root sample --targets ruby --all-samples --ignore-unstable-stdout`
+- `python3 tools/check/runtime_parity_check.py --case-root sample --targets ruby --ignore-unstable-stdout`
 
 決定ログ:
 - 2026-02-27: ユーザー指示により、Ruby backend 追加タスクを `P2` 優先度で TODO 管理する方針を確定した。

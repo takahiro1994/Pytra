@@ -10,7 +10,7 @@
 - `docs/ja/todo/index.md` の `ID: P0-PHP-S13-PARITY-INVEST-01`
 
 背景:
-- `tools/check/runtime_parity_check.py --case-root sample --all-samples --targets ruby,lua,scala,php` の最新実行で、失敗は `sample/13` の PHP 1件のみ。
+- `tools/check/runtime_parity_check.py --case-root sample --targets ruby,lua,scala,php` の最新実行で、失敗は `sample/13` の PHP 1件のみ。
 - 失敗内容は stdout 不一致で、Python 期待値 `frames: 147` に対し PHP 実測値が `frames: 2`。
 - `sample/16` / `sample/18` の PHP 実行は通るため、PHP backend 全面障害ではなく `sample/13` 固有の変換経路不整合の可能性が高い。
 

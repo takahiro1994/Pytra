@@ -53,7 +53,7 @@
 - `python3 src/eastlink.py out/east3/link-input.json --output-dir out/linked`
 - `python3 src/ir2lang.py out/linked/link-output.json --target cpp --output-dir out/cpp`
 - `python3 tools/check/runtime_parity_check.py --targets cpp --case-root fixture`
-- `python3 tools/check/runtime_parity_check.py --targets cpp --case-root sample --all-samples`
+- `python3 tools/check/runtime_parity_check.py --targets cpp --case-root sample`
 
 ## 1. 問題の本質
 
@@ -599,7 +599,7 @@ src/
 ### 10.3 sample / fixture
 
 - `runtime_parity_check.py --targets cpp --case-root fixture`
-- `runtime_parity_check.py --targets cpp --case-root sample --all-samples`
+- `runtime_parity_check.py --targets cpp --case-root sample`
 - `sample/18` を重点監視ケースにする
 - `sample/05` を module-cross non-escape 監視ケースにする
 
@@ -697,4 +697,4 @@ src/
 - 2026-03-07: [ID: P0-LINKED-PROGRAM-OPT-01-S7-02] `ir2lang.py` は `link-output.json` を受理できるようにし、non-C++ は entry linked module の single-file 再開、C++ は linked module 群を `write_multi_file_cpp(...)` へ流す backend-only restart 導線を実装した。`tools/unittest/tooling/test_py2x_cli.py` と `tools/unittest/tooling/test_ir2lang_cli.py` で dump/link-only/restart/cpp multi-file restart を固定した。
 - 2026-03-07: [ID: P0-LINKED-PROGRAM-OPT-01-S8-01] `link-output` validator を module-entry 正規化ありへ強化し、`LinkOutputModuleEntry` / `load_linked_output_bundle(...)` / `ir2lang.py` が tuple `entry_modules` を前提に動くよう揃えた。`tools/unittest/link/test_program_loader.py` で `link-output` schema 正規化、missing entry fail、raw bundle materialize 順序、linked bundle load の artifact path を固定し、`tools/unittest/link/test_global_optimizer.py` で reordered module map に対する `optimize_linked_program(...)` の determinism を固定した。
 - 2026-03-07: [ID: P0-LINKED-PROGRAM-OPT-01-S8-02] `NonEscapeInterproceduralPass` から `source_path` ベースの import-closure fallback を撤去し、linked-program 経路では linker/materializer が渡す `meta.non_escape_import_closure` だけを参照する fail-closed 契約へ揃えた。`global_optimizer.py` の `type_id` 決定は `Enum` / `IntEnum` / `IntFlag` と代表的な built-in exception base を root として扱うよう補強し、`tools/unittest/ir/test_east3_non_escape_interprocedural_pass.py`、`tools/unittest/link/test_global_optimizer.py`、C++ enum fixture 回帰で非退行を固定した。
-- 2026-03-07: [ID: P0-LINKED-PROGRAM-OPT-01-S8-02] docs は `spec-linker.md` と `how-to-use.md` に linked-program debug/restart 手順、および global pass が manifest 列挙 module 以外を追加読込しない契約を追記した。検証は `PYTHONPATH=/workspace/Pytra:/workspace/Pytra/src python3 -m unittest discover -s /workspace/Pytra/tools/unittest/emit/cpp -p 'test_*.py'` で `Ran 509 tests in 1016.609s`, `OK`、`python3 tools/check/runtime_parity_check.py --targets cpp --case-root fixture` で `cases=3 pass=3 fail=0`、`python3 tools/check/runtime_parity_check.py --targets cpp --case-root sample --all-samples` で `cases=18 pass=18 fail=0` を確認した。
+- 2026-03-07: [ID: P0-LINKED-PROGRAM-OPT-01-S8-02] docs は `spec-linker.md` と `how-to-use.md` に linked-program debug/restart 手順、および global pass が manifest 列挙 module 以外を追加読込しない契約を追記した。検証は `PYTHONPATH=/workspace/Pytra:/workspace/Pytra/src python3 -m unittest discover -s /workspace/Pytra/tools/unittest/emit/cpp -p 'test_*.py'` で `Ran 509 tests in 1016.609s`, `OK`、`python3 tools/check/runtime_parity_check.py --targets cpp --case-root fixture` で `cases=3 pass=3 fail=0`、`python3 tools/check/runtime_parity_check.py --targets cpp --case-root sample` で `cases=18 pass=18 fail=0` を確認した。

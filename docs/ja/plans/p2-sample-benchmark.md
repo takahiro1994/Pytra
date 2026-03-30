@@ -5,7 +5,7 @@
 # P2-SAMPLE-BENCHMARK: sample parity check で実行時間を自動計測し README に反映する
 
 最終更新: 2026-03-30
-ステータス: 未着手
+ステータス: 完了
 
 ## 背景
 

@@ -39,7 +39,7 @@ Verification commands:
 - `python3 tools/check/check_py2go_transpile.py`
 - `python3 tools/check/check_py2swift_transpile.py`
 - `python3 tools/check/check_py2kotlin_transpile.py`
-- `python3 tools/check/runtime_parity_check.py --case-root sample --targets go,swift,kotlin --all-samples --ignore-unstable-stdout`
+- `python3 tools/check/runtime_parity_check.py --case-root sample --targets go,swift,kotlin --ignore-unstable-stdout`
 
 Decision log:
 - 2026-02-26: Initial draft created. Added low-priority migration plan to native-ize Go/Swift/Kotlin sidecar toolchain.emit.

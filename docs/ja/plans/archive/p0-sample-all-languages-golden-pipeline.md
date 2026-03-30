@@ -86,7 +86,7 @@
 - `src/hooks/rs/emitter/rs_emitter.py` で call lower（owned clone / by-ref 引数推論）、subscript 代入の borrow-safe 化、dict 添字 read/write・`in/not in` lower、`Raise`/`IfExp`/`int(str)` の Rust lower、class method の `&mut self` 判定を修正し、sample 実行時の compile/runtime 差分を収束させた。
 - PNG/GIF runtime 呼び出しで path 第1引数を move しない経路を追加し、画像系サンプルで再発していた `E0382`（moved value）を解消した。
 - 検証結果:
-  - `python3 tools/check/runtime_parity_check.py --case-root sample --targets rs --all-samples --ignore-unstable-stdout`
+  - `python3 tools/check/runtime_parity_check.py --case-root sample --targets rs --ignore-unstable-stdout`
   - `SUMMARY cases=18 pass=18 fail=0 targets=rs`
   - `python3 tools/unittest/test_py2rs_smoke.py`（`Ran 22 tests ... OK`）
 
@@ -96,7 +96,7 @@
 - 検証結果:
   - `python3 tools/unittest/test_py2cs_smoke.py`（13件 pass）
   - `python3 tools/unittest/test_runtime_parity_check_cli.py`（4件 pass）
-  - `python3 tools/check/runtime_parity_check.py --case-root sample --targets cs --all-samples --ignore-unstable-stdout`
+  - `python3 tools/check/runtime_parity_check.py --case-root sample --targets cs --ignore-unstable-stdout`
   - `SUMMARY cases=18 pass=18 fail=0 targets=cs`
 
 `P0-SAMPLE-GOLDEN-ALL-01-S6` 確定内容（2026-02-25）:
@@ -106,7 +106,7 @@
 - 検証結果:
   - `python3 tools/unittest/test_py2js_smoke.py`（15件 pass）
   - `python3 tools/unittest/test_py2ts_smoke.py`（13件 pass）
-  - `python3 tools/check/runtime_parity_check.py --case-root sample --targets js,ts --all-samples --ignore-unstable-stdout`
+  - `python3 tools/check/runtime_parity_check.py --case-root sample --targets js,ts --ignore-unstable-stdout`
   - `SUMMARY cases=18 pass=18 fail=0 targets=js,ts`
 
 `P0-SAMPLE-GOLDEN-ALL-01-S7` 確定内容（2026-02-25）:
@@ -115,7 +115,7 @@
 - 検証結果:
   - `python3 tools/unittest/test_py2swift_smoke.py`（8件 pass）
   - `python3 tools/check/check_py2swift_transpile.py`（`checked=130 ok=130 fail=0 skipped=6`）
-  - `python3 tools/check/runtime_parity_check.py --case-root sample --targets go,java,swift,kotlin --all-samples --ignore-unstable-stdout`
+  - `python3 tools/check/runtime_parity_check.py --case-root sample --targets go,java,swift,kotlin --ignore-unstable-stdout`
   - `SUMMARY cases=18 pass=18 fail=0 targets=go,java,kotlin,swift`
   - `SUMMARY_CATEGORIES: ok: 72`
 
@@ -129,12 +129,12 @@
 - 2026-02-25: `P0-SAMPLE-GOLDEN-ALL-01-S2` として runtime parity のケース解決・失敗分類・JSON集計を実装し、`python3 tools/unittest/test_runtime_parity_check_cli.py` / `python3 tools/unittest/test_image_runtime_parity.py` / `python3 tools/check/runtime_parity_check.py import_pytra_runtime_png --targets cpp --summary-json <tmp>` を通して運用経路を再固定した。
 - 2026-02-25: `P0-SAMPLE-GOLDEN-ALL-01-S3` として C++ module 解決・runtime tuple unpack・tuple boxing・type_id 初期化順序を修正し、`runtime_parity_check.py --case-root sample --targets cpp --ignore-unstable-stdout` で 18件完走（pass=18）を確認した。
 - 2026-02-25: `P0-SAMPLE-GOLDEN-ALL-01-S4` の着手時点で実行環境に `rustc` が存在せず、`runtime_parity_check.py --case-root sample --targets rs --ignore-unstable-stdout` は `toolchain_missing: 18` のみを返した。Rust toolchain 導入後に compile/run 差分修正へ進む。
-- 2026-02-25: `P0-SAMPLE-GOLDEN-ALL-01-S4` として Rust emitter の call/subscript/dict/class mutability lower を修正し、`runtime_parity_check.py --case-root sample --targets rs --all-samples --ignore-unstable-stdout` で 18件完走（pass=18）と `tools/unittest/test_py2rs_smoke.py` 22件 pass を確認した。
-- 2026-02-25: `P0-SAMPLE-GOLDEN-ALL-01-S5` の初回検証として `runtime_parity_check.py --case-root sample --targets cs --all-samples --ignore-unstable-stdout` を実行し、`toolchain_missing: 18`（`mcs`/`mono` 未導入）を確認した。
-- 2026-02-25: `P0-SAMPLE-GOLDEN-ALL-01-S5` として C# emitter/runtime と parity 実行スクリプトを修正し、`runtime_parity_check.py --case-root sample --targets cs --all-samples --ignore-unstable-stdout` で 18件完走（pass=18）を確認した。
-- 2026-02-25: `P0-SAMPLE-GOLDEN-ALL-01-S6` として JS emitter/runtime shim 経路を改修し、`runtime_parity_check.py --case-root sample --targets js,ts --all-samples --ignore-unstable-stdout` で 18件完走（pass=18）と `test_py2{js,ts}_smoke.py` pass を確認した。
-- 2026-02-25: `P0-SAMPLE-GOLDEN-ALL-01-S7` の初回検証として `runtime_parity_check.py --case-root sample --targets go,java,swift,kotlin --all-samples --ignore-unstable-stdout` を実行し、`toolchain_missing: 72`（`go/javac/java/kotlinc/swiftc` 未導入）を確認した。
+- 2026-02-25: `P0-SAMPLE-GOLDEN-ALL-01-S4` として Rust emitter の call/subscript/dict/class mutability lower を修正し、`runtime_parity_check.py --case-root sample --targets rs --ignore-unstable-stdout` で 18件完走（pass=18）と `tools/unittest/test_py2rs_smoke.py` 22件 pass を確認した。
+- 2026-02-25: `P0-SAMPLE-GOLDEN-ALL-01-S5` の初回検証として `runtime_parity_check.py --case-root sample --targets cs --ignore-unstable-stdout` を実行し、`toolchain_missing: 18`（`mcs`/`mono` 未導入）を確認した。
+- 2026-02-25: `P0-SAMPLE-GOLDEN-ALL-01-S5` として C# emitter/runtime と parity 実行スクリプトを修正し、`runtime_parity_check.py --case-root sample --targets cs --ignore-unstable-stdout` で 18件完走（pass=18）を確認した。
+- 2026-02-25: `P0-SAMPLE-GOLDEN-ALL-01-S6` として JS emitter/runtime shim 経路を改修し、`runtime_parity_check.py --case-root sample --targets js,ts --ignore-unstable-stdout` で 18件完走（pass=18）と `test_py2{js,ts}_smoke.py` pass を確認した。
+- 2026-02-25: `P0-SAMPLE-GOLDEN-ALL-01-S7` の初回検証として `runtime_parity_check.py --case-root sample --targets go,java,swift,kotlin --ignore-unstable-stdout` を実行し、`toolchain_missing: 72`（`go/javac/java/kotlinc/swiftc` 未導入）を確認した。
 - 2026-02-25: `go` / `javac` / `java` / `kotlinc` を導入して `P0-SAMPLE-GOLDEN-ALL-01-S7` を再検証した。`go/kotlin` は C# 体裁生成物による compile 失敗、`java` は preview stub による stdout 空、`swift` は `swiftc` 未導入で、`run_failed: 36 / output_mismatch: 18 / toolchain_missing: 18` を確認した。
-- 2026-02-25: `P0-SAMPLE-GOLDEN-ALL-01-S7` として `py2go.py` / `py2java.py` / `py2kotlin.py` を JS sidecar bridge へ移行し、`runtime_parity_check.py --case-root sample --targets go,java,swift,kotlin --all-samples --ignore-unstable-stdout` で `ok: 54`（go/java/kotlin）・`toolchain_missing: 18`（swift）のみへ収束した。
-- 2026-02-25: `P0-SAMPLE-GOLDEN-ALL-01-S7` として `py2swift.py` を JS sidecar bridge へ移行し、`tools/shims/swiftc` shim を導入。`runtime_parity_check.py --case-root sample --targets go,java,swift,kotlin --all-samples --ignore-unstable-stdout` で `ok: 72`（4言語×18件）を確認し S7 を完了した。
+- 2026-02-25: `P0-SAMPLE-GOLDEN-ALL-01-S7` として `py2go.py` / `py2java.py` / `py2kotlin.py` を JS sidecar bridge へ移行し、`runtime_parity_check.py --case-root sample --targets go,java,swift,kotlin --ignore-unstable-stdout` で `ok: 54`（go/java/kotlin）・`toolchain_missing: 18`（swift）のみへ収束した。
+- 2026-02-25: `P0-SAMPLE-GOLDEN-ALL-01-S7` として `py2swift.py` を JS sidecar bridge へ移行し、`tools/shims/swiftc` shim を導入。`runtime_parity_check.py --case-root sample --targets go,java,swift,kotlin --ignore-unstable-stdout` で `ok: 72`（4言語×18件）を確認し S7 を完了した。
 - 2026-02-25: `P0-SAMPLE-GOLDEN-ALL-01-S8` として `docs/ja/README.md` / `readme.md` の実行結果注記を更新し、全9言語 parity 完走状態（S3〜S7）を反映した。

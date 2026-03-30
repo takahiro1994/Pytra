@@ -34,13 +34,13 @@
 確認コマンド:
 - `python3 -m unittest discover -s test/unit -p 'test_py2rb_smoke.py' -v`
 - `python3 tools/check/check_py2rb_transpile.py`
-- `python3 tools/check/runtime_parity_check.py --case-root sample --targets ruby --all-samples --ignore-unstable-stdout`
+- `python3 tools/check/runtime_parity_check.py --case-root sample --targets ruby --ignore-unstable-stdout`
 
 決定ログ:
 - 2026-02-27: `sample/05` 遅延要因分析の過程で `sample/06` Ruby 生成コードの `int/int` 除算意味差を確認。P0 として修正タスクを起票。
 - 2026-02-28: [ID: P0-RUBY-DIV-SEMANTICS-01-S1-01] `test_py2rb_smoke.py` に `/` 回帰（`test_true_division_binop_uses_pytra_div_helper` / `test_sample06_uses_true_division_helper`）を追加し、`sample/06` 系で true division helper 経由のコード生成を検知可能にした。
 - 2026-02-28: [ID: P0-RUBY-DIV-SEMANTICS-01-S1-02] Ruby emitter の `Div` lowering を `__pytra_div(lhs, rhs)` に変更し、runtime helper `__pytra_div`（`__pytra_float` ベース、0 除算は `ZeroDivisionError`）を追加して `int/int` の整数除算差分を解消した。
-- 2026-02-28: [ID: P0-RUBY-DIV-SEMANTICS-01-S1-03] `sample/ruby` 18件を再生成し、`runtime_parity_check --targets ruby --all-samples` を実行して `pass=18 fail=0` を確認。`check_py2rb_transpile.py`（`checked=133 ok=133 fail=0 skipped=6`）も通過した。
+- 2026-02-28: [ID: P0-RUBY-DIV-SEMANTICS-01-S1-03] `sample/ruby` 18件を再生成し、`runtime_parity_check --targets ruby` を実行して `pass=18 fail=0` を確認。`check_py2rb_transpile.py`（`checked=133 ok=133 fail=0 skipped=6`）も通過した。
 
 ## 分解
 

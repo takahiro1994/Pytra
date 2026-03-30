@@ -32,14 +32,14 @@ Out of scope:
 Acceptance Criteria:
 - `tools/check/check_py2lua_transpile.py` converts all 18 `sample/py` cases without skips.
 - All 18 generated artifacts are present in `sample/lua`.
-- `runtime_parity_check --targets lua --all-samples` is non-regressive under existing conditions (at least no output mismatch).
+- `runtime_parity_check --targets lua` is non-regressive under existing conditions (at least no output mismatch).
 - If known skip reasons remain, they are explicitly tracked as unresolved items in this plan (not in `DEFAULT_EXPECTED_FAILS`).
 
 Validation Commands (planned):
 - `python3 tools/check/check_todo_priority.py`
 - `python3 tools/check/check_py2lua_transpile.py`
 - `PYTHONPATH=src python3 -m unittest discover -s test/unit -p 'test_py2lua_smoke.py' -v`
-- `python3 tools/check/runtime_parity_check.py --case-root sample --targets lua --all-samples --ignore-unstable-stdout`
+- `python3 tools/check/runtime_parity_check.py --case-root sample --targets lua --ignore-unstable-stdout`
 - `python3 tools/gen/regenerate_samples.py --langs lua --force`
 
 Decision Log:
@@ -48,7 +48,7 @@ Decision Log:
 - 2026-03-01: Implemented `Subscript` assignment target / tuple assign / `Tuple` / `ListComp` / `Slice` / `Raise` in `lua_native_emitter.py`, resolving transpile failures for all 14 remaining cases.
 - 2026-03-01: Removed 14 sample entries (`01,05..16,18`) from `DEFAULT_EXPECTED_FAILS` in `tools/check/check_py2lua_transpile.py`, and confirmed `checked=101 ok=101 fail=0`.
 - 2026-03-01: Regenerated `sample/lua` to all 18 files with `tools/gen/regenerate_samples.py --langs lua --force`.
-- 2026-03-01: Re-ran `test_py2lua_smoke.py` (16 tests) and `runtime_parity_check --targets lua --all-samples`, confirming no output mismatch (`toolchain_missing` categorized in this environment).
+- 2026-03-01: Re-ran `test_py2lua_smoke.py` (16 tests) and `runtime_parity_check --targets lua`, confirming no output mismatch (`toolchain_missing` categorized in this environment).
 
 ## Breakdown
 

@@ -40,7 +40,7 @@
 受け入れ基準:
 - `python3 -m unittest discover -s tools/unittest/emit/cpp -p test_*.py` が通過する。
 - `python3 tools/check/runtime_parity_check.py --targets cpp --case-root fixture` が通過する。
-- `python3 tools/check/runtime_parity_check.py --targets cpp --case-root sample --all-samples` が通過する。
+- `python3 tools/check/runtime_parity_check.py --targets cpp --case-root sample` が通過する。
 - `json/argparse/png/gif/time/pathlib/os/glob` まわりの `.gen.*` は、SoT 再生成で正しく出力され、生成物を手編集しなくても成立する。
 - C++ emitter 側で import 元モジュール名や helper 名の ad-hoc 直書き追加を行わない。
 
@@ -48,7 +48,7 @@
 - `python3 tools/check/check_todo_priority.py`
 - `python3 -m unittest discover -s tools/unittest/emit/cpp -p test_*.py`
 - `python3 tools/check/runtime_parity_check.py --targets cpp --case-root fixture`
-- `python3 tools/check/runtime_parity_check.py --targets cpp --case-root sample --all-samples`
+- `python3 tools/check/runtime_parity_check.py --targets cpp --case-root sample`
 - `python3 -m unittest discover -s tools/unittest/emit/cpp -p test_py2cpp_features.py -k json_extended_runtime`
 - `python3 -m unittest discover -s tools/unittest/emit/cpp -p test_py2cpp_features.py -k argparse_extended_runtime`
 
@@ -65,7 +65,7 @@
 - [x] [ID: P0-CPP-REGRESSION-RECOVERY-01-S5-01] C++ unit 全体、fixture parity、sample parity を再実行し、回帰が残らないことを確認して docs/ja/todo を更新する。
 
 決定ログ:
-- 2026-03-06: `tools/check/runtime_parity_check.py --targets cpp --case-root fixture` と `--case-root sample --all-samples` は通過した一方、`python3 -m unittest discover -s tools/unittest/emit/cpp -p test_*.py` は未通過であることを確認した。以後の修正対象は unit suite の実障害に絞る。
+- 2026-03-06: `tools/check/runtime_parity_check.py --targets cpp --case-root fixture` と `--case-root sample` は通過した一方、`python3 -m unittest discover -s tools/unittest/emit/cpp -p test_*.py` は未通過であることを確認した。以後の修正対象は unit suite の実障害に絞る。
 - 2026-03-06: `build_multi_cpp.py` と fixture compile helper を「実際に include された runtime source だけを compile」する方式へ修正済みのため、`json.gen.*` / `argparse.gen.*` compile break は build 導線の偽陽性ではなく生成契約の破綻として扱う。
 - 2026-03-06: 本計画では、`.gen.*` の直接修正を禁止し、SoT・IR/lower・emitter・runtime 生成契約のどこで壊れたかを固定してから修正する。
 - 2026-03-06: [ID: `P0-CPP-REGRESSION-RECOVERY-01-S1-01`] `python3 -m unittest discover -s tools/unittest/emit/cpp -p test_*.py` の進行中 fail と、代表 failing test の個別再実行を突き合わせて分類した。責務固定は以下の通り。
@@ -115,4 +115,4 @@
 - 2026-03-06: [ID: `P0-CPP-REGRESSION-RECOVERY-01-S3-02`] `os.path` まわりは 2 段で壊れていた。1) `src/pytra/std/os.py` が `path` submodule を Python fallback として束縛しておらず、SoT 規約（`from pytra.std import os_path as path`）から外れていた。2) C++ 側は `os.path.*` を `pytra::std::os_path::*` へ直描画する一方で、その helper 宣言/定義と public shim の compile-source 追跡が揃っていなかった。修正として、`os.py` に `os_path as path` を戻し、`runtime_calls.json` で `os.path` と `pytra.std.os_path` を `py_os_path_*` helper へ、`os.path` owner を `pytra::std::os_path` へ整理した。`src/runtime/cpp/std/os_path.ext.h` を新設して helper 宣言を分離し、`os_path.ext.cpp` へ wrapper 実装を追加した。さらに `CppModuleEmitter._collect_runtime_modules_from_node()` で module-attr ノードから実 runtime module（今回だと `pytra.std.os_path`）を回収するようにし、`tools/cpp_runtime_deps.py` も `src/runtime/cpp/pytra/*.h` public shim を辿れるよう `RUNTIME_ROOT` を include 探索対象へ追加した。最後に `--emit-runtime-cpp` で `os.py` / `os_path.py` / `glob.py` を再生成し、public shim が `.ext.h` も forward するよう `src/backends/cpp/cli.py` を更新した。確認は `test_os_path_calls_use_runtime_helpers`、`test_os_glob_extended_runtime`、`test_pylib_os_glob.py`、`python3 tools/gen/gen_runtime_symbol_index.py --check` で pass。
 - 2026-03-06: [ID: `P0-CPP-REGRESSION-RECOVERY-01-S4-01`] 3 系統の破綻を同時に修正した。1) `table.get(..., {}).items()` のような object owner `dict.items()` は、typed dict 反復と同一視してはいけないため、C++ emitter で `DictItems` を `py_dict_items(...)` adapter へ切り替える条件を追加した。`dict.get` 直後で型が `unknown` に落ちるケースは builtin_runtime 側で `dict.get` owner の value 型を再検査し、`py_dict_items` が選ばれるよう補強した。2) `dict[str, object]` に対する `dict_get_str(root, "name", "")` は `object` overload と `optional<dict<...>>` overload の両方へ変換可能で曖昧だったため、`py_runtime.ext.h` に `dict<str, object>` 直受けの `dict_get_{bool,str,int,float,list}` overload を追加して plain dict 経路を固定した。3) `dict[int, int]` への添字 `even_map[2]` は C++ literal `2` が `int` になり `K=int64` と template deduction が割れていたため、`_coerce_dict_key_expr()` で numeric constant key を declared key 型へ揃えるよう修正した。確認は `test_dict_get_items_runtime`、`test_any_dict_items_runtime`、`test_comprehension_dict_set_runtime` と、`test_py2cpp_codegen_issues.py` 中の `dict.get` 周辺 7 件で pass。
 - 2026-03-06: [ID: `P0-CPP-REGRESSION-RECOVERY-01-S4-02`] emitter / CLI 契約の破綻を修正した。1) `DEFAULT_AUG_OPS["Mod"]` が `%` になっていたため native `%=` が壊れており、`%=` へ修正した。2) `emit_stmt()` は fallback table を持っているのに unknown stmt で即例外化していたため、dynamic hook 無効時は `/* unsupported stmt kind: ... */` を出すようにし、`Pass` も profile 含め `/* pass */` に統一した。3) `src/backends/cpp/cli.py` の `--dump-options` は `.cpp` 出力時の互換分岐に誤ってネストされていたため、入力存在確認後の早期 return に出し直した。4) `src/toolchain/frontends/transpile_cli.py` では self-hosted parser の `unsupported_syntax: expected token ...` を `not_implemented` 扱いしていたため、token mismatch を `user_syntax_error` へ正規化した。5) あわせて `tools/unittest/emit/cpp` の古い生成契約前提を整理し、public shim include、typed list/value class、`super()` / `Base.f(self, ...)` lowering、負数定数 `-(1)`/`-(2)` など現在の出力契約へテストを更新した。確認は `test_py2cpp_features.py` の既知 5 件、`test_cpp_runtime_symbol_index_integration.py`、`test_cpp_type.py`、`test_east3_cpp_bridge.py`、`test_py2cpp_codegen_issues.py` の failfast 追跡で pass。
-- 2026-03-06: [ID: `P0-CPP-REGRESSION-RECOVERY-01-S5-01`] `python3 -m unittest discover -s tools/unittest/emit/cpp -p 'test_*.py'` は 484 件すべて通過した。加えて `python3 tools/check/runtime_parity_check.py --targets cpp --case-root fixture` は `pass=3 fail=0`、`python3 tools/check/runtime_parity_check.py --targets cpp --case-root sample --all-samples` は `pass=18 fail=0` で通過し、sample は artifact `size/CRC32` 一致も再確認した。追加修正は `typing.*` annotation 正規化、runtime header 宣言の mutable parameter 契約同期、`py_runtime_argv_storage` の TU 分離解消、`transpile_cli` 互換 shim wrapper 整理、`random/re/math` runtime 再生成である。
+- 2026-03-06: [ID: `P0-CPP-REGRESSION-RECOVERY-01-S5-01`] `python3 -m unittest discover -s tools/unittest/emit/cpp -p 'test_*.py'` は 484 件すべて通過した。加えて `python3 tools/check/runtime_parity_check.py --targets cpp --case-root fixture` は `pass=3 fail=0`、`python3 tools/check/runtime_parity_check.py --targets cpp --case-root sample` は `pass=18 fail=0` で通過し、sample は artifact `size/CRC32` 一致も再確認した。追加修正は `typing.*` annotation 正規化、runtime header 宣言の mutable parameter 契約同期、`py_runtime_argv_storage` の TU 分離解消、`transpile_cli` 互換 shim wrapper 整理、`random/re/math` runtime 再生成である。

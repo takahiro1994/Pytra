@@ -123,7 +123,7 @@ Design Policy:
 - `python3 tools/check/check_py2cpp_transpile.py`
 - `PYTHONPATH=src python3 -m unittest discover -s test/unit -p 'test_cpp_runtime_*.py' -v`
 - `PYTHONPATH=src python3 -m unittest discover -s test/unit -p 'test_py2cpp_*.py' -v`
-- `python3 tools/check/runtime_parity_check.py --case-root sample --targets cpp --all-samples --ignore-unstable-stdout`
+- `python3 tools/check/runtime_parity_check.py --case-root sample --targets cpp --ignore-unstable-stdout`
 
 Decision Log:
 - 2026-02-28: Per user instruction, finalized policy to prioritize migrating `list` alone to the PyObj/RC model before expanding to `str/dict/set`.

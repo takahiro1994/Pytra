@@ -30,7 +30,7 @@ Verification command:
 python3 tools/check/runtime_parity_check.py \
   --targets cpp \
   --case-root sample \
-  --all-samples \
+  \
   --cpp-codegen-opt 3 \
   --east3-opt-level 2
 ```

@@ -268,7 +268,7 @@ src/runtime/cpp/
 - `python3 tools/check/check_runtime_cpp_layout.py`
 - `PYTHONPATH=src python3 -m unittest discover -s tools/unittest/emit/cpp -p 'test_*.py'`
 - `python3 tools/check/runtime_parity_check.py --targets cpp --case-root fixture`
-- `python3 tools/check/runtime_parity_check.py --targets cpp --case-root sample --all-samples`
+- `python3 tools/check/runtime_parity_check.py --targets cpp --case-root sample`
 
 ## 分解
 

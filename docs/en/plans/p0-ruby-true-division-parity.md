@@ -34,13 +34,13 @@ Acceptance criteria:
 Verification commands:
 - `python3 -m unittest discover -s test/unit -p 'test_py2rb_smoke.py' -v`
 - `python3 tools/check/check_py2rb_transpile.py`
-- `python3 tools/check/runtime_parity_check.py --case-root sample --targets ruby --all-samples --ignore-unstable-stdout`
+- `python3 tools/check/runtime_parity_check.py --case-root sample --targets ruby --ignore-unstable-stdout`
 
 Decision log:
 - 2026-02-27: During analysis of `sample/05` slowdown factors, we confirmed `int/int` division semantic differences in Ruby-generated `sample/06`; opened this as a P0 fix task.
 - 2026-02-28: [ID: P0-RUBY-DIV-SEMANTICS-01-S1-01] Added `/` regressions to `test_py2rb_smoke.py` (`test_true_division_binop_uses_pytra_div_helper` / `test_sample06_uses_true_division_helper`) so code generation via true-division helper is detectable in `sample/06`-related cases.
 - 2026-02-28: [ID: P0-RUBY-DIV-SEMANTICS-01-S1-02] Changed Ruby emitter `Div` lowering to `__pytra_div(lhs, rhs)`, and added runtime helper `__pytra_div` (based on `__pytra_float`, raising `ZeroDivisionError` on divide-by-zero), eliminating `int/int` integer-division differences.
-- 2026-02-28: [ID: P0-RUBY-DIV-SEMANTICS-01-S1-03] Regenerated all 18 `sample/ruby` outputs and ran `runtime_parity_check --targets ruby --all-samples`, confirming `pass=18 fail=0`. Also passed `check_py2rb_transpile.py` (`checked=133 ok=133 fail=0 skipped=6`).
+- 2026-02-28: [ID: P0-RUBY-DIV-SEMANTICS-01-S1-03] Regenerated all 18 `sample/ruby` outputs and ran `runtime_parity_check --targets ruby`, confirming `pass=18 fail=0`. Also passed `check_py2rb_transpile.py` (`checked=133 ok=133 fail=0 skipped=6`).
 
 ## Breakdown
 

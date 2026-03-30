@@ -10,7 +10,7 @@
 - `docs/ja/todo/index.md` の `ID: P0-RUBY-S18-TOKENIZE-INVEST-01`
 
 背景:
-- `tools/check/runtime_parity_check.py --case-root sample --targets ruby --all-samples` で `18_mini_language_interpreter` のみ失敗する。
+- `tools/check/runtime_parity_check.py --case-root sample --targets ruby` で `18_mini_language_interpreter` のみ失敗する。
 - 失敗内容は Ruby 実行時の `tokenize error at line=0 pos=6 ch==` で、`run_failed` に分類される。
 - parity 検証スクリプトは artifact 事前削除済みであり、今回の failure は stale artifact 起因ではない。
 

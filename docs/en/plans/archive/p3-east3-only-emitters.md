@@ -55,7 +55,7 @@ Decision log:
 - 2026-02-26: `S6-01` updated the current-operation section in `docs/ja/plans/plan-east123-migration.md` to `EAST3 only`, removing non-C++ `stage2` compatibility assumptions (compat-mode warning / compat loader dependency). Moved old assumptions into historical notes.
 - 2026-02-26: `S6-02` synced `docs/en/plans/plan-east123-migration.md` to the same content as `docs-ja`, aligning JA/EN docs on `EAST3 only` contract and notes.
 - 2026-02-26: `S7-01` passed smoke/check for all 8 non-C++ targets. `test_py2{rs,cs,js,ts,go,java,swift,kotlin}_smoke.py` all `OK`; `check_py2{rs,cs,js,ts,go,java,swift,kotlin}_transpile.py` all `checked=132 ok=132 fail=0 skipped=6`.
-- 2026-02-26: `S7-02` ran `runtime_parity_check --case-root sample --targets rs,cs,js,ts,go,java,swift,kotlin --all-samples --ignore-unstable-stdout`; confirmed `SUMMARY cases=18 pass=18 fail=0` and `ok: 144`, completing final `EAST3 only` parity validation for all 8 non-C++ targets.
+- 2026-02-26: `S7-02` ran `runtime_parity_check --case-root sample --targets rs,cs,js,ts,go,java,swift,kotlin --ignore-unstable-stdout`; confirmed `SUMMARY cases=18 pass=18 fail=0` and `ok: 144`, completing final `EAST3 only` parity validation for all 8 non-C++ targets.
 
 ## Breakdown
 
@@ -78,4 +78,4 @@ Decision log:
 - [x] [ID: P3-EAST3-ONLY-01-S6-01] Remove `stage=2` compatibility assumptions from related docs and update to `EAST3 only`.
 - [x] [ID: P3-EAST3-ONLY-01-S6-02] Sync required `docs/` translations and eliminate JA/EN inconsistency.
 - [x] [ID: P3-EAST3-ONLY-01-S7-01] Pass smoke/check for all 8 non-C++ targets (`test_py2*` + `check_py2*`).
-- [x] [ID: P3-EAST3-ONLY-01-S7-02] Run `runtime_parity_check --case-root sample --targets rs,cs,js,ts,go,java,swift,kotlin --all-samples --ignore-unstable-stdout` and complete final consistency validation.
+- [x] [ID: P3-EAST3-ONLY-01-S7-02] Run `runtime_parity_check --case-root sample --targets rs,cs,js,ts,go,java,swift,kotlin --ignore-unstable-stdout` and complete final consistency validation.

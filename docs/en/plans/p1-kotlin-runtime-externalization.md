@@ -41,7 +41,7 @@ Validation Commands (planned):
 - `python3 tools/check/check_todo_priority.py`
 - `python3 tools/check/check_py2kotlin_transpile.py`
 - `PYTHONPATH=src python3 -m unittest discover -s test/unit -p 'test_py2kotlin_smoke.py' -v`
-- `python3 tools/check/runtime_parity_check.py --case-root sample --targets kotlin --all-samples --ignore-unstable-stdout`
+- `python3 tools/check/runtime_parity_check.py --case-root sample --targets kotlin --ignore-unstable-stdout`
 - `python3 tools/gen/regenerate_samples.py --langs kotlin --force`
 - `rg -n "fun __pytra_truthy\(v: Any\?\): Boolean" sample/kotlin`
 
@@ -92,4 +92,4 @@ Decision Log:
 - 2026-03-01: Marked unsupported Kotlin fixtures (Try/Yield/Swap) as expected fail in `tools/check/check_py2kotlin_transpile.py`, confirming `checked=129 ok=129 fail=0 skipped=10`.
 - 2026-03-01: Updated Kotlin parity path, reflecting `py_runtime.kt` bundled compilation and artifact no-op policy for Kotlin execution in `runtime_parity_check.py`.
 - 2026-03-01: Fixed Kotlin emitter `dict.get(key, default)` to `map.get(key) ?: default`, added `Dict(entries)` rendering, and resolved sample/18 runtime failure (token map emptied).
-- 2026-03-01: Passed `PYTHONPATH=src python3 -m unittest discover -s test/unit -p 'test_py2kotlin_smoke.py' -v` (12 tests), `python3 tools/check/check_py2kotlin_transpile.py`, `python3 tools/check/runtime_parity_check.py --case-root sample --targets kotlin --all-samples --ignore-unstable-stdout` (18/18 pass), and `python3 tools/gen/regenerate_samples.py --langs kotlin --force`.
+- 2026-03-01: Passed `PYTHONPATH=src python3 -m unittest discover -s test/unit -p 'test_py2kotlin_smoke.py' -v` (12 tests), `python3 tools/check/check_py2kotlin_transpile.py`, `python3 tools/check/runtime_parity_check.py --case-root sample --targets kotlin --ignore-unstable-stdout` (18/18 pass), and `python3 tools/gen/regenerate_samples.py --langs kotlin --force`.

@@ -40,13 +40,13 @@
 - `src/runtime/cpp/` 配下は `core/` と `gen/` のみで、`pytra/` shim は存在しない。
 - C++ の runtime 参照が `runtime/cpp/core` と `runtime/cpp/gen` に統一され、`runtime/cpp/pytra` 参照が消える。
 - `tools/check/runtime_parity_check.py --targets cpp --case-root fixture` が通る。
-- `tools/check/runtime_parity_check.py --targets cpp --case-root sample --all-samples` が通る。
+- `tools/check/runtime_parity_check.py --targets cpp --case-root sample` が通る。
 
 確認コマンド（予定）:
 - `python3 tools/check/check_todo_priority.py`
 - `rg -n "runtime/cpp/pytra|src/runtime2" src/backends/cpp src/toolchain tools`
 - `python3 tools/check/runtime_parity_check.py --targets cpp --case-root fixture`
-- `python3 tools/check/runtime_parity_check.py --targets cpp --case-root sample --all-samples`
+- `python3 tools/check/runtime_parity_check.py --targets cpp --case-root sample`
 
 ## 分解
 

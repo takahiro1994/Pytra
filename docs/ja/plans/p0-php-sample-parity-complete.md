@@ -33,16 +33,16 @@
 - PHP 以外の backend 改修
 
 受け入れ基準:
-- `python3 tools/check/runtime_parity_check.py --case-root sample --targets php --all-samples --summary-json work/logs/runtime_parity_sample_php_all_pass_20260304.json` で `case_pass=18`, `case_fail=0`。
+- `python3 tools/check/runtime_parity_check.py --case-root sample --targets php --summary-json work/logs/runtime_parity_sample_php_all_pass_20260304.json` で `case_pass=18`, `case_fail=0`。
 - 上記ログで `category_counts` が `ok` のみ（`output_mismatch` / `artifact_*` / `run_failed` が 0）。
 - 失敗修正に対応する最小回帰（unit または parity 導線）が追加され、同系統の退行を検知できる。
 
 確認コマンド（予定）:
 - `python3 tools/check/check_todo_priority.py`
 - `python3 tools/gen/regenerate_samples.py --langs php --force`
-- `python3 tools/check/runtime_parity_check.py --case-root sample --targets php --all-samples --summary-json work/logs/runtime_parity_sample_php_rebaseline_20260304.json`
+- `python3 tools/check/runtime_parity_check.py --case-root sample --targets php --summary-json work/logs/runtime_parity_sample_php_rebaseline_20260304.json`
 - `python3 tools/check/runtime_parity_check.py --case-root sample --targets php 05_mandelbrot_zoom 06_julia_parameter_sweep 08_langtons_ant 10_plasma_effect 11_lissajous_particles 12_sorting_visualization 14_simple_raymarching 16_glass_sculpture_chaos --summary-json work/logs/runtime_parity_sample_php_crc_focus_20260304.json`
-- `python3 tools/check/runtime_parity_check.py --case-root sample --targets php --all-samples --summary-json work/logs/runtime_parity_sample_php_all_pass_20260304.json`
+- `python3 tools/check/runtime_parity_check.py --case-root sample --targets php --summary-json work/logs/runtime_parity_sample_php_all_pass_20260304.json`
 
 決定ログ:
 - 2026-03-04: ユーザー指示により、PHP parity 全件完了を P0 で再起票。既存ログ上の未達（`artifact_crc32_mismatch` 8件）を baseline として採用。
@@ -61,6 +61,6 @@
 - [x] [ID: P0-PHP-SAMPLE-PARITY-COMPLETE-01-S2-02] PHP PNG runtime（chunk 構築・圧縮経路・CRC 計算）を再検証し、必要な差分を修正する。
 - [x] [ID: P0-PHP-SAMPLE-PARITY-COMPLETE-01-S2-03] PHP lower/emitter の画像出力入力（palette/frame/list/bytes 経路）を是正し、runtime へ渡すデータ差分を解消する。
 - [x] [ID: P0-PHP-SAMPLE-PARITY-COMPLETE-01-S2-04] `sample/13` の stdout mismatch 再発有無を検証し、未解消なら根本原因を修正する。
-- [x] [ID: P0-PHP-SAMPLE-PARITY-COMPLETE-01-S3-01] `--targets php --all-samples` を再実行し、`case_pass=18` / `case_fail=0` を確認する。
+- [x] [ID: P0-PHP-SAMPLE-PARITY-COMPLETE-01-S3-01] `--targets php` を再実行し、`case_pass=18` / `case_fail=0` を確認する。
 - [x] [ID: P0-PHP-SAMPLE-PARITY-COMPLETE-01-S3-02] 修正内容に対応する回帰テスト（unit または parity 用チェック）を追加して再発防止を固定する。
 - [x] [ID: P0-PHP-SAMPLE-PARITY-COMPLETE-01-S3-03] 生成ログと決定事項を計画書へ記録し、TODO の完了条件を明示してクローズ可能状態にする。

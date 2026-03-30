@@ -365,7 +365,7 @@
 - `python3 -m unittest discover -s tools/unittest/tooling -p 'test_runtime_symbol_index*.py'`
 - `python3 -m unittest discover -s tools/unittest/emit/cpp -p test_*.py`
 - `python3 tools/check/runtime_parity_check.py --targets cpp --case-root fixture`
-- `python3 tools/check/runtime_parity_check.py --targets cpp --case-root sample --all-samples`
+- `python3 tools/check/runtime_parity_check.py --targets cpp --case-root sample`
 
 ### 非C++ backend への適用方針（S5-01 固定）
 

@@ -42,7 +42,7 @@ Validation Commands (planned):
 - `python3 tools/check/check_todo_priority.py`
 - `python3 tools/check/check_py2rs_transpile.py`
 - `PYTHONPATH=src python3 -m unittest discover -s test/unit -p 'test_py2rs_smoke.py' -v`
-- `python3 tools/check/runtime_parity_check.py --case-root sample --targets rs --all-samples --ignore-unstable-stdout`
+- `python3 tools/check/runtime_parity_check.py --case-root sample --targets rs --ignore-unstable-stdout`
 - `python3 tools/gen/regenerate_samples.py --langs rs --force`
 - `rg -n "fn py_perf_counter|fn py_isdigit|mod pytra \\{" sample/rs`
 
@@ -126,5 +126,5 @@ Decision Log:
 - 2026-03-01: Added `py_str_at`/`py_slice_str`, `PyAny` conversions, `type_id/isinstance` base, and `pub mod time/math/pytra` to `src/runtime/rs/pytra/built_in/py_runtime.rs`; validated standalone syntax via `rustc --crate-type lib` (`S2-01`).
 - 2026-03-01: Added bundled `py_runtime.rs` copy path to `py2rs.py` and verified runtime placement at generation target via CLI smoke (`S2-02`). Four failures in `check_py2rs_transpile.py` (`Try/Yield/Swap` unsupported) are existing spec gaps handled in `S3-01`.
 - 2026-03-01: Removed runtime inline output (`RUST_RUNTIME_SUPPORT`/`_emit_pyany_runtime`/`_emit_isinstance_runtime_helpers` calls) from `rs_emitter.py`, migrated to `mod py_runtime;` + `pub use` + `use crate::py_runtime::*;`, and switched `isinstance` to runtime-side type-table initialization via `py_register_generated_type_info()` (`S2-03`).
-- 2026-03-01: Confirmed `PYTHONPATH=src python3 -m unittest discover -s test/unit -p 'test_py2rs_smoke.py' -v` (28 OK), `python3 tools/check/check_py2rs_transpile.py` (`checked=129 ok=129 fail=0 skipped=10`), and `python3 tools/check/runtime_parity_check.py --case-root sample --targets rs --all-samples --ignore-unstable-stdout` (18/18 PASS) (`S3-01`).
+- 2026-03-01: Confirmed `PYTHONPATH=src python3 -m unittest discover -s test/unit -p 'test_py2rs_smoke.py' -v` (28 OK), `python3 tools/check/check_py2rs_transpile.py` (`checked=129 ok=129 fail=0 skipped=10`), and `python3 tools/check/runtime_parity_check.py --case-root sample --targets rs --ignore-unstable-stdout` (18/18 PASS) (`S3-01`).
 - 2026-03-01: After `python3 tools/gen/regenerate_samples.py --langs rs --force` (`regen=18 fail=0`), confirmed zero inline helper residue with `rg -n "fn py_perf_counter|fn py_isdigit|mod pytra \\{" sample/rs --glob '!py_runtime.rs'` (`S3-02`).

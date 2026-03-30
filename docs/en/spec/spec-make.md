@@ -173,7 +173,7 @@ Exit non-zero in the following cases:
 - `./pytra sample/py/01_mandelbrot.py --target cpp --build --output-dir out/mandelbrot` performs conversion, Makefile generation, and build in sequence.
 - `./pytra sample/py/01_mandelbrot.py --target cpp --build --compiler g++ --std c++20 --opt -O3 --exe mandelbrot.out` reflects the specified values into the Makefile and the build.
 - `./pytra sample/py/01_mandelbrot.py --target cpp --codegen-opt 3 --build --output-dir out/mandelbrot` selects the maximum-opt C++ route through the linked-program optimizer.
-- `python3 tools/check/runtime_parity_check.py --targets cpp --case-root sample --all-samples --cpp-codegen-opt 3 --east3-opt-level 2` remains green.
+- `python3 tools/check/runtime_parity_check.py --targets cpp --case-root sample --cpp-codegen-opt 3 --east3-opt-level 2` remains green.
 - `./pytra sample/py/01_mandelbrot.py --target rs --build` exits with an error as specified.
 - Running `make -f out/mandelbrot/Makefile` a second time results in an incremental build with minimal relink/recompile.
 

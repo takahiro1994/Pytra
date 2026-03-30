@@ -44,7 +44,7 @@ Validation Commands (planned):
 - `python3 tools/check/check_todo_priority.py`
 - `python3 tools/check/check_py2rb_transpile.py`
 - `python3 -m unittest discover -s test/unit -p 'test_py2rb_smoke.py' -v`
-- `python3 tools/check/runtime_parity_check.py --case-root sample --targets ruby --all-samples --ignore-unstable-stdout`
+- `python3 tools/check/runtime_parity_check.py --case-root sample --targets ruby --ignore-unstable-stdout`
 
 Decision Log:
 - 2026-02-27: Per user instruction, finalized policy to track Ruby backend addition under P2 priority in TODO.

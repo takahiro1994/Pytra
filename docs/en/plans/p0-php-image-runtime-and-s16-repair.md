@@ -35,12 +35,12 @@ Acceptance criteria:
 - In PHP execution, `sample/01` (PNG) and `sample/06` (GIF) actually generate artifacts.
 - `sample/16` completes in PHP and outputs `output:` and `elapsed_sec:`.
 - In parity, stale artifacts are always deleted before each sample case run (enforced in code).
-- `runtime_parity_check --case-root sample --targets php --all-samples` is evaluated without artifact false positives at minimum.
+- `runtime_parity_check --case-root sample --targets php` is evaluated without artifact false positives at minimum.
 
 Verification commands (planned):
 - `python3 tools/check/check_todo_priority.py`
 - `python3 tools/gen/regenerate_samples.py --langs php --force`
-- `python3 tools/check/runtime_parity_check.py --case-root sample --targets php --all-samples`
+- `python3 tools/check/runtime_parity_check.py --case-root sample --targets php`
 - `python3 tools/check/check_py2php_transpile.py`
 
 Decision log:

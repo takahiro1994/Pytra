@@ -32,11 +32,11 @@
 - Ruby 実行時に `sample/01` の PNG が実際に生成される。
 - `sample/01` で Python 実行出力 PNG と Ruby 実行出力 PNG のバイト列が一致する。
 - 代表 GIF ケース（`sample/06` など）でも Python と Ruby の GIF バイト一致（または差分理由の仕様化）が確認される。
-- `runtime_parity_check --targets ruby --all-samples` が非退行で通る。
+- `runtime_parity_check --targets ruby` が非退行で通る。
 
 確認コマンド（予定）:
 - `python3 tools/check/check_todo_priority.py`
-- `python3 tools/check/runtime_parity_check.py --case-root sample --targets ruby --all-samples --ignore-unstable-stdout`
+- `python3 tools/check/runtime_parity_check.py --case-root sample --targets ruby --ignore-unstable-stdout`
 - `python3 tools/gen/regenerate_samples.py --langs ruby --force`
 - `PYTHONPATH=src python3 -m unittest discover -s test/unit -p 'test_py2rb_smoke.py' -v`
 - `python3 tools/check/check_py2rb_transpile.py`
@@ -46,7 +46,7 @@
 - 2026-02-28: Ruby emitter の `save_gif` / `write_rgb_png` / `grayscale_palette` lower を `__pytra_noop` / `[]` から実体 runtime 呼び出しへ切替え、`save_gif` keyword（`delay_cs`/`loop`）を位置引数へ反映する実装方針を採用した。
 - 2026-02-28: `src/runtime/ruby/pytra/py_runtime.rb` に PNG（CRC32/Adler32/zlib store）・GIF（LZW/パレット）書き出し実装を追加し、Ruby 単体で画像を生成可能にした。
 - 2026-02-28: `tools/verify_ruby_sample_artifact_parity.py --samples 01_mandelbrot 06_julia_parameter_sweep` を追加実行し、PNG/GIF の Python vs Ruby バイト一致を確認した。
-- 2026-02-28: `runtime_parity_check --case-root sample --targets ruby --all-samples --ignore-unstable-stdout` を実行し、18/18 case pass を確認した。
+- 2026-02-28: `runtime_parity_check --case-root sample --targets ruby --ignore-unstable-stdout` を実行し、18/18 case pass を確認した。
 
 ## 分解
 

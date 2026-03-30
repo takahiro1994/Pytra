@@ -32,14 +32,14 @@
 受け入れ基準:
 - `tools/check/check_py2lua_transpile.py` で `sample/py` 18件がスキップなしで変換成功する。
 - `sample/lua` に 18 件すべての生成物が揃う。
-- `runtime_parity_check --targets lua --all-samples` が既存条件で非退行（少なくとも output mismatch なし）となる。
+- `runtime_parity_check --targets lua` が既存条件で非退行（少なくとも output mismatch なし）となる。
 - 既知スキップ理由が残る場合は、`DEFAULT_EXPECTED_FAILS` でなく計画書の未解決項目として明示される。
 
 確認コマンド（予定）:
 - `python3 tools/check/check_todo_priority.py`
 - `python3 tools/check/check_py2lua_transpile.py`
 - `PYTHONPATH=src python3 -m unittest discover -s test/unit -p 'test_py2lua_smoke.py' -v`
-- `python3 tools/check/runtime_parity_check.py --case-root sample --targets lua --all-samples --ignore-unstable-stdout`
+- `python3 tools/check/runtime_parity_check.py --case-root sample --targets lua --ignore-unstable-stdout`
 - `python3 tools/gen/regenerate_samples.py --langs lua --force`
 
 決定ログ:
@@ -48,7 +48,7 @@
 - 2026-03-01: `lua_native_emitter.py` に `Subscript` 代入 target / tuple assign / `Tuple` / `ListComp` / `Slice` / `Raise` を実装し、残件14ケースの transpile 失敗を解消した。
 - 2026-03-01: `tools/check/check_py2lua_transpile.py` の `DEFAULT_EXPECTED_FAILS` から sample 14件（`01,05..16,18`）を削除し、`checked=101 ok=101 fail=0` を確認した。
 - 2026-03-01: `tools/gen/regenerate_samples.py --langs lua --force` で `sample/lua` を 18件へ再生成した。
-- 2026-03-01: `test_py2lua_smoke.py`（16件）と `runtime_parity_check --targets lua --all-samples` を再実行し、output mismatch なしを確認した（環境上は `toolchain_missing` 分類）。
+- 2026-03-01: `test_py2lua_smoke.py`（16件）と `runtime_parity_check --targets lua` を再実行し、output mismatch なしを確認した（環境上は `toolchain_missing` 分類）。
 
 ## 分解
 

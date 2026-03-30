@@ -55,7 +55,7 @@
 - `python3 tools/check/check_todo_priority.py`
 - `python3 tools/check/audit_image_runtime_sot.py --fail-on-core-mix --fail-on-gen-markers --fail-on-non-compliant`
 - `python3 tools/check/check_emitter_runtimecall_guardrails.py`
-- `python3 tools/check/runtime_parity_check.py --case-root sample --all-samples --ignore-unstable-stdout`
+- `python3 tools/check/runtime_parity_check.py --case-root sample --ignore-unstable-stdout`
 
 ## 分解
 
@@ -107,7 +107,7 @@
 - 2026-03-05: [ID: `P2-RUNTIME-PARITY-CPP-02-S3-03`] lint/fail-fast 導線として `check_emitter_runtimecall_guardrails.py` と `check_emitter_forbidden_runtime_symbols.py` が `tools/run/run_local_ci.py` 必須ステップで常時実行されることを再確認。strict backend（`java`）は allowlist 非依存で即 fail するため、PR/CI 上の禁止ルールを固定できる状態にした。
 - 2026-03-05: [ID: `P2-RUNTIME-PARITY-CPP-02-S4-01`] sample parity 再実行を開始し、`01_mandelbrot` と `02_raytrace_spheres` の全14target結果を `work/logs/runtime_parity_sample01_multilang_20260305.json` / `work/logs/runtime_parity_sample02_multilang_20260305.json` に固定。主要failカテゴリは `js/ts: png runtime export mismatch`, `go: generated png/gif compile errors + main衝突`, `nim: module名(先頭数字)不正`, `cpp(02): gif/png object link main重複 + write_rgb_png未解決`, `java(02): math.java class/file名不一致`。
 - 2026-03-05: [ID: `P2-RUNTIME-PARITY-CPP-02-S4-01`] `nim` の `run_failed`（invalid module name）を修正。`pytra_cli_profiles.py` で nim 出力名を `main.nim` 固定化し、`runtime_parity_check.py` で nim 実行出力の `stderr` フォールバック + warning除外を追加。`01_mandelbrot` / `02_raytrace_spheres` の nim parity は artifact size+CRC32 一致で通過（`work/logs/runtime_parity_sample0{1,2}_nim_after_stderr_fallback_20260305.json`）。
-- 2026-03-05: [ID: `P2-RUNTIME-PARITY-CPP-02-S4-01`] `runtime_parity_check.py --case-root sample --targets cpp,rs,cs,js,ts,go,java,swift,kotlin,ruby,lua,scala,php,nim --all-samples --ignore-unstable-stdout` を再実行し、`01` で `js/ts/go/nim`、`02/03` で追加の `java/cpp` 失敗を確認。主因は `js/png.js` の f-string 残存、`go/png.go` 文字列生成崩れ、Nim 実行モジュール名制約、Java runtime class 命名崩れ（`tmp`）、C++ runtime 側の `main` 重複 + `write_rgb_png` 未解決。`rs/cs/ruby/lua/php/swift/kotlin/scala` は少なくとも `01-03` で artifact size/CRC32 一致を確認。
+- 2026-03-05: [ID: `P2-RUNTIME-PARITY-CPP-02-S4-01`] `runtime_parity_check.py --case-root sample --targets cpp,rs,cs,js,ts,go,java,swift,kotlin,ruby,lua,scala,php,nim --ignore-unstable-stdout` を再実行し、`01` で `js/ts/go/nim`、`02/03` で追加の `java/cpp` 失敗を確認。主因は `js/png.js` の f-string 残存、`go/png.go` 文字列生成崩れ、Nim 実行モジュール名制約、Java runtime class 命名崩れ（`tmp`）、C++ runtime 側の `main` 重複 + `write_rgb_png` 未解決。`rs/cs/ruby/lua/php/swift/kotlin/scala` は少なくとも `01-03` で artifact size/CRC32 一致を確認。
 - 2026-03-05: [ID: `P2-RUNTIME-PARITY-CPP-02-S4-01`] `src/pytra/utils/png.py` の SoT 実装を backend 互換寄り（f-string 除去、`bytes([..])` 置換）へ正規化し、`gen_runtime_from_manifest.py --items utils/png --targets js,ts,go` で再生成。`01_mandelbrot` の再検証で `js/ts` は構文エラーから「`write_rgb_png` export未解決」へ前進、`go` は文字列崩れが解消した一方で `extend/main重複/pyWriteRGBPNG未定義` が残ることを確認した。
 - 2026-03-05: [ID: `P2-RUNTIME-PARITY-CPP-02-S4-01`] `runtime_parity_check.py` に target別出力ディレクトリの事前削除（stale transpile/build生成物の掃除）を追加し、再実行時の `work/transpile/*` 取り違えを解消。`runtime_parity_check.py --case-root sample --targets js,ts,go,cpp,java,nim 01_mandelbrot 02_raytrace_spheres` を再実行し、6target 全てで artifact size/CRC32 一致（`work/logs/runtime_parity_sample01_02_focus_20260305_after_freshfix.json`）を確認した。
 - 2026-03-05: [ID: `P2-RUNTIME-PARITY-CPP-02-S4-01`] C++先行移行時に退避していた非C++ runtime を `src/runtime2/{rs,cs,js,ts,go,java,swift,kotlin,ruby,lua,scala,php,nim}` から `src/runtime/` へ復旧し、`backend_registry` runtime hook の `runtime source not found` 連鎖を解消した。
