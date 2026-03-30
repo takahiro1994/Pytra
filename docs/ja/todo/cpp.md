@@ -52,17 +52,6 @@
    - 完了: py_types.h に rc_from_value オーバーロード群を追加、emitter.py の _wrap_container_value_expr を rc_from_value に統一。parity: for_range/comprehension/argparse_extended OK
 8. [x] [ID: P3-CR-CPP-S8] C++ emitter に `_safe_cpp_ident` を追加する — C++ 予約語（`double`, `class`, `int`, `float`, `namespace`, `template` 等）と衝突する関数名・メソッド名・変数名に末尾 `_` を付与する（Go emitter の `_safe_go_ident` と同等）
 
-### P4-CPP-SELFHOST: C++ emitter で toolchain2 を C++ に変換し g++ build を通す
-
-文脈: [docs/ja/plans/p4-cpp-selfhost.md](../plans/p4-cpp-selfhost.md)
-
-1. [ ] [ID: P4-CPP-SELFHOST-S0] selfhost 対象コード（`src/toolchain2/` 全 .py）で戻り値型の注釈が欠けている関数に型注釈を追加する — resolve が `inference_failure` にならない状態にする（P6-GO-SELFHOST-S0 と共通。先に完了した側の成果を共有）
-2. [x] [ID: P4-CPP-SELFHOST-S1] toolchain2 全 .py を C++ に emit し、g++ build が通ることを確認する
-   - 完了: code_emitter.py → code_emitter.cpp 生成・リンク成功（runtime cpp + 依存 .cpp と結合）
-3. [x] [ID: P4-CPP-SELFHOST-S2] g++ build 失敗ケースを emitter/runtime の修正で解消する（EAST の workaround 禁止）
-   - 完了: tuple subscript 検出拡張、py_dict_set_mut 追加、object→str/container 型強制、前方宣言二段階出力、is_simple_ident ガード、py_set_add_mut fallback を py_to_string 経由に変更
-4. [ ] [ID: P4-CPP-SELFHOST-S3] selfhost 用 C++ golden を配置し、回帰テストとして維持する
-
 ### P5-CPP-PARENS: C++ emitter に演算子優先順位テーブルを追加する
 
 
@@ -77,3 +66,14 @@
 2. [ ] [ID: P10-CPP-TYPETABLE-S2] destructor dispatch を `g_type_table` なしで実現する設計を策定する（vtable、template 特殊化、`ControlBlock` に destructor ポインタを持たせる等）
 3. [ ] [ID: P10-CPP-TYPETABLE-S3] `g_type_table`、`py_tid_register_known_class_type`、`PYTRA_TID_*` 定数を撤去する
 4. [ ] [ID: P10-CPP-TYPETABLE-S4] fixture + sample parity に影響がないことを確認する
+
+### P20-CPP-SELFHOST: C++ emitter で toolchain2 を C++ に変換し g++ build を通す
+
+文脈: [docs/ja/plans/p4-cpp-selfhost.md](../plans/p4-cpp-selfhost.md)
+
+1. [ ] [ID: P20-CPP-SELFHOST-S0] selfhost 対象コード（`src/toolchain2/` 全 .py）で戻り値型の注釈が欠けている関数に型注釈を追加する — resolve が `inference_failure` にならない状態にする（他言語と共通。先に完了した側の成果を共有）
+2. [x] [ID: P20-CPP-SELFHOST-S1] toolchain2 全 .py を C++ に emit し、g++ build が通ることを確認する
+   - 完了: code_emitter.py → code_emitter.cpp 生成・リンク成功（runtime cpp + 依存 .cpp と結合）
+3. [x] [ID: P20-CPP-SELFHOST-S2] g++ build 失敗ケースを emitter/runtime の修正で解消する（EAST の workaround 禁止）
+   - 完了: tuple subscript 検出拡張、py_dict_set_mut 追加、object→str/container 型強制、前方宣言二段階出力、is_simple_ident ガード、py_set_add_mut fallback を py_to_string 経由に変更
+4. [ ] [ID: P20-CPP-SELFHOST-S3] selfhost 用 C++ golden を配置し、回帰テストとして維持する
