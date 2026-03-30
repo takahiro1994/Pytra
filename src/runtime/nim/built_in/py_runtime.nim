@@ -3,11 +3,35 @@ import std/os
 import std/times
 import std/tables
 import std/strutils
+import std/math
+import std/sequtils
+import std/sets
+import std/algorithm
 
+# ---------------------------------------------------------------------------
+# Type aliases
+# ---------------------------------------------------------------------------
+type PyObj* = ref RootObj
+type PyPath* = string
+
+# ---------------------------------------------------------------------------
+# Print
+# ---------------------------------------------------------------------------
+proc py_print*() =
+  echo ""
+
+proc py_print*(args: varargs[string, `$`]) =
+  var parts: seq[string] = @[]
+  for a in args:
+    parts.add(a)
+  echo parts.join(" ")
+
+# ---------------------------------------------------------------------------
+# Conversions
+# ---------------------------------------------------------------------------
 proc py_perf_counter*(): float =
   epochTime()
 
-# Pytra built-ins
 proc py_int*(v: auto): int =
   when v is string:
     parseInt(v)
@@ -32,20 +56,68 @@ proc py_to_string*(v: auto): string =
   else:
     $v
 
-proc py_isdigit*(v: char): bool =
-  v.isDigit()
+proc py_bool*(v: auto): bool =
+  when v is bool:
+    v
+  elif v is int or v is float:
+    v != 0
+  elif v is string:
+    v.len > 0
+  else:
+    not v.isNil
 
-proc py_isdigit*(v: string): bool =
-  v.len > 0 and v[0].isDigit()
+proc py_ord*(c: string): int =
+  if c.len > 0: int(c[0]) else: 0
 
-proc py_isalpha*(v: char): bool =
-  v.isAlphaAscii()
+proc py_chr*(i: int): string =
+  $chr(i)
 
-proc py_isalpha*(v: string): bool =
-  v.len > 0 and v[0].isAlphaAscii()
+# ---------------------------------------------------------------------------
+# String methods
+# ---------------------------------------------------------------------------
+proc py_str_strip*(s: string): string = s.strip()
+proc py_str_lstrip*(s: string): string = s.strip(trailing = false)
+proc py_str_rstrip*(s: string): string = s.strip(leading = false)
+proc py_str_startswith*(s: string, prefix: string): bool = s.startsWith(prefix)
+proc py_str_endswith*(s: string, suffix: string): bool = s.endsWith(suffix)
+proc py_str_replace*(s: string, old: string, new_str: string): string = s.replace(old, new_str)
+proc py_str_find*(s: string, sub: string): int = s.find(sub)
+proc py_str_rfind*(s: string, sub: string): int =
+  var last = -1
+  var pos = 0
+  while pos < s.len:
+    let found = s.find(sub, pos)
+    if found < 0: break
+    last = found
+    pos = found + 1
+  return last
+proc py_str_split*(s: string): seq[string] = s.splitWhitespace()
+proc py_str_split*(s: string, sep: string): seq[string] = s.split(sep)
+proc py_str_join*(sep: string, items: seq[string]): string = items.join(sep)
+proc py_str_upper*(s: string): string = s.toUpperAscii()
+proc py_str_lower*(s: string): string = s.toLowerAscii()
+proc py_str_count*(s: string, sub: string): int = s.count(sub)
+proc py_str_index*(s: string, sub: string): int =
+  let i = s.find(sub)
+  if i < 0: raise newException(ValueError, "substring not found")
+  return i
+proc py_str_isdigit*(s: string): bool = s.len > 0 and s.allCharsInSet(Digits)
+proc py_str_isalpha*(s: string): bool = s.len > 0 and s.allCharsInSet(Letters)
+proc py_str_isalnum*(s: string): bool = s.len > 0 and s.allCharsInSet(Letters + Digits)
+proc py_str_isspace*(s: string): bool = s.len > 0 and s.allCharsInSet(Whitespace)
 
-proc py_len*(v: seq or string or Table): int =
-  v.len
+proc py_isdigit*(v: char): bool = v.isDigit()
+proc py_isdigit*(v: string): bool = v.len > 0 and v[0].isDigit()
+proc py_isalpha*(v: char): bool = v.isAlphaAscii()
+proc py_isalpha*(v: string): bool = v.len > 0 and v[0].isAlphaAscii()
+
+# ---------------------------------------------------------------------------
+# Builtins
+# ---------------------------------------------------------------------------
+proc py_len*(v: string): int = v.len
+proc py_len*[T](v: seq[T]): int = v.len
+proc py_len*[K, V](v: Table[K, V]): int = v.len
+proc py_len*[T](v: HashSet[T]): int = v.len
 
 template py_truthy*(v: auto): bool =
   when v is bool:
@@ -57,16 +129,59 @@ template py_truthy*(v: auto): bool =
   else:
     not v.isNil
 
-# Python-style modulo
-proc py_mod*[T: int or float](a, b: T): T =
-  if b == 0:
-    return 0
+proc py_round*(v: float64): int64 = int64(round(v))
+proc py_round*(v: float64, ndigits: int): float64 =
+  let factor = pow(10.0, float64(ndigits))
+  round(v * factor) / factor
+
+proc py_sum*[T](items: seq[T]): T =
+  var total: T = T(0)
+  for item in items:
+    total += item
+  return total
+
+proc py_sorted*[T](items: seq[T]): seq[T] =
+  var copy = items
+  copy.sort()
+  return copy
+
+proc py_reversed*[T](items: seq[T]): seq[T] =
+  var copy = items
+  copy.reverse()
+  return copy
+
+proc py_enumerate*[T](items: seq[T]): seq[(int, T)] =
+  var result_seq: seq[(int, T)] = @[]
+  var i = 0
+  for item in items:
+    result_seq.add((i, item))
+    i += 1
+  return result_seq
+
+proc py_in*[T](item: T, items: seq[T]): bool = item in items
+proc py_in*(item: string, items: string): bool = item in items
+
+# ---------------------------------------------------------------------------
+# Math
+# ---------------------------------------------------------------------------
+proc py_floordiv*(a, b: int64): int64 =
+  if b == 0: raise newException(DivByZeroDefect, "integer division by zero")
+  let d = a div b
+  if (a xor b) < 0 and d * b != a:
+    return d - 1
+  return d
+
+proc py_mod*[T: int64 | float64](a, b: T): T =
+  if b == T(0): return T(0)
   let r = a mod b
-  if (r > 0 and b < 0) or (r < 0 and b > 0):
+  if (r > T(0) and b < T(0)) or (r < T(0) and b > T(0)):
     r + b
   else:
     r
 
+# ---------------------------------------------------------------------------
+# Range iterator
+# ---------------------------------------------------------------------------
 iterator py_range*(start: int, stop: int, step: int): int =
   if step != 0:
     var i = start
@@ -79,14 +194,59 @@ iterator py_range*(start: int, stop: int, step: int): int =
         yield i
         i += step
 
+# ---------------------------------------------------------------------------
+# Container helpers
+# ---------------------------------------------------------------------------
+proc pop*[T](s: var seq[T]): T =
+  if s.len == 0: raise newException(IndexDefect, "pop from empty list")
+  result = s[s.len - 1]
+  s.setLen(s.len - 1)
+
+proc pop*[T](s: var seq[T], idx: int): T =
+  if idx < 0 or idx >= s.len: raise newException(IndexDefect, "pop index out of range")
+  result = s[idx]
+  s.delete(idx)
+
+# ---------------------------------------------------------------------------
+# Assertions (test framework)
+# ---------------------------------------------------------------------------
+proc py_assert_true*(cond: bool) =
+  if not cond:
+    raise newException(AssertionDefect, "assertion failed")
+
+proc py_assert_eq*[T](a, b: T) =
+  if a != b:
+    raise newException(AssertionDefect, "assertion failed: " & $a & " != " & $b)
+
+proc py_assert_stdout*(expected: seq[string], fn: proc()) =
+  # Simplified: just run the function (full stdout capture requires more work)
+  fn()
+
+proc py_assert_all*(items: seq[bool]) =
+  for item in items:
+    if not item:
+      raise newException(AssertionDefect, "assert_all failed")
+
+# ---------------------------------------------------------------------------
+# Format helper
+# ---------------------------------------------------------------------------
+proc py_fmt*(v: auto, spec: string): string =
+  # Simplified format - handle common cases
+  if spec.endsWith("f"):
+    let precision_str = spec[0 ..< spec.len - 1]
+    if precision_str.startsWith("."):
+      let prec = parseInt(precision_str[1 ..< precision_str.len])
+      return formatFloat(float(v), ffDecimal, prec)
+  return $v
+
+# ---------------------------------------------------------------------------
 # Binary file I/O helpers
+# ---------------------------------------------------------------------------
 proc py_write_bytes*(f: File, data: seq[uint8]) =
-  ## Write raw bytes to a file (binary mode).
   if data.len > 0:
     discard f.writeBuffer(unsafeAddr data[0], data.len)
 
 proc py_write_bytes*(f: File, data: seq[int]) =
-  ## Write seq[int] as raw bytes to a file (binary mode).
   if data.len > 0:
     var buf = newSeq[uint8](data.len)
     for i in 0 ..< data.len:

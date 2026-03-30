@@ -32,12 +32,12 @@
 
 文脈: [docs/ja/plans/p1-nim-emitter.md](../plans/p1-nim-emitter.md)
 
-1. [ ] [ID: P1-NIM-EMITTER-S1] `src/toolchain2/emit/nim/` に Nim emitter を新規実装する — CommonRenderer + override 構成。旧 `src/toolchain/emit/nim/` と TS emitter を参考にする。Nim 固有（インデントベース構文、`var`/`let`/`const`、`proc`/`func` 等）だけ override
-2. [ ] [ID: P1-NIM-EMITTER-S2] `src/runtime/nim/mapping.json` を作成する — `calls`, `types`, `env.target`, `builtin_prefix`, `implicit_promotions` を定義
-3. [ ] [ID: P1-NIM-EMITTER-S3] fixture 全件の Nim emit 成功を確認する
-4. [ ] [ID: P1-NIM-EMITTER-S4] Nim runtime を toolchain2 の emit 出力と整合させる
-5. [ ] [ID: P1-NIM-EMITTER-S5] fixture + sample の Nim compile + run parity を通す（`nim c -r`）
-6. [ ] [ID: P1-NIM-EMITTER-S6] stdlib の Nim parity を通す（`--case-root stdlib`）
+1. [x] [ID: P1-NIM-EMITTER-S1] `src/toolchain2/emit/nim/` に Nim emitter を新規実装する — CommonRenderer + override 構成。emitter.py, types.py, __init__.py, profiles/nim.json を作成。完了: 2026-03-31
+2. [x] [ID: P1-NIM-EMITTER-S2] `src/runtime/nim/mapping.json` を作成する — `calls`, `types`, `env.target`, `builtin_prefix`, `implicit_promotions`, `skip_modules` を定義。完了: 2026-03-31
+3. [x] [ID: P1-NIM-EMITTER-S3] fixture 全件の Nim emit 成功を確認する — 129/131 成功（残り2件は parser 側の trait 未対応）。完了: 2026-03-31
+4. [x] [ID: P1-NIM-EMITTER-S4] Nim runtime を toolchain2 の emit 出力と整合させる — py_print, str methods, container helpers, assert framework 等を追加。完了: 2026-03-31
+5. [ ] [ID: P1-NIM-EMITTER-S5] fixture + sample の Nim compile + run parity を通す（`nim c -r`）— Nim コンパイラ要
+6. [ ] [ID: P1-NIM-EMITTER-S6] stdlib の Nim parity を通す（`--case-root stdlib`）— Nim コンパイラ要
 
 ### P2-NIM-LINT-FIX: Nim emitter のハードコード違反を修正する
 

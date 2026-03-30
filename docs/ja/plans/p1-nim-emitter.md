@@ -5,7 +5,7 @@
 # P1-NIM-EMITTER: Nim emitter を toolchain2 に新規実装する
 
 最終更新: 2026-03-31
-ステータス: 未着手
+ステータス: S1-S4 完了、S5-S6 は Nim コンパイラ要
 
 ## 背景
 
@@ -21,3 +21,4 @@
 ## 決定ログ
 
 - 2026-03-31: Nim backend 担当を新設。emitter guide に従い toolchain2 emitter を実装する方針。
+- 2026-03-31: S1-S4 完了。emitter.py (1962行), types.py, profiles/nim.json, mapping.json を作成。fixture 129/131 emit 成功（残り2件は parser 側 trait 未対応）。py_runtime.nim を大幅拡充（py_print, str methods, container helpers, assert framework 等）。
