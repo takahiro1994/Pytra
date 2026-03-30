@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "language": "cs",
+
+  "types": {
+    "int8": "sbyte",
+    "uint8": "byte",
+    "int16": "short",
+    "uint16": "ushort",
+    "int32": "int",
+    "uint32": "uint",
+    "int64": "long",
+    "uint64": "ulong",
+    "float32": "float",
+    "float64": "double",
+    "bool": "bool",
+    "str": "string",
+    "None": "void",
+    "Any": "object",
+    "Path": "string"
+  },
+
+  "generic_types": {
+    "list": "List<{T}>",
+    "dict": "Dictionary<{K}, {V}>",
+    "set": "HashSet<{T}>",
+    "tuple": "Tuple<{...}>",
+    "optional": "{T}?"
+  },
+
+  "operators": {
+    "bin": {
+      "FloorDiv": "__floordiv",
+      "Pow": "__pow"
+    },
+    "bool": {
+      "And": "&&",
+      "Or": "||"
+    },
+    "unary": {
+      "Not": "!"
+    },
+    "precedence": {
+      "Mult": 5, "Div": 5, "Mod": 5, "LShift": 5, "RShift": 5, "BitAnd": 5,
+      "Add": 4, "Sub": 4, "BitOr": 4, "BitXor": 4,
+      "Eq": 3, "NotEq": 3, "Lt": 3, "LtE": 3, "Gt": 3, "GtE": 3,
+      "And": 2,
+      "Or": 1,
+      "USub": 6, "UAdd": 6, "Not": 6, "Invert": 6,
+      "In": 3, "NotIn": 3, "Is": 3, "IsNot": 3
+    }
+  },
+
+  "syntax": {
+    "if": "if ({cond}) {",
+    "elif": "} else if ({cond}) {",
+    "else": "} else {",
+    "while": "while ({cond}) {",
+    "block_close": "}",
+    "return": "return",
+    "break": "break",
+    "continue": "continue",
+    "comment_prefix": "//"
+  },
+
+  "lowering": {
+    "tuple_unpack_style": "individual_temps",
+    "container_covariance": false,
+    "closure_style": "closure_syntax",
+    "with_style": "try_finally",
+    "property_style": "method_call",
+    "swap_style": "temp_var",
+    "none_literal": "null",
+    "bool_literals": ["true", "false"],
+    "self_keyword": "this",
+    "type_position": "prefix",
+    "condition_parens": true,
+    "block_braces": "braces",
+    "stmt_terminator": ";",
+    "string_type_owned": true,
+    "exception_style": "native_throw"
+  }
+}

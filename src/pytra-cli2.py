@@ -23,6 +23,7 @@ from pytra.std import json
 from pytra.std.pathlib import Path
 from toolchain2.common.jv import deep_copy_json
 from toolchain2.compile.lower import lower_east2_to_east3
+from toolchain2.emit.cs.emitter import emit_cs_module
 from toolchain2.emit.cpp.emitter import emit_cpp_module
 from toolchain2.emit.cpp.header_gen import build_cpp_header_from_east3
 from toolchain2.emit.cpp.runtime_bundle import emit_runtime_module_artifacts
@@ -69,6 +70,21 @@ def _copy_go_runtime_files(output_dir: Path) -> int:
         "module pytra_selfhost_go\n\ngo 1.22\n",
         encoding="utf-8",
     )
+    return copied
+
+
+def _copy_cs_runtime_files(output_dir: Path) -> int:
+    """Copy C# runtime files into the emit directory, preserving subdirectories."""
+    runtime_root = _repo_root().joinpath("src").joinpath("runtime").joinpath("cs")
+    copied = 0
+    if not runtime_root.exists():
+        return copied
+    for cs_file in runtime_root.glob("**/*.cs"):
+        rel = cs_file.relative_to(runtime_root)
+        dst = output_dir.joinpath(rel)
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        dst.write_text(cs_file.read_text(encoding="utf-8"), encoding="utf-8")
+        copied += 1
     return copied
 
 
@@ -602,6 +618,27 @@ def _emit_go(manifest_path: Path, output_dir: Path) -> int:
     return 0
 
 
+def _emit_cs(manifest_path: Path, output_dir: Path) -> int:
+    """C# emit: linked output → C# source files."""
+    manifest_doc, linked_modules = load_linked_output(manifest_path)
+    _ = manifest_doc
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    written = 0
+    for module in linked_modules:
+        code = emit_cs_module(module.east_doc)
+        if code.strip() == "":
+            continue
+        fname = module.module_id.replace(".", "_") + ".cs"
+        out_path = output_dir.joinpath(fname)
+        out_path.write_text(code, encoding="utf-8")
+        written += 1
+    written += _copy_cs_runtime_files(output_dir)
+
+    print("emitted: " + str(output_dir) + " (" + str(written) + " C# files)")
+    return 0
+
+
 def cmd_emit(args: list[str]) -> int:
     """emit サブコマンド: linked output → target code (暫定: 現行 toolchain/emit/ への橋渡し)"""
     input_text = ""
@@ -672,10 +709,13 @@ def cmd_emit(args: list[str]) -> int:
     if target == "rs":
         return _emit_rs(manifest_path, Path(output_dir_text))
 
+    if target == "cs":
+        return _emit_cs(manifest_path, Path(output_dir_text))
+
     if target == "ts" or target == "js":
         return _emit_ts(manifest_path, Path(output_dir_text), strip_types=(target == "js"))
 
-    print("error: unsupported target: " + target + " (available: cpp, go, rs, ts, js)")
+    print("error: unsupported target: " + target + " (available: cpp, go, rs, cs, ts, js)")
     return 1
 
 
@@ -869,8 +909,8 @@ def cmd_build(args: list[str]) -> int:
         print("error: at least one input .py file is required")
         return 1
 
-    if target not in ("cpp", "go", "rs", "ts", "js"):
-        print("error: unsupported target: " + target + " (available: cpp, go, rs, ts, js)")
+    if target not in ("cpp", "go", "rs", "cs", "ts", "js"):
+        print("error: unsupported target: " + target + " (available: cpp, go, rs, cs, ts, js)")
         return 1
 
     try:
@@ -959,6 +999,14 @@ def _build_pipeline(inputs: list[str], output_dir_text: str, target: str) -> int
             output_dir.joinpath(m.module_id.replace(".", "_") + ".go").write_text(code, encoding="utf-8")
             written += 1
         written += _copy_go_runtime_files(output_dir)
+    elif target == "cs":
+        for m in link_result.linked_modules:
+            code = emit_cs_module(m.east_doc)
+            if code.strip() == "":
+                continue
+            output_dir.joinpath(m.module_id.replace(".", "_") + ".cs").write_text(code, encoding="utf-8")
+            written += 1
+        written += _copy_cs_runtime_files(output_dir)
     elif target == "rs":
         for m in link_result.linked_modules:
             code = emit_rs_module(m.east_doc)
