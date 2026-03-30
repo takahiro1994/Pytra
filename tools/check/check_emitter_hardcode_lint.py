@@ -101,6 +101,13 @@ CATEGORIES: dict[str, list[str]] = {
         r'"__main__"',
         r'"super\(\)"',
     ],
+    "type_id": [
+        # EAST3 の isinstance / type_id 情報から来るべき判定を emitter がハードコード
+        r'"py_runtime_object_isinstance"',
+        r'"PYTRA_TID_"',
+        r'"py_tid_"',
+        r'"g_type_table"',
+    ],
 }
 
 CATEGORY_LABELS: dict[str, str] = {
@@ -110,6 +117,7 @@ CATEGORY_LABELS: dict[str, str] = {
     "prefix_match":   "prefix match  ",
     "class_name":     "class name    ",
     "python_syntax":  "Python syntax ",
+    "type_id":        "type_id       ",
 }
 
 

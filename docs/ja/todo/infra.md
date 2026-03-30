@@ -36,7 +36,9 @@
 
 ### P0-LINT-TYPEID-CATEGORY: emitter lint に type_id/isinstance カテゴリを追加する
 
-1. [ ] [ID: P0-LINT-TYPEID-S1] `check_emitter_hardcode_lint.py` に第7カテゴリ「type_id / isinstance ロジックのハードコード」を追加する — 禁止パターン: `py_runtime_object_isinstance`, `PYTRA_TID_`, `py_tid_`, `g_type_table`
-2. [ ] [ID: P0-LINT-TYPEID-S2] emitter-hardcode-lint.md に新カテゴリが表示されることを確認する
+1. [x] [ID: P0-LINT-TYPEID-S1] `check_emitter_hardcode_lint.py` に第7カテゴリ「type_id / isinstance ロジックのハードコード」を追加する — 禁止パターン: `py_runtime_object_isinstance`, `PYTRA_TID_`, `py_tid_`, `g_type_table`
+   完了: `CATEGORIES["type_id"]` と `CATEGORY_LABELS["type_id"]` を追加。
+2. [x] [ID: P0-LINT-TYPEID-S2] emitter-hardcode-lint.md に新カテゴリが表示されることを確認する
+   完了: cpp で🟥（違反あり）、他実装済み言語で🟩。emitter-hardcode-lint.md・summary 再生成済み。
 
 （P20-INT32 は [plans/p4-int32-default.md](../plans/p4-int32-default.md) に保留中。再開時にここへ戻す。）

@@ -5,7 +5,7 @@
 # Sample parity matrix
 
 > Machine-generated file. Run `python3 tools/gen/gen_backend_progress.py` to update.
-> Generated at: 2026-03-30T13:25:15
+> Generated at: 2026-03-30T16:04:37
 > [Links](./index.md)
 
 | Icon | Meaning |
@@ -32,8 +32,8 @@
 | 14_raymarching_light_cycle | ⬜ | ⬜ | ⬜ | ⬜ | 🟥 | 🟥 | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
 | 15_wave_interference_loop | ⬜ | ⬜ | ⬜ | ⬜ | 🟥 | 🟥 | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
 | 16_glass_sculpture_chaos | ⬜ | ⬜ | ⬜ | ⬜ | 🟥 | 🟥 | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| 17_monte_carlo_pi | 🟩 | ⬜ | ⬜ | ⬜ | 🟩 | 🟩 | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
+| 17_monte_carlo_pi | 🟩 | ⬜ | ⬜ | ⬜ | 🟥 | 🟥 | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
 | 18_mini_language_interpreter | 🟥 | ⬜ | ⬜ | ⬜ | 🟥 | 🟥 | ⬜ | 🟩 | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
-| **🟩 PASS** | 2 | — | — | — | 1 | 1 | — | 18 | — | — | — | — | — | — | — | — | — | — |
-| **🟥 FAIL** | 1 | — | — | — | 17 | 17 | — | — | — | — | — | — | — | — | — | — | — | — |
+| **🟩 PASS** | 2 | — | — | — | — | — | — | 18 | — | — | — | — | — | — | — | — | — | — |
+| **🟥 FAIL** | 1 | — | — | — | 18 | 18 | — | — | — | — | — | — | — | — | — | — | — | — |
 | **⬜ Untested** | 15 | 18 | 18 | 18 | — | — | 18 | — | 18 | 18 | 18 | 18 | 18 | 18 | 18 | 18 | 18 | 18 |
