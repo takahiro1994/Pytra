@@ -126,6 +126,23 @@ namespace Pytra.CsModule
         public const long PYTRA_TID_DICT = 6;
         public const long PYTRA_TID_SET = 7;
         public const long PYTRA_TID_OBJECT = 8;
+        public const long PYTRA_TID_BASE_EXCEPTION = 9;
+        public const long PYTRA_TID_EXCEPTION = 10;
+        public const long PYTRA_TID_RUNTIME_ERROR = 11;
+        public const long PYTRA_TID_VALUE_ERROR = 12;
+        public const long PYTRA_TID_TYPE_ERROR = 13;
+        public const long PYTRA_TID_INDEX_ERROR = 14;
+        public const long PYTRA_TID_KEY_ERROR = 15;
+        public const long PYTRA_TID_INT8 = 16;
+        public const long PYTRA_TID_INT16 = 17;
+        public const long PYTRA_TID_INT32 = 18;
+        public const long PYTRA_TID_INT64 = 19;
+        public const long PYTRA_TID_UINT8 = 20;
+        public const long PYTRA_TID_UINT16 = 21;
+        public const long PYTRA_TID_UINT32 = 22;
+        public const long PYTRA_TID_UINT64 = 23;
+        public const long PYTRA_TID_FLOAT32 = 24;
+        public const long PYTRA_TID_FLOAT64 = 25;
         private const long PYTRA_USER_TYPE_ID_BASE = 1000;
 
         private static long _pyNextTypeId = PYTRA_USER_TYPE_ID_BASE;
@@ -295,11 +312,28 @@ namespace Pytra.CsModule
             RegisterTypeNode(PYTRA_TID_OBJECT, -1);
             RegisterTypeNode(PYTRA_TID_INT, PYTRA_TID_OBJECT);
             RegisterTypeNode(PYTRA_TID_BOOL, PYTRA_TID_INT);
+            RegisterTypeNode(PYTRA_TID_INT8, PYTRA_TID_INT);
+            RegisterTypeNode(PYTRA_TID_INT16, PYTRA_TID_INT);
+            RegisterTypeNode(PYTRA_TID_INT32, PYTRA_TID_INT);
+            RegisterTypeNode(PYTRA_TID_INT64, PYTRA_TID_INT);
+            RegisterTypeNode(PYTRA_TID_UINT8, PYTRA_TID_INT);
+            RegisterTypeNode(PYTRA_TID_UINT16, PYTRA_TID_INT);
+            RegisterTypeNode(PYTRA_TID_UINT32, PYTRA_TID_INT);
+            RegisterTypeNode(PYTRA_TID_UINT64, PYTRA_TID_INT);
             RegisterTypeNode(PYTRA_TID_FLOAT, PYTRA_TID_OBJECT);
+            RegisterTypeNode(PYTRA_TID_FLOAT32, PYTRA_TID_FLOAT);
+            RegisterTypeNode(PYTRA_TID_FLOAT64, PYTRA_TID_FLOAT);
             RegisterTypeNode(PYTRA_TID_STR, PYTRA_TID_OBJECT);
             RegisterTypeNode(PYTRA_TID_LIST, PYTRA_TID_OBJECT);
             RegisterTypeNode(PYTRA_TID_DICT, PYTRA_TID_OBJECT);
             RegisterTypeNode(PYTRA_TID_SET, PYTRA_TID_OBJECT);
+            RegisterTypeNode(PYTRA_TID_BASE_EXCEPTION, PYTRA_TID_OBJECT);
+            RegisterTypeNode(PYTRA_TID_EXCEPTION, PYTRA_TID_BASE_EXCEPTION);
+            RegisterTypeNode(PYTRA_TID_RUNTIME_ERROR, PYTRA_TID_EXCEPTION);
+            RegisterTypeNode(PYTRA_TID_VALUE_ERROR, PYTRA_TID_EXCEPTION);
+            RegisterTypeNode(PYTRA_TID_TYPE_ERROR, PYTRA_TID_EXCEPTION);
+            RegisterTypeNode(PYTRA_TID_INDEX_ERROR, PYTRA_TID_EXCEPTION);
+            RegisterTypeNode(PYTRA_TID_KEY_ERROR, PYTRA_TID_EXCEPTION);
             RecomputeTypeRanges();
         }
 
@@ -365,17 +399,69 @@ namespace Pytra.CsModule
             {
                 return PYTRA_TID_BOOL;
             }
-            if (value is sbyte || value is byte || value is short || value is ushort || value is int || value is uint || value is long || value is ulong)
+            if (value is sbyte)
             {
-                return PYTRA_TID_INT;
+                return PYTRA_TID_INT8;
             }
-            if (value is float || value is double || value is decimal)
+            if (value is short)
             {
-                return PYTRA_TID_FLOAT;
+                return PYTRA_TID_INT16;
+            }
+            if (value is int)
+            {
+                return PYTRA_TID_INT32;
+            }
+            if (value is long)
+            {
+                return PYTRA_TID_INT64;
+            }
+            if (value is byte)
+            {
+                return PYTRA_TID_UINT8;
+            }
+            if (value is ushort)
+            {
+                return PYTRA_TID_UINT16;
+            }
+            if (value is uint)
+            {
+                return PYTRA_TID_UINT32;
+            }
+            if (value is ulong)
+            {
+                return PYTRA_TID_UINT64;
+            }
+            if (value is float)
+            {
+                return PYTRA_TID_FLOAT32;
+            }
+            if (value is double || value is decimal)
+            {
+                return PYTRA_TID_FLOAT64;
             }
             if (value is string)
             {
                 return PYTRA_TID_STR;
+            }
+            if (value is KeyNotFoundException)
+            {
+                return PYTRA_TID_KEY_ERROR;
+            }
+            if (value is ArgumentOutOfRangeException)
+            {
+                return PYTRA_TID_INDEX_ERROR;
+            }
+            if (value is ArgumentException)
+            {
+                return PYTRA_TID_VALUE_ERROR;
+            }
+            if (value is InvalidCastException)
+            {
+                return PYTRA_TID_TYPE_ERROR;
+            }
+            if (value is Exception)
+            {
+                return PYTRA_TID_EXCEPTION;
             }
             if (value is IDictionary)
             {
@@ -451,6 +537,11 @@ namespace Pytra.CsModule
         public static bool py_runtime_value_isinstance(object value, long expectedTypeId)
         {
             return py_runtime_type_id_is_subtype(py_runtime_value_type_id(value), expectedTypeId);
+        }
+
+        public static bool pytra_isinstance(long actualTypeId, long expectedTypeId)
+        {
+            return py_runtime_type_id_is_subtype(actualTypeId, expectedTypeId);
         }
 
         private static bool py_isinstance(object value, long expectedTypeId)
@@ -693,6 +784,16 @@ namespace Pytra.CsModule
             return value.Replace(oldValue, newValue);
         }
 
+        public static T min<T>(T left, T right) where T : IComparable<T>
+        {
+            return left.CompareTo(right) <= 0 ? left : right;
+        }
+
+        public static T max<T>(T left, T right) where T : IComparable<T>
+        {
+            return left.CompareTo(right) >= 0 ? left : right;
+        }
+
         public static List<byte> py_int_to_bytes(object valueLike, object lengthLike, object byteorderLike)
         {
             long value = Convert.ToInt64(valueLike, CultureInfo.InvariantCulture);
@@ -869,9 +970,42 @@ namespace Pytra.CsModule
             return new List<K>(source.Keys);
         }
 
+        public static List<object[]> py_dict_items<K, V>(Dictionary<K, V> source)
+        {
+            var outv = new List<object[]>();
+            foreach (KeyValuePair<K, V> item in source)
+            {
+                outv.Add(new object[] { item.Key, item.Value });
+            }
+            return outv;
+        }
+
         public static List<V> py_dict_values<K, V>(Dictionary<K, V> source)
         {
             return new List<V>(source.Values);
+        }
+
+        public static Dictionary<string, object> py_dict_string_object(object value)
+        {
+            if (value is Dictionary<string, object> direct)
+            {
+                return direct;
+            }
+            if (value is IDictionary<string, object> generic)
+            {
+                return new Dictionary<string, object>(generic);
+            }
+            if (value is IDictionary dict)
+            {
+                var outv = new Dictionary<string, object>();
+                foreach (DictionaryEntry item in dict)
+                {
+                    string key = Convert.ToString(item.Key, CultureInfo.InvariantCulture) ?? "";
+                    outv[key] = item.Value;
+                }
+                return outv;
+            }
+            return (Dictionary<string, object>)value;
         }
 
         public static bool py_set_add<T>(HashSet<T> source, object value)
@@ -970,6 +1104,16 @@ namespace Pytra.CsModule
             return py_equals(left, right);
         }
 
+        private static string py_format_float(double value)
+        {
+            string text = value.ToString("G15", CultureInfo.InvariantCulture);
+            if (!text.Contains(".") && !text.Contains("E") && !text.Contains("e"))
+            {
+                return text + ".0";
+            }
+            return text;
+        }
+
         private static string py_format_sequence(IEnumerable source)
         {
             var parts = new List<string>();
@@ -989,6 +1133,18 @@ namespace Pytra.CsModule
             if (value is bool boolean)
             {
                 return boolean ? "True" : "False";
+            }
+            if (value is float f)
+            {
+                return py_format_float(f);
+            }
+            if (value is double d)
+            {
+                return py_format_float(d);
+            }
+            if (value is decimal m)
+            {
+                return py_format_float((double)m);
             }
             if (value is Exception ex)
             {
@@ -1012,6 +1168,61 @@ namespace Pytra.CsModule
         public static string py_to_string(object value)
         {
             return py_display(value);
+        }
+
+        public static string py_format(object value, string spec)
+        {
+            if (string.IsNullOrEmpty(spec))
+            {
+                return py_to_string(value);
+            }
+            if (spec.EndsWith("%", StringComparison.Ordinal))
+            {
+                string innerSpec = spec.Substring(0, spec.Length - 1);
+                return py_format(Convert.ToDouble(value, CultureInfo.InvariantCulture) * 100.0, innerSpec + "f") + "%";
+            }
+            char kind = spec[spec.Length - 1];
+            string widthSpec = spec.Substring(0, spec.Length - 1);
+            if (kind == 'd' || kind == 'x' || kind == 'X')
+            {
+                string text = kind == 'd'
+                    ? Convert.ToInt64(value, CultureInfo.InvariantCulture).ToString("D", CultureInfo.InvariantCulture)
+                    : Convert.ToInt64(value, CultureInfo.InvariantCulture).ToString(kind.ToString(), CultureInfo.InvariantCulture);
+                if (int.TryParse(widthSpec, NumberStyles.Integer, CultureInfo.InvariantCulture, out int width) && width > text.Length)
+                {
+                    return text.PadLeft(width);
+                }
+                return text;
+            }
+            if (kind == 'f')
+            {
+                int precision = 6;
+                int width = 0;
+                if (widthSpec.StartsWith(".", StringComparison.Ordinal))
+                {
+                    int.TryParse(widthSpec.Substring(1), NumberStyles.Integer, CultureInfo.InvariantCulture, out precision);
+                }
+                else if (!string.IsNullOrEmpty(widthSpec))
+                {
+                    int dot = widthSpec.IndexOf('.');
+                    if (dot >= 0)
+                    {
+                        int.TryParse(widthSpec.Substring(0, dot), NumberStyles.Integer, CultureInfo.InvariantCulture, out width);
+                        int.TryParse(widthSpec.Substring(dot + 1), NumberStyles.Integer, CultureInfo.InvariantCulture, out precision);
+                    }
+                    else
+                    {
+                        int.TryParse(widthSpec, NumberStyles.Integer, CultureInfo.InvariantCulture, out width);
+                    }
+                }
+                string text = Convert.ToDouble(value, CultureInfo.InvariantCulture).ToString("F" + precision.ToString(CultureInfo.InvariantCulture), CultureInfo.InvariantCulture);
+                if (width > text.Length)
+                {
+                    return text.PadLeft(width);
+                }
+                return text;
+            }
+            return py_to_string(value);
         }
 
         public static bool py_isdigit(string value)

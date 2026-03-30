@@ -38,6 +38,9 @@ class EmitContext:
     trait_names: set[str] = field(default_factory=set)
     class_bases: dict[str, str] = field(default_factory=dict)
     class_methods: dict[str, set[str]] = field(default_factory=dict)
+    class_properties: dict[str, set[str]] = field(default_factory=dict)
+    enum_constant_types: set[str] = field(default_factory=set)
+    type_id_values: dict[str, int] = field(default_factory=dict)
     renamed_symbols: dict[str, str] = field(default_factory=dict)
     temp_index: int = 0
     current_base_class_name: str = ""
@@ -83,6 +86,13 @@ def _module_class_name(module_id: str) -> str:
     if safe == "":
         return "Module"
     return safe[0].upper() + safe[1:]
+
+
+def _fqcn_to_tid_const(name: str) -> str:
+    parts = [_safe_cs_ident(part).upper() for part in name.split(".") if part != ""]
+    if len(parts) == 0:
+        return ""
+    return "_".join(parts) + "_TID"
 
 
 def _decorators(node: dict[str, JsonVal]) -> list[str]:
@@ -144,6 +154,10 @@ def _resolve_runtime_module_member(mapping: RuntimeMapping, module_id: str, memb
             mapped = mapping.calls[key]
             if isinstance(mapped, str) and mapped != "":
                 return mapped
+    if member_name in mapping.calls:
+        mapped2 = mapping.calls[member_name]
+        if isinstance(mapped2, str) and mapped2 != "":
+            return mapped2
     if module_id != "" and not should_skip_module(module_id, mapping):
         return _module_class_name(module_id) + "." + safe_member
     if module_id.startswith("pytra.std."):
@@ -232,13 +246,74 @@ def _target_type_from_stmt(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
 
 
 def _render_type(ctx: EmitContext, resolved_type: str, *, for_return: bool = False) -> str:
+    if resolved_type in ctx.enum_constant_types:
+        return "long"
     if resolved_type in ctx.class_names:
         return _safe_name(ctx, resolved_type)
+    if resolved_type == "Path" and resolved_type in ctx.import_alias_modules:
+        module_id = ctx.import_alias_modules.get(resolved_type, "")
+        if module_id != "" and not should_skip_module(module_id, ctx.mapping):
+            return _module_class_name(module_id) + "." + _safe_name(ctx, resolved_type)
+    mapped_builtin = cs_type(resolved_type, mapping=ctx.mapping, for_return=for_return)
+    if resolved_type in ctx.mapping.types or mapped_builtin != _safe_cs_ident(resolved_type):
+        return mapped_builtin
     if resolved_type in ctx.import_alias_modules:
         module_id = ctx.import_alias_modules.get(resolved_type, "")
         if module_id != "" and not should_skip_module(module_id, ctx.mapping):
             return _module_class_name(module_id) + "." + _safe_name(ctx, resolved_type)
-    return cs_type(resolved_type, mapping=ctx.mapping, for_return=for_return)
+    return mapped_builtin
+
+
+def _builtin_type_id_expr(type_name: str) -> str:
+    return {
+        "none": "py_runtime.PYTRA_TID_NONE",
+        "None": "py_runtime.PYTRA_TID_NONE",
+        "bool": "py_runtime.PYTRA_TID_BOOL",
+        "int": "py_runtime.PYTRA_TID_INT",
+        "int8": "py_runtime.PYTRA_TID_INT8",
+        "int16": "py_runtime.PYTRA_TID_INT16",
+        "int32": "py_runtime.PYTRA_TID_INT32",
+        "int64": "py_runtime.PYTRA_TID_INT64",
+        "uint8": "py_runtime.PYTRA_TID_UINT8",
+        "uint16": "py_runtime.PYTRA_TID_UINT16",
+        "uint32": "py_runtime.PYTRA_TID_UINT32",
+        "uint64": "py_runtime.PYTRA_TID_UINT64",
+        "float": "py_runtime.PYTRA_TID_FLOAT",
+        "float32": "py_runtime.PYTRA_TID_FLOAT32",
+        "float64": "py_runtime.PYTRA_TID_FLOAT64",
+        "str": "py_runtime.PYTRA_TID_STR",
+        "list": "py_runtime.PYTRA_TID_LIST",
+        "dict": "py_runtime.PYTRA_TID_DICT",
+        "set": "py_runtime.PYTRA_TID_SET",
+        "bytes": "py_runtime.PYTRA_TID_LIST",
+        "bytearray": "py_runtime.PYTRA_TID_LIST",
+        "object": "py_runtime.PYTRA_TID_OBJECT",
+        "Obj": "py_runtime.PYTRA_TID_OBJECT",
+        "Any": "py_runtime.PYTRA_TID_OBJECT",
+    }.get(type_name, "")
+
+
+def _expected_type_id_expr(ctx: EmitContext, node: JsonVal) -> str:
+    if not isinstance(node, dict):
+        return ""
+    type_name = _str(node, "type_object_of")
+    if type_name == "":
+        type_name = _str(node, "id")
+    if type_name.startswith("PYTRA_TID_"):
+        return "py_runtime." + type_name
+    builtin = _builtin_type_id_expr(type_name)
+    if builtin != "":
+        return builtin
+    if type_name in ctx.type_id_values:
+        return str(ctx.type_id_values[type_name]) + "L"
+    fqcn_tid = _fqcn_to_tid_const(type_name)
+    if fqcn_tid in ctx.type_id_values:
+        return str(ctx.type_id_values[fqcn_tid]) + "L"
+    if type_name.endswith("_TID") and type_name in ctx.type_id_values:
+        return str(ctx.type_id_values[type_name]) + "L"
+    if type_name.endswith("_TID"):
+        return "py_runtime." + _safe_cs_ident(type_name)
+    return ""
 
 
 def _arg_order_and_types(node: dict[str, JsonVal]) -> tuple[list[str], dict[str, str]]:
@@ -262,11 +337,27 @@ def _emit_constant(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
         return "true" if value else "false"
     if isinstance(value, str):
         return _quote_string(value)
+    if isinstance(value, int) and _str(node, "resolved_type") in ("int", "int64"):
+        return str(value) + "L"
     return str(value)
 
 
 def _emit_name(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
-    return _safe_name(ctx, _str(node, "id"))
+    ident = _str(node, "id")
+    if ident.startswith("PYTRA_TID_"):
+        return "py_runtime." + ident
+    if ident in ctx.class_names or ident in ctx.trait_names or ident in ctx.enum_constant_types:
+        return _safe_name(ctx, ident)
+    if ident.endswith("_TID") and ident in ctx.type_id_values:
+        return str(ctx.type_id_values[ident]) + "L"
+    if ident in ctx.type_id_values:
+        return str(ctx.type_id_values[ident]) + "L"
+    safe_ident = _safe_name(ctx, ident)
+    resolved_type = _str(node, "resolved_type")
+    known_type = ctx.var_types.get(safe_ident, "")
+    if _is_dynamic_resolved_type(known_type) and not _is_dynamic_resolved_type(resolved_type):
+        return _coerce_dynamic_expr(ctx, safe_ident, resolved_type)
+    return safe_ident
 
 
 def _render_list_literal(ctx: EmitContext, node: dict[str, JsonVal], *, preferred_type: str = "") -> str:
@@ -313,6 +404,8 @@ def _render_subscript(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
     owner_node = node.get("value")
     owner = _emit_expr(ctx, owner_node)
     owner_type = _str(owner_node, "resolved_type") if isinstance(owner_node, dict) else ""
+    if owner_type == "" and isinstance(owner_node, dict) and _str(owner_node, "kind") == "Name":
+        owner_type = ctx.var_types.get(_safe_name(ctx, _str(owner_node, "id")), "")
     result_type = _str(node, "resolved_type")
     slice_node = node.get("slice")
     if isinstance(slice_node, dict) and _str(slice_node, "kind") == "Slice":
@@ -329,6 +422,8 @@ def _render_subscript(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
         return text_expr
     if owner_type.startswith("list[") or owner_type in ("bytes", "bytearray"):
         return "py_runtime.py_get(" + owner + ", " + index + ")"
+    if owner_type in ("tuple", "object[]") or owner_type.startswith("tuple[") or owner_type.endswith("[]"):
+        return owner + "[((int)" + index + ")]"
     return owner + "[" + index + "]"
 
 
@@ -349,7 +444,11 @@ def _render_ifexp(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
 
 
 def _emit_formatted_value(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
-    return "Convert.ToString(" + _emit_expr(ctx, node.get("value")) + ")"
+    format_spec = _str(node, "format_spec")
+    value_expr = _emit_expr(ctx, node.get("value"))
+    if format_spec != "":
+        return "py_runtime.py_format(" + value_expr + ", " + _quote_string(format_spec) + ")"
+    return "Convert.ToString(" + value_expr + ")"
 
 
 def _emit_fstring(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
@@ -376,7 +475,9 @@ def _emit_fstring(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
 
 def _emit_box(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
     value = node.get("value")
-    if isinstance(value, dict) and _str(value, "resolved_type") == "Callable":
+    if isinstance(value, dict) and _str(value, "resolved_type") in ("Callable", "callable"):
+        if _str(value, "kind") == "Name":
+            return "new Action(" + _safe_name(ctx, _str(value, "id")) + ")"
         return "new Action(" + _emit_expr(ctx, value) + ")"
     return _emit_expr(ctx, value)
 
@@ -439,6 +540,9 @@ def _emit_attribute(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
             return resolved
     owner = _emit_expr(ctx, owner_node)
     attr = _safe_cs_ident(attr_name)
+    owner_type = _str(owner_node, "resolved_type") if isinstance(owner_node, dict) else ""
+    if attr_name in ctx.class_properties.get(owner_type, set()):
+        return owner + "." + attr + "()"
     return owner + "." + attr
 
 
@@ -482,11 +586,21 @@ def _render_expr_with_preferred_type(ctx: EmitContext, node: JsonVal, preferred_
     kind = _str(node, "kind")
     if kind in ("Box", "Unbox"):
         return _render_expr_with_preferred_type(ctx, node.get("value"), preferred_type=preferred_type)
+    if kind == "Call" and _bool(node, "yields_dynamic") and preferred_type != "":
+        return _coerce_dynamic_expr(ctx, _emit_expr(ctx, node), preferred_type)
     if kind == "Subscript":
         owner_node = node.get("value")
         owner_type = _str(owner_node, "resolved_type") if isinstance(owner_node, dict) else ""
         if owner_type == "str" and preferred_type not in ("", "str", "object", "Obj", "Any", "unknown"):
             return "((" + _render_type(ctx, preferred_type) + ")py_runtime.py_ord(" + _emit_expr(ctx, node) + "))"
+        if preferred_type == "str":
+            return "py_runtime.py_to_string(" + _emit_expr(ctx, node) + ")"
+        if preferred_type not in ("", "object", "Obj", "Any", "unknown") and (
+            owner_type.startswith("tuple[") or owner_type.endswith("[]") or _is_dynamic_resolved_type(owner_type)
+        ):
+            return "((" + _render_type(ctx, preferred_type) + ")" + _emit_expr(ctx, node) + ")"
+    if kind == "BinOp" and preferred_type in ("int8", "int16", "int32", "uint8", "uint16", "uint32"):
+        return "((" + _render_type(ctx, preferred_type) + ")" + _emit_expr(ctx, node) + ")"
     if kind == "List":
         return _render_list_literal(ctx, node, preferred_type=preferred_type)
     if kind == "Set":
@@ -512,9 +626,11 @@ def _container_method_call(
             return "py_runtime.py_pop(" + owner_expr + ")"
     if owner_type.startswith("dict["):
         if method_name == "get" and len(args) >= 1:
-            default_expr = args[1] if len(args) > 1 else "default"
+            default_expr = args[1] if len(args) > 1 else "null"
             temp_name = _next_temp(ctx, "__dict_value")
             return "(" + owner_expr + ".TryGetValue(" + args[0] + ", out var " + temp_name + ") ? " + temp_name + " : " + default_expr + ")"
+        if method_name == "items":
+            return "py_runtime.py_dict_items(" + owner_expr + ")"
         if method_name == "keys":
             key_type = "object"
             inner = owner_type[5:-1].strip()
@@ -604,6 +720,10 @@ def _emit_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
     if isinstance(func, dict) and _str(func, "kind") == "Attribute":
         owner_node = func.get("value")
         attr_name = _str(func, "attr")
+        if attr_name == "cast":
+            if len(args) >= 2:
+                return "((" + _render_type(ctx, _str(node, "resolved_type")) + ")" + args[1] + ")"
+            return args[-1] if len(args) > 0 else ""
         if _is_super_call(owner_node) and ctx.current_base_class_name != "":
             return "base." + _safe_cs_ident(attr_name) + "(" + ", ".join(args) + ")"
         owner_expr = _emit_expr(ctx, owner_node)
@@ -615,24 +735,34 @@ def _emit_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
                 module_id = _str(owner_node, "runtime_module_id")
                 if module_id == "":
                     module_id = ctx.import_alias_modules.get(_str(owner_node, "id"), "")
+            if attr_name == "cast":
+                if len(args) >= 2:
+                    return "((" + _render_type(ctx, _str(node, "resolved_type")) + ")" + args[1] + ")"
+                return args[-1] if len(args) > 0 else ""
+            if attr_name == "Path":
+                return "new " + _module_class_name(module_id) + ".Path(" + ", ".join(args) + ")"
             resolved_module_call = _resolve_runtime_module_member(ctx.mapping, module_id, attr_name)
             if resolved_module_call != "":
+                if resolved_module_call == "__CAST__":
+                    if len(args) == 1:
+                        return "((" + _render_type(ctx, _str(node, "resolved_type")) + ")" + args[0] + ")"
+                    return args[0] if len(args) > 0 else ""
                 return resolved_module_call + "(" + ", ".join(args) + ")"
         container_call = _container_method_call(ctx, owner_expr, owner_type, attr_name, args)
         if container_call != "":
             return container_call
     if isinstance(func, dict) and _str(func, "kind") == "Name":
         func_name = _str(func, "id")
-        if func_name == "pytra_isinstance":
-            raw_args = _list(node, "args")
-            if len(raw_args) >= 2:
-                actual = raw_args[0]
-                actual_value = actual.get("value") if isinstance(actual, dict) and _str(actual, "kind") == "ObjTypeId" else None
-                type_name = _class_name_from_tid_constant(ctx, raw_args[1])
-                if isinstance(actual_value, dict) and type_name != "":
-                    return "(" + _emit_expr(ctx, actual_value) + " is " + _render_type(ctx, type_name) + ")"
         if func_name in ctx.runtime_imports and "." in ctx.runtime_imports[func_name]:
             return _maybe_cast_dynamic_call(ctx, node, ctx.runtime_imports[func_name] + "(" + ", ".join(args) + ")")
+        if func_name == "str":
+            if len(args) == 0:
+                return "\"\""
+            return "py_runtime.py_to_string(" + args[0] + ")"
+        if func_name == "Path" and func_name in ctx.import_alias_modules:
+            module_id = ctx.import_alias_modules.get(func_name, "")
+            if module_id != "" and not should_skip_module(module_id, ctx.mapping):
+                return "new " + _module_class_name(module_id) + "." + _safe_name(ctx, func_name) + "(" + ", ".join(args) + ")"
         if _str(func, "resolved_type") == "type":
             if func_name in ctx.import_alias_modules:
                 module_id = ctx.import_alias_modules.get(func_name, "")
@@ -643,7 +773,7 @@ def _emit_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
             module_id = ctx.import_alias_modules.get(func_name, "")
             if module_id != "" and not should_skip_module(module_id, ctx.mapping):
                 return _module_class_name(module_id) + "." + _safe_name(ctx, func_name) + "(" + ", ".join(args) + ")"
-        if owner_expr != "" and func_name in ("append", "pop", "get", "keys", "values", "add", "discard", "remove"):
+        if owner_expr != "" and func_name in ("append", "pop", "get", "items", "keys", "values", "add", "discard", "remove"):
             owner_call = _container_method_call(ctx, owner_expr, owner_type, func_name, args)
             if owner_call != "":
                 return _maybe_cast_dynamic_call(ctx, node, owner_call)
@@ -665,6 +795,8 @@ def _emit_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
         if prepend_owner and owner_expr != "":
             call_args = [owner_expr] + call_args
         return _maybe_cast_dynamic_call(ctx, node, resolved + "(" + ", ".join(call_args) + ")")
+    if isinstance(func, dict) and _str(func, "kind") == "Name":
+        return _maybe_cast_dynamic_call(ctx, node, _safe_name(ctx, _str(func, "id")) + "(" + ", ".join(args) + ")")
     return _maybe_cast_dynamic_call(ctx, node, _emit_expr(ctx, func) + "(" + ", ".join(args) + ")")
 
 
@@ -680,12 +812,14 @@ def _emit_condition_expr(ctx: EmitContext, node: JsonVal, *, wrap: bool = True) 
 
 
 def _is_dynamic_resolved_type(resolved_type: str) -> bool:
-    return resolved_type in ("", "Any", "object", "Obj", "unknown")
+    return resolved_type in ("", "Any", "object", "Obj", "unknown", "JsonVal", "Node")
 
 
 def _coerce_dynamic_expr(ctx: EmitContext, expr: str, resolved_type: str) -> str:
     if _is_dynamic_resolved_type(resolved_type):
         return expr
+    if _render_type(ctx, resolved_type) == "Dictionary<string, object>":
+        return "py_runtime.py_dict_string_object(" + expr + ")"
     return "((" + _render_type(ctx, resolved_type) + ")" + expr + ")"
 
 
@@ -706,6 +840,16 @@ def _emit_list_repeat(ctx: EmitContext, left_node: JsonVal, right_node: JsonVal,
 
 def _emit_binop(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
     op = _str(node, "op")
+    if op == "FloorDiv":
+        left = _emit_expr(ctx, node.get("left"))
+        right = _emit_expr(ctx, node.get("right"))
+        return "py_runtime.py_floordiv(" + left + ", " + right + ")"
+    if op == "Div":
+        left = _emit_expr(ctx, node.get("left"))
+        right = _emit_expr(ctx, node.get("right"))
+        if _str(node, "resolved_type") == "float32":
+            return "(((float)" + left + ") / " + right + ")"
+        return "(((double)" + left + ") / " + right + ")"
     if op == "Add":
         result_type = _str(node, "resolved_type")
         if result_type.startswith("list[") or result_type in ("bytes", "bytearray"):
@@ -720,7 +864,15 @@ def _emit_binop(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
         result_type = _str(node, "resolved_type")
         if left_type.startswith("list[") or right_type.startswith("list["):
             return _emit_list_repeat(ctx, left_node, right_node, result_type)
-    return CommonRenderer.render_binop(_CsExprCommonRenderer(ctx), node)
+    rendered = CommonRenderer.render_binop(_CsExprCommonRenderer(ctx), node)
+    if op in ("LShift", "RShift"):
+        left_text = _emit_expr(ctx, node.get("left"))
+        right_text = _emit_expr(ctx, node.get("right"))
+        shift = ">>" if op == "RShift" else "<<"
+        rendered = "(" + left_text + " " + shift + " ((int)" + right_text + "))"
+    if _str(node, "resolved_type") in ("int8", "int16", "int32", "uint8", "uint16", "uint32"):
+        return "((" + _render_type(ctx, _str(node, "resolved_type")) + ")" + rendered + ")"
+    return rendered
 
 
 def _emit_compare(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
@@ -816,7 +968,7 @@ def _iter_target_decl_type(ctx: EmitContext, target_node: JsonVal, iter_node: Js
     if target_rt == "":
         target_rt = _str(target_node, "target_type")
     runtime_call = _iter_expr_runtime_call(iter_node)
-    if runtime_call in ("enumerate", "py_enumerate_object", "zip"):
+    if runtime_call in ("enumerate", "py_enumerate_object", "zip", "dict.items", "items"):
         return "object[]"
     if target_rt == "str" and isinstance(iter_node, dict) and _str(iter_node, "resolved_type") == "str":
         return "char"
@@ -915,14 +1067,10 @@ def _emit_unbox(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
 
 def _emit_isinstance_expr(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
     value_expr = _emit_expr(ctx, node.get("value"))
-    expected = node.get("expected_type_id")
-    if isinstance(expected, dict):
-        type_name = _str(expected, "type_object_of")
-        if type_name == "":
-            type_name = _str(expected, "id")
-        if type_name != "":
-            return "(" + value_expr + " is " + _render_type(ctx, type_name) + ")"
-    return "false"
+    expected_expr = _expected_type_id_expr(ctx, node.get("expected_type_id"))
+    if expected_expr == "":
+        return "false"
+    return "py_runtime.pytra_isinstance(py_runtime.py_runtime_value_type_id(" + value_expr + "), " + expected_expr + ")"
 
 
 class _CsStmtCommonRenderer(CommonRenderer):
@@ -989,7 +1137,18 @@ class _CsStmtCommonRenderer(CommonRenderer):
 
     def emit_expr_stmt(self, node: dict[str, JsonVal]) -> None:
         self.ctx.indent_level = self.state.indent_level
-        self._emit_stmt_line(_emit_expr(self.ctx, node.get("value")))
+        value = node.get("value")
+        if isinstance(value, dict) and _str(value, "kind") == "Name":
+            value_id = _str(value, "id")
+            if value_id == "continue":
+                self._emit_stmt_line("continue")
+                self.state.indent_level = self.ctx.indent_level
+                return
+            if value_id == "break":
+                self._emit_stmt_line("break")
+                self.state.indent_level = self.ctx.indent_level
+                return
+        self._emit_stmt_line(_emit_expr(self.ctx, value))
         self.state.indent_level = self.ctx.indent_level
 
     def render_raise_value(self, node: dict[str, JsonVal]) -> str:
@@ -1127,16 +1286,26 @@ def _emit_assign_stmt(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
     target = node.get("target")
     value = node.get("value")
     target_text = _emit_expr(ctx, target)
+    if isinstance(target, dict) and _str(target, "kind") == "Name":
+        target_text = _safe_name(ctx, _str(target, "id"))
     preferred_type = _str(node, "decl_type")
     if preferred_type == "" and isinstance(target, dict):
         preferred_type = _str(target, "resolved_type")
-    value_text = _render_expr_with_preferred_type(ctx, value, preferred_type=preferred_type)
+    if isinstance(value, dict):
+        value_text = _render_expr_with_preferred_type(ctx, value, preferred_type=preferred_type)
+    else:
+        value_text = cs_zero_value(preferred_type, mapping=ctx.mapping) if preferred_type != "" else "null"
     if isinstance(target, dict) and _str(target, "kind") == "Name" and _str(target, "id") == "_":
         ctx.lines.append("    " * ctx.indent_level + "_ = " + value_text + ";")
         return
     declare = _bool(node, "declare") or _str(node, "kind") == "AnnAssign"
     if isinstance(target, dict) and _str(target, "kind") == "Attribute":
         declare = False
+    if isinstance(target, dict) and _str(target, "kind") == "Subscript":
+        owner = _emit_expr(ctx, target.get("value"))
+        index = _emit_expr(ctx, target.get("slice"))
+        ctx.lines.append("    " * ctx.indent_level + "py_runtime.py_set(" + owner + ", " + index + ", " + value_text + ");")
+        return
     if isinstance(target, dict) and _str(target, "kind") == "Name":
         if ctx.current_return_type != "" and target_text not in ctx.var_types:
             declare = True
@@ -1144,30 +1313,40 @@ def _emit_assign_stmt(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
             declare = False
     if declare:
         decl_type = _target_type_from_stmt(ctx, node)
-        ctx.var_types[target_text] = decl_type
+        ctx.var_types[target_text] = preferred_type if preferred_type != "" else "object"
         ctx.lines.append("    " * ctx.indent_level + decl_type + " " + target_text + " = " + value_text + ";")
         return
     if isinstance(target, dict) and _str(target, "kind") == "Name" and target_text not in ctx.var_types and ctx.current_return_type != "":
         decl_type2 = _target_type_from_stmt(ctx, node)
-        ctx.var_types[target_text] = decl_type2
+        ctx.var_types[target_text] = preferred_type if preferred_type != "" else "object"
         ctx.lines.append("    " * ctx.indent_level + decl_type2 + " " + target_text + " = " + value_text + ";")
         return
     ctx.lines.append("    " * ctx.indent_level + target_text + " = " + value_text + ";")
 
 
 def _emit_for_range(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
-    target = _emit_expr(ctx, node.get("target"))
+    target_node = node.get("target")
+    target = _emit_expr(ctx, target_node)
+    if isinstance(target_node, dict) and _str(target_node, "kind") == "Name":
+        target = _safe_name(ctx, _str(target_node, "id"))
+    loop_var = target
+    declared_before = target in ctx.var_types
+    if declared_before:
+        loop_var = _next_temp(ctx, "__range_item")
     start = _emit_expr(ctx, node.get("start"))
     stop = _emit_expr(ctx, node.get("stop"))
     step = _emit_expr(ctx, node.get("step"))
     indent = "    " * ctx.indent_level
-    loop_cond = target + " < " + stop
-    loop_inc = target + " += " + step
+    loop_cond = loop_var + " < " + stop
+    loop_inc = loop_var + " += " + step
     step_text = step.strip()
-    if step_text.startswith("-"):
-        loop_cond = target + " > " + stop
-    ctx.lines.append(indent + "for (long " + target + " = " + start + "; " + loop_cond + "; " + loop_inc + ") {")
+    normalized_step = step_text.replace("(", "").replace(")", "").strip()
+    if normalized_step.startswith("-"):
+        loop_cond = loop_var + " > " + stop
+    ctx.lines.append(indent + "for (long " + loop_var + " = " + start + "; " + loop_cond + "; " + loop_inc + ") {")
     ctx.indent_level += 1
+    if declared_before:
+        ctx.lines.append("    " * ctx.indent_level + target + " = " + loop_var + ";")
     _emit_stmt_list(ctx, _list(node, "body"))
     ctx.indent_level -= 1
     ctx.lines.append(indent + "}")
@@ -1177,6 +1356,8 @@ def _emit_for_each(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
     target_node = node.get("target")
     iter_node = node.get("iter")
     target = _emit_expr(ctx, target_node)
+    if isinstance(target_node, dict) and _str(target_node, "kind") in ("Name", "NameTarget"):
+        target = _safe_name(ctx, _str(target_node, "id"))
     iter_expr = _emit_expr(ctx, iter_node)
     target_type = _iter_target_decl_type(ctx, target_node, iter_node)
     target_kind = _str(target_node, "kind") if isinstance(target_node, dict) else ""
@@ -1184,6 +1365,7 @@ def _emit_for_each(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
     declared_before = target in ctx.var_types
     if target_kind == "Tuple":
         loop_name = _next_temp(ctx, "__tuple_item")
+        ctx.var_types[loop_name] = "object[]"
     elif target_kind == "Name" and target_type == "char" and _str(target_node, "resolved_type") == "str":
         loop_name = _next_temp(ctx, "__char_item")
     elif declared_before and target_kind in ("Name", "NameTarget"):
@@ -1293,12 +1475,27 @@ def _emit_function(ctx: EmitContext, node: dict[str, JsonVal], *, force_public: 
     return_type = _str(node, "return_type")
     if return_type == "":
         return_type = "None"
+    body = _list(node, "body")
+    if return_type == "None":
+        for stmt in body:
+            if not isinstance(stmt, dict) or _str(stmt, "kind") != "Return":
+                continue
+            value = stmt.get("value")
+            if isinstance(value, dict):
+                inferred = _str(value, "resolved_type")
+                if inferred not in ("", "None", "none"):
+                    return_type = inferred
+                    break
     saved_var_types = dict(ctx.var_types)
     ctx.current_return_type = return_type
     arg_order, arg_types = _arg_order_and_types(node)
+    vararg_name = _str(node, "vararg_name")
+    vararg_type = _str(node, "vararg_type")
     params: list[str] = []
     for idx, raw_arg_name in enumerate(arg_order):
         if ctx.current_class_name != "" and idx == 0 and raw_arg_name == "self":
+            continue
+        if raw_arg_name == vararg_name and vararg_name != "":
             continue
         arg_name = _safe_name(ctx, raw_arg_name)
         src_type = ""
@@ -1309,6 +1506,11 @@ def _emit_function(ctx: EmitContext, node: dict[str, JsonVal], *, force_public: 
             src_type = "object"
         ctx.var_types[arg_name] = src_type
         params.append(_render_type(ctx, src_type) + " " + arg_name)
+    if vararg_name != "" and vararg_type != "":
+        safe_vararg = _safe_name(ctx, vararg_name)
+        vararg_list_type = "list[" + vararg_type + "]"
+        ctx.var_types[safe_vararg] = vararg_list_type
+        params.append(_render_type(ctx, vararg_list_type) + " " + safe_vararg)
     decorators = _decorators(node)
     is_staticmethod = "staticmethod" in decorators or "classmethod" in decorators
     modifiers: list[str] = []
@@ -1323,7 +1525,6 @@ def _emit_function(ctx: EmitContext, node: dict[str, JsonVal], *, force_public: 
         else:
             modifiers.append("virtual")
     indent = "    " * ctx.indent_level
-    body = _list(node, "body")
     if ctx.current_class_name != "" and _str(node, "name") == "__init__":
         base_init = ""
         if len(body) > 0 and ctx.current_base_class_name != "":
@@ -1354,10 +1555,12 @@ def _emit_class(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
     name = _safe_name(ctx, _str(node, "name"))
     indent = "    " * ctx.indent_level
     base_name = _str(node, "base")
+    fqcn = ctx.module_id + "." + _str(node, "name") if ctx.module_id != "" else _str(node, "name")
     is_trait = _is_trait_class(node)
+    is_enum_constants = base_name in ("Enum", "IntEnum", "IntFlag")
     implemented_traits = _implemented_traits(node)
     supertypes: list[str] = []
-    if base_name != "" and base_name != "object":
+    if base_name != "" and base_name != "object" and not is_enum_constants:
         supertypes.append(_render_type(ctx, base_name))
     for trait_name in implemented_traits:
         rendered_trait = _render_type(ctx, trait_name)
@@ -1366,6 +1569,8 @@ def _emit_class(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
     base_spec = (" : " + ", ".join(supertypes)) if len(supertypes) > 0 else ""
     if is_trait:
         ctx.lines.append(indent + "public interface " + name + base_spec + " {")
+    elif is_enum_constants:
+        ctx.lines.append(indent + "public static class " + name + " {")
     else:
         ctx.lines.append(indent + "public class " + name + base_spec + " {")
     ctx.indent_level += 1
@@ -1373,6 +1578,27 @@ def _emit_class(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
     previous_base_class = ctx.current_base_class_name
     ctx.current_class_name = name
     ctx.current_base_class_name = base_name
+    if is_enum_constants:
+        for stmt in _list(node, "body"):
+            if not isinstance(stmt, dict):
+                continue
+            kind = _str(stmt, "kind")
+            target = stmt.get("target")
+            if kind not in ("Assign", "AnnAssign"):
+                continue
+            if not isinstance(target, dict) or _str(target, "kind") != "Name":
+                continue
+            field_name = _safe_name(ctx, _str(target, "id"))
+            value = stmt.get("value")
+            value_expr = "0L"
+            if isinstance(value, dict):
+                value_expr = _render_expr_with_preferred_type(ctx, value, preferred_type="int64")
+            ctx.lines.append("    " * ctx.indent_level + "public const long " + field_name + " = " + value_expr + ";")
+        ctx.current_class_name = previous_class
+        ctx.current_base_class_name = previous_base_class
+        ctx.indent_level -= 1
+        ctx.lines.append(indent + "}")
+        return
     if is_trait:
         for stmt in _list(node, "body"):
             if not isinstance(stmt, dict) or _str(stmt, "kind") not in ("FunctionDef", "ClosureDef"):
@@ -1393,6 +1619,13 @@ def _emit_class(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
         ctx.indent_level -= 1
         ctx.lines.append(indent + "}")
         return
+    class_tid = -1
+    for candidate in (fqcn, _str(node, "name"), _fqcn_to_tid_const(fqcn), _fqcn_to_tid_const(_str(node, "name"))):
+        if candidate in ctx.type_id_values:
+            class_tid = ctx.type_id_values[candidate]
+            break
+    if class_tid >= 0:
+        ctx.lines.append("    " * ctx.indent_level + "public static long PYTRA_TYPE_ID = " + str(class_tid) + "L;")
     emitted_fields: set[str] = set()
     is_dataclass = _bool(node, "dataclass")
     static_field_names: set[str] = set()
@@ -1406,7 +1639,7 @@ def _emit_class(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
         target = stmt.get("target")
         if not isinstance(target, dict) or _str(target, "kind") != "Name":
             continue
-        field_name = _emit_expr(ctx, target)
+        field_name = _safe_name(ctx, _str(target, "id"))
         if field_name == "":
             continue
         if is_dataclass:
@@ -1456,7 +1689,10 @@ def _emit_class(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
         if kind == "FunctionDef" or kind == "ClosureDef":
             _emit_function(ctx, stmt, force_public=True, static_method=False)
         elif kind == "AnnAssign":
-            field_name = _emit_expr(ctx, stmt.get("target"))
+            target_node = stmt.get("target")
+            field_name = _emit_expr(ctx, target_node)
+            if isinstance(target_node, dict) and _str(target_node, "kind") == "Name":
+                field_name = _safe_name(ctx, _str(target_node, "id"))
             if field_name in emitted_fields:
                 continue
             field_type = _target_type_from_stmt(ctx, stmt)
@@ -1468,7 +1704,10 @@ def _emit_class(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
             ctx.lines.append("    " * ctx.indent_level + prefix + field_type + " " + field_name + " = " + init + ";")
             emitted_fields.add(field_name)
         elif kind == "Assign":
-            field_name2 = _emit_expr(ctx, stmt.get("target"))
+            target_node2 = stmt.get("target")
+            field_name2 = _emit_expr(ctx, target_node2)
+            if isinstance(target_node2, dict) and _str(target_node2, "kind") == "Name":
+                field_name2 = _safe_name(ctx, _str(target_node2, "id"))
             if field_name2 in emitted_fields:
                 continue
             value2 = stmt.get("value")
@@ -1508,6 +1747,27 @@ def _emit_stmt_extension(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
         return
     if kind == "AugAssign":
         _emit_aug_assign_stmt(ctx, node)
+        return
+    if kind == "Swap":
+        left = node.get("left")
+        right = node.get("right")
+        left_text = _emit_expr(ctx, left)
+        right_text = _emit_expr(ctx, right)
+        temp_name = _next_temp(ctx, "__swap_tmp")
+        temp_type = "object"
+        if isinstance(left, dict):
+            left_type = _str(left, "resolved_type")
+            if left_type != "":
+                temp_type = _render_type(ctx, left_type)
+        ctx.lines.append(indent + temp_type + " " + temp_name + " = " + left_text + ";")
+        if isinstance(left, dict) and _str(left, "kind") == "Subscript":
+            ctx.lines.append(indent + "py_runtime.py_set(" + _emit_expr(ctx, left.get("value")) + ", " + _emit_expr(ctx, left.get("slice")) + ", " + right_text + ");")
+        else:
+            ctx.lines.append(indent + left_text + " = " + right_text + ";")
+        if isinstance(right, dict) and _str(right, "kind") == "Subscript":
+            ctx.lines.append(indent + "py_runtime.py_set(" + _emit_expr(ctx, right.get("value")) + ", " + _emit_expr(ctx, right.get("slice")) + ", " + temp_name + ");")
+        else:
+            ctx.lines.append(indent + right_text + " = " + temp_name + ";")
         return
     if kind == "VarDecl":
         name = _safe_name(ctx, _str(node, "name"))
@@ -1565,6 +1825,8 @@ def emit_cs_module(east3_doc: dict[str, JsonVal]) -> str:
 
     mapping_path = Path(__file__).resolve().parents[3] / "runtime" / "cs" / "mapping.json"
     mapping = load_runtime_mapping(mapping_path)
+    if module_id == "pytra.built_in.type_id_table":
+        return ""
     if should_skip_module(module_id, mapping):
         return ""
 
@@ -1579,8 +1841,21 @@ def emit_cs_module(east3_doc: dict[str, JsonVal]) -> str:
     main_guard_body = _list(east3_doc, "main_guard_body")
     class_names: set[str] = set()
     trait_names: set[str] = set()
+    enum_constant_types: set[str] = set()
     class_bases: dict[str, str] = {}
     class_methods: dict[str, set[str]] = {}
+    class_properties: dict[str, set[str]] = {}
+    type_id_values: dict[str, int] = {}
+    type_id_table = _dict(lp, "type_id_resolved_v1")
+    for key, value in type_id_table.items():
+        if isinstance(key, str) and isinstance(value, int):
+            type_id_values[key] = value
+            tail = key.split(".")[-1]
+            if tail != "" and tail not in type_id_values:
+                type_id_values[tail] = value
+            tid_const = _fqcn_to_tid_const(key)
+            if tid_const != "":
+                type_id_values[tid_const] = value
     for stmt in body:
         if isinstance(stmt, dict) and _str(stmt, "kind") == "ClassDef":
             name = _str(stmt, "name")
@@ -1588,16 +1863,22 @@ def emit_cs_module(east3_doc: dict[str, JsonVal]) -> str:
                 class_names.add(name)
                 if _is_trait_class(stmt):
                     trait_names.add(name)
+                if _str(stmt, "base") in ("Enum", "IntEnum", "IntFlag"):
+                    enum_constant_types.add(name)
                 base = _str(stmt, "base")
                 if base != "":
                     class_bases[name] = base
                 methods: set[str] = set()
+                props: set[str] = set()
                 for member in _list(stmt, "body"):
                     if isinstance(member, dict) and _str(member, "kind") in ("FunctionDef", "ClosureDef"):
                         method_name = _str(member, "name")
                         if method_name != "":
                             methods.add(method_name)
+                            if "property" in _decorators(member):
+                                props.add(method_name)
                 class_methods[name] = methods
+                class_properties[name] = props
 
     ctx = EmitContext(
         module_id=module_id,
@@ -1610,6 +1891,9 @@ def emit_cs_module(east3_doc: dict[str, JsonVal]) -> str:
         trait_names=trait_names,
         class_bases=class_bases,
         class_methods=class_methods,
+        class_properties=class_properties,
+        enum_constant_types=enum_constant_types,
+        type_id_values=type_id_values,
         renamed_symbols=renamed_symbols,
     )
     class_name = _module_class_name(module_id)
@@ -1624,6 +1908,33 @@ def emit_cs_module(east3_doc: dict[str, JsonVal]) -> str:
     ctx.lines.append("    {")
     ctx.indent_level = 2
 
+    registrations: list[str] = []
+    for stmt in body:
+        if not isinstance(stmt, dict) or _str(stmt, "kind") != "ClassDef":
+            continue
+        raw_name = _str(stmt, "name")
+        if raw_name == "" or _is_trait_class(stmt) or _str(stmt, "base") in ("Enum", "IntEnum", "IntFlag"):
+            continue
+        fqcn = module_id + "." + raw_name if module_id != "" else raw_name
+        class_tid = ctx.type_id_values.get(fqcn, ctx.type_id_values.get(raw_name, -1))
+        if class_tid < 0:
+            continue
+        base_tid = _builtin_type_id_expr(_str(stmt, "base"))
+        if base_tid == "":
+            base_tid = _expected_type_id_expr(ctx, {"id": _str(stmt, "base")}) if _str(stmt, "base") != "" else ""
+        if base_tid == "":
+            base_tid = "py_runtime.PYTRA_TID_OBJECT"
+        registrations.append("py_runtime.py_register_type(" + str(class_tid) + "L, " + base_tid + ");")
+
+    if len(registrations) > 0:
+        ctx.lines.append("        static " + class_name + "()")
+        ctx.lines.append("        {")
+        for line in registrations:
+            ctx.lines.append("            " + line)
+        ctx.lines.append("        }")
+        if len(body) > 0:
+            ctx.lines.append("")
+
     for stmt in body:
         if not isinstance(stmt, dict):
             continue
@@ -1632,7 +1943,10 @@ def emit_cs_module(east3_doc: dict[str, JsonVal]) -> str:
             _emit_stmt_extension(ctx, stmt)
             continue
         if kind == "AnnAssign":
-            target_name = _emit_expr(ctx, stmt.get("target"))
+            target_node = stmt.get("target")
+            target_name = _emit_expr(ctx, target_node)
+            if isinstance(target_node, dict) and _str(target_node, "kind") == "Name":
+                target_name = _safe_name(ctx, _str(target_node, "id"))
             decl_type = _target_type_from_stmt(ctx, stmt)
             value = stmt.get("value")
             init = cs_zero_value(_str(stmt, "decl_type"), mapping=ctx.mapping)
@@ -1641,7 +1955,10 @@ def emit_cs_module(east3_doc: dict[str, JsonVal]) -> str:
             ctx.lines.append("        public static " + decl_type + " " + target_name + " = " + init + ";")
             continue
         if kind == "Assign":
-            target_name2 = _emit_expr(ctx, stmt.get("target"))
+            target_node2 = stmt.get("target")
+            target_name2 = _emit_expr(ctx, target_node2)
+            if isinstance(target_node2, dict) and _str(target_node2, "kind") == "Name":
+                target_name2 = _safe_name(ctx, _str(target_node2, "id"))
             value2 = stmt.get("value")
             init2 = _emit_expr(ctx, value2)
             target_type2 = "object"
@@ -1649,7 +1966,7 @@ def emit_cs_module(east3_doc: dict[str, JsonVal]) -> str:
                 target_type2 = cs_type(_str(value2, "resolved_type"), mapping=ctx.mapping)
             ctx.lines.append("        public static " + target_type2 + " " + target_name2 + " = " + init2 + ";")
 
-    if ctx.is_entry and len(main_guard_body) > 0:
+    if ctx.is_entry:
         if len(body) > 0:
             ctx.lines.append("")
         _emit_main_method(ctx, main_guard_body)

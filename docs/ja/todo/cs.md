@@ -6,7 +6,7 @@
 
 > 領域別 TODO。全体索引は [index.md](./index.md) を参照。
 
-最終更新: 2026-03-30
+最終更新: 2026-03-31
 
 ## 運用ルール
 
@@ -34,9 +34,9 @@
 
 1. [x] [ID: P1-CS-EMITTER-S1] `src/toolchain2/emit/cs/` に C# emitter を新規実装する — CommonRenderer + override 構成。旧 `src/toolchain/emit/cs/` と TS emitter（`src/toolchain2/emit/ts/`）を参考にする。C# 固有のノード（namespace、using、property、LINQ 等）だけ override として残す（2026-03-30: `emit_cs_module()`、`types.py`、`toolchain2/emit/profiles/cs.json`、`pytra-cli2 --target cs` の emit/build 経路を追加）
 2. [x] [ID: P1-CS-EMITTER-S2] `src/runtime/cs/mapping.json` を作成し、runtime_call の写像を定義する。`types` テーブルも含める（spec-runtime-mapping.md §7）。`env.target` 必須エントリも忘れないこと（2026-03-30: `src/runtime/cs/mapping.json` を追加し、`env.target`、主要 built-in/runtime call、`types`、`implicit_promotions` を定義）
-3. [ ] [ID: P1-CS-EMITTER-S3] fixture 全件の C# emit 成功を確認する（`runtime_parity_check_fast.py --targets cs` の既存経路で確認する。2026-03-30: `--category core` は 22/22 pass、`--category collections` は 20/20 pass、`--category control` は 16/16 pass、`--category imports` は 7/7 pass、`--category oop` は 18/18 pass、`--category strings` は 12/12 pass。未解消は `--category signature` 8/13 pass、`--category typing` 8/23 pass）
-4. [ ] [ID: P1-CS-EMITTER-S4] C# runtime を toolchain2 の emit 出力と整合させる（旧 runtime の引き継ぎ or 再実装）
-5. [ ] [ID: P1-CS-EMITTER-S5] fixture + sample の C# compile + run parity を通す（`mcs` + `mono` または `dotnet run`）
+3. [x] [ID: P1-CS-EMITTER-S3] fixture 全件の C# emit 成功を確認する（`runtime_parity_check_fast.py --targets cs` の既存経路で確認する。2026-03-31: fixture full sweep は 131/131 pass。`core` 22/22、`collections` 20/20、`control` 16/16、`imports` 7/7、`oop` 18/18、`strings` 12/12、`signature` 13/13、`typing` 23/23 も個別確認済み）
+4. [x] [ID: P1-CS-EMITTER-S4] C# runtime を toolchain2 の emit 出力と整合させる（旧 runtime の引き継ぎ or 再実装。2026-03-31: `src/runtime/cs/` に `type_id` / `pytra_isinstance` / container helper / `min` / `max` / display / exact POD helper を追加し、toolchain2 emit 出力と整合）
+5. [ ] [ID: P1-CS-EMITTER-S5] fixture + sample の C# compile + run parity を通す（`mcs` + `mono` または `dotnet run`。2026-03-31: fixture は 131/131 pass、sample は 16/18 pass。残りは `17_monte_carlo_pi` と `18_mini_language_interpreter` の `pytra.std.pathlib` / `typing.cast` 周辺）
 6. [ ] [ID: P1-CS-EMITTER-S6] stdlib の C# parity を通す（`--case-root stdlib`）
 
 ### P2-CS-LINT-FIX: C# emitter のハードコード違反を修正する

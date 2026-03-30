@@ -21,11 +21,11 @@ namespace Pytra.CsModule
             return SysPath.GetFileName(p);
         }
 
-        public static (string, string) splitext(string p)
+        public static string[] splitext(string p)
         {
             string ext = SysPath.GetExtension(p);
             string stem = p.Substring(0, p.Length - ext.Length);
-            return (stem, ext);
+            return new string[] { stem, ext };
         }
 
         public static string abspath(string p)
