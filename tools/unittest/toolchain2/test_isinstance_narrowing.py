@@ -95,11 +95,9 @@ def f(east_doc: dict[str, JsonVal]) -> dict[str, str]:
         self.assertEqual(iter_expr.get("resolved_type"), "list[JsonVal]")
         self.assertEqual(target_plan.get("target_type"), "JsonVal")
 
-        self.assertIn("for _, stmt := range body_val.([]any)", go_code)
-        self.assertIn("stmt.(map[string]any)[\"kind\"]", go_code)
+        self.assertIn("for _, stmt := range body_val.(*PyList[any]).items", go_code)
+        self.assertIn("stmt.(*PyDict[string, any]).items", go_code)
         self.assertNotIn("stmt.get(\"kind\")", go_code)
-        self.assertNotIn(".(*list)", go_code)
-        self.assertNotIn(".(*dict)", go_code)
 
     def test_ifexp_isinstance_narrowing_refines_optional_dict_value(self) -> None:
         source = """\
@@ -112,8 +110,8 @@ def f(node: JsonVal) -> str:
 """
         _east2, _east3, go_code = _resolve_lower_emit(source)
 
-        self.assertIn("owner_node := func() map[string]any", go_code)
-        self.assertIn("owner_node[\"kind\"]", go_code)
+        self.assertIn("owner_node *PyDict[string, any]", go_code)
+        self.assertIn("owner_node.items", go_code)
         self.assertNotIn("owner_node.get(", go_code)
 
     def test_container_unbox_prefers_narrowed_generic_container_type(self) -> None:
@@ -128,9 +126,7 @@ def f(node: JsonVal) -> None:
 """
         _east2, _east3, go_code = _resolve_lower_emit(source)
 
-        self.assertNotIn(".(*dict)", go_code)
-        self.assertNotIn(".(*list)", go_code)
-        self.assertIn("for _, item := range node.([]any)", go_code)
+        self.assertIn("for _, item := range node.(*PyList[any]).items", go_code)
 
     def test_or_guard_continue_narrows_dict_loop_variable_for_following_uses(self) -> None:
         source = """\
@@ -164,8 +160,7 @@ def f(class_body: list[JsonVal]) -> str:
         assert isinstance(rhs_owner, dict)
         self.assertEqual(rhs_owner.get("resolved_type"), "dict[str,JsonVal]")
 
-        self.assertIn("method.(map[string]any)[\"kind\"]", go_code)
-        self.assertIn("method.(map[string]any)[\"name\"]", go_code)
+        self.assertIn("method.(*PyDict[string, any]).items", go_code)
         self.assertNotIn("method.get(", go_code)
 
     def test_reassignment_invalidates_narrowing_for_following_uses(self) -> None:

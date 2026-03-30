@@ -164,7 +164,27 @@ class CommonRendererTests(unittest.TestCase):
             },
         )
 
-        self.assertEqual(rendered, "(int64(1) + int64(2))")
+        self.assertEqual(rendered, "int64(1) + int64(2)")
+
+    def test_cpp_emitter_expr_dispatch_respects_precedence_for_nested_binop(self) -> None:
+        rendered = emit_cpp_expr(
+            CppEmitContext(),
+            {
+                "kind": "BinOp",
+                "left": {
+                    "kind": "BinOp",
+                    "left": {"kind": "Constant", "value": 1, "resolved_type": "int64"},
+                    "op": "Add",
+                    "right": {"kind": "Constant", "value": 2, "resolved_type": "int64"},
+                    "resolved_type": "int64",
+                },
+                "op": "Mult",
+                "right": {"kind": "Constant", "value": 3, "resolved_type": "int64"},
+                "resolved_type": "int64",
+            },
+        )
+
+        self.assertEqual(rendered, "(int64(1) + int64(2)) * int64(3)")
 
     def test_cpp_emitter_binop_keeps_explicit_numeric_promotion_casts(self) -> None:
         rendered = emit_cpp_expr(
@@ -182,7 +202,24 @@ class CommonRendererTests(unittest.TestCase):
             },
         )
 
-        self.assertEqual(rendered, "(static_cast<float64>(n) / static_cast<float64>(d))")
+        self.assertEqual(rendered, "static_cast<float64>(n) / static_cast<float64>(d)")
+
+    def test_cpp_emitter_binop_skips_stale_integer_numeric_promotion_casts(self) -> None:
+        rendered = emit_cpp_expr(
+            CppEmitContext(),
+            {
+                "kind": "BinOp",
+                "left": {"kind": "Name", "id": "s8", "resolved_type": "int32"},
+                "op": "Add",
+                "right": {"kind": "Name", "id": "u8b", "resolved_type": "int32"},
+                "resolved_type": "int32",
+                "casts": [
+                    {"on": "left", "from": "int8", "to": "uint8", "reason": "numeric_promotion"},
+                ],
+            },
+        )
+
+        self.assertEqual(rendered, "s8 + u8b")
 
     def test_cpp_emitter_mod_uses_python_semantics_helper(self) -> None:
         rendered = emit_cpp_expr(
@@ -197,6 +234,19 @@ class CommonRendererTests(unittest.TestCase):
         )
 
         self.assertEqual(rendered, "py_mod(x, int64(2))")
+
+    def test_cpp_emitter_compare_uses_py_is_none_for_object_identity_checks(self) -> None:
+        rendered = emit_cpp_expr(
+            CppEmitContext(),
+            {
+                "kind": "Compare",
+                "left": {"kind": "Name", "id": "v", "resolved_type": "object"},
+                "ops": ["Is"],
+                "comparators": [{"kind": "Constant", "value": None, "resolved_type": "None"}],
+            },
+        )
+
+        self.assertEqual(rendered, "py_is_none(v)")
 
     def test_cpp_tuple_unpack_reuses_existing_locals_instead_of_redeclaring(self) -> None:
         ctx = CppEmitContext()
@@ -357,6 +407,29 @@ class CommonRendererTests(unittest.TestCase):
         self.assertIn("if (ready) {", rendered)
         self.assertIn("} else if (retry) {", rendered)
         self.assertIn("return int64(3);", rendered)
+
+    def test_cpp_emitter_stmt_dispatch_avoids_double_condition_parens_for_compare(self) -> None:
+        ctx = CppEmitContext()
+        emit_cpp_stmt(
+            ctx,
+            {
+                "kind": "If",
+                "test": {
+                    "kind": "Compare",
+                    "left": {"kind": "Name", "id": "count", "resolved_type": "int64"},
+                    "ops": ["Gt"],
+                    "comparators": [{"kind": "Constant", "value": 0, "resolved_type": "int64"}],
+                    "resolved_type": "bool",
+                },
+                "body": [{"kind": "Pass"}],
+                "orelse": [],
+            },
+        )
+
+        rendered = "\n".join(ctx.lines)
+
+        self.assertIn("if (count > int64(0)) {", rendered)
+        self.assertNotIn("if ((count > int64(0))) {", rendered)
 
     def test_cpp_emitter_stmt_dispatch_preserves_container_truthiness_hook(self) -> None:
         ctx = CppEmitContext()

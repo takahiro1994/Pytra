@@ -73,11 +73,19 @@ def _collect_golden_params() -> list[tuple[str, str, Path, Path]]:
             doc = json.loads(p.read_text(encoding="utf-8"))
         except Exception:
             continue
-        sp = doc.get("source_path", "")
-        if not sp.startswith("src/toolchain2/"):
+        sp_raw = doc.get("source_path", "")
+        # Normalize absolute or relative source paths to "src/toolchain2/..." form
+        _tc_suffix = "/src/toolchain2/"
+        _tc_prefix = "src/toolchain2/"
+        if sp_raw.startswith(_tc_prefix):
+            sp = sp_raw
+        else:
+            idx = sp_raw.find(_tc_suffix)
+            sp = ("src/toolchain2/" + sp_raw[idx + len(_tc_suffix):]) if idx >= 0 else ""
+        if not sp:
             continue
-        rel = sp.removeprefix("src/toolchain2/")
-        module_id = rel.replace("/", ".").removesuffix(".py")
+        # Use full module_id (toolchain2.* prefix) to match golden file naming
+        module_id = sp.removeprefix("src/").replace("/", ".").removesuffix(".py")
         for target, ext in _EXT.items():
             fname = module_id.replace(".", "_") + ext
             module_map.setdefault(target, {})[fname] = p
