@@ -24,6 +24,7 @@ from toolchain2.emit.cpp.types import (
     is_container_resolved_type,
     _top_level_optional_inner,
     _split_generic_args,
+    init_types_mapping,
 )
 from toolchain2.emit.common.code_emitter import (
     RuntimeMapping, load_runtime_mapping, resolve_runtime_call,
@@ -3206,6 +3207,7 @@ def emit_cpp_module(
 
     mapping_path = Path(__file__).resolve().parents[3] / "runtime" / "cpp" / "mapping.json"
     mapping = load_runtime_mapping(mapping_path)
+    init_types_mapping(mapping.types)  # P0-CPP-TYPEMAP-S3: inject types table into cpp type resolver
 
     if should_skip_module(module_id, mapping) and not allow_runtime_module: return ""
 

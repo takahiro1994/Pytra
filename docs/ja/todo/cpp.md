@@ -24,10 +24,14 @@
 
 仕様: [spec-runtime-mapping.md](../spec/spec-runtime-mapping.md) §7
 
-1. [ ] [ID: P0-CPP-TYPEMAP-S1] `src/runtime/cpp/mapping.json` に `types` テーブルを追加する — POD 型（`int64` → `int64_t` 等）とクラス型（`Exception` → `std::runtime_error` 等）の全写像を定義する
-2. [ ] [ID: P0-CPP-TYPEMAP-S2] `CodeEmitter` 基底クラスに `resolve_type()` メソッドを追加する — `types` テーブルから型名を解決する共通 API
-3. [ ] [ID: P0-CPP-TYPEMAP-S3] C++ emitter の型名ハードコード（`types.py` 含む）を `resolve_type()` 呼び出しに置換する
-4. [ ] [ID: P0-CPP-TYPEMAP-S4] fixture parity に影響がないことを確認する
+1. [x] [ID: P0-CPP-TYPEMAP-S1] `src/runtime/cpp/mapping.json` に `types` テーブルを追加する — POD 型（`int64` → `int64_t` 等）とクラス型（`Exception` → `std::runtime_error` 等）の全写像を定義する
+   - 完了: POD 型・クラス型・エイリアス型の全 23 エントリを追加
+2. [x] [ID: P0-CPP-TYPEMAP-S2] `CodeEmitter` 基底クラスに `resolve_type()` メソッドを追加する — `types` テーブルから型名を解決する共通 API
+   - 完了: 既存実装（code_emitter.py:340 の `resolve_type()`）を確認
+3. [x] [ID: P0-CPP-TYPEMAP-S3] C++ emitter の型名ハードコード（`types.py` 含む）を `resolve_type()` 呼び出しに置換する
+   - 完了: `init_types_mapping()` を types.py に追加、emitter.py で mapping.types を注入。`cpp_type()` が mapping.json の `types` テーブルを優先参照するよう変更
+4. [x] [ID: P0-CPP-TYPEMAP-S4] fixture parity に影響がないことを確認する
+   - 完了: control/for_range, stdlib/math_extended が OK
 
 ### P3-COMMON-RENDERER-CPP: C++ emitter の CommonRenderer 移行 + fixture parity
 

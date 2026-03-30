@@ -2,6 +2,9 @@
 
 toolchain2 C++ backend は `src/runtime/cpp/core/*` の公開 alias (`str`,
 `list[T]`, `dict[K,V]`, `float64`, `object` など) を正本として使う。
+
+型写像は mapping.json の `types` テーブルを正本とする（P0-CPP-TYPEMAP-S3）。
+`init_types_mapping()` で emitter 起動時に注入する。`_TYPE_MAP` は後方互換フォールバック。
 """
 
 from __future__ import annotations
@@ -9,6 +12,18 @@ from __future__ import annotations
 import re
 
 
+# mapping.json "types" テーブルの注入先。emitter 起動時に init_types_mapping() で設定する。
+_g_types: dict[str, str] = {}
+
+
+def init_types_mapping(types: dict[str, str]) -> None:
+    """mapping.json の types テーブルを注入する。emit_module() 呼び出し前に一度だけ呼ぶ。"""
+    global _g_types
+    _g_types = types
+
+
+# フォールバック: mapping.json が空の場合に使うハードコード表。
+# 正本は src/runtime/cpp/mapping.json の "types" テーブル。
 _TYPE_MAP: dict[str, str] = {
     "int": "int64",
     "int8": "int8",
@@ -65,7 +80,10 @@ def cpp_type(resolved_type: str, *, prefer_value_container: bool = False) -> str
     if resolved_type == "" or resolved_type == "unknown":
         return "auto"
 
-    mapped = _TYPE_MAP.get(resolved_type, "")
+    # mapping.json "types" テーブルを優先（P0-CPP-TYPEMAP-S3）
+    mapped = _g_types.get(resolved_type, "")
+    if mapped == "":
+        mapped = _TYPE_MAP.get(resolved_type, "")
     if mapped != "":
         return mapped
 
