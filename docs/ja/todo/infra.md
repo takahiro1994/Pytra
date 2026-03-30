@@ -22,6 +22,8 @@
 
 ### P0-SELFHOST-GOLDEN-UNIFIED: selfhost golden の生成・検証スクリプトを1本に統一する
 
+文脈: [docs/ja/plans/p0-selfhost-golden-unified.md](../plans/p0-selfhost-golden-unified.md)
+
 1. [ ] [ID: P0-SELFHOST-GOLDEN-S1] `tools/gen/regenerate_selfhost_golden.py` を作成する — `--target cpp,go,rs,ts` で指定した言語の selfhost golden を一括生成する。toolchain2 全 .py を emit し、`test/selfhost/<lang>/` に配置する
 2. [ ] [ID: P0-SELFHOST-GOLDEN-S2] golden の回帰テストを `tools/unittest/selfhost/test_selfhost_golden.py` に統一する — 各言語の golden が最新の emit 結果と一致するか検証 + コンパイルが通るか検証。言語別の個別スクリプト（`test_cpp_selfhost_golden.py` 等）は廃止する
 3. [ ] [ID: P0-SELFHOST-GOLDEN-S3] 既存の言語別 selfhost golden スクリプトを `tools/unregistered/` に退避する
