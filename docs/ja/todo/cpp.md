@@ -20,6 +20,13 @@
 
 ## 未完了タスク
 
+### P0-CPP-GIF-TRANSPILE: pytra.utils.gif をトランスパイル対象にする
+
+`src/runtime/cpp/generated/utils/gif.cpp` が撤去済み（toolchain2 移行時に `generated/` ごと削除）。`mapping.json` の `skip_modules` に `pytra.utils.` が含まれているため `pytra.utils.gif` がトランスパイルされず、`py_save_gif` が未定義でリンクエラーになる。TS の PNG 修正（`skip_modules` から `pytra.utils.png` を外した）と同じ構造。
+
+1. [ ] [ID: P0-CPP-GIF-S1] `src/runtime/cpp/mapping.json` の `skip_modules` を修正する — `pytra.utils.gif` と `pytra.utils.png` をスキップ対象から外し、トランスパイル対象にする。`pyopen` / `PyFile` の OS glue が C++ runtime に必要なら追加する
+2. [ ] [ID: P0-CPP-GIF-S2] sample の GIF 出力ケース（05〜16）が C++ で compile + run parity PASS することを確認する
+
 ### P0-CPP-TYPE-MAPPING: C++ emitter の型写像を mapping.json に移行する
 
 仕様: [spec-runtime-mapping.md](../spec/spec-runtime-mapping.md) §7
@@ -46,8 +53,10 @@
    - 完了: commit 51447a04f — `py_at` for tuple を `#endif` の内側に移動
 4. [x] [ID: P3-CR-CPP-S4] C++ runtime の py_types.h 例外安全性を修正する — `PyBoxedValue` と `ControlBlock` の2段階 `new` で例外安全にする。実用上 bad_alloc はリカバー不可能だが、変換器が生成するコードの品質として例外安全を保証する
    - 完了: commit 678317b7e / 51447a04f — `make_unique` に移行
-5. [ ] [ID: P3-CR-CPP-S5] CommonRenderer の list/dict/tuple 出力で `source_span.lineno` を参照し、元ソースの改行を再現する
-6. [ ] [ID: P3-CR-CPP-S6] isinstance を `pytra_isinstance` に一本化する — プリミティブ型（`str`, `list`, `dict`, `set` 等）の isinstance 判定を `type_id_support.h` の `py_runtime_object_isinstance` + `PYTRA_TID_*` から linker 生成の `pytra_isinstance` に移行する。`type_id_support.h` の旧 isinstance 関数群（`py_tid_is_subtype`, `py_tid_isinstance`, `py_runtime_value_type_id`）を削除する。注: `g_type_table` は destructor dispatch に使われており、本タスクのスコープ外。`g_type_table` の撤去は P10-CPP-TYPETABLE-REDESIGN で別途対応する
+5. [x] [ID: P3-CR-CPP-S5] CommonRenderer の list/dict/tuple 出力で `source_span.lineno` を参照し、元ソースの改行を再現する
+   - 完了: 前セッションで実装済み
+6. [x] [ID: P3-CR-CPP-S6] isinstance を `pytra_isinstance` に一本化する — プリミティブ型（`str`, `list`, `dict`, `set` 等）の isinstance 判定を `type_id_support.h` の `py_runtime_object_isinstance` + `PYTRA_TID_*` から linker 生成の `pytra_isinstance` に移行する。`type_id_support.h` の旧 isinstance 関数群（`py_tid_is_subtype`, `py_tid_isinstance`, `py_runtime_value_type_id`）を削除する。注: `g_type_table` は destructor dispatch に使われており、本タスクのスコープ外。`g_type_table` の撤去は P10-CPP-TYPETABLE-REDESIGN で別途対応する
+   - 完了: type_id.py の `_BUILTIN_CLASS_IDS` に全プリミティブ leaf 型 (None/bool/int/float/str/list/dict/set) を追加。linker が isinstance を pytra_isinstance に自動リライト。emitter.py の throw セミコロン欠落 (pre-existing bug) も同時修正
 7. [x] [ID: P3-CR-CPP-S7] `rc_list_from_value` / `rc_dict_from_value` 等の型別 RC 化関数を汎用 `rc_from_value<T>` に一本化する — emitter は「非 POD → `rc_from_value(...)` で包む」だけで済むようにし、型ごとの関数名分岐を emitter から除去する
    - 完了: py_types.h に rc_from_value オーバーロード群を追加、emitter.py の _wrap_container_value_expr を rc_from_value に統一。parity: for_range/comprehension/argparse_extended OK
 8. [x] [ID: P3-CR-CPP-S8] C++ emitter に `_safe_cpp_ident` を追加する — C++ 予約語（`double`, `class`, `int`, `float`, `namespace`, `template` 等）と衝突する関数名・メソッド名・変数名に末尾 `_` を付与する（Go emitter の `_safe_go_ident` と同等）
