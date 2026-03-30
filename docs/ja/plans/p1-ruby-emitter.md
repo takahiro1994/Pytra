@@ -5,7 +5,7 @@
 # P1-RUBY-EMITTER: Ruby emitter を toolchain2 に新規実装する
 
 最終更新: 2026-03-31
-ステータス: 未着手
+ステータス: S1-S3 完了、S4-S6 未着手
 
 ## 背景
 
@@ -21,3 +21,4 @@
 ## 決定ログ
 
 - 2026-03-31: Ruby backend 担当を新設。emitter guide に従い toolchain2 emitter を実装する方針。
+- 2026-03-31: S1-S3 完了。`src/toolchain2/emit/ruby/` に emitter を新規実装。mapping.json 作成。全1031件のlinked fixture で emit 成功（0 failures）。parity check ツールに Ruby の emit/runtime copy/run dispatch を追加。

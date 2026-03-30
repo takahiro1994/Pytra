@@ -32,10 +32,10 @@
 
 文脈: [docs/ja/plans/p1-ruby-emitter.md](../plans/p1-ruby-emitter.md)
 
-1. [ ] [ID: P1-RUBY-EMITTER-S1] `src/toolchain2/emit/rb/` に Ruby emitter を新規実装する — CommonRenderer + override 構成。旧 `src/toolchain/emit/rb/` と TS emitter を参考にする
-2. [ ] [ID: P1-RUBY-EMITTER-S2] `src/runtime/ruby/mapping.json` を作成する — `calls`, `types`, `env.target`, `builtin_prefix`, `implicit_promotions` を定義
-3. [ ] [ID: P1-RUBY-EMITTER-S3] fixture 全件の Ruby emit 成功を確認する
-4. [ ] [ID: P1-RUBY-EMITTER-S4] Ruby runtime を toolchain2 の emit 出力と整合させる
+1. [x] [ID: P1-RUBY-EMITTER-S1] `src/toolchain2/emit/ruby/` に Ruby emitter を新規実装する — CommonRenderer + override 構成。TS emitter を参考に実装完了（2026-03-31）
+2. [x] [ID: P1-RUBY-EMITTER-S2] `src/runtime/ruby/mapping.json` を作成する — `calls`, `types`, `env.target`, `builtin_prefix`, `implicit_promotions` を定義（2026-03-31）
+3. [x] [ID: P1-RUBY-EMITTER-S3] fixture 全件の Ruby emit 成功を確認する — 全1031件のlinked EAST3で emit 成功、0 failures（2026-03-31）
+4. [x] [ID: P1-RUBY-EMITTER-S4] Ruby runtime を toolchain2 の emit 出力と整合させる — py_runtime.rb に不足していた15関数を追加（2026-03-31）
 5. [ ] [ID: P1-RUBY-EMITTER-S5] fixture + sample の Ruby run parity を通す（`ruby`）
 6. [ ] [ID: P1-RUBY-EMITTER-S6] stdlib の Ruby parity を通す（`--case-root stdlib`）
 
