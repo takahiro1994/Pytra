@@ -40,6 +40,8 @@ from toolchain2.emit.cpp.emitter import emit_cpp_module  # type: ignore
 from toolchain2.emit.cpp.header_gen import build_cpp_header_from_east3  # type: ignore
 from toolchain2.emit.cpp.runtime_bundle import emit_runtime_module_artifacts  # type: ignore
 from toolchain2.emit.go.emitter import emit_go_module  # type: ignore
+from toolchain2.emit.rs.emitter import emit_rs_module  # type: ignore
+from toolchain2.emit.ts.emitter import emit_ts_module  # type: ignore
 from toolchain2.link.linker import link_modules  # type: ignore
 from toolchain2.emit.cpp.runtime_paths import runtime_rel_tail_for_module  # type: ignore
 from toolchain2.optimize.optimizer import optimize_east3_document  # type: ignore
@@ -110,6 +112,9 @@ def _transpile_in_memory(
     Returns (success, error_message).
     """
     try:
+        # js is TS with strip_types=True; pipeline uses "ts" profile
+        pipeline_target = "ts" if target == "js" else target
+
         # 1. Parse
         east1_doc = parse_python_file(str(case_path))
 
@@ -121,7 +126,7 @@ def _transpile_in_memory(
         resolve_east1_to_east2(east2_doc, registry=registry)
 
         # 3. Compile (lower)
-        east3_doc = lower_east2_to_east3(east2_doc, target_language=target)
+        east3_doc = lower_east2_to_east3(east2_doc, target_language=pipeline_target)
 
         # 4. Optimize
         east3_opt, _report = optimize_east3_document(east3_doc, opt_level=east3_opt_level)
@@ -134,7 +139,7 @@ def _transpile_in_memory(
             json.dumps(east3_opt, ensure_ascii=False, indent=2) + "\n",
             encoding="utf-8",
         )
-        link_result = link_modules([str(link_path)], target=target, dispatch_mode="native")
+        link_result = link_modules([str(link_path)], target=pipeline_target, dispatch_mode="native")
 
         # 6. Emit
         emit_dir = output_dir / "emit"
@@ -148,6 +153,33 @@ def _transpile_in_memory(
                 out_name = m.module_id.replace(".", "_") + ".go"
                 emit_dir.joinpath(out_name).write_text(code, encoding="utf-8")
             _copy_go_runtime(emit_dir)
+        elif target == "rs":
+            for m in link_result.linked_modules:
+                code = emit_rs_module(m.east_doc)
+                if code.strip() == "":
+                    continue
+                emit_dir.joinpath(m.module_id.replace(".", "_") + ".rs").write_text(
+                    code, encoding="utf-8"
+                )
+            _copy_rs_runtime(emit_dir)
+        elif target == "ts":
+            for m in link_result.linked_modules:
+                code = emit_ts_module(m.east_doc)
+                if code.strip() == "":
+                    continue
+                emit_dir.joinpath(m.module_id.replace(".", "_") + ".ts").write_text(
+                    code, encoding="utf-8"
+                )
+            _copy_ts_runtime(emit_dir)
+        elif target == "js":
+            for m in link_result.linked_modules:
+                code = emit_ts_module(m.east_doc, strip_types=True)
+                if code.strip() == "":
+                    continue
+                emit_dir.joinpath(m.module_id.replace(".", "_") + ".js").write_text(
+                    code, encoding="utf-8"
+                )
+            _copy_js_runtime(emit_dir)
         elif target == "cpp":
             for m in link_result.linked_modules:
                 if m.module_kind == "runtime":
@@ -183,6 +215,41 @@ def _copy_go_runtime(emit_dir: Path) -> None:
     for f in sorted(go_runtime.rglob("*.go")):
         dest = emit_dir / f.name
         shutil.copy2(f, dest)
+
+
+def _copy_rs_runtime(emit_dir: Path) -> None:
+    """Copy Rust runtime files to emit directory (flat)."""
+    rs_runtime = ROOT / "src" / "runtime" / "rs"
+    for bucket in ("built_in", "std"):
+        bucket_dir = rs_runtime / bucket
+        if bucket_dir.exists():
+            for rs_file in bucket_dir.glob("*.rs"):
+                shutil.copy2(rs_file, emit_dir / rs_file.name)
+
+
+def _copy_ts_runtime(emit_dir: Path) -> None:
+    """Copy TypeScript built-in runtime file to emit directory."""
+    runtime_src = ROOT / "src" / "runtime" / "ts" / "built_in" / "py_runtime.ts"
+    if runtime_src.exists():
+        shutil.copy2(runtime_src, emit_dir / "pytra_built_in_py_runtime.ts")
+
+
+def _copy_js_runtime(emit_dir: Path) -> None:
+    """Copy JavaScript runtime files to emit directory.
+
+    built_in/py_runtime.js  → pytra_built_in_py_runtime.js  (name emitter expects)
+    std/*.js                → <same name>.js
+    """
+    js_runtime = ROOT / "src" / "runtime" / "js"
+    built_in_dir = js_runtime / "built_in"
+    if built_in_dir.exists():
+        src = built_in_dir / "py_runtime.js"
+        if src.exists():
+            shutil.copy2(src, emit_dir / "pytra_built_in_py_runtime.js")
+    std_dir = js_runtime / "std"
+    if std_dir.exists():
+        for js_file in std_dir.glob("*.js"):
+            shutil.copy2(js_file, emit_dir / js_file.name)
 
 
 def _emit_helper_cpp(m, emit_dir: Path) -> None:
@@ -232,7 +299,138 @@ def _run_target(
         cmd = "go run " + " ".join(shlex.quote(f) for f in go_files)
         return run_shell(cmd, cwd=work_dir, env=env, timeout_sec=timeout_sec)
 
+    if target == "rs":
+        stem = case_path.stem
+        entry_rs = emit_dir / (stem + ".rs")
+        if not entry_rs.exists():
+            return subprocess.CompletedProcess("", 1, "", f"entry file not found: {entry_rs}")
+        exe_path = emit_dir / (stem + "_rs.out")
+        build = run_shell(
+            f"rustc -O {shlex.quote(str(entry_rs))} -o {shlex.quote(str(exe_path))}",
+            cwd=work_dir, env=env, timeout_sec=timeout_sec,
+        )
+        if build.returncode != 0:
+            return build
+        return run_shell(shlex.quote(str(exe_path)), cwd=work_dir, env=env, timeout_sec=timeout_sec)
+
+    if target == "ts":
+        stem = case_path.stem
+        entry_ts = emit_dir / (stem + ".ts")
+        if not entry_ts.exists():
+            return subprocess.CompletedProcess("", 1, "", f"entry file not found: {entry_ts}")
+        ts_env = dict(env) if env else {}
+        ts_env.setdefault("npm_config_cache", "/tmp/npm-cache")
+        return run_shell(
+            f"npx -y tsx {shlex.quote(str(entry_ts))}",
+            cwd=work_dir, env=ts_env, timeout_sec=timeout_sec,
+        )
+
+    if target == "js":
+        stem = case_path.stem
+        entry_js = emit_dir / (stem + ".js")
+        if not entry_js.exists():
+            return subprocess.CompletedProcess("", 1, "", f"entry file not found: {entry_js}")
+        return run_shell(
+            f"node {shlex.quote(str(entry_js))}",
+            cwd=work_dir, env=env, timeout_sec=timeout_sec,
+        )
+
     return subprocess.CompletedProcess("", 1, "", f"unsupported target: {target}")
+
+
+# ---------------------------------------------------------------------------
+# Python results persistence (separate file from target results)
+# ---------------------------------------------------------------------------
+
+def _save_python_results(records: list[CheckRecord], case_root: str) -> None:
+    """Save Python execution timing to .parity-results/python_<case_root>.json."""
+    import datetime
+    parity_dir = ROOT / ".parity-results"
+    parity_dir.mkdir(parents=True, exist_ok=True)
+    out_path = parity_dir / f"python_{case_root}.json"
+
+    existing: dict[str, object] = {}
+    if out_path.exists():
+        try:
+            loaded = json.loads(out_path.read_text(encoding="utf-8"))
+            if isinstance(loaded, dict) and "results" in loaded:
+                existing = loaded["results"]  # type: ignore[assignment]
+        except Exception:
+            pass
+
+    now = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
+    results: dict[str, object] = dict(existing)
+    for rec in records:
+        if rec.target != "python" or rec.elapsed_sec is None:
+            continue
+        entry: dict[str, object] = {"category": rec.category, "timestamp": now,
+                                     "elapsed_sec": round(rec.elapsed_sec, 3)}
+        results[rec.case_stem] = entry
+
+    doc = {"target": "python", "case_root": case_root, "results": results}
+    out_path.write_text(json.dumps(doc, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+
+# ---------------------------------------------------------------------------
+# Sample auto-copy: copy PASS-verified emit files to sample/<lang>/
+# ---------------------------------------------------------------------------
+
+# target_name → (sample_dir_name, file_extension)
+_SAMPLE_TARGET_MAP: dict[str, tuple[str, str]] = {
+    "cpp":    ("cpp",        ".cpp"),
+    "go":     ("go",         ".go"),
+    "rs":     ("rs",         ".rs"),
+    "ts":     ("ts",         ".ts"),
+    "js":     ("js",         ".js"),
+    "cs":     ("cs",         ".cs"),
+    "ruby":   ("ruby",       ".rb"),
+    "lua":    ("lua",        ".lua"),
+    "php":    ("php",        ".php"),
+    "java":   ("java",       ".java"),
+    "swift":  ("swift",      ".swift"),
+    "kotlin": ("kotlin",     ".kt"),
+    "scala":  ("scala",      ".scala"),
+    "nim":    ("nim",        ".nim"),
+    "dart":   ("dart",       ".dart"),
+    "ps1":    ("powershell", ".ps1"),
+    "zig":    ("zig",        ".zig"),
+    "julia":  ("julia",      ".jl"),
+}
+
+
+def _copy_sample_emit(target: str, emit_dir: Path, case_stem: str) -> None:
+    """Copy entry file from emit_dir to sample/<lang>/ after parity PASS."""
+    if target not in _SAMPLE_TARGET_MAP:
+        return
+    sample_dir_name, ext = _SAMPLE_TARGET_MAP[target]
+    src = emit_dir / (case_stem + ext)
+    if not src.exists():
+        return
+    dest_dir = ROOT / "sample" / sample_dir_name
+    dest_dir.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(src, dest_dir / src.name)
+
+
+def _maybe_regenerate_benchmark() -> None:
+    """Auto-run gen_sample_benchmark.py if >10 minutes since last generation."""
+    marker = ROOT / "sample" / "README-ja.md"
+    if marker.exists() and (time.time() - marker.stat().st_mtime) < 600:
+        return
+    gen_script = ROOT / "tools" / "gen" / "gen_sample_benchmark.py"
+    if not gen_script.exists():
+        return
+    # Only run if benchmark data exists
+    if not (ROOT / ".parity-results" / "python_sample.json").exists():
+        return
+    try:
+        subprocess.run(
+            ["python3", str(gen_script)],
+            cwd=str(ROOT),
+            timeout=30,
+            capture_output=True,
+        )
+    except Exception:
+        pass
 
 
 # ---------------------------------------------------------------------------
@@ -249,9 +447,15 @@ def check_case(
     cmd_timeout_sec: int = 120,
     records: list[CheckRecord] | None = None,
 ) -> int:
-    def _record(target: str, category: str, detail: str) -> None:
+    do_bench = case_root == "sample"
+
+    def _record(target: str, category: str, detail: str, elapsed_sec: float | None = None) -> None:
         if records is not None:
-            records.append(CheckRecord(case_stem=case_stem, target=target, category=category, detail=detail))
+            records.append(CheckRecord(
+                case_stem=case_stem, target=target,
+                category=category, detail=detail,
+                elapsed_sec=elapsed_sec,
+            ))
 
     case_path = find_case_path(case_stem, case_root)
     if case_path is None:
@@ -275,16 +479,18 @@ def check_case(
             (work / "sample" / "out").mkdir(parents=True, exist_ok=True)
 
         _purge_case_artifacts(work, case_stem)
-        py = run_shell(
-            f"python {shlex.quote(case_path.as_posix())}",
-            cwd=work,
-            env={"PYTHONPATH": "src"},
-            timeout_sec=cmd_timeout_sec,
-        )
+        py_cmd = f"python {shlex.quote(case_path.as_posix())}"
+        py_env = {"PYTHONPATH": "src"}
+        py_t0 = time.monotonic()
+        py = run_shell(py_cmd, cwd=work, env=py_env, timeout_sec=cmd_timeout_sec)
+        py_elapsed_sec: float | None = round(time.monotonic() - py_t0, 3) if do_bench else None
         if py.returncode != 0:
             print(f"[ERROR] python:{case_stem} failed")
             _record("python", "python_failed", py.stderr.strip())
             return 1
+
+        if do_bench:
+            _record("python", "ok", "", elapsed_sec=py_elapsed_sec)
 
         expected = _normalize_output_for_compare(py.stdout)
         expected_artifact_path: Path | None = None
@@ -328,7 +534,9 @@ def check_case(
             # Compile + run (subprocess)
             _purge_case_artifacts(work, case_stem)
             _safe_unlink(expected_artifact_path)
+            rr_t0 = time.monotonic()
             rr = _run_target(target_name, out_dir, case_path, work_dir=work, env=target_env, timeout_sec=cmd_timeout_sec)
+            rr_elapsed: float | None = round(time.monotonic() - rr_t0, 3) if do_bench else None
             if rr.returncode != 0:
                 msg = rr.stderr.strip()
                 mismatches.append(f"{case_stem}:{target_name}: run failed: {msg}")
@@ -342,11 +550,18 @@ def check_case(
                 _record(target_name, "output_mismatch", "stdout mismatch")
                 continue
 
+            # Record target execution time from the single run above
+            target_elapsed_sec: float | None = None
+            if do_bench:
+                target_elapsed_sec = round(rr_elapsed, 3) if rr_elapsed is not None else None
+
             # Artifact check
             actual_out_txt = _parse_output_path(raw_actual)
             if expected_artifact_size is None:
+                if case_root == "sample":
+                    _copy_sample_emit(target_name, out_dir / "emit", case_stem)
                 print(f"[OK] {case_stem}:{target_name}")
-                _record(target_name, "ok", "")
+                _record(target_name, "ok", "", elapsed_sec=target_elapsed_sec)
                 continue
 
             if actual_out_txt == "":
@@ -373,8 +588,10 @@ def check_case(
                 continue
 
             info = f"artifact_size={actual_size} artifact_crc32={_crc32_hex(actual_crc)}"
+            if case_root == "sample":
+                _copy_sample_emit(target_name, out_dir / "emit", case_stem)
             print(f"[OK] {case_stem}:{target_name} {info}")
-            _record(target_name, "ok", info)
+            _record(target_name, "ok", info, elapsed_sec=target_elapsed_sec)
 
     finally:
         if work.exists():
@@ -493,7 +710,10 @@ def main() -> int:
 
     from runtime_parity_check import _save_parity_results, _maybe_regenerate_progress  # type: ignore
     _save_parity_results(records, args.case_root, enabled_targets)
+    if args.case_root == "sample":
+        _save_python_results(records, args.case_root)
     _maybe_regenerate_progress()
+    _maybe_regenerate_benchmark()
     return exit_code
 
 
