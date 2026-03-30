@@ -26,6 +26,7 @@ PYTRA_CLI2 = "src/pytra-cli2.py"
 
 FIXTURE_SOURCE_DIR = Path("test/fixture/source/py")
 SAMPLE_SOURCE_DIR = Path("sample/py")
+STDLIB_SOURCE_DIR = Path("test/stdlib/source/py")
 
 FIXTURE_GOLDEN = {
     "east1": Path("test/fixture/east1/py"),
@@ -41,6 +42,14 @@ SAMPLE_GOLDEN = {
     "east3": Path("test/sample/east3"),
     "east3-opt": Path("test/sample/east3-opt"),
     "linked": Path("test/sample/linked"),
+}
+
+STDLIB_GOLDEN = {
+    "east1": Path("test/stdlib/east1/py"),
+    "east2": Path("test/stdlib/east2"),
+    "east3": Path("test/stdlib/east3"),
+    "east3-opt": Path("test/stdlib/east3-opt"),
+    "linked": Path("test/stdlib/linked"),
 }
 
 # pytra implementation sources (src/pytra/**/*.py)
@@ -165,6 +174,8 @@ def regenerate(case_root: str, progress_every: int = 10) -> int:
         configs.append(("fixture", FIXTURE_SOURCE_DIR, FIXTURE_GOLDEN))
     if case_root in ("sample", "all"):
         configs.append(("sample", SAMPLE_SOURCE_DIR, SAMPLE_GOLDEN))
+    if case_root in ("stdlib", "all"):
+        configs.append(("stdlib", STDLIB_SOURCE_DIR, STDLIB_GOLDEN))
     if case_root in ("pytra", "all"):
         configs.append(("pytra", PYTRA_SOURCE_DIR, PYTRA_GOLDEN))
 
@@ -296,7 +307,7 @@ def main() -> int:
             i += 1
             continue
         if tok == "-h" or tok == "--help":
-            print("usage: regenerate_golden.py [--case-root=fixture|sample|pytra|all] [--progress-every=N]")
+            print("usage: regenerate_golden.py [--case-root=fixture|sample|stdlib|pytra|all] [--progress-every=N]")
             print()
             print("Regenerates golden files using toolchain2 pipeline (parse→resolve→compile→optimize).")
             print("Default progress: every 10 files (use 0 to disable).")

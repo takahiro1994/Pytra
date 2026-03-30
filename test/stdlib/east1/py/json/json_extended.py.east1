@@ -1,0 +1,893 @@
+{
+  "kind": "Module",
+  "source_path": "test/stdlib/source/py/json/json_extended.py",
+  "source_span": {
+    "lineno": null,
+    "col": null,
+    "end_lineno": null,
+    "end_col": null
+  },
+  "body": [
+    {
+      "kind": "ImportFrom",
+      "source_span": {
+        "lineno": 1,
+        "col": 0,
+        "end_lineno": 1,
+        "end_col": 32
+      },
+      "module": "pytra.std.json",
+      "names": [
+        {
+          "name": "dumps",
+          "asname": null
+        }
+      ],
+      "level": 0
+    },
+    {
+      "kind": "ImportFrom",
+      "source_span": {
+        "lineno": 2,
+        "col": 0,
+        "end_lineno": 2,
+        "end_col": 62
+      },
+      "module": "pytra.utils.assertions",
+      "names": [
+        {
+          "name": "py_assert_all",
+          "asname": null
+        },
+        {
+          "name": "py_assert_eq",
+          "asname": null
+        }
+      ],
+      "level": 0
+    },
+    {
+      "kind": "FunctionDef",
+      "source_span": {
+        "lineno": 5,
+        "col": 0,
+        "end_lineno": 13,
+        "end_col": 49
+      },
+      "name": "run_json_extended",
+      "original_name": "run_json_extended",
+      "arg_types": {},
+      "arg_order": [],
+      "arg_defaults": {},
+      "arg_index": {},
+      "return_type": "bool",
+      "renamed_symbols": {},
+      "docstring": null,
+      "body": [
+        {
+          "kind": "AnnAssign",
+          "source_span": {
+            "lineno": 6,
+            "col": 4,
+            "end_lineno": 6,
+            "end_col": 27
+          },
+          "target": {
+            "kind": "Name",
+            "source_span": {
+              "lineno": 6,
+              "col": 4,
+              "end_lineno": 6,
+              "end_col": 10
+            },
+            "casts": [],
+            "borrow_kind": "value",
+            "repr": "checks",
+            "id": "checks"
+          },
+          "annotation": "list[bool]",
+          "value": {
+            "kind": "List",
+            "source_span": {
+              "lineno": 6,
+              "col": 25,
+              "end_lineno": 6,
+              "end_col": 27
+            },
+            "casts": [],
+            "borrow_kind": "value",
+            "repr": "[]",
+            "elements": []
+          },
+          "declare": true
+        },
+        {
+          "kind": "AnnAssign",
+          "source_span": {
+            "lineno": 7,
+            "col": 4,
+            "end_lineno": 7,
+            "end_col": 26
+          },
+          "target": {
+            "kind": "Name",
+            "source_span": {
+              "lineno": 7,
+              "col": 4,
+              "end_lineno": 7,
+              "end_col": 6
+            },
+            "casts": [],
+            "borrow_kind": "value",
+            "repr": "s1",
+            "id": "s1"
+          },
+          "annotation": "str",
+          "value": {
+            "kind": "Call",
+            "source_span": {
+              "lineno": 7,
+              "col": 14,
+              "end_lineno": 7,
+              "end_col": 26
+            },
+            "casts": [],
+            "borrow_kind": "value",
+            "repr": "dumps(\"abc\")",
+            "func": {
+              "kind": "Name",
+              "source_span": {
+                "lineno": 7,
+                "col": 14,
+                "end_lineno": 7,
+                "end_col": 19
+              },
+              "casts": [],
+              "borrow_kind": "value",
+              "repr": "dumps",
+              "id": "dumps"
+            },
+            "args": [
+              {
+                "kind": "Constant",
+                "source_span": {
+                  "lineno": 7,
+                  "col": 20,
+                  "end_lineno": 7,
+                  "end_col": 25
+                },
+                "casts": [],
+                "borrow_kind": "value",
+                "repr": "\"abc\"",
+                "value": "abc"
+              }
+            ],
+            "keywords": []
+          },
+          "declare": true
+        },
+        {
+          "kind": "AnnAssign",
+          "source_span": {
+            "lineno": 8,
+            "col": 4,
+            "end_lineno": 8,
+            "end_col": 24
+          },
+          "target": {
+            "kind": "Name",
+            "source_span": {
+              "lineno": 8,
+              "col": 4,
+              "end_lineno": 8,
+              "end_col": 6
+            },
+            "casts": [],
+            "borrow_kind": "value",
+            "repr": "s2",
+            "id": "s2"
+          },
+          "annotation": "str",
+          "value": {
+            "kind": "Call",
+            "source_span": {
+              "lineno": 8,
+              "col": 14,
+              "end_lineno": 8,
+              "end_col": 24
+            },
+            "casts": [],
+            "borrow_kind": "value",
+            "repr": "dumps(123)",
+            "func": {
+              "kind": "Name",
+              "source_span": {
+                "lineno": 8,
+                "col": 14,
+                "end_lineno": 8,
+                "end_col": 19
+              },
+              "casts": [],
+              "borrow_kind": "value",
+              "repr": "dumps",
+              "id": "dumps"
+            },
+            "args": [
+              {
+                "kind": "Constant",
+                "source_span": {
+                  "lineno": 8,
+                  "col": 20,
+                  "end_lineno": 8,
+                  "end_col": 23
+                },
+                "casts": [],
+                "borrow_kind": "value",
+                "repr": "123",
+                "value": 123
+              }
+            ],
+            "keywords": []
+          },
+          "declare": true
+        },
+        {
+          "kind": "AnnAssign",
+          "source_span": {
+            "lineno": 9,
+            "col": 4,
+            "end_lineno": 9,
+            "end_col": 25
+          },
+          "target": {
+            "kind": "Name",
+            "source_span": {
+              "lineno": 9,
+              "col": 4,
+              "end_lineno": 9,
+              "end_col": 6
+            },
+            "casts": [],
+            "borrow_kind": "value",
+            "repr": "s3",
+            "id": "s3"
+          },
+          "annotation": "str",
+          "value": {
+            "kind": "Call",
+            "source_span": {
+              "lineno": 9,
+              "col": 14,
+              "end_lineno": 9,
+              "end_col": 25
+            },
+            "casts": [],
+            "borrow_kind": "value",
+            "repr": "dumps(True)",
+            "func": {
+              "kind": "Name",
+              "source_span": {
+                "lineno": 9,
+                "col": 14,
+                "end_lineno": 9,
+                "end_col": 19
+              },
+              "casts": [],
+              "borrow_kind": "value",
+              "repr": "dumps",
+              "id": "dumps"
+            },
+            "args": [
+              {
+                "kind": "Constant",
+                "source_span": {
+                  "lineno": 9,
+                  "col": 20,
+                  "end_lineno": 9,
+                  "end_col": 24
+                },
+                "casts": [],
+                "borrow_kind": "value",
+                "repr": "True",
+                "value": true
+              }
+            ],
+            "keywords": []
+          },
+          "declare": true
+        },
+        {
+          "kind": "Expr",
+          "source_span": {
+            "lineno": 10,
+            "col": 4,
+            "end_lineno": 10,
+            "end_col": 51
+          },
+          "value": {
+            "kind": "Call",
+            "source_span": {
+              "lineno": 10,
+              "col": 4,
+              "end_lineno": 10,
+              "end_col": 51
+            },
+            "casts": [],
+            "borrow_kind": "value",
+            "repr": "checks.append(py_assert_eq(s1, '\"abc\"', \"str\"))",
+            "func": {
+              "kind": "Attribute",
+              "source_span": {
+                "lineno": 10,
+                "col": 4,
+                "end_lineno": 10,
+                "end_col": 17
+              },
+              "casts": [],
+              "borrow_kind": "value",
+              "repr": "checks.append",
+              "value": {
+                "kind": "Name",
+                "source_span": {
+                  "lineno": 10,
+                  "col": 4,
+                  "end_lineno": 10,
+                  "end_col": 10
+                },
+                "casts": [],
+                "borrow_kind": "value",
+                "repr": "checks",
+                "id": "checks"
+              },
+              "attr": "append"
+            },
+            "args": [
+              {
+                "kind": "Call",
+                "source_span": {
+                  "lineno": 10,
+                  "col": 18,
+                  "end_lineno": 10,
+                  "end_col": 50
+                },
+                "casts": [],
+                "borrow_kind": "value",
+                "repr": "py_assert_eq(s1, '\"abc\"', \"str\")",
+                "func": {
+                  "kind": "Name",
+                  "source_span": {
+                    "lineno": 10,
+                    "col": 18,
+                    "end_lineno": 10,
+                    "end_col": 30
+                  },
+                  "casts": [],
+                  "borrow_kind": "value",
+                  "repr": "py_assert_eq",
+                  "id": "py_assert_eq"
+                },
+                "args": [
+                  {
+                    "kind": "Name",
+                    "source_span": {
+                      "lineno": 10,
+                      "col": 31,
+                      "end_lineno": 10,
+                      "end_col": 33
+                    },
+                    "casts": [],
+                    "borrow_kind": "value",
+                    "repr": "s1",
+                    "id": "s1"
+                  },
+                  {
+                    "kind": "Constant",
+                    "source_span": {
+                      "lineno": 10,
+                      "col": 35,
+                      "end_lineno": 10,
+                      "end_col": 42
+                    },
+                    "casts": [],
+                    "borrow_kind": "value",
+                    "repr": "'\"abc\"'",
+                    "value": "\"abc\""
+                  },
+                  {
+                    "kind": "Constant",
+                    "source_span": {
+                      "lineno": 10,
+                      "col": 44,
+                      "end_lineno": 10,
+                      "end_col": 49
+                    },
+                    "casts": [],
+                    "borrow_kind": "value",
+                    "repr": "\"str\"",
+                    "value": "str"
+                  }
+                ],
+                "keywords": []
+              }
+            ],
+            "keywords": []
+          }
+        },
+        {
+          "kind": "Expr",
+          "source_span": {
+            "lineno": 11,
+            "col": 4,
+            "end_lineno": 11,
+            "end_col": 49
+          },
+          "value": {
+            "kind": "Call",
+            "source_span": {
+              "lineno": 11,
+              "col": 4,
+              "end_lineno": 11,
+              "end_col": 49
+            },
+            "casts": [],
+            "borrow_kind": "value",
+            "repr": "checks.append(py_assert_eq(s2, \"123\", \"int\"))",
+            "func": {
+              "kind": "Attribute",
+              "source_span": {
+                "lineno": 11,
+                "col": 4,
+                "end_lineno": 11,
+                "end_col": 17
+              },
+              "casts": [],
+              "borrow_kind": "value",
+              "repr": "checks.append",
+              "value": {
+                "kind": "Name",
+                "source_span": {
+                  "lineno": 11,
+                  "col": 4,
+                  "end_lineno": 11,
+                  "end_col": 10
+                },
+                "casts": [],
+                "borrow_kind": "value",
+                "repr": "checks",
+                "id": "checks"
+              },
+              "attr": "append"
+            },
+            "args": [
+              {
+                "kind": "Call",
+                "source_span": {
+                  "lineno": 11,
+                  "col": 18,
+                  "end_lineno": 11,
+                  "end_col": 48
+                },
+                "casts": [],
+                "borrow_kind": "value",
+                "repr": "py_assert_eq(s2, \"123\", \"int\")",
+                "func": {
+                  "kind": "Name",
+                  "source_span": {
+                    "lineno": 11,
+                    "col": 18,
+                    "end_lineno": 11,
+                    "end_col": 30
+                  },
+                  "casts": [],
+                  "borrow_kind": "value",
+                  "repr": "py_assert_eq",
+                  "id": "py_assert_eq"
+                },
+                "args": [
+                  {
+                    "kind": "Name",
+                    "source_span": {
+                      "lineno": 11,
+                      "col": 31,
+                      "end_lineno": 11,
+                      "end_col": 33
+                    },
+                    "casts": [],
+                    "borrow_kind": "value",
+                    "repr": "s2",
+                    "id": "s2"
+                  },
+                  {
+                    "kind": "Constant",
+                    "source_span": {
+                      "lineno": 11,
+                      "col": 35,
+                      "end_lineno": 11,
+                      "end_col": 40
+                    },
+                    "casts": [],
+                    "borrow_kind": "value",
+                    "repr": "\"123\"",
+                    "value": "123"
+                  },
+                  {
+                    "kind": "Constant",
+                    "source_span": {
+                      "lineno": 11,
+                      "col": 42,
+                      "end_lineno": 11,
+                      "end_col": 47
+                    },
+                    "casts": [],
+                    "borrow_kind": "value",
+                    "repr": "\"int\"",
+                    "value": "int"
+                  }
+                ],
+                "keywords": []
+              }
+            ],
+            "keywords": []
+          }
+        },
+        {
+          "kind": "Expr",
+          "source_span": {
+            "lineno": 12,
+            "col": 4,
+            "end_lineno": 12,
+            "end_col": 51
+          },
+          "value": {
+            "kind": "Call",
+            "source_span": {
+              "lineno": 12,
+              "col": 4,
+              "end_lineno": 12,
+              "end_col": 51
+            },
+            "casts": [],
+            "borrow_kind": "value",
+            "repr": "checks.append(py_assert_eq(s3, \"true\", \"bool\"))",
+            "func": {
+              "kind": "Attribute",
+              "source_span": {
+                "lineno": 12,
+                "col": 4,
+                "end_lineno": 12,
+                "end_col": 17
+              },
+              "casts": [],
+              "borrow_kind": "value",
+              "repr": "checks.append",
+              "value": {
+                "kind": "Name",
+                "source_span": {
+                  "lineno": 12,
+                  "col": 4,
+                  "end_lineno": 12,
+                  "end_col": 10
+                },
+                "casts": [],
+                "borrow_kind": "value",
+                "repr": "checks",
+                "id": "checks"
+              },
+              "attr": "append"
+            },
+            "args": [
+              {
+                "kind": "Call",
+                "source_span": {
+                  "lineno": 12,
+                  "col": 18,
+                  "end_lineno": 12,
+                  "end_col": 50
+                },
+                "casts": [],
+                "borrow_kind": "value",
+                "repr": "py_assert_eq(s3, \"true\", \"bool\")",
+                "func": {
+                  "kind": "Name",
+                  "source_span": {
+                    "lineno": 12,
+                    "col": 18,
+                    "end_lineno": 12,
+                    "end_col": 30
+                  },
+                  "casts": [],
+                  "borrow_kind": "value",
+                  "repr": "py_assert_eq",
+                  "id": "py_assert_eq"
+                },
+                "args": [
+                  {
+                    "kind": "Name",
+                    "source_span": {
+                      "lineno": 12,
+                      "col": 31,
+                      "end_lineno": 12,
+                      "end_col": 33
+                    },
+                    "casts": [],
+                    "borrow_kind": "value",
+                    "repr": "s3",
+                    "id": "s3"
+                  },
+                  {
+                    "kind": "Constant",
+                    "source_span": {
+                      "lineno": 12,
+                      "col": 35,
+                      "end_lineno": 12,
+                      "end_col": 41
+                    },
+                    "casts": [],
+                    "borrow_kind": "value",
+                    "repr": "\"true\"",
+                    "value": "true"
+                  },
+                  {
+                    "kind": "Constant",
+                    "source_span": {
+                      "lineno": 12,
+                      "col": 43,
+                      "end_lineno": 12,
+                      "end_col": 49
+                    },
+                    "casts": [],
+                    "borrow_kind": "value",
+                    "repr": "\"bool\"",
+                    "value": "bool"
+                  }
+                ],
+                "keywords": []
+              }
+            ],
+            "keywords": []
+          }
+        },
+        {
+          "kind": "Return",
+          "source_span": {
+            "lineno": 13,
+            "col": 4,
+            "end_lineno": 13,
+            "end_col": 49
+          },
+          "value": {
+            "kind": "Call",
+            "source_span": {
+              "lineno": 13,
+              "col": 11,
+              "end_lineno": 13,
+              "end_col": 49
+            },
+            "casts": [],
+            "borrow_kind": "value",
+            "repr": "py_assert_all(checks, \"json_extended\")",
+            "func": {
+              "kind": "Name",
+              "source_span": {
+                "lineno": 13,
+                "col": 11,
+                "end_lineno": 13,
+                "end_col": 24
+              },
+              "casts": [],
+              "borrow_kind": "value",
+              "repr": "py_assert_all",
+              "id": "py_assert_all"
+            },
+            "args": [
+              {
+                "kind": "Name",
+                "source_span": {
+                  "lineno": 13,
+                  "col": 25,
+                  "end_lineno": 13,
+                  "end_col": 31
+                },
+                "casts": [],
+                "borrow_kind": "value",
+                "repr": "checks",
+                "id": "checks"
+              },
+              {
+                "kind": "Constant",
+                "source_span": {
+                  "lineno": 13,
+                  "col": 33,
+                  "end_lineno": 13,
+                  "end_col": 48
+                },
+                "casts": [],
+                "borrow_kind": "value",
+                "repr": "\"json_extended\"",
+                "value": "json_extended"
+              }
+            ],
+            "keywords": []
+          }
+        }
+      ],
+      "is_generator": 0,
+      "yield_value_type": "unknown",
+      "leading_comments": [],
+      "leading_trivia": []
+    }
+  ],
+  "main_guard_body": [
+    {
+      "kind": "Expr",
+      "source_span": {
+        "lineno": 17,
+        "col": 4,
+        "end_lineno": 17,
+        "end_col": 30
+      },
+      "value": {
+        "kind": "Call",
+        "source_span": {
+          "lineno": 17,
+          "col": 4,
+          "end_lineno": 17,
+          "end_col": 30
+        },
+        "casts": [],
+        "borrow_kind": "value",
+        "repr": "print(run_json_extended())",
+        "func": {
+          "kind": "Name",
+          "source_span": {
+            "lineno": 17,
+            "col": 4,
+            "end_lineno": 17,
+            "end_col": 9
+          },
+          "casts": [],
+          "borrow_kind": "value",
+          "repr": "print",
+          "id": "print"
+        },
+        "args": [
+          {
+            "kind": "Call",
+            "source_span": {
+              "lineno": 17,
+              "col": 10,
+              "end_lineno": 17,
+              "end_col": 29
+            },
+            "casts": [],
+            "borrow_kind": "value",
+            "repr": "run_json_extended()",
+            "func": {
+              "kind": "Name",
+              "source_span": {
+                "lineno": 17,
+                "col": 10,
+                "end_lineno": 17,
+                "end_col": 27
+              },
+              "casts": [],
+              "borrow_kind": "value",
+              "repr": "run_json_extended",
+              "id": "run_json_extended"
+            },
+            "args": [],
+            "keywords": []
+          }
+        ],
+        "keywords": []
+      }
+    }
+  ],
+  "renamed_symbols": {},
+  "meta": {
+    "import_resolution": {
+      "bindings": [
+        {
+          "module_id": "pytra.std.json",
+          "export_name": "dumps",
+          "local_name": "dumps",
+          "binding_kind": "symbol",
+          "source_file": "test/stdlib/source/py/json/json_extended.py",
+          "source_line": 1
+        },
+        {
+          "module_id": "pytra.utils.assertions",
+          "export_name": "py_assert_all",
+          "local_name": "py_assert_all",
+          "binding_kind": "symbol",
+          "source_file": "test/stdlib/source/py/json/json_extended.py",
+          "source_line": 2
+        },
+        {
+          "module_id": "pytra.utils.assertions",
+          "export_name": "py_assert_eq",
+          "local_name": "py_assert_eq",
+          "binding_kind": "symbol",
+          "source_file": "test/stdlib/source/py/json/json_extended.py",
+          "source_line": 2
+        }
+      ],
+      "qualified_refs": [
+        {
+          "module_id": "pytra.std.json",
+          "symbol": "dumps",
+          "local_name": "dumps"
+        },
+        {
+          "module_id": "pytra.utils.assertions",
+          "symbol": "py_assert_all",
+          "local_name": "py_assert_all"
+        },
+        {
+          "module_id": "pytra.utils.assertions",
+          "symbol": "py_assert_eq",
+          "local_name": "py_assert_eq"
+        }
+      ]
+    },
+    "import_bindings": [
+      {
+        "module_id": "pytra.std.json",
+        "export_name": "dumps",
+        "local_name": "dumps",
+        "binding_kind": "symbol",
+        "source_file": "test/stdlib/source/py/json/json_extended.py",
+        "source_line": 1
+      },
+      {
+        "module_id": "pytra.utils.assertions",
+        "export_name": "py_assert_all",
+        "local_name": "py_assert_all",
+        "binding_kind": "symbol",
+        "source_file": "test/stdlib/source/py/json/json_extended.py",
+        "source_line": 2
+      },
+      {
+        "module_id": "pytra.utils.assertions",
+        "export_name": "py_assert_eq",
+        "local_name": "py_assert_eq",
+        "binding_kind": "symbol",
+        "source_file": "test/stdlib/source/py/json/json_extended.py",
+        "source_line": 2
+      }
+    ],
+    "qualified_symbol_refs": [
+      {
+        "module_id": "pytra.std.json",
+        "symbol": "dumps",
+        "local_name": "dumps"
+      },
+      {
+        "module_id": "pytra.utils.assertions",
+        "symbol": "py_assert_all",
+        "local_name": "py_assert_all"
+      },
+      {
+        "module_id": "pytra.utils.assertions",
+        "symbol": "py_assert_eq",
+        "local_name": "py_assert_eq"
+      }
+    ],
+    "import_modules": {},
+    "import_symbols": {
+      "dumps": {
+        "module": "pytra.std.json",
+        "name": "dumps"
+      },
+      "py_assert_all": {
+        "module": "pytra.utils.assertions",
+        "name": "py_assert_all"
+      },
+      "py_assert_eq": {
+        "module": "pytra.utils.assertions",
+        "name": "py_assert_eq"
+      }
+    }
+  },
+  "east_stage": 1
+}
