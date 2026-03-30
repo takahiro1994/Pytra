@@ -654,6 +654,21 @@ namespace Pytra.CsModule
             source.Add(py_convert_value<T>(value));
         }
 
+        public static List<T> py_repeat<T>(List<T> source, object timesLike)
+        {
+            long times = Convert.ToInt64(timesLike);
+            List<T> outList = new List<T>();
+            if (times <= 0)
+            {
+                return outList;
+            }
+            for (long i = 0; i < times; i++)
+            {
+                outList.AddRange(source);
+            }
+            return outList;
+        }
+
         private static T py_convert_value<T>(object value)
         {
             if (value is T same)
@@ -701,9 +716,85 @@ namespace Pytra.CsModule
             return source.Count;
         }
 
+        public static long py_len<T>(ICollection<T> source)
+        {
+            return source.Count;
+        }
+
+        public static long py_len(object source)
+        {
+            if (source == null)
+            {
+                return 0;
+            }
+            if (source is string text)
+            {
+                return text.Length;
+            }
+            if (source is ICollection collection)
+            {
+                return collection.Count;
+            }
+            MethodInfo lenMethod = source.GetType().GetMethod("__len__", Type.EmptyTypes);
+            if (lenMethod != null)
+            {
+                object value = lenMethod.Invoke(source, null);
+                return Convert.ToInt64(value, CultureInfo.InvariantCulture);
+            }
+            throw new ArgumentException("object has no len()");
+        }
+
         public static long py_len(string source)
         {
             return source.Length;
+        }
+
+        public static T py_or<T>(Func<T> left, Func<T> right)
+        {
+            T value = left();
+            if (py_bool(value))
+            {
+                return value;
+            }
+            return right();
+        }
+
+        public static T py_and<T>(Func<T> left, Func<T> right)
+        {
+            T value = left();
+            if (py_bool(value))
+            {
+                return right();
+            }
+            return value;
+        }
+
+        public static List<K> py_dict_keys<K, V>(Dictionary<K, V> source)
+        {
+            return new List<K>(source.Keys);
+        }
+
+        public static List<V> py_dict_values<K, V>(Dictionary<K, V> source)
+        {
+            return new List<V>(source.Values);
+        }
+
+        public static bool py_set_add<T>(HashSet<T> source, object value)
+        {
+            return source.Add(py_convert_value<T>(value));
+        }
+
+        public static bool py_set_discard<T>(HashSet<T> source, object value)
+        {
+            return source.Remove(py_convert_value<T>(value));
+        }
+
+        public static void py_set_remove<T>(HashSet<T> source, object value)
+        {
+            if (!source.Remove(py_convert_value<T>(value)))
+            {
+                throw new KeyNotFoundException();
+            }
         }
 
         public static bool py_bool(object value)
@@ -737,6 +828,68 @@ namespace Pytra.CsModule
                 return c.Count != 0;
             }
             return true;
+        }
+
+        private static bool py_is_numeric(object value)
+        {
+            if (value == null)
+            {
+                return false;
+            }
+            TypeCode code = Type.GetTypeCode(value.GetType());
+            switch (code)
+            {
+                case TypeCode.Byte:
+                case TypeCode.SByte:
+                case TypeCode.Int16:
+                case TypeCode.UInt16:
+                case TypeCode.Int32:
+                case TypeCode.UInt32:
+                case TypeCode.Int64:
+                case TypeCode.UInt64:
+                case TypeCode.Single:
+                case TypeCode.Double:
+                case TypeCode.Decimal:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        private static bool py_equals(object left, object right)
+        {
+            if (left == null || right == null)
+            {
+                return Equals(left, right);
+            }
+            if (py_is_numeric(left) && py_is_numeric(right))
+            {
+                return Convert.ToDouble(left, CultureInfo.InvariantCulture)
+                    == Convert.ToDouble(right, CultureInfo.InvariantCulture);
+            }
+            return Equals(left, right);
+        }
+
+        private static string py_display(object value)
+        {
+            if (value == null)
+            {
+                return "None";
+            }
+            if (value is bool boolean)
+            {
+                return boolean ? "True" : "False";
+            }
+            if (value is Exception ex)
+            {
+                return ex.Message;
+            }
+            return Convert.ToString(value, CultureInfo.InvariantCulture);
+        }
+
+        public static string py_to_string(object value)
+        {
+            return py_display(value);
         }
 
         public static bool py_isdigit(string value)
@@ -858,7 +1011,12 @@ namespace Pytra.CsModule
                 Console.WriteLine();
                 return;
             }
-            Console.WriteLine(string.Join(" ", args));
+            string[] rendered = new string[args.Length];
+            for (int i = 0; i < args.Length; i++)
+            {
+                rendered[i] = py_display(args[i]);
+            }
+            Console.WriteLine(string.Join(" ", rendered));
         }
 
         // Python の `x in y` に相当する最小判定ヘルパ。
@@ -886,7 +1044,7 @@ namespace Pytra.CsModule
             {
                 foreach (object item in enumerable)
                 {
-                    if (Equals(item, needle))
+                    if (py_equals(item, needle))
                     {
                         return true;
                     }
