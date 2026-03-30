@@ -6,7 +6,7 @@
 
 > 領域別 TODO。全体索引は [index.md](./index.md) を参照。
 
-最終更新: 2026-03-30（P0-SELFHOST-MATRIX-AUTO-REFRESH・P10-STDLIB-TEST-SEPARATION 完了）
+最終更新: 2026-03-30（P0-PROGRESS-SUMMARY 完了）
 
 ## 運用ルール
 
@@ -22,9 +22,13 @@
 
 ### P0-PROGRESS-SUMMARY: バックエンド全体サマリページを自動生成する
 
-1. [ ] [ID: P0-PROGRESS-SUMMARY-S1] `gen_backend_progress.py` に summary 生成を追加する — 各言語1行で fixture/sample/stdlib/selfhost/emitter lint の状況を表示する `backend-progress-summary.md` を日英同時生成。parity check 末尾の自動再生成（`_maybe_regenerate_progress`, `_maybe_regenerate_benchmark`, `_maybe_refresh_selfhost_python`, `_maybe_run_emitter_lint`）は `.parity-results/.gen.lock` で排他制御し、複数 agent の同時書き込みを防ぐこと
-2. [ ] [ID: P0-PROGRESS-SUMMARY-S2] `progress/index.md` の「バックエンドサポート状況」セクションに summary へのリンクを追加する（または summary をインライン表示する）
-3. [ ] [ID: P0-PROGRESS-SUMMARY-S3] `check_emitter_hardcode_lint.py` の出力に合計行（🟩 PASS / 🟥 FAIL）を追加する — 他のマトリクスと同じ形式
-4. [ ] [ID: P0-PROGRESS-SUMMARY-S4] parity check の末尾に `_maybe_run_emitter_lint()` を追加する — `emitter-hardcode-lint.md` の mtime が 1 時間以上古ければ `check_emitter_hardcode_lint.py` を自動実行する
+1. [x] [ID: P0-PROGRESS-SUMMARY-S1] `gen_backend_progress.py` に summary 生成を追加する — 各言語1行で fixture/sample/stdlib/selfhost/emitter lint の状況を表示する `backend-progress-summary.md` を日英同時生成。parity check 末尾の自動再生成（`_maybe_regenerate_progress`, `_maybe_regenerate_benchmark`, `_maybe_refresh_selfhost_python`, `_maybe_run_emitter_lint`）は `.parity-results/.gen.lock` で排他制御し、複数 agent の同時書き込みを防ぐこと
+   完了: `_build_summary_matrix()` 追加。`_acquire_gen_lock()` / `_release_gen_lock()` で 4 関数を保護。
+2. [x] [ID: P0-PROGRESS-SUMMARY-S2] `progress/index.md` の「バックエンドサポート状況」セクションに summary へのリンクを追加する（または summary をインライン表示する）
+   完了: JA/EN index.md に既存のリンクを確認。
+3. [x] [ID: P0-PROGRESS-SUMMARY-S3] `check_emitter_hardcode_lint.py` の出力に合計行（🟩 PASS / 🟥 FAIL）を追加する — 他のマトリクスと同じ形式
+   完了: `lang_total()` 追加。stdout・Markdown・JSON（`.parity-results/emitter_lint.json`）に合計行を出力。
+4. [x] [ID: P0-PROGRESS-SUMMARY-S4] parity check の末尾に `_maybe_run_emitter_lint()` を追加する — `emitter-hardcode-lint.md` の mtime が 1 時間以上古ければ `check_emitter_hardcode_lint.py` を自動実行する
+   完了: `runtime_parity_check_fast.py` に追加。gen.lock で 4 関数まとめて排他制御。
 
 （P20-INT32 は [plans/p4-int32-default.md](../plans/p4-int32-default.md) に保留中。再開時にここへ戻す。）
