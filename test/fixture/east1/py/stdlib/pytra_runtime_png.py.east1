@@ -14,6 +14,36 @@
         "lineno": 3,
         "col": 0,
         "end_lineno": 3,
+        "end_col": 27
+      },
+      "names": [
+        {
+          "name": "pytra.std.env",
+          "asname": "env"
+        }
+      ]
+    },
+    {
+      "kind": "Import",
+      "source_span": {
+        "lineno": 4,
+        "col": 0,
+        "end_lineno": 4,
+        "end_col": 25
+      },
+      "names": [
+        {
+          "name": "pytra.std.os",
+          "asname": "os"
+        }
+      ]
+    },
+    {
+      "kind": "Import",
+      "source_span": {
+        "lineno": 5,
+        "col": 0,
+        "end_lineno": 5,
         "end_col": 29
       },
       "names": [
@@ -26,9 +56,9 @@
     {
       "kind": "ImportFrom",
       "source_span": {
-        "lineno": 4,
+        "lineno": 6,
         "col": 0,
-        "end_lineno": 4,
+        "end_lineno": 6,
         "end_col": 78
       },
       "module": "pytra.utils.assertions",
@@ -51,9 +81,9 @@
     {
       "kind": "FunctionDef",
       "source_span": {
-        "lineno": 7,
+        "lineno": 9,
         "col": 0,
-        "end_lineno": 19,
+        "end_lineno": 23,
         "end_col": 61
       },
       "name": "run_case",
@@ -67,19 +97,217 @@
       "docstring": null,
       "body": [
         {
+          "kind": "AnnAssign",
+          "source_span": {
+            "lineno": 10,
+            "col": 4,
+            "end_lineno": 10,
+            "end_col": 88
+          },
+          "target": {
+            "kind": "Name",
+            "source_span": {
+              "lineno": 10,
+              "col": 4,
+              "end_lineno": 10,
+              "end_col": 11
+            },
+            "casts": [],
+            "borrow_kind": "value",
+            "repr": "out_dir",
+            "id": "out_dir"
+          },
+          "annotation": "str",
+          "value": {
+            "kind": "IfExp",
+            "source_span": {
+              "lineno": 10,
+              "col": 19,
+              "end_lineno": 10,
+              "end_col": 88
+            },
+            "casts": [],
+            "borrow_kind": "value",
+            "repr": "\"work/tmp/test_png_out\" if env.target == \"python\" else \"test_png_out\"",
+            "test": {
+              "kind": "Compare",
+              "source_span": {
+                "lineno": 10,
+                "col": 46,
+                "end_lineno": 10,
+                "end_col": 68
+              },
+              "casts": [],
+              "borrow_kind": "value",
+              "repr": "env.target == \"python\"",
+              "left": {
+                "kind": "Attribute",
+                "source_span": {
+                  "lineno": 10,
+                  "col": 46,
+                  "end_lineno": 10,
+                  "end_col": 56
+                },
+                "casts": [],
+                "borrow_kind": "value",
+                "repr": "env.target",
+                "value": {
+                  "kind": "Name",
+                  "source_span": {
+                    "lineno": 10,
+                    "col": 46,
+                    "end_lineno": 10,
+                    "end_col": 49
+                  },
+                  "casts": [],
+                  "borrow_kind": "value",
+                  "repr": "env",
+                  "id": "env"
+                },
+                "attr": "target"
+              },
+              "ops": [
+                "Eq"
+              ],
+              "comparators": [
+                {
+                  "kind": "Constant",
+                  "source_span": {
+                    "lineno": 10,
+                    "col": 60,
+                    "end_lineno": 10,
+                    "end_col": 68
+                  },
+                  "casts": [],
+                  "borrow_kind": "value",
+                  "repr": "\"python\"",
+                  "value": "python"
+                }
+              ]
+            },
+            "body": {
+              "kind": "Constant",
+              "source_span": {
+                "lineno": 10,
+                "col": 19,
+                "end_lineno": 10,
+                "end_col": 42
+              },
+              "casts": [],
+              "borrow_kind": "value",
+              "repr": "\"work/tmp/test_png_out\"",
+              "value": "work/tmp/test_png_out"
+            },
+            "orelse": {
+              "kind": "Constant",
+              "source_span": {
+                "lineno": 10,
+                "col": 74,
+                "end_lineno": 10,
+                "end_col": 88
+              },
+              "casts": [],
+              "borrow_kind": "value",
+              "repr": "\"test_png_out\"",
+              "value": "test_png_out"
+            }
+          },
+          "declare": true
+        },
+        {
+          "kind": "Expr",
+          "source_span": {
+            "lineno": 11,
+            "col": 4,
+            "end_lineno": 11,
+            "end_col": 39
+          },
+          "value": {
+            "kind": "Call",
+            "source_span": {
+              "lineno": 11,
+              "col": 4,
+              "end_lineno": 11,
+              "end_col": 39
+            },
+            "casts": [],
+            "borrow_kind": "value",
+            "repr": "os.makedirs(out_dir, exist_ok=True)",
+            "func": {
+              "kind": "Attribute",
+              "source_span": {
+                "lineno": 11,
+                "col": 4,
+                "end_lineno": 11,
+                "end_col": 15
+              },
+              "casts": [],
+              "borrow_kind": "value",
+              "repr": "os.makedirs",
+              "value": {
+                "kind": "Name",
+                "source_span": {
+                  "lineno": 11,
+                  "col": 4,
+                  "end_lineno": 11,
+                  "end_col": 6
+                },
+                "casts": [],
+                "borrow_kind": "value",
+                "repr": "os",
+                "id": "os"
+              },
+              "attr": "makedirs"
+            },
+            "args": [
+              {
+                "kind": "Name",
+                "source_span": {
+                  "lineno": 11,
+                  "col": 16,
+                  "end_lineno": 11,
+                  "end_col": 23
+                },
+                "casts": [],
+                "borrow_kind": "value",
+                "repr": "out_dir",
+                "id": "out_dir"
+              }
+            ],
+            "keywords": [
+              {
+                "arg": "exist_ok",
+                "value": {
+                  "kind": "Constant",
+                  "source_span": {
+                    "lineno": 11,
+                    "col": 34,
+                    "end_lineno": 11,
+                    "end_col": 38
+                  },
+                  "casts": [],
+                  "borrow_kind": "value",
+                  "repr": "True",
+                  "value": true
+                }
+              }
+            ]
+          }
+        },
+        {
           "kind": "Assign",
           "source_span": {
-            "lineno": 8,
+            "lineno": 12,
             "col": 4,
-            "end_lineno": 8,
+            "end_lineno": 12,
             "end_col": 49
           },
           "target": {
             "kind": "Name",
             "source_span": {
-              "lineno": 8,
+              "lineno": 12,
               "col": 4,
-              "end_lineno": 8,
+              "end_lineno": 12,
               "end_col": 12
             },
             "casts": [],
@@ -88,34 +316,60 @@
             "id": "out_path"
           },
           "value": {
-            "kind": "Constant",
+            "kind": "BinOp",
             "source_span": {
-              "lineno": 8,
+              "lineno": 12,
               "col": 15,
-              "end_lineno": 8,
+              "end_lineno": 12,
               "end_col": 49
             },
             "casts": [],
             "borrow_kind": "value",
-            "repr": "\"out/import_pytra_runtime_png.png\"",
-            "value": "out/import_pytra_runtime_png.png"
+            "repr": "out_dir + \"/pytra_runtime_png.png\"",
+            "left": {
+              "kind": "Name",
+              "source_span": {
+                "lineno": 12,
+                "col": 15,
+                "end_lineno": 12,
+                "end_col": 22
+              },
+              "casts": [],
+              "borrow_kind": "value",
+              "repr": "out_dir",
+              "id": "out_dir"
+            },
+            "op": "Add",
+            "right": {
+              "kind": "Constant",
+              "source_span": {
+                "lineno": 12,
+                "col": 25,
+                "end_lineno": 12,
+                "end_col": 49
+              },
+              "casts": [],
+              "borrow_kind": "value",
+              "repr": "\"/pytra_runtime_png.png\"",
+              "value": "/pytra_runtime_png.png"
+            }
           },
           "declare": true
         },
         {
           "kind": "Assign",
           "source_span": {
-            "lineno": 9,
+            "lineno": 13,
             "col": 4,
-            "end_lineno": 9,
+            "end_lineno": 13,
             "end_col": 75
           },
           "target": {
             "kind": "Name",
             "source_span": {
-              "lineno": 9,
+              "lineno": 13,
               "col": 4,
-              "end_lineno": 9,
+              "end_lineno": 13,
               "end_col": 10
             },
             "casts": [],
@@ -126,9 +380,9 @@
           "value": {
             "kind": "Call",
             "source_span": {
-              "lineno": 9,
+              "lineno": 13,
               "col": 13,
-              "end_lineno": 9,
+              "end_lineno": 13,
               "end_col": 75
             },
             "casts": [],
@@ -137,9 +391,9 @@
             "func": {
               "kind": "Name",
               "source_span": {
-                "lineno": 9,
+                "lineno": 13,
                 "col": 13,
-                "end_lineno": 9,
+                "end_lineno": 13,
                 "end_col": 22
               },
               "casts": [],
@@ -151,9 +405,9 @@
               {
                 "kind": "List",
                 "source_span": {
-                  "lineno": 9,
+                  "lineno": 13,
                   "col": 23,
-                  "end_lineno": 9,
+                  "end_lineno": 13,
                   "end_col": 74
                 },
                 "casts": [],
@@ -163,9 +417,9 @@
                   {
                     "kind": "Constant",
                     "source_span": {
-                      "lineno": 9,
+                      "lineno": 13,
                       "col": 25,
-                      "end_lineno": 9,
+                      "end_lineno": 13,
                       "end_col": 28
                     },
                     "casts": [],
@@ -176,9 +430,9 @@
                   {
                     "kind": "Constant",
                     "source_span": {
-                      "lineno": 9,
+                      "lineno": 13,
                       "col": 30,
-                      "end_lineno": 9,
+                      "end_lineno": 13,
                       "end_col": 31
                     },
                     "casts": [],
@@ -189,9 +443,9 @@
                   {
                     "kind": "Constant",
                     "source_span": {
-                      "lineno": 9,
+                      "lineno": 13,
                       "col": 33,
-                      "end_lineno": 9,
+                      "end_lineno": 13,
                       "end_col": 34
                     },
                     "casts": [],
@@ -202,9 +456,9 @@
                   {
                     "kind": "Constant",
                     "source_span": {
-                      "lineno": 9,
+                      "lineno": 13,
                       "col": 36,
-                      "end_lineno": 9,
+                      "end_lineno": 13,
                       "end_col": 37
                     },
                     "casts": [],
@@ -215,9 +469,9 @@
                   {
                     "kind": "Constant",
                     "source_span": {
-                      "lineno": 9,
+                      "lineno": 13,
                       "col": 39,
-                      "end_lineno": 9,
+                      "end_lineno": 13,
                       "end_col": 42
                     },
                     "casts": [],
@@ -228,9 +482,9 @@
                   {
                     "kind": "Constant",
                     "source_span": {
-                      "lineno": 9,
+                      "lineno": 13,
                       "col": 44,
-                      "end_lineno": 9,
+                      "end_lineno": 13,
                       "end_col": 45
                     },
                     "casts": [],
@@ -241,9 +495,9 @@
                   {
                     "kind": "Constant",
                     "source_span": {
-                      "lineno": 9,
+                      "lineno": 13,
                       "col": 47,
-                      "end_lineno": 9,
+                      "end_lineno": 13,
                       "end_col": 48
                     },
                     "casts": [],
@@ -254,9 +508,9 @@
                   {
                     "kind": "Constant",
                     "source_span": {
-                      "lineno": 9,
+                      "lineno": 13,
                       "col": 50,
-                      "end_lineno": 9,
+                      "end_lineno": 13,
                       "end_col": 51
                     },
                     "casts": [],
@@ -267,9 +521,9 @@
                   {
                     "kind": "Constant",
                     "source_span": {
-                      "lineno": 9,
+                      "lineno": 13,
                       "col": 53,
-                      "end_lineno": 9,
+                      "end_lineno": 13,
                       "end_col": 56
                     },
                     "casts": [],
@@ -280,9 +534,9 @@
                   {
                     "kind": "Constant",
                     "source_span": {
-                      "lineno": 9,
+                      "lineno": 13,
                       "col": 58,
-                      "end_lineno": 9,
+                      "end_lineno": 13,
                       "end_col": 61
                     },
                     "casts": [],
@@ -293,9 +547,9 @@
                   {
                     "kind": "Constant",
                     "source_span": {
-                      "lineno": 9,
+                      "lineno": 13,
                       "col": 63,
-                      "end_lineno": 9,
+                      "end_lineno": 13,
                       "end_col": 66
                     },
                     "casts": [],
@@ -306,9 +560,9 @@
                   {
                     "kind": "Constant",
                     "source_span": {
-                      "lineno": 9,
+                      "lineno": 13,
                       "col": 68,
-                      "end_lineno": 9,
+                      "end_lineno": 13,
                       "end_col": 71
                     },
                     "casts": [],
@@ -326,17 +580,17 @@
         {
           "kind": "Expr",
           "source_span": {
-            "lineno": 15,
+            "lineno": 19,
             "col": 4,
-            "end_lineno": 15,
+            "end_lineno": 19,
             "end_col": 45
           },
           "value": {
             "kind": "Call",
             "source_span": {
-              "lineno": 15,
+              "lineno": 19,
               "col": 4,
-              "end_lineno": 15,
+              "end_lineno": 19,
               "end_col": 45
             },
             "casts": [],
@@ -345,9 +599,9 @@
             "func": {
               "kind": "Attribute",
               "source_span": {
-                "lineno": 15,
+                "lineno": 19,
                 "col": 4,
-                "end_lineno": 15,
+                "end_lineno": 19,
                 "end_col": 21
               },
               "casts": [],
@@ -356,9 +610,9 @@
               "value": {
                 "kind": "Name",
                 "source_span": {
-                  "lineno": 15,
+                  "lineno": 19,
                   "col": 4,
-                  "end_lineno": 15,
+                  "end_lineno": 19,
                   "end_col": 7
                 },
                 "casts": [],
@@ -372,9 +626,9 @@
               {
                 "kind": "Name",
                 "source_span": {
-                  "lineno": 15,
+                  "lineno": 19,
                   "col": 22,
-                  "end_lineno": 15,
+                  "end_lineno": 19,
                   "end_col": 30
                 },
                 "casts": [],
@@ -385,9 +639,9 @@
               {
                 "kind": "Constant",
                 "source_span": {
-                  "lineno": 15,
+                  "lineno": 19,
                   "col": 32,
-                  "end_lineno": 15,
+                  "end_lineno": 19,
                   "end_col": 33
                 },
                 "casts": [],
@@ -398,9 +652,9 @@
               {
                 "kind": "Constant",
                 "source_span": {
-                  "lineno": 15,
+                  "lineno": 19,
                   "col": 35,
-                  "end_lineno": 15,
+                  "end_lineno": 19,
                   "end_col": 36
                 },
                 "casts": [],
@@ -411,9 +665,9 @@
               {
                 "kind": "Name",
                 "source_span": {
-                  "lineno": 15,
+                  "lineno": 19,
                   "col": 38,
-                  "end_lineno": 15,
+                  "end_lineno": 19,
                   "end_col": 44
                 },
                 "casts": [],
@@ -450,17 +704,17 @@
         {
           "kind": "AnnAssign",
           "source_span": {
-            "lineno": 16,
+            "lineno": 20,
             "col": 4,
-            "end_lineno": 16,
+            "end_lineno": 20,
             "end_col": 28
           },
           "target": {
             "kind": "Name",
             "source_span": {
-              "lineno": 16,
+              "lineno": 20,
               "col": 4,
-              "end_lineno": 16,
+              "end_lineno": 20,
               "end_col": 11
             },
             "casts": [],
@@ -472,9 +726,9 @@
           "value": {
             "kind": "List",
             "source_span": {
-              "lineno": 16,
+              "lineno": 20,
               "col": 26,
-              "end_lineno": 16,
+              "end_lineno": 20,
               "end_col": 28
             },
             "casts": [],
@@ -487,17 +741,17 @@
         {
           "kind": "Expr",
           "source_span": {
-            "lineno": 17,
+            "lineno": 21,
             "col": 4,
-            "end_lineno": 17,
+            "end_lineno": 21,
             "end_col": 66
           },
           "value": {
             "kind": "Call",
             "source_span": {
-              "lineno": 17,
+              "lineno": 21,
               "col": 4,
-              "end_lineno": 17,
+              "end_lineno": 21,
               "end_col": 66
             },
             "casts": [],
@@ -506,9 +760,9 @@
             "func": {
               "kind": "Attribute",
               "source_span": {
-                "lineno": 17,
+                "lineno": 21,
                 "col": 4,
-                "end_lineno": 17,
+                "end_lineno": 21,
                 "end_col": 18
               },
               "casts": [],
@@ -517,9 +771,9 @@
               "value": {
                 "kind": "Name",
                 "source_span": {
-                  "lineno": 17,
+                  "lineno": 21,
                   "col": 4,
-                  "end_lineno": 17,
+                  "end_lineno": 21,
                   "end_col": 11
                 },
                 "casts": [],
@@ -533,9 +787,9 @@
               {
                 "kind": "Call",
                 "source_span": {
-                  "lineno": 17,
+                  "lineno": 21,
                   "col": 19,
-                  "end_lineno": 17,
+                  "end_lineno": 21,
                   "end_col": 65
                 },
                 "casts": [],
@@ -544,9 +798,9 @@
                 "func": {
                   "kind": "Name",
                   "source_span": {
-                    "lineno": 17,
+                    "lineno": 21,
                     "col": 19,
-                    "end_lineno": 17,
+                    "end_lineno": 21,
                     "end_col": 31
                   },
                   "casts": [],
@@ -558,9 +812,9 @@
                   {
                     "kind": "Call",
                     "source_span": {
-                      "lineno": 17,
+                      "lineno": 21,
                       "col": 32,
-                      "end_lineno": 17,
+                      "end_lineno": 21,
                       "end_col": 43
                     },
                     "casts": [],
@@ -569,9 +823,9 @@
                     "func": {
                       "kind": "Name",
                       "source_span": {
-                        "lineno": 17,
+                        "lineno": 21,
                         "col": 32,
-                        "end_lineno": 17,
+                        "end_lineno": 21,
                         "end_col": 35
                       },
                       "casts": [],
@@ -583,9 +837,9 @@
                       {
                         "kind": "Name",
                         "source_span": {
-                          "lineno": 17,
+                          "lineno": 21,
                           "col": 36,
-                          "end_lineno": 17,
+                          "end_lineno": 21,
                           "end_col": 42
                         },
                         "casts": [],
@@ -599,9 +853,9 @@
                   {
                     "kind": "Constant",
                     "source_span": {
-                      "lineno": 17,
+                      "lineno": 21,
                       "col": 45,
-                      "end_lineno": 17,
+                      "end_lineno": 21,
                       "end_col": 47
                     },
                     "casts": [],
@@ -612,9 +866,9 @@
                   {
                     "kind": "Constant",
                     "source_span": {
-                      "lineno": 17,
+                      "lineno": 21,
                       "col": 49,
-                      "end_lineno": 17,
+                      "end_lineno": 21,
                       "end_col": 64
                     },
                     "casts": [],
@@ -632,17 +886,17 @@
         {
           "kind": "Expr",
           "source_span": {
-            "lineno": 18,
+            "lineno": 22,
             "col": 4,
-            "end_lineno": 18,
+            "end_lineno": 22,
             "end_col": 60
           },
           "value": {
             "kind": "Call",
             "source_span": {
-              "lineno": 18,
+              "lineno": 22,
               "col": 4,
-              "end_lineno": 18,
+              "end_lineno": 22,
               "end_col": 60
             },
             "casts": [],
@@ -651,9 +905,9 @@
             "func": {
               "kind": "Attribute",
               "source_span": {
-                "lineno": 18,
+                "lineno": 22,
                 "col": 4,
-                "end_lineno": 18,
+                "end_lineno": 22,
                 "end_col": 18
               },
               "casts": [],
@@ -662,9 +916,9 @@
               "value": {
                 "kind": "Name",
                 "source_span": {
-                  "lineno": 18,
+                  "lineno": 22,
                   "col": 4,
-                  "end_lineno": 18,
+                  "end_lineno": 22,
                   "end_col": 11
                 },
                 "casts": [],
@@ -678,9 +932,9 @@
               {
                 "kind": "Call",
                 "source_span": {
-                  "lineno": 18,
+                  "lineno": 22,
                   "col": 19,
-                  "end_lineno": 18,
+                  "end_lineno": 22,
                   "end_col": 59
                 },
                 "casts": [],
@@ -689,9 +943,9 @@
                 "func": {
                   "kind": "Name",
                   "source_span": {
-                    "lineno": 18,
+                    "lineno": 22,
                     "col": 19,
-                    "end_lineno": 18,
+                    "end_lineno": 22,
                     "end_col": 33
                   },
                   "casts": [],
@@ -703,9 +957,9 @@
                   {
                     "kind": "Constant",
                     "source_span": {
-                      "lineno": 18,
+                      "lineno": 22,
                       "col": 34,
-                      "end_lineno": 18,
+                      "end_lineno": 22,
                       "end_col": 38
                     },
                     "casts": [],
@@ -716,9 +970,9 @@
                   {
                     "kind": "Constant",
                     "source_span": {
-                      "lineno": 18,
+                      "lineno": 22,
                       "col": 40,
-                      "end_lineno": 18,
+                      "end_lineno": 22,
                       "end_col": 58
                     },
                     "casts": [],
@@ -736,17 +990,17 @@
         {
           "kind": "Expr",
           "source_span": {
-            "lineno": 19,
+            "lineno": 23,
             "col": 4,
-            "end_lineno": 19,
+            "end_lineno": 23,
             "end_col": 61
           },
           "value": {
             "kind": "Call",
             "source_span": {
-              "lineno": 19,
+              "lineno": 23,
               "col": 4,
-              "end_lineno": 19,
+              "end_lineno": 23,
               "end_col": 61
             },
             "casts": [],
@@ -755,9 +1009,9 @@
             "func": {
               "kind": "Name",
               "source_span": {
-                "lineno": 19,
+                "lineno": 23,
                 "col": 4,
-                "end_lineno": 19,
+                "end_lineno": 23,
                 "end_col": 9
               },
               "casts": [],
@@ -769,9 +1023,9 @@
               {
                 "kind": "Call",
                 "source_span": {
-                  "lineno": 19,
+                  "lineno": 23,
                   "col": 10,
-                  "end_lineno": 19,
+                  "end_lineno": 23,
                   "end_col": 60
                 },
                 "casts": [],
@@ -780,9 +1034,9 @@
                 "func": {
                   "kind": "Name",
                   "source_span": {
-                    "lineno": 19,
+                    "lineno": 23,
                     "col": 10,
-                    "end_lineno": 19,
+                    "end_lineno": 23,
                     "end_col": 23
                   },
                   "casts": [],
@@ -794,9 +1048,9 @@
                   {
                     "kind": "Name",
                     "source_span": {
-                      "lineno": 19,
+                      "lineno": 23,
                       "col": 24,
-                      "end_lineno": 19,
+                      "end_lineno": 23,
                       "end_col": 31
                     },
                     "casts": [],
@@ -807,9 +1061,9 @@
                   {
                     "kind": "Constant",
                     "source_span": {
-                      "lineno": 19,
+                      "lineno": 23,
                       "col": 33,
-                      "end_lineno": 19,
+                      "end_lineno": 23,
                       "end_col": 59
                     },
                     "casts": [],
@@ -833,9 +1087,9 @@
     {
       "kind": "FunctionDef",
       "source_span": {
-        "lineno": 22,
+        "lineno": 26,
         "col": 0,
-        "end_lineno": 23,
+        "end_lineno": 27,
         "end_col": 14
       },
       "name": "_case_main",
@@ -851,17 +1105,17 @@
         {
           "kind": "Expr",
           "source_span": {
-            "lineno": 23,
+            "lineno": 27,
             "col": 4,
-            "end_lineno": 23,
+            "end_lineno": 27,
             "end_col": 14
           },
           "value": {
             "kind": "Call",
             "source_span": {
-              "lineno": 23,
+              "lineno": 27,
               "col": 4,
-              "end_lineno": 23,
+              "end_lineno": 27,
               "end_col": 14
             },
             "casts": [],
@@ -870,9 +1124,9 @@
             "func": {
               "kind": "Name",
               "source_span": {
-                "lineno": 23,
+                "lineno": 27,
                 "col": 4,
-                "end_lineno": 23,
+                "end_lineno": 27,
                 "end_col": 12
               },
               "casts": [],
@@ -895,17 +1149,17 @@
     {
       "kind": "Expr",
       "source_span": {
-        "lineno": 27,
+        "lineno": 31,
         "col": 4,
-        "end_lineno": 27,
+        "end_lineno": 31,
         "end_col": 16
       },
       "value": {
         "kind": "Call",
         "source_span": {
-          "lineno": 27,
+          "lineno": 31,
           "col": 4,
-          "end_lineno": 27,
+          "end_lineno": 31,
           "end_col": 16
         },
         "casts": [],
@@ -914,9 +1168,9 @@
         "func": {
           "kind": "Name",
           "source_span": {
-            "lineno": 27,
+            "lineno": 31,
             "col": 4,
-            "end_lineno": 27,
+            "end_lineno": 31,
             "end_col": 14
           },
           "casts": [],
@@ -934,12 +1188,28 @@
     "import_resolution": {
       "bindings": [
         {
+          "module_id": "pytra.std.env",
+          "export_name": "",
+          "local_name": "env",
+          "binding_kind": "module",
+          "source_file": "test/fixture/source/py/stdlib/pytra_runtime_png.py",
+          "source_line": 3
+        },
+        {
+          "module_id": "pytra.std.os",
+          "export_name": "",
+          "local_name": "os",
+          "binding_kind": "module",
+          "source_file": "test/fixture/source/py/stdlib/pytra_runtime_png.py",
+          "source_line": 4
+        },
+        {
           "module_id": "pytra.utils.png",
           "export_name": "",
           "local_name": "png",
           "binding_kind": "module",
           "source_file": "test/fixture/source/py/stdlib/pytra_runtime_png.py",
-          "source_line": 3
+          "source_line": 5
         },
         {
           "module_id": "pytra.utils.assertions",
@@ -947,7 +1217,7 @@
           "local_name": "py_assert_all",
           "binding_kind": "symbol",
           "source_file": "test/fixture/source/py/stdlib/pytra_runtime_png.py",
-          "source_line": 4
+          "source_line": 6
         },
         {
           "module_id": "pytra.utils.assertions",
@@ -955,7 +1225,7 @@
           "local_name": "py_assert_eq",
           "binding_kind": "symbol",
           "source_file": "test/fixture/source/py/stdlib/pytra_runtime_png.py",
-          "source_line": 4
+          "source_line": 6
         },
         {
           "module_id": "pytra.utils.assertions",
@@ -963,7 +1233,7 @@
           "local_name": "py_assert_true",
           "binding_kind": "symbol",
           "source_file": "test/fixture/source/py/stdlib/pytra_runtime_png.py",
-          "source_line": 4
+          "source_line": 6
         }
       ],
       "qualified_refs": [
@@ -986,12 +1256,28 @@
     },
     "import_bindings": [
       {
+        "module_id": "pytra.std.env",
+        "export_name": "",
+        "local_name": "env",
+        "binding_kind": "module",
+        "source_file": "test/fixture/source/py/stdlib/pytra_runtime_png.py",
+        "source_line": 3
+      },
+      {
+        "module_id": "pytra.std.os",
+        "export_name": "",
+        "local_name": "os",
+        "binding_kind": "module",
+        "source_file": "test/fixture/source/py/stdlib/pytra_runtime_png.py",
+        "source_line": 4
+      },
+      {
         "module_id": "pytra.utils.png",
         "export_name": "",
         "local_name": "png",
         "binding_kind": "module",
         "source_file": "test/fixture/source/py/stdlib/pytra_runtime_png.py",
-        "source_line": 3
+        "source_line": 5
       },
       {
         "module_id": "pytra.utils.assertions",
@@ -999,7 +1285,7 @@
         "local_name": "py_assert_all",
         "binding_kind": "symbol",
         "source_file": "test/fixture/source/py/stdlib/pytra_runtime_png.py",
-        "source_line": 4
+        "source_line": 6
       },
       {
         "module_id": "pytra.utils.assertions",
@@ -1007,7 +1293,7 @@
         "local_name": "py_assert_eq",
         "binding_kind": "symbol",
         "source_file": "test/fixture/source/py/stdlib/pytra_runtime_png.py",
-        "source_line": 4
+        "source_line": 6
       },
       {
         "module_id": "pytra.utils.assertions",
@@ -1015,7 +1301,7 @@
         "local_name": "py_assert_true",
         "binding_kind": "symbol",
         "source_file": "test/fixture/source/py/stdlib/pytra_runtime_png.py",
-        "source_line": 4
+        "source_line": 6
       }
     ],
     "qualified_symbol_refs": [
@@ -1036,6 +1322,8 @@
       }
     ],
     "import_modules": {
+      "env": "pytra.std.env",
+      "os": "pytra.std.os",
       "png": "pytra.utils.png"
     },
     "import_symbols": {

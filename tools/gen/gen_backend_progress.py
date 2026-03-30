@@ -26,6 +26,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 FIXTURE_ROOT = ROOT / "test" / "fixture" / "source" / "py"
 SAMPLE_ROOT = ROOT / "sample" / "py"
+STDLIB_ROOT = ROOT / "test" / "stdlib" / "source" / "py"
 PARITY_DIR = ROOT / ".parity-results"
 
 PARITY_LANGS = [
@@ -95,6 +96,22 @@ def _collect_sample_cases() -> list[str]:
     return out
 
 
+def _collect_stdlib_cases() -> list[tuple[str, str]]:
+    """Return (module, stem) pairs sorted by module then stem."""
+    out: list[tuple[str, str]] = []
+    if not STDLIB_ROOT.exists():
+        return out
+    for mod_dir in sorted(STDLIB_ROOT.iterdir()):
+        if not mod_dir.is_dir():
+            continue
+        for f in sorted(mod_dir.glob("*.py")):
+            stem = f.stem
+            if stem == "__init__":
+                continue
+            out.append((mod_dir.name, stem))
+    return out
+
+
 # ---------------------------------------------------------------------------
 # Load parity results
 # ---------------------------------------------------------------------------
@@ -114,6 +131,19 @@ def _load_results(case_root: str) -> dict[str, dict[str, dict[str, object]]]:
         except Exception:
             data[lang] = {}
     return data
+
+
+def _load_lint_results() -> dict[str, int | None]:
+    """Return {lang: total_violations | None}. None = not implemented."""
+    path = PARITY_DIR / "emitter_lint.json"
+    if not path.exists():
+        return {}
+    try:
+        doc = json.loads(path.read_text(encoding="utf-8"))
+        langs = doc.get("langs", {})
+        return {k: (None if v is None else int(v)) for k, v in langs.items()}
+    except Exception:
+        return {}
 
 
 def _load_selfhost_results() -> dict[str, dict[str, object]]:
@@ -440,21 +470,277 @@ def _build_selfhost_matrix_en(selfhost_data: dict[str, dict[str, object]]) -> li
     return lines
 
 
+def _parity_summary_icon(results: dict[str, dict[str, dict[str, object]]], lang: str, case_stems: set[str]) -> str:
+    """Icon for one parity column in the summary: PASS if all tested cases pass, else FAIL or UNTESTED."""
+    lang_data = results.get(lang, {})
+    tested = [lang_data[s] for s in case_stems if s in lang_data]
+    if not tested:
+        return "⬜"
+    if all(_case_icon(str(e.get("category", ""))) == "🟩" for e in tested):
+        return "🟩"
+    return "🟥"
+
+
+def _lint_icon(violations: int | None) -> str:
+    if violations is None:
+        return "⬜"
+    return "🟩" if violations == 0 else "🟥"
+
+
+def _build_summary_matrix(
+    fixture_cases: list[tuple[str, str]],
+    sample_cases: list[str],
+    stdlib_cases: list[tuple[str, str]],
+    fixture_results: dict[str, dict[str, dict[str, object]]],
+    sample_results: dict[str, dict[str, dict[str, object]]],
+    stdlib_results: dict[str, dict[str, dict[str, object]]],
+    selfhost_data: dict[str, dict[str, object]],
+    lint_results: dict[str, int | None],
+) -> list[str]:
+    """Build JA summary matrix: each language × {fixture, sample, stdlib, selfhost, lint}."""
+    fixture_stems = {stem for _, stem in fixture_cases}
+    sample_stems = set(sample_cases)
+    stdlib_stems = {stem for _, stem in stdlib_cases}
+    python_doc = selfhost_data.get("python", {})
+
+    lines: list[str] = []
+    lines.append("| 言語 | fixture | sample | stdlib | selfhost | emitter lint |")
+    lines.append("|---|:---:|:---:|:---:|:---:|:---:|")
+
+    for lang in PARITY_LANGS:
+        fix_icon  = _parity_summary_icon(fixture_results, lang, fixture_stems)
+        smp_icon  = _parity_summary_icon(sample_results, lang, sample_stems)
+        std_icon  = _parity_summary_icon(stdlib_results, lang, stdlib_stems)
+        sh_icon   = _selfhost_stage_icon(python_doc, lang)
+        lint_icon = _lint_icon(lint_results.get(lang))
+        lines.append(f"| {_col_name(lang)} | {fix_icon} | {smp_icon} | {std_icon} | {sh_icon} | {lint_icon} |")
+
+    return lines
+
+
+def _build_summary_matrix_en(
+    fixture_cases: list[tuple[str, str]],
+    sample_cases: list[str],
+    stdlib_cases: list[tuple[str, str]],
+    fixture_results: dict[str, dict[str, dict[str, object]]],
+    sample_results: dict[str, dict[str, dict[str, object]]],
+    stdlib_results: dict[str, dict[str, dict[str, object]]],
+    selfhost_data: dict[str, dict[str, object]],
+    lint_results: dict[str, int | None],
+) -> list[str]:
+    """English version of _build_summary_matrix."""
+    fixture_stems = {stem for _, stem in fixture_cases}
+    sample_stems = set(sample_cases)
+    stdlib_stems = {stem for _, stem in stdlib_cases}
+    python_doc = selfhost_data.get("python", {})
+
+    lines: list[str] = []
+    lines.append("| Lang | fixture | sample | stdlib | selfhost | emitter lint |")
+    lines.append("|---|:---:|:---:|:---:|:---:|:---:|")
+
+    for lang in PARITY_LANGS:
+        fix_icon  = _parity_summary_icon(fixture_results, lang, fixture_stems)
+        smp_icon  = _parity_summary_icon(sample_results, lang, sample_stems)
+        std_icon  = _parity_summary_icon(stdlib_results, lang, stdlib_stems)
+        sh_icon   = _selfhost_stage_icon(python_doc, lang)
+        lint_icon = _lint_icon(lint_results.get(lang))
+        lines.append(f"| {_col_name(lang)} | {fix_icon} | {smp_icon} | {std_icon} | {sh_icon} | {lint_icon} |")
+
+    return lines
+
+
+def _build_stdlib_matrix(cases: list[tuple[str, str]], results: dict[str, dict[str, dict[str, object]]]) -> list[str]:
+    """Build JA markdown table rows for stdlib module × language matrix.
+
+    PASS (🟩): all cases in the module passed for this language.
+    FAIL (🟥): at least one case in the module failed.
+    UNTESTED (⬜): no parity data for any case in the module.
+    """
+    lang_list = PARITY_LANGS
+    lines: list[str] = []
+    lines.append(f"| モジュール | {' | '.join(_col_name(l) for l in lang_list)} |")
+    lines.append(f"|---|{'|'.join(['---:'] * len(lang_list))}|")
+
+    # Group cases by module
+    from collections import defaultdict
+    module_stems: dict[str, list[str]] = defaultdict(list)
+    for mod, stem in cases:
+        module_stems[mod].append(stem)
+
+    ok_cells_total = [0] * len(lang_list)
+    fail_cells_total = [0] * len(lang_list)
+    untested_cells_total = [0] * len(lang_list)
+
+    for mod in sorted(module_stems.keys()):
+        stems = module_stems[mod]
+        cells = []
+        for i, lang in enumerate(lang_list):
+            lang_results = results.get(lang, {})
+            ok_count = sum(1 for s in stems if _case_icon(str(lang_results.get(s, {}).get("category", ""))) == "🟩" and s in lang_results)
+            fail_count = sum(1 for s in stems if _case_icon(str(lang_results.get(s, {}).get("category", ""))) == "🟥" and s in lang_results)
+            if fail_count > 0:
+                cells.append("🟥")
+                fail_cells_total[i] += 1
+            elif ok_count > 0:
+                cells.append("🟩")
+                ok_cells_total[i] += 1
+            else:
+                cells.append("⬜")
+                untested_cells_total[i] += 1
+        lines.append(f"| {mod} | {' | '.join(cells)} |")
+
+    ok_cells = [str(v) if v > 0 else "—" for v in ok_cells_total]
+    fail_cells = [str(v) if v > 0 else "—" for v in fail_cells_total]
+    untested_cells = [str(v) if v > 0 else "—" for v in untested_cells_total]
+    lines.append(f"| **🟩 PASS** | {' | '.join(ok_cells)} |")
+    lines.append(f"| **🟥 FAIL** | {' | '.join(fail_cells)} |")
+    lines.append(f"| **⬜ 未実行** | {' | '.join(untested_cells)} |")
+    return lines
+
+
+def _build_stdlib_matrix_en(cases: list[tuple[str, str]], results: dict[str, dict[str, dict[str, object]]]) -> list[str]:
+    """English version of _build_stdlib_matrix."""
+    lang_list = PARITY_LANGS
+    lines: list[str] = []
+    lines.append(f"| Module | {' | '.join(_col_name(l) for l in lang_list)} |")
+    lines.append(f"|---|{'|'.join(['---:'] * len(lang_list))}|")
+
+    from collections import defaultdict
+    module_stems: dict[str, list[str]] = defaultdict(list)
+    for mod, stem in cases:
+        module_stems[mod].append(stem)
+
+    ok_cells_total = [0] * len(lang_list)
+    fail_cells_total = [0] * len(lang_list)
+    untested_cells_total = [0] * len(lang_list)
+
+    for mod in sorted(module_stems.keys()):
+        stems = module_stems[mod]
+        cells = []
+        for i, lang in enumerate(lang_list):
+            lang_results = results.get(lang, {})
+            ok_count = sum(1 for s in stems if _case_icon(str(lang_results.get(s, {}).get("category", ""))) == "🟩" and s in lang_results)
+            fail_count = sum(1 for s in stems if _case_icon(str(lang_results.get(s, {}).get("category", ""))) == "🟥" and s in lang_results)
+            if fail_count > 0:
+                cells.append("🟥")
+                fail_cells_total[i] += 1
+            elif ok_count > 0:
+                cells.append("🟩")
+                ok_cells_total[i] += 1
+            else:
+                cells.append("⬜")
+                untested_cells_total[i] += 1
+        lines.append(f"| {mod} | {' | '.join(cells)} |")
+
+    ok_cells = [str(v) if v > 0 else "—" for v in ok_cells_total]
+    fail_cells = [str(v) if v > 0 else "—" for v in fail_cells_total]
+    untested_cells = [str(v) if v > 0 else "—" for v in untested_cells_total]
+    lines.append(f"| **🟩 PASS** | {' | '.join(ok_cells)} |")
+    lines.append(f"| **🟥 FAIL** | {' | '.join(fail_cells)} |")
+    lines.append(f"| **⬜ Untested** | {' | '.join(untested_cells)} |")
+    return lines
+
+
 # ---------------------------------------------------------------------------
 # Document generation
 # ---------------------------------------------------------------------------
 
+def _render_ja_summary(
+    fixture_cases: list[tuple[str, str]],
+    sample_cases: list[str],
+    stdlib_cases: list[tuple[str, str]],
+    fixture_results: dict[str, dict[str, dict[str, object]]],
+    sample_results: dict[str, dict[str, dict[str, object]]],
+    stdlib_results: dict[str, dict[str, dict[str, object]]],
+    selfhost_data: dict[str, dict[str, object]],
+    lint_results: dict[str, int | None],
+    generated_at: str,
+) -> str:
+    lines: list[str] = [
+        '<a href="../../en/progress/backend-progress-summary.md">',
+        '  <img alt="Read in English" src="https://img.shields.io/badge/docs-English-2563EB?style=flat-square">',
+        "</a>",
+        "",
+        "# バックエンド全体サマリ",
+        "",
+        f"> 機械生成ファイル。`python3 tools/gen/gen_backend_progress.py` で更新する。",
+        f"> 生成日時: {generated_at}",
+        "> [関連リンク](./index.md)",
+        "",
+        "各言語の fixture / sample / stdlib / selfhost / emitter lint の状況を一覧表示する。",
+        "",
+        "| アイコン | 意味 |",
+        "|---|---|",
+        "| 🟩 | PASS |",
+        "| 🟥 | FAIL（1件以上） |",
+        "| ⬜ | 未実行 |",
+        "",
+    ]
+    lines += _build_summary_matrix(
+        fixture_cases, sample_cases, stdlib_cases,
+        fixture_results, sample_results, stdlib_results,
+        selfhost_data, lint_results,
+    )
+    lines.append("")
+    return "\n".join(lines)
+
+
+def _render_en_summary(
+    fixture_cases: list[tuple[str, str]],
+    sample_cases: list[str],
+    stdlib_cases: list[tuple[str, str]],
+    fixture_results: dict[str, dict[str, dict[str, object]]],
+    sample_results: dict[str, dict[str, dict[str, object]]],
+    stdlib_results: dict[str, dict[str, dict[str, object]]],
+    selfhost_data: dict[str, dict[str, object]],
+    lint_results: dict[str, int | None],
+    generated_at: str,
+) -> str:
+    lines: list[str] = [
+        '<a href="../../ja/progress/backend-progress-summary.md">',
+        '  <img alt="日本語で読む" src="https://img.shields.io/badge/docs-日本語-DC2626?style=flat-square">',
+        "</a>",
+        "",
+        "# Backend overall summary",
+        "",
+        f"> Machine-generated file. Run `python3 tools/gen/gen_backend_progress.py` to update.",
+        f"> Generated at: {generated_at}",
+        "> [Links](./index.md)",
+        "",
+        "Overview of fixture / sample / stdlib / selfhost / emitter lint status per language.",
+        "",
+        "| Icon | Meaning |",
+        "|---|---|",
+        "| 🟩 | PASS |",
+        "| 🟥 | FAIL (at least one) |",
+        "| ⬜ | Not run |",
+        "",
+    ]
+    lines += _build_summary_matrix_en(
+        fixture_cases, sample_cases, stdlib_cases,
+        fixture_results, sample_results, stdlib_results,
+        selfhost_data, lint_results,
+    )
+    lines.append("")
+    return "\n".join(lines)
+
+
 def _render_ja(
     fixture_cases: list[tuple[str, str]],
     sample_cases: list[str],
+    stdlib_cases: list[tuple[str, str]],
     fixture_results: dict[str, dict[str, dict[str, object]]],
     sample_results: dict[str, dict[str, dict[str, object]]],
+    stdlib_results: dict[str, dict[str, dict[str, object]]],
     selfhost_data: dict[str, dict[str, object]],
+    lint_results: dict[str, int | None],
     generated_at: str,
-) -> str:
+) -> dict[str, str]:
     return {
+        "summary": _render_ja_summary(fixture_cases, sample_cases, stdlib_cases, fixture_results, sample_results, stdlib_results, selfhost_data, lint_results, generated_at),
         "fixture": _render_ja_fixture(fixture_cases, fixture_results, generated_at),
         "sample": _render_ja_sample(sample_cases, sample_results, generated_at),
+        "stdlib": _render_ja_stdlib(stdlib_cases, stdlib_results, generated_at),
         "selfhost": _render_ja_selfhost(selfhost_data, generated_at),
     }
 
@@ -507,6 +793,33 @@ def _render_ja_sample(sample_cases: list[str], sample_results: dict, generated_a
     return "\n".join(lines)
 
 
+def _render_ja_stdlib(stdlib_cases: list[tuple[str, str]], stdlib_results: dict, generated_at: str) -> str:
+    lines: list[str] = [
+        '<a href="../../en/progress/backend-progress-stdlib.md">',
+        '  <img alt="Read in English" src="https://img.shields.io/badge/docs-English-2563EB?style=flat-square">',
+        "</a>",
+        "",
+        "# stdlib parity マトリクス",
+        "",
+        f"> 機械生成ファイル。`python3 tools/gen/gen_backend_progress.py` で更新する。",
+        f"> 生成日時: {generated_at}",
+        "> [関連リンク](./index.md)",
+        "",
+        "各 stdlib モジュールのテストが各言語で parity PASS しているかを示す。",
+        "モジュール内のテストが1件でも FAIL なら 🟥 。",
+        "",
+        "| アイコン | 意味 |",
+        "|---|---|",
+        "| 🟩 | PASS（モジュール内全ケースが emit + compile + run + stdout 一致） |",
+        "| 🟥 | FAIL（1件以上 FAIL） |",
+        "| ⬜ | 未実行 |",
+        "",
+    ]
+    lines += _build_stdlib_matrix(stdlib_cases, stdlib_results)
+    lines.append("")
+    return "\n".join(lines)
+
+
 def _render_ja_selfhost(selfhost_data: dict, generated_at: str) -> str:
     lines: list[str] = [
         '<a href="../../en/progress/backend-progress-selfhost.md">',
@@ -536,14 +849,19 @@ def _render_ja_selfhost(selfhost_data: dict, generated_at: str) -> str:
 def _render_en(
     fixture_cases: list[tuple[str, str]],
     sample_cases: list[str],
+    stdlib_cases: list[tuple[str, str]],
     fixture_results: dict[str, dict[str, dict[str, object]]],
     sample_results: dict[str, dict[str, dict[str, object]]],
+    stdlib_results: dict[str, dict[str, dict[str, object]]],
     selfhost_data: dict[str, dict[str, object]],
+    lint_results: dict[str, int | None],
     generated_at: str,
-) -> str:
+) -> dict[str, str]:
     return {
+        "summary": _render_en_summary(fixture_cases, sample_cases, stdlib_cases, fixture_results, sample_results, stdlib_results, selfhost_data, lint_results, generated_at),
         "fixture": _render_en_fixture(fixture_cases, fixture_results, generated_at),
         "sample": _render_en_sample(sample_cases, sample_results, generated_at),
+        "stdlib": _render_en_stdlib(stdlib_cases, stdlib_results, generated_at),
         "selfhost": _render_en_selfhost(selfhost_data, generated_at),
     }
 
@@ -596,6 +914,33 @@ def _render_en_sample(sample_cases: list[str], sample_results: dict, generated_a
     return "\n".join(lines)
 
 
+def _render_en_stdlib(stdlib_cases: list[tuple[str, str]], stdlib_results: dict, generated_at: str) -> str:
+    lines: list[str] = [
+        '<a href="../../ja/progress/backend-progress-stdlib.md">',
+        '  <img alt="日本語で読む" src="https://img.shields.io/badge/docs-日本語-DC2626?style=flat-square">',
+        "</a>",
+        "",
+        "# stdlib parity matrix",
+        "",
+        f"> Machine-generated file. Run `python3 tools/gen/gen_backend_progress.py` to update.",
+        f"> Generated at: {generated_at}",
+        "> [Links](./index.md)",
+        "",
+        "Shows whether each stdlib module's tests pass parity for each target language.",
+        "If any test in the module fails, the module cell shows 🟥.",
+        "",
+        "| Icon | Meaning |",
+        "|---|---|",
+        "| 🟩 | PASS (all cases in module: emit + compile + run + stdout match) |",
+        "| 🟥 | FAIL (at least one case failed) |",
+        "| ⬜ | Not run |",
+        "",
+    ]
+    lines += _build_stdlib_matrix_en(stdlib_cases, stdlib_results)
+    lines.append("")
+    return "\n".join(lines)
+
+
 def _render_en_selfhost(selfhost_data: dict, generated_at: str) -> str:
     lines: list[str] = [
         '<a href="../../ja/progress/backend-progress-selfhost.md">',
@@ -629,32 +974,40 @@ def _render_en_selfhost(selfhost_data: dict, generated_at: str) -> str:
 def main() -> int:
     fixture_cases = _collect_fixture_cases()
     sample_cases = _collect_sample_cases()
+    stdlib_cases = _collect_stdlib_cases()
     fixture_results = _load_results("fixture")
     sample_results = _load_results("sample")
+    stdlib_results = _load_results("stdlib")
     selfhost_data = _load_selfhost_results()
+    lint_results = _load_lint_results()
 
     generated_at = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
 
-    ja_pages = _render_ja(fixture_cases, sample_cases, fixture_results, sample_results, selfhost_data, generated_at)
-    en_pages = _render_en(fixture_cases, sample_cases, fixture_results, sample_results, selfhost_data, generated_at)
+    ja_pages = _render_ja(fixture_cases, sample_cases, stdlib_cases, fixture_results, sample_results, stdlib_results, selfhost_data, lint_results, generated_at)
+    en_pages = _render_en(fixture_cases, sample_cases, stdlib_cases, fixture_results, sample_results, stdlib_results, selfhost_data, lint_results, generated_at)
 
     ja_dir = ROOT / "docs" / "ja" / "progress"
     en_dir = ROOT / "docs" / "en" / "progress"
     ja_dir.mkdir(parents=True, exist_ok=True)
     en_dir.mkdir(parents=True, exist_ok=True)
 
-    for key in ("fixture", "sample", "selfhost"):
+    for key in ("summary", "fixture", "sample", "stdlib", "selfhost"):
         (ja_dir / f"backend-progress-{key}.md").write_text(ja_pages[key], encoding="utf-8")
         (en_dir / f"backend-progress-{key}.md").write_text(en_pages[key], encoding="utf-8")
 
-    for key in ("fixture", "sample", "selfhost"):
+    for key in ("summary", "fixture", "sample", "stdlib", "selfhost"):
         print(f"[OK] {ja_dir / f'backend-progress-{key}.md'}")
         print(f"[OK] {en_dir / f'backend-progress-{key}.md'}")
 
     # Warn about stale keys in parity results
     fixture_stems = {stem for _, stem in fixture_cases}
     sample_stems = set(sample_cases)
-    for label, stems, res in (("fixture", fixture_stems, fixture_results), ("sample", sample_stems, sample_results)):
+    stdlib_stems = {stem for _, stem in stdlib_cases}
+    for label, stems, res in (
+        ("fixture", fixture_stems, fixture_results),
+        ("sample", sample_stems, sample_results),
+        ("stdlib", stdlib_stems, stdlib_results),
+    ):
         for lang, lang_data in res.items():
             extra = set(lang_data.keys()) - stems
             if len(extra) > 0:

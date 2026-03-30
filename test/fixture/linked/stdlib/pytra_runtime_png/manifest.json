@@ -39,6 +39,30 @@
       "module_kind": "runtime"
     },
     {
+      "module_id": "pytra.std.env",
+      "input": "/workspace/Pytra/src/runtime/east/std/env.east",
+      "output": "east3/pytra/std/env.east3.json",
+      "source_path": "src/pytra/std/env.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    },
+    {
+      "module_id": "pytra.std.os",
+      "input": "/workspace/Pytra/src/runtime/east/std/os.east",
+      "output": "east3/pytra/std/os.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/std/os.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    },
+    {
+      "module_id": "pytra.std.os_path",
+      "input": "/workspace/Pytra/src/runtime/east/std/os_path.east",
+      "output": "east3/pytra/std/os_path.east3.json",
+      "source_path": "/workspace/Pytra/src/pytra/std/os_path.py",
+      "is_entry": false,
+      "module_kind": "runtime"
+    },
+    {
       "module_id": "pytra.utils.assertions",
       "input": "/workspace/Pytra/src/runtime/east/utils/assertions.east",
       "output": "east3/pytra/utils/assertions.east3.json",
@@ -249,6 +273,15 @@
         "pytra.built_in.type_id::_try_runtime_tagged_type_id"
       ],
       "pytra.built_in.type_id::pytra_isinstance": [],
+      "pytra.std.os::getcwd": [],
+      "pytra.std.os::makedirs": [],
+      "pytra.std.os::mkdir": [],
+      "pytra.std.os_path::abspath": [],
+      "pytra.std.os_path::basename": [],
+      "pytra.std.os_path::dirname": [],
+      "pytra.std.os_path::exists": [],
+      "pytra.std.os_path::join": [],
+      "pytra.std.os_path::splitext": [],
       "pytra.utils.assertions::_eq_any": [],
       "pytra.utils.assertions::py_assert_all": [],
       "pytra.utils.assertions::py_assert_eq": [
@@ -431,6 +464,33 @@
       ],
       [
         "pytra.built_in.type_id::pytra_isinstance"
+      ],
+      [
+        "pytra.std.os::getcwd"
+      ],
+      [
+        "pytra.std.os::makedirs"
+      ],
+      [
+        "pytra.std.os::mkdir"
+      ],
+      [
+        "pytra.std.os_path::abspath"
+      ],
+      [
+        "pytra.std.os_path::basename"
+      ],
+      [
+        "pytra.std.os_path::dirname"
+      ],
+      [
+        "pytra.std.os_path::exists"
+      ],
+      [
+        "pytra.std.os_path::join"
+      ],
+      [
+        "pytra.std.os_path::splitext"
       ],
       [
         "pytra.utils.assertions::_eq_any"

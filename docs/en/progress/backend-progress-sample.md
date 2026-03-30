@@ -5,7 +5,7 @@
 # Sample parity matrix
 
 > Machine-generated file. Run `python3 tools/gen/gen_backend_progress.py` to update.
-> Generated at: 2026-03-30T11:24:56
+> Generated at: 2026-03-30T12:11:26
 > [Links](./index.md)
 
 | Icon | Meaning |
