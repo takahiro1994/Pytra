@@ -9,15 +9,8 @@ from __future__ import annotations
 
 import sys
 
-from toolchain.emit.lua.emitter import transpile_to_lua_native
+from toolchain2.emit.lua.emitter import transpile_to_lua
 from toolchain.emit.loader import emit_all_modules
-
-
-def _transpile_lua(east_doc: dict) -> str:
-    meta = east_doc.get("meta", {})
-    emit_ctx = meta.get("emit_context", {}) if isinstance(meta, dict) else {}
-    is_entry = emit_ctx.get("is_entry", False) if isinstance(emit_ctx, dict) else False
-    return transpile_to_lua_native(east_doc, is_submodule=not is_entry)
 
 
 def main() -> int:
@@ -43,7 +36,7 @@ def main() -> int:
         print("error: input manifest.json is required", file=sys.stderr)
         return 1
 
-    return emit_all_modules(input_path, output_dir, ".lua", _transpile_lua, lang="lua")
+    return emit_all_modules(input_path, output_dir, ".lua", transpile_to_lua, lang="lua")
 
 
 if __name__ == "__main__":

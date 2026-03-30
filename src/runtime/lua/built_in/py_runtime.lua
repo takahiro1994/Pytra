@@ -713,3 +713,404 @@ function reversed(t)
     end
     return out
 end
+
+function __pytra_len(v)
+    if type(v) == "string" then return #v end
+    if type(v) == "table" then
+        local n = #v
+        if n > 0 then return n end
+        local count = 0
+        for _ in pairs(v) do count = count + 1 end
+        return count
+    end
+    return 0
+end
+
+function __pytra_floordiv(a, b)
+    return math.floor(a / b)
+end
+
+function __pytra_range(start, stop, step)
+    if step == nil then step = 1 end
+    local out = {}
+    if step > 0 then
+        local i = start
+        while i < stop do
+            out[#out + 1] = i
+            i = i + step
+        end
+    elseif step < 0 then
+        local i = start
+        while i > stop do
+            out[#out + 1] = i
+            i = i + step
+        end
+    end
+    return out
+end
+
+function __pytra_enumerate(seq)
+    local out = {}
+    for i = 1, #seq do
+        out[#out + 1] = {i - 1, seq[i]}
+    end
+    return out
+end
+
+function __pytra_reversed(seq)
+    local out = {}
+    for i = #seq, 1, -1 do
+        out[#out + 1] = seq[i]
+    end
+    return out
+end
+
+function __pytra_sorted(seq)
+    local out = {}
+    for i = 1, #seq do out[i] = seq[i] end
+    table.sort(out)
+    return out
+end
+
+function __pytra_ord(ch)
+    return string.byte(ch, 1) or 0
+end
+
+function __pytra_chr(n)
+    return string.char(n % 256)
+end
+
+function __pytra_round(v, ndigits)
+    if ndigits == nil then ndigits = 0 end
+    local m = 10 ^ ndigits
+    return math.floor(v * m + 0.5) / m
+end
+
+function __pytra_math_log2(x) return math.log(x) / math.log(2) end
+function __pytra_math_log10(x) return math.log(x, 10) end
+function __pytra_math_pow(a, b) return a ^ b end
+function __pytra_math_hypot(a, b) return math.sqrt(a*a + b*b) end
+function __pytra_math_isfinite(x) return x == x and x ~= math.huge and x ~= -math.huge end
+function __pytra_math_isinf(x) return x == math.huge or x == -math.huge end
+function __pytra_math_isnan(x) return x ~= x end
+
+-- Dict helpers
+function __pytra_dict_get(d, key, default)
+    local v = d[key]
+    if v == nil then return default end
+    return v
+end
+
+function __pytra_dict_items(d)
+    local out = {}
+    for k, v in pairs(d) do
+        out[#out + 1] = {k, v}
+    end
+    return out
+end
+
+function __pytra_dict_keys(d)
+    local out = {}
+    for k, _ in pairs(d) do
+        out[#out + 1] = k
+    end
+    return out
+end
+
+function __pytra_dict_values(d)
+    local out = {}
+    for _, v in pairs(d) do
+        out[#out + 1] = v
+    end
+    return out
+end
+
+function __pytra_dict_pop(d, key)
+    local v = d[key]
+    d[key] = nil
+    return v
+end
+
+function __pytra_dict_update(d, other)
+    for k, v in pairs(other) do
+        d[k] = v
+    end
+end
+
+function __pytra_dict_setdefault(d, key, default)
+    if d[key] == nil then d[key] = default end
+    return d[key]
+end
+
+-- List helpers
+function __pytra_list_clear(lst)
+    for i = #lst, 1, -1 do lst[i] = nil end
+end
+
+function __pytra_list_extend(lst, other)
+    for i = 1, #other do
+        lst[#lst + 1] = other[i]
+    end
+end
+
+function __pytra_list_index(lst, value)
+    for i = 1, #lst do
+        if lst[i] == value then return i - 1 end
+    end
+    error("ValueError: " .. tostring(value) .. " is not in list")
+end
+
+function __pytra_list_remove(lst, value)
+    for i = 1, #lst do
+        if lst[i] == value then
+            table.remove(lst, i)
+            return
+        end
+    end
+    error("ValueError: list.remove(x): x not in list")
+end
+
+function __pytra_list_reverse(lst)
+    local n = #lst
+    for i = 1, math.floor(n / 2) do
+        lst[i], lst[n - i + 1] = lst[n - i + 1], lst[i]
+    end
+end
+
+function __pytra_list_ctor(iter)
+    if type(iter) == "table" then
+        local out = {}
+        for i = 1, #iter do out[i] = iter[i] end
+        return out
+    end
+    return {}
+end
+
+-- Set helpers
+function __pytra_set_ctor(iter)
+    local out = {}
+    if type(iter) == "table" then
+        if #iter > 0 then
+            for i = 1, #iter do out[iter[i]] = true end
+        else
+            for k, _ in pairs(iter) do out[k] = true end
+        end
+    end
+    return out
+end
+
+function __pytra_set_add(s, val) s[val] = true end
+function __pytra_set_discard(s, val) s[val] = nil end
+function __pytra_set_remove(s, val)
+    if s[val] == nil then error("KeyError: " .. tostring(val)) end
+    s[val] = nil
+end
+function __pytra_set_clear(s)
+    for k in pairs(s) do s[k] = nil end
+end
+
+-- String helpers
+function __pytra_str_strip(s)
+    return s:match("^%s*(.-)%s*$") or ""
+end
+function __pytra_str_lstrip(s)
+    return s:match("^%s*(.*)$") or ""
+end
+function __pytra_str_rstrip(s)
+    return s:match("^(.-)%s*$") or ""
+end
+function __pytra_str_startswith(s, prefix)
+    return s:sub(1, #prefix) == prefix
+end
+function __pytra_str_endswith(s, suffix)
+    if #suffix == 0 then return true end
+    return s:sub(-#suffix) == suffix
+end
+function __pytra_str_replace(s, old, new)
+    local result = s:gsub(old:gsub("([%(%)%.%%%+%-%*%?%[%]%^%$])", "%%%1"), new)
+    return result
+end
+function __pytra_str_find(s, sub, start)
+    if start == nil then start = 0 end
+    local i = s:find(sub, start + 1, true)
+    if i == nil then return -1 end
+    return i - 1
+end
+function __pytra_str_rfind(s, sub)
+    local last = -1
+    local i = 1
+    while true do
+        local found = s:find(sub, i, true)
+        if found == nil then break end
+        last = found - 1
+        i = found + 1
+    end
+    return last
+end
+function __pytra_str_split(s, sep)
+    if sep == nil then sep = " " end
+    local parts = {}
+    if sep == "" then
+        for i = 1, #s do parts[#parts + 1] = s:sub(i, i) end
+        return parts
+    end
+    local pos = 1
+    while true do
+        local i = s:find(sep, pos, true)
+        if i == nil then
+            parts[#parts + 1] = s:sub(pos)
+            break
+        end
+        parts[#parts + 1] = s:sub(pos, i - 1)
+        pos = i + #sep
+    end
+    return parts
+end
+function __pytra_str_join(sep, lst)
+    return table.concat(lst, sep)
+end
+function __pytra_str_upper(s) return s:upper() end
+function __pytra_str_lower(s) return s:lower() end
+function __pytra_str_count(s, sub)
+    local count = 0
+    local i = 1
+    while true do
+        local found = s:find(sub, i, true)
+        if found == nil then break end
+        count = count + 1
+        i = found + 1
+    end
+    return count
+end
+function __pytra_str_index(s, sub)
+    local i = s:find(sub, 1, true)
+    if i == nil then error("ValueError: substring not found") end
+    return i - 1
+end
+function __pytra_str_isspace(s)
+    if #s == 0 then return false end
+    return s:match("^%s+$") ~= nil
+end
+
+-- Ternary helper (Lua does not have ternary, and `cond and a or b` fails when a is falsy)
+function __pytra_ternary(cond, a, b)
+    if cond then return a else return b end
+end
+
+-- Format helper for f-strings
+function __pytra_fmt(v, spec)
+    if spec == "" then return tostring(v) end
+    -- Simple numeric format specs
+    local width, prec, ftype = spec:match("^(%d*)%.?(%d*)([fdegsx%%]?)$")
+    if ftype == "f" or ftype == "e" or ftype == "g" then
+        local p = tonumber(prec) or 6
+        return string.format("%." .. p .. ftype, v)
+    end
+    if ftype == "d" then
+        return string.format("%d", v)
+    end
+    if ftype == "s" then
+        return tostring(v)
+    end
+    if ftype == "x" then
+        return string.format("%x", v)
+    end
+    -- Fallback
+    return tostring(v)
+end
+
+-- Assertion helpers
+function __pytra_assert_stdout(expected, fn)
+    -- Capture stdout
+    local captured = {}
+    local old_write = io.write
+    io.write = function(...)
+        for i = 1, select("#", ...) do
+            captured[#captured + 1] = tostring(select(i, ...))
+        end
+    end
+    fn()
+    io.write = old_write
+    local output = table.concat(captured)
+    local lines = {}
+    for line in (output .. "\n"):gmatch("([^\n]*)\n") do
+        if line ~= "" then
+            lines[#lines + 1] = line
+        end
+    end
+    local ok = true
+    if #lines ~= #expected then
+        ok = false
+    else
+        for i = 1, #expected do
+            if lines[i] ~= expected[i] then
+                ok = false
+                break
+            end
+        end
+    end
+    if ok then
+        return "PASS"
+    else
+        return "FAIL: expected " .. table.concat(expected, ", ") .. " got " .. table.concat(lines, ", ")
+    end
+end
+
+function __pytra_assert_true(cond, msg)
+    if cond then return "PASS" end
+    return "FAIL: " .. (msg or "assertion failed")
+end
+
+function __pytra_assert_eq(a, b, msg)
+    if a == b then return "PASS" end
+    return "FAIL: " .. tostring(a) .. " ~= " .. tostring(b) .. (msg and (" " .. msg) or "")
+end
+
+function __pytra_assert_all(results)
+    local all_pass = true
+    for i = 1, #results do
+        if results[i] ~= "PASS" then
+            all_pass = false
+            break
+        end
+    end
+    if all_pass then return "PASS" end
+    local fails = {}
+    for i = 1, #results do
+        if results[i] ~= "PASS" then
+            fails[#fails + 1] = results[i]
+        end
+    end
+    return table.concat(fails, "\n")
+end
+
+-- makedirs
+function __pytra_makedirs(path)
+    os.execute('mkdir -p "' .. tostring(path) .. '"')
+end
+
+-- open (with context manager support)
+function __pytra_open(path, mode)
+    local f = io.open(path, mode)
+    if not f then error("cannot open file: " .. tostring(path)) end
+    local wrapper = {}
+    function wrapper:write(data)
+        if type(data) == "table" then
+            local parts = {}
+            for i = 1, #data do parts[i] = string.char(data[i] % 256) end
+            f:write(table.concat(parts))
+        else
+            f:write(tostring(data))
+        end
+    end
+    function wrapper:close() f:close() end
+    function wrapper:read(mode_)
+        if mode_ == nil then mode_ = "*a" end
+        return f:read(mode_)
+    end
+    return wrapper
+end
+
+-- sys stubs
+__pytra_sys_argv = arg or {}
+__pytra_sys_path = {}

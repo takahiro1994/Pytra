@@ -548,7 +548,7 @@ def _run_target(
         if not entry_lua.exists():
             return subprocess.CompletedProcess("", 1, "", f"entry file not found: {entry_lua}")
         return run_shell(
-            f"lua5.4 {shlex.quote(str(entry_lua))}",
+            f"lua {shlex.quote(str(entry_lua))}",
             cwd=work_dir, env=env, timeout_sec=timeout_sec,
         )
 
