@@ -57,6 +57,20 @@ Review 指摘: `py_splitext` を多値返却にした後、emitter の `_emit_as
 3. [x] [ID: P2-CR-PARENS-S3] 最外の冗長括弧（`x = (expr);` の外側）を除去する
 4. [x] [ID: P2-CR-PARENS-S4] Go fixture + sample parity に影響がないことを確認する — typing 23/23, stdlib 16/16, sample 18/18 全 PASS
 
+### P3-GO-LINT-FIX: Go emitter のハードコード違反を修正する
+
+仕様: [spec-emitter-guide.md](../spec/spec-emitter-guide.md) §1, §7
+
+違反一覧（`check_emitter_hardcode_lint.py` 検出）:
+- module_name 6件: `ctx.imports_needed.add("math")` / `"os"` — native import のハードコード
+- runtime_symbol 2件: `dispatch == "py_print"` / `"py_len"` — mapping.json 経由の値を再度文字列マッチ
+- class_name 19件: `"Exception"` / `"Path"` / `"ArgumentParser"` 等 — P0-GO-TYPE-MAPPING で一部解消済み、残りを除去
+
+1. [ ] [ID: P3-GO-LINT-S1] module_name 違反を修正する — native import を runtime manifest または mapping.json から導出する
+2. [ ] [ID: P3-GO-LINT-S2] runtime_symbol 違反を修正する — `py_print` / `py_len` の文字列マッチを除去
+3. [ ] [ID: P3-GO-LINT-S3] class_name 違反を修正する — `types` テーブル or EAST3 の型情報から解決する
+4. [ ] [ID: P3-GO-LINT-S4] `check_emitter_hardcode_lint.py` で Go の違反が 0 件になることを確認する
+
 ### P6-GO-SELFHOST: Go emitter で toolchain2 を Go に変換し go build を通す
 
 文脈: [docs/ja/plans/p6-go-selfhost.md](../plans/p6-go-selfhost.md)
