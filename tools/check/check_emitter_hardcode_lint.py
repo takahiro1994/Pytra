@@ -108,17 +108,94 @@ CATEGORIES: dict[str, list[str]] = {
         r'"py_tid_"',
         r'"g_type_table"',
     ],
+    # skip_pure_python は grep ではなく mapping.json + ソース解析で判定する
+    # パターンリストは空にし、collect_hits で別途処理する
+    "skip_pure_python": [],
 }
 
 CATEGORY_LABELS: dict[str, str] = {
-    "module_name":    "module name   ",
-    "runtime_symbol": "runtime symbol",
-    "target_constant":"target const  ",
-    "prefix_match":   "prefix match  ",
-    "class_name":     "class name    ",
-    "python_syntax":  "Python syntax ",
-    "type_id":        "type_id       ",
+    "module_name":       "module name   ",
+    "runtime_symbol":    "runtime symbol",
+    "target_constant":   "target const  ",
+    "prefix_match":      "prefix match  ",
+    "class_name":        "class name    ",
+    "python_syntax":     "Python syntax ",
+    "type_id":           "type_id       ",
+    "skip_pure_python":  "skip pure py  ",
 }
+
+
+# ---------------------------------------------------------------------------
+# Pure Python module detection for skip_pure_python category
+# ---------------------------------------------------------------------------
+
+PYTRA_STD_DIR = ROOT / "src" / "pytra" / "std"
+
+
+def _is_pure_python_module(module_name: str) -> bool:
+    """Check if a pytra.std module is pure Python (no @extern decorators).
+
+    A module with @extern is a native wrapper (OS/C API) and should be skipped.
+    A module without @extern is pure Python and must be transpiled, not skipped.
+    """
+    # module_name may be "pytra.std.json" or "pytra.std." (prefix match)
+    # For prefix matches, we can't check individual modules
+    parts = module_name.split(".")
+    if len(parts) < 3:
+        return False
+    stem = parts[2] if len(parts) >= 3 else ""
+    if stem == "" or stem.startswith("_"):
+        return False
+    py_file = PYTRA_STD_DIR / (stem + ".py")
+    if not py_file.exists():
+        return False
+    content = py_file.read_text(encoding="utf-8")
+    has_extern = "@extern" in content
+    return not has_extern
+
+
+def _check_skip_pure_python(lang_key: str) -> list[tuple[str, str, Path, int, str]]:
+    """Check if a language's mapping.json skips pure Python modules."""
+    import json as _json
+    hits: list[tuple[str, str, Path, int, str]] = []
+    # Find mapping.json for this language
+    lang_dir_map: dict[str, str] = {
+        "cpp": "cpp", "rs": "rs", "go": "go", "ts": "ts",
+        "cs": "cs", "java": "java", "kotlin": "kotlin",
+        "swift": "swift", "dart": "dart", "ruby": "ruby",
+        "lua": "lua", "scala": "scala", "php": "php",
+        "nim": "nim", "julia": "julia", "zig": "zig",
+        "ps1": "ps1", "js": "ts",
+    }
+    runtime_dir = lang_dir_map.get(lang_key, lang_key)
+    mapping_path = ROOT / "src" / "runtime" / runtime_dir / "mapping.json"
+    if not mapping_path.exists():
+        return hits
+    data = _json.loads(mapping_path.read_text(encoding="utf-8"))
+    skip_modules = data.get("skip_modules", [])
+    if not isinstance(skip_modules, list):
+        return hits
+    for entry in skip_modules:
+        if not isinstance(entry, str):
+            continue
+        # Only check pytra.std.* entries (not pytra.built_in. or pytra.core.)
+        if not entry.startswith("pytra.std."):
+            continue
+        # Prefix entries like "pytra.std." skip everything — check each module
+        if entry == "pytra.std.":
+            for py_file in sorted(PYTRA_STD_DIR.glob("*.py")):
+                if py_file.name.startswith("_"):
+                    continue
+                mod_name = "pytra.std." + py_file.stem
+                if _is_pure_python_module(mod_name):
+                    line = f"skip_modules contains \"{entry}\" which skips pure Python module {mod_name}"
+                    hits.append((lang_key, "skip_pure_python", mapping_path, 0, line))
+            continue
+        # Exact or prefix match for specific module
+        if _is_pure_python_module(entry):
+            line = f"skip_modules contains \"{entry}\" but {entry} is pure Python (no @extern)"
+            hits.append((lang_key, "skip_pure_python", mapping_path, 0, line))
+    return hits
 
 
 # ---------------------------------------------------------------------------
@@ -169,6 +246,13 @@ def collect_hits(
                     if re.search(pat, raw):
                         hits.append((lang, cat, fpath, lineno, stripped[:120]))
                         break  # 1行につき同カテゴリの重複カウントを避ける
+
+    # skip_pure_python: check mapping.json skip_modules against pure Python sources
+    if not filter_cat or filter_cat == "skip_pure_python":
+        for lang_key, _dir in ALL_LANGS_ORDERED:
+            if filter_lang and lang_key != filter_lang:
+                continue
+            hits.extend(_check_skip_pure_python(lang_key))
 
     return hits
 
