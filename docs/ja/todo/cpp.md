@@ -56,6 +56,18 @@
 5. [x] [ID: P6-CPP-FIXPAR-S5] `ok_typed_varargs_representative` の const 修飾不整合を解消する
    - 完了: call graph を見て mutable param を signature へ反映するよう C++ emitter を補正し、`runtime_parity_check_fast.py ... ok_typed_varargs_representative` で PASS を確認
 
+### P1-CPP-LINT-CLEANUP: emitter hardcode lint 違反の解消
+
+文脈: [docs/ja/plans/plan-cpp-lint-cleanup.md](../plans/plan-cpp-lint-cleanup.md)
+
+`check_emitter_hardcode_lint.py` で検出される 4 カテゴリ 14 件の違反を解消する。
+
+1. [ ] [ID: P1-CPP-LINT-S1] class_name 違反 (3件) を解消する — 例外クラス名を mapping.json の types テーブルから導出、ArgumentParser 分岐を EAST3 の解決済み情報に置換
+2. [ ] [ID: P1-CPP-LINT-S2] runtime_symbol 違反 (1件) を解消する — `py_print`/`py_len` の文字列マッチを mapping.json の `call_adapters` に移行
+3. [ ] [ID: P1-CPP-LINT-S3] type_id 違反 (1件) を解消する — `PYTRA_TID_*` プレフィックス fallback を除去し、EAST3/linker の type_id 確定に依存
+4. [ ] [ID: P1-CPP-LINT-S4] skip_pure_python 違反 (9件) を解消する — `skip_modules` の `pytra.std.` 全 skip を撤廃し、`@extern` モジュールだけを個別 skip にする。小モジュール (env/template/timeit) から段階的に transpile 対象化
+5. [ ] [ID: P1-CPP-LINT-S5] fixture + sample parity に回帰がないことを確認する
+
 ### P10-CPP-TYPETABLE-REDESIGN: g_type_table と destructor dispatch の再設計
 
 文脈: [docs/ja/plans/p10-cpp-typetable-redesign.md](../plans/p10-cpp-typetable-redesign.md)
