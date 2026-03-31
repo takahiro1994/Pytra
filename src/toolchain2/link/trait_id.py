@@ -5,14 +5,10 @@ Trait は runtime metadata を持たず、link 時に nominal 関係だけを解
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 from pytra.std.json import JsonVal
 
-if TYPE_CHECKING:
-    from toolchain2.link.linker import LinkedModule
-
 from toolchain2.link.import_maps import collect_import_maps
+from toolchain2.link.shared_types import LinkedModule
 
 
 def _safe_str(val: JsonVal) -> str:

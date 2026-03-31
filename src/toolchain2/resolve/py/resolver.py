@@ -138,6 +138,10 @@ class ResolveContext:
     current_params: set[str] = field(default_factory=set)
     # Whether we're inside a class body
     in_class: bool = False
+    # Current class name while resolving methods
+    current_class: str = ""
+    # Current function/method name while resolving body
+    current_function: str = ""
     # Source file path
     source_file: str = ""
     # Runtime symbol index (loaded lazily)
@@ -460,7 +464,9 @@ def _resolve_trait_contracts(stmt: dict[str, JsonVal], class_name: str, ctx: Res
     is_trait = cls_sig.is_trait or ("trait" in decorators)
     implements_traits: list[str] = []
     for decorator in decorators:
-        implements_traits.extend(_parse_implements_decorator(decorator))
+        parsed_traits = _parse_implements_decorator(decorator)
+        for trait_name in parsed_traits:
+            implements_traits.append(trait_name)
 
     meta_val = stmt.get("meta")
     meta: dict[str, JsonVal] = meta_val if isinstance(meta_val, dict) else {}
@@ -1967,6 +1973,22 @@ def _resolve_simple_call(expr: dict[str, JsonVal], func: dict[str, JsonVal], ctx
     # Resolve arguments first
     _resolve_call_args(expr, ctx)
 
+    if name == "super":
+        current_cls_name: str = ctx.current_class
+        if current_cls_name != "":
+            current_cls: ClassSig | None = ctx.lookup_local_class(current_cls_name)
+            if current_cls is not None and len(current_cls.bases) > 0:
+                base_name = _ctx_normalize_type(str(current_cls.bases[0]), ctx)
+                if base_name != "":
+                    expr["resolved_type"] = base_name
+                    func["resolved_type"] = "callable"
+                    expr["special_form"] = "super"
+                    expr["super_of"] = current_cls_name
+                    return base_name
+        expr["resolved_type"] = "unknown"
+        func["resolved_type"] = "callable"
+        return "unknown"
+
     # Imported symbol?
     imp: dict[str, str] = ctx.import_symbols.get(name, {})
     if len(imp) > 0:
@@ -2824,6 +2846,12 @@ def _resolve_dict(expr: dict[str, JsonVal], ctx: ResolveContext) -> str:
     return result
 
 
+def _node_dict_or_empty(value: JsonVal) -> dict[str, JsonVal]:
+    if isinstance(value, dict):
+        return value
+    return {}
+
+
 def _resolve_set(expr: dict[str, JsonVal], ctx: ResolveContext) -> str:
     elems = expr.get("elements")
     elem_type: str = "unknown"
@@ -3238,8 +3266,10 @@ def _resolve_function_def(stmt: dict[str, JsonVal], ctx: ResolveContext) -> None
     # Resolve body in function scope
     old_scope: Scope = ctx.scope
     old_params: set[str] = ctx.current_params
+    old_current_function: str = ctx.current_function
     ctx.scope = fn_scope
     ctx.current_params = set(arg_order)
+    ctx.current_function = str(stmt.get("name")) if isinstance(stmt.get("name"), str) else ""
     body = stmt.get("body")
     if isinstance(body, list):
         for s in body:
@@ -3247,6 +3277,7 @@ def _resolve_function_def(stmt: dict[str, JsonVal], ctx: ResolveContext) -> None
                 _resolve_stmt(s, ctx)
     ctx.scope = old_scope
     ctx.current_params = old_params
+    ctx.current_function = old_current_function
 
     refined_callable_params: dict[str, str] = {}
     callable_param_names: set[str] = set()
@@ -3410,9 +3441,9 @@ def _resolve_class_def(stmt: dict[str, JsonVal], ctx: ResolveContext) -> None:
             stmt["class_storage_hint"] = "value"
 
     # Normalize and refresh field_types from the prescanned class signature.
-    ft_raw = stmt.get("field_types")
-    if not isinstance(ft_raw, dict):
-        ft_raw = {}
+    ft_raw_any = stmt.get("field_types")
+    ft_raw: dict[str, JsonVal] = ft_raw_any if isinstance(ft_raw_any, dict) else {}
+    if not isinstance(ft_raw_any, dict):
         stmt["field_types"] = ft_raw
     else:
         for fk, fv in ft_raw.items():
@@ -3436,8 +3467,10 @@ def _resolve_class_def(stmt: dict[str, JsonVal], ctx: ResolveContext) -> None:
 
     old_scope: Scope = ctx.scope
     old_in_class: bool = ctx.in_class
+    old_current_class: str = ctx.current_class
     ctx.scope = cls_scope
     ctx.in_class = True
+    ctx.current_class = class_name
 
     # First pass: define class-level variables in scope
     body = stmt.get("body")
@@ -3468,6 +3501,7 @@ def _resolve_class_def(stmt: dict[str, JsonVal], ctx: ResolveContext) -> None:
                 _resolve_stmt(item, ctx)
     ctx.scope = old_scope
     ctx.in_class = old_in_class
+    ctx.current_class = old_current_class
 
     if cls_sig_existing is not None and isinstance(body, list):
         for item in body:
@@ -3793,7 +3827,9 @@ def _convert_call_to_range_expr(expr: dict[str, JsonVal], ctx: ResolveContext) -
             _resolve_expr(a, ctx)
 
     range_func = expr.get("func")
-    source_span = range_func.get("source_span", {}) if isinstance(range_func, dict) else expr.get("source_span", {})
+    source_span: dict[str, JsonVal] = _node_dict_or_empty(expr.get("source_span"))
+    if isinstance(range_func, dict):
+        source_span = _node_dict_or_empty(range_func.get("source_span"))
 
     if len(args) == 1:
         start: dict[str, JsonVal] = {
@@ -3801,24 +3837,24 @@ def _convert_call_to_range_expr(expr: dict[str, JsonVal], ctx: ResolveContext) -
             "resolved_type": "int64", "casts": [], "borrow_kind": "value",
             "repr": "0", "value": 0,
         }
-        stop = args[0] if isinstance(args[0], dict) else {}
+        stop = _node_dict_or_empty(args[0])
         step: dict[str, JsonVal] = {
             "kind": "Constant", "source_span": source_span,
             "resolved_type": "int64", "casts": [], "borrow_kind": "value",
             "repr": "1", "value": 1,
         }
     elif len(args) == 2:
-        start = args[0] if isinstance(args[0], dict) else {}
-        stop = args[1] if isinstance(args[1], dict) else {}
+        start = _node_dict_or_empty(args[0])
+        stop = _node_dict_or_empty(args[1])
         step = {
             "kind": "Constant", "source_span": source_span,
             "resolved_type": "int64", "casts": [], "borrow_kind": "value",
             "repr": "1", "value": 1,
         }
     elif len(args) >= 3:
-        start = args[0] if isinstance(args[0], dict) else {}
-        stop = args[1] if isinstance(args[1], dict) else {}
-        step = args[2] if isinstance(args[2], dict) else {}
+        start = _node_dict_or_empty(args[0])
+        stop = _node_dict_or_empty(args[1])
+        step = _node_dict_or_empty(args[2])
     else:
         return
 
@@ -3835,7 +3871,7 @@ def _convert_call_to_range_expr(expr: dict[str, JsonVal], ctx: ResolveContext) -
         range_mode = "dynamic"
 
     # Replace the Call node in-place with RangeExpr
-    orig_span = expr.get("source_span", {})
+    orig_span: dict[str, JsonVal] = _node_dict_or_empty(expr.get("source_span"))
     orig_repr = expr.get("repr", "")
     expr.clear()
     expr["kind"] = "RangeExpr"
@@ -3877,7 +3913,9 @@ def _convert_for_to_forrange(
 
     # Use the range() function name span for synthesized constants
     range_func = iter_call.get("func")
-    source_span = range_func.get("source_span", {}) if isinstance(range_func, dict) else iter_call.get("source_span", {})
+    source_span: dict[str, JsonVal] = _node_dict_or_empty(iter_call.get("source_span"))
+    if isinstance(range_func, dict):
+        source_span = _node_dict_or_empty(range_func.get("source_span"))
 
     if len(args) == 1:
         start_node: dict[str, JsonVal] = {
@@ -3889,7 +3927,7 @@ def _convert_for_to_forrange(
             "repr": "0",
             "value": 0,
         }
-        stop_node = args[0] if isinstance(args[0], dict) else {}
+        stop_node = _node_dict_or_empty(args[0])
         step_node: dict[str, JsonVal] = {
             "kind": "Constant",
             "source_span": source_span,
@@ -3900,8 +3938,8 @@ def _convert_for_to_forrange(
             "value": 1,
         }
     elif len(args) == 2:
-        start_node = args[0] if isinstance(args[0], dict) else {}
-        stop_node = args[1] if isinstance(args[1], dict) else {}
+        start_node = _node_dict_or_empty(args[0])
+        stop_node = _node_dict_or_empty(args[1])
         step_node = {
             "kind": "Constant",
             "source_span": source_span,
@@ -3912,9 +3950,9 @@ def _convert_for_to_forrange(
             "value": 1,
         }
     elif len(args) >= 3:
-        start_node = args[0] if isinstance(args[0], dict) else {}
-        stop_node = args[1] if isinstance(args[1], dict) else {}
-        step_node = args[2] if isinstance(args[2], dict) else {}
+        start_node = _node_dict_or_empty(args[0])
+        stop_node = _node_dict_or_empty(args[1])
+        step_node = _node_dict_or_empty(args[2])
     else:
         return
 
@@ -4268,8 +4306,14 @@ def _prescan_module(doc: dict[str, JsonVal], ctx: ResolveContext) -> None:
                 alias_value = item.get("type_expr")
             if isinstance(alias_name, str) and alias_name != "" and isinstance(alias_value, str) and alias_value != "":
                 ctx.type_aliases[alias_name] = alias_value
-        for alias_name, alias_value in list(ctx.type_aliases.items()):
-            ctx.type_aliases[alias_name] = normalize_type(alias_value, ctx.type_aliases, {alias_name})
+        alias_names: list[str] = []
+        for alias_name in ctx.type_aliases.keys():
+            if isinstance(alias_name, str):
+                alias_names.append(alias_name)
+        for alias_name in alias_names:
+            alias_value = ctx.type_aliases.get(alias_name, "")
+            if isinstance(alias_value, str):
+                ctx.type_aliases[alias_name] = normalize_type(alias_value, ctx.type_aliases, {alias_name})
 
     # Collect function and class signatures
     if isinstance(body, list):
@@ -4355,8 +4399,14 @@ def _extract_class_sig_for_prescan(node: dict[str, JsonVal], ctx: ResolveContext
     decorators: list[str] = _class_decorators(node)
     implements_traits: list[str] = []
     for decorator in decorators:
-        implements_traits.extend(_parse_implements_decorator(decorator))
-    is_enum_class: bool = any(base in ("Enum", "IntEnum", "IntFlag") for base in bases)
+        parsed_traits = _parse_implements_decorator(decorator)
+        for trait_name in parsed_traits:
+            implements_traits.append(trait_name)
+    is_enum_class: bool = False
+    for base in bases:
+        if base == "Enum" or base == "IntEnum" or base == "IntFlag":
+            is_enum_class = True
+            break
     body_raw = node.get("body")
     if isinstance(body_raw, list):
         for item in body_raw:
@@ -4396,6 +4446,43 @@ def _extract_class_sig_for_prescan(node: dict[str, JsonVal], ctx: ResolveContext
         is_trait=("trait" in decorators),
         implements_traits=implements_traits,
     )
+
+
+def _promote_inherited_class_storage_hints(doc: dict[str, JsonVal], ctx: ResolveContext) -> None:
+    """Promote base classes with descendants to ref storage transitively."""
+    body = doc.get("body")
+    if not isinstance(body, list):
+        return
+    class_nodes: dict[str, dict[str, JsonVal]] = {}
+    for item in body:
+        if isinstance(item, dict) and item.get("kind") == "ClassDef":
+            name = item.get("name")
+            if isinstance(name, str) and name != "":
+                class_nodes[name] = item
+    if len(class_nodes) == 0:
+        return
+    promoted: set[str] = set()
+    pending: list[str] = []
+    for class_name, cls_sig in ctx.module_classes.items():
+        if class_name not in class_nodes:
+            continue
+        for base in cls_sig.bases:
+            base_name = extract_base_type(base)
+            if base_name in class_nodes and base_name not in promoted:
+                promoted.add(base_name)
+                pending.append(base_name)
+    while len(pending) > 0:
+        current = pending.pop(0)
+        current_sig = ctx.module_classes.get(current)
+        if current_sig is None:
+            continue
+        for base in current_sig.bases:
+            base_name2 = extract_base_type(base)
+            if base_name2 in class_nodes and base_name2 not in promoted:
+                promoted.add(base_name2)
+                pending.append(base_name2)
+    for class_name2 in promoted:
+        class_nodes[class_name2]["class_storage_hint"] = "ref"
 
 
 # ---------------------------------------------------------------------------
@@ -4439,6 +4526,8 @@ def resolve_east1_to_east2(
             if isinstance(stmt, dict):
                 _resolve_stmt(stmt, ctx)
 
+    _promote_inherited_class_storage_hints(east1_doc, ctx)
+
     # Post-processing: metadata
     east1_doc["east_stage"] = 2
     east1_doc["schema_version"] = 1
@@ -4456,7 +4545,8 @@ def resolve_east1_to_east2(
     normalized: JsonVal = normalize_field_order(east1_doc)
     if isinstance(normalized, dict):
         east1_doc.clear()
-        east1_doc.update(normalized)
+        for key, value in normalized.items():
+            east1_doc[key] = value
 
     return east1_doc
 

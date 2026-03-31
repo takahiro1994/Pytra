@@ -50,18 +50,43 @@ def _bracket_depth_str_aware(text: str) -> int:
 
 def _unclosed_triple_quote(line: str) -> str:
     """Return the triple-quote delimiter if line opens but doesn't close one, else ""."""
-    for tq in ('"""', "'''"):
-        # Count occurrences outside of the other quote type
-        count: int = 0
-        i: int = 0
-        while i < len(line):
-            if line[i:i+3] == tq:
-                count += 1
-                i += 3
+    in_single: bool = False
+    in_double: bool = False
+    i: int = 0
+    n: int = len(line)
+    while i < n:
+        ch: str = line[i]
+        if in_single:
+            if ch == "\\" and i + 1 < n:
+                i += 2
+                continue
+            if ch == "'":
+                in_single = False
+            i += 1
+            continue
+        if in_double:
+            if ch == "\\" and i + 1 < n:
+                i += 2
+                continue
+            if ch == '"':
+                in_double = False
+            i += 1
+            continue
+        if ch == "#":
+            break
+        if ch == "'" or ch == '"':
+            if i + 2 < n and line[i + 1] == ch and line[i + 2] == ch:
+                tq: str = ch + ch + ch
+                end: int = line.find(tq, i + 3)
+                if end < 0:
+                    return tq
+                i = end + 3
+                continue
+            if ch == "'":
+                in_single = True
             else:
-                i += 1
-        if count % 2 == 1:
-            return tq
+                in_double = True
+        i += 1
     return ""
 
 

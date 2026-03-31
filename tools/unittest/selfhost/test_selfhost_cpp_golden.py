@@ -12,14 +12,6 @@ ROOT = next(p for p in Path(__file__).resolve().parents if (p / "src").exists())
 CPP_GOLDEN_DIR = ROOT / "test" / "selfhost" / "cpp"
 REGEN_PATH = ROOT / "tools" / "gen" / "regenerate_selfhost_golden.py"
 TIMEOUT_SEC = int(os.environ.get("SELFHOST_GOLDEN_TIMEOUT", "30"))
-KNOWN_CPP_GOLDEN_SKIPS = {
-    "toolchain2.compile.passes",
-    "toolchain2.optimize.passes.tuple_target_direct_expansion",
-    "toolchain2.optimize.passes.typed_enumerate_normalization",
-    "toolchain2.optimize.passes.typed_repeat_materialization",
-    "toolchain2.resolve.py.resolver",
-}
-
 _EMIT_HELPER = """
 import sys
 sys.path.insert(0, sys.argv[1])
@@ -62,8 +54,7 @@ class SelfhostCppGoldenTest(unittest.TestCase):
         golden_names = {p.name for p in CPP_GOLDEN_DIR.glob("*.cpp")}
         expected_names = set(entries.keys())
         missing_names = sorted(expected_names - golden_names)
-        missing_modules = {entries[name][0] for name in missing_names}
-        self.assertEqual(missing_modules, KNOWN_CPP_GOLDEN_SKIPS)
+        self.assertEqual(missing_names, [])
 
     def test_cpp_golden_matches_current_emitter_output(self) -> None:
         entries = _collect_cpp_entries()

@@ -15,6 +15,11 @@ _RUNTIME_CPP_ROOT = Path(__file__).resolve().parents[3] / "runtime" / "cpp"
 _TYPE_ONLY_SYMBOL_BINDINGS: set[tuple[str, str]] = {
     ("pytra.std.json", "JsonVal"),
 }
+_CPP_SKIP_MODULE_IDS: set[str] = {
+    "abc",
+    "readonly",
+    "str",
+}
 
 
 def runtime_rel_tail_for_module(module_id: str) -> str:
@@ -22,6 +27,8 @@ def runtime_rel_tail_for_module(module_id: str) -> str:
 
 
 def cpp_include_for_module(module_id: str) -> str:
+    if module_id in _CPP_SKIP_MODULE_IDS:
+        return ""
     if is_runtime_namespace_module(module_id) or is_type_only_dependency_module_id(module_id):
         return ""
     rel = resolve_runtime_module_rel_tail(module_id)

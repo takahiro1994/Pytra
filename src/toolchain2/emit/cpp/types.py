@@ -49,6 +49,7 @@ _TYPE_MAP: dict[str, str] = {
     "Obj": "object",
     "object": "object",
     "JsonVal": "object",
+    "Node": "Object<dict<str, object>>",
     "Callable": "object",
 }
 
@@ -148,12 +149,12 @@ def cpp_signature_type(resolved_type: str, *, prefer_value_container: bool = Fal
     return cpp_type(resolved_type, prefer_value_container=prefer_value_container)
 
 
-def cpp_param_decl(resolved_type: str, name: str, *, mutable: bool = False) -> str:
+def cpp_param_decl(resolved_type: str, name: str, *, is_mutable: bool = False) -> str:
     """Render a function parameter declaration."""
     ct = cpp_signature_type(resolved_type)
     if _is_small_value_type(ct):
         return ct + " " + name
-    if mutable:
+    if is_mutable:
         return ct + "& " + name
     return "const " + ct + "& " + name
 

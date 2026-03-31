@@ -9,7 +9,7 @@ from dataclasses import dataclass
 from typing import Optional, Union
 
 from toolchain2.common.types import split_generic_types
-from toolchain2.parse.py.nodes import NamedType, GenericType, TypeExpr
+from toolchain2.parse.py.nodes import NamedType, GenericType, JsonVal
 
 
 # デフォルト型エイリアス
@@ -100,14 +100,14 @@ def _resolve_base_type(base: str, type_aliases: dict[str, str]) -> str:
 def annotation_to_type_expr(
     ann: str,
     type_aliases: dict[str, str],
-) -> TypeExpr:
-    """型注釈文字列を TypeExpr ノードに変換する。"""
+) -> JsonVal:
+    """型注釈文字列を JsonVal ノードに変換する。"""
     resolved = resolve_type_annotation(ann, type_aliases)
     return _parse_type_expr(resolved)
 
 
-def _parse_type_expr(text: str) -> TypeExpr:
-    """正規化済み型文字列を TypeExpr に変換する。"""
+def _parse_type_expr(text: str) -> JsonVal:
+    """正規化済み型文字列を JsonVal に変換する。"""
     text = text.strip()
     bracket_pos = text.find("[")
     if bracket_pos > 0 and text.endswith("]"):

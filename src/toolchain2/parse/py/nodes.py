@@ -22,6 +22,13 @@ from toolchain2.common import kinds as K
 from toolchain2.parse.py.source_span import SourceSpan, NULL_SPAN
 
 
+# selfhost C++ header generation cannot represent Python Union aliases like
+# Expr = Union[...] in field declarations. Keep runtime hints simple.
+Expr = JsonVal
+Stmt = JsonVal
+TriviaNode = JsonVal
+
+
 # ---------------------------------------------------------------------------
 # Type expression nodes (型注釈用 — ソースのまま保持)
 # ---------------------------------------------------------------------------
@@ -58,7 +65,7 @@ class TriviaComment:
     def to_jv(self) -> dict[str, JsonVal]:
         return {"kind": "comment", "text": self.text}
 
-TriviaNode = Union[TriviaBlank, TriviaComment]
+TriviaNodeNode = Union[TriviaBlank, TriviaComment]
 
 
 # ---------------------------------------------------------------------------
@@ -80,15 +87,15 @@ class ImportAlias:
 @dataclass
 class Keyword:
     arg: Optional[str]
-    value_node: Expr  # forward ref
+    value_node: JsonVal  # forward ref
     def to_jv(self) -> dict[str, JsonVal]:
         return {"arg": self.arg, "value": expr_to_jv(self.value_node)}
 
 @dataclass
 class Comprehension:
-    target: Expr
-    iter_expr: Expr
-    ifs: list[Expr]
+    target: JsonVal
+    iter_expr: JsonVal
+    ifs: list[JsonVal]
     is_async: bool
     def to_jv(self) -> dict[str, JsonVal]:
         return {"target": expr_to_jv(self.target), "iter": expr_to_jv(self.iter_expr),
@@ -96,8 +103,8 @@ class Comprehension:
 
 @dataclass
 class DictEntry:
-    key: Expr
-    value: Expr
+    key: JsonVal
+    value: JsonVal
     def to_jv(self) -> dict[str, JsonVal]:
         return {"key": expr_to_jv(self.key), "value": expr_to_jv(self.value)}
 
@@ -147,9 +154,9 @@ class Constant:
 @dataclass
 class BinOp:
     base: ExprBase
-    left: Expr
+    left: JsonVal
     op: str
-    right: Expr
+    right: JsonVal
     def to_jv(self) -> dict[str, JsonVal]:
         d: dict[str, JsonVal] = {"kind": K.BIN_OP}
         d.update(_expr_base_jv(self.base))
@@ -162,7 +169,7 @@ class BinOp:
 class UnaryOp:
     base: ExprBase
     op: str
-    operand: Expr
+    operand: JsonVal
     def to_jv(self) -> dict[str, JsonVal]:
         d: dict[str, JsonVal] = {"kind": K.UNARY_OP}
         d.update(_expr_base_jv(self.base))
@@ -174,7 +181,7 @@ class UnaryOp:
 class BoolOp:
     base: ExprBase
     op: str
-    values: list[Expr]
+    values: list[JsonVal]
     def to_jv(self) -> dict[str, JsonVal]:
         d: dict[str, JsonVal] = {"kind": "BoolOp"}
         d.update(_expr_base_jv(self.base))
@@ -185,9 +192,9 @@ class BoolOp:
 @dataclass
 class Compare:
     base: ExprBase
-    left: Expr
+    left: JsonVal
     ops: list[str]
-    comparators: list[Expr]
+    comparators: list[JsonVal]
     def to_jv(self) -> dict[str, JsonVal]:
         d: dict[str, JsonVal] = {"kind": K.COMPARE}
         d.update(_expr_base_jv(self.base))
@@ -199,8 +206,8 @@ class Compare:
 @dataclass
 class Call:
     base: ExprBase
-    func: Expr
-    args: list[Expr]
+    func: JsonVal
+    args: list[JsonVal]
     keywords: list[Keyword]
     def to_jv(self) -> dict[str, JsonVal]:
         d: dict[str, JsonVal] = {"kind": K.CALL}
@@ -213,7 +220,7 @@ class Call:
 @dataclass
 class Attribute:
     base: ExprBase
-    value: Expr
+    value: JsonVal
     attr: str
     def to_jv(self) -> dict[str, JsonVal]:
         d: dict[str, JsonVal] = {"kind": K.ATTRIBUTE}
@@ -225,12 +232,12 @@ class Attribute:
 @dataclass
 class Subscript:
     base: ExprBase
-    value: Expr
-    slice_expr: Expr
+    value: JsonVal
+    slice_expr: JsonVal
     is_slice: bool = False
     lowered_kind: Optional[str] = None
-    lower: Optional[Expr] = None
-    upper: Optional[Expr] = None
+    lower: Optional[JsonVal] = None
+    upper: Optional[JsonVal] = None
     def to_jv(self) -> dict[str, JsonVal]:
         d: dict[str, JsonVal] = {"kind": K.SUBSCRIPT}
         d.update(_expr_base_jv(self.base))
@@ -245,9 +252,9 @@ class Subscript:
 
 @dataclass
 class SliceExpr:
-    lower: Optional[Expr]
-    upper: Optional[Expr]
-    step: Optional[Expr]
+    lower: Optional[JsonVal]
+    upper: Optional[JsonVal]
+    step: Optional[JsonVal]
     def to_jv(self) -> dict[str, JsonVal]:
         return {"kind": "Slice",
                 "lower": expr_to_jv(self.lower) if self.lower is not None else None,
@@ -257,9 +264,9 @@ class SliceExpr:
 @dataclass
 class IfExp:
     base: ExprBase
-    test: Expr
-    body: Expr
-    orelse: Expr
+    test: JsonVal
+    body: JsonVal
+    orelse: JsonVal
     def to_jv(self) -> dict[str, JsonVal]:
         d: dict[str, JsonVal] = {"kind": K.IF_EXP}
         d.update(_expr_base_jv(self.base))
@@ -271,7 +278,7 @@ class IfExp:
 @dataclass
 class ListExpr:
     base: ExprBase
-    elements: list[Expr]
+    elements: list[JsonVal]
     def to_jv(self) -> dict[str, JsonVal]:
         d: dict[str, JsonVal] = {"kind": K.LIST}
         d.update(_expr_base_jv(self.base))
@@ -281,7 +288,7 @@ class ListExpr:
 @dataclass
 class TupleExpr:
     base: ExprBase
-    elements: list[Expr]
+    elements: list[JsonVal]
     def to_jv(self) -> dict[str, JsonVal]:
         d: dict[str, JsonVal] = {"kind": K.TUPLE}
         d.update(_expr_base_jv(self.base))
@@ -291,7 +298,7 @@ class TupleExpr:
 @dataclass
 class SetExpr:
     base: ExprBase
-    elements: list[Expr]
+    elements: list[JsonVal]
     def to_jv(self) -> dict[str, JsonVal]:
         d: dict[str, JsonVal] = {"kind": K.SET}
         d.update(_expr_base_jv(self.base))
@@ -301,8 +308,8 @@ class SetExpr:
 @dataclass
 class DictExpr:
     base: ExprBase
-    keys: list[Expr]
-    dict_values: list[Expr]
+    keys: list[JsonVal]
+    dict_values: list[JsonVal]
     entries: Optional[list[DictEntry]] = None
     def to_jv(self) -> dict[str, JsonVal]:
         d: dict[str, JsonVal] = {"kind": K.DICT}
@@ -317,7 +324,7 @@ class DictExpr:
 @dataclass
 class ListComp:
     base: ExprBase
-    elt: Expr
+    elt: JsonVal
     generators: list[Comprehension]
     def to_jv(self) -> dict[str, JsonVal]:
         d: dict[str, JsonVal] = {"kind": K.LIST_COMP}
@@ -338,7 +345,7 @@ class FStringText:
 
 @dataclass
 class FormattedValue:
-    value: Expr
+    value: JsonVal
     format_spec: Optional[str] = None
     def to_jv(self) -> dict[str, JsonVal]:
         d: dict[str, JsonVal] = {"kind": "FormattedValue", "value": expr_to_jv(self.value)}
@@ -359,7 +366,7 @@ class JoinedStr:
 @dataclass
 class LambdaArg:
     name: str
-    default_expr: Optional[Expr] = None
+    default_expr: Optional[JsonVal] = None
     def to_jv(self) -> dict[str, JsonVal]:
         d: dict[str, JsonVal] = {"kind": "arg", "arg": self.name, "annotation": None}
         if self.default_expr is not None:
@@ -370,7 +377,7 @@ class LambdaArg:
 class LambdaExpr:
     base: ExprBase
     args: list[LambdaArg]
-    body: Expr
+    body: JsonVal
     return_type: str
     def to_jv(self) -> dict[str, JsonVal]:
         d: dict[str, JsonVal] = {"kind": "Lambda"}
@@ -383,9 +390,9 @@ class LambdaExpr:
 @dataclass
 class RangeExpr:
     base: ExprBase
-    start: Expr
-    stop: Expr
-    step: Expr
+    start: JsonVal
+    stop: JsonVal
+    step: JsonVal
     range_mode: str
     def to_jv(self) -> dict[str, JsonVal]:
         d: dict[str, JsonVal] = {"kind": "RangeExpr"}
@@ -400,7 +407,7 @@ class RangeExpr:
 @dataclass
 class SetComp:
     base: ExprBase
-    elt: Expr
+    elt: JsonVal
     generators: list[Comprehension]
     def to_jv(self) -> dict[str, JsonVal]:
         d: dict[str, JsonVal] = {"kind": "SetComp"}
@@ -412,8 +419,8 @@ class SetComp:
 @dataclass
 class DictComp:
     base: ExprBase
-    key: Expr
-    value: Expr
+    key: JsonVal
+    value: JsonVal
     generators: list[Comprehension]
     def to_jv(self) -> dict[str, JsonVal]:
         d: dict[str, JsonVal] = {"kind": "DictComp"}
@@ -426,21 +433,21 @@ class DictComp:
 @dataclass
 class Starred:
     base: ExprBase
-    value: Expr
+    value: JsonVal
     def to_jv(self) -> dict[str, JsonVal]:
         d: dict[str, JsonVal] = {"kind": K.STARRED}
         d.update(_expr_base_jv(self.base))
         d["value"] = expr_to_jv(self.value)
         return d
 
-Expr = Union[
+ExprNode = Union[
     Name, Constant, BinOp, UnaryOp, BoolOp, Compare, Call, Attribute,
     Subscript, SliceExpr, IfExp, ListExpr, SetExpr, TupleExpr, DictExpr,
     ListComp, SetComp, DictComp, JoinedStr,
     RangeExpr, LambdaExpr, Starred,
 ]
 
-def expr_to_jv(e: Expr) -> dict[str, JsonVal]:
+def expr_to_jv(e: JsonVal) -> dict[str, JsonVal]:
     return e.to_jv()
 
 
@@ -469,12 +476,12 @@ class ImportFrom:
 @dataclass
 class AnnAssign:
     source_span: SourceSpan
-    target: Expr
+    target: JsonVal
     annotation: str
-    value: Optional[Expr]
+    value: Optional[JsonVal]
     declare: bool
     node_meta: Optional[dict[str, JsonVal]] = None
-    leading_trivia: Optional[list[TriviaNode]] = None
+    leading_trivia: Optional[list[JsonVal]] = None
     leading_comments: Optional[list[str]] = None
     def to_jv(self) -> dict[str, JsonVal]:
         d: dict[str, JsonVal] = {
@@ -494,10 +501,10 @@ class AnnAssign:
 @dataclass
 class Assign:
     source_span: SourceSpan
-    target: Expr
-    value: Expr
+    target: JsonVal
+    value: JsonVal
     declare: bool
-    leading_trivia: Optional[list[TriviaNode]] = None
+    leading_trivia: Optional[list[JsonVal]] = None
     leading_comments: Optional[list[str]] = None
     def to_jv(self) -> dict[str, JsonVal]:
         d: dict[str, JsonVal] = {
@@ -514,9 +521,9 @@ class Assign:
 @dataclass
 class AugAssign:
     source_span: SourceSpan
-    target: Expr
+    target: JsonVal
     op: str
-    value: Expr
+    value: JsonVal
     declare: bool
     def to_jv(self) -> dict[str, JsonVal]:
         return {"kind": K.AUG_ASSIGN, "source_span": self.source_span.to_jv(),
@@ -526,8 +533,8 @@ class AugAssign:
 @dataclass
 class ExprStmt:
     source_span: SourceSpan
-    value: Expr
-    leading_trivia: Optional[list[TriviaNode]] = None
+    value: JsonVal
+    leading_trivia: Optional[list[JsonVal]] = None
     leading_comments: Optional[list[str]] = None
     def to_jv(self) -> dict[str, JsonVal]:
         d: dict[str, JsonVal] = {"kind": K.EXPR, "source_span": self.source_span.to_jv(),
@@ -541,8 +548,8 @@ class ExprStmt:
 @dataclass
 class Swap:
     source_span: SourceSpan
-    left: Expr
-    right: Expr
+    left: JsonVal
+    right: JsonVal
     def to_jv(self) -> dict[str, JsonVal]:
         return {"kind": K.SWAP, "source_span": self.source_span.to_jv(),
                 "left": expr_to_jv(self.left), "right": expr_to_jv(self.right)}
@@ -550,8 +557,8 @@ class Swap:
 @dataclass
 class Return:
     source_span: SourceSpan
-    value: Optional[Expr]
-    leading_trivia: Optional[list[TriviaNode]] = None
+    value: Optional[JsonVal]
+    leading_trivia: Optional[list[JsonVal]] = None
     leading_comments: Optional[list[str]] = None
     def to_jv(self) -> dict[str, JsonVal]:
         d: dict[str, JsonVal] = {"kind": K.RETURN, "source_span": self.source_span.to_jv(),
@@ -565,7 +572,7 @@ class Return:
 @dataclass
 class Yield:
     source_span: SourceSpan
-    value: Expr
+    value: JsonVal
     def to_jv(self) -> dict[str, JsonVal]:
         return {"kind": K.YIELD, "source_span": self.source_span.to_jv(),
                 "value": expr_to_jv(self.value)}
@@ -573,8 +580,8 @@ class Yield:
 @dataclass
 class Raise:
     source_span: SourceSpan
-    exc: Optional[Expr]
-    cause: Optional[Expr]
+    exc: Optional[JsonVal]
+    cause: Optional[JsonVal]
     def to_jv(self) -> dict[str, JsonVal]:
         return {"kind": "Raise", "source_span": self.source_span.to_jv(),
                 "exc": expr_to_jv(self.exc) if self.exc is not None else None,
@@ -582,9 +589,9 @@ class Raise:
 
 @dataclass
 class ExceptHandler:
-    exc_type_expr: Optional[Expr]
+    exc_type_expr: Optional[JsonVal]
     name: Optional[str]
-    body: list[Stmt]
+    body: list[JsonVal]
     source_span: SourceSpan
     def to_jv(self) -> dict[str, JsonVal]:
         return {"kind": "ExceptHandler",
@@ -595,10 +602,10 @@ class ExceptHandler:
 @dataclass
 class Try:
     source_span: SourceSpan
-    body: list[Stmt]
+    body: list[JsonVal]
     handlers: list[ExceptHandler]
-    orelse: list[Stmt]
-    finalbody: list[Stmt]
+    orelse: list[JsonVal]
+    finalbody: list[JsonVal]
     def to_jv(self) -> dict[str, JsonVal]:
         return {"kind": K.TRY, "source_span": self.source_span.to_jv(),
                 "body": [stmt_to_jv(s) for s in self.body],
@@ -615,10 +622,10 @@ class Pass:
 @dataclass
 class If:
     source_span: SourceSpan
-    test: Expr
-    body: list[Stmt]
-    orelse: list[Stmt]
-    leading_trivia: Optional[list[TriviaNode]] = None
+    test: JsonVal
+    body: list[JsonVal]
+    orelse: list[JsonVal]
+    leading_trivia: Optional[list[JsonVal]] = None
     leading_comments: Optional[list[str]] = None
     def to_jv(self) -> dict[str, JsonVal]:
         d: dict[str, JsonVal] = {"kind": K.IF, "source_span": self.source_span.to_jv(),
@@ -634,11 +641,11 @@ class If:
 @dataclass
 class For:
     source_span: SourceSpan
-    target: Expr
-    iter_expr: Expr  # JSON key: "iter"
-    body: list[Stmt]
-    orelse: list[Stmt]
-    leading_trivia: Optional[list[TriviaNode]] = None
+    target: JsonVal
+    iter_expr: JsonVal  # JSON key: "iter"
+    body: list[JsonVal]
+    orelse: list[JsonVal]
+    leading_trivia: Optional[list[JsonVal]] = None
     def to_jv(self) -> dict[str, JsonVal]:
         d: dict[str, JsonVal] = {"kind": K.FOR, "source_span": self.source_span.to_jv(),
                                   "target": expr_to_jv(self.target),
@@ -652,9 +659,9 @@ class For:
 @dataclass
 class While:
     source_span: SourceSpan
-    test: Expr
-    body: list[Stmt]
-    orelse: list[Stmt]
+    test: JsonVal
+    body: list[JsonVal]
+    orelse: list[JsonVal]
     def to_jv(self) -> dict[str, JsonVal]:
         return {"kind": K.WHILE, "source_span": self.source_span.to_jv(),
                 "test": expr_to_jv(self.test),
@@ -664,9 +671,9 @@ class While:
 @dataclass
 class With:
     source_span: SourceSpan
-    context_expr: Expr   # the expression after 'with' (e.g., open(path, "wb"))
+    context_expr: JsonVal   # the expression after 'with' (e.g., open(path, "wb"))
     var_name: str        # the 'as' variable name (e.g., "f")
-    body: list[Stmt]
+    body: list[JsonVal]
     def to_jv(self) -> dict[str, JsonVal]:
         return {"kind": "With", "source_span": self.source_span.to_jv(),
                 "context_expr": expr_to_jv(self.context_expr),
@@ -685,14 +692,14 @@ class FunctionDef:
     return_type: str
     renamed_symbols: dict[str, str]
     docstring: Optional[str]
-    body: list[Stmt]
+    body: list[JsonVal]
     is_generator: int
     yield_value_type: str
     vararg_name: Optional[str] = None
     vararg_type: Optional[str] = None
     decorators: Optional[list[str]] = None
     node_meta: Optional[dict[str, JsonVal]] = None
-    leading_trivia: Optional[list[TriviaNode]] = None
+    leading_trivia: Optional[list[JsonVal]] = None
     leading_comments: Optional[list[str]] = None
     def to_jv(self) -> dict[str, JsonVal]:
         d: dict[str, JsonVal] = {
@@ -724,12 +731,12 @@ class ClassDef:
     name: str
     original_name: str
     base: Optional[str]
-    body: list[Stmt]
+    body: list[JsonVal]
     dataclass_flag: bool
     field_types: dict[str, str]
     decorators: Optional[list[str]] = None
     node_meta: Optional[dict[str, JsonVal]] = None
-    leading_trivia: Optional[list[TriviaNode]] = None
+    leading_trivia: Optional[list[JsonVal]] = None
     leading_comments: Optional[list[str]] = None
     def to_jv(self) -> dict[str, JsonVal]:
         d: dict[str, JsonVal] = {
@@ -760,12 +767,12 @@ class TypeAlias:
                 "name": self.name,
                 "value": self.value}
 
-Stmt = Union[
+StmtNode = Union[
     Import, ImportFrom, AnnAssign, Assign, AugAssign, ExprStmt, Swap, Return, Yield, Raise, Pass,
     If, For, While, With, Try, FunctionDef, ClassDef, TypeAlias,
 ]
 
-def stmt_to_jv(s: Stmt) -> dict[str, JsonVal]:
+def stmt_to_jv(s: JsonVal) -> dict[str, JsonVal]:
     return s.to_jv()
 
 
@@ -777,8 +784,8 @@ def stmt_to_jv(s: Stmt) -> dict[str, JsonVal]:
 class Module:
     source_path: str
     source_span: SourceSpan
-    body: list[Stmt]
-    main_guard_body: list[Stmt]
+    body: list[JsonVal]
+    main_guard_body: list[JsonVal]
     meta: dict[str, JsonVal]
     renamed_symbols: dict[str, str]
     east_stage: int = 1

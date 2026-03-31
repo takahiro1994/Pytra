@@ -12,78 +12,128 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 from pytra.std.json import JsonVal
 
-if TYPE_CHECKING:
-    from toolchain2.link.linker import LinkedModule
+from toolchain2.link.import_maps import collect_import_modules
+from toolchain2.link.import_maps import collect_import_symbols
+from toolchain2.link.shared_types import LinkedModule
 
-from toolchain2.link.import_maps import collect_import_maps
 
+_BUILTIN_TYPE_IDS: dict[str, int] = {
+    "None": 0,
+    "bool": 1,
+    "int": 2,
+    "float": 3,
+    "str": 4,
+    "list": 5,
+    "dict": 6,
+    "set": 7,
+    "object": 8,
+    "BaseException": 9,
+    "Exception": 10,
+    "RuntimeError": 11,
+    "ValueError": 12,
+    "TypeError": 13,
+    "IndexError": 14,
+    "KeyError": 15,
+}
 
-_BUILTIN_TYPE_IDS: dict[str, int] = {}
-_BUILTIN_TYPE_IDS["None"] = 0
-_BUILTIN_TYPE_IDS["bool"] = 1
-_BUILTIN_TYPE_IDS["int"] = 2
-_BUILTIN_TYPE_IDS["float"] = 3
-_BUILTIN_TYPE_IDS["str"] = 4
-_BUILTIN_TYPE_IDS["list"] = 5
-_BUILTIN_TYPE_IDS["dict"] = 6
-_BUILTIN_TYPE_IDS["set"] = 7
-_BUILTIN_TYPE_IDS["object"] = 8
-_BUILTIN_TYPE_IDS["BaseException"] = 9
-_BUILTIN_TYPE_IDS["Exception"] = 10
-_BUILTIN_TYPE_IDS["RuntimeError"] = 11
-_BUILTIN_TYPE_IDS["ValueError"] = 12
-_BUILTIN_TYPE_IDS["TypeError"] = 13
-_BUILTIN_TYPE_IDS["IndexError"] = 14
-_BUILTIN_TYPE_IDS["KeyError"] = 15
+_BUILTIN_CLASS_IDS: dict[str, int] = {
+    "object": 8,
+    "BaseException": 9,
+    "Exception": 10,
+    "RuntimeError": 11,
+    "ValueError": 12,
+    "TypeError": 13,
+    "IndexError": 14,
+    "KeyError": 15,
+    "None": 0,
+    "bool": 1,
+    "int": 2,
+    "float": 3,
+    "str": 4,
+    "list": 5,
+    "dict": 6,
+    "set": 7,
+}
 
-_BUILTIN_CLASS_IDS: dict[str, int] = {}
-_BUILTIN_CLASS_IDS["object"] = _BUILTIN_TYPE_IDS["object"]
-_BUILTIN_CLASS_IDS["BaseException"] = _BUILTIN_TYPE_IDS["BaseException"]
-_BUILTIN_CLASS_IDS["Exception"] = _BUILTIN_TYPE_IDS["Exception"]
-_BUILTIN_CLASS_IDS["RuntimeError"] = _BUILTIN_TYPE_IDS["RuntimeError"]
-_BUILTIN_CLASS_IDS["ValueError"] = _BUILTIN_TYPE_IDS["ValueError"]
-_BUILTIN_CLASS_IDS["TypeError"] = _BUILTIN_TYPE_IDS["TypeError"]
-_BUILTIN_CLASS_IDS["IndexError"] = _BUILTIN_TYPE_IDS["IndexError"]
-_BUILTIN_CLASS_IDS["KeyError"] = _BUILTIN_TYPE_IDS["KeyError"]
-_BUILTIN_CLASS_IDS["None"] = _BUILTIN_TYPE_IDS["None"]
-_BUILTIN_CLASS_IDS["bool"] = _BUILTIN_TYPE_IDS["bool"]
-_BUILTIN_CLASS_IDS["int"] = _BUILTIN_TYPE_IDS["int"]
-_BUILTIN_CLASS_IDS["float"] = _BUILTIN_TYPE_IDS["float"]
-_BUILTIN_CLASS_IDS["str"] = _BUILTIN_TYPE_IDS["str"]
-_BUILTIN_CLASS_IDS["list"] = _BUILTIN_TYPE_IDS["list"]
-_BUILTIN_CLASS_IDS["dict"] = _BUILTIN_TYPE_IDS["dict"]
-_BUILTIN_CLASS_IDS["set"] = _BUILTIN_TYPE_IDS["set"]
+_BUILTIN_CLASS_CHILDREN: dict[str, list[str]] = {
+    "object": ["BaseException"],
+    "BaseException": ["Exception"],
+    "Exception": ["IndexError", "KeyError", "RuntimeError", "TypeError", "ValueError"],
+    "RuntimeError": [],
+    "ValueError": [],
+    "TypeError": [],
+    "IndexError": [],
+    "KeyError": [],
+}
 
-_BUILTIN_CLASS_CHILDREN: dict[str, list[str]] = {}
-_BUILTIN_CLASS_CHILDREN["object"] = ["BaseException"]
-_BUILTIN_CLASS_CHILDREN["BaseException"] = ["Exception"]
-_BUILTIN_CLASS_CHILDREN["Exception"] = ["IndexError", "KeyError", "RuntimeError", "TypeError", "ValueError"]
-_BUILTIN_CLASS_CHILDREN["RuntimeError"] = []
-_BUILTIN_CLASS_CHILDREN["ValueError"] = []
-_BUILTIN_CLASS_CHILDREN["TypeError"] = []
-_BUILTIN_CLASS_CHILDREN["IndexError"] = []
-_BUILTIN_CLASS_CHILDREN["KeyError"] = []
-
-_ROOT_BASE_NAMES: set[str] = set(_BUILTIN_TYPE_IDS.keys())
-_ROOT_BASE_NAMES.add("Enum")
-_ROOT_BASE_NAMES.add("IntEnum")
-_ROOT_BASE_NAMES.add("IntFlag")
-_ROOT_BASE_NAMES.add("BaseException")
-_ROOT_BASE_NAMES.add("Exception")
-_ROOT_BASE_NAMES.add("RuntimeError")
-_ROOT_BASE_NAMES.add("ValueError")
-_ROOT_BASE_NAMES.add("TypeError")
-_ROOT_BASE_NAMES.add("IndexError")
-_ROOT_BASE_NAMES.add("KeyError")
-_ROOT_BASE_NAMES.add("TypedDict")
-_ROOT_BASE_NAMES.add("ABC")
-_ROOT_BASE_NAMES.add("Protocol")
+_ROOT_BASE_NAMES: set[str] = {
+    "None",
+    "bool",
+    "int",
+    "float",
+    "str",
+    "list",
+    "dict",
+    "set",
+    "object",
+    "Enum",
+    "IntEnum",
+    "IntFlag",
+    "BaseException",
+    "Exception",
+    "RuntimeError",
+    "ValueError",
+    "TypeError",
+    "IndexError",
+    "KeyError",
+    "TypedDict",
+    "ABC",
+    "Protocol",
+}
 
 _USER_TYPE_ID_BASE = 1000
+
+
+def _builtin_class_names_in_id_order() -> list[str]:
+    out: list[str] = []
+    pending_id = 0
+    while pending_id <= 15:
+        for builtin_name in _BUILTIN_CLASS_IDS:
+            if _BUILTIN_CLASS_IDS[builtin_name] == pending_id:
+                out.append(builtin_name)
+                break
+        pending_id += 1
+    return out
+
+
+def _sorted_strings(values: list[str]) -> list[str]:
+    out: list[str] = []
+    used: set[str] = set()
+    while len(out) < len(values):
+        found = False
+        min_value = ""
+        for value in values:
+            if value in used:
+                continue
+            if not found or value < min_value:
+                min_value = value
+                found = True
+        if not found:
+            break
+        used.add(min_value)
+        out.append(min_value)
+    return out
+
+
+def _tail_name(name: str) -> str:
+    if "." not in name:
+        return name
+    parts = name.split(".")
+    if len(parts) == 0:
+        return name
+    return parts[len(parts) - 1]
 
 
 def builtin_exception_type_names() -> set[str]:
@@ -113,8 +163,10 @@ def _safe_name(val: JsonVal) -> str:
     return ""
 
 
-def _iter_class_defs(east_doc: dict[str, JsonVal]) -> list[dict[str, JsonVal]]:
+def _iter_class_defs(east_doc: JsonVal) -> list[dict[str, JsonVal]]:
     """Extract top-level ClassDef nodes from module body."""
+    if not isinstance(east_doc, dict):
+        return []
     body_val = east_doc.get("body")
     body = body_val if isinstance(body_val, list) else []
     out: list[dict[str, JsonVal]] = []
@@ -171,9 +223,9 @@ def _resolve_declared_class_base_fqcn(
     fqcn: str,
     module_id: str,
     all_classes: set[str],
-    local_classes: dict[str, str],
-    import_modules: dict[str, str],
-    import_symbols: dict[str, str],
+    local_classes: JsonVal,
+    import_modules: JsonVal,
+    import_symbols: JsonVal,
 ) -> str:
     """Resolve a declared base class name to a fully-qualified class name (FQCN)."""
     name = base_name.strip()
@@ -183,21 +235,36 @@ def _resolve_declared_class_base_fqcn(
         return name
     if name in all_classes:
         return name
-    if name in local_classes:
-        return local_classes[name]
+    if isinstance(local_classes, dict) and name in local_classes:
+        local_fqcn = local_classes[name]
+        if isinstance(local_fqcn, str):
+            return local_fqcn
     # Check import symbols (binding_kind=symbol: "module_id::export_name")
-    imported_symbol = import_symbols.get(name, "").strip()
+    imported_symbol = ""
+    if isinstance(import_symbols, dict) and name in import_symbols:
+        imported_symbol_val = import_symbols[name]
+        if isinstance(imported_symbol_val, str):
+            imported_symbol = imported_symbol_val.strip()
     if imported_symbol != "" and "::" in imported_symbol:
-        dep_module_id, export_name = imported_symbol.split("::", 1)
+        pair = imported_symbol.split("::")
+        dep_module_id = pair[0] if len(pair) > 0 else ""
+        export_name = pair[1] if len(pair) > 1 else ""
         export_name = export_name.strip()
         if dep_module_id.strip() != "" and export_name != "":
             return dep_module_id.strip() + "." + export_name
     # Check dotted name (e.g. module.ClassName)
     if "." in name:
-        owner_name, attr_name = name.rsplit(".", 1)
-        imported_module = import_modules.get(owner_name, "").strip()
-        if imported_module != "" and attr_name.strip() != "":
-            return imported_module + "." + attr_name.strip()
+        dotted_parts = name.split(".")
+        if len(dotted_parts) >= 2:
+            owner_name = dotted_parts[0]
+            attr_name = dotted_parts[len(dotted_parts) - 1]
+            imported_module = ""
+            if isinstance(import_modules, dict) and owner_name in import_modules:
+                imported_module_val = import_modules[owner_name]
+                if isinstance(imported_module_val, str):
+                    imported_module = imported_module_val.strip()
+            if imported_module != "" and attr_name.strip() != "":
+                return imported_module + "." + attr_name.strip()
     # Fallback: assume local
     fqcn_candidate = module_id + "." + name
     if fqcn_candidate in all_classes:
@@ -220,38 +287,34 @@ def build_type_id_table(
     children: dict[str, list[str]] = {}
     all_classes: set[str] = set()
     module_local_classes: dict[str, dict[str, str]] = {}
-    module_import_maps: dict[str, tuple[dict[str, str], dict[str, str]]] = {}
     module_class_defs: dict[str, list[dict[str, JsonVal]]] = {}
 
-    for module in sorted(modules, key=lambda m: m.module_id):
-        doc = module.east_doc
-        if not isinstance(doc, dict):
-            continue
-
-        import_modules, import_symbols = collect_import_maps(doc)
-        module_import_maps[module.module_id] = (import_modules, import_symbols)
+    for module in modules:
+        current_module_id = module.module_id + ""
 
         # First pass: collect local class names → FQCN
         local_classes: dict[str, str] = {}
-        class_defs = _iter_class_defs(doc)
-        module_class_defs[module.module_id] = class_defs
+        class_defs = _iter_class_defs(module.east_doc)
+        module_class_defs[current_module_id] = class_defs
         for class_def in class_defs:
             if _is_trait_class(class_def):
                 continue
             class_name = _safe_name(class_def.get("name"))
             if class_name == "":
                 continue
-            fqcn = module.module_id + "." + class_name
+            fqcn = current_module_id + "." + class_name
             if fqcn in all_classes:
                 raise _input_invalid("duplicate class definition: " + fqcn)
             local_classes[class_name] = fqcn
             all_classes.add(fqcn)
-        module_local_classes[module.module_id] = local_classes
+        module_local_classes[current_module_id] = local_classes
 
-    for module in sorted(modules, key=lambda m: m.module_id):
-        class_defs = module_class_defs.get(module.module_id, [])
-        local_classes = module_local_classes.get(module.module_id, {})
-        import_modules, import_symbols = module_import_maps.get(module.module_id, ({}, {}))
+    for module in modules:
+        current_module_id = module.module_id + ""
+        class_defs = module_class_defs.get(current_module_id, [])
+        local_classes = module_local_classes.get(current_module_id, {})
+        import_modules = collect_import_modules(module.east_doc)
+        import_symbols = collect_import_symbols(module.east_doc)
 
         for class_def in class_defs:
             if _is_trait_class(class_def):
@@ -259,7 +322,7 @@ def build_type_id_table(
             class_name = _safe_name(class_def.get("name"))
             if class_name == "":
                 continue
-            fqcn = module.module_id + "." + class_name
+            fqcn = current_module_id + "." + class_name
             base_names = _iter_class_base_names(class_def)
             if len(base_names) > 1:
                 raise _input_invalid(
@@ -273,7 +336,7 @@ def build_type_id_table(
                 base_fqcn = _resolve_declared_class_base_fqcn(
                     base_names[0],
                     fqcn=fqcn,
-                    module_id=module.module_id,
+                    module_id=current_module_id,
                     all_classes=all_classes,
                     local_classes=local_classes,
                     import_modules=import_modules,
@@ -297,7 +360,12 @@ def build_type_id_table(
                     cycle_start = i
                     break
                 i += 1
-            cycle = stack[cycle_start:] + [fqcn]
+            cycle: list[str] = []
+            cycle_idx = cycle_start
+            while cycle_idx < len(stack):
+                cycle.append(stack[cycle_idx])
+                cycle_idx += 1
+            cycle.append(fqcn)
             raise _input_invalid("inheritance cycle: " + " -> ".join(cycle))
 
         visit_state[fqcn] = 1
@@ -306,18 +374,27 @@ def build_type_id_table(
             _visit(base_fqcn, stack + [fqcn])
         visit_state[fqcn] = 2
 
-    for fqcn in sorted(class_bases.keys()):
-        _visit(fqcn, [])
+    class_base_names: list[str] = []
+    for fqcn in class_bases:
+        class_base_names.append(fqcn)
+    for fqcn in _sorted_strings(class_base_names):
+        empty_stack: list[str] = []
+        _visit(fqcn, empty_stack)
 
     # Build children map
-    for fqcn, base_fqcn in sorted(class_bases.items()):
+    sorted_class_names = _sorted_strings(class_base_names)
+    for fqcn in sorted_class_names:
+        base_fqcn = class_bases[fqcn]
         if base_fqcn not in children:
             children[base_fqcn] = []
         children[base_fqcn].append(fqcn)
 
     # Sort children for determinism
-    for parent in list(children.keys()):
-        children[parent] = sorted(children[parent])
+    child_parents: list[str] = []
+    for parent in children:
+        child_parents.append(parent)
+    for parent in _sorted_strings(child_parents):
+        children[parent] = _sorted_strings(children[parent])
 
     # DFS assignment
     next_id_holder: list[int] = [_USER_TYPE_ID_BASE]
@@ -333,8 +410,8 @@ def build_type_id_table(
         exit_val = next_id_holder[0]
         type_info_table[fqcn] = {"id": entry, "entry": entry, "exit": exit_val}
 
-    for builtin_name, builtin_id in sorted(_BUILTIN_CLASS_IDS.items(), key=lambda item: item[1]):
-        type_id_table[builtin_name] = builtin_id
+    for builtin_name in _builtin_class_names_in_id_order():
+        type_id_table[builtin_name] = _BUILTIN_CLASS_IDS[builtin_name]
 
     def _walk_builtin(name: str) -> None:
         for builtin_child in _BUILTIN_CLASS_CHILDREN.get(name, []):
@@ -354,25 +431,28 @@ def build_type_id_table(
     # Add type_info_table entries for any _BUILTIN_CLASS_IDS entries not processed by
     # _walk_builtin (e.g. None, bool, int, float, str, list, dict, set — standalone leaf types).
     # type_id_table entries were already added above; only type_info is missing.
-    for builtin_name in sorted(_BUILTIN_CLASS_IDS.keys()):
+    for builtin_name in _builtin_class_names_in_id_order():
         if builtin_name not in type_info_table:
             raw_tid = _BUILTIN_CLASS_IDS[builtin_name]
             type_info_table[builtin_name] = {"id": raw_tid, "entry": raw_tid, "exit": raw_tid + 1}
 
-    for synthetic_root in sorted(_ROOT_BASE_NAMES):
+    synthetic_roots: list[str] = []
+    for synthetic_root in _ROOT_BASE_NAMES:
+        synthetic_roots.append(synthetic_root)
+    for synthetic_root in _sorted_strings(synthetic_roots):
         if synthetic_root in _BUILTIN_CLASS_IDS:
             continue
         for child_fqcn in children.get(synthetic_root, []):
             if child_fqcn not in type_info_table:
                 _assign(child_fqcn)
 
-    for fqcn, base_fqcn in sorted(class_bases.items()):
+    for fqcn in sorted_class_names:
+        base_fqcn = class_bases[fqcn]
         if base_fqcn == "object" and fqcn not in type_info_table:
             _assign(fqcn)
 
-    object_info = type_info_table.get("object")
-    if isinstance(object_info, dict):
-        object_info["exit"] = next_id_holder[0]
+    if "object" in type_info_table:
+        type_info_table["object"]["exit"] = next_id_holder[0]
 
     if len(type_id_table) != len(class_bases) + len(_BUILTIN_CLASS_IDS):
         raise _input_invalid(
@@ -384,9 +464,11 @@ def build_type_id_table(
 
     # Build base type_id map
     type_id_base_map: dict[str, int] = {}
-    for builtin_name, builtin_id in sorted(_BUILTIN_CLASS_IDS.items(), key=lambda item: item[1]):
+    for builtin_name in _builtin_class_names_in_id_order():
+        builtin_id = _BUILTIN_CLASS_IDS[builtin_name]
         builtin_base = ""
-        for candidate, children_list in _BUILTIN_CLASS_CHILDREN.items():
+        for candidate in _BUILTIN_CLASS_CHILDREN:
+            children_list = _BUILTIN_CLASS_CHILDREN[candidate]
             if builtin_name in children_list:
                 builtin_base = candidate
                 break
@@ -395,25 +477,40 @@ def build_type_id_table(
         else:
             type_id_base_map[builtin_name] = builtin_id
 
-    for fqcn, base_fqcn in class_bases.items():
+    for fqcn in class_bases:
+        base_fqcn = class_bases[fqcn]
         if base_fqcn in type_id_table:
             type_id_base_map[fqcn] = type_id_table[base_fqcn]
         else:
-            base_short = base_fqcn.rsplit(".", 1)[-1] if "." in base_fqcn else base_fqcn
+            base_short = _tail_name(base_fqcn)
             type_id_base_map[fqcn] = _BUILTIN_TYPE_IDS.get(base_short, _BUILTIN_TYPE_IDS["object"])
 
     # Convert to JsonVal-compatible dicts
     tid_table: dict[str, JsonVal] = {}
-    for k, v in sorted(type_id_table.items()):
-        tid_table[k] = v
+    type_id_names: list[str] = []
+    for fqcn in type_id_table:
+        type_id_names.append(fqcn)
+    for fqcn in _sorted_strings(type_id_names):
+        tid_table[fqcn] = type_id_table[fqcn]
 
     tid_base: dict[str, JsonVal] = {}
-    for k, v in sorted(type_id_base_map.items()):
-        tid_base[k] = v
+    type_id_base_names: list[str] = []
+    for fqcn in type_id_base_map:
+        type_id_base_names.append(fqcn)
+    for fqcn in _sorted_strings(type_id_base_names):
+        tid_base[fqcn] = type_id_base_map[fqcn]
 
     tid_info: dict[str, JsonVal] = {}
-    for k, v in sorted(type_info_table.items()):
-        info: dict[str, JsonVal] = {"id": v["id"], "entry": v["entry"], "exit": v["exit"]}
-        tid_info[k] = info
+    type_info_names: list[str] = []
+    for fqcn in type_info_table:
+        type_info_names.append(fqcn)
+    for fqcn in _sorted_strings(type_info_names):
+        info_row = type_info_table[fqcn]
+        info: dict[str, JsonVal] = {
+            "id": info_row["id"],
+            "entry": info_row["entry"],
+            "exit": info_row["exit"],
+        }
+        tid_info[fqcn] = info
 
     return tid_table, tid_base, tid_info

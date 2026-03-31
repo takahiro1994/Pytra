@@ -6,12 +6,9 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 from pytra.std.json import JsonVal
 
-if TYPE_CHECKING:
-    from toolchain2.link.linker import LinkedModule
+from toolchain2.link.shared_types import LinkedModule
 
 
 _TYPE_ONLY_MODULE_IDS: set[str] = {

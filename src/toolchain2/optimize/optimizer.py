@@ -8,6 +8,11 @@ from pytra.std import time
 from pytra.std.json import JsonVal
 
 
+def _load_attr(module_name: str, attr_name: str):
+    module = __import__(module_name, fromlist=[attr_name])
+    return getattr(module, attr_name)
+
+
 @dataclass
 class PassContext:
     """Runtime context for optimizer passes."""
@@ -216,8 +221,7 @@ def parse_east3_opt_pass_overrides(spec: str) -> tuple[set[str], set[str]]:
 
 def build_default_pass_manager() -> PassManager:
     """Build default pass manager with all local passes."""
-    from toolchain2.optimize.passes import build_local_only_passes
-
+    build_local_only_passes = _load_attr("toolchain2.optimize.passes", "build_local_only_passes")
     return PassManager(build_local_only_passes())
 
 

@@ -68,91 +68,73 @@ def load_runtime_mapping(mapping_path: Path) -> RuntimeMapping:
     raw_obj = json.loads_obj(text)
     if raw_obj is None:
         return RuntimeMapping()
-    raw = raw_obj.raw
 
     prefix_str = "__pytra_"
-    if "builtin_prefix" in raw:
-        prefix = raw["builtin_prefix"]
-        if isinstance(prefix, str):
-            prefix_str = str(prefix)
-
-    calls_raw: JsonVal = None
-    if "calls" in raw:
-        calls_raw = raw["calls"]
     calls: dict[str, str] = {}
-    if isinstance(calls_raw, dict):
-        for key, v in calls_raw.items():
-            if isinstance(v, str):
-                calls[key] = v
-
-    types_raw: JsonVal = None
-    if "types" in raw:
-        types_raw = raw["types"]
     types: dict[str, str] = {}
-    if isinstance(types_raw, dict):
-        for key, v in types_raw.items():
-            if isinstance(v, str):
-                types[key] = v
-
-    skip_raw: JsonVal = None
-    if "skip_modules" in raw:
-        skip_raw = raw["skip_modules"]
     skip: list[str] = []
-    if isinstance(skip_raw, list):
-        for item in skip_raw:
-            if isinstance(item, str):
-                skip_item = str(item)
-                skip.append(skip_item)
-
-    skip_exact_raw: JsonVal = None
-    if "skip_modules_exact" in raw:
-        skip_exact_raw = raw["skip_modules_exact"]
     skip_exact: set[str] = set()
-    if isinstance(skip_exact_raw, list):
-        for item in skip_exact_raw:
-            if isinstance(item, str):
-                skip_exact.add(str(item))
-
-    implicit_promotions_raw: JsonVal = None
-    if "implicit_promotions" in raw:
-        implicit_promotions_raw = raw["implicit_promotions"]
     implicit_promotions: set[str] = set()
-    if isinstance(implicit_promotions_raw, list):
-        for item in implicit_promotions_raw:
-            if isinstance(item, list):
-                item_list = cast(list[JsonVal], item)
-                if len(item_list) == 2:
-                    from_type = item_list[0]
-                    to_type = item_list[1]
-                    if isinstance(from_type, str) and isinstance(to_type, str):
-                        implicit_promotions.add(from_type + "->" + to_type)
-
-    module_native_files_raw: JsonVal = None
-    if "module_native_files" in raw:
-        module_native_files_raw = raw["module_native_files"]
     module_native_files: dict[str, str] = {}
-    if isinstance(module_native_files_raw, dict):
-        for key, v in module_native_files_raw.items():
-            if isinstance(v, str):
-                module_native_files[key] = v
-
-    call_adapters_raw: JsonVal = None
-    if "call_adapters" in raw:
-        call_adapters_raw = raw["call_adapters"]
     call_adapters: dict[str, str] = {}
-    if isinstance(call_adapters_raw, dict):
-        for key, v in call_adapters_raw.items():
-            if isinstance(v, str):
-                call_adapters[key] = v
-
-    non_native_modules_raw: JsonVal = None
-    if "non_native_modules" in raw:
-        non_native_modules_raw = raw["non_native_modules"]
     non_native_modules: set[str] = set()
-    if isinstance(non_native_modules_raw, list):
-        for item in non_native_modules_raw:
+
+    prefix = raw_obj.get_str("builtin_prefix")
+    if prefix is not None:
+        prefix_str = prefix
+
+    calls_obj = raw_obj.get_obj("calls")
+    if calls_obj is not None:
+        for key, value in calls_obj.raw.items():
+            if isinstance(key, str) and isinstance(value, str):
+                calls[key] = value
+
+    types_obj = raw_obj.get_obj("types")
+    if types_obj is not None:
+        for key, value in types_obj.raw.items():
+            if isinstance(key, str) and isinstance(value, str):
+                types[key] = value
+
+    skip_arr = raw_obj.get_arr("skip_modules")
+    if skip_arr is not None:
+        for item in skip_arr.raw:
             if isinstance(item, str):
-                non_native_modules.add(str(item))
+                skip.append(item)
+
+    skip_exact_arr = raw_obj.get_arr("skip_modules_exact")
+    if skip_exact_arr is not None:
+        for item in skip_exact_arr.raw:
+            if isinstance(item, str):
+                skip_exact.add(item)
+
+    implicit_promotions_arr = raw_obj.get_arr("implicit_promotions")
+    if implicit_promotions_arr is not None:
+        for item in implicit_promotions_arr.raw:
+            item_arr = json.JsonValue(item).as_arr()
+            if item_arr is None:
+                continue
+            from_type = item_arr.get_str(0)
+            to_type = item_arr.get_str(1)
+            if from_type is not None and to_type is not None:
+                implicit_promotions.add(from_type + "->" + to_type)
+
+    module_native_files_obj = raw_obj.get_obj("module_native_files")
+    if module_native_files_obj is not None:
+        for key, value in module_native_files_obj.raw.items():
+            if isinstance(key, str) and isinstance(value, str):
+                module_native_files[key] = value
+
+    call_adapters_obj = raw_obj.get_obj("call_adapters")
+    if call_adapters_obj is not None:
+        for key, value in call_adapters_obj.raw.items():
+            if isinstance(key, str) and isinstance(value, str):
+                call_adapters[key] = value
+
+    non_native_modules_arr = raw_obj.get_arr("non_native_modules")
+    if non_native_modules_arr is not None:
+        for item in non_native_modules_arr.raw:
+            if isinstance(item, str):
+                non_native_modules.add(item)
 
     return RuntimeMapping(
         builtin_prefix=prefix_str,
@@ -198,14 +180,16 @@ def build_import_alias_map(meta: dict[str, JsonVal]) -> dict[str, str]:
     # From import_modules: {alias: module_id}
     im = meta.get("import_modules")
     if isinstance(im, dict):
-        for alias, mod_id in im.items():
+        for alias in im:
+            mod_id = im[alias]
             if isinstance(alias, str) and isinstance(mod_id, str):
                 alias_map[alias] = mod_id
 
     # From import_symbols: {alias: {module: str, name: str}}
     isyms = meta.get("import_symbols")
     if isinstance(isyms, dict):
-        for alias, info in isyms.items():
+        for alias in isyms:
+            info = isyms[alias]
             if isinstance(alias, str) and isinstance(info, dict):
                 mod = info.get("module")
                 if isinstance(mod, str) and mod != "" and alias not in alias_map:
@@ -237,6 +221,18 @@ def resolve_runtime_symbol_name(
     if symbol.startswith(mapping.builtin_prefix):
         return symbol[len(mapping.builtin_prefix):]
     return mapping.builtin_prefix + symbol
+
+
+def should_skip_module(module_id: str, mapping: RuntimeMapping) -> bool:
+    """Check if a module should be skipped (provided by native runtime)."""
+    if module_id in mapping.skip_module_exact:
+        return True
+    if module_id == "pytra.built_in.error" or module_id == "pytra.built_in.type_id_table":
+        return False
+    for prefix in mapping.skip_module_prefixes:
+        if module_id.startswith(prefix):
+            return True
+    return False
 
 
 def build_runtime_import_map(
@@ -294,6 +290,9 @@ def build_runtime_import_map(
                 or should_skip_module(full_module_id, mapping)
             )
         )
+        if is_runtime_namespace and not should_skip_module(module_id, mapping):
+            # pytra.* helper module emitted by the backend: prefer its transpiled symbols.
+            continue
         if is_runtime_namespace and not is_native_runtime:
             # pytra.* module that has its own compiled output file (not provided by py_runtime).
             # Skip from runtime_imports so _emit_import_stmt generates a proper module import.
@@ -368,15 +367,3 @@ def resolve_type(east3_type: str, mapping: RuntimeMapping) -> str:
     Callers should fall back to language-specific type logic when "" is returned.
     """
     return mapping.types.get(east3_type, "")
-
-
-def should_skip_module(module_id: str, mapping: RuntimeMapping) -> bool:
-    """Check if a module should be skipped (provided by native runtime)."""
-    if module_id in mapping.skip_module_exact:
-        return True
-    if module_id == "pytra.built_in.error" or module_id == "pytra.built_in.type_id_table":
-        return False
-    for prefix in mapping.skip_module_prefixes:
-        if module_id.startswith(prefix):
-            return True
-    return False

@@ -13,6 +13,7 @@ from pytra.std.pathlib import Path
 from pytra.std import json
 from pytra.typing import cast
 
+from toolchain2.link.shared_types import LinkedModule
 from toolchain2.link.runtime_discovery import discover_runtime_modules
 from toolchain2.link.runtime_discovery import resolve_runtime_east_path
 from toolchain2.link.type_id import build_type_id_table
@@ -35,24 +36,9 @@ TYPE_ID_TABLE_SOURCE_PATH = "src/pytra/built_in/type_id_table.py"
 TYPE_ID_TABLE_HELPER_ID = "pytra.built_in.type_id_table"
 TYPE_ID_RUNTIME_MODULE_ID = "pytra.built_in.type_id"
 
-_LINK_EXTERNAL_MODULE_PREFIXES: tuple[str, ...] = (
+_LINK_EXTERNAL_MODULE_PREFIXES: list[str] = [
     "pytra.",
-)
-
-# ---------------------------------------------------------------------------
-# Result types
-# ---------------------------------------------------------------------------
-
-@dataclass
-class LinkedModule:
-    """1 module の linked 結果。"""
-    module_id: str
-    input_path: str
-    source_path: str
-    is_entry: bool
-    east_doc: dict[str, JsonVal]
-    module_kind: str  # "user" | "runtime" | "helper"
-
+]
 
 @dataclass
 class LinkResult:

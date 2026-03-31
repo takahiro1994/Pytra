@@ -6,7 +6,6 @@
 from __future__ import annotations
 
 from pytra.std.json import JsonVal
-from toolchain2.common.types import split_generic_types
 
 
 # Python → EAST2 type name mapping
@@ -103,14 +102,43 @@ def _split_top_level_union(t: str) -> list[str]:
     return parts
 
 
+def _split_generic_type_args(text: str) -> list[str]:
+    out: list[str] = []
+    part = ""
+    depth = 0
+    for ch in text:
+        if ch == "<" or ch == "[":
+            depth += 1
+            part += ch
+            continue
+        if ch == ">" or ch == "]":
+            if depth > 0:
+                depth -= 1
+            part += ch
+            continue
+        if ch == "," and depth == 0:
+            out.append(part.strip())
+            part = ""
+            continue
+        part += ch
+    last = part.strip()
+    if last != "":
+        out.append(last)
+    return out
+
+
 def normalize_type(raw: str, aliases: dict[str, str] | None = None, _seen: set[str] | None = None) -> str:
     """Normalize a Python type annotation to EAST2 canonical form."""
     t: str = _strip_outer_quotes(raw.strip())
     if t == "":
         return "unknown"
     t = _normalize_typing_alias(t)
-    alias_map: dict[str, str] = aliases if aliases is not None else {}
-    seen: set[str] = _seen if _seen is not None else set()
+    alias_map: dict[str, str] = {}
+    if aliases is not None:
+        alias_map = aliases
+    seen: set[str] = set()
+    if _seen is not None:
+        seen = _seen
 
     alias_target: str = alias_map.get(t, "")
     if alias_target != "":
@@ -133,7 +161,7 @@ def normalize_type(raw: str, aliases: dict[str, str] | None = None, _seen: set[s
     # Union[X, Y] → X | Y
     if t.startswith("Union[") and t.endswith("]"):
         union_inner: str = t[6:-1].strip()
-        union_args: list[str] = split_generic_types(union_inner)
+        union_args: list[str] = _split_generic_type_args(union_inner)
         return " | ".join([normalize_type(a, alias_map, seen) for a in union_args])
 
     # Union type: X | Y (top-level only)
@@ -160,7 +188,7 @@ def normalize_type(raw: str, aliases: dict[str, str] | None = None, _seen: set[s
         elif base == "Deque":
             base_norm = "deque"
         # Normalize inner type args
-        args: list[str] = split_generic_types(inner_str)
+        args: list[str] = _split_generic_type_args(inner_str)
         norm_args: list[str] = [normalize_type(a, alias_map, seen) for a in args]
         if len(norm_args) == 1:
             return base_norm + "[" + norm_args[0] + "]"
@@ -185,7 +213,7 @@ def make_type_expr(type_str: str) -> dict[str, JsonVal]:
     if bracket > 0 and t.endswith("]"):
         base: str = t[:bracket]
         inner: str = t[bracket + 1:-1]
-        args: list[str] = split_generic_types(inner)
+        args: list[str] = _split_generic_type_args(inner)
         return {
             "kind": "GenericType",
             "base": base,
@@ -237,5 +265,5 @@ def extract_type_args(t: str) -> list[str]:
     bracket: int = t.find("[")
     if bracket > 0 and t.endswith("]"):
         inner: str = t[bracket + 1:-1]
-        return split_generic_types(inner)
+        return _split_generic_type_args(inner)
     return []

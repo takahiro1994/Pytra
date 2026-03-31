@@ -187,7 +187,7 @@ def _function_params(node: dict[str, JsonVal]) -> list[str]:
             continue
         arg_type = types.get(arg)
         resolved_type = arg_type if isinstance(arg_type, str) else "object"
-        text = cpp_param_decl(resolved_type, arg, mutable=usage.get(arg) == "reassigned")
+        text = cpp_param_decl(resolved_type, arg, is_mutable=usage.get(arg) == "reassigned")
         default_node = defaults.get(arg)
         if isinstance(default_node, dict):
             default_text = _render_default_expr(default_node)

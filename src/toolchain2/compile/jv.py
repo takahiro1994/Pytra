@@ -11,7 +11,7 @@ deep_copy_json と normalize_type_name は toolchain2.common から re-export �
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Union
+from pytra.std.json import JsonVal
 
 from toolchain2.emit.common.profile_loader import LoweringProfile, load_lowering_profile
 
@@ -19,10 +19,8 @@ from toolchain2.emit.common.profile_loader import LoweringProfile, load_lowering
 from toolchain2.common.jv import deep_copy_json as deep_copy_json
 from toolchain2.common.types import normalize_type_name as normalize_type_name
 
-# JsonVal 再帰型エイリアス (pytra.std.json.JsonVal と同等)
-JsonVal = Union[None, bool, int, float, str, list["JsonVal"], dict[str, "JsonVal"]]
-
-# Node = dict[str, JsonVal]
+# Runtime import contract for existing toolchain2 modules.
+# The C++ emitter skips this typing-only alias assignment.
 Node = dict[str, JsonVal]
 
 
@@ -34,7 +32,7 @@ class CompileContext:
     """
 
     # nominal ADT 宣言テーブル (type_summary.py が参照)
-    nominal_adt_table: dict[str, Node] = field(default_factory=dict)
+    nominal_adt_table: dict[str, dict[str, JsonVal]] = field(default_factory=dict)
 
     # legacy compat bridge フラグ (lower.py が参照)
     legacy_compat_bridge: bool = True
@@ -106,10 +104,10 @@ def jv_str(v: JsonVal) -> str:
     return ""
 
 
-def jv_str_or(v: JsonVal, default: str) -> str:
+def jv_str_or(v: JsonVal, fallback: str) -> str:
     if isinstance(v, str):
         return v
-    return default
+    return fallback
 
 
 def jv_int(v: JsonVal) -> int:
@@ -130,7 +128,7 @@ def jv_list(v: JsonVal) -> list[JsonVal]:
     return []
 
 
-def jv_dict(v: JsonVal) -> Node:
+def jv_dict(v: JsonVal) -> dict[str, JsonVal]:
     if isinstance(v, dict):
         return v
     return {}
@@ -144,37 +142,37 @@ def jv_is_list(v: JsonVal) -> bool:
     return isinstance(v, list)
 
 
-def nd_kind(node: Node) -> str:
+def nd_kind(node: dict[str, JsonVal]) -> str:
     return jv_str(node.get("kind", ""))
 
 
-def nd_get_str(node: Node, key: str) -> str:
+def nd_get_str(node: dict[str, JsonVal], key: str) -> str:
     return jv_str(node.get(key, ""))
 
 
-def nd_get_str_or(node: Node, key: str, default: str) -> str:
-    return jv_str_or(node.get(key), default)
+def nd_get_str_or(node: dict[str, JsonVal], key: str, fallback: str) -> str:
+    return jv_str_or(node.get(key), fallback)
 
 
-def nd_get_dict(node: Node, key: str) -> Node:
+def nd_get_dict(node: dict[str, JsonVal], key: str) -> dict[str, JsonVal]:
     return jv_dict(node.get(key))
 
 
-def nd_get_list(node: Node, key: str) -> list[JsonVal]:
+def nd_get_list(node: dict[str, JsonVal], key: str) -> list[JsonVal]:
     return jv_list(node.get(key))
 
 
-def nd_get_int(node: Node, key: str) -> int:
+def nd_get_int(node: dict[str, JsonVal], key: str) -> int:
     return jv_int(node.get(key))
 
 
-def nd_get_bool(node: Node, key: str) -> bool:
+def nd_get_bool(node: dict[str, JsonVal], key: str) -> bool:
     return jv_bool(node.get(key))
 
 
-def nd_source_span(node: Node) -> JsonVal:
+def nd_source_span(node: dict[str, JsonVal]) -> JsonVal:
     return node.get("source_span")
 
 
-def nd_repr(node: Node) -> str:
+def nd_repr(node: dict[str, JsonVal]) -> str:
     return jv_str(node.get("repr", ""))

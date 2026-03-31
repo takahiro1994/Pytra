@@ -11,7 +11,7 @@ from pytra.std.pathlib import Path
 from pytra.std import json
 
 
-_RUNTIME_EAST_ROOT = Path(__file__).resolve().parents[2] / "runtime" / "east"
+_RUNTIME_EAST_ROOT = Path("src").joinpath("runtime").joinpath("east")
 
 _RUNTIME_MODULE_BUCKETS: dict[str, str] = {
     "pytra.built_in.": "built_in",
@@ -35,23 +35,28 @@ _TYPE_ID_RUNTIME_NODE_KINDS: set[str] = {
     "ClassDef",
 }
 
-_TYPE_ONLY_SYMBOL_BINDINGS: set[tuple[str, str]] = {
-    ("pytra.std.json", "JsonVal"),
+_TYPE_ONLY_SYMBOL_BINDING_KEYS: set[str] = {
+    "pytra.std.json::JsonVal",
 }
 
 
-def resolve_runtime_east_path(module_id: str) -> str:
-    """Resolve a runtime module_id to its .east file path, or empty string."""
-    rel = resolve_runtime_module_rel_tail(module_id)
-    if rel != "" and not rel.startswith("core/"):
-        east_path = _RUNTIME_EAST_ROOT / (rel + ".east")
-        if east_path.exists():
-            return str(east_path)
-    # Fallback: bare module name → pytra.std.X
-    bare_path = _RUNTIME_EAST_ROOT / "std" / (module_id + ".east")
-    if bare_path.exists():
-        return str(bare_path)
-    return ""
+def _sorted_strings(values: list[str]) -> list[str]:
+    out: list[str] = []
+    used: set[str] = set()
+    while len(out) < len(values):
+        found = False
+        min_value = ""
+        for value in values:
+            if value in used:
+                continue
+            if not found or value < min_value:
+                min_value = value
+                found = True
+        if not found:
+            break
+        used.add(min_value)
+        out.append(min_value)
+    return out
 
 
 def resolve_runtime_module_rel_tail(module_id: str) -> str:
@@ -63,6 +68,20 @@ def resolve_runtime_module_rel_tail(module_id: str) -> str:
         if module_id.startswith(prefix):
             name = module_id[len(prefix):]
             return bucket + "/" + name.replace(".", "/")
+    return ""
+
+
+def resolve_runtime_east_path(module_id: str) -> str:
+    """Resolve a runtime module_id to its .east file path, or empty string."""
+    rel = resolve_runtime_module_rel_tail(module_id)
+    if rel != "" and not rel.startswith("core/"):
+        east_path = _RUNTIME_EAST_ROOT / (rel + ".east")
+        if east_path.exists():
+            return str(east_path)
+    # Fallback: bare module name → pytra.std.X
+    bare_path = _RUNTIME_EAST_ROOT.joinpath("std").joinpath(module_id + ".east")
+    if bare_path.exists():
+        return str(bare_path)
     return ""
 
 
@@ -110,10 +129,12 @@ def _has_format_spec(node: JsonVal) -> bool:
 
 def _load_east_file(path_str: str) -> dict[str, JsonVal]:
     """Load a .east file as a JSON dict."""
+    text = ""
     try:
         text = Path(path_str).read_text(encoding="utf-8")
     except Exception as exc:
         raise RuntimeError("failed to read runtime EAST: " + path_str + ": " + str(exc)) from exc
+    obj: JsonVal = None
     try:
         obj = json.loads(text).raw
     except Exception as exc:
@@ -137,7 +158,7 @@ def _append_runtime_dep(
 
 
 def _is_type_only_symbol_binding(module_id: str, export_name: str) -> bool:
-    return (module_id, export_name) in _TYPE_ONLY_SYMBOL_BINDINGS
+    return (module_id + "::" + export_name) in _TYPE_ONLY_SYMBOL_BINDING_KEYS
 
 
 def _import_from_is_type_only(module_id: str, names_val: JsonVal) -> bool:
@@ -184,7 +205,9 @@ def discover_runtime_modules(
 
     Iterates until no new runtime dependencies are found (transitive closure).
     """
-    result: dict[str, dict[str, JsonVal]] = dict(module_map)
+    result: dict[str, dict[str, JsonVal]] = {}
+    for module_path in module_map:
+        result[module_path] = module_map[module_path]
     seen_paths: set[str] = set(result.keys())
 
     changed = True
@@ -192,7 +215,8 @@ def discover_runtime_modules(
         changed = False
         new_deps: list[tuple[str, str]] = []  # (path_str, path_str)
 
-        for east_doc in list(result.values()):
+        for east_path in list(result.keys()):
+            east_doc = result[east_path]
             if not isinstance(east_doc, dict):
                 continue
 
@@ -256,7 +280,8 @@ def discover_runtime_modules(
             # import_bindings while still carrying lowered runtime_module_id refs.
             embedded_runtime_refs: set[str] = set()
             _scan_runtime_refs(east_doc, embedded_runtime_refs)
-            for runtime_module_id in sorted(embedded_runtime_refs):
+            runtime_refs_sorted = _sorted_strings(list(embedded_runtime_refs))
+            for runtime_module_id in runtime_refs_sorted:
                 _append_runtime_dep(new_deps, seen_paths, runtime_module_id, required=True)
 
         for path_str, _ in new_deps:

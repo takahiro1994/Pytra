@@ -20,7 +20,7 @@ from toolchain2.parse.py.source_span import SourceSpan, NULL_SPAN, make_span
 from toolchain2.parse.py.nodes import (
     JsonVal,
     # Trivia
-    TriviaBlank, TriviaComment, TriviaNode,
+    TriviaBlank, TriviaComment, JsonVal,
     # Import
     ImportAlias,
     # Semantic
@@ -29,10 +29,10 @@ from toolchain2.parse.py.nodes import (
     ExprBase, Name, Constant, BinOp, UnaryOp, BoolOp, Compare,
     Call, Attribute, Subscript, SliceExpr, IfExp, ListExpr, TupleExpr,
     SetExpr, DictExpr, ListComp, SetComp, DictComp, JoinedStr, FStringText, FormattedValue,
-    LambdaExpr, LambdaArg, Starred, Expr, expr_to_jv,
+    LambdaExpr, LambdaArg, Starred, JsonVal, expr_to_jv,
     # Statements
     Import, ImportFrom, AnnAssign, Assign, AugAssign, ExprStmt, Swap, Return, Yield, Raise, Pass, Try, ExceptHandler,
-    If, For, While, With, FunctionDef, ClassDef, TypeAlias, Stmt,
+    If, For, While, With, FunctionDef, ClassDef, TypeAlias, JsonVal,
     # Module
     Module,
 )
@@ -133,13 +133,13 @@ def _parse_extern_v2_decorator(s: str) -> Optional[dict[str, str]]:
 
 
 def _parse_runtime_decorator(s: str) -> tuple[str, str, str]:
-    """@runtime("namespace") または @runtime("namespace", symbol="...", tag="...") をパース。
-    成功時は (namespace, symbol_override, tag_override)。失敗時は ("", "", "")。
+    """@runtime("runtime_ns") または @runtime("runtime_ns", symbol="...", tag="...") をパース。
+    成功時は (runtime_ns, symbol_override, tag_override)。失敗時は ("", "", "")。
     """
     if not s.startswith("@runtime(") or not s.endswith(")"):
         return "", "", ""
     inner = s[len("@runtime("):-1].strip()
-    # First arg must be a quoted namespace string
+    # First arg must be a quoted runtime_ns string
     if not inner:
         return "", "", ""
     quote = inner[0]
@@ -148,8 +148,8 @@ def _parse_runtime_decorator(s: str) -> tuple[str, str, str]:
     end_quote = inner.find(quote, 1)
     if end_quote < 0:
         return "", "", ""
-    namespace = inner[1:end_quote]
-    if namespace == "":
+    runtime_ns = inner[1:end_quote]
+    if runtime_ns == "":
         return "", "", ""
     rest = inner[end_quote + 1:].strip()
     symbol_override = ""
@@ -168,17 +168,17 @@ def _parse_runtime_decorator(s: str) -> tuple[str, str, str]:
                 symbol_override = val
             elif key == "tag":
                 tag_override = val
-    return namespace, symbol_override, tag_override
+    return runtime_ns, symbol_override, tag_override
 
 
-def _runtime_fn_extern_v2(namespace: str, fn_name: str, symbol_override: str, tag_override: str) -> dict[str, str]:
+def _runtime_fn_extern_v2(runtime_ns: str, fn_name: str, symbol_override: str, tag_override: str) -> dict[str, str]:
     symbol = symbol_override if symbol_override != "" else fn_name
     tag = tag_override if tag_override != "" else "stdlib.fn." + fn_name
-    return {"module": namespace, "symbol": symbol, "tag": tag}
+    return {"module": runtime_ns, "symbol": symbol, "tag": tag}
 
 
-def _runtime_class_extern_v2(namespace: str, class_name: str) -> dict[str, str]:
-    return {"module": namespace + "." + class_name, "symbol": class_name, "tag": "container." + class_name}
+def _runtime_class_extern_v2(runtime_ns: str, class_name: str) -> dict[str, str]:
+    return {"module": runtime_ns + "." + class_name, "symbol": class_name, "tag": "container." + class_name}
 
 
 def _runtime_method_tag(method_name: str) -> str:
@@ -187,12 +187,12 @@ def _runtime_method_tag(method_name: str) -> str:
     return "stdlib.method." + method_name
 
 
-def _runtime_method_extern_v2(namespace: str, class_name: str, method_name: str) -> dict[str, str]:
-    return {"module": namespace + "." + class_name, "symbol": class_name + "." + method_name, "tag": _runtime_method_tag(method_name), "kind": "method"}
+def _runtime_method_extern_v2(runtime_ns: str, class_name: str, method_name: str) -> dict[str, str]:
+    return {"module": runtime_ns + "." + class_name, "symbol": class_name + "." + method_name, "tag": _runtime_method_tag(method_name), "kind": "method"}
 
 
 def _parse_extern_var_call(value_text: str, var_name: str = "") -> Optional[dict[str, str]]:
-    """extern_var(module=..., symbol=..., tag=...) または runtime_var("namespace") を解析。"""
+    """extern_var(module=..., symbol=..., tag=...) または runtime_var("runtime_ns") を解析。"""
     vt = value_text.strip()
     if vt.startswith("extern_var(") and vt.endswith(")"):
         inner = vt[len("extern_var("):-1]
@@ -200,9 +200,9 @@ def _parse_extern_var_call(value_text: str, var_name: str = "") -> Optional[dict
     if vt.startswith("runtime_var(") and vt.endswith(")"):
         inner = vt[len("runtime_var("):-1].strip()
         if len(inner) >= 2 and inner[0] in ('"', "'") and inner[-1] == inner[0]:
-            namespace = inner[1:-1]
-            if namespace != "" and var_name != "":
-                return {"module": namespace, "symbol": var_name, "tag": "stdlib.symbol." + var_name}
+            runtime_ns = inner[1:-1]
+            if runtime_ns != "" and var_name != "":
+                return {"module": runtime_ns, "symbol": var_name, "tag": "stdlib.symbol." + var_name}
     return None
 
 
@@ -218,7 +218,12 @@ def _parse_from_import(s: str) -> tuple[str, str]:
     m = re.match(r"^from\s+([A-Za-z_][A-Za-z0-9_\.]*)\s+import\s+(.+)$", s)
     if m is None:
         return "", ""
-    return re.strip_group(m, 1), re.strip_group(m, 2)
+    names_text = re.strip_group(m, 2)
+    while names_text.startswith("(") and names_text.endswith(")"):
+        names_text = names_text[1:-1].strip()
+    if names_text.endswith(","):
+        names_text = names_text[:-1].strip()
+    return re.strip_group(m, 1), names_text
 
 
 def _parse_def_header(s: str) -> tuple[str, str, str]:
@@ -343,7 +348,7 @@ def _parse_inline_suite(
     indent: int,
     name_types: dict[str, str],
     scope_label: str,
-) -> list[Stmt]:
+) -> list[JsonVal]:
     if inline_text == "":
         return []
     synthetic_line = (" " * indent) + inline_text
@@ -506,7 +511,7 @@ def _tokenize_expr(text: str) -> list[Token]:
 
 @dataclass
 class ExprParser:
-    """式パーサー。トークン列を走査して Expr ノードを生成する。"""
+    """式パーサー。トークン列を走査して JsonVal ノードを生成する。"""
     tokens: list[Token]
     pos: int
     source_line: int
@@ -553,17 +558,17 @@ class ExprParser:
         """絶対 col → ローカル位置に逆算する。"""
         return abs_col - self.line_col_offset
 
-    def _child_local_start(self, child: Expr) -> int:
+    def _child_local_start(self, child: JsonVal) -> int:
         """子ノードのローカル開始位置。"""
         return self._to_local(_expr_col(child))
 
-    def _child_local_end(self, child: Expr) -> int:
+    def _child_local_end(self, child: JsonVal) -> int:
         """子ノードのローカル終了位置。"""
         return self._to_local(_expr_end_col(child))
 
     # --- Precedence climbing ---
 
-    def parse_expr(self) -> Expr:
+    def parse_expr(self) -> JsonVal:
         if self.peek().value == "lambda":
             return self._parse_lambda()
         return self._parse_ternary()
@@ -577,7 +582,7 @@ class ExprParser:
         while self.peek().value != ":" and self.peek().kind != "EOF":
             if self.peek().kind == "NAME":
                 pname = self.advance().value
-                default_expr: Optional[Expr] = None
+                default_expr: Optional[JsonVal] = None
                 if self.peek().value == "=":
                     self.advance()
                     # Parse default value (stop at , or :)
@@ -593,7 +598,7 @@ class ExprParser:
         base = self._base(start, end)
         return LambdaExpr(base=base, args=lambda_args, body=body, return_type="unknown")
 
-    def _parse_ternary(self) -> Expr:
+    def _parse_ternary(self) -> JsonVal:
         """a if cond else b"""
         body = self._parse_or()
         if self.peek().value == "if":
@@ -608,11 +613,11 @@ class ExprParser:
             return IfExp(base=base, test=test, body=body, orelse=orelse)
         return body
 
-    def _parse_or(self) -> Expr:
+    def _parse_or(self) -> JsonVal:
         left = self._parse_and()
         if self.peek().value != "or":
             return left
-        values: list[Expr] = [left]
+        values: list[JsonVal] = [left]
         while self.peek().value == "or":
             self.advance()
             values.append(self._parse_and())
@@ -621,11 +626,11 @@ class ExprParser:
         base = self._base(start, end)
         return BoolOp(base=base, op="Or", values=values)
 
-    def _parse_and(self) -> Expr:
+    def _parse_and(self) -> JsonVal:
         left = self._parse_not()
         if self.peek().value != "and":
             return left
-        values: list[Expr] = [left]
+        values: list[JsonVal] = [left]
         while self.peek().value == "and":
             self.advance()
             values.append(self._parse_not())
@@ -634,7 +639,7 @@ class ExprParser:
         base = self._base(start, end)
         return BoolOp(base=base, op="And", values=values)
 
-    def _parse_not(self) -> Expr:
+    def _parse_not(self) -> JsonVal:
         if self.peek().value == "not":
             tok = self.advance()
             operand = self._parse_not()
@@ -643,10 +648,10 @@ class ExprParser:
             return UnaryOp(base=base, op="Not", operand=operand)
         return self._parse_compare()
 
-    def _parse_compare(self) -> Expr:
+    def _parse_compare(self) -> JsonVal:
         left = self._parse_bitor()
         ops: list[str] = []
-        comparators: list[Expr] = []
+        comparators: list[JsonVal] = []
         while True:
             tok = self.peek()
             op_str = ""
@@ -694,7 +699,7 @@ class ExprParser:
             return Compare(base=base, left=left, ops=ops, comparators=comparators)
         return left
 
-    def _parse_bitor(self) -> Expr:
+    def _parse_bitor(self) -> JsonVal:
         left = self._parse_bitxor()
         while self.peek().value == "|":
             self.advance()
@@ -705,7 +710,7 @@ class ExprParser:
             left = BinOp(base=base, left=left, op="BitOr", right=right)
         return left
 
-    def _parse_bitxor(self) -> Expr:
+    def _parse_bitxor(self) -> JsonVal:
         left = self._parse_bitand()
         while self.peek().value == "^":
             self.advance()
@@ -716,7 +721,7 @@ class ExprParser:
             left = BinOp(base=base, left=left, op="BitXor", right=right)
         return left
 
-    def _parse_bitand(self) -> Expr:
+    def _parse_bitand(self) -> JsonVal:
         left = self._parse_shift()
         while self.peek().value == "&":
             self.advance()
@@ -727,7 +732,7 @@ class ExprParser:
             left = BinOp(base=base, left=left, op="BitAnd", right=right)
         return left
 
-    def _parse_shift(self) -> Expr:
+    def _parse_shift(self) -> JsonVal:
         left = self._parse_addsub()
         while self.peek().value == "<<" or self.peek().value == ">>":
             op_tok = self.advance()
@@ -739,7 +744,7 @@ class ExprParser:
             left = BinOp(base=base, left=left, op=op_name, right=right)
         return left
 
-    def _parse_addsub(self) -> Expr:
+    def _parse_addsub(self) -> JsonVal:
         left = self._parse_muldiv()
         while self.peek().value == "+" or self.peek().value == "-":
             op_tok = self.advance()
@@ -751,7 +756,7 @@ class ExprParser:
             left = BinOp(base=base, left=left, op=op_name, right=right)
         return left
 
-    def _parse_muldiv(self) -> Expr:
+    def _parse_muldiv(self) -> JsonVal:
         left = self._parse_unary()
         while self.peek().value in ("*", "/", "//", "%"):
             op_tok = self.advance()
@@ -765,7 +770,7 @@ class ExprParser:
             left = BinOp(base=base, left=left, op=op_name, right=right)
         return left
 
-    def _parse_unary(self) -> Expr:
+    def _parse_unary(self) -> JsonVal:
         tok = self.peek()
         if tok.value == "-" and tok.kind == "OP":
             self.advance()
@@ -787,7 +792,7 @@ class ExprParser:
             return UnaryOp(base=base, op="Invert", operand=operand)
         return self._parse_power()
 
-    def _parse_power(self) -> Expr:
+    def _parse_power(self) -> JsonVal:
         left = self._parse_postfix()
         if self.peek().value == "**":
             self.advance()
@@ -798,7 +803,7 @@ class ExprParser:
             left = BinOp(base=base, left=left, op="Pow", right=right)
         return left
 
-    def _parse_postfix(self) -> Expr:
+    def _parse_postfix(self) -> JsonVal:
         """後置演算子: .attr, [index], (call)"""
         expr = self._parse_primary()
         while True:
@@ -828,10 +833,10 @@ class ExprParser:
                 break
         return expr
 
-    def _parse_call(self, func: Expr) -> Call:
+    def _parse_call(self, func: JsonVal) -> Call:
         """関数呼び出し。"""
         self.expect("OP", "(")
-        args: list[Expr] = []
+        args: list[JsonVal] = []
         keywords: list[Keyword] = []
         if self.peek().value != ")":
             while True:
@@ -862,7 +867,7 @@ class ExprParser:
                             target = self._parse_comp_target()
                             self.expect("NAME", "in")
                             iter_expr = self._parse_comp_iter()
-                            ifs: list[Expr] = []
+                            ifs: list[JsonVal] = []
                             while self.peek().value == "if":
                                 self.advance()
                                 ifs.append(self._parse_comp_iter())
@@ -891,7 +896,7 @@ class ExprParser:
         call = Call(base=base, func=func, args=args, keywords=keywords)
         return call
 
-    def _parse_primary(self) -> Expr:
+    def _parse_primary(self) -> JsonVal:
         """基本式: リテラル、名前、括弧、リスト、タプル、辞書。"""
         tok = self.peek()
 
@@ -997,7 +1002,7 @@ class ExprParser:
                     target = self._parse_comp_target()
                     self.expect("NAME", "in")
                     iter_expr = self._parse_comp_iter()
-                    ifs: list[Expr] = []
+                    ifs: list[JsonVal] = []
                     while self.peek().value == "if":
                         self.advance()
                         ifs.append(self._parse_comp_iter())
@@ -1008,7 +1013,7 @@ class ExprParser:
                 return ListComp(base=base, elt=first, generators=gens)
             if self.peek().value == ",":
                 # Tuple
-                elements: list[Expr] = [first]
+                elements: list[JsonVal] = [first]
                 while self.peek().value == ",":
                     self.advance()
                     if self.peek().value == ")":
@@ -1046,7 +1051,7 @@ class ExprParser:
 
         raise ValueError("unexpected token in expression: " + tok.value + " at pos " + str(tok.start))
 
-    def _parse_list_or_listcomp(self) -> Expr:
+    def _parse_list_or_listcomp(self) -> JsonVal:
         open_tok = self.advance()  # [
         if self.peek().value == "]":
             close_tok = self.advance()
@@ -1057,7 +1062,7 @@ class ExprParser:
         if self.peek().value == "for":
             return self._parse_listcomp_tail(open_tok, first)
         # Regular list
-        elements: list[Expr] = [first]
+        elements: list[JsonVal] = [first]
         while self.peek().value == ",":
             self.advance()
             if self.peek().value == "]":
@@ -1068,7 +1073,7 @@ class ExprParser:
         base = self._base(open_tok.start, end_tok.end)
         return ListExpr(base=base, elements=elements)
 
-    def _parse_listcomp_tail(self, open_tok: Token, elt: Expr) -> ListComp:
+    def _parse_listcomp_tail(self, open_tok: Token, elt: JsonVal) -> ListComp:
         gens: list[Comprehension] = []
         while self.peek().value == "for":
             self.advance()  # consume 'for'
@@ -1078,7 +1083,7 @@ class ExprParser:
             # iter_expr は 'if', 'for', ']' で止める
             iter_expr = self._parse_comp_iter()
             # EAST1: 型推論しない
-            ifs: list[Expr] = []
+            ifs: list[JsonVal] = []
             while self.peek().value == "if":
                 self.advance()
                 ifs.append(self._parse_comp_iter())
@@ -1088,7 +1093,7 @@ class ExprParser:
         base = self._base(open_tok.start, end_tok.end)
         return ListComp(base=base, elt=elt, generators=gens)
 
-    def _parse_comp_target(self) -> Expr:
+    def _parse_comp_target(self) -> JsonVal:
         """comprehension の target をパース。'in' キーワードで止める。"""
         tok = self.peek()
         if tok.kind == "NAME" and tok.value != "in":
@@ -1097,7 +1102,7 @@ class ExprParser:
             first = Name(base=base, id=tok.value)
             # Check for tuple target: x, y
             if self.peek().value == ",":
-                elements: list[Expr] = [first]
+                elements: list[JsonVal] = [first]
                 while self.peek().value == ",":
                     self.advance()
                     if self.peek().value == "in":
@@ -1110,7 +1115,7 @@ class ExprParser:
             return first
         return self.parse_expr()
 
-    def _parse_comp_iter(self) -> Expr:
+    def _parse_comp_iter(self) -> JsonVal:
         """comprehension の iter/if 式をパース。'for', 'if', ']', '}', ')' で止める。"""
         # 通常の式パースを行うが、トップレベルの 'for', 'if' で止める
         # これは _parse_ternary の 'if' と衝突するため、or レベルまでパースする
@@ -1124,21 +1129,21 @@ class ExprParser:
             target = self._parse_comp_target()
             self.expect("NAME", "in")
             iter_expr = self._parse_comp_iter()
-            ifs: list[Expr] = []
+            ifs: list[JsonVal] = []
             while self.peek().value == "if":
                 self.advance()
                 ifs.append(self._parse_comp_iter())
             gens.append(Comprehension(target=target, iter_expr=iter_expr, ifs=ifs, is_async=False))
         return gens
 
-    def _parse_subscript_index(self) -> Expr:
+    def _parse_subscript_index(self) -> JsonVal:
         """subscript の index をパース。`:` が来たら SliceExpr を生成。"""
         # Check for initial `:` (e.g., a[:3])
         if self.peek().value == ":":
             return self._parse_slice(None)
         first = self.parse_expr()
         if self.peek().value == ",":
-            elements: list[Expr] = [first]
+            elements: list[JsonVal] = [first]
             while self.peek().value == ",":
                 self.advance()
                 if self.peek().value == "]":
@@ -1153,11 +1158,11 @@ class ExprParser:
             return self._parse_slice(first)
         return first
 
-    def _parse_slice(self, lower: Optional[Expr]) -> SliceExpr:
+    def _parse_slice(self, lower: Optional[JsonVal]) -> SliceExpr:
         """slice 式をパース。`:` を消費した状態で呼ばれる。"""
         self.advance()  # consume ':'
-        upper: Optional[Expr] = None
-        step: Optional[Expr] = None
+        upper: Optional[JsonVal] = None
+        step: Optional[JsonVal] = None
         if self.peek().value != "]" and self.peek().value != ":":
             upper = self.parse_expr()
         if self.peek().value == ":":
@@ -1166,7 +1171,7 @@ class ExprParser:
                 step = self.parse_expr()
         return SliceExpr(lower=lower, upper=upper, step=step)
 
-    def _parse_dict_or_set(self) -> Expr:
+    def _parse_dict_or_set(self) -> JsonVal:
         """dict リテラル、set リテラル、dict/set comprehension をパース。"""
         open_tok = self.advance()
         if self.peek().value == "}":
@@ -1185,8 +1190,8 @@ class ExprParser:
                 base = self._base(open_tok.start, end_tok.end)
                 return DictComp(base=base, key=first, value=first_val, generators=gens)
             # Regular dict
-            keys: list[Expr] = [first]
-            values: list[Expr] = [first_val]
+            keys: list[JsonVal] = [first]
+            values: list[JsonVal] = [first_val]
             entries: list[DictEntry] = [DictEntry(key=first, value=first_val)]
             while self.peek().value == ",":
                 self.advance()
@@ -1210,7 +1215,7 @@ class ExprParser:
             base = self._base(open_tok.start, end_tok.end)
             return SetComp(base=base, elt=first, generators=gens)
         # Set literal: {a, b, c}
-        elements: list[Expr] = [first]
+        elements: list[JsonVal] = [first]
         while self.peek().value == ",":
             self.advance()
             if self.peek().value == "}":
@@ -1231,7 +1236,7 @@ class ExprParser:
 # ExprBase.source_span.col = line_col_offset + local_start なので、
 # local_start = col - line_col_offset で逆算する。
 
-def _expr_col(e: Expr) -> int:
+def _expr_col(e: JsonVal) -> int:
     """式ノードの source_span.col (絶対位置)。"""
     if hasattr(e, 'base') and isinstance(e.base, ExprBase):
         sp = e.base.source_span
@@ -1240,7 +1245,7 @@ def _expr_col(e: Expr) -> int:
     return 0
 
 
-def _expr_end_col(e: Expr) -> int:
+def _expr_end_col(e: JsonVal) -> int:
     """式ノードの source_span.end_col (絶対位置)。"""
     if hasattr(e, 'base') and isinstance(e.base, ExprBase):
         sp = e.base.source_span
@@ -1249,7 +1254,7 @@ def _expr_end_col(e: Expr) -> int:
     return 0
 
 
-def _get_func_name(func: Expr) -> str:
+def _get_func_name(func: JsonVal) -> str:
     if isinstance(func, Name):
         return func.id
     if isinstance(func, Attribute):
@@ -1322,8 +1327,8 @@ def parse_python_source(source: str, filename: str) -> Module:
     _prescan(ctx, lines)
 
     # Phase 2: Parse body
-    body_items: list[Stmt] = []
-    main_guard_body: list[Stmt] = []
+    body_items: list[JsonVal] = []
+    main_guard_body: list[JsonVal] = []
     _parse_module_body(ctx, lines, body_items, main_guard_body)
 
     # Phase 3: Post-processing
@@ -1407,13 +1412,13 @@ def _prescan(ctx: ParseContext, lines: list[str]) -> None:
 def _parse_module_body(
     ctx: ParseContext,
     lines: list[str],
-    body_items: list[Stmt],
-    main_guard_body: list[Stmt],
+    body_items: list[JsonVal],
+    main_guard_body: list[JsonVal],
 ) -> None:
     """Phase 2: モジュール本体をパースする。"""
     ln_no = 0
     total = len(lines)
-    pending_trivia: list[TriviaNode] = []
+    pending_trivia: list[JsonVal] = []
     pending_comments: list[str] = []
     pending_decorators: list[str] = []
     leading_file_trivia_done = False
@@ -1675,7 +1680,7 @@ def _parse_module_body(
             if pending_runtime_ns != "":
                 cls_meta["runtime_v1"] = {
                     "schema_version": 1,
-                    "namespace": pending_runtime_ns,
+                    "runtime_ns": pending_runtime_ns,
                 }
                 cls_meta["extern_v2"] = _runtime_class_extern_v2(pending_runtime_ns, cls_name)
                 pending_runtime_ns = ""
@@ -1775,7 +1780,7 @@ def _parse_function_def(
     lines: list[str],
     start_ln: int,
     fn_name: str,
-    trivia: list[TriviaNode],
+    trivia: list[JsonVal],
     comments: list[str],
     class_name: str = "",
     parent_indent: int = 0,
@@ -1869,7 +1874,7 @@ def _parse_function_def(
 
     # Parse body with arg types in scope
     name_types: dict[str, str] = dict(arg_types)
-    body_stmts: list[Stmt] = _parse_block_lines(ctx, block_lines, name_types, fn_name, start_hint=start_ln) if len(block_lines) > 0 else []
+    body_stmts: list[JsonVal] = _parse_block_lines(ctx, block_lines, name_types, fn_name, start_hint=start_ln) if len(block_lines) > 0 else []
 
 
     # Extract docstring and remove from body
@@ -1934,7 +1939,7 @@ def _parse_function_def(
     return fd, end_ln
 
 
-def _has_yield(stmts: list[Stmt]) -> bool:
+def _has_yield(stmts: list[JsonVal]) -> bool:
     """ステートメントリストに yield が含まれるか再帰的にチェック。"""
     for s in stmts:
         if isinstance(s, Yield):
@@ -1959,7 +1964,7 @@ def _parse_class_def(
     lines: list[str],
     start_ln: int,
     cls_name: str,
-    trivia: list[TriviaNode],
+    trivia: list[JsonVal],
     comments: list[str],
     decorators: Optional[list[str]] = None,
     is_dataclass: bool = False,
@@ -2056,8 +2061,8 @@ def _parse_try_stmt(
     try_body = _parse_block_lines(ctx, try_lines, name_types, "try")
 
     handlers: list[ExceptHandler] = []
-    orelse: list[Stmt] = []
-    finalbody: list[Stmt] = []
+    orelse: list[JsonVal] = []
+    finalbody: list[JsonVal] = []
 
     # Parse except/else/finally clauses
     while next_i < len(block_lines):
@@ -2085,7 +2090,7 @@ def _parse_try_stmt(
                 exc_type_str = re.strip_group(m_exc, 1)
             elif s == "except:" or s.startswith("except:"):
                 pass  # bare except
-            exc_type_expr: Optional[Expr] = None
+            exc_type_expr: Optional[JsonVal] = None
             if exc_type_str is not None:
                 exc_type_expr = _make_name_expr(exc_type_str, handler_abs_ln, indent + 7, ctx)
             handler_lines, next_i = _collect_sub_block(block_lines, next_i + 1, indent)
@@ -2145,22 +2150,7 @@ def _merge_logical_lines(lines: list[str]) -> list[str]:
     while i < n:
         ln = lines[i]
         s = ln.rstrip()
-        # Count bracket depth
-        depth = 0
-        in_str = ""
-        for ch in s:
-            if in_str != "":
-                if ch == "\\" and len(in_str) == 1:
-                    continue  # skip escaped char (simplified)
-                if ch == in_str[0]:
-                    in_str = ""
-                continue
-            if ch == '"' or ch == "'":
-                in_str = ch
-            elif ch == "(" or ch == "[" or ch == "{":
-                depth += 1
-            elif ch == ")" or ch == "]" or ch == "}":
-                depth -= 1
+        depth = _bracket_depth(s)
         explicit_cont = s.endswith("\\")
         if depth > 0 or explicit_cont:
             # Merge with next lines until balanced
@@ -2171,17 +2161,7 @@ def _merge_logical_lines(lines: list[str]) -> list[str]:
             while i < n and (depth > 0 or explicit_cont):
                 next_ln = lines[i]
                 next_s = next_ln.strip()
-                for ch in next_s:
-                    if in_str != "":
-                        if ch == in_str[0]:
-                            in_str = ""
-                        continue
-                    if ch == '"' or ch == "'":
-                        in_str = ch
-                    elif ch == "(" or ch == "[" or ch == "{":
-                        depth += 1
-                    elif ch == ")" or ch == "]" or ch == "}":
-                        depth -= 1
+                depth += _bracket_depth(next_s)
                 explicit_cont = next_s.rstrip().endswith("\\")
                 next_clean = _strip_inline_comment(next_s).strip()
                 if explicit_cont and next_clean.endswith("\\"):
@@ -2266,14 +2246,14 @@ def _parse_block_lines(
     name_types: dict[str, str],
     scope_label: str,
     start_hint: int = 0,
-) -> list[Stmt]:
+) -> list[JsonVal]:
     """インデントされたブロック内の文をパースする。"""
     block_lines = _merge_logical_lines(block_lines)
-    stmts: list[Stmt] = []
+    stmts: list[JsonVal] = []
     i = 0
     total = len(block_lines)
     last_abs_ln = start_hint  # hint for _find_abs_line
-    pending_trivia: list[TriviaNode] = []
+    pending_trivia: list[JsonVal] = []
     pending_comments: list[str] = []
     pending_decorators: list[str] = []
     pending_block_extern_v2: Optional[dict[str, str]] = None
@@ -2614,7 +2594,7 @@ def _parse_block_lines(
         if var_name != "":
             resolved = type_ann
             name_types[var_name] = resolved
-            target: Expr = _make_attr_or_name_expr(var_name, abs_ln, indent, ctx)
+            target: JsonVal = _make_attr_or_name_expr(var_name, abs_ln, indent, ctx)
             value = _parse_expr_text(ctx, value_text, abs_ln, _find_expr_col(ctx, value_text, abs_ln, indent + s_clean.index("=") + 2), name_types)
             span = make_span(abs_ln, indent, abs_ln, indent + len(s_clean))
             ann_stmt = AnnAssign(
@@ -2885,7 +2865,7 @@ def _parse_expr_text(
     line: int,
     col_offset: int,
     name_types: dict[str, str],
-) -> Expr:
+) -> JsonVal:
     """テキストから式をパースする。"""
     tokens = _tokenize_expr(text)
     # 元の行テキストを取得 (span 計算の基準)
@@ -2910,6 +2890,10 @@ def _try_parse_tuple_assign(s: str) -> tuple[str, str]:
 
     Returns (lhs_text, rhs_text) or ("", "") if not a tuple assign.
     """
+    stripped = s.lstrip()
+    for keyword in ("if ", "elif ", "while ", "for ", "def ", "class ", "with ", "try:", "except ", "return ", "raise "):
+        if stripped.startswith(keyword):
+            return ("", "")
     # Find the top-level '=' that is not '==' and not inside brackets
     depth: int = 0
     eq_pos: int = -1
@@ -2936,6 +2920,14 @@ def _try_parse_tuple_assign(s: str) -> tuple[str, str]:
         return ("", "")
     lhs = s[:eq_pos].rstrip()
     rhs = s[eq_pos + 1:].lstrip()
+    depth = 0
+    for ch in lhs:
+        if ch == "[" or ch == "(" or ch == "{":
+            depth += 1
+        elif ch == "]" or ch == ")" or ch == "}":
+            depth -= 1
+        elif ch == ":" and depth == 0:
+            return ("", "")
     # Check lhs has a top-level comma (= tuple targets)
     has_comma = False
     depth = 0
@@ -3064,7 +3056,7 @@ def _make_name_expr(name: str, line: int, col: int, ctx: ParseContext) -> Name:
     return name_node
 
 
-def _parse_tuple_or_expr(ctx: ParseContext, text: str, line: int, col: int, name_types: dict[str, str]) -> Expr:
+def _parse_tuple_or_expr(ctx: ParseContext, text: str, line: int, col: int, name_types: dict[str, str]) -> JsonVal:
     """カンマ区切りの式をパース。複数要素ならタプル、単一ならそのまま。"""
     tokens = _tokenize_expr(text)
     source_line_text = ""
@@ -3077,7 +3069,7 @@ def _parse_tuple_or_expr(ctx: ParseContext, text: str, line: int, col: int, name
     )
     first = parser.parse_expr()
     if parser.peek().value == ",":
-        elements: list[Expr] = [first]
+        elements: list[JsonVal] = [first]
         while parser.peek().value == ",":
             parser.advance()
             if parser.peek().kind == "EOF":
@@ -3089,7 +3081,7 @@ def _parse_tuple_or_expr(ctx: ParseContext, text: str, line: int, col: int, name
     return first
 
 
-def _parse_assign_value(ctx: ParseContext, value_text: str, line: int, col_hint: int, name_types: dict[str, str]) -> Expr:
+def _parse_assign_value(ctx: ParseContext, value_text: str, line: int, col_hint: int, name_types: dict[str, str]) -> JsonVal:
     """代入右辺をパース。末尾カンマはタプルとして扱う。"""
     vt = value_text.rstrip()
     col = _find_expr_col(ctx, value_text, line, col_hint)
@@ -3103,7 +3095,7 @@ def _parse_assign_value(ctx: ParseContext, value_text: str, line: int, col_hint:
     return _parse_expr_text(ctx, vt, line, col, name_types)
 
 
-def _make_attr_or_name_expr(text: str, line: int, col: int, ctx: ParseContext) -> Expr:
+def _make_attr_or_name_expr(text: str, line: int, col: int, ctx: ParseContext) -> JsonVal:
     """self.attr のような属性アクセスを Attribute ノードに、単純名を Name ノードに変換。"""
     if "." in text:
         parts = text.split(".", 1)
@@ -3126,9 +3118,9 @@ def _parse_for_stmt(
     start_i: int,
     parent_indent: int,
     name_types: dict[str, str],
-    trivia: list[TriviaNode],
+    trivia: list[JsonVal],
     comments: list[str],
-) -> tuple[Stmt, int]:
+) -> tuple[JsonVal, int]:
     """for 文をパースする。"""
     ln = block_lines[start_i]
     s = _strip_inline_comment(ln.strip())
@@ -3168,10 +3160,10 @@ def _parse_for_stmt(
     # EAST1: range() は変換しない。全て For ノード。
     iter_expr = _parse_expr_text(ctx, iter_text, abs_ln, _find_expr_col(ctx, iter_text, abs_ln, indent), name_types)
     # Tuple unpacking target: for i, x in ...
-    target: Expr
+    target: JsonVal
     if "," in target_name:
         parts = [p.strip() for p in target_name.split(",") if p.strip() != ""]
-        elements: list[Expr] = [_make_name_expr(p, abs_ln, indent + 4, ctx) for p in parts]
+        elements: list[JsonVal] = [_make_name_expr(p, abs_ln, indent + 4, ctx) for p in parts]
         target_col = _find_expr_col(ctx, target_name, abs_ln, indent + 4)
         target_span = make_span(abs_ln, target_col, abs_ln, target_col + len(target_name))
         target = TupleExpr(base=ExprBase(source_span=target_span, repr_text=target_name), elements=elements)
@@ -3195,7 +3187,7 @@ def _parse_while_stmt(
     start_i: int,
     parent_indent: int,
     name_types: dict[str, str],
-    trivia: list[TriviaNode],
+    trivia: list[JsonVal],
     comments: list[str],
 ) -> tuple[While, int]:
     """while 文をパースする。"""
@@ -3236,7 +3228,7 @@ def _parse_with_stmt(
     start_i: int,
     parent_indent: int,
     name_types: dict[str, str],
-    trivia: list[TriviaNode],
+    trivia: list[JsonVal],
     comments: list[str],
 ) -> tuple[With, int]:
     """with 文をパースする。with EXPR as VAR:"""
@@ -3285,7 +3277,7 @@ def _parse_if_stmt(
     start_i: int,
     parent_indent: int,
     name_types: dict[str, str],
-    trivia: list[TriviaNode],
+    trivia: list[JsonVal],
     comments: list[str],
 ) -> tuple[If, int]:
     """if/elif/else 文をパースする。"""
@@ -3309,7 +3301,7 @@ def _parse_if_stmt(
         then_stmts = _parse_block_lines(ctx, then_lines, name_types, "if")
 
     # Check for elif / else
-    orelse: list[Stmt] = []
+    orelse: list[JsonVal] = []
     if next_i < len(block_lines):
         next_ln = block_lines[next_i]
         next_s = next_ln.strip()
@@ -3379,7 +3371,7 @@ def _parse_elif_stmt(
         then_lines, next_i = _collect_sub_block(block_lines, start_i + 1, indent)
         then_stmts = _parse_block_lines(ctx, then_lines, name_types, "elif")
 
-    orelse: list[Stmt] = []
+    orelse: list[JsonVal] = []
     if next_i < len(block_lines):
         next_ln = block_lines[next_i]
         next_s = next_ln.strip()
@@ -3431,7 +3423,7 @@ def _collect_sub_block(block_lines: list[str], start_i: int, parent_indent: int)
 # Postprocessing + meta building
 # ---------------------------------------------------------------------------
 
-def _postprocess(ctx: ParseContext, body_items: list[Stmt], renamed_symbols: dict[str, str]) -> None:
+def _postprocess(ctx: ParseContext, body_items: list[JsonVal], renamed_symbols: dict[str, str]) -> None:
     """Phase 3: 後処理（main リネーム）。"""
     # Rename main → __pytra_main
     for stmt in body_items:

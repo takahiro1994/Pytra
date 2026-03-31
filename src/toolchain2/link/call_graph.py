@@ -6,13 +6,10 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 from pytra.std.json import JsonVal
 from pytra.typing import cast
 
-if TYPE_CHECKING:
-    from toolchain2.link.linker import LinkedModule
+from toolchain2.link.shared_types import LinkedModule
 
 
 def _collect_symbols(
@@ -176,14 +173,14 @@ def _build_module_call_graph(
 
 def _strongly_connected_components(
     graph: dict[str, set[str]],
-) -> list[tuple[str, ...]]:
+) -> list[list[str]]:
     """Tarjan's SCC algorithm."""
     index_counter: list[int] = [0]
     stack: list[str] = []
     on_stack: set[str] = set()
     index_map: dict[str, int] = {}
     lowlink: dict[str, int] = {}
-    result: list[tuple[str, ...]] = []
+    result: list[list[str]] = []
 
     def _strongconnect(v: str) -> None:
         index_map[v] = index_counter[0]
@@ -209,7 +206,7 @@ def _strongly_connected_components(
                 component.append(w)
                 if w == v:
                     break
-            result.append(tuple(sorted(component)))
+            result.append(sorted(component))
 
     for node in sorted(graph.keys()):
         if node not in index_map:
@@ -220,7 +217,7 @@ def _strongly_connected_components(
 
 def build_call_graph(
     modules: list[LinkedModule],
-) -> tuple[dict[str, tuple[str, ...]], list[tuple[str, ...]]]:
+) -> tuple[dict[str, list[str]], list[list[str]]]:
     """Build program-wide call graph.
 
     Returns:
@@ -257,7 +254,7 @@ def build_call_graph(
     sccs = _strongly_connected_components(raw_graph)
 
     # Convert to sorted tuples for determinism
-    graph: dict[str, tuple[str, ...]] = {}
+    graph: dict[str, list[str]] = {}
     for caller in sorted(raw_graph.keys()):
         graph[caller] = tuple(sorted(raw_graph[caller]))
 

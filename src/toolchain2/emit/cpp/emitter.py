@@ -295,18 +295,6 @@ class _CppExprCommonRenderer(CommonRenderer):
     def render_call(self, node: dict[str, JsonVal]) -> str:
         return _emit_call(self.ctx, node)
 
-    def render_binop(self, node: dict[str, JsonVal]) -> str:
-        return _emit_binop(self.ctx, node)
-
-    def render_unaryop(self, node: dict[str, JsonVal]) -> str:
-        return _emit_unaryop(self.ctx, node)
-
-    def render_compare(self, node: dict[str, JsonVal]) -> str:
-        return _emit_compare(self.ctx, node)
-
-    def render_boolop(self, node: dict[str, JsonVal]) -> str:
-        return _emit_boolop(self.ctx, node)
-
     def render_assign_stmt(self, node: dict[str, JsonVal]) -> str:
         raise RuntimeError("cpp common renderer assign hook is not used in expr adapter")
 
@@ -919,6 +907,7 @@ def _emit_expr_extension(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
     if kind == "Set": return _emit_set_literal(ctx, node)
     if kind == "Dict": return _emit_dict_literal(ctx, node)
     if kind == "Tuple": return _emit_tuple_literal(ctx, node)
+    if kind == "RangeExpr": return _emit_range_expr(ctx, node)
     if kind == "ListComp": return _emit_list_comp(ctx, node)
     if kind == "SetComp": return _emit_set_comp(ctx, node)
     if kind == "DictComp": return _emit_dict_comp(ctx, node)
@@ -1720,6 +1709,64 @@ def _emit_tuple_literal(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
     return "std::make_tuple(" + ", ".join(parts) + ")"
 
 
+def _is_python_type_alias_expr(node: JsonVal) -> bool:
+    if not isinstance(node, dict) or _str(node, "kind") != "Subscript":
+        return False
+    base = node.get("value")
+    if not isinstance(base, dict):
+        return False
+    base_id = _str(base, "id")
+    return base_id in {
+        "Union",
+        "Optional",
+        "dict",
+        "list",
+        "set",
+        "tuple",
+        "Callable",
+        "TypeVar",
+        "TypeAlias",
+        "Literal",
+        "ClassVar",
+        "Final",
+        "Annotated",
+        "Protocol",
+    }
+
+
+def _emit_range_expr(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
+    rt = _str(node, "resolved_type")
+    result_value_type = cpp_type(rt, prefer_value_container=True)
+    start = node.get("start")
+    stop = node.get("stop")
+    step = node.get("step")
+    start_code = _emit_expr(ctx, start) if isinstance(start, dict) else "0"
+    stop_code = _emit_expr(ctx, stop) if isinstance(stop, dict) else "0"
+    step_code = _emit_expr(ctx, step) if isinstance(step, dict) else "1"
+    mode = _str(node, "range_mode")
+    if mode == "":
+        mode = "dynamic"
+    cond = (
+        "__range_i < (" + stop_code + ")"
+        if mode == "ascending"
+        else (
+            "__range_i > (" + stop_code + ")"
+            if mode == "descending"
+            else "((" + step_code + ") > 0 ? __range_i < (" + stop_code + ") : __range_i > (" + stop_code + "))"
+        )
+    )
+    value_expr = (
+        "([&]() -> " + result_value_type + " { "
+        + result_value_type + " __range_out{}; "
+        + "for (int64 __range_i = " + start_code + "; " + cond + "; __range_i += (" + step_code + ")) { "
+        + "__range_out.push_back(__range_i); "
+        + "} "
+        + "return __range_out; "
+        + "})()"
+    )
+    return _wrap_container_value_expr(rt, value_expr) if is_container_resolved_type(rt) else value_expr
+
+
 def _emit_list_comp(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
     return _emit_comp_lambda(ctx, node, "list")
 
@@ -2101,11 +2148,21 @@ def _emit_issubclass(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
 def _emit_slice_expr(ctx: CppEmitContext, node: dict[str, JsonVal], value_expr: str, slice_node: dict[str, JsonVal]) -> str:
     value_node = node.get("value")
     value_type = _str(value_node, "resolved_type") if isinstance(value_node, dict) else ""
+    storage_type = _expr_storage_type(ctx, value_node)
+    if (value_type in ("", "unknown", "tuple", "list", "dict", "set") or value_type == storage_type) and storage_type != "":
+        value_type = storage_type
+    class_var_spec = _class_var_spec(ctx, value_node)
+    if class_var_spec is not None and value_type in ("", "unknown", "tuple", "list", "dict", "set"):
+        spec_type = _str(class_var_spec, "type")
+        if spec_type != "":
+            value_type = spec_type
     lower = slice_node.get("lower")
     upper = slice_node.get("upper")
     lo_expr = _emit_expr(ctx, lower) if isinstance(lower, dict) else "0"
     up_expr = _emit_expr(ctx, upper) if isinstance(upper, dict) else "py_len(" + value_expr + ")"
     if value_type == "str":
+        return "py_str_slice(" + value_expr + ", " + lo_expr + ", " + up_expr + ")"
+    if value_type in ("", "unknown"):
         return "py_str_slice(" + value_expr + ", " + lo_expr + ", " + up_expr + ")"
     if value_type.startswith("list[") or value_type in ("bytes", "bytearray"):
         return "py_list_slice_copy(" + value_expr + ", " + lo_expr + ", " + up_expr + ")"
@@ -2279,6 +2336,8 @@ def _emit_assign(ctx: CppEmitContext, node: dict[str, JsonVal]) -> None:
     value = node.get("value")
     if len(targets) == 0 and isinstance(target_single, dict): targets = [target_single]
     if len(targets) == 0: return
+    if _is_python_type_alias_expr(value):
+        return
 
     val_code = _emit_expr(ctx, value)
     t = targets[0]
@@ -2466,7 +2525,7 @@ def _emit_closure_def(ctx: CppEmitContext, node: dict[str, JsonVal]) -> None:
         _register_local_storage(ctx, arg_name, arg_type)
         _declare_local_visible(ctx, arg_name)
     _register_local_storage(ctx, name, _closure_function_type(node))
-    params = [_param_decl_text(arg_type, arg_name, mutable) for arg_name, arg_type, mutable in _function_param_meta(node, ctx)]
+    params = [_param_decl_text(arg_type, arg_name, is_mutable) for arg_name, arg_type, is_mutable in _function_param_meta(node, ctx)]
     ret = cpp_signature_type(return_type)
     signature = "[" + "&" + "](" + ", ".join(params) + ")"
     if ret != "void":
@@ -2761,13 +2820,13 @@ def _function_signature(
     *,
     owner_name: str = "",
     owner_is_trait: bool = False,
-    declaration_only: bool,
+    declaration_only: bool = False,
 ) -> str:
     name = _safe_cpp_ident(_str(node, "name"))
     if name == "":
         return ""
     is_static = _has_decorator(node, "staticmethod")
-    params = [_param_decl_text(arg_type, arg_name, mutable) for arg_name, arg_type, mutable in _function_param_meta(node, ctx)]
+    params = [_param_decl_text(arg_type, arg_name, is_mutable) for arg_name, arg_type, is_mutable in _function_param_meta(node, ctx)]
     if declaration_only and owner_name != "":
         if owner_is_trait and not is_static:
             static_prefix = "virtual "
@@ -2878,7 +2937,7 @@ def _function_template_params(node: dict[str, JsonVal]) -> list[str]:
     return out
 
 
-_BUILTIN_RESOLVED_TYPE_NAMES: frozenset[str] = frozenset({
+_BUILTIN_RESOLVED_TYPE_NAMES: set[str] = {
     "int", "int8", "int16", "int32", "int64",
     "uint8", "uint16", "uint32", "uint64",
     "float", "float32", "float64",
@@ -2886,7 +2945,7 @@ _BUILTIN_RESOLVED_TYPE_NAMES: frozenset[str] = frozenset({
     "None", "none", "object", "Any", "Obj",
     "JsonVal", "Callable", "callable", "type",
     "unknown", "PyFile",
-})
+}
 
 
 def _is_user_class_param_type(resolved_type: str) -> bool:
@@ -2953,11 +3012,11 @@ def _function_param_meta(node: dict[str, JsonVal], ctx: CppEmitContext | None = 
             continue
         arg_type = arg_types.get(arg_name, "")
         arg_type_str = arg_type if isinstance(arg_type, str) else "object"
-        mutable = (arg_usage.get(arg_name) == "reassigned"
-                   or _function_param_is_mutated_via_call(node, arg_name, ctx)
-                   or (_is_user_class_param_type(arg_type_str)
-                       and arg_usage.get(arg_name) != "readonly"))
-        out.append((arg_name, arg_type_str, mutable))
+        is_mutable = (arg_usage.get(arg_name) == "reassigned"
+                      or _function_param_is_mutated_via_call(node, arg_name, ctx)
+                      or (_is_user_class_param_type(arg_type_str)
+                          and arg_usage.get(arg_name) != "readonly"))
+        out.append((arg_name, arg_type_str, is_mutable))
     vararg_name = node.get("vararg_name")
     if isinstance(vararg_name, str) and vararg_name != "":
         vararg_type = arg_types.get(vararg_name, "")
@@ -2984,8 +3043,8 @@ def _collect_function_mutable_param_indexes(node: JsonVal, out: dict[str, set[in
         name = _str(node, "name")
         if name != "":
             indexes: set[int] = set()
-            for idx, (_arg_name, _arg_type, mutable) in enumerate(_function_param_meta(node)):
-                if mutable:
+            for idx, (_arg_name, _arg_type, is_mutable) in enumerate(_function_param_meta(node)):
+                if is_mutable:
                     indexes.add(idx)
             out[name] = indexes
     for child in node.values():
@@ -3008,8 +3067,8 @@ def _attribute_target_type(ctx: CppEmitContext, node: JsonVal) -> str:
     return ""
 
 
-def _param_decl_text(resolved_type: str, name: str, mutable: bool) -> str:
-    return cpp_param_decl(resolved_type, name, mutable=mutable)
+def _param_decl_text(resolved_type: str, name: str, is_mutable: bool) -> str:
+    return cpp_param_decl(resolved_type, name, is_mutable=is_mutable)
 
 
 def _return_type(node: dict[str, JsonVal]) -> str:

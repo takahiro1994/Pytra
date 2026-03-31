@@ -40,6 +40,10 @@ if str(ROOT / "src") not in sys.path:
     sys.path.insert(0, str(ROOT / "src"))
 if str(ROOT / "tools" / "check") not in sys.path:
     sys.path.insert(0, str(ROOT / "tools" / "check"))
+if str(ROOT / "tools" / "unregistered") not in sys.path:
+    sys.path.insert(0, str(ROOT / "tools" / "unregistered"))
+
+from cpp_runtime_deps import collect_runtime_cpp_sources
 
 PARITY_DIR = ROOT / ".parity-results"
 
@@ -206,15 +210,18 @@ def _build_selfhost_binary(selfhost_lang: str) -> tuple[Path | None, str]:
     bin_dir.mkdir(parents=True, exist_ok=True)
     bin_path = bin_dir / selfhost_lang
 
-    # Step 1: emit toolchain2 to selfhost_lang via pytra-cli2
+    # Step 1: emit the toolchain2 CLI to selfhost_lang via pytra-cli2
     cli2 = ROOT / "src" / "pytra-cli2.py"
-    entry = ROOT / "src" / "toolchain2" / "emit" / selfhost_lang / "emitter.py"
+    entry = ROOT / "src" / "pytra-cli2.py"
     if not entry.exists():
         return None, f"no entry file for selfhost_lang={selfhost_lang}: {entry}"
 
     emit_dir = build_dir / "emit"
+    if emit_dir.exists():
+        shutil.rmtree(emit_dir)
     result = subprocess.run(
         [sys.executable, str(cli2), "-build", str(entry), "--target", selfhost_lang,
+         *([] if selfhost_lang != "rs" else ["--rs-package"]),
          "-o", str(emit_dir)],
         cwd=str(ROOT), capture_output=True, text=True,
     )
@@ -226,8 +233,27 @@ def _build_selfhost_binary(selfhost_lang: str) -> tuple[Path | None, str]:
         cpp_files = sorted(str(p) for p in emit_dir.rglob("*.cpp"))
         if not cpp_files:
             return None, "no .cpp files emitted"
+        runtime_sources = [
+            str(ROOT / rel)
+            for rel in collect_runtime_cpp_sources(cpp_files, emit_dir)
+        ]
         compile_result = subprocess.run(
-            ["g++", "-O2", "-std=c++17"] + cpp_files + ["-o", str(bin_path)],
+            [
+                "g++",
+                "-O2",
+                "-std=c++20",
+                "-I",
+                str(emit_dir),
+                "-I",
+                str(ROOT / "src"),
+                "-I",
+                str(ROOT / "src" / "runtime" / "cpp"),
+                "-I",
+                str(ROOT / "src" / "runtime" / "east"),
+            ]
+            + cpp_files
+            + runtime_sources
+            + ["-o", str(bin_path)],
             cwd=str(ROOT), capture_output=True, text=True,
         )
         if compile_result.returncode != 0:
@@ -247,15 +273,19 @@ def _build_selfhost_binary(selfhost_lang: str) -> tuple[Path | None, str]:
         return bin_path, ""
 
     if selfhost_lang == "rs":
-        entry_rs = next(emit_dir.glob("*.rs"), None)
-        if entry_rs is None:
-            return None, "no .rs files emitted"
+        cargo_toml = emit_dir / "Cargo.toml"
+        if not cargo_toml.exists():
+            return None, "missing Cargo.toml in Rust package output"
         compile_result = subprocess.run(
-            ["rustc", "-O", str(entry_rs), "-o", str(bin_path)],
-            cwd=str(ROOT), capture_output=True, text=True,
+            ["cargo", "build", "--release"],
+            cwd=str(emit_dir), capture_output=True, text=True,
         )
         if compile_result.returncode != 0:
-            return None, f"rustc failed: {compile_result.stderr.strip()}"
+            return None, f"cargo build failed: {compile_result.stderr.strip()}"
+        built_bin = emit_dir / "target" / "release" / "pytra_selfhost"
+        if not built_bin.exists():
+            return None, "cargo build succeeded but binary was not produced"
+        shutil.copy2(built_bin, bin_path)
         return bin_path, ""
 
     return None, f"unsupported selfhost_lang for build: {selfhost_lang}"
@@ -308,24 +338,40 @@ def _transpile_via_selfhost_binary(
         )
         link_result = link_modules([str(link_path)], target=pipeline_target, dispatch_mode="native")
 
-        # Write each linked module as east3 JSON for the selfhost binary
-        east3_dir = out_dir / "_east3"
+        # Write a linked-output bundle and invoke the selfhost CLI with `-emit`.
+        linked_dir = out_dir / "_linked"
+        linked_dir.mkdir(parents=True, exist_ok=True)
+        east3_dir = linked_dir / "east3"
         east3_dir.mkdir(parents=True, exist_ok=True)
-        emit_out = out_dir / "emit"
-        emit_out.mkdir(parents=True, exist_ok=True)
-
+        manifest_path = linked_dir / "manifest.json"
+        manifest_path.write_text(
+            json.dumps(link_result.manifest, ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+        )
         for m in link_result.linked_modules:
-            module_east3 = east3_dir / (m.module_id.replace(".", "_") + ".east3")
+            rel_path = Path("east3") / (m.module_id.replace(".", "/") + ".east3.json")
+            module_east3 = linked_dir / rel_path
+            module_east3.parent.mkdir(parents=True, exist_ok=True)
             module_east3.write_text(
                 json.dumps(m.east_doc, ensure_ascii=False, indent=2) + "\n",
                 encoding="utf-8",
             )
-            # Invoke selfhost binary per module
-            cmd = [str(selfhost_bin), str(module_east3), "-o", str(emit_out),
-                   "--target", emit_target]
-            rr = subprocess.run(cmd, cwd=str(ROOT), capture_output=True, text=True, timeout=60)
-            if rr.returncode != 0:
-                return False, f"selfhost binary failed for {m.module_id}: {rr.stderr.strip()}"
+
+        emit_out = out_dir / "emit"
+        emit_out.mkdir(parents=True, exist_ok=True)
+        cmd = [
+            str(selfhost_bin),
+            "-emit",
+            str(linked_dir),
+            "-o",
+            str(emit_out),
+            "--target",
+            emit_target,
+        ]
+        rr = subprocess.run(cmd, cwd=str(ROOT), capture_output=True, text=True, timeout=60)
+        if rr.returncode != 0:
+            detail = rr.stderr.strip() or rr.stdout.strip()
+            return False, f"selfhost binary failed: {detail}"
 
         return True, ""
     except Exception as e:

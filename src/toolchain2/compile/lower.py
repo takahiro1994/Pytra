@@ -8,7 +8,7 @@ Port of toolchain/compile/east2_to_east3_lowering.py for toolchain2.
 
 from __future__ import annotations
 
-from typing import Union, Callable
+from typing import Union
 
 from pytra.typing import cast
 from toolchain2.compile.jv import JsonVal, Node, CompileContext, deep_copy_json
@@ -518,7 +518,7 @@ def _copy_extra_fields(
     out: Node,
     consumed: set[str],
     *,
-    lower_node_fn: Callable[[JsonVal], JsonVal],
+    lower_node_fn,
 ) -> None:
     for key in source.keys():
         key_s: str = cast(str, key)
@@ -529,10 +529,11 @@ def _copy_extra_fields(
 
 
 def _wrap_value_for_target_type(
-    value_expr: JsonVal, target_type: str,
+    value_expr: JsonVal,
+    target_type: str,
+    ctx: CompileContext,
     *,
     target_type_expr: JsonVal = None,
-    ctx: CompileContext,
 ) -> JsonVal:
     target_summary: Node = cast(dict[str, JsonVal], type_expr_summary_from_payload(ctx, target_type_expr, target_type))
     target_mirror = target_summary["mirror"] if "mirror" in target_summary else None
@@ -753,7 +754,7 @@ def _build_target_plan(
     target: JsonVal,
     target_type: JsonVal,
     *,
-    lower_node_fn: Callable[[JsonVal], JsonVal],
+    lower_node_fn,
     ctx: CompileContext,
 ) -> Node:
     tt_norm = _normalize_type_name(target_type)
@@ -793,7 +794,7 @@ def _build_target_plan(
     return out
 
 
-def _lower_assignment_like_stmt(stmt: Node, *, lower_node_fn: Callable[[JsonVal], JsonVal], ctx: CompileContext) -> Node:
+def _lower_assignment_like_stmt(stmt: Node, *, lower_node_fn, ctx: CompileContext) -> Node:
     out: Node = {}
     for key in stmt.keys():
         key_s: str = cast(str, key)
@@ -862,7 +863,7 @@ def _lower_assignment_like_stmt(stmt: Node, *, lower_node_fn: Callable[[JsonVal]
     return out
 
 
-def _lower_return_stmt(stmt: Node, *, lower_node_fn: Callable[[JsonVal], JsonVal], ctx: CompileContext) -> Node:
+def _lower_return_stmt(stmt: Node, *, lower_node_fn, ctx: CompileContext) -> Node:
     out: Node = {}
     for key in stmt.keys():
         key_s: str = cast(str, key)
@@ -884,7 +885,7 @@ def _lower_function_def_stmt(
     stmt: Node,
     *,
     dispatch_mode: str,
-    lower_node_fn: Callable[[JsonVal], JsonVal],
+    lower_node_fn,
     ctx: CompileContext,
 ) -> Node:
     _ = dispatch_mode
@@ -913,7 +914,7 @@ def _lower_function_def_stmt(
         ctx.pop_storage_scope()
 
 
-def _lower_for_stmt(stmt: Node, *, dispatch_mode: str, lower_node_fn: Callable[[JsonVal], JsonVal], ctx: CompileContext) -> Node:
+def _lower_for_stmt(stmt: Node, *, dispatch_mode: str, lower_node_fn, ctx: CompileContext) -> Node:
     iter_expr = lower_node_fn(stmt.get("iter"))
     iter_plan: Node = {}
     iter_plan["kind"] = RUNTIME_ITER_FOR_PLAN
@@ -936,7 +937,7 @@ def _lower_for_stmt(stmt: Node, *, dispatch_mode: str, lower_node_fn: Callable[[
     return out
 
 
-def _lower_forrange_stmt(stmt: Node, *, lower_node_fn: Callable[[JsonVal], JsonVal], ctx: CompileContext) -> Node:
+def _lower_forrange_stmt(stmt: Node, *, lower_node_fn, ctx: CompileContext) -> Node:
     start_node = lower_node_fn(stmt.get("start"))
     stop_node = lower_node_fn(stmt.get("stop"))
     step_node = lower_node_fn(stmt.get("step"))
@@ -959,7 +960,7 @@ def _lower_forrange_stmt(stmt: Node, *, lower_node_fn: Callable[[JsonVal], JsonV
     return out
 
 
-def _lower_forcore_stmt(stmt: Node, *, dispatch_mode: str, lower_node_fn: Callable[[JsonVal], JsonVal], ctx: CompileContext) -> Node:
+def _lower_forcore_stmt(stmt: Node, *, dispatch_mode: str, lower_node_fn, ctx: CompileContext) -> Node:
     out: Node = {}
     for key in stmt.keys():
         key_s: str = cast(str, key)
@@ -1547,7 +1548,7 @@ def _build_or_of_checks(checks: list[Node], source_expr: JsonVal) -> Node:
 
 def _type_ref_to_type_id(
     type_ref_expr: JsonVal, *, dispatch_mode: str,
-    lower_node_fn: Callable[[JsonVal], JsonVal],
+    lower_node_fn,
 ) -> JsonVal:
     node = lower_node_fn(type_ref_expr)
     if not isinstance(node, dict):
@@ -1576,7 +1577,7 @@ def _type_ref_to_type_id(
 
 def _collect_expected_type_id_specs(
     type_spec_expr: JsonVal, *, dispatch_mode: str,
-    lower_node_fn: Callable[[JsonVal], JsonVal],
+    lower_node_fn,
     ctx: CompileContext,
 ) -> list[Node]:
     spec_node = lower_node_fn(type_spec_expr)
@@ -1607,7 +1608,7 @@ def _collect_expected_type_id_specs(
 
 def _lower_isinstance_call(
     out_call: Node, *, dispatch_mode: str,
-    lower_node_fn: Callable[[JsonVal], JsonVal],
+    lower_node_fn,
     ctx: CompileContext,
 ) -> Node:
     args = out_call.get("args")
@@ -1641,7 +1642,7 @@ def _lower_isinstance_call(
 
 def _lower_issubclass_call(
     out_call: Node, *, dispatch_mode: str,
-    lower_node_fn: Callable[[JsonVal], JsonVal],
+    lower_node_fn,
     ctx: CompileContext,
 ) -> Node:
     args = out_call.get("args")
@@ -1679,7 +1680,7 @@ def _lower_issubclass_call(
 
 def _lower_type_id_call_expr(
     out_call: Node, *, dispatch_mode: str,
-    lower_node_fn: Callable[[JsonVal], JsonVal],
+    lower_node_fn,
     legacy_compat: bool,
     ctx: CompileContext,
 ) -> Node:
@@ -2115,7 +2116,7 @@ def _lower_call_expr(call: Node, *, dispatch_mode: str, ctx: CompileContext) -> 
 # ---------------------------------------------------------------------------
 
 def _lower_node_dispatch(node: Node, *, dispatch_mode: str, ctx: CompileContext) -> JsonVal:
-    lower_fn: Callable[[JsonVal], JsonVal] = lambda v: _lower_node(v, dispatch_mode=dispatch_mode, ctx=ctx)
+    lower_fn = lambda v: _lower_node(v, dispatch_mode=dispatch_mode, ctx=ctx)
     kind = node.get("kind")
     if kind == FUNCTION_DEF or kind == CLOSURE_DEF:
         return _lower_function_def_stmt(node, dispatch_mode=dispatch_mode, lower_node_fn=lower_fn, ctx=ctx)

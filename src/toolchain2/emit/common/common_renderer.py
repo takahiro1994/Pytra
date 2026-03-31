@@ -7,7 +7,6 @@ override only the nodes or statement forms they need to specialize.
 
 from __future__ import annotations
 
-from abc import ABC
 from dataclasses import dataclass
 from dataclasses import field
 
@@ -22,7 +21,7 @@ class CommonRendererState:
     lines: list[str] = field(default_factory=list)
 
 
-class CommonRenderer(ABC):
+class CommonRenderer:
     def __init__(self, language: str) -> None:
         self.language = language
         self.profile = load_profile_doc(language)
@@ -67,9 +66,9 @@ class CommonRenderer(ABC):
         raw = self.profile.get("operators")
         return raw if isinstance(raw, dict) else {}
 
-    def _syntax_text(self, key: str, default: str) -> str:
+    def _syntax_text(self, key: str, fallback: str) -> str:
         value = self._syntax().get(key)
-        return value if isinstance(value, str) and value != "" else default
+        return value if isinstance(value, str) and value != "" else fallback
 
     def _stmt_terminator(self) -> str:
         value = self._lowering().get("stmt_terminator")
@@ -92,13 +91,13 @@ class CommonRenderer(ABC):
                 return true_lit if value else false_lit
         return "true" if value else "false"
 
-    def _operator_text(self, group: str, op: str, default: str) -> str:
+    def _operator_text(self, group: str, op: str, fallback: str) -> str:
         operators = self._operators().get(group)
         if isinstance(operators, dict):
             value = operators.get(op)
             if isinstance(value, str) and value != "":
                 return value
-        return default
+        return fallback
 
     def _operator_precedence(self, op: str) -> int:
         value = self._op_prec_table.get(op)

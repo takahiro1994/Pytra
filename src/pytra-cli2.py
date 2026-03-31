@@ -23,16 +23,9 @@ from pytra.std import json
 from pytra.std.pathlib import Path
 from toolchain2.common.jv import deep_copy_json
 from toolchain2.compile.lower import lower_east2_to_east3
-from toolchain2.emit.cs.emitter import emit_cs_module
 from toolchain2.emit.cpp.emitter import emit_cpp_module
 from toolchain2.emit.cpp.header_gen import build_cpp_header_from_east3
 from toolchain2.emit.cpp.runtime_bundle import emit_runtime_module_artifacts
-from toolchain2.emit.go.emitter import emit_go_module
-from toolchain2.emit.java.emitter import emit_java_module
-from toolchain2.emit.java.types import java_module_class_name
-from toolchain2.emit.rs.emitter import emit_rs_module
-from toolchain2.emit.nim.emitter import emit_nim_module
-from toolchain2.emit.ts.emitter import emit_ts_module
 from toolchain2.link.linker import LinkResult
 from toolchain2.link.linker import link_modules
 from toolchain2.link.manifest_loader import load_linked_output
@@ -47,6 +40,11 @@ from toolchain2.resolve.py.resolver import resolve_file
 def _repo_root() -> Path:
     """Return repository root anchored at this script, not caller cwd."""
     return Path(__file__).resolve().parent.parent
+
+
+def _load_attr(module_name: str, attr_name: str):
+    module = __import__(module_name, fromlist=[attr_name])
+    return getattr(module, attr_name)
 
 
 def _builtin_registry_paths() -> tuple[Path, Path, Path]:
@@ -618,6 +616,8 @@ def cmd_link(args: list[str]) -> int:
 
 def _emit_go(manifest_path: Path, output_dir: Path) -> int:
     """Go emit: linked output → Go source files."""
+    emit_go_module = _load_attr("toolchain2.emit.go.emitter", "emit_go_module")
+
     manifest_doc, linked_modules = load_linked_output(manifest_path)
     output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -640,6 +640,8 @@ def _emit_go(manifest_path: Path, output_dir: Path) -> int:
 
 def _emit_cs(manifest_path: Path, output_dir: Path) -> int:
     """C# emit: linked output → C# source files."""
+    emit_cs_module = _load_attr("toolchain2.emit.cs.emitter", "emit_cs_module")
+
     manifest_doc, linked_modules = load_linked_output(manifest_path)
     _ = manifest_doc
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -661,6 +663,9 @@ def _emit_cs(manifest_path: Path, output_dir: Path) -> int:
 
 def _emit_java(manifest_path: Path, output_dir: Path) -> int:
     """Java emit: linked output -> Java source files."""
+    emit_java_module = _load_attr("toolchain2.emit.java.emitter", "emit_java_module")
+    java_module_class_name = _load_attr("toolchain2.emit.java.types", "java_module_class_name")
+
     manifest_doc, linked_modules = load_linked_output(manifest_path)
     _ = manifest_doc
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -790,13 +795,98 @@ def _generate_type_id_table_rs(type_id_table: dict) -> str:  # type: ignore[type
     lines: list[str] = []
     for fqcn, tid in sorted(type_id_table.items(), key=lambda kv: kv[1]):
         const_name = _fqcn_to_tid_const(fqcn)
-        lines.append("const " + const_name + ": i64 = " + str(tid) + "_i64;")
+        lines.append("pub const " + const_name + ": i64 = " + str(tid) + "_i64;")
     return "\n".join(lines) + "\n" if lines else ""
 
 
-def _emit_rs(manifest_path: Path, output_dir: Path) -> int:
+def _copy_rs_runtime_files(dst_dir: Path) -> int:
+    written = 0
+    rs_runtime = _repo_root().joinpath("src").joinpath("runtime").joinpath("rs")
+    for bucket in ("built_in", "std"):
+        bucket_dir = rs_runtime.joinpath(bucket)
+        if bucket_dir.exists():
+            for rs_file in bucket_dir.glob("*.rs"):
+                if rs_file.name == "pytra_built_in_type_id_table.rs":
+                    continue
+                dst = dst_dir.joinpath(rs_file.name)
+                dst.write_text(rs_file.read_text(encoding="utf-8"), encoding="utf-8")
+                written += 1
+    return written
+
+
+def _write_rs_package_files(
+    manifest_doc: dict,
+    linked_modules: list,
+    output_dir: Path,
+) -> int:
+    emit_rs_module = _load_attr("toolchain2.emit.rs.emitter", "emit_rs_module")
+
+    output_dir.mkdir(parents=True, exist_ok=True)
+    src_dir = output_dir.joinpath("src")
+    src_dir.mkdir(parents=True, exist_ok=True)
+
+    written = 0
+    module_names: list[str] = []
+    entry_mod_name = ""
+    for module in linked_modules:
+        code = emit_rs_module(module.east_doc, package_mode=True)
+        if code.strip() == "":
+            continue
+        mod_name = module.module_id.replace(".", "_")
+        src_dir.joinpath(mod_name + ".rs").write_text(code, encoding="utf-8")
+        module_names.append(mod_name)
+        if module.is_entry:
+            entry_mod_name = mod_name
+        written += 1
+
+    written += _copy_rs_runtime_files(src_dir)
+    runtime_module_names = sorted(p.stem for p in src_dir.glob("*.rs"))
+
+    tid_table_path = src_dir.joinpath("pytra_built_in_type_id_table.rs")
+    global_section = manifest_doc.get("global") if isinstance(manifest_doc, dict) else None
+    type_id_table = global_section.get("type_id_table") if isinstance(global_section, dict) else None
+    if isinstance(type_id_table, dict) and len(type_id_table) > 0:
+        tid_rs = _generate_type_id_table_rs(type_id_table)
+        if tid_rs != "":
+            tid_table_path.write_text(tid_rs, encoding="utf-8")
+            written += 1
+            runtime_module_names = sorted(p.stem for p in src_dir.glob("*.rs"))
+
+    lib_lines = [f"pub mod {name};" for name in runtime_module_names if name not in ("lib", "main")]
+    src_dir.joinpath("lib.rs").write_text("\n".join(lib_lines) + ("\n" if lib_lines else ""), encoding="utf-8")
+    written += 1
+
+    if entry_mod_name == "":
+        for module in linked_modules:
+            if module.is_entry:
+                entry_mod_name = module.module_id.replace(".", "_")
+                break
+    main_text = "fn main() {\n"
+    if entry_mod_name != "":
+        main_text += "    pytra_selfhost::" + entry_mod_name + "::main();\n"
+    main_text += "}\n"
+    src_dir.joinpath("main.rs").write_text(main_text, encoding="utf-8")
+    written += 1
+
+    cargo_text = "[package]\n"
+    cargo_text += 'name = "pytra_selfhost"\n'
+    cargo_text += 'version = "0.1.0"\n'
+    cargo_text += 'edition = "2021"\n\n'
+    cargo_text += "[dependencies]\n"
+    output_dir.joinpath("Cargo.toml").write_text(cargo_text, encoding="utf-8")
+    written += 1
+    return written
+
+
+def _emit_rs(manifest_path: Path, output_dir: Path, *, package_mode: bool = False) -> int:
     """Rust emit: linked output → Rust source files."""
+    emit_rs_module = _load_attr("toolchain2.emit.rs.emitter", "emit_rs_module")
+
     manifest_doc, linked_modules = load_linked_output(manifest_path)
+    if package_mode:
+        written = _write_rs_package_files(manifest_doc, linked_modules, output_dir)
+        print("emitted: " + str(output_dir) + " (" + str(written) + " Rust files)")
+        return 0
     output_dir.mkdir(parents=True, exist_ok=True)
 
     written = 0
@@ -811,14 +901,7 @@ def _emit_rs(manifest_path: Path, output_dir: Path) -> int:
         written += 1
 
     # Copy rs runtime files
-    rs_runtime = _repo_root().joinpath("src").joinpath("runtime").joinpath("rs")
-    for bucket in ("built_in", "std"):
-        bucket_dir = rs_runtime.joinpath(bucket)
-        if bucket_dir.exists():
-            for rs_file in bucket_dir.glob("*.rs"):
-                dst = output_dir.joinpath(rs_file.name)
-                dst.write_text(rs_file.read_text(encoding="utf-8"), encoding="utf-8")
-                written += 1
+    written += _copy_rs_runtime_files(output_dir)
 
     # Generate pytra_built_in_type_id_table.rs from manifest if not already emitted
     tid_table_path = output_dir.joinpath("pytra_built_in_type_id_table.rs")
@@ -837,6 +920,8 @@ def _emit_rs(manifest_path: Path, output_dir: Path) -> int:
 
 def _emit_nim(manifest_path: Path, output_dir: Path) -> int:
     """Nim emit: linked output -> Nim source files."""
+    emit_nim_module = _load_attr("toolchain2.emit.nim.emitter", "emit_nim_module")
+
     manifest_doc, linked_modules = load_linked_output(manifest_path)
     output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -878,6 +963,8 @@ def _copy_ts_runtime_files(output_dir: Path) -> int:
 
 def _emit_ts(manifest_path: Path, output_dir: Path, *, strip_types: bool = False) -> int:
     """TypeScript/JavaScript emit: linked output → TS/JS source files."""
+    emit_ts_module = _load_attr("toolchain2.emit.ts.emitter", "emit_ts_module")
+
     manifest_doc, linked_modules = load_linked_output(manifest_path)
     output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -926,7 +1013,10 @@ def _emit_cpp(manifest_path: Path, output_dir: Path) -> int:
             h_path = output_dir.joinpath(rel + ".h")
             cpp_path.parent.mkdir(parents=True, exist_ok=True)
             h_path.parent.mkdir(parents=True, exist_ok=True)
-            cpp_path.write_text(emit_cpp_module(module.east_doc), encoding="utf-8")
+            cpp_path.write_text(
+                emit_cpp_module(module.east_doc, self_header=rel + ".h"),
+                encoding="utf-8",
+            )
             h_path.write_text(
                 build_cpp_header_from_east3(
                     module.module_id,
@@ -937,14 +1027,25 @@ def _emit_cpp(manifest_path: Path, output_dir: Path) -> int:
             )
             written += 2
             continue
-        code = emit_cpp_module(module.east_doc)
+        mid = module.module_id
+        code = emit_cpp_module(module.east_doc, self_header=mid.replace(".", "/") + ".h")
         if code.strip() == "":
             continue
         # Use module_id for filename
-        mid = module.module_id
         fname = mid.replace(".", "_") + ".cpp"
         output_dir.joinpath(fname).write_text(code, encoding="utf-8")
-        written += 1
+        rel_header = mid.replace(".", "/") + ".h"
+        h_path = output_dir.joinpath(rel_header)
+        h_path.parent.mkdir(parents=True, exist_ok=True)
+        h_path.write_text(
+            build_cpp_header_from_east3(
+                module.module_id,
+                module.east_doc,
+                rel_header_path=rel_header,
+            ),
+            encoding="utf-8",
+        )
+        written += 2
 
     print("emitted: " + str(output_dir) + " (" + str(written) + " C++ files)")
     return 0
@@ -959,6 +1060,7 @@ def cmd_build(args: list[str]) -> int:
     inputs: list[str] = []
     output_dir_text = ""
     target = "cpp"
+    rs_package = False
 
     i = 0
     while i < len(args):
@@ -977,8 +1079,12 @@ def cmd_build(args: list[str]) -> int:
             target = args[i + 1]
             i += 2
             continue
+        if tok == "--rs-package":
+            rs_package = True
+            i += 1
+            continue
         if tok == "-h" or tok == "--help":
-            print("usage: pytra-cli2 -build INPUT.py [-o OUTPUT_DIR] [--target TARGET]")
+            print("usage: pytra-cli2 -build INPUT.py [-o OUTPUT_DIR] [--target TARGET] [--rs-package]")
             return 0
         if not tok.startswith("-"):
             inputs.append(tok)
@@ -993,13 +1099,13 @@ def cmd_build(args: list[str]) -> int:
         return 1
 
     try:
-        return _build_pipeline(inputs, output_dir_text, target)
+        return _build_pipeline(inputs, output_dir_text, target, rs_package=rs_package)
     except Exception:
         print("error: build failed")
         return 1
 
 
-def _build_pipeline(inputs: list[str], output_dir_text: str, target: str) -> int:
+def _build_pipeline(inputs: list[str], output_dir_text: str, target: str, *, rs_package: bool = False) -> int:
     """Run the full build pipeline in-memory."""
     # 1. Parse
     east1_docs = _collect_build_sources(inputs)
@@ -1091,6 +1197,8 @@ def _build_pipeline(inputs: list[str], output_dir_text: str, target: str) -> int
     output_dir.mkdir(parents=True, exist_ok=True)
     written = 0
     if target == "go":
+        emit_go_module = _load_attr("toolchain2.emit.go.emitter", "emit_go_module")
+
         for m in link_result.linked_modules:
             code = emit_go_module(m.east_doc)
             if code.strip() == "":
@@ -1099,6 +1207,9 @@ def _build_pipeline(inputs: list[str], output_dir_text: str, target: str) -> int
             written += 1
         written += _copy_go_runtime_files(output_dir)
     elif target == "java":
+        emit_java_module = _load_attr("toolchain2.emit.java.emitter", "emit_java_module")
+        java_module_class_name = _load_attr("toolchain2.emit.java.types", "java_module_class_name")
+
         for m in link_result.linked_modules:
             if m.module_kind == "runtime":
                 continue
@@ -1109,6 +1220,8 @@ def _build_pipeline(inputs: list[str], output_dir_text: str, target: str) -> int
             written += 1
         written += _copy_java_runtime_files(output_dir)
     elif target == "cs":
+        emit_cs_module = _load_attr("toolchain2.emit.cs.emitter", "emit_cs_module")
+
         for m in link_result.linked_modules:
             code = emit_cs_module(m.east_doc)
             if code.strip() == "":
@@ -1117,22 +1230,22 @@ def _build_pipeline(inputs: list[str], output_dir_text: str, target: str) -> int
             written += 1
         written += _copy_cs_runtime_files(output_dir)
     elif target == "rs":
-        for m in link_result.linked_modules:
-            code = emit_rs_module(m.east_doc)
-            if code.strip() == "":
-                continue
-            output_dir.joinpath(m.module_id.replace(".", "_") + ".rs").write_text(code, encoding="utf-8")
-            written += 1
-        # Copy rs runtime files
-        rs_runtime = _repo_root().joinpath("src").joinpath("runtime").joinpath("rs")
-        for bucket in ("built_in", "std"):
-            bucket_dir = rs_runtime.joinpath(bucket)
-            if bucket_dir.exists():
-                for rs_file in bucket_dir.glob("*.rs"):
-                    output_dir.joinpath(rs_file.name).write_text(rs_file.read_text(encoding="utf-8"), encoding="utf-8")
-                    written += 1
+        emit_rs_module = _load_attr("toolchain2.emit.rs.emitter", "emit_rs_module")
+
+        if rs_package:
+            written = _write_rs_package_files(link_result.manifest, link_result.linked_modules, output_dir)
+        else:
+            for m in link_result.linked_modules:
+                code = emit_rs_module(m.east_doc)
+                if code.strip() == "":
+                    continue
+                output_dir.joinpath(m.module_id.replace(".", "_") + ".rs").write_text(code, encoding="utf-8")
+                written += 1
+            written += _copy_rs_runtime_files(output_dir)
         print("emitted: " + str(output_dir) + " (" + str(written) + " Rust files)")
     elif target == "nim":
+        emit_nim_module = _load_attr("toolchain2.emit.nim.emitter", "emit_nim_module")
+
         for m in link_result.linked_modules:
             code = emit_nim_module(m.east_doc)
             if code.strip() == "":
@@ -1148,6 +1261,8 @@ def _build_pipeline(inputs: list[str], output_dir_text: str, target: str) -> int
                     written += 1
         print("emitted: " + str(output_dir) + " (" + str(written) + " Nim files)")
     elif target == "ts" or target == "js":
+        emit_ts_module = _load_attr("toolchain2.emit.ts.emitter", "emit_ts_module")
+
         strip = (target == "js")
         ext = ".js" if strip else ".ts"
         for m in link_result.linked_modules:
@@ -1178,7 +1293,10 @@ def _build_pipeline(inputs: list[str], output_dir_text: str, target: str) -> int
                 h_path = output_dir.joinpath(rel + ".h")
                 cpp_path.parent.mkdir(parents=True, exist_ok=True)
                 h_path.parent.mkdir(parents=True, exist_ok=True)
-                cpp_path.write_text(emit_cpp_module(m.east_doc), encoding="utf-8")
+                cpp_path.write_text(
+                    emit_cpp_module(m.east_doc, self_header=rel + ".h"),
+                    encoding="utf-8",
+                )
                 h_path.write_text(
                     build_cpp_header_from_east3(
                         m.module_id,
@@ -1189,11 +1307,22 @@ def _build_pipeline(inputs: list[str], output_dir_text: str, target: str) -> int
                 )
                 written += 2
                 continue
-            code = emit_cpp_module(m.east_doc)
+            code = emit_cpp_module(m.east_doc, self_header=m.module_id.replace(".", "/") + ".h")
             if code.strip() == "":
                 continue
             output_dir.joinpath(m.module_id.replace(".", "_") + ".cpp").write_text(code, encoding="utf-8")
-            written += 1
+            rel_header = m.module_id.replace(".", "/") + ".h"
+            h_path = output_dir.joinpath(rel_header)
+            h_path.parent.mkdir(parents=True, exist_ok=True)
+            h_path.write_text(
+                build_cpp_header_from_east3(
+                    m.module_id,
+                    m.east_doc,
+                    rel_header_path=rel_header,
+                ),
+                encoding="utf-8",
+            )
+            written += 2
     print("build: emitted " + str(written) + " " + target + " files to " + str(output_dir))
     return 0
 
