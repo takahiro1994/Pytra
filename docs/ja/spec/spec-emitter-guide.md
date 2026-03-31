@@ -26,6 +26,7 @@ emitter は EAST3 を忠実にレンダリングする。以下は禁止:
 | **mapping にない名前変換をハードコードする** | `mapping.json` が正本 | mapping.json に追加する |
 | **型推論を再実装する** | §12.1 参照 | EAST の型推論を修正する |
 | **戻り値型が未確定の FunctionDef を受理する** | resolve が `None` または注釈から確定しているはず | resolve のバグ |
+| **`in` 演算子を tuple 要素数ごとに特殊化する** | tuple は iterable。要素数ごとの runtime 実装は破綻する | iterable の汎用 `contains` で処理する（`slice.contains()`, `[]T.contains()` 等） |
 
 emitter が許可されるのは:
 
