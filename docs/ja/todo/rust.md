@@ -27,6 +27,15 @@
 
 ## 未完了タスク
 
+### P0-RS-SKIP-PURE-PY: skip_modules から pure Python モジュールを外す
+
+`check_emitter_hardcode_lint.py --lang rs` で `skip_pure_python` 違反 2 件。`mapping.json` の `skip_modules` に `pytra.std.pathlib` と `pytra.std.env` が入っているが、両方とも `@extern` なしの pure Python モジュールであり transpile すべき。正本ソースに `@extern` マーカーを足して lint を黙らせるのは禁止。
+
+1. [ ] [ID: P0-RS-SKIP-PURE-S1] `src/runtime/rs/mapping.json` の `skip_modules` から `pytra.std.pathlib` と `pytra.std.env` を削除する
+2. [ ] [ID: P0-RS-SKIP-PURE-S2] transpile された pathlib / env が Rust で compile できることを確認する（必要なら emitter / runtime を修正）
+3. [ ] [ID: P0-RS-SKIP-PURE-S3] `check_emitter_hardcode_lint.py --lang rs` で `skip_pure_python` が 0 件になることを確認する
+4. [ ] [ID: P0-RS-SKIP-PURE-S4] fixture + sample parity に回帰がないことを確認する
+
 ### P0-RS-CALLABLE: callable 型（高階関数）の Rust parity を通す
 
 EAST3 の `GenericType(base="callable", args=[引数型, 戻り値型])` を Rust の関数ポインタ (`fn(Args) -> R`) または `Box<dyn Fn(Args) -> R>` に変換する処理が必要。`callable_higher_order` fixture が compile + run parity PASS することを完了条件とする。
