@@ -18,6 +18,7 @@
     "bytearray_ctor": "__MAKE_BYTES__",
     "bytes_ctor": "__MAKE_BYTES__",
     "list.append": "py_list_append_mut",
+    "list.extend": "py_list_extend_mut",
     "list.clear": "py_list_clear_mut",
     "list.index": "py_index",
     "list.pop": "py_list_pop_mut",

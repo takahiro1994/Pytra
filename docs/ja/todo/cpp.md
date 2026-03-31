@@ -26,7 +26,8 @@
 
 selfhost で必要な 4 パターン（dict.items() tuple unpack, typed dict.get(), typed list index, str cast）を網羅する fixture。EAST3 には全て情報が載っており、emitter が既存フィールドを正しく読めば解決する。
 
-1. [ ] [ID: P0-CPP-TYPED-S1] `typed_container_access` fixture が C++ で compile + run parity PASS することを確認する（失敗なら emitter を修正）
+1. [x] [ID: P0-CPP-TYPED-S1] `typed_container_access` fixture が C++ で compile + run parity PASS することを確認する（失敗なら emitter を修正）
+   - 完了: 先頭失敗は 4 パターン本体ではなく `run_typed_container_access()` 内の `checks.extend(...)` が `py_extend(...)` に落ちる mapping 漏れだった。`src/runtime/cpp/mapping.json` に `list.extend -> py_list_extend_mut` を追加し、`PYTHONPATH=src:tools python3 tools/check/runtime_parity_check_fast.py --targets cpp --case-root fixture --east3-opt-level 2 typed_container_access` は PASS した。
 
 ### P0-CPP-IN-MEMBERSHIP: in_membership_iterable fixture の C++ parity を通す
 
