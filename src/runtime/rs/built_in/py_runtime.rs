@@ -147,6 +147,15 @@ impl<T: Clone> PyList<T> {
     }
 }
 
+impl<T: Clone> IntoIterator for PyList<T> {
+    type Item = T;
+    type IntoIter = std::vec::IntoIter<T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter_snapshot().into_iter()
+    }
+}
+
 // PyList + PyList — Python list concatenation
 impl<T: Clone> std::ops::Add for PyList<T> {
     type Output = PyList<T>;
@@ -538,6 +547,10 @@ pub fn py_str_count(s: &str, sub: &str) -> i64 {
 }
 pub fn py_str_split(s: &str, sep: &str) -> PyList<String> {
     PyList::<String>::from_vec(s.split(sep).map(|x| x.to_string()).collect())
+}
+pub fn py_str_split_n(s: &str, sep: &str, maxsplit: &i64) -> PyList<String> {
+    let limit = if *maxsplit < 0 { usize::MAX } else { (*maxsplit as usize) + 1 };
+    PyList::<String>::from_vec(s.splitn(limit, sep).map(|x| x.to_string()).collect())
 }
 pub fn py_str_join(sep: &str, items: &PyList<String>) -> String {
     items.py_borrow().join(sep)
@@ -1951,6 +1964,10 @@ pub fn py_assert_stdout<F: Fn()>(expected: PyList<String>, f: F) -> bool {
         }
     }
     true
+}
+
+pub fn py_exit(code: i64) -> ! {
+    std::process::exit(code as i32)
 }
 
 // Sub-module declarations (std, utils, pytra facade) are generated
