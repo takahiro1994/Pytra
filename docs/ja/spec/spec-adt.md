@@ -125,19 +125,23 @@ struct IntOrStr {
 
 全フィールドを持つためメモリは無駄になるが、ADT をサポートしない言語側の制約であり許容する。現時点で該当する言語はない（Zig は tagged union を持つ）。
 
-## 4. 再帰型の制約
+## 4. 再帰型の扱い
 
 `JsonVal` のように自身を含む再帰的な ADT は、一部の言語でポインタが必要:
 
 | 言語 | 再帰型の扱い |
 |---|---|
-| Rust | `Box<JsonVal>` で問題なし |
-| C++ | `std::variant` + `unique_ptr` は RC 管理が壊れる → 継承 or `object` |
-| Zig | ポインタ必須だが tagged union 自体は使える |
+| Rust | `enum JsonVal { Arr(Vec<Box<JsonVal>>), ... }` — Box でポインタ化 |
+| C++ | `struct JsonVal { std::variant<..., rc<std::vector<JsonVal>>> value; }` — struct で包み、再帰 variant を rc でポインタ化。`using` は前方参照不可だが `struct` なら宣言時点で型名が存在するため可能 |
+| Zig | `*JsonVal` でポインタ化 + 自前 RC or arena allocator |
 | Go | `any` で問題なし（GC 管理） |
-| 他 | 各言語のヒープ確保機構でポインタ化 |
+| Swift | `indirect enum` で明示 |
+| TS | 直接書ける（`type JsonVal = number \| JsonVal[]`） |
+| C#/Java/Kotlin/Scala/Dart | 参照型なので自然に再帰可能 |
 
 非再帰 union (`int | str`, `str | None`) はどの言語でも問題なし。
+
+**再帰型であっても `object` への退化は禁止。** 各言語のポインタ / RC / GC 機構を使って ADT として表現する。
 
 ## 5. EAST3 との関係
 
@@ -167,15 +171,19 @@ EAST3 の isinstance narrowing（Unbox ノード）は、全言語の ADT パタ
 
 emitter は Unbox ノードを見て言語固有のパターンマッチ構文を生成するだけ。
 
-## 6. `object` が残るケース
+## 6. `object` への退化は全面禁止
 
-以下の場合のみ `object` への退化を許容する:
+union type を `object` に退化させることを **全面禁止** する。
 
-1. **`Any` 型注釈**: ユーザーが明示的に `Any` と書いた場合
-2. **再帰 ADT の C++**: `std::variant` + ポインタで RC が壊れるため（§4）
-3. **動的型付け言語**: 元々全変数が `object` 相当なので影響なし
+- `Any` 型注釈は Pytra で禁止されている。`object` が生成される入口がない
+- 再帰 ADT も §4 のとおり、各言語のポインタ / RC / GC 機構で ADT として表現できる
+- 動的型付け言語は元々全変数が動的型なので、ADT の変換は不要（言語のネイティブ表現をそのまま使う）
 
-`int | str` のような一般 union を `object` に退化させることは禁止。
+これにより:
+- lowering が union を `object` に退化させる必要がなくなる
+- boxing / unboxing ノードは消える
+- `yields_dynamic` / `Unbox` / `OBJ_ITER_INIT` 等の `object` 境界の補助機構は不要になる
+- emitter は `object` パスを持つ必要がない
 
 ## 7. 関連
 

@@ -105,9 +105,10 @@ enum __Union_int_str {
 
 ## 完了条件
 
-- 非再帰 union は `std::variant` / enum 等の nominal ADT で表現される（`object` に退化しない）
-- 再帰 ADT は C++/Zig で継承ベース or 既存 `object` を使用（RC 管理の制約）
-- `object` に退化するのは `Any` 型注釈がある場合と再帰 ADT の C++/Zig のみ
+- 非再帰 union は `std::variant` / enum 等の nominal ADT で表現される
+- 再帰 ADT も各言語のポインタ / RC / GC で ADT として表現する（C++ は `struct { variant<..., rc<vector<Self>>> }`）
+- `object` への退化は全面禁止（`Any` 型注釈自体が Pytra で禁止されているため入口がない）
+- boxing / unboxing ノードは消える
 - union type を使った fixture が全言語で compile + run parity PASS
 - selfhost コードの `JsonVal` が `object` ではなく nominal ADT として処理される
 - box/unbox ノードが union → object 退化に起因するケースでは生成されない
