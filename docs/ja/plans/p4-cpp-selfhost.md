@@ -5,7 +5,7 @@
 # P4-CPP-SELFHOST: C++ emitter で toolchain2 を C++ に変換し g++ build を通す
 
 最終更新: 2026-03-31
-ステータス: 進行中（S0-S2 完了、S3 未完了）
+ステータス: 完了（S0-S3 完了）
 
 ## 背景
 
@@ -39,3 +39,4 @@ Pytra の変換器自身（toolchain2）を C++ に変換し、変換後の C++ 
 - 2026-03-29: P4-CPP-SELFHOST を起票。P3-COMMON-RENDERER-CPP 完了後に着手。
 - 2026-03-30: S1（emit + build 通過）、S2（build 失敗修正）完了。tuple subscript 検出拡張、py_dict_set_mut 追加、object→str/container 型強制、前方宣言二段階出力等。
 - 2026-03-31: S0 を監査で完了。`src/toolchain2/` 全 `.py` を `ast` 走査し、戻り値注釈欠落が 0 件であることを確認。回帰防止として `tools/unittest/selfhost/test_selfhost_return_annotations.py` を追加。
+- 2026-03-31: S3 を完了。`tools/gen/regenerate_selfhost_golden.py --target cpp --timeout 60` で `test/selfhost/cpp/` を更新し、emit 成功する 42 モジュールの C++ golden を確定。emit 失敗の 5 モジュールは既知 skip として固定し、`tools/unittest/selfhost/test_selfhost_cpp_golden.py` で golden coverage / re-emit 一致を `unittest` から検証する回帰テストを追加。

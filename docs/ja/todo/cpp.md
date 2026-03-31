@@ -98,4 +98,5 @@
    - 完了: code_emitter.py → code_emitter.cpp 生成・リンク成功（runtime cpp + 依存 .cpp と結合）
 3. [x] [ID: P20-CPP-SELFHOST-S2] g++ build 失敗ケースを emitter/runtime の修正で解消する（EAST の workaround 禁止）
    - 完了: tuple subscript 検出拡張、py_dict_set_mut 追加、object→str/container 型強制、前方宣言二段階出力、is_simple_ident ガード、py_set_add_mut fallback を py_to_string 経由に変更
-4. [ ] [ID: P20-CPP-SELFHOST-S3] selfhost 用 C++ golden を配置し、回帰テストとして維持する
+4. [x] [ID: P20-CPP-SELFHOST-S3] selfhost 用 C++ golden を配置し、回帰テストとして維持する
+   - 完了: `python3 tools/gen/regenerate_selfhost_golden.py --target cpp --timeout 60` で `test/selfhost/cpp/` の golden を再生成し、emit 成功する 42 モジュールを更新した。emit 失敗する 5 モジュール（`toolchain2.compile.passes`, `toolchain2.optimize.passes.{tuple_target_direct_expansion,typed_enumerate_normalization,typed_repeat_materialization}`, `toolchain2.resolve.py.resolver`）は既知 skip として整理し、`tools/unittest/selfhost/test_selfhost_cpp_golden.py` に C++ 専用の golden coverage / re-emit 一致テストを追加した
