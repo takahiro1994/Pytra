@@ -2424,7 +2424,7 @@ def _emit_ann_assign(ctx: CppEmitContext, node: dict[str, JsonVal]) -> None:
 
     _register_local_storage(ctx, name, rt)
     _declare_local_visible(ctx, name)
-    ct = _decl_cpp_type(ctx, rt, name)
+    ct = "auto" if _cpp_type_is_unknownish(rt) else _decl_cpp_type(ctx, rt, name)
     if value is not None:
         val_expr = _emit_expr(ctx, value)
         val_expr = _wrap_expr_for_target_type(ctx, rt, val_expr, value)
@@ -2459,7 +2459,7 @@ def _emit_assign(ctx: CppEmitContext, node: dict[str, JsonVal]) -> None:
             dt = _str(node, "decl_type")
             _register_local_storage(ctx, name, dt)
             _declare_local_visible(ctx, name)
-            if dt == "" or dt == "unknown":
+            if _cpp_type_is_unknownish(dt):
                 _emit(ctx, "auto " + name + " = " + val_code + ";")
             else:
                 ct = _decl_cpp_type(ctx, dt, name)
@@ -2768,8 +2768,9 @@ def _emit_tuple_unpack(ctx: CppEmitContext, node: dict[str, JsonVal]) -> None:
     value = node.get("value")
     tuple_expr = _emit_expr(ctx, value)
     temp_name = _next_temp(ctx, "__tup")
-    tuple_type = cpp_signature_type(_effective_resolved_type(value))
-    if tuple_type == "auto":
+    source_type = normalize_cpp_container_alias(_effective_resolved_type(value))
+    tuple_type = cpp_signature_type(source_type)
+    if tuple_type == "auto" or _cpp_type_is_unknownish(source_type):
         tuple_type = "auto"
     _emit(ctx, tuple_type + " " + temp_name + " = " + tuple_expr + ";")
     for idx, target in enumerate(targets):
@@ -2781,7 +2782,12 @@ def _emit_tuple_unpack(ctx: CppEmitContext, node: dict[str, JsonVal]) -> None:
         resolved_type = _str(target, "resolved_type")
         if resolved_type in ("", "unknown") and idx < len(target_types) and isinstance(target_types[idx], str):
             resolved_type = target_types[idx]
-        assign_expr = "::std::get<" + str(idx) + ">(" + temp_name + ")"
+        if source_type.startswith("tuple[") or _cpp_type_is_unknownish(source_type):
+            assign_expr = "::std::get<" + str(idx) + ">(" + temp_name + ")"
+        elif source_type.startswith("list[") or source_type in ("bytes", "bytearray"):
+            assign_expr = "py_list_at_ref(" + temp_name + ", int64(" + str(idx) + "))"
+        else:
+            assign_expr = temp_name + "[" + str(idx) + "]"
         if _is_local_visible(ctx, name):
             _emit(ctx, name + " = " + assign_expr + ";")
         else:
@@ -2796,6 +2802,10 @@ def _emit_swap(ctx: CppEmitContext, node: dict[str, JsonVal]) -> None:
     left = _emit_expr(ctx, node.get("left"))
     right = _emit_expr(ctx, node.get("right"))
     _emit(ctx, "std::swap(" + left + ", " + right + ");")
+
+
+def _cpp_type_is_unknownish(type_name: str) -> bool:
+    return type_name == "" or type_name == "unknown" or "unknown" in type_name
 
 
 def _handler_type_name(handler: dict[str, JsonVal]) -> str:
@@ -3413,9 +3423,12 @@ def _emit_cast_expr(ctx: CppEmitContext, target_node: JsonVal, value_node: JsonV
             target_name = _str(target_node, "repr")
     value_expr = _emit_expr(ctx, value_node)
     value_type = _effective_resolved_type(value_node)
+    static_value_type = _expr_static_type(ctx, value_node)
     storage_type = _expr_storage_type(ctx, value_node)
     value_kind = _str(value_node, "kind") if isinstance(value_node, dict) else ""
     if target_name == "":
+        return value_expr
+    if target_name in (value_type, static_value_type, storage_type):
         return value_expr
     if (
         value_kind == "Unbox"

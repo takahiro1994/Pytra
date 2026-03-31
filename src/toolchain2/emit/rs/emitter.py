@@ -3533,6 +3533,16 @@ def _emit_assign(ctx: RsEmitContext, node: dict[str, JsonVal]) -> None:
         else:
             ctx.declared_vars.add(target_name)
             resolved_type = _str(value, "resolved_type") if isinstance(value, dict) else ""
+            if resolved_type == "":
+                resolved_type = _str(node, "decl_type")
+            if resolved_type in ("", "unknown") and isinstance(value, dict) and _str(value, "kind") == "Call":
+                func_node = value.get("func")
+                if isinstance(func_node, dict) and _str(func_node, "kind") == "Name":
+                    sig = ctx.function_signatures.get(_str(func_node, "id"))
+                    if isinstance(sig, dict):
+                        ret = _str(sig, "return_type")
+                        if ret != "":
+                            resolved_type = ret
             if resolved_type != "":
                 ctx.var_types[target_name] = resolved_type
             elif isinstance(value, dict) and _str(value, "kind") == "Call":

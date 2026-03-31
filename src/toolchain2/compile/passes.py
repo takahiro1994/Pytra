@@ -415,7 +415,7 @@ def _lc_in_stmts(stmts: list[JsonVal], ctx: CompileContext) -> list[JsonVal]:
                     if isinstance(ann, str) and ann != "" and "unknown" not in ann:
                         at = ann
                 expanded = _expand_lc_to_stmts(value, cn, at)
-                if cn != tn and tn != "":
+                if cn != tn and isinstance(target, dict):
                     assign_value: Node = {}
                     assign_value["kind"] = NAME
                     assign_value["id"] = cn
@@ -424,6 +424,7 @@ def _lc_in_stmts(stmts: list[JsonVal], ctx: CompileContext) -> list[JsonVal]:
                     assign_stmt["kind"] = ASSIGN
                     assign_stmt["target"] = deep_copy_json(target)
                     assign_stmt["value"] = assign_value
+                    assign_stmt["declare"] = False
                     expanded.append(assign_stmt)
                 for ex in expanded:
                     result.append(ex)
@@ -1216,10 +1217,10 @@ def _expand_tuple_unpack_in_stmts(stmts: list[JsonVal], ctx: CompileContext) -> 
             elem_types = _parse_tuple_element_types(val_rt)
 
         tuple_style: str = ctx.lowering_profile.tuple_unpack_style
-        if tuple_style == "structured_binding" or tuple_style == "pattern_match":
+        if (tuple_style == "structured_binding" or tuple_style == "pattern_match") and _tuple_unpack_targets_are_simple_names(elements_list):
             result.append(_make_tuple_unpack_high_level(TUPLE_UNPACK, elements_list, value, elem_types))
             continue
-        if tuple_style == "multi_return":
+        if tuple_style == "multi_return" and _tuple_unpack_targets_are_simple_names(elements_list):
             result.append(_make_tuple_unpack_high_level(MULTI_ASSIGN, elements_list, value, elem_types))
             continue
 
@@ -1247,9 +1248,6 @@ def _expand_tuple_unpack_in_stmts(stmts: list[JsonVal], ctx: CompileContext) -> 
         for i, elem in enumerate(elements_list):
             if not isinstance(elem, dict):
                 continue
-            elem_name = elem.get("id")
-            if not isinstance(elem_name, str) or elem_name == "":
-                continue
             elem_rt = elem_types[i] if i < len(elem_types) else "unknown"
             idx_value: Node = {}
             idx_value["kind"] = NAME
@@ -1264,19 +1262,53 @@ def _expand_tuple_unpack_in_stmts(stmts: list[JsonVal], ctx: CompileContext) -> 
             idx_node["value"] = idx_value
             idx_node["slice"] = idx_slice
             idx_node["resolved_type"] = elem_rt
-            elem_target: Node = {}
-            elem_target["kind"] = NAME
-            elem_target["id"] = elem_name
-            elem_target["resolved_type"] = elem_rt
-            elem_assign: Node = {}
-            elem_assign["kind"] = ASSIGN
-            elem_assign["target"] = elem_target
-            elem_assign["value"] = idx_node
-            elem_assign["declare"] = True
-            elem_assign["decl_type"] = elem_rt
-            result.append(elem_assign)
+            _append_tuple_unpack_target_assignments(result, cast(Node, elem), idx_node, elem_rt, ctx)
 
     return result
+
+
+def _tuple_unpack_targets_are_simple_names(elements: list[JsonVal]) -> bool:
+    for elem in elements:
+        if not isinstance(elem, dict):
+            return False
+        if _sk(cast(Node, elem)) not in (NAME, "NameTarget"):
+            return False
+        if jv_str(elem.get("id")) == "":
+            return False
+    return True
+
+
+def _append_tuple_unpack_target_assignments(
+    out: list[JsonVal],
+    target: Node,
+    value: Node,
+    elem_rt: str,
+    ctx: CompileContext,
+) -> None:
+    target_kind = _sk(target)
+    if target_kind in (NAME, "NameTarget"):
+        elem_name = jv_str(target.get("id"))
+        if elem_name == "":
+            return
+        elem_target: Node = {}
+        elem_target["kind"] = NAME
+        elem_target["id"] = elem_name
+        elem_target["resolved_type"] = elem_rt
+        elem_assign: Node = {}
+        elem_assign["kind"] = ASSIGN
+        elem_assign["target"] = elem_target
+        elem_assign["value"] = value
+        elem_assign["declare"] = True
+        elem_assign["decl_type"] = elem_rt
+        out.append(elem_assign)
+        return
+
+    elem_assign: Node = {}
+    elem_assign["kind"] = ASSIGN
+    elem_assign["target"] = deep_copy_json(target)
+    elem_assign["value"] = value
+    elem_assign["declare"] = False
+    out.extend(_expand_tuple_unpack_in_stmts([elem_assign], ctx))
 
 
 def _same_lvalue(a: Node, b: Node) -> bool:

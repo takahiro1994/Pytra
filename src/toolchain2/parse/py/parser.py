@@ -2698,7 +2698,17 @@ def _parse_block_lines(
                 target_col = _find_expr_col(ctx, lhs_text, abs_ln, indent)
                 target_span = make_span(abs_ln, target_col, abs_ln, target_col + len(lhs_text))
                 tuple_target = TupleExpr(base=ExprBase(source_span=target_span, repr_text=lhs_text), elements=elements)
-                value = _parse_expr_text(ctx, rhs_text, abs_ln, _find_expr_col(ctx, rhs_text, abs_ln, indent + len(lhs_text) + 3), name_types)
+                rhs_parts = [p.strip() for p in _split_top_level_csv(rhs_text) if p.strip() != ""]
+                if len(rhs_parts) >= 2:
+                    rhs_elements = [
+                        _parse_expr_text(ctx, p, abs_ln, _find_expr_col(ctx, p, abs_ln, indent + len(lhs_text) + 3), name_types)
+                        for p in rhs_parts
+                    ]
+                    value_col = _find_expr_col(ctx, rhs_text, abs_ln, indent + len(lhs_text) + 3)
+                    value_span = make_span(abs_ln, value_col, abs_ln, value_col + len(rhs_text))
+                    value = TupleExpr(base=ExprBase(source_span=value_span, repr_text=rhs_text), elements=rhs_elements)
+                else:
+                    value = _parse_expr_text(ctx, rhs_text, abs_ln, _find_expr_col(ctx, rhs_text, abs_ln, indent + len(lhs_text) + 3), name_types)
                 span = make_span(abs_ln, indent, abs_ln, indent + len(s_clean))
                 assign_stmt = Assign(source_span=span, target=tuple_target, value=value, declare=False)
                 if len(pending_trivia) > 0:
@@ -2928,20 +2938,11 @@ def _try_parse_tuple_assign(s: str) -> tuple[str, str]:
             depth -= 1
         elif ch == ":" and depth == 0:
             return ("", "")
-    # Check lhs has a top-level comma (= tuple targets)
-    has_comma = False
-    depth = 0
-    for ch in lhs:
-        if ch == "[" or ch == "(":
-            depth += 1
-        elif ch == "]" or ch == ")":
-            depth -= 1
-        elif ch == "," and depth == 0:
-            has_comma = True
-            break
-    if not has_comma:
+    stripped_lhs = _strip_outer_tuple_target_wrapper(lhs)
+    lhs_parts = [p.strip() for p in _split_tuple_targets(stripped_lhs) if p.strip() != ""]
+    if len(lhs_parts) < 2:
         return ("", "")
-    return (lhs, rhs)
+    return (stripped_lhs, rhs)
 
 
 def _bracket_depth(text: str) -> int:
@@ -3025,6 +3026,7 @@ def _split_tuple_targets(text: str) -> list[str]:
     'a[i], a[j]' → ['a[i]', 'a[j]']
     'a, b' → ['a', 'b']
     """
+    text = _strip_outer_tuple_target_wrapper(text.strip())
     parts: list[str] = []
     depth: int = 0
     current: list[str] = []
@@ -3044,6 +3046,51 @@ def _split_tuple_targets(text: str) -> list[str]:
     if tail != "":
         parts.append(tail)
     return parts
+
+
+def _split_top_level_csv(text: str) -> list[str]:
+    parts: list[str] = []
+    depth: int = 0
+    current: list[str] = []
+    for ch in text:
+        if ch in ("[", "(", "{"):
+            depth += 1
+            current.append(ch)
+        elif ch in ("]", ")", "}"):
+            depth -= 1
+            current.append(ch)
+        elif ch == "," and depth == 0:
+            parts.append("".join(current).strip())
+            current = []
+        else:
+            current.append(ch)
+    tail = "".join(current).strip()
+    if tail != "":
+        parts.append(tail)
+    return parts
+
+
+def _strip_outer_tuple_target_wrapper(text: str) -> str:
+    stripped = text.strip()
+    while True:
+        if _is_wrapped_by_pair(stripped, "(", ")") or _is_wrapped_by_pair(stripped, "[", "]"):
+            stripped = stripped[1:-1].strip()
+            continue
+        return stripped
+
+
+def _is_wrapped_by_pair(text: str, open_ch: str, close_ch: str) -> bool:
+    if len(text) < 2 or text[0] != open_ch or text[-1] != close_ch:
+        return False
+    depth = 0
+    for i, ch in enumerate(text):
+        if ch == open_ch:
+            depth += 1
+        elif ch == close_ch:
+            depth -= 1
+            if depth == 0 and i != len(text) - 1:
+                return False
+    return depth == 0
 
 
 def _make_name_expr(name: str, line: int, col: int, ctx: ParseContext) -> Name:

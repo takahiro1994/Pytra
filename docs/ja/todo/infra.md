@@ -26,10 +26,14 @@
 
 EAST3 で 3 パターンの tuple unpack が壊れている。括弧付き左辺 `(x,y,z)=` / `[x,y,z]=` が `Expr` に崩壊、comprehension + unpack で代入が消失。`tuple_unpack_variants` fixture で検出済み。
 
-1. [ ] [ID: P0-TUPLE-UNPACK-S1] EAST1 parser で括弧付き左辺 `(x,y,z)` / `[x,y,z]` を括弧なしと同様に tuple target として認識させる
-2. [ ] [ID: P0-TUPLE-UNPACK-S2] list comprehension 展開パスで元の代入ターゲットが Tuple の場合に `__comp_N[0]`, `__comp_N[1]`, ... への代入を生成する
-3. [ ] [ID: P0-TUPLE-UNPACK-S3] `tuple_unpack_variants` fixture が全パターン EAST3 で正しい TupleUnpack を生成することを確認する
-4. [ ] [ID: P0-TUPLE-UNPACK-S4] C++ / Rust の fixture parity に回帰がないことを確認する
+1. [x] [ID: P0-TUPLE-UNPACK-S1] EAST1 parser で括弧付き左辺 `(x,y,z)` / `[x,y,z]` を括弧なしと同様に tuple target として認識させる
+   - 完了: `parser.py` で左辺の外側 wrapper を剥がして tuple target 判定するよう修正し、bare RHS CSV も `TupleExpr` として保持するようにした
+2. [x] [ID: P0-TUPLE-UNPACK-S2] list comprehension 展開パスで元の代入ターゲットが Tuple の場合に `__comp_N[0]`, `__comp_N[1]`, ... への代入を生成する
+   - 完了: `passes.py` で listcomp 展開後の元 target を保持し、individual_temps 展開で `Subscript` / nested tuple target も再帰的に展開するよう修正した
+3. [x] [ID: P0-TUPLE-UNPACK-S3] `tuple_unpack_variants` fixture が全パターン EAST3 で正しい TupleUnpack を生成することを確認する
+   - 完了: `tools/unittest/toolchain2/test_tuple_unpack_lowering_profile.py` に parser/lowering 回帰を追加し、`test_paren_unpack` / `test_bracket_unpack` / `test_comprehension_unpack` が EAST3 で正しい unpack へ落ちることを確認した
+4. [x] [ID: P0-TUPLE-UNPACK-S4] C++ / Rust の fixture parity に回帰がないことを確認する
+   - 完了: `runtime_parity_check_fast.py --targets cpp|rs --case-root fixture --east3-opt-level 2 tuple_unpack_variants` が両 backend で PASS。あわせて C++/Rust emitter の tuple/list source 判定と local function return type 補完を修正した
 
 ### P0-PARITY-CHANGELOG: parity 変化点ログの自動記録
 

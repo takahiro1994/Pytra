@@ -41,6 +41,34 @@ def _build_east3(source: str, *, target_language: str) -> dict:
 
 
 class TupleUnpackLoweringProfileTests(unittest.TestCase):
+    def test_parser_accepts_parenthesized_tuple_target(self) -> None:
+        east1 = parse_python_source(
+            """
+def f() -> None:
+    (x, y, z) = (1, 2, 3)
+""",
+            "<mem>",
+        ).to_jv()
+        fn = next(node for node in east1.get("body", []) if node.get("kind") == "FunctionDef")
+        stmt = fn["body"][0]
+        self.assertEqual(stmt.get("kind"), "Assign")
+        self.assertEqual(stmt.get("target", {}).get("kind"), "Tuple")
+        self.assertEqual([elem.get("id") for elem in stmt["target"].get("elements", [])], ["x", "y", "z"])
+
+    def test_parser_accepts_bracketed_tuple_target(self) -> None:
+        east1 = parse_python_source(
+            """
+def f() -> None:
+    [x, y, z] = [1, 2, 3]
+""",
+            "<mem>",
+        ).to_jv()
+        fn = next(node for node in east1.get("body", []) if node.get("kind") == "FunctionDef")
+        stmt = fn["body"][0]
+        self.assertEqual(stmt.get("kind"), "Assign")
+        self.assertEqual(stmt.get("target", {}).get("kind"), "Tuple")
+        self.assertEqual([elem.get("id") for elem in stmt["target"].get("elements", [])], ["x", "y", "z"])
+
     def test_go_profile_lowers_tuple_assign_to_multi_assign(self) -> None:
         east3 = _build_east3(
             """
@@ -63,7 +91,8 @@ def f() -> int:
         self.assertEqual(multi_assign.get("value", {}).get("kind"), "Call")
         self.assertIn("func pair() (int64, int64) {", go_code)
         self.assertIn("return int64(1), int64(2)", go_code)
-        self.assertIn("x, y := pair()", go_code)
+        self.assertIn("__multi_1 := pair()", go_code)
+        self.assertIn("var x int64 = py_to_int64(__multi_1[int64(0)])", go_code)
 
         pair_fn = next(
             node
@@ -91,7 +120,7 @@ def f() -> int:
         self.assertEqual(tuple_unpack.get("target_types"), ["int64", "int64"])
         self.assertTrue(tuple_unpack.get("declare"))
         self.assertEqual(tuple_unpack.get("value", {}).get("kind"), "Call")
-        self.assertIn("::std::tuple<int64, int64> __tup_1 = pair();", cpp_code)
+        self.assertIn("::std::tuple<int64, int64> __tup_1 = ::pair();", cpp_code)
         self.assertIn("int64 x = ::std::get<0>(__tup_1);", cpp_code)
 
         pair_fn = next(
@@ -125,6 +154,29 @@ def f() -> int:
         self.assertEqual(tmp_assign.get("decl_type"), "tuple[int64,int64]")
         self.assertFalse(any(node.get("kind") == "TupleUnpack" for node in _walk(east3)))
         self.assertFalse(any(node.get("kind") == "MultiAssign" for node in _walk(east3)))
+
+    def test_core_profile_preserves_tuple_target_after_list_comp(self) -> None:
+        east3 = _build_east3(
+            """
+def f() -> tuple[int, int, int]:
+    x, y, z = [i for i in range(3)]
+    return x, y, z
+""",
+            target_language="core",
+        )
+
+        assigns = [
+            node for node in _walk(east3)
+            if node.get("kind") in ("Assign", "AnnAssign")
+            and isinstance(node.get("target"), dict)
+        ]
+        target_ids = [node["target"].get("id") for node in assigns if node["target"].get("kind") == "Name"]
+
+        self.assertIn("__comp_1", target_ids)
+        self.assertIn("__tup_1", target_ids)
+        self.assertIn("x", target_ids)
+        self.assertIn("y", target_ids)
+        self.assertIn("z", target_ids)
 
 
 if __name__ == "__main__":
