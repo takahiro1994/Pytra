@@ -27,6 +27,18 @@
 
 ## 未完了タスク
 
+### P0-RS-IN-ITERABLE: `in` 演算子を iterable の汎用 contains で処理する
+
+文脈: [docs/ja/plans/plan-rs-in-iterable-contains.md](../plans/plan-rs-in-iterable-contains.md)
+
+現状の Rust runtime は tuple の `in` を要素数ごとの `PyContains` trait impl (2〜12要素) で処理しており、13要素以上で破綻する。tuple をスライスに変換して `.contains()` を呼ぶ汎用方式に移行する。range は算術判定で処理する。
+
+1. [ ] [ID: P0-RS-IN-ITER-S1] Rust emitter の `_emit_compare` で `In`/`NotIn` + `Tuple` を `[...].contains(&key)` に変換する
+2. [ ] [ID: P0-RS-IN-ITER-S2] Rust emitter の `_emit_compare` で `In`/`NotIn` + `RangeExpr` を算術判定に変換する
+3. [ ] [ID: P0-RS-IN-ITER-S3] `py_runtime.rs` の tuple 要素数別 `PyContains` impl (2〜12要素) を削除する
+4. [ ] [ID: P0-RS-IN-ITER-S4] `in_membership_iterable` fixture が Rust で compile + run parity PASS することを確認する
+5. [ ] [ID: P0-RS-IN-ITER-S5] fixture + sample の全件 parity に回帰がないことを確認する
+
 ### P0-EAST3-IN-EXPAND: `in` リテラル展開を EAST3 optimizer で行う
 
 文脈: [docs/ja/plans/plan-east3-opt-in-literal-expansion.md](../plans/plan-east3-opt-in-literal-expansion.md)
