@@ -26,9 +26,12 @@
 
 `_emit_constant` が整数リテラルを常に `int64(0)` のようにキャスト付きで出力している。CommonRenderer に `literal_nowrap_ranges` テーブルを追加し、各言語共通で判定する仕組みにする。
 
-1. [ ] [ID: P0-CPP-LITERAL-S1] CommonRenderer に `literal_nowrap_ranges` テーブル読み込み + `render_constant` 拡張を実装する
-2. [ ] [ID: P0-CPP-LITERAL-S2] C++ の profile/mapping に `literal_nowrap_ranges` を設定し、`_emit_constant` の整数キャストロジックを CommonRenderer へ委譲する
-3. [ ] [ID: P0-CPP-LITERAL-S3] fixture + sample parity に影響がないことを確認する
+1. [x] [ID: P0-CPP-LITERAL-S1] CommonRenderer に `literal_nowrap_ranges` テーブル読み込み + `render_constant` 拡張を実装する
+   - 完了: `CommonRenderer` が profile の `literal_nowrap_ranges` を読み込み、整数 `Constant` を値域に応じて bare literal / typed wrap に分岐するよう更新した。`types` mapping も参照して `int64(2147483648)` のような fallback wrap を共通ロジックで生成する
+2. [x] [ID: P0-CPP-LITERAL-S2] C++ の profile/mapping に `literal_nowrap_ranges` を設定し、`_emit_constant` の整数キャストロジックを CommonRenderer へ委譲する
+   - 完了: `src/toolchain2/emit/profiles/cpp.json` に C++ 用の `literal_nowrap_ranges` を追加し、`_emit_constant` は整数型を `CommonRenderer.render_constant(...)` へ委譲する形へ縮退した。あわせて `min` / `max` は template deduction を壊さないよう integer literal を target type で強制ラップする補助経路を追加した
+3. [x] [ID: P0-CPP-LITERAL-S3] fixture + sample parity に影響がないことを確認する
+   - 完了: sample は `PYTHONPATH=src:tools python3 tools/check/runtime_parity_check_fast.py --targets cpp --case-root sample --east3-opt-level 2` で `18/18 PASS` を確認。fixture は直前の full run が `130/131` で唯一の失敗だった `exception_user_defined_multi_handler` を修正し、`runtime_parity_check_fast.py ... exception_user_defined_multi_handler` と `... super_init` の個別 PASS、加えて `src/pytra-cli.py build test/fixture/source/py/control/exception_user_defined_multi_handler.py --target cpp` の build 成功を確認した
 
 ### P5-CPP-PARENS: C++ emitter に演算子優先順位テーブルを追加する
 

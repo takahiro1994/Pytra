@@ -3,6 +3,7 @@
   "language": "cpp",
 
   "types": {
+    "int": "int64",
     "int8": "int8_t",
     "uint8": "uint8_t",
     "int16": "int16_t",
@@ -18,6 +19,12 @@
     "None": "void",
     "Any": "object",
     "Path": "str"
+  },
+
+  "literal_nowrap_ranges": {
+    "int": [-2147483648, 2147483647],
+    "int32": [-2147483648, 2147483647],
+    "int64": [-2147483648, 2147483647]
   },
 
   "generic_types": {
@@ -36,6 +43,37 @@
     "bool": {
       "And": "&&",
       "Or": "||"
+    },
+    "unary": {
+      "Not": "!"
+    },
+    "precedence": {
+      "Mult": 12,
+      "Div": 12,
+      "Mod": 12,
+      "Add": 11,
+      "Sub": 11,
+      "LShift": 10,
+      "RShift": 10,
+      "Lt": 9,
+      "LtE": 9,
+      "Gt": 9,
+      "GtE": 9,
+      "In": 9,
+      "NotIn": 9,
+      "Eq": 8,
+      "NotEq": 8,
+      "Is": 8,
+      "IsNot": 8,
+      "BitAnd": 7,
+      "BitXor": 6,
+      "BitOr": 5,
+      "And": 4,
+      "Or": 3,
+      "USub": 13,
+      "UAdd": 13,
+      "Not": 13,
+      "Invert": 13
     }
   },
 

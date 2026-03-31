@@ -27,6 +27,29 @@ class CommonRenderer(ABC):
         self.language = language
         self.profile = load_profile_doc(language)
         self.state = CommonRendererState()
+        self._op_prec_table: dict[str, int] = {}
+        self._literal_nowrap_ranges: dict[str, tuple[int, int] | str] = {}
+        operators = self.profile.get("operators")
+        precedence = operators.get("precedence") if isinstance(operators, dict) else None
+        if isinstance(precedence, dict):
+            for key, value in precedence.items():
+                if isinstance(key, str) and isinstance(value, int):
+                    self._op_prec_table[key] = value
+        literal_nowrap = self.profile.get("literal_nowrap_ranges")
+        if isinstance(literal_nowrap, dict):
+            for key, value in literal_nowrap.items():
+                if not isinstance(key, str):
+                    continue
+                if value == "always":
+                    self._literal_nowrap_ranges[key] = "always"
+                    continue
+                if (
+                    isinstance(value, list)
+                    and len(value) == 2
+                    and isinstance(value[0], int)
+                    and isinstance(value[1], int)
+                ):
+                    self._literal_nowrap_ranges[key] = (value[0], value[1])
 
     # ------------------------------------------------------------------
     # profile helpers
@@ -76,6 +99,107 @@ class CommonRenderer(ABC):
             if isinstance(value, str) and value != "":
                 return value
         return default
+
+    def _operator_precedence(self, op: str) -> int:
+        value = self._op_prec_table.get(op)
+        return value if isinstance(value, int) else -1
+
+    def _literal_type_text(self, resolved_type: str) -> str:
+        raw = self.profile.get("types")
+        if isinstance(raw, dict):
+            mapped = raw.get(resolved_type)
+            if isinstance(mapped, str) and mapped != "":
+                return mapped
+        return resolved_type
+
+    def _literal_can_omit_wrap(self, resolved_type: str, value: int) -> bool:
+        spec = self._literal_nowrap_ranges.get(resolved_type)
+        if spec == "always":
+            return True
+        if isinstance(spec, tuple):
+            return spec[0] <= value <= spec[1]
+        return False
+
+    def _wrap_int_literal(self, resolved_type: str, value: int) -> str:
+        literal_type = self._literal_type_text(resolved_type)
+        if literal_type == "":
+            literal_type = resolved_type
+        if literal_type == "":
+            return str(value)
+        return literal_type + "(" + str(value) + ")"
+
+    def _expr_precedence(self, node: JsonVal) -> int:
+        if not isinstance(node, dict):
+            return 100
+        kind = self._str(node, "kind")
+        if kind == "BinOp":
+            return self._operator_precedence(self._str(node, "op"))
+        if kind == "BoolOp":
+            return self._operator_precedence(self._str(node, "op"))
+        if kind == "Compare":
+            ops = self._list(node, "ops")
+            if len(ops) == 0:
+                return 100
+            op_obj = ops[0]
+            op_name = op_obj if isinstance(op_obj, str) else self._str(op_obj, "kind")
+            return self._operator_precedence(op_name)
+        if kind == "UnaryOp":
+            return self._operator_precedence(self._str(node, "op"))
+        return 100
+
+    def _needs_parentheses(self, child: JsonVal, parent_op: str, *, is_right: bool = False) -> bool:
+        parent_prec = self._operator_precedence(parent_op)
+        if parent_prec < 0:
+            return False
+        child_prec = self._expr_precedence(child)
+        if child_prec < 0:
+            return False
+        if child_prec < parent_prec:
+            return True
+        if is_right and child_prec == parent_prec and isinstance(child, dict):
+            kind = self._str(child, "kind")
+            if kind in ("BinOp", "BoolOp", "Compare"):
+                return True
+        return False
+
+    def _wrap_expr_for_precedence(
+        self,
+        rendered: str,
+        node: JsonVal,
+        parent_op: str,
+        *,
+        is_right: bool = False,
+    ) -> str:
+        if self._needs_parentheses(node, parent_op, is_right=is_right):
+            return "(" + rendered + ")"
+        return rendered
+
+    def _render_infix_expr(
+        self,
+        left_node: JsonVal,
+        left_rendered: str,
+        right_node: JsonVal,
+        right_rendered: str,
+        op_name: str,
+        op_text: str,
+    ) -> str:
+        if len(self._op_prec_table) == 0:
+            return "(" + left_rendered + " " + op_text + " " + right_rendered + ")"
+        left = self._wrap_expr_for_precedence(left_rendered, left_node, op_name)
+        right = self._wrap_expr_for_precedence(right_rendered, right_node, op_name, is_right=True)
+        return left + " " + op_text + " " + right
+
+    def _render_prefix_expr(
+        self,
+        operand_node: JsonVal,
+        operand_rendered: str,
+        op_name: str,
+        op_text: str,
+    ) -> str:
+        if len(self._op_prec_table) == 0:
+            return "(" + op_text + operand_rendered + ")"
+        operand = self._wrap_expr_for_precedence(operand_rendered, operand_node, op_name, is_right=True)
+        return op_text + operand
 
     # ------------------------------------------------------------------
     # line helpers
@@ -232,18 +356,25 @@ class CommonRenderer(ABC):
             return self._bool_literal(value)
         if isinstance(value, str):
             return self._quote_string(value)
+        if isinstance(value, int):
+            resolved_type = self._str(node, "resolved_type")
+            if self._literal_can_omit_wrap(resolved_type, value):
+                return str(value)
+            return self._wrap_int_literal(resolved_type, value)
         return str(value)
 
     def render_binop(self, node: dict[str, JsonVal]) -> str:
         left = self.render_expr(node.get("left"))
         right = self.render_expr(node.get("right"))
-        op = self._operator_text("bin", self._str(node, "op"), self._str(node, "op"))
-        return "(" + left + " " + op + " " + right + ")"
+        op_name = self._str(node, "op")
+        op = self._operator_text("bin", op_name, self._str(node, "op"))
+        return self._render_infix_expr(node.get("left"), left, node.get("right"), right, op_name, op)
 
     def render_unaryop(self, node: dict[str, JsonVal]) -> str:
         operand = self.render_expr(node.get("operand"))
-        op = self._operator_text("unary", self._str(node, "op"), self._str(node, "op"))
-        return "(" + op + operand + ")"
+        op_name = self._str(node, "op")
+        op = self._operator_text("unary", op_name, self._str(node, "op"))
+        return self._render_prefix_expr(node.get("operand"), operand, op_name, op)
 
     def render_compare(self, node: dict[str, JsonVal]) -> str:
         left = self.render_expr(node.get("left"))
@@ -251,24 +382,49 @@ class CommonRenderer(ABC):
         ops = self._list(node, "ops")
         if len(comparators) == 0 or len(ops) == 0:
             return left
+        if len(self._op_prec_table) == 0:
+            parts: list[str] = []
+            current_left = left
+            for idx, comparator in enumerate(comparators):
+                op_obj = ops[idx] if idx < len(ops) else None
+                op_name = op_obj if isinstance(op_obj, str) else self._str(op_obj, "kind")
+                op_text = self._operator_text("cmp", op_name, op_name)
+                right = self.render_expr(comparator)
+                parts.append("(" + current_left + " " + op_text + " " + right + ")")
+                current_left = right
+            if len(parts) == 1:
+                return parts[0]
+            joiner = " " + self._operator_text("bool", "And", "&&") + " "
+            return "(" + joiner.join(parts) + ")"
         parts: list[str] = []
         current_left = left
+        current_left_node = node.get("left")
         for idx, comparator in enumerate(comparators):
             op_obj = ops[idx] if idx < len(ops) else None
             op_name = op_obj if isinstance(op_obj, str) else self._str(op_obj, "kind")
             op_text = self._operator_text("cmp", op_name, op_name)
             right = self.render_expr(comparator)
-            parts.append("(" + current_left + " " + op_text + " " + right + ")")
+            left_part = self._wrap_expr_for_precedence(current_left, current_left_node, op_name)
+            right_part = self._wrap_expr_for_precedence(right, comparator, op_name, is_right=True)
+            parts.append(left_part + " " + op_text + " " + right_part)
             current_left = right
+            current_left_node = comparator
         if len(parts) == 1:
             return parts[0]
         joiner = " " + self._operator_text("bool", "And", "&&") + " "
-        return "(" + joiner.join(parts) + ")"
+        return joiner.join(parts)
 
     def render_boolop(self, node: dict[str, JsonVal]) -> str:
         values = self._list(node, "values")
         op_text = self._operator_text("bool", self._str(node, "op"), self._str(node, "op"))
-        return "(" + (" " + op_text + " ").join(self.render_expr(value) for value in values) + ")"
+        if len(self._op_prec_table) == 0:
+            return "(" + (" " + op_text + " ").join(self.render_expr(value) for value in values) + ")"
+        op_name = self._str(node, "op")
+        parts: list[str] = []
+        for idx, value in enumerate(values):
+            rendered = self.render_expr(value)
+            parts.append(self._wrap_expr_for_precedence(rendered, value, op_name, is_right=idx > 0))
+        return (" " + op_text + " ").join(parts)
 
     def render_expr(self, node: JsonVal) -> str:
         if not isinstance(node, dict):

@@ -164,7 +164,7 @@ class CommonRendererTests(unittest.TestCase):
             },
         )
 
-        self.assertEqual(rendered, "int64(1) + int64(2)")
+        self.assertEqual(rendered, "1 + 2")
 
     def test_cpp_emitter_expr_dispatch_respects_precedence_for_nested_binop(self) -> None:
         rendered = emit_cpp_expr(
@@ -184,7 +184,7 @@ class CommonRendererTests(unittest.TestCase):
             },
         )
 
-        self.assertEqual(rendered, "(int64(1) + int64(2)) * int64(3)")
+        self.assertEqual(rendered, "(1 + 2) * 3")
 
     def test_cpp_emitter_binop_keeps_explicit_numeric_promotion_casts(self) -> None:
         rendered = emit_cpp_expr(
@@ -233,7 +233,44 @@ class CommonRendererTests(unittest.TestCase):
             },
         )
 
-        self.assertEqual(rendered, "py_mod(x, int64(2))")
+        self.assertEqual(rendered, "py_mod(x, 2)")
+
+    def test_cpp_emitter_constant_keeps_wrap_for_narrowing_integer_types(self) -> None:
+        rendered = emit_cpp_expr(
+            CppEmitContext(),
+            {"kind": "Constant", "value": 7, "resolved_type": "int8"},
+        )
+
+        self.assertEqual(rendered, "int8_t(7)")
+
+    def test_cpp_emitter_constant_keeps_wrap_for_out_of_range_int64_literals(self) -> None:
+        rendered = emit_cpp_expr(
+            CppEmitContext(),
+            {"kind": "Constant", "value": 2147483648, "resolved_type": "int64"},
+        )
+
+        self.assertEqual(rendered, "int64(2147483648)")
+
+    def test_cpp_emitter_minmax_keep_typed_integer_literals_for_template_deduction(self) -> None:
+        rendered = emit_cpp_expr(
+            CppEmitContext(),
+            {
+                "kind": "Call",
+                "lowered_kind": "BuiltinCall",
+                "builtin_name": "max",
+                "runtime_call": "max",
+                "resolved_type": "int64",
+                "args": [
+                    {"kind": "Constant", "value": 0, "resolved_type": "int64"},
+                    {"kind": "Name", "id": "v", "resolved_type": "int64"},
+                ],
+                "func": {"kind": "Name", "id": "max"},
+            },
+        )
+
+        self.assertIn("int64(0)", rendered)
+        self.assertIn("v", rendered)
+        self.assertNotIn("(0, v)", rendered)
 
     def test_cpp_emitter_compare_uses_py_is_none_for_object_identity_checks(self) -> None:
         rendered = emit_cpp_expr(
@@ -406,7 +443,7 @@ class CommonRendererTests(unittest.TestCase):
 
         self.assertIn("if (ready) {", rendered)
         self.assertIn("} else if (retry) {", rendered)
-        self.assertIn("return int64(3);", rendered)
+        self.assertIn("return 3;", rendered)
 
     def test_cpp_emitter_stmt_dispatch_avoids_double_condition_parens_for_compare(self) -> None:
         ctx = CppEmitContext()
@@ -428,8 +465,8 @@ class CommonRendererTests(unittest.TestCase):
 
         rendered = "\n".join(ctx.lines)
 
-        self.assertIn("if (count > int64(0)) {", rendered)
-        self.assertNotIn("if ((count > int64(0))) {", rendered)
+        self.assertIn("if (count > 0) {", rendered)
+        self.assertNotIn("if ((count > 0)) {", rendered)
 
     def test_cpp_emitter_stmt_dispatch_preserves_container_truthiness_hook(self) -> None:
         ctx = CppEmitContext()

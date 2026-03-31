@@ -1120,8 +1120,8 @@ def has_key(env: dict[str, int], name: str) -> bool:
 
         cpp_code = emit_cpp_module(doc)
 
-        self.assertIn("py_list_append_mut(xs, int64(1));", cpp_code)
-        self.assertIn('int64 item = py_dict_get(d, str("x"), int64(0));', cpp_code)
+        self.assertIn("py_list_append_mut(xs, 1);", cpp_code)
+        self.assertIn('int64 item = py_dict_get(d, str("x"), 0);', cpp_code)
         self.assertIn('py_set_add_mut(s, str("x"));', cpp_code)
         self.assertNotIn("push_back(", cpp_code)
 
@@ -1670,7 +1670,7 @@ def has_key(env: dict[str, int], name: str) -> bool:
 
         cpp_code = emit_cpp_module(doc)
 
-        self.assertIn("py_max(int64(0), v);", cpp_code)
+        self.assertIn("py_max(0, v);", cpp_code)
 
     def test_cpp_emitter_uses_fresh_discard_names_for_range_targets(self) -> None:
         doc = _module_doc(
@@ -1750,7 +1750,7 @@ def has_key(env: dict[str, int], name: str) -> bool:
 
         cpp_code = emit_cpp_module(doc)
 
-        self.assertIn("Object<list<int64>> stack = rc_list_from_value(list<int64>{int64(1)});", cpp_code)
+        self.assertIn("Object<list<int64>> stack = rc_list_from_value(list<int64>{1});", cpp_code)
         self.assertIn("while (py_to_bool(stack)) {", cpp_code)
         self.assertIn("py_list_pop_mut(stack);", cpp_code)
 
@@ -2007,7 +2007,7 @@ def has_key(env: dict[str, int], name: str) -> bool:
 
         cpp_code = emit_cpp_module(doc)
 
-        self.assertIn("Object<set<int64>> seen = rc_set_from_value(set<int64>{int64(1), int64(2)});", cpp_code)
+        self.assertIn("Object<set<int64>> seen = rc_set_from_value(set<int64>{1, 2});", cpp_code)
 
     def test_cpp_emitter_uses_py_at_for_dict_reads_but_keeps_subscript_store_targets(self) -> None:
         doc = _module_doc(
@@ -2060,7 +2060,7 @@ def has_key(env: dict[str, int], name: str) -> bool:
         cpp_code = emit_cpp_module(doc)
 
         self.assertIn("return py_at(env, name);", cpp_code)
-        self.assertIn('(*(env))[str("x")] = int64(1);', cpp_code)
+        self.assertIn('(*(env))[str("x")] = 1;', cpp_code)
 
     def test_cpp_emitter_rewrites_negative_unary_list_index_from_size(self) -> None:
         doc = _module_doc(
@@ -2132,7 +2132,7 @@ def has_key(env: dict[str, int], name: str) -> bool:
 
         cpp_code = emit_cpp_module(doc)
 
-        self.assertIn("(a + int64(1));", cpp_code)
+        self.assertIn("(a + 1);", cpp_code)
         self.assertNotIn("static_cast<int64_t>(a)", cpp_code)
 
     def test_cpp_emitter_keeps_binop_casts_outside_implicit_promotions(self) -> None:
@@ -2673,6 +2673,76 @@ def has_key(env: dict[str, int], name: str) -> bool:
         self.assertIn("Exception::Exception(const str& msg) : BaseException(msg) {", cpp_code)
         self.assertIn("ValueError::ValueError(const str& msg) : Exception(msg) {", cpp_code)
 
+    def test_cpp_emitter_closure_constructor_drops_super_init_body_call_when_init_list_is_used(self) -> None:
+        doc = _module_doc(
+            "app.main",
+            body=[
+                {
+                    "kind": "ClassDef",
+                    "name": "ValueError",
+                    "base": "Exception",
+                    "body": [],
+                },
+                {
+                    "kind": "ClassDef",
+                    "name": "ParseError",
+                    "base": "ValueError",
+                    "field_types": {"line": "int64"},
+                    "body": [
+                        {
+                            "kind": "ClosureDef",
+                            "name": "__init__",
+                            "arg_types": {"self": "ParseError", "line": "int64", "msg": "str"},
+                            "arg_order": ["self", "line", "msg"],
+                            "arg_defaults": {},
+                            "arg_index": {"self": 0, "line": 1, "msg": 2},
+                            "return_type": "None",
+                            "arg_usage": {"self": "reassigned", "line": "readonly", "msg": "readonly"},
+                            "renamed_symbols": {},
+                            "body": [
+                                {
+                                    "kind": "Expr",
+                                    "value": {
+                                        "kind": "Call",
+                                        "func": {
+                                            "kind": "Attribute",
+                                            "value": {
+                                                "kind": "Call",
+                                                "func": {"kind": "Name", "id": "super"},
+                                                "args": [],
+                                                "keywords": [],
+                                            },
+                                            "attr": "__init__",
+                                        },
+                                        "args": [{"kind": "Name", "id": "msg", "resolved_type": "str"}],
+                                        "keywords": [],
+                                    },
+                                },
+                                {
+                                    "kind": "Assign",
+                                    "targets": [
+                                        {
+                                            "kind": "Attribute",
+                                            "value": {"kind": "Name", "id": "self", "resolved_type": "ParseError"},
+                                            "attr": "line",
+                                        }
+                                    ],
+                                    "value": {"kind": "Name", "id": "line", "resolved_type": "int64"},
+                                },
+                            ],
+                        }
+                    ],
+                },
+            ],
+        )
+
+        cpp_code = emit_cpp_module(doc)
+
+        self.assertIn("ParseError::ParseError(int64 line, const str& msg) : ValueError(msg) {", cpp_code)
+        self.assertIn("this->line = line;", cpp_code)
+        self.assertNotIn("py___init__", cpp_code)
+        self.assertNotIn("::super()", cpp_code)
+
     def test_cpp_emitter_uses_value_select_boolops_for_strings(self) -> None:
         doc = _module_doc(
             "app.main",
@@ -2882,7 +2952,7 @@ def has_key(env: dict[str, int], name: str) -> bool:
 
         cpp_code = emit_cpp_module(doc)
 
-        self.assertIn('return rc_dict_from_value(dict<str, object>{{str("n"), object(int64(1))}, {str("s"), object(str("x"))}});', cpp_code)
+        self.assertIn('return rc_dict_from_value(dict<str, object>{{str("n"), object(1)}, {str("s"), object(str("x"))}});', cpp_code)
 
     def test_cpp_emitter_unboxes_object_builtin_cast_args(self) -> None:
         doc = _module_doc(
@@ -4360,8 +4430,8 @@ def has_key(env: dict[str, int], name: str) -> bool:
         cpp_code = emit_cpp_module(doc)
 
         self.assertIn("py_runtime_object_type_id(dyn)", cpp_code)
-        self.assertIn("py_runtime_type_id_is_subtype(int64(1001), int64(1000))", cpp_code)
-        self.assertIn("py_runtime_type_id_issubclass(int64(1001), int64(1000))", cpp_code)
+        self.assertIn("py_runtime_type_id_is_subtype(1001, 1000)", cpp_code)
+        self.assertIn("py_runtime_type_id_issubclass(1001, 1000)", cpp_code)
         self.assertIn("py_dict_clear_mut(state);", cpp_code)
 
     def test_cpp_emitter_uses_linked_type_ids_for_nominal_classes(self) -> None:

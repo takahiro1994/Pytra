@@ -952,7 +952,8 @@ def _emit_constant(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
         rt = _str(node, "resolved_type")
         if rt in ("float64", "float32", "float"): return str(float(val))
         if rt in ("int", "int8", "int16", "int32", "int64", "uint8", "uint16", "uint32", "uint64"):
-            return cpp_signature_type(rt) + "(" + str(val) + ")"
+            renderer = _CppExprCommonRenderer(ctx)
+            return CommonRenderer.render_constant(renderer, node)
         return str(val)
     if isinstance(val, float):
         s = repr(val)
@@ -1413,6 +1414,13 @@ def _emit_builtin_call(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
     if isinstance(func, dict) and _str(func, "kind") == "Attribute":
         call_arg_strs = [_emit_expr(ctx, func.get("value"))] + arg_strs
 
+    if bn in ("min", "max") and len(args) >= 2:
+        target_type = _str(node, "resolved_type")
+        forced_args = [_emit_expr_with_forced_literal_type(ctx, arg, target_type) for arg in args]
+        resolved = resolve_runtime_call(rc, bn, _str(node, "runtime_call_adapter_kind"), ctx.mapping)
+        if resolved != "":
+            return resolved + "(" + ", ".join(forced_args) + ")"
+
     if rc in ("static_cast", "int", "float", "bool"):
         rt = _str(node, "resolved_type")
         ct = cpp_signature_type(rt)
@@ -1521,6 +1529,17 @@ def _emit_builtin_call(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
             _emit_fail(ctx, "unmapped_runtime_call", fn)
         return ctx.mapping.builtin_prefix + fn + "(" + ", ".join(call_arg_strs) + ")"
     _emit_fail(ctx, "unknown_builtin", repr(node))
+
+
+def _emit_expr_with_forced_literal_type(ctx: CppEmitContext, node: JsonVal, target_type: str) -> str:
+    if not isinstance(node, dict):
+        return _emit_expr(ctx, node)
+    if _str(node, "kind") == "Constant":
+        value = node.get("value")
+        if isinstance(value, int) and not isinstance(value, bool):
+            if target_type in ("int", "int8", "int16", "int32", "int64", "uint8", "uint16", "uint32", "uint64"):
+                return cpp_signature_type(target_type) + "(" + str(value) + ")"
+    return _emit_expr(ctx, node)
 
 
 def _emit_attribute(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
@@ -2717,7 +2736,7 @@ def _emit_function_def_impl(ctx: CppEmitContext, node: dict[str, JsonVal], owner
     init_list = _constructor_init_list(ctx, node, owner_name)
     _emit(ctx, signature + init_list + " {")
     ctx.indent_level += 1
-    _emit_body(ctx, _list(node, "body"))
+    _emit_body(ctx, _function_body_for_emit(ctx, node, owner_name, init_list))
     ctx.indent_level -= 1
     _emit(ctx, "}")
     _emit_blank(ctx)
@@ -2812,6 +2831,30 @@ def _constructor_init_list(ctx: CppEmitContext, node: dict[str, JsonVal], owner_
         if isinstance(kw, dict):
             args.append(_emit_expr(ctx, kw.get("value")))
     return " : " + base_name + "(" + ", ".join(args) + ")"
+
+
+def _function_body_for_emit(
+    ctx: CppEmitContext,
+    node: dict[str, JsonVal],
+    owner_name: str,
+    init_list: str,
+) -> list[JsonVal]:
+    body = _list(node, "body")
+    if init_list == "" or owner_name == "" or _str(node, "name") != "__init__" or len(body) == 0:
+        return body
+    first = body[0]
+    if not isinstance(first, dict) or _str(first, "kind") != "Expr":
+        return body
+    value = first.get("value")
+    if not isinstance(value, dict) or _str(value, "kind") != "Call":
+        return body
+    func = value.get("func")
+    if not isinstance(func, dict) or _str(func, "kind") != "Attribute" or _str(func, "attr") != "__init__":
+        return body
+    owner = func.get("value")
+    if not _is_zero_arg_super_call(owner):
+        return body
+    return body[1:]
 
 
 def _function_template_params(node: dict[str, JsonVal]) -> list[str]:
