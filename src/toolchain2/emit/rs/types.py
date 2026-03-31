@@ -173,6 +173,31 @@ def _lookup_type(resolved_type: str) -> str:
     return _FALLBACK_TYPE_MAP.get(resolved_type, "")
 
 
+_PYANY_UNION_MEMBERS: set[str] = {
+    "None", "none",
+    "bool",
+    "int", "int8", "int16", "int32", "int64",
+    "uint8", "uint16", "uint32", "uint64",
+    "float", "float32", "float64",
+    "str",
+    "list", "dict", "set", "tuple",
+    "object", "Obj", "Any", "JsonVal",
+}
+
+
+def union_prefers_pyany(resolved_type: str) -> bool:
+    parts = [p.strip() for p in resolved_type.split("|") if p.strip() != ""]
+    if len(parts) <= 1:
+        return False
+    for part in parts:
+        if part in _PYANY_UNION_MEMBERS:
+            continue
+        if part.startswith(("list[", "dict[", "set[", "tuple[")):
+            continue
+        return False
+    return True
+
+
 def rs_type(resolved_type: str) -> str:
     """Convert an EAST3 resolved_type to a Rust type string."""
     if resolved_type == "" or resolved_type == "unknown":
@@ -214,15 +239,20 @@ def rs_type(resolved_type: str) -> str:
         inner = resolved_type[6:-1]
         return "VecDeque<" + rs_type(inner) + ">"
 
-    # tuple[A, B, ...] → Vec<A> if all args same type, else Vec<Box<dyn Any>>
+    # tuple[T, ...] → Vec<T>
+    # tuple[A, B, ...] → Rust fixed tuple
     if resolved_type.startswith("tuple[") and resolved_type.endswith("]"):
         inner = resolved_type[6:-1]
         parts = _split_generic_args(inner)
-        if len(parts) == 1:
+        if len(parts) >= 2 and parts[-1] == "...":
             elem_rt = rs_type(parts[0])
             if elem_rt != "Box<dyn std::any::Any>":
                 return "Vec<" + elem_rt + ">"
-        return "Vec<Box<dyn std::any::Any>>"
+            return "Vec<Box<dyn std::any::Any>>"
+        tuple_items = [rs_type(part) for part in parts]
+        if len(tuple_items) == 1:
+            return "(" + tuple_items[0] + ",)"
+        return "(" + ", ".join(tuple_items) + ")"
 
     # Optional[T] / T | None → Option<T>
     if resolved_type.endswith(" | None") or resolved_type.endswith("|None"):
@@ -236,6 +266,8 @@ def rs_type(resolved_type: str) -> str:
     if "|" in resolved_type:
         parts2 = [p.strip() for p in resolved_type.split("|") if p.strip() != ""]
         if len(parts2) > 1:
+            if union_prefers_pyany(resolved_type):
+                return "PyAny"
             return "Box<dyn std::any::Any>"
 
     # User class → Box<ClassName> (owned reference via Box for heap allocation)
@@ -245,6 +277,12 @@ def rs_type(resolved_type: str) -> str:
 def rs_zero_value(resolved_type: str) -> str:
     """Return the Rust default/zero value for a type."""
     rt = rs_type(resolved_type)
+    if "<" in rt:
+        base = rt.split("<", 1)[0]
+        generic_args = rt[len(base):]
+    else:
+        base = rt
+        generic_args = ""
     if rt in ("i8", "i16", "i32", "i64", "u8", "u16", "u32", "u64"):
         return "0"
     if rt in ("f32", "f64"):
@@ -258,11 +296,11 @@ def rs_zero_value(resolved_type: str) -> str:
     if rt.startswith("Option<"):
         return "None"
     if rt.startswith("PyList<"):
-        return rt + "::new()"
+        return base + "::" + generic_args + "::new()"
     if rt.startswith("HashMap<"):
-        return rt + "::new()"
+        return base + "::" + generic_args + "::new()"
     if rt.startswith("HashSet<"):
-        return rt + "::new()"
+        return base + "::" + generic_args + "::new()"
     if rt.startswith("Vec<"):
         return "Vec::new()"
     return "Default::default()"
