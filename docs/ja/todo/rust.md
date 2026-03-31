@@ -60,8 +60,8 @@ linked EAST3 には property 判定 (`attribute_access_kind`) や戻り値型 (`
 
 EAST3 の `GenericType(base="callable", args=[引数型, 戻り値型])` を Rust の関数ポインタ (`fn(Args) -> R`) または `Box<dyn Fn(Args) -> R>` に変換する処理が必要。`callable_higher_order` fixture が compile + run parity PASS することを完了条件とする。
 
-1. [ ] [ID: P0-RS-CALLABLE-S1] Rust emitter で `callable` 型を関数ポインタまたは trait object に変換する処理を追加する
-2. [ ] [ID: P0-RS-CALLABLE-S2] `callable_higher_order` fixture が Rust で compile + run parity PASS することを確認する
+1. [x] [ID: P0-RS-CALLABLE-S1] Rust emitter で `callable` 型を関数ポインタまたは trait object に変換する処理を追加する
+2. [x] [ID: P0-RS-CALLABLE-S2] `callable_higher_order` fixture が Rust で compile + run parity PASS することを確認する
 
 ### P0-RS-IN-ITERABLE: `in` 演算子を iterable の汎用 contains で処理する
 

@@ -1184,14 +1184,11 @@ def _resolve_stmt_list_with_narrowing(stmts: JsonVal, ctx: ResolveContext, narro
                         ctx.scope.vars.pop(name, None)
                     saved.pop(name, None)
     finally:
-        for saved_name in saved:
-            saved_row = saved[saved_name]
-            had_local = saved_row[0]
-            saved_value = saved_row[1]
+        for name, (had_local, value) in saved.items():
             if had_local:
-                ctx.scope.vars[saved_name] = saved_value
+                ctx.scope.vars[name] = value
             else:
-                ctx.scope.vars.pop(saved_name, None)
+                ctx.scope.vars.pop(name, None)
 
 
 def _same_expr_shape(left: JsonVal, right: JsonVal) -> bool:
@@ -1439,6 +1436,155 @@ def _collect_callable_param_uses(node: JsonVal, params: set[str], out: dict[str,
             _collect_callable_param_uses(value, params, out, invalid)
 
 
+def _callable_type_uses_signature(type_str: str) -> bool:
+    return type_str in ("callable", "Callable") or type_str.startswith("callable[") or type_str.startswith("Callable[")
+
+
+def _effective_resolved_type_for_callable(node: JsonVal) -> str:
+    if not isinstance(node, dict):
+        return ""
+    resolved = node.get("resolved_type")
+    if isinstance(resolved, str) and resolved != "":
+        return resolved
+    if node.get("kind") == "Unbox":
+        return _effective_resolved_type_for_callable(node.get("value"))
+    return ""
+
+
+def _infer_callable_return_from_parent(
+    call_node: dict[str, JsonVal],
+    parent: JsonVal,
+    grandparent: JsonVal,
+    func_node: dict[str, JsonVal],
+) -> str:
+    if isinstance(parent, dict):
+        parent_kind_obj = parent.get("kind")
+        parent_kind = parent_kind_obj if isinstance(parent_kind_obj, str) else ""
+        if parent_kind == "Return":
+            ret_obj = func_node.get("return_type")
+            return ret_obj if isinstance(ret_obj, str) else ""
+        if parent_kind == "Unbox":
+            resolved = _effective_resolved_type_for_callable(parent)
+            if resolved != "":
+                return resolved
+        if parent_kind == "Call":
+            runtime_call_obj = parent.get("runtime_call")
+            runtime_call = runtime_call_obj if isinstance(runtime_call_obj, str) else ""
+            if runtime_call == "list.append":
+                owner = parent.get("runtime_owner")
+                owner_type = _effective_resolved_type_for_callable(owner)
+                if owner_type.startswith("list[") and owner_type.endswith("]"):
+                    return owner_type[5:-1]
+            func = parent.get("func")
+            call_func = call_node.get("func")
+            func_kind = func.get("kind") if isinstance(func, dict) else ""
+            func_id = func.get("id") if isinstance(func, dict) else ""
+            call_func_id = call_func.get("id") if isinstance(call_func, dict) else ""
+            if isinstance(func_kind, str) and isinstance(func_id, str) and isinstance(call_func_id, str) and func_kind == "Name" and func_id == call_func_id:
+                grandparent_kind = grandparent.get("kind") if isinstance(grandparent, dict) else ""
+                if grandparent_kind == "Return":
+                    ret_obj = func_node.get("return_type")
+                    return ret_obj if isinstance(ret_obj, str) else ""
+                if grandparent_kind == "Unbox":
+                    resolved = _effective_resolved_type_for_callable(grandparent)
+                    if resolved != "":
+                        return resolved
+        if parent_kind in ("Assign", "AnnAssign"):
+            declared_obj = parent.get("decl_type")
+            declared = declared_obj if isinstance(declared_obj, str) else ""
+            if declared != "":
+                return declared
+    return ""
+
+
+def _callable_type_needs_refinement(type_str: str, ctx: ResolveContext) -> bool:
+    if not _callable_type_uses_signature(type_str):
+        return False
+    if type_str in ("callable", "Callable"):
+        return True
+    params, ret = _parse_callable_signature(type_str, ctx)
+    if len(params) == 0:
+        return True
+    if _is_unknown_like_type(ret):
+        return True
+    for param in params:
+        if _is_unknown_like_type(param):
+            return True
+    return False
+
+
+def _infer_callable_param_signature(
+    func_node: dict[str, JsonVal],
+    param_name: str,
+    ctx: ResolveContext,
+) -> str:
+    arg_types = func_node.get("arg_types")
+    declared = ""
+    if isinstance(arg_types, dict):
+        declared_obj = arg_types.get(param_name)
+        declared = declared_obj if isinstance(declared_obj, str) else ""
+    if not _callable_type_needs_refinement(declared, ctx):
+        return ""
+
+    inferred_args: list[str] = []
+    inferred_ret = ""
+    if declared not in ("callable", "Callable", ""):
+        declared_params, declared_ret = _parse_callable_signature(declared, ctx)
+        if len(declared_params) > 0 and all(not _is_unknown_like_type(p) for p in declared_params):
+            inferred_args = declared_params
+        if declared_ret != "" and not _is_unknown_like_type(declared_ret):
+            inferred_ret = declared_ret
+
+    invalid = False
+
+    def _set_args(arg_types2: list[str]) -> None:
+        nonlocal inferred_args, invalid
+        if len(arg_types2) == 0:
+            return
+        if any(_is_unknown_like_type(t) or _callable_type_uses_signature(t) for t in arg_types2):
+            return
+        if len(inferred_args) == 0:
+            inferred_args = list(arg_types2)
+            return
+        if inferred_args != arg_types2:
+            invalid = True
+
+    def _set_ret(ret_type: str) -> None:
+        nonlocal inferred_ret, invalid
+        if ret_type == "" or _is_unknown_like_type(ret_type) or _callable_type_uses_signature(ret_type):
+            return
+        if inferred_ret == "":
+            inferred_ret = ret_type
+            return
+        if inferred_ret != ret_type:
+            invalid = True
+
+    def _visit(cur: JsonVal, parent: JsonVal = None, grandparent: JsonVal = None) -> None:
+        nonlocal invalid
+        if invalid:
+            return
+        if isinstance(cur, dict):
+            cur_kind = cur.get("kind")
+            if cur_kind == "Call":
+                func = cur.get("func")
+                func_kind = func.get("kind") if isinstance(func, dict) else ""
+                func_id = func.get("id") if isinstance(func, dict) else ""
+                if func_kind == "Name" and func_id == param_name:
+                    _set_args(_collect_call_arg_types(cur))
+                    _set_ret(_infer_callable_return_from_parent(cur, parent, grandparent, func_node))
+            for child in cur.values():
+                _visit(child, cur, parent)
+        elif isinstance(cur, list):
+            for child in cur:
+                _visit(child, parent, grandparent)
+
+    body = func_node.get("body")
+    _visit(body if isinstance(body, list) else [])
+    if invalid or len(inferred_args) == 0 or inferred_ret == "":
+        return ""
+    return _make_callable_type(inferred_args, inferred_ret)
+
+
 def _refresh_callable_param_calls(node: JsonVal, refined: dict[str, str], ctx: ResolveContext) -> None:
     if isinstance(node, list):
         for item in node:
@@ -1458,6 +1604,118 @@ def _refresh_callable_param_calls(node: JsonVal, refined: dict[str, str], ctx: R
     for value in node.values():
         if isinstance(value, (dict, list)):
             _refresh_callable_param_calls(value, refined, ctx)
+
+
+def _refine_callable_params_from_calls(module_doc: dict[str, JsonVal], ctx: ResolveContext) -> None:
+    functions: dict[str, dict[str, JsonVal]] = {}
+    for stmt in module_doc.get("body", []):
+        if isinstance(stmt, dict) and stmt.get("kind") == "FunctionDef":
+            name = stmt.get("name")
+            if isinstance(name, str) and name != "":
+                functions[name] = stmt
+
+    def _local_function_callable_type(name: str) -> str:
+        fn_def = functions.get(name)
+        if not isinstance(fn_def, dict):
+            return ""
+        arg_order_obj = fn_def.get("arg_order")
+        arg_types_obj = fn_def.get("arg_types")
+        ret_obj = fn_def.get("return_type")
+        if not isinstance(arg_order_obj, list) or not isinstance(arg_types_obj, dict) or not isinstance(ret_obj, str):
+            return ""
+        params: list[str] = []
+        for arg_name in arg_order_obj:
+            if not isinstance(arg_name, str) or arg_name == "self":
+                continue
+            arg_type_obj = arg_types_obj.get(arg_name)
+            arg_type = arg_type_obj if isinstance(arg_type_obj, str) else ""
+            if arg_type == "":
+                return ""
+            params.append(arg_type)
+        return _make_callable_type(params, ret_obj)
+
+    observed: dict[str, dict[str, str]] = {}
+    invalid: set[tuple[str, str]] = set()
+
+    def _record(fn_name: str, param_name: str, callable_type: str) -> None:
+        key = (fn_name, param_name)
+        if key in invalid:
+            return
+        cur = observed.setdefault(fn_name, {})
+        prev = cur.get(param_name, "")
+        if prev == "" or prev == callable_type:
+            cur[param_name] = callable_type
+            return
+        invalid.add(key)
+        cur.pop(param_name, None)
+
+    def _visit(node: JsonVal) -> None:
+        if isinstance(node, list):
+            for item in node:
+                _visit(item)
+            return
+        if not isinstance(node, dict):
+            return
+        if node.get("kind") == "Call":
+            func = node.get("func")
+            fn_name = func.get("id") if isinstance(func, dict) else None
+            fn_def = functions.get(fn_name) if isinstance(fn_name, str) else None
+            if isinstance(fn_def, dict):
+                arg_order_obj = fn_def.get("arg_order")
+                arg_types_obj = fn_def.get("arg_types")
+                args_obj = node.get("args")
+                if isinstance(arg_order_obj, list) and isinstance(arg_types_obj, dict) and isinstance(args_obj, list):
+                    positional_index = 0
+                    for param in arg_order_obj:
+                        if not isinstance(param, str) or param == "self":
+                            continue
+                        declared_obj = arg_types_obj.get(param)
+                        declared = declared_obj if isinstance(declared_obj, str) else ""
+                        if not _callable_type_needs_refinement(declared, ctx):
+                            positional_index += 1
+                            continue
+                        if positional_index >= len(args_obj):
+                            positional_index += 1
+                            continue
+                        actual_arg = args_obj[positional_index]
+                        actual = _effective_resolved_type_for_callable(actual_arg)
+                        if actual in ("callable", "Callable") and isinstance(actual_arg, dict) and actual_arg.get("kind") == "Name":
+                            actual_name = actual_arg.get("id")
+                            if isinstance(actual_name, str):
+                                precise_actual = _local_function_callable_type(actual_name)
+                                if precise_actual != "":
+                                    actual = precise_actual
+                        if _callable_type_uses_signature(actual) and not _callable_type_needs_refinement(actual, ctx):
+                            _record(fn_name, param, actual)
+                        positional_index += 1
+        for value in node.values():
+            if isinstance(value, (dict, list)):
+                _visit(value)
+
+    _visit(module_doc.get("body", []))
+    _visit(module_doc.get("main_guard_body", []))
+
+    for fn_name, param_map in observed.items():
+        fn_def = functions.get(fn_name)
+        if not isinstance(fn_def, dict):
+            continue
+        arg_types_obj = fn_def.get("arg_types")
+        if not isinstance(arg_types_obj, dict):
+            continue
+        refined: dict[str, str] = {}
+        for param_name, callable_type in param_map.items():
+            if (fn_name, param_name) in invalid:
+                continue
+            arg_types_obj[param_name] = callable_type
+            refined[param_name] = callable_type
+            arg_types_raw = fn_def.get("arg_types_raw")
+            if isinstance(arg_types_raw, dict):
+                arg_types_raw[param_name] = callable_type
+            arg_type_exprs = fn_def.get("arg_type_exprs")
+            if isinstance(arg_type_exprs, dict):
+                arg_type_exprs[param_name] = make_type_expr(callable_type)
+        if refined:
+            _refresh_callable_param_calls(fn_def.get("body"), refined, ctx)
 
 
 # ---------------------------------------------------------------------------
@@ -1807,14 +2065,11 @@ def _resolve_boolop(expr: dict[str, JsonVal], ctx: ResolveContext) -> str:
                         saved[name] = (name in ctx.scope.vars, ctx.scope.vars.get(name, ""))
                     ctx.scope.vars[name] = typ
         finally:
-            for saved_name in saved:
-                saved_row = saved[saved_name]
-                had_local = saved_row[0]
-                saved_value = saved_row[1]
+            for name, (had_local, value) in saved.items():
                 if had_local:
-                    ctx.scope.vars[saved_name] = saved_value
+                    ctx.scope.vars[name] = value
                 else:
-                    ctx.scope.vars.pop(saved_name, None)
+                    ctx.scope.vars.pop(name, None)
     expr["resolved_type"] = result_type
     return result_type
 
@@ -3297,28 +3552,22 @@ def _resolve_function_def(stmt: dict[str, JsonVal], ctx: ResolveContext) -> None
     ctx.current_function = old_current_function
 
     refined_callable_params: dict[str, str] = {}
-    callable_param_names: set[str] = set()
     for arg_name, arg_type in arg_types.items():
-        if arg_type == "callable":
-            callable_param_names.add(arg_name)
-    if len(callable_param_names) > 0 and not _is_unknown_like_type(ret):
-        observed_calls: dict[str, list[str]] = {}
-        invalid_calls: set[str] = set()
-        _collect_callable_param_uses(body, callable_param_names, observed_calls, invalid_calls)
-        for arg_name2, observed_types in observed_calls.items():
-            if arg_name2 in invalid_calls:
-                continue
-            callable_sig = _make_callable_type(observed_types, ret)
-            arg_types[arg_name2] = callable_sig
-            refined_callable_params[arg_name2] = callable_sig
-            if isinstance(arg_types_raw, dict):
-                arg_types_raw[arg_name2] = callable_sig
-        if len(refined_callable_params) > 0:
-            arg_type_exprs = stmt.get("arg_type_exprs")
-            if isinstance(arg_type_exprs, dict):
-                for arg_name3, callable_sig2 in refined_callable_params.items():
-                    arg_type_exprs[arg_name3] = make_type_expr(callable_sig2)
-            _refresh_callable_param_calls(body, refined_callable_params, ctx)
+        if not _callable_type_needs_refinement(arg_type, ctx):
+            continue
+        callable_sig = _infer_callable_param_signature(stmt, arg_name, ctx)
+        if callable_sig == "":
+            continue
+        arg_types[arg_name] = callable_sig
+        refined_callable_params[arg_name] = callable_sig
+        if isinstance(arg_types_raw, dict):
+            arg_types_raw[arg_name] = callable_sig
+    if len(refined_callable_params) > 0:
+        arg_type_exprs = stmt.get("arg_type_exprs")
+        if isinstance(arg_type_exprs, dict):
+            for arg_name2, callable_sig2 in refined_callable_params.items():
+                arg_type_exprs[arg_name2] = make_type_expr(callable_sig2)
+        _refresh_callable_param_calls(body, refined_callable_params, ctx)
 
 
 def _compute_arg_usage(arg_order: list[str], func: dict[str, JsonVal]) -> dict[str, str]:
@@ -4543,6 +4792,7 @@ def resolve_east1_to_east2(
             if isinstance(stmt, dict):
                 _resolve_stmt(stmt, ctx)
 
+    _refine_callable_params_from_calls(east1_doc, ctx)
     _promote_inherited_class_storage_hints(east1_doc, ctx)
 
     # Post-processing: metadata
