@@ -18,7 +18,7 @@
 | 言語群 | union の表現 | 備考 |
 |---|---|---|
 | **Rust, Swift, Kotlin, Scala, Nim** | enum / tagged union | ネイティブサポート |
-| **Zig** | tagged union | 再帰型でポインタ必須。実装が面倒な場合は object fallback 許容 |
+| **Zig** | tagged union | 再帰型でポインタ必須だが tagged union 自体は使える |
 | **C++** | `std::variant` or 継承 | RC は必要なら外側で `shared_ptr` |
 | **TS/JS** | union type そのまま | 言語が union を直接サポート |
 | **C#, Java, Dart** | sealed class / abstract record | パターンマッチで網羅性チェック可能 |
@@ -89,7 +89,7 @@ enum __Union_int_str {
 
 ## 完了条件
 
-- `object` に退化するのは `Any` 型注釈がある場合と、Zig のような言語制約がある場合のみ
+- `object` に退化するのは `Any` 型注釈がある場合のみ（Zig 含め全言語で nominal ADT を使用）
 - union type を使った fixture が全言語で compile + run parity PASS
 - selfhost コードの `JsonVal` が `object` ではなく nominal ADT として処理される
 - box/unbox ノードが union → object 退化に起因するケースでは生成されない
