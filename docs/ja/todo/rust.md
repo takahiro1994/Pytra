@@ -33,11 +33,11 @@
 
 現状の Rust runtime は tuple の `in` を要素数ごとの `PyContains` trait impl (2〜12要素) で処理しており、13要素以上で破綻する。tuple をスライスに変換して `.contains()` を呼ぶ汎用方式に移行する。range は算術判定で処理する。
 
-1. [ ] [ID: P0-RS-IN-ITER-S1] Rust emitter の `_emit_compare` で `In`/`NotIn` + `Tuple` を `[...].contains(&key)` に変換する
-2. [ ] [ID: P0-RS-IN-ITER-S2] Rust emitter の `_emit_compare` で `In`/`NotIn` + `RangeExpr` を算術判定に変換する
-3. [ ] [ID: P0-RS-IN-ITER-S3] `py_runtime.rs` の tuple 要素数別 `PyContains` impl (2〜12要素) を削除する
-4. [ ] [ID: P0-RS-IN-ITER-S4] `in_membership_iterable` fixture が Rust で compile + run parity PASS することを確認する
-5. [ ] [ID: P0-RS-IN-ITER-S5] fixture + sample の全件 parity に回帰がないことを確認する
+1. [x] [ID: P0-RS-IN-ITER-S1] Rust emitter の `_emit_compare` で `In`/`NotIn` + `Tuple` を `[...].contains(&key)` に変換する
+2. [x] [ID: P0-RS-IN-ITER-S2] Rust emitter の `_emit_compare` で `In`/`NotIn` + `RangeExpr` を算術判定に変換する
+3. [x] [ID: P0-RS-IN-ITER-S3] `py_runtime.rs` の tuple 要素数別 `PyContains` impl (2〜12要素) を削除する
+4. [x] [ID: P0-RS-IN-ITER-S4] `in_membership_iterable` fixture が Rust で compile + run parity PASS することを確認する
+5. [x] [ID: P0-RS-IN-ITER-S5] fixture + sample の全件 parity に回帰がないことを確認する
 
 ### P0-EAST3-IN-EXPAND: `in` リテラル展開を EAST3 optimizer で行う
 
@@ -45,8 +45,8 @@
 
 `x in (1, 2, 3)` のような少数リテラル要素の `in` を EAST3 optimizer で `x == 1 || x == 2 || x == 3` に展開する。emitter が要素数ごとに runtime 実装を用意するのは禁止（spec-emitter-guide §1.1）。大きいコレクションや非リテラル要素は iterable の汎用 `contains` のまま残す。
 
-1. [ ] [ID: P0-IN-EXPAND-S1] EAST3 optimizer に `Compare(In/NotIn) + Tuple/List(literal, len <= 3)` → `BoolOp(Or/And, [Compare(Eq/NotEq), ...])` の pass を追加する
-2. [ ] [ID: P0-IN-EXPAND-S2] 全言語の fixture + sample parity に回帰がないことを確認する
+1. [x] [ID: P0-IN-EXPAND-S1] EAST3 optimizer に `Compare(In/NotIn) + Tuple/List(literal, len <= 3)` → `BoolOp(Or/And, [Compare(Eq/NotEq), ...])` の pass を追加する
+2. [ ] [ID: P0-IN-EXPAND-S2] Rust の fixture + sample parity に回帰がないことを確認する
 3. [ ] [ID: P0-IN-EXPAND-S3] Rust runtime の要素数ごとの `PyContains` tuple impl を削除し、iterable 汎用の `contains` に置換する
 
 ### P0-EAST3-INHERIT: 継承クラスの ref 一貫性 + super() 解決
