@@ -46,8 +46,8 @@
 `x in (1, 2, 3)` のような少数リテラル要素の `in` を EAST3 optimizer で `x == 1 || x == 2 || x == 3` に展開する。emitter が要素数ごとに runtime 実装を用意するのは禁止（spec-emitter-guide §1.1）。大きいコレクションや非リテラル要素は iterable の汎用 `contains` のまま残す。
 
 1. [x] [ID: P0-IN-EXPAND-S1] EAST3 optimizer に `Compare(In/NotIn) + Tuple/List(literal, len <= 3)` → `BoolOp(Or/And, [Compare(Eq/NotEq), ...])` の pass を追加する
-2. [ ] [ID: P0-IN-EXPAND-S2] Rust の fixture + sample parity に回帰がないことを確認する
-3. [ ] [ID: P0-IN-EXPAND-S3] Rust runtime の要素数ごとの `PyContains` tuple impl を削除し、iterable 汎用の `contains` に置換する
+2. [x] [ID: P0-IN-EXPAND-S2] Rust の fixture + sample parity に回帰がないことを確認する
+3. [x] [ID: P0-IN-EXPAND-S3] Rust runtime の要素数ごとの `PyContains` tuple impl を削除し、iterable 汎用の `contains` に置換する
 
 ### P0-EAST3-INHERIT: 継承クラスの ref 一貫性 + super() 解決
 

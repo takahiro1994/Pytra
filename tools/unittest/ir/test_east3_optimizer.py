@@ -11,6 +11,7 @@ from src.toolchain.misc.east_parts.east3_opt_passes.cpp_list_value_local_hint_pa
 from src.toolchain.misc.east_parts.east3_opt_passes.empty_init_shorthand_pass import EmptyInitShorthandPass
 from src.toolchain.misc.east_parts.east3_opt_passes.expression_normalization_pass import ExpressionNormalizationPass
 from src.toolchain.misc.east_parts.east3_opt_passes.identity_py_to_elision_pass import IdentityPyToElisionPass
+from src.toolchain.misc.east_parts.east3_opt_passes.in_literal_expansion_pass import InLiteralExpansionPass
 from src.toolchain.misc.east_parts.east3_opt_passes.literal_cast_fold_pass import LiteralCastFoldPass
 from src.toolchain.misc.east_parts.east3_opt_passes.loop_invariant_cast_hoist_pass import LoopInvariantCastHoistPass
 from src.toolchain.misc.east_parts.east3_opt_passes.loop_invariant_hoist_lite_pass import LoopInvariantHoistLitePass
@@ -97,6 +98,7 @@ class East3OptimizerTest(unittest.TestCase):
         global_names = [str(pass_obj.name) for pass_obj in build_global_post_link_passes()]
         self.assertEqual(default_names, local_names)
         self.assertIn("LifetimeAnalysisPass", default_names)
+        self.assertIn("InLiteralExpansionPass", default_names)
         self.assertNotIn("NonEscapeInterproceduralPass", default_names)
         self.assertNotIn("ContainerValueLocalHintPass", default_names)
 
@@ -183,7 +185,7 @@ class East3OptimizerTest(unittest.TestCase):
         out_doc, report = optimize_east3_document(
             doc,
             opt_level="1",
-            opt_pass_spec="-NoOpCastCleanupPass,-LiteralCastFoldPass,-IdentityPyToElisionPass,-NumericCastChainReductionPass,-RangeForCanonicalizationPass,-ExpressionNormalizationPass,-EmptyInitShorthandPass,-SafeReserveHintPass,-TypedEnumerateNormalizationPass,-TypedRepeatMaterializationPass,-DictStrKeyNormalizationPass,-TupleTargetDirectExpansionPass,-LifetimeAnalysisPass,-UnusedLoopVarElisionPass,-StrengthReductionFloatLoopPass",
+            opt_pass_spec="-NoOpCastCleanupPass,-LiteralCastFoldPass,-InLiteralExpansionPass,-IdentityPyToElisionPass,-NumericCastChainReductionPass,-RangeForCanonicalizationPass,-ExpressionNormalizationPass,-EmptyInitShorthandPass,-SafeReserveHintPass,-TypedEnumerateNormalizationPass,-TypedRepeatMaterializationPass,-DictStrKeyNormalizationPass,-TupleTargetDirectExpansionPass,-LifetimeAnalysisPass,-UnusedLoopVarElisionPass,-StrengthReductionFloatLoopPass",
         )
         self.assertIs(out_doc, doc)
         trace = report.get("trace")
@@ -1080,6 +1082,78 @@ class East3OptimizerTest(unittest.TestCase):
         self.assertEqual(hint.get("version"), "1")
         self.assertEqual(hint.get("names"), ["x", "y"])
         self.assertEqual(hint.get("types"), ["int64", "str"])
+
+    def test_in_literal_expansion_pass_rewrites_small_tuple_membership(self) -> None:
+        doc = _module_doc()
+        compare = {
+            "kind": "Compare",
+            "left": {"kind": "Name", "id": "x", "resolved_type": "int64"},
+            "ops": ["In"],
+            "comparators": [{
+                "kind": "Tuple",
+                "elements": [_const_i(1), _const_i(2), _const_i(3)],
+                "resolved_type": "tuple[int64, int64, int64]",
+            }],
+            "resolved_type": "bool",
+            "borrow_kind": "value",
+            "casts": [],
+        }
+        doc["body"] = [{"kind": "Expr", "value": compare}]
+        result = InLiteralExpansionPass().run(doc, PassContext(opt_level=1))
+        self.assertTrue(result.changed)
+        value = doc["body"][0]["value"]
+        self.assertEqual(value["kind"], "BoolOp")
+        self.assertEqual(value["op"], "Or")
+        self.assertEqual(len(value["values"]), 3)
+        self.assertEqual(value["values"][0]["ops"], ["Eq"])
+
+    def test_in_literal_expansion_pass_rewrites_small_list_notin(self) -> None:
+        doc = _module_doc()
+        compare = {
+            "kind": "Compare",
+            "left": {"kind": "Name", "id": "x", "resolved_type": "int64"},
+            "ops": ["NotIn"],
+            "comparators": [{
+                "kind": "List",
+                "elements": [_const_i(4), _const_i(5)],
+                "resolved_type": "list[int64]",
+            }],
+            "resolved_type": "bool",
+            "borrow_kind": "value",
+            "casts": [],
+        }
+        doc["body"] = [{"kind": "Expr", "value": compare}]
+        result = InLiteralExpansionPass().run(doc, PassContext(opt_level=1))
+        self.assertTrue(result.changed)
+        value = doc["body"][0]["value"]
+        self.assertEqual(value["kind"], "BoolOp")
+        self.assertEqual(value["op"], "And")
+        self.assertEqual(value["values"][0]["ops"], ["NotEq"])
+
+    def test_in_literal_expansion_pass_skips_non_literal_or_large_membership(self) -> None:
+        doc = _module_doc()
+        compare = {
+            "kind": "Compare",
+            "left": {"kind": "Name", "id": "x", "resolved_type": "int64"},
+            "ops": ["In"],
+            "comparators": [{
+                "kind": "Tuple",
+                "elements": [
+                    _const_i(1),
+                    _const_i(2),
+                    _const_i(3),
+                    _const_i(4),
+                ],
+                "resolved_type": "tuple[int64, int64, int64, int64]",
+            }],
+            "resolved_type": "bool",
+            "borrow_kind": "value",
+            "casts": [],
+        }
+        doc["body"] = [{"kind": "Expr", "value": compare}]
+        result = InLiteralExpansionPass().run(doc, PassContext(opt_level=1))
+        self.assertFalse(result.changed)
+        self.assertEqual(doc["body"][0]["value"]["kind"], "Compare")
 
     def test_tuple_target_direct_expansion_pass_clears_assign_hint_for_union_rhs(self) -> None:
         doc = _module_doc()

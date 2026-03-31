@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from toolchain2.optimize.passes.noop_cast_cleanup import NoOpCastCleanupPass
 from toolchain2.optimize.passes.literal_cast_fold import LiteralCastFoldPass
+from toolchain2.optimize.passes.in_literal_expansion import InLiteralExpansionPass
 from toolchain2.optimize.passes.identity_py_to_elision import IdentityPyToElisionPass
 from toolchain2.optimize.passes.numeric_cast_chain_reduction import NumericCastChainReductionPass
 from toolchain2.optimize.passes.range_for_canonicalization import RangeForCanonicalizationPass
@@ -26,6 +27,7 @@ def build_local_only_passes() -> list[East3OptimizerPass]:
     return [
         NoOpCastCleanupPass(),
         LiteralCastFoldPass(),
+        InLiteralExpansionPass(),
         IdentityPyToElisionPass(),
         NumericCastChainReductionPass(),
         RangeForCanonicalizationPass(),

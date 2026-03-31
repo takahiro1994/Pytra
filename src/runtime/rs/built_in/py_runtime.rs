@@ -29,6 +29,11 @@ impl<T> Clone for PyList<T> {
     }
 }
 
+thread_local! {
+    static PY_ARGV: RefCell<PyList<String>> = RefCell::new(PyList::from_vec(std::env::args().collect()));
+    static PY_PATH: RefCell<PyList<String>> = RefCell::new(PyList::new());
+}
+
 impl<T> PyList<T> {
     pub fn new() -> Self {
         PyList { inner: Rc::new(RefCell::new(Vec::new())) }
@@ -207,14 +212,22 @@ impl PyStringify for u8 {
         format!("{}", self)
     }
 }
+fn py_float_string(value: f64) -> String {
+    let s = format!("{:?}", value);
+    if s.contains('.') || s.contains('e') || s.contains('E') || s.contains("inf") || s.contains("nan") {
+        s
+    } else {
+        s + ".0"
+    }
+}
 impl PyStringify for f64 {
     fn py_stringify(&self) -> String {
-        format!("{}", self)
+        py_float_string(*self)
     }
 }
 impl PyStringify for f32 {
     fn py_stringify(&self) -> String {
-        format!("{}", self)
+        py_float_string(*self as f64)
     }
 }
 impl PyStringify for String {
@@ -247,6 +260,11 @@ impl<T: PyStringify> PyStringify for &T {
         (**self).py_stringify()
     }
 }
+impl<T: PyStringify> PyStringify for Box<T> {
+    fn py_stringify(&self) -> String {
+        (**self).py_stringify()
+    }
+}
 impl PyStringify for () {
     fn py_stringify(&self) -> String {
         "None".to_string()
@@ -256,10 +274,7 @@ impl PyStringify for PyAny {
     fn py_stringify(&self) -> String {
         match self {
             PyAny::Int(n) => n.to_string(),
-            PyAny::Float(f) => {
-                let s = f.to_string();
-                if !s.contains('.') { format!("{}.0", s) } else { s }
-            }
+            PyAny::Float(f) => py_float_string(*f),
             PyAny::Bool(b) => if *b { "True".to_string() } else { "False".to_string() },
             PyAny::Str(s) => s.clone(),
             PyAny::Dict(_) => "<dict>".to_string(),
@@ -373,6 +388,30 @@ pub fn py_bool<T: PyBool>(v: &T) -> bool {
     v.py_bool()
 }
 
+pub fn py_get_argv() -> PyList<String> {
+    PY_ARGV.with(|v| v.borrow().clone())
+}
+
+pub fn py_set_argv(values: PyList<String>) {
+    PY_ARGV.with(|v| *v.borrow_mut() = values);
+}
+
+pub fn py_get_path() -> PyList<String> {
+    PY_PATH.with(|v| v.borrow().clone())
+}
+
+pub fn py_set_path(values: PyList<String>) {
+    PY_PATH.with(|v| *v.borrow_mut() = values);
+}
+
+pub fn py_write_stderr(text: String) {
+    let _ = std::io::stderr().write_all(text.as_bytes());
+}
+
+pub fn py_write_stdout(text: String) {
+    let _ = std::io::stdout().write_all(text.as_bytes());
+}
+
 pub fn py_isdigit(v: &str) -> bool {
     if v.is_empty() {
         return false;
@@ -406,8 +445,17 @@ pub fn py_str_get_at(s: &str, i: i64) -> String {
     s.chars().nth(idx).map(|c| c.to_string()).unwrap_or_default()
 }
 pub fn py_str_strip(s: &str) -> String { s.trim().to_string() }
+pub fn py_str_strip_chars(s: &str, chars: &str) -> String {
+    s.trim_matches(|c| chars.contains(c)).to_string()
+}
 pub fn py_str_lstrip(s: &str) -> String { s.trim_start().to_string() }
+pub fn py_str_lstrip_chars(s: &str, chars: &str) -> String {
+    s.trim_start_matches(|c| chars.contains(c)).to_string()
+}
 pub fn py_str_rstrip(s: &str) -> String { s.trim_end().to_string() }
+pub fn py_str_rstrip_chars(s: &str, chars: &str) -> String {
+    s.trim_end_matches(|c| chars.contains(c)).to_string()
+}
 pub fn py_str_upper(s: &str) -> String { s.to_uppercase() }
 pub fn py_str_lower(s: &str) -> String { s.to_lowercase() }
 
@@ -422,8 +470,8 @@ pub fn py_str_find(s: &str, sub: &str) -> i64 {
 pub fn py_str_rfind(s: &str, sub: &str) -> i64 {
     s.rfind(sub).map(|i| i as i64).unwrap_or(-1_i64)
 }
-pub fn py_str_index(s: &str, sub: &str) -> i64 {
-    s.find(sub).map(|i| i as i64).expect("substring not found")
+pub fn py_str_index<T: AsRef<str>>(s: &str, sub: T) -> i64 {
+    s.find(sub.as_ref()).map(|i| i as i64).expect("substring not found")
 }
 pub fn py_str_count(s: &str, sub: &str) -> i64 {
     if sub.is_empty() { return (s.chars().count() + 1) as i64; }
@@ -469,6 +517,14 @@ pub fn py_sorted<T: Ord + Clone>(items: &PyList<T>) -> PyList<T> {
     PyList::<T>::from_vec(v)
 }
 
+pub fn py_min<T: PartialOrd + Clone>(a: T, b: T) -> T {
+    if a < b { a } else { b }
+}
+
+pub fn py_max<T: PartialOrd + Clone>(a: T, b: T) -> T {
+    if a > b { a } else { b }
+}
+
 /// Python `reversed(iterable)` — returns new reversed PyList.
 pub fn py_reversed<T: Clone>(items: &PyList<T>) -> PyList<T> {
     let mut v = items.py_borrow().clone();
@@ -483,6 +539,12 @@ pub fn py_set<T: Eq + Hash + Clone>(items: &PyList<T>) -> HashSet<T> {
 
 /// Python `list(iterable)` constructor.
 pub fn py_list<T: Clone>(items: &PyList<T>) -> PyList<T> { items.clone() }
+pub fn py_str_repeat(s: &str, count: i64) -> String {
+    if count <= 0 {
+        return String::new();
+    }
+    s.repeat(count as usize)
+}
 
 pub fn py_str_at(s: &str, index: i64) -> String {
     let n = if s.is_ascii() { s.len() as i64 } else { s.chars().count() as i64 };
@@ -509,6 +571,14 @@ pub fn py_str_at_nonneg(s: &str, index: usize) -> String {
         return (b as char).to_string();
     }
     s.chars().nth(index).map(|c| c.to_string()).unwrap_or_default()
+}
+
+pub fn py_ord<T: AsRef<str>>(s: T) -> i64 {
+    s.as_ref().chars().next().map(|c| c as i64).unwrap_or(0)
+}
+
+pub fn py_chr(code: i64) -> String {
+    char::from_u32(code as u32).unwrap_or('\0').to_string()
 }
 
 pub fn py_slice_str(s: &str, start: Option<i64>, end: Option<i64>) -> String {
@@ -597,17 +667,6 @@ impl PyContains<str> for String {
     fn py_contains(&self, key: &str) -> bool {
         self.contains(key)
     }
-}
-
-// Tuple `in` support (common sizes)
-impl<T: PartialEq> PyContains<T> for (T, T) {
-    fn py_contains(&self, key: &T) -> bool { &self.0 == key || &self.1 == key }
-}
-impl<T: PartialEq> PyContains<T> for (T, T, T) {
-    fn py_contains(&self, key: &T) -> bool { &self.0 == key || &self.1 == key || &self.2 == key }
-}
-impl<T: PartialEq> PyContains<T> for (T, T, T, T) {
-    fn py_contains(&self, key: &T) -> bool { &self.0 == key || &self.1 == key || &self.2 == key || &self.3 == key }
 }
 
 // VecDeque support
@@ -981,7 +1040,7 @@ impl PyAnyToStringArg for PyAny {
     fn py_any_to_string_arg(&self) -> String {
         match self {
             PyAny::Int(n) => n.to_string(),
-            PyAny::Float(f) => f.to_string(),
+            PyAny::Float(f) => py_float_string(*f),
             PyAny::Bool(b) => b.to_string(),
             PyAny::Str(s) => s.clone(),
             PyAny::Dict(d) => format!("{:?}", d),
@@ -1210,11 +1269,17 @@ impl<T: PyRuntimeTypeId> PyRuntimeTypeId for Box<T> {
     }
 }
 
+impl<T: PyRuntimeTypeId> PyRuntimeTypeId for Rc<RefCell<T>> {
+    fn py_runtime_type_id(&self) -> i64 {
+        self.borrow().py_runtime_type_id()
+    }
+}
+
 pub fn py_runtime_value_type_id<T: PyRuntimeTypeId>(value: &T) -> i64 {
     value.py_runtime_type_id()
 }
 
-fn py_runtime_type_id<T: PyRuntimeTypeId>(value: &T) -> i64 {
+pub fn py_runtime_type_id<T: PyRuntimeTypeId>(value: &T) -> i64 {
     py_runtime_value_type_id(value)
 }
 
@@ -1230,7 +1295,7 @@ pub fn py_runtime_type_id_is_subtype(actual_type_id: i64, expected_type_id: i64)
     expected.min <= actual.order && actual.order <= expected.max
 }
 
-fn py_is_subtype(actual_type_id: i64, expected_type_id: i64) -> bool {
+pub fn py_is_subtype(actual_type_id: i64, expected_type_id: i64) -> bool {
     py_runtime_type_id_is_subtype(actual_type_id, expected_type_id)
 }
 
@@ -1371,10 +1436,17 @@ pub struct PyPath {
     value: String,
 }
 
+pub type Path = PyPath;
+
+#[allow(non_snake_case)]
+pub fn Path(value: String) -> Box<Path> {
+    Box::new(PyPath::new(value))
+}
+
 impl PyPath {
-    pub fn new(value: &str) -> Self {
+    pub fn new<T: AsRef<str>>(value: T) -> Self {
         Self {
-            value: value.to_string(),
+            value: value.as_ref().to_string(),
         }
     }
 
@@ -1409,6 +1481,13 @@ impl PyPath {
             .unwrap_or_default()
     }
 
+    pub fn suffix(&self) -> String {
+        StdPath::new(&self.value)
+            .extension()
+            .map(|s| format!(".{}", s.to_string_lossy()))
+            .unwrap_or_default()
+    }
+
     pub fn exists(&self) -> bool {
         StdPath::new(&self.value).exists()
     }
@@ -1417,8 +1496,8 @@ impl PyPath {
         std::fs::read_to_string(&self.value).expect("read_text failed")
     }
 
-    pub fn write_text(&self, content: &str) {
-        std::fs::write(&self.value, content.as_bytes()).expect("write_text failed");
+    pub fn write_text<T: AsRef<str>>(&self, content: T) {
+        std::fs::write(&self.value, content.as_ref().as_bytes()).expect("write_text failed");
     }
 
     pub fn mkdir(&self, parents: bool, exist_ok: bool) {
@@ -1434,6 +1513,10 @@ impl PyPath {
             }
         }
     }
+
+    pub fn joinpath(&self, part: String) -> Box<PyPath> {
+        Box::new(PyPath::new(StdPath::new(&self.value).join(part).to_string_lossy().to_string()))
+    }
 }
 
 pub fn py_getcwd() -> String {
@@ -1441,6 +1524,88 @@ pub fn py_getcwd() -> String {
         .expect("cwd")
         .to_string_lossy()
         .to_string()
+}
+
+pub fn py_join(left: String, right: String) -> String {
+    StdPath::new(&left)
+        .join(right)
+        .to_string_lossy()
+        .to_string()
+}
+
+pub fn py_splitext(path: String) -> (String, String) {
+    let p = StdPath::new(&path);
+    let stem = match p.file_stem() {
+        Some(name) => match p.parent() {
+            Some(parent) if !parent.as_os_str().is_empty() => parent
+                .join(name)
+                .to_string_lossy()
+                .to_string(),
+            _ => name.to_string_lossy().to_string(),
+        },
+        None => path.clone(),
+    };
+    let ext = p
+        .extension()
+        .map(|s| format!(".{}", s.to_string_lossy()))
+        .unwrap_or_default();
+    (stem, ext)
+}
+
+pub fn py_basename(path: String) -> String {
+    StdPath::new(&path)
+        .file_name()
+        .map(|s| s.to_string_lossy().to_string())
+        .unwrap_or_default()
+}
+
+pub fn py_dirname(path: String) -> String {
+    StdPath::new(&path)
+        .parent()
+        .map(|p| p.to_string_lossy().to_string())
+        .unwrap_or_default()
+}
+
+pub fn py_exists(path: String) -> bool {
+    StdPath::new(&path).exists()
+}
+
+pub fn py_glob(pattern: String) -> PyList<String> {
+    let pattern_path = StdPath::new(&pattern);
+    let dir = pattern_path.parent().unwrap_or_else(|| StdPath::new("."));
+    let file_pat = pattern_path
+        .file_name()
+        .map(|s| s.to_string_lossy().to_string())
+        .unwrap_or_default();
+    let mut out = Vec::new();
+    let entries = match std::fs::read_dir(dir) {
+        Ok(entries) => entries,
+        Err(_) => return PyList::from_vec(out),
+    };
+    for entry in entries.flatten() {
+        let name = entry.file_name().to_string_lossy().to_string();
+        if py_glob_match(&name, &file_pat) {
+            if dir == StdPath::new(".") {
+                out.push(name);
+            } else {
+                out.push(dir.join(&name).to_string_lossy().to_string());
+            }
+        }
+    }
+    out.sort();
+    PyList::from_vec(out)
+}
+
+fn py_glob_match(candidate: &str, pattern: &str) -> bool {
+    if pattern == "*" {
+        return true;
+    }
+    if let Some(idx) = pattern.find('*') {
+        let (prefix, suffix_with_star) = pattern.split_at(idx);
+        let suffix = &suffix_with_star[1..];
+        return candidate.starts_with(prefix) && candidate.ends_with(suffix);
+    }
+    candidate == pattern
 }
 
 pub fn py_format_grouped_int(value: i64) -> String {
@@ -1520,6 +1685,12 @@ impl PyFileWritable for PyList<i64> {
     fn write_to_file(&self, file: &mut fs::File) {
         let bytes: Vec<u8> = self.py_borrow().iter().map(|v| (*v & 0xFF) as u8).collect();
         file.write_all(&bytes).expect("write failed");
+    }
+}
+
+impl PyFileWritable for String {
+    fn write_to_file(&self, file: &mut fs::File) {
+        file.write_all(self.as_bytes()).expect("write failed");
     }
 }
 
