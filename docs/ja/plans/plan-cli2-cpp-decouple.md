@@ -43,13 +43,12 @@ def _emit_linked_module(target: str, module: LinkedModule, output_dir: Path) -> 
 
 ただし spec-agent.md §5 で動的 import は selfhost 対象コードでは禁止。なので:
 
-**選択肢 A**: `_emit_linked_module` をモジュールレベル関数テーブル（dict）にし、各言語 emitter が起動時に登録する
+**決定**: emitter 呼び出しのみサブプロセス化する。parse / resolve / compile / optimize / link はインメモリのまま維持。
 
-**選択肢 B**: `pytra-cli2.py` の `-build` コマンド自体を言語別のサブコマンドに分離し、C++ build は `toolchain2.emit.cpp.cli` が担当する。`pytra-cli2.py` は `-build` 時にサブプロセスで言語別 CLI を呼ぶ
-
-**選択肢 C**: selfhost 対象を `pytra-cli2.py` 全体ではなく、言語非依存部分のみにする。C++ 固有パスは selfhost 対象外として明示する
-
-**推奨**: 選択肢 B。`pytra-cli.py`（旧 CLI）が既に C++ build を `toolchain2.emit.cpp.cli` にサブプロセス委譲しているので、`pytra-cli2.py` も同じ構造にする。
+- `pytra-cli2.py` は `-emit` / `-build` で各言語の emitter をサブプロセスで呼ぶ
+- `pytra-cli.py`（旧 CLI）が既に同じ構造で selfhost も通っている
+- emitter はパイプラインの最後で1回呼ばれるだけなので、サブプロセスのオーバーヘッドは無視できる
+- 関数内 import は Pytra で変換できないため不可。サブプロセスが唯一の手段
 
 ## 影響範囲
 
