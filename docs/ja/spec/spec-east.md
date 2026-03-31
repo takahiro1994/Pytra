@@ -117,6 +117,96 @@
 - `from __future__ import annotations` は frontend 専用ディレクティブとして受理し、EAST ノード/`meta.import_*` には出力しない。
 - `__future__` の他機能や `from __future__ import *` は `unsupported_syntax` として fail-closed で拒否する。
 
+### 4.1 Python → EAST ノード変換表
+
+emitter は以下の変換表に従って EAST3 ノードを処理する。emitter が Python の元構文を再解釈してはならず、EAST3 のノード kind とフィールドだけを見てコードを生成すること。
+
+#### 代入・unpack
+
+| Python | EAST3 ノード | 主要フィールド |
+|---|---|---|
+| `x = 1` | `Assign` | `target: Name`, `value` |
+| `x: int = 1` | `AnnAssign` | `target: Name`, `annotation`, `value`, `decl_type` |
+| `x, y = 1, 2` | `TupleUnpack` | `targets: [Name, ...]`, `value: Tuple` |
+| `(x, y) = (1, 2)` | `TupleUnpack` | 括弧なしと同一（注: 現行バグ、P0-EAST-TUPLE-UNPACK で修正予定） |
+| `[x, y] = [1, 2]` | `TupleUnpack` | 角括弧なしと同一（注: 現行バグ、同上） |
+| `a, (b, c) = 1, (2, 3)` | `TupleUnpack` | ネストした targets |
+| `a[0], a[1] = 1, 2` | `TupleUnpack` | targets に `Subscript` を含む |
+| `x, y = y, x` | `Swap` | `left`, `right` |
+| `x += 1` | `AugAssign` | `target`, `op`, `value` |
+
+#### ループ
+
+| Python | EAST3 ノード | 主要フィールド |
+|---|---|---|
+| `for x in range(n)` | `ForRange` → `ForCore(StaticRangeForPlan)` | `start`, `stop`, `step`, `target_plan` |
+| `for x in iterable` | `For` → `ForCore(RuntimeIterForPlan)` | `iter_plan.iter_expr`, `target_plan` |
+| `for k, v in d.items()` | `ForCore` | `target_plan.direct_unpack_names: [k, v]`, `tuple_expanded: true` |
+| `while cond` | `While` | `test`, `body` |
+
+#### 関数・クロージャ
+
+| Python | EAST3 ノード | 主要フィールド |
+|---|---|---|
+| `def f(x: int) -> str` | `FunctionDef` | `arg_types`, `return_type`, `arg_usage` |
+| 関数内 `def` | `ClosureDef` | 上記 + `captures: [{name, mode, type_expr}]` |
+| `lambda x: x + 1` | `Lambda` | `args`, `body` |
+| `fn: callable` 引数 | `arg_type_exprs.fn: GenericType(base="callable", args=[引数型, 戻り値型])` | |
+
+#### 制御構文
+
+| Python | EAST3 ノード | 主要フィールド |
+|---|---|---|
+| `if __name__ == "__main__":` | `main_guard_body`（トップレベル分離） | |
+| `if / elif / else` | `If` | `test`, `body`, `orelse` |
+| `try / except / finally` | `Try` | `body`, `handlers`, `finalbody` |
+| `raise X` | `Raise` | `exc` |
+| `return x` | `Return` | `value` |
+| `pass` / `break` / `continue` | `Pass` / `Break` / `Continue` | |
+
+#### 式
+
+| Python | EAST3 ノード | 主要フィールド |
+|---|---|---|
+| `range(n)` (for 以外) | `RangeExpr` | `start`, `stop`, `step` |
+| `[x for x in it]` | `ListComp` → `ForCore` + `__comp_N.append()` に展開 | |
+| `x if cond else y` | `IfExp` | `test`, `body`, `orelse` |
+| `isinstance(x, T)` | narrowing 後の `Unbox` ノード挿入 | `resolved_type` が具象型に更新 |
+| `super().method()` | `Call` | receiver `resolved_type` が base class に解決（注: P0-EAST3-INHERIT で修正済み） |
+
+#### クラス
+
+| Python | EAST3 ノード | 主要フィールド |
+|---|---|---|
+| `class Foo:` | `ClassDef` | `class_storage_hint`, `field_types`, `base` |
+| `class Foo(Bar):` | `ClassDef` | `base: "Bar"` |
+| `@dataclass class Foo:` | `ClassDef` | `dataclass: true` |
+| `@trait class Foo:` | `ClassDef` + `meta.trait_v1` | |
+| `type X = A \| B` | `ClassDef` + `meta.nominal_adt_v1` | `role: "family"` / `"variant"` |
+| `match x:` | `Match` | `subject`, `cases: [MatchCase]` |
+
+#### import
+
+| Python | EAST3 ノード | 主要フィールド |
+|---|---|---|
+| `import mod` | `Import` | `meta.import_bindings` |
+| `from mod import sym` | `ImportFrom` | `meta.qualified_symbol_refs` |
+| `from __future__ import annotations` | 出力しない（frontend 専用） | |
+
+#### コンテナ操作（EAST3 の解決済み情報）
+
+emitter はこれらの EAST3 フィールドからコンテナ操作の意味論を知ることができる。Python のメソッド名を再解釈してはならない。
+
+| Python | EAST3 の解決済み情報 |
+|---|---|
+| `d.get("key", 0)` | `semantic_tag: "stdlib.method.get"`, `resolved_type: "int64"`, `yields_dynamic: true` |
+| `d.items()` | `resolved_type: "list[tuple[K,V]]"` |
+| `d.keys()` / `d.values()` | `resolved_type: "list[K]"` / `"list[V]"` |
+| `lst[i]` | `Subscript.resolved_type` に要素型 |
+| `str(x)` | `semantic_tag: "cast.str"`, `runtime_call: "py_to_string"` |
+| `len(x)` | `runtime_call: "py_len"`, mapping.json で解決 |
+| `x in container` | `Compare(In)`, container の `resolved_type` で判定 |
+
 ## 5. ノード共通属性
 
 式ノード（`_expr`）は以下を持つ。
