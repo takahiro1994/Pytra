@@ -2366,7 +2366,10 @@ def _emit_method_call(
     if not ref_method_is_ref and isinstance(obj, dict) and _str(obj, "kind") == "Name":
         name_rs = ctx.var_rust_types.get(_str(obj, "id"), "")
         ref_method_is_ref = name_rs.startswith("Rc<RefCell<") and name_rs.endswith(">>")
-    if ref_method_is_ref and ref_method_class not in ctx.parent_class_names and not (isinstance(obj, dict) and _str(obj, "kind") == "Name" and _str(obj, "id") == "self"):
+    _is_deque_like = obj_type == "deque" or obj_actual_type == "deque"
+    if not _is_deque_like:
+        _is_deque_like = obj_type.startswith("deque[") or obj_actual_type.startswith("deque[")
+    if ref_method_is_ref and not _is_deque_like and ref_method_class not in ctx.parent_class_names and not (isinstance(obj, dict) and _str(obj, "kind") == "Name" and _str(obj, "id") == "self"):
         method_node = ctx.class_instance_methods.get(ref_method_class, {}).get(method)
         needs_mut = True
         if isinstance(method_node, dict):
@@ -2406,6 +2409,10 @@ def _emit_method_call(
         if method == "clear":
             return "{ " + raw_obj_str + ".py_borrow_mut().clear(); }"
         if method == "extend":
+            if len(args) >= 1 and isinstance(args[0], dict):
+                arg_rt = _resolved_type_in_context(ctx, args[0])
+                if arg_rt.startswith("list[") or arg_rt == "list" or arg_rt in ("bytes", "bytearray"):
+                    return raw_obj_str + ".py_borrow_mut().extend(" + rendered_args[0] + ".iter_snapshot())"
             return raw_obj_str + ".py_borrow_mut().extend(" + ", ".join(rendered_args) + ")"
         if method == "insert":
             if len(rendered_args) >= 2:
