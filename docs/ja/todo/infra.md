@@ -20,6 +20,17 @@
 
 ## 未完了タスク
 
+### P0-EAST-TUPLE-UNPACK: EAST の tuple unpack バグ修正
+
+文脈: [docs/ja/plans/plan-east-tuple-unpack-bugs.md](../plans/plan-east-tuple-unpack-bugs.md)
+
+EAST3 で 3 パターンの tuple unpack が壊れている。括弧付き左辺 `(x,y,z)=` / `[x,y,z]=` が `Expr` に崩壊、comprehension + unpack で代入が消失。`tuple_unpack_variants` fixture で検出済み。
+
+1. [ ] [ID: P0-TUPLE-UNPACK-S1] EAST1 parser で括弧付き左辺 `(x,y,z)` / `[x,y,z]` を括弧なしと同様に tuple target として認識させる
+2. [ ] [ID: P0-TUPLE-UNPACK-S2] list comprehension 展開パスで元の代入ターゲットが Tuple の場合に `__comp_N[0]`, `__comp_N[1]`, ... への代入を生成する
+3. [ ] [ID: P0-TUPLE-UNPACK-S3] `tuple_unpack_variants` fixture が全パターン EAST3 で正しい TupleUnpack を生成することを確認する
+4. [ ] [ID: P0-TUPLE-UNPACK-S4] C++ / Rust の fixture parity に回帰がないことを確認する
+
 ### P0-PARITY-CHANGELOG: parity 変化点ログの自動記録
 
 文脈: [docs/ja/plans/plan-parity-changelog.md](../plans/plan-parity-changelog.md)
