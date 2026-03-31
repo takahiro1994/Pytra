@@ -33,7 +33,7 @@
 
 前提: P0-EAST-TUPLE-UNPACK（infra TODO）で EAST 側のバグ 3 件（括弧付き左辺、comprehension + unpack）が修正された後に着手。
 
-1. [ ] [ID: P0-RS-TUPLE-UNPACK-S1] `tuple_unpack_variants` fixture が Rust で compile + run parity PASS することを確認する（失敗なら emitter を修正）
+1. [x] [ID: P0-RS-TUPLE-UNPACK-S1] `tuple_unpack_variants` fixture が Rust で compile + run parity PASS することを確認する（失敗なら emitter を修正）
 
 ### P0-RS-TYPED-CONTAINER: typed_container_access fixture の Rust parity を通す
 
@@ -41,23 +41,23 @@
 
 selfhost で必要な 4 パターン（dict.items() tuple unpack, typed dict.get(), typed list index, str cast）を網羅する fixture。EAST3 には全て情報が載っており、emitter が既存フィールドを正しく読めば解決する。
 
-1. [ ] [ID: P0-RS-TYPED-S1] `typed_container_access` fixture が Rust で compile + run parity PASS することを確認する（失敗なら emitter を修正）
+1. [x] [ID: P0-RS-TYPED-S1] `typed_container_access` fixture が Rust で compile + run parity PASS することを確認する（失敗なら emitter を修正）
 
 ### P0-LINKER-RECEIVER-HINT: linker に receiver_storage_hint を追加
 
 文脈: [docs/ja/plans/plan-common-renderer-peer-class-info.md](../plans/plan-common-renderer-peer-class-info.md)
 
 1. [x] S1〜S4 完了（linker pass 追加、Rust emitter borrow() 挿入、pathlib parity PASS）
-2. [ ] [ID: P0-RECV-HINT-S5] fixture + sample の全件 parity に回帰がないことを確認する
+2. [x] [ID: P0-RECV-HINT-S5] fixture + sample の全件 parity に回帰がないことを確認する
 
 ### P0-RS-SKIP-PURE-PY: skip_modules から pure Python モジュールを外す
 
 `check_emitter_hardcode_lint.py --lang rs` で `skip_pure_python` 違反 2 件。`mapping.json` の `skip_modules` に `pytra.std.pathlib` と `pytra.std.env` が入っているが、両方とも `@extern` なしの pure Python モジュールであり transpile すべき。正本ソースに `@extern` マーカーを足して lint を黙らせるのは禁止。
 
-1. [ ] [ID: P0-RS-SKIP-PURE-S1] `src/runtime/rs/mapping.json` の `skip_modules` から `pytra.std.pathlib` と `pytra.std.env` を削除する
-2. [ ] [ID: P0-RS-SKIP-PURE-S2] transpile された pathlib / env が Rust で compile できることを確認する（必要なら emitter / runtime を修正）
-3. [ ] [ID: P0-RS-SKIP-PURE-S3] `check_emitter_hardcode_lint.py --lang rs` で `skip_pure_python` が 0 件になることを確認する
-4. [ ] [ID: P0-RS-SKIP-PURE-S4] fixture + sample parity に回帰がないことを確認する
+1. [x] [ID: P0-RS-SKIP-PURE-S1] `src/runtime/rs/mapping.json` の `skip_modules` から `pytra.std.pathlib` と `pytra.std.env` を削除する
+2. [x] [ID: P0-RS-SKIP-PURE-S2] transpile された pathlib / env が Rust で compile できることを確認する（必要なら emitter / runtime を修正）
+3. [x] [ID: P0-RS-SKIP-PURE-S3] `check_emitter_hardcode_lint.py --lang rs` で `skip_pure_python` が 0 件になることを確認する
+4. [x] [ID: P0-RS-SKIP-PURE-S4] fixture + sample parity に回帰がないことを確認する
 
 ### P9-RS-SELFHOST: Rust emitter で toolchain2 を Rust に変換し cargo build を通す
 
