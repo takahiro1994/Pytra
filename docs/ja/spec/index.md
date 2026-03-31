@@ -18,6 +18,7 @@
 |---|---|---|
 | 型システム・type_id | [spec-type_id.md](./spec-type_id.md) | 単一継承、isinstance、POD exact match |
 | tagged union | [spec-tagged-union.md](./spec-tagged-union.md) | `type X = A \| B` の宣言、コード生成 |
+| ADT | [spec-adt.md](./spec-adt.md) | union type の言語別変換方針、enum/variant/sealed class |
 | Trait | [spec-trait.md](./spec-trait.md) | `@trait` / `@implements`、pure interface |
 | 例外処理 | [spec-exception.md](./spec-exception.md) | raise/try/except、native_throw と union_return |
 | Boxing/Unboxing | [spec-boxing.md](./spec-boxing.md) | Any/object 境界の型変換 |
