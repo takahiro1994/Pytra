@@ -44,7 +44,7 @@ def _repo_root() -> Path:
     for path_entry in sys.path:
         candidate = Path(path_entry).resolve()
         if candidate.joinpath("pytra-cli2.py").exists():
-            return candidate.parent
+            return Path(candidate.parent)
         if candidate.joinpath("src").joinpath("pytra-cli2.py").exists():
             return candidate
     cur = Path(".").resolve()
@@ -54,7 +54,7 @@ def _repo_root() -> Path:
         parent = cur.parent
         if str(parent) == str(cur):
             return Path(".").resolve()
-        cur = parent
+        cur = Path(parent)
 
 
 def _unsupported_target_attr(module_name: str, attr_name: str) -> None:
@@ -132,50 +132,23 @@ def _builtin_registry_paths() -> tuple[Path, Path, Path]:
 
 def _copy_go_runtime_files(output_dir: Path) -> int:
     """Copy native Go runtime files into the flat emit directory."""
-    runtime_root = _repo_root().joinpath("src").joinpath("runtime").joinpath("go")
-    copied = 0
-    for bucket in ["built_in", "std"]:
-        for go_file in runtime_root.joinpath(bucket).glob("*.go"):
-            dst = output_dir.joinpath(go_file.name)
-            dst.write_text(go_file.read_text(encoding="utf-8"), encoding="utf-8")
-            copied += 1
-    output_dir.joinpath("go.mod").write_text(
-        "module pytra_selfhost_go\n\ngo 1.22\n",
-        encoding="utf-8",
-    )
-    return copied
+    _ = output_dir
+    _unsupported_target_attr("pytra-cli2", "_copy_go_runtime_files")
+    return 0
 
 
 def _copy_cs_runtime_files(output_dir: Path) -> int:
     """Copy C# runtime files into the emit directory, preserving subdirectories."""
-    runtime_root = _repo_root().joinpath("src").joinpath("runtime").joinpath("cs")
-    copied = 0
-    if not runtime_root.exists():
-        return copied
-    for cs_file in runtime_root.glob("**/*.cs"):
-        rel_text = str(cs_file).replace(str(runtime_root) + "/", "")
-        dst = output_dir.joinpath(rel_text)
-        dst.parent.mkdir(parents=True, exist_ok=True)
-        dst.write_text(cs_file.read_text(encoding="utf-8"), encoding="utf-8")
-        copied += 1
-    return copied
+    _ = output_dir
+    _unsupported_target_attr("pytra-cli2", "_copy_cs_runtime_files")
+    return 0
 
 
 def _copy_java_runtime_files(output_dir: Path) -> int:
     """Copy Java runtime files into the flat emit directory."""
-    runtime_root = _repo_root().joinpath("src").joinpath("runtime").joinpath("java")
-    copied = 0
-    if not runtime_root.exists():
-        return copied
-    for bucket in ["built_in", "std"]:
-        bucket_dir = runtime_root.joinpath(bucket)
-        if not bucket_dir.exists():
-            continue
-        for java_file in bucket_dir.glob("*.java"):
-            dst = output_dir.joinpath(java_file.name)
-            dst.write_text(java_file.read_text(encoding="utf-8"), encoding="utf-8")
-            copied += 1
-    return copied
+    _ = output_dir
+    _unsupported_target_attr("pytra-cli2", "_copy_java_runtime_files")
+    return 0
 
 
 def _module_source_path(module_id: str) -> Path:

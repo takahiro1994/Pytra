@@ -604,12 +604,14 @@ def _ensure_symbol_import(meta: dict[str, JsonVal], module_id: str, export_name:
     if not isinstance(bindings, list):
         bindings = []
         meta["import_bindings"] = bindings
+    exists = False
     for binding in bindings:
         if not isinstance(binding, dict):
             continue
         if binding.get("module_id") == module_id and binding.get("export_name") == export_name and binding.get("local_name") == local_name:
+            exists = True
             break
-    else:
+    if not exists:
         bindings.append({
             "module_id": module_id,
             "runtime_module_id": module_id,

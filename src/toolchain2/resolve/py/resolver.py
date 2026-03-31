@@ -1184,11 +1184,14 @@ def _resolve_stmt_list_with_narrowing(stmts: JsonVal, ctx: ResolveContext, narro
                         ctx.scope.vars.pop(name, None)
                     saved.pop(name, None)
     finally:
-        for name, (had_local, value) in saved.items():
+        for saved_name in saved:
+            saved_row = saved[saved_name]
+            had_local = saved_row[0]
+            saved_value = saved_row[1]
             if had_local:
-                ctx.scope.vars[name] = value
+                ctx.scope.vars[saved_name] = saved_value
             else:
-                ctx.scope.vars.pop(name, None)
+                ctx.scope.vars.pop(saved_name, None)
 
 
 def _same_expr_shape(left: JsonVal, right: JsonVal) -> bool:
@@ -1804,11 +1807,14 @@ def _resolve_boolop(expr: dict[str, JsonVal], ctx: ResolveContext) -> str:
                         saved[name] = (name in ctx.scope.vars, ctx.scope.vars.get(name, ""))
                     ctx.scope.vars[name] = typ
         finally:
-            for name, (had_local, value) in saved.items():
+            for saved_name in saved:
+                saved_row = saved[saved_name]
+                had_local = saved_row[0]
+                saved_value = saved_row[1]
                 if had_local:
-                    ctx.scope.vars[name] = value
+                    ctx.scope.vars[saved_name] = saved_value
                 else:
-                    ctx.scope.vars.pop(name, None)
+                    ctx.scope.vars.pop(saved_name, None)
     expr["resolved_type"] = result_type
     return result_type
 

@@ -113,7 +113,10 @@ class RsEmitContext:
 def _package_prelude_uses() -> list[str]:
     return [
         "use crate::py_runtime::*;",
+        "use crate::pytra_built_in_error::RuntimeError;",
         "use crate::pytra_built_in_type_id_table::*;",
+        "use crate::pytra_std_re::*;",
+        "use crate::time_native::perf_counter;",
         "use std::cell::RefCell;",
         "use std::collections::{BTreeMap, HashMap, HashSet, VecDeque};",
         "use std::rc::Rc;",
@@ -489,8 +492,6 @@ class _RsStmtCommonRenderer(CommonRenderer):
     def __init__(self, ctx: RsEmitContext) -> None:
         self.ctx = ctx
         super().__init__("rs")
-        self.state.lines = ctx.lines
-        self.state.indent_level = ctx.indent_level
 
     def render_name(self, node: dict[str, JsonVal]) -> str:
         return _emit_name(self.ctx, node)
@@ -2123,6 +2124,9 @@ def _emit_method_call(
                     kw_val = kw.get("value")
                     rendered_args.append(_emit_expr(ctx, kw_val))
             module_ref = safe_rs_ident(obj_id) if obj_id != "" else _module_id_to_rs_mod_name(module_id)
+            if method[:1].isupper():
+                ctor = module_ref + "::" + safe_rs_ident(method) + "::new(" + ", ".join(rendered_args) + ")"
+                return "Rc::new(RefCell::new(" + ctor + "))"
             return module_ref + "::" + safe_rs_ident(method) + "(" + ", ".join(rendered_args) + ")"
         if is_emitted_pytra_module:
             rendered_args = [_emit_call_arg(ctx, a) for a in args]
@@ -5128,6 +5132,8 @@ def _emit_obj_type_id_downcast(ctx: RsEmitContext, ref_expr: str, user_cls: list
     so we try downcast_ref::<Box<ClassName>> first, then bare ClassName as fallback.
     Falls back to py_runtime_type_id for primitive types.
     """
+    if ctx.package_mode:
+        return "py_runtime_type_id(" + ref_expr + ")"
     parts: list[str] = []
     for fqcn, _dense in user_cls:
         simple_name = fqcn.rsplit(".", 1)[-1] if "." in fqcn else fqcn
@@ -5466,6 +5472,10 @@ def _collect_uses(ctx: RsEmitContext, meta: dict[str, JsonVal]) -> list[str]:
     if not ctx.package_mode:
         return []
     lines: list[str] = _package_prelude_uses()
+    if ctx.module_id == "pytra.built_in.error":
+        lines = [line for line in lines if line != "use crate::pytra_built_in_error::RuntimeError;"]
+    if ctx.module_id == "pytra.std.re":
+        lines = [line for line in lines if line != "use crate::pytra_std_re::*;"]
     seen: set[str] = set(lines)
     bindings = meta.get("import_bindings")
     if not isinstance(bindings, list):
@@ -5480,11 +5490,15 @@ def _collect_uses(ctx: RsEmitContext, meta: dict[str, JsonVal]) -> list[str]:
             continue
         if module_id in ("pytra.typing", "pytra.types", "abc"):
             continue
+        wildcard_line = "pub use crate::" + _module_id_to_rs_mod_name(module_id) + "::*;"
+        if wildcard_line not in seen:
+            seen.add(wildcard_line)
+            lines.append(wildcard_line)
         binding_kind = binding.get("binding_kind")
         local_name = binding.get("local_name")
         export_name = binding.get("export_name")
         if binding_kind == "module" and isinstance(local_name, str) and local_name != "":
-            line = "use crate::" + _module_id_to_rs_mod_name(module_id) + " as " + safe_rs_ident(local_name) + ";"
+            line = "pub use crate::" + _module_id_to_rs_mod_name(module_id) + " as " + safe_rs_ident(local_name) + ";"
         elif binding_kind == "symbol" and isinstance(local_name, str) and local_name != "":
             symbol_name = export_name if isinstance(export_name, str) and export_name != "" else local_name
             symbol_name = _normalize_binding_name(symbol_name)
@@ -5494,7 +5508,7 @@ def _collect_uses(ctx: RsEmitContext, meta: dict[str, JsonVal]) -> list[str]:
             module_leaf = module_id.rsplit(".", 1)[-1] if "." in module_id else module_id
             if symbol_name == module_leaf:
                 source_rs = _module_id_to_rs_mod_name(module_id)
-                line = "use crate::" + source_rs
+                line = "pub use crate::" + source_rs
                 local_rs = safe_rs_ident(local_name)
                 if local_rs != source_rs:
                     line += " as " + local_rs
@@ -5506,7 +5520,7 @@ def _collect_uses(ctx: RsEmitContext, meta: dict[str, JsonVal]) -> list[str]:
             nested_module_id = module_id + "." + symbol_name
             if _has_nested_python_module(module_id, symbol_name) and _is_transpiled_module(ctx, nested_module_id):
                 source_rs = _module_id_to_rs_mod_name(nested_module_id)
-                line = "use crate::" + source_rs
+                line = "pub use crate::" + source_rs
                 local_rs = safe_rs_ident(local_name)
                 if local_rs != source_rs:
                     line += " as " + local_rs
@@ -5520,7 +5534,7 @@ def _collect_uses(ctx: RsEmitContext, meta: dict[str, JsonVal]) -> list[str]:
                 mod_prefix = _module_id_to_rs_mod_name(module_id)
                 if mod_prefix != "":
                     source_rs = mod_prefix + "__" + symbol_name[1:]
-            line = "use crate::" + _module_id_to_rs_mod_name(module_id) + "::" + source_rs
+            line = "pub use crate::" + _module_id_to_rs_mod_name(module_id) + "::" + source_rs
             local_rs = safe_rs_ident(local_name)
             if local_rs != source_rs:
                 line += " as " + local_rs
@@ -5559,9 +5573,9 @@ def _rewrite_package_module_factories(lines: list[str]) -> list[str]:
             continue
         for factory_name in factory_defs:
             prefix = factory_name + "()"
-            if not stripped.startswith(prefix):
+            if not line.startswith(prefix):
                 continue
-            captured[factory_name].append("__module_value" + stripped[len(prefix):])
+            captured[factory_name].append("__module_value" + line[len(prefix):].rstrip())
             skipped.add(idx)
             break
     out: list[str] = []
