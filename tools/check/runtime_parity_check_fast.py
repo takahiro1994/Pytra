@@ -679,14 +679,17 @@ def _release_gen_lock() -> None:
 
 
 def _maybe_refresh_selfhost_python() -> None:
-    """Auto-re-aggregate selfhost_python.json if >15 minutes since last update.
+    """Auto-re-aggregate selfhost_python.json if >3 minutes since last update.
 
     Reads existing .parity-results/*.json and writes selfhost_python.json so
     that gen_backend_progress.py always has up-to-date selfhost matrix data.
+    呼び出しは _maybe_regenerate_progress() の後に置くこと。
+    こうすることで「今サイクルの progress は前サイクルの selfhost を使い、
+    次サイクルの progress は今サイクルの新鮮な selfhost を使う」連鎖になる。
     [P0-SELFHOST-REFRESH-S1]
     """
     marker = ROOT / ".parity-results" / "selfhost_python.json"
-    if marker.exists() and (time.time() - marker.stat().st_mtime) < 900:
+    if marker.exists() and (time.time() - marker.stat().st_mtime) < 180:
         return
     run_script = ROOT / "tools" / "run" / "run_selfhost_parity.py"
     if not run_script.exists():
@@ -729,13 +732,13 @@ def _maybe_regenerate_benchmark() -> None:
 
 
 def _maybe_run_emitter_lint() -> None:
-    """Auto-run check_emitter_hardcode_lint.py if >10 minutes since last run.
+    """Auto-run check_emitter_hardcode_lint.py if >30 minutes since last run.
 
     Updates emitter-hardcode-lint.md and .parity-results/emitter_lint.json.
     [P0-PROGRESS-SUMMARY-S4]
     """
     marker = ROOT / "docs" / "ja" / "progress-preview" / "emitter-hardcode-lint.md"
-    if marker.exists() and (time.time() - marker.stat().st_mtime) < 600:
+    if marker.exists() and (time.time() - marker.stat().st_mtime) < 1800:
         return
     lint_script = ROOT / "tools" / "check" / "check_emitter_hardcode_lint.py"
     if not lint_script.exists():
@@ -1032,10 +1035,10 @@ def main() -> int:
     # Acquire exclusive lock before running generation scripts [P0-PROGRESS-SUMMARY-S1]
     if _acquire_gen_lock():
         try:
-            _maybe_refresh_selfhost_python()
             _maybe_run_emitter_lint()
             _maybe_regenerate_progress()
             _maybe_regenerate_benchmark()
+            _maybe_refresh_selfhost_python()
         finally:
             _release_gen_lock()
     return exit_code
