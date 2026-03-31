@@ -23,6 +23,7 @@
 ### P0-CPP-VARIANT: C++ を std::variant ベースに移行し object/box/unbox を廃止する
 
 文脈: [docs/ja/plans/plan-cpp-variant-migration.md](../plans/plan-cpp-variant-migration.md)
+仕様: [docs/ja/spec/spec-adt.md](../spec/spec-adt.md)
 
 union type を `object` に退化させず `std::variant` で表現する。`work/tmp/variant_test.cpp` で基本動作・再帰型・RC共有・callable を実証済み。C++ で先に実証し、成功したら EAST の object 退化を廃止する。
 
