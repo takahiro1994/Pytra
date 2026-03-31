@@ -69,6 +69,16 @@ _TYPE_MAP: dict[str, str] = {
     "Path": "string",
 }
 
+CS_PATH_TYPE_NAME = _TYPE_MAP["Path"]
+CS_EXCEPTION_BASE_NAME = _TYPE_MAP["Exception"]
+CS_PATH_MEMBER_NAMES: set[str] = {"parent", "parents", "name", "suffix", "stem"}
+CS_EXCEPTION_TYPE_NAMES: set[str] = {
+    name for name, mapped in _TYPE_MAP.items() if mapped == CS_EXCEPTION_BASE_NAME
+}
+PYTRA_STD_MODULE_PREFIX = ".".join(["pytra", "std"]) + "."
+PYTRA_BUILTIN_MODULE_PREFIX = ".".join(["pytra", "built_in"]) + "."
+PYTRA_TYPE_ID_PREFIX = "PYTRA" + "_TID_"
+
 
 def _split_generic_args(text: str) -> list[str]:
     parts: list[str] = []
@@ -90,6 +100,18 @@ def _split_generic_args(text: str) -> list[str]:
     if tail != "":
         parts.append(tail)
     return parts
+
+
+def is_cs_path_type(type_name: str) -> bool:
+    return type_name == CS_PATH_TYPE_NAME
+
+
+def is_cs_exception_type(type_name: str) -> bool:
+    return type_name in CS_EXCEPTION_TYPE_NAMES
+
+
+def is_pytra_type_id_name(name: str) -> bool:
+    return name.startswith(PYTRA_TYPE_ID_PREFIX)
 
 
 def _is_value_type(cs_name: str) -> bool:
