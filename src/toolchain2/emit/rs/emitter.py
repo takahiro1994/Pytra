@@ -1167,6 +1167,13 @@ def _emit_attribute(ctx: RsEmitContext, node: dict[str, JsonVal]) -> str:
     attr = _str(node, "attr")
     if obj_id == "self" and attr in ctx.constructor_field_locals:
         return _rs_constructor_field_name(attr)
+    if obj_type == "py_imported_module" or obj_actual_type == "py_imported_module":
+        if attr == "environ":
+            obj = _emit_expr(ctx, obj_node)
+            return obj + ".environ()"
+    if (obj_type == "py_completed_process" or obj_actual_type == "py_completed_process") and attr == "returncode":
+        obj = _emit_expr(ctx, obj_node)
+        return obj + ".returncode"
     # type(x).__name__ → static class name string when type is known at compile time
     if attr == "__name__" and isinstance(obj_node, dict) and _str(obj_node, "kind") == "Call":
         call_func = obj_node.get("func")
@@ -1733,6 +1740,44 @@ def _emit_call(ctx: RsEmitContext, node: dict[str, JsonVal]) -> str:
     if func_name == "cast":
         return _emit_cast_call(ctx, node, args)
 
+    if func_name == "id" and len(args) == 1:
+        arg_expr = _emit_call_arg(ctx, args[0])
+        arg_type = _actual_type_in_context(ctx, args[0]) if isinstance(args[0], dict) else ""
+        arg_rs = _rs_type_for_context(ctx, arg_type) if arg_type != "" else ""
+        if arg_rs.startswith("Rc<RefCell<"):
+            return "(Rc::as_ptr(&" + arg_expr + ") as usize as i64)"
+        if arg_rs.startswith("Box<"):
+            return "((&*" + arg_expr + ") as *const _ as usize as i64)"
+        return "((&" + arg_expr + ") as *const _ as usize as i64)"
+
+    if func_name == "__import__" and len(args) >= 1 and isinstance(args[0], dict) and _str(args[0], "kind") == "Constant":
+        mod_name = args[0].get("value")
+        if mod_name == "os":
+            return "py_import_os()"
+        if mod_name == "subprocess":
+            return "py_import_subprocess()"
+
+    if func_name == "dict" and len(args) == 1:
+        arg_expr = _emit_call_arg(ctx, args[0])
+        arg_type = _actual_type_in_context(ctx, args[0]) if isinstance(args[0], dict) else ""
+        if arg_type.startswith("dict[") or arg_type == "dict":
+            return arg_expr + ".clone()"
+        return "HashMap::from_iter(" + arg_expr + ".into_iter())"
+
+    if func_name == "Path":
+        if len(args) >= 1:
+            arg0 = args[0]
+            if isinstance(arg0, dict) and _str(arg0, "kind") == "Box":
+                inner = arg0.get("value")
+                if isinstance(inner, dict) and _str(inner, "resolved_type") == "str":
+                    return "Path(" + _emit_expr(ctx, inner) + ")"
+            return "Path(" + _emit_call_arg(ctx, args[0]) + ")"
+        return 'Path("".to_string())'
+
+    mapped3 = ctx.runtime_imports.get(func_name)
+    if mapped3 is not None and mapped3 != "":
+        return _emit_runtime_call(ctx, mapped3, func, args, keywords, node)
+
     # Check for class constructor
     if func_name in ctx.class_names:
         return _emit_constructor_call(ctx, func_name, args, keywords, node)
@@ -1767,11 +1812,6 @@ def _emit_call(ctx: RsEmitContext, node: dict[str, JsonVal]) -> str:
         elem1 = rs_type(t1[5:-1]) if t1.startswith("list[") and t1.endswith("]") else "f64"
         return ("PyList::<(" + elem0 + ", " + elem1 + ")>::from_vec("
                 + a0 + ".iter_snapshot().into_iter().zip(" + a1 + ".iter_snapshot().into_iter()).collect())")
-
-    # Check for runtime imports
-    mapped3 = ctx.runtime_imports.get(func_name)
-    if mapped3 is not None and mapped3 != "":
-        return _emit_runtime_call(ctx, mapped3, func, args, keywords, node)
 
     # Regular call
     # Determine callable parameter types (for int→float coercion at call sites)
@@ -2038,6 +2078,14 @@ def _emit_runtime_call(
             elem_type = _rs_type_for_context(ctx, inner)
         return "HashSet::<" + elem_type + ">::new()"
 
+    if mapped == "py_sorted" and len(args) >= 1:
+        first = rendered_args[0]
+        if not first.startswith("&"):
+            first = "&(" + first + ")"
+        if len(args) >= 2 and isinstance(args[1], dict) and _str(args[1], "kind") == "Name" and _str(args[1], "id") == "str":
+            return "py_sorted_by_stringify(" + first + ")"
+        return "py_sorted(" + first + ")"
+
     return mapped + "(" + ", ".join(rendered_args) + ")"
 
 
@@ -2053,6 +2101,12 @@ def _emit_method_call(
     obj_type = _resolved_type_in_context(ctx, obj)
     obj_actual_type = _actual_type_in_context(ctx, obj)
     obj_id = _str(obj, "id") if isinstance(obj, dict) else ""
+    if obj_type == "py_imported_module" and method == "run":
+        rendered_args = [_emit_call_arg(ctx, a) for a in args]
+        for kw in keywords:
+            if isinstance(kw, dict):
+                rendered_args.append(_emit_expr(ctx, kw.get("value")))
+        return _emit_expr(ctx, obj) + ".run(" + ", ".join(rendered_args) + ")"
 
     # Mutating a value-type nested inside PyList<T> must operate on the borrowed slot,
     # not on the cloned value returned by .get().
@@ -2413,6 +2467,22 @@ def _emit_method_call(
 
     # Generic method call
     all_args_str = ", ".join(rendered_args)
+
+    path_like_types = {obj_type, obj_actual_type, rs_type(obj_type), rs_type(obj_actual_type)}
+    if any(t in ("Path", "PyPath", "pathlib.Path", "pytra.std.pathlib.Path") or t.endswith(".Path") for t in path_like_types if t != ""):
+        if method == "glob" and len(rendered_args) == 1:
+            return obj_str + ".glob(" + rendered_args[0] + ")"
+        if method == "read_text":
+            return obj_str + ".read_text()"
+        if method == "write_text" and len(rendered_args) >= 1:
+            return obj_str + ".write_text(" + rendered_args[0] + ")"
+        if method == "mkdir":
+            if len(rendered_args) >= 2:
+                return obj_str + ".mkdir(" + rendered_args[0] + ", " + rendered_args[1] + ")"
+            if len(rendered_args) == 1:
+                return obj_str + ".mkdir(" + rendered_args[0] + ", false)"
+            return obj_str + ".mkdir(false, false)"
+
     return obj_str + "." + safe_rs_ident(method) + "(" + all_args_str + ")"
 
 
@@ -3326,6 +3396,23 @@ def _emit_assign(ctx: RsEmitContext, node: dict[str, JsonVal]) -> None:
             resolved_type = _str(value, "resolved_type") if isinstance(value, dict) else ""
             if resolved_type != "":
                 ctx.var_types[target_name] = resolved_type
+            elif isinstance(value, dict) and _str(value, "kind") == "Call":
+                func_node = value.get("func")
+                func_name = _str(func_node, "id") if isinstance(func_node, dict) else ""
+                call_args = _list(value, "args")
+                if func_name == "__import__" and len(call_args) >= 1 and isinstance(call_args[0], dict) and _str(call_args[0], "kind") == "Constant":
+                    mod_name = call_args[0].get("value")
+                    if mod_name in ("os", "subprocess"):
+                        ctx.var_types[target_name] = "py_imported_module"
+                elif func_name == "dict" and len(call_args) == 1 and isinstance(call_args[0], dict):
+                    arg_type = _actual_type_in_context(ctx, call_args[0])
+                    if arg_type.startswith("dict[") or arg_type == "dict":
+                        ctx.var_types[target_name] = arg_type
+                elif isinstance(func_node, dict) and _str(func_node, "kind") == "Attribute":
+                    owner = func_node.get("value")
+                    owner_type = _actual_type_in_context(ctx, owner)
+                    if owner_type == "py_imported_module" and _str(func_node, "attr") == "run":
+                        ctx.var_types[target_name] = "py_completed_process"
             # Module-level assignment: use const/static
             if ctx.at_module_level:
                 if _looks_like_type_alias_assignment(target_name, value):
@@ -3656,22 +3743,36 @@ def _emit_for_core(ctx: RsEmitContext, node: dict[str, JsonVal]) -> None:
 
 def _emit_loop_target(ctx: RsEmitContext, target: JsonVal, target_plan: JsonVal) -> str:
     """Get Rust loop variable expression."""
-    if isinstance(target_plan, dict):
-        plan_kind = _str(target_plan, "kind")
+    def _pattern_from_plan(plan: dict[str, JsonVal]) -> str:
+        plan_kind = _str(plan, "kind")
         if plan_kind == "NameTarget":
-            return _rs_var_name(ctx, _str(target_plan, "id"))
+            return _rs_var_name(ctx, _str(plan, "id"))
         if plan_kind == "TupleTarget":
-            elements = _list(target_plan, "elements")
-            parts = [_rs_var_name(ctx, _str(e, "id")) if isinstance(e, dict) else "_" for e in elements]
+            elements = _list(plan, "elements")
+            parts = [
+                _pattern_from_plan(e) if isinstance(e, dict) else "_"
+                for e in elements
+            ]
             return "(" + ", ".join(parts) + ")"
-    if isinstance(target, dict):
-        target_kind = _str(target, "kind")
+        return "_"
+
+    def _pattern_from_target(target_node: dict[str, JsonVal]) -> str:
+        target_kind = _str(target_node, "kind")
         if target_kind == "Name":
-            return _rs_var_name(ctx, _str(target, "id"))
-        elif target_kind == "Tuple":
-            elements = _list(target, "elements")
-            parts = [_rs_var_name(ctx, _str(e, "id")) if isinstance(e, dict) else "_" for e in elements]
+            return _rs_var_name(ctx, _str(target_node, "id"))
+        if target_kind == "Tuple":
+            elements = _list(target_node, "elements")
+            parts = [
+                _pattern_from_target(e) if isinstance(e, dict) else "_"
+                for e in elements
+            ]
             return "(" + ", ".join(parts) + ")"
+        return "_"
+
+    if isinstance(target_plan, dict):
+        return _pattern_from_plan(target_plan)
+    if isinstance(target, dict):
+        return _pattern_from_target(target)
     if isinstance(target, str):
         return _rs_var_name(ctx, target)
     return "_item"
@@ -3679,11 +3780,38 @@ def _emit_loop_target(ctx: RsEmitContext, target: JsonVal, target_plan: JsonVal)
 
 def _emit_loop_var_declared(ctx: RsEmitContext, target: JsonVal, target_plan: JsonVal) -> None:
     """Mark loop variable as declared."""
-    if isinstance(target_plan, dict) and _str(target_plan, "kind") == "NameTarget":
-        ctx.declared_vars.add(_str(target_plan, "id"))
+    def _declare_plan(plan: dict[str, JsonVal]) -> None:
+        plan_kind = _str(plan, "kind")
+        if plan_kind == "NameTarget":
+            name = _str(plan, "id")
+            if name != "":
+                ctx.declared_vars.add(name)
+                target_type = _str(plan, "target_type")
+                if target_type != "":
+                    ctx.var_types[name] = target_type
+            return
+        if plan_kind == "TupleTarget":
+            for elem in _list(plan, "elements"):
+                if isinstance(elem, dict):
+                    _declare_plan(elem)
+
+    def _declare_target(target_node: dict[str, JsonVal]) -> None:
+        target_kind = _str(target_node, "kind")
+        if target_kind == "Name":
+            name = _str(target_node, "id")
+            if name != "":
+                ctx.declared_vars.add(name)
+            return
+        if target_kind == "Tuple":
+            for elem in _list(target_node, "elements"):
+                if isinstance(elem, dict):
+                    _declare_target(elem)
+
+    if isinstance(target_plan, dict):
+        _declare_plan(target_plan)
         return
-    if isinstance(target, dict) and _str(target, "kind") == "Name":
-        ctx.declared_vars.add(_str(target, "id"))
+    if isinstance(target, dict):
+        _declare_target(target)
 
 
 def _emit_static_range_for_from_plan(
@@ -3836,6 +3964,23 @@ def _emit_for_iter(ctx: RsEmitContext, iter_node: JsonVal, target: JsonVal) -> s
             if len(args) == 1:
                 inner = _emit_expr(ctx, args[0])
                 return inner + ".iter_snapshot().into_iter().rev()"
+
+    if kind == "Tuple":
+        elements = _list(iter_node, "elements")
+        elem_types: list[str] = []
+        if resolved_type.startswith("tuple[") and resolved_type.endswith("]"):
+            elem_types = _split_generic_args(resolved_type[6:-1])
+        rendered = [_emit_expr(ctx, e) for e in elements]
+        if len(rendered) == 0:
+            return "Vec::<PyAny>::new().into_iter()"
+        if len(elem_types) == len(rendered) and len(set(elem_types)) == 1:
+            return "vec![" + ", ".join(rendered) + "].into_iter()"
+        boxed = [
+            _box_to_pyany(ctx, e, rendered[idx] if idx < len(rendered) else _emit_expr(ctx, e))
+            for idx, e in enumerate(elements)
+            if isinstance(e, dict)
+        ]
+        return "PyList::<PyAny>::from_vec(vec![" + ", ".join(boxed) + "]).iter_snapshot().into_iter()"
 
     # If resolved_type is unknown/empty, check ctx.var_types for the variable
     # JsonVal / PyAny iteration (treats as list)

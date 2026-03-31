@@ -1079,15 +1079,19 @@ def _tte_walk(node: JsonVal, ctx: CompileContext) -> None:
                         tmp = ctx.next_tte_name()
                         assigns: list[JsonVal] = []
                         direct_names: list[JsonVal] = []
+                        all_flat_names = True
                         for i, elem in enumerate(elements_list):
                             if not isinstance(elem, dict):
+                                all_flat_names = False
                                 continue
                             elem_node: Node = cast(dict[str, JsonVal], elem)
                             if elem_node.get("kind") != NAME_TARGET:
+                                all_flat_names = False
                                 continue
                             en = elem_node.get("id", "")
                             et = elem_node.get("target_type", "")
                             if not isinstance(en, str) or en == "":
+                                all_flat_names = False
                                 continue
                             if not isinstance(et, str):
                                 et = ""
@@ -1103,22 +1107,23 @@ def _tte_walk(node: JsonVal, ctx: CompileContext) -> None:
                             assign["declare"] = True
                             assigns.append(assign)
                             direct_names.append(en)
-                        tp_out: Node = {}
-                        tp_out["kind"] = NAME_TARGET
-                        tp_out["id"] = tmp
-                        tp_out["target_type"] = tp_node.get("target_type", "")
-                        tp_out["direct_unpack_names"] = direct_names
-                        tp_out["tuple_expanded"] = True
-                        nd["target_plan"] = tp_out
-                        body = nd.get("body")
-                        if isinstance(body, list):
-                            body_list: list[JsonVal] = cast(list[JsonVal], body)
-                            new_body: list[JsonVal] = []
-                            for stmt in assigns:
-                                new_body.append(stmt)
-                            for stmt in body_list:
-                                new_body.append(stmt)
-                            nd["body"] = new_body
+                        if all_flat_names and len(direct_names) == len(elements_list):
+                            tp_out: Node = {}
+                            tp_out["kind"] = NAME_TARGET
+                            tp_out["id"] = tmp
+                            tp_out["target_type"] = tp_node.get("target_type", "")
+                            tp_out["direct_unpack_names"] = direct_names
+                            tp_out["tuple_expanded"] = True
+                            nd["target_plan"] = tp_out
+                            body = nd.get("body")
+                            if isinstance(body, list):
+                                body_list: list[JsonVal] = cast(list[JsonVal], body)
+                                new_body: list[JsonVal] = []
+                                for stmt in assigns:
+                                    new_body.append(stmt)
+                                for stmt in body_list:
+                                    new_body.append(stmt)
+                                nd["body"] = new_body
     for v in nd.values():
         if isinstance(v, dict):
             _tte_walk(v, ctx)
@@ -2574,6 +2579,9 @@ def _guard_narrowing_from_expr(expr: JsonVal) -> dict[str, str]:
             if target_type != "__conflict__":
                 out[name] = target_type
         return out
+    if kind == UNARY_OP and _tp_safe(nd.get("op")) == "Not":
+        operand = nd.get("operand")
+        return _invert_guard_narrowing_from_expr(operand)
     return {}
 
 
@@ -2581,6 +2589,9 @@ def _invert_guard_narrowing_from_expr(expr: JsonVal) -> dict[str, str]:
     if not isinstance(expr, dict):
         return {}
     nd: Node = expr
+    if nd.get("kind", "") == UNARY_OP and _tp_safe(nd.get("op")) == "Not":
+        operand = nd.get("operand")
+        return _guard_narrowing_from_expr(operand)
     if nd.get("kind", "") == BOOL_OP and _tp_safe(nd.get("op")) == "Or":
         merged: dict[str, str] = {}
         values = nd.get("values")
@@ -2644,10 +2655,15 @@ def _invert_guard_narrowing_from_expr(expr: JsonVal) -> dict[str, str]:
     return {}
 
 
-def _make_guard_unbox(name_node: Node, target_type: str) -> Node:
+def _make_guard_unbox(name_node: Node, target_type: str, storage_type: str = "") -> Node:
     out: Node = {}
     out["kind"] = UNBOX
-    out["value"] = deep_copy_json(name_node)
+    inner = deep_copy_json(name_node)
+    # Restore the original storage type on the inner node so the emitter can see the
+    # pre-narrowing type and emit the correct runtime conversion (e.g. py_str, py_any_as_list).
+    if storage_type != "" and storage_type != target_type:
+        inner["resolved_type"] = storage_type
+    out["value"] = inner
     out["resolved_type"] = target_type
     out["borrow_kind"] = "value"
     out["casts"] = []
@@ -2674,6 +2690,7 @@ def _guard_needs_unbox(current_type: str, storage_type: str, target_type: str) -
             or "object" in storage_type
             or storage_type == "Obj"
             or storage_type == "unknown"
+            or storage_type == "JsonVal"
         ):
             return True
     return current_type != target_type
@@ -2695,7 +2712,7 @@ def _guard_expr(node: JsonVal, env: dict[str, str]) -> JsonVal:
         current_type = _tp_safe(nd.get("resolved_type"))
         storage_type = env.get("__storage__:" + name, "")
         if _guard_needs_unbox(current_type, storage_type, target_type):
-            return _make_guard_unbox(nd, target_type)
+            return _make_guard_unbox(nd, target_type, storage_type)
         return nd
     if kind == "IsInstance":
         expected = nd.get("expected_type_id")
@@ -2707,6 +2724,45 @@ def _guard_expr(node: JsonVal, env: dict[str, str]) -> JsonVal:
             nd["expected_type_id"] = _guard_expr(expected_list, env)
         return nd
     if kind in (FUNCTION_DEF, CLOSURE_DEF, CLASS_DEF, UNBOX):
+        return nd
+    if kind == IF_EXP:
+        test = nd.get("test")
+        if isinstance(test, dict):
+            test_node_ifexp: Node = cast(dict[str, JsonVal], test)
+            nd["test"] = _guard_expr(test_node_ifexp, env)
+        elif isinstance(test, list):
+            test_list_ifexp: list[JsonVal] = cast(list[JsonVal], test)
+            nd["test"] = _guard_expr(test_list_ifexp, env)
+        body_env_ifexp: dict[str, str] = {}
+        for key_ifexp, val_ifexp in env.items():
+            body_env_ifexp[key_ifexp] = val_ifexp
+        _guard_env_merge(body_env_ifexp, _guard_narrowing_from_expr(nd.get("test")))
+        body_ifexp = nd.get("body")
+        if isinstance(body_ifexp, dict):
+            body_node_ifexp: Node = cast(dict[str, JsonVal], body_ifexp)
+            nd["body"] = _guard_expr(body_node_ifexp, body_env_ifexp)
+        elif isinstance(body_ifexp, list):
+            body_list_ifexp: list[JsonVal] = cast(list[JsonVal], body_ifexp)
+            nd["body"] = _guard_expr(body_list_ifexp, body_env_ifexp)
+        orelse_ifexp = nd.get("orelse")
+        if isinstance(orelse_ifexp, dict):
+            orelse_node_ifexp: Node = cast(dict[str, JsonVal], orelse_ifexp)
+            nd["orelse"] = _guard_expr(orelse_node_ifexp, env)
+        elif isinstance(orelse_ifexp, list):
+            orelse_list_ifexp: list[JsonVal] = cast(list[JsonVal], orelse_ifexp)
+            nd["orelse"] = _guard_expr(orelse_list_ifexp, env)
+        return nd
+    if kind == BOOL_OP and _tp_safe(nd.get("op")) == "And":
+        values = nd.get("values")
+        if isinstance(values, list):
+            values_list: list[JsonVal] = cast(list[JsonVal], values)
+            and_env: dict[str, str] = {}
+            for key, val in env.items():
+                and_env[key] = val
+            for i in range(len(values_list)):
+                values_list[i] = _guard_expr(values_list[i], and_env)
+                extra = _guard_narrowing_from_expr(values_list[i])
+                _guard_env_merge(and_env, extra)
         return nd
     for key in list(nd.keys()):
         value = nd[key]

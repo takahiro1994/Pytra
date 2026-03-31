@@ -3161,12 +3161,9 @@ def _parse_for_stmt(
     iter_expr = _parse_expr_text(ctx, iter_text, abs_ln, _find_expr_col(ctx, iter_text, abs_ln, indent), name_types)
     # Tuple unpacking target: for i, x in ...
     target: JsonVal
+    target_col = _find_expr_col(ctx, target_name, abs_ln, indent + 4)
     if "," in target_name:
-        parts = [p.strip() for p in target_name.split(",") if p.strip() != ""]
-        elements: list[JsonVal] = [_make_name_expr(p, abs_ln, indent + 4, ctx) for p in parts]
-        target_col = _find_expr_col(ctx, target_name, abs_ln, indent + 4)
-        target_span = make_span(abs_ln, target_col, abs_ln, target_col + len(target_name))
-        target = TupleExpr(base=ExprBase(source_span=target_span, repr_text=target_name), elements=elements)
+        target = _parse_tuple_or_expr(ctx, target_name, abs_ln, target_col, name_types)
     else:
         target = _make_name_expr(target_name, abs_ln, indent + 4, ctx)
     for_stmt = For(

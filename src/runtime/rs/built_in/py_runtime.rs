@@ -517,6 +517,58 @@ pub fn py_sorted<T: Ord + Clone>(items: &PyList<T>) -> PyList<T> {
     PyList::<T>::from_vec(v)
 }
 
+pub fn py_sorted_by_stringify<T: Clone + PyStringify>(items: &PyList<T>) -> PyList<T> {
+    let mut v = items.py_borrow().clone();
+    v.sort_by_key(|item| item.py_stringify());
+    PyList::<T>::from_vec(v)
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct PyCompletedProcess {
+    pub returncode: i64,
+}
+
+#[derive(Clone, Debug)]
+pub enum PyImportedModule {
+    Os,
+    Subprocess,
+}
+
+impl PyImportedModule {
+    pub fn environ(&self) -> HashMap<String, String> {
+        match self {
+            PyImportedModule::Os => std::env::vars().collect(),
+            PyImportedModule::Subprocess => HashMap::new(),
+        }
+    }
+
+    pub fn run(&self, cmd: PyList<String>, env: HashMap<String, String>) -> PyCompletedProcess {
+        match self {
+            PyImportedModule::Subprocess => {
+                let status = std::process::Command::new(
+                    cmd.py_borrow().first().cloned().unwrap_or_default()
+                )
+                .args(cmd.py_borrow().iter().skip(1).cloned())
+                .envs(env)
+                .status()
+                .expect("subprocess run failed");
+                PyCompletedProcess {
+                    returncode: status.code().unwrap_or(1) as i64,
+                }
+            }
+            PyImportedModule::Os => PyCompletedProcess { returncode: 1 },
+        }
+    }
+}
+
+pub fn py_import_os() -> PyImportedModule {
+    PyImportedModule::Os
+}
+
+pub fn py_import_subprocess() -> PyImportedModule {
+    PyImportedModule::Subprocess
+}
+
 pub fn py_min<T: PartialOrd + Clone>(a: T, b: T) -> T {
     if a < b { a } else { b }
 }
@@ -1498,6 +1550,18 @@ impl PyPath {
 
     pub fn write_text<T: AsRef<str>>(&self, content: T) {
         std::fs::write(&self.value, content.as_ref().as_bytes()).expect("write_text failed");
+    }
+
+    pub fn glob<T: AsRef<str>>(&self, pattern: T) -> PyList<Box<PyPath>> {
+        let pattern_path = StdPath::new(&self.value).join(pattern.as_ref());
+        PyList::from_vec(
+            py_glob(pattern_path.to_string_lossy().to_string())
+                .py_borrow()
+                .iter()
+                .cloned()
+                .map(|p| Box::new(PyPath::new(p)))
+                .collect(),
+        )
     }
 
     pub fn mkdir(&self, parents: bool, exist_ok: bool) {
