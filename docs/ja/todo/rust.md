@@ -27,17 +27,17 @@
 
 ## 未完了タスク
 
-### P0-COMMON-PEER-CLASS: CommonRenderer に peer module クラス情報参照を追加
+### P0-LINKER-RECEIVER-HINT: linker に receiver_storage_hint を追加
 
 文脈: [docs/ja/plans/plan-common-renderer-peer-class-info.md](../plans/plan-common-renderer-peer-class-info.md)
 
-全 emitter が自モジュールの body からしかクラス情報を収集できず、peer module（import 先の linked EAST3）のクラス情報（`class_storage_hint`, method signature, property）を参照できない。CommonRenderer に `PeerClassRegistry` を追加し、linked bundle の peer module EAST3 から全言語共通でクラス情報を引けるようにする。
+linked EAST3 には property 判定 (`attribute_access_kind`) や戻り値型 (`Call.resolved_type`) は既にあるが、receiver が ref class か value class かの情報 (`class_storage_hint`) だけが `Attribute` / `Call` ノードに載っていない。linker が `receiver_storage_hint` フィールドを追加すれば、emitter は peer module を読む必要がなくなる。
 
-1. [ ] [ID: P0-PEER-CLASS-S1] `PeerClassInfo` / `PeerClassRegistry` を CommonRenderer または code_emitter.py に追加する
-2. [ ] [ID: P0-PEER-CLASS-S2] linked bundle の peer module EAST3 を走査して registry を構築するローダーを実装する
-3. [ ] [ID: P0-PEER-CLASS-S3] Rust emitter の `_emit_attribute` / `_emit_call` で registry を参照し、`pytra.std.pathlib.Path` の method/property/ref-class が正しく emit されることを確認する
-4. [ ] [ID: P0-PEER-CLASS-S4] `path_stringify` / `pathlib_extended` fixture が Rust で compile + run parity PASS することを確認する
-5. [ ] [ID: P0-PEER-CLASS-S5] fixture + sample の全件 parity に回帰がないことを確認する
+1. [ ] [ID: P0-RECV-HINT-S1] linker に全 module の ClassDef から `{class_name: class_storage_hint}` マップを構築する処理を追加する
+2. [ ] [ID: P0-RECV-HINT-S2] linker が `Attribute` / `Call` ノードの receiver の `resolved_type` を引いて `receiver_storage_hint` を付与する pass を追加する
+3. [ ] [ID: P0-RECV-HINT-S3] Rust emitter の `_emit_attribute` / `_emit_call` で `receiver_storage_hint` を参照し、ref class なら `borrow()` を挿入する
+4. [ ] [ID: P0-RECV-HINT-S4] `pathlib_extended` / `path_stringify` fixture が Rust で compile + run parity PASS することを確認する
+5. [ ] [ID: P0-RECV-HINT-S5] fixture + sample の全件 parity に回帰がないことを確認する
 
 ### P0-RS-SKIP-PURE-PY: skip_modules から pure Python モジュールを外す
 
