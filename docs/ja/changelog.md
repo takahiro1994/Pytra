@@ -4,35 +4,43 @@
 
 # 更新履歴
 
-## 2026-03-31 (後半)
-
-- **spec-east.md §4.1 Python → EAST ノード変換表**: 代入/unpack、ループ、関数/クロージャ、制御構文、式、クラス、import、コンテナ操作の全カテゴリで変換表を追加。
-- **EAST tuple unpack バグ修正**: 括弧付き左辺 `(x,y,z)=` / `[x,y,z]=` と comprehension + unpack の 3 パターンを修正。
-- **C++ callable 型サポート**: `callable[[Args],Ret]` → `std::function<R(Args...)>` 変換を実装。
-- **C++ in/not in の range 算術展開**: `x in range(start, stop, step)` を算術判定式に直接展開。
-- **Rust in 演算子を iterable 汎用化**: 要素数ごとの `PyContains` を廃止、slice.contains() に統一。
-- **EAST3 optimizer に in リテラル展開**: 少数リテラルの `in` を `||` チェーンに展開する pass を追加。
-- **Rust 継承 ref 一貫性 + super() 解決**: 基底クラスの ref 昇格、super() の型解決を EAST2/EAST3 で実装。
-- **linker に receiver_storage_hint**: peer module のクラス情報を Attribute/Call ノードに付与。
-- **pytra-cli2.py から C++/Rust emit を subprocess 委譲**: selfhost で不要な言語の emitter が依存グラフに入らなくなった。
-- **parity changelog 自動記録**: PASS 件数の変化を progress-preview/changelog.md に自動追記。
-- **emitter lint に skip_pure_python カテゴリ**: pure Python モジュールの skip を検出。
-- **fixture 追加**: tuple_unpack_variants, typed_container_access, in_membership_iterable, callable_higher_order。
-- **spec-emitter-guide 更新**: selfhost parity (run_selfhost_parity.py) を §13 に追加、tuple in 要素数特殊化を §1.1 で禁止。
-- **spec-setup.md 新設**: clone 直後の golden / runtime east 生成手順を一箇所にまとめた。
-- **出力先整理**: sample → sample-preview、progress → progress-preview、runtime east を gitignore 化。
-- **自動生成間隔変更**: progress 3分、emitter lint 10分、selfhost 15分、benchmark 3分。
-
 ## 2026-03-31
 
 - **Ruby / Lua / PHP / Nim backend 担当を新設**: TODO と plans を起票。各言語の emitter 実装 → lint → selfhost のタスクを積んだ。
-- **C# / Java emitter 新規実装進行中**: C# は strings 12/12 PASS、Java は S1/S2 完了。
+- **C# emitter selfhost 手前まで完了**: fixture 131/131 + sample 18/18 + stdlib 16/16 PASS。lint 全カテゴリ 0 件。dotnet fallback を parity check に追加。
+- **C# / Java emitter 新規実装進行中**: Java は S1/S2 完了。
 - **spec-python-compat: bool は int のサブタイプではない**: isinstance(True, int) は Pytra では False。全プリミティブ型は leaf 型。
 - **spec-emitter-guide §15 FAQ 拡充**: unsigned right shift（`>>` → `>>>`）、パッケージマネージャ依存禁止、型チェックスキップ禁止、yields_dynamic cast ガイダンスを追加。
+- **spec-emitter-guide §13 selfhost parity**: `run_selfhost_parity.py` を正本ツールとして追加。selfhost の完了条件（emit → build → golden → fixture parity → sample parity）を明記。
+- **spec-emitter-guide §1.1 禁止事項追加**: `in` 演算子の tuple 要素数ごとの特殊化を禁止。iterable の汎用 contains で処理すること。
 - **EAST3 narrowing Cast ノード**: Rust 担当が isinstance narrowing 後に Cast ノードを挿入する EAST3 修正を実施。emitter workaround を削除。
-- **P7-GO-SELFHOST-RUNTIME 起票**: Go selfhost バイナリの実稼働に必要な3つのギャップ（linker type_id、Go emitter 自己翻訳、CLI wrapper）を特定。
-- **Dockerfile に TypeScript compiler 追加**: `npm install -g typescript` を Zig の後に配置。`package.json` / `node_modules/` は削除。
-- **parity check: npx tsx → tsc + node**: npm 依存を完全排除。
+- **EAST tuple unpack バグ修正**: 括弧付き左辺 `(x,y,z)=` / `[x,y,z]=` と comprehension + unpack の 3 パターンを修正。
+- **spec-east.md §4.1 Python → EAST ノード変換表**: 代入/unpack、ループ、関数/クロージャ、制御構文、式、クラス、import、コンテナ操作の全カテゴリで変換表を追加。
+- **C++ callable 型サポート**: `callable[[Args],Ret]` → `std::function<R(Args...)>` 変換を実装。
+- **C++ in/not in の range 算術展開**: `x in range(start, stop, step)` を算術判定式に直接展開。
+- **C++ variant 移行計画**: union type を `std::variant` で表現し `object` / box / unbox を廃止する計画を策定。`work/tmp/variant_test.cpp` で基本動作・再帰型・RC共有を実証。Phase 1 (variant 出力) の S1 完了。
+- **C++ selfhost S0-S4 完了**: 全モジュール emit 成功、golden 配置。S5 (build) 以降は残。
+- **C++ lint 全カテゴリ PASS**: P1-CPP-LINT-CLEANUP 全5件解消。skip_modules から pytra.std. 全 skip を撤廃。
+- **C++ g_type_table 撤去**: ControlBlock に deleter ポインタを持たせる設計に変更。fixture 131/131 + sample 18/18 PASS。
+- **C++ 整数リテラル冗長キャスト除去**: CommonRenderer に `literal_nowrap_ranges` テーブルを追加。profile 駆動で bare literal / typed wrap を切り替え。
+- **Rust in 演算子を iterable 汎用化**: 要素数ごとの `PyContains` を廃止、slice.contains() に統一。
+- **EAST3 optimizer に in リテラル展開**: 少数リテラルの `in` を `||` チェーンに展開する pass を追加。
+- **Rust 継承 ref 一貫性 + super() 解決**: 基底クラスの ref 昇格、super() の型解決を EAST2/EAST3 で実装。
+- **Rust fixture 132/132 + sample 18/18 PASS**: emitter 新規実装、mapping.json、stdlib argparse parity PASS。
+- **Rust selfhost mod 構造計画**: flat include! → Rust mod + use 構造への移行を設計。
+- **linker に receiver_storage_hint**: peer module のクラス情報を Attribute/Call ノードに付与。
+- **pytra-cli2.py から C++/Rust emit を subprocess 委譲**: selfhost で不要な言語の emitter が依存グラフに入らなくなった。
+- **parity changelog 自動記録**: PASS 件数の変化を progress-preview/changelog.md に自動追記。emitter lint の変化も同じ仕組みで記録。
+- **emitter lint に skip_pure_python カテゴリ**: pure Python モジュールの skip を検出。cli.py を除外リストに追加。
+- **fixture 追加**: tuple_unpack_variants, typed_container_access, in_membership_iterable, callable_higher_order, object_container_access。
+- **spec-setup.md 新設**: clone 直後の golden / runtime east 生成手順を一箇所にまとめた。
+- **spec-adt.md 新設**: union type の言語別変換方針。17言語の変換表、再帰型の扱い、RC 管理ルール、object 退化全面禁止。
+- **出力先整理**: sample → sample-preview、progress → progress-preview、runtime east を gitignore 化。
+- **自動生成間隔変更**: progress 3分、emitter lint 10分、selfhost 15分、benchmark 3分。
+- **TODO archive 整理**: 日付別ファイル統合（20260330-go.md, 20260330-p10reorg.md, 20260321b.md を統合）。
+- **P7-GO-SELFHOST-RUNTIME 起票**: Go selfhost バイナリの実稼働に必要な3つのギャップを特定。
+- **全言語 selfhost TODO に parity ステップ追加**: `run_selfhost_parity.py` の fixture/sample parity を全言語の TODO に積んだ。
+- **Dockerfile に TypeScript compiler 追加**: `npm install -g typescript`。npm 依存排除（tsc + node）。
 
 ## 2026-03-30
 

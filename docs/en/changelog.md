@@ -4,34 +4,43 @@
 
 # Changelog
 
-## 2026-03-31 (second half)
-
-- **spec-east.md §4.1 Python → EAST node conversion table**: Added comprehensive table for all categories.
-- **EAST tuple unpack bugfix**: Fixed 3 patterns — parenthesized LHS, bracket LHS, comprehension + unpack.
-- **C++ callable type support**: `callable[[Args],Ret]` → `std::function<R(Args...)>`.
-- **C++ range in arithmetic expansion**: `x in range(start, stop, step)` expanded to arithmetic check.
-- **Rust in operator generalized**: Replaced per-arity PyContains with slice.contains().
-- **EAST3 optimizer in-literal expansion**: Small literal `in` expanded to `||` chain.
-- **Rust inheritance ref consistency + super() resolution**: Base class ref promotion, super() type resolution.
-- **Linker receiver_storage_hint**: Peer module class info attached to Attribute/Call nodes.
-- **pytra-cli2.py C++/Rust emit subprocess delegation**: Selfhost no longer pulls in other language emitters.
-- **Parity changelog auto-recording**: PASS count changes auto-appended to progress-preview/changelog.md.
-- **Emitter lint skip_pure_python category**: Detects pure Python modules in skip_modules.
-- **New fixtures**: tuple_unpack_variants, typed_container_access, in_membership_iterable, callable_higher_order.
-- **spec-emitter-guide updates**: selfhost parity in §13, tuple in arity specialization banned in §1.1.
-- **spec-setup.md**: Consolidated clone setup instructions (golden + runtime east).
-- **Output path cleanup**: sample → sample-preview, progress → progress-preview, runtime east gitignored.
-- **Auto-generation intervals**: progress 3min, emitter lint 10min, selfhost 15min, benchmark 3min.
-
 ## 2026-03-31
 
 - **Ruby / Lua / PHP / Nim backend teams added**: TODO and plans created for each language.
-- **C# / Java emitter progress**: C# strings 12/12 PASS, Java S1/S2 complete.
+- **C# emitter pre-selfhost complete**: fixture 131/131 + sample 18/18 + stdlib 16/16 PASS. Lint all categories 0. Added dotnet fallback to parity check.
+- **C# / Java emitter progress**: Java S1/S2 complete.
 - **spec-python-compat: bool is NOT a subtype of int**: isinstance(True, int) returns False in Pytra.
 - **spec-emitter-guide §15 FAQ expanded**: unsigned right shift, package manager prohibition, type check skip prohibition, yields_dynamic cast guidance.
+- **spec-emitter-guide §13 selfhost parity**: Added `run_selfhost_parity.py` as canonical tool. Defined selfhost completion criteria (emit → build → golden → fixture parity → sample parity).
+- **spec-emitter-guide §1.1 new prohibition**: Banned per-arity tuple `in` specialization. Must use iterable generic contains.
 - **EAST3 narrowing Cast node**: Rust team implemented Cast node insertion after isinstance narrowing.
+- **EAST tuple unpack bugfix**: Fixed 3 patterns — parenthesized LHS `(x,y,z)=`, bracket LHS `[x,y,z]=`, comprehension + unpack.
+- **spec-east.md §4.1 Python → EAST node conversion table**: Comprehensive table for all categories (assignment/unpack, loops, functions/closures, control flow, expressions, classes, imports, container operations).
+- **C++ callable type support**: `callable[[Args],Ret]` → `std::function<R(Args...)>`.
+- **C++ range in arithmetic expansion**: `x in range(start, stop, step)` expanded to arithmetic check.
+- **C++ variant migration plan**: Replace `object` / box / unbox with `std::variant`. Verified basic operation, recursive types, RC sharing in `work/tmp/variant_test.cpp`. Phase 1 S1 complete.
+- **C++ selfhost S0-S4 complete**: All modules emit success, golden placed. S5 (build) onwards remaining.
+- **C++ lint all categories PASS**: P1-CPP-LINT-CLEANUP all 5 items resolved. Removed pytra.std. blanket skip from skip_modules.
+- **C++ g_type_table removed**: Switched to deleter pointer in ControlBlock. fixture 131/131 + sample 18/18 PASS.
+- **C++ integer literal redundant cast removal**: Added `literal_nowrap_ranges` table to CommonRenderer. Profile-driven bare literal / typed wrap switching.
+- **Rust in operator generalized**: Replaced per-arity PyContains with slice.contains().
+- **EAST3 optimizer in-literal expansion**: Small literal `in` expanded to `||` chain.
+- **Rust inheritance ref consistency + super() resolution**: Base class ref promotion, super() type resolution in EAST2/EAST3.
+- **Rust fixture 132/132 + sample 18/18 PASS**: New emitter implementation, mapping.json, stdlib argparse parity PASS.
+- **Rust selfhost mod structure plan**: Designed migration from flat include! to Rust mod + use structure.
+- **Linker receiver_storage_hint**: Peer module class info attached to Attribute/Call nodes.
+- **pytra-cli2.py C++/Rust emit subprocess delegation**: Selfhost no longer pulls in other language emitters.
+- **Parity changelog auto-recording**: PASS count changes auto-appended to progress-preview/changelog.md. Emitter lint changes also recorded.
+- **Emitter lint skip_pure_python category**: Detects pure Python modules in skip_modules. Added cli.py to exclusion list.
+- **New fixtures**: tuple_unpack_variants, typed_container_access, in_membership_iterable, callable_higher_order, object_container_access.
+- **spec-setup.md**: Consolidated clone setup instructions (golden + runtime east).
+- **spec-adt.md**: ADT specification — union type conversion per language (17 languages), recursive type handling, RC management rules, object fallback banned.
+- **Output path cleanup**: sample → sample-preview, progress → progress-preview, runtime east gitignored.
+- **Auto-generation intervals**: progress 3min, emitter lint 10min, selfhost 15min, benchmark 3min.
+- **TODO archive cleanup**: Merged date-split files (20260330-go.md, 20260330-p10reorg.md, 20260321b.md).
 - **P7-GO-SELFHOST-RUNTIME filed**: 3 gaps identified for Go selfhost binary.
-- **Dockerfile: add TypeScript compiler**: `npm install -g typescript`. Removed package.json/node_modules.
+- **All-language selfhost TODO parity steps**: Added `run_selfhost_parity.py` fixture/sample parity to all language TODOs.
+- **Dockerfile: add TypeScript compiler**: `npm install -g typescript`. npm dependency eliminated (tsc + node).
 - **parity check: npx tsx → tsc + node**: Zero npm dependency.
 
 ## 2026-03-30
