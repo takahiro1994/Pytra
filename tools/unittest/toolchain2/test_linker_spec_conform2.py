@@ -3335,7 +3335,7 @@ def has_key(env: dict[str, int], name: str) -> bool:
         self.assertEqual(body[0].get("target", {}).get("id"), "id_table")
         self.assertTrue(any(stmt.get("target", {}).get("id") == "CLASS_INHERIT_BASIC_BASE_TID" for stmt in body if isinstance(stmt, dict)))
 
-    def test_linker_rewrites_nominal_isinstance_to_pytra_isinstance_call(self) -> None:
+    def test_linker_keeps_nominal_isinstance_for_cpp_emitter(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             entry_path = Path(tmp) / "app.main.east3.json"
             entry_path.write_text(
@@ -3363,13 +3363,11 @@ def has_key(env: dict[str, int], name: str) -> bool:
             result = link_modules([str(entry_path)], target="cpp", dispatch_mode="native")
 
         linked = next(module.east_doc for module in result.linked_modules if module.module_id == "app.main")
-        call = next(node for node in _walk_nodes(linked) if node.get("kind") == "Call" and node.get("func", {}).get("id") == "pytra_isinstance")
-        args = call.get("args", [])
-        self.assertEqual(args[0].get("kind"), "ObjTypeId")
-        self.assertEqual(args[1].get("id"), "APP_MAIN_PATH_TID")
+        expr = next(node for node in _walk_nodes(linked) if node.get("kind") == "IsInstance")
+        self.assertEqual(expr.get("expected_type_id", {}).get("id"), "Path")
         bindings = linked.get("meta", {}).get("import_bindings", [])
-        self.assertTrue(any(b.get("module_id") == "pytra.built_in.type_id_table" and b.get("export_name") == "APP_MAIN_PATH_TID" for b in bindings))
-        self.assertTrue(any(b.get("module_id") == "pytra.built_in.type_id" and b.get("export_name") == "pytra_isinstance" for b in bindings))
+        self.assertFalse(any(b.get("module_id") == "pytra.built_in.type_id_table" for b in bindings))
+        self.assertFalse(any(b.get("module_id") == "pytra.built_in.type_id" for b in bindings))
 
     def test_cpp_emitter_lowers_traits_to_virtual_interfaces_and_trait_masks(self) -> None:
         doc = _module_doc(
@@ -4477,7 +4475,7 @@ def has_key(env: dict[str, int], name: str) -> bool:
 
         cpp_code = emit_cpp_module(doc)
 
-        self.assertIn("py_runtime_object_isinstance(dyn, static_cast<pytra_type_id>(1000))", cpp_code)
+        self.assertIn("__pytra_value.isinstance(&Path::PYTRA_TYPE_INFO)", cpp_code)
         self.assertIn("object(make_object<Path>(1000, p))", cpp_code)
         self.assertIn("static_cast<pytra_type_id>(1000)", cpp_code)
 

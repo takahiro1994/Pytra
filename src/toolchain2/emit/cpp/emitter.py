@@ -892,6 +892,36 @@ def _emit_builtin_isinstance(value_expr: str, expected_name: str) -> str:
     return ""
 
 
+def _emit_static_type_id_expr(ctx: CppEmitContext, type_name: str) -> str:
+    normalized = _normalize_expected_type_name(type_name)
+    builtin = {
+        "None": "static_cast<pytra_type_id>(PYTRA_TID_NONE)",
+        "none": "static_cast<pytra_type_id>(PYTRA_TID_NONE)",
+        "bool": "static_cast<pytra_type_id>(PYTRA_TID_BOOL)",
+        "int": "static_cast<pytra_type_id>(PYTRA_TID_INT)",
+        "int64": "static_cast<pytra_type_id>(PYTRA_TID_INT)",
+        "float": "static_cast<pytra_type_id>(PYTRA_TID_FLOAT)",
+        "float64": "static_cast<pytra_type_id>(PYTRA_TID_FLOAT)",
+        "str": "static_cast<pytra_type_id>(PYTRA_TID_STR)",
+        "list": "static_cast<pytra_type_id>(PYTRA_TID_LIST)",
+        "dict": "static_cast<pytra_type_id>(PYTRA_TID_DICT)",
+        "set": "static_cast<pytra_type_id>(PYTRA_TID_SET)",
+        "object": "static_cast<pytra_type_id>(PYTRA_TID_OBJECT)",
+    }.get(normalized, "")
+    if builtin != "":
+        return builtin
+    if normalized.startswith("list["):
+        return "static_cast<pytra_type_id>(PYTRA_TID_LIST)"
+    if normalized.startswith("dict["):
+        return "static_cast<pytra_type_id>(PYTRA_TID_DICT)"
+    if normalized.startswith("set["):
+        return "static_cast<pytra_type_id>(PYTRA_TID_SET)"
+    class_type_id = _lookup_class_type_id(ctx, normalized)
+    if class_type_id is not None:
+        return "static_cast<pytra_type_id>(" + str(class_type_id) + ")"
+    return ""
+
+
 def _select_union_lane(union_type: str, target_type: str) -> str:
     lanes = _split_top_level_union_type(union_type)
     for lane in lanes:
@@ -2349,9 +2379,7 @@ def _emit_box(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
         return (
             "object(make_object<"
             + cpp_value_type
-            + ">(py_runtime_value_type_id("
-            + value_expr
-            + "), "
+            + ">("
             + value_expr
             + "))"
         )
@@ -2456,12 +2484,12 @@ def _emit_obj_type_id(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
     value = node.get("value")
     value_expr = _emit_expr(ctx, value)
     value_type = _effective_resolved_type(value)
+    static_expr = _emit_static_type_id_expr(ctx, value_type)
+    if static_expr != "" and value_type not in ("object", "Any", "Obj", "unknown") and "|" not in value_type:
+        return static_expr
     if value_type in ("object", "Any", "Obj", "unknown") or "|" in value_type:
         return "py_runtime_object_type_id(" + value_expr + ")"
-    class_type_id = _lookup_class_type_id(ctx, value_type)
-    if class_type_id is not None:
-        return "static_cast<pytra_type_id>(" + str(class_type_id) + ")"
-    return "py_runtime_value_type_id(" + value_expr + ")"
+    return "py_runtime_object_type_id(" + value_expr + ")"
 
 
 def _emit_issubtype(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:

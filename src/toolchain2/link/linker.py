@@ -1164,7 +1164,11 @@ def _rewrite_type_id_isinstance(
     module_id: str,
     doc: dict[str, JsonVal],
     type_id_table: dict[str, JsonVal],
+    *,
+    target: str,
 ) -> None:
+    if target == "cpp":
+        return
     import_parts = cast(tuple[JsonVal, JsonVal], collect_import_maps(doc))
     import_modules = cast(dict[str, str], import_parts[0])
     import_symbols = cast(dict[str, str], import_parts[1])
@@ -1697,7 +1701,7 @@ def link_modules(
     for module, doc in copied_docs:
         if module.module_id == TYPE_ID_TABLE_MODULE_ID:
             continue
-        _rewrite_type_id_isinstance(module.module_id, doc, type_id_table)
+        _rewrite_type_id_isinstance(module.module_id, doc, type_id_table, target=target)
         if module.module_id == TYPE_ID_RUNTIME_MODULE_ID:
             _rewrite_type_id_runtime_id_table(doc)
 

@@ -65,6 +65,29 @@ struct hash<::std::tuple<Ts...>> {
 #include "core/object.h"
 
 template <class T>
+struct py_runtime_builtin_type_id;
+
+template <class T>
+struct py_runtime_builtin_type_id<list<T>> {
+    static constexpr pytra_type_id value = PYTRA_TID_LIST;
+};
+
+template <class K, class V>
+struct py_runtime_builtin_type_id<dict<K, V>> {
+    static constexpr pytra_type_id value = PYTRA_TID_DICT;
+};
+
+template <class T>
+struct py_runtime_builtin_type_id<set<T>> {
+    static constexpr pytra_type_id value = PYTRA_TID_SET;
+};
+
+template <typename T, typename... Args>
+Object<T> make_object(Args&&... args) {
+    return make_object<T>(py_runtime_builtin_type_id<T>::value, ::std::forward<Args>(args)...);
+}
+
+template <class T>
 struct py_is_rc_list_handle : ::std::false_type {};
 
 template <class T>
