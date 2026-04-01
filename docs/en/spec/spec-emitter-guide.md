@@ -755,7 +755,36 @@ EAST の `Any` / `Obj` / `unknown` は各言語の動的型に写像する:
 - emitter は上記の動的型にフォールバックしてよい。
 - ただし、`unknown` の頻出は EAST3 型推論のバグである可能性が高い。issue として報告すべきであり、emitter 側に恒久的なワークアラウンドを追加すべきではない。
 
-### 12.4 数値 cast の出力判定
+### 12.4 Optional / union の型写像
+
+EAST の `type_expr` は `OptionalType` と `UnionType` を明確に区別する（[spec-east.md](./spec-east.md) §6.4）。emitter はこの区別を守って型を写像しなければならない。
+
+#### 3 分類と写像ルール
+
+| EAST `type_expr` | 意味 | C++ | Go | Rust | Java | C# | TS |
+|---|---|---|---|---|---|---|---|
+| `OptionalType(inner=T)` | `T \| None` | `std::optional<T>` | `*T` / nil | `Option<T>` | `T` (nullable ref) / `Optional<T>` | `T?` | `T \| null` |
+| `UnionType(general)` | `T1 \| T2` (None なし) | `std::variant<T1, T2>` | `any` | `enum { T1(T1), T2(T2) }` | `Object` | `object` | `T1 \| T2` |
+| `OptionalType(inner=UnionType)` | `T1 \| T2 \| None` | `std::optional<std::variant<T1, T2>>` | `any` | `Option<enum>` | `Object` | `object?` | `T1 \| T2 \| null` |
+
+#### None 値の写像
+
+| 言語 | None 値 |
+|---|---|
+| C++ | `std::nullopt` |
+| Rust | `None` |
+| Go | `nil` |
+| TS/JS | `null` |
+| Java | `null` |
+| C# | `null` |
+
+#### 禁止事項
+
+- `None` を `std::variant` の型パラメータに入れてはならない。`None` は型ではなく値である。`T | None` は常に `OptionalType` として処理する。
+- `OptionalType` を `UnionType(options=[T, None])` のまま emit してはならない。EAST 側で正規化済みであり、emitter が再分類する必要はない。
+- `UnionType(union_mode=dynamic)` を general union と同じ写像で処理してはならない。`Any` / `object` を含む union は §12.3 の動的型写像に従う。
+
+### 12.5 数値 cast の出力判定
 
 EAST は数値型の混合演算で常に明示的な cast ノードを挿入する（spec-east2.md §2.5）。emitter はこの cast を出力するかどうかを `mapping.json` の `implicit_promotions` テーブルで判定する。
 
