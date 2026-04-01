@@ -1581,7 +1581,7 @@ def link_modules(
         module_map[str(p.resolve())] = doc
 
     # 2. runtime module を探索・追加 (transitive closure)
-    module_map = discover_runtime_modules(module_map)
+    module_map = discover_runtime_modules(module_map, target=target)
 
     # 3. module_id を割り当て、dispatch_mode を検証
     runtime_east_root = Path(__file__).resolve().parents[2] / "runtime" / "east"
@@ -1701,7 +1701,8 @@ def link_modules(
     for module, doc in copied_docs:
         if module.module_id == TYPE_ID_TABLE_MODULE_ID:
             continue
-        _rewrite_type_id_isinstance(module.module_id, doc, type_id_table, target=target)
+        if dispatch_mode == "type_id":
+            _rewrite_type_id_isinstance(module.module_id, doc, type_id_table, target=target)
         if module.module_id == TYPE_ID_RUNTIME_MODULE_ID:
             _rewrite_type_id_runtime_id_table(doc)
 
@@ -1716,7 +1717,7 @@ def link_modules(
             module_kind=module.module_kind,
         ))
 
-    dependency_parts: tuple[JsonVal, JsonVal] = cast(tuple[JsonVal, JsonVal], build_all_resolved_dependencies(linked_input_modules))
+    dependency_parts: tuple[JsonVal, JsonVal] = cast(tuple[JsonVal, JsonVal], build_all_resolved_dependencies(linked_input_modules, target=target))
     resolved_deps = cast(dict[str, list[str]], dependency_parts[0])
     user_deps = cast(dict[str, list[str]], dependency_parts[1])
 

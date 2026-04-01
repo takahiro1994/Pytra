@@ -2487,9 +2487,11 @@ def _emit_obj_type_id(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
     static_expr = _emit_static_type_id_expr(ctx, value_type)
     if static_expr != "" and value_type not in ("object", "Any", "Obj", "unknown") and "|" not in value_type:
         return static_expr
-    if value_type in ("object", "Any", "Obj", "unknown") or "|" in value_type:
-        return "py_runtime_object_type_id(" + value_expr + ")"
-    return "py_runtime_object_type_id(" + value_expr + ")"
+    return (
+        "([&]() -> pytra_type_id { auto __pytra_value = "
+        + value_expr
+        + "; return static_cast<bool>(__pytra_value) ? static_cast<pytra_type_id>(__pytra_value.type_id()) : static_cast<pytra_type_id>(PYTRA_TID_NONE); }())"
+    )
 
 
 def _emit_issubtype(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
@@ -2497,7 +2499,7 @@ def _emit_issubtype(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
     expected = _emit_expr(ctx, node.get("expected_type_id"))
     if actual == "" or expected == "":
         return "false"
-    return "py_runtime_type_id_is_subtype(" + actual + ", " + expected + ")"
+    return "py_tid_is_subtype(static_cast<int64>(" + actual + "), static_cast<int64>(" + expected + "))"
 
 
 def _emit_issubclass(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
@@ -2505,7 +2507,7 @@ def _emit_issubclass(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
     expected = _emit_expr(ctx, node.get("expected_type_id"))
     if actual == "" or expected == "":
         return "false"
-    return "py_runtime_type_id_issubclass(" + actual + ", " + expected + ")"
+    return "py_tid_issubclass(static_cast<int64>(" + actual + "), static_cast<int64>(" + expected + "))"
 
 
 def _emit_slice_expr(ctx: CppEmitContext, node: dict[str, JsonVal], value_expr: str, slice_node: dict[str, JsonVal]) -> str:

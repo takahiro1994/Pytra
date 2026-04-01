@@ -60,6 +60,28 @@ static inline bool py_is_none(const object& v) { return !static_cast<bool>(v); }
 template <class T>
 static inline bool py_is_none(const T&) { return false; }
 
+template <class Exact>
+static inline bool py_runtime_object_exact_is(const object& value) {
+    if (!value) {
+        return false;
+    }
+    if constexpr (::std::is_same_v<Exact, bool>) return value.type_id() == PYTRA_TID_BOOL;
+    else if constexpr (::std::is_same_v<Exact, int64>) return value.type_id() == PYTRA_TID_INT;
+    else if constexpr (::std::is_same_v<Exact, float64>) return value.type_id() == PYTRA_TID_FLOAT;
+    else if constexpr (::std::is_same_v<Exact, str>) return value.type_id() == PYTRA_TID_STR;
+    else return false;
+}
+
+template <class Exact, class T>
+static inline bool py_runtime_value_exact_is(const T&) {
+    return ::std::is_same_v<::std::decay_t<T>, Exact>;
+}
+
+template <class Exact>
+static inline bool py_runtime_value_exact_is(const object& value) {
+    return py_runtime_object_exact_is<Exact>(value);
+}
+
 static inline bool py_is_bool(const object& v) {
     return static_cast<bool>(v) && v.type_id() == PYTRA_TID_BOOL;
 }

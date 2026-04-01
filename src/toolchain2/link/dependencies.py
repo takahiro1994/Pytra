@@ -68,10 +68,10 @@ def _is_type_only_symbol_binding(binding: JsonVal) -> bool:
     return isinstance(module_id, str) and isinstance(export_name, str) and (module_id, export_name) in _TYPE_ONLY_SYMBOL_BINDINGS
 
 
-def _scan_runtime_refs(node: JsonVal, out: set[str]) -> None:
+def _scan_runtime_refs(node: JsonVal, out: set[str], *, include_type_id_runtime: bool = True) -> None:
     if isinstance(node, list):
         for item in node:
-            _scan_runtime_refs(item, out)
+            _scan_runtime_refs(item, out, include_type_id_runtime=include_type_id_runtime)
         return
     if not isinstance(node, dict):
         return
@@ -80,14 +80,14 @@ def _scan_runtime_refs(node: JsonVal, out: set[str]) -> None:
     if runtime_module_id != "":
         out.add(runtime_module_id)
     kind = node.get("kind")
-    if isinstance(kind, str) and kind in _TYPE_ID_RUNTIME_NODE_KINDS:
+    if include_type_id_runtime and isinstance(kind, str) and kind in _TYPE_ID_RUNTIME_NODE_KINDS:
         out.add("pytra.built_in.type_id")
 
     for value in node.values():
         if isinstance(value, dict):
-            _scan_runtime_refs(value, out)
+            _scan_runtime_refs(value, out, include_type_id_runtime=include_type_id_runtime)
         elif isinstance(value, list):
-            _scan_runtime_refs(value, out)
+            _scan_runtime_refs(value, out, include_type_id_runtime=include_type_id_runtime)
 
 
 def _normalized_runtime_module_id(node: JsonVal) -> str:
@@ -148,6 +148,8 @@ def _binding_dependency_module_id(binding: JsonVal) -> str:
 
 def _build_resolved_dependencies(
     east_doc: dict[str, JsonVal],
+    *,
+    target: str = "",
 ) -> list[str]:
     """Build resolved dependency list for a single module from its EAST3 meta."""
     deps: list[str] = []
@@ -169,7 +171,11 @@ def _build_resolved_dependencies(
                 deps.append(mod_id)
 
     embedded_runtime_refs: set[str] = set()
-    _scan_runtime_refs(east_doc.get("body"), embedded_runtime_refs)
+    _scan_runtime_refs(
+        east_doc.get("body"),
+        embedded_runtime_refs,
+        include_type_id_runtime=(target != "cpp"),
+    )
     for runtime_module_id in sorted(embedded_runtime_refs):
         if runtime_module_id != "" and runtime_module_id not in seen:
             seen.add(runtime_module_id)
@@ -203,6 +209,8 @@ def _build_resolved_dependencies(
 
 def build_all_resolved_dependencies(
     modules: list[LinkedModule],
+    *,
+    target: str = "",
 ) -> tuple[dict[str, list[str]], dict[str, list[str]]]:
     """Build resolved_dependencies_v1 and user_module_dependencies_v1 for all modules.
 
@@ -224,7 +232,7 @@ def build_all_resolved_dependencies(
             user_deps[module.module_id] = []
             continue
 
-        deps = _build_resolved_dependencies(module.east_doc)
+        deps = _build_resolved_dependencies(module.east_doc, target=target)
         resolved[module.module_id] = deps
         # Filter to only user module dependencies (exclude self)
         u_deps = [d for d in deps if d in user_module_ids and d != module.module_id]

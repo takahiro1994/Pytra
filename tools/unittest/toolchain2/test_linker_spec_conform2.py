@@ -224,6 +224,40 @@ class Toolchain2LinkerSpecConform2Tests(unittest.TestCase):
 
             self.assertEqual(result.manifest["entry_modules"], ["app.main"])
 
+    def test_link_modules_keeps_isinstance_node_for_java_native_dispatch(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            entry_path = Path(tmp) / "app.main.east3.json"
+            entry_path.write_text(
+                json.dumps(
+                    _module_doc(
+                        "app.main",
+                        body=[
+                            {"kind": "ClassDef", "name": "Path", "body": []},
+                            {
+                                "kind": "Expr",
+                                "value": {
+                                    "kind": "IsInstance",
+                                    "value": {"kind": "Name", "id": "dyn", "resolved_type": "object"},
+                                    "expected_type_id": {"kind": "Name", "id": "Path", "resolved_type": "type"},
+                                    "resolved_type": "bool",
+                                },
+                            },
+                        ],
+                    ),
+                    ensure_ascii=False,
+                ),
+                encoding="utf-8",
+            )
+
+            result = link_modules([str(entry_path)], target="java", dispatch_mode="native")
+
+        linked = next(module.east_doc for module in result.linked_modules if module.module_id == "app.main")
+        expr = next(node for node in _walk_nodes(linked) if node.get("kind") == "IsInstance")
+        self.assertEqual(expr.get("expected_type_id", {}).get("id"), "Path")
+        bindings = linked.get("meta", {}).get("import_bindings", [])
+        self.assertFalse(any(b.get("module_id") == "pytra.built_in.type_id_table" for b in bindings))
+        self.assertFalse(any(b.get("module_id") == "pytra.built_in.type_id" for b in bindings))
+
     def test_build_all_resolved_dependencies_skips_type_only_template_but_keeps_runtime_module_import(self) -> None:
         modules = [
             _linked_module(
@@ -4427,9 +4461,9 @@ def has_key(env: dict[str, int], name: str) -> bool:
 
         cpp_code = emit_cpp_module(doc)
 
-        self.assertIn("py_runtime_object_type_id(dyn)", cpp_code)
-        self.assertIn("py_runtime_type_id_is_subtype(1001, 1000)", cpp_code)
-        self.assertIn("py_runtime_type_id_issubclass(1001, 1000)", cpp_code)
+        self.assertIn("__pytra_value.type_id()", cpp_code)
+        self.assertIn("py_tid_is_subtype(static_cast<int64>(1001), static_cast<int64>(1000))", cpp_code)
+        self.assertIn("py_tid_issubclass(static_cast<int64>(1001), static_cast<int64>(1000))", cpp_code)
         self.assertIn("py_dict_clear_mut(state);", cpp_code)
 
     def test_cpp_emitter_uses_linked_type_ids_for_nominal_classes(self) -> None:

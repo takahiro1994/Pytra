@@ -14,7 +14,6 @@
 #include "built_in/dict_ops.h"
 #include "built_in/set_ops.h"
 #include "built_in/bounds.h"
-#include "core/type_id_support.h"
 #include "core/tagged_value.h"
 #include "core/rc_ops.h"
 #include "core/scope_exit.h"
@@ -28,6 +27,11 @@
 // emit パイプラインで生成されるヘッダー。ソースツリーには存在しない。
 // emitter が必要に応じて個別に include を生成する。
 // py_runtime.h からは include しない。
+
+bool py_tid_is_subtype(int64 actual_type_id, int64 expected_type_id);
+bool py_tid_issubclass(int64 actual_type_id, int64 expected_type_id);
+bool py_tid_isinstance(const object& value, int64 expected_type_id);
+int64 py_tid_register_class_type(int64 base_type_id);
 
 // py_div / py_floordiv / py_mod は built_in/scalar_ops.h へ移動済み。
 
