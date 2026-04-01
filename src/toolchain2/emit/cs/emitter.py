@@ -48,6 +48,7 @@ class EmitContext:
     type_id_values: dict[str, int] = field(default_factory=dict)
     renamed_symbols: dict[str, str] = field(default_factory=dict)
     module_function_names: set[str] = field(default_factory=set)
+    function_arg_types: dict[str, list[str]] = field(default_factory=dict)
     temp_index: int = 0
     current_base_class_name: str = ""
     current_function_name: str = ""
@@ -463,6 +464,15 @@ def _render_set_literal(ctx: EmitContext, node: dict[str, JsonVal], *, preferred
     if rt != "":
         out_type = _render_type(ctx, rt)
     rendered = [_emit_expr(ctx, elem) for elem in elems]
+    if out_type.startswith("HashSet<") and out_type.endswith("[]>"):
+        elem_type = out_type[len("HashSet<"):-3]
+        if len(rendered) == 0:
+            return "new " + out_type + "(py_runtime.array_comparer<" + elem_type + ">())"
+        return (
+            "new " + out_type + "(py_runtime.array_comparer<" + elem_type + ">()) { "
+            + ", ".join(rendered)
+            + " }"
+        )
     if len(rendered) == 0:
         return "new " + out_type + "()"
     return "new " + out_type + " { " + ", ".join(rendered) + " }"
@@ -508,6 +518,8 @@ def _render_subscript(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
         return "py_runtime.py_get(" + owner + ", " + index + ")"
     if owner_type in ("tuple", "object[]") or owner_type.startswith("tuple[") or owner_type.endswith("[]"):
         return owner + "[((int)" + index + ")]"
+    if _is_dynamic_resolved_type(owner_type):
+        return "py_runtime.py_get(" + owner + ", " + index + ")"
     return owner + "[" + index + "]"
 
 
@@ -674,6 +686,10 @@ def _render_expr_with_preferred_type(ctx: EmitContext, node: JsonVal, preferred_
         return _render_expr_with_preferred_type(ctx, node.get("value"), preferred_type=preferred_type)
     if kind == "Call" and _bool(node, "yields_dynamic") and preferred_type != "":
         return _coerce_dynamic_expr(ctx, _emit_expr(ctx, node), preferred_type)
+    if preferred_type.startswith("callable[") and kind == "Name":
+        return "((" + _render_type(ctx, preferred_type) + ")" + _emit_expr(ctx, node) + ")"
+    if preferred_type.startswith("callable[") and kind == "Lambda":
+        return "((" + _render_type(ctx, preferred_type) + ")((" + _emit_expr(ctx, node) + ")))"
     if kind == "Subscript":
         owner_node = node.get("value")
         owner_type = _str(owner_node, "resolved_type") if isinstance(owner_node, dict) else ""
@@ -681,8 +697,14 @@ def _render_expr_with_preferred_type(ctx: EmitContext, node: JsonVal, preferred_
             return "((" + _render_type(ctx, preferred_type) + ")py_runtime.py_ord(" + _emit_expr(ctx, node) + "))"
         if preferred_type == "str":
             return "py_runtime.py_to_string(" + _emit_expr(ctx, node) + ")"
+        rendered_preferred_type = _render_type(ctx, preferred_type) if preferred_type != "" else ""
+        if rendered_preferred_type.endswith("[]") and (
+            owner_type == "tuple" or owner_type.startswith("tuple[") or owner_type.endswith("[]") or _is_dynamic_resolved_type(owner_type)
+        ):
+            elem_type = rendered_preferred_type[:-2]
+            return "py_runtime.py_array_cast<" + elem_type + ">(" + _emit_expr(ctx, node) + ")"
         if preferred_type not in ("", "object", "Obj", "Any", "unknown") and (
-            owner_type.startswith("tuple[") or owner_type.endswith("[]") or _is_dynamic_resolved_type(owner_type)
+            owner_type == "tuple" or owner_type.startswith("tuple[") or owner_type.endswith("[]") or _is_dynamic_resolved_type(owner_type)
         ):
             return "((" + _render_type(ctx, preferred_type) + ")" + _emit_expr(ctx, node) + ")"
     if kind == "BinOp" and preferred_type in ("int8", "int16", "int32", "uint8", "uint16", "uint32"):
@@ -777,6 +799,9 @@ def _emit_builtin_ctor(ctx: EmitContext, func_name: str, node: dict[str, JsonVal
             return "new " + target_type + "()"
     if func_name == "set":
         if len(args) == 0:
+            if target_type.startswith("HashSet<") and target_type.endswith("[]>"):
+                elem_type = target_type[len("HashSet<"):-3]
+                return "new " + target_type + "(py_runtime.array_comparer<" + elem_type + ">())"
             return "new " + target_type + "()"
         return "new " + target_type + "(" + args[0] + ")"
     if func_name == "tuple":
@@ -834,7 +859,14 @@ def _class_name_from_tid_constant(ctx: EmitContext, node: JsonVal) -> str:
 
 
 def _emit_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
-    args = [_emit_expr(ctx, arg) for arg in _list(node, "args")]
+    func = node.get("func")
+    preferred_arg_types: list[str] = []
+    if isinstance(func, dict) and _str(func, "kind") == "Name":
+        preferred_arg_types = ctx.function_arg_types.get(_str(func, "id"), [])
+    args: list[str] = []
+    for idx, arg in enumerate(_list(node, "args")):
+        preferred_type = preferred_arg_types[idx] if idx < len(preferred_arg_types) else ""
+        args.append(_render_expr_with_preferred_type(ctx, arg, preferred_type=preferred_type))
     keyword_args: list[str] = []
     for keyword in _list(node, "keywords"):
         if not isinstance(keyword, dict):
@@ -848,7 +880,6 @@ def _emit_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
     runtime_call = _str(node, "runtime_call")
     builtin_name = _call_builtin_name(node)
     adapter = _str(node, "runtime_call_adapter_kind")
-    func = node.get("func")
     owner_expr = ""
     owner_type = ""
     prepend_owner = False
@@ -1477,12 +1508,18 @@ def _emit_assign_stmt(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
             declare = False
     if declare:
         decl_type = _target_type_from_stmt(ctx, node)
-        ctx.var_types[target_text] = preferred_type if preferred_type != "" else "object"
+        inferred_type = preferred_type
+        if inferred_type == "" and isinstance(value, dict):
+            inferred_type = _str(value, "resolved_type")
+        ctx.var_types[target_text] = inferred_type if inferred_type != "" else "object"
         ctx.lines.append("    " * ctx.indent_level + decl_type + " " + target_text + " = " + value_text + ";")
         return
     if isinstance(target, dict) and _str(target, "kind") == "Name" and target_text not in ctx.var_types and ctx.current_return_type != "":
         decl_type2 = _target_type_from_stmt(ctx, node)
-        ctx.var_types[target_text] = preferred_type if preferred_type != "" else "object"
+        inferred_type2 = preferred_type
+        if inferred_type2 == "" and isinstance(value, dict):
+            inferred_type2 = _str(value, "resolved_type")
+        ctx.var_types[target_text] = inferred_type2 if inferred_type2 != "" else "object"
         ctx.lines.append("    " * ctx.indent_level + decl_type2 + " " + target_text + " = " + value_text + ";")
         return
     ctx.lines.append("    " * ctx.indent_level + target_text + " = " + value_text + ";")
@@ -2049,6 +2086,7 @@ def emit_cs_module(east3_doc: dict[str, JsonVal]) -> str:
     class_properties: dict[str, set[str]] = {}
     type_id_values: dict[str, int] = {}
     module_function_names: set[str] = set()
+    function_arg_types: dict[str, list[str]] = {}
     type_id_table = _dict(lp, "type_id_resolved_v1")
     for key, value in type_id_table.items():
         if isinstance(key, str) and isinstance(value, int):
@@ -2086,6 +2124,8 @@ def emit_cs_module(east3_doc: dict[str, JsonVal]) -> str:
             fn_name = _str(stmt, "name")
             if fn_name != "":
                 module_function_names.add(fn_name)
+                arg_order, arg_types = _arg_order_and_types(stmt)
+                function_arg_types[fn_name] = [arg_types.get(arg_name, "") for arg_name in arg_order]
 
     ctx = EmitContext(
         module_id=module_id,
@@ -2102,6 +2142,7 @@ def emit_cs_module(east3_doc: dict[str, JsonVal]) -> str:
         enum_constant_types=enum_constant_types,
         type_id_values=type_id_values,
         module_function_names=module_function_names,
+        function_arg_types=function_arg_types,
         renamed_symbols=renamed_symbols,
     )
     class_name = _module_class_name(module_id)

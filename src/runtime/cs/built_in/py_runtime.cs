@@ -7,6 +7,19 @@ using System.Reflection;
 
 namespace Pytra.CsModule
 {
+    public sealed class PyArrayComparer<T> : IEqualityComparer<T[]>
+    {
+        public bool Equals(T[] left, T[] right)
+        {
+            return StructuralComparisons.StructuralEqualityComparer.Equals(left, right);
+        }
+
+        public int GetHashCode(T[] value)
+        {
+            return StructuralComparisons.StructuralEqualityComparer.GetHashCode(value);
+        }
+    }
+
     public sealed class PyFile : IDisposable
     {
         private readonly Stream _stream;
@@ -775,6 +788,38 @@ namespace Pytra.CsModule
             return idx;
         }
 
+        public static List<long> range(long stop)
+        {
+            return range(0L, stop, 1L);
+        }
+
+        public static List<long> range(long start, long stop)
+        {
+            return range(start, stop, 1L);
+        }
+
+        public static List<long> range(long start, long stop, long step)
+        {
+            List<long> outv = new List<long>();
+            if (step == 0)
+            {
+                throw new ArgumentException("range() arg 3 must not be zero");
+            }
+            if (step > 0)
+            {
+                for (long value = start; value < stop; value += step)
+                {
+                    outv.Add(value);
+                }
+                return outv;
+            }
+            for (long value = start; value > stop; value += step)
+            {
+                outv.Add(value);
+            }
+            return outv;
+        }
+
         public static string strip(string value)
         {
             return value.Trim();
@@ -850,6 +895,43 @@ namespace Pytra.CsModule
             return source[key];
         }
 
+        public static object py_get(object source, object indexLike)
+        {
+            if (source is string text)
+            {
+                return py_get(text, indexLike);
+            }
+            if (source is IList list)
+            {
+                int idx = NormalizeIndex(Convert.ToInt64(indexLike), list.Count);
+                return list[idx];
+            }
+            if (source is Array array)
+            {
+                int idx = NormalizeIndex(Convert.ToInt64(indexLike), array.Length);
+                return array.GetValue(idx);
+            }
+            throw new ArgumentException("unsupported py_get() source");
+        }
+
+        public static T[] py_array_cast<T>(object value)
+        {
+            if (value is T[] direct)
+            {
+                return direct;
+            }
+            if (value is IEnumerable enumerable)
+            {
+                var outv = new List<T>();
+                foreach (object item in enumerable)
+                {
+                    outv.Add(py_convert_value<T>(item));
+                }
+                return outv.ToArray();
+            }
+            throw new ArgumentException("unsupported array cast");
+        }
+
         public static void py_set<T>(List<T> source, object indexLike, object value)
         {
             int idx = NormalizeIndex(Convert.ToInt64(indexLike), source.Count);
@@ -864,6 +946,16 @@ namespace Pytra.CsModule
         public static void py_append<T>(List<T> source, object value)
         {
             source.Add(py_convert_value<T>(value));
+        }
+
+        public static void extend<T>(List<T> source, IEnumerable<T> values)
+        {
+            source.AddRange(values);
+        }
+
+        public static IEqualityComparer<T[]> array_comparer<T>()
+        {
+            return new PyArrayComparer<T>();
         }
 
         public static List<T> py_repeat<T>(List<T> source, object timesLike)
@@ -1107,6 +1199,10 @@ namespace Pytra.CsModule
             {
                 return Equals(left, right);
             }
+            if (left is Array leftArray && right is Array rightArray)
+            {
+                return StructuralComparisons.StructuralEqualityComparer.Equals(leftArray, rightArray);
+            }
             if (py_is_numeric(left) && py_is_numeric(right))
             {
                 return Convert.ToDouble(left, CultureInfo.InvariantCulture)
@@ -1122,7 +1218,7 @@ namespace Pytra.CsModule
 
         private static string py_format_float(double value)
         {
-            string text = value.ToString("G17", CultureInfo.InvariantCulture).Replace("E", "e");
+            string text = value.ToString("R", CultureInfo.InvariantCulture).Replace("E", "e");
             if (!text.Contains(".") && !text.Contains("E") && !text.Contains("e"))
             {
                 return text + ".0";
@@ -1276,6 +1372,11 @@ namespace Pytra.CsModule
                 return new List<string>(source.Split((char[])null, StringSplitOptions.RemoveEmptyEntries));
             }
             return new List<string>(source.Split(new[] { sep }, StringSplitOptions.None));
+        }
+
+        public static string upper(string value)
+        {
+            return (value ?? "").ToUpperInvariant();
         }
 
         public static bool isspace(string value)
