@@ -28,6 +28,15 @@
 
 ## 未完了タスク
 
+### P0-RUBY-TYPE-ID-CLEANUP: Ruby runtime から __pytra_isinstance を削除する
+
+仕様: [docs/ja/spec/spec-adt.md](../spec/spec-adt.md) §6
+
+Ruby は `is_a?` がネイティブにあるので `__pytra_isinstance` は不要。
+
+1. [ ] [ID: P0-RUBY-TYPEID-CLN-S1] `src/runtime/ruby/built_in/py_runtime.rb` から `__pytra_isinstance` を削除する
+2. [ ] [ID: P0-RUBY-TYPEID-CLN-S2] fixture + sample parity に回帰がないことを確認する
+
 ### P1-RUBY-EMITTER: Ruby emitter を toolchain2 に新規実装する
 
 文脈: [docs/ja/plans/p1-ruby-emitter.md](../plans/p1-ruby-emitter.md)

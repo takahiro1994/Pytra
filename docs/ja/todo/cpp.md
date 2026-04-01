@@ -20,6 +20,16 @@
 
 ## 未完了タスク
 
+### P0-CPP-TYPE-ID-CLEANUP: C++ runtime から PYTRA_TID_* / type_id_support を削除する
+
+仕様: [docs/ja/spec/spec-adt.md](../spec/spec-adt.md) §6
+
+P0-CPP-VARIANT (variant 移行) の完了後に着手。variant 移行で `object` / `type_id` が不要になったら、`PYTRA_TID_*` 定数、`type_id_support.h`、`py_runtime_object_type_id` を削除する。
+
+1. [ ] [ID: P0-CPP-TYPEID-CLN-S1] `src/runtime/cpp/core/py_scalar_types.h` から `PYTRA_TID_*` 定数を削除する
+2. [ ] [ID: P0-CPP-TYPEID-CLN-S2] `src/runtime/cpp/core/type_id_support.h` を削除する
+3. [ ] [ID: P0-CPP-TYPEID-CLN-S3] fixture + sample + stdlib parity に回帰がないことを確認する
+
 ### P0-CPP-VARIANT: C++ を std::variant ベースに移行し object/box/unbox を廃止する
 
 文脈: [docs/ja/plans/plan-cpp-variant-migration.md](../plans/plan-cpp-variant-migration.md)
@@ -29,10 +39,14 @@ union type を `object` に退化させず `std::variant` で表現する。`wor
 
 **Phase 1: variant 出力追加**
 
-1. [ ] [ID: P0-CPP-VARIANT-S1] C++ emitter に `UnionType` → `std::variant<T1, T2, ...>` の型変換パスを追加する
-2. [ ] [ID: P0-CPP-VARIANT-S2] isinstance narrowing を `std::holds_alternative<T>` + `std::get<T>` に変換する
-3. [ ] [ID: P0-CPP-VARIANT-S3] 再帰型を `struct { variant<..., shared_ptr<vector<Self>>> }` で出力する
-4. [ ] [ID: P0-CPP-VARIANT-S4] 基本 union fixture（`int | str`, `str | None` 等）が C++ で PASS することを確認する
+1. [x] [ID: P0-CPP-VARIANT-S1] C++ emitter に `UnionType` → `std::variant<T1, T2, ...>` の型変換パスを追加する
+   - 完了: `src/toolchain/emit/cpp/emitter/type_bridge.py` と `header_builder.py` / `cpp_emitter.py` の type alias 出力を更新し、一般 union を `object`/`_Union_*` へ退化させず `::std::variant<...>` として出力するように変更した。`tools/unittest/emit/cpp/test_cpp_type.py`、`tools/unittest/emit/cpp/test_east3_cpp_bridge.py`、`tools/unittest/emit/cpp/test_py2cpp_features.py` に回帰テストを追加し、対象テストを実行済み。
+2. [x] [ID: P0-CPP-VARIANT-S2] isinstance narrowing を `std::holds_alternative<T>` + `std::get<T>` に変換する
+   - 完了: `src/toolchain/emit/cpp/emitter/runtime_expr.py` の `IsInstance` 出力で general union / alias union を `std::holds_alternative<T>` に変換し、`src/toolchain/emit/cpp/emitter/cpp_emitter.py` の `Unbox` 出力で対応 lane を `std::get<T>` に変換するように更新した。`tools/unittest/emit/cpp/test_east3_cpp_bridge.py` に general union / alias union の narrowing 回帰を追加し、対象テストを実行済み。
+3. [x] [ID: P0-CPP-VARIANT-S3] 再帰型を `struct { variant<..., shared_ptr<vector<Self>>> }` で出力する
+   - 完了: named recursive union alias は `using` ではなく `struct <Name> : ::std::variant<...>` として出力し、自己参照する `list/dict/set` lane は `Object<...>` に持ち上げて前方参照を切るように変更した。`tools/unittest/emit/cpp/test_py2cpp_features.py` に synthetic recursive alias の C++ / header 出力回帰を追加し、`src/pytra/std/json.py --emit-runtime-cpp` の `json.h` でも `struct JsonVal : ::std::variant<...>` を確認した。
+4. [x] [ID: P0-CPP-VARIANT-S4] 基本 union fixture（`int | str`, `str | None` 等）が C++ で PASS することを確認する
+   - 完了: `PYTHONPATH=/workspace/Pytra/src:/workspace/Pytra/tools/check python3 tools/check/runtime_parity_check_fast.py --targets cpp type_alias_pep695 ifexp_optional_inference nested_types none_optional --cmd-timeout-sec 120` を実行し、`type_alias_pep695`（named union alias）、`ifexp_optional_inference`（`str | None`）、`nested_types`（`dict[str, str | None]`）、`none_optional`（`int | None`）の 4 case が C++ parity PASS することを確認した。
 
 **Phase 2: object 型を削除**
 
@@ -57,7 +71,8 @@ union type を `object` に退化させず `std::variant` で表現する。`wor
 
 selfhost で必要な動的型パターン（`dict[str, object]` の items() unpack / get()、`list[object]` の index、str 不要 unbox、`set[tuple[str,str]]`）を網羅する fixture。EAST3 には全て情報が載っている。selfhost build (S5) の前提。
 
-1. [ ] [ID: P0-CPP-OBJ-CONT-S1] `object_container_access` fixture が C++ で compile + run parity PASS することを確認する（失敗なら emitter を修正）
+1. [x] [ID: P0-CPP-OBJ-CONT-S1] `object_container_access` fixture が C++ で compile + run parity PASS することを確認する（失敗なら emitter を修正）
+   - 完了: `src/runtime/cpp/core/py_types.h` に `std::tuple<...>` 向け hash 特殊化を追加し、`set[tuple[str, str]]` の compile failure を解消した。`PYTHONPATH=/workspace/Pytra/src:/workspace/Pytra/tools/check python3 tools/check/runtime_parity_check_fast.py --targets cpp object_container_access --cmd-timeout-sec 120` で parity PASS を確認し、`tools/unittest/emit/cpp/test_object_t.py` に tuple-key set の runtime 回帰テストを追加した。
 
 ### P20-CPP-SELFHOST: C++ emitter で toolchain2 を C++ に変換し g++ build を通す
 

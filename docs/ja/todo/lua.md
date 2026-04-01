@@ -28,6 +28,15 @@
 
 ## 未完了タスク
 
+### P0-LUA-TYPE-ID-CLEANUP: Lua runtime から __pytra_isinstance を削除する
+
+仕様: [docs/ja/spec/spec-adt.md](../spec/spec-adt.md) §6
+
+Lua は `type()` がネイティブにあるので `__pytra_isinstance` は不要。
+
+1. [ ] [ID: P0-LUA-TYPEID-CLN-S1] `src/runtime/lua/built_in/py_runtime.lua` から `__pytra_isinstance` を削除する
+2. [ ] [ID: P0-LUA-TYPEID-CLN-S2] fixture + sample parity に回帰がないことを確認する
+
 ### P1-LUA-EMITTER: Lua emitter を toolchain2 に新規実装する
 
 文脈: [docs/ja/plans/p1-lua-emitter.md](../plans/p1-lua-emitter.md)

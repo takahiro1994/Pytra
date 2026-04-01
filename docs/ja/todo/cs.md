@@ -28,8 +28,16 @@
 
 ## 未完了タスク
 
+### P0-CS-TYPE-ID-CLEANUP: C# runtime から PYTRA_TID_* / pytra_isinstance を削除する
 
-## 未完了タスク
+仕様: [docs/ja/spec/spec-adt.md](../spec/spec-adt.md) §6
+
+C# は `is` / `switch` がネイティブにあるので `PYTRA_TID_*` 定数 (26個)、`pytra_isinstance`、`type_id_table` は不要。
+
+1. [ ] [ID: P0-CS-TYPEID-CLN-S1] `src/runtime/cs/built_in/py_runtime.cs` から `PYTRA_TID_*` 定数と `pytra_isinstance` を削除する
+2. [ ] [ID: P0-CS-TYPEID-CLN-S2] `src/runtime/cs/generated/built_in/type_id.cs` を削除する
+3. [ ] [ID: P0-CS-TYPEID-CLN-S3] C# emitter の isinstance を `x is Type t` に置換する
+4. [ ] [ID: P0-CS-TYPEID-CLN-S4] fixture + sample + stdlib parity に回帰がないことを確認する
 
 ### P3-CS-SELFHOST: C# emitter で toolchain2 を C# に変換し build を通す
 

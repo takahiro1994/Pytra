@@ -27,6 +27,16 @@
 
 ## 未完了タスク
 
+### P0-RS-TYPE-ID-CLEANUP: Rust runtime から PYTRA_TID_* / type_id テーブルを削除する
+
+仕様: [docs/ja/spec/spec-adt.md](../spec/spec-adt.md) §6
+
+Rust emitter が `instanceof` をネイティブ pattern match で処理するようになったら、runtime の `PYTRA_TID_*` 定数と type_id テーブルを削除する。
+
+1. [ ] [ID: P0-RS-TYPEID-CLN-S1] `src/runtime/rs/built_in/py_runtime.rs` から `PYTRA_TID_*` 定数と type_id テーブルを削除する
+2. [ ] [ID: P0-RS-TYPEID-CLN-S2] `pytra_isinstance` / `py_is_subtype` を削除し、emitter は `match` / `if let` を使う
+3. [ ] [ID: P0-RS-TYPEID-CLN-S3] fixture + sample + stdlib parity に回帰がないことを確認する
+
 ### P0-RS-OBJECT-CONTAINER: object_container_access fixture の Rust parity を通す
 
 文脈: [docs/ja/plans/plan-object-container-access-parity.md](../plans/plan-object-container-access-parity.md)

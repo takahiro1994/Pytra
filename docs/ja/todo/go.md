@@ -20,6 +20,16 @@
 
 ## 未完了タスク
 
+### P0-GO-TYPE-ID-CLEANUP: Go runtime から pytra_isinstance / py_runtime_object_type_id を削除する
+
+仕様: [docs/ja/spec/spec-adt.md](../spec/spec-adt.md) §6
+
+Go は `any` + type switch がネイティブにあるので `pytra_isinstance` / `py_runtime_object_type_id` は不要。emitter が type switch を直接生成するようにする。
+
+1. [ ] [ID: P0-GO-TYPEID-CLN-S1] `src/runtime/go/built_in/py_runtime.go` から `pytra_isinstance` と `py_runtime_object_type_id` を削除する
+2. [ ] [ID: P0-GO-TYPEID-CLN-S2] Go emitter の isinstance を `switch v := x.(type)` に置換する
+3. [ ] [ID: P0-GO-TYPEID-CLN-S3] fixture + sample + stdlib parity に回帰がないことを確認する
+
 ### P0-GO-BOOLOP-BOOL-SHORTCIRCUIT: bool 型の and/or を && / || で出力する
 
 `if t > 0.0 and t < t_min:` のように両辺が比較式で期待型が `bool` の場合、Go では `if t > 0.0 && t < t_min {` と出力すべき。現状は値選択式として即時実行クロージャに展開しており、コードが著しく読みにくい。
