@@ -42,7 +42,7 @@ Java は `instanceof` がネイティブにあるので `pytra_built_in_type_id_
 
 今セッションで追加された fixture の Java parity 確認。Python では全て PASS 済み。
 
-1. [ ] [ID: P0-JAVA-NEWFIX-S1] `tuple_unpack_variants` が Java で compile + run parity PASS することを確認する
+1. [x] [ID: P0-JAVA-NEWFIX-S1] `tuple_unpack_variants` が Java で compile + run parity PASS することを確認する（2026-04-01）— old EAST3 lowering の nested `FunctionDef -> ClosureDef` / non-Name listcomp target assignment 漏れを修正し、Java emitter の `ClosureDef` helper emit・unpack・`try/catch`・dynamic Eq・`print(bool)` を補正して `pytra-cli.py --target java --run` で `True`
 2. [ ] [ID: P0-JAVA-NEWFIX-S2] `typed_container_access` が Java で compile + run parity PASS することを確認する
 3. [ ] [ID: P0-JAVA-NEWFIX-S3] `in_membership_iterable` が Java で compile + run parity PASS することを確認する
 4. [ ] [ID: P0-JAVA-NEWFIX-S4] `callable_higher_order` が Java で compile + run parity PASS することを確認する

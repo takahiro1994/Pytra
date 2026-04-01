@@ -135,8 +135,9 @@ def _expand_listcomp_assign(
                 annotation_type = ann_str
     stmts = _expand_listcomp_to_stmts(listcomp, comp_name, annotation_type)
 
-    # If we used a temp name, add final assignment
-    if comp_name != target_name and target_name != "":
+    # If we used a temp name, add final assignment back to the original target.
+    # Non-Name targets (tuple/list unpack etc.) must also receive this assignment.
+    if comp_name != target_name or target_name == "":
         stmts.append({
             "kind": "Assign",
             "target": copy.deepcopy(target),

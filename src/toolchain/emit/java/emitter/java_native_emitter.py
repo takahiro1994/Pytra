@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import copy
+
 from typing import Any
 from toolchain.emit.common.emitter.code_emitter import (
     reject_backend_general_union_type_exprs,
@@ -643,7 +645,12 @@ def _render_compare_expr(expr: dict[str, Any]) -> str:
                 left_resolved = left_resolved_any if isinstance(left_resolved_any, str) else ""
             right_resolved_any = comp_node.get("resolved_type") if isinstance(comp_node, dict) else ""
             right_resolved = right_resolved_any if isinstance(right_resolved_any, str) else ""
+            use_objects_equals = False
             if left_resolved == "str" or right_resolved == "str":
+                use_objects_equals = True
+            if left_resolved in {"object", "unknown", "Any"} or right_resolved in {"object", "unknown", "Any"}:
+                use_objects_equals = True
+            if use_objects_equals:
                 expr_txt = "java.util.Objects.equals(" + cur_left + ", " + right + ")"
                 if op == "NotEq":
                     expr_txt = "!(" + expr_txt + ")"
@@ -780,6 +787,8 @@ _CURRENT_IMPORT_SYMBOLS: dict[str, dict[str, str]] = {}
 _RELATIVE_IMPORT_NAME_ALIASES: dict[str, str] = {}
 _IMPORT_ALIAS_MAP: list[dict[str, str]] = [{}]
 _CURRENT_MODULE_ID_JAVA: list[str] = [""]
+_PENDING_CLOSURE_HELPERS: list[dict[str, Any]] = []
+_CURRENT_CLOSURE_HELPERS: list[dict[str, dict[str, Any]]] = [{}]
 
 
 def _is_extern_call(value_node: Any) -> bool:
@@ -1102,8 +1111,6 @@ def _render_call_via_runtime_call(
     binding_module: str,
     binding_symbol: str,
 ) -> str:
-    if runtime_call in _ASSERTION_RUNTIME_CALLS:
-        return _java_string_literal("True")
     if semantic_tag == "stdlib.symbol.Path":
         if len(args) == 0:
             return "new pathlib.Path(\"\")"
@@ -1150,6 +1157,24 @@ def _render_call_expr(expr: dict[str, Any]) -> str:
     semantic_tag = semantic_tag_any if isinstance(semantic_tag_any, str) else ""
     binding_module, binding_symbol = _resolved_call_binding(expr)
     callee_name = _call_name(expr)
+    closure_info = _CURRENT_CLOSURE_HELPERS[0].get(callee_name)
+    if closure_info is not None:
+        helper_name_any = closure_info.get("helper_name")
+        helper_name = helper_name_any if isinstance(helper_name_any, str) else ""
+        capture_names_any = closure_info.get("capture_names")
+        capture_names = capture_names_any if isinstance(capture_names_any, list) else []
+        rendered_closure_args: list[str] = []
+        i = 0
+        while i < len(capture_names):
+            capture_name = capture_names[i]
+            if isinstance(capture_name, str) and capture_name != "":
+                rendered_closure_args.append(_safe_ident(capture_name, "capture"))
+            i += 1
+        i = 0
+        while i < len(args):
+            rendered_closure_args.append(_render_expr(args[i]))
+            i += 1
+        return helper_name + "(" + ", ".join(rendered_closure_args) + ")"
     resolved_type_any = expr.get("resolved_type")
     resolved_type = resolved_type_any if isinstance(resolved_type_any, str) else ""
     if semantic_tag == "stdlib.symbol.Path" or (
@@ -1260,11 +1285,11 @@ def _render_call_expr(expr: dict[str, Any]) -> str:
             arg_expr = _render_expr(args[0])
             if arg_expr == "null":
                 return 'System.out.println((String) null)'
-            return "System.out.println(" + arg_expr + ")"
+            return "System.out.println(PyRuntime.pyToString(" + arg_expr + "))"
         rendered: list[str] = []
         i = 0
         while i < len(args):
-            rendered.append("String.valueOf(" + _render_expr(args[i]) + ")")
+            rendered.append("PyRuntime.pyToString(" + _render_expr(args[i]) + ")")
             i += 1
         return "System.out.println(" + " + \" \" + ".join(rendered) + ")"
     if callee_name in {"RuntimeError", "ValueError", "TypeError", "Exception", "AssertionError"}:
@@ -2067,69 +2092,108 @@ def _try_emit_tuple_assign(
     if not isinstance(target_any, dict):
         return None
     tad: dict[str, Any] = target_any
-    if tad.get("kind") != "Tuple":
+    target_kind = tad.get("kind")
+    if target_kind != "Tuple" and target_kind != "List":
         return None
-    elems_any = tad.get("elements")
+    return _emit_unpack_target(target_any, value_any, decl_type_any=decl_type_any, declare_hint=declare_hint, indent=indent, ctx=ctx)
+
+
+def _repeated_element_types(type_name: Any, count: int) -> list[str]:
+    if not isinstance(type_name, str):
+        return []
+    type_text = type_name.strip()
+    if not (type_text.startswith("list[") and type_text.endswith("]")):
+        return []
+    elem_type = type_text[5:-1].strip()
+    if elem_type == "":
+        return []
+    out: list[str] = []
+    i = 0
+    while i < count:
+        out.append(elem_type)
+        i += 1
+    return out
+
+
+def _emit_unpack_target(
+    target_any: Any,
+    value_any: Any,
+    *,
+    decl_type_any: Any,
+    declare_hint: bool,
+    indent: str,
+    ctx: dict[str, Any],
+) -> list[str] | None:
+    if not isinstance(target_any, dict):
+        return None
+    td: dict[str, Any] = target_any
+    kind = td.get("kind")
+    declared = _declared_set(ctx)
+    type_map = _type_map(ctx)
+    if kind == "Name":
+        java_type = _java_type(td.get("resolved_type"), allow_void=False)
+        if java_type == "Object":
+            inferred = _java_type(decl_type_any, allow_void=False)
+            if inferred != "void":
+                java_type = inferred
+        rhs = _cast_from_object(_render_expr(value_any), java_type)
+        name = _safe_ident(td.get("id"), "tmp")
+        if declare_hint:
+            if name in declared:
+                return [indent + name + " = " + rhs + ";"]
+            declared.add(name)
+            type_map[name] = java_type
+            return [indent + java_type + " " + name + " = " + rhs + ";"]
+        if name not in declared:
+            declared.add(name)
+            type_map[name] = java_type
+            return [indent + java_type + " " + name + " = " + rhs + ";"]
+        return [indent + name + " = " + rhs + ";"]
+    if kind == "Subscript":
+        owner = _render_expr(td.get("value"))
+        index = _render_expr(td.get("slice"))
+        target_type = _java_type(td.get("resolved_type"), allow_void=False)
+        if target_type == "Object":
+            inferred = _java_type(decl_type_any, allow_void=False)
+            if inferred != "void":
+                target_type = inferred
+        rhs = _cast_from_object(_render_expr(value_any), target_type)
+        norm_index = _normalize_index_expr(owner, index)
+        return [indent + owner + ".set((int)(" + norm_index + "), " + rhs + ");"]
+    if kind != "Tuple" and kind != "List":
+        return None
+    elems_any = td.get("elements")
     elems = elems_any if isinstance(elems_any, list) else []
     if len(elems) == 0:
         return None
-    i = 0
-    while i < len(elems):
-        elem = elems[i]
-        if not isinstance(elem, dict):
-            return None
-        ed: dict[str, Any] = elem
-        kind = ed.get("kind")
-        if kind != "Name" and kind != "Subscript":
-            return None
-        i += 1
     tuple_tmp = _fresh_tmp(ctx, "tuple")
-    tuple_expr = _render_expr(value_any)
-    lines: list[str] = [indent + "java.util.ArrayList<Object> " + tuple_tmp + " = ((java.util.ArrayList<Object>)(Object)(" + tuple_expr + "));"]
-    declared = _declared_set(ctx)
-    type_map = _type_map(ctx)
+    lines: list[str] = [indent + "java.util.ArrayList<Object> " + tuple_tmp + " = ((java.util.ArrayList<Object>)(Object)(" + _render_expr(value_any) + "));"]
     tuple_types = _tuple_element_types(decl_type_any)
+    if len(tuple_types) == 0:
+        tuple_types = _repeated_element_types(decl_type_any, len(elems))
     if len(tuple_types) == 0 and isinstance(value_any, dict):
-        vd2: dict[str, Any] = value_any
-        tuple_types = _tuple_element_types(vd2.get("resolved_type"))
+        tuple_types = _tuple_element_types(value_any.get("resolved_type"))
+        if len(tuple_types) == 0:
+            tuple_types = _repeated_element_types(value_any.get("resolved_type"), len(elems))
     i = 0
     while i < len(elems):
         elem = elems[i]
         if not isinstance(elem, dict):
-            i += 1
-            continue
-        emd: dict[str, Any] = elem
-        kind = emd.get("kind")
-        java_type = "Object"
+            return None
+        elem_type_any: Any = ""
         if i < len(tuple_types):
-            inferred = _java_type(tuple_types[i], allow_void=False)
-            java_type = "Object" if inferred == "void" else inferred
-        rhs = _cast_from_object(tuple_tmp + ".get(" + str(i) + ")", java_type)
-        if kind == "Name":
-            name = _safe_ident(emd.get("id"), "tmp_" + str(i))
-            if declare_hint:
-                if name in declared:
-                    lines.append(indent + name + " = " + rhs + ";")
-                else:
-                    lines.append(indent + java_type + " " + name + " = " + rhs + ";")
-                    declared.add(name)
-                    type_map[name] = java_type
-            else:
-                if name not in declared:
-                    lines.append(indent + java_type + " " + name + " = " + rhs + ";")
-                    declared.add(name)
-                    type_map[name] = java_type
-                else:
-                    lines.append(indent + name + " = " + rhs + ";")
-        else:
-            owner = _render_expr(emd.get("value"))
-            index = _render_expr(emd.get("slice"))
-            target_type = _java_type(emd.get("resolved_type"), allow_void=False)
-            if target_type == "Object":
-                target_type = java_type
-            rhs_for_target = _cast_from_object(tuple_tmp + ".get(" + str(i) + ")", target_type)
-            norm_index = _normalize_index_expr(owner, index)
-            lines.append(indent + owner + ".set((int)(" + norm_index + "), " + rhs_for_target + ");")
+            elem_type_any = tuple_types[i]
+        child_lines = _emit_unpack_target(
+            elem,
+            {"kind": "Subscript", "value": {"kind": "Name", "id": tuple_tmp}, "slice": {"kind": "Constant", "value": i}},
+            decl_type_any=elem_type_any,
+            declare_hint=declare_hint,
+            indent=indent,
+            ctx=ctx,
+        )
+        if child_lines is None:
+            return None
+        lines.extend(child_lines)
         i += 1
     return lines
 
@@ -2552,13 +2616,21 @@ def _emit_stmt(stmt: Any, *, indent: str, ctx: dict[str, Any]) -> list[str]:
         lines.append(indent + "}")
         return lines
     if kind == "Try":
-        lines: list[str] = []
+        lines: list[str] = [indent + "try {"]
         body_any = sd2.get("body")
         body = body_any if isinstance(body_any, list) else []
+        body_ctx: dict[str, Any] = {
+            "tmp": ctx.get("tmp", 0),
+            "declared": set(_declared_set(ctx)),
+            "types": dict(_type_map(ctx)),
+            "return_type": ctx.get("return_type", ""),
+        }
         i = 0
         while i < len(body):
-            lines.extend(_emit_stmt(body[i], indent=indent, ctx=ctx))
+            lines.extend(_emit_stmt(body[i], indent=indent + "    ", ctx=body_ctx))
             i += 1
+        ctx["tmp"] = body_ctx.get("tmp", ctx.get("tmp", 0))
+        lines.append(indent + "}")
         handlers_any = sd2.get("handlers")
         handlers = handlers_any if isinstance(handlers_any, list) else []
         i = 0
@@ -2566,24 +2638,43 @@ def _emit_stmt(stmt: Any, *, indent: str, ctx: dict[str, Any]) -> list[str]:
             h = handlers[i]
             if isinstance(h, dict):
                 hd: dict[str, Any] = h
+                lines.append(indent + "catch (Exception __pytra_err_" + str(i) + ") {")
                 h_body_any = hd.get("body")
                 h_body = h_body_any if isinstance(h_body_any, list) else []
+                h_ctx: dict[str, Any] = {
+                    "tmp": ctx.get("tmp", 0),
+                    "declared": set(_declared_set(ctx)),
+                    "types": dict(_type_map(ctx)),
+                    "return_type": ctx.get("return_type", ""),
+                }
                 j = 0
                 while j < len(h_body):
-                    lines.extend(_emit_stmt(h_body[j], indent=indent, ctx=ctx))
+                    lines.extend(_emit_stmt(h_body[j], indent=indent + "    ", ctx=h_ctx))
                     j += 1
+                ctx["tmp"] = h_ctx.get("tmp", ctx.get("tmp", 0))
+                lines.append(indent + "}")
             i += 1
+        final_any = sd2.get("finalbody")
+        final = final_any if isinstance(final_any, list) else []
+        if len(final) > 0:
+            lines.append(indent + "finally {")
+            final_ctx: dict[str, Any] = {
+                "tmp": ctx.get("tmp", 0),
+                "declared": set(_declared_set(ctx)),
+                "types": dict(_type_map(ctx)),
+                "return_type": ctx.get("return_type", ""),
+            }
+            i = 0
+            while i < len(final):
+                lines.extend(_emit_stmt(final[i], indent=indent + "    ", ctx=final_ctx))
+                i += 1
+            ctx["tmp"] = final_ctx.get("tmp", ctx.get("tmp", 0))
+            lines.append(indent + "}")
         orelse_any = sd2.get("orelse")
         orelse = orelse_any if isinstance(orelse_any, list) else []
         i = 0
         while i < len(orelse):
             lines.extend(_emit_stmt(orelse[i], indent=indent, ctx=ctx))
-            i += 1
-        final_any = sd2.get("finalbody")
-        final = final_any if isinstance(final_any, list) else []
-        i = 0
-        while i < len(final):
-            lines.extend(_emit_stmt(final[i], indent=indent, ctx=ctx))
             i += 1
         return lines
     if kind == "VarDecl":
@@ -2594,6 +2685,8 @@ def _emit_stmt(stmt: Any, *, indent: str, ctx: dict[str, Any]) -> list[str]:
         type_map[name] = var_type
         declared.add(name)
         return [indent + var_type + " " + name + " = " + _default_return_expr(var_type) + ";"]
+    if kind == "ClosureDef":
+        return []
 
     raise RuntimeError("java native emitter: unsupported stmt kind: " + str(kind))
 
@@ -2604,6 +2697,28 @@ def _stmt_guarantees_return(stmt: Any) -> bool:
     sd: dict[str, Any] = stmt
     kind = sd.get("kind")
     if kind == "Return" or kind == "Raise":
+        return True
+    if kind == "Try":
+        final_any = sd.get("finalbody")
+        finalbody = final_any if isinstance(final_any, list) else []
+        if len(finalbody) > 0:
+            return _block_guarantees_return(finalbody)
+        body_any = sd.get("body")
+        body = body_any if isinstance(body_any, list) else []
+        handlers_any = sd.get("handlers")
+        handlers = handlers_any if isinstance(handlers_any, list) else []
+        if len(handlers) == 0 or not _block_guarantees_return(body):
+            return False
+        i = 0
+        while i < len(handlers):
+            handler = handlers[i]
+            if not isinstance(handler, dict):
+                return False
+            hbody_any = handler.get("body")
+            hbody = hbody_any if isinstance(hbody_any, list) else []
+            if not _block_guarantees_return(hbody):
+                return False
+            i += 1
         return True
     if kind != "If":
         return False
@@ -2623,6 +2738,75 @@ def _block_guarantees_return(body: list[Any]) -> bool:
             return True
         i += 1
     return False
+
+
+def _closure_helper_info(owner_name: str, node: dict[str, Any]) -> dict[str, Any]:
+    helper_name = "__closure_" + _safe_ident(owner_name, "owner") + "_" + _safe_ident(node.get("name"), "closure")
+    captures_any = node.get("captures")
+    captures = captures_any if isinstance(captures_any, list) else []
+    capture_names: list[str] = []
+    capture_types: dict[str, str] = {}
+    i = 0
+    while i < len(captures):
+        capture = captures[i]
+        if isinstance(capture, dict):
+            capture_name = capture.get("name")
+            if isinstance(capture_name, str) and capture_name != "":
+                capture_names.append(capture_name)
+                capture_type = capture.get("type")
+                if not isinstance(capture_type, str) or capture_type == "":
+                    capture_types_any = node.get("capture_types")
+                    if isinstance(capture_types_any, dict):
+                        fallback_type = capture_types_any.get(capture_name)
+                        capture_type = fallback_type if isinstance(fallback_type, str) else ""
+                if not isinstance(capture_type, str) or capture_type == "":
+                    capture_type = "Object"
+                capture_types[capture_name] = capture_type
+        i += 1
+    return {
+        "helper_name": helper_name,
+        "capture_names": capture_names,
+        "capture_types": capture_types,
+        "local_name": node.get("name"),
+    }
+
+
+def _queue_closure_helper(owner_name: str, node: dict[str, Any]) -> dict[str, Any]:
+    helper_info = _closure_helper_info(owner_name, node)
+    helper_node: dict[str, Any] = copy.deepcopy(node)
+    helper_arg_order: list[str] = []
+    helper_arg_types: dict[str, str] = {}
+    capture_names_any = helper_info.get("capture_names")
+    capture_names = capture_names_any if isinstance(capture_names_any, list) else []
+    capture_types_any = helper_info.get("capture_types")
+    capture_types = capture_types_any if isinstance(capture_types_any, dict) else {}
+    i = 0
+    while i < len(capture_names):
+        capture_name = capture_names[i]
+        if isinstance(capture_name, str) and capture_name != "":
+            helper_arg_order.append(capture_name)
+            capture_type = capture_types.get(capture_name)
+            helper_arg_types[capture_name] = capture_type if isinstance(capture_type, str) and capture_type != "" else "Object"
+        i += 1
+    arg_order_any = node.get("arg_order")
+    arg_order = arg_order_any if isinstance(arg_order_any, list) else []
+    arg_types_any = node.get("arg_types")
+    arg_types = arg_types_any if isinstance(arg_types_any, dict) else {}
+    i = 0
+    while i < len(arg_order):
+        arg_name = arg_order[i]
+        if isinstance(arg_name, str) and arg_name != "":
+            helper_arg_order.append(arg_name)
+            arg_type = arg_types.get(arg_name)
+            helper_arg_types[arg_name] = arg_type if isinstance(arg_type, str) and arg_type != "" else "Object"
+        i += 1
+    helper_node["kind"] = "FunctionDef"
+    helper_node["name"] = helper_info["helper_name"]
+    helper_node["arg_order"] = helper_arg_order
+    helper_node["arg_types"] = helper_arg_types
+    helper_node["closure_local_name"] = helper_info["local_name"]
+    _PENDING_CLOSURE_HELPERS.append(helper_node)
+    return helper_info
 
 
 def _emit_function(fn: dict[str, Any], *, indent: str, in_class: bool) -> list[str]:
@@ -2688,6 +2872,21 @@ def _emit_function_in_class(
     body_any = fn.get("body")
     body = body_any if isinstance(body_any, list) else []
     ctx: dict[str, Any] = {"tmp": 0, "declared": set(), "types": {}, "return_type": return_type}
+    saved_closure_helpers = dict(_CURRENT_CLOSURE_HELPERS[0])
+    local_closure_helpers: dict[str, dict[str, Any]] = {}
+    local_name_any = fn.get("closure_local_name")
+    if isinstance(local_name_any, str) and local_name_any != "":
+        local_closure_helpers[local_name_any] = _closure_helper_info(name, fn)
+    i = 0
+    while i < len(body):
+        stmt = body[i]
+        if isinstance(stmt, dict) and stmt.get("kind") == "ClosureDef":
+            stmt_name = stmt.get("name")
+            if isinstance(stmt_name, str) and stmt_name != "":
+                local_closure_helpers[stmt_name] = _queue_closure_helper(name, stmt)
+        i += 1
+    _CURRENT_CLOSURE_HELPERS[0] = dict(saved_closure_helpers)
+    _CURRENT_CLOSURE_HELPERS[0].update(local_closure_helpers)
     param_names = _function_param_names(fn, drop_self=drop_self)
     arg_types_any = fn.get("arg_types")
     arg_types = arg_types_any if isinstance(arg_types_any, dict) else {}
@@ -2710,6 +2909,7 @@ def _emit_function_in_class(
     if (not is_constructor) and return_type != "void" and not _block_guarantees_return(body):
         lines.append(indent + "    return " + _default_return_expr(return_type) + ";")
     lines.append(indent + "}")
+    _CURRENT_CLOSURE_HELPERS[0] = saved_closure_helpers
     return lines
 
 
@@ -2834,9 +3034,13 @@ def transpile_to_java_native(east_doc: dict[str, Any], class_name: str = "Main",
 
     prev_import_symbols = dict(_CURRENT_IMPORT_SYMBOLS)
     prev_relative_import_aliases = dict(_RELATIVE_IMPORT_NAME_ALIASES)
+    prev_pending_closure_helpers = list(_PENDING_CLOSURE_HELPERS)
+    prev_current_closure_helpers = dict(_CURRENT_CLOSURE_HELPERS[0])
     try:
         _CURRENT_IMPORT_SYMBOLS.clear()
         _RELATIVE_IMPORT_NAME_ALIASES.clear()
+        _PENDING_CLOSURE_HELPERS.clear()
+        _CURRENT_CLOSURE_HELPERS[0] = {}
         _RELATIVE_IMPORT_NAME_ALIASES.update(_collect_relative_import_name_aliases(east_doc))
         meta = east_doc.get("meta") if isinstance(east_doc.get("meta"), dict) else {}
         from toolchain.emit.common.emitter.code_emitter import build_import_alias_map
@@ -2964,6 +3168,12 @@ def transpile_to_java_native(east_doc: dict[str, Any], class_name: str = "Main",
             lines.extend(_emit_function(functions[i], indent="    ", in_class=False))
             i += 1
 
+        helper_index = 0
+        while helper_index < len(_PENDING_CLOSURE_HELPERS):
+            lines.append("")
+            lines.extend(_emit_function(_PENDING_CLOSURE_HELPERS[helper_index], indent="    ", in_class=False))
+            helper_index += 1
+
         if is_entry:
             if emit_main:
                 lines.append("")
@@ -3014,3 +3224,6 @@ def transpile_to_java_native(east_doc: dict[str, Any], class_name: str = "Main",
         _CURRENT_IMPORT_SYMBOLS.update(prev_import_symbols)
         _RELATIVE_IMPORT_NAME_ALIASES.clear()
         _RELATIVE_IMPORT_NAME_ALIASES.update(prev_relative_import_aliases)
+        _PENDING_CLOSURE_HELPERS.clear()
+        _PENDING_CLOSURE_HELPERS.extend(prev_pending_closure_helpers)
+        _CURRENT_CLOSURE_HELPERS[0] = prev_current_closure_helpers

@@ -378,6 +378,133 @@ class East2ToEast3LoweringTest(East23LoweringNominalAdtFixtureMixin, unittest.Te
         self.assertEqual(inner_body[0].get("kind"), "ForCore")
         self.assertEqual(inner_body[0].get("iter_mode"), "static_fastpath")
 
+    def test_lower_nested_function_defs_to_closure_defs_with_captures(self) -> None:
+        east2 = {
+            "kind": "Module",
+            "meta": {"dispatch_mode": "native"},
+            "body": [
+                {
+                    "kind": "FunctionDef",
+                    "name": "outer",
+                    "arg_types": {"seed": "int64", "bump": "int64"},
+                    "arg_order": ["seed", "bump"],
+                    "arg_defaults": {},
+                    "return_type": "int64",
+                    "body": [
+                        {
+                            "kind": "AnnAssign",
+                            "target": {"kind": "Name", "id": "x", "resolved_type": "int64"},
+                            "annotation": "int64",
+                            "decl_type": "int64",
+                            "value": {"kind": "Name", "id": "seed", "resolved_type": "int64"},
+                            "declare": True,
+                        },
+                        {
+                            "kind": "AnnAssign",
+                            "target": {"kind": "Name", "id": "scale", "resolved_type": "int64"},
+                            "annotation": "int64",
+                            "decl_type": "int64",
+                            "value": _const_i(2),
+                            "declare": True,
+                        },
+                        {
+                            "kind": "FunctionDef",
+                            "name": "inner",
+                            "arg_types": {"y": "int64"},
+                            "arg_order": ["y"],
+                            "arg_defaults": {},
+                            "return_type": "int64",
+                            "body": [
+                                {
+                                    "kind": "Return",
+                                    "value": {
+                                        "kind": "BinOp",
+                                        "left": {
+                                            "kind": "BinOp",
+                                            "left": {"kind": "Name", "id": "x", "resolved_type": "int64"},
+                                            "op": "Add",
+                                            "right": {"kind": "Name", "id": "scale", "resolved_type": "int64"},
+                                            "resolved_type": "int64",
+                                        },
+                                        "op": "Add",
+                                        "right": {"kind": "Name", "id": "y", "resolved_type": "int64"},
+                                        "resolved_type": "int64",
+                                    },
+                                }
+                            ],
+                        },
+                        {
+                            "kind": "Assign",
+                            "target": {"kind": "Name", "id": "x", "resolved_type": "int64"},
+                            "value": {
+                                "kind": "BinOp",
+                                "left": {"kind": "Name", "id": "x", "resolved_type": "int64"},
+                                "op": "Add",
+                                "right": {"kind": "Name", "id": "bump", "resolved_type": "int64"},
+                                "resolved_type": "int64",
+                            },
+                        },
+                    ],
+                }
+            ],
+        }
+
+        out = lower_east2_to_east3(east2)
+        outer = out.get("body", [])[0]
+        inner = outer.get("body", [])[2]
+
+        self.assertEqual(inner.get("kind"), "ClosureDef")
+        self.assertEqual(inner.get("capture_types"), {"scale": "int64", "x": "int64"})
+        self.assertEqual(inner.get("capture_modes"), {"scale": "readonly", "x": "mutable"})
+
+    def test_lower_listcomp_assign_preserves_non_name_target_assignment(self) -> None:
+        east2 = {
+            "kind": "Module",
+            "meta": {"dispatch_mode": "native"},
+            "body": [
+                {
+                    "kind": "Assign",
+                    "target": {
+                        "kind": "List",
+                        "elements": [
+                            {"kind": "Name", "id": "x", "resolved_type": "unknown"},
+                            {"kind": "Name", "id": "y", "resolved_type": "unknown"},
+                            {"kind": "Name", "id": "z", "resolved_type": "unknown"},
+                        ],
+                    },
+                    "declare": True,
+                    "decl_type": "list[int64]",
+                    "value": {
+                        "kind": "ListComp",
+                        "resolved_type": "list[int64]",
+                        "elt": {"kind": "Name", "id": "i", "resolved_type": "int64"},
+                        "generators": [
+                            {
+                                "kind": "comprehension",
+                                "target": {"kind": "Name", "id": "i", "resolved_type": "int64"},
+                                "iter": {
+                                    "kind": "RangeExpr",
+                                    "start": _const_i(0),
+                                    "stop": _const_i(3),
+                                    "step": _const_i(1),
+                                },
+                                "ifs": [],
+                            }
+                        ],
+                    },
+                }
+            ],
+        }
+
+        out = lower_east2_to_east3(east2)
+        body = out.get("body", [])
+        self.assertEqual(body[0].get("kind"), "AnnAssign")
+        self.assertEqual(body[1].get("kind"), "ForCore")
+        self.assertEqual(body[2].get("kind"), "Assign")
+        self.assertEqual(body[2].get("target", {}).get("kind"), "List")
+        self.assertEqual(body[2].get("value", {}).get("kind"), "Name")
+        self.assertEqual(body[2].get("value", {}).get("id"), "__comp_1")
+
     def test_invalid_dispatch_mode_falls_back_to_native(self) -> None:
         east2 = {
             "kind": "Module",
