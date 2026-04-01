@@ -369,13 +369,29 @@ def implemented_langs() -> set[str]:
 def build_matrix(
     hits: list[tuple[str, str, Path, int, str]],
     langs: list[str],
+    *,
+    include_runtime: bool = False,
 ) -> dict[str, dict[str, int | None]]:
     """None = 未実装、0以上 = 実装済み（違反数）"""
     impl = implemented_langs()
+    all_cats: dict[str, list[str]] = dict(CATEGORIES)
+    if include_runtime:
+        for k, v in RUNTIME_CATEGORIES.items():
+            all_cats[k] = v
     mat: dict[str, dict[str, int | None]] = {
         cat: {lang: (0 if lang in impl else None) for lang in langs}
-        for cat in CATEGORIES
+        for cat in all_cats
     }
+    # runtime カテゴリは runtime ディレクトリの存在で判定
+    if include_runtime:
+        runtime_root = ROOT / "src" / "runtime"
+        for cat in RUNTIME_CATEGORIES:
+            for lang in langs:
+                runtime_dir_name = {k: d for k, d in ALL_LANGS_ORDERED}.get(lang, lang)
+                if (runtime_root / runtime_dir_name).exists():
+                    mat[cat][lang] = 0
+                else:
+                    mat[cat][lang] = None
     for lang, cat, _f, _ln, _line in hits:
         if cat in mat and lang in mat[cat]:
             mat[cat][lang] = (mat[cat][lang] or 0) + 1
@@ -430,12 +446,28 @@ def _count_cell(n: int | None) -> str:
     return "—" if n is None or n == 0 else str(n)
 
 
+def _all_category_labels(mat: dict[str, dict[str, int | None]]) -> dict[str, str]:
+    """Return combined emitter + runtime category labels for categories present in mat."""
+    labels: dict[str, str] = {}
+    for cat in mat:
+        if cat in CATEGORY_LABELS:
+            labels[cat] = CATEGORY_LABELS[cat]
+        elif cat in RUNTIME_CATEGORY_LABELS:
+            labels[cat] = RUNTIME_CATEGORY_LABELS[cat]
+        else:
+            labels[cat] = cat
+    return labels
+
+
 def print_matrix(mat: dict[str, dict[str, int | None]], langs: list[str]) -> None:
     header = "| カテゴリ           | " + " | ".join(langs) + " |"
     sep    = "|" + "-" * (len(header) - 2) + "|"
     print(header)
     print(sep)
-    for cat, label in CATEGORY_LABELS.items():
+    all_labels = _all_category_labels(mat)
+    for cat, label in all_labels.items():
+        if cat not in mat:
+            continue
         cells = [_cell(mat[cat][l]) for l in langs]
         print(f"| {label} | " + " | ".join(cells) + " |")
     # Totals rows
@@ -662,7 +694,7 @@ def main() -> int:
     total = len(hits)
     print(f"\n=== emitter hardcode lint — {total} 件の違反 ===\n")
 
-    mat = build_matrix(hits, all_langs)
+    mat = build_matrix(hits, all_langs, include_runtime=args.include_runtime)
     print_matrix(mat, all_langs)
 
     if args.verbose and hits:
