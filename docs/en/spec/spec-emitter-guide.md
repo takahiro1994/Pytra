@@ -767,13 +767,26 @@ EAST の `type_expr` は `OptionalType` と `UnionType` を明確に区別する
 | `UnionType(general)` | `T1 \| T2`（None なし） |
 | `OptionalType(inner=UnionType)` | `T1 \| T2 \| None` |
 
-#### 言語別の写像例
+#### 言語別の写像（仕様目標）
 
-| EAST | C++ | Go | Rust | Java | C# | TS |
+[spec-adt.md §3](./spec-adt.md) で定義する各言語の変換先を目標とする。
+
+| EAST | C++ | Rust | Go | Java | C# | TS |
 |---|---|---|---|---|---|---|
-| `OptionalType(T)` | `std::optional<T>` | `*T` / nil | `Option<T>` | `T` (nullable) / `Optional<T>` | `T?` | `T \| null` |
-| `UnionType(general)` | `std::variant<T1, T2>` | `any` | `enum { T1(T1), T2(T2) }` | `Object` | `object` | `T1 \| T2` |
-| `OptionalType(UnionType)` | 下記参照 | `any` | `Option<enum>` | `Object` | `object?` | `T1 \| T2 \| null` |
+| `OptionalType(T)` | `std::optional<T>` | `Option<T>` | `*T` / nil | `T` (nullable) | `T?` | `T \| null` |
+| `UnionType(general)` | `std::variant<T1, T2>` | `enum { T1(T1), T2(T2) }` | `any` | `Object` | `object` | `T1 \| T2` |
+| `OptionalType(UnionType)` | 下記参照 | `Option<enum>` | `any` | `Object` | `object?` | `T1 \| T2 \| null` |
+
+#### 現行実装との乖離
+
+| 言語 | `UnionType(general)` の仕様目標 | 現行実装 | 備考 |
+|---|---|---|---|
+| C++ | `std::variant<T1, T2>` | `std::variant<T1, T2>` | 実装済み |
+| TS | `T1 \| T2` | `T1 \| T2` | 実装済み（ネイティブ union） |
+| Rust | `enum { T1(T1), T2(T2) }` | `PyAny` / `Box<dyn Any>` | 型安全 enum 未実装 |
+| Go | `any` | `any` | 仕様どおり |
+| Java | `Object` | `Object` | 仕様どおり |
+| C# | `object` | `object` | 仕様どおり |
 
 #### C++ の `OptionalType(inner=UnionType)` 写像
 
