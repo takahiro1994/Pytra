@@ -163,6 +163,11 @@ def _java_ref_type(type_name: Any) -> str:
         if len(parts) == 2:
             return "java.util.HashMap<" + _java_ref_type(parts[0]) + ", " + _java_ref_type(parts[1]) + ">"
         return "java.util.HashMap<Object, Object>"
+    if tn.startswith("set["):
+        elems = _split_type_args(tn, "set")
+        if len(elems) == 1:
+            return "java.util.LinkedHashSet<" + _java_ref_type(elems[0]) + ">"
+        return "java.util.LinkedHashSet<Object>"
     if tn.startswith("tuple["):
         return "java.util.ArrayList<Object>"
     if tn in {"unknown", "object", "any", "None"}:
@@ -206,6 +211,11 @@ def _java_type(type_name: Any, *, allow_void: bool) -> str:
         if len(parts) == 2:
             return "java.util.HashMap<" + _java_ref_type(parts[0]) + ", " + _java_ref_type(parts[1]) + ">"
         return "java.util.HashMap<Object, Object>"
+    if tn.startswith("set["):
+        elems = _split_type_args(tn, "set")
+        if len(elems) == 1:
+            return "java.util.LinkedHashSet<" + _java_ref_type(elems[0]) + ">"
+        return "java.util.LinkedHashSet<Object>"
     if tn.startswith("tuple["):
         return "java.util.ArrayList<Object>"
     if tn.isidentifier():
@@ -624,16 +634,7 @@ def _render_compare_expr(expr: dict[str, Any]) -> str:
         right = _render_expr(comp_node)
         op = ops[i]
         if op == "In" or op == "NotIn":
-            expr_txt = right + ".contains(" + cur_left + ")"
-            if isinstance(comp_node, dict):
-                cd: dict[str, Any] = comp_node
-                comp_resolved = cd.get("resolved_type")
-                if isinstance(comp_resolved, str):
-                    cs: str = comp_resolved
-                    if cs.startswith("dict["):
-                        expr_txt = right + ".containsKey(" + cur_left + ")"
-                    elif comp_resolved == "str":
-                        expr_txt = right + ".contains(String.valueOf(" + cur_left + "))"
+            expr_txt = "PyRuntime.pyIn(" + cur_left + ", " + right + ")"
             if op == "NotIn":
                 expr_txt = "!(" + expr_txt + ")"
             parts.append("(" + expr_txt + ")")
@@ -1274,6 +1275,14 @@ def _render_call_expr(expr: dict[str, Any]) -> str:
         if len(args) == 0:
             return "new java.util.ArrayList<Object>()"
         return "PyRuntime.__pytra_enumerate(" + _render_expr(args[0]) + ")"
+    if callee_name == "range":
+        if len(args) == 1:
+            return "PyRuntime.pyRange(0, (int)(" + _render_expr(args[0]) + "), 1)"
+        if len(args) == 2:
+            return "PyRuntime.pyRange((int)(" + _render_expr(args[0]) + "), (int)(" + _render_expr(args[1]) + "), 1)"
+        if len(args) >= 3:
+            return "PyRuntime.pyRange((int)(" + _render_expr(args[0]) + "), (int)(" + _render_expr(args[1]) + "), (int)(" + _render_expr(args[2]) + "))"
+        return "new java.util.ArrayList<Object>()"
     if callee_name == "isinstance":
         if len(args) < 2:
             return "false"
@@ -1545,6 +1554,21 @@ def _render_expr(expr: Any) -> str:
         if dict_type != "java.util.HashMap<Object, Object>":
             return "((" + dict_type + ")(Object)(" + base + "))"
         return base
+    if kind == "Set":
+        elements_any = ed4.get("elements")
+        elements = elements_any if isinstance(elements_any, list) else []
+        resolved_any = ed4.get("resolved_type")
+        set_type = _java_type(resolved_any, allow_void=False)
+        if not set_type.startswith("java.util.LinkedHashSet<"):
+            set_type = "java.util.LinkedHashSet<Object>"
+        if len(elements) == 0:
+            return "new " + set_type + "()"
+        rendered: list[str] = []
+        i = 0
+        while i < len(elements):
+            rendered.append(_render_expr(elements[i]))
+            i += 1
+        return "new " + set_type + "(java.util.Arrays.asList(" + ", ".join(rendered) + "))"
     if kind == "ListComp":
         return "new java.util.ArrayList<Object>()"
     if kind == "IfExp":
