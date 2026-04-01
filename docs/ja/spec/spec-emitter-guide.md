@@ -47,6 +47,36 @@ emitter が許可されるのは:
 
 **EAST の情報が不足している場合は、emitter にワークアラウンドを書くのではなく、EAST（resolve/compile/optimize）を修正すること。**
 
+### 1.5 `str()` / `int()` 等のビルトインキャストと boxing 回避
+
+`str(x)` は EAST3 で `semantic_tag: "cast.str"` / `runtime_call: "py_to_string"` に lower される。EAST3 の `call_arg_type` は `Obj`（object 期待）になっているが、**emitter は `call_arg_type` ではなく引数の `resolved_type` を見て、具体型のまま runtime 関数を呼ぶこと。**
+
+```python
+# Python
+s: str = str(42)
+```
+
+```
+# EAST3
+Call: str(42)
+  semantic_tag: "cast.str"
+  runtime_call: "py_to_string"
+  arg[0].resolved_type: "int64"    ← これを使う
+  arg[0].call_arg_type: "Obj"      ← これは無視
+```
+
+```cpp
+// 正しい C++ — boxing なし
+str s = py_to_string(int64(42));
+
+// 間違い — 不要な boxing
+str s = py_to_string(object(int64(42)));
+```
+
+大半の言語の runtime は `py_to_string` / `str()` に具体型のオーバーロードを持っている。`object` 経由で boxing する必要はない。
+
+このルールは `str()` だけでなく `int()` / `float()` / `bool()` / `len()` 等のビルトインキャスト・関数にも適用される。`call_arg_type: Obj` は Python の動的 dispatch を表しているだけで、静的型が `resolved_type` に載っているならそれを使うこと。
+
 ### 1.2 EAST3 の前提条件
 
 emitter に到達する EAST3 は以下を満たしていなければならない。満たさない場合は前段のバグであり、emitter で吸収してはならない。
