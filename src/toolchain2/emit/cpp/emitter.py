@@ -869,6 +869,24 @@ def _normalize_expected_type_name(expected_name: str) -> str:
     }.get(expected_name, expected_name)
 
 
+def _builtin_type_id_value(type_name: str) -> int | None:
+    normalized = _normalize_expected_type_name(type_name)
+    return {
+        "None": 0,
+        "none": 0,
+        "bool": 1,
+        "int": 2,
+        "int64": 2,
+        "float": 3,
+        "float64": 3,
+        "str": 4,
+        "list": 5,
+        "dict": 6,
+        "set": 7,
+        "object": 8,
+    }.get(normalized)
+
+
 def _emit_builtin_isinstance(value_expr: str, expected_name: str) -> str:
     normalized = _normalize_expected_type_name(expected_name)
     if normalized in ("None", "none"):
@@ -894,28 +912,15 @@ def _emit_builtin_isinstance(value_expr: str, expected_name: str) -> str:
 
 def _emit_static_type_id_expr(ctx: CppEmitContext, type_name: str) -> str:
     normalized = _normalize_expected_type_name(type_name)
-    builtin = {
-        "None": "static_cast<pytra_type_id>(PYTRA_TID_NONE)",
-        "none": "static_cast<pytra_type_id>(PYTRA_TID_NONE)",
-        "bool": "static_cast<pytra_type_id>(PYTRA_TID_BOOL)",
-        "int": "static_cast<pytra_type_id>(PYTRA_TID_INT)",
-        "int64": "static_cast<pytra_type_id>(PYTRA_TID_INT)",
-        "float": "static_cast<pytra_type_id>(PYTRA_TID_FLOAT)",
-        "float64": "static_cast<pytra_type_id>(PYTRA_TID_FLOAT)",
-        "str": "static_cast<pytra_type_id>(PYTRA_TID_STR)",
-        "list": "static_cast<pytra_type_id>(PYTRA_TID_LIST)",
-        "dict": "static_cast<pytra_type_id>(PYTRA_TID_DICT)",
-        "set": "static_cast<pytra_type_id>(PYTRA_TID_SET)",
-        "object": "static_cast<pytra_type_id>(PYTRA_TID_OBJECT)",
-    }.get(normalized, "")
-    if builtin != "":
-        return builtin
+    builtin_id = _builtin_type_id_value(normalized)
+    if builtin_id is not None:
+        return "static_cast<pytra_type_id>(" + str(builtin_id) + ")"
     if normalized.startswith("list["):
-        return "static_cast<pytra_type_id>(PYTRA_TID_LIST)"
+        return "static_cast<pytra_type_id>(5)"
     if normalized.startswith("dict["):
-        return "static_cast<pytra_type_id>(PYTRA_TID_DICT)"
+        return "static_cast<pytra_type_id>(6)"
     if normalized.startswith("set["):
-        return "static_cast<pytra_type_id>(PYTRA_TID_SET)"
+        return "static_cast<pytra_type_id>(7)"
     class_type_id = _lookup_class_type_id(ctx, normalized)
     if class_type_id is not None:
         return "static_cast<pytra_type_id>(" + str(class_type_id) + ")"
@@ -2490,7 +2495,7 @@ def _emit_obj_type_id(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
     return (
         "([&]() -> pytra_type_id { auto __pytra_value = "
         + value_expr
-        + "; return static_cast<bool>(__pytra_value) ? static_cast<pytra_type_id>(__pytra_value.type_id()) : static_cast<pytra_type_id>(PYTRA_TID_NONE); }())"
+        + "; return static_cast<bool>(__pytra_value) ? static_cast<pytra_type_id>(__pytra_value.type_id()) : static_cast<pytra_type_id>(0); }())"
     )
 
 
