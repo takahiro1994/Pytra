@@ -1535,6 +1535,10 @@ def has_key(env: dict[str, int], name: str) -> bool:
     def test_cpp_signature_type_maps_jsonval_alias_to_object(self) -> None:
         self.assertEqual(cpp_signature_type("JsonVal"), "object")
         self.assertEqual(cpp_signature_type("dict[str,JsonVal]"), "Object<dict<str, object>>")
+        self.assertEqual(
+            cpp_signature_type("None | bool | str"),
+            "::std::variant<::std::monostate, bool, str>",
+        )
 
     def test_cpp_runtime_bundle_keeps_template_runtime_helpers_header_only(self) -> None:
         doc = _fixture_doc("src/runtime/east/built_in/numeric_ops.east")
@@ -4546,6 +4550,75 @@ def has_key(env: dict[str, int], name: str) -> bool:
 
         self.assertIn("::std::holds_alternative<Base>(x)", cpp_code)
         self.assertIn("::std::holds_alternative<Child>(x)", cpp_code)
+
+    def test_cpp_emitter_cast_optional_inner_uses_deref_not_std_get(self) -> None:
+        doc = _module_doc(
+            "app.main",
+            body=[
+                {
+                    "kind": "FunctionDef",
+                    "name": "indent_value",
+                    "arg_order": ["indent"],
+                    "arg_types": {"indent": "int64 | None"},
+                    "arg_usage": {"indent": "readonly"},
+                    "arg_defaults": {},
+                    "return_type": "int64",
+                    "body": [
+                        {
+                            "kind": "Return",
+                            "value": {
+                                "kind": "Call",
+                                "func": {"kind": "Name", "id": "cast"},
+                                "args": [
+                                    {"kind": "Name", "id": "int64", "resolved_type": "type"},
+                                    {"kind": "Name", "id": "indent", "resolved_type": "int64 | None"},
+                                ],
+                                "resolved_type": "int64",
+                            },
+                        }
+                    ],
+                }
+            ],
+        )
+
+        cpp_code = emit_cpp_module(doc)
+
+        self.assertIn("return (*(indent));", cpp_code)
+        self.assertNotIn("std::get<int64>(indent)", cpp_code)
+
+    def test_cpp_emitter_uses_function_signature_arg_type_before_stale_object_box(self) -> None:
+        doc = _module_doc(
+            "app.main",
+            body=[
+                {
+                    "kind": "Expr",
+                    "value": {
+                        "kind": "Call",
+                        "func": {"kind": "Name", "id": "dumps"},
+                        "args": [
+                            {
+                                "kind": "Box",
+                                "value": {"kind": "Constant", "value": "abc", "resolved_type": "str"},
+                                "resolved_type": "object",
+                                "call_arg_type": "object",
+                            }
+                        ],
+                        "function_signature_v1": {
+                            "arg_order": ["obj"],
+                            "arg_types": {"obj": "JsonVal"},
+                            "arg_usage": {"obj": "readonly"},
+                            "return_type": "str",
+                        },
+                        "resolved_type": "str",
+                    },
+                }
+            ],
+        )
+
+        cpp_code = emit_cpp_module(doc)
+
+        self.assertIn('::dumps(str("abc"))', cpp_code)
+        self.assertNotIn('::dumps(object(str("abc")))', cpp_code)
 
     def test_cpp_header_gen_emits_forward_decls_before_class_bodies(self) -> None:
         doc = _module_doc(
