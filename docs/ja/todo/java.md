@@ -42,8 +42,8 @@
 
 `check_emitter_hardcode_lint.py --lang java` で `skip_pure_python` が FAIL。
 
-1. [ ] [ID: P0-JAVA-LINT-V2-S1] skip_pure_python 違反を修正する — mapping.json の skip_modules から pure Python モジュールを外す
-2. [ ] [ID: P0-JAVA-LINT-V2-S2] `check_emitter_hardcode_lint.py --lang java` で全カテゴリ 0 件になることを確認する
+1. [x] [ID: P0-JAVA-LINT-V2-S1] skip_pure_python 違反を修正する — mapping.json の skip_modules から pure Python モジュールを外す（2026-04-01）— `src/runtime/java/mapping.json` から `pytra.std.` を除去
+2. [x] [ID: P0-JAVA-LINT-V2-S2] `check_emitter_hardcode_lint.py --lang java` で全カテゴリ 0 件になることを確認する（2026-04-01）— 0 件
 
 ### P3-JAVA-SELFHOST: Java emitter で toolchain2 を Java に変換し build を通す
 

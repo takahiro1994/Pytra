@@ -2535,7 +2535,7 @@ def _parse_block_lines(
 
         # for ... in range(...)  or  for ... in ...:
         if s_clean.startswith("for "):
-            for_stmt, i = _parse_for_stmt(ctx, block_lines, i, base_indent, name_types, pending_trivia, pending_comments)
+            for_stmt, i = _parse_for_stmt(ctx, block_lines, i, base_indent, name_types, pending_trivia, pending_comments, abs_ln)
             stmts.append(for_stmt)
             pending_trivia = []
             pending_comments = []
@@ -2543,7 +2543,7 @@ def _parse_block_lines(
 
         # while ...:
         if s_clean.startswith("while "):
-            while_stmt, i = _parse_while_stmt(ctx, block_lines, i, base_indent, name_types, pending_trivia, pending_comments)
+            while_stmt, i = _parse_while_stmt(ctx, block_lines, i, base_indent, name_types, pending_trivia, pending_comments, abs_ln)
             stmts.append(while_stmt)
             pending_trivia = []
             pending_comments = []
@@ -2551,7 +2551,7 @@ def _parse_block_lines(
 
         # with ...:
         if s_clean.startswith("with "):
-            with_stmt, i = _parse_with_stmt(ctx, block_lines, i, base_indent, name_types, pending_trivia, pending_comments)
+            with_stmt, i = _parse_with_stmt(ctx, block_lines, i, base_indent, name_types, pending_trivia, pending_comments, abs_ln)
             stmts.append(with_stmt)
             pending_trivia = []
             pending_comments = []
@@ -2590,7 +2590,7 @@ def _parse_block_lines(
 
         # if ...:
         if s_clean.startswith("if "):
-            if_stmt, i = _parse_if_stmt(ctx, block_lines, i, base_indent, name_types, pending_trivia, pending_comments)
+            if_stmt, i = _parse_if_stmt(ctx, block_lines, i, base_indent, name_types, pending_trivia, pending_comments, abs_ln)
             stmts.append(if_stmt)
             pending_trivia = []
             pending_comments = []
@@ -3174,14 +3174,13 @@ def _parse_for_stmt(
     name_types: dict[str, str],
     trivia: list[JsonVal],
     comments: list[str],
+    abs_ln: int,
 ) -> tuple[JsonVal, int]:
     """for 文をパースする。"""
     ln = block_lines[start_i]
     s = _strip_inline_comment(ln.strip())
     header, inline_suite = _split_header_inline_suite(s)
     indent = len(ln) - len(ln.lstrip(" "))
-    abs_ln = _find_abs_line(ctx.lines, ln, 0)
-
     # Parse: for TARGET in ITER:
     target_name, iter_text = _parse_for_header(header)
     if target_name == "":
@@ -3205,7 +3204,7 @@ def _parse_for_stmt(
     if len(sub_lines) > 0:
         for bl in reversed(sub_lines):
             if bl.strip() != "":
-                end_ln = _find_abs_line(ctx.lines, bl, 0)
+                end_ln = _find_abs_line(ctx.lines, bl, abs_ln - 1)
                 end_col = len(bl.rstrip())
                 break
 
@@ -3240,14 +3239,13 @@ def _parse_while_stmt(
     name_types: dict[str, str],
     trivia: list[JsonVal],
     comments: list[str],
+    abs_ln: int,
 ) -> tuple[While, int]:
     """while 文をパースする。"""
     ln = block_lines[start_i]
     s = _strip_inline_comment(ln.strip())
     header, inline_suite = _split_header_inline_suite(s)
     indent = len(ln) - len(ln.lstrip(" "))
-    abs_ln = _find_abs_line(ctx.lines, ln, 0)
-
     # Parse: while COND:
     cond_text = header[6:].rstrip(":").strip()
     test = _parse_expr_text(ctx, cond_text, abs_ln, _find_expr_col(ctx, cond_text, abs_ln, indent + 6), name_types)
@@ -3265,7 +3263,7 @@ def _parse_while_stmt(
     if len(sub_lines) > 0:
         for bl in reversed(sub_lines):
             if bl.strip() != "":
-                end_ln = _find_abs_line(ctx.lines, bl, 0)
+                end_ln = _find_abs_line(ctx.lines, bl, abs_ln - 1)
                 end_col = len(bl.rstrip())
                 break
 
@@ -3281,14 +3279,13 @@ def _parse_with_stmt(
     name_types: dict[str, str],
     trivia: list[JsonVal],
     comments: list[str],
+    abs_ln: int,
 ) -> tuple[With, int]:
     """with 文をパースする。with EXPR as VAR:"""
     ln = block_lines[start_i]
     s = _strip_inline_comment(ln.strip())
     header, inline_suite = _split_header_inline_suite(s)
     indent = len(ln) - len(ln.lstrip(" "))
-    abs_ln = _find_abs_line(ctx.lines, ln, 0)
-
     # Parse: with EXPR as VAR:
     inner = header[5:].rstrip(":").strip()  # strip "with " prefix and trailing ":"
     var_name: str = ""
@@ -3313,7 +3310,7 @@ def _parse_with_stmt(
     if len(sub_lines) > 0:
         for bl in reversed(sub_lines):
             if bl.strip() != "":
-                end_ln = _find_abs_line(ctx.lines, bl, 0)
+                end_ln = _find_abs_line(ctx.lines, bl, abs_ln - 1)
                 end_col = len(bl.rstrip())
                 break
 
@@ -3330,14 +3327,13 @@ def _parse_if_stmt(
     name_types: dict[str, str],
     trivia: list[JsonVal],
     comments: list[str],
+    abs_ln: int,
 ) -> tuple[If, int]:
     """if/elif/else 文をパースする。"""
     ln = block_lines[start_i]
     s = _strip_inline_comment(ln.strip())
     header, inline_suite = _split_header_inline_suite(s)
     indent = len(ln) - len(ln.lstrip(" "))
-    abs_ln = _find_abs_line(ctx.lines, ln, 0)
-
     # Parse condition
     cond_text = header[3:].rstrip(":").strip()
     test = _parse_expr_text(ctx, cond_text, abs_ln, _find_expr_col(ctx, cond_text, abs_ln, indent + 3), name_types)
@@ -3360,12 +3356,14 @@ def _parse_if_stmt(
         if next_indent == indent:
             if next_s.startswith("elif "):
                 # Convert elif to nested if
-                elif_stmt, next_i = _parse_elif_stmt(ctx, block_lines, next_i, indent, name_types)
+                elif_stmt, next_i = _parse_elif_stmt(ctx, block_lines, next_i, indent, name_types, abs_ln)
                 orelse = [elif_stmt]
             elif next_s.startswith("else:") or next_s == "else:":
                 else_header, else_inline_suite = _split_header_inline_suite(_strip_inline_comment(next_s))
                 if else_inline_suite != "":
-                    orelse = _parse_inline_suite(ctx, else_inline_suite, _find_abs_line(ctx.lines, next_ln, 0), indent + 4, name_types, "else")
+                    orelse = _parse_inline_suite(
+                        ctx, else_inline_suite, _find_abs_line(ctx.lines, next_ln, abs_ln - 1), indent + 4, name_types, "else"
+                    )
                     next_i += 1
                 else:
                     else_lines, next_i = _collect_sub_block(block_lines, next_i + 1, indent)
@@ -3384,7 +3382,7 @@ def _parse_if_stmt(
     elif len(then_lines) > 0:
         for bl in reversed(then_lines):
             if bl.strip() != "":
-                end_ln = _find_abs_line(ctx.lines, bl, 0)
+                end_ln = _find_abs_line(ctx.lines, bl, abs_ln - 1)
                 end_col = len(bl.rstrip())
                 break
 
@@ -3403,13 +3401,14 @@ def _parse_elif_stmt(
     start_i: int,
     parent_indent: int,
     name_types: dict[str, str],
+    line_hint: int,
 ) -> tuple[If, int]:
     """elif 節を If ノードとしてパースする。"""
     ln = block_lines[start_i]
     s = _strip_inline_comment(ln.strip())
     header, inline_suite = _split_header_inline_suite(s)
     indent = len(ln) - len(ln.lstrip(" "))
-    abs_ln = _find_abs_line(ctx.lines, ln, 0)
+    abs_ln = _find_abs_line(ctx.lines, ln, line_hint - 1)
 
     cond_text = header[5:].rstrip(":").strip()
     test = _parse_expr_text(ctx, cond_text, abs_ln, _find_expr_col(ctx, cond_text, abs_ln, indent + 5), name_types)
@@ -3429,12 +3428,14 @@ def _parse_elif_stmt(
         next_indent = len(next_ln) - len(next_ln.lstrip(" ")) if next_s != "" else 0
         if next_indent == indent:
             if next_s.startswith("elif "):
-                elif_stmt, next_i = _parse_elif_stmt(ctx, block_lines, next_i, indent, name_types)
+                elif_stmt, next_i = _parse_elif_stmt(ctx, block_lines, next_i, indent, name_types, abs_ln)
                 orelse = [elif_stmt]
             elif next_s.startswith("else:"):
                 else_header, else_inline_suite = _split_header_inline_suite(_strip_inline_comment(next_s))
                 if else_inline_suite != "":
-                    orelse = _parse_inline_suite(ctx, else_inline_suite, _find_abs_line(ctx.lines, next_ln, 0), indent + 4, name_types, "else")
+                    orelse = _parse_inline_suite(
+                        ctx, else_inline_suite, _find_abs_line(ctx.lines, next_ln, abs_ln - 1), indent + 4, name_types, "else"
+                    )
                     next_i += 1
                 else:
                     else_lines, next_i = _collect_sub_block(block_lines, next_i + 1, indent)
@@ -3442,6 +3443,20 @@ def _parse_elif_stmt(
 
     end_ln = abs_ln
     end_col = indent + len(s)
+    if len(orelse) > 0:
+        last_stmt = orelse[-1]
+        if hasattr(last_stmt, "source_span"):
+            sp = last_stmt.source_span
+            if sp.end_lineno is not None:
+                end_ln = sp.end_lineno
+            if sp.end_col is not None:
+                end_col = sp.end_col
+    elif len(then_lines) > 0:
+        for bl in reversed(then_lines):
+            if bl.strip() != "":
+                end_ln = _find_abs_line(ctx.lines, bl, abs_ln - 1)
+                end_col = len(bl.rstrip())
+                break
     span = make_span(abs_ln, indent, end_ln, end_col)
     return If(source_span=span, test=test, body=then_stmts, orelse=orelse), next_i
 
