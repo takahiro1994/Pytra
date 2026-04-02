@@ -1000,9 +1000,15 @@ def _render_call_via_runtime_call(
                 if method_name == "add" and len(args) == 1:
                     return "__pytra_set_add(&" + owner_expr + ", " + _render_expr(args[0]) + ")"
                 if method_name == "pop" and owner_type.startswith("dict[") and len(args) == 1:
-                    return "__pytra_dict_pop(&" + owner_expr + ", " + _render_expr(args[0]) + ")"
+                    return _cast_from_any(
+                        "__pytra_dict_pop(&" + owner_expr + ", " + _render_expr(args[0]) + ")",
+                        _swift_type(expr.get("resolved_type"), allow_void=False),
+                    )
                 if method_name == "setdefault" and owner_type.startswith("dict[") and len(args) == 2:
-                    return "__pytra_dict_setdefault(&" + owner_expr + ", " + _render_expr(args[0]) + ", " + _render_expr(args[1]) + ")"
+                    return _cast_from_any(
+                        "__pytra_dict_setdefault(&" + owner_expr + ", " + _render_expr(args[0]) + ", " + _render_expr(args[1]) + ")",
+                        _swift_type(expr.get("resolved_type"), allow_void=False),
+                    )
             runtime_symbol = _resolved_runtime_symbol(runtime_call, adapter)
             if runtime_symbol == "":
                 return ""

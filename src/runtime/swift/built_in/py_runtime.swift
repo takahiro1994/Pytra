@@ -273,7 +273,11 @@ func __pytra_set_literal(_ items: [Any]) -> [Any] {
 
 func __pytra_set_add(_ items: inout [Any], _ value: Any?) {
     if !__pytra_contains(items, value) {
-        items.append(value as Any)
+        if let unwrapped = value {
+            items.append(unwrapped)
+        } else {
+            items.append(__pytra_any_default())
+        }
     }
 }
 
@@ -289,7 +293,7 @@ func __pytra_dict_setdefault(_ dict: inout [AnyHashable: Any], _ key: Any?, _ de
     if let value = dict[hashed] {
         return value
     }
-    let stored = defaultValue as Any
+    let stored: Any = defaultValue ?? __pytra_any_default()
     dict[hashed] = stored
     return stored
 }
@@ -396,6 +400,9 @@ func __pytra_is_list(_ v: Any?) -> Bool {
 // --- bytearray / bytes ---
 
 func __pytra_bytearray(_ size: Any?) -> [Any] {
+    if let list = size as? [Any] {
+        return list
+    }
     let n = __pytra_int(size)
     return [Any](repeating: Int64(0) as Any, count: Int(n))
 }
@@ -574,7 +581,6 @@ func write_rgb_png(_ path: Any?, _ width: Any?, _ height: Any?, _ pixels: Any?) 
     data.append(_chunk("IDAT", zlib))
     data.append(_chunk("IEND", Data()))
     try? data.write(to: URL(fileURLWithPath: p))
-    __pytra_print("wrote: " + p)
 }
 
 func __pytra_grayscale_palette() -> [Any] {
