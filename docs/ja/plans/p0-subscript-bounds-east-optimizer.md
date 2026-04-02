@@ -44,6 +44,14 @@ toolchain2 ではこのオプションが移行されておらず、C++ runtime 
 - emitter にオプションを生やすこと（禁止）
 - `src/pytra/utils/png.py` の正本改善（別タスク、ただし相乗効果あり）
 
+## 既存ドキュメントの状況
+
+- `docs/en/spec/spec-options.md` に旧 emitter オプションとして `--negative-index-mode` / `--bounds-check-mode` / `-O0`~`-O3` が記載されている
+- `docs/ja/spec/archive/20260328-spec-options.md` に日本語版（archive 済み）
+- いずれも「emitter のオプション」として書かれており、EAST optimizer のオプションとしての記述はない
+- toolchain2 にはこれらが一切移行されていない
+- spec-east.md / spec-east3-optimizer.md にも該当記述なし
+
 ## 受け入れ基準
 
 - [ ] EAST optimizer に `--negative-index-mode` / `--bounds-check-mode` オプションがある
@@ -51,6 +59,9 @@ toolchain2 ではこのオプションが移行されておらず、C++ runtime 
 - [ ] emitter はメタデータのみを参照し、オプション自体を知らない
 - [ ] C++ sample 01 (mandelbrot) の実行時間が Rust/Go と同等レベルに改善される
 - [ ] fixture + sample parity に回帰がない
+- [ ] spec-options.md を更新し、EAST optimizer のオプションとして再定義する（emitter オプションの記述を削除）
+- [ ] spec-east3-optimizer.md に `subscript_access_v1` パスを追記する
+- [ ] user guide / tutorial の CLI ヘルプにオプションが反映されている
 
 ## サブタスク
 
