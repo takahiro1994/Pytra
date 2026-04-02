@@ -1,0 +1,38 @@
+{
+  "builtin_prefix": "__pytra_",
+  "calls": {
+    "env.target": "\"scala\"",
+    "print": "println",
+    "py_print": "println",
+    "py_len": "__pytra_len",
+    "len": "__pytra_len",
+    "str": "__pytra_str",
+    "py_to_string": "__pytra_str",
+    "bytearray": "__pytra_bytearray",
+    "bytes": "__pytra_bytes",
+    "bytearray_ctor": "__pytra_bytearray",
+    "bytes_ctor": "__pytra_bytes"
+  },
+  "types": {
+    "int64": "Long",
+    "float64": "Double",
+    "bool": "Boolean",
+    "str": "String",
+    "None": "Unit",
+    "Any": "Any",
+    "Path": "java.nio.file.Path"
+  },
+  "implicit_promotions": [],
+  "skip_modules": [
+    "pytra.built_in.",
+    "pytra.typing",
+    "pytra.core."
+  ],
+  "skip_modules_exact": [
+    "math",
+    "time",
+    "typing",
+    "enum",
+    "dataclasses"
+  ]
+}

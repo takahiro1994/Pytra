@@ -41,6 +41,8 @@ from toolchain2.resolve.py.resolver import east2_output_path_from_east1
 from toolchain2.resolve.py.resolver import resolve_east1_to_east2
 from toolchain2.resolve.py.resolver import resolve_file
 from toolchain2.emit.cs.emitter import emit_cs_module
+from toolchain2.emit.scala.emitter import emit_scala_module
+from toolchain2.emit.kotlin.emitter import emit_kotlin_module
 
 
 def _repo_root() -> Path:
@@ -88,6 +90,14 @@ def _java_module_class_name(_module_id: str) -> str:
 
 def _emit_cs_module(_east_doc: dict[str, JsonVal]) -> str:
     return emit_cs_module(_east_doc)
+
+
+def _emit_scala_module(_east_doc: dict[str, JsonVal]) -> str:
+    return emit_scala_module(_east_doc)
+
+
+def _emit_kotlin_module(_east_doc: dict[str, JsonVal]) -> str:
+    return emit_kotlin_module(_east_doc)
 
 
 def _emit_rs_module(_east_doc: dict[str, JsonVal], package_mode: bool = False) -> str:
@@ -169,6 +179,38 @@ def _copy_java_runtime_files(output_dir: Path) -> int:
         for java_file in bucket_dir.glob("*.java"):
             dst = output_dir.joinpath(java_file.name)
             dst.write_text(java_file.read_text(encoding="utf-8"), encoding="utf-8")
+            copied += 1
+    return copied
+
+
+def _copy_scala_runtime_files(output_dir: Path) -> int:
+    runtime_root = _repo_root().joinpath("src").joinpath("runtime").joinpath("scala")
+    copied = 0
+    if not runtime_root.exists():
+        return copied
+    for bucket in ["built_in", "std"]:
+        bucket_dir = runtime_root.joinpath(bucket)
+        if not bucket_dir.exists():
+            continue
+        for scala_file in bucket_dir.glob("*.scala"):
+            dst = output_dir.joinpath(scala_file.name)
+            dst.write_text(scala_file.read_text(encoding="utf-8"), encoding="utf-8")
+            copied += 1
+    return copied
+
+
+def _copy_kotlin_runtime_files(output_dir: Path) -> int:
+    runtime_root = _repo_root().joinpath("src").joinpath("runtime").joinpath("kotlin")
+    copied = 0
+    if not runtime_root.exists():
+        return copied
+    for bucket in ["built_in", "std"]:
+        bucket_dir = runtime_root.joinpath(bucket)
+        if not bucket_dir.exists():
+            continue
+        for kt_file in bucket_dir.glob("*.kt"):
+            dst = output_dir.joinpath(kt_file.name)
+            dst.write_text(kt_file.read_text(encoding="utf-8"), encoding="utf-8")
             copied += 1
     return copied
 
@@ -801,6 +843,82 @@ def _emit_java(manifest_path: Path, output_dir: Path) -> int:
     return 1
 
 
+def _emit_scala(manifest_path: Path, output_dir: Path) -> int:
+    manifest_doc = json.loads_obj(manifest_path.read_text(encoding="utf-8"))
+    if manifest_doc is None:
+        print("error: invalid manifest: " + str(manifest_path))
+        return 1
+    modules = manifest_doc.get_arr("modules")
+    if modules is None:
+        print("error: invalid manifest.modules: " + str(manifest_path))
+        return 1
+    output_dir.mkdir(parents=True, exist_ok=True)
+    emitted = 0
+    for item in modules.raw:
+        item_obj = json.JsonValue(item).as_obj()
+        if item_obj is None:
+            continue
+        module_id = item_obj.get_str("module_id")
+        rel_output = item_obj.get_str("output")
+        if module_id is None or module_id == "" or rel_output is None or rel_output == "":
+            continue
+        east_path = manifest_path.parent.joinpath(rel_output)
+        if not east_path.exists():
+            print("error: linked east3 missing: " + str(east_path))
+            return 1
+        east_doc_obj = json.loads_obj(east_path.read_text(encoding="utf-8"))
+        if east_doc_obj is None:
+            print("error: invalid east3 document: " + str(east_path))
+            return 1
+        code = _emit_scala_module(east_doc_obj.raw)
+        if code.strip() == "":
+            continue
+        out_path = output_dir.joinpath(module_id.replace(".", "_") + ".scala")
+        out_path.write_text(code, encoding="utf-8")
+        emitted += 1
+    _copy_scala_runtime_files(output_dir)
+    print("emitted: " + str(output_dir) + " (" + str(emitted) + " files)")
+    return 0
+
+
+def _emit_kotlin(manifest_path: Path, output_dir: Path) -> int:
+    manifest_doc = json.loads_obj(manifest_path.read_text(encoding="utf-8"))
+    if manifest_doc is None:
+        print("error: invalid manifest: " + str(manifest_path))
+        return 1
+    modules = manifest_doc.get_arr("modules")
+    if modules is None:
+        print("error: invalid manifest.modules: " + str(manifest_path))
+        return 1
+    output_dir.mkdir(parents=True, exist_ok=True)
+    emitted = 0
+    for item in modules.raw:
+        item_obj = json.JsonValue(item).as_obj()
+        if item_obj is None:
+            continue
+        module_id = item_obj.get_str("module_id")
+        rel_output = item_obj.get_str("output")
+        if module_id is None or module_id == "" or rel_output is None or rel_output == "":
+            continue
+        east_path = manifest_path.parent.joinpath(rel_output)
+        if not east_path.exists():
+            print("error: linked east3 missing: " + str(east_path))
+            return 1
+        east_doc_obj = json.loads_obj(east_path.read_text(encoding="utf-8"))
+        if east_doc_obj is None:
+            print("error: invalid east3 document: " + str(east_path))
+            return 1
+        code = _emit_kotlin_module(east_doc_obj.raw)
+        if code.strip() == "":
+            continue
+        out_path = output_dir.joinpath(module_id.replace(".", "_") + ".kt")
+        out_path.write_text(code, encoding="utf-8")
+        emitted += 1
+    _copy_kotlin_runtime_files(output_dir)
+    print("emitted: " + str(output_dir) + " (" + str(emitted) + " files)")
+    return 0
+
+
 def cmd_emit(args: list[str]) -> int:
     """emit サブコマンド: linked output → target code (暫定: 現行 toolchain/emit/ への橋渡し)"""
     input_text = ""
@@ -877,13 +995,19 @@ def cmd_emit(args: list[str]) -> int:
     if target == "java":
         return _emit_java(manifest_path, Path(output_dir_text))
 
+    if target == "scala":
+        return _emit_scala(manifest_path, Path(output_dir_text))
+
+    if target == "kotlin":
+        return _emit_kotlin(manifest_path, Path(output_dir_text))
+
     if target == "ts" or target == "js":
         return _emit_ts(manifest_path, Path(output_dir_text), strip_types=(target == "js"))
 
     if target == "nim":
         return _emit_nim(manifest_path, Path(output_dir_text))
 
-    print("error: unsupported target: " + target + " (available: cpp, go, rs, cs, java, ts, js, nim)")
+    print("error: unsupported target: " + target + " (available: cpp, go, rs, cs, java, scala, kotlin, ts, js, nim)")
     return 1
 
 
@@ -998,8 +1122,8 @@ def cmd_build(args: list[str]) -> int:
         print("error: at least one input .py file is required")
         return 1
 
-    if target not in ["cpp", "go", "rs", "cs", "java", "ts", "js"]:
-        print("error: unsupported target: " + target + " (available: cpp, go, rs, cs, java, ts, js)")
+    if target not in ["cpp", "go", "rs", "cs", "java", "scala", "kotlin", "ts", "js"]:
+        print("error: unsupported target: " + target + " (available: cpp, go, rs, cs, java, scala, kotlin, ts, js)")
         return 1
 
     try:
@@ -1120,6 +1244,10 @@ def _build_pipeline(
         return _emit_cs(linked_dir.joinpath("manifest.json"), output_dir)
     if target == "java":
         return _emit_java(linked_dir.joinpath("manifest.json"), output_dir)
+    if target == "scala":
+        return _emit_scala(linked_dir.joinpath("manifest.json"), output_dir)
+    if target == "kotlin":
+        return _emit_kotlin(linked_dir.joinpath("manifest.json"), output_dir)
     if target == "ts" or target == "js":
         return _emit_ts(linked_dir.joinpath("manifest.json"), output_dir, strip_types=(target == "js"))
     if target == "nim":
