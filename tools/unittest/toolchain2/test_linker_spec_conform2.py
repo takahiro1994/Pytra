@@ -5587,6 +5587,109 @@ def has_key(env: dict[str, int], name: str) -> bool:
         self.assertNotIn(".unbox<str>()", cpp_code)
         self.assertNotIn("py_to_string(object(42))", cpp_code)
 
+    def test_cpp_emitter_cast_same_type_name_from_object_storage_unboxes_once(self) -> None:
+        doc = _module_doc(
+            "app.main",
+            body=[
+                {
+                    "kind": "FunctionDef",
+                    "name": "cast_value",
+                    "arg_order": ["x"],
+                    "arg_types": {"x": "object"},
+                    "arg_usage": {"x": "readonly"},
+                    "arg_defaults": {},
+                    "return_type": "int64",
+                    "body": [
+                        {
+                            "kind": "Return",
+                            "value": {
+                                "kind": "Call",
+                                "func": {"kind": "Name", "id": "cast"},
+                                "args": [
+                                    {"kind": "Name", "id": "int64", "resolved_type": "type"},
+                                    {"kind": "Name", "id": "x", "resolved_type": "int64"},
+                                ],
+                                "resolved_type": "int64",
+                            },
+                        }
+                    ],
+                }
+            ],
+        )
+
+        cpp_code = emit_cpp_module(doc)
+
+        self.assertIn("return (x).unbox<int64>();", cpp_code)
+        self.assertNotIn(".unbox<int64>().unbox<int64>()", cpp_code)
+
+    def test_cpp_emitter_builtin_int_same_type_name_from_object_storage_unboxes_once(self) -> None:
+        doc = _module_doc(
+            "app.main",
+            body=[
+                {
+                    "kind": "FunctionDef",
+                    "name": "cast_value",
+                    "arg_order": ["x"],
+                    "arg_types": {"x": "object"},
+                    "arg_usage": {"x": "readonly"},
+                    "arg_defaults": {},
+                    "return_type": "int64",
+                    "body": [
+                        {
+                            "kind": "Return",
+                            "value": {
+                                "kind": "Call",
+                                "lowered_kind": "BuiltinCall",
+                                "runtime_call": "int",
+                                "func": {"kind": "Name", "id": "int", "resolved_type": "callable"},
+                                "args": [{"kind": "Name", "id": "x", "resolved_type": "int64"}],
+                                "resolved_type": "int64",
+                            },
+                        }
+                    ],
+                }
+            ],
+        )
+
+        cpp_code = emit_cpp_module(doc)
+
+        self.assertIn("return (x).unbox<int64>();", cpp_code)
+        self.assertNotIn(".unbox<int64>().unbox<int64>()", cpp_code)
+
+    def test_cpp_emitter_builtin_str_same_type_name_from_object_storage_unboxes_once(self) -> None:
+        doc = _module_doc(
+            "app.main",
+            body=[
+                {
+                    "kind": "FunctionDef",
+                    "name": "cast_value",
+                    "arg_order": ["x"],
+                    "arg_types": {"x": "object"},
+                    "arg_usage": {"x": "readonly"},
+                    "arg_defaults": {},
+                    "return_type": "str",
+                    "body": [
+                        {
+                            "kind": "Return",
+                            "value": {
+                                "kind": "Call",
+                                "lowered_kind": "BuiltinCall",
+                                "runtime_call": "str",
+                                "func": {"kind": "Name", "id": "str", "resolved_type": "callable"},
+                                "args": [{"kind": "Name", "id": "x", "resolved_type": "str"}],
+                                "resolved_type": "str",
+                            },
+                        }
+                    ],
+                }
+            ],
+        )
+
+        cpp_code = emit_cpp_module(doc)
+
+        self.assertIn("return (x).unbox<str>();", cpp_code)
+        self.assertNotIn(".unbox<str>().unbox<str>()", cpp_code)
+
     def test_cpp_header_gen_preserves_exception_class_inheritance(self) -> None:
         doc = _module_doc(
             "pytra.built_in.error",

@@ -1943,7 +1943,14 @@ def _emit_builtin_call(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
         ct = cpp_signature_type(rt)
         if len(args) >= 1 and isinstance(args[0], dict):
             arg_kind = _str(args[0], "kind")
+            arg_resolved_type = _expanded_union_type(_str(args[0], "resolved_type"))
             if arg_kind == "Box" and rt not in ("", "unknown", "Any", "Obj", "object"):
+                return _emit_expr_as_type(ctx, args[0], rt)
+            if (
+                rt not in ("", "unknown", "Any", "Obj", "object")
+                and arg_kind in ("Name", "Attribute", "Subscript")
+                and arg_resolved_type == rt
+            ):
                 return _emit_expr_as_type(ctx, args[0], rt)
             arg_type = _expanded_union_type(_str(args[0], "resolved_type"))
             storage_type = _expanded_union_type(_expr_storage_type(ctx, args[0]))
@@ -1977,6 +1984,8 @@ def _emit_builtin_call(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
     if rc in ("py_to_string", "str") and len(arg_strs) >= 1:
         if len(args) >= 1 and isinstance(args[0], dict) and _str(args[0], "resolved_type") == "str":
             arg_kind = _str(args[0], "kind")
+            if arg_kind in ("Name", "Attribute", "Subscript"):
+                return _emit_expr_as_type(ctx, args[0], "str")
             storage_type = _expanded_union_type(_expr_storage_type(ctx, args[0]))
             if arg_kind != "Unbox" and storage_type not in ("", "unknown") and _needs_object_cast(storage_type):
                 return _emit_object_unbox(arg_strs[0], "str")
@@ -4152,17 +4161,24 @@ def _emit_cast_expr(ctx: CppEmitContext, target_node: JsonVal, value_node: JsonV
         target_name = _str(target_node, "id")
         if target_name == "":
             target_name = _str(target_node, "repr")
+    value_type = _effective_resolved_type(value_node)
+    value_kind = _str(value_node, "kind") if isinstance(value_node, dict) else ""
     if target_name not in ("", "unknown", "Any", "Obj", "object") and isinstance(value_node, dict) and _str(value_node, "kind") == "Box":
         boxed_value = value_node.get("value")
         if isinstance(boxed_value, dict):
             return _emit_expr_as_type(ctx, boxed_value, target_name)
+    if (
+        target_name not in ("", "unknown", "Any", "Obj", "object")
+        and isinstance(value_node, dict)
+        and value_kind in ("Name", "Attribute", "Subscript")
+        and value_type == target_name
+    ):
+        return _emit_expr_as_type(ctx, value_node, target_name)
     value_expr = _emit_expr(ctx, value_node)
-    value_type = _effective_resolved_type(value_node)
     static_value_type = _expr_static_type(ctx, value_node)
     storage_type = _expr_storage_type(ctx, value_node)
     union_value_type = _expanded_union_type(value_type)
     union_storage_type = _expanded_union_type(storage_type)
-    value_kind = _str(value_node, "kind") if isinstance(value_node, dict) else ""
     if target_name == "":
         return value_expr
     if (
