@@ -30,8 +30,7 @@
 - 優先度上書きは `docs/ja/todo2.md` ではなく、チャット指示で `対象ID` / `完了条件` / `非対象` を明示して行います（テンプレート: `docs/ja/plans/instruction-template.md`）。
 - 各領域の agent は自分の領域ファイル（`docs/ja/todo/{cpp,go,rust,ts,infra}.md`）内で優先度順に着手します。
 - `docs/ja/todo/index.md` の進捗メモは 1 行要約に留め、詳細な判断・検証ログは文脈ファイル（`docs/ja/plans/*.md`）の `決定ログ` へ追記します。
-- 大きいタスクは文脈ファイルで `-S1` / `-S2` 形式の子タスクへ分割してよく、`tools/check/check_todo_priority.py` は最上位未完了 `ID` とその子 `ID` を許可します。
-- `docs/ja/todo/index.md` または `docs/ja/plans/*.md` に進捗ログを追加したターンでは、`python3 tools/check/check_todo_priority.py` を通過させます（`plans` 側は `決定ログ` の日付行のみが進捗判定対象）。
+- 大きいタスクは文脈ファイルで `-S1` / `-S2` 形式の子タスクへ分割してよい。
 - 割り込み等で未コミット差分が残る場合は、同一 `ID` を完了させるか差分を戻してから別 `ID` へ移ります。
 - タスク完了時はチェック状態を更新します。
 

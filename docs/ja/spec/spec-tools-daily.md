@@ -14,8 +14,6 @@
   - 目的: `tools/check/`, `tools/gen/`, `tools/run/` のスクリプトが `tools/README.md` 台帳に全て記載されているかを検証し、台帳に載っていないファイルを fail させる。`tools/` 直下への `.py` ファイル直置きも fail。
 - `tools/check/check_mapping_json.py`
   - 目的: 全言語の `src/runtime/<lang>/mapping.json` を検証する（valid JSON・`calls` キー存在・`builtin_prefix` 存在・必須エントリ `env.target` 存在・空文字エントリなし）。`run_local_ci.py` に組み込み済み。
-- `tools/check/check_todo_priority.py`
-  - 目的: `docs/ja/todo/index.md` / `docs/ja/plans/*.md` の差分に追加した進捗 `ID` が、未完了の最上位 `ID`（またはその子 `ID`）と一致するかを検証し、優先度逸脱を防止する。`plans` 側は `決定ログ`（`- YYYY-MM-DD: ...`）行のみを進捗判定対象にし、構造整理の ID 列挙は対象外とする。
 - `tools/check/check_jsonvalue_decode_boundaries.py`
   - 目的: `pytra-cli.py` / `east2x.py` / `toolchain/compile/east_io.py` / `toolchain/link/*` の JSON artifact 境界で `json.loads_obj(...)` が正本であることを検証し、raw `json.loads(...)` への再侵入を fail-fast に止める。
 - `tools/check/check_py2x_transpile.py`

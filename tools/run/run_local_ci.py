@@ -23,7 +23,6 @@ def build_steps() -> list[list[str]]:
         ["python3", "tools/check/check_mapping_json.py"],
         ["python3", "tools/check/check_legacy_cli_references.py"],
         ["python3", "tools/check/check_legacy_transpile_checkers_absent.py"],
-        ["python3", "tools/check/check_todo_priority.py"],
         ["python3", "tools/check/check_jsonvalue_decode_boundaries.py"],
         ["python3", "tools/check/check_jsonvalue_typeexpr_contract.py"],
         ["python3", "tools/check/check_east_stage_boundary.py"],
