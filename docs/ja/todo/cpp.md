@@ -39,7 +39,8 @@
    - 完了メモ: `src/toolchain2/optimize/optimizer.py` の `resolve_negative_index_mode()` / `resolve_bounds_check_mode()` を `opt_level` aware にし、未指定時の default を `0 -> always/always`, `1 -> const_only/off`, `2 -> off/off` に変更した。`src/pytra-cli2.py` と `tools/check/runtime_parity_check_fast.py` から `opt_level` を引き回し、明示 `--negative-index-mode` / `--bounds-check-mode` は従来どおり個別 override として維持した。`runtime_parity_check_fast --opt-level 0/2` の summary で mode 決定を確認済み。
 3. [x] [ID: P0-OPT-LEVEL-S3] spec-options.md / spec-east3-optimizer.md / tutorial を更新する
    - 完了メモ: 正本 `docs/ja/` の `spec-east3-optimizer.md`, `spec-tools-parity.md`, `tutorial/dev-operations.md` を `--opt-level` 表記へ更新し、`O0/O1/O2` と `negative_index_mode` / `bounds_check_mode` の既定対応も追記した。旧 `--east3-opt-level` 表記は plan / archive の履歴記述を除き、正本 spec/tutorial から除去済み。
-4. [ ] [ID: P0-OPT-LEVEL-S4] fixture + sample + stdlib parity に回帰がないことを確認する
+4. [x] [ID: P0-OPT-LEVEL-S4] fixture + sample + stdlib parity に回帰がないことを確認する
+   - 完了メモ: `runtime_parity_check_fast --case-root stdlib --targets cpp --opt-level 1` で `16/16 PASS`、`--case-root sample` で `18/18 PASS`、`--case-root fixture` で `144/144 PASS` を確認した。途中で見つかった `dict_mutation_methods`, `list_mutation_methods`, `none_optional`, `str_methods_extended` は C++ runtime / emitter を修正して解消済み。最終 summary は `targets=cpp opt_level=1 negative_index_mode=const_only bounds_check_mode=off` で回帰 0。
 
 ### P0-CPP-VARIANT: C++ を std::variant ベースに移行し object/box/unbox を廃止する
 
