@@ -109,10 +109,17 @@ runtime モジュールの Python 正本は `src/pytra/` にあり、`.east`（E
 
 ### オプション
 
-- 添字境界チェック: `--bounds-check-mode {always,debug,off}`（既定: `off`）
+- 最適化レベル: `--opt-level {0,1,2}`（既定: `1`）
+  - `0`: 最適化なし、Python 完全互換（添字の負数正規化・境界チェックを常に行う）
+  - `1`: 軽量最適化（定数負数のみ正規化、境界チェック off）
+  - `2`: 積極最適化（負数正規化 off、境界チェック off、浮動小数ループ強度削減）
+- 添字の個別制御（`--opt-level` のデフォルトを上書きする）:
+  - `--negative-index-mode {always,const_only,off}` — 負数インデックスの正規化
+  - `--bounds-check-mode {always,debug,off}` — 添字の範囲チェック
 - 除算仕様: `--floor-div-mode {native,python}` / `--mod-mode {native,python}`（既定: `native`）
 - 整数ビット幅: `--int-width {32,64}`（既定: `64`）
-- EAST3 最適化レベル: `--east3-opt-level {0,1,2}`（既定: `1`）
+
+注: `--opt-level` 等の最適化オプションは EAST optimizer への指示であり、emitter は EAST3 に付与されたメタデータを参照するだけです。
 
 </details>
 

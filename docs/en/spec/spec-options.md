@@ -20,14 +20,19 @@ Its purpose is to let users explicitly choose trade-offs between "Python compati
 
 Enabled in `pytra-cli.py --target cpp`:
 
-- `--negative-index-mode {always,const_only,off}`
-  - `always`: always process negative indices with Python-compatible behavior
-  - `const_only`: Python-compatible behavior only for constant negative indices (current default)
-  - `off`: do not apply Python-compatible behavior
-- `--bounds-check-mode {always,debug,off}`
+- `--opt-level {0,1,2}` (replaces legacy `-O0`~`-O3` and `--east3-opt-level`)
+  - `0`: no optimization, full Python compatibility (negative index normalization: always, bounds check: always)
+  - `1`: light optimization (negative index: const_only, bounds check: off) — **current default**
+  - `2`: aggressive optimization (negative index: off, bounds check: off, float loop strength reduction)
+  - This is a directive to the EAST optimizer. The emitter does not know about this option; it only reads `meta.subscript_access_v1` metadata on EAST3 nodes.
+- `--negative-index-mode {always,const_only,off}` (overrides `--opt-level` default)
+  - `always`: always normalize negative indices with Python-compatible behavior
+  - `const_only`: normalize only constant negative indices
+  - `off`: do not normalize
+- `--bounds-check-mode {always,debug,off}` (overrides `--opt-level` default)
   - `always`: always check index access
   - `debug`: check only when `NDEBUG` is disabled
-  - `off`: no checks (current default)
+  - `off`: no checks
 - `--floor-div-mode {python,native}`
   - `python`: Python-compatible via `py_floordiv`
   - `native`: use C++ `/` directly (current default)
@@ -43,12 +48,8 @@ Enabled in `pytra-cli.py --target cpp`:
 - `--str-slice-mode {byte,codepoint}`
   - `byte` is available
   - `codepoint` is not implemented yet (error if specified)
-- `-O0` / `-O1` / `-O2` / `-O3`
-  - Generated code optimization level
-  - `-O0`: no optimization (readability/investigation first)
-  - `-O1`: light optimization
-  - `-O2`: medium optimization
-  - `-O3`: aggressive optimization (default)
+- `-O0` / `-O1` / `-O2` / `-O3` — **deprecated**, replaced by `--opt-level {0,1,2}`.
+  - Legacy mapping: `-O0` → `--opt-level 0`, `-O1` → `--opt-level 1`, `-O2`/`-O3` → `--opt-level 2`.
 - `--parser-backend {self_hosted,cpython}`
   - Select EAST generation backend
 - `--no-main`

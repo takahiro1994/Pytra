@@ -8,32 +8,31 @@ This page covers advanced transpilation routes and runtime helper annotations (p
 
 ## C++ Max-Opt Route
 
-- `./pytra ... --target cpp --codegen-opt 3` uses the linked-program optimizer route rather than the C++ compat route.
+- `./pytra ... --target cpp --opt-level 2` enables aggressive optimization via the linked-program optimizer.
 - With `--build`, Pytra continues from linked-program optimization into multi-file output, Makefile generation, and build.
 - Intermediate linked bundles are written under `--output-dir/.pytra_linked/`.
-- `--codegen-opt 0/1/2` keeps the legacy route.
+- `--opt-level 0/1` keeps the default route.
 - Route changes must be guarded not only by representative CLI tests but also by sample parity.
 
 ```bash
 ./pytra sample/py/18_mini_language_interpreter.py \
   --target cpp \
-  --codegen-opt 3 \
+  --opt-level 2 \
   --build \
   --output-dir out/sample18_maxopt \
-  --opt -O3 \
   --exe sample18.out
 ```
 
 Verification command:
 
 ```bash
-python3 tools/check/runtime_parity_check.py \
+python3 tools/check/runtime_parity_check_fast.py \
   --targets cpp \
   --case-root sample \
-  \
-  --cpp-codegen-opt 3 \
-  --east3-opt-level 2
+  --opt-level 2
 ```
+
+Note: `--opt-level` is a directive to the EAST optimizer. It is separate from g++'s `-O3` flag. `--opt-level 2` performs optimizations at the EAST stage (bounds-check elision, float loop strength reduction, etc.), while `-O3` is passed to g++ for native code optimization.
 
 ## `@abi` in Runtime Helpers
 

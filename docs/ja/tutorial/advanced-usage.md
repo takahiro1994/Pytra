@@ -8,32 +8,31 @@
 
 ## C++ max-opt route
 
-- `./pytra ... --target cpp --codegen-opt 3` は、C++ compat route ではなく linked-program optimizer を通す max route です。
+- `./pytra ... --target cpp --opt-level 2` は、積極最適化を有効にして linked-program optimizer を通す max route です。
 - `--build` を併用すると、linked-program 最適化後の multi-file output から `Makefile` 生成と build を続けて実行します。
 - 中間の linked bundle は `--output-dir/.pytra_linked/` に置きます。
-- `--codegen-opt 0/1/2` は従来 route を維持します。
+- `--opt-level 0/1` は従来 route を維持します。
 - route 変更の非退行確認は、representative CLI test だけでなく sample parity でも見る前提です。
 
 ```bash
 ./pytra sample/py/18_mini_language_interpreter.py \
   --target cpp \
-  --codegen-opt 3 \
+  --opt-level 2 \
   --build \
   --output-dir out/sample18_maxopt \
-  --opt -O3 \
   --exe sample18.out
 ```
 
 確認コマンド:
 
 ```bash
-python3 tools/check/runtime_parity_check.py \
+python3 tools/check/runtime_parity_check_fast.py \
   --targets cpp \
   --case-root sample \
-  --all-samples \
-  --cpp-codegen-opt 3 \
-  --east3-opt-level 2
+  --opt-level 2
 ```
+
+注: `--opt-level` は EAST optimizer への指示です。C++ コンパイラの `-O3` フラグ（g++ に渡す）とは別物です。`--opt-level 2` は添字の bounds check 省略や浮動小数ループ最適化等を EAST 段で行い、g++ の `-O3` は生成された C++ コードのネイティブ最適化を行います。
 
 ## runtime 宣言
 

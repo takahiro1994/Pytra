@@ -84,10 +84,17 @@ Notes:
 
 ### Options
 
-- Index bounds check: `--bounds-check-mode {always,debug,off}` (default: `off`)
+- Optimization level: `--opt-level {0,1,2}` (default: `1`)
+  - `0`: no optimization, full Python compatibility (always normalize negative indices, always bounds-check)
+  - `1`: light optimization (normalize constant negatives only, bounds-check off)
+  - `2`: aggressive optimization (negative normalization off, bounds-check off, float loop strength reduction)
+- Index control (overrides `--opt-level` defaults):
+  - `--negative-index-mode {always,const_only,off}` — negative index normalization
+  - `--bounds-check-mode {always,debug,off}` — index bounds checking
 - Division semantics: `--floor-div-mode {native,python}` / `--mod-mode {native,python}` (default: `native`)
 - Integer bit width: `--int-width {32,64}` (default: `64`)
-- EAST3 optimization level: `--east3-opt-level {0,1,2}` (default: `1`)
+
+Note: `--opt-level` and related options are directives to the EAST optimizer. The emitter only reads metadata attached to EAST3 nodes by the optimizer.
 
 </details>
 
