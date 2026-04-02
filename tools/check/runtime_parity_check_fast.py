@@ -974,12 +974,12 @@ def check_case(
             shutil.rmtree(work, ignore_errors=True)
 
     if mismatches:
-        print("\n[FAIL] mismatches")
+        print(f"\n[FAIL] {case_stem} mismatches", flush=True)
         for m in mismatches:
-            print(f"- {m}")
+            print(f"- {m}", flush=True)
         return 1
 
-    print(f"[PASS] {case_stem}")
+    print(f"[PASS] {case_stem}", flush=True)
     return 0
 
 
@@ -1046,6 +1046,7 @@ def main() -> int:
             fail_cases += 1
         else:
             pass_cases += 1
+        sys.stdout.flush()
     elapsed = time.monotonic() - t_start
 
     category_counts: dict[str, int] = {}

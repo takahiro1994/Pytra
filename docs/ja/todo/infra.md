@@ -24,8 +24,8 @@
 
 C++ fixture parity（137件、20分超）で完了まで stdout が返らず、進捗が見えない問題。
 
-1. [ ] [ID: P5-PARITY-STREAM-S1] `tools/check/runtime_parity_check_fast.py` の各ケース完了時に即座に stdout へ結果行を flush する（バッファリングをやめる）
-2. [ ] [ID: P5-PARITY-STREAM-S2] 既存の summary 出力フォーマットとの互換を維持する
+1. [x] [ID: P5-PARITY-STREAM-S1] `tools/check/runtime_parity_check_fast.py` の各ケース完了時に即座に stdout へ結果行を flush する（バッファリングをやめる）— `[PASS]`/`[FAIL]` print に `flush=True` を追加し、メインループで `sys.stdout.flush()` を呼ぶ（2026-04-02）
+2. [x] [ID: P5-PARITY-STREAM-S2] 既存の summary 出力フォーマットとの互換を維持する — SUMMARY行/SUMMARY_CATEGORIES行は変更なし（2026-04-02）
 
 ### P20-DATA-DRIVEN-TESTS: パイプライン系テストのデータ駆動化
 
