@@ -705,10 +705,17 @@ def _emit_expr_as_type(ctx: CppEmitContext, node: JsonVal, target_type: str) -> 
     if not isinstance(node, dict):
         return _emit_expr(ctx, node)
     node = _normalize_cpp_boundary_expr(ctx, node)
-    if _str(node, "kind") == "Box" and target_type not in ("Any", "Obj", "object"):
+    node_kind = _str(node, "kind")
+    if node_kind == "Box" and target_type not in ("Any", "Obj", "object"):
         inner = node.get("value")
         if isinstance(inner, dict):
             return _emit_expr_as_type(ctx, inner, target_type)
+    if node_kind == "Unbox" and target_type not in ("Any", "Obj", "object"):
+        inner = node.get("value")
+        if isinstance(inner, dict) and _str(inner, "kind") == "Box":
+            boxed_value = inner.get("value")
+            if isinstance(boxed_value, dict):
+                return _emit_expr_as_type(ctx, boxed_value, target_type)
     storage_type = _expr_storage_type(ctx, node)
     if storage_type == target_type:
         kind = _str(node, "kind")
@@ -2614,6 +2621,10 @@ def _emit_unbox(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
     target_mirror = _node_type_mirror(node)
     if target_mirror != "":
         target = target_mirror
+    if target not in ("", "object") and isinstance(value, dict) and _str(value, "kind") == "Box":
+        boxed_value = value.get("value")
+        if isinstance(boxed_value, dict):
+            return _emit_expr_as_type(ctx, boxed_value, target)
     if isinstance(value, dict) and _str(value, "kind") == "Name":
         value_expr = _emit_name_storage(value)
     else:
@@ -4135,6 +4146,10 @@ def _emit_cast_expr(ctx: CppEmitContext, target_node: JsonVal, value_node: JsonV
         target_name = _str(target_node, "id")
         if target_name == "":
             target_name = _str(target_node, "repr")
+    if target_name not in ("", "unknown", "Any", "Obj", "object") and isinstance(value_node, dict) and _str(value_node, "kind") == "Box":
+        boxed_value = value_node.get("value")
+        if isinstance(boxed_value, dict):
+            return _emit_expr_as_type(ctx, boxed_value, target_name)
     value_expr = _emit_expr(ctx, value_node)
     value_type = _effective_resolved_type(value_node)
     static_value_type = _expr_static_type(ctx, value_node)

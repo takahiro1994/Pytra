@@ -5428,6 +5428,83 @@ def has_key(env: dict[str, int], name: str) -> bool:
         self.assertIn("return (*(indent));", cpp_code)
         self.assertNotIn("return (*((*(indent))));", cpp_code)
 
+    def test_cpp_emitter_unbox_box_pair_uses_inner_scalar_directly(self) -> None:
+        doc = _module_doc(
+            "app.main",
+            body=[
+                {
+                    "kind": "FunctionDef",
+                    "name": "read_value",
+                    "arg_order": [],
+                    "arg_types": {},
+                    "arg_usage": {},
+                    "arg_defaults": {},
+                    "return_type": "int64",
+                    "body": [
+                        {
+                            "kind": "Return",
+                            "value": {
+                                "kind": "Unbox",
+                                "target": "int64",
+                                "resolved_type": "int64",
+                                "value": {
+                                    "kind": "Box",
+                                    "resolved_type": "object",
+                                    "value": {"kind": "Constant", "value": 42, "resolved_type": "int64"},
+                                },
+                            },
+                        }
+                    ],
+                }
+            ],
+        )
+
+        cpp_code = emit_cpp_module(doc)
+
+        self.assertIn("return 42;", cpp_code)
+        self.assertNotIn(".unbox<int64>()", cpp_code)
+        self.assertNotIn("object(42)", cpp_code)
+
+    def test_cpp_emitter_cast_expr_skips_boxed_scalar_runtime_object_path(self) -> None:
+        doc = _module_doc(
+            "app.main",
+            body=[
+                {
+                    "kind": "FunctionDef",
+                    "name": "cast_value",
+                    "arg_order": [],
+                    "arg_types": {},
+                    "arg_usage": {},
+                    "arg_defaults": {},
+                    "return_type": "int64",
+                    "body": [
+                        {
+                            "kind": "Return",
+                            "value": {
+                                "kind": "Call",
+                                "func": {"kind": "Name", "id": "cast"},
+                                "args": [
+                                    {"kind": "Name", "id": "int64", "resolved_type": "type"},
+                                    {
+                                        "kind": "Box",
+                                        "resolved_type": "object",
+                                        "value": {"kind": "Constant", "value": 42, "resolved_type": "int64"},
+                                    },
+                                ],
+                                "resolved_type": "int64",
+                            },
+                        }
+                    ],
+                }
+            ],
+        )
+
+        cpp_code = emit_cpp_module(doc)
+
+        self.assertIn("return 42;", cpp_code)
+        self.assertNotIn(".unbox<int64>()", cpp_code)
+        self.assertNotIn("static_cast<int64>(object(42))", cpp_code)
+
     def test_cpp_header_gen_preserves_exception_class_inheritance(self) -> None:
         doc = _module_doc(
             "pytra.built_in.error",
