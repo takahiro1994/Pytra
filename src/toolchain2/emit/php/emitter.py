@@ -1971,60 +1971,7 @@ def _emit_function_def(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
     saved_ret = ctx.current_return_type
     ctx.current_return_type = return_type
 
-    mutable_methods = {
-        "append", "extend", "insert", "pop", "clear", "sort", "reverse",
-        "update", "add", "discard", "remove",
-    }
-
-    def _root_name(expr: JsonVal) -> str:
-        if not isinstance(expr, dict):
-            return ""
-        kind = _str(expr, "kind")
-        if kind == "Name":
-            return _str(expr, "id")
-        if kind in ("Attribute", "Subscript"):
-            return _root_name(expr.get("value"))
-        return ""
-
-    def _param_needs_by_ref(param_name: str, param_type: str) -> bool:
-        is_mutable_container = (
-            param_type.startswith("list[") or param_type == "list"
-            or param_type.startswith("dict[") or param_type == "dict"
-            or param_type.startswith("set[") or param_type == "set"
-            or param_type == "bytearray" or param_type == "bytes"
-        )
-        if not is_mutable_container:
-            return False
-
-        def _walk(n: JsonVal) -> bool:
-            if isinstance(n, dict):
-                kind = _str(n, "kind")
-                if kind in ("Assign", "AnnAssign"):
-                    target = n.get("target")
-                    if isinstance(target, dict) and _str(target, "kind") == "Subscript" and _root_name(target) == param_name:
-                        return True
-                elif kind == "AugAssign":
-                    target = n.get("target")
-                    if isinstance(target, dict):
-                        if _str(target, "kind") == "Name" and _str(target, "id") == param_name:
-                            return True
-                        if _str(target, "kind") == "Subscript" and _root_name(target) == param_name:
-                            return True
-                elif kind == "Call":
-                    func_node = n.get("func")
-                    if isinstance(func_node, dict) and _str(func_node, "kind") == "Attribute":
-                        if _root_name(func_node.get("value")) == param_name and _str(func_node, "attr") in mutable_methods:
-                            return True
-                for value in n.values():
-                    if _walk(value):
-                        return True
-            elif isinstance(n, list):
-                for value in n:
-                    if _walk(value):
-                        return True
-            return False
-
-        return _walk(body)
+    arg_usage = _dict(node, "arg_usage")
 
     # Build parameter list
     params: list[str] = []
@@ -2038,7 +1985,7 @@ def _emit_function_def(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
         a_type = a_type_val if isinstance(a_type_val, str) else ""
         safe_a = _safe_php_ident(a_str)
         ctx.var_types[safe_a] = a_type
-        by_ref = _param_needs_by_ref(a_str, a_type)
+        by_ref = _str(arg_usage, a_str) == "reassigned"
         params.append(("&" if by_ref else "") + _php_var(safe_a))
 
     # Handle varargs

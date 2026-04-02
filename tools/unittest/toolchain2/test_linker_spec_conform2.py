@@ -36,6 +36,7 @@ from toolchain2.compile.lower import lower_east2_to_east3
 from toolchain2.optimize.optimizer import optimize_east3_document
 from toolchain2.emit.go.emitter import emit_go_module
 from toolchain2.emit.cpp.emitter import emit_cpp_module
+from toolchain2.emit.php.emitter import emit_php_module
 from toolchain2.emit.cpp.header_gen import build_cpp_header_from_east3
 from toolchain2.emit.cpp.runtime_bundle import emit_runtime_module_artifacts
 from toolchain2.emit.cpp.runtime_paths import collect_cpp_dependency_module_ids
@@ -1663,6 +1664,63 @@ def has_key(env: dict[str, int], name: str) -> bool:
         cpp_code = emit_cpp_module(doc, allow_runtime_module=True)
 
         self.assertIn("void _png_append(bytearray& dst, const bytearray& src)", cpp_code)
+
+    def test_php_emitter_uses_arg_usage_for_by_ref_params(self) -> None:
+        doc = _module_doc(
+            "pytra.utils.png",
+            body=[
+                {
+                    "kind": "FunctionDef",
+                    "name": "_png_append",
+                    "arg_types": {"dst": "bytearray", "src": "bytearray"},
+                    "arg_order": ["dst", "src"],
+                    "arg_defaults": {},
+                    "arg_usage": {"dst": "reassigned", "src": "readonly"},
+                    "return_type": "None",
+                    "body": [{"kind": "Pass"}],
+                }
+            ],
+        )
+
+        php_code = emit_php_module(doc)
+
+        self.assertIn("function _png_append(&$dst, $src)", php_code)
+
+    def test_php_emitter_does_not_infer_by_ref_from_mutable_type_alone(self) -> None:
+        doc = _module_doc(
+            "pytra.utils.png",
+            body=[
+                {
+                    "kind": "FunctionDef",
+                    "name": "_png_append",
+                    "arg_types": {"dst": "bytearray", "src": "bytearray"},
+                    "arg_order": ["dst", "src"],
+                    "arg_defaults": {},
+                    "arg_usage": {"dst": "readonly", "src": "readonly"},
+                    "return_type": "None",
+                    "body": [
+                        {
+                            "kind": "Expr",
+                            "value": {
+                                "kind": "Call",
+                                "func": {
+                                    "kind": "Attribute",
+                                    "value": {"kind": "Name", "id": "dst", "resolved_type": "bytearray"},
+                                    "attr": "append",
+                                },
+                                "args": [{"kind": "Int", "value": 1, "resolved_type": "int64"}],
+                                "resolved_type": "None",
+                            },
+                        }
+                    ],
+                }
+            ],
+        )
+
+        php_code = emit_php_module(doc)
+
+        self.assertIn("function _png_append($dst, $src)", php_code)
+        self.assertNotIn("function _png_append(&$dst, $src)", php_code)
 
     def test_cpp_runtime_helpers_emit_template_prefix_for_generic_function_types(self) -> None:
         doc = _module_doc(
