@@ -79,6 +79,7 @@
 - `src/*_module/` は互換レイヤ扱いとし、新規 runtime 実体ファイルを追加しません（段階撤去対象）。
 - `src/runtime/cpp/generated/utils/png.cpp` / `src/runtime/cpp/generated/utils/gif.cpp` は `src/pytra/utils/*.py` からの生成物として扱い、手編集しません（`py2cpp.py` 実行時に自動更新される）。
 - `src/runtime/<lang>/generated/` の `png/gif` 書き出し本体は、`src/pytra/utils/png.py` / `src/pytra/utils/gif.py` を正本とした生成物のみを許可し、言語別の手書き実装を禁止します。
+- **`src/pytra/utils/png.py` / `src/pytra/utils/gif.py` / `src/pytra/std/*.py` の正本ファイルは言語 backend 担当が変更してはならない。** 正本の変更は全言語に波及するため、変更はプランナーまたはインフラ担当が全言語への影響を確認したうえで行う。
 - `png/gif` で許可される言語差分は、入出力アダプタや最小のランタイム接続コードに限定し、エンコード本体ロジック（CRC32/Adler32/DEFLATE/LZW/chunk構築）を手で複製してはいけません。
 - 画像runtimeは C++ と同じ責務分離を全言語で強制します。canonical 形は `src/runtime/<lang>/native/` に手書き runtime、`src/runtime/<lang>/generated/` に `src/pytra/utils/{png,gif}.py` 由来の生成物のみを置く形です。未移行 backend の `pytra-core/pytra-gen` は rollout debt としてのみ許可します。
 - `py_runtime.*` など core 側ファイルへ PNG/GIF エンコード本体（`write_rgb_png` / `save_gif` / `grayscale_palette`）を直書きしてはいけません。必要な場合は canonical generated lane API への薄い委譲だけを許可します。
