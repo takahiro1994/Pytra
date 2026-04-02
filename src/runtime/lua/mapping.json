@@ -112,6 +112,7 @@
     "py_truthy": "__pytra_truthy",
     "py_in": "__pytra_contains",
     "py_isinstance": "__pytra_isinstance",
+    "module_ctor.math": "__pytra_math_module",
     "py_assert_stdout": "__pytra_assert_stdout",
     "py_assert_true": "__pytra_assert_true",
     "py_assert_eq": "__pytra_assert_eq",

@@ -2227,13 +2227,14 @@ def _emit_import_stmt(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
             mod_name = _str(item, "name")
             asname = _str(item, "asname")
             local_name = asname if asname != "" else mod_name
-            if mod_name == "math":
+            module_ctor = ctx.mapping.calls.get("module_ctor." + mod_name, "")
+            if module_ctor != "":
                 safe_local = _lua_symbol_name(ctx, local_name)
                 if safe_local not in ctx.declared_locals:
                     ctx.declared_locals.add(safe_local)
-                    _emit(ctx, "local " + safe_local + " = __pytra_math_module()")
+                    _emit(ctx, "local " + safe_local + " = " + module_ctor + "()")
                 else:
-                    _emit(ctx, safe_local + " = __pytra_math_module()")
+                    _emit(ctx, safe_local + " = " + module_ctor + "()")
             elif mod_name != "" and not should_skip_module(mod_name, ctx.mapping):
                 module_file = _lua_module_filename(mod_name)
                 if module_file not in ctx.loaded_module_files:
