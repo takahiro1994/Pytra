@@ -17,19 +17,38 @@ toolchain2 ではこのオプションが移行されておらず、C++ runtime 
 
 ## 方針
 
-1. `--negative-index-mode` / `--bounds-check-mode` を EAST optimizer のオプションとして復活させる
+### `--east3-opt-level` を `--opt-level` に改名し、最適化プリセットとして統合する
+
+旧 `--east3-opt-level` は内部実装名がそのまま CLI に露出している。ユーザーから見れば単に「最適化レベル」なので `--opt-level` に改名する。
+
+`--opt-level` がデフォルトの `negative_index_mode` / `bounds_check_mode` を決定し、個別オプションで上書きできる:
+
+| `--opt-level` | 意味 | `negative_index_mode` デフォルト | `bounds_check_mode` デフォルト |
+|---|---|---|---|
+| `0` | 最適化なし、Python 完全互換 | `always` | `always` |
+| `1` | 軽量最適化（デフォルト） | `const_only` | `off` |
+| `2` | 積極最適化 | `off` | `off` |
+
+個別オプション（`--negative-index-mode` / `--bounds-check-mode`）は `--opt-level` のデフォルトを上書きする:
+```
+--opt-level 2 --negative-index-mode always   # 積極最適化だが負数インデックスは常に正規化
+```
+
+### optimizer / emitter の責務
+
+1. `--opt-level` / `--negative-index-mode` / `--bounds-check-mode` は optimizer への入力
 2. optimizer が `Subscript` ノードにメタデータを付与する:
    - `meta.subscript_access_v1.negative_index: "normalize" | "skip"` — 負数正規化の要否
    - `meta.subscript_access_v1.bounds_check: "full" | "off"` — 範囲チェックの要否
 3. optimizer の判定ロジック:
-   - `ForRange` ループ変数による添字 → `negative_index: "skip"`, `bounds_check: "off"`
+   - `ForRange` ループ変数による添字 → `negative_index: "skip"`, `bounds_check: "off"`（opt-level に関係なく安全）
    - 定数リテラル非負 → `negative_index: "skip"`
    - 負数リテラル（`a[-1]`）→ `negative_index: "normalize"`
-   - それ以外 → オプション設定に従う
+   - それ以外 → `--opt-level` が決めたデフォルト（個別オプションで上書き可）に従う
 4. emitter はメタデータを見て runtime API を選ぶだけ:
    - `bounds_check: "full"` → `py_list_at_ref`（既存、full check）
    - `bounds_check: "off"` → 直接 `operator[]` / 言語のネイティブ添字アクセス
-5. emitter は `--negative-index-mode` / `--bounds-check-mode` のオプション自体を知らない
+5. emitter は `--opt-level` / `--negative-index-mode` / `--bounds-check-mode` のオプション自体を知らない
 
 ## 対象
 
@@ -56,7 +75,9 @@ toolchain2 ではこのオプションが移行されておらず、C++ runtime 
 
 ## 受け入れ基準
 
-- [ ] EAST optimizer に `--negative-index-mode` / `--bounds-check-mode` オプションがある
+- [ ] `--east3-opt-level` が `--opt-level` に改名されている
+- [ ] `--opt-level` が `negative_index_mode` / `bounds_check_mode` のデフォルトを決定する
+- [ ] `--negative-index-mode` / `--bounds-check-mode` で個別上書きできる
 - [ ] `Subscript` ノードに `meta.subscript_access_v1` が付与される
 - [ ] emitter はメタデータのみを参照し、オプション自体を知らない
 - [ ] C++ sample 01 (mandelbrot) の実行時間が Rust/Go と同等レベルに改善される
@@ -68,16 +89,19 @@ toolchain2 ではこのオプションが移行されておらず、C++ runtime 
 
 ## サブタスク
 
-1. [ ] [ID: P0-SUB-BOUNDS-S1] `meta.subscript_access_v1` スキーマを spec-east.md に定義する
-2. [ ] [ID: P0-SUB-BOUNDS-S2] EAST optimizer に `--negative-index-mode` / `--bounds-check-mode` を追加し、`Subscript` ノードにメタデータを付与するパスを実装する
+1. [x] [ID: P0-SUB-BOUNDS-S1] `meta.subscript_access_v1` スキーマを spec-east.md に定義する
+2. [ ] [ID: P0-SUB-BOUNDS-S1.5] `--east3-opt-level` を `--opt-level` に改名する（pytra-cli2.py, runtime_parity_check_fast.py, optimizer, spec, tutorial 全箇所）
+3. [ ] [ID: P0-SUB-BOUNDS-S2] optimizer に `--opt-level` と `--negative-index-mode` / `--bounds-check-mode` の連動を実装する
+   - `--opt-level` がデフォルトの `negative_index_mode` / `bounds_check_mode` を決定する
+   - `--negative-index-mode` / `--bounds-check-mode` で個別上書きできる
    - `optimize_east3_document()` の引数に `negative_index_mode` / `bounds_check_mode` を追加する
-   - `runtime_parity_check_fast.py` にも `--negative-index-mode` / `--bounds-check-mode` CLI オプションを追加し、optimizer に引き回す
-   - parity check のデフォルトは旧 toolchain と同じ `const_only` + `off` にする
-3. [ ] [ID: P0-SUB-BOUNDS-S3] C++ emitter でメタデータに基づく direct index / py_list_at_ref の分岐を実装する
-4. [ ] [ID: P0-SUB-BOUNDS-S4] sample 01 (mandelbrot) の C++ 実行時間が改善されることを確認する
-5. [ ] [ID: P0-SUB-BOUNDS-S5] fixture + sample + stdlib parity に回帰がないことを確認する
-6. [ ] [ID: P0-SUB-BOUNDS-S6] negative index の回帰 fixture を追加する — `a[-1]` / `a[-2]` を含む fixture で、optimizer が誤って `negative_index: skip` を付けた場合に FAIL になることを検証する
+   - `runtime_parity_check_fast.py` にも `--opt-level` / `--negative-index-mode` / `--bounds-check-mode` を追加して optimizer に引き回す
+4. [ ] [ID: P0-SUB-BOUNDS-S3] C++ emitter でメタデータに基づく direct index / py_list_at_ref の分岐を実装する
+5. [ ] [ID: P0-SUB-BOUNDS-S4] sample 01 (mandelbrot) の C++ 実行時間が改善されることを確認する
+6. [ ] [ID: P0-SUB-BOUNDS-S5] fixture + sample + stdlib parity に回帰がないことを確認する
+7. [ ] [ID: P0-SUB-BOUNDS-S6] negative index の回帰 fixture を追加する — `a[-1]` / `a[-2]` を含む fixture で、optimizer が誤って `negative_index: skip` を付けた場合に FAIL になることを検証する
 
 ## 決定ログ
 
 - 2026-04-02: C++ sample 01 が Python と同等（12.8s vs 34.9s、Rust 1.9s）と遅い原因を調査。PNG runtime の `py_list_at_ref` が毎回 bounds check + 負数正規化していることが根本原因。旧 toolchain では `bounds_check_mode=off` がデフォルトだったが toolchain2 に未移行。emitter のオプションではなく EAST optimizer の責務として再設計する方針で起票。
+- 2026-04-02: `--east3-opt-level` は内部実装名がそのまま CLI に露出しているので `--opt-level` に改名する。`--opt-level` が `negative_index_mode` / `bounds_check_mode` のデフォルトを決定し、個別オプションで上書きできる設計にする。
