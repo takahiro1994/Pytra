@@ -1406,6 +1406,30 @@ def f() -> None:
         self.assertEqual(ann_assign3.get("value", {}).get("kind"), "Box")
         self.assertEqual(ann_assign3.get("value", {}).get("target"), "list[Any]")
 
+    def test_compile_uses_dynamic_target_resolved_type_for_cpp_box(self) -> None:
+        source = """
+from pytra.typing import Any
+
+def f() -> None:
+    values: list[Any] = [1, 2]
+"""
+        east2 = parse_python_source(source, "<mem>").to_jv()
+        resolve_east1_to_east2(east2, registry=_load_registry())
+        east3 = lower_east2_to_east3(east2, target_language="cpp")
+
+        ann_assign3 = next(
+            node
+            for node in _walk(east3)
+            if node.get("kind") == "AnnAssign"
+            and isinstance(node.get("target"), dict)
+            and node["target"].get("id") == "values"
+        )
+        boxed = ann_assign3.get("value", {})
+
+        self.assertEqual(boxed.get("kind"), "Box")
+        self.assertEqual(boxed.get("target"), "list[Any]")
+        self.assertEqual(boxed.get("resolved_type"), "list[Any]")
+
     def test_compile_inserts_unbox_for_yields_dynamic_assignment_targets(self) -> None:
         source = """
 from pytra.typing import Any
@@ -1857,6 +1881,31 @@ def f() -> str:
         self.assertEqual(boxed_arg.get("kind"), "Box")
         self.assertEqual(boxed_arg.get("target"), "bool|int64|float64|str|list[Any]|dict[str,Any]|None")
         self.assertEqual(boxed_arg.get("value", {}).get("resolved_type"), "int64")
+
+    def test_compile_uses_union_target_resolved_type_for_cpp_box(self) -> None:
+        source = """
+from pytra.std.json import dumps
+
+def f() -> str:
+    return dumps(1)
+"""
+        east2 = parse_python_source(source, "<mem>").to_jv()
+        resolve_east1_to_east2(east2, registry=_load_registry())
+        east3 = lower_east2_to_east3(east2, target_language="cpp")
+
+        dumps_call = next(
+            node
+            for node in _walk(east3)
+            if node.get("kind") == "Call"
+            and isinstance(node.get("func"), dict)
+            and node["func"].get("kind") == "Name"
+            and node["func"].get("id") == "dumps"
+        )
+        boxed_arg = dumps_call.get("args", [])[0]
+
+        self.assertEqual(boxed_arg.get("kind"), "Box")
+        self.assertEqual(boxed_arg.get("target"), "bool|int64|float64|str|list[Any]|dict[str,Any]|None")
+        self.assertEqual(boxed_arg.get("resolved_type"), "bool|int64|float64|str|list[Any]|dict[str,Any]|None")
 
     def test_compile_preserves_tuple_unpack_value_type_for_static_tuple_calls(self) -> None:
         source = """

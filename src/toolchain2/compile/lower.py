@@ -592,9 +592,12 @@ def _wrap_value_for_target_type(
         set_type_expr_summary(out, target_summary)
         return out
     if is_dynamic_like_summary(target_summary) and not is_dynamic_like_summary(value_summary):
+        box_resolved_type = "object"
+        if ctx.target_language == "cpp" and target_t not in ("", "unknown"):
+            box_resolved_type = target_t
         out = _make_boundary_expr(
             kind="Box", value_key="value", value_node=value_expr,
-            resolved_type="object", source_expr=value_expr,
+            resolved_type=box_resolved_type, source_expr=value_expr,
             ctx=ctx,
         )
         out["bridge_lane_v1"] = bridge_lane_payload(target_summary, value_summary)
