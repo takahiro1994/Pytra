@@ -298,6 +298,41 @@ func __pytra_dict_setdefault(_ dict: inout [AnyHashable: Any], _ key: Any?, _ de
     return stored
 }
 
+func __pytra_get(_ dict: Any?, _ key: Any?, _ defaultValue: Any?) -> Any {
+    if let map = dict as? [AnyHashable: Any] {
+        return map[AnyHashable(__pytra_str(key))] ?? (defaultValue ?? __pytra_any_default())
+    }
+    return defaultValue ?? __pytra_any_default()
+}
+
+func __pytra_keys(_ dict: Any?) -> [Any] {
+    if let map = dict as? [AnyHashable: Any] {
+        return map.keys.map { $0.base }
+    }
+    return []
+}
+
+func __pytra_values(_ dict: Any?) -> [Any] {
+    if let map = dict as? [AnyHashable: Any] {
+        return Array(map.values)
+    }
+    return []
+}
+
+func __pytra_deque_appendleft(_ items: inout [Any], _ value: Any?) {
+    items.insert(value ?? __pytra_any_default(), at: 0)
+}
+
+func __pytra_deque_popleft(_ items: inout [Any]) -> Any {
+    if items.isEmpty { return __pytra_any_default() }
+    return items.removeFirst()
+}
+
+func __pytra_deque_pop(_ items: inout [Any]) -> Any {
+    if items.isEmpty { return __pytra_any_default() }
+    return items.removeLast()
+}
+
 func __pytra_ifexp(_ cond: Bool, _ a: Any, _ b: Any) -> Any {
     return cond ? a : b
 }

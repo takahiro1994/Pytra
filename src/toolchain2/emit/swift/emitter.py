@@ -252,6 +252,8 @@ def _swift_type(type_name: Any, *, allow_void: bool) -> str:
         return "Bool"
     if type_name == "str":
         return "String"
+    if ts3 == "deque":
+        return "[Any]"
     if ts3.startswith("list[") or ts3.startswith("tuple[") or ts3.startswith("set["):
         return "[Any]"
     if ts3.startswith("dict["):
@@ -690,13 +692,26 @@ def _render_boolop_expr(expr: dict[str, Any]) -> str:
     values = values_any if isinstance(values_any, list) else []
     if len(values) == 0:
         return "false"
-    rendered: list[str] = []
-    i = 0
+    resolved = expr.get("resolved_type")
+    if resolved == "bool":
+        rendered: list[str] = []
+        i = 0
+        while i < len(values):
+            rendered.append(_render_truthy_expr(values[i]))
+            i += 1
+        delim = " && " if op == "And" else " || "
+        return "(" + delim.join(rendered) + ")"
+    cur = _render_expr(values[0])
+    i = 1
     while i < len(values):
-        rendered.append(_render_truthy_expr(values[i]))
+        nxt = _render_expr(values[i])
+        tmp = "__boolop_" + str(i)
+        if op == "And":
+            cur = "({ let " + tmp + " = " + cur + "; return __pytra_truthy(" + tmp + ") ? " + nxt + " : " + tmp + " })()"
+        else:
+            cur = "({ let " + tmp + " = " + cur + "; return __pytra_truthy(" + tmp + ") ? " + tmp + " : " + nxt + " })()"
         i += 1
-    delim = " && " if op == "And" else " || "
-    return "(" + delim.join(rendered) + ")"
+    return _cast_from_any(cur, _swift_type(resolved, allow_void=False))
 
 
 def _snake_to_pascal(name: str) -> str:
@@ -989,6 +1004,10 @@ def _render_call_via_runtime_call(
             rendered_assert_args.append(_render_expr(args[i]))
             i += 1
         return "__pytra_assert(" + ", ".join(rendered_assert_args) + ")"
+    runtime_module = _runtime_module_id(expr)
+    runtime_name = _runtime_symbol_name(expr)
+    if runtime_module == "pytra.std.collections" and runtime_name == "deque":
+        return "[]"
     adapter = expr.get("runtime_call_adapter_kind", "")
     adapter = adapter if isinstance(adapter, str) else ""
     if runtime_source == "runtime_call":
@@ -1045,8 +1064,6 @@ def _render_call_via_runtime_call(
             return runtime_symbol + "(" + ", ".join(rendered_runtime_args) + ")"
         return ""
     runtime_symbol = _resolved_runtime_symbol(runtime_call, adapter)
-    runtime_module = _runtime_module_id(expr)
-    runtime_name = _runtime_symbol_name(expr)
     if runtime_module == "pytra.utils.png" and runtime_name == "write_rgb_png":
         rendered_runtime_args: list[str] = []
         i = 0
@@ -1151,6 +1168,8 @@ def _render_call_expr(expr: dict[str, Any]) -> str:
         if len(args) == 0:
             return "[]"
         return "__pytra_bytearray(" + _render_expr(args[0]) + ")"
+    if callee_name == "deque":
+        return "[]"
     if callee_name == "bytes":
         if len(args) == 0:
             return "[]"
@@ -1268,12 +1287,20 @@ def _render_call_expr(expr: dict[str, Any]) -> str:
                 owner_type.startswith("list[")
                 or owner_type.startswith("dict[")
                 or owner_type.startswith("set[")
-                or owner_type in {"bytes", "bytearray", "str"}
+                or owner_type in {"bytes", "bytearray", "str", "deque"}
             ):
                 if attr_name == "clear" and len(args) == 0:
                     return owner_expr + ".removeAll()"
                 if (owner_type.startswith("list[") or owner_type in {"bytes", "bytearray"}) and attr_name == "append" and len(args) == 1:
                     return owner_expr + ".append(" + _render_expr(args[0]) + ")"
+                if owner_type == "deque" and attr_name == "append" and len(args) == 1:
+                    return owner_expr + ".append(" + _render_expr(args[0]) + ")"
+                if owner_type == "deque" and attr_name == "appendleft" and len(args) == 1:
+                    return "__pytra_deque_appendleft(&" + owner_expr + ", " + _render_expr(args[0]) + ")"
+                if owner_type == "deque" and attr_name == "popleft" and len(args) == 0:
+                    return "__pytra_deque_popleft(&" + owner_expr + ")"
+                if owner_type == "deque" and attr_name == "pop" and len(args) == 0:
+                    return "__pytra_deque_pop(&" + owner_expr + ")"
                 if (owner_type.startswith("list[") or owner_type in {"bytes", "bytearray"}) and attr_name == "reverse" and len(args) == 0:
                     return owner_expr + ".reverse()"
                 if owner_type.startswith("list[") and attr_name == "sort" and len(args) == 0:
@@ -1442,41 +1469,125 @@ def _render_expr(expr: Any) -> str:
         if not isinstance(iter_any, dict):
             return "[]"
         id: dict[str, Any] = iter_any
-        if id.get("kind") != "RangeExpr":
-            return "[]"
         loop_var = _safe_ident(td2.get("id"), "i")
         if loop_var == "_":
             loop_var = "__lc_i"
-        start = _render_expr(id.get("start"))
-        stop = _render_expr(id.get("stop"))
-        step = _render_expr(id.get("step"))
+        loop_type = _swift_type(td2.get("resolved_type"), allow_void=False)
         elt = _render_expr(ed2.get("elt"))
+        if id.get("kind") == "RangeExpr":
+            start = _render_expr(id.get("start"))
+            stop = _render_expr(id.get("stop"))
+            step = _render_expr(id.get("step"))
+            return (
+                "({ () -> [Any] in "
+                "var __out: [Any] = []; "
+                "let __step = __pytra_int("
+                + step
+                + "); "
+                "var "
+                + loop_var
+                + " = __pytra_int("
+                + start
+                + "); "
+                "while ((__step >= 0 && "
+                + loop_var
+                + " < __pytra_int("
+                + stop
+                + ")) || (__step < 0 && "
+                + loop_var
+                + " > __pytra_int("
+                + stop
+                + "))) { "
+                "__out.append("
+                + elt
+                + "); "
+                + loop_var
+                + " += __step "
+                "}; "
+                "return __out "
+                "})()"
+            )
+        iter_expr = _render_expr(iter_any)
+        cond = ""
+        if len(ifs) == 1:
+            cond = "if " + _render_truthy_expr(ifs[0]) + " { __out.append(" + elt + ") }"
+        else:
+            cond = "__out.append(" + elt + ")"
         return (
             "({ () -> [Any] in "
             "var __out: [Any] = []; "
-            "let __step = __pytra_int("
-            + step
-            + "); "
-            "var "
+            "for __item in __pytra_as_list("
+            + iter_expr
+            + ") { let "
             + loop_var
-            + " = __pytra_int("
-            + start
-            + "); "
-            "while ((__step >= 0 && "
-            + loop_var
-            + " < __pytra_int("
-            + stop
-            + ")) || (__step < 0 && "
-            + loop_var
-            + " > __pytra_int("
-            + stop
-            + "))) { "
-            "__out.append("
-            + elt
-            + "); "
-            + loop_var
-            + " += __step "
-            "}; "
+            + ": "
+            + loop_type
+            + " = "
+            + _cast_from_any("__item", loop_type)
+            + "; "
+            + cond
+            + " }; "
+            "return __out "
+            "})()"
+        )
+
+    if kind == "SetComp":
+        gens_any = ed2.get("generators")
+        gens = gens_any if isinstance(gens_any, list) else []
+        if len(gens) != 1 or not isinstance(gens[0], dict):
+            return "[]"
+        gen = gens[0]
+        target_any = gen.get("target")
+        iter_any = gen.get("iter")
+        ifs_any = gen.get("ifs")
+        ifs = ifs_any if isinstance(ifs_any, list) else []
+        if not isinstance(target_any, dict) or target_any.get("kind") != "Name":
+            return "[]"
+        if not isinstance(iter_any, dict):
+            return "[]"
+        loop_var = _safe_ident(target_any.get("id"), "item")
+        loop_type = _swift_type(target_any.get("resolved_type"), allow_void=False)
+        iter_expr = _render_expr(iter_any)
+        elt = _render_expr(ed2.get("elt"))
+        cond = ""
+        if len(ifs) == 1:
+            cond = "if " + _render_truthy_expr(ifs[0]) + " { __pytra_set_add(&__out, " + elt + ") }"
+        else:
+            cond = "__pytra_set_add(&__out, " + elt + ")"
+        return (
+            "({ () -> [Any] in "
+            "var __out: [Any] = []; "
+            "for __item in __pytra_as_list(" + iter_expr + ") { let " + loop_var + ": " + loop_type + " = " + _cast_from_any("__item", loop_type) + "; " + cond + " }; "
+            "return __out "
+            "})()"
+        )
+
+    if kind == "DictComp":
+        gens_any = ed2.get("generators")
+        gens = gens_any if isinstance(gens_any, list) else []
+        if len(gens) != 1 or not isinstance(gens[0], dict):
+            return "[:]"
+        gen = gens[0]
+        target_any = gen.get("target")
+        iter_any = gen.get("iter")
+        ifs_any = gen.get("ifs")
+        ifs = ifs_any if isinstance(ifs_any, list) else []
+        if not isinstance(target_any, dict) or target_any.get("kind") != "Name":
+            return "[:]"
+        if not isinstance(iter_any, dict):
+            return "[:]"
+        loop_var = _safe_ident(target_any.get("id"), "item")
+        loop_type = _swift_type(target_any.get("resolved_type"), allow_void=False)
+        iter_expr = _render_expr(iter_any)
+        key_expr = _render_expr(ed2.get("key"))
+        value_expr = _render_expr(ed2.get("value"))
+        store = "__out[AnyHashable(__pytra_str(" + key_expr + "))] = " + value_expr
+        if len(ifs) == 1:
+            store = "if " + _render_truthy_expr(ifs[0]) + " { " + store + " }"
+        return (
+            "({ () -> [AnyHashable: Any] in "
+            "var __out: [AnyHashable: Any] = [:]; "
+            "for __item in __pytra_as_list(" + iter_expr + ") { let " + loop_var + ": " + loop_type + " = " + _cast_from_any("__item", loop_type) + "; " + store + " }; "
             "return __out "
             "})()"
         )
@@ -3286,6 +3397,7 @@ def emit_swift_module(east_doc: dict[str, Any]) -> str:
         or module_id == "pytra.std.os"
         or module_id == "pytra.std.env"
         or module_id == "pytra.std.os_path"
+        or module_id == "pytra.std.collections"
     ):
         return ""
     return transpile_to_swift_native(east_doc)
