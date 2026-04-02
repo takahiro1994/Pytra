@@ -33,6 +33,8 @@ from toolchain2.link.shared_types import linked_module_is_entry
 from toolchain2.link.shared_types import linked_module_mark_non_entry
 from toolchain2.link.shared_types import linked_module_source_path
 from toolchain2.optimize.optimizer import optimize_east3_doc_only
+from toolchain2.optimize.optimizer import resolve_bounds_check_mode
+from toolchain2.optimize.optimizer import resolve_negative_index_mode
 from toolchain2.parse.py.parse_python import parse_python_file
 from toolchain2.resolve.py.builtin_registry import load_builtin_registry
 from toolchain2.resolve.py.resolver import east2_output_path_from_east1
@@ -196,8 +198,22 @@ def _lower_cpp_doc(east2_doc: dict[str, JsonVal]) -> dict[str, JsonVal]:
 
 
 def _optimize_cpp_doc(east3_doc: dict[str, JsonVal]) -> dict[str, JsonVal]:
-    optimized_doc: dict[str, JsonVal] = optimize_east3_doc_only(east3_doc, opt_level=1)
+    optimized_doc: dict[str, JsonVal] = optimize_east3_doc_only(
+        east3_doc,
+        opt_level=1,
+        debug_flags=_optimizer_debug_flags("", ""),
+    )
     return optimized_doc
+
+
+def _optimizer_debug_flags(
+    negative_index_mode: str,
+    bounds_check_mode: str,
+) -> dict[str, JsonVal]:
+    return {
+        "negative_index_mode": resolve_negative_index_mode(negative_index_mode),
+        "bounds_check_mode": resolve_bounds_check_mode(bounds_check_mode),
+    }
 
 
 def _demote_non_entry_module(module: LinkedModule, entry_abs: str) -> None:
@@ -502,7 +518,13 @@ def cmd_compile(args: list[str]) -> int:
 # optimize: *.east3 → *.east3
 # ---------------------------------------------------------------------------
 
-def _optimize_one(input_path: Path, output_text: str, pretty: bool) -> int:
+def _optimize_one(
+    input_path: Path,
+    output_text: str,
+    pretty: bool,
+    negative_index_mode: str,
+    bounds_check_mode: str,
+) -> int:
     """1 ファイルを optimize して .east3 を生成する。"""
     if not input_path.exists():
         print("error: file not found: " + str(input_path))
@@ -515,7 +537,11 @@ def _optimize_one(input_path: Path, output_text: str, pretty: bool) -> int:
         return 1
 
     typed_east3_doc: dict[str, JsonVal] = east3_doc
-    optimized_doc = optimize_east3_doc_only(typed_east3_doc, opt_level=1)
+    optimized_doc = optimize_east3_doc_only(
+        typed_east3_doc,
+        opt_level=1,
+        debug_flags=_optimizer_debug_flags(negative_index_mode, bounds_check_mode),
+    )
     out_path = Path(output_text) if output_text != "" else input_path
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -533,6 +559,8 @@ def cmd_optimize(args: list[str]) -> int:
     inputs: list[str] = []
     output_text = ""
     pretty = False
+    negative_index_mode = ""
+    bounds_check_mode = ""
 
     i = 0
     while i < len(args):
@@ -548,8 +576,22 @@ def cmd_optimize(args: list[str]) -> int:
             pretty = True
             i += 1
             continue
+        if tok == "--negative-index-mode":
+            if i + 1 >= len(args):
+                print("error: missing value for --negative-index-mode")
+                return 1
+            negative_index_mode = args[i + 1]
+            i += 2
+            continue
+        if tok == "--bounds-check-mode":
+            if i + 1 >= len(args):
+                print("error: missing value for --bounds-check-mode")
+                return 1
+            bounds_check_mode = args[i + 1]
+            i += 2
+            continue
         if tok == "-h" or tok == "--help":
-            print("usage: pytra-cli2 -optimize INPUT.east3 [-o OUTPUT.east3] [--pretty]")
+            print("usage: pytra-cli2 -optimize INPUT.east3 [-o OUTPUT.east3] [--pretty] [--negative-index-mode MODE] [--bounds-check-mode MODE]")
             print("       pytra-cli2 -optimize INPUT1.east3 INPUT2.east3 ...  (multiple files)")
             return 0
         if not tok.startswith("-"):
@@ -567,7 +609,7 @@ def cmd_optimize(args: list[str]) -> int:
     exit_code = 0
     for inp in inputs:
         input_path = Path(inp)
-        rc = _optimize_one(input_path, output_text, pretty)
+        rc = _optimize_one(input_path, output_text, pretty, negative_index_mode, bounds_check_mode)
         if rc != 0:
             exit_code = rc
     return exit_code
@@ -859,6 +901,8 @@ def cmd_build(args: list[str]) -> int:
     output_dir_text = ""
     target = "cpp"
     rs_package = False
+    negative_index_mode = ""
+    bounds_check_mode = ""
 
     i = 0
     while i < len(args):
@@ -881,8 +925,22 @@ def cmd_build(args: list[str]) -> int:
             rs_package = True
             i += 1
             continue
+        if tok == "--negative-index-mode":
+            if i + 1 >= len(args):
+                print("error: missing value for --negative-index-mode")
+                return 1
+            negative_index_mode = args[i + 1]
+            i += 2
+            continue
+        if tok == "--bounds-check-mode":
+            if i + 1 >= len(args):
+                print("error: missing value for --bounds-check-mode")
+                return 1
+            bounds_check_mode = args[i + 1]
+            i += 2
+            continue
         if tok == "-h" or tok == "--help":
-            print("usage: pytra-cli2 -build INPUT.py [-o OUTPUT_DIR] [--target TARGET] [--rs-package]")
+            print("usage: pytra-cli2 -build INPUT.py [-o OUTPUT_DIR] [--target TARGET] [--rs-package] [--negative-index-mode MODE] [--bounds-check-mode MODE]")
             return 0
         if not tok.startswith("-"):
             inputs.append(tok)
@@ -897,13 +955,28 @@ def cmd_build(args: list[str]) -> int:
         return 1
 
     try:
-        return _build_pipeline(inputs, output_dir_text, target, rs_package=rs_package)
+        return _build_pipeline(
+            inputs,
+            output_dir_text,
+            target,
+            rs_package=rs_package,
+            negative_index_mode=negative_index_mode,
+            bounds_check_mode=bounds_check_mode,
+        )
     except Exception:
         print("error: build failed")
         return 1
 
 
-def _build_pipeline(inputs: list[str], output_dir_text: str, target: str, *, rs_package: bool = False) -> int:
+def _build_pipeline(
+    inputs: list[str],
+    output_dir_text: str,
+    target: str,
+    *,
+    rs_package: bool = False,
+    negative_index_mode: str = "",
+    bounds_check_mode: str = "",
+) -> int:
     """Run the full build pipeline in-memory."""
     # 1. Parse
     east1_docs = _collect_build_sources(inputs)
@@ -928,8 +1001,12 @@ def _build_pipeline(inputs: list[str], output_dir_text: str, target: str, *, rs_
 
     # 4. Optimize
     east3_opt_docs: list[tuple[str, dict[str, JsonVal]]] = []
+    optimizer_debug_flags = _optimizer_debug_flags(negative_index_mode, bounds_check_mode)
     for inp, east3_doc in east3_docs:
-        east3_opt_docs.append((inp, optimize_east3_doc_only(east3_doc, opt_level=1)))
+        east3_opt_docs.append((
+            inp,
+            optimize_east3_doc_only(east3_doc, opt_level=1, debug_flags=optimizer_debug_flags),
+        ))
     print("build: optimized " + str(len(east3_opt_docs)) + " files")
 
     # 5. Link — write east3-opt to temp files for link_modules

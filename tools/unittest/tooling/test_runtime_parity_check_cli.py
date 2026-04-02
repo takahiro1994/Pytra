@@ -13,7 +13,8 @@ from unittest.mock import patch
 
 
 ROOT = next(p for p in Path(__file__).resolve().parents if (p / "src").exists())
-RUNTIME_PARITY_CHECK = ROOT / "tools" / "runtime_parity_check.py"
+RUNTIME_PARITY_CHECK = ROOT / "tools" / "check" / "runtime_parity_check.py"
+RUNTIME_PARITY_CHECK_FAST = ROOT / "tools" / "check" / "runtime_parity_check_fast.py"
 
 
 def _load_runtime_parity_module():
@@ -26,10 +27,21 @@ def _load_runtime_parity_module():
     return module
 
 
+def _load_runtime_parity_fast_module():
+    spec = importlib.util.spec_from_file_location("runtime_parity_check_fast", RUNTIME_PARITY_CHECK_FAST)
+    if spec is None or spec.loader is None:
+        raise RuntimeError("failed to load runtime_parity_check_fast module")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
 class RuntimeParityCheckCliTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         cls.rpc = _load_runtime_parity_module()
+        cls.rpc_fast = _load_runtime_parity_fast_module()
 
     def test_collect_sample_case_stems_is_fixed_to_18_samples(self) -> None:
         stems = self.rpc.collect_sample_case_stems()
@@ -210,6 +222,54 @@ class RuntimeParityCheckCliTest(unittest.TestCase):
         self.assertIn("--codegen-opt 3", cpp_target.run_cmd)
         ruby_target = next(t for t in targets if t.name == "ruby")
         self.assertNotIn("--codegen-opt", ruby_target.transpile_cmd)
+
+    def test_runtime_parity_check_fast_forwards_subscript_optimizer_modes(self) -> None:
+        records: list = []
+        py_success = subprocess.CompletedProcess(args="python fake.py", returncode=0, stdout="OK\n", stderr="")
+        rr_success = subprocess.CompletedProcess(args="run", returncode=0, stdout="OK\n", stderr="")
+
+        with patch.object(
+            self.rpc_fast,
+            "find_case_path",
+            return_value=ROOT / "sample" / "py" / "01_mandelbrot.py",
+        ), patch.object(
+            self.rpc_fast,
+            "run_shell",
+            return_value=py_success,
+        ), patch.object(
+            self.rpc_fast,
+            "get_target_profile",
+            return_value=type("Profile", (), {"runner_needs": ("python", "g++")})(),
+        ), patch.object(
+            self.rpc_fast,
+            "can_run",
+            return_value=True,
+        ), patch.object(
+            self.rpc_fast,
+            "_tool_env_for_target",
+            return_value={"PATH": "/tmp/cpp-bin"},
+        ), patch.object(
+            self.rpc_fast,
+            "_transpile_in_memory",
+            return_value=(True, ""),
+        ) as transpile_mock, patch.object(
+            self.rpc_fast,
+            "_run_target",
+            return_value=rr_success,
+        ):
+            code = self.rpc_fast.check_case(
+                "01_mandelbrot",
+                {"cpp"},
+                case_root="sample",
+                east3_opt_level=1,
+                negative_index_mode="always",
+                bounds_check_mode="debug",
+                records=records,
+            )
+
+        self.assertEqual(code, 0)
+        transpile_mock.assert_called_once()
+        self.assertEqual(transpile_mock.call_args.args[3:], (1, "always", "debug"))
 
     def test_build_targets_includes_scala_entry(self) -> None:
         case_path = ROOT / "sample" / "py" / "01_mandelbrot.py"

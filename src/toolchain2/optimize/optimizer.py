@@ -191,6 +191,26 @@ def resolve_east3_opt_level(opt_level: str | int) -> int:
     return level
 
 
+def resolve_negative_index_mode(mode: str) -> str:
+    """Normalize --negative-index-mode value."""
+    text = mode.strip()
+    if text == "":
+        return "const_only"
+    if text in ("always", "const_only", "off"):
+        return text
+    raise ValueError("invalid --negative-index-mode: " + text)
+
+
+def resolve_bounds_check_mode(mode: str) -> str:
+    """Normalize --bounds-check-mode value."""
+    text = mode.strip()
+    if text == "":
+        return "off"
+    if text in ("always", "debug", "off"):
+        return text
+    raise ValueError("invalid --bounds-check-mode: " + text)
+
+
 def parse_east3_opt_pass_overrides(spec: str) -> tuple[set[str], set[str]]:
     """Parse --east3-opt-pass into (enabled, disabled) sets."""
     enabled: set[str] = set()

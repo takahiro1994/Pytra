@@ -18,6 +18,7 @@ from toolchain2.optimize.passes.tuple_target_direct_expansion import TupleTarget
 from toolchain2.optimize.passes.lifetime_analysis import LifetimeAnalysisPass
 from toolchain2.optimize.passes.unused_loop_var_elision import UnusedLoopVarElisionPass
 from toolchain2.optimize.passes.strength_reduction_float_loop import StrengthReductionFloatLoopPass
+from toolchain2.optimize.passes.subscript_access_annotation import SubscriptAccessAnnotationPass
 
 from toolchain2.optimize.optimizer import East3OptimizerPass
 
@@ -41,6 +42,7 @@ def build_local_only_passes() -> list[East3OptimizerPass]:
         LifetimeAnalysisPass(),
         UnusedLoopVarElisionPass(),
         StrengthReductionFloatLoopPass(),
+        SubscriptAccessAnnotationPass(),
     ]
 
 

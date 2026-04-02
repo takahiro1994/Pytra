@@ -26,6 +26,9 @@ from toolchain2.emit.common.code_emitter import (
 from toolchain2.link.linker import link_modules
 from toolchain2.optimize.optimizer import optimize_east3_document
 from toolchain2.optimize.optimizer import make_pass_context
+from toolchain2.optimize.optimizer import resolve_bounds_check_mode
+from toolchain2.optimize.optimizer import resolve_negative_index_mode
+from toolchain2.optimize.passes.subscript_access_annotation import SubscriptAccessAnnotationPass
 from toolchain2.optimize.passes.typed_enumerate_normalization import TypedEnumerateNormalizationPass
 from toolchain2.optimize.passes.typed_repeat_materialization import TypedRepeatMaterializationPass
 from toolchain2.parse.py.parser import parse_python_source
@@ -56,6 +59,126 @@ def _load_registry() -> BuiltinRegistry:
 
 
 class Toolchain2SpecConformTests(unittest.TestCase):
+    def test_optimizer_mode_normalizers_accept_defaults_and_reject_invalid(self) -> None:
+        self.assertEqual(resolve_negative_index_mode(""), "const_only")
+        self.assertEqual(resolve_negative_index_mode("always"), "always")
+        self.assertEqual(resolve_bounds_check_mode(""), "off")
+        self.assertEqual(resolve_bounds_check_mode("debug"), "debug")
+        with self.assertRaisesRegex(ValueError, "invalid --negative-index-mode"):
+            resolve_negative_index_mode("maybe")
+        with self.assertRaisesRegex(ValueError, "invalid --bounds-check-mode"):
+            resolve_bounds_check_mode("fast")
+
+    def test_subscript_access_annotation_marks_range_index_fastpath(self) -> None:
+        subscript = {
+            "kind": "Subscript",
+            "value": {"kind": "Name", "id": "xs", "resolved_type": "list[int64]"},
+            "slice": {"kind": "Name", "id": "i", "resolved_type": "int64"},
+            "resolved_type": "int64",
+        }
+        doc = {
+            "kind": "Module",
+            "east_stage": 3,
+            "body": [
+                {
+                    "kind": "ForCore",
+                    "iter_mode": "static_fastpath",
+                    "iter_plan": {
+                        "kind": "StaticRangeForPlan",
+                        "start": {"kind": "Constant", "value": 0},
+                        "stop": {"kind": "Name", "id": "n", "resolved_type": "int64"},
+                        "step": {"kind": "Constant", "value": 1},
+                        "range_mode": "ascending",
+                    },
+                    "target_plan": {"kind": "NameTarget", "id": "i", "target_type": "int64"},
+                    "body": [{"kind": "Expr", "value": subscript}],
+                    "orelse": [],
+                }
+            ],
+        }
+
+        result = SubscriptAccessAnnotationPass().run(doc, make_pass_context(opt_level=1))
+
+        self.assertTrue(result.changed)
+        hint = subscript.get("meta", {}).get("subscript_access_v1")
+        self.assertEqual(
+            hint,
+            {
+                "schema_version": "subscript_access_v1",
+                "negative_index": "skip",
+                "bounds_check": "off",
+                "reason": "for_range_index",
+            },
+        )
+
+    def test_subscript_access_annotation_respects_negative_literal_and_default_modes(self) -> None:
+        negative = {
+            "kind": "Subscript",
+            "value": {"kind": "Name", "id": "xs", "resolved_type": "list[int64]"},
+            "slice": {"kind": "UnaryOp", "op": "USub", "operand": {"kind": "Constant", "value": 1}},
+            "resolved_type": "int64",
+        }
+        dynamic = {
+            "kind": "Subscript",
+            "value": {"kind": "Name", "id": "buf", "resolved_type": "bytes"},
+            "slice": {"kind": "Name", "id": "j", "resolved_type": "int64"},
+            "resolved_type": "uint8",
+        }
+        doc = {
+            "kind": "Module",
+            "east_stage": 3,
+            "body": [{"kind": "Expr", "value": negative}, {"kind": "Expr", "value": dynamic}],
+        }
+
+        result = SubscriptAccessAnnotationPass().run(
+            doc,
+            make_pass_context(
+                opt_level=1,
+                debug_flags={"negative_index_mode": "always", "bounds_check_mode": "debug"},
+            ),
+        )
+
+        self.assertTrue(result.changed)
+        self.assertEqual(
+            negative.get("meta", {}).get("subscript_access_v1"),
+            {
+                "schema_version": "subscript_access_v1",
+                "negative_index": "normalize",
+                "bounds_check": "full",
+                "reason": "negative_literal",
+            },
+        )
+        self.assertEqual(
+            dynamic.get("meta", {}).get("subscript_access_v1"),
+            {
+                "schema_version": "subscript_access_v1",
+                "negative_index": "normalize",
+                "bounds_check": "full",
+                "reason": "optimizer_default",
+            },
+        )
+
+    def test_optimize_east3_document_registers_subscript_access_annotation_pass(self) -> None:
+        subscript = {
+            "kind": "Subscript",
+            "value": {"kind": "Name", "id": "xs", "resolved_type": "list[int64]"},
+            "slice": {"kind": "Constant", "value": 0, "resolved_type": "int64"},
+            "resolved_type": "int64",
+        }
+        doc = {"kind": "Module", "east_stage": 3, "schema_version": 1, "meta": {}, "body": [{"kind": "Expr", "value": subscript}]}
+
+        out_doc, report = optimize_east3_document(
+            deep_copy_json(doc),
+            opt_level=1,
+            debug_flags={"negative_index_mode": "const_only", "bounds_check_mode": "off"},
+        )
+
+        self.assertIsInstance(out_doc.get("body"), list)
+        hint = out_doc["body"][0]["value"].get("meta", {}).get("subscript_access_v1")
+        self.assertEqual(hint.get("reason"), "non_negative_constant")
+        trace = report.get("trace", [])
+        self.assertTrue(any(item.get("name") == "SubscriptAccessAnnotationPass" for item in trace if isinstance(item, dict)))
+
     def test_common_emitter_resolves_runtime_symbol_names_from_mapping_first(self) -> None:
         mapping = RuntimeMapping(
             builtin_prefix="rt_",

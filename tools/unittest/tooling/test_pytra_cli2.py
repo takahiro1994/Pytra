@@ -8,6 +8,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 
 ROOT = next(p for p in Path(__file__).resolve().parents if (p / "src").exists())
@@ -25,6 +26,31 @@ _SPEC.loader.exec_module(pytra_cli2_mod)
 
 
 class PytraCli2Test(unittest.TestCase):
+    def test_optimizer_debug_flags_normalize_subscript_modes(self) -> None:
+        flags = pytra_cli2_mod._optimizer_debug_flags("always", "debug")
+        self.assertEqual(flags, {"negative_index_mode": "always", "bounds_check_mode": "debug"})
+
+    def test_optimizer_debug_flags_apply_defaults(self) -> None:
+        flags = pytra_cli2_mod._optimizer_debug_flags("", "")
+        self.assertEqual(flags, {"negative_index_mode": "const_only", "bounds_check_mode": "off"})
+
+    def test_cmd_optimize_forwards_subscript_optimizer_modes(self) -> None:
+        with patch.object(pytra_cli2_mod, "_optimize_one", return_value=0) as optimize_one:
+            rc = pytra_cli2_mod.cmd_optimize(
+                [
+                    "mod.east3",
+                    "--negative-index-mode",
+                    "always",
+                    "--bounds-check-mode",
+                    "debug",
+                ]
+            )
+        self.assertEqual(rc, 0)
+        optimize_one.assert_called_once()
+        call_args = optimize_one.call_args[0]
+        self.assertEqual(str(call_args[0]), "mod.east3")
+        self.assertEqual(call_args[1:], ("", False, "always", "debug"))
+
     def test_repo_root_is_anchored_to_script_not_cwd(self) -> None:
         old_cwd = os.getcwd()
         try:

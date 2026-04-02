@@ -51,6 +51,8 @@ from toolchain2.emit.php.emitter import emit_php_module  # type: ignore
 from toolchain2.link.linker import link_modules  # type: ignore
 from toolchain2.emit.cpp.runtime_paths import runtime_rel_tail_for_module  # type: ignore
 from toolchain2.optimize.optimizer import optimize_east3_document  # type: ignore
+from toolchain2.optimize.optimizer import resolve_bounds_check_mode  # type: ignore
+from toolchain2.optimize.optimizer import resolve_negative_index_mode  # type: ignore
 from toolchain2.parse.py.parse_python import parse_python_file  # type: ignore
 from toolchain2.resolve.py.builtin_registry import load_builtin_registry  # type: ignore
 from toolchain2.resolve.py.resolver import resolve_east1_to_east2  # type: ignore
@@ -114,6 +116,8 @@ def _transpile_in_memory(
     target: str,
     output_dir: Path,
     east3_opt_level: int = 1,
+    negative_index_mode: str = "",
+    bounds_check_mode: str = "",
 ) -> tuple[bool, str]:
     """Transpile a .py file to target language using in-memory pipeline.
 
@@ -137,7 +141,14 @@ def _transpile_in_memory(
         east3_doc = lower_east2_to_east3(east2_doc, target_language=pipeline_target)
 
         # 4. Optimize
-        east3_opt, _report = optimize_east3_document(east3_doc, opt_level=east3_opt_level)
+        east3_opt, _report = optimize_east3_document(
+            east3_doc,
+            opt_level=east3_opt_level,
+            debug_flags={
+                "negative_index_mode": resolve_negative_index_mode(negative_index_mode),
+                "bounds_check_mode": resolve_bounds_check_mode(bounds_check_mode),
+            },
+        )
 
         # 5. Link — write east3-opt to temp file for link_modules
         link_dir = output_dir / "_link"
@@ -821,6 +832,8 @@ def check_case(
     case_root: str,
     east3_opt_level: int = 1,
     cmd_timeout_sec: int = 120,
+    negative_index_mode: str = "",
+    bounds_check_mode: str = "",
     records: list[CheckRecord] | None = None,
 ) -> int:
     do_bench = case_root == "sample"
@@ -901,7 +914,14 @@ def check_case(
 
             # In-memory transpile
             out_dir = work / "transpile" / target_name
-            ok, err_msg = _transpile_in_memory(case_path, target_name, out_dir, east3_opt_level)
+            ok, err_msg = _transpile_in_memory(
+                case_path,
+                target_name,
+                out_dir,
+                east3_opt_level,
+                negative_index_mode,
+                bounds_check_mode,
+            )
             if not ok:
                 mismatches.append(f"{case_stem}:{target_name}: transpile failed: {err_msg}")
                 _record(target_name, "transpile_failed", err_msg)
@@ -997,6 +1017,8 @@ def main() -> int:
     parser.add_argument("--targets", default="cpp", help="comma separated targets (default: cpp)")
     parser.add_argument("--category", default="", help="fixture subdirectory (e.g. oop, control)")
     parser.add_argument("--east3-opt-level", default=1, type=int, choices=(0, 1, 2))
+    parser.add_argument("--negative-index-mode", default="", choices=("", "always", "const_only", "off"))
+    parser.add_argument("--bounds-check-mode", default="", choices=("", "always", "debug", "off"))
     parser.add_argument("--cmd-timeout-sec", default=120, type=int)
     parser.add_argument("--summary-json", default="")
     args = parser.parse_args()
@@ -1039,6 +1061,8 @@ def main() -> int:
             case_root=args.case_root,
             east3_opt_level=args.east3_opt_level,
             cmd_timeout_sec=args.cmd_timeout_sec,
+            negative_index_mode=args.negative_index_mode,
+            bounds_check_mode=args.bounds_check_mode,
             records=records,
         )
         if code != 0:
@@ -1057,6 +1081,8 @@ def main() -> int:
         f"SUMMARY cases={len(stems)} pass={pass_cases} fail={fail_cases} "
         f"targets={','.join(sorted(enabled_targets))} "
         f"east3_opt_level={args.east3_opt_level} "
+        f"negative_index_mode={resolve_negative_index_mode(args.negative_index_mode)} "
+        f"bounds_check_mode={resolve_bounds_check_mode(args.bounds_check_mode)} "
         f"elapsed={elapsed:.1f}s"
     )
     if len(category_counts) > 0:
@@ -1068,6 +1094,8 @@ def main() -> int:
         summary = {
             "case_root": args.case_root,
             "east3_opt_level": args.east3_opt_level,
+            "negative_index_mode": resolve_negative_index_mode(args.negative_index_mode),
+            "bounds_check_mode": resolve_bounds_check_mode(args.bounds_check_mode),
             "targets": sorted(enabled_targets),
             "cases": stems,
             "case_total": len(stems),
