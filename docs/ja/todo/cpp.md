@@ -83,7 +83,8 @@ selfhost で必要な動的型パターン（`dict[str, object]` の items() unp
 
 旧 toolchain の emitter オプション `--negative-index-mode` / `--bounds-check-mode` が toolchain2 に未移行。C++ runtime の `py_list_at_ref` が全添字アクセスで常に負数正規化 + bounds check を行い、hot loop で深刻な性能劣化を引き起こしている（sample 01 mandelbrot: C++ 12.8s vs Rust 1.9s）。これらは emitter ではなく EAST optimizer のオプションとして実装し、`Subscript` ノードにメタデータを付与する。emitter はメタデータのみを参照し、オプション自体を知らない。
 
-1. [ ] [ID: P0-SUB-BOUNDS-S1] `meta.subscript_access_v1` スキーマを spec-east.md に定義する
+1. [x] [ID: P0-SUB-BOUNDS-S1] `meta.subscript_access_v1` スキーマを spec-east.md に定義する
+   - 完了: `docs/ja/spec/spec-east.md` に `Subscript.meta.subscript_access_v1` の canonical schema（`negative_index`, `bounds_check`, `reason`）と fail-closed 規則を追加し、`docs/ja/spec/spec-east3-optimizer.md` に `SubscriptAccessAnnotationPass` の責務・v1 判定規則・backend との境界を追記した。
 2. [ ] [ID: P0-SUB-BOUNDS-S2] EAST optimizer に `--negative-index-mode` / `--bounds-check-mode` を追加し、`Subscript` ノードにメタデータを付与するパスを実装する
 3. [ ] [ID: P0-SUB-BOUNDS-S3] C++ emitter でメタデータに基づく direct index / py_list_at_ref の分岐を実装する
 4. [ ] [ID: P0-SUB-BOUNDS-S4] sample 01 (mandelbrot) の C++ 実行時間が改善されることを確認する

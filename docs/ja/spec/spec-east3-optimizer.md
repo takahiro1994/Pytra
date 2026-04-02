@@ -107,6 +107,7 @@
 | `UnusedLoopVarElisionPass` | `O1` | 実装済み | 未使用 `NameTarget` を `_` へ置換 | ループ本体/`orelse`/後続参照と動的名前解決（`locals` 等）を検出した場合は不適用 |
 | `LoopInvariantHoistLitePass` | `O2` | 実装済み | 非空 `StaticRangeForPlan` の先頭不変代入を preheader へ hoist | 非空ループの静的証明・副作用なし・再代入なしが条件 |
 | `StrengthReductionFloatLoopPass` | `O2` | 実装済み | `float` の `x / C` を `x * (1/C)` へ変換 | `C` が有限・非0・2冪絶対値の定数のときのみ |
+| `SubscriptAccessAnnotationPass` | `O1` | 未実装（P0-SUB-BOUNDS） | `Subscript.meta.subscript_access_v1` を付与し、negative-index / bounds-check 方針を固定 | backend が再推論せず fail-closed できる形だけ annotate |
 | `RedundantWrapperCtorPass` | - | 未実装（候補） | `bytes(bytes_expr)` の冗長ケース削除 | 一時値かつ alias リスクなし |
 | `DeadTempCleanupPass` | - | 未実装（候補） | 未使用一時の削除 | 参照・副作用なし |
 
@@ -116,6 +117,55 @@
 - `O0` は全 pass 無効、`O1` は上表 `O1` pass、`O2` は `O1 + O2` pass を実行する。
 - `NonEscapeInterproceduralPass` と `ContainerValueLocalHintPass`（旧 `CppListValueLocalHintPass`、2026-03-23 に汎化・改名）は 2026-03-07 以降、`EAST3 local optimizer` の既定 pass 列から外し、`LinkedProgramOptimizer` 側の whole-program/global annotation pass として扱う。
 - `LifetimeAnalysisPass` は local-only pass として残し、linked program 段へ移さない。
+
+### 8.5 `SubscriptAccessAnnotationPass` 契約（`subscript_access_v1`）
+
+目的:
+
+- `Subscript` アクセスの負数正規化要否と bounds check 要否を optimizer が canonical metadata として固定する。
+- backend が loop context や定数パターンを再推論せず、metadata だけで helper を選べるようにする。
+
+入力:
+
+- `kind == "Subscript"` の式ノード。
+- `PassContext.debug_flags` / optimizer option により `negative-index-mode` と `bounds-check-mode` を受け取ってよい。
+
+出力:
+
+- `Subscript.meta.subscript_access_v1`
+
+```json
+{
+  "schema_version": "subscript_access_v1",
+  "negative_index": "normalize | skip",
+  "bounds_check": "full | off",
+  "reason": "string"
+}
+```
+
+v1 判定規則:
+
+- `ForRange` ループ変数による添字アクセス:
+  - `negative_index = "skip"`
+  - `bounds_check = "off"`
+  - `reason = "for_range_index"`
+- 非負の定数リテラル添字:
+  - `negative_index = "skip"`
+  - `bounds_check` は option 既定に従う
+  - `reason = "non_negative_constant"`
+- 負数リテラル添字:
+  - `negative_index = "normalize"`
+  - `bounds_check` は option 既定に従う
+  - `reason = "negative_literal"`
+- それ以外:
+  - `negative_index` / `bounds_check` は optimizer option に従う
+  - `reason = "mode_default"`
+
+fail-closed 規則:
+
+- loop induction 由来・非負保証・negative literal のいずれも静的に証明できない場合、annotation は option 既定以上に弱めてはならない。
+- `subscript_access_v1` を生成できない/破損した場合、backend は direct index ではなく full-check helper を選ぶ。
+- backend は `subscript_access_v1` がある場合でも surrounding AST を見て上書き判断してはならない。
 
 ### 8.1 `for ... in range(...)` 最適化の責務境界
 

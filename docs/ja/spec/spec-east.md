@@ -538,6 +538,46 @@ v1 の非対象:
 - `list/str` スライスは同型
   - EAST 自体は `Subscript`/`Slice` を保持し、`str-index-mode` / `str-slice-mode` の意味論は生成器側で適用する。
   - 現行 C++ 生成器では `byte` / `native` を実装済み、`codepoint` は未実装。
+
+### 7.0.1 `Subscript.meta.subscript_access_v1`
+
+linked-program optimizer / EAST3 optimizer は、`Subscript` ノードに添字アクセス方針の canonical metadata として `meta.subscript_access_v1` を付与してよい。
+
+用途:
+
+- 負数添字の正規化要否
+- bounds check の要否
+- backend が `py_list_at_ref(...)` のような full-check helper と direct index を切り替えるための正本
+
+`subscript_access_v1` のスキーマ:
+
+```json
+{
+  "schema_version": "subscript_access_v1",
+  "negative_index": "normalize | skip",
+  "bounds_check": "full | off",
+  "reason": "string"
+}
+```
+
+規則:
+
+- `negative_index`
+  - `normalize`: Python の負数添字セマンティクスを保持するため、backend は `-1 -> len(values) - 1` などの正規化を行う。
+  - `skip`: optimizer が「この経路では負数正規化が不要」と確定したことを表す。backend は負数補正を再計算してはならない。
+- `bounds_check`
+  - `full`: Python と同等の bounds check を要求する。backend は `IndexError` 相当の挙動を維持しなければならない。
+  - `off`: optimizer が「この経路では bounds check を省略してよい」と確定したことを表す。backend は direct index / native indexing を選択してよい。
+- `reason`
+  - optimizer が付与理由を記録する任意文字列。
+  - v1 推奨値: `for_range_index`, `non_negative_constant`, `negative_literal`, `mode_default`
+
+責務境界:
+
+- optimizer が `subscript_access_v1` を付与した場合、backend はこの metadata のみを参照して access helper を選択する。
+- backend / runtime は raw `Subscript.slice` や surrounding loop から `negative_index` / `bounds_check` を再推論してはならない。
+- `subscript_access_v1` が存在しない場合、backend は fail-closed に既定の安全経路（例: full check helper）へ倒す。
+- `subscript_access_v1` の未知値・欠損・破損は fail-closed とし、backend は direct index を選んではならない。
 - `Call`:
 - 既知: `int`, `float`, `bool`, `str`, `bytes`, `bytearray`, `len`, `range`, `min`, `max`, `round`, `print`, `write_rgb_png`, `save_gif`, `grayscale_palette`, `perf_counter`, `Path`, `Exception`, `RuntimeError`
 - `float(...)`, `round(...)`, `perf_counter()`, `math.*` 主要関数は `float64`
