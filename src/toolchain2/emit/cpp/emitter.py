@@ -1983,6 +1983,10 @@ def _emit_builtin_call(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
             return arg_strs[0]
         if len(args) >= 1 and isinstance(args[0], dict):
             arg_kind = _str(args[0], "kind")
+            if arg_kind == "Box":
+                boxed_value = args[0].get("value")
+                if isinstance(boxed_value, dict):
+                    return "str(py_to_string(" + _emit_expr(ctx, boxed_value) + "))"
             arg_type = _expanded_union_type(_str(args[0], "resolved_type"))
             storage_type = _expanded_union_type(_expr_storage_type(ctx, args[0]))
             if _optional_inner_type(storage_type) == "str":
