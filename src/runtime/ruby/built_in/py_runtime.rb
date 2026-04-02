@@ -43,7 +43,44 @@ def __pytra_str(v)
   return "" if v.nil?
   return "True" if v == true
   return "False" if v == false
+  return v if v.is_a?(String)
+  if v.is_a?(PytraTuple) || v.is_a?(Array) || v.is_a?(Hash) || v.is_a?(Set)
+    return __pytra_repr(v)
+  end
   v.to_s
+end
+
+def __pytra_repr(v)
+  return "None" if v.nil?
+  return "True" if v == true
+  return "False" if v == false
+  if v.is_a?(String)
+    return "'" + v.gsub("\\", "\\\\").gsub("'", "\\'") + "'"
+  end
+  if v.is_a?(PytraTuple)
+    items = v.map { |item| __pytra_repr(item) }
+    return "(" + items[0] + ",)" if items.length == 1
+    return "(" + items.join(", ") + ")"
+  end
+  if v.is_a?(Array)
+    return "[" + v.map { |item| __pytra_repr(item) }.join(", ") + "]"
+  end
+  if v.is_a?(Hash)
+    return "{" + v.map { |k, val| __pytra_repr(k) + ": " + __pytra_repr(val) }.join(", ") + "}"
+  end
+  if v.is_a?(Set)
+    return "{" + v.to_a.map { |item| __pytra_repr(item) }.join(", ") + "}"
+  end
+  v.to_s
+end
+
+class PytraTuple < Array
+end
+
+def __pytra_tuple(items)
+  tuple = PytraTuple.new
+  items.each { |item| tuple << item }
+  tuple
 end
 
 def __pytra_len(v)

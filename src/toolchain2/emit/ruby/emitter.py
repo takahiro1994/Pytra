@@ -147,8 +147,19 @@ def _ruby_class_name(name: str) -> str:
     return safe_name
 
 
+def _lookup_class_field(ctx: EmitContext, class_name: str, attr: str) -> str:
+    cur = class_name
+    while cur != "":
+        field_map = ctx.class_fields.get(cur, {})
+        field_type = field_map.get(attr, "")
+        if field_type != "":
+            return field_type
+        cur = ctx.class_bases.get(cur, "")
+    return ""
+
+
 def _should_skip_module_ruby(module_id: str, mapping: RuntimeMapping) -> bool:
-    if module_id == "pytra.built_in.error":
+    if module_id == "pytra.built_in.error" or module_id == "pytra.std.json":
         return True
     return should_skip_module(module_id, mapping)
 
@@ -355,8 +366,8 @@ def _emit_attribute(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
     if isinstance(owner_node, dict) and _str(owner_node, "id") == "self":
         if attr.startswith("_"):
             return "@" + attr
-        field_map = ctx.class_fields.get(ctx.current_class, {})
-        if attr in ctx.class_property_methods.get(ctx.current_class, set()) or attr not in field_map:
+        field_type = _lookup_class_field(ctx, ctx.current_class, attr)
+        if attr in ctx.class_property_methods.get(ctx.current_class, set()) or field_type == "":
             return _ruby_method_name(attr)
         return "@" + attr
     # Handle module constant access (e.g. math.pi, sys.argv)
@@ -427,6 +438,8 @@ def _emit_binop(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
         if isinstance(cast, dict):
             on = _str(cast, "on")
             to = _str(cast, "to")
+            if not to.startswith("float"):
+                continue
             if on == "left":
                 left_code = left_code + ".to_f"
             elif on == "right":
@@ -565,7 +578,7 @@ def _emit_tuple_literal(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
     parts: list[str] = []
     for e in elements:
         parts.append(_emit_expr(ctx, e))
-    return "[" + ", ".join(parts) + "]"
+    return "__pytra_tuple([" + ", ".join(parts) + "])"
 
 
 def _emit_ifexp(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
@@ -628,6 +641,10 @@ def _emit_isinstance(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
     type_node = node.get("type")
     value_code = _emit_expr(ctx, value)
     type_name = ""
+    nominal = _dict(node, "nominal_adt_test_v1")
+    family_name = nominal.get("family_name")
+    if isinstance(family_name, str):
+        type_name = family_name
     if isinstance(type_node, dict):
         type_name = _str(type_node, "id")
         if type_name == "":
@@ -637,7 +654,11 @@ def _emit_isinstance(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
     if type_name == "":
         expected_node = node.get("expected_type_id")
         if isinstance(expected_node, dict):
-            type_name = _str(expected_node, "id")
+            type_name = _str(expected_node, "type_object_of")
+            if type_name == "":
+                type_name = _str(expected_node, "family_name")
+            if type_name == "":
+                type_name = _str(expected_node, "id")
             if type_name == "":
                 type_name = _str(expected_node, "repr")
     # Map to Ruby type check
@@ -646,24 +667,6 @@ def _emit_isinstance(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
         "str": "String", "bool": "TrueClass", "list": "Array",
         "dict": "Hash", "set": "Set", "tuple": "Array",
     }
-    if type_name.startswith("PYTRA_TID_"):
-        tid_name = type_name[len("PYTRA_TID_"):]
-        if tid_name == "DICT":
-            type_name = "dict"
-        elif tid_name == "LIST":
-            type_name = "list"
-        elif tid_name == "SET":
-            type_name = "set"
-        elif tid_name == "TUPLE":
-            type_name = "tuple"
-        elif tid_name == "STR":
-            type_name = "str"
-        elif tid_name == "INT":
-            type_name = "int"
-        elif tid_name == "FLOAT":
-            type_name = "float"
-        elif tid_name == "BOOL":
-            type_name = "bool"
     ruby_cls = type_map.get(type_name, type_name)
     return value_code + ".is_a?(" + ruby_cls + ")"
 
@@ -2242,7 +2245,7 @@ def _collect_module_class_info(ctx: EmitContext, body: list[JsonVal]) -> None:
             if not isinstance(cs, dict):
                 continue
             sk = _str(cs, "kind")
-            if sk == "FunctionDef":
+            if sk == "FunctionDef" or sk == "ClosureDef":
                 fn_name = _str(cs, "name")
                 fn_decorators = _list(cs, "decorators")
                 for d in fn_decorators:
@@ -2255,12 +2258,21 @@ def _collect_module_class_info(ctx: EmitContext, body: list[JsonVal]) -> None:
                 target = cs.get("target")
                 ft = ""
                 if isinstance(target, dict):
-                    ft = _str(target, "id")
+                    target_kind = _str(target, "kind")
+                    if target_kind == "Attribute":
+                        owner = target.get("value")
+                        if isinstance(owner, dict) and _str(owner, "id") == "self":
+                            ft = _str(target, "attr")
+                    else:
+                        ft = _str(target, "id")
                 dt = _str(cs, "decl_type")
                 if dt == "":
                     dt = _str(cs, "resolved_type")
                 if ft != "" and dt != "":
                     field_map[ft] = dt
+        if len(field_map) == 0:
+            for fname, ftype in _collect_class_fields(ctx, stmt):
+                field_map[fname] = ftype
         ctx.class_static_methods[name] = statics
         ctx.class_property_methods[name] = props
         ctx.class_fields[name] = field_map

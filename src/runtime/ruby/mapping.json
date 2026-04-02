@@ -125,7 +125,6 @@
     "pytra.built_in.",
     "pytra.typing",
     "pytra.std.glob",
-    "pytra.std.json",
     "pytra.std.math",
     "pytra.std.os",
     "pytra.std.os_path",
