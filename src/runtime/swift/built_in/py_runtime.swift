@@ -50,6 +50,42 @@ func pytraRunEmbeddedNode(_ sourceBase64: String, _ args: [String]) -> Int32 {
 // ---- legacy swift emitter helper compatibility ----
 func __pytra_noop(_ args: Any...) {}
 
+class BaseException: Error, CustomStringConvertible {
+    var message: String
+
+    init(_ message: String = "") {
+        self.message = message
+    }
+
+    var description: String {
+        return message
+    }
+}
+
+class Exception: BaseException {}
+class RuntimeError: Exception {}
+class ValueError: Exception {}
+class TypeError: Exception {}
+class IndexError: Exception {}
+class KeyError: Exception {}
+class NameError: Exception {}
+
+class Enum: CustomStringConvertible {
+    let value: AnyHashable
+
+    required init(_ value: AnyHashable) {
+        self.value = value
+    }
+
+    var description: String {
+        return String(describing: value)
+    }
+}
+
+func ==(lhs: Enum, rhs: Enum) -> Bool {
+    return type(of: lhs) == type(of: rhs) && lhs.value == rhs.value
+}
+
 func __pytra_any_default() -> Any {
     return Int64(0)
 }
@@ -122,6 +158,10 @@ func __pytra_str(_ v: Any?) -> String {
     if let s = value as? String { return s }
     if let b = value as? Bool { return b ? "True" : "False" }
     return String(describing: value)
+}
+
+func __pytra_py_to_string(_ v: Any?) -> String {
+    return __pytra_str(v)
 }
 
 func __pytra_len(_ v: Any?) -> Int64 {
@@ -238,6 +278,9 @@ func __pytra_contains(_ container: Any?, _ value: Any?) -> Bool {
 func __pytra_as_list(_ v: Any?) -> [Any] {
     if let list = v as? [Any] {
         return list
+    }
+    if let s = v as? String {
+        return Array(s).map { String($0) as Any }
     }
     if let mutableList = v as? NSArray {
         return mutableList.map { $0 }
@@ -497,6 +540,14 @@ func __pytra_enumerate(_ v: Any?) -> [(Int64, Any)] {
     let list = (v as? [Any]) ?? []
     var result: [(Int64, Any)] = []
     for (i, item) in list.enumerated() { result.append((Int64(i), item)) }
+    return result
+}
+
+func __pytra_py_enumerate_object(_ v: Any?, _ start: Any? = nil) -> [(Int64, Any)] {
+    let list = (v as? [Any]) ?? []
+    let offset = __pytra_int(start)
+    var result: [(Int64, Any)] = []
+    for (i, item) in list.enumerated() { result.append((offset + Int64(i), item)) }
     return result
 }
 

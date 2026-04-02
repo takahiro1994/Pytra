@@ -62,6 +62,7 @@ _CLASS_BASES: list[dict[str, str]] = [{}]
 _CLASS_METHODS: list[dict[str, set[str]]] = [{}]
 _MAIN_CALL_ALIAS: list[str] = [""]
 _RELATIVE_IMPORT_NAME_ALIASES: list[dict[str, str]] = [{}]
+_THROWING_FUNCTIONS: list[set[str]] = [set()]
 
 
 def _safe_ident(name: Any, fallback: str) -> str:
@@ -238,10 +239,57 @@ def _leading_comment_lines(stmt: dict[str, Any], prefix: str, indent: str = "") 
     return out
 
 
+def _split_generic_args(text: str) -> list[str]:
+    parts: list[str] = []
+    current: list[str] = []
+    depth = 0
+    for ch in text:
+        if ch == "[" or ch == "<":
+            depth += 1
+            current.append(ch)
+            continue
+        if ch == "]" or ch == ">":
+            depth -= 1
+            current.append(ch)
+            continue
+        if ch == "," and depth == 0:
+            piece = "".join(current).strip()
+            if piece != "":
+                parts.append(piece)
+            current = []
+            continue
+        current.append(ch)
+    tail = "".join(current).strip()
+    if tail != "":
+        parts.append(tail)
+    return parts
+
+
+def _callable_signature_parts(type_name: str) -> tuple[list[str], str] | None:
+    if not type_name.startswith("callable[") or not type_name.endswith("]"):
+        return None
+    inner = type_name[9:-1].strip()
+    if not inner.startswith("["):
+        return None
+    close = inner.find("]")
+    if close < 0:
+        return None
+    args_text = inner[1:close].strip()
+    ret_text = inner[close + 1:].lstrip(",").strip()
+    args = _split_generic_args(args_text) if args_text != "" else []
+    return (args, ret_text)
+
+
 def _swift_type(type_name: Any, *, allow_void: bool) -> str:
     if not isinstance(type_name, str):
         return "Any"
     ts3: str = type_name
+    callable_parts = _callable_signature_parts(ts3)
+    if callable_parts is not None:
+        arg_types, ret_type = callable_parts
+        rendered_args = [_swift_type(item, allow_void=False) for item in arg_types]
+        rendered_ret = _swift_type(ret_type, allow_void=True)
+        return "(" + ", ".join(rendered_args) + ") -> " + rendered_ret
     if type_name == "None":
         return "Void" if allow_void else "Any"
     if type_name in {"int", "int64", "int32", "int16", "int8", "uint8", "uint16", "uint32", "uint64", "byte"}:
@@ -267,6 +315,106 @@ def _swift_type(type_name: Any, *, allow_void: bool) -> str:
     return "Any"
 
 
+def _expr_called_function_names(expr: Any) -> set[str]:
+    out: set[str] = set()
+    if not isinstance(expr, dict):
+        return out
+    kind = expr.get("kind")
+    if kind == "Call":
+        func_any = expr.get("func")
+        if isinstance(func_any, dict) and func_any.get("kind") == "Name":
+            name = _safe_ident(func_any.get("id"), "")
+            if name != "":
+                out.add(name)
+        out |= _expr_called_function_names(func_any)
+        args_any = expr.get("args")
+        args = args_any if isinstance(args_any, list) else []
+        i = 0
+        while i < len(args):
+            out |= _expr_called_function_names(args[i])
+            i += 1
+        keywords_any = expr.get("keywords")
+        keywords = keywords_any if isinstance(keywords_any, list) else []
+        i = 0
+        while i < len(keywords):
+            kw = keywords[i]
+            if isinstance(kw, dict):
+                out |= _expr_called_function_names(kw.get("value"))
+            i += 1
+        return out
+    for value in expr.values():
+        if isinstance(value, dict):
+            out |= _expr_called_function_names(value)
+        elif isinstance(value, list):
+            for item in value:
+                out |= _expr_called_function_names(item)
+    return out
+
+
+def _stmt_has_raise_or_try(stmt: Any) -> bool:
+    if not isinstance(stmt, dict):
+        return False
+    kind = stmt.get("kind")
+    if kind in {"Raise", "Try"}:
+        return True
+    for value in stmt.values():
+        if isinstance(value, dict) and _stmt_has_raise_or_try(value):
+            return True
+        if isinstance(value, list):
+            for item in value:
+                if _stmt_has_raise_or_try(item):
+                    return True
+    return False
+
+
+def _stmt_called_function_names(stmt: Any) -> set[str]:
+    out: set[str] = set()
+    if not isinstance(stmt, dict):
+        return out
+    for value in stmt.values():
+        if isinstance(value, dict):
+            out |= _expr_called_function_names(value)
+            out |= _stmt_called_function_names(value)
+        elif isinstance(value, list):
+            for item in value:
+                out |= _expr_called_function_names(item)
+                out |= _stmt_called_function_names(item)
+    return out
+
+
+def _collect_throwing_functions(east_doc: dict[str, Any]) -> set[str]:
+    function_bodies: dict[str, list[Any]] = {}
+    body_any = east_doc.get("body")
+    body = body_any if isinstance(body_any, list) else []
+    for node in body:
+        if not isinstance(node, dict):
+            continue
+        if node.get("kind") == "FunctionDef":
+            name = _safe_ident(node.get("name"), "")
+            fn_body_any = node.get("body")
+            fn_body = fn_body_any if isinstance(fn_body_any, list) else []
+            if name != "":
+                function_bodies[name] = fn_body
+    throwing: set[str] = set()
+    changed = True
+    while changed:
+        changed = False
+        for name, fn_body in function_bodies.items():
+            if name in throwing:
+                continue
+            direct_throw = False
+            called_names: set[str] = set()
+            i = 0
+            while i < len(fn_body):
+                direct_throw = direct_throw or _stmt_has_raise_or_try(fn_body[i])
+                called_names |= _stmt_called_function_names(fn_body[i])
+                i += 1
+            if direct_throw or len(called_names & throwing) > 0:
+                throwing.add(name)
+                changed = True
+    return throwing
+
+
 def _default_return_expr(swift_type: str) -> str:
     if swift_type == "Int64":
         return "0"
@@ -285,6 +433,42 @@ def _default_return_expr(swift_type: str) -> str:
     if swift_type == "Any":
         return "__pytra_any_default()"
     return swift_type + "()"
+
+
+def _collect_return_value_types(body: list[Any]) -> set[str]:
+    out: set[str] = set()
+    i = 0
+    while i < len(body):
+        stmt = body[i]
+        if isinstance(stmt, dict):
+            kind = stmt.get("kind")
+            if kind == "Return":
+                value_any = stmt.get("value")
+                if isinstance(value_any, dict):
+                    inferred = _swift_type(value_any.get("resolved_type"), allow_void=False)
+                    if inferred == "Any":
+                        inferred = _infer_swift_type(value_any)
+                    out.add(inferred)
+            for value in stmt.values():
+                if isinstance(value, list):
+                    out |= _collect_return_value_types(value)
+        i += 1
+    return out
+
+
+def _function_return_swift_type(fn: dict[str, Any], *, allow_void: bool) -> str:
+    return_type = _swift_type(fn.get("return_type"), allow_void=allow_void)
+    if return_type != "Void":
+        return return_type
+    body_any = fn.get("body")
+    body = body_any if isinstance(body_any, list) else []
+    inferred = _collect_return_value_types(body)
+    inferred.discard("Void")
+    if len(inferred) == 1:
+        return next(iter(inferred))
+    if len(inferred) > 1:
+        return "Any"
+    return return_type
 
 
 def _tuple_element_types(type_name: Any) -> list[str]:
@@ -1016,11 +1200,21 @@ def _render_call_via_runtime_call(
             owner_expr = ""
             owner_type = ""
             if isinstance(runtime_owner, dict):
-                owner_expr = _render_expr(runtime_owner)
+                if runtime_owner.get("kind") == "Call" and _call_name(runtime_owner) == "super":
+                    owner_expr = "super"
+                else:
+                    owner_expr = _render_expr(runtime_owner)
                 rt = runtime_owner.get("resolved_type")
                 owner_type = rt if isinstance(rt, str) else ""
             if owner_expr != "":
                 method_name = runtime_call.split(".")[-1].strip()
+                if method_name == "__init__":
+                    rendered_runtime_args: list[str] = []
+                    i = 0
+                    while i < len(args):
+                        rendered_runtime_args.append(_render_expr(args[i]))
+                        i += 1
+                    return owner_expr + ".init(" + ", ".join(rendered_runtime_args) + ")"
                 if method_name == "clear":
                     return owner_expr + ".removeAll()"
                 if method_name == "reverse":
@@ -1205,7 +1399,9 @@ def _render_call_expr(expr: dict[str, Any]) -> str:
     if callee_name == "enumerate":
         if len(args) == 0:
             return "__pytra_enumerate([])"
-        return "__pytra_enumerate(" + _render_expr(args[0]) + ")"
+        if len(args) == 1:
+            return "__pytra_enumerate(" + _render_expr(args[0]) + ")"
+        return "__pytra_py_enumerate_object(" + _render_expr(args[0]) + ", " + _render_expr(args[1]) + ")"
     if callee_name == "min":
         if len(args) == 0:
             return "Int64(0)"
@@ -1240,6 +1436,15 @@ def _render_call_expr(expr: dict[str, Any]) -> str:
         return "__pytra_open(" + ", ".join(rendered_args) + ")"
 
     func_any = expr.get("func")
+    if callee_name == "__pytra___init__" and len(args) >= 1:
+        first_arg = args[0]
+        if isinstance(first_arg, dict) and first_arg.get("kind") == "Call" and _call_name(first_arg) == "super":
+            rendered_super_args: list[str] = []
+            i = 1
+            while i < len(args):
+                rendered_super_args.append(_render_expr(args[i]))
+                i += 1
+            return "super.init(" + ", ".join(rendered_super_args) + ")"
     if isinstance(func_any, dict) and func_any.get("kind") == "Attribute":
         attr_name = _safe_ident(func_any.get("attr"), "")
         owner_any = func_any.get("value")
@@ -1338,7 +1543,10 @@ def _render_call_expr(expr: dict[str, Any]) -> str:
     while i < len(args):
         rendered_args.append(_render_expr(args[i]))
         i += 1
-    return func_expr + "(" + ", ".join(rendered_args) + ")"
+    call_code = func_expr + "(" + ", ".join(rendered_args) + ")"
+    if callee_name in _THROWING_FUNCTIONS[0]:
+        return "try " + call_code
+    return call_code
 
 
 def _render_isinstance_check(lhs: str, typ: Any) -> str:
@@ -1594,8 +1802,17 @@ def _render_expr(expr: Any) -> str:
 
     if kind == "IfExp":
         test_expr = _render_truthy_expr(ed2.get("test"))
-        body_expr = _render_expr(ed2.get("body"))
-        else_expr = _render_expr(ed2.get("orelse"))
+        body_node = ed2.get("body")
+        else_node = ed2.get("orelse")
+        body_expr = _render_expr(body_node)
+        else_expr = _render_expr(else_node)
+        result_type = _swift_type(ed2.get("resolved_type"), allow_void=False)
+        if result_type != "Any":
+            if _needs_cast(body_node, result_type):
+                body_expr = _cast_from_any(body_expr, result_type)
+            if _needs_cast(else_node, result_type):
+                else_expr = _cast_from_any(else_expr, result_type)
+            return "(" + test_expr + " ? " + body_expr + " : " + else_expr + ")"
         return "__pytra_ifexp(" + test_expr + ", " + body_expr + ", " + else_expr + ")"
 
     if kind == "Subscript":
@@ -2512,15 +2729,41 @@ def _emit_stmt(stmt: Any, *, indent: str, ctx: dict[str, Any]) -> list[str]:
         return []
 
     if kind == "Raise":
-        return [indent + "fatalError(\"pytra raise\")"]
+        exc_any = sd2.get("exc")
+        if isinstance(exc_any, dict):
+            return [indent + "throw " + _render_expr(exc_any)]
+        current_exc_any = ctx.get("current_exc_var")
+        current_exc = current_exc_any if isinstance(current_exc_any, str) else ""
+        if current_exc != "":
+            return [indent + "throw " + current_exc]
+        return [indent + "throw RuntimeError(\"pytra raise\")"]
 
     if kind == "Try":
         lines: list[str] = []
+        final_any = sd2.get("finalbody")
+        final = final_any if isinstance(final_any, list) else []
+        if len(final) > 0:
+            lines.append(indent + "defer {")
+            final_ctx: dict[str, Any] = {
+                "tmp": ctx.get("tmp", 0),
+                "declared": set(_declared_set(ctx)),
+                "types": dict(_type_map(ctx)),
+                "ref_vars": set(_ref_var_set(ctx)),
+                "return_type": ctx.get("return_type", ""),
+                "continue_prefix": ctx.get("continue_prefix", ""),
+                "current_exc_var": ctx.get("current_exc_var", ""),
+            }
+            i = 0
+            while i < len(final):
+                lines.extend(_emit_stmt(final[i], indent=indent + "    ", ctx=final_ctx))
+                i += 1
+            lines.append(indent + "}")
+        lines.append(indent + "do {")
         body_any = sd2.get("body")
         body = body_any if isinstance(body_any, list) else []
         i = 0
         while i < len(body):
-            lines.extend(_emit_stmt(body[i], indent=indent, ctx=ctx))
+            lines.extend(_emit_stmt(body[i], indent=indent + "    ", ctx=ctx))
             i += 1
         handlers_any = sd2.get("handlers")
         handlers = handlers_any if isinstance(handlers_any, list) else []
@@ -2531,23 +2774,40 @@ def _emit_stmt(stmt: Any, *, indent: str, ctx: dict[str, Any]) -> list[str]:
                 hd: dict[str, Any] = h
                 h_body_any = hd.get("body")
                 h_body = h_body_any if isinstance(h_body_any, list) else []
+                handler_name_any = hd.get("name")
+                handler_name = _safe_ident(handler_name_any, "err") if isinstance(handler_name_any, str) and handler_name_any != "" else "err"
+                handler_type_any = hd.get("type")
+                if isinstance(handler_type_any, dict) and handler_type_any.get("kind") == "Name":
+                    lines.append(indent + "} catch let " + handler_name + " as " + _safe_ident(handler_type_any.get("id"), "Exception") + " {")
+                else:
+                    lines.append(indent + "} catch {")
+                    lines.append(indent + "    let " + handler_name + " = error")
+                handler_ctx: dict[str, Any] = {
+                    "tmp": ctx.get("tmp", 0),
+                    "declared": set(_declared_set(ctx)),
+                    "types": dict(_type_map(ctx)),
+                    "ref_vars": set(_ref_var_set(ctx)),
+                    "return_type": ctx.get("return_type", ""),
+                    "continue_prefix": ctx.get("continue_prefix", ""),
+                    "current_exc_var": handler_name,
+                }
+                _declared_set(handler_ctx).add(handler_name)
+                _type_map(handler_ctx)[handler_name] = "Any"
                 j = 0
                 while j < len(h_body):
-                    lines.extend(_emit_stmt(h_body[j], indent=indent, ctx=ctx))
+                    lines.extend(_emit_stmt(h_body[j], indent=indent + "    ", ctx=handler_ctx))
                     j += 1
             i += 1
         orelse_any = sd2.get("orelse")
         orelse = orelse_any if isinstance(orelse_any, list) else []
+        if len(handlers) == 0:
+            lines.append(indent + "} catch {")
+            lines.append(indent + "    throw error")
         i = 0
         while i < len(orelse):
-            lines.extend(_emit_stmt(orelse[i], indent=indent, ctx=ctx))
+            lines.extend(_emit_stmt(orelse[i], indent=indent + "    ", ctx=ctx))
             i += 1
-        final_any = sd2.get("finalbody")
-        final = final_any if isinstance(final_any, list) else []
-        i = 0
-        while i < len(final):
-            lines.extend(_emit_stmt(final[i], indent=indent, ctx=ctx))
-            i += 1
+        lines.append(indent + "}")
         return lines
 
     if kind == "VarDecl":
@@ -2642,7 +2902,7 @@ def _emit_function(
 
     # @extern functions → delegate to _native module
     if "extern" in decorators and receiver_name is None:
-        return_type = _swift_type(fn.get("return_type"), allow_void=True)
+        return_type = _function_return_swift_type(fn, allow_void=True)
         drop_self = False
         params = _function_params(fn, drop_self=drop_self, use_any=False)
         param_names = _function_param_names(fn, drop_self=drop_self)
@@ -2659,7 +2919,7 @@ def _emit_function(
             return [sig + " {", indent + "    return " + delegate, indent + "}"]
         return [sig + " {", indent + "    " + delegate, indent + "}"]
 
-    return_type = _swift_type(fn.get("return_type"), allow_void=True)
+    return_type = _function_return_swift_type(fn, allow_void=True)
     if is_init:
         return_type = "Void"
 
@@ -2677,6 +2937,8 @@ def _emit_function(
         elif receiver_name is not None and in_class_name is not None and _class_has_base_method(in_class_name, name):
             fn_prefix = "override "
         sig = indent + fn_prefix + "func " + name + "(" + ", ".join(params) + ")"
+        if receiver_name is None and name in _THROWING_FUNCTIONS[0]:
+            sig += " throws"
         if return_type != "Void":
             sig += " -> " + return_type
         lines.append(sig + " {")
@@ -2809,7 +3071,7 @@ def _emit_class(cls: dict[str, Any], *, indent: str) -> list[str]:
                 fn_name = _safe_ident(node.get("name"), "func")
                 drop_self = True
                 params = _function_params(node, drop_self=drop_self, use_any=False)
-                return_type = _swift_type(node.get("return_type"), allow_void=True)
+                return_type = _function_return_swift_type(node, allow_void=True)
                 sig = indent + "    func " + fn_name + "(" + ", ".join(params) + ")"
                 if return_type != "Void":
                     sig += " -> " + return_type
@@ -2817,7 +3079,21 @@ def _emit_class(cls: dict[str, Any], *, indent: str) -> list[str]:
             i += 1
         lines.append(indent + "}")
         return lines
-    annassign_specs: dict[str, tuple[str, str | None]] = {}
+    if base_name == "Enum":
+        i = 0
+        while i < len(body):
+            node = body[i]
+            if isinstance(node, dict) and node.get("kind") == "Assign":
+                target_any = node.get("target")
+                if isinstance(target_any, dict) and target_any.get("kind") == "Name":
+                    member_name = _safe_ident(target_any.get("id"), "")
+                    value_any = node.get("value")
+                    if member_name != "" and isinstance(value_any, dict):
+                        lines.append(indent + "    static let " + member_name + " = " + class_name + "(" + _render_expr(value_any) + ")")
+            i += 1
+        lines.append(indent + "}")
+        return lines
+    static_field_specs: dict[str, tuple[str, str, bool]] = {}
     i = 0
     while i < len(body):
         node = body[i]
@@ -2827,27 +3103,58 @@ def _emit_class(cls: dict[str, Any], *, indent: str) -> list[str]:
                 raw_name = target_any.get("id")
                 if isinstance(raw_name, str) and raw_name != "":
                     field_name = _safe_ident(raw_name, "field")
-                    field_type = _swift_type(node.get("decl_type") or node.get("annotation"), allow_void=False)
-                    default_expr = None
                     if node.get("value") is not None:
+                        field_type = _swift_type(node.get("decl_type") or node.get("annotation"), allow_void=False)
                         default_expr = _render_expr(node.get("value"))
-                    annassign_specs[field_name] = (field_type, default_expr)
+                        static_field_specs[field_name] = (field_type, default_expr, True)
+        if isinstance(node, dict) and node.get("kind") == "Assign":
+            target_any = node.get("target")
+            if not isinstance(target_any, dict):
+                targets_any = node.get("targets")
+                targets = targets_any if isinstance(targets_any, list) else []
+                if len(targets) == 1 and isinstance(targets[0], dict):
+                    target_any = targets[0]
+            if isinstance(target_any, dict) and target_any.get("kind") == "Name":
+                raw_name = target_any.get("id")
+                value_any = node.get("value")
+                if isinstance(raw_name, str) and raw_name != "" and isinstance(value_any, dict):
+                    field_name = _safe_ident(raw_name, "field")
+                    field_type = _swift_type(
+                        node.get("decl_type") or value_any.get("resolved_type"),
+                        allow_void=False,
+                    )
+                    default_expr = _render_expr(value_any)
+                    static_field_specs[field_name] = (field_type, default_expr, True)
         i += 1
     field_specs: list[tuple[str, str, str, str | None, bool]] = []
+    seen_fields: set[str] = set()
     for raw_name, raw_type in field_types.items():
         if not isinstance(raw_name, str):
             continue
         field_name = _safe_ident(raw_name, "field")
+        seen_fields.add(field_name)
         field_type = _swift_type(raw_type, allow_void=False)
-        default_expr = annassign_specs.get(field_name, (field_type, None))[1]
+        spec = static_field_specs.get(field_name)
+        default_expr = spec[1] if spec is not None and spec[1] != "" else None
         default_value = default_expr if default_expr is not None else _default_return_expr(field_type)
         if default_value == "":
             default_value = "__pytra_any_default()"
-        is_static_field = (not is_dataclass) and field_name in annassign_specs
+        is_static_field = (not is_dataclass) and spec is not None and spec[2]
         field_specs.append((field_name, field_type, default_value, default_expr, is_static_field))
         if is_dataclass:
             lines.append(indent + "    var " + field_name + ": " + field_type + " = " + default_value)
         elif is_static_field:
+            lines.append(indent + "    static var " + field_name + ": " + field_type + " = " + default_value)
+        else:
+            lines.append(indent + "    var " + field_name + ": " + field_type + " = " + default_value)
+    for field_name, (field_type, default_expr, is_static_field) in static_field_specs.items():
+        if field_name in seen_fields or is_dataclass:
+            continue
+        default_value = default_expr if default_expr != "" else _default_return_expr(field_type)
+        if default_value == "":
+            default_value = "__pytra_any_default()"
+        field_specs.append((field_name, field_type, default_value, default_expr if default_expr != "" else None, is_static_field))
+        if is_static_field:
             lines.append(indent + "    static var " + field_name + ": " + field_type + " = " + default_value)
         else:
             lines.append(indent + "    var " + field_name + ": " + field_type + " = " + default_value)
@@ -2978,6 +3285,10 @@ def _emit_runtime_helpers() -> list[str]:
         "    guard let value = v else { return \"\" }",
         "    if let s = value as? String { return s }",
         "    return String(describing: value)",
+        "}",
+        "",
+        "func __pytra_py_to_string(_ v: Any?) -> String {",
+        "    return __pytra_str(v)",
         "}",
         "",
         "func __pytra_len(_ v: Any?) -> Int64 {",
@@ -3289,6 +3600,7 @@ def transpile_to_swift_native(east_doc: dict[str, Any]) -> str:
     _CLASS_BASES[0] = {}
     _CLASS_METHODS[0] = {}
     _MAIN_CALL_ALIAS[0] = ""
+    _THROWING_FUNCTIONS[0] = _collect_throwing_functions(east_doc)
     _RELATIVE_IMPORT_NAME_ALIASES[0] = _collect_relative_import_name_aliases(east_doc)
     meta = east_doc.get("meta") if isinstance(east_doc.get("meta"), dict) else {}
     pass  # import alias resolution handled by emit_context
@@ -3376,15 +3688,16 @@ def transpile_to_swift_native(east_doc: dict[str, Any]) -> str:
 
     if has_user_main:
         lines.append("")
-        lines.append("func __pytra_entry_main() {")
-        lines.append("    " + user_main_symbol + "()")
+        entry_main_throws = user_main_symbol in _THROWING_FUNCTIONS[0]
+        lines.append("func __pytra_entry_main()" + (" throws" if entry_main_throws else "") + " {")
+        lines.append("    " + ("try " if entry_main_throws else "") + user_main_symbol + "()")
         lines.append("}")
 
     has_main_guard = len(main_guard) > 0
     if has_main_guard:
         lines.append("")
-        lines.append("func __pytra_entry_guard() {")
-        guard_ctx: dict[str, Any] = {"tmp": 0, "declared": set(), "types": {}}
+        lines.append("func __pytra_entry_guard() throws {")
+        guard_ctx: dict[str, Any] = {"tmp": 0, "declared": set(), "types": {}, "ref_vars": set(), "current_exc_var": ""}
         i = 0
         while i < len(main_guard):
             lines.extend(_emit_stmt(main_guard[i], indent="    ", ctx=guard_ctx))
@@ -3396,8 +3709,9 @@ def transpile_to_swift_native(east_doc: dict[str, Any]) -> str:
         lines.append("@main")
         lines.append("struct Main {")
         lines.append("    static func main() {")
+        lines.append("        do {")
         if has_main_guard:
-            lines.append("        __pytra_entry_guard()")
+            lines.append("            try __pytra_entry_guard()")
         else:
             has_case_main = False
             i = 0
@@ -3407,9 +3721,12 @@ def transpile_to_swift_native(east_doc: dict[str, Any]) -> str:
                     break
                 i += 1
             if has_case_main:
-                lines.append("        _case_main()")
+                lines.append("            " + ("try " if "_case_main" in _THROWING_FUNCTIONS[0] else "") + "_case_main()")
             elif has_user_main:
-                lines.append("        __pytra_entry_main()")
+                lines.append("            " + ("try " if user_main_symbol in _THROWING_FUNCTIONS[0] else "") + "__pytra_entry_main()")
+        lines.append("        } catch {")
+        lines.append("            __pytra_py_print(__pytra_py_to_string(error))")
+        lines.append("        }")
         lines.append("    }")
         lines.append("}")
     lines.append("")
