@@ -2327,6 +2327,55 @@ def has_key(env: dict[str, int], name: str) -> bool:
 
         self.assertIn("::takes_cb(([&](object) -> object { __pytra_main(); return object(); }))", cpp_code)
 
+    def test_cpp_emitter_passes_zero_arg_typed_callable_without_object_bridge(self) -> None:
+        doc = _module_doc(
+            "app.main",
+            body=[
+                {
+                    "kind": "FunctionDef",
+                    "name": "takes_cb",
+                    "arg_types": {"cb": "callable[[],None]"},
+                    "arg_order": ["cb"],
+                    "arg_defaults": {},
+                    "arg_usage": {"cb": "readonly"},
+                    "return_type": "bool",
+                    "body": [{"kind": "Return", "value": {"kind": "Constant", "value": True, "resolved_type": "bool"}}],
+                },
+                {
+                    "kind": "FunctionDef",
+                    "name": "main",
+                    "arg_types": {},
+                    "arg_order": [],
+                    "arg_defaults": {},
+                    "arg_usage": {},
+                    "return_type": "None",
+                    "body": [],
+                },
+                {
+                    "kind": "Expr",
+                    "value": {
+                        "kind": "Call",
+                        "func": {"kind": "Name", "id": "takes_cb"},
+                        "args": [{"kind": "Name", "id": "main", "resolved_type": "callable[[],None]", "call_arg_type": "callable[[],None]"}],
+                        "function_signature_v1": {
+                            "arg_types": {"cb": "callable[[],None]"},
+                            "arg_order": ["cb"],
+                            "arg_defaults": {},
+                            "arg_usage": {"cb": "readonly"},
+                            "return_type": "bool",
+                        },
+                        "resolved_type": "bool",
+                    },
+                },
+            ],
+        )
+
+        cpp_code = emit_cpp_module(doc)
+
+        self.assertIn("bool takes_cb(const ::std::function<void()>& cb)", cpp_code)
+        self.assertIn("::takes_cb(__pytra_main)", cpp_code)
+        self.assertNotIn("([&](object) -> object", cpp_code)
+
     def test_go_emitter_wraps_container_builtin_results_as_ref_handles(self) -> None:
         doc = _module_doc(
             "app.main",
