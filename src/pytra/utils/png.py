@@ -7,11 +7,7 @@ RGB 8bit バッファを PNG ファイルとして保存する。
 
 
 def _png_append(dst: bytearray, src: bytearray) -> None:
-    i = 0
-    n = len(src)
-    while i < n:
-        dst.append(src[i])
-        i += 1
+    dst.extend(src)
 
 
 def _crc32(data: bytearray) -> int:
@@ -63,11 +59,7 @@ def _zlib_deflate_store(data: bytearray) -> bytearray:
         out.append(final)
         _png_append(out, _png_u16le(chunk_len))
         _png_append(out, _png_u16le(0xFFFF ^ chunk_len))
-        i = pos
-        end = pos + chunk_len
-        while i < end:
-            out.append(data[i])
-            i += 1
+        out.extend(data[pos:pos + chunk_len])
         pos += chunk_len
     _png_append(out, _png_u32be(_adler32(data)))
     return out
@@ -88,8 +80,7 @@ def _chunk(chunk_type: bytearray, data: bytearray) -> bytearray:
 
 def write_rgb_png(path: str, width: int, height: int, pixels: bytes) -> None:
     raw: bytearray = bytearray()
-    for b in pixels:
-        raw.append(int(b))
+    raw.extend(pixels)
     expected = width * height * 3
     if len(raw) != expected:
         raise ValueError("pixels length mismatch: got=" + str(len(raw)) + " expected=" + str(expected))
@@ -100,11 +91,7 @@ def write_rgb_png(path: str, width: int, height: int, pixels: bytes) -> None:
     while y < height:
         scanlines.append(0)
         start = y * row_bytes
-        end = start + row_bytes
-        i = start
-        while i < end:
-            scanlines.append(raw[i])
-            i += 1
+        scanlines.extend(raw[start:start + row_bytes])
         y += 1
 
     ihdr: bytearray = bytearray()

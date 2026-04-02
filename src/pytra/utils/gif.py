@@ -2,11 +2,7 @@
 
 
 def _gif_append(dst: bytearray, src: bytearray) -> None:
-    i = 0
-    n = len(src)
-    while i < n:
-        dst.append(src[i])
-        i += 1
+    dst.extend(src)
 
 
 def _gif_u16le(v: int) -> bytearray:
@@ -90,15 +86,13 @@ def save_gif(
     frame_lists: list[bytearray] = []
     for fr in frames:
         fr_buf: bytearray = bytearray()
-        for v in fr:
-            fr_buf.append(int(v))
+        fr_buf.extend(fr)
         if len(fr_buf) != width * height:
             raise ValueError("frame size mismatch")
         frame_lists.append(fr_buf)
 
     palette_buf: bytearray = bytearray()
-    for v in palette:
-        palette_buf.append(int(v))
+    palette_buf.extend(palette)
 
     out: bytearray = bytearray()
     _gif_append(out, bytearray([71, 73, 70, 56, 57, 97]))  # GIF89a
@@ -131,10 +125,7 @@ def save_gif(
             remain = len(compressed) - pos
             chunk_len = 255 if remain > 255 else remain
             out.append(chunk_len)
-            i = 0
-            while i < chunk_len:
-                out.append(compressed[pos + i])
-                i += 1
+            out.extend(compressed[pos:pos + chunk_len])
             pos += chunk_len
         out.append(0)
 
