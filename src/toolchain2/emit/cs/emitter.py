@@ -499,7 +499,11 @@ def _emit_name(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
 
 def _render_list_literal(ctx: EmitContext, node: dict[str, JsonVal], *, preferred_type: str = "") -> str:
     elems = _list(node, "elements")
-    rt = preferred_type if preferred_type != "" else _str(node, "resolved_type")
+    node_rt = _str(node, "resolved_type")
+    rt = preferred_type if preferred_type not in ("", "object", "Obj", "Any", "unknown") else node_rt
+    if node_rt.startswith("list[") or node_rt == "list":
+        if not (rt.startswith("list[") or rt == "list"):
+            rt = node_rt
     out_type = "List<object>"
     if rt != "":
         out_type = _render_type(ctx, rt)
@@ -511,7 +515,11 @@ def _render_list_literal(ctx: EmitContext, node: dict[str, JsonVal], *, preferre
 
 def _render_set_literal(ctx: EmitContext, node: dict[str, JsonVal], *, preferred_type: str = "") -> str:
     elems = _list(node, "elements")
-    rt = preferred_type if preferred_type != "" else _str(node, "resolved_type")
+    node_rt = _str(node, "resolved_type")
+    rt = preferred_type if preferred_type not in ("", "object", "Obj", "Any", "unknown") else node_rt
+    if node_rt.startswith("set[") or node_rt == "set":
+        if not (rt.startswith("set[") or rt == "set"):
+            rt = node_rt
     out_type = "HashSet<object>"
     if rt != "":
         out_type = _render_type(ctx, rt)
@@ -532,7 +540,11 @@ def _render_set_literal(ctx: EmitContext, node: dict[str, JsonVal], *, preferred
 
 def _render_dict_literal(ctx: EmitContext, node: dict[str, JsonVal], *, preferred_type: str = "") -> str:
     entries = _list(node, "entries")
-    rt = preferred_type if preferred_type != "" else _str(node, "resolved_type")
+    node_rt = _str(node, "resolved_type")
+    rt = preferred_type if preferred_type not in ("", "object", "Obj", "Any", "unknown") else node_rt
+    if node_rt.startswith("dict[") or node_rt == "dict":
+        if not (rt.startswith("dict[") or rt == "dict"):
+            rt = node_rt
     out_type = "Dictionary<object, object>"
     if rt != "":
         out_type = _render_type(ctx, rt)
@@ -741,13 +753,23 @@ def _render_expr_with_preferred_type(ctx: EmitContext, node: JsonVal, preferred_
     if kind == "Call" and _bool(node, "yields_dynamic") and preferred_type != "":
         return _coerce_dynamic_expr(ctx, _emit_expr(ctx, node), preferred_type)
     if preferred_type.startswith("callable[") and kind == "Name":
-        return "((" + _render_type(ctx, preferred_type) + ")" + _emit_expr(ctx, node) + ")"
+        return _safe_name(ctx, _str(node, "id"))
     if preferred_type.startswith("callable[") and kind == "Lambda":
-        return "((" + _render_type(ctx, preferred_type) + ")((" + _emit_expr(ctx, node) + ")))"
+        return _emit_expr(ctx, node)
+    if preferred_type in ("callable", "Callable") and kind == "Name":
+        return _safe_name(ctx, _str(node, "id"))
+    if preferred_type in ("callable", "Callable") and kind == "Lambda":
+        return _emit_expr(ctx, node)
     if kind == "Subscript":
         owner_node = node.get("value")
         owner_type = _str(owner_node, "resolved_type") if isinstance(owner_node, dict) else ""
-        if owner_type == "str" and preferred_type not in ("", "str", "object", "Obj", "Any", "unknown"):
+        slice_node = node.get("slice")
+        is_slice = isinstance(slice_node, dict) and _str(slice_node, "kind") == "Slice"
+        numeric_pref_types = {
+            "int", "byte", "int8", "int16", "int32", "int64",
+            "uint8", "uint16", "uint32", "uint64",
+        }
+        if owner_type == "str" and not is_slice and preferred_type in numeric_pref_types:
             return "((" + _render_type(ctx, preferred_type) + ")py_runtime.py_ord(" + _emit_expr(ctx, node) + "))"
         if preferred_type == "str":
             return "py_runtime.py_to_string(" + _emit_expr(ctx, node) + ")"
@@ -782,6 +804,8 @@ def _container_method_call(
     if owner_type.startswith("list[") or owner_type in ("bytes", "bytearray"):
         if method_name == "append" and len(args) >= 1:
             return "py_runtime.py_append(" + owner_expr + ", " + args[0] + ")"
+        if method_name == "extend" and len(args) >= 1:
+            return "py_runtime.extend(" + owner_expr + ", " + args[0] + ")"
         if method_name == "pop":
             if len(args) >= 1:
                 return "py_runtime.py_pop(" + owner_expr + ", " + args[0] + ")"
@@ -825,6 +849,10 @@ def _container_method_call(
             return "py_runtime.isspace(" + owner_expr + ")"
         if method_name == "isalnum":
             return "py_runtime.isalnum(" + owner_expr + ")"
+        if method_name == "lower":
+            return "py_runtime.lower(" + owner_expr + ")"
+        if method_name == "lstrip":
+            return "py_runtime.lstrip(" + owner_expr + (", " + ", ".join(args) if len(args) > 0 else "") + ")"
     return ""
 
 
@@ -920,6 +948,8 @@ def _emit_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
     args: list[str] = []
     for idx, arg in enumerate(_list(node, "args")):
         preferred_type = preferred_arg_types[idx] if idx < len(preferred_arg_types) else ""
+        if preferred_type == "" and isinstance(arg, dict):
+            preferred_type = _str(arg, "call_arg_type")
         args.append(_render_expr_with_preferred_type(ctx, arg, preferred_type=preferred_type))
     keyword_args: list[str] = []
     for keyword in _list(node, "keywords"):

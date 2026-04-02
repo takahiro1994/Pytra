@@ -933,9 +933,34 @@ namespace Pytra.CsModule
             source.Add(py_convert_value<T>(value));
         }
 
+        public static void clear<T>(List<T> source)
+        {
+            source.Clear();
+        }
+
+        public static void clear<K, V>(Dictionary<K, V> source)
+        {
+            source.Clear();
+        }
+
+        public static void clear<T>(HashSet<T> source)
+        {
+            source.Clear();
+        }
+
         public static void extend<T>(List<T> source, IEnumerable<T> values)
         {
             source.AddRange(values);
+        }
+
+        public static void sort<T>(List<T> source)
+        {
+            source.Sort();
+        }
+
+        public static void reverse<T>(List<T> source)
+        {
+            source.Reverse();
         }
 
         public static IEqualityComparer<T[]> array_comparer<T>()
@@ -998,6 +1023,24 @@ namespace Pytra.CsModule
             T value = source[idx];
             source.RemoveAt(idx);
             return value;
+        }
+
+        public static V pop<K, V>(Dictionary<K, V> source, K key)
+        {
+            V value = source[key];
+            source.Remove(key);
+            return value;
+        }
+
+        public static V setdefault<K, V>(Dictionary<K, V> source, K key, V defaultValue)
+        {
+            V value;
+            if (source.TryGetValue(key, out value))
+            {
+                return value;
+            }
+            source[key] = defaultValue;
+            return defaultValue;
         }
 
         public static long py_len<T>(List<T> source)
@@ -1388,6 +1431,11 @@ namespace Pytra.CsModule
             return text.TrimStart(chars.ToCharArray());
         }
 
+        public static string lstrip(string value)
+        {
+            return lstrip(value, null);
+        }
+
         public static Exception SystemExit(object code)
         {
             string text = py_to_string(code);
@@ -1464,6 +1512,11 @@ namespace Pytra.CsModule
         public static string upper(string value)
         {
             return (value ?? "").ToUpperInvariant();
+        }
+
+        public static string lower(string value)
+        {
+            return (value ?? "").ToLowerInvariant();
         }
 
         public static bool isspace(string value)
