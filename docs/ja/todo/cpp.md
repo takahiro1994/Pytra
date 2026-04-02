@@ -58,7 +58,8 @@ union type を `object` に退化させず `std::variant` で表現する。`wor
 6. [ ] [ID: P0-CPP-VARIANT-S6] `object.h` の `object` クラス削除に向けた blocker を分離し、削除順を固定する
    - メモ: `PYTRA_TID_*` と `py_runtime_object_type_id` の cleanup は `P0-CPP-TYPEID-CLN` で概ね完了済み。現状の blocker は `src/toolchain2/compile/lower.py` の `resolved_type="object"` / iter boundary、`src/toolchain2/emit/cpp/emitter.py` の `Box` / `Unbox` / generic callable bridge、`src/runtime/cpp/std/{argparse,pathlib}.*` と tuple index fallback などの `object` 実使用パス。`object.h` 本体は `S8` / `S10` より前には削除しない。
 7. [ ] [ID: P0-CPP-VARIANT-S6A] C++ runtime / emitter に残っている不要な `PYTRA_TID_OBJECT` / object-type-id 正規化の残骸を削除する
-8. [ ] [ID: P0-CPP-VARIANT-S6B] `object.h` の `Object<void>` / `using object = Object<void>` を削除する前提として、runtime stdlib の object seam を inventory 化し、owner を `S8` / `S10` / follow-up plan に振り分ける
+8. [x] [ID: P0-CPP-VARIANT-S6B] `object.h` の `Object<void>` / `using object = Object<void>` を削除する前提として、runtime stdlib の object seam を inventory 化し、owner を `S8` / `S10` / follow-up plan に振り分ける
+   - 完了: [p0-cpp-object-seam-inventory.md](../plans/p0-cpp-object-seam-inventory.md) を追加し、`lower.py` の object 退化、C++ emitter の `Box` / `Unbox` / generic callable bridge、runtime stdlib (`argparse`, `pathlib`, tuple index fallback)、runtime core (`object.h`, `py_types.h`, `base_ops.h`, `conversions.h`) を棚卸しした。削除順は `P0-CMN-BOXUNBOX -> P0-CPP-VARIANT-S8/S9 -> P0-CPP-VARIANT-S10/S11 -> P0-CPP-VARIANT-S6B` に固定する。
 9. [ ] [ID: P0-CPP-VARIANT-S7] fixture 全件 + sample 全件が `object` 型なしで PASS することを確認する
 
 **Phase 3: box/unbox 削除**
