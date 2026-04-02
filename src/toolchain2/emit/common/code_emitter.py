@@ -282,6 +282,11 @@ def build_runtime_import_map(
             export_symbol = export_name
         full_module_id = module_id + "." + export_symbol
         is_runtime_namespace = module_id.startswith("pytra.")
+        if not is_runtime_namespace:
+            symbol_key = module_id + "." + export_symbol
+            if symbol_key in mapping.calls:
+                runtime_imports[local_name] = mapping.calls[symbol_key]
+                continue
         if (
             not is_runtime_namespace
             and not should_skip_module(module_id, mapping)
