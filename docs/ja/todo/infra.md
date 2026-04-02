@@ -20,6 +20,18 @@
 
 ## 未完了タスク
 
+### P0-SUBSCRIPT-BOUNDS: negative-index-mode / bounds-check-mode を EAST optimizer に移管する
+
+文脈: [docs/ja/plans/p0-subscript-bounds-east-optimizer.md](../plans/p0-subscript-bounds-east-optimizer.md)
+
+旧 toolchain の emitter オプション `--negative-index-mode` / `--bounds-check-mode` が toolchain2 に未移行。C++ runtime の `py_list_at_ref` が全添字アクセスで常に負数正規化 + bounds check を行い、hot loop で深刻な性能劣化を引き起こしている。これらは emitter ではなく EAST optimizer のオプションとして実装し、`Subscript` ノードにメタデータを付与する。emitter はメタデータのみを参照し、オプション自体を知らない。
+
+1. [ ] [ID: P0-SUB-BOUNDS-S1] `meta.subscript_access_v1` スキーマを spec-east.md に定義する
+2. [ ] [ID: P0-SUB-BOUNDS-S2] EAST optimizer に `--negative-index-mode` / `--bounds-check-mode` を追加し、`Subscript` ノードにメタデータを付与するパスを実装する
+3. [ ] [ID: P0-SUB-BOUNDS-S3] C++ emitter でメタデータに基づく direct index / py_list_at_ref の分岐を実装する
+4. [ ] [ID: P0-SUB-BOUNDS-S4] sample 01 (mandelbrot) の C++ 実行時間が改善されることを確認する
+5. [ ] [ID: P0-SUB-BOUNDS-S5] fixture + sample + stdlib parity に回帰がないことを確認する
+
 ### P5-PARITY-STREAMING: runtime_parity_check_fast.py のストリーミング出力
 
 C++ fixture parity（137件、20分超）で完了まで stdout が返らず、進捗が見えない問題。
