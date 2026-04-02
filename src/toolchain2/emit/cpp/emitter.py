@@ -1933,6 +1933,12 @@ def _emit_builtin_call(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
             item_type = "uint8"
         if item_type != "":
             call_arg_strs = [_emit_expr(ctx, owner_node), _emit_expr_as_type(ctx, args[0], item_type)]
+    if rc == "list.sort" and isinstance(func, dict) and _str(func, "kind") == "Attribute":
+        ctx.includes_needed.add("built_in/list_ops.h")
+        return "py_list_sort_mut(" + _emit_expr(ctx, func.get("value")) + ")"
+    if rc == "list.reverse" and isinstance(func, dict) and _str(func, "kind") == "Attribute":
+        ctx.includes_needed.add("built_in/list_ops.h")
+        return "py_list_reverse_mut(" + _emit_expr(ctx, func.get("value")) + ")"
     if rc == "dict.get" and isinstance(func, dict) and _str(func, "kind") == "Attribute" and len(args) >= 1:
         owner_node = func.get("value")
         owner_type = _expanded_union_type(_effective_resolved_type(owner_node))
