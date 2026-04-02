@@ -15,7 +15,7 @@
 | Rust backend | [rust.md](./rust.md) |
 | TS/JS backend | [ts.md](./ts.md) |
 | C# backend | [cs.md](./cs.md) |
-| Java backend | [java.md](./java.md) |
+| JVM backend (Java / Scala / Kotlin) | [java.md](./java.md) |
 | Ruby backend | [ruby.md](./ruby.md) |
 | Lua backend | [lua.md](./lua.md) |
 | PHP backend | [php.md](./php.md) |

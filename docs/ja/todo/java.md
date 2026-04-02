@@ -2,11 +2,12 @@
   <img alt="Read in English" src="https://img.shields.io/badge/docs-English-2563EB?style=flat-square">
 </a>
 
-# TODO — Java backend
+# TODO — JVM backend（Java / Scala / Kotlin）
 
 > 領域別 TODO。全体索引は [index.md](./index.md) を参照。
+> Java / Scala / Kotlin は全て JVM ターゲットのため、このファイルで一括管理する。
 
-最終更新: 2026-04-01
+最終更新: 2026-04-02
 
 ## 運用ルール
 
@@ -20,9 +21,21 @@
 
 ## 参考資料
 
+### Java
 - 旧 toolchain1 の Java emitter: `src/toolchain/emit/java/`
+- toolchain2 の Java emitter: `src/toolchain2/emit/java/`
+- Java runtime: `src/runtime/java/`
+
+### Scala
+- toolchain2 の Scala emitter: `src/toolchain2/emit/scala/`
+- Scala runtime: `src/runtime/scala/`
+
+### Kotlin
+- toolchain2 の Kotlin emitter: `src/toolchain2/emit/kotlin/`（未実装の場合あり）
+- Kotlin runtime: `src/runtime/kotlin/`（未実装の場合あり）
+
+### 共通
 - toolchain2 の TS emitter（参考実装）: `src/toolchain2/emit/ts/`
-- 既存の Java runtime: `src/runtime/java/`
 - emitter 実装ガイドライン: `docs/ja/spec/spec-emitter-guide.md`
 - mapping.json 仕様: `docs/ja/spec/spec-runtime-mapping.md`
 
