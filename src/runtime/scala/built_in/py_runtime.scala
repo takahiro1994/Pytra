@@ -158,7 +158,13 @@ def __pytra_len(v: Any): Long = {
         case xs: scala.collection.Seq[?] => xs.size.toLong
         case m: scala.collection.Map[?, ?] => m.size.toLong
         case s: scala.collection.Set[?] => s.size.toLong
-        case _ => 0L
+        case _ =>
+            try {
+                val method = v.getClass.getMethod("__len__")
+                __pytra_int(method.invoke(v))
+            } catch {
+                case _: Throwable => 0L
+            }
     }
 }
 
@@ -169,21 +175,18 @@ def __pytra_index(i: Long, n: Long): Long = {
 def __pytra_get_index(container: Any, index: Any): Any = {
     container match {
         case s: String =>
-            if (s.isEmpty) return ""
             val i = __pytra_index(__pytra_int(index), s.length.toLong)
-            if (i < 0L || i >= s.length.toLong) return ""
+            if (i < 0L || i >= s.length.toLong) throw new RuntimeException("string index out of range")
             s.charAt(i.toInt).toString
         case m: mutable.LinkedHashMap[?, ?] =>
-            m.asInstanceOf[mutable.LinkedHashMap[Any, Any]].getOrElse(__pytra_str(index), __pytra_any_default())
+            m.asInstanceOf[mutable.LinkedHashMap[Any, Any]].getOrElse(index, __pytra_any_default())
         case m: scala.collection.Map[?, ?] =>
-            m.asInstanceOf[scala.collection.Map[Any, Any]].getOrElse(__pytra_str(index), __pytra_any_default())
+            m.asInstanceOf[scala.collection.Map[Any, Any]].getOrElse(index, __pytra_any_default())
         case _ =>
             val list = __pytra_as_list(container)
-            if (list.nonEmpty) {
-                val i = __pytra_index(__pytra_int(index), list.size.toLong)
-                if (i >= 0L && i < list.size.toLong) return list(i.toInt)
-            }
-            __pytra_any_default()
+            val i = __pytra_index(__pytra_int(index), list.size.toLong)
+            if (i >= 0L && i < list.size.toLong) return list(i.toInt)
+            throw new RuntimeException("list index out of range")
     }
 }
 
@@ -357,10 +360,39 @@ def __pytra_bytes(v: Any): mutable.ArrayBuffer[Long] = {
 def __pytra_list_repeat(value: Any, count: Any): mutable.ArrayBuffer[Any] = {
     val out = mutable.ArrayBuffer[Any]()
     val n = __pytra_int(count)
+    val items = __pytra_as_list(value)
     var i = 0L
     while (i < n) {
-        out.append(value)
+        out ++= items
         i += 1L
+    }
+    out
+}
+
+def __pytra_range(args: Any*): mutable.ArrayBuffer[Any] = {
+    var start = 0L
+    var stop = 0L
+    var step = 1L
+    if (args.length == 1) {
+        stop = __pytra_int(args(0))
+    } else if (args.length >= 2) {
+        start = __pytra_int(args(0))
+        stop = __pytra_int(args(1))
+        if (args.length >= 3) step = __pytra_int(args(2))
+    }
+    val out = mutable.ArrayBuffer[Any]()
+    if (step == 0L) return out
+    var i = start
+    if (step > 0L) {
+        while (i < stop) {
+            out.append(i)
+            i += step
+        }
+    } else {
+        while (i > stop) {
+            out.append(i)
+            i += step
+        }
     }
     out
 }
@@ -412,6 +444,10 @@ def __pytra_as_set(v: Any): mutable.LinkedHashSet[Any] = {
             out
         case _ => mutable.LinkedHashSet[Any]()
     }
+}
+
+def __pytra_set_new(v: Any = null): mutable.LinkedHashSet[Any] = {
+    if (v == null) mutable.LinkedHashSet[Any]() else __pytra_as_set(v)
 }
 
 def __pytra_as_dict(v: Any): mutable.LinkedHashMap[Any, Any] = {

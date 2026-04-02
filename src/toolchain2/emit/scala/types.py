@@ -43,7 +43,7 @@ def _safe_scala_ident(name: str) -> str:
     if out[0].isdigit():
         out = "_" + out
     if out in _SCALA_KEYWORDS:
-        out += "_"
+        out += "_py"
     return out
 
 
@@ -79,12 +79,16 @@ def scala_type(resolved_type: str) -> str:
         return "Any"
     if resolved_type == "Path":
         return "java.nio.file.Path"
+    if resolved_type == "deque":
+        return "pytra_std_collections.deque"
+    if resolved_type in ("bytes", "bytearray"):
+        return "scala.collection.mutable.ArrayBuffer[Long]"
     if resolved_type.startswith("list[") and resolved_type.endswith("]"):
         inner = resolved_type[5:-1]
         return "scala.collection.mutable.ArrayBuffer[" + scala_type(inner) + "]"
     if resolved_type.startswith("set[") and resolved_type.endswith("]"):
         inner = resolved_type[4:-1]
-        return "scala.collection.mutable.HashSet[" + scala_type(inner) + "]"
+        return "scala.collection.mutable.LinkedHashSet[" + scala_type(inner) + "]"
     if resolved_type.startswith("dict[") and resolved_type.endswith("]"):
         parts = _split_generic_args(resolved_type[5:-1])
         if len(parts) == 2:
