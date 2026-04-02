@@ -1733,6 +1733,12 @@ end
 
 -- open (with context manager support)
 function __pytra_open(path, mode)
+    if type(path) == "string" and type(mode) == "string" and (string.find(mode, "w", 1, true) ~= nil or string.find(mode, "a", 1, true) ~= nil) then
+        local parent = string.match(path, "^(.*)[/\\][^/\\]+$")
+        if parent ~= nil and parent ~= "" then
+            __pytra_makedirs(parent)
+        end
+    end
     local f = io.open(path, mode)
     if not f then error("cannot open file: " .. tostring(path)) end
     local wrapper = {}
