@@ -493,6 +493,8 @@ native:   src/runtime/<lang>/native/utils/png_native.<ext>  ← I/O アダプタ
 
 画像 runtime が動かない場合は、**transpile パイプライン（EAST → emitter）の修正** で対処すること。手書きで回避してはならない。
 
+**正本ファイル（`src/pytra/utils/*.py`、`src/pytra/std/*.py`）は言語 backend 担当が変更してはならない。** これらのファイルは全言語の生成物の元になるため、変更は全言語に波及する。変更が必要な場合はプランナーまたはインフラ担当が全言語への影響を確認したうえで行う。
+
 ### built_in モジュールの emit スキップ
 
 linker は `pytra.built_in.io_ops` / `pytra.built_in.scalar_ops` 等を link-output に含める（依存追跡のため）。しかし emitter はこれらのモジュールの **emit をスキップ** すべき。
