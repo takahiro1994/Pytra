@@ -31,6 +31,7 @@
     "py_reversed_object": "__pytra_reversed",
     "sorted": "__pytra_sorted",
     "list.append": "__LIST_APPEND__",
+    "list.extend": "__LIST_EXTEND__",
     "list.pop": "__LIST_POP__",
     "list.clear": "__LIST_CLEAR__",
     "list.index": "__LIST_INDEX__",

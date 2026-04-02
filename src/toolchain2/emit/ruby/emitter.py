@@ -128,6 +128,21 @@ def _ruby_symbol_name(ctx: EmitContext, name: str) -> str:
     return _safe_ruby_ident(name)
 
 
+def _ruby_class_name(name: str) -> str:
+    safe_name = _safe_ruby_ident(name).lstrip("_")
+    if safe_name == "":
+        return "PytraAnon"
+    if not safe_name[0].isupper():
+        return safe_name[0].upper() + safe_name[1:]
+    return safe_name
+
+
+def _should_skip_module_ruby(module_id: str, mapping: RuntimeMapping) -> bool:
+    if module_id == "pytra.built_in.error":
+        return True
+    return should_skip_module(module_id, mapping)
+
+
 def _is_exception_type_name(ctx: EmitContext, name: str) -> bool:
     if ruby_is_builtin_exception(name):
         return True
@@ -306,6 +321,8 @@ def _emit_name(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
         return "super"
     if name in ctx.runtime_imports:
         return ctx.runtime_imports[name]
+    if name in ctx.class_names:
+        return _ruby_class_name(name)
     if name in ctx.function_names:
         return "method(:" + _ruby_symbol_name(ctx, name) + ")"
     return _ruby_symbol_name(ctx, name)
@@ -324,9 +341,9 @@ def _emit_attribute(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
         is_module = owner_rt == "module" or owner_id in ctx.import_alias_modules
         if is_module:
             mod_id = _str(node, "runtime_module_id")
-            if mod_id == "":
+            if mod_id == "" or not _should_skip_module_ruby(mod_id, ctx.mapping):
                 mod_id = ctx.import_alias_modules.get(owner_id, "")
-            if should_skip_module(mod_id, ctx.mapping):
+            if _should_skip_module_ruby(mod_id, ctx.mapping):
                 runtime_symbol = _str(node, "runtime_symbol")
                 if runtime_symbol == "":
                     runtime_symbol = attr
@@ -342,8 +359,8 @@ def _emit_attribute(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
         # Class.static_method / Class.member
         if owner_id in ctx.class_names:
             if len(attr) > 0 and attr[0].isupper():
-                return owner_id + "::" + attr
-            return owner_id + "." + _ruby_method_name(attr)
+                return _ruby_class_name(owner_id) + "::" + attr
+            return _ruby_class_name(owner_id) + "." + _ruby_method_name(attr)
     owner = _emit_expr(ctx, owner_node)
     if len(attr) > 0 and attr[0].isupper():
         return owner + "::" + attr
@@ -477,6 +494,18 @@ def _emit_list_literal(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
 def _emit_dict_literal(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
     keys = _list(node, "keys")
     values = _list(node, "values")
+    if len(keys) == 0 and len(values) == 0:
+        entries = _list(node, "entries")
+        if len(entries) > 0:
+            parts_from_entries: list[str] = []
+            for entry in entries:
+                if not isinstance(entry, dict):
+                    continue
+                k_code = _emit_expr(ctx, entry.get("key"))
+                v_code = _emit_expr(ctx, entry.get("value"))
+                parts_from_entries.append(k_code + " => " + v_code)
+            if len(parts_from_entries) > 0:
+                return "{" + ", ".join(parts_from_entries) + "}"
     if len(keys) == 0:
         return "{}"
     parts: list[str] = []
@@ -702,9 +731,13 @@ def _emit_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
     # Extract builtin_name from func node
     builtin_name = ""
     if isinstance(func, dict):
-        builtin_name = _str(func, "id")
-        if builtin_name == "":
-            builtin_name = _str(func, "repr")
+        func_kind = _str(func, "kind")
+        if func_kind == "Attribute":
+            builtin_name = _str(func, "attr")
+        else:
+            builtin_name = _str(func, "id")
+            if builtin_name == "":
+                builtin_name = _str(func, "repr")
     should_resolve_runtime = call_key != "" or adapter_kind != ""
     if not should_resolve_runtime and builtin_name in ctx.runtime_imports:
         should_resolve_runtime = True
@@ -714,8 +747,13 @@ def _emit_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
         and builtin_name not in ctx.function_names
         and builtin_name not in ctx.class_names
         and builtin_name not in ctx.var_types
+        and builtin_name not in ctx.import_alias_modules
     ):
         should_resolve_runtime = True
+    alias_module_id = ctx.import_alias_modules.get(builtin_name, "")
+    if builtin_name in ctx.import_alias_modules and builtin_name not in ctx.runtime_imports:
+        if alias_module_id != "" and not _should_skip_module_ruby(alias_module_id, ctx.mapping):
+            should_resolve_runtime = False
     mapped = resolve_runtime_call(call_key, builtin_name, adapter_kind, ctx.mapping) if should_resolve_runtime else ""
 
     # When func is Attribute (method call), prepend owner to builtin args
@@ -749,6 +787,8 @@ def _emit_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
         return _emit_set_ctor(ctx, args)
     if mapped == "__LIST_APPEND__":
         return _emit_method_call_on_first_arg_strs(builtin_args_strs, "push")
+    if mapped == "__LIST_EXTEND__":
+        return _emit_method_call_on_first_arg_strs(builtin_args_strs, "concat")
     if mapped == "__LIST_POP__":
         return _emit_list_pop_strs(builtin_args_strs)
     if mapped == "__LIST_CLEAR__":
@@ -824,12 +864,17 @@ def _emit_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
                 for a in args:
                     arg_strs0.append(_emit_expr(ctx, a))
                 return _render_super_call(arg_strs0)
+            if fn_name in ctx.runtime_imports:
+                arg_strs_import: list[str] = []
+                for a in args:
+                    arg_strs_import.append(_emit_expr(ctx, a))
+                return ctx.runtime_imports[fn_name] + "(" + ", ".join(arg_strs_import) + ")"
             # Class constructors
             if fn_name in ctx.class_names:
                 arg_strs2: list[str] = []
                 for a in args:
                     arg_strs2.append(_emit_expr(ctx, a))
-                return fn_name + ".new(" + ", ".join(arg_strs2) + ")"
+                return _ruby_class_name(fn_name) + ".new(" + ", ".join(arg_strs2) + ")"
             # Exception constructors
             if _is_exception_type_name(ctx, fn_name):
                 exc_cls = ruby_exception_class(fn_name)
@@ -944,7 +989,7 @@ def _emit_method_call(ctx: EmitContext, func: dict[str, JsonVal], args: list[Jso
         if owner_id in ctx.class_names:
             static_set = ctx.class_static_methods.get(owner_id, set())
             if attr in static_set:
-                return owner_id + "." + _ruby_method_name(attr) + "(" + ", ".join(arg_strs) + ")"
+                return _ruby_class_name(owner_id) + "." + _ruby_method_name(attr) + "(" + ", ".join(arg_strs) + ")"
     # super().__init__(*args) -> super(*args)
     if _is_super_receiver(owner_node):
         if attr == "__init__":
@@ -1264,6 +1309,12 @@ def _emit_assign(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
 def _emit_ann_assign(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
     target = node.get("target")
     value = node.get("value")
+    if isinstance(target, dict) and _str(target, "kind") == "Attribute":
+        attr_code = _emit_attribute(ctx, target)
+        if isinstance(value, dict):
+            value_code = _emit_expr(ctx, value)
+            _emit(ctx, attr_code + " = " + value_code)
+        return
     name = ""
     if isinstance(target, dict):
         name = _str(target, "id")
@@ -1598,8 +1649,16 @@ def _emit_try(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
         if not isinstance(handler, dict):
             continue
         exc_type = _str(handler, "type")
+        if exc_type == "":
+            exc_type_node = handler.get("type")
+            if isinstance(exc_type_node, dict):
+                exc_type = _str(exc_type_node, "id")
+                if exc_type == "":
+                    exc_type = _str(exc_type_node, "repr")
         exc_name = _str(handler, "name")
         ruby_exc = ruby_exception_class(exc_type) if exc_type != "" else "StandardError"
+        if exc_type in ctx.class_names:
+            ruby_exc = _ruby_class_name(exc_type)
         saved_exc_var = ctx.current_exc_var
         if exc_name != "":
             safe_exc = _safe_ruby_ident(exc_name)
@@ -1663,7 +1722,7 @@ def _emit_import_stmt(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
     if kind == "ImportFrom":
         module = _str(node, "module")
         # Skip standard library and built-in modules
-        if should_skip_module(module, ctx.mapping):
+        if _should_skip_module_ruby(module, ctx.mapping):
             return
         rel_path = module.replace(".", "_")
         _emit(ctx, 'require_relative "' + rel_path + '"')
@@ -1675,7 +1734,7 @@ def _emit_import_stmt(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
                 mod_name = _str(name_item, "name")
             elif isinstance(name_item, str):
                 mod_name = name_item
-            if mod_name != "" and not should_skip_module(mod_name, ctx.mapping):
+            if mod_name != "" and not _should_skip_module_ruby(mod_name, ctx.mapping):
                 rel_path = mod_name.replace(".", "_")
                 _emit(ctx, 'require_relative "' + rel_path + '"')
 
@@ -1897,7 +1956,7 @@ def _emit_class_def(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
     body = _list(node, "body")
     decorators = _list(node, "decorators")
 
-    safe_name = _safe_ruby_ident(name)
+    safe_name = _ruby_class_name(name)
 
     # Check for trait/interface
     is_trait = False
@@ -1929,7 +1988,7 @@ def _emit_class_def(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
         # Trait -> Ruby module
         _emit(ctx, "module " + safe_name)
     elif base_name != "" and base_name != "object":
-        ruby_base = _safe_ruby_ident(base_name)
+        ruby_base = _ruby_class_name(base_name)
         if _is_exception_type_name(ctx, base_name):
             ruby_base = ruby_exception_class(base_name)
         _emit(ctx, "class " + safe_name + " < " + ruby_base)
@@ -2012,6 +2071,13 @@ def _emit_class_def(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
 
     ctx.indent_level -= 1
     _emit(ctx, "end")
+    if name != "" and name[0].islower():
+        _emit_blank(ctx)
+        _emit(ctx, "def " + _safe_ruby_ident(name) + "(*args)")
+        ctx.indent_level += 1
+        _emit(ctx, _ruby_class_name(name) + ".new(*args)")
+        ctx.indent_level -= 1
+        _emit(ctx, "end")
     _emit_blank(ctx)
 
     ctx.current_class = saved_class
@@ -2130,7 +2196,7 @@ def transpile_to_ruby(east3_doc: dict[str, JsonVal]) -> str:
     mapping = load_runtime_mapping(mapping_path)
 
     # Skip runtime modules
-    if should_skip_module(module_id, mapping):
+    if _should_skip_module_ruby(module_id, mapping):
         return ""
 
     # built_in modules are provided by py_runtime; skip_modules in mapping handles this
@@ -2169,6 +2235,17 @@ def transpile_to_ruby(east3_doc: dict[str, JsonVal]) -> str:
                 ctx.class_type_ids[fqcn] = type_id_val
 
     ctx.import_alias_modules = build_import_alias_map(meta)
+    bindings = meta.get("import_bindings")
+    if isinstance(bindings, list):
+        for binding in bindings:
+            if not isinstance(binding, dict):
+                continue
+            if binding.get("binding_kind") != "module":
+                continue
+            local_name = binding.get("local_name")
+            runtime_module_id = binding.get("runtime_module_id")
+            if isinstance(local_name, str) and local_name != "" and isinstance(runtime_module_id, str) and runtime_module_id != "":
+                ctx.import_alias_modules[local_name] = runtime_module_id
     ctx.runtime_imports = build_runtime_import_map(meta, mapping)
 
     # First pass: collect class info
