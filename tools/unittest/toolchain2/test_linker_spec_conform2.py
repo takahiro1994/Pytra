@@ -3504,8 +3504,82 @@ def has_key(env: dict[str, int], name: str) -> bool:
 
         cpp_code = emit_cpp_module(doc)
 
-        self.assertIn("return object(rc_dict_from_value(dict<str, object>{}));", cpp_code)
+        self.assertIn("return object(rc_from_value(dict<str, object>{}));", cpp_code)
         self.assertNotIn("dict<object, object>{}", cpp_code)
+
+    def test_cpp_emitter_boxes_empty_unknown_list_via_list_literal_path(self) -> None:
+        doc = _module_doc(
+            "app.main",
+            body=[
+                {
+                    "kind": "FunctionDef",
+                    "name": "default_list",
+                    "arg_types": {},
+                    "arg_order": [],
+                    "arg_defaults": {},
+                    "arg_index": {},
+                    "return_type": "object",
+                    "arg_usage": {},
+                    "renamed_symbols": {},
+                    "docstring": None,
+                    "body": [
+                        {
+                            "kind": "Return",
+                            "value": {
+                                "kind": "Box",
+                                "resolved_type": "object",
+                                "value": {
+                                    "kind": "List",
+                                    "resolved_type": "list[unknown]",
+                                    "elements": [],
+                                },
+                            },
+                        }
+                    ],
+                }
+            ],
+        )
+
+        cpp_code = emit_cpp_module(doc)
+
+        self.assertIn("return object(rc_from_value(list<object>{}));", cpp_code)
+
+    def test_cpp_emitter_boxes_empty_unknown_set_via_set_literal_path(self) -> None:
+        doc = _module_doc(
+            "app.main",
+            body=[
+                {
+                    "kind": "FunctionDef",
+                    "name": "default_set",
+                    "arg_types": {},
+                    "arg_order": [],
+                    "arg_defaults": {},
+                    "arg_index": {},
+                    "return_type": "object",
+                    "arg_usage": {},
+                    "renamed_symbols": {},
+                    "docstring": None,
+                    "body": [
+                        {
+                            "kind": "Return",
+                            "value": {
+                                "kind": "Box",
+                                "resolved_type": "object",
+                                "value": {
+                                    "kind": "Set",
+                                    "resolved_type": "set[unknown]",
+                                    "elements": [],
+                                },
+                            },
+                        }
+                    ],
+                }
+            ],
+        )
+
+        cpp_code = emit_cpp_module(doc)
+
+        self.assertIn("return object(rc_from_value(set<object>{}));", cpp_code)
 
     def test_go_emitter_uses_list_index_helper_for_list_receivers(self) -> None:
         doc = _module_doc(

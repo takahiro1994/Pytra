@@ -2733,11 +2733,11 @@ def _emit_box(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
         value_kind = _str(value, "kind")
         value_type = _effective_resolved_type(value)
         if value_kind == "Dict" and value_type == "dict[unknown,unknown]" and len(_list(value, "entries")) == 0:
-            return "object(rc_from_value(dict<str, object>{}))"
+            return "object(" + _emit_expr(ctx, value) + ")"
         if value_kind == "List" and value_type == "list[unknown]" and len(_list(value, "elements")) == 0:
-            return "object(rc_from_value(list<object>{}))"
+            return "object(" + _emit_expr(ctx, value) + ")"
         if value_kind == "Set" and value_type == "set[unknown]" and len(_list(value, "elements")) == 0:
-            return "object(rc_from_value(set<object>{}))"
+            return "object(" + _emit_expr(ctx, value) + ")"
     value_expr = _emit_expr(ctx, value)
     value_type = _expanded_union_type(_effective_resolved_type(value))
     if _is_top_level_union_type(value_type):
