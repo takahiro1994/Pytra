@@ -155,7 +155,7 @@ class JuliaBootstrapRewriter:
                 kept_body.append(self._rewrite_node(stmt_any))
                 continue
             stmt_kind = stmt_any.get("kind")
-            if stmt_kind != "Assign":
+            if stmt_kind not in {"Assign", "AnnAssign"}:
                 kept_body.append(self._rewrite_node(stmt_any))
                 continue
             target_any = stmt_any.get("target")

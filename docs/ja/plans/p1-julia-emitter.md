@@ -66,3 +66,4 @@
 - 2026-04-03: [ID: P1-JULIA-EMITTER-S1] subset native renderer に bitwise `~`, `&`, `|`, `^` を追加し、`bitwise_invert_basic` も native path に寄せた。
 - 2026-04-03: [ID: P1-JULIA-EMITTER-S1] subset native renderer に `@staticmethod` class support を追加し、`staticmethod_basic` も native path に寄せた。
 - 2026-04-04: [ID: P1-JULIA-EMITTER-S1] subset native renderer に instance field `AugAssign` (`self.field += ...`) を追加し、`class_instance` も native path に寄せた。
+- 2026-04-04: [ID: P1-JULIA-EMITTER-S1] bootstrap rewrite が class body の `AnnAssign` static attr も global へ lift するよう修正し、`class_member` も native path に寄せた。
