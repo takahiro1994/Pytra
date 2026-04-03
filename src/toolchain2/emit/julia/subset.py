@@ -193,6 +193,10 @@ def _stmt_supported(node: JsonVal) -> bool:
         return _expr_supported(node.get("test")) and all(_stmt_supported(stmt) for stmt in _list(node, "body")) and all(
             _stmt_supported(stmt) for stmt in _list(node, "orelse")
         )
+    if kind == "While":
+        return _expr_supported(node.get("test")) and all(_stmt_supported(stmt) for stmt in _list(node, "body")) and all(
+            _stmt_supported(stmt) for stmt in _list(node, "orelse")
+        )
     if kind == "ForCore":
         target_plan = node.get("target_plan")
         iter_plan = node.get("iter_plan")
@@ -473,6 +477,14 @@ class JuliaSubsetRenderer:
                 for stmt in orelse:
                     self._emit_stmt(stmt)
                 self.indent_level -= 1
+            self._emit("end")
+            return
+        if kind == "While":
+            self._emit("while __pytra_truthy(" + self._render_expr(node.get("test")) + ")")
+            self.indent_level += 1
+            for stmt in _list(node, "body"):
+                self._emit_stmt(stmt)
+            self.indent_level -= 1
             self._emit("end")
             return
         if kind == "ForCore":

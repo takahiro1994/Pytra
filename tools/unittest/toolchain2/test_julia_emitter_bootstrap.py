@@ -309,6 +309,12 @@ class JuliaEmitterBootstrapTests(unittest.TestCase):
         rewritten = self.rewriter.rewrite_document(prepared)
         self.assertEqual(can_render_module_natively(rewritten), True)
 
+    def test_subset_accepts_rewritten_yield_generator_min_fixture(self) -> None:
+        doc = _load_east3_for_julia("yield_generator_min")
+        _module_id, prepared = prepare_module_for_emit(doc)
+        rewritten = self.rewriter.rewrite_document(prepared)
+        self.assertEqual(can_render_module_natively(rewritten), True)
+
     def test_renderer_uses_subset_for_range_fixture(self) -> None:
         source = self.renderer.render_module(_load_east3_for_julia("for_range"))
         self.assertIn("for i in 0:(n - 1)", source)
@@ -401,6 +407,12 @@ class JuliaEmitterBootstrapTests(unittest.TestCase):
         self.assertIn("self.value = 7", source)
         self.assertIn("o = __pytra_new_Obj()", source)
         self.assertIn("__pytra_print((o.value == 7))", source)
+
+    def test_renderer_uses_subset_for_rewritten_yield_generator_min_fixture(self) -> None:
+        source = self.renderer.render_module(_load_east3_for_julia("yield_generator_min"))
+        self.assertIn("while __pytra_truthy((i < n))", source)
+        self.assertIn("push!(__yield_values, i)", source)
+        self.assertIn("for v in gen(5)", source)
 
     def test_emit_nested_closure_fixture_through_toolchain2_entrypoint(self) -> None:
         source = transpile_to_julia_native(_load_east3_for_julia("nested_closure_def"))

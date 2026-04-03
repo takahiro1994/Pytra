@@ -71,6 +71,10 @@ class KotlinRenderer(CommonRenderer):
         return prefix + str(self._tmp_counter)
 
     def _render_type(self, resolved_type: str) -> str:
+        if resolved_type == "Obj":
+            if resolved_type in self.module_class_names:
+                return _safe_kotlin_ident(resolved_type)
+            return "Any?"
         if resolved_type in self.enum_like_classes:
             return "Long"
         if resolved_type in self.import_symbols:
