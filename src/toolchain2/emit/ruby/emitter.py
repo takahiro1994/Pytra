@@ -2645,3 +2645,6 @@ def transpile_to_ruby(east3_doc: dict[str, JsonVal]) -> str:
     if not result.endswith("\n"):
         result = result + "\n"
     return result
+
+
+emit_ruby_module = transpile_to_ruby

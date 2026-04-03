@@ -16,6 +16,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import importlib
 import json
 import os
 import shlex
@@ -36,28 +37,12 @@ if str(ROOT / "src") not in sys.path:
 # --- toolchain2 imports (in-memory pipeline) ---
 from toolchain2.common.jv import deep_copy_json  # type: ignore
 from toolchain2.compile.lower import lower_east2_to_east3  # type: ignore
-from toolchain2.emit.cs.emitter import emit_cs_module  # type: ignore
 from toolchain2.emit.cpp.emitter import emit_cpp_module  # type: ignore
 from toolchain2.emit.cpp.header_gen import build_cpp_header_from_east3  # type: ignore
 from toolchain2.emit.cpp.runtime_bundle import emit_runtime_module_artifacts  # type: ignore
-from toolchain2.emit.go.emitter import emit_go_module  # type: ignore
-from toolchain2.emit.java.emitter import emit_java_module  # type: ignore
 from toolchain2.emit.java.types import java_module_class_name  # type: ignore
-from toolchain2.emit.scala.emitter import emit_scala_module  # type: ignore
-from toolchain2.emit.kotlin.emitter import emit_kotlin_module  # type: ignore
-from toolchain2.emit.swift.emitter import emit_swift_module  # type: ignore
-from toolchain2.emit.rs.emitter import emit_rs_module  # type: ignore
-from toolchain2.emit.ts.emitter import emit_ts_module  # type: ignore
-from toolchain2.emit.dart.emitter import emit_dart_module  # type: ignore
-from toolchain2.emit.julia.emitter import emit_julia_module  # type: ignore
-from toolchain2.emit.ruby.emitter import transpile_to_ruby as emit_ruby_module  # type: ignore
-from toolchain2.emit.lua.emitter import emit_lua_module  # type: ignore
-from toolchain2.emit.nim.emitter import emit_nim_module  # type: ignore
-from toolchain2.emit.php.emitter import emit_php_module  # type: ignore
-from toolchain2.emit.zig.emitter import emit_zig_module  # type: ignore
-from toolchain2.emit.powershell.emitter import emit_ps1_module  # type: ignore
-from toolchain2.link.linker import link_modules  # type: ignore
 from toolchain2.emit.cpp.runtime_paths import runtime_rel_tail_for_module  # type: ignore
+from toolchain2.link.linker import link_modules  # type: ignore
 from toolchain2.optimize.optimizer import optimize_east3_document  # type: ignore
 from toolchain2.optimize.optimizer import optimize_east3_doc_only  # type: ignore
 from toolchain2.optimize.optimizer import resolve_bounds_check_mode  # type: ignore
@@ -93,6 +78,109 @@ from runtime_parity_check import (  # type: ignore
     run_shell,
 )
 from toolchain.misc.pytra_cli_profiles import get_target_profile, list_parity_targets  # type: ignore
+
+
+# ---------------------------------------------------------------------------
+# Dynamic emit dispatch config
+# ---------------------------------------------------------------------------
+# (ext, hierarchical_output, inject_type, filter_type)
+# inject_type: None | "basic" | "context"
+# filter_type: None | "builtin_runtime" | "all_runtime"
+_EMIT_LANG_CONFIG: dict[str, tuple[str, bool, str | None, str | None]] = {
+    "go":     (".go",    False, None,      None),
+    "rs":     (".rs",    False, None,      None),
+    "cs":     (".cs",    False, None,      None),
+    "ts":     (".ts",    False, None,      None),
+    "ruby":   (".rb",    False, None,      None),
+    "lua":    (".lua",   False, None,      None),
+    "php":    (".php",   False, None,      None),
+    "ps1":    (".ps1",   False, None,      None),
+    "scala":  (".scala", False, "basic",   "builtin_runtime"),
+    "kotlin": (".kt",    False, "basic",   "builtin_runtime"),
+    "swift":  (".swift", False, "basic",   None),
+    "julia":  (".jl",    True,  "context", None),
+    "nim":    (".nim",   True,  "context", None),
+    "dart":   (".dart",  True,  "context", None),
+    "zig":    (".zig",   True,  "context", None),
+    # "java": handled separately (java_module_class_name output naming)
+    # "js":   handled separately (ts emitter + strip_types=True + package.json)
+    # "cpp":  handled separately (direct emit via emit_runtime_module_artifacts)
+}
+
+
+def _lang_rel_output_path(module_id: str, ext: str) -> Path:
+    """Compute hierarchical output path (pytra.x.y → x/y.ext)."""
+    rel = module_id[len("pytra."):] if module_id.startswith("pytra.") else module_id
+    return Path(rel.replace(".", "/") + ext)
+
+
+def _inject_module_meta(
+    east_doc: dict,
+    module_id: str,
+    ext: str,
+    lang: str,
+    *,
+    is_entry: bool,
+    inject_type: str | None,
+) -> None:
+    """Inject emit metadata into east_doc.meta before calling emit_fn."""
+    if inject_type is None:
+        return
+    meta = east_doc.get("meta")
+    if not isinstance(meta, dict):
+        meta = {}
+        east_doc["meta"] = meta
+    if inject_type == "basic":
+        east_doc["module_id"] = module_id
+        meta["module_id"] = module_id
+        meta["is_entry"] = is_entry
+        emit_ctx = meta.get("emit_context")
+        if not isinstance(emit_ctx, dict):
+            emit_ctx = {}
+            meta["emit_context"] = emit_ctx
+        emit_ctx["module_id"] = module_id
+        emit_ctx["is_entry"] = is_entry
+    elif inject_type == "context":
+        rel_path = _lang_rel_output_path(module_id, ext)
+        depth = len(rel_path.parts) - 1
+        root_rel_prefix = "../" * depth if depth > 0 else ("" if lang == "nim" else "./")
+        meta["emit_context"] = {
+            "module_id": module_id,
+            "root_rel_prefix": root_rel_prefix,
+            "is_entry": is_entry,
+        }
+
+
+def _call_runtime_copier(lang: str, emit_dir: Path) -> None:
+    """Copy runtime files for lang. Tries cli.py first, falls back to local functions."""
+    try:
+        cli_mod = importlib.import_module(f"toolchain2.emit.{lang}.cli")
+        fn = getattr(cli_mod, f"_copy_{lang}_runtime", None)
+        if fn is not None:
+            fn(emit_dir)
+            return
+    except (ImportError, AttributeError):
+        pass
+    # Local fallback for languages without a cli.py runtime copier
+    local = {
+        "go": _copy_go_runtime,
+        "java": _copy_java_runtime,
+        "rs": _copy_rs_runtime,
+        "julia": _copy_julia_runtime,
+        "ts": _copy_ts_runtime,
+        "js": _copy_js_runtime,
+        "ruby": _copy_ruby_runtime,
+        "lua": _copy_lua_runtime,
+        "php": _copy_php_runtime,
+        "nim": _copy_nim_runtime,
+        "swift": _copy_swift_runtime,
+        "dart": _copy_dart_runtime,
+        "ps1": _copy_ps1_runtime,
+        "powershell": _copy_ps1_runtime,
+    }
+    fn = local.get(lang)
+    if fn is not None:
+        fn(emit_dir)
 
 
 # ---------------------------------------------------------------------------
@@ -207,97 +295,7 @@ def _transpile_in_memory(
         emit_dir = output_dir / "emit"
         emit_dir.mkdir(parents=True, exist_ok=True)
 
-        if target == "go":
-            for m in link_result.linked_modules:
-                code = emit_go_module(m.east_doc)
-                if code.strip() == "":
-                    continue
-                out_name = m.module_id.replace(".", "_") + ".go"
-                emit_dir.joinpath(out_name).write_text(code, encoding="utf-8")
-            _copy_go_runtime(emit_dir)
-        elif target == "java":
-            for m in link_result.linked_modules:
-                if m.module_kind == "runtime":
-                    continue
-                code = emit_java_module(m.east_doc)
-                if code.strip() == "":
-                    continue
-                out_name = java_module_class_name(m.module_id) + ".java"
-                emit_dir.joinpath(out_name).write_text(code, encoding="utf-8")
-            _copy_java_runtime(emit_dir)
-        elif target == "scala":
-            for m in link_result.linked_modules:
-                if m.module_kind in ("runtime", "helper") and (m.module_id.startswith("pytra.built_in.") or m.module_id.startswith("pytra.core.")):
-                    continue
-                _inject_basic_module_id(
-                    m.east_doc,
-                    m.module_id,
-                    is_entry=bool(getattr(m, "is_entry", False)),
-                )
-                code = emit_scala_module(m.east_doc)
-                if code.strip() == "":
-                    continue
-                emit_dir.joinpath(m.module_id.replace(".", "_") + ".scala").write_text(
-                    code, encoding="utf-8"
-                )
-            _copy_scala_runtime(emit_dir)
-        elif target == "kotlin":
-            for m in link_result.linked_modules:
-                if m.module_kind in ("runtime", "helper") and (m.module_id.startswith("pytra.built_in.") or m.module_id.startswith("pytra.core.")):
-                    continue
-                _inject_basic_module_id(
-                    m.east_doc,
-                    m.module_id,
-                    is_entry=bool(getattr(m, "is_entry", False)),
-                )
-                code = emit_kotlin_module(m.east_doc)
-                if code.strip() == "":
-                    continue
-                emit_dir.joinpath(m.module_id.replace(".", "_") + ".kt").write_text(
-                    code, encoding="utf-8"
-                )
-            _copy_kotlin_runtime(emit_dir)
-        elif target == "rs":
-            for m in link_result.linked_modules:
-                code = emit_rs_module(m.east_doc)
-                if code.strip() == "":
-                    continue
-                emit_dir.joinpath(m.module_id.replace(".", "_") + ".rs").write_text(
-                    code, encoding="utf-8"
-                )
-            _copy_rs_runtime(emit_dir)
-        elif target == "cs":
-            for m in link_result.linked_modules:
-                code = emit_cs_module(m.east_doc)
-                if code.strip() == "":
-                    continue
-                emit_dir.joinpath(m.module_id.replace(".", "_") + ".cs").write_text(
-                    code, encoding="utf-8"
-                )
-            _copy_cs_runtime(emit_dir)
-        elif target == "ts":
-            for m in link_result.linked_modules:
-                code = emit_ts_module(m.east_doc)
-                if code.strip() == "":
-                    continue
-                emit_dir.joinpath(m.module_id.replace(".", "_") + ".ts").write_text(
-                    code, encoding="utf-8"
-                )
-            _copy_ts_runtime(emit_dir)
-        elif target == "js":
-            for m in link_result.linked_modules:
-                code = emit_ts_module(m.east_doc, strip_types=True)
-                if code.strip() == "":
-                    continue
-                emit_dir.joinpath(m.module_id.replace(".", "_") + ".js").write_text(
-                    code, encoding="utf-8"
-                )
-            _copy_js_runtime(emit_dir)
-            # ESM imports require "type": "module" in package.json for .js files
-            pkg_json = emit_dir / "package.json"
-            if not pkg_json.exists():
-                pkg_json.write_text('{"type":"module"}\n', encoding="utf-8")
-        elif target == "cpp":
+        if target == "cpp":
             for m in link_result.linked_modules:
                 if m.module_kind == "runtime":
                     emit_runtime_module_artifacts(
@@ -316,122 +314,71 @@ def _transpile_in_memory(
                 emit_dir.joinpath(m.module_id.replace(".", "_") + ".cpp").write_text(
                     code, encoding="utf-8"
                 )
-        elif target == "ruby":
+        elif target == "java":
+            emit_java_module = importlib.import_module("toolchain2.emit.java.emitter").emit_java_module
             for m in link_result.linked_modules:
-                code = emit_ruby_module(m.east_doc)
+                if m.module_kind == "runtime":
+                    continue
+                code = emit_java_module(m.east_doc)
                 if code.strip() == "":
                     continue
-                emit_dir.joinpath(m.module_id.replace(".", "_") + ".rb").write_text(
+                out_name = java_module_class_name(m.module_id) + ".java"
+                emit_dir.joinpath(out_name).write_text(code, encoding="utf-8")
+            _copy_java_runtime(emit_dir)
+        elif target == "js":
+            emit_ts_module = importlib.import_module("toolchain2.emit.ts.emitter").emit_ts_module
+            for m in link_result.linked_modules:
+                code = emit_ts_module(m.east_doc, strip_types=True)
+                if code.strip() == "":
+                    continue
+                emit_dir.joinpath(m.module_id.replace(".", "_") + ".js").write_text(
                     code, encoding="utf-8"
                 )
-            _copy_ruby_runtime(emit_dir)
-        elif target == "lua":
+            _copy_js_runtime(emit_dir)
+            # ESM imports require "type": "module" in package.json for .js files
+            pkg_json = emit_dir / "package.json"
+            if not pkg_json.exists():
+                pkg_json.write_text('{"type":"module"}\n', encoding="utf-8")
+        elif target in _EMIT_LANG_CONFIG:
+            cfg = _EMIT_LANG_CONFIG[target]
+            ext, hierarchical, inject_type, filter_type = cfg
+            # js → ts emitter directory; ps1 → powershell emitter directory
+            lang = "ts" if target == "js" else ("powershell" if target == "ps1" else target)
+            emit_mod = importlib.import_module(f"toolchain2.emit.{lang}.emitter")
+            # function name uses target name (emit_ps1_module, not emit_powershell_module)
+            emit_fn = getattr(emit_mod, f"emit_{target}_module")
             for m in link_result.linked_modules:
-                code = emit_lua_module(m.east_doc)
+                if filter_type == "builtin_runtime" and m.module_kind in ("runtime", "helper"):
+                    if m.module_id.startswith("pytra.built_in.") or m.module_id.startswith("pytra.core."):
+                        continue
+                # Zig requires detecting is_entry from source path when flag is unset
+                if target == "zig":
+                    is_entry = bool(getattr(m, "is_entry", False))
+                    if not is_entry and getattr(m, "module_kind", "") == "user":
+                        src_p = getattr(m, "source_path", "")
+                        inp_p = getattr(m, "input_path", "")
+                        module_tail = m.module_id.rsplit(".", 1)[-1]
+                        is_entry = (
+                            module_tail == case_path.stem
+                            or Path(src_p).stem == case_path.stem
+                            or Path(inp_p).stem == case_path.stem
+                        )
+                else:
+                    is_entry = bool(getattr(m, "is_entry", False))
+                _inject_module_meta(
+                    m.east_doc, m.module_id, ext, lang,
+                    is_entry=is_entry, inject_type=inject_type,
+                )
+                code = emit_fn(m.east_doc)
                 if code.strip() == "":
                     continue
-                emit_dir.joinpath(m.module_id.replace(".", "_") + ".lua").write_text(
-                    code, encoding="utf-8"
-                )
-            _copy_lua_runtime(emit_dir)
-        elif target == "julia":
-            for m in link_result.linked_modules:
-                _inject_julia_emit_context(
-                    m.east_doc,
-                    m.module_id,
-                    is_entry=bool(getattr(m, "is_entry", False)),
-                )
-                code = emit_julia_module(m.east_doc)
-                if code.strip() == "":
-                    continue
-                out_path = emit_dir / _julia_rel_output_path(m.module_id)
-                out_path.parent.mkdir(parents=True, exist_ok=True)
+                if hierarchical:
+                    out_path = emit_dir / _lang_rel_output_path(m.module_id, ext)
+                    out_path.parent.mkdir(parents=True, exist_ok=True)
+                else:
+                    out_path = emit_dir / (m.module_id.replace(".", "_") + ext)
                 out_path.write_text(code, encoding="utf-8")
-            _copy_julia_runtime(emit_dir)
-        elif target == "php":
-            for m in link_result.linked_modules:
-                code = emit_php_module(m.east_doc)
-                if code.strip() == "":
-                    continue
-                emit_dir.joinpath(m.module_id.replace(".", "_") + ".php").write_text(
-                    code, encoding="utf-8"
-                )
-            _copy_php_runtime(emit_dir)
-        elif target == "nim":
-            for m in link_result.linked_modules:
-                _inject_nim_emit_context(
-                    m.east_doc,
-                    m.module_id,
-                    is_entry=bool(getattr(m, "is_entry", False)),
-                )
-                code = emit_nim_module(m.east_doc)
-                if code.strip() == "":
-                    continue
-                out_path = emit_dir / _nim_rel_output_path(m.module_id)
-                out_path.parent.mkdir(parents=True, exist_ok=True)
-                out_path.write_text(code, encoding="utf-8")
-            _copy_nim_runtime(emit_dir)
-        elif target == "swift":
-            for m in link_result.linked_modules:
-                _inject_basic_module_id(
-                    m.east_doc,
-                    m.module_id,
-                    is_entry=bool(getattr(m, "is_entry", False)),
-                )
-                code = emit_swift_module(m.east_doc)
-                if code.strip() == "":
-                    continue
-                emit_dir.joinpath(m.module_id.replace(".", "_") + ".swift").write_text(
-                    code, encoding="utf-8"
-                )
-            _copy_swift_runtime(emit_dir)
-        elif target == "dart":
-            for m in link_result.linked_modules:
-                _inject_dart_emit_context(
-                    m.east_doc,
-                    m.module_id,
-                    is_entry=bool(getattr(m, "is_entry", False)),
-                )
-                code = emit_dart_module(m.east_doc)
-                if code.strip() == "":
-                    continue
-                out_path = emit_dir / _dart_rel_output_path(m.module_id)
-                out_path.parent.mkdir(parents=True, exist_ok=True)
-                out_path.write_text(code, encoding="utf-8")
-            _copy_dart_runtime(emit_dir)
-        elif target == "zig":
-            for m in link_result.linked_modules:
-                is_entry = bool(getattr(m, "is_entry", False))
-                if not is_entry and getattr(m, "module_kind", "") == "user":
-                    source_path = getattr(m, "source_path", "")
-                    input_path = getattr(m, "input_path", "")
-                    module_tail = getattr(m, "module_id", "").rsplit(".", 1)[-1]
-                    is_entry = (
-                        module_tail == case_path.stem
-                        or Path(source_path).stem == case_path.stem
-                        or Path(input_path).stem == case_path.stem
-                    )
-                _inject_zig_emit_context(
-                    m.east_doc,
-                    m.module_id,
-                    is_entry=is_entry,
-                )
-                code = emit_zig_module(m.east_doc)
-                if code.strip() == "":
-                    continue
-                out_path = emit_dir / _zig_rel_output_path(m.module_id)
-                out_path.parent.mkdir(parents=True, exist_ok=True)
-                out_path.write_text(code, encoding="utf-8")
-            _copy_zig_runtime(emit_dir)
-        elif target == "ps1":
-            for m in link_result.linked_modules:
-                code = emit_ps1_module(m.east_doc)
-                if code.strip() == "":
-                    continue
-                emit_dir.joinpath(m.module_id.replace(".", "_") + ".ps1").write_text(
-                    code, encoding="utf-8"
-                )
-            _copy_ps1_runtime(emit_dir)
+            _call_runtime_copier(lang, emit_dir)
         else:
             return False, f"unsupported target: {target}"
 
@@ -450,15 +397,6 @@ def _copy_go_runtime(emit_dir: Path) -> None:
         shutil.copy2(f, dest)
 
 
-def _copy_scala_runtime(emit_dir: Path) -> None:
-    scala_runtime = ROOT / "src" / "runtime" / "scala"
-    if not scala_runtime.exists():
-        return
-    for f in sorted(scala_runtime.rglob("*.scala")):
-        dest = emit_dir / f.name
-        shutil.copy2(f, dest)
-
-
 def _copy_julia_runtime(emit_dir: Path) -> None:
     julia_runtime = ROOT / "src" / "runtime" / "julia"
     if not julia_runtime.exists():
@@ -468,144 +406,6 @@ def _copy_julia_runtime(emit_dir: Path) -> None:
         dest = emit_dir / rel
         dest.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(f, dest)
-
-
-def _copy_kotlin_runtime(emit_dir: Path) -> None:
-    kotlin_runtime = ROOT / "src" / "runtime" / "kotlin"
-    if not kotlin_runtime.exists():
-        return
-    for f in sorted(kotlin_runtime.rglob("*.kt")):
-        dest = emit_dir / f.name
-        shutil.copy2(f, dest)
-
-
-def _dart_rel_output_path(module_id: str) -> Path:
-    rel_module = module_id
-    if rel_module.startswith("pytra."):
-        rel_module = rel_module[len("pytra."):]
-    return Path(rel_module.replace(".", "/") + ".dart")
-
-
-def _nim_rel_output_path(module_id: str) -> Path:
-    rel_module = module_id
-    if rel_module.startswith("pytra."):
-        rel_module = rel_module[len("pytra."):]
-    return Path(rel_module.replace(".", "/") + ".nim")
-
-
-def _zig_rel_output_path(module_id: str) -> Path:
-    rel_module = module_id
-    if rel_module.startswith("pytra."):
-        rel_module = rel_module[len("pytra."):]
-    return Path(rel_module.replace(".", "/") + ".zig")
-
-
-def _julia_rel_output_path(module_id: str) -> Path:
-    rel_module = module_id
-    if rel_module.startswith("pytra."):
-        rel_module = rel_module[len("pytra."):]
-    return Path(rel_module.replace(".", "/") + ".jl")
-
-
-def _inject_dart_emit_context(
-    east_doc: dict[str, object],
-    module_id: str,
-    *,
-    is_entry: bool,
-) -> None:
-    meta = east_doc.get("meta")
-    if not isinstance(meta, dict):
-        meta = {}
-        east_doc["meta"] = meta
-    rel_path = _dart_rel_output_path(module_id)
-    depth = len(rel_path.parts) - 1
-    root_rel_prefix = "../" * depth if depth > 0 else "./"
-    meta["emit_context"] = {
-        "module_id": module_id,
-        "root_rel_prefix": root_rel_prefix,
-        "is_entry": is_entry,
-    }
-
-
-def _inject_basic_module_id(
-    east_doc: dict[str, object],
-    module_id: str,
-    *,
-    is_entry: bool = False,
-) -> None:
-    east_doc["module_id"] = module_id
-    meta = east_doc.get("meta")
-    if not isinstance(meta, dict):
-        meta = {}
-        east_doc["meta"] = meta
-    meta["module_id"] = module_id
-    meta["is_entry"] = is_entry
-    emit_context = meta.get("emit_context")
-    if not isinstance(emit_context, dict):
-        emit_context = {}
-        meta["emit_context"] = emit_context
-    emit_context["module_id"] = module_id
-    emit_context["is_entry"] = is_entry
-
-
-def _inject_nim_emit_context(
-    east_doc: dict[str, object],
-    module_id: str,
-    *,
-    is_entry: bool,
-) -> None:
-    meta = east_doc.get("meta")
-    if not isinstance(meta, dict):
-        meta = {}
-        east_doc["meta"] = meta
-    rel_path = _nim_rel_output_path(module_id)
-    depth = len(rel_path.parts) - 1
-    root_rel_prefix = "../" * depth if depth > 0 else ""
-    meta["emit_context"] = {
-        "module_id": module_id,
-        "root_rel_prefix": root_rel_prefix,
-        "is_entry": is_entry,
-    }
-
-
-def _inject_zig_emit_context(
-    east_doc: dict[str, object],
-    module_id: str,
-    *,
-    is_entry: bool,
-) -> None:
-    meta = east_doc.get("meta")
-    if not isinstance(meta, dict):
-        meta = {}
-        east_doc["meta"] = meta
-    rel_path = _zig_rel_output_path(module_id)
-    depth = len(rel_path.parts) - 1
-    root_rel_prefix = "../" * depth if depth > 0 else "./"
-    meta["emit_context"] = {
-        "module_id": module_id,
-        "root_rel_prefix": root_rel_prefix,
-        "is_entry": is_entry,
-    }
-
-
-def _inject_julia_emit_context(
-    east_doc: dict[str, object],
-    module_id: str,
-    *,
-    is_entry: bool,
-) -> None:
-    meta = east_doc.get("meta")
-    if not isinstance(meta, dict):
-        meta = {}
-        east_doc["meta"] = meta
-    rel_path = _julia_rel_output_path(module_id)
-    depth = len(rel_path.parts) - 1
-    root_rel_prefix = "../" * depth if depth > 0 else "./"
-    meta["emit_context"] = {
-        "module_id": module_id,
-        "root_rel_prefix": root_rel_prefix,
-        "is_entry": is_entry,
-    }
 
 
 def _copy_dart_runtime(emit_dir: Path) -> None:
@@ -629,25 +429,6 @@ def _copy_rs_runtime(emit_dir: Path) -> None:
                 shutil.copy2(rs_file, emit_dir / rs_file.name)
 
 
-def _copy_zig_runtime(emit_dir: Path) -> None:
-    zig_runtime = ROOT / "src" / "runtime" / "zig"
-    if not zig_runtime.exists():
-        return
-    py_runtime_text = ""
-    py_runtime_src = zig_runtime / "built_in" / "py_runtime.zig"
-    if py_runtime_src.exists():
-        py_runtime_text = py_runtime_src.read_text(encoding="utf-8")
-    for zig_file in sorted(zig_runtime.rglob("*.zig")):
-        rel = zig_file.relative_to(zig_runtime)
-        dest = emit_dir / rel
-        dest.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(zig_file, dest)
-    if py_runtime_text != "":
-        core_dst = emit_dir / "core" / "py_runtime.zig"
-        core_dst.parent.mkdir(parents=True, exist_ok=True)
-        core_dst.write_text(py_runtime_text, encoding="utf-8")
-
-
 def _copy_java_runtime(emit_dir: Path) -> None:
     """Copy Java runtime files to emit directory (flat)."""
     java_runtime = ROOT / "src" / "runtime" / "java"
@@ -656,24 +437,6 @@ def _copy_java_runtime(emit_dir: Path) -> None:
         if bucket_dir.exists():
             for java_file in bucket_dir.glob("*.java"):
                 shutil.copy2(java_file, emit_dir / java_file.name)
-
-
-def _copy_cs_runtime(emit_dir: Path) -> None:
-    """Copy the native C# runtime files used by the toolchain2 CLI path."""
-    cs_runtime = ROOT / "src" / "runtime" / "cs"
-    if not cs_runtime.exists():
-        return
-    built_in = cs_runtime / "built_in" / "py_runtime.cs"
-    if built_in.exists():
-        dest = emit_dir / "built_in" / "py_runtime.cs"
-        dest.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(built_in, dest)
-    std_dir = cs_runtime / "std"
-    if std_dir.exists():
-        for cs_file in sorted(std_dir.glob("*.cs")):
-            dest = emit_dir / "std" / cs_file.name
-            dest.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(cs_file, dest)
 
 
 def _copy_swift_runtime(emit_dir: Path) -> None:
