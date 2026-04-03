@@ -3628,6 +3628,9 @@ def _emit_class_def(ctx: CppEmitContext, node: dict[str, JsonVal]) -> None:
         for s in body:
             if not isinstance(s, dict) or _str(s, "kind") not in ("FunctionDef", "ClosureDef"):
                 continue
+            template_prefix = _function_template_prefix(s)
+            if template_prefix != "":
+                _emit(ctx, template_prefix)
             decl = _function_signature(ctx, s, owner_name=name, owner_is_trait=is_trait, declaration_only=True)
             if decl != "":
                 _emit(ctx, decl + ";")

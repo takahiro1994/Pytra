@@ -2478,6 +2478,66 @@ class Parser:
         self.assertTrue(any("unnormalized type 'float'" in err for err in range_result.errors))
         self.assertFalse(any("RangeExpr" in err for err in range_result.errors))
 
+    def test_resolve_trait_helpers_avoid_object_resolved_type(self) -> None:
+        def _walk_nodes_local(node: object) -> list[dict[str, object]]:
+            out: list[dict[str, object]] = []
+            if isinstance(node, dict):
+                out.append(node)
+                for value in node.values():
+                    out.extend(_walk_nodes_local(value))
+            elif isinstance(node, list):
+                for item in node:
+                    out.extend(_walk_nodes_local(item))
+            return out
+
+        fixture = ROOT / "test" / "fixture" / "source" / "py" / "oop" / "trait_basic.py"
+        east1 = parse_python_file(str(fixture))
+        east1["source_path"] = "test/fixture/source/py/oop/trait_basic.py"
+        builtins_path = ROOT / "test" / "include" / "east1" / "py" / "built_in" / "builtins.py.east1"
+        containers_path = ROOT / "test" / "include" / "east1" / "py" / "built_in" / "containers.py.east1"
+        stdlib_dir = ROOT / "test" / "include" / "east1" / "py" / "std"
+        registry = load_builtin_registry(builtins_path, containers_path, stdlib_dir)
+        resolve_east1_to_east2(east1, registry=registry)
+
+        object_nodes = [
+            node for node in _walk_nodes_local(east1)
+            if isinstance(node, dict) and node.get("resolved_type") == "object"
+        ]
+        self.assertEqual(object_nodes, [])
+
+    def test_resolve_typed_container_access_dict_get_prefers_default_type(self) -> None:
+        def _walk_nodes_local(node: object) -> list[dict[str, object]]:
+            out: list[dict[str, object]] = []
+            if isinstance(node, dict):
+                out.append(node)
+                for value in node.values():
+                    out.extend(_walk_nodes_local(value))
+            elif isinstance(node, list):
+                for item in node:
+                    out.extend(_walk_nodes_local(item))
+            return out
+
+        fixture = ROOT / "test" / "fixture" / "source" / "py" / "typing" / "typed_container_access.py"
+        east1 = parse_python_file(str(fixture))
+        east1["source_path"] = "test/fixture/source/py/typing/typed_container_access.py"
+        builtins_path = ROOT / "test" / "include" / "east1" / "py" / "built_in" / "builtins.py.east1"
+        containers_path = ROOT / "test" / "include" / "east1" / "py" / "built_in" / "containers.py.east1"
+        stdlib_dir = ROOT / "test" / "include" / "east1" / "py" / "std"
+        registry = load_builtin_registry(builtins_path, containers_path, stdlib_dir)
+        resolve_east1_to_east2(east1, registry=registry)
+
+        target_call = None
+        for node in _walk_nodes_local(east1):
+            if isinstance(node, dict) and node.get("kind") == "Call" and node.get("repr") == 'od.get("name", "")':
+                target_call = node
+                break
+
+        self.assertIsNotNone(target_call)
+        self.assertEqual(target_call.get("resolved_type"), "str")
+        args = target_call.get("args")
+        self.assertIsInstance(args, list)
+        self.assertEqual(args[1].get("call_arg_type"), "str")
+
 
 if __name__ == "__main__":
     unittest.main()

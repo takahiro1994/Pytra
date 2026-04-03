@@ -2788,6 +2788,20 @@ def _resolve_container_method_call(
         ret = _substitute_type_params(ret, receiver_type, cls)
     ret = _ctx_normalize_type(ret, ctx)
 
+    args_raw = expr.get("args")
+    if (
+        owner_base == "dict"
+        and method == "get"
+        and ret in ("object", "Obj", "Any")
+        and isinstance(args_raw, list)
+        and len(args_raw) >= 2
+        and isinstance(args_raw[1], dict)
+    ):
+        default_rt = _ctx_normalize_type(str(args_raw[1].get("resolved_type", "")), ctx)
+        if default_rt not in ("", "unknown", "object", "Obj", "Any"):
+            ret = default_rt
+            args_raw[1]["call_arg_type"] = ret
+
     expr["resolved_type"] = ret
     func["resolved_type"] = "callable"
 
@@ -3810,6 +3824,7 @@ def _resolve_class_def(stmt: dict[str, JsonVal], ctx: ResolveContext) -> None:
         for item in body:
             if isinstance(item, dict):
                 _resolve_stmt(item, ctx)
+    _rewrite_trait_helper_call_signatures(stmt, ctx)
     ctx.scope = old_scope
     ctx.in_class = old_in_class
     ctx.current_class = old_current_class
@@ -3849,6 +3864,86 @@ def _resolve_class_def(stmt: dict[str, JsonVal], ctx: ResolveContext) -> None:
                         ft_raw[field_name2] = cls_sig_existing.fields[field_name2]
 
     _resolve_trait_contracts(stmt, class_name, ctx)
+
+
+def _rewrite_trait_helper_call_signatures(stmt: dict[str, JsonVal], ctx: ResolveContext) -> None:
+    """Normalize local trait helper __call__ signatures away from object."""
+    class_name = str(stmt.get("name", "")) if isinstance(stmt.get("name"), str) else ""
+    if class_name == "":
+        return
+    body = stmt.get("body")
+    if not isinstance(body, list):
+        return
+    cls_sig = ctx.module_classes.get(class_name)
+    for item in body:
+        if not isinstance(item, dict) or item.get("kind") != "FunctionDef" or item.get("name") != "__call__":
+            continue
+        if _rewrite_identity_decorator_call(item, cls_sig):
+            continue
+        _rewrite_implements_factory_call(item, cls_sig)
+
+
+def _rewrite_identity_decorator_call(func: dict[str, JsonVal], cls_sig: ClassSig | None) -> bool:
+    arg_types = func.get("arg_types")
+    arg_order = func.get("arg_order")
+    body = func.get("body")
+    if not isinstance(arg_types, dict) or not isinstance(arg_order, list) or not isinstance(body, list):
+        return False
+    if len(arg_order) != 2:
+        return False
+    param_name = arg_order[1]
+    if not isinstance(param_name, str):
+        return False
+    if str(arg_types.get(param_name, "")) != "object":
+        return False
+    if str(func.get("return_type", "")) != "object":
+        return False
+    if len(body) != 1:
+        return False
+    ret_stmt = body[0]
+    if not isinstance(ret_stmt, dict) or ret_stmt.get("kind") != "Return":
+        return False
+    ret_value = ret_stmt.get("value")
+    if not isinstance(ret_value, dict) or ret_value.get("kind") != "Name" or ret_value.get("id") != param_name:
+        return False
+    arg_types[param_name] = "T"
+    func["return_type"] = "T"
+    ret_value["resolved_type"] = "T"
+    if cls_sig is not None:
+        if len(cls_sig.template_params) == 0:
+            cls_sig.template_params = ["T"]
+        method_sig = cls_sig.methods.get("__call__")
+        if method_sig is not None:
+            method_sig.arg_types[param_name] = "T"
+            method_sig.return_type = "T"
+    return True
+
+
+def _rewrite_implements_factory_call(func: dict[str, JsonVal], cls_sig: ClassSig | None) -> bool:
+    if str(func.get("return_type", "")) != "object":
+        return False
+    body = func.get("body")
+    if not isinstance(body, list) or len(body) != 1:
+        return False
+    ret_stmt = body[0]
+    if not isinstance(ret_stmt, dict) or ret_stmt.get("kind") != "Return":
+        return False
+    ret_value = ret_stmt.get("value")
+    if not isinstance(ret_value, dict) or ret_value.get("kind") != "Call":
+        return False
+    callee = ret_value.get("func")
+    if not isinstance(callee, dict) or callee.get("kind") != "Name":
+        return False
+    callee_name = str(callee.get("id", "")) if isinstance(callee.get("id"), str) else ""
+    if callee_name == "":
+        return False
+    func["return_type"] = callee_name
+    ret_value["resolved_type"] = callee_name
+    if cls_sig is not None:
+        method_sig = cls_sig.methods.get("__call__")
+        if method_sig is not None:
+            method_sig.return_type = callee_name
+    return True
 
 
 def _resolve_assign(stmt: dict[str, JsonVal], ctx: ResolveContext) -> None:

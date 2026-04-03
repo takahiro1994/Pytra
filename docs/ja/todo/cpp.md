@@ -30,8 +30,10 @@
 
 trait の `cls` を型パラメータにするのと `dict.get` の型推論修正は EAST compile/resolve の変更。修正後に S11（validator で全面禁止）に着手。
 
-1. [ ] [ID: P0-OBJ-ZERO-S1] trait デコレータの `cls` を `@template` 型パラメータ `T` に変更する（EAST compile/resolve）
-2. [ ] [ID: P0-OBJ-ZERO-S2] `typed_container_access` の `dict.get()` が value 型を返すように型推論を修正する（EAST compile/resolve）
+1. [x] [ID: P0-OBJ-ZERO-S1] trait デコレータの `cls` を `@template` 型パラメータ `T` に変更する（EAST compile/resolve）
+   - 完了メモ: resolver で trait helper の `__call__` 形を正規化し、identity decorator の `cls: object -> object` を `T -> T`、implements factory の `-> object` を具体 helper 型へ置き換えた。`trait_basic`, `trait_with_inheritance` の C++ parity `PASS` と、対象 fixture の `resolved_type="object"` 0 件を確認した。
+2. [x] [ID: P0-OBJ-ZERO-S2] `typed_container_access` の `dict.get()` が value 型を返すように型推論を修正する（EAST compile/resolve）
+   - 完了メモ: `dict.get(key, default)` が `dict[..., object]` でも concrete default を持つ場合はその default 型へ寄せるよう resolver を修正した。`typed_container_access` の C++ parity `PASS` と、`od.get("name", "")` の `resolved_type == "str"` / `call_arg_type == "str"` を unit test で固定した。
 3. [ ] [ID: P0-OBJ-ZERO-S3] 影響する fixture の EAST3 golden を再生成し、`resolved_type: "object"` がゼロであることを確認する（対象 fixture のみ再生成）
 4. [ ] [ID: P0-OBJ-ZERO-S4] P0-CPP-VARIANT-S11 を実行する（EAST3 validator に「`resolved_type: "object"` ならエラー」を追加）
 
