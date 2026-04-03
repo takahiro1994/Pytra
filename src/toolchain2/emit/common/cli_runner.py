@@ -102,12 +102,23 @@ def _load_linked_modules(manifest_path: Path) -> list[dict[str, JsonVal]]:
     return result
 
 
-def run_emit_cli(emit_fn: EmitFn, argv: list[str], *, default_ext: str = "") -> int:
+PostEmitFn = typing.Callable[[Path], None]
+
+
+def run_emit_cli(
+    emit_fn: EmitFn,
+    argv: list[str],
+    *,
+    default_ext: str = "",
+    post_emit: PostEmitFn | None = None,
+) -> int:
     """Run the emit CLI with the given language-specific emit function.
 
     Args:
         emit_fn: Language-specific emit function (east_doc -> code string).
         argv: Command-line arguments (excluding program name).
+        post_emit: Optional callback called after all modules are emitted,
+                   receives output_dir. Use for runtime file copying etc.
         default_ext: Default file extension (e.g. ".rs", ".go"). If empty,
                      must be provided via --ext.
     Returns:
@@ -154,6 +165,9 @@ def run_emit_cli(emit_fn: EmitFn, argv: list[str], *, default_ext: str = "") -> 
         out_name: str = module_id.replace(".", "_") + file_ext
         output_dir.joinpath(out_name).write_text(code, encoding="utf-8")
         written += 1
+
+    if post_emit is not None:
+        post_emit(output_dir)
 
     print("emitted: " + str(output_dir) + " (" + str(written) + " files)")
     return 0
