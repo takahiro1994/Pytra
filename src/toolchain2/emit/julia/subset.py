@@ -1329,6 +1329,50 @@ class JuliaSubsetRenderer:
         else:
             self._emit(target_name + " = " + self._render_expr(value))
 
+    def _emit_if_stmt(self, node: dict[str, JsonVal]) -> None:
+        self._emit("if __pytra_truthy(" + self._render_expr(node.get("test")) + ")")
+        self.indent_level += 1
+        for stmt in _list(node, "body"):
+            self._emit_stmt(stmt)
+        self.indent_level -= 1
+        orelse = _list(node, "orelse")
+        if len(orelse) > 0:
+            self._emit("else")
+            self.indent_level += 1
+            for stmt in orelse:
+                self._emit_stmt(stmt)
+            self.indent_level -= 1
+        self._emit("end")
+
+    def _emit_while_stmt(self, node: dict[str, JsonVal]) -> None:
+        self._emit("while __pytra_truthy(" + self._render_expr(node.get("test")) + ")")
+        self.indent_level += 1
+        for stmt in _list(node, "body"):
+            self._emit_stmt(stmt)
+        self.indent_level -= 1
+        self._emit("end")
+
+    def _emit_for_stmt(self, node: dict[str, JsonVal]) -> None:
+        self._emit(self._render_for_header(node))
+        self.indent_level += 1
+        for stmt in _list(node, "body"):
+            self._emit_stmt(stmt)
+        self.indent_level -= 1
+        self._emit("end")
+
+    def _emit_function_stmt(self, node: dict[str, JsonVal]) -> None:
+        name = _ident(_str(node, "name"))
+        args = [_ident(arg) for arg in _list(node, "arg_order") if isinstance(arg, str)]
+        vararg_name = node.get("vararg_name")
+        if isinstance(vararg_name, str) and vararg_name != "":
+            args.append(_ident(vararg_name))
+        self._emit("function " + name + "(" + ", ".join(args) + ")")
+        self.indent_level += 1
+        for stmt in _list(node, "body"):
+            self._emit_stmt(stmt)
+        self.indent_level -= 1
+        self._emit("end")
+
     def _emit_stmt(self, node: JsonVal) -> None:
         if not isinstance(node, dict):
             raise RuntimeError("julia subset: stmt must be dict")
@@ -1377,51 +1421,19 @@ class JuliaSubsetRenderer:
             self._emit_augassign_stmt(node)
             return
         if kind == "If":
-            self._emit("if __pytra_truthy(" + self._render_expr(node.get("test")) + ")")
-            self.indent_level += 1
-            for stmt in _list(node, "body"):
-                self._emit_stmt(stmt)
-            self.indent_level -= 1
-            orelse = _list(node, "orelse")
-            if len(orelse) > 0:
-                self._emit("else")
-                self.indent_level += 1
-                for stmt in orelse:
-                    self._emit_stmt(stmt)
-                self.indent_level -= 1
-            self._emit("end")
+            self._emit_if_stmt(node)
             return
         if kind == "While":
-            self._emit("while __pytra_truthy(" + self._render_expr(node.get("test")) + ")")
-            self.indent_level += 1
-            for stmt in _list(node, "body"):
-                self._emit_stmt(stmt)
-            self.indent_level -= 1
-            self._emit("end")
+            self._emit_while_stmt(node)
             return
         if kind == "Try":
             self._emit_try(node)
             return
         if kind == "ForCore":
-            self._emit(self._render_for_header(node))
-            self.indent_level += 1
-            for stmt in _list(node, "body"):
-                self._emit_stmt(stmt)
-            self.indent_level -= 1
-            self._emit("end")
+            self._emit_for_stmt(node)
             return
         if kind == "FunctionDef":
-            name = _ident(_str(node, "name"))
-            args = [_ident(arg) for arg in _list(node, "arg_order") if isinstance(arg, str)]
-            vararg_name = node.get("vararg_name")
-            if isinstance(vararg_name, str) and vararg_name != "":
-                args.append(_ident(vararg_name))
-            self._emit("function " + name + "(" + ", ".join(args) + ")")
-            self.indent_level += 1
-            for stmt in _list(node, "body"):
-                self._emit_stmt(stmt)
-            self.indent_level -= 1
-            self._emit("end")
+            self._emit_function_stmt(node)
             return
         if kind == "TypeAlias":
             return
