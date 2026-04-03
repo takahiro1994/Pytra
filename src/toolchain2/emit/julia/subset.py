@@ -1373,6 +1373,26 @@ class JuliaSubsetRenderer:
         self.indent_level -= 1
         self._emit("end")
 
+    def _emit_raise_stmt(self, node: dict[str, JsonVal]) -> None:
+        exc = node.get("exc")
+        if exc is None:
+            self._emit("rethrow()")
+        else:
+            self._emit("throw(" + self._render_expr(exc) + ")")
+
+    def _emit_return_stmt(self, node: dict[str, JsonVal]) -> None:
+        value = node.get("value")
+        if value is None:
+            self._emit("return nothing")
+        else:
+            self._emit("return " + self._render_expr(value))
+
+    def _emit_class_stmt(self, node: dict[str, JsonVal]) -> None:
+        if _exception_class_supported(node):
+            self._emit_exception_class(node)
+        else:
+            self._emit_class(node)
+
     def _emit_stmt(self, node: JsonVal) -> None:
         if not isinstance(node, dict):
             raise RuntimeError("julia subset: stmt must be dict")
@@ -1390,18 +1410,10 @@ class JuliaSubsetRenderer:
             self._emit(_ident(_str(node, "name")) + " = nothing")
             return
         if kind == "Raise":
-            exc = node.get("exc")
-            if exc is None:
-                self._emit("rethrow()")
-            else:
-                self._emit("throw(" + self._render_expr(exc) + ")")
+            self._emit_raise_stmt(node)
             return
         if kind == "Return":
-            value = node.get("value")
-            if value is None:
-                self._emit("return nothing")
-            else:
-                self._emit("return " + self._render_expr(value))
+            self._emit_return_stmt(node)
             return
         if kind == "Expr":
             self._emit_expr_stmt(node)
@@ -1438,10 +1450,7 @@ class JuliaSubsetRenderer:
         if kind == "TypeAlias":
             return
         if kind == "ClassDef":
-            if _exception_class_supported(node):
-                self._emit_exception_class(node)
-            else:
-                self._emit_class(node)
+            self._emit_class_stmt(node)
             return
         raise RuntimeError("julia subset: unsupported stmt kind: " + kind)
 
