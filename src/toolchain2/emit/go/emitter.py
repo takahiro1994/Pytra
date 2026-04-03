@@ -354,6 +354,27 @@ def _is_container_resolved_type(resolved_type: str) -> bool:
     )
 
 
+def _is_union_like_resolved_type(ctx: EmitContext, resolved_type: str) -> bool:
+    if resolved_type in ("", "unknown"):
+        return False
+    if resolved_type in ctx.union_type_aliases:
+        return True
+    if "|" in resolved_type:
+        parts = [part.strip() for part in resolved_type.split("|") if part.strip() != ""]
+        return len(parts) > 1
+    return False
+
+
+def _go_set_elem_type(ctx: EmitContext, resolved_type: str) -> str:
+    if resolved_type.startswith("tuple[") and resolved_type.endswith("]"):
+        return "string"
+    return _go_signature_type(ctx, resolved_type)
+
+
+def _optional_child_types_fit(inner_type: str, child_types: set[str]) -> bool:
+    return all(child_type in ("None", "none", inner_type) for child_type in child_types)
+
+
 def _prefer_value_container_local(ctx: EmitContext, name: str, resolved_type: str) -> bool:
     return (
         name != ""
@@ -379,7 +400,7 @@ def _go_ref_container_type(ctx: EmitContext, resolved_type: str) -> str:
             return "*PyDict[" + _go_type_with_ctx(ctx, parts[0]) + ", " + _go_signature_type(ctx, parts[1]) + "]"
     if resolved_type.startswith("set[") and resolved_type.endswith("]"):
         inner = resolved_type[4:-1]
-        return "*PySet[" + _go_signature_type(ctx, inner) + "]"
+        return "*PySet[" + _go_set_elem_type(ctx, inner) + "]"
     # Optional container: dict[K,V] | None → *PyDict[K,V] (nil encodes None)
     if resolved_type.endswith(" | None") or resolved_type.endswith("|None"):
         inner4 = resolved_type[:-7].strip() if resolved_type.endswith(" | None") else resolved_type[:-5].strip()
@@ -438,7 +459,7 @@ def _go_ref_container_ctor(ctx: EmitContext, resolved_type: str, literal_suffix:
         return "PySetFromMap[any](map[any]struct{}{})"
     if resolved_type.startswith("set[") and resolved_type.endswith("]"):
         inner3 = resolved_type[4:-1]
-        elem_gt2 = _go_signature_type(ctx, inner3)
+        elem_gt2 = _go_set_elem_type(ctx, inner3)
         if literal_suffix == "{}":
             return "NewPySet[" + elem_gt2 + "]()"
         return "PySetFromMap[" + elem_gt2 + "](map[" + elem_gt2 + "]struct{}" + literal_suffix + ")"
@@ -470,7 +491,11 @@ def _wrap_ref_container_value_code(ctx: EmitContext, value_code: str, resolved_t
         return _wrap_ref_container_value_code(ctx, value_code, opt_inner)
     if value_code.startswith("NewPyList[") or value_code.startswith("PyListFromSlice["):
         return value_code
+    if value_code.startswith("py_list_any("):
+        return value_code
     if value_code.startswith("NewPyDict[") or value_code.startswith("PyDictFromMap["):
+        return value_code
+    if value_code.startswith("py_dict_string_any("):
         return value_code
     if value_code.startswith("NewPySet[") or value_code.startswith("PySetFromMap["):
         return value_code
@@ -649,6 +674,13 @@ def _is_wrapper_container_expr(ctx: EmitContext, node: JsonVal, rendered: str) -
         return _is_container_resolved_type(_str(node, "resolved_type"))
     if kind == "Attribute":
         return _is_container_resolved_type(_str(node, "resolved_type"))
+    if kind == "Subscript":
+        if not _is_container_resolved_type(_str(node, "resolved_type")):
+            return False
+        value_node = node.get("value")
+        if not isinstance(value_node, dict):
+            return False
+        return _is_wrapper_container_expr(ctx, value_node, _emit_expr(ctx, value_node))
     if kind != "Name":
         return False
     name = _str(node, "id")
@@ -1466,7 +1498,8 @@ def _container_wrapper_go_type(resolved_type: str) -> str:
             return "*PyDict[" + go_type(parts[0]) + ", " + go_type(parts[1]) + "]"
     if resolved_type.startswith("set[") and resolved_type.endswith("]"):
         inner = resolved_type[4:-1]
-        return "*PySet[" + go_type(inner) + "]"
+        elem_gt = "string" if inner.startswith("tuple[") and inner.endswith("]") else go_type(inner)
+        return "*PySet[" + elem_gt + "]"
     return go_type(resolved_type)
 
 
@@ -1879,6 +1912,10 @@ def _emit_compare(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
         right = _emit_expr(ctx, comp_node)
         # Type coerce byte to int64 for comparison
         comp_rt = _str(comp_node, "resolved_type") if isinstance(comp_node, dict) else ""
+        if isinstance(comp_node, dict):
+            effective_comp_rt = _effective_resolved_type(ctx, comp_node)
+            if effective_comp_rt not in ("", "unknown"):
+                comp_rt = effective_comp_rt
         if isinstance(comp_node, dict) and _str(comp_node, "kind") == "Name":
             comp_name = _safe_go_ident(_str(comp_node, "id"))
             if comp_name in ctx.var_types and ctx.var_types[comp_name] != "":
@@ -1891,12 +1928,16 @@ def _emit_compare(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
                 right = _wrapper_container_storage_expr(ctx, comp_node, right)
                 if comp_rt.startswith("tuple[") and _str(comp_node, "kind") == "Call":
                     right = "py_tuple_any(" + right + ")"
+                if comp_rt.startswith("set[tuple["):
+                    prev = "py_tuple_key(" + prev + ")"
             parts.append("py_contains(" + right + ", " + prev + ")")
         elif op_str == "NotIn":
             if isinstance(comp_node, dict):
                 right = _wrapper_container_storage_expr(ctx, comp_node, right)
                 if comp_rt.startswith("tuple[") and _str(comp_node, "kind") == "Call":
                     right = "py_tuple_any(" + right + ")"
+                if comp_rt.startswith("set[tuple["):
+                    prev = "py_tuple_key(" + prev + ")"
             parts.append("!py_contains(" + right + ", " + prev + ")")
         elif op_str == "Is":
             parts.append("(" + prev + " == " + right + ")")
@@ -2126,6 +2167,15 @@ def _emit_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
                 return "py_items(" + owner + ")"
             if attr == "update" and owner_rt == "set[str]" and len(arg_strs) >= 1:
                 return "py_set_update_str(" + owner + ", " + arg_strs[0] + ")"
+            owner_effective_rt = _effective_resolved_type(ctx, owner_node) if isinstance(owner_node, dict) else owner_rt
+            if owner_effective_rt == "":
+                owner_effective_rt = owner_rt
+            if attr == "add" and owner_effective_rt.startswith("set") and len(arg_strs) >= 1:
+                owner_storage = _wrapper_container_storage_expr(ctx, owner_node, owner)
+                elem_code = arg_strs[0]
+                if owner_effective_rt.startswith("set[tuple["):
+                    elem_code = "py_tuple_key(" + elem_code + ")"
+                return owner_storage + "[" + elem_code + "] = struct{}{}"
             if attr == "index" and owner_rt.startswith("list[") and len(arg_strs) >= 1:
                 owner_storage = _wrapper_container_storage_expr(ctx, owner_node, owner)
                 return "py_list_index(" + owner_storage + ", " + arg_strs[0] + ")"
@@ -2504,15 +2554,20 @@ def _emit_builtin_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
             if enum_cast != "":
                 return enum_cast
             src_type = _str(args[0], "resolved_type")
+            src_is_dynamic = (
+                src_type in ("Any", "object", "Obj")
+                or go_type(src_type) == "any"
+                or _is_union_like_resolved_type(ctx, src_type)
+            )
             if src_type == "str" and gt in ("int64", "int32"):
                 return "py_str_to_int64(" + arg_strs[0] + ")"
             if src_type == "str" and gt in ("float64", "float32"):
                 cast_prefix = "float32" if gt == "float32" else ""
                 inner = "py_str_to_float64(" + arg_strs[0] + ")"
                 return cast_prefix + "(" + inner + ")" if cast_prefix != "" else inner
-            if src_type in ("Any", "object", "Obj") and gt in ("int64", "int32", "int16", "int8", "uint8", "uint16", "uint32", "uint64"):
+            if src_is_dynamic and gt in ("int64", "int32", "int16", "int8", "uint8", "uint16", "uint32", "uint64"):
                 return _coerce_from_any(arg_strs[0], rt)
-            if src_type in ("Any", "object", "Obj") and gt == "bool":
+            if src_is_dynamic and gt == "bool":
                 return "py_bool(" + arg_strs[0] + ")"
         if len(arg_strs) >= 1:
             return gt + "(" + arg_strs[0] + ")"
@@ -2709,7 +2764,11 @@ def _emit_builtin_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
             owner = _emit_expr(ctx, func.get("value"))
             owner = _wrapper_container_storage_expr(ctx, func.get("value"), owner)
             if len(arg_strs) >= 1:
-                return owner + "[" + arg_strs[0] + "] = struct{}{}"
+                owner_rt = _effective_resolved_type(ctx, func.get("value")) if isinstance(func.get("value"), dict) else ""
+                elem_code = arg_strs[0]
+                if owner_rt.startswith("set[tuple["):
+                    elem_code = "py_tuple_key(" + elem_code + ")"
+                return owner + "[" + elem_code + "] = struct{}{}"
 
     # list.pop
     if dispatch == "__LIST_POP__":
@@ -3199,11 +3258,29 @@ def _emit_list_literal(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
     if rt.startswith("list[") and rt.endswith("]"):
         elem_type = rt[5:-1]
         gt = "[]" + _go_signature_type(ctx, elem_type)
+    if elem_type != "":
+        child_types = {
+            _effective_resolved_type(ctx, e)
+            for e in elements
+            if isinstance(e, dict) and _effective_resolved_type(ctx, e) not in ("", "unknown")
+        }
+        optional_inner = _optional_inner_type(elem_type)
+        needs_widen = _is_union_like_resolved_type(ctx, elem_type) or any(
+            _go_signature_type(ctx, child_type) != _go_signature_type(ctx, elem_type)
+            for child_type in child_types
+        )
+        if optional_inner != "" and _optional_child_types_fit(optional_inner, child_types):
+            needs_widen = False
+        if needs_widen:
+            elem_type = "any"
+            gt = "[]any"
     parts = []
     for e in elements:
         code = _emit_expr(ctx, e)
-        if elem_type != "" and _is_container_resolved_type(elem_type) and not _is_wrapper_container_expr(ctx, e, code):
-            code = _wrap_ref_container_value_code(ctx, code, elem_type)
+        child_type = _effective_resolved_type(ctx, e) if isinstance(e, dict) else ""
+        wrap_type = elem_type if elem_type != "any" else child_type
+        if wrap_type != "" and _is_container_resolved_type(wrap_type) and not _is_wrapper_container_expr(ctx, e, code):
+            code = _wrap_ref_container_value_code(ctx, code, wrap_type)
         parts.append(code)
     literal = gt + "{" + ", ".join(parts) + "}"
     return literal
@@ -3223,6 +3300,25 @@ def _emit_dict_literal(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
             val_type = type_parts[1]
             key_gt = _go_type_with_ctx(ctx, key_type)
             val_gt = _go_signature_type(ctx, val_type)
+    value_nodes = [entry.get("value") for entry in _list(node, "entries") if isinstance(entry, dict)]
+    if len(value_nodes) == 0:
+        value_nodes = _list(node, "values")
+    child_val_types = {
+        _effective_resolved_type(ctx, value_node)
+        for value_node in value_nodes
+        if isinstance(value_node, dict) and _effective_resolved_type(ctx, value_node) not in ("", "unknown")
+    }
+    if val_type != "":
+        optional_inner = _optional_inner_type(val_type)
+        needs_widen = _is_union_like_resolved_type(ctx, val_type) or any(
+            _go_signature_type(ctx, child_type) != _go_signature_type(ctx, val_type)
+            for child_type in child_val_types
+        )
+        if optional_inner != "" and _optional_child_types_fit(optional_inner, child_val_types):
+            needs_widen = False
+        if needs_widen:
+            val_type = "any"
+            val_gt = "any"
     gt = ("map[" + key_gt + "]" + val_gt) if (key_gt != "" and val_gt != "") else go_type(rt)
 
     # EAST3 uses "entries" list of {key, value} dicts
@@ -3237,11 +3333,14 @@ def _emit_dict_literal(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
                 if key_type != "" and isinstance(key_node, dict):
                     if _optional_inner_type(key_type) != "":
                         k = _wrap_optional_value_code(ctx, k, key_type, key_node)
+                if isinstance(value_node, dict):
+                    actual_val_type = _effective_resolved_type(ctx, value_node)
+                    wrap_type = val_type if val_type != "any" else actual_val_type
+                    if wrap_type != "" and _is_container_resolved_type(wrap_type) and not _is_wrapper_container_expr(ctx, value_node, v):
+                        v = _wrap_ref_container_value_code(ctx, v, wrap_type)
                 if val_type != "" and isinstance(value_node, dict):
                     if _optional_inner_type(val_type) != "":
                         v = _wrap_optional_value_code(ctx, v, val_type, value_node)
-                    elif _is_container_resolved_type(val_type) and not _is_wrapper_container_expr(ctx, value_node, v):
-                        v = _wrap_ref_container_value_code(ctx, v, val_type)
                 parts.append(k + ": " + v)
     else:
         # Fallback: separate keys/values lists
@@ -3255,11 +3354,14 @@ def _emit_dict_literal(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
             if key_type != "" and isinstance(key_node2, dict):
                 if _optional_inner_type(key_type) != "":
                     k = _wrap_optional_value_code(ctx, k, key_type, key_node2)
+            if isinstance(value_node2, dict):
+                actual_val_type2 = _effective_resolved_type(ctx, value_node2)
+                wrap_type2 = val_type if val_type != "any" else actual_val_type2
+                if wrap_type2 != "" and _is_container_resolved_type(wrap_type2) and not _is_wrapper_container_expr(ctx, value_node2, v):
+                    v = _wrap_ref_container_value_code(ctx, v, wrap_type2)
             if val_type != "" and isinstance(value_node2, dict):
                 if _optional_inner_type(val_type) != "":
                     v = _wrap_optional_value_code(ctx, v, val_type, value_node2)
-                elif _is_container_resolved_type(val_type) and not _is_wrapper_container_expr(ctx, value_node2, v):
-                    v = _wrap_ref_container_value_code(ctx, v, val_type)
             parts.append(k + ": " + v)
 
     return gt + "{" + ", ".join(parts) + "}"
@@ -3267,9 +3369,19 @@ def _emit_dict_literal(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
 
 def _emit_set_literal(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
     elements = _list(node, "elements")
-    parts = [_emit_expr(ctx, e) + ": {}" for e in elements]
     rt = _str(node, "resolved_type")
+    elem_rt = ""
+    if rt.startswith("set[") and rt.endswith("]"):
+        elem_rt = rt[4:-1]
+    parts = []
+    for e in elements:
+        key_code = _emit_expr(ctx, e)
+        if elem_rt.startswith("tuple[") and elem_rt.endswith("]"):
+            key_code = "py_tuple_key(" + key_code + ")"
+        parts.append(key_code + ": {}")
     native = go_type(rt)
+    if elem_rt.startswith("tuple[") and elem_rt.endswith("]"):
+        native = "map[string]struct{}"
     native_literal = native + "{" + ", ".join(parts) + "}"
     return _wrap_ref_container_value_code(ctx, native_literal, rt)
 
@@ -3439,6 +3551,9 @@ def _emit_isinstance(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
         "PYTRA_TID_STR": "py_is_str",
         "PYTRA_TID_LIST": "py_is_list",
         "PYTRA_TID_DICT": "py_is_dict",
+        "list": "py_is_list",
+        "dict": "py_is_dict",
+        "set": "py_is_set",
     }
     helper_name = builtin_tid_helpers.get(expected_name, "")
     if helper_name != "":

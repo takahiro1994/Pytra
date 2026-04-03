@@ -18,6 +18,8 @@ type PyList[T any] struct {
 	items []T
 }
 
+func (*PyList[T]) __pytra_is_list() {}
+
 type pyListView interface {
 	pyListLen() int
 	pyListItemAny(i int) any
@@ -25,6 +27,10 @@ type pyListView interface {
 
 type pyDictView interface {
 	pyIsDictView()
+}
+
+type pyDictAccessor interface {
+	pyDictItemsAny() any
 }
 
 func NewPyList[T any]() *PyList[T] {
@@ -39,6 +45,10 @@ func PyListFromSlice[T any](items []T) *PyList[T] {
 
 func py_tuple_any(values ...any) []any {
 	return values
+}
+
+func py_tuple_key(value any) string {
+	return gofmt.Sprintf("%#v", value)
 }
 
 func py_list_any(items any) *PyList[any] {
@@ -121,6 +131,9 @@ type PyDict[K comparable, V any] struct {
 	items map[K]V
 }
 
+func (*PyDict[K, V]) __pytra_is_dict() {}
+func (d *PyDict[K, V]) pyDictItemsAny() any { return d.items }
+
 func NewPyDict[K comparable, V any]() *PyDict[K, V] {
 	return &PyDict[K, V]{items: map[K]V{}}
 }
@@ -161,6 +174,8 @@ func (d *PyDict[K, V]) pyMapStringAny() map[string]any {
 type PySet[T comparable] struct {
 	items map[T]struct{}
 }
+
+func (*PySet[T]) __pytra_is_set() {}
 
 func NewPySet[T comparable]() *PySet[T] {
 	return &PySet[T]{items: map[T]struct{}{}}
@@ -803,6 +818,14 @@ func py_is_dict(v any) bool {
 	return rv.IsValid() && rv.Kind() == goreflect.Map
 }
 
+func py_is_set(v any) bool {
+	rv := goreflect.ValueOf(v)
+	if !rv.IsValid() || rv.Kind() != goreflect.Map {
+		return false
+	}
+	return rv.Type().Elem().Kind() == goreflect.Struct
+}
+
 func py_ternary_int(cond bool, a, b int64) int64 {
 	if cond {
 		return a
@@ -1187,9 +1210,26 @@ func py_remove[K comparable](s any, key K) {
 	}
 }
 
+func py_unwrap_dict_value(m any) goreflect.Value {
+	if accessor, ok := m.(pyDictAccessor); ok {
+		mv := goreflect.ValueOf(accessor.pyDictItemsAny())
+		if mv.IsValid() && mv.Kind() == goreflect.Map {
+			return mv
+		}
+	}
+	mv := goreflect.ValueOf(m)
+	if !mv.IsValid() {
+		return goreflect.Value{}
+	}
+	if mv.Kind() == goreflect.Map {
+		return mv
+	}
+	return goreflect.Value{}
+}
+
 // Dict
 func py_dict_get(m any, key any, def_ any) any {
-	mv := goreflect.ValueOf(m)
+	mv := py_unwrap_dict_value(m)
 	if !mv.IsValid() || mv.Kind() != goreflect.Map {
 		return def_
 	}
@@ -1214,7 +1254,7 @@ func py_dict_get(m any, key any, def_ any) any {
 }
 
 func py_items(m any) [][]any {
-	mv := goreflect.ValueOf(m)
+	mv := py_unwrap_dict_value(m)
 	if !mv.IsValid() || mv.Kind() != goreflect.Map {
 		return [][]any{}
 	}
@@ -1228,7 +1268,7 @@ func py_items(m any) [][]any {
 }
 
 func py_dict_keys(m any) []string {
-	mv := goreflect.ValueOf(m)
+	mv := py_unwrap_dict_value(m)
 	if !mv.IsValid() || mv.Kind() != goreflect.Map {
 		return []string{}
 	}
@@ -1243,7 +1283,7 @@ func py_dict_keys(m any) []string {
 }
 
 func py_dict_values(m any) []any {
-	mv := goreflect.ValueOf(m)
+	mv := py_unwrap_dict_value(m)
 	if !mv.IsValid() || mv.Kind() != goreflect.Map {
 		return []any{}
 	}
