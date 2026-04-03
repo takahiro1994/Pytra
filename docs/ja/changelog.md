@@ -4,6 +4,46 @@
 
 # 更新履歴
 
+## 2026-04-03
+
+- **emitter 呼び出し構造の統一**: 共通ランナー `cli_runner.py` を新設。17 言語の cli.py を共通ランナーに移行（Rust のみ独自維持）。`pytra-cli2.py` は subprocess で cli.py を呼ぶ形に統一し、emitter 直接 import を廃止。
+- **parity check emit ロジック共通化**: `runtime_parity_check_fast.py` の 18 言語 if/elif チェーンを `importlib` 動的 import + 共通ループに置換。新言語追加時に parity check 修正不要に。
+- **`resolved_type: "object"` 全面禁止**: EAST3 validator で `resolved_type: "object"` を fail-fast。trait `cls: object` → `@template T`、`dict.get()` 型推論バグを修正し残存 6 ノードをゼロに。
+- **IsInstance ノードから PYTRA_TID_* 廃止**: `expected_type_name` を直接持つ形に移行。C++ emitter の逆引きテーブルも削除。全言語の emitter が native isinstance（`x is Type`, `instanceof`, `holds_alternative` 等）を使える。
+- **`--east3-opt-level` → `--opt-level` 改名**: negative_index_mode / bounds_check_mode のデフォルトを opt-level で決定する設計に統合。
+- **@extern class opaque 型**: spec-opaque-type.md を確定。`class_storage_hint: "opaque"` + `meta.opaque_v1` を compile/resolve で付与。`eo_` prefix の emit-only fixture 規約を新設。
+- **builtin_name 廃止**: EAST3 から `builtin_name` フィールド生成を削除。mapping.json キーを `runtime_call` に統一。
+- **runtime_call カバレッジ lint**: `check_runtime_call_coverage.py` を新設し `emitter-hardcode-lint.md` に `rt: call_cov` カテゴリとして統合。
+- **emitter lint 常時 10 カテゴリ**: `--include-runtime` をデフォルト ON に変更。parity check からの自動 lint 呼び出しは廃止（手動 or run_local_ci のみ）。
+- **全件 SKIP を FAIL に**: parity check で toolchain missing により全ターゲットが SKIP のケースを PASS ではなく FAIL に変更。
+- **tools/unregistered/ 削除**: 旧ツール 110 ファイルを削除。`run_local_ci.py` から参照を除去。
+- **check_todo_priority.py 削除**: 優先順位チェッカーを削除（実用性なし）。
+- **Julia / Zig / PowerShell / Swift / Dart backend TODO 新設**: 各言語に toolchain2 emitter 実装タスクを起票。
+- **Kotlin / Scala を JVM backend TODO に統合**: `java.md` で一括管理。
+
+## 2026-04-02
+
+- **C++ monostate → optional\<variant\>**: `T1 | T2 | None` の型写像を `std::variant<..., std::monostate>` から `std::optional<std::variant<...>>` に変更。Rust `Option<enum>` と対応統一。
+- **C++ bounds check / negative index を EAST optimizer に移管**: 旧 emitter オプション `--negative-index-mode` / `--bounds-check-mode` を optimizer のメタデータ（`subscript_access_v1`）に移管。C++ sample 01 mandelbrot 12.8s → 0.82s。
+- **png.py / gif.py の extend 最適化**: `_png_append` / `_gif_append` の append ループを `extend` に変更。全言語の PNG/GIF 生成が高速化。
+- **bytes_copy_semantics fixture 追加**: `bytes(bytearray)` のコピーセマンティクス検証。Lua の不正な zero-copy 最適化を検出。
+- **negative_index fixture 追加**: `negative_index_comprehensive`（list/str/bytes/bytearray の負数インデックス）、`negative_index_out_of_range`（`a[-100]` の IndexError）。
+- **emitter guide §12.4 Optional/union 型写像**: 3 分類と言語別写像ルールを新設。monostate 方式と optional+variant 方式の両方を文書化。
+- **emitter guide §12.5 数値 cast → §12.6 callable 型写像**: callable | None の各言語での表現を文書化。
+- **spec-adt.md monostate → optional 整合**: 旧 monostate 例を修正、p6-plan に経緯注釈。
+- **emitter hardcode lint runtime キャッシュ**: `--include-runtime` 結果を `.parity-results/emitter_lint_runtime.json` に保存し、通常実行で復元。
+- **lint total_cats 分母バグ修正**: `len(CATEGORIES)` → `len(mat)` でカテゴリ数の不一致を解消。
+- **fixture リネーム**: `any_basic` → `union_basic`、`any_dict_items` → `union_dict_items`、`any_list_mixed` → `union_list_mixed`、`any_none` → `optional_none`。
+- **Java / C# 完了タスクをアーカイブ**: Java TYPE-ID-CLEANUP / NEW-FIXTURES / LINT-V2、C# TYPE-ID-CLEANUP。
+- **README バッジ順統一**: JVM 3 言語（Java / Scala / Kotlin）を隣接配置。全テーブルの列順を統一。
+
+## 2026-04-01
+
+- **emitter hardcode lint runtime キャッシュ機構**: `--include-runtime` 実行結果をキャッシュし、通常実行で復元する仕組みを追加。
+- **正本ファイル変更禁止ルール**: `src/pytra/utils/*.py` / `src/pytra/std/*.py` は言語 backend 担当が変更してはならない旨を spec-agent.md と emitter guide に明記。
+- **EAST3 copy elision メタデータ計画**: `bytes(bytearray)` のコピー省略を EAST/linker メタデータで制御する計画を起票。
+- **C++ prefix_match lint 修正**: `runtime_paths.py` の `pytra.std.` フォールバックを削除。C++ lint 全 8 カテゴリ 🟩。
+
 ## 2026-03-31
 
 - **Ruby / Lua / PHP / Nim backend 担当を新設**: TODO と plans を起票。各言語の emitter 実装 → lint → selfhost のタスクを積んだ。

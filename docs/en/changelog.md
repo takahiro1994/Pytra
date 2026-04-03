@@ -4,6 +4,42 @@
 
 # Changelog
 
+## 2026-04-03
+
+- **Unified emitter call structure**: New common runner `cli_runner.py`. 17 languages migrated (Rust only exception). `pytra-cli2.py` calls cli.py via subprocess, no direct emitter imports.
+- **Parity check emit unification**: Replaced 18-language if/elif chain with importlib dynamic import + common loop.
+- **`resolved_type: "object"` banned globally**: EAST3 validator fail-fast. Trait `cls: object` → `@template T`, dict.get() type inference bug fixed.
+- **IsInstance PYTRA_TID_* removed**: Migrated to `expected_type_name`. C++ reverse lookup table deleted.
+- **`--east3-opt-level` → `--opt-level` rename**: Integrated negative_index/bounds_check preset.
+- **@extern class opaque type**: spec finalized, class_storage_hint:"opaque" + meta.opaque_v1. New `eo_` prefix for emit-only fixtures.
+- **builtin_name removed**: Deleted from EAST3 compile/resolve. mapping.json keys unified to runtime_call.
+- **runtime_call coverage lint**: New `rt: call_cov` category in emitter-hardcode-lint.md.
+- **Lint always 10 categories**: `--include-runtime` default ON. Removed auto-lint from parity check.
+- **All-skip now FAIL**: Parity check reports FAIL when all targets skip (missing toolchain).
+- **tools/unregistered/ deleted**: 110 retired scripts removed.
+- **check_todo_priority.py deleted**: Impractical priority checker removed.
+- **Julia / Zig / PowerShell / Swift / Dart backend TODOs**: Toolchain2 emitter tasks created for each.
+- **Kotlin / Scala merged into JVM backend TODO**: Managed in java.md.
+
+## 2026-04-02
+
+- **C++ monostate → optional\<variant\>**: `T1 | T2 | None` mapping changed from `std::variant<..., std::monostate>` to `std::optional<std::variant<...>>`. Aligned with Rust `Option<enum>`.
+- **C++ bounds check / negative index → EAST optimizer**: Migrated to `subscript_access_v1` metadata. Sample 01 mandelbrot 12.8s → 0.82s.
+- **png.py / gif.py extend optimization**: Replaced append loops with extend. Speeds up PNG/GIF for all languages.
+- **bytes_copy_semantics fixture**: Verifies bytes(bytearray) makes independent copy.
+- **negative_index fixtures**: comprehensive + out_of_range.
+- **emitter guide §12.4-12.6**: Optional/union type mapping, callable type mapping for all languages.
+- **Emitter lint improvements**: runtime cache, total_cats denominator fix.
+- **Fixture rename**: any_* → union_*/optional_none.
+- **Java / C# tasks archived**. Badge order unified (JVM grouped).
+
+## 2026-04-01
+
+- **Emitter lint runtime cache**: --include-runtime results cached and restored on normal runs.
+- **Source-of-truth modification prohibition**: src/pytra/utils/*.py and src/pytra/std/*.py may not be modified by backend agents.
+- **EAST3 copy elision plan**: Planned copy_elision_safe_v1 metadata for bytes(bytearray) optimization.
+- **C++ prefix_match lint fix**: Removed pytra.std. fallback from runtime_paths.py.
+
 ## 2026-03-31
 
 - **Ruby / Lua / PHP / Nim backend teams added**: TODO and plans created for each language.
