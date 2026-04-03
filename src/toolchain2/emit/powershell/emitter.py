@@ -750,10 +750,10 @@ def _render_call(ctx: EmitContext, expr: dict[str, JsonVal]) -> str:
 
             safe_fn = _safe(fn_name, "_fn")
 
-            # Callable parameter: call via & $var (handles string names and scriptblocks)
-            # Only applies when fn_name is a known callable param/local, not a top-level function
+            # Callable variable: call via & $var (handles string names and scriptblocks)
+            # Use & $var whenever resolved_type is callable and it's not a top-level function/class.
             func_rt = _gs(func, "resolved_type")
-            if (func_rt.startswith("callable") or func_rt.startswith("Callable")) and fn_name not in ctx.function_names and fn_name not in ctx.class_names and runtime_call == "" and (fn_name in ctx.arg_types or fn_name in ctx.lambda_vars):
+            if (func_rt.startswith("callable") or func_rt.startswith("Callable")) and fn_name not in ctx.function_names and fn_name not in ctx.class_names and runtime_call == "":
                 if len(rendered_args) == 0:
                     return "(& $" + safe_fn + ")"
                 return "(& $" + safe_fn + " " + " ".join(rendered_args) + ")"
@@ -1093,9 +1093,13 @@ def _emit_stmt(ctx: EmitContext, stmt: dict[str, JsonVal], indent: str) -> list[
             if tname != "":
                 return [indent + "$" + _safe(tname, "_v") + " = $__native_" + _safe(tname, "_v")]
             return [indent + "# extern var (no target)"]
-        # Track lambda assignments
+        # Track lambda assignments and callable-typed variable assignments
         if isinstance(val_node, dict) and _gs(val_node, "kind") == "Lambda":
             if len(targets) == 1 and isinstance(targets[0], dict) and _gs(targets[0], "kind") == "Name":
+                ctx.lambda_vars.add(_gs(targets[0], "id"))
+        if len(targets) == 1 and isinstance(targets[0], dict) and _gs(targets[0], "kind") == "Name":
+            tgt_rt = _gs(targets[0], "resolved_type")
+            if "callable" in tgt_rt.lower():
                 ctx.lambda_vars.add(_gs(targets[0], "id"))
         # Tuple unpacking: (a, b) = expr
         if len(targets) == 1 and isinstance(targets[0], dict):
@@ -1137,6 +1141,10 @@ def _emit_stmt(ctx: EmitContext, stmt: dict[str, JsonVal], indent: str) -> list[
             return [indent + "# extern var (no target)"]
         if isinstance(value, dict) and _gs(value, "kind") == "Lambda":
             if isinstance(target, dict) and _gs(target, "kind") == "Name":
+                ctx.lambda_vars.add(_gs(target, "id"))
+        if isinstance(target, dict) and _gs(target, "kind") == "Name":
+            tgt_rt_ann = _gs(target, "resolved_type")
+            if "callable" in tgt_rt_ann.lower():
                 ctx.lambda_vars.add(_gs(target, "id"))
         lhs = _render_expr(ctx, target)
         return [indent + lhs + " = " + _render_expr(ctx, value)]
