@@ -84,6 +84,7 @@ _ISINSTANCE_TYPE_TEXT = {
 }
 
 _IMPORTFROM_MODULES: dict[str, set[str] | None] = {
+    "pytra.enum": {"Enum", "IntEnum", "IntFlag"},
     "pytra.utils.assertions": {"py_assert_stdout", "py_assert_eq", "py_assert_all", "py_assert_true"},
     "pytra.utils.png": None,
     "pytra.std.collections": {"deque"},
@@ -145,7 +146,13 @@ def _quote_string(value: str) -> str:
 
 
 def _simple_class_supported(node: dict[str, JsonVal]) -> bool:
-    if _str(node, "base") != "":
+    base = _str(node, "base")
+    if base in {"Enum", "IntEnum", "IntFlag"}:
+        body = _list(node, "body")
+        return len(body) == 0 or (
+            len(body) == 1 and isinstance(body[0], dict) and _str(body[0], "kind") == "Pass"
+        )
+    if base != "":
         return False
     body = _list(node, "body")
     if len(body) == 0:
@@ -953,6 +960,8 @@ class JuliaSubsetRenderer:
                     bound_name = _ident(_str(item, "asname") or source_name)
                     if source_name == "deque":
                         self._emit(bound_name + " = __pytra_deque")
+                return
+            if module_name == "pytra.enum":
                 return
             if module_name == "pytra.std.json":
                 return
