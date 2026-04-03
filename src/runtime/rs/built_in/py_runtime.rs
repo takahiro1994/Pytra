@@ -1281,6 +1281,15 @@ impl<T: Clone> PySlice for Vec<T> {
     }
 }
 
+impl<T: Clone> PySlice for PyList<T> {
+    type Output = PyList<T>;
+    fn py_slice(&self, start: Option<i64>, end: Option<i64>) -> Self::Output {
+        let snapshot = self.iter_snapshot();
+        let (s, e) = normalize_slice_range(snapshot.len() as i64, start, end);
+        PyList::from_vec(snapshot[s..e].to_vec())
+    }
+}
+
 impl PySlice for String {
     type Output = String;
     fn py_slice(&self, start: Option<i64>, end: Option<i64>) -> Self::Output {

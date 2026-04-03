@@ -1882,20 +1882,20 @@ def _emit_subscript(ctx: RsEmitContext, node: dict[str, JsonVal]) -> str:
     if isinstance(slice_node, dict) and _str(slice_node, "kind") == "Slice":
         lower = slice_node.get("lower")
         upper = slice_node.get("upper")
-        lo = _emit_expr(ctx, lower) if lower is not None else "0"
-        hi_raw = _emit_expr(ctx, upper) if upper is not None else "usize::MAX"
-        if obj_type.startswith("list["):
-            elem_type = obj_type[5:-1]
-            rs_elem = _rs_type_for_context(ctx, elem_type)
-            return "PyList::<" + rs_elem + ">::from_vec({ let __list = " + obj + "; let __borrow = __list.py_borrow(); let __lo = (" + lo + ") as usize; let __hi = ((" + hi_raw + ") as usize).min(__borrow.len()); __borrow[__lo..__hi].to_vec() })"
-        if obj_type == "str":
-            ref_obj = "&" + obj if not obj.startswith("&") else obj
-            lo_expr = "0"
-            if lo != "0":
-                lo_expr = "({ let __loi = (" + lo + ") as i64; if __loi < 0 { (__s.len() as i64 + __loi).max(0) as usize } else { __loi as usize } })"
-            return "{ let __s = " + ref_obj + "; let __lo = " + lo_expr + "; let __hi = ((" + hi_raw + ") as usize).min(__s.len()); __s[__lo..__hi].to_string() }"
+        lo = _emit_expr(ctx, lower) if lower is not None else ""
+        hi_raw = _emit_expr(ctx, upper) if upper is not None else ""
+        obj_rs = _rs_type_for_context(ctx, obj_type) if obj_type != "" else _infer_node_rust_type(ctx, obj_node)
+        ref_obj = "&" + obj if not obj.startswith("&") else obj
+        lo_expr = "None" if lo == "" else "Some((" + lo + ") as i64)"
+        hi_expr = "None" if hi_raw == "" else "Some((" + hi_raw + ") as i64)"
+        if obj_type.startswith("list[") or obj_rs.startswith("PyList<"):
+            return "py_slice(" + ref_obj + ", " + lo_expr + ", " + hi_expr + ")"
+        if obj_type == "str" or obj_rs == "String":
+            return "py_slice(" + ref_obj + ", " + lo_expr + ", " + hi_expr + ")"
         # Default slice
-        return obj + "[(" + lo + " as usize)..(" + hi_raw + " as usize)]"
+        lo_raw = "0" if lo == "" else lo
+        hi_fallback = "usize::MAX" if hi_raw == "" else hi_raw
+        return obj + "[(" + lo_raw + " as usize)..(" + hi_fallback + " as usize)]"
 
     idx = _emit_expr(ctx, slice_node)
     # Tuple indexing (both "tuple" and "tuple[...]")
