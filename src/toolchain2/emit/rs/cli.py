@@ -9,6 +9,7 @@ from pytra.std.json import JsonVal
 from pytra.std.pathlib import Path
 
 from toolchain2.emit.rs.emitter import emit_rs_module
+from toolchain2.emit.rs.emitter import module_requires_runtime_type_ids
 from toolchain2.link.manifest_loader import load_linked_output
 
 
@@ -107,12 +108,15 @@ def _write_rs_package_files(
     written = 0
     entry_mod = ""
 
+    needs_runtime_type_ids = False
     for module in linked_modules:
         east_doc = getattr(module, "east_doc", None)
         module_id = getattr(module, "module_id", "")
         is_entry = getattr(module, "is_entry", False)
         if not isinstance(east_doc, dict) or not isinstance(module_id, str) or module_id == "":
             continue
+        if module_requires_runtime_type_ids(east_doc):
+            needs_runtime_type_ids = True
         code = emit_rs_module(east_doc, package_mode=True)
         if code.strip() == "":
             continue
@@ -128,11 +132,12 @@ def _write_rs_package_files(
         if src_dir.joinpath(runtime_mod + ".rs").exists() and runtime_mod not in module_names:
             module_names.append(runtime_mod)
 
-    type_id_table = _manifest_type_id_table(manifest_doc, linked_modules)
-    tid_src = _generate_type_id_table_rs(type_id_table)
-    src_dir.joinpath("pytra_built_in_type_id_table.rs").write_text(tid_src, encoding="utf-8")
-    module_names.append("pytra_built_in_type_id_table")
-    written += 1
+    if needs_runtime_type_ids:
+        type_id_table = _manifest_type_id_table(manifest_doc, linked_modules)
+        tid_src = _generate_type_id_table_rs(type_id_table)
+        src_dir.joinpath("pytra_built_in_type_id_table.rs").write_text(tid_src, encoding="utf-8")
+        module_names.append("pytra_built_in_type_id_table")
+        written += 1
 
     lib_lines = [
         "pub mod " + mod_name + ";"
@@ -171,7 +176,10 @@ def emit_rs_from_manifest(manifest_path: Path, output_dir: Path, *, package_mode
 
     output_dir.mkdir(parents=True, exist_ok=True)
     written = 0
+    needs_runtime_type_ids = False
     for module in linked_modules:
+        if module_requires_runtime_type_ids(module.east_doc):
+            needs_runtime_type_ids = True
         code = emit_rs_module(module.east_doc)
         if code.strip() == "":
             continue
@@ -179,11 +187,12 @@ def emit_rs_from_manifest(manifest_path: Path, output_dir: Path, *, package_mode
         output_dir.joinpath(fname).write_text(code, encoding="utf-8")
         written += 1
     written += _copy_rs_runtime_files(output_dir)
-    type_id_table = _manifest_type_id_table(manifest_doc, linked_modules)
-    tid_rs = _generate_type_id_table_rs(type_id_table)
-    if tid_rs != "" or not output_dir.joinpath("pytra_built_in_type_id_table.rs").exists():
-        output_dir.joinpath("pytra_built_in_type_id_table.rs").write_text(tid_rs, encoding="utf-8")
-        written += 1
+    if needs_runtime_type_ids:
+        type_id_table = _manifest_type_id_table(manifest_doc, linked_modules)
+        tid_rs = _generate_type_id_table_rs(type_id_table)
+        if tid_rs != "" or not output_dir.joinpath("pytra_built_in_type_id_table.rs").exists():
+            output_dir.joinpath("pytra_built_in_type_id_table.rs").write_text(tid_rs, encoding="utf-8")
+            written += 1
     print("emitted: " + str(output_dir) + " (" + str(written) + " Rust files)")
     return 0
 

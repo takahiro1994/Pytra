@@ -119,17 +119,19 @@ class RsEmitContext:
     vec_vararg_names: set[str] = field(default_factory=set)
 
 
-def _package_prelude_uses() -> list[str]:
-    return [
+def _package_prelude_uses(include_type_ids: bool) -> list[str]:
+    lines = [
         "use crate::py_runtime::*;",
         "use crate::pytra_built_in_error::RuntimeError;",
-        "use crate::pytra_built_in_type_id_table::*;",
         "use crate::pytra_std_re::*;",
         "use crate::time_native::perf_counter;",
         "use std::cell::RefCell;",
         "use std::collections::{BTreeMap, HashMap, HashSet, VecDeque};",
         "use std::rc::Rc;",
     ]
+    if include_type_ids:
+        lines.append("use crate::pytra_built_in_type_id_table::*;")
+    return lines
 
 
 # ---------------------------------------------------------------------------
@@ -610,6 +612,27 @@ def _doc_requires_runtime_type_ids(body: list[JsonVal], main_guard: list[JsonVal
     walk(body)
     walk(main_guard)
     return found
+
+
+def module_requires_runtime_type_ids(east3_doc: dict[str, JsonVal]) -> bool:
+    body = _list(east3_doc, "body")
+    main_guard = _list(east3_doc, "main_guard_body")
+    class_names: set[str] = set()
+
+    def collect_classes(node: JsonVal) -> None:
+        if isinstance(node, dict):
+            if _str(node, "kind") == "ClassDef":
+                name = _str(node, "name")
+                if name != "":
+                    class_names.add(name)
+            for value in node.values():
+                collect_classes(value)
+        elif isinstance(node, list):
+            for item in node:
+                collect_classes(item)
+
+    collect_classes(body)
+    return _doc_requires_runtime_type_ids(body, main_guard, class_names)
 
 
 def _rs_zero_value_for_context(ctx: RsEmitContext, resolved_type: str) -> str:
@@ -6422,7 +6445,7 @@ def _collect_uses(ctx: RsEmitContext, meta: dict[str, JsonVal]) -> list[str]:
     """Determine which `use` statements are needed."""
     if not ctx.package_mode:
         return []
-    lines: list[str] = _package_prelude_uses()
+    lines: list[str] = _package_prelude_uses(ctx.needs_runtime_type_ids)
     if ctx.module_id == "pytra.built_in.error":
         lines = [line for line in lines if line != "use crate::pytra_built_in_error::RuntimeError;"]
     if ctx.module_id == "pytra.std.re":
