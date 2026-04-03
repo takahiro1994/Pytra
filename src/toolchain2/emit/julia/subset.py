@@ -55,6 +55,7 @@ _EXCEPTION_TYPE_TEXT = {
 _IMPORTFROM_MODULES: dict[str, set[str] | None] = {
     "pytra.utils.assertions": {"py_assert_stdout", "py_assert_eq", "py_assert_all", "py_assert_true"},
     "pytra.utils.png": None,
+    "pytra.std.collections": {"deque"},
     "math": {"floor", "sqrt"},
     "time": {"perf_counter"},
 }
@@ -279,13 +280,17 @@ def _expr_supported(node: JsonVal) -> bool:
                 return False
             return attr in {
                 "append",
+                "appendleft",
                 "clear",
                 "endswith",
                 "get",
                 "join",
+                "popleft",
+                "pop",
                 "replace",
                 "reverse",
                 "rstrip",
+                "setdefault",
                 "sort",
                 "startswith",
                 "strip",
@@ -539,14 +544,24 @@ class JuliaSubsetRenderer:
                 args = [self._render_expr(arg) for arg in _list(node, "args")]
                 if attr == "append" and len(args) == 1:
                     return "push!(" + owner + ", " + args[0] + ")"
+                if attr == "appendleft" and len(args) == 1:
+                    return "pushfirst!(" + owner + ", " + args[0] + ")"
                 if attr == "clear" and len(args) == 0:
                     return "empty!(" + owner + ")"
                 if attr == "sort" and len(args) == 0:
                     return "sort!(" + owner + ")"
                 if attr == "reverse" and len(args) == 0:
                     return "reverse!(" + owner + ")"
+                if attr == "popleft" and len(args) == 0:
+                    return "popfirst!(" + owner + ")"
                 if attr == "get" and len(args) == 2:
                     return "get(" + owner + ", " + args[0] + ", " + args[1] + ")"
+                if attr == "pop" and len(args) == 1:
+                    return "pop!(" + owner + ", " + args[0] + ")"
+                if attr == "pop" and len(args) == 0:
+                    return "pop!(" + owner + ")"
+                if attr == "setdefault" and len(args) == 2:
+                    return "get!(" + owner + ", " + args[0] + ", " + args[1] + ")"
                 if attr == "join" and len(args) == 1:
                     return "join(" + args[0] + ", " + owner + ")"
                 if attr == "strip" and len(args) == 0:
@@ -598,6 +613,8 @@ class JuliaSubsetRenderer:
                     return owner + "[(" + lower_text + " + 1):end]"
                 return owner + "[(" + lower_text + " + 1):" + upper_text + "]"
             index = self._render_expr(slice_node)
+            if owner_type.startswith("dict["):
+                return owner + "[" + index + "]"
             if owner_type == "str":
                 return "string(" + owner + "[__pytra_idx(" + index + ", length(" + owner + "))])"
             return owner + "[__pytra_idx(" + index + ", length(" + owner + "))]"
@@ -660,6 +677,15 @@ class JuliaSubsetRenderer:
                 return
             if module_name == "pytra.utils.png":
                 self._emit('include(joinpath(@__DIR__, "utils", "png.jl"))')
+                return
+            if module_name == "pytra.std.collections":
+                for item in names:
+                    if not isinstance(item, dict):
+                        continue
+                    source_name = _str(item, "name")
+                    bound_name = _ident(_str(item, "asname") or source_name)
+                    if source_name == "deque":
+                        self._emit(bound_name + " = __pytra_deque")
                 return
             if module_name == "math":
                 self._emit('include(joinpath(@__DIR__, "std", "math_native.jl"))')
