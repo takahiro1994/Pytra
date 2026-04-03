@@ -16,10 +16,12 @@ _BINOP_TEXT = {
     "Mult": "*",
     "Div": "/",
     "FloorDiv": "div",
+    "LShift": "<<",
     "Mod": "%",
     "BitAnd": "&",
     "BitOr": "|",
     "BitXor": "xor",
+    "RShift": ">>",
 }
 
 _CMP_TEXT = {
