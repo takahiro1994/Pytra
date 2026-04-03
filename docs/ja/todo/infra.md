@@ -20,6 +20,29 @@
 
 ## 未完了タスク
 
+### P0-LEGACY-TOOLCHAIN-REMOVAL: 旧 toolchain + pytra-cli.py を削除する
+
+全言語の toolchain2 emitter 実装（各言語の P1-*-EMITTER-S1）が完了した時点で、旧パイプラインを削除する。
+
+削除対象:
+- `src/toolchain/`（旧 emitter、旧 compile、旧 frontends、旧 misc）
+- `src/pytra-cli.py`（旧 CLI。`src/pytra-cli2.py` が正本）
+- 旧パイプラインを参照している test/spec/docs の記述
+
+前提条件（全て S1 完了が必要）:
+- [x] C++ / Rust / C# / TS-JS / Go / Java / Ruby / Lua / PHP / Nim / Dart
+- [x] Scala / Kotlin（S1-S2 完了）
+- [x] Swift（S1-S2 完了）
+- [ ] Julia（S1 進行中、fixture 85/145）
+- [ ] Zig（S1 未完了）
+- [ ] PowerShell（S1 未着手）
+
+1. [ ] [ID: P0-LEGACY-RM-S1] 全言語の P1-*-EMITTER-S1 完了を確認する（ゲート）
+2. [ ] [ID: P0-LEGACY-RM-S2] `src/toolchain/` を削除する
+3. [ ] [ID: P0-LEGACY-RM-S3] `src/pytra-cli.py` を削除し、`src/pytra-cli2.py` を `src/pytra-cli.py` にリネームする
+4. [ ] [ID: P0-LEGACY-RM-S4] spec / tutorial / README の旧パイプライン参照を更新する
+5. [ ] [ID: P0-LEGACY-RM-S5] `run_local_ci.py` 等のツールから旧パイプライン参照を削除する
+
 ### P0-ISINSTANCE-DETID: EAST3 の IsInstance ノードから PYTRA_TID_* を廃止し型名を直接持たせる
 
 EAST3 の `IsInstance` ノードが `expected_type_id: {"id": "PYTRA_TID_DICT"}` のように廃止予定の type_id 定数を参照している。emitter は型名（`dict`, `str`, `list` 等）を知りたいだけなのに、`PYTRA_TID_DICT` → `dict` の逆引きを強いられている。C++ emitter はこの逆引きを内部で持っているが、新規 backend（Kotlin, Scala 等）がこの旧方式を実装しようとする原因になっている。
@@ -49,8 +72,8 @@ fixture: `test/fixture/source/py/oop/extern_opaque_basic.py`
 
 S1-S3 完了済み（[archive/20260403.md](archive/20260403.md) 参照）。
 
-4. [ ] [ID: P0-BN-REMOVE-S4] EAST compile/resolve から `builtin_name` フィールド生成を削除する
-5. [ ] [ID: P0-BN-REMOVE-S5] `check_runtime_call_coverage.py` の `rt: call_cov` が正しく突き合わせできることを確認する（C++ で代表確認。各言語の parity は各担当に委譲）
+4. [x] [ID: P0-BN-REMOVE-S4] EAST compile/resolve から `builtin_name` フィールド生成を削除する — resolver.py/lower.py/passes.py から `builtin_name` 書き込みを全削除。内部 reader を `runtime_call`/`semantic_tag`/`predicate_kind` に移行。optimize passes の `builtin_name` fallback を削除。C++ emitter の `builtin_name` reads を `runtime_call` ベースに移行。EAST3 golden を全再生成（fixture/sample/pytra 全件 0 failed）。fixture+cpp/ts parity 144/145 維持（2026-04-03）
+5. [x] [ID: P0-BN-REMOVE-S5] `check_runtime_call_coverage.py` の `rt: call_cov` が正しく突き合わせできることを確認する — C++ で実行確認。EAST golden 179 件から 123 unique runtime_call を収集、cpp 43 件の EAST→mapping 未登録は全て extern_delegate / prefix 系で正常（exit 0）。mapping→EAST 30 件は math/bytes 等の fixture カバレッジ不足のみで警告扱い（--warn-dead）。各言語 parity 確認は各担当に委譲（2026-04-03）
 
 ### P20-DATA-DRIVEN-TESTS: パイプライン系テストのデータ駆動化
 
