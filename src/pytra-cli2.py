@@ -70,19 +70,10 @@ def _run_subprocess(cmd: list[str]) -> int:
     return result.returncode
 
 
-def _emit_go_module(_east_doc: dict[str, JsonVal]) -> str:
-    _unsupported_target_attr("toolchain2.emit.go.emitter", "emit_go_module")
-    return ""
-
-
-def _emit_java_module(_east_doc: dict[str, JsonVal]) -> str:
-    _unsupported_target_attr("toolchain2.emit.java.emitter", "emit_java_module")
-    return ""
-
-
-def _java_module_class_name(_module_id: str) -> str:
-    _unsupported_target_attr("toolchain2.emit.java.types", "java_module_class_name")
-    return ""
+def _emit_target_subprocess(target: str, manifest_path: Path, output_dir: Path) -> int:
+    """Emit via subprocess: python3 -m toolchain2.emit.<target>.cli manifest -o dir."""
+    cmd = [_python(), "-m", "toolchain2.emit." + target + ".cli", str(manifest_path), "--output-dir", str(output_dir)]
+    return _run_subprocess(cmd)
 
 
 
@@ -721,44 +712,10 @@ def cmd_link(args: list[str]) -> int:
 # emit: linked → target
 # ---------------------------------------------------------------------------
 
-def _emit_go(manifest_path: Path, output_dir: Path) -> int:
-    """Go emit: linked output → Go source files."""
-    _ = manifest_path
-    _ = output_dir
-    _unsupported_target_attr("toolchain2.emit.go.emitter", "emit_go_module")
-    return 1
-
-
-def _emit_cs(manifest_path: Path, output_dir: Path) -> int:
-    """C# emit: linked output → subprocess delegated C# emitter."""
-    cmd = [_python(), "-m", "toolchain2.emit.cs.cli", str(manifest_path), "--output-dir", str(output_dir)]
-    return _run_subprocess(cmd)
-
-
-def _emit_java(manifest_path: Path, output_dir: Path) -> int:
-    """Java emit: linked output -> Java source files."""
-    _ = manifest_path
-    _ = output_dir
-    _unsupported_target_attr("toolchain2.emit.java.emitter", "emit_java_module")
-    return 1
-
-
-def _emit_scala(manifest_path: Path, output_dir: Path) -> int:
-    """Scala emit: linked output → subprocess delegated Scala emitter."""
-    cmd = [_python(), "-m", "toolchain2.emit.scala.cli", str(manifest_path), "--output-dir", str(output_dir)]
-    return _run_subprocess(cmd)
-
-
-def _emit_kotlin(manifest_path: Path, output_dir: Path) -> int:
-    """Kotlin emit: linked output → subprocess delegated Kotlin emitter."""
-    cmd = [_python(), "-m", "toolchain2.emit.kotlin.cli", str(manifest_path), "--output-dir", str(output_dir)]
-    return _run_subprocess(cmd)
-
-
-def _emit_zig(manifest_path: Path, output_dir: Path) -> int:
-    """Zig emit: linked output → subprocess delegated Zig emitter."""
-    cmd = [_python(), "-m", "toolchain2.emit.zig.cli", str(manifest_path), "--output-dir", str(output_dir)]
-    return _run_subprocess(cmd)
+_SUBPROCESS_EMIT_TARGETS: list[str] = [
+    "go", "cs", "java", "scala", "kotlin", "zig",
+    "dart", "lua", "php", "ruby", "nim", "swift", "julia", "powershell",
+]
 
 
 def cmd_emit(args: list[str]) -> int:
@@ -822,37 +779,19 @@ def cmd_emit(args: list[str]) -> int:
     if output_dir_text == "":
         output_dir_text = str(Path("work").joinpath("tmp").joinpath("emit").joinpath(target))
 
-    if target == "go":
-        return _emit_go(manifest_path, Path(output_dir_text))
-
     if target == "cpp":
         return _emit_cpp(manifest_path, Path(output_dir_text))
 
     if target == "rs":
         return _emit_rs(manifest_path, Path(output_dir_text))
 
-    if target == "cs":
-        return _emit_cs(manifest_path, Path(output_dir_text))
-
-    if target == "java":
-        return _emit_java(manifest_path, Path(output_dir_text))
-
-    if target == "scala":
-        return _emit_scala(manifest_path, Path(output_dir_text))
-
-    if target == "kotlin":
-        return _emit_kotlin(manifest_path, Path(output_dir_text))
-
     if target == "ts" or target == "js":
         return _emit_ts(manifest_path, Path(output_dir_text), strip_types=(target == "js"))
 
-    if target == "nim":
-        return _emit_nim(manifest_path, Path(output_dir_text))
+    if target in _SUBPROCESS_EMIT_TARGETS:
+        return _emit_target_subprocess(target, manifest_path, Path(output_dir_text))
 
-    if target == "zig":
-        return _emit_zig(manifest_path, Path(output_dir_text))
-
-    print("error: unsupported target: " + target + " (available: cpp, go, rs, cs, java, scala, kotlin, ts, js, nim, zig)")
+    print("error: unsupported target: " + target)
     return 1
 
 
