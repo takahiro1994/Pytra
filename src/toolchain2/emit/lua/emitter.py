@@ -1822,40 +1822,69 @@ def _emit_assign_target(ctx: EmitContext, target: dict[str, JsonVal]) -> str:
 
 def _emit_tuple_assign(ctx: EmitContext, target: dict[str, JsonVal], value: JsonVal, declare: bool) -> None:
     elements = _list(target, "elements")
-    names: list[str] = []
+    targets: list[tuple[str, bool, str]] = []
     for e in elements:
         if isinstance(e, dict):
-            name = _str(e, "id")
             if _bool(e, "unused"):
-                names.append("_")
+                targets.append(("_", False, ""))
             else:
-                safe = _lua_symbol_name(ctx, name)
-                names.append(safe)
+                kind = _str(e, "kind")
+                if kind == "Name":
+                    safe = _lua_symbol_name(ctx, _str(e, "id"))
+                    targets.append((safe, True, safe))
+                else:
+                    targets.append((_emit_assign_target(ctx, e), False, ""))
         else:
-            names.append("_")
-    val_code = _emit_expr(ctx, value)
+            targets.append(("_", False, ""))
+
+    def _emit_tuple_target_assign(target_code: str, is_name_target: bool, safe_name: str, rhs_code: str) -> None:
+        if target_code == "_":
+            return
+        if declare and is_name_target:
+            if safe_name not in ctx.declared_locals:
+                ctx.declared_locals.add(safe_name)
+                _emit(ctx, "local " + safe_name + " = " + rhs_code)
+                return
+        _emit(ctx, target_code + " = " + rhs_code)
+
     # Check if RHS is a tuple literal
     if isinstance(value, dict) and _str(value, "kind") == "Tuple":
         rhs_elems = _list(value, "elements")
-        rhs_parts = [_emit_expr(ctx, e) for e in rhs_elems]
-        if declare:
-            _emit(ctx, "local " + ", ".join(names) + " = " + ", ".join(rhs_parts))
-        else:
-            _emit(ctx, ", ".join(names) + " = " + ", ".join(rhs_parts))
+        rhs_temps: list[str] = []
+        for elem in rhs_elems:
+            tmp = _next_temp(ctx, "tupv")
+            if isinstance(elem, dict):
+                checked_call = _emit_checked_subscript_call(ctx, elem)
+                if checked_call != "":
+                    err_tmp = _next_temp(ctx, "err")
+                    ok_tmp = _next_temp(ctx, "ok")
+                    _emit(ctx, "local " + ok_tmp + ", " + err_tmp + " = " + checked_call)
+                    _emit(ctx, "if " + err_tmp + " ~= nil then")
+                    ctx.indent_level += 1
+                    _emit_error_propagation(ctx, err_tmp, allow_current_catch=True)
+                    ctx.indent_level -= 1
+                    _emit(ctx, "end")
+                    _emit(ctx, "local " + tmp + " = " + ok_tmp)
+                else:
+                    _emit(ctx, "local " + tmp + " = " + _emit_expr(ctx, elem))
+            else:
+                _emit(ctx, "local " + tmp + " = nil")
+            rhs_temps.append(tmp)
+        for i, (target_code, is_name_target, safe_name) in enumerate(targets):
+            if i >= len(rhs_temps):
+                break
+            _emit_tuple_target_assign(target_code, is_name_target, safe_name, rhs_temps[i])
         return
+
+    val_code = _emit_expr(ctx, value)
     # Unpack table
     temp = _next_temp(ctx, "tup")
     if isinstance(value, dict) and _str(value, "kind") == "Call":
         _emit(ctx, "local " + temp + " = {" + val_code + "}")
     else:
         _emit(ctx, "local " + temp + " = " + val_code)
-    for i, n in enumerate(names):
-        if n == "_":
-            continue
-        if declare:
-            _emit(ctx, "local " + n + " = " + temp + "[" + str(i + 1) + "]")
-        else:
-            _emit(ctx, n + " = " + temp + "[" + str(i + 1) + "]")
+    for i, (target_code, is_name_target, safe_name) in enumerate(targets):
+        _emit_tuple_target_assign(target_code, is_name_target, safe_name, temp + "[" + str(i + 1) + "]")
 
 
 def _emit_aug_assign(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
@@ -2430,9 +2459,39 @@ def _emit_swap(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
     left = node.get("left")
     right = node.get("right")
     if isinstance(left, dict) and isinstance(right, dict):
-        lc = _lua_symbol_name(ctx, _str(left, "id"))
-        rc = _lua_symbol_name(ctx, _str(right, "id"))
-        _emit(ctx, lc + ", " + rc + " = " + rc + ", " + lc)
+        left_tmp = _next_temp(ctx, "swap")
+        right_tmp = _next_temp(ctx, "swap")
+
+        left_checked = _emit_checked_subscript_call(ctx, left)
+        if left_checked != "":
+            err_tmp = _next_temp(ctx, "err")
+            ok_tmp = _next_temp(ctx, "ok")
+            _emit(ctx, "local " + ok_tmp + ", " + err_tmp + " = " + left_checked)
+            _emit(ctx, "if " + err_tmp + " ~= nil then")
+            ctx.indent_level += 1
+            _emit_error_propagation(ctx, err_tmp, allow_current_catch=True)
+            ctx.indent_level -= 1
+            _emit(ctx, "end")
+            _emit(ctx, "local " + left_tmp + " = " + ok_tmp)
+        else:
+            _emit(ctx, "local " + left_tmp + " = " + _emit_expr(ctx, left))
+
+        right_checked = _emit_checked_subscript_call(ctx, right)
+        if right_checked != "":
+            err_tmp = _next_temp(ctx, "err")
+            ok_tmp = _next_temp(ctx, "ok")
+            _emit(ctx, "local " + ok_tmp + ", " + err_tmp + " = " + right_checked)
+            _emit(ctx, "if " + err_tmp + " ~= nil then")
+            ctx.indent_level += 1
+            _emit_error_propagation(ctx, err_tmp, allow_current_catch=True)
+            ctx.indent_level -= 1
+            _emit(ctx, "end")
+            _emit(ctx, "local " + right_tmp + " = " + ok_tmp)
+        else:
+            _emit(ctx, "local " + right_tmp + " = " + _emit_expr(ctx, right))
+
+        _emit(ctx, _emit_assign_target(ctx, left) + " = " + right_tmp)
+        _emit(ctx, _emit_assign_target(ctx, right) + " = " + left_tmp)
 
 
 def _emit_multi_assign(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
