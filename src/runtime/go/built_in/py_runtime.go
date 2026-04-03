@@ -408,14 +408,39 @@ func py_len(v any) int64 {
 	}
 }
 
-func py_pop(m map[string]any, key string, defaultValue any) any {
-	if m == nil {
-		return defaultValue
+func py_clear[K comparable, V any](d *PyDict[K, V]) {
+	if d == nil {
+		return
 	}
-	if value, ok := m[key]; ok {
-		delete(m, key)
+	clear(d.items)
+}
+
+func py_pop[K comparable, V any](d *PyDict[K, V], key K, defaultValue ...V) V {
+	var zero V
+	if d == nil {
+		if len(defaultValue) > 0 {
+			return defaultValue[0]
+		}
+		return zero
+	}
+	if value, ok := d.items[key]; ok {
+		delete(d.items, key)
 		return value
 	}
+	if len(defaultValue) > 0 {
+		return defaultValue[0]
+	}
+	return zero
+}
+
+func py_setdefault[K comparable, V any](d *PyDict[K, V], key K, defaultValue V) V {
+	if d == nil {
+		return defaultValue
+	}
+	if value, ok := d.items[key]; ok {
+		return value
+	}
+	d.items[key] = defaultValue
 	return defaultValue
 }
 
