@@ -539,6 +539,15 @@ def _rs_type_for_context(ctx: RsEmitContext, resolved_type: str) -> str:
     return rs_signature_type(resolved_type, ctx.class_names, ctx.trait_names)
 
 
+def _is_path_type_name(ctx: RsEmitContext, type_name: str) -> bool:
+    if type_name in ("", "unknown"):
+        return False
+    if type_name == "Path":
+        return True
+    mapped_path = ctx.mapping.types.get("Path", "")
+    return mapped_path != "" and type_name == mapped_path
+
+
 def _collect_signature_type_params(
     ctx: RsEmitContext,
     arg_types: dict[str, JsonVal],
@@ -1637,11 +1646,11 @@ def _emit_attribute(ctx: RsEmitContext, node: dict[str, JsonVal]) -> str:
     obj = _emit_expr(ctx, obj_node)
     receiver_storage_hint = _str(node, "receiver_storage_hint")
     attr_access_kind = _str(node, "attribute_access_kind")
-    path_like_types = {obj_type, obj_actual_type, rs_type(obj_type), rs_type(obj_actual_type)}
+    path_like_types = {obj_type, obj_actual_type, _resolved_type_in_context(ctx, obj_node)}
     if isinstance(obj_node, dict) and _str(obj_node, "kind") == "Name":
         name_rs = ctx.var_rust_types.get(_str(obj_node, "id"), "")
         inner_rs = name_rs[len("Rc<RefCell<"):-2] if name_rs.startswith("Rc<RefCell<") and name_rs.endswith(">>") else ""
-        is_path_ref = inner_rs in ("Path", "PyPath", "pathlib.Path", "pytra.std.pathlib.Path") or inner_rs.endswith(".Path")
+        is_path_ref = _is_path_type_name(ctx, _resolved_type_in_context(ctx, obj_node)) or _is_path_type_name(ctx, inner_rs)
         if name_rs.startswith("Rc<RefCell<") and name_rs.endswith(">>") and not (is_path_ref and attr in ("parent", "name", "stem", "suffix")):
             if inner_rs in ctx.class_property_methods and attr in ctx.class_property_methods.get(inner_rs, set()):
                 return obj + ".borrow()." + safe_rs_ident(attr) + "()"
@@ -1731,7 +1740,7 @@ def _emit_attribute(ctx: RsEmitContext, node: dict[str, JsonVal]) -> str:
             or attr_rs.startswith("Rc<RefCell<")
         ):
             return obj + "." + safe_rs_ident(attr) + ".clone()"
-    if any(t in ('Path', 'PyPath', 'pathlib.Path', 'pytra.std.pathlib.Path') or t.endswith('.Path') for t in path_like_types if t != ""):
+    if any(_is_path_type_name(ctx, t) for t in path_like_types if t != ""):
         if attr == "parent":
             return obj + ".parent()"
         if attr in ("name", "stem", "suffix"):
@@ -3138,8 +3147,8 @@ def _emit_method_call(
     # Generic method call
     all_args_str = ", ".join(rendered_args)
 
-    path_like_types = {obj_type, obj_actual_type, rs_type(obj_type), rs_type(obj_actual_type)}
-    if any(t == "PyPath" for t in path_like_types if t != ""):
+    path_like_types = {obj_type, obj_actual_type, _resolved_type_in_context(ctx, obj)}
+    if any(_is_path_type_name(ctx, t) for t in path_like_types if t != ""):
         if method == "glob" and len(rendered_args) == 1:
             return obj_str + ".glob(" + rendered_args[0] + ")"
         if method == "read_text":
