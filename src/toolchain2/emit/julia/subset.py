@@ -56,6 +56,7 @@ _IMPORTFROM_MODULES: dict[str, set[str] | None] = {
     "pytra.utils.assertions": {"py_assert_stdout", "py_assert_eq", "py_assert_all", "py_assert_true"},
     "pytra.utils.png": None,
     "pytra.std.collections": {"deque"},
+    "pytra.std.math": {"fabs", "floor", "sqrt"},
     "math": {"floor", "sqrt"},
     "time": {"perf_counter"},
 }
@@ -226,6 +227,10 @@ def _ident(name: str) -> str:
     return name
 
 
+def _import_supported(names: list[JsonVal]) -> bool:
+    return all(isinstance(item, dict) and _str(item, "name") == "math" for item in names)
+
+
 def _expr_supported(node: JsonVal) -> bool:
     if not isinstance(node, dict):
         return False
@@ -283,7 +288,9 @@ def _expr_supported(node: JsonVal) -> bool:
                 "appendleft",
                 "clear",
                 "endswith",
+                "fabs",
                 "find",
+                "floor",
                 "get",
                 "index",
                 "isalnum",
@@ -298,6 +305,7 @@ def _expr_supported(node: JsonVal) -> bool:
                 "setdefault",
                 "split",
                 "sort",
+                "sqrt",
                 "startswith",
                 "strip",
             }
@@ -320,6 +328,8 @@ def _stmt_supported(node: JsonVal) -> bool:
     if not isinstance(node, dict):
         return False
     kind = _str(node, "kind")
+    if kind == "Import":
+        return _import_supported(_list(node, "names"))
     if kind == "ImportFrom":
         module_name = _str(node, "module")
         names = _list(node, "names")
@@ -676,6 +686,21 @@ class JuliaSubsetRenderer:
         if not isinstance(node, dict):
             raise RuntimeError("julia subset: stmt must be dict")
         kind = _str(node, "kind")
+        if kind == "Import":
+            for item in _list(node, "names"):
+                if not isinstance(item, dict):
+                    continue
+                source_name = _str(item, "name")
+                bound_name = _ident(_str(item, "asname") or source_name)
+                if source_name == "math":
+                    self._emit('include(joinpath(@__DIR__, "std", "math_native.jl"))')
+                    self._emit(
+                        bound_name
+                        + " = (ceil=__MathNative.ceil, cos=__MathNative.cos, e=__MathNative.e, exp=__MathNative.exp, "
+                        + "fabs=__MathNative.fabs, floor=__MathNative.floor, log=__MathNative.log, log10=__MathNative.log10, "
+                        + "pi=__MathNative.pi, pow=__MathNative.pow, sin=__MathNative.sin, sqrt=__MathNative.sqrt, tan=__MathNative.tan)"
+                    )
+            return
         if kind == "ImportFrom":
             module_name = _str(node, "module")
             names = _list(node, "names")
@@ -706,6 +731,15 @@ class JuliaSubsetRenderer:
                         self._emit(bound_name + " = __pytra_deque")
                 return
             if module_name == "math":
+                self._emit('include(joinpath(@__DIR__, "std", "math_native.jl"))')
+                for item in names:
+                    if not isinstance(item, dict):
+                        continue
+                    source_name = _str(item, "name")
+                    bound_name = _ident(_str(item, "asname") or source_name)
+                    self._emit(bound_name + " = __MathNative." + source_name)
+                return
+            if module_name == "pytra.std.math":
                 self._emit('include(joinpath(@__DIR__, "std", "math_native.jl"))')
                 for item in names:
                     if not isinstance(item, dict):

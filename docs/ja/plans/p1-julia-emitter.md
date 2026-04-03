@@ -55,3 +55,4 @@
 - 2026-04-03: [ID: P1-JULIA-EMITTER-S1] subset native renderer に `str` method 群、list mutation、`JoinedStr` / `FormattedValue` を追加し、単純 string/list fixture も native path へ寄せた。
 - 2026-04-03: [ID: P1-JULIA-EMITTER-S1] subset native renderer に `pytra.std.collections.deque` import と deque/dict mutation を追加し、単純 collections fixture も native path へ広げた。
 - 2026-04-03: [ID: P1-JULIA-EMITTER-S1] subset native renderer に `str` extended method 群（`lower/find/index/isalnum/lstrip/split`）を追加し、追加の string fixture も native path へ寄せた。
+- 2026-04-03: [ID: P1-JULIA-EMITTER-S1] subset native renderer に `Import(math)` と `ImportFrom(pytra.std.math)` を追加し、math module / symbol import fixture も native path に寄せた。
