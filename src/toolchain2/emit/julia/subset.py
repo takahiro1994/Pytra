@@ -768,6 +768,40 @@ class JuliaSubsetRenderer:
             return "replace(" + owner + ", " + args[0] + " => " + args[1] + ")"
         return ""
 
+    def _render_attribute_call(
+        self,
+        node: dict[str, JsonVal],
+        owner_node: JsonVal,
+        owner: str,
+        owner_type: str,
+        owner_name: str,
+        attr: str,
+        args: list[str],
+        keywords: list[dict[str, JsonVal]],
+    ) -> str:
+        if (
+            isinstance(owner_node, dict)
+            and _str(owner_node, "kind") == "Call"
+            and isinstance(owner_node.get("func"), dict)
+            and _str(owner_node.get("func"), "kind") == "Name"
+            and _str(owner_node.get("func"), "id") == "super"
+        ):
+            super_call = self._render_super_method_call(owner_type, attr, args)
+            if super_call != "":
+                return super_call
+        mapped_method = self._render_mapped_method_call(node, owner, args)
+        if mapped_method != "":
+            return mapped_method
+        collection_method = self._render_collection_method_call(owner, owner_type, attr, args)
+        if collection_method != "":
+            return collection_method
+        string_method = self._render_string_base_call(owner, attr, args)
+        if string_method != "":
+            return string_method
+        if attr == "makedirs" and len(args) == 1 and len(keywords) == 1 and keywords[0].get("arg") == "exist_ok":
+            return owner + ".makedirs(" + args[0] + ", " + self._render_expr(keywords[0].get("value")) + ")"
+        return self._render_class_dispatch_call(owner, owner_type, owner_name, attr, args, keywords)
+
     def _next_tmp(self, prefix: str) -> str:
         self.tmp_counter += 1
         return prefix + str(self.tmp_counter)
@@ -966,30 +1000,9 @@ class JuliaSubsetRenderer:
                 owner_name = _str(owner_node, "id") if isinstance(owner_node, dict) else ""
                 args = [self._render_expr(arg) for arg in _list(node, "args")]
                 keywords = [item for item in _list(node, "keywords") if isinstance(item, dict)]
-                if (
-                    isinstance(owner_node, dict)
-                    and _str(owner_node, "kind") == "Call"
-                    and isinstance(owner_node.get("func"), dict)
-                    and _str(owner_node.get("func"), "kind") == "Name"
-                    and _str(owner_node.get("func"), "id") == "super"
-                ):
-                    super_call = self._render_super_method_call(owner_type, attr, args)
-                    if super_call != "":
-                        return super_call
-                mapped_method = self._render_mapped_method_call(node, owner, args)
-                if mapped_method != "":
-                    return mapped_method
-                collection_method = self._render_collection_method_call(owner, owner_type, attr, args)
-                if collection_method != "":
-                    return collection_method
-                string_method = self._render_string_base_call(owner, attr, args)
-                if string_method != "":
-                    return string_method
-                if attr == "makedirs" and len(args) == 1 and len(keywords) == 1 and keywords[0].get("arg") == "exist_ok":
-                    return owner + ".makedirs(" + args[0] + ", " + self._render_expr(keywords[0].get("value")) + ")"
-                class_call = self._render_class_dispatch_call(owner, owner_type, owner_name, attr, args, keywords)
-                if class_call != "":
-                    return class_call
+                attr_call = self._render_attribute_call(node, owner_node, owner, owner_type, owner_name, attr, args, keywords)
+                if attr_call != "":
+                    return attr_call
             func = self._render_expr(func_node)
             args = [self._render_expr(arg) for arg in _list(node, "args")]
             runtime_call = _str(node, "resolved_runtime_call")
