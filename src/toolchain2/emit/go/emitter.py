@@ -2342,6 +2342,8 @@ def _emit_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
                     arg0_code = adjusted_args2[0] if len(adjusted_args2) >= 1 else ""
                     if not _is_wrapper_container_expr(ctx, arg0, arg0_code):
                         adjusted_args2[0] = _wrap_ref_container_value_code(ctx, arg0_code, "list[str]")
+                if len(adjusted_args2) >= 2:
+                    adjusted_args2[1] = "func() { py_call_void(" + adjusted_args2[1] + ") }"
                 return "py_assert_stdout(" + ", ".join(adjusted_args2) + ")"
             if fn_name in ctx.builtin_exc_bounds:
                 if len(call_arg_strs) >= 1:

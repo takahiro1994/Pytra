@@ -444,6 +444,19 @@ func py_setdefault[K comparable, V any](d *PyDict[K, V], key K, defaultValue V) 
 	return defaultValue
 }
 
+func py_call_void(fn any) {
+	switch f := fn.(type) {
+	case func():
+		f()
+	case func() *PytraErrorCarrier:
+		if err := f(); err != nil {
+			panic(err)
+		}
+	default:
+		panic("py_call_void: unsupported callable")
+	}
+}
+
 func py_abs(v int64) int64 {
 	if v < 0 {
 		return -v
