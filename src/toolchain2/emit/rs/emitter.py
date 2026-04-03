@@ -109,6 +109,8 @@ class RsEmitContext:
     known_method_signatures: dict[tuple[str, str], dict[str, JsonVal]] = field(default_factory=dict)
     imported_symbol_storage_hints: dict[str, str] = field(default_factory=dict)
     imported_class_fields: dict[str, dict[str, str]] = field(default_factory=dict)
+    imported_symbol_names: set[str] = field(default_factory=set)
+    type_only_imported_symbols: set[str] = field(default_factory=set)
     # Name of variable holding the caught exception message inside a catch handler (for bare raise)
     catch_err_msg_var: str = ""
     # During constructor lowering, self.field accesses are redirected to mutable locals.
@@ -175,12 +177,13 @@ def _dict(node: JsonVal, key: str) -> dict[str, JsonVal]:
     return {}
 
 
-def _iter_import_runtime_ids(meta: dict[str, JsonVal]) -> list[tuple[str, str]]:
+def _iter_import_runtime_ids(meta: dict[str, JsonVal], type_only_symbols: set[str] | None = None) -> list[tuple[str, str]]:
     """Collect (resolved_binding_kind, runtime_module_id) pairs from import bindings."""
     out: list[tuple[str, str]] = []
     bindings = meta.get("import_bindings")
     if not isinstance(bindings, list):
         return out
+    skip_symbols = type_only_symbols if isinstance(type_only_symbols, set) else set()
     seen: set[str] = set()
     for binding in bindings:
         if not isinstance(binding, dict):
@@ -194,8 +197,18 @@ def _iter_import_runtime_ids(meta: dict[str, JsonVal]) -> list[tuple[str, str]]:
         mod_id = runtime_module_id if isinstance(runtime_module_id, str) and runtime_module_id != "" else module_id
         local_name = binding.get("local_name")
         imported_name = binding.get("imported_name")
+        export_name = binding.get("export_name")
         runtime_symbol = binding.get("runtime_symbol")
         runtime_symbol_kind = binding.get("runtime_symbol_kind")
+        if (
+            resolved_kind == "symbol"
+            and (
+                (isinstance(local_name, str) and local_name in skip_symbols)
+                or (isinstance(imported_name, str) and imported_name in skip_symbols)
+                or (isinstance(export_name, str) and export_name in skip_symbols)
+            )
+        ):
+            continue
         if (
             isinstance(mod_id, str)
             and resolved_kind == "symbol"
@@ -259,6 +272,60 @@ def _build_import_class_fields(meta: dict[str, JsonVal]) -> dict[str, dict[str, 
         if len(typed_fields) > 0:
             out[local_name] = typed_fields
     return out
+
+
+def _build_imported_symbol_names(meta: dict[str, JsonVal]) -> set[str]:
+    out: set[str] = set()
+    bindings = meta.get("import_bindings")
+    if not isinstance(bindings, list):
+        return out
+    for binding in bindings:
+        if not isinstance(binding, dict):
+            continue
+        if binding.get("binding_kind") != "symbol":
+            continue
+        local_name = binding.get("local_name")
+        if isinstance(local_name, str) and local_name != "":
+            out.add(local_name)
+    return out
+
+
+def _collect_value_name_refs(nodes: list[JsonVal]) -> set[str]:
+    refs: set[str] = set()
+
+    def visit(node: JsonVal) -> None:
+        if isinstance(node, list):
+            for item in node:
+                visit(item)
+            return
+        if not isinstance(node, dict):
+            return
+        kind = _str(node, "kind")
+        if kind == "Name":
+            name = _str(node, "id")
+            if name != "":
+                refs.add(name)
+            return
+        if kind == "NamedType":
+            return
+        for value in node.values():
+            visit(value)
+
+    visit(nodes)
+    return refs
+
+
+def _build_type_only_imported_symbols(
+    meta: dict[str, JsonVal],
+    body: list[JsonVal],
+    main_guard: list[JsonVal],
+) -> set[str]:
+    imported = _build_imported_symbol_names(meta)
+    if len(imported) == 0:
+        return set()
+    value_refs = _collect_value_name_refs(body)
+    value_refs.update(_collect_value_name_refs(main_guard))
+    return {name for name in imported if name not in value_refs}
 
 
 def _call_signature(node: dict[str, JsonVal], fallback: dict[str, JsonVal] | None = None) -> dict[str, JsonVal] | None:
@@ -646,6 +713,7 @@ def _collect_signature_type_params(
     excluded.update(ctx.ref_classes)
     excluded.update(ctx.enum_bases)
     excluded.update(ctx.imported_symbol_storage_hints.keys())
+    excluded.update(ctx.type_only_imported_symbols)
 
     def visit(type_name: str) -> None:
         for match in re.finditer(r"\b[A-Z][A-Za-z0-9_]*\b", type_name):
@@ -7037,6 +7105,8 @@ def emit_rs_module(east3_doc: dict[str, JsonVal], *, package_mode: bool = False)
     ctx.runtime_imports = build_runtime_import_map(meta, mapping)
     ctx.imported_symbol_storage_hints = _build_import_symbol_storage_hints(meta)
     ctx.imported_class_fields = _build_import_class_fields(meta)
+    ctx.imported_symbol_names = _build_imported_symbol_names(meta)
+    ctx.type_only_imported_symbols = _build_type_only_imported_symbols(meta, body, main_guard)
     ctx.known_method_signatures = {
         (_ARGPARSE_CLASS, 'add_argument'): _ARGPARSE_ADD_ARGUMENT_SIG,
         (_ARGPARSE_FQCN, 'add_argument'): _ARGPARSE_ADD_ARGUMENT_SIG,
@@ -7101,7 +7171,7 @@ def emit_rs_module(east3_doc: dict[str, JsonVal], *, package_mode: bool = False)
             inc = "include!(\"" + dep_mod_id.replace(".", "_") + ".rs\");"
             if inc not in lines:
                 lines.append(inc)
-        for resolved_kind, mod_id in _iter_import_runtime_ids(meta):
+        for resolved_kind, mod_id in _iter_import_runtime_ids(meta, ctx.type_only_imported_symbols):
             if mod_id == "" or mod_id == ctx.module_id:
                 continue
             canonical_mod_id = mod_id
