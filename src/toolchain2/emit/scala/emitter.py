@@ -77,6 +77,11 @@ class ScalaRenderer(CommonRenderer):
         if kind == "Attribute":
             self._emit(self._emit_expr(target) + " = " + value_code)
             return
+        if kind == "Subscript":
+            owner = target.get("value")
+            index = target.get("slice")
+            self._emit("__pytra_set_index(" + self._emit_expr(owner) + ", " + self._emit_expr(index) + ", " + value_code + ")")
+            return
         raise RuntimeError("scala emitter: unsupported store target: " + kind)
 
     def _emit_boolop_value_expr(self, values: list[JsonVal], is_and: bool) -> str:
@@ -204,8 +209,8 @@ class ScalaRenderer(CommonRenderer):
             target = node.get("target")
             decl_type = self._str(node, "decl_type")
             value = self._emit_expr(node.get("value"))
-            if isinstance(target, dict) and self._str(target, "kind") == "Attribute":
-                self._emit(self._emit_expr(target) + " = " + value)
+            if isinstance(target, dict) and self._str(target, "kind") in ("Attribute", "Subscript"):
+                self._emit_store_target(target, value)
                 return
             target_name = _safe_scala_ident(self._str(target, "id"))
             self._emit("var " + target_name + ": " + scala_type(decl_type) + " = " + value)
@@ -213,8 +218,8 @@ class ScalaRenderer(CommonRenderer):
         if kind == "Assign":
             target = node.get("target")
             value = self._emit_expr(node.get("value"))
-            if isinstance(target, dict) and self._str(target, "kind") == "Attribute":
-                self._emit(self._emit_expr(target) + " = " + value)
+            if isinstance(target, dict) and self._str(target, "kind") in ("Attribute", "Subscript"):
+                self._emit_store_target(target, value)
                 return
             target_name = _safe_scala_ident(self._str(target, "id"))
             self._emit("var " + target_name + " = " + value)
