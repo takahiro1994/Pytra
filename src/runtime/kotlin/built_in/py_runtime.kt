@@ -3,6 +3,8 @@ import kotlin.math.*
 import java.io.File
 import java.nio.file.Paths
 
+class PyTuple(items: Collection<Any?> = emptyList()) : ArrayList<Any?>(items)
+
 fun __pytra_noop(vararg args: Any?) { }
 
 fun __pytra_any_default(): Any? {
@@ -51,10 +53,33 @@ fun __pytra_float(v: Any?): Double {
     return 0.0
 }
 
-fun __pytra_str(v: Any?): String {
+private fun __pytra_repr(v: Any?): String {
     if (v == null) return "None"
     if (v is Boolean) return if (v) "True" else "False"
+    if (v is String) return "'" + v.replace("\\", "\\\\").replace("'", "\\'") + "'"
+    if (v is PyTuple) {
+        val inner = v.joinToString(", ") { __pytra_repr(it) }
+        return if (v.size == 1) "(" + inner + ",)" else "(" + inner + ")"
+    }
+    if (v is List<*>) {
+        return "[" + v.joinToString(", ") { __pytra_repr(it) } + "]"
+    }
+    if (v is Map<*, *>) {
+        return "{" + v.entries.joinToString(", ") { __pytra_repr(it.key) + ": " + __pytra_repr(it.value) } + "}"
+    }
+    if (v is Set<*>) {
+        return "{" + v.joinToString(", ") { __pytra_repr(it) } + "}"
+    }
     return v.toString()
+}
+
+fun __pytra_str(v: Any?): String {
+    if (v is String) return v
+    return __pytra_repr(v)
+}
+
+fun __pytra_tuple(vararg items: Any?): PyTuple {
+    return PyTuple(items.toList())
 }
 
 fun __pytra_join(sep: Any?, items: Any?): String {
@@ -408,6 +433,7 @@ fun __pytra_type_name(v: Any?): String {
     if (v is Long || v is Int) return "int"
     if (v is Double || v is Float) return "float"
     if (v is String) return "str"
+    if (v is PyTuple) return "tuple"
     if (v is MutableMap<*, *> || v is Map<*, *>) return "dict"
     if (v is MutableSet<*> || v is Set<*>) return "set"
     if (v is MutableList<*> || v is List<*>) return "list"

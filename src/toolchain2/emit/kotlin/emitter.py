@@ -715,12 +715,26 @@ class KotlinRenderer(CommonRenderer):
             return owner + "[(" + index + ").toInt()]"
         if kind == "List":
             elems = [self._emit_expr(elem) for elem in self._list(node, "elements")]
+            if len(elems) == 0:
+                resolved_type = self._str(node, "resolved_type")
+                list_type = self._render_type(resolved_type)
+                if list_type.startswith("MutableList<") and list_type.endswith(">"):
+                    inner = list_type[len("MutableList<"):-1]
+                    return "mutableListOf<" + inner + ">()"
             return "mutableListOf(" + ", ".join(elems) + ")"
         if kind == "Tuple":
             elems = [self._emit_expr(elem) for elem in self._list(node, "elements")]
-            return "mutableListOf(" + ", ".join(elems) + ")"
+            if len(elems) == 0:
+                return "__pytra_tuple()"
+            return "__pytra_tuple(" + ", ".join(elems) + ")"
         if kind == "Set":
             elems = [self._emit_expr(elem) for elem in self._list(node, "elements")]
+            if len(elems) == 0:
+                resolved_type = self._str(node, "resolved_type")
+                set_type = self._render_type(resolved_type)
+                if set_type.startswith("MutableSet<") and set_type.endswith(">"):
+                    inner = set_type[len("MutableSet<"):-1]
+                    return "linkedSetOf<" + inner + ">()"
             return "linkedSetOf(" + ", ".join(elems) + ")"
         if kind == "ListComp":
             elt_code = self._emit_expr(node.get("elt"))
@@ -833,11 +847,7 @@ class KotlinRenderer(CommonRenderer):
                     first_arg = self._emit_expr(arg_nodes[0]) if len(arg_nodes) > 0 else "\"error\""
                     return "RuntimeException(" + first_arg + ".toString())"
                 if dynamic_dict_owner and attr == "get" and len(arg_nodes) == 1:
-                    expr = "__pytra_as_dict(" + owner_expr + ").get(" + self._emit_expr(arg_nodes[0]) + ")"
-                    result_type = self._str(node, "resolved_type")
-                    if result_type not in ("", "unknown", "Any", "object", "Obj"):
-                        return "(" + expr + " as " + self._render_type(result_type) + ")"
-                    return expr
+                    return "__pytra_as_dict(" + owner_expr + ").get(" + self._emit_expr(arg_nodes[0]) + ")"
                 if dynamic_dict_owner and attr == "get" and len(arg_nodes) == 2:
                     default_expr = self._emit_expr(arg_nodes[1])
                     result_type = self._str(node, "resolved_type")
@@ -863,11 +873,7 @@ class KotlinRenderer(CommonRenderer):
                     if attr == "strip" and len(arg_nodes) == 0:
                         return owner_expr + ".trim()"
                 if owner_type.startswith("dict[") and attr == "get" and len(arg_nodes) == 1:
-                    expr = "__pytra_as_dict(" + owner_expr + ").get(" + self._emit_expr(arg_nodes[0]) + ")"
-                    result_type = self._str(node, "resolved_type")
-                    if result_type not in ("", "unknown", "Any", "object", "Obj"):
-                        return "(" + expr + " as " + self._render_type(result_type) + ")"
-                    return expr
+                    return "__pytra_as_dict(" + owner_expr + ").get(" + self._emit_expr(arg_nodes[0]) + ")"
                 if owner_type.startswith("dict[") and attr == "get" and len(arg_nodes) == 2:
                     default_expr = self._emit_expr(arg_nodes[1])
                     result_type = self._str(node, "resolved_type")
