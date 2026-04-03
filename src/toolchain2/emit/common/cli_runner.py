@@ -24,6 +24,7 @@ from pytra.std.pathlib import Path
 
 
 EmitFn = typing.Callable[[dict[str, JsonVal]], str]
+DirectEmitFn = typing.Callable[[dict[str, JsonVal], Path], int]
 
 
 def _parse_args(argv: list[str]) -> tuple[str, str, str]:
@@ -106,30 +107,41 @@ PostEmitFn = typing.Callable[[Path], None]
 
 
 def run_emit_cli(
-    emit_fn: EmitFn,
-    argv: list[str],
+    emit_fn: EmitFn | None = None,
+    argv: list[str] | None = None,
     *,
     default_ext: str = "",
     post_emit: PostEmitFn | None = None,
+    direct_emit_fn: DirectEmitFn | None = None,
 ) -> int:
     """Run the emit CLI with the given language-specific emit function.
 
     Args:
         emit_fn: Language-specific emit function (east_doc -> code string).
+                 Mutually exclusive with direct_emit_fn.
         argv: Command-line arguments (excluding program name).
         post_emit: Optional callback called after all modules are emitted,
                    receives output_dir. Use for runtime file copying etc.
+        direct_emit_fn: Alternative emit function that writes files directly
+                        (east_doc, output_dir -> written_count). Used by C++ etc.
+                        When set, emit_fn and default_ext are ignored.
         default_ext: Default file extension (e.g. ".rs", ".go"). If empty,
                      must be provided via --ext.
     Returns:
         Exit code (0 on success).
     """
+    if argv is None:
+        argv = []
     input_text, output_dir_text, file_ext = _parse_args(argv)
 
-    if file_ext == "":
-        file_ext = default_ext
-    if file_ext == "":
-        raise RuntimeError("file extension must be specified via --ext or default_ext")
+    use_direct = direct_emit_fn is not None
+    if not use_direct:
+        if emit_fn is None:
+            raise RuntimeError("either emit_fn or direct_emit_fn must be provided")
+        if file_ext == "":
+            file_ext = default_ext
+        if file_ext == "":
+            raise RuntimeError("file extension must be specified via --ext or default_ext")
 
     if input_text == "":
         print("error: manifest.json path or directory is required")
@@ -149,22 +161,26 @@ def run_emit_cli(
 
     modules: list[dict[str, JsonVal]] = _load_linked_modules(manifest_path)
     written: int = 0
-    for east_doc in modules:
-        code: str = emit_fn(east_doc)
-        if code.strip() == "":
-            continue
-        # Determine output filename from module_id in meta
-        meta: JsonVal = east_doc.get("meta")
-        module_id: str = ""
-        if isinstance(meta, dict):
-            mid: JsonVal = meta.get("_cli_module_id")
-            if isinstance(mid, str):
-                module_id = mid
-        if module_id == "":
-            module_id = "module_" + str(written)
-        out_name: str = module_id.replace(".", "_") + file_ext
-        output_dir.joinpath(out_name).write_text(code, encoding="utf-8")
-        written += 1
+
+    if use_direct and direct_emit_fn is not None:
+        for east_doc in modules:
+            written += direct_emit_fn(east_doc, output_dir)
+    elif emit_fn is not None:
+        for east_doc in modules:
+            code: str = emit_fn(east_doc)
+            if code.strip() == "":
+                continue
+            meta: JsonVal = east_doc.get("meta")
+            module_id: str = ""
+            if isinstance(meta, dict):
+                mid: JsonVal = meta.get("_cli_module_id")
+                if isinstance(mid, str):
+                    module_id = mid
+            if module_id == "":
+                module_id = "module_" + str(written)
+            out_name: str = module_id.replace(".", "_") + file_ext
+            output_dir.joinpath(out_name).write_text(code, encoding="utf-8")
+            written += 1
 
     if post_emit is not None:
         post_emit(output_dir)
