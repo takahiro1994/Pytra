@@ -72,15 +72,15 @@ def min(*args: T) -> T: ...
 def max(*args: T) -> T: ...
 
 @template("T")
-@runtime("pytra.built_in.iter_ops", symbol="py_sorted", tag="iter.sorted")
+@runtime("pytra.core.py_runtime", symbol="py_sorted", tag="iter.sorted")
 def sorted(x: list[T]) -> list[T]: ...
 
 @template("T")
-@runtime("pytra.built_in.iter_ops", symbol="py_reversed_object", tag="iter.reversed")
+@runtime("pytra.core.py_runtime", symbol="py_reversed_object", tag="iter.reversed")
 def reversed(x: list[T]) -> list[T]: ...
 
 @template("T")
-@runtime("pytra.built_in.iter_ops", symbol="py_enumerate_object", tag="iter.enumerate")
+@runtime("pytra.core.py_runtime", symbol="py_enumerate_object", tag="iter.enumerate")
 def enumerate(x: list[T], start: int = 0) -> list[tuple[int, T]]: ...
 
 @template("T", "U")

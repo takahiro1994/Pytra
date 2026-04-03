@@ -48,8 +48,6 @@
     "py_assert_true": "PyRuntime.pyAssertTrue",
     "py_assert_eq": "PyRuntime.pyAssertEq",
     "py_assert_all": "PyRuntime.pyAssertAll",
-    "py_enumerate_object": "PyRuntime.pyEnumerate",
-    "py_reversed_object": "PyRuntime.pyReversed",
     "write_rgb_png": "PyRuntime.pyWriteRgbPng",
     "sum": "PyRuntime.pySum",
     "zip": "PyRuntime.pyZip",

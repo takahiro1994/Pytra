@@ -1611,7 +1611,97 @@ def _try_lower_enum_forcore(stmt: Node, ctx: CompileContext) -> JsonVal:
                             continue
         remaining.append(s)
     if idx_name == "" or val_name == "":
-        return None
+        # Non-destructured case: for pair in enumerate(xs, start)
+        # target_plan has a non-tuple id (e.g. "pair") with type tuple[int64, T]
+        pair_name: str = jv_str(tp_node.get("id", ""))
+        pair_type: str = jv_str(tp_node.get("target_type", ""))
+        if pair_name == "" or not pair_type.startswith("tuple["):
+            return None
+        # Extract element type T from tuple[int64, T]
+        inner_types = _split_comma_types(pair_type[6:-1])
+        elem_type = inner_types[1] if len(inner_types) >= 2 else "object"
+        if elem_type in ("", "object", "Any", "unknown"):
+            return None
+        counter_nd = ctx.next_enum_name()
+        elem_var = ctx.next_enum_name()
+        # init: counter_nd = start_val
+        nd_init_target: Node = {}
+        nd_init_target["kind"] = NAME
+        nd_init_target["id"] = counter_nd
+        nd_init_target["resolved_type"] = "int64"
+        nd_init_value: Node = {}
+        nd_init_value["kind"] = CONSTANT
+        nd_init_value["value"] = start_val
+        nd_init_value["resolved_type"] = "int64"
+        nd_init: Node = {}
+        nd_init["kind"] = ASSIGN
+        nd_init["target"] = nd_init_target
+        nd_init["value"] = nd_init_value
+        nd_init["decl_type"] = "int64"
+        nd_init["declare"] = True
+        # iter over xs with new loop variable elem_var
+        nd_nip: Node = {}
+        nd_nip["kind"] = RUNTIME_ITER_FOR_PLAN
+        nd_nip["iter_expr"] = deep_copy_json(iterable)
+        nd_nip["dispatch_mode"] = ip_node.get("dispatch_mode", "native")
+        nd_nip["init_op"] = "ObjIterInit"
+        nd_nip["next_op"] = "ObjIterNext"
+        nd_ntp: Node = {}
+        nd_ntp["kind"] = NAME_TARGET
+        nd_ntp["id"] = elem_var
+        nd_ntp["target_type"] = elem_type
+        # pair = (counter_nd, elem_var)
+        nd_ctr_name: Node = {}
+        nd_ctr_name["kind"] = NAME
+        nd_ctr_name["id"] = counter_nd
+        nd_ctr_name["resolved_type"] = "int64"
+        nd_elem_name: Node = {}
+        nd_elem_name["kind"] = NAME
+        nd_elem_name["id"] = elem_var
+        nd_elem_name["resolved_type"] = elem_type
+        nd_tuple: Node = {}
+        nd_tuple["kind"] = TUPLE
+        nd_tuple["resolved_type"] = pair_type
+        nd_tuple["elements"] = [nd_ctr_name, nd_elem_name]
+        nd_pair_target: Node = {}
+        nd_pair_target["kind"] = NAME
+        nd_pair_target["id"] = pair_name
+        nd_pair_target["resolved_type"] = pair_type
+        nd_pair_assign: Node = {}
+        nd_pair_assign["kind"] = ASSIGN
+        nd_pair_assign["target"] = nd_pair_target
+        nd_pair_assign["value"] = nd_tuple
+        nd_pair_assign["decl_type"] = pair_type
+        nd_pair_assign["declare"] = True
+        nd_increment_target: Node = {}
+        nd_increment_target["kind"] = NAME
+        nd_increment_target["id"] = counter_nd
+        nd_increment_target["resolved_type"] = "int64"
+        nd_increment_value: Node = {}
+        nd_increment_value["kind"] = CONSTANT
+        nd_increment_value["value"] = 1
+        nd_increment_value["resolved_type"] = "int64"
+        nd_increment: Node = {}
+        nd_increment["kind"] = AUG_ASSIGN
+        nd_increment["target"] = nd_increment_target
+        nd_increment["op"] = "Add"
+        nd_increment["value"] = nd_increment_value
+        nd_nb: list[JsonVal] = []
+        nd_nb.append(nd_pair_assign)
+        for item in body_list:
+            nd_nb.append(item)
+        nd_nb.append(nd_increment)
+        nd_nf: Node = {}
+        nd_nf["kind"] = FOR_CORE
+        nd_nf["iter_mode"] = stmt.get("iter_mode", "runtime_protocol")
+        nd_nf["iter_plan"] = nd_nip
+        nd_nf["target_plan"] = nd_ntp
+        nd_nf["body"] = nd_nb
+        nd_nf["orelse"] = stmt.get("orelse", [])
+        nd_out: list[JsonVal] = []
+        nd_out.append(nd_init)
+        nd_out.append(nd_nf)
+        return nd_out
     counter = ctx.next_enum_name()
     init_target: Node = {}
     init_target["kind"] = NAME
@@ -1716,6 +1806,172 @@ def lower_enumerate(module: Node, ctx: CompileContext) -> Node:
     if isinstance(body, list):
         body_list: list[JsonVal] = cast(list[JsonVal], body)
         module["body"] = _enum_in_stmts(body_list, ctx)
+    return module
+
+
+# ===========================================================================
+# reversed lowering
+# ===========================================================================
+
+def _try_lower_reversed_forcore(stmt: Node, ctx: CompileContext) -> JsonVal:
+    ip = stmt.get("iter_plan")
+    if not isinstance(ip, dict):
+        return None
+    ip_node: Node = cast(dict[str, JsonVal], ip)
+    if ip_node.get("kind") != RUNTIME_ITER_FOR_PLAN:
+        return None
+    ie = ip_node.get("iter_expr")
+    if not isinstance(ie, dict):
+        return None
+    ie_node: Node = cast(dict[str, JsonVal], ie)
+    st: str = jv_str(ie_node.get("semantic_tag", ""))
+    is_rev = st == "iter.reversed"
+    if not is_rev:
+        func = ie_node.get("func")
+        if isinstance(func, dict):
+            func_node: Node = cast(dict[str, JsonVal], func)
+            is_rev = func_node.get("id") == "reversed" or func_node.get("attr") == "reversed"
+    if not is_rev:
+        return None
+    args = ie_node.get("args", [])
+    if not isinstance(args, list):
+        return None
+    args_list: list[JsonVal] = cast(list[JsonVal], args)
+    if len(args_list) < 1:
+        return None
+    xs = args_list[0]
+    if not isinstance(xs, dict):
+        return None
+    xs_node: Node = cast(dict[str, JsonVal], xs)
+    xs_type: str = jv_str(xs_node.get("resolved_type", ""))
+    if xs_type in ("", "object", "Any", "unknown"):
+        return None
+    tp = stmt.get("target_plan", {})
+    if not isinstance(tp, dict):
+        return None
+    tp_node: Node = cast(dict[str, JsonVal], tp)
+    v_name: str = jv_str(tp_node.get("id", ""))
+    v_type: str = jv_str(tp_node.get("target_type", ""))
+    if v_name == "" or v_type in ("", "object", "Any", "unknown"):
+        return None
+    body = stmt.get("body", [])
+    if not isinstance(body, list):
+        return None
+    body_list: list[JsonVal] = cast(list[JsonVal], body)
+    counter: str = ctx.next_enum_name()
+    # Build len(xs) call
+    len_func: Node = {}
+    len_func["kind"] = NAME
+    len_func["id"] = "len"
+    len_func["resolved_type"] = "callable"
+    len_call: Node = {}
+    len_call["kind"] = CALL
+    len_call["resolved_type"] = "int64"
+    len_call["func"] = len_func
+    len_call["args"] = [deep_copy_json(xs)]
+    len_call["keywords"] = []
+    len_call["lowered_kind"] = "BuiltinCall"
+    len_call["builtin_name"] = "len"
+    len_call["runtime_call"] = "len"
+    len_call["runtime_module_id"] = "pytra.core.py_runtime"
+    len_call["runtime_symbol"] = "len"
+    len_call["runtime_call_adapter_kind"] = "builtin"
+    len_call["semantic_tag"] = "core.len"
+    # Build len(xs) - 1
+    one: Node = {}
+    one["kind"] = CONSTANT
+    one["value"] = 1
+    one["resolved_type"] = "int64"
+    start_expr: Node = {}
+    start_expr["kind"] = BIN_OP
+    start_expr["resolved_type"] = "int64"
+    start_expr["left"] = len_call
+    start_expr["op"] = "Sub"
+    start_expr["right"] = one
+    # stop = -1, step = -1
+    stop_expr: Node = {}
+    stop_expr["kind"] = CONSTANT
+    stop_expr["value"] = -1
+    stop_expr["resolved_type"] = "int64"
+    step_expr: Node = {}
+    step_expr["kind"] = CONSTANT
+    step_expr["value"] = -1
+    step_expr["resolved_type"] = "int64"
+    # iter_plan: StaticRangeForPlan
+    iter_plan: Node = {}
+    iter_plan["kind"] = STATIC_RANGE_FOR_PLAN
+    iter_plan["start"] = start_expr
+    iter_plan["stop"] = stop_expr
+    iter_plan["step"] = step_expr
+    # target_plan: counter index
+    ntp: Node = {}
+    ntp["kind"] = NAME_TARGET
+    ntp["id"] = counter
+    ntp["target_type"] = "int64"
+    # body prepend: v: v_type = xs[counter]
+    idx_name_node: Node = {}
+    idx_name_node["kind"] = NAME
+    idx_name_node["id"] = counter
+    idx_name_node["resolved_type"] = "int64"
+    sub_node: Node = {}
+    sub_node["kind"] = SUBSCRIPT
+    sub_node["resolved_type"] = v_type
+    sub_node["value"] = deep_copy_json(xs)
+    sub_node["slice"] = idx_name_node
+    assign_target: Node = {}
+    assign_target["kind"] = NAME
+    assign_target["id"] = v_name
+    assign_target["resolved_type"] = v_type
+    elem_assign: Node = {}
+    elem_assign["kind"] = ASSIGN
+    elem_assign["target"] = assign_target
+    elem_assign["value"] = sub_node
+    elem_assign["decl_type"] = v_type
+    elem_assign["declare"] = True
+    nb: list[JsonVal] = []
+    nb.append(elem_assign)
+    for item in body_list:
+        nb.append(item)
+    nf: Node = {}
+    nf["kind"] = FOR_CORE
+    nf["iter_mode"] = "static_fastpath"
+    nf["iter_plan"] = iter_plan
+    nf["target_plan"] = ntp
+    nf["body"] = nb
+    nf["orelse"] = stmt.get("orelse", [])
+    return nf
+
+
+def _reversed_in_stmts(stmts: list[JsonVal], ctx: CompileContext) -> list[JsonVal]:
+    result: list[JsonVal] = []
+    for stmt in stmts:
+        if not isinstance(stmt, dict):
+            result.append(stmt)
+            continue
+        kind = stmt.get("kind", "")
+        if kind == FOR_CORE:
+            lowered = _try_lower_reversed_forcore(stmt, ctx)
+            if isinstance(lowered, dict):
+                lowered_node: Node = cast(dict[str, JsonVal], lowered)
+                # Recurse into the new body
+                inner = lowered_node.get("body")
+                if isinstance(inner, list):
+                    lowered_node["body"] = _reversed_in_stmts(cast(list[JsonVal], inner), ctx)
+                result.append(lowered_node)
+                continue
+        for key in ("body", "orelse"):
+            nested = stmt.get(key)
+            if isinstance(nested, list):
+                stmt[key] = _reversed_in_stmts(cast(list[JsonVal], nested), ctx)
+        result.append(stmt)
+    return result
+
+
+def lower_reversed(module: Node, ctx: CompileContext) -> Node:
+    body = module.get("body")
+    if isinstance(body, list):
+        body_list: list[JsonVal] = cast(list[JsonVal], body)
+        module["body"] = _reversed_in_stmts(body_list, ctx)
     return module
 
 
