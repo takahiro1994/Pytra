@@ -86,6 +86,10 @@ def cmd_emit(argv: list[str]) -> int:
     if target == "":
         _fatal("pytra emit: --target is required")
     src_dir = _find_src_dir()
+    if target == "julia":
+        cmd = [_python(), "-m", "toolchain2.emit.julia.cli"] + remaining
+        result = _run(cmd)
+        return result.returncode
     emit_script = src_dir + "/toolchain/emit/" + target + ".py"
     if not Path(emit_script).exists():
         _fatal("pytra emit: unknown target '" + target + "'")

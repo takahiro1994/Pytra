@@ -27,8 +27,10 @@ SUPPORTED_TARGETS: list[str] = [
     "lua",
     "ruby",
     "php",
+    "julia",
     "nim",
     "dart",
+    "zig",
 ]
 
 TARGET_EXT: dict[str, str] = {
@@ -45,8 +47,10 @@ TARGET_EXT: dict[str, str] = {
     "lua": ".lua",
     "ruby": ".rb",
     "php": ".php",
+    "julia": ".jl",
     "nim": ".nim",
     "dart": ".dart",
+    "zig": ".zig",
 }
 
 
@@ -74,8 +78,10 @@ _TARGET_PROFILES: dict[str, TargetProfile] = {
     "lua": TargetProfile(target="lua", extension=".lua", build_driver="noncpp", fixed_output_name="", allow_codegen_opt=False, runner_needs=("python", "lua")),
     "ruby": TargetProfile(target="ruby", extension=".rb", build_driver="noncpp", fixed_output_name="", allow_codegen_opt=False, runner_needs=("python", "ruby")),
     "php": TargetProfile(target="php", extension=".php", build_driver="noncpp", fixed_output_name="", allow_codegen_opt=False, runner_needs=("python", "php")),
+    "julia": TargetProfile(target="julia", extension=".jl", build_driver="noncpp", fixed_output_name="", allow_codegen_opt=False, runner_needs=("python", "julia")),
     "nim": TargetProfile(target="nim", extension=".nim", build_driver="noncpp", fixed_output_name="main.nim", allow_codegen_opt=False, runner_needs=("python", "nim")),
     "dart": TargetProfile(target="dart", extension=".dart", build_driver="noncpp", fixed_output_name="", allow_codegen_opt=False, runner_needs=("python", "dart")),
+    "zig": TargetProfile(target="zig", extension=".zig", build_driver="noncpp", fixed_output_name="", allow_codegen_opt=False, runner_needs=("python", "zig")),
 }
 
 
@@ -92,7 +98,7 @@ def list_supported_targets() -> list[str]:
 
 def list_parity_targets() -> list[str]:
     # Keep parity output order stable for existing logs and README refresh tooling.
-    return ["cpp", "rs", "cs", "js", "ruby", "lua", "php", "ts", "go", "java", "swift", "kotlin", "scala", "nim", "dart"]
+    return ["cpp", "rs", "cs", "js", "ruby", "lua", "php", "ts", "go", "java", "swift", "kotlin", "scala", "julia", "nim", "dart", "zig"]
 
 
 def validate_profile_option_compatibility(
@@ -158,6 +164,9 @@ def make_noncpp_build_plan(
         return NonCppBuildPlan(build_cmd=None, run_cmd=run_cmd)
     if target == "php":
         run_cmd = ["php", str(output_path)] if run_after_build else None
+        return NonCppBuildPlan(build_cmd=None, run_cmd=run_cmd)
+    if target == "julia":
+        run_cmd = ["julia", str(output_path)] if run_after_build else None
         return NonCppBuildPlan(build_cmd=None, run_cmd=run_cmd)
 
     if target == "rs":
@@ -281,5 +290,11 @@ def make_noncpp_build_plan(
     if target == "dart":
         run_cmd = ["dart", "run", str(output_path)] if run_after_build else None
         return NonCppBuildPlan(build_cmd=None, run_cmd=run_cmd)
+
+    if target == "zig":
+        exe_path = out_dir / f"{stem}_zig.out"
+        build_cmd = ["zig", "build-exe", str(output_path), "-O", "ReleaseFast", "-I", str(out_dir), f"-femit-bin={exe_path}"]
+        run_cmd = [str(exe_path)] if run_after_build else None
+        return NonCppBuildPlan(build_cmd=build_cmd, run_cmd=run_cmd)
 
     raise RuntimeError(unsupported_noncpp_build_target_message(target))

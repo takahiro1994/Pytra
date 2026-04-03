@@ -8,43 +8,52 @@ end
 Base.show(io::IO, e::__PytraException) = print(io, e.msg)
 Base.showerror(io::IO, e::__PytraException) = print(io, e.msg)
 
-abstract type ValueError <: PytraBuiltinException end
-mutable struct __PytraValueError <: ValueError
+abstract type PytraValueError <: PytraBuiltinException end
+mutable struct __PytraValueError <: PytraValueError
     msg
 end
 Base.show(io::IO, e::__PytraValueError) = print(io, e.msg)
 Base.showerror(io::IO, e::__PytraValueError) = print(io, e.msg)
-ValueError(msg="error") = __PytraValueError(msg)
+__pytra_value_error(msg="error") = __PytraValueError(msg)
 
-abstract type RuntimeError <: PytraBuiltinException end
-mutable struct __PytraRuntimeError <: RuntimeError
+abstract type PytraRuntimeError <: PytraBuiltinException end
+mutable struct __PytraRuntimeError <: PytraRuntimeError
     msg
 end
 Base.show(io::IO, e::__PytraRuntimeError) = print(io, e.msg)
 Base.showerror(io::IO, e::__PytraRuntimeError) = print(io, e.msg)
-RuntimeError(msg="error") = __PytraRuntimeError(msg)
+__pytra_runtime_error(msg="error") = __PytraRuntimeError(msg)
 
-abstract type TypeError <: PytraBuiltinException end
-mutable struct __PytraTypeError <: TypeError
+abstract type PytraTypeError <: PytraBuiltinException end
+mutable struct __PytraTypeError <: PytraTypeError
     msg
 end
 Base.show(io::IO, e::__PytraTypeError) = print(io, e.msg)
 Base.showerror(io::IO, e::__PytraTypeError) = print(io, e.msg)
-TypeError(msg="error") = __PytraTypeError(msg)
+__pytra_type_error(msg="error") = __PytraTypeError(msg)
 
-abstract type AssertionError <: PytraBuiltinException end
-mutable struct __PytraAssertionError <: AssertionError
+abstract type PytraAssertionError <: PytraBuiltinException end
+mutable struct __PytraAssertionError <: PytraAssertionError
     msg
 end
 Base.show(io::IO, e::__PytraAssertionError) = print(io, e.msg)
 Base.showerror(io::IO, e::__PytraAssertionError) = print(io, e.msg)
-AssertionError(msg="error") = __PytraAssertionError(msg)
+__pytra_assertion_error(msg="error") = __PytraAssertionError(msg)
+
+abstract type PytraIndexError <: PytraBuiltinException end
+mutable struct __PytraIndexError <: PytraIndexError
+    msg
+end
+Base.show(io::IO, e::__PytraIndexError) = print(io, e.msg)
+Base.showerror(io::IO, e::__PytraIndexError) = print(io, e.msg)
+__pytra_index_error(msg="error") = __PytraIndexError(msg)
 
 __pytra_exception_message(v::__PytraException) = string(v.msg)
 __pytra_exception_message(v::__PytraValueError) = string(v.msg)
 __pytra_exception_message(v::__PytraRuntimeError) = string(v.msg)
 __pytra_exception_message(v::__PytraTypeError) = string(v.msg)
 __pytra_exception_message(v::__PytraAssertionError) = string(v.msg)
+__pytra_exception_message(v::__PytraIndexError) = string(v.msg)
 
 function __pytra_exception_message(v)
     return string(v)
@@ -64,11 +73,76 @@ function __pytra_print(args...)
         elseif v === nothing
             push!(parts, "None")
         else
-            push!(parts, string(v))
+            push!(parts, __pytra_str(v))
         end
     end
     println(join(parts, " "))
     return nothing
+end
+
+function __pytra_str(v)
+    if v === nothing
+        return "None"
+    end
+    if isa(v, Bool)
+        return v ? "True" : "False"
+    end
+    if isa(v, AbstractString)
+        return v
+    end
+    if isa(v, AbstractVector)
+        parts = String[]
+        for item in v
+            if isa(item, AbstractString)
+                push!(parts, "'" * item * "'")
+            else
+                push!(parts, __pytra_str(item))
+            end
+        end
+        return "[" * join(parts, ", ") * "]"
+    end
+    if isa(v, Tuple)
+        parts = String[]
+        for item in v
+            if isa(item, AbstractString)
+                push!(parts, "'" * item * "'")
+            else
+                push!(parts, __pytra_str(item))
+            end
+        end
+        if length(parts) == 1
+            return "(" * parts[1] * ",)"
+        end
+        return "(" * join(parts, ", ") * ")"
+    end
+    if isa(v, AbstractDict)
+        parts = String[]
+        dict_keys = collect(keys(v))
+        sort!(dict_keys, by=__pytra_str)
+        for k in dict_keys
+            item = v[k]
+            key_repr = isa(k, AbstractString) ? "'" * k * "'" : __pytra_str(k)
+            val_repr = isa(item, AbstractString) ? "'" * item * "'" : __pytra_str(item)
+            push!(parts, key_repr * ": " * val_repr)
+        end
+        return "{" * join(parts, ", ") * "}"
+    end
+    return string(v)
+end
+
+function __pytra_format(v, spec)
+    if spec == "4d"
+        return lpad(string(Int(v)), 4)
+    end
+    if spec == ".4f"
+        return string(round(Float64(v), digits=4))
+    end
+    return __pytra_str(v)
+end
+
+function __pytra_re_sub(pattern, repl, text, count=nothing)
+    regex = Regex(pattern)
+    return replace(text, regex => repl)
 end
 
 function __pytra_truthy(v)
@@ -173,6 +247,36 @@ function __pytra_slice(arr, start, stop)
     return arr[s:stop]
 end
 
+function __pytra_str_slice(s, start, stop)
+    len_s = length(s)
+    start_idx = start
+    if start_idx < 0
+        start_idx = len_s + start_idx
+    end
+    if start_idx < 0
+        start_idx = 0
+    end
+    stop_idx = stop
+    if stop_idx === nothing
+        stop_idx = len_s
+    elseif stop_idx < 0
+        stop_idx = len_s + stop_idx
+    end
+    if stop_idx < 0
+        stop_idx = 0
+    end
+    if stop_idx > len_s
+        stop_idx = len_s
+    end
+    if start_idx > stop_idx
+        return ""
+    end
+    if start_idx == stop_idx
+        return ""
+    end
+    return s[(start_idx + 1):stop_idx]
+end
+
 function __pytra_bytearray(v=nothing)
     if v === nothing
         return UInt8[]
@@ -197,6 +301,16 @@ function __pytra_bytes(v=nothing)
         return Vector{UInt8}(codeunits(v))
     end
     return UInt8[]
+end
+
+function __pytra_deque(v=nothing)
+    if v === nothing
+        return Any[]
+    end
+    if isa(v, AbstractArray) || isa(v, Tuple)
+        return collect(v)
+    end
+    return Any[v]
 end
 
 function __pytra_str_find(s, sub)

@@ -95,8 +95,18 @@ def _run_one(*, src: Path, out: Path, target: str) -> RunResult:
             return RunResult(False, "manifest.json not found after link stage", "", "")
 
         # Stage 2: emit
-        emit_script = str(ROOT / "src" / "toolchain" / "emit" / (target + ".py"))
-        emit_cmd = ["python3", emit_script, str(link_output), "--output-dir", str(emit_dir)]
+        if target == "julia":
+            emit_cmd = [
+                "python3",
+                "-m",
+                "toolchain2.emit.julia.cli",
+                str(link_output),
+                "--output-dir",
+                str(emit_dir),
+            ]
+        else:
+            emit_script = str(ROOT / "src" / "toolchain" / "emit" / (target + ".py"))
+            emit_cmd = ["python3", emit_script, str(link_output), "--output-dir", str(emit_dir)]
         cp = subprocess.run(emit_cmd, cwd=ROOT, capture_output=True, text=True, env=env)
         if cp.returncode != 0:
             raw = (cp.stderr or "").strip() or (cp.stdout or "").strip()

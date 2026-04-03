@@ -105,6 +105,14 @@ def _safe_ident(name: Any, fallback: str = "value") -> str:
     return out
 
 
+def _julia_namedtuple(fields: list[str]) -> str:
+    if len(fields) == 0:
+        return "()"
+    if len(fields) == 1:
+        return "(" + fields[0] + ",)"
+    return "(" + ", ".join(fields) + ")"
+
+
 def _relative_import_module_path(module_id: str) -> str:
     parts = [
         _safe_ident(part, "module")
@@ -308,12 +316,10 @@ def _runtime_symbol_alias_expr(runtime_module_id: str, runtime_symbol: str) -> s
     sym = runtime_symbol.strip()
     if sym == "":
         return ""
-    # math and perf_counter symbols are resolved via generated std/*.jl
-    # that delegate to __native. No inline expressions here.
     if _is_math_runtime_symbol(mod, sym):
-        return ""
+        return "__MathNative." + sym
     if _is_perf_counter_runtime_symbol(mod, sym):
-        return ""
+        return "__TimeNative." + sym
     if _is_sys_runtime_symbol(mod, sym):
         if sym == "argv":
             return "ARGS"
@@ -324,6 +330,8 @@ def _runtime_symbol_alias_expr(runtime_module_id: str, runtime_symbol: str) -> s
         if sym == "write_stderr":
             return "(s -> print(stderr, s))"
         return sym
+    if mod == "pytra.std.collections" and sym == "deque":
+        return "__pytra_deque"
     return ""
 
 
@@ -331,22 +339,36 @@ def _runtime_module_alias_line(alias: str, runtime_module_id: str) -> str:
     mod = canonical_runtime_module_id(runtime_module_id.strip())
     if mod == "":
         return ""
+    if mod == "pytra.std.env":
+        return alias + " = " + _julia_namedtuple(['target="julia"'])
     if mod in {"enum", "pytra.std.enum"}:
         return "# import " + alias + " (enum stub)"
     if mod in {"pytra.std.math", "math"}:
-        # Include std/math.jl then wrap exported symbols in a NamedTuple
-        # so that `math.sqrt(...)` works.
         symbol_names_list = lookup_runtime_module_symbols(mod)
-        fields = ", ".join(s + "=" + s for s in symbol_names_list if s != "")
-        return "__PYTRA_INCLUDE_STD_MATH__\n" + alias + " = (" + fields + ")"
+        fields = [s + "=__MathNative." + s for s in symbol_names_list if s != ""]
+        return "__PYTRA_INCLUDE_STD_MATH__\n" + alias + " = " + _julia_namedtuple(fields)
+    if mod == "pytra.std.time":
+        symbol_names_list = lookup_runtime_module_symbols(mod)
+        fields = [s + "=__TimeNative." + s for s in symbol_names_list if s != ""]
+        return "__PYTRA_INCLUDE_STD_TIME__\n" + alias + " = " + _julia_namedtuple(fields)
+    if mod == "pytra.std.os":
+        return "__PYTRA_INCLUDE_STD_OS__\n__PYTRA_INCLUDE_STD_OS_PATH__\n" + alias + " = (getcwd=__OsNative.getcwd, makedirs=__OsNative.makedirs, mkdir=__OsNative.mkdir, path=(join=__OsPathNative.join, splitext=__OsPathNative.splitext, basename=__OsPathNative.basename, dirname=__OsPathNative.dirname, exists=__OsPathNative.exists))"
+    if mod == "pytra.std.glob":
+        symbol_names_list = lookup_runtime_module_symbols(mod)
+        fields = [s + "=__GlobNative." + s for s in symbol_names_list if s != ""]
+        return "__PYTRA_INCLUDE_STD_GLOB__\n" + alias + " = " + _julia_namedtuple(fields)
     if mod == "pytra.std.argparse":
-        return "# import " + alias + " (argparse stub)"
+        return "__PYTRA_INCLUDE_STD_ARGPARSE__\n" + alias + " = (ArgumentParser=ArgumentParser, add_argument=add_argument, parse_args=parse_args)"
     if mod == "pytra.std.re":
         return "# import " + alias + " (re stub)"
     if mod == "pytra.std.json":
-        return "# import " + alias + " (json stub)"
+        return "__PYTRA_INCLUDE_STD_JSON__\n" + alias + " = (dumps=dumps, loads=loads, loads_arr=loads_arr)"
     if mod == "pytra.std.pathlib":
         return "__PYTRA_INCLUDE_STD_PATHLIB__"
+    if mod == "pytra.std.sys":
+        if alias == "sys":
+            return "__PYTRA_INCLUDE_STD_SYS__"
+        return "__PYTRA_INCLUDE_STD_SYS__\n" + alias + " = sys"
     if mod == "pytra.std.collections":
         return "# import " + alias + " (collections stub)"
     # Generic module import: include generated file and wrap symbols in NamedTuple
@@ -360,9 +382,9 @@ def _runtime_module_alias_line(alias: str, runtime_module_id: str) -> str:
     include_path = rel.replace(".", "/") + ".jl"
     # Derive include marker from path
     marker = "__PYTRA_INCLUDE_" + rel.replace(".", "_").replace("/", "_").upper() + "__"
-    fields = ", ".join(s + "=" + s for s in symbol_names if s != "")
-    if fields != "":
-        return marker + "\n" + alias + " = (" + fields + ")"
+    fields = [s + "=" + s for s in symbol_names if s != ""]
+    if len(fields) > 0:
+        return marker + "\n" + alias + " = " + _julia_namedtuple(fields)
     return marker
 
 
@@ -371,6 +393,10 @@ def _runtime_symbol_alias_line(alias: str, runtime_module_id: str, runtime_symbo
     sym = runtime_symbol.strip()
     expr = _runtime_symbol_alias_expr(runtime_module_id, runtime_symbol)
     if expr != "":
+        if _is_math_runtime_symbol(mod, sym):
+            return "__PYTRA_INCLUDE_STD_MATH__\n" + alias + " = " + expr
+        if _is_perf_counter_runtime_symbol(mod, sym):
+            return "__PYTRA_INCLUDE_STD_TIME__\n" + alias + " = " + expr
         return alias + " = " + expr
     # math/time symbols: include generated std/*.jl (which delegates to __native)
     if _is_math_runtime_symbol(mod, sym):
@@ -382,19 +408,31 @@ def _runtime_symbol_alias_line(alias: str, runtime_module_id: str, runtime_symbo
             return "# " + alias + " (enum stub)"
         return ""
     if mod == "pytra.std.argparse" and sym == "ArgumentParser":
-        return "# " + alias + " (argparse stub)"
+        return "__PYTRA_INCLUDE_STD_ARGPARSE__"
+    if mod == "pytra.std.os" and sym == "os":
+        return "__PYTRA_INCLUDE_STD_OS__\n__PYTRA_INCLUDE_STD_OS_PATH__\n" + alias + " = (getcwd=__OsNative.getcwd, makedirs=__OsNative.makedirs, mkdir=__OsNative.mkdir, path=(join=__OsPathNative.join, splitext=__OsPathNative.splitext, basename=__OsPathNative.basename, dirname=__OsPathNative.dirname, exists=__OsPathNative.exists))"
+    if mod == "pytra.std.glob" and sym == "glob":
+        return "__PYTRA_INCLUDE_STD_GLOB__\n" + alias + " = " + _julia_namedtuple(["glob=__GlobNative.glob"])
     if mod == "pytra.std.re" and sym == "sub":
-        return alias + " = (_pattern, _repl, text) -> text"
+        return alias + " = __pytra_re_sub"
     if mod == "pytra.std.json":
-        if sym == "loads":
-            return "# " + alias + " (json.loads stub)"
-        if sym == "dumps":
-            return "# " + alias + " (json.dumps stub)"
+        if sym in {"loads", "loads_arr", "dumps", "json"}:
+            if sym == "json":
+                return "__PYTRA_INCLUDE_STD_JSON__\n" + alias + " = (dumps=dumps, loads=loads, loads_arr=loads_arr)"
+            if alias == sym:
+                return "__PYTRA_INCLUDE_STD_JSON__"
+            return "__PYTRA_INCLUDE_STD_JSON__\n" + alias + " = " + sym
         return ""
     if mod == "pytra.std.pathlib" and sym == "Path":
         return "__PYTRA_INCLUDE_STD_PATHLIB__"
+    if mod == "pytra.std.sys" and sym == "sys":
+        if alias == "sys":
+            return "__PYTRA_INCLUDE_STD_SYS__"
+        return "__PYTRA_INCLUDE_STD_SYS__\n" + alias + " = sys"
+    if mod == "pytra.std.sys" and sym in {"argv", "path", "set_argv", "set_path"}:
+        return "__PYTRA_INCLUDE_STD_SYS__\n" + alias + " = " + sym
     if mod == "pytra.std.collections" and sym == "deque":
-        return "# " + alias + " (deque stub)"
+        return alias + " = __pytra_deque"
     if mod == "pytra.utils.png" and sym != "":
         return "__PYTRA_INCLUDE_UTILS_PNG__"
     if mod == "pytra.utils.gif" and sym != "":
@@ -419,11 +457,20 @@ class JuliaNativeEmitter:
         self.indent = 0
         self.tmp_seq = 0
         self.class_names: set[str] = set()
+        self.class_factory_names: dict[str, str] = {}
+        self.class_impl_names: dict[str, str] = {}
+        self.class_base_map: dict[str, str] = {}
+        self.class_declared_fields: dict[str, list[str]] = {}
+        self.class_zeroarg_methods: dict[str, set[str]] = {}
         self.imported_modules: set[str] = set()
         self.function_names: set[str] = set()
         self.relative_import_name_aliases: dict[str, str] = {}
         self.current_class_name: str = ""
         self.current_class_base_name: str = ""
+        self.current_class_base_source_name: str = ""
+        self.current_class_is_exception: bool = False
+        self.current_catch_var_stack: list[str] = []
+        self.current_exception_name_stack: list[set[str]] = []
         self._local_type_stack: list[dict[str, str]] = [{}]
         meta = east_doc.get("meta", {})
         emit_ctx = meta.get("emit_context", {}) if isinstance(meta, dict) else {}
@@ -448,6 +495,33 @@ class JuliaNativeEmitter:
             parts = combined.replace("\\", "/").split("/")
         args = ', '.join('"' + p + '"' for p in parts)
         return 'include(joinpath(@__DIR__, ' + args + '))'
+
+    @staticmethod
+    def _builtin_exception_ctor_name(name: str) -> str:
+        builtins = {
+            "Exception": "__PytraException",
+            "ValueError": "__pytra_value_error",
+            "RuntimeError": "__pytra_runtime_error",
+            "TypeError": "__pytra_type_error",
+            "AssertionError": "__pytra_assertion_error",
+            "IndexError": "__pytra_index_error",
+        }
+        return builtins.get(name, name)
+
+    @staticmethod
+    def _builtin_exception_type_name(name: str) -> str:
+        builtins = {
+            "ValueError": "PytraValueError",
+            "RuntimeError": "PytraRuntimeError",
+            "TypeError": "PytraTypeError",
+            "AssertionError": "PytraAssertionError",
+            "IndexError": "BoundsError",
+        }
+        return builtins.get(name, name)
+
+    @staticmethod
+    def _is_exception_type_name(name: str) -> bool:
+        return name == "Exception" or name.endswith("Error")
 
     @staticmethod
     def _is_extern_var(stmt: dict[str, Any]) -> bool:
@@ -749,6 +823,8 @@ class JuliaNativeEmitter:
         resolved = self._lookup_expr_type(node_any)
         if (
             resolved == "str"
+            or resolved == "bytes"
+            or resolved == "bytearray"
             or resolved.startswith("list[")
             or resolved.startswith("tuple[")
             or resolved.startswith("dict[")
@@ -757,23 +833,113 @@ class JuliaNativeEmitter:
             return True
         return False
 
+    def _render_truthy_expr(self, expr_any: Any) -> str:
+        return "__pytra_truthy(" + self._render_expr(expr_any) + ")"
+
+    def _render_boolop_expr(self, expr_any: dict[str, Any]) -> str:
+        values_any = expr_any.get("values")
+        values = values_any if isinstance(values_any, list) else []
+        if len(values) == 0:
+            return "false"
+        out = self._render_expr(values[0])
+        op = str(expr_any.get("op"))
+        for idx in range(1, len(values)):
+            next_expr = self._render_expr(values[idx])
+            tmp_name = self._next_tmp_name("__pytra_boolop")
+            if op == "And":
+                out = (
+                    "(begin "
+                    + tmp_name + " = " + out + "; "
+                    + "__pytra_truthy(" + tmp_name + ") ? (" + next_expr + ") : " + tmp_name
+                    + " end)"
+                )
+            else:
+                out = (
+                    "(begin "
+                    + tmp_name + " = " + out + "; "
+                    + "__pytra_truthy(" + tmp_name + ") ? " + tmp_name + " : (" + next_expr + ")"
+                    + " end)"
+                )
+        return out
+
     def _render_cond_expr(self, test_any: Any) -> str:
-        test = self._render_expr(test_any)
-        if self._is_sequence_expr(test_any):
-            return "__pytra_truthy(" + test + ")"
-        return test
+        return self._render_truthy_expr(test_any)
+
+    def _collect_declared_class_fields(self, stmt: dict[str, Any]) -> list[str]:
+        body = self._dict_list(stmt.get("body"))
+        fields: list[str] = []
+        for sub in body:
+            if sub.get("kind") == "AnnAssign":
+                target_any = sub.get("target")
+                if isinstance(target_any, dict) and target_any.get("kind") == "Name":
+                    field_name = _safe_ident(target_any.get("id"), "field")
+                    if field_name not in fields:
+                        fields.append(field_name)
+            if sub.get("kind") != "FunctionDef" or sub.get("name") != "__init__":
+                continue
+            init_body = self._dict_list(sub.get("body"))
+            for init_stmt in init_body:
+                if init_stmt.get("kind") not in {"AnnAssign", "Assign"}:
+                    continue
+                t_any = init_stmt.get("target")
+                if isinstance(t_any, dict) and t_any.get("kind") == "Attribute":
+                    attr_val = t_any.get("value")
+                    if isinstance(attr_val, dict) and attr_val.get("kind") == "Name":
+                        if str(attr_val.get("id")) == "self":
+                            field_name = _safe_ident(t_any.get("attr"), "field")
+                            if field_name not in fields:
+                                fields.append(field_name)
+        return fields
+
+    def _all_class_fields(self, cls_name: str) -> list[str]:
+        fields: list[str] = []
+        base_name = self.class_base_map.get(cls_name, "")
+        if base_name != "":
+            for field_name in self._all_class_fields(base_name):
+                if field_name not in fields:
+                    fields.append(field_name)
+        for field_name in self.class_declared_fields.get(cls_name, []):
+            if field_name not in fields:
+                fields.append(field_name)
+        return fields
 
     # ── scan ──
 
     def _scan_module_symbols(self, body: list[dict[str, Any]]) -> None:
         self.class_names = set()
+        self.class_factory_names = {}
+        self.class_impl_names = {}
+        self.class_base_map = {}
+        self.class_declared_fields = {}
+        self.class_zeroarg_methods = {}
         self.imported_modules = set()
         self.function_names = set()
         self.relative_import_name_aliases = _collect_relative_import_name_aliases(self.east_doc)
+        subclassed: set[str] = set()
         for stmt in body:
             kind = stmt.get("kind")
             if kind == "ClassDef":
-                self.class_names.add(_safe_ident(stmt.get("name"), "Class"))
+                cls_name = _safe_ident(stmt.get("name"), "Class")
+                self.class_names.add(cls_name)
+                base_any = stmt.get("base")
+                base_name = _safe_ident(base_any, "") if isinstance(base_any, str) else ""
+                self.class_base_map[cls_name] = base_name
+                if base_name != "":
+                    subclassed.add(base_name)
+                self.class_declared_fields[cls_name] = self._collect_declared_class_fields(stmt)
+                zeroarg_methods: set[str] = set()
+                class_body = self._dict_list(stmt.get("body"))
+                for sub in class_body:
+                    if sub.get("kind") == "FunctionDef" and sub.get("name") == "__init__":
+                        self.class_factory_names[cls_name] = "__pytra_new_" + cls_name
+                    if sub.get("kind") == "FunctionDef":
+                        arg_order_any = sub.get("arg_order")
+                        arg_order = arg_order_any if isinstance(arg_order_any, list) else []
+                        if len(arg_order) == 1 and _safe_ident(arg_order[0], "") == "self":
+                            method_name = _safe_ident(sub.get("name"), "method")
+                            if method_name != "__init__":
+                                zeroarg_methods.add(method_name)
+                self.class_zeroarg_methods[cls_name] = zeroarg_methods
                 continue
             if kind == "FunctionDef":
                 self.function_names.add(_safe_ident(stmt.get("name"), "fn"))
@@ -817,6 +983,12 @@ class JuliaNativeEmitter:
                     resolved = resolve_import_binding_doc(module_name, symbol, "symbol")
                     if resolved.get("resolved_binding_kind") == "module":
                         self.imported_modules.add(_safe_ident(alias, "mod"))
+        for cls_name in self.class_names:
+            self.class_factory_names.setdefault(cls_name, "__pytra_new_" + cls_name)
+            if cls_name in subclassed:
+                self.class_impl_names[cls_name] = "__pytra_cls_" + cls_name
+            else:
+                self.class_impl_names[cls_name] = cls_name
 
     # ── imports ──
 
@@ -846,6 +1018,9 @@ class JuliaNativeEmitter:
                             if line != "":
                                 import_lines.append(line)
                                 continue
+                    if mod in {"pytra.std.env", "env"}:
+                        import_lines.append(alias_txt + " = " + _julia_namedtuple(['target="julia"']))
+                        continue
                     if mod == "pytra.typing" or mod == "typing":
                         continue
                     if mod.startswith("pytra.utils.") or mod.startswith("pytra.std."):
@@ -875,6 +1050,27 @@ class JuliaNativeEmitter:
                     alias = asname if isinstance(asname, str) and asname != "" else sym
                     alias_txt = _safe_ident(alias, sym)
                     if _is_compile_time_std_import_symbol(mod, sym):
+                        continue
+                    if mod == "pytra.std" and sym == "os":
+                        import_lines.append("__PYTRA_INCLUDE_STD_OS__")
+                        import_lines.append("__PYTRA_INCLUDE_STD_OS_PATH__")
+                        import_lines.append(
+                            alias_txt
+                            + " = (getcwd=__OsNative.getcwd, makedirs=__OsNative.makedirs, mkdir=__OsNative.mkdir, path=(join=__OsPathNative.join, splitext=__OsPathNative.splitext, basename=__OsPathNative.basename, dirname=__OsPathNative.dirname, exists=__OsPathNative.exists))"
+                        )
+                        continue
+                    if mod == "pytra.std" and sym == "glob":
+                        import_lines.append("__PYTRA_INCLUDE_STD_GLOB__")
+                        import_lines.append(alias_txt + " = " + _julia_namedtuple(["glob=__GlobNative.glob"]))
+                        continue
+                    if mod == "pytra.std" and sym == "json":
+                        import_lines.append("__PYTRA_INCLUDE_STD_JSON__")
+                        import_lines.append(alias_txt + " = (dumps=dumps, loads=loads, loads_arr=loads_arr)")
+                        continue
+                    if mod == "pytra.std" and sym == "sys":
+                        import_lines.append("__PYTRA_INCLUDE_STD_SYS__")
+                        if alias_txt != "sys":
+                            import_lines.append(alias_txt + " = sys")
                         continue
                     if mod in {"pytra.utils.assertions", "pytra.std.test"} and sym == "py_assert_stdout":
                         import_lines.append(
@@ -929,8 +1125,18 @@ class JuliaNativeEmitter:
                     key = line[len(_MARKER_PREFIX):-len(_MARKER_SUFFIX)].lower()
                     if key not in seen_includes:
                         seen_includes.add(key)
-                        # Reconstruct path: STD_MATH → std/math.jl
-                        path = key.replace("_", "/", 1) + ".jl"
+                        native_std_paths = {
+                            "std_argparse": "std/argparse.jl",
+                            "std_json": "std/json.jl",
+                            "std_math": "std/math_native.jl",
+                            "std_time": "std/time_native.jl",
+                            "std_os": "std/os_native.jl",
+                            "std_os_path": "std/os_path_native.jl",
+                            "std_glob": "std/glob_native.jl",
+                            "std_sys": "std/sys.jl",
+                            "std_pathlib": "std/pathlib.jl",
+                        }
+                        path = native_std_paths.get(key, key.replace("_", "/", 1) + ".jl")
                         resolved_lines.append(self._include_line(path))
                     continue
                 resolved_lines.append(line)
@@ -988,7 +1194,7 @@ class JuliaNativeEmitter:
             target_any = stmt.get("target")
             if isinstance(target_any, dict):
                 td: dict[str, Any] = target_any
-                if td.get("kind") == "Tuple":
+                if td.get("kind") in {"Tuple", "List"}:
                     self._emit_tuple_assign(target_any, stmt.get("value"))
                     return
                 target = self._render_target(target_any)
@@ -997,7 +1203,7 @@ class JuliaNativeEmitter:
                 return
             targets = stmt.get("targets")
             if isinstance(targets, list) and len(targets) > 0 and isinstance(targets[0], dict):
-                if targets[0].get("kind") == "Tuple":
+                if targets[0].get("kind") in {"Tuple", "List"}:
                     self._emit_tuple_assign(targets[0], stmt.get("value"))
                     return
                 target = self._render_target(targets[0])
@@ -1021,6 +1227,20 @@ class JuliaNativeEmitter:
                 return
             self._emit_line(target + " = " + target + " " + op_token + " " + value)
             return
+        if kind == "MultiAssign":
+            targets_any = stmt.get("targets")
+            targets = targets_any if isinstance(targets_any, list) else []
+            if len(targets) == 0:
+                raise RuntimeError("lang=julia unsupported multassign shape")
+            tmp_name = self._next_tmp_name("__pytra_tup")
+            self._emit_line(tmp_name + " = " + self._render_expr(stmt.get("value")))
+            i = 0
+            while i < len(targets):
+                target_any = targets[i]
+                if isinstance(target_any, dict):
+                    self._emit_line(self._render_target(target_any) + " = " + tmp_name + "[" + str(i + 1) + "]")
+                i += 1
+            return
         if kind == "Swap":
             self._emit_swap(stmt)
             return
@@ -1037,6 +1257,12 @@ class JuliaNativeEmitter:
                 if loop_kw == "continue":
                     self._emit_line("continue")
                     return
+                if loop_kw == "raise":
+                    if len(self.current_catch_var_stack) > 0:
+                        self._emit_line("rethrow()")
+                    else:
+                        self._emit_line('throw(Exception("error"))')
+                    return
             # discard_result: suppress return value (spec §9)
             if bool(stmt.get("discard_result")):
                 self._emit_line(self._render_expr(value_any) + ";")
@@ -1045,22 +1271,12 @@ class JuliaNativeEmitter:
             return
         if kind == "Raise":
             exc_any = stmt.get("exc")
-            if isinstance(exc_any, dict) and exc_any.get("kind") == "Call":
-                fn_any = exc_any.get("func")
-                if isinstance(fn_any, dict) and fn_any.get("kind") == "Name":
-                    fn_name = _safe_ident(fn_any.get("id"), "")
-                    if fn_name in {"RuntimeError", "ValueError", "TypeError", "Exception", "AssertionError"}:
-                        args_any = exc_any.get("args")
-                        args = args_any if isinstance(args_any, list) else []
-                        if len(args) > 0:
-                            self._emit_line("error(" + self._render_expr(args[0]) + ")")
-                            return
-                        self._emit_line('error("error")')
-                        return
             if isinstance(exc_any, dict):
-                self._emit_line("error(" + self._render_expr(exc_any) + ")")
+                self._emit_line("throw(" + self._render_expr(exc_any) + ")")
+            elif len(self.current_catch_var_stack) > 0:
+                self._emit_line("rethrow()")
             else:
-                self._emit_line('error("error")')
+                self._emit_line('throw(Exception("error"))')
             return
         if kind == "Try":
             self._emit_line("try")
@@ -1074,11 +1290,43 @@ class JuliaNativeEmitter:
             if len(handlers) > 0:
                 self._emit_line("catch __pytra_exc")
                 self.indent += 1
-                for h in handlers:
-                    if isinstance(h, dict):
-                        h_body = self._dict_list(h.get("body"))
-                        for sub in h_body:
-                            self._emit_stmt(sub)
+                for idx, h in enumerate(handlers):
+                    if not isinstance(h, dict):
+                        continue
+                    if idx == 0:
+                        prefix = "if "
+                    else:
+                        prefix = "elseif "
+                    h_type = h.get("type")
+                    type_name = ""
+                    if isinstance(h_type, dict) and h_type.get("kind") == "Name":
+                        type_name = self._builtin_exception_type_name(_safe_ident(h_type.get("id"), ""))
+                    if type_name != "":
+                        self._emit_line(prefix + "isa(__pytra_exc, " + type_name + ")")
+                    else:
+                        self._emit_line(("if " if idx == 0 else "else"))
+                    self.indent += 1
+                    h_name = h.get("name")
+                    current_exception_names: set[str] = {"__pytra_exc"}
+                    if isinstance(h_name, str) and h_name != "":
+                        safe_name = _safe_ident(h_name, "err")
+                        self._emit_line(safe_name + " = __pytra_exc")
+                        current_exception_names.add(safe_name)
+                    self.current_catch_var_stack.append("__pytra_exc")
+                    self.current_exception_name_stack.append(current_exception_names)
+                    h_body = self._dict_list(h.get("body"))
+                    for sub in h_body:
+                        self._emit_stmt(sub)
+                    self.current_exception_name_stack.pop()
+                    self.current_catch_var_stack.pop()
+                    self.indent -= 1
+                if len(handlers) > 0:
+                    if all(isinstance(h, dict) and isinstance(h.get("type"), dict) for h in handlers):
+                        self._emit_line("else")
+                        self.indent += 1
+                        self._emit_line("rethrow()")
+                        self.indent -= 1
+                    self._emit_line("end")
                 self.indent -= 1
             finalbody = self._dict_list(stmt.get("finalbody"))
             if len(finalbody) > 0:
@@ -1127,6 +1375,11 @@ class JuliaNativeEmitter:
         name = _safe_ident(stmt.get("name"), "fn")
         arg_order_any = stmt.get("arg_order")
         args = arg_order_any if isinstance(arg_order_any, list) else []
+        arg_types_any = stmt.get("arg_types")
+        if isinstance(arg_types_any, dict):
+            for arg_name_any in arg_types_any.keys():
+                if isinstance(arg_name_any, str) and arg_name_any not in args:
+                    args.append(arg_name_any)
         arg_names: list[str] = []
         for a in args:
             arg_names.append(_safe_ident(a, "arg"))
@@ -1184,38 +1437,56 @@ class JuliaNativeEmitter:
         cls_name = _safe_ident(stmt.get("name"), "Class")
         base_any = stmt.get("base")
         base_name = _safe_ident(base_any, "") if isinstance(base_any, str) else ""
+        is_dataclass = bool(stmt.get("dataclass"))
+        if base_name in {"Enum", "IntEnum", "IntFlag"}:
+            body = self._dict_list(stmt.get("body"))
+            if base_name != "":
+                self._emit_line("# inherits from " + base_name)
+            for sub in body:
+                if sub.get("kind") != "Assign":
+                    continue
+                target_any = sub.get("target")
+                if not isinstance(target_any, dict) or target_any.get("kind") != "Name":
+                    continue
+                member_name = _safe_ident(target_any.get("id"), "member")
+                value = self._render_expr(sub.get("value"))
+                self._emit_line("__pytra_cls_" + cls_name + "_" + member_name + " = " + value)
+            self._emit_line("")
+            return
+        base_type_name = self._builtin_exception_type_name(base_name)
+        is_exception_class = self._is_exception_type_name(base_name)
+        class_impl_name = self.class_impl_names.get(cls_name, cls_name)
+        is_abstract_backed = class_impl_name != cls_name
 
         # Collect fields
         body = self._dict_list(stmt.get("body"))
-        fields: list[str] = []
-        for sub in body:
-            if sub.get("kind") == "AnnAssign":
-                target_any = sub.get("target")
-                if isinstance(target_any, dict) and target_any.get("kind") == "Name":
-                    fields.append(_safe_ident(target_any.get("id"), "field"))
-            if sub.get("kind") == "FunctionDef" and sub.get("name") == "__init__":
-                init_body = self._dict_list(sub.get("body"))
-                for init_stmt in init_body:
-                    if init_stmt.get("kind") in {"AnnAssign", "Assign"}:
-                        t_any = init_stmt.get("target")
-                        if isinstance(t_any, dict) and t_any.get("kind") == "Attribute":
-                            attr_val = t_any.get("value")
-                            if isinstance(attr_val, dict) and attr_val.get("kind") == "Name":
-                                if str(attr_val.get("id")) == "self":
-                                    field_name = _safe_ident(t_any.get("attr"), "field")
-                                    if field_name not in fields:
-                                        fields.append(field_name)
+        fields = self._all_class_fields(cls_name)
+        if is_exception_class and "__pytra_message" not in fields:
+            fields.insert(0, "__pytra_message")
 
         # Emit struct
         if base_name != "":
             self._emit_line("# inherits from " + base_name)
-        self._emit_line("mutable struct " + cls_name)
+        if is_abstract_backed:
+            self._emit_line("abstract type " + cls_name + " end")
+            if base_type_name != "":
+                self._emit_line("mutable struct " + class_impl_name + " <: " + base_type_name)
+            else:
+                self._emit_line("mutable struct " + class_impl_name + " <: " + cls_name)
+        elif base_type_name != "":
+            self._emit_line("mutable struct " + cls_name + " <: " + base_type_name)
+        else:
+            self._emit_line("mutable struct " + cls_name)
         self.indent += 1
         if len(fields) > 0:
             for f in fields:
                 self._emit_line(f)
         self.indent -= 1
         self._emit_line("end")
+        if is_exception_class:
+            self._emit_line("Base.show(io::IO, e::" + cls_name + ") = print(io, e.__pytra_message)")
+            self._emit_line("Base.showerror(io::IO, e::" + cls_name + ") = print(io, e.__pytra_message)")
+            self._emit_line("__pytra_exception_message(e::" + cls_name + ") = string(e.__pytra_message)")
         self._emit_line("")
 
         # Emit constructor and methods
@@ -1228,13 +1499,55 @@ class JuliaNativeEmitter:
             self._emit_class_method(cls_name, base_name, sub)
 
         if not has_init:
-            # Default constructor already generated by Julia struct
-            pass
+            factory_name = self.class_factory_names.get(cls_name)
+            if isinstance(factory_name, str):
+                dataclass_fields: list[str] = []
+                dataclass_defaults: dict[str, str] = {}
+                if is_dataclass:
+                    for sub in body:
+                        if sub.get("kind") != "AnnAssign":
+                            continue
+                        target_any = sub.get("target")
+                        if isinstance(target_any, dict) and target_any.get("kind") == "Name":
+                            field_name = _safe_ident(target_any.get("id"), "field")
+                            dataclass_fields.append(field_name)
+                            if isinstance(sub.get("value"), dict):
+                                dataclass_defaults[field_name] = self._render_expr(sub.get("value"))
+                arg_sig: list[str] = []
+                init_args: list[str] = []
+                if is_dataclass and len(dataclass_fields) > 0:
+                    seen_default = False
+                    for field_name in dataclass_fields:
+                        if field_name in dataclass_defaults:
+                            seen_default = True
+                            arg_sig.append(field_name + "=" + dataclass_defaults[field_name])
+                        else:
+                            arg_sig.append(field_name)
+                        if field_name in dataclass_defaults:
+                            init_args.append(field_name)
+                        else:
+                            init_args.append(field_name if is_dataclass else "nothing")
+                self._emit_line("function " + factory_name + "(" + ", ".join(arg_sig) + ")")
+                self.indent += 1
+                if is_dataclass and len(dataclass_fields) > 0:
+                    self._emit_line("return " + class_impl_name + "(" + ", ".join(init_args) + ")")
+                else:
+                    init_defaults = ", ".join(["nothing" for _ in fields])
+                    self._emit_line("return " + class_impl_name + "(" + init_defaults + ")")
+                self.indent -= 1
+                self._emit_line("end")
+                self._emit_line("")
 
     def _emit_class_method(self, cls_name: str, base_name: str, stmt: dict[str, Any]) -> None:
         method_name = _safe_ident(stmt.get("name"), "method")
+        base_type_name = self._builtin_exception_type_name(base_name)
         arg_order_any = stmt.get("arg_order")
         arg_order = arg_order_any if isinstance(arg_order_any, list) else []
+        arg_types_any = stmt.get("arg_types")
+        if isinstance(arg_types_any, dict):
+            for arg_name_any in arg_types_any.keys():
+                if isinstance(arg_name_any, str) and arg_name_any not in arg_order:
+                    arg_order.append(arg_name_any)
         args: list[str] = []
         for i_idx, arg in enumerate(arg_order):
             arg_name = _safe_ident(arg, "arg")
@@ -1244,15 +1557,30 @@ class JuliaNativeEmitter:
             args.append(arg_name)
         prev_class = self.current_class_name
         prev_base = self.current_class_base_name
+        prev_base_source = self.current_class_base_source_name
+        prev_is_exception = self.current_class_is_exception
         self.current_class_name = cls_name
-        self.current_class_base_name = base_name
+        self.current_class_base_name = base_type_name
+        self.current_class_base_source_name = base_name
+        self.current_class_is_exception = self._is_exception_type_name(base_name)
 
         if method_name == "__init__":
             # Constructor: emit as a function returning new instance
             init_args = [a for a in args if not a.startswith("self")]
-            self._emit_line("function " + cls_name + "(" + ", ".join(init_args) + ")")
+            factory_name = self.class_factory_names.get(cls_name, "__pytra_new_" + cls_name)
+            self._emit_line("function " + factory_name + "(" + ", ".join(init_args) + ")")
             self.indent += 1
-            self._emit_line("self = " + cls_name + "(" + ", ".join(["nothing" for _ in self._get_class_fields(stmt)]) + ")")
+            init_defaults: list[str] = []
+            init_field_names = self._all_class_fields(cls_name)
+            if self._is_exception_type_name(base_name) and "__pytra_message" not in init_field_names:
+                init_field_names = ["__pytra_message"] + init_field_names
+            for field_name in init_field_names:
+                if field_name == "__pytra_message":
+                    init_defaults.append('""')
+                else:
+                    init_defaults.append("nothing")
+            impl_name = self.class_impl_names.get(cls_name, cls_name)
+            self._emit_line("self = " + impl_name + "(" + ", ".join(init_defaults) + ")")
             self._push_function_context(stmt, [_safe_ident(a, "arg") for a in arg_order[1:]], arg_order[1:])
             self._emit_block(stmt.get("body"))
             self._pop_function_context()
@@ -1271,21 +1599,12 @@ class JuliaNativeEmitter:
             self._emit_line("")
         self.current_class_name = prev_class
         self.current_class_base_name = prev_base
+        self.current_class_base_source_name = prev_base_source
+        self.current_class_is_exception = prev_is_exception
 
     def _get_class_fields(self, init_stmt: dict[str, Any]) -> list[str]:
-        fields: list[str] = []
-        init_body = self._dict_list(init_stmt.get("body"))
-        for stmt in init_body:
-            if stmt.get("kind") in {"AnnAssign", "Assign"}:
-                t_any = stmt.get("target")
-                if isinstance(t_any, dict) and t_any.get("kind") == "Attribute":
-                    attr_val = t_any.get("value")
-                    if isinstance(attr_val, dict) and attr_val.get("kind") == "Name":
-                        if str(attr_val.get("id")) == "self":
-                            field_name = _safe_ident(t_any.get("attr"), "field")
-                            if field_name not in fields:
-                                fields.append(field_name)
-        return fields
+        _ = init_stmt
+        return self._all_class_fields(self.current_class_name)
 
     def _emit_for_core(self, stmt: dict[str, Any]) -> None:
         iter_mode = str(stmt.get("iter_mode"))
@@ -1341,6 +1660,7 @@ class JuliaNativeEmitter:
                 raise RuntimeError("lang=julia unsupported forcore runtime shape")
             ipd2: dict[str, Any] = iter_plan
             iter_expr = self._render_expr(ipd2.get("iter_expr"))
+            iter_expr_type = self._lookup_expr_type(ipd2.get("iter_expr"))
             tuple_target = isinstance(target_plan, dict) and target_plan.get("kind") == "TupleTarget"
             # Check if target needs integer promotion (e.g. bytes → int32)
             target_type = ""
@@ -1357,6 +1677,8 @@ class JuliaNativeEmitter:
             self.indent += 1
             if needs_int_promotion and not tuple_target:
                 self._emit_line(target_name + " = Int(" + iter_name + ")")
+            elif not tuple_target and iter_expr_type == "str":
+                self._emit_line(target_name + " = string(" + iter_name + ")")
 
             if tuple_target and isinstance(target_plan, dict):
                 direct_names_any = target_plan.get("direct_unpack_names")
@@ -1475,6 +1797,10 @@ class JuliaNativeEmitter:
                     or self._is_str_expr(right_node)
                 ):
                     return "(" + left + " * " + right + ")"
+                left_type = self._lookup_expr_type(left_node)
+                right_type = self._lookup_expr_type(right_node)
+                if left_type.startswith("list[") or right_type.startswith("list["):
+                    return "vcat(" + left + ", " + right + ")"
             if op_raw == "Mult" and (self._is_sequence_expr(left_node) or self._is_sequence_expr(right_node)):
                 return "__pytra_repeat_seq(" + left + ", " + right + ")"
             if op_raw == "BitXor":
@@ -1511,16 +1837,7 @@ class JuliaNativeEmitter:
                 return "(" + left + " !== " + right + ")"
             return "(" + left + " " + _cmp_symbol(op0) + " " + right + ")"
         if kind == "BoolOp":
-            values_any = ed.get("values")
-            values = values_any if isinstance(values_any, list) else []
-            if len(values) == 0:
-                return "false"
-            op = str(ed.get("op"))
-            delim = " && " if op == "And" else " || "
-            out: list[str] = []
-            for v in values:
-                out.append(self._render_expr(v))
-            return "(" + delim.join(out) + ")"
+            return self._render_boolop_expr(ed)
         if kind == "Call":
             return self._render_call(expr_any)
         if kind == "Lambda":
@@ -1553,6 +1870,8 @@ class JuliaNativeEmitter:
             out: list[str] = []
             for e in elems:
                 out.append(self._render_expr(e))
+            if len(out) == 1:
+                return "(" + out[0] + ",)"
             return "(" + ", ".join(out) + ")"
         if kind == "Set":
             elems_any = ed.get("elements")
@@ -1576,9 +1895,20 @@ class JuliaNativeEmitter:
                 return "Any[]"
             itd: dict[str, Any] = iter_any
             elt = self._render_expr(ed.get("elt"))
-            if td2.get("kind") != "Name":
+            if td2.get("kind") == "Name":
+                loop_var = _safe_ident(td2.get("id"), "__lc_i")
+            elif td2.get("kind") == "Tuple":
+                elems_any = td2.get("elements")
+                elems = elems_any if isinstance(elems_any, list) else []
+                parts: list[str] = []
+                for elem in elems:
+                    if isinstance(elem, dict) and elem.get("kind") == "Name":
+                        parts.append(_safe_ident(elem.get("id"), "__lc_i"))
+                if len(parts) == 0:
+                    return "Any[]"
+                loop_var = "(" + ", ".join(parts) + ")"
+            else:
                 return "Any[]"
-            loop_var = _safe_ident(td2.get("id"), "__lc_i")
             if itd.get("kind") == "RangeExpr":
                 start = self._render_expr(itd.get("start"))
                 stop = self._render_expr(itd.get("stop"))
@@ -1590,6 +1920,8 @@ class JuliaNativeEmitter:
                     range_expr = start + ":" + step + ":(" + stop + " - 1)"
             else:
                 range_expr = self._render_expr(iter_any)
+            if self._lookup_expr_type(iter_any) == "str":
+                range_expr = "(__pytra_str(__pytra_ch) for __pytra_ch in " + range_expr + ")"
             cond_expr = ""
             ifs_any = gen.get("ifs")
             if isinstance(ifs_any, list) and len(ifs_any) > 0:
@@ -1616,6 +1948,8 @@ class JuliaNativeEmitter:
             elt = self._render_expr(ed.get("elt"))
             loop_var = _safe_ident(td_sc.get("id"), "__sc_i")
             range_expr = self._render_expr(iter_any)
+            if self._lookup_expr_type(iter_any) == "str":
+                range_expr = "(__pytra_str(__pytra_ch) for __pytra_ch in " + range_expr + ")"
             cond_expr = ""
             ifs_any = gen.get("ifs")
             if isinstance(ifs_any, list) and len(ifs_any) > 0:
@@ -1693,9 +2027,7 @@ class JuliaNativeEmitter:
                 lower = self._render_expr(lower_node) if isinstance(lower_node, dict) else "0"
                 upper = self._render_expr(upper_node) if isinstance(upper_node, dict) else "nothing"
                 if owner_type == "str":
-                    if upper == "nothing":
-                        return owner + "[(" + lower + " + 1):end]"
-                    return owner + "[(" + lower + " + 1):" + upper + "]"
+                    return "__pytra_str_slice(" + owner + ", " + lower + ", " + upper + ")"
                 if upper == "nothing":
                     return owner + "[(" + lower + " + 1):end]"
                 return owner + "[(" + lower + " + 1):" + upper + "]"
@@ -1717,14 +2049,32 @@ class JuliaNativeEmitter:
                 return "string(" + owner + "[__pytra_idx(" + index + ", length(" + owner + "))])"
             return owner + "[__pytra_idx(" + index + ", length(" + owner + "))]"
         if kind == "Attribute":
-            owner = self._render_expr(ed.get("value"))
+            owner_node = ed.get("value")
+            if isinstance(owner_node, dict) and owner_node.get("kind") == "Call":
+                func_any = owner_node.get("func")
+                if isinstance(func_any, dict) and func_any.get("kind") == "Name":
+                    if str(func_any.get("id")) == "type" and str(ed.get("attr")) == "__name__":
+                        args_any = owner_node.get("args")
+                        args = args_any if isinstance(args_any, list) else []
+                        if len(args) >= 1:
+                            return "string(nameof(typeof(" + self._render_expr(args[0]) + ")))"
+            owner = self._render_expr(owner_node)
             attr = _safe_ident(ed.get("attr"), "field")
+            owner_type = self._lookup_expr_type(owner_node)
+            if owner_type in self.class_zeroarg_methods and attr in self.class_zeroarg_methods[owner_type]:
+                return attr + "(" + owner + ")"
             return owner + "." + attr
         if kind == "IsInstance":
             value = self._render_expr(ed.get("value"))
+            expected = ""
             expected_any = ed.get("expected_type_id")
             if isinstance(expected_any, dict) and expected_any.get("kind") == "Name":
                 expected = _safe_ident(expected_any.get("id"), "object")
+            else:
+                expected_name_any = ed.get("expected_type_name")
+                if isinstance(expected_name_any, str) and expected_name_any != "":
+                    expected = _safe_ident(expected_name_any, "object")
+            if expected != "":
                 if expected in {"int", "int64"}:
                     return "(isa(" + value + ", Integer))"
                 if expected in {"float", "float64"}:
@@ -1749,10 +2099,10 @@ class JuliaNativeEmitter:
             expected = self._render_expr(ed.get("expected_type_id"))
             return "(" + actual + " <: " + expected + ")"
         if kind == "IfExp":
-            test = self._render_expr(ed.get("test"))
+            test = self._render_truthy_expr(ed.get("test"))
             body = self._render_expr(ed.get("body"))
             orelse = self._render_expr(ed.get("orelse"))
-            return "(__pytra_truthy(" + test + ") ? (" + body + ") : (" + orelse + "))"
+            return "(" + test + " ? (" + body + ") : (" + orelse + "))"
         if kind == "JoinedStr":
             values_any = ed.get("values")
             values = values_any if isinstance(values_any, list) else []
@@ -1765,7 +2115,11 @@ class JuliaNativeEmitter:
                 if item_kind == "Constant" and isinstance(item_d.get("value"), str):
                     parts.append(self._render_expr(item_d))
                 elif item_kind == "FormattedValue":
-                    parts.append("string(" + self._render_expr(item_d.get("value")) + ")")
+                    fmt_any = item_d.get("format_spec")
+                    if isinstance(fmt_any, str) and fmt_any != "":
+                        parts.append("__pytra_format(" + self._render_expr(item_d.get("value")) + ", " + _julia_string(fmt_any) + ")")
+                    else:
+                        parts.append("string(" + self._render_expr(item_d.get("value")) + ")")
                 else:
                     parts.append("string(" + self._render_expr(item_d) + ")")
             return "(" + " * ".join(parts) + ")"
@@ -1776,6 +2130,12 @@ class JuliaNativeEmitter:
         if kind == "ObjTypeId":
             return "typeof(" + self._render_expr(ed.get("value")) + ")"
         if kind == "ObjStr":
+            value_any = ed.get("value")
+            if isinstance(value_any, dict) and value_any.get("kind") == "Name":
+                value_name = _safe_ident(value_any.get("id"), "value")
+                for names in reversed(self.current_exception_name_stack):
+                    if value_name in names:
+                        return "__pytra_exception_message(" + self._render_expr(value_any) + ")"
             return "string(" + self._render_expr(ed.get("value")) + ")"
         if kind == "ObjBool":
             val = self._render_expr(ed.get("value"))
@@ -1838,7 +2198,15 @@ class JuliaNativeEmitter:
             if fn_name == "str":
                 if len(rendered_args) == 0:
                     return '""'
-                return "string(" + rendered_args[0] + ")"
+                return "__pytra_str(" + rendered_args[0] + ")"
+            if fn_name == "set":
+                if len(rendered_args) == 0:
+                    return "Set{Any}()"
+                return "Set(" + rendered_args[0] + ")"
+            if fn_name == "type":
+                if len(rendered_args) == 0:
+                    return "Any"
+                return "typeof(" + rendered_args[0] + ")"
             if fn_name == "len":
                 if len(rendered_args) == 0:
                     return "0"
@@ -1891,7 +2259,10 @@ class JuliaNativeEmitter:
             if fn_name == "open":
                 return "py_open(" + ", ".join(rendered_args) + ")"
             if fn_name in self.class_names:
-                return fn_name + "(" + ", ".join(rendered_args) + ")"
+                factory_name = self.class_factory_names.get(fn_name, fn_name)
+                return factory_name + "(" + ", ".join(rendered_args) + ")"
+            if self._is_exception_type_name(fn_name):
+                return self._builtin_exception_ctor_name(fn_name) + "(" + ", ".join(rendered_args) + ")"
             rendered_name = self._render_name_expr(func_any)
             return rendered_name + "(" + ", ".join(rendered_args + kw_values_in_order) + ")"
 
@@ -1905,13 +2276,36 @@ class JuliaNativeEmitter:
                     super_name = str(super_func.get("id"))
                     if super_name in {"super", "_super"}:
                         if attr == "__init__":
+                            if self.current_class_is_exception:
+                                if len(rendered_args) > 0:
+                                    return "(self.__pytra_message = string(" + rendered_args[0] + "))"
+                                return '(self.__pytra_message = "")'
+                            base_source_name = self.current_class_base_source_name
+                            if base_source_name != "":
+                                base_factory_name = self.class_factory_names.get(base_source_name, base_source_name)
+                                inherited_fields = self._all_class_fields(base_source_name)
+                                copy_parts = ["__pytra_base = " + base_factory_name + "(" + ", ".join(rendered_args) + ")"]
+                                for field_name in inherited_fields:
+                                    copy_parts.append("self." + field_name + " = __pytra_base." + field_name)
+                                copy_parts.append("nothing")
+                                return "(begin " + "; ".join(copy_parts) + "; end)"
                             return "nothing"
                         if self.current_class_base_name != "":
                             return self.current_class_base_name + "_" + attr + "(" + ", ".join(["self"] + rendered_args) + ")"
             owner = self._render_expr(owner_node)
             owner_type = self._lookup_expr_type(owner_node)
+            root_import_name = ""
+            root_probe = owner_node
+            while isinstance(root_probe, dict) and root_probe.get("kind") == "Attribute":
+                root_probe = root_probe.get("value")
+            if isinstance(root_probe, dict) and root_probe.get("kind") == "Name":
+                root_import_name = _safe_ident(root_probe.get("id"), "")
+            if root_import_name in self.imported_modules or root_import_name in self._import_alias_map:
+                return owner + "." + attr + "(" + ", ".join(rendered_args + kw_values_in_order) + ")"
             if isinstance(owner_node, dict) and owner_node.get("kind") == "Name":
                 owner_name = _safe_ident(owner_node.get("id"), "")
+                if owner_name in self.class_names:
+                    return attr + "(" + ", ".join(rendered_args + kw_values_in_order) + ")"
                 if owner_name in self.imported_modules or owner_name in self._import_alias_map:
                     return owner + "." + attr + "(" + ", ".join(rendered_args + kw_values_in_order) + ")"
             # dict.get
@@ -1922,10 +2316,20 @@ class JuliaNativeEmitter:
             # list methods
             if attr == "append" and len(rendered_args) == 1:
                 return "push!(" + owner + ", " + rendered_args[0] + ")"
+            if attr == "appendleft" and len(rendered_args) == 1:
+                return "pushfirst!(" + owner + ", " + rendered_args[0] + ")"
+            if attr == "pop" and owner_type.startswith("dict[") and len(rendered_args) >= 1:
+                if len(rendered_args) >= 2:
+                    return "pop!(" + owner + ", " + rendered_args[0] + ", " + rendered_args[1] + ")"
+                return "pop!(" + owner + ", " + rendered_args[0] + ")"
+            if attr == "setdefault" and owner_type.startswith("dict[") and len(rendered_args) >= 2:
+                return "get!(" + owner + ", " + rendered_args[0] + ", " + rendered_args[1] + ")"
             if attr == "pop":
                 if len(rendered_args) == 0:
                     return "pop!(" + owner + ")"
                 return "splice!(" + owner + ", (" + rendered_args[0] + ") + 1)"
+            if attr == "popleft" and len(rendered_args) == 0:
+                return "popfirst!(" + owner + ")"
             if attr == "insert" and len(rendered_args) == 2:
                 return "insert!(" + owner + ", (" + rendered_args[0] + ") + 1, " + rendered_args[1] + ")"
             if attr == "extend" and len(rendered_args) == 1:
@@ -1938,7 +2342,7 @@ class JuliaNativeEmitter:
                 return "reverse!(" + owner + ")"
             if attr == "sort":
                 return "sort!(" + owner + ")"
-            if attr == "index" and len(rendered_args) >= 1:
+            if attr == "index" and owner_type != "str" and len(rendered_args) >= 1:
                 return "(findfirst(x -> x == " + rendered_args[0] + ", " + owner + ") - 1)"
             if attr == "count" and len(rendered_args) >= 1:
                 return "count(x -> x == " + rendered_args[0] + ", " + owner + ")"
@@ -1966,6 +2370,8 @@ class JuliaNativeEmitter:
                     return "join(" + rendered_args[0] + ", " + owner + ")"
                 if attr == "find" and len(rendered_args) >= 1:
                     return "__pytra_str_find(" + owner + ", " + rendered_args[0] + ")"
+                if attr == "index" and len(rendered_args) >= 1:
+                    return "__pytra_str_find(" + owner + ", " + rendered_args[0] + ")"
                 if attr == "rfind" and len(rendered_args) >= 1:
                     return "__pytra_str_rfind(" + owner + ", " + rendered_args[0] + ")"
                 if attr == "replace" and len(rendered_args) >= 2:
@@ -1991,6 +2397,12 @@ class JuliaNativeEmitter:
                 return "collect(pairs(" + owner + "))"
             if attr == "update" and len(rendered_args) == 1:
                 return "merge!(" + owner + ", " + rendered_args[0] + ")"
+            if attr == "add" and len(rendered_args) == 1:
+                return "push!(" + owner + ", " + rendered_args[0] + ")"
+            if attr == "discard" and len(rendered_args) == 1:
+                return "delete!(" + owner + ", " + rendered_args[0] + ")"
+            if attr == "remove" and len(rendered_args) == 1:
+                return "delete!(" + owner + ", " + rendered_args[0] + ")"
             # Method call with self
             if self.current_class_name != "" and isinstance(owner_node, dict) and owner_node.get("kind") == "Name":
                 if str(owner_node.get("id")) == "self":
@@ -2005,6 +2417,9 @@ class JuliaNativeEmitter:
         ident = _safe_ident(expr_any.get("id"), "value")
         if ident == "main" and "__pytra_main" in self.function_names and "main" not in self.function_names:
             ident = "__pytra_main"
+        builtin_exception = self._builtin_exception_type_name(ident)
+        if builtin_exception != ident:
+            ident = builtin_exception
         return self.relative_import_name_aliases.get(ident, ident)
 
     def _render_constant(self, value: Any) -> str:

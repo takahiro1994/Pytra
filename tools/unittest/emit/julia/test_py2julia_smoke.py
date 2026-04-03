@@ -16,12 +16,30 @@ if str(ROOT) not in sys.path:
 if str(ROOT / "src") not in sys.path:
     sys.path.insert(0, str(ROOT / "src"))
 
-from toolchain.emit.julia.emitter import transpile_to_julia, transpile_to_julia_native
+from toolchain2.emit.julia.emitter import transpile_to_julia
+from toolchain2.emit.julia.emitter import transpile_to_julia_native
 from toolchain.misc.transpile_cli import load_east3_document
 
 RUNTIME_SRC = ROOT / "src" / "runtime" / "julia" / "built_in" / "py_runtime.jl"
-JULIA_BIN = shutil.which("julia") or ""
+RUNTIME_ROOT = ROOT / "src" / "runtime" / "julia"
 PYTHON_BIN = sys.executable or "python3"
+
+
+def _resolve_julia_bin() -> str:
+    env_bin = os.environ.get("PYTRA_JULIA_BIN", "").strip()
+    if env_bin:
+        return env_bin
+    direct_candidates = [
+        Path("/home/node/.julia/juliaup/julia-1.12.5+0.x64.linux.gnu/bin/julia"),
+        Path.home() / ".julia" / "juliaup" / "julia-1.12.5+0.x64.linux.gnu" / "bin" / "julia",
+    ]
+    for candidate in direct_candidates:
+        if candidate.exists():
+            return str(candidate)
+    return shutil.which("julia") or ""
+
+
+JULIA_BIN = _resolve_julia_bin()
 
 
 def load_east(
@@ -48,11 +66,23 @@ def load_east(
         dump_east3_opt_trace=dump_east3_opt_trace,
         target_lang="julia",
     )
-    return doc3 if isinstance(doc3, dict) else {}
+    if not isinstance(doc3, dict):
+        return {}
+    meta = doc3.get("meta")
+    if not isinstance(meta, dict):
+        meta = {}
+        doc3["meta"] = meta
+    emit_ctx = meta.get("emit_context")
+    if not isinstance(emit_ctx, dict):
+        emit_ctx = {}
+        meta["emit_context"] = emit_ctx
+    emit_ctx["is_entry"] = True
+    return doc3
 
 
 def find_fixture_case(stem: str) -> Path:
-    matches = sorted((ROOT / "test" / "fixtures").rglob(f"{stem}.py"))
+    fixture_root = ROOT / "test" / "fixture" / "source" / "py"
+    matches = sorted(fixture_root.rglob(f"{stem}.py"))
     if not matches:
         raise FileNotFoundError(f"missing fixture: {stem}")
     return matches[0]
@@ -79,7 +109,9 @@ def _run_julia(source: str, timeout: int = 15) -> subprocess.CompletedProcess[st
     with tempfile.TemporaryDirectory() as tmpdir:
         src_path = Path(tmpdir) / "main.jl"
         src_path.write_text(source, encoding="utf-8")
-        shutil.copy2(str(RUNTIME_SRC), str(Path(tmpdir) / "py_runtime.jl"))
+        runtime_dst = Path(tmpdir) / "built_in"
+        runtime_dst.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(str(RUNTIME_SRC), str(runtime_dst / "py_runtime.jl"))
         return subprocess.run(
             [JULIA_BIN, str(src_path)],
             capture_output=True,
