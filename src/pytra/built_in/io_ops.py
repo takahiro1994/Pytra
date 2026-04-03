@@ -5,5 +5,5 @@ from pytra.std import extern
 
 
 @extern
-def py_print(value: object) -> None:
+def py_print[T](value: T) -> None:
     print(value)

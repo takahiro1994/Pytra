@@ -18,6 +18,9 @@ class CompletedProcess:
         self.stderr: str = stderr
 
 
+type RunKwarg = str | bool | dict[str, str]
+
+
 @extern
 def run(cmd: list[str], cwd: str = "", capture_output: bool = False, env: dict[str, str] = {}) -> CompletedProcess:
     """Run a command as a subprocess.
@@ -32,7 +35,7 @@ def run(cmd: list[str], cwd: str = "", capture_output: bool = False, env: dict[s
         CompletedProcess with returncode and optional stdout/stderr.
     """
     import os as _os
-    kwargs: dict[str, object] = {}
+    kwargs: dict[str, RunKwarg] = {}
     if cwd != "":
         kwargs["cwd"] = cwd
     if capture_output:

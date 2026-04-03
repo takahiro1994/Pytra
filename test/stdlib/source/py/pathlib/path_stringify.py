@@ -1,7 +1,7 @@
 from pytra.std.pathlib import Path
 
 
-def stringify(raw: object) -> str:
+def stringify(raw: str | Path) -> str:
     path = Path(raw)
     return str(path)
 

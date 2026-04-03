@@ -1,31 +1,30 @@
 """Pure-Python source-of-truth for containment helpers."""
 
 
-def py_contains_dict_object(values: object, key: object) -> bool:
-    needle = str(key)
-    for cur in values:
-        if cur == needle:
-            return True
-    return False
-
-
-def py_contains_list_object(values: object, key: object) -> bool:
+def py_contains_dict_object[K, V](values: dict[K, V], key: K) -> bool:
     for cur in values:
         if cur == key:
             return True
     return False
 
 
-def py_contains_set_object(values: object, key: object) -> bool:
+def py_contains_list_object[T](values: list[T], key: T) -> bool:
     for cur in values:
         if cur == key:
             return True
     return False
 
 
-def py_contains_str_object(values: object, key: object) -> bool:
-    needle = str(key)
-    haystack = str(values)
+def py_contains_set_object[T](values: set[T], key: T) -> bool:
+    for cur in values:
+        if cur == key:
+            return True
+    return False
+
+
+def py_contains_str_object(values: str, key: str) -> bool:
+    needle = key
+    haystack = values
     n = len(haystack)
     m = len(needle)
     if m == 0:

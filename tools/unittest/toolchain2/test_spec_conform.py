@@ -17,6 +17,7 @@ if str(ROOT / "src") not in sys.path:
 from toolchain2.common.jv import deep_copy_json
 from toolchain2.compile.jv import CompileContext
 from toolchain2.compile.lower import lower_east2_to_east3
+from toolchain2.compile.validate_east3 import validate_east3
 from toolchain2.compile.passes import apply_guard_narrowing
 from toolchain2.emit.common.code_emitter import (
     RuntimeMapping,
@@ -2537,6 +2538,41 @@ class Parser:
         args = target_call.get("args")
         self.assertIsInstance(args, list)
         self.assertEqual(args[1].get("call_arg_type"), "str")
+
+    def test_validate_east3_rejects_object_resolved_type(self) -> None:
+        doc = {
+            "kind": "Module",
+            "east_stage": 3,
+            "schema_version": 1,
+            "source_path": "<mem>",
+            "meta": {"dispatch_mode": "native"},
+            "body": [
+                {
+                    "kind": "Expr",
+                    "value": {
+                        "kind": "Name",
+                        "id": "x",
+                        "resolved_type": "object",
+                    },
+                }
+            ],
+        }
+
+        result = validate_east3(doc)
+
+        self.assertFalse(result.ok)
+        self.assertTrue(any('resolved_type is forbidden "object"' in err for err in result.errors))
+
+    def test_compile_rejects_object_resolved_type_in_east3(self) -> None:
+        source = """
+def f(x: object) -> None:
+    print(x)
+"""
+        east2 = parse_python_source(source, "<mem>").to_jv()
+        resolve_east1_to_east2(east2, registry=_load_registry())
+
+        with self.assertRaisesRegex(RuntimeError, "EAST3 validation failed"):
+            lower_east2_to_east3(deep_copy_json(east2), target_language="cpp")
 
 
 if __name__ == "__main__":

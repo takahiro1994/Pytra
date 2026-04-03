@@ -13,7 +13,7 @@ Backends with native format support can override with emitter-level optimization
 """
 
 
-def py_format_value(value: object, spec: str) -> str:
+def py_format_value[T](value: T, spec: str) -> str:
     """Format *value* according to Python format spec *spec*.
 
     Equivalent to ``format(value, spec)`` in Python.
@@ -25,7 +25,7 @@ def py_format_value(value: object, spec: str) -> str:
     return _apply_align(raw, parsed)
 
 
-def py_format_conversion(value: object, conversion: str) -> str:
+def py_format_conversion[T](value: T, conversion: str) -> str:
     """Apply f-string conversion flag (!s, !r, !a)."""
     if conversion == "s":
         return _to_str(value)
@@ -36,7 +36,7 @@ def py_format_conversion(value: object, conversion: str) -> str:
     return _to_str(value)
 
 
-def _to_str(value: object) -> str:
+def _to_str[T](value: T) -> str:
     v: str = ""
     if isinstance(value, str):
         v = value
@@ -54,7 +54,7 @@ def _to_str(value: object) -> str:
     return v
 
 
-def _repr_value(value: object) -> str:
+def _repr_value[T](value: T) -> str:
     if isinstance(value, str):
         return "'" + value + "'"
     return _to_str(value)
@@ -202,7 +202,7 @@ def _spec_type(p: list[str]) -> str:
 
 # -- Core formatting --
 
-def _format_core(value: object, parsed: list[str]) -> str:
+def _format_core[T](value: T, parsed: list[str]) -> str:
     tc: str = _spec_type(parsed)
     sign: str = _spec_sign(parsed)
     precision: str = _spec_precision(parsed)

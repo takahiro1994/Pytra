@@ -15,6 +15,7 @@ from toolchain2.compile.jv import JsonVal, Node, CompileContext, deep_copy_json
 from toolchain2.compile.jv import jv_str, jv_dict, jv_list, jv_is_dict, jv_is_list
 from toolchain2.compile.jv import nd_kind, nd_get_str, nd_get_dict, nd_get_list
 from toolchain2.compile.source_span import walk_normalize_spans
+from toolchain2.compile.validate_east3 import validate_east3, format_result
 from toolchain2.common.kinds import (
     MODULE, FUNCTION_DEF, CLOSURE_DEF, CLASS_DEF, ASSIGN, ANN_ASSIGN, AUG_ASSIGN, RETURN,
     FOR, FOR_RANGE, FOR_CORE, CALL, ATTRIBUTE, NAME, CONSTANT,
@@ -2257,4 +2258,7 @@ def lower_east2_to_east3(east_module: Node, object_dispatch_mode: str = "", targ
         meta_norm = mn
     lowered_node["meta"] = meta_norm
     meta_norm["dispatch_mode"] = dispatch_mode
+    validation = validate_east3(lowered_node)
+    if not validation.ok:
+        raise RuntimeError("EAST3 validation failed\n" + format_result(validation))
     return lowered_node
