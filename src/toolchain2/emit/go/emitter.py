@@ -1426,6 +1426,11 @@ def _maybe_coerce_expr_to_type(ctx: EmitContext, value_node: JsonVal, value_code
     source_gt = go_type(source_type)
     if target_gt == "" or target_gt == "any" or source_gt == target_gt:
         return value_code
+    if (
+        source_type in ("Callable", "callable")
+        and target_gt.startswith("func(")
+    ):
+        return value_code
     source_optional_inner = _optional_inner_type(source_type)
     if source_optional_inner != "" and go_type(source_optional_inner) == target_gt:
         if source_gt.startswith("*") and not target_gt.startswith("*"):
