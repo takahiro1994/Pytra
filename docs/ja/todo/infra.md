@@ -20,6 +20,18 @@
 
 ## 未完了タスク
 
+### P0-MAPPING-FQCN-KEY: mapping.json の calls キーを完全修飾に統一する
+
+文脈: [docs/ja/plans/p0-mapping-fqcn-key.md](../plans/p0-mapping-fqcn-key.md)
+
+共通基盤 `code_emitter.py` の `resolve_runtime_symbol_name` が `runtime_symbol`（bare `"sin"` 等）だけで mapping.json を引いている。ユーザー定義関数と衝突するリスクあり。EAST3 は `runtime_module_id` + `runtime_symbol` を完全修飾で持っているので、mapping.json キーも `"pytra.std.math.sin"` のように完全修飾にする。
+
+1. [ ] [ID: P0-FQCN-KEY-S1] `resolve_runtime_symbol_name` に `module_id` パラメータを追加し完全修飾で先に引く
+2. [ ] [ID: P0-FQCN-KEY-S2] 全言語の mapping.json キーを完全修飾に統一、重複エントリ削除
+3. [ ] [ID: P0-FQCN-KEY-S3] bare fallback を削除
+4. [ ] [ID: P0-FQCN-KEY-S4] `check_runtime_call_coverage.py` の突き合わせを完全修飾に対応
+5. [ ] [ID: P0-FQCN-KEY-S5] C++ parity で代表確認（各言語は各担当に委譲）
+
 ### P10-LEGACY-TOOLCHAIN-REMOVAL: 旧 toolchain + pytra-cli.py を削除する
 
 文脈: [docs/ja/plans/p10-legacy-toolchain-removal.md](../plans/p10-legacy-toolchain-removal.md)
