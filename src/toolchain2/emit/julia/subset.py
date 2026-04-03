@@ -1393,6 +1393,43 @@ class JuliaSubsetRenderer:
         else:
             self._emit_class(node)
 
+    def _emit_try_handlers(self, handlers: list[JsonVal], err_name: str) -> None:
+        self._emit("catch " + err_name)
+        self.indent_level += 1
+        for index, handler in enumerate(handlers):
+            if not isinstance(handler, dict):
+                continue
+            type_node = handler.get("type")
+            type_name = self._render_expr(type_node) if isinstance(type_node, dict) else ""
+            mapped_type_name = self.mapping.predicate_types.get(type_name, "")
+            if mapped_type_name != "":
+                type_name = mapped_type_name
+            cond = "true" if type_name == "" else err_name + " isa " + type_name
+            if index == 0:
+                self._emit("if " + cond)
+            else:
+                self._emit("elseif " + cond)
+            self.indent_level += 1
+            bound_name = handler.get("name")
+            if isinstance(bound_name, str) and bound_name != "":
+                self._emit(bound_name + " = " + err_name)
+            for stmt in _list(handler, "body"):
+                self._emit_stmt(stmt)
+            self.indent_level -= 1
+        self._emit("else")
+        self.indent_level += 1
+        self._emit("rethrow()")
+        self.indent_level -= 1
+        self._emit("end")
+        self.indent_level -= 1
+
+    def _emit_try_finally(self, finalbody: list[JsonVal]) -> None:
+        self._emit("finally")
+        self.indent_level += 1
+        for stmt in finalbody:
+            self._emit_stmt(stmt)
+        self.indent_level -= 1
+
     def _emit_stmt(self, node: JsonVal) -> None:
         if not isinstance(node, dict):
             raise RuntimeError("julia subset: stmt must be dict")
@@ -1463,41 +1500,9 @@ class JuliaSubsetRenderer:
             self._emit_stmt(stmt)
         self.indent_level -= 1
         if len(handlers) > 0:
-            err_name = "__pytra_err"
-            self._emit("catch " + err_name)
-            self.indent_level += 1
-            for index, handler in enumerate(handlers):
-                if not isinstance(handler, dict):
-                    continue
-                type_node = handler.get("type")
-                type_name = self._render_expr(type_node) if isinstance(type_node, dict) else ""
-                mapped_type_name = self.mapping.predicate_types.get(type_name, "")
-                if mapped_type_name != "":
-                    type_name = mapped_type_name
-                cond = "true" if type_name == "" else err_name + " isa " + type_name
-                if index == 0:
-                    self._emit("if " + cond)
-                else:
-                    self._emit("elseif " + cond)
-                self.indent_level += 1
-                bound_name = handler.get("name")
-                if isinstance(bound_name, str) and bound_name != "":
-                    self._emit(bound_name + " = " + err_name)
-                for stmt in _list(handler, "body"):
-                    self._emit_stmt(stmt)
-                self.indent_level -= 1
-            self._emit("else")
-            self.indent_level += 1
-            self._emit("rethrow()")
-            self.indent_level -= 1
-            self._emit("end")
-            self.indent_level -= 1
+            self._emit_try_handlers(handlers, "__pytra_err")
         if len(finalbody) > 0:
-            self._emit("finally")
-            self.indent_level += 1
-            for stmt in finalbody:
-                self._emit_stmt(stmt)
-            self.indent_level -= 1
+            self._emit_try_finally(finalbody)
         self._emit("end")
 
     def _emit_class(self, node: dict[str, JsonVal]) -> None:
