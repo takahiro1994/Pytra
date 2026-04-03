@@ -352,7 +352,6 @@ def _make_static_scalar_cast_expr(value_expr: JsonVal, target_type: str, *, ctx:
     out["borrow_kind"] = "value"
     out["casts"] = []
     out["lowered_kind"] = BUILTIN_CALL
-    out["builtin_name"] = func_name
     out["runtime_call"] = "static_cast"
     _copy_source_span_and_repr(value_expr, out)
     set_type_expr_summary(out, type_expr_summary_from_payload(ctx, None, target_type))
@@ -1430,7 +1429,9 @@ def _normalize_type_predicate_target_name(type_name: str) -> str:
 
 def _make_type_predicate_expr(
     *, kind: str, left_key: str, left_expr: JsonVal,
-    expected_type_id_expr: JsonVal, source_expr: JsonVal,
+    expected_type_id_expr: JsonVal = None,
+    expected_type_name: str = "",
+    source_expr: JsonVal,
     ctx: CompileContext,
 ) -> Node:
     out: Node = {}
@@ -1439,7 +1440,10 @@ def _make_type_predicate_expr(
     out["borrow_kind"] = "value"
     out["casts"] = []
     out[left_key] = left_expr
-    out["expected_type_id"] = expected_type_id_expr
+    if kind == IS_INSTANCE:
+        out["expected_type_name"] = expected_type_name
+    else:
+        out["expected_type_id"] = expected_type_id_expr
     _copy_source_span_and_repr(source_expr, out)
     ls: Node = expr_type_summary(ctx, left_expr)
     set_type_expr_summary(out, ls)
@@ -1543,6 +1547,16 @@ def _type_ref_to_type_id(
     return node_dict
 
 
+def _type_ref_to_type_name(type_ref_expr: JsonVal, *, lower_node_fn) -> str:
+    """Return the canonical type name for IsInstance's expected_type_name field."""
+    node = lower_node_fn(type_ref_expr)
+    if not isinstance(node, dict):
+        return ""
+    if node.get("kind") != NAME:
+        return ""
+    return _normalize_type_predicate_target_name(jv_str(node.get("id", "")))
+
+
 def _collect_expected_type_id_specs(
     type_spec_expr: JsonVal, *, dispatch_mode: str,
     lower_node_fn,
@@ -1560,6 +1574,7 @@ def _collect_expected_type_id_specs(
                 if lowered is not None:
                     spec: Node = {}
                     spec["type_id_expr"] = lowered
+                    spec["type_name_str"] = _type_ref_to_type_name(elem, lower_node_fn=lower_node_fn)
                     spec["type_ref_expr"] = elem
                     spec["nominal_adt_test_v1"] = _build_nominal_adt_type_test_meta(elem, ctx)
                     out.append(spec)
@@ -1568,6 +1583,7 @@ def _collect_expected_type_id_specs(
     if lowered_one is not None:
         spec1: Node = {}
         spec1["type_id_expr"] = lowered_one
+        spec1["type_name_str"] = _type_ref_to_type_name(spec_node, lower_node_fn=lower_node_fn)
         spec1["type_ref_expr"] = spec_node
         spec1["nominal_adt_test_v1"] = _build_nominal_adt_type_test_meta(spec_node, ctx)
         out.append(spec1)
@@ -1585,32 +1601,27 @@ def _lower_isinstance_call(
         return out_call
     value_expr = al[0]
     specs = _collect_expected_type_id_specs(al[1], dispatch_mode=dispatch_mode, lower_node_fn=lower_node_fn, ctx=ctx)
-    expected = [s.get("type_id_expr") for s in specs if isinstance(s, dict)]
-    if len(expected) == 0:
+    type_names = [jv_str(s.get("type_name_str", "")) for s in specs if isinstance(s, dict)]
+    if all(tn == "" for tn in type_names):
         fo = _const_bool_node(False)
         _copy_source_span_and_repr(out_call, fo)
         return fo
     for spec in specs:
         if not isinstance(spec, dict):
             continue
-        type_ref_expr = spec.get("type_ref_expr")
-        if not isinstance(type_ref_expr, dict):
-            continue
-        if type_ref_expr.get("kind") != NAME:
-            continue
-        if _normalize_type_predicate_target_name(jv_str(type_ref_expr.get("id", ""))) == "object":
+        if jv_str(spec.get("type_name_str", "")) == "object":
             to = _const_bool_node(True)
             _copy_source_span_and_repr(out_call, to)
             return to
     checks: list[Node] = []
     for spec in specs:
         spec_node: Node = cast(dict[str, JsonVal], spec)
-        tid = spec_node.get("type_id_expr")
-        if tid is None:
+        type_name = jv_str(spec_node.get("type_name_str", ""))
+        if type_name == "":
             continue
         check = _make_type_predicate_expr(
             kind=jv_str(IS_INSTANCE), left_key="value", left_expr=value_expr,
-            expected_type_id_expr=tid, source_expr=out_call,
+            expected_type_name=type_name, source_expr=out_call,
             ctx=ctx,
         )
         ttm = spec_node.get("nominal_adt_test_v1")
@@ -1682,11 +1693,11 @@ def _lower_type_id_call_expr(
     if st == "type.issubclass":
         return _lower_issubclass_call(out_call, dispatch_mode=dispatch_mode, lower_node_fn=lower_node_fn, ctx=ctx)
     lk = jv_str(out_call.get("lowered_kind", ""))
-    bn = jv_str(out_call.get("builtin_name", ""))
     if lk == TYPE_PREDICATE_CALL:
-        if bn == "isinstance":
+        pk = jv_str(out_call.get("predicate_kind", ""))
+        if pk == "isinstance":
             return _lower_isinstance_call(out_call, dispatch_mode=dispatch_mode, lower_node_fn=lower_node_fn, ctx=ctx)
-        if bn == "issubclass":
+        if pk == "issubclass":
             return _lower_issubclass_call(out_call, dispatch_mode=dispatch_mode, lower_node_fn=lower_node_fn, ctx=ctx)
     func_obj = out_call.get("func")
     if not isinstance(func_obj, dict):
@@ -1705,7 +1716,11 @@ def _lower_type_id_call_expr(
         al2 = out_call.get("args")
         a2: list[JsonVal] = cast(list[JsonVal], al2) if isinstance(al2, list) else []
         if len(a2) == 2:
-            return _make_type_predicate_expr(kind=jv_str(IS_INSTANCE), left_key="value", left_expr=a2[0], expected_type_id_expr=a2[1], source_expr=out_call, ctx=ctx)
+            _tid_expr = a2[1]
+            _tid_map = {"PYTRA_TID_NONE": "None", "PYTRA_TID_STR": "str", "PYTRA_TID_LIST": "list", "PYTRA_TID_DICT": "dict", "PYTRA_TID_SET": "set"}
+            _raw_id = jv_str(_tid_expr.get("id", "")) if isinstance(_tid_expr, dict) else ""
+            _type_name = _tid_map.get(_raw_id, _raw_id)
+            return _make_type_predicate_expr(kind=jv_str(IS_INSTANCE), left_key="value", left_expr=a2[0], expected_type_name=_type_name, source_expr=out_call, ctx=ctx)
     if fn == "py_issubclass" or fn == "py_tid_issubclass":
         al2 = out_call.get("args")
         a2: list[JsonVal] = cast(list[JsonVal], al2) if isinstance(al2, list) else []
@@ -2085,12 +2100,12 @@ def _lower_call_expr(call: Node, *, dispatch_mode: str, ctx: CompileContext) -> 
         return out
     if not ctx.legacy_compat_bridge:
         return out
-    bn = jv_str(out.get("builtin_name", ""))
-    if bn == "bool":
+    rc_legacy = jv_str(out.get("runtime_call", ""))
+    if rc_legacy in ("bool", "static_cast") and jv_str(out.get("semantic_tag", "")) == "cast.bool":
         return _make_boundary_expr(kind=jv_str(OBJ_BOOL), value_key="value", value_node=a0, resolved_type="bool", source_expr=out, ctx=ctx)
-    if bn == "len":
+    if rc_legacy in ("len", "py_len"):
         return _make_boundary_expr(kind=jv_str(OBJ_LEN), value_key="value", value_node=a0, resolved_type="int64", source_expr=out, ctx=ctx)
-    if bn == "str":
+    if rc_legacy in ("str", "py_to_string"):
         return _make_boundary_expr(kind=jv_str(OBJ_STR), value_key="value", value_node=a0, resolved_type="str", source_expr=out, ctx=ctx)
     if isinstance(func_obj, dict):
         func_node2: Node = cast(dict[str, JsonVal], func_obj)

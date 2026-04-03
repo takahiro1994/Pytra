@@ -748,16 +748,9 @@ def _fold_trait_predicates(
     for node in _walk_nodes(doc):
         if node.get("kind") != "IsInstance":
             continue
-        expected = node.get("expected_type_id")
-        if not isinstance(expected, dict):
+        expected_name = node.get("expected_type_name")
+        if not isinstance(expected_name, str) or expected_name == "":
             continue
-        expected_name = ""
-        expected_id = expected.get("id")
-        if isinstance(expected_id, str) and expected_id != "":
-            expected_name = expected_id
-        expected_repr = expected.get("repr")
-        if expected_name == "" and isinstance(expected_repr, str):
-            expected_name = expected_repr
         trait_fqcn = _link_resolve_trait_ref(
             expected_name,
             module_id=module_id,
@@ -1466,17 +1459,9 @@ def _rewrite_type_id_isinstance(
     for node in _walk_nodes(doc):
         if node.get("kind") != "IsInstance":
             continue
-        expected = node.get("expected_type_id")
-        if not isinstance(expected, dict):
+        expected_name = node.get("expected_type_name")
+        if not isinstance(expected_name, str) or expected_name == "":
             continue
-        expected_name = ""
-        expected_id = expected.get("id")
-        if isinstance(expected_id, str) and expected_id != "":
-            expected_name = expected_id
-        if expected_name == "":
-            expected_repr = expected.get("repr")
-            if isinstance(expected_repr, str):
-                expected_name = expected_repr
         target_fqcn = _resolve_type_id_target(
             expected_name,
             module_id=module_id,

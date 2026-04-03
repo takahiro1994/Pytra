@@ -667,6 +667,13 @@ if isinstance(items, list):
 - 手動 `cast` は引き続き有効であり、narrowing と併用できる。
 - narrowing は暗黙 cast と等価であり、型安全性を破壊しない。
 
+`IsInstance` ノードの `expected_type_name` フィールド（EAST3）:
+
+- EAST3 の `IsInstance` ノードは `expected_type_name: str` フィールドに期待型名（`"dict"`, `"str"`, `"list"`, `"int32"`, `"Dog"` 等）を直接保持する。
+- `PYTRA_TID_DICT` のような型 ID 定数（`expected_type_id` フィールド）は廃止済み。emitter は逆引きテーブルを持ってはならない。
+- POD 型（`int8`〜`float64`）・ユーザ定義クラス名も同じフィールドに入る。
+- `IsSubclass` / `IsSubtype` は引き続き `expected_type_id`（整数型 ID 式）を使う。このフィールドはそれら専用であり `IsInstance` には付かない。
+
 `range` について:
 
 - 入力AST上で `Call(Name("range"), ...)` が現れても、最終EASTでは専用ノード（例: `ForRange` / `RangeExpr` 等）へ変換し、直接の `Call` として残さない。

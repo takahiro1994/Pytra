@@ -1871,7 +1871,6 @@ def _try_lower_reversed_forcore(stmt: Node, ctx: CompileContext) -> JsonVal:
     len_call["args"] = [deep_copy_json(xs)]
     len_call["keywords"] = []
     len_call["lowered_kind"] = "BuiltinCall"
-    len_call["builtin_name"] = "len"
     len_call["runtime_call"] = "len"
     len_call["runtime_module_id"] = "pytra.core.py_runtime"
     len_call["runtime_symbol"] = "len"
@@ -2689,17 +2688,7 @@ def apply_integer_promotion(module: Node, ctx: CompileContext) -> Node:
 # guard narrowing
 # ===========================================================================
 
-_TYPE_GUARD_DEFAULTS: dict[str, str] = {
-    "PYTRA_TID_NONE": "None",
-    "PYTRA_TID_BOOL": "bool",
-    "PYTRA_TID_INT": "int64",
-    "PYTRA_TID_FLOAT": "float64",
-    "PYTRA_TID_STR": "str",
-    "PYTRA_TID_LIST": "list[JsonVal]",
-    "PYTRA_TID_DICT": "dict[str,JsonVal]",
-    "PYTRA_TID_SET": "set[JsonVal]",
-    "PYTRA_TID_TUPLE": "tuple[JsonVal]",
-}
+_TYPE_GUARD_DEFAULTS: dict[str, str] = {}
 
 
 def _split_union_members(type_name: str) -> list[str]:
@@ -2754,21 +2743,12 @@ def _select_guard_target_type(source_type: str, expected_name: str) -> str:
     if src == "" or src == "unknown" or expected == "" or expected == "unknown":
         return ""
     guard_type = expected
-    default_type = _TYPE_GUARD_DEFAULTS.get(expected, "")
-    if default_type != "":
-        guard_type = default_type
-        if expected == "PYTRA_TID_INT":
-            guard_type = "int"
-        elif expected == "PYTRA_TID_FLOAT":
-            guard_type = "float"
     members = _split_union_members(src)
     if len(members) == 0:
         members = [src]
     for member in members:
         if _type_matches_guard(member, guard_type):
             return normalize_type_name(member)
-    if default_type != "":
-        return normalize_type_name(default_type)
     if _type_matches_guard(src, guard_type):
         return src
     return expected
@@ -2781,7 +2761,6 @@ def _guard_narrowing_from_expr(expr: JsonVal) -> dict[str, str]:
     kind = nd.get("kind", "")
     if kind == "IsInstance":
         raw_value = nd.get("value")
-        expected = nd.get("expected_type_id")
         if isinstance(raw_value, dict):
             value_node0: Node = cast(dict[str, JsonVal], raw_value)
             if value_node0.get("kind") == UNBOX:
@@ -2796,12 +2775,7 @@ def _guard_narrowing_from_expr(expr: JsonVal) -> dict[str, str]:
         name = _tp_safe(value_node.get("id"))
         if name == "":
             return {}
-        expected_name = ""
-        if isinstance(expected, dict):
-            expected_node: Node = cast(dict[str, JsonVal], expected)
-            expected_name = _tp_safe(expected_node.get("id"))
-            if expected_name == "":
-                expected_name = _tp_safe(expected_node.get("repr"))
+        expected_name = _tp_safe(nd.get("expected_type_name"))
         target_type = _select_guard_target_type(_tp_safe(value_node.get("resolved_type")), expected_name)
         if target_type == "" or target_type == "unknown":
             return {}
@@ -3003,13 +2977,7 @@ def _guard_expr(node: JsonVal, env: dict[str, str]) -> JsonVal:
             return _make_guard_unbox(nd, target_type, storage_type)
         return nd
     if kind == "IsInstance":
-        expected = nd.get("expected_type_id")
-        if isinstance(expected, dict):
-            expected_node: Node = cast(dict[str, JsonVal], expected)
-            nd["expected_type_id"] = _guard_expr(expected_node, env)
-        elif isinstance(expected, list):
-            expected_list: list[JsonVal] = cast(list[JsonVal], expected)
-            nd["expected_type_id"] = _guard_expr(expected_list, env)
+        # expected_type_name is a plain string — no sub-expression to recurse into
         return nd
     if kind in (FUNCTION_DEF, CLOSURE_DEF, CLASS_DEF, UNBOX):
         return nd

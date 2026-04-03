@@ -702,11 +702,11 @@ def _apply_collection_type_hint(node: dict[str, JsonVal], target_type: str, ctx:
     kind: str = str(node.get("kind", ""))
     current: str = str(node.get("resolved_type", ""))
     if kind == "Call":
-        builtin_name = str(node.get("builtin_name", ""))
-        if builtin_name == "list" and hinted_type.startswith("list[") and current in ("", "unknown", "list[unknown]"):
+        call_rc = str(node.get("runtime_call", ""))
+        if call_rc == "list_ctor" and hinted_type.startswith("list[") and current in ("", "unknown", "list[unknown]"):
             node["resolved_type"] = hinted_type
             return
-        if builtin_name == "set" and hinted_type.startswith("set[") and current in ("", "unknown", "set[unknown]"):
+        if call_rc == "set_ctor" and hinted_type.startswith("set[") and current in ("", "unknown", "set[unknown]"):
             node["resolved_type"] = hinted_type
             return
     if kind == "List" and hinted_type.startswith("list[") and current in ("", "unknown", "list[unknown]"):
@@ -1047,10 +1047,7 @@ def _resolve_isinstance_guard_info(expr: JsonVal) -> tuple[JsonVal, str]:
     kind = str(expr.get("kind", ""))
     if kind == "IsInstance":
         value = expr.get("value")
-        expected = expr.get("expected_type_id")
-        if isinstance(expected, dict):
-            return value, _resolve_safe_str(expected.get("id")) or _resolve_safe_str(expected.get("repr"))
-        return value, ""
+        return value, _resolve_safe_str(expr.get("expected_type_name"))
     if kind == "Call" and str(expr.get("predicate_kind", "")) == "isinstance":
         args = expr.get("args")
         if isinstance(args, list) and len(args) >= 2:
@@ -2389,7 +2386,6 @@ def _resolve_simple_call(expr: dict[str, JsonVal], func: dict[str, JsonVal], ctx
         expr["resolved_type"] = ret
         func["resolved_type"] = "type"
         expr["lowered_kind"] = "BuiltinCall"
-        expr["builtin_name"] = "list"
         expr["runtime_call"] = "list_ctor"
         expr["runtime_module_id"] = "pytra.core.list"
         expr["runtime_symbol"] = "list"
@@ -2410,7 +2406,6 @@ def _resolve_simple_call(expr: dict[str, JsonVal], func: dict[str, JsonVal], ctx
         expr["resolved_type"] = ret
         func["resolved_type"] = "type"
         expr["lowered_kind"] = "BuiltinCall"
-        expr["builtin_name"] = "set"
         expr["runtime_call"] = "set_ctor"
         expr["runtime_module_id"] = "pytra.core.set"
         expr["runtime_symbol"] = "set"
@@ -2433,7 +2428,6 @@ def _resolve_simple_call(expr: dict[str, JsonVal], func: dict[str, JsonVal], ctx
         expr["resolved_type"] = ret
         func["resolved_type"] = "type"
         expr["lowered_kind"] = "BuiltinCall"
-        expr["builtin_name"] = "tuple"
         expr["runtime_call"] = "tuple_ctor"
         expr["runtime_module_id"] = "pytra.core.tuple"
         expr["runtime_symbol"] = "tuple"
@@ -2459,7 +2453,6 @@ def _resolve_builtin_call(
         expr["resolved_type"] = "PyFile"
         func["resolved_type"] = "callable"
         expr["lowered_kind"] = "BuiltinCall"
-        expr["builtin_name"] = "open"
         expr["runtime_call"] = "open"
         expr["runtime_module_id"] = "pytra.core.py_runtime"
         expr["runtime_symbol"] = "open"
@@ -2522,7 +2515,6 @@ def _resolve_builtin_call(
         return ret
 
     expr["lowered_kind"] = "BuiltinCall"
-    expr["builtin_name"] = name
 
     # Specialize int(str)/float(str)/str(non-str) for emitter clarity
     specialized_rc: str = ""
@@ -2553,6 +2545,11 @@ def _resolve_builtin_call(
         ctx.used_builtin_modules.add(extern.module)
     elif specialized_rc != "":
         expr["runtime_call"] = specialized_rc
+    else:
+        # Fallback for unrecognized builtins (no extern entry, no specialization).
+        # Use the Python function name as runtime_call; emitters apply builtin_prefix.
+        expr["runtime_call"] = name
+        expr["runtime_call_adapter_kind"] = "builtin"
 
     return ret
 
@@ -2813,7 +2810,6 @@ def _resolve_container_method_call(
     # Normalize runtime_call: str.strip → py_strip, str.join → py_join etc.
     normalized_rc: str = _normalize_method_runtime_call(owner_base, method, runtime_call_name)
     expr["lowered_kind"] = "BuiltinCall"
-    expr["builtin_name"] = method
     expr["runtime_call"] = normalized_rc
     if mod != "":
         expr["runtime_module_id"] = mod
@@ -3724,25 +3720,36 @@ def _resolve_class_def(stmt: dict[str, JsonVal], ctx: ResolveContext) -> None:
 
     # Add class_storage_hint if not present
     if "class_storage_hint" not in stmt:
-        base_val = stmt.get("base")
-        has_base: bool = base_val is not None and isinstance(base_val, str) and base_val != ""
-        is_dataclass: bool = stmt.get("dataclass") is True
-        # Check for __init__ method
-        has_init: bool = False
-        cls_body = stmt.get("body")
-        if isinstance(cls_body, list):
-            for item in cls_body:
-                if isinstance(item, dict) and item.get("kind") == "FunctionDef" and item.get("name") == "__init__":
-                    has_init = True
-                    break
-        # Enum/IntEnum/IntFlag bases are value types
-        base_str: str = str(base_val) if isinstance(base_val, str) else ""
-        is_enum_base: bool = base_str in ("Enum", "IntEnum", "IntFlag")
-        # base (non-enum), __init__, or @dataclass → "ref", otherwise "value"
-        if (has_base and not is_enum_base) or has_init or is_dataclass:
-            stmt["class_storage_hint"] = "ref"
+        is_extern_class: bool = "extern" in decorators
+        ft_check: object = stmt.get("field_types")
+        has_fields: bool = bool(ft_check) if isinstance(ft_check, dict) else False
+        if is_extern_class and not has_fields:
+            # @extern class with no fields → opaque (raw pointer, no RC)
+            stmt["class_storage_hint"] = "opaque"
+            meta_obj = stmt.get("meta")
+            meta_dict: dict[str, JsonVal] = dict(meta_obj) if isinstance(meta_obj, dict) else {}
+            meta_dict["opaque_v1"] = {"schema_version": 1}
+            stmt["meta"] = meta_dict
         else:
-            stmt["class_storage_hint"] = "value"
+            base_val = stmt.get("base")
+            has_base: bool = base_val is not None and isinstance(base_val, str) and base_val != ""
+            is_dataclass: bool = stmt.get("dataclass") is True
+            # Check for __init__ method
+            has_init: bool = False
+            cls_body = stmt.get("body")
+            if isinstance(cls_body, list):
+                for item in cls_body:
+                    if isinstance(item, dict) and item.get("kind") == "FunctionDef" and item.get("name") == "__init__":
+                        has_init = True
+                        break
+            # Enum/IntEnum/IntFlag bases are value types
+            base_str: str = str(base_val) if isinstance(base_val, str) else ""
+            is_enum_base: bool = base_str in ("Enum", "IntEnum", "IntFlag")
+            # base (non-enum), __init__, or @dataclass → "ref", otherwise "value"
+            if (has_base and not is_enum_base) or has_init or is_dataclass:
+                stmt["class_storage_hint"] = "ref"
+            else:
+                stmt["class_storage_hint"] = "value"
 
     # Normalize and refresh field_types from the prescanned class signature.
     ft_raw_any = stmt.get("field_types")
