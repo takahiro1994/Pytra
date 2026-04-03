@@ -2035,6 +2035,18 @@ def _emit_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
                         if not _is_wrapper_container_expr(ctx, arg_node, arg_code):
                             arg_code = _wrap_ref_container_value_code(ctx, arg_code, elem_type)
                     return owner_storage + " = append(" + owner_storage + ", " + arg_code + ")"
+            if attr == "extend" and len(arg_strs) >= 1:
+                owner_storage = _wrapper_container_storage_expr(ctx, owner_node, owner)
+                src_code = arg_strs[0]
+                src_node = args[0] if len(args) >= 1 and isinstance(args[0], dict) else None
+                if isinstance(src_node, dict):
+                    src_rt = _effective_resolved_type(ctx, src_node)
+                    if _is_container_resolved_type(src_rt):
+                        src_code = _wrapper_container_storage_expr(ctx, src_node, src_code)
+                if owner_rt in ("bytes", "bytearray", "list[uint8]", "unknown"):
+                    return owner_storage + " = append(" + owner_storage + ", " + src_code + "...)"
+                if owner_rt.startswith("list["):
+                    return owner_storage + " = append(" + owner_storage + ", " + src_code + "...)"
             if attr in ("keys", "values") and ((owner_rt.startswith("dict[") and owner_rt.endswith("]")) or owner_rt in ("Node", "dict[str,Any]")):
                 if owner_rt in ("Node", "dict[str,Any]"):
                     if attr == "keys":
