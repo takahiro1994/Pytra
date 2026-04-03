@@ -477,17 +477,19 @@ def _wrap_ref_container_value_code(ctx: EmitContext, value_code: str, resolved_t
     if resolved_type == "list":
         if value_code == "[]any{}":
             return "NewPyList[any]()"
-        return "PyListFromSlice[any](" + value_code + ")"
+        return "py_list_any(" + value_code + ")"
     if resolved_type.startswith("list[") and resolved_type.endswith("]"):
         inner = resolved_type[5:-1]
         elem_gt = _go_signature_type(ctx, inner)
         if value_code == "[]" + elem_gt + "{}":
             return "NewPyList[" + elem_gt + "]()"
+        if elem_gt == "any":
+            return "py_list_any(" + value_code + ")"
         return "PyListFromSlice[" + elem_gt + "](" + value_code + ")"
     if resolved_type == "dict":
         if value_code == "map[string]any{}":
             return "NewPyDict[string, any]()"
-        return "PyDictFromMap[string, any](" + value_code + ")"
+        return "py_dict_string_any(" + value_code + ")"
     if resolved_type.startswith("dict[") and resolved_type.endswith("]"):
         inner2 = resolved_type[5:-1]
         parts = _split_generic_args(inner2)
@@ -498,6 +500,8 @@ def _wrap_ref_container_value_code(ctx: EmitContext, value_code: str, resolved_t
             _is_empty_map = value_code.startswith("map[") and value_code.endswith("{}")
             if _is_empty_map:
                 return "NewPyDict[" + key_gt + ", " + val_gt + "]()"
+            if key_gt == "string" and val_gt == "any":
+                return "py_dict_string_any(" + value_code + ")"
             return "PyDictFromMap[" + key_gt + ", " + val_gt + "](" + value_code + ")"
     if resolved_type == "set":
         if value_code == "map[any]struct{}{}":
@@ -566,26 +570,29 @@ def _wrapper_container_storage_expr(ctx: EmitContext, node: JsonVal, rendered: s
         return rendered
     node_rt = _str(node, "resolved_type")
     if _str(node, "kind") == "Call":
-        if node_rt.startswith("list[") or node_rt == "list":
-            return rendered + ".items"
-        if node_rt.startswith("dict[") or node_rt == "dict":
-            return rendered + ".items"
-        if node_rt.startswith("set[") or node_rt == "set":
-            return rendered + ".items"
+        if _is_wrapper_container_expr(ctx, node, rendered):
+            if node_rt.startswith("list[") or node_rt == "list":
+                return rendered + ".items"
+            if node_rt.startswith("dict[") or node_rt == "dict":
+                return rendered + ".items"
+            if node_rt.startswith("set[") or node_rt == "set":
+                return rendered + ".items"
     if _str(node, "kind") == "Attribute":
-        if node_rt.startswith("list[") or node_rt == "list":
-            return rendered + ".items"
-        if node_rt.startswith("dict[") or node_rt == "dict":
-            return rendered + ".items"
-        if node_rt.startswith("set[") or node_rt == "set":
-            return rendered + ".items"
+        if _is_wrapper_container_expr(ctx, node, rendered):
+            if node_rt.startswith("list[") or node_rt == "list":
+                return rendered + ".items"
+            if node_rt.startswith("dict[") or node_rt == "dict":
+                return rendered + ".items"
+            if node_rt.startswith("set[") or node_rt == "set":
+                return rendered + ".items"
     if _str(node, "kind") == "Subscript":
-        if node_rt.startswith("list[") or node_rt == "list":
-            return rendered + ".items"
-        if node_rt.startswith("dict[") or node_rt == "dict":
-            return rendered + ".items"
-        if node_rt.startswith("set[") or node_rt == "set":
-            return rendered + ".items"
+        if _is_wrapper_container_expr(ctx, node, rendered):
+            if node_rt.startswith("list[") or node_rt == "list":
+                return rendered + ".items"
+            if node_rt.startswith("dict[") or node_rt == "dict":
+                return rendered + ".items"
+            if node_rt.startswith("set[") or node_rt == "set":
+                return rendered + ".items"
     if _str(node, "kind") != "Name":
         return rendered
     name = _str(node, "id")
@@ -628,7 +635,16 @@ def _is_wrapper_container_expr(ctx: EmitContext, node: JsonVal, rendered: str) -
         return False
     kind = _str(node, "kind")
     if kind == "Call":
-        return _is_container_resolved_type(_str(node, "resolved_type"))
+        return (
+            rendered.startswith("NewPyList[")
+            or rendered.startswith("PyListFromSlice[")
+            or rendered.startswith("py_list_any(")
+            or rendered.startswith("NewPyDict[")
+            or rendered.startswith("PyDictFromMap[")
+            or rendered.startswith("py_dict_string_any(")
+            or rendered.startswith("NewPySet[")
+            or rendered.startswith("PySetFromMap[")
+        )
     if kind == "IfExp":
         return _is_container_resolved_type(_str(node, "resolved_type"))
     if kind == "Attribute":

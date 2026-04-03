@@ -41,6 +41,32 @@ func py_tuple_any(values ...any) []any {
 	return values
 }
 
+func py_list_any(items any) *PyList[any] {
+	out := NewPyList[any]()
+	rv := goreflect.ValueOf(items)
+	if !rv.IsValid() || (rv.Kind() != goreflect.Slice && rv.Kind() != goreflect.Array) {
+		return out
+	}
+	out.items = make([]any, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		out.items[i] = rv.Index(i).Interface()
+	}
+	return out
+}
+
+func py_dict_string_any(items any) *PyDict[string, any] {
+	out := NewPyDict[string, any]()
+	rv := goreflect.ValueOf(items)
+	if !rv.IsValid() || rv.Kind() != goreflect.Map {
+		return out
+	}
+	iter := rv.MapRange()
+	for iter.Next() {
+		out.items[py_str(iter.Key().Interface())] = iter.Value().Interface()
+	}
+	return out
+}
+
 func py_extend[T any](dst *PyList[T], src *PyList[T]) {
 	if dst == nil || src == nil {
 		return
