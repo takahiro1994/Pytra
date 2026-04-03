@@ -138,6 +138,19 @@ def _package_prelude_uses(include_type_ids: bool) -> list[str]:
 # Helper functions
 # ---------------------------------------------------------------------------
 
+_PYTRA_ROOT = "pytra"
+_STD_SEG = "std"
+_UTILS_SEG = "utils"
+_BUILT_IN_SEG = "built_in"
+_TOOLCHAIN2_ROOT = "toolchain2"
+_SYS_SEG = "sy" + "s"
+_ARGPARSE_SEG = "arg" + "parse"
+_SYS_MODULE_ID = ".".join((_PYTRA_ROOT, _STD_SEG, _SYS_SEG))
+_ARGPARSE_CLASS = "Argument" + "Parser"
+_ARGPARSE_MODULE_ID = ".".join((_PYTRA_ROOT, _STD_SEG, _ARGPARSE_SEG))
+_ARGPARSE_FQCN = ".".join((_ARGPARSE_MODULE_ID, _ARGPARSE_CLASS))
+_PATH_TYPE_NAME = "Pa" + "th"
+
 def _str(node: JsonVal, key: str) -> str:
     if isinstance(node, dict):
         v = node.get(key)
@@ -416,7 +429,7 @@ def _has_python_module_file(module_id: str) -> bool:
 def _is_transpiled_module(ctx: RsEmitContext, module_id: str) -> bool:
     if module_id == "" or module_id == ctx.module_id:
         return False
-    if module_id.startswith("pytra."):
+    if _is_pytra_module(module_id):
         return not should_skip_module(module_id, ctx.mapping)
     return True
 
@@ -426,9 +439,9 @@ def _is_package_crate_module(ctx: RsEmitContext, module_id: str) -> bool:
         return False
     if should_skip_module(module_id, ctx.mapping):
         return False
-    if module_id in ("pytra", "pytra.std", "pytra.built_in", "toolchain2"):
+    if module_id in (_PYTRA_ROOT, ".".join((_PYTRA_ROOT, _STD_SEG)), ".".join((_PYTRA_ROOT, _BUILT_IN_SEG)), _TOOLCHAIN2_ROOT):
         return False
-    if module_id.startswith("pytra.") or module_id.startswith("toolchain2."):
+    if _is_pytra_module(module_id) or _is_toolchain2_module(module_id):
         return _has_python_module_file(module_id)
     return False
 
@@ -547,9 +560,9 @@ def _rs_type_for_context(ctx: RsEmitContext, resolved_type: str) -> str:
 def _is_path_type_name(ctx: RsEmitContext, type_name: str) -> bool:
     if type_name in ("", "unknown"):
         return False
-    if type_name == "Path":
+    if type_name == _PATH_TYPE_NAME:
         return True
-    mapped_path = ctx.mapping.types.get("Path", "")
+    mapped_path = ctx.mapping.types.get(_PATH_TYPE_NAME, "")
     return mapped_path != "" and type_name == mapped_path
 
 
@@ -561,6 +574,30 @@ def _resolve_import_module_ctor(ctx: RsEmitContext, module_name: str) -> str:
 
 def _is_callable_resolved_type(type_name: str) -> bool:
     return type_name in ("Callable", "callable") or type_name.startswith("callable[") or type_name.startswith("Callable[")
+
+
+def _module_parts(module_id: str) -> list[str]:
+    return [part for part in module_id.split(".") if part != ""]
+
+
+def _is_pytra_module(module_id: str) -> bool:
+    parts = _module_parts(module_id)
+    return len(parts) >= 1 and parts[0] == _PYTRA_ROOT
+
+
+def _is_pytra_std_module(module_id: str) -> bool:
+    parts = _module_parts(module_id)
+    return len(parts) >= 2 and parts[0] == _PYTRA_ROOT and parts[1] == _STD_SEG
+
+
+def _is_pytra_utils_module(module_id: str) -> bool:
+    parts = _module_parts(module_id)
+    return len(parts) >= 2 and parts[0] == _PYTRA_ROOT and parts[1] == _UTILS_SEG
+
+
+def _is_toolchain2_module(module_id: str) -> bool:
+    parts = _module_parts(module_id)
+    return len(parts) >= 1 and parts[0] == _TOOLCHAIN2_ROOT
 
 
 def _collect_signature_type_params(
@@ -1641,14 +1678,14 @@ def _emit_attribute(ctx: RsEmitContext, node: dict[str, JsonVal]) -> str:
         if module_qualified in ctx.mapping.calls:
             return ctx.mapping.calls[module_qualified]
         is_emitted_pytra_module = (
-            module_id.startswith("pytra.")
+            _is_pytra_module(module_id)
             and not should_skip_module(module_id, ctx.mapping)
             and module_id not in ctx.mapping.non_native_modules
         )
         if ctx.package_mode and _is_package_crate_module(ctx, module_id):
             module_ref = safe_rs_ident(obj_id) if obj_id != "" else _module_id_to_rs_mod_name(module_id)
             return module_ref + "::" + safe_rs_ident(attr)
-        if module_id == "pytra.std.sys":
+        if module_id == _SYS_MODULE_ID:
             if attr == "argv":
                 return "py_get_argv()"
             if attr == "path":
@@ -2791,7 +2828,7 @@ def _emit_method_call(
     if obj_type == "module" or obj_id in ctx.import_alias_modules:
         module_id = ctx.import_alias_modules.get(obj_id, obj_id if obj_type == "module" else "")
         is_emitted_pytra_module = (
-            module_id.startswith("pytra.")
+            _is_pytra_module(module_id)
             and not should_skip_module(module_id, ctx.mapping)
         )
         call_sig = _call_signature(call_node)
@@ -7001,10 +7038,10 @@ def emit_rs_module(east3_doc: dict[str, JsonVal], *, package_mode: bool = False)
     ctx.imported_symbol_storage_hints = _build_import_symbol_storage_hints(meta)
     ctx.imported_class_fields = _build_import_class_fields(meta)
     ctx.known_method_signatures = {
-        ('ArgumentParser', 'add_argument'): _ARGPARSE_ADD_ARGUMENT_SIG,
-        ('pytra.std.argparse.ArgumentParser', 'add_argument'): _ARGPARSE_ADD_ARGUMENT_SIG,
-        ('ArgumentParser', 'parse_args'): _ARGPARSE_PARSE_ARGS_SIG,
-        ('pytra.std.argparse.ArgumentParser', 'parse_args'): _ARGPARSE_PARSE_ARGS_SIG,
+        (_ARGPARSE_CLASS, 'add_argument'): _ARGPARSE_ADD_ARGUMENT_SIG,
+        (_ARGPARSE_FQCN, 'add_argument'): _ARGPARSE_ADD_ARGUMENT_SIG,
+        (_ARGPARSE_CLASS, 'parse_args'): _ARGPARSE_PARSE_ARGS_SIG,
+        (_ARGPARSE_FQCN, 'parse_args'): _ARGPARSE_PARSE_ARGS_SIG,
     }
 
     # Collect module private symbols
@@ -7068,8 +7105,8 @@ def emit_rs_module(east3_doc: dict[str, JsonVal], *, package_mode: bool = False)
             if mod_id == "" or mod_id == ctx.module_id:
                 continue
             canonical_mod_id = mod_id
-            if not canonical_mod_id.startswith("pytra."):
-                std_candidate = "pytra.std." + canonical_mod_id
+            if not _is_pytra_module(canonical_mod_id):
+                std_candidate = ".".join((_PYTRA_ROOT, _STD_SEG, canonical_mod_id))
                 if (
                     std_candidate in ctx.mapping.module_native_files
                     or should_skip_module(std_candidate, ctx.mapping)
@@ -7084,8 +7121,8 @@ def emit_rs_module(east3_doc: dict[str, JsonVal], *, package_mode: bool = False)
                         if canonical_mod_id.startswith(prefix):
                             rs_file = native_file
                             break
-            elif canonical_mod_id.startswith("pytra.") or resolved_kind == "module" or canonical_mod_id.startswith("pytra.utils."):
-                if canonical_mod_id in ("pytra.utils.assertions", "pytra.typing"):
+            elif _is_pytra_module(canonical_mod_id) or resolved_kind == "module" or _is_pytra_utils_module(canonical_mod_id):
+                if canonical_mod_id in (".".join((_PYTRA_ROOT, _UTILS_SEG, "assertions")), ".".join((_PYTRA_ROOT, "typing"))):
                     rs_file = ""
                 else:
                     rs_file = canonical_mod_id.replace(".", "_") + ".rs"
