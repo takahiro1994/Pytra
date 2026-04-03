@@ -1207,7 +1207,24 @@ def _emit_obj_type_id(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
         return value_expr + ".__pytra_type_id()"
     if _is_exception_type_name(ctx, value_type):
         return "int64(" + str(_exception_type_id(ctx, value_type)) + ")"
-    return "py_runtime_object_type_id(" + value_expr + ")"
+    value_name = _next_temp(ctx, "obj_tid_value")
+    return (
+        "func() int64 {\n"
+        + "\t" + value_name + " := any(" + value_expr + ")\n"
+        + "\tswitch t := " + value_name + ".(type) {\n"
+        + "\tcase *PytraErrorCarrier:\n"
+        + "\t\treturn t.TypeId\n"
+        + "\tcase interface{ pytraErrorBase() *PytraErrorCarrier }:\n"
+        + "\t\tbase := t.pytraErrorBase()\n"
+        + "\t\tif base != nil {\n"
+        + "\t\t\treturn base.TypeId\n"
+        + "\t\t}\n"
+        + "\tcase interface{ __pytra_type_id() int64 }:\n"
+        + "\t\treturn t.__pytra_type_id()\n"
+        + "\t}\n"
+        + "\treturn pytraEnsureRecoveredError(" + value_name + ").TypeId\n"
+        + "}()"
+    )
 
 
 def _emit_issubtype(ctx: EmitContext, node: dict[str, JsonVal]) -> str:

@@ -532,21 +532,6 @@ func pytraErrorIsInstance(err *PytraErrorCarrier, tidMin int64, tidMax int64) bo
 	return err.TypeId >= tidMin && err.TypeId <= tidMax
 }
 
-func py_runtime_object_type_id(value any) int64 {
-	switch t := value.(type) {
-	case *PytraErrorCarrier:
-		return t.TypeId
-	case interface{ pytraErrorBase() *PytraErrorCarrier }:
-		base := t.pytraErrorBase()
-		if base != nil {
-			return base.TypeId
-		}
-	case interface{ __pytra_type_id() int64 }:
-		return t.__pytra_type_id()
-	}
-	return pytraEnsureRecoveredError(value).TypeId
-}
-
 func py_runtime_type_id_is_subtype(actualTypeId int64, expectedTypeId int64) bool {
 	for i := 0; i+1 < len(id_table.items); i += 2 {
 		if id_table.items[i] == expectedTypeId {
