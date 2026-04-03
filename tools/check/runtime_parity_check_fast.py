@@ -189,6 +189,7 @@ def _call_runtime_copier(lang: str, emit_dir: Path) -> None:
         "lua": _copy_lua_runtime,
         "php": _copy_php_runtime,
         "nim": _copy_nim_runtime,
+        "zig": _copy_zig_runtime,
         "swift": _copy_swift_runtime,
         "dart": _copy_dart_runtime,
         "ps1": _copy_ps1_runtime,
@@ -599,6 +600,24 @@ def _copy_nim_runtime(emit_dir: Path) -> None:
     if std_dir.exists():
         for nim_file in sorted(std_dir.glob("*_native.nim")):
             shutil.copy2(nim_file, emit_dir / nim_file.name)
+
+
+def _copy_zig_runtime(emit_dir: Path) -> None:
+    """Copy Zig runtime files to emit directory."""
+    zig_runtime = ROOT / "src" / "runtime" / "zig"
+    for bucket in ("built_in", "std"):
+        bucket_dir = zig_runtime / bucket
+        if not bucket_dir.exists():
+            continue
+        dest_bucket = emit_dir / bucket
+        dest_bucket.mkdir(parents=True, exist_ok=True)
+        for zig_file in sorted(bucket_dir.glob("*.zig")):
+            shutil.copy2(zig_file, dest_bucket / zig_file.name)
+    built_in_runtime = zig_runtime / "built_in" / "py_runtime.zig"
+    if built_in_runtime.exists():
+        core_dst = emit_dir / "core" / "py_runtime.zig"
+        core_dst.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(built_in_runtime, core_dst)
 
 
 def _copy_ps1_runtime(emit_dir: Path) -> None:
