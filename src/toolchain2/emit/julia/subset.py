@@ -707,6 +707,17 @@ class JuliaSubsetRenderer:
             return "collect(values(" + owner + "))"
         return ""
 
+    def _render_static_cast_call(self, builtin_name: str, result_type: str, args: list[str]) -> str:
+        if len(args) != 1:
+            return ""
+        if builtin_name == "int" or result_type in {"int", "int64"}:
+            return "__pytra_int(" + args[0] + ")"
+        if builtin_name == "bool" or result_type == "bool":
+            return "__pytra_truthy(" + args[0] + ")"
+        if builtin_name == "str" or result_type in {"str", "string"}:
+            return "__pytra_str(" + args[0] + ")"
+        return ""
+
     def _next_tmp(self, prefix: str) -> str:
         self.tmp_counter += 1
         return prefix + str(self.tmp_counter)
@@ -966,13 +977,10 @@ class JuliaSubsetRenderer:
             if isinstance(func_node, dict) and _str(func_node, "kind") == "Attribute":
                 use_mapped_runtime = ""
             result_type = _str(node, "resolved_type")
-            if runtime_call == "static_cast" and len(args) == 1:
-                if builtin_name == "int" or result_type in {"int", "int64"}:
-                    return "__pytra_int(" + args[0] + ")"
-                if builtin_name == "bool" or result_type == "bool":
-                    return "__pytra_truthy(" + args[0] + ")"
-                if builtin_name == "str" or result_type in {"str", "string"}:
-                    return "__pytra_str(" + args[0] + ")"
+            if runtime_call == "static_cast":
+                cast_expr = self._render_static_cast_call(builtin_name, result_type, args)
+                if cast_expr != "":
+                    return cast_expr
             if func == "int" and len(args) == 1:
                 if use_mapped_runtime != "" and use_mapped_runtime != "__CAST__":
                     return use_mapped_runtime + "(" + args[0] + ")"
