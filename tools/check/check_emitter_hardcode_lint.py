@@ -807,20 +807,16 @@ def main() -> int:
                         help="対象カテゴリを絞り込む（例: module_name）")
     parser.add_argument("--no-write", action="store_true",
                         help="docs/progress/ への書き出しをスキップする")
-    parser.add_argument("--include-runtime", action="store_true",
-                        help="src/runtime/ のソースファイルも検査対象に含める（手動実行用）")
+    parser.add_argument("--skip-runtime", action="store_true",
+                        help="src/runtime/ の検査をスキップする（デバッグ用）")
     args = parser.parse_args()
 
     hits = collect_hits(args.lang, args.category)
     runtime_hits: list[tuple[str, str, Path, int, str]] = []
-    if args.include_runtime:
+    if not args.skip_runtime:
         runtime_hits = collect_runtime_hits(args.lang, args.category)
-    else:
-        # Load cached runtime lint results so they are not lost on non-runtime runs
-        runtime_hits = _load_runtime_hits_cache()
     hits.extend(runtime_hits)
-    # Always merge runtime categories into matrix when runtime hits exist
-    has_runtime = len(runtime_hits) > 0
+    has_runtime = not args.skip_runtime
 
     # 全18言語を README バッジ順で固定（toolchain2 未実装言語は 🟩0 で表示）
     if args.lang:
@@ -837,9 +833,6 @@ def main() -> int:
     mat = build_matrix(hits, all_langs, include_runtime=has_runtime)
     print_matrix(mat, all_langs)
 
-    # Save runtime hits to cache when --include-runtime is used
-    if args.include_runtime:
-        _save_runtime_hits(runtime_hits, now)
 
     if args.verbose and hits:
         print("\n--- 詳細 ---")
