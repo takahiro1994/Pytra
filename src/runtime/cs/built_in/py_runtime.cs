@@ -880,6 +880,16 @@ namespace Pytra.CsModule
             return source[key];
         }
 
+        public static string get(string source, object indexLike)
+        {
+            return py_get(source, indexLike);
+        }
+
+        public static V get<K, V>(Dictionary<K, V> source, K key)
+        {
+            return py_get(source, key);
+        }
+
         public static object py_get(object source, object indexLike)
         {
             if (source is string text)
@@ -897,6 +907,11 @@ namespace Pytra.CsModule
                 return array.GetValue(idx);
             }
             throw new ArgumentException("unsupported py_get() source");
+        }
+
+        public static object get(object source, object indexLike)
+        {
+            return py_get(source, indexLike);
         }
 
         public static T[] py_array_cast<T>(object value)

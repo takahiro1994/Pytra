@@ -306,6 +306,8 @@ def _qualify_stmt_result_type(
 
 
 def _render_type(ctx: EmitContext, resolved_type: str, *, for_return: bool = False) -> str:
+    if len(resolved_type) == 1 and resolved_type.isupper():
+        return "object"
     if resolved_type in ctx.enum_constant_types:
         return "long"
     if resolved_type in ctx.class_names:
@@ -329,6 +331,8 @@ def _render_type(ctx: EmitContext, resolved_type: str, *, for_return: bool = Fal
 
 
 def _expected_type_name(node: JsonVal) -> str:
+    if isinstance(node, str):
+        return node
     if not isinstance(node, dict):
         return ""
     type_name = _str(node, "type_object_of")
@@ -1348,6 +1352,8 @@ def _emit_isinstance_expr(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
     value_expr = _emit_expr(ctx, node.get("value"))
     boxed_expr = "((object)(" + value_expr + "))"
     expected_type = _expected_type_name(node.get("expected_type_id"))
+    if expected_type == "":
+        expected_type = _str(node, "expected_type_name")
     if expected_type == "":
         return "false"
     rendered = _emit_builtin_isinstance_expr(ctx, boxed_expr, expected_type)
