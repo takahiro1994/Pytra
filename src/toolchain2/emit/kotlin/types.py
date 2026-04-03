@@ -38,6 +38,8 @@ def _safe_kotlin_ident(name: str) -> str:
     for ch in name:
         chars.append(ch if (ch.isalnum() or ch == "_") else "_")
     out = "".join(chars) or "_unnamed"
+    if set(out) == {"_"}:
+        out = "_unused" + str(len(out))
     if out[0].isdigit():
         out = "_" + out
     if out in _KOTLIN_KEYWORDS:

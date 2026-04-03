@@ -254,6 +254,16 @@ class ScalaRenderer(CommonRenderer):
             else:
                 self._emit(target_name + " = " + value)
             return
+        if kind == "VarDecl":
+            name = _safe_scala_ident(self._str(node, "name"))
+            decl_type = self._str(node, "type")
+            if decl_type == "":
+                decl_type = self._str(node, "decl_type")
+            if decl_type == "":
+                decl_type = "Any"
+            if self._should_declare_name(name, True):
+                self._emit("var " + name + ": " + scala_type(decl_type) + " = " + scala_zero_value(decl_type))
+            return
         if kind == "ImportFrom":
             module_name = self._str(node, "module")
             self._emit("// import from " + module_name)
@@ -475,9 +485,9 @@ class ScalaRenderer(CommonRenderer):
             step_node = iter_plan.get("step")
             step = self._emit_expr(step_node) if isinstance(step_node, dict) else "1L"
             idx_name = "_idx_" + target_name
-            descending = self._str(iter_plan, "range_mode") == "descending"
+            descending = self._str(iter_plan, "range_mode") == "descending" or step.strip().startswith("-")
             cmp_op = ">" if descending else "<"
-            update = idx_name + " = " + idx_name + (" - " if descending else " + ") + step.replace("-", "")
+            update = idx_name + " = " + idx_name + " + (" + step + ")"
             self._emit("var " + idx_name + " = " + start)
             self._emit("while (" + idx_name + " " + cmp_op + " " + stop + ") {")
             self.state.indent_level += 1
@@ -493,6 +503,10 @@ class ScalaRenderer(CommonRenderer):
             iter_expr = self._emit_expr(iter_plan.get("iter_expr"))
         elif isinstance(node.get("iter"), dict):
             iter_expr = self._emit_expr(node.get("iter"))
+        iter_node = iter_plan.get("iter_expr") if isinstance(iter_plan, dict) else node.get("iter")
+        iter_type = self._str(iter_node, "resolved_type") if isinstance(iter_node, dict) else ""
+        if iter_type in ("str", "string"):
+            iter_expr = "__pytra_as_list(" + iter_expr + ")"
         self._emit("for (" + target_name + " <- " + iter_expr + ") {")
         self.state.indent_level += 1
         for stmt in body:
@@ -553,14 +567,18 @@ class ScalaRenderer(CommonRenderer):
             owner = self._emit_expr(owner_node)
             return owner + "." + _safe_scala_ident(self._str(node, "attr"))
         if kind == "Subscript":
-            owner = self._emit_expr(node.get("value"))
+            owner_node = node.get("value")
+            owner = self._emit_expr(owner_node)
+            owner_type = self._str(owner_node, "resolved_type") if isinstance(owner_node, dict) else ""
             slice_node = node.get("slice")
             if isinstance(slice_node, dict) and self._str(slice_node, "kind") == "Slice":
                 lower_node = slice_node.get("lower")
                 upper_node = slice_node.get("upper")
                 lower = self._emit_expr(lower_node) if isinstance(lower_node, dict) else "0"
-                upper = self._emit_expr(upper_node) if isinstance(upper_node, dict) else owner + ".length"
-                return owner + ".slice((" + lower + ").toInt, (" + upper + ").toInt)"
+                upper = self._emit_expr(upper_node) if isinstance(upper_node, dict) else "__pytra_len(" + owner + ")"
+                if owner_type in ("str", "string"):
+                    return "__pytra_slice(" + owner + ", " + lower + ", " + upper + ").asInstanceOf[String]"
+                return "__pytra_slice(" + owner + ", " + lower + ", " + upper + ")"
             index = self._emit_expr(slice_node)
             result_type = scala_type(self._str(node, "resolved_type"))
             return "__pytra_get_index(" + owner + ", " + index + ").asInstanceOf[" + result_type + "]"
@@ -667,7 +685,7 @@ class ScalaRenderer(CommonRenderer):
                         return "__pytra_join(" + owner_expr + ", " + self._emit_expr(arg_nodes[0]) + ")"
                     if attr == "split":
                         sep = self._emit_expr(arg_nodes[0]) if len(arg_nodes) >= 1 else "null"
-                        return "__pytra_split(" + owner_expr + ", " + sep + ")"
+                        return "__pytra_split(" + owner_expr + ", " + sep + ").asInstanceOf[" + scala_type(self._str(node, "resolved_type")) + "]"
                     if attr == "strip":
                         return "__pytra_strip(" + owner_expr + ")"
                     if attr == "lstrip":
@@ -688,6 +706,10 @@ class ScalaRenderer(CommonRenderer):
                         return "__pytra_find(" + owner_expr + ", " + self._emit_expr(arg_nodes[0]) + ")"
                     if attr == "count" and len(arg_nodes) >= 1:
                         return "__pytra_count_substr(" + owner_expr + ", " + self._emit_expr(arg_nodes[0]) + ")"
+                    if attr == "index" and len(arg_nodes) >= 1:
+                        return "__pytra_find(" + owner_expr + ", " + self._emit_expr(arg_nodes[0]) + ")"
+                    if attr == "isalnum" and len(arg_nodes) == 0:
+                        return "__pytra_isalnum(" + owner_expr + ")"
                 if owner_type.startswith("dict[") and attr == "get" and len(arg_nodes) == 2:
                     return owner_expr + ".getOrElse(" + self._emit_expr(arg_nodes[0]) + ", " + self._emit_expr(arg_nodes[1]) + ")"
                 if owner_type.startswith("dict["):
@@ -784,9 +806,11 @@ class ScalaRenderer(CommonRenderer):
             if len(comparators) == 1 and len(ops) == 1:
                 right = self._emit_expr(comparators[0])
                 op = ops[0] if isinstance(ops[0], str) else self._str(ops[0], "kind")
+                if op == "Eq":
+                    return "__pytra_eq(" + left + ", " + right + ")"
+                if op == "NotEq":
+                    return "!__pytra_eq(" + left + ", " + right + ")"
                 op_text = {
-                    "Eq": "==",
-                    "NotEq": "!=",
                     "Lt": "<",
                     "LtE": "<=",
                     "Gt": ">",
@@ -808,6 +832,19 @@ class ScalaRenderer(CommonRenderer):
                 return "-" + operand
             if op == "Invert":
                 return "~(" + operand + ")"
+        if kind == "JoinedStr":
+            parts: list[str] = []
+            for value in self._list(node, "values"):
+                if not isinstance(value, dict):
+                    continue
+                value_kind = self._str(value, "kind")
+                if value_kind == "Constant" and isinstance(value.get("value"), str):
+                    parts.append(self._quote_string(str(value.get("value"))))
+                else:
+                    parts.append(self._emit_expr(value))
+            return "\"\"" if len(parts) == 0 else "(" + " + ".join(parts) + ")"
+        if kind == "FormattedValue":
+            return "__pytra_str(" + self._emit_expr(node.get("value")) + ")"
         raise RuntimeError("scala emitter: unsupported expr kind: " + kind)
 
 

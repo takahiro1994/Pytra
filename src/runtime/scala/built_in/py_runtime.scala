@@ -318,6 +318,24 @@ def __pytra_split(v: Any, sep: Any): mutable.ArrayBuffer[Any] = {
 def __pytra_upper(v: Any): String = __pytra_str(v).toUpperCase
 def __pytra_lower(v: Any): String = __pytra_str(v).toLowerCase
 def __pytra_find(v: Any, sub: Any): Long = __pytra_str(v).indexOf(__pytra_str(sub)).toLong
+def __pytra_isalnum(v: Any): Boolean = {
+    val s = __pytra_str(v)
+    if (s.isEmpty) return false
+    s.forall(_.isLetterOrDigit)
+}
+def __pytra_eq(a: Any, b: Any): Boolean = {
+    if (a == null || b == null) return a == b
+    (a, b) match {
+        case (x: String, y) => x == __pytra_str(y)
+        case (x, y: String) => __pytra_str(x) == y
+        case (x: Boolean, y) => __pytra_float(x) == __pytra_float(y)
+        case (x, y: Boolean) => __pytra_float(x) == __pytra_float(y)
+        case (x: Long, y) => __pytra_float(x) == __pytra_float(y)
+        case (x: Int, y) => __pytra_float(x) == __pytra_float(y)
+        case (x: Double, y) => __pytra_float(x) == __pytra_float(y)
+        case _ => a == b
+    }
+}
 def __pytra_count_substr(v: Any, sub: Any): Long = {
     val s = __pytra_str(v)
     val t = __pytra_str(sub)

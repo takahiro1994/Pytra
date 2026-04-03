@@ -312,6 +312,17 @@ class KotlinRenderer(CommonRenderer):
                 self._emit("var " + target_name + " = " + value)
                 self._declare_local(target_name)
             return
+        if kind == "VarDecl":
+            name = _safe_kotlin_ident(self._str(node, "name"))
+            decl_type = self._str(node, "type")
+            if decl_type == "":
+                decl_type = self._str(node, "decl_type")
+            if decl_type == "":
+                decl_type = "Any"
+            if not self._is_declared_local(name):
+                self._emit("var " + name + ": " + self._render_type(decl_type) + " = " + kotlin_zero_value(decl_type))
+                self._declare_local(name)
+            return
         if kind == "ImportFrom":
             module_name = self._str(node, "module")
             self._emit("// import from " + module_name)
@@ -620,9 +631,9 @@ class KotlinRenderer(CommonRenderer):
             step_node = iter_plan.get("step")
             step = self._emit_expr(step_node) if isinstance(step_node, dict) else "1L"
             idx_name = "_idx_" + target_name
-            descending = self._str(iter_plan, "range_mode") == "descending"
+            descending = self._str(iter_plan, "range_mode") == "descending" or step.strip().startswith("-")
             cmp_op = ">" if descending else "<"
-            update = idx_name + " = " + idx_name + (" - " if descending else " + ") + step.replace("-", "")
+            update = idx_name + " = " + idx_name + " + (" + step + ")"
             self._emit("var " + idx_name + " = " + start)
             self._emit("while (" + idx_name + " " + cmp_op + " " + stop + ") {")
             self.state.indent_level += 1
@@ -638,6 +649,10 @@ class KotlinRenderer(CommonRenderer):
             iter_expr = self._emit_expr(iter_plan.get("iter_expr"))
         elif isinstance(node.get("iter"), dict):
             iter_expr = self._emit_expr(node.get("iter"))
+        iter_node = iter_plan.get("iter_expr") if isinstance(iter_plan, dict) else node.get("iter")
+        iter_type = self._str(iter_node, "resolved_type") if isinstance(iter_node, dict) else ""
+        if iter_type in ("str", "string"):
+            iter_expr = "__pytra_as_list(" + iter_expr + ")"
         loop_var = target_name
         prelude: list[str] = []
         if isinstance(target_node, dict):
@@ -744,10 +759,12 @@ class KotlinRenderer(CommonRenderer):
                 lower_node = slice_node.get("lower")
                 upper_node = slice_node.get("upper")
                 lower = self._emit_expr(lower_node) if isinstance(lower_node, dict) else "0"
-                upper = self._emit_expr(upper_node) if isinstance(upper_node, dict) else owner + ".size"
+                upper = self._emit_expr(upper_node) if isinstance(upper_node, dict) else "__pytra_len(" + owner + ")"
+                if owner_type in ("str", "string"):
+                    return "(__pytra_slice(" + owner + ", " + lower + ", " + upper + ") as String)"
                 if owner_type.startswith("list[") or owner_type.startswith("tuple[") or owner_type in ("list", "tuple", "bytes", "bytearray"):
                     return owner + ".slice((" + lower + ").toInt() until (" + upper + ").toInt()).toMutableList()"
-                return owner + ".slice((" + lower + ").toInt() until (" + upper + ").toInt())"
+                return "__pytra_slice(" + owner + ", " + lower + ", " + upper + ")"
             index = self._emit_expr(slice_node)
             if owner_type.startswith("dict["):
                 key_node = slice_node if isinstance(slice_node, dict) else None
@@ -932,12 +949,31 @@ class KotlinRenderer(CommonRenderer):
                         return "__pytra_join(" + owner_expr + ", " + self._emit_expr(arg_nodes[0]) + ")"
                     if attr == "isdigit" and len(arg_nodes) == 0:
                         return "__pytra_isdigit(" + owner_expr + ")"
+                    if attr == "isalnum" and len(arg_nodes) == 0:
+                        return "__pytra_isalnum(" + owner_expr + ")"
                     if attr == "upper" and len(arg_nodes) == 0:
-                        return owner_expr + ".uppercase()"
+                        return "__pytra_upper(" + owner_expr + ")"
                     if attr == "lower" and len(arg_nodes) == 0:
-                        return owner_expr + ".lowercase()"
+                        return "__pytra_lower(" + owner_expr + ")"
+                    if attr == "startswith" and len(arg_nodes) >= 1:
+                        return "__pytra_startswith(" + owner_expr + ", " + self._emit_expr(arg_nodes[0]) + ")"
+                    if attr == "endswith" and len(arg_nodes) >= 1:
+                        return "__pytra_endswith(" + owner_expr + ", " + self._emit_expr(arg_nodes[0]) + ")"
                     if attr == "strip" and len(arg_nodes) == 0:
-                        return owner_expr + ".trim()"
+                        return "__pytra_strip(" + owner_expr + ")"
+                    if attr == "lstrip" and len(arg_nodes) == 0:
+                        return "__pytra_lstrip(" + owner_expr + ")"
+                    if attr == "rstrip" and len(arg_nodes) == 0:
+                        return "__pytra_rstrip(" + owner_expr + ")"
+                    if attr == "replace" and len(arg_nodes) >= 2:
+                        return "__pytra_replace(" + owner_expr + ", " + self._emit_expr(arg_nodes[0]) + ", " + self._emit_expr(arg_nodes[1]) + ")"
+                    if attr == "find" and len(arg_nodes) >= 1:
+                        return "__pytra_find(" + owner_expr + ", " + self._emit_expr(arg_nodes[0]) + ")"
+                    if attr == "index" and len(arg_nodes) >= 1:
+                        return "__pytra_find(" + owner_expr + ", " + self._emit_expr(arg_nodes[0]) + ")"
+                    if attr == "split":
+                        sep = self._emit_expr(arg_nodes[0]) if len(arg_nodes) >= 1 else "null"
+                        return "(__pytra_split(" + owner_expr + ", " + sep + ") as MutableList<String>)"
                 if owner_type.startswith("dict[") and attr == "get" and len(arg_nodes) == 1:
                     return "__pytra_as_dict(" + owner_expr + ").get(" + self._emit_expr(arg_nodes[0]) + ")"
                 if owner_type.startswith("dict[") and attr == "get" and len(arg_nodes) == 2:
@@ -1078,6 +1114,10 @@ class KotlinRenderer(CommonRenderer):
             if len(comparators) == 1 and len(ops) == 1:
                 right = self._emit_expr(comparators[0])
                 op = ops[0] if isinstance(ops[0], str) else self._str(ops[0], "kind")
+                if op == "Eq":
+                    return "__pytra_eq(" + left + ", " + right + ")"
+                if op == "NotEq":
+                    return "!__pytra_eq(" + left + ", " + right + ")"
                 if op == "In":
                     return "__pytra_contains(" + right + ", " + left + ")"
                 if op == "NotIn":
@@ -1102,6 +1142,19 @@ class KotlinRenderer(CommonRenderer):
                 return "-" + operand
             if op == "Invert":
                 return operand + ".inv()"
+        if kind == "JoinedStr":
+            parts: list[str] = []
+            for value in self._list(node, "values"):
+                if not isinstance(value, dict):
+                    continue
+                value_kind = self._str(value, "kind")
+                if value_kind == "Constant" and isinstance(value.get("value"), str):
+                    parts.append(self._quote_string(str(value.get("value"))))
+                else:
+                    parts.append(self._emit_expr(value))
+            return "\"\"" if len(parts) == 0 else "(" + " + ".join(parts) + ")"
+        if kind == "FormattedValue":
+            return "__pytra_str(" + self._emit_expr(node.get("value")) + ")"
         raise RuntimeError("kotlin emitter: unsupported expr kind: " + kind)
 
 

@@ -159,6 +159,39 @@ fun __pytra_join(sep: Any?, items: Any?): String {
     return __pytra_as_list(items).joinToString(__pytra_str(sep)) { __pytra_str(it) }
 }
 
+fun __pytra_strip(v: Any?): String = __pytra_str(v).trim()
+fun __pytra_lstrip(v: Any?): String = __pytra_str(v).trimStart()
+fun __pytra_rstrip(v: Any?): String = __pytra_str(v).trimEnd()
+fun __pytra_split(v: Any?, sep: Any?): MutableList<String> {
+    val s = __pytra_str(v)
+    val parts = if (sep == null || __pytra_str(sep).isEmpty()) {
+        s.trim().split(Regex("\\s+")).filter { it.isNotEmpty() }
+    } else {
+        s.split(__pytra_str(sep))
+    }
+    return parts.toMutableList()
+}
+fun __pytra_startswith(v: Any?, prefix: Any?): Boolean = __pytra_str(v).startsWith(__pytra_str(prefix))
+fun __pytra_endswith(v: Any?, suffix: Any?): Boolean = __pytra_str(v).endsWith(__pytra_str(suffix))
+fun __pytra_replace(v: Any?, old: Any?, newValue: Any?): String = __pytra_str(v).replace(__pytra_str(old), __pytra_str(newValue))
+fun __pytra_upper(v: Any?): String = __pytra_str(v).uppercase()
+fun __pytra_lower(v: Any?): String = __pytra_str(v).lowercase()
+fun __pytra_find(v: Any?, sub: Any?): Long = __pytra_str(v).indexOf(__pytra_str(sub)).toLong()
+fun __pytra_isalnum(v: Any?): Boolean {
+    val s = __pytra_str(v)
+    if (s.isEmpty()) return false
+    return s.all { it.isLetterOrDigit() }
+}
+
+fun __pytra_eq(a: Any?, b: Any?): Boolean {
+    if (a == null || b == null) return a == b
+    if (a is String || b is String) return __pytra_str(a) == __pytra_str(b)
+    if ((a is Long || a is Int || a is Double || a is Boolean) && (b is Long || b is Int || b is Double || b is Boolean)) {
+        return __pytra_float(a) == __pytra_float(b)
+    }
+    return a == b
+}
+
 fun __pytra_len(v: Any?): Long {
     if (v == null) return 0L
     if (v is String) return v.length.toLong()
@@ -412,6 +445,9 @@ fun __pytra_as_list(v: Any?): MutableList<Any?> {
     if (v is Set<*>) {
         @Suppress("UNCHECKED_CAST")
         return (v as Set<Any?>).toMutableList()
+    }
+    if (v is String) {
+        return v.map { it.toString() as Any? }.toMutableList()
     }
     return mutableListOf()
 }
