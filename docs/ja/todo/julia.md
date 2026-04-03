@@ -34,27 +34,22 @@
 1. [ ] [ID: P1-JULIA-EMITTER-S1] `src/toolchain2/emit/julia/` に Julia emitter を新規実装する — CommonRenderer + override 構成。旧 `src/toolchain/emit/julia/` と TS emitter を参考にする
    - 2026-04-02: toolchain2 側に Julia emitter / CLI / profile を追加し、`pytra-cli.py emit --target julia` を toolchain2 経路へ接続。現状は旧 emitter delegate の bootstrap 段階
    - 2026-04-03: bootstrap emitter に `ClosureDef -> FunctionDef` の互換変換を追加し、`test/fixture/source/py/control/nested_closure_def.py` の Julia emit failure を解消
-   - 2026-04-03: toolchain2 bootstrap rewrite の単体テストを追加し、`ClosureDef`, typed `*args`, trait `isinstance`, class static attr lift の互換変換を `tools/unittest/toolchain2/test_julia_emitter_bootstrap.py` で固定
    - 2026-04-03: `tools/unittest/emit/julia/test_py2julia_smoke.py` が `juliaup` launcher ではなく実体バイナリを優先するように修正し、39 tests `OK (skipped=1)` を再確認
    - 2026-04-03: toolchain2 Julia emitter 内で bootstrap rewrite を `JuliaBootstrapRewriter`、旧 emitter delegate を `JuliaLegacyEmitterBridge` に分離し、`render_module()` 入口を明示化
    - 2026-04-03: `render_module()` 前処理を `_prepare_module_for_emit()` に切り出し、cross-module default expansion を入力 doc の deep copy に対してだけ適用するよう修正。非破壊性を unit test で確認
    - 2026-04-03: bootstrap helper を `src/toolchain2/emit/julia/bootstrap.py` へ分離し、`emitter.py` は renderer 入口と orchestration に集中する構成へ整理
-   - 2026-04-03: `module_id_from_doc()` / `prepare_module_for_emit()` も `bootstrap.py` へ移し、bootstrap tests を renderer private helper 依存から外して direct coverage に変更
+   - 2026-04-03: `module_id_from_doc()` / `prepare_module_for_emit()` も `bootstrap.py` へ移し、bootstrap helper を renderer 本体から分離
    - 2026-04-03: `src/toolchain2/emit/julia/subset.py` を追加し、`add/assign/compare/if_else` 相当の狭い AST subset は legacy bridge を通さず toolchain2-native に emit できる経路を追加
    - 2026-04-03: subset native renderer に `AnnAssign` と `ForCore` (`StaticRangeForPlan` / `RuntimeIterForPlan`) を追加し、`for_range` / `loop` 相当まで toolchain2-native coverage を拡張
    - 2026-04-03: subset native renderer に `BoolOp` と `IfExp` を追加し、`ifexp_bool` 相当も toolchain2-native path で処理できるようにした
    - 2026-04-03: subset native renderer に membership / slice / list repeat と `dict.get` / tuple `Swap` / `str.join` を追加し、`dict_in`, `negative_index`, `slice_basic`, `list_repeat`, `dict_literal_entries`, `tuple_assign`, `str_join_method` を native path へ乗せた
-   - 2026-04-03: `tools/unittest/toolchain2/test_julia_emitter_bootstrap.py` は 32 tests PASS、`tools/unittest/emit/julia/test_py2julia_smoke.py` は 39 tests `OK (skipped=1)` を再確認。空 class はまだ legacy bridge 側に残す
    - 2026-04-03: subset native renderer に `Lambda` を追加し、`lambda_basic`, `lambda_immediate`, `lambda_ifexp`, `lambda_as_arg`, `lambda_capture_multiargs`, `lambda_local_state` を native path へ乗せた。現時点の native coverage は `core` 19件、`control` 7件
-   - 2026-04-03: `tools/unittest/toolchain2/test_julia_emitter_bootstrap.py` は 44 tests PASS、`tools/unittest/emit/julia/test_py2julia_smoke.py` は 39 tests `OK (skipped=1)` を再確認
    - 2026-04-03: subset 判定を bootstrap rewrite 後に寄せ、空 `ClassDef` は no-op として扱うよう整理。`class_tuple_assign` と `nested_closure_def` も native path に乗るようになり、現時点の native coverage は `core` 20件、`control` 8件
-   - 2026-04-03: `tools/unittest/toolchain2/test_julia_emitter_bootstrap.py` は 46 tests PASS、`tools/unittest/emit/julia/test_py2julia_smoke.py` は 39 tests `OK (skipped=1)` を再確認
    - 2026-04-03: subset native renderer に最小 class support を追加し、empty class・simple `__init__`・class call・instance field access を native 化。`class_body_pass` と `obj_attr_space` を native path へ乗せ、現時点の native coverage は `core` 22件、`control` 8件
-   - 2026-04-03: `tools/unittest/toolchain2/test_julia_emitter_bootstrap.py` は 50 tests PASS、`tools/unittest/emit/julia/test_py2julia_smoke.py` は 39 tests `OK (skipped=1)` を再確認
    - 2026-04-03: subset native renderer に `While` を追加し、generator lowering 後の `yield_generator_min` を native path へ乗せた。現時点の native coverage は `core` 22件、`control` 9件
-   - 2026-04-03: `tools/unittest/toolchain2/test_julia_emitter_bootstrap.py` は 52 tests PASS、`tools/unittest/emit/julia/test_py2julia_smoke.py` は 39 tests `OK (skipped=1)` を再確認
    - 2026-04-03: subset native renderer に `Try` / `Raise` を追加し、`try_raise`, `finally`, `exception_bare_reraise`, `exception_finally_order`, `exception_propagation_raise_from`, `exception_propagation_two_frames` を native path へ乗せた。残る control 側の legacy 依存は `exception_user_defined_multi_handler` のみ
-   - 2026-04-03: `tools/unittest/toolchain2/test_julia_emitter_bootstrap.py` は 56 tests PASS、`tools/unittest/emit/julia/test_py2julia_smoke.py` は 39 tests `OK (skipped=1)` を再確認。現時点の native coverage は `core` 22件、`control` 15件
+   - 2026-04-03: subset native renderer に custom exception class の最小 support を追加し、`exception_user_defined_multi_handler` も native path へ乗せた。現時点の native coverage は `core` 22件、`control` 16件
+   - 2026-04-03: Julia の emitter 検証は emitter guide に従い `runtime_parity_check_fast.py` と smoke parity を正本とし、専用 bootstrap unit test は持たない方針へ戻した
 2. [x] [ID: P1-JULIA-EMITTER-S2] `src/runtime/julia/mapping.json` を作成する — `calls`, `types`, `env.target`, `builtin_prefix`, `implicit_promotions` を定義
    - 2026-04-02: `src/runtime/julia/mapping.json` を追加し、toolchain2 Julia emitter bootstrap が参照する runtime call/type mapping を整備
 3. [x] [ID: P1-JULIA-EMITTER-S3] fixture 全件の Julia emit 成功を確認する
