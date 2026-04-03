@@ -130,9 +130,15 @@ def _simple_class_supported(node: dict[str, JsonVal]) -> bool:
         if _str(stmt, "kind") != "FunctionDef":
             return False
         decorators = [item for item in _list(stmt, "decorators") if isinstance(item, str)]
-        if any(item not in {"property"} for item in decorators):
+        if any(item not in {"property", "staticmethod"} for item in decorators):
             return False
         args = [arg for arg in _list(stmt, "arg_order") if isinstance(arg, str)]
+        if "staticmethod" in decorators:
+            if "property" in decorators or "self" in args:
+                return False
+            if not all(_stmt_supported(inner) for inner in _list(stmt, "body")):
+                return False
+            continue
         if len(args) == 0 or args[0] != "self":
             return False
         name = _str(stmt, "name")
@@ -483,6 +489,7 @@ class JuliaSubsetRenderer:
         self.exception_class_names: set[str] = set()
         self.class_method_names: dict[str, set[str]] = {}
         self.class_property_names: dict[str, set[str]] = {}
+        self.class_static_method_names: dict[str, set[str]] = {}
 
     def _indent(self) -> str:
         return "    " * self.indent_level
@@ -511,6 +518,10 @@ class JuliaSubsetRenderer:
             owner = self._render_expr(owner_node)
             owner_type = _str(owner_node, "resolved_type") if isinstance(owner_node, dict) else ""
             attr = _str(node, "attr")
+            if isinstance(owner_node, dict) and _str(owner_node, "kind") == "Name":
+                owner_name = _str(owner_node, "id")
+                if attr in self.class_static_method_names.get(owner_name, set()):
+                    return _ident(attr)
             if attr in self.class_property_names.get(owner_type, set()):
                 return _ident(attr) + "(" + owner + ")"
             return owner + "." + attr
@@ -635,6 +646,7 @@ class JuliaSubsetRenderer:
                 owner = self._render_expr(owner_node)
                 owner_type = _str(owner_node, "resolved_type") if isinstance(owner_node, dict) else ""
                 attr = _str(func_node, "attr")
+                owner_name = _str(owner_node, "id") if isinstance(owner_node, dict) else ""
                 args = [self._render_expr(arg) for arg in _list(node, "args")]
                 keywords = [item for item in _list(node, "keywords") if isinstance(item, dict)]
                 if attr == "append" and len(args) == 1:
@@ -699,6 +711,8 @@ class JuliaSubsetRenderer:
                     return "collect(values(" + owner + "))"
                 if attr == "write_rgb_png" and len(args) == 4 and len(keywords) == 0:
                     return owner + ".write_rgb_png(" + ", ".join(args) + ")"
+                if attr in self.class_static_method_names.get(owner_name, set()) and len(keywords) == 0:
+                    return _ident(attr) + "(" + ", ".join(args) + ")"
                 if attr in self.class_method_names.get(owner_type, set()) and len(keywords) == 0:
                     call_args = [owner]
                     call_args.extend(args)
@@ -1184,12 +1198,14 @@ class JuliaSubsetRenderer:
         }
         self.class_method_names = {}
         self.class_property_names = {}
+        self.class_static_method_names = {}
         for stmt in _list(east3_doc, "body"):
             if not isinstance(stmt, dict) or _str(stmt, "kind") != "ClassDef":
                 continue
             class_name = _str(stmt, "name")
             methods: set[str] = set()
             properties: set[str] = set()
+            static_methods: set[str] = set()
             for item in _list(stmt, "body"):
                 if not isinstance(item, dict) or _str(item, "kind") != "FunctionDef":
                     continue
@@ -1197,12 +1213,15 @@ class JuliaSubsetRenderer:
                 if name == "__init__":
                     continue
                 decorators = [value for value in _list(item, "decorators") if isinstance(value, str)]
-                if "property" in decorators:
+                if "staticmethod" in decorators:
+                    static_methods.add(name)
+                elif "property" in decorators:
                     properties.add(name)
                 else:
                     methods.add(name)
             self.class_method_names[class_name] = methods
             self.class_property_names[class_name] = properties
+            self.class_static_method_names[class_name] = static_methods
         self.exception_class_names = {
             _str(stmt, "name")
             for stmt in _list(east3_doc, "body")
