@@ -461,6 +461,30 @@ class KotlinRenderer(CommonRenderer):
             self.state.indent_level -= 1
             self._emit("}")
             return
+        if base_name == "Enum":
+            enum_members: list[tuple[str, str]] = []
+            for stmt in self._list(node, "body"):
+                if not isinstance(stmt, dict) or self._str(stmt, "kind") != "Assign":
+                    continue
+                target = stmt.get("target")
+                if not isinstance(target, dict) or self._str(target, "kind") != "Name":
+                    continue
+                field_name = _safe_kotlin_ident(self._str(target, "id"))
+                value_node = stmt.get("value")
+                value = self._emit_expr(value_node) if isinstance(value_node, dict) else "null"
+                enum_members.append((field_name, value))
+            self._emit("class " + class_name + " private constructor(val value: Any?) {")
+            self.state.indent_level += 1
+            if len(enum_members) > 0:
+                self._emit("companion object {")
+                self.state.indent_level += 1
+                for field_name, value in enum_members:
+                    self._emit("val " + field_name + ": " + class_name + " = " + class_name + "(" + value + ")")
+                self.state.indent_level -= 1
+                self._emit("}")
+            self.state.indent_level -= 1
+            self._emit("}")
+            return
         prev_class_name = self.current_class_name
         self.current_class_name = class_name
         instance_fields = self._collect_class_fields(node)
