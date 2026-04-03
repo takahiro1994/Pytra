@@ -428,7 +428,7 @@ def _stmt_supported(node: JsonVal) -> bool:
             return True
         if _str(target, "kind") == "Attribute":
             owner = target.get("value")
-            return isinstance(owner, dict) and _str(owner, "kind") == "Name" and _str(owner, "id") == "self"
+            return isinstance(owner, dict) and _str(owner, "kind") == "Name"
         return False
     if kind == "If":
         return _expr_supported(node.get("test")) and all(_stmt_supported(stmt) for stmt in _list(node, "body")) and all(
