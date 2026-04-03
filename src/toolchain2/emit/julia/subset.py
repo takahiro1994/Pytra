@@ -295,6 +295,7 @@ def _expr_supported(node: JsonVal) -> bool:
             ):
                 return False
             return attr in {
+                "add",
                 "append",
                 "appendleft",
                 "clear",
@@ -306,6 +307,7 @@ def _expr_supported(node: JsonVal) -> bool:
                 "index",
                 "isalnum",
                 "join",
+                "keys",
                 "lower",
                 "lstrip",
                 "makedirs",
@@ -318,6 +320,7 @@ def _expr_supported(node: JsonVal) -> bool:
                 "split",
                 "sort",
                 "sqrt",
+                "values",
                 "write_rgb_png",
                 "startswith",
                 "strip",
@@ -372,7 +375,14 @@ def _stmt_supported(node: JsonVal) -> bool:
         return isinstance(target, dict) and _str(target, "kind") == "Name" and _expr_supported(node.get("value"))
     if kind == "Assign":
         target = node.get("target")
-        return isinstance(target, dict) and _str(target, "kind") == "Name" and _expr_supported(node.get("value"))
+        if not isinstance(target, dict):
+            return False
+        target_kind = _str(target, "kind")
+        if target_kind == "Name":
+            return _expr_supported(node.get("value"))
+        if target_kind == "Subscript":
+            return _expr_supported(target.get("value")) and _expr_supported(target.get("slice")) and _expr_supported(node.get("value"))
+        return False
     if kind == "Swap":
         left = node.get("left")
         right = node.get("right")
@@ -595,6 +605,8 @@ class JuliaSubsetRenderer:
                 keywords = [item for item in _list(node, "keywords") if isinstance(item, dict)]
                 if attr == "append" and len(args) == 1:
                     return "push!(" + owner + ", " + args[0] + ")"
+                if attr == "add" and len(args) == 1:
+                    return "push!(" + owner + ", " + args[0] + ")"
                 if attr == "appendleft" and len(args) == 1:
                     return "pushfirst!(" + owner + ", " + args[0] + ")"
                 if attr == "clear" and len(args) == 0:
@@ -629,6 +641,8 @@ class JuliaSubsetRenderer:
                     return "split(" + owner + ", " + args[0] + ")"
                 if attr == "join" and len(args) == 1:
                     return "join(" + args[0] + ", " + owner + ")"
+                if attr == "keys" and len(args) == 0:
+                    return "collect(keys(" + owner + "))"
                 if attr == "strip" and len(args) == 0:
                     return "strip(" + owner + ")"
                 if attr == "rstrip" and len(args) == 0:
@@ -639,6 +653,8 @@ class JuliaSubsetRenderer:
                     return "endswith(" + owner + ", " + args[0] + ")"
                 if attr == "replace" and len(args) == 2:
                     return "replace(" + owner + ", " + args[0] + " => " + args[1] + ")"
+                if attr == "values" and len(args) == 0:
+                    return "collect(values(" + owner + "))"
                 if attr == "write_rgb_png" and len(args) == 4 and len(keywords) == 0:
                     return owner + ".write_rgb_png(" + ", ".join(args) + ")"
             func = self._render_expr(func_node)
@@ -884,7 +900,19 @@ class JuliaSubsetRenderer:
             self._emit(_ident(_str(node.get("target"), "id")) + " = " + self._render_expr(node.get("value")))
             return
         if kind == "Assign":
-            self._emit(_ident(_str(node.get("target"), "id")) + " = " + self._render_expr(node.get("value")))
+            target = node.get("target")
+            if isinstance(target, dict) and _str(target, "kind") == "Subscript":
+                owner_node = target.get("value")
+                owner = self._render_expr(owner_node)
+                owner_type = _str(owner_node, "resolved_type") if isinstance(owner_node, dict) else ""
+                index = self._render_expr(target.get("slice"))
+                value = self._render_expr(node.get("value"))
+                if owner_type == "bytearray":
+                    self._emit(owner + "[__pytra_idx(" + index + ", length(" + owner + "))] = " + value)
+                    return
+                self._emit(owner + "[" + index + "] = " + value)
+                return
+            self._emit(_ident(_str(target, "id")) + " = " + self._render_expr(node.get("value")))
             return
         if kind == "Swap":
             left = _ident(_str(node.get("left"), "id"))
