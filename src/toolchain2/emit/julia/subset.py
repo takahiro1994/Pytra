@@ -299,6 +299,7 @@ def _expr_supported(node: JsonVal) -> bool:
                 "append",
                 "appendleft",
                 "clear",
+                "discard",
                 "endswith",
                 "fabs",
                 "find",
@@ -314,6 +315,7 @@ def _expr_supported(node: JsonVal) -> bool:
                 "popleft",
                 "pop",
                 "replace",
+                "remove",
                 "reverse",
                 "rstrip",
                 "setdefault",
@@ -611,6 +613,8 @@ class JuliaSubsetRenderer:
                     return "pushfirst!(" + owner + ", " + args[0] + ")"
                 if attr == "clear" and len(args) == 0:
                     return "empty!(" + owner + ")"
+                if attr == "discard" and len(args) == 1:
+                    return "delete!(" + owner + ", " + args[0] + ")"
                 if attr == "find" and len(args) == 1:
                     return "__pytra_str_find(" + owner + ", " + args[0] + ")"
                 if attr == "index" and len(args) == 1:
@@ -653,6 +657,8 @@ class JuliaSubsetRenderer:
                     return "endswith(" + owner + ", " + args[0] + ")"
                 if attr == "replace" and len(args) == 2:
                     return "replace(" + owner + ", " + args[0] + " => " + args[1] + ")"
+                if attr == "remove" and len(args) == 1:
+                    return "delete!(" + owner + ", " + args[0] + ")"
                 if attr == "values" and len(args) == 0:
                     return "collect(values(" + owner + "))"
                 if attr == "write_rgb_png" and len(args) == 4 and len(keywords) == 0:
@@ -690,6 +696,8 @@ class JuliaSubsetRenderer:
                     )
             if func == "str" and len(args) == 1:
                 return "string(" + args[0] + ")"
+            if func == "set" and len(args) == 0:
+                return "Set()"
             if func == "bytearray" and len(args) == 1:
                 return "__pytra_bytearray(" + args[0] + ")"
             if func == "reversed" and len(args) == 1:
