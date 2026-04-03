@@ -363,6 +363,16 @@ class KotlinRenderer(CommonRenderer):
             return
         if kind == "Raise":
             exc = node.get("exc")
+            if isinstance(exc, dict) and self._str(exc, "kind") == "Call":
+                func = exc.get("func")
+                if isinstance(func, dict):
+                    func_kind = self._str(func, "kind")
+                    if func_kind == "Name" and self._str(func, "id").endswith("Error"):
+                        self._emit("throw " + self._emit_expr(exc))
+                        return
+                    if func_kind == "Attribute" and self._str(func, "attr").endswith("Error"):
+                        self._emit("throw " + self._emit_expr(exc))
+                        return
             message = self._emit_expr(exc) if isinstance(exc, dict) else "\"raise\""
             self._emit("throw RuntimeException(" + message + ".toString())")
             return
@@ -382,13 +392,19 @@ class KotlinRenderer(CommonRenderer):
             if len(handlers) == 0:
                 self._emit("} finally {")
             else:
-                self._emit("} catch (_: Throwable) {")
-                self.state.indent_level += 1
-                for handler in handlers:
-                    if isinstance(handler, dict):
-                        for stmt in self._list(handler, "body"):
-                            self._emit_stmt(stmt)
-                self.state.indent_level -= 1
+                for idx, handler in enumerate(handlers):
+                    if not isinstance(handler, dict):
+                        continue
+                    raw_exc_name = "__pytraErr" + str(idx)
+                    bound_name = _safe_kotlin_ident(self._str(handler, "name"))
+                    catch_kw = "} catch (" + raw_exc_name + ": Throwable) {" if idx == 0 else "catch (" + raw_exc_name + ": Throwable) {"
+                    self._emit(catch_kw)
+                    self.state.indent_level += 1
+                    if bound_name != "":
+                        self._emit("val " + bound_name + " = (" + raw_exc_name + ".message ?: " + raw_exc_name + ".toString())")
+                    for stmt in self._list(handler, "body"):
+                        self._emit_stmt(stmt)
+                    self.state.indent_level -= 1
                 self._emit("} finally {")
             self.state.indent_level += 1
             for stmt in self._list(node, "finalbody"):
@@ -781,6 +797,8 @@ class KotlinRenderer(CommonRenderer):
                 if owner_type in ("str", "string"):
                     if attr == "join" and len(arg_nodes) == 1:
                         return "__pytra_join(" + owner_expr + ", " + self._emit_expr(arg_nodes[0]) + ")"
+                    if attr == "isdigit" and len(arg_nodes) == 0:
+                        return "__pytra_isdigit(" + owner_expr + ")"
                     if attr == "upper" and len(arg_nodes) == 0:
                         return owner_expr + ".uppercase()"
                     if attr == "lower" and len(arg_nodes) == 0:
@@ -825,6 +843,13 @@ class KotlinRenderer(CommonRenderer):
                 mapped = self.mapping.calls.get(func_id)
                 if isinstance(mapped, str) and mapped != "":
                     func_name = mapped
+                if func_id == "bool":
+                    arg_nodes = self._list(node, "args")
+                    arg_expr = self._emit_expr(arg_nodes[0]) if len(arg_nodes) > 0 else "null"
+                    return "__pytra_truthy(" + arg_expr + ")"
+                if func_id.endswith("Error"):
+                    first_arg = self._emit_expr(self._list(node, "args")[0]) if len(self._list(node, "args")) > 0 else "\"error\""
+                    return "RuntimeException(" + first_arg + ".toString())"
                 if func_id in self.import_symbols:
                     import_path = self.import_symbols[func_id]
                     if import_path.startswith("pytra_built_in_error.") and func_id.endswith("Error"):
