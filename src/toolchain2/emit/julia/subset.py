@@ -422,12 +422,14 @@ def _stmt_supported(node: JsonVal) -> bool:
         )
     if kind == "AugAssign":
         target = node.get("target")
-        return (
-            isinstance(target, dict)
-            and _str(target, "kind") == "Name"
-            and _str(node, "op") in _BINOP_TEXT
-            and _expr_supported(node.get("value"))
-        )
+        if not isinstance(target, dict) or _str(node, "op") not in _BINOP_TEXT or not _expr_supported(node.get("value")):
+            return False
+        if _str(target, "kind") == "Name":
+            return True
+        if _str(target, "kind") == "Attribute":
+            owner = target.get("value")
+            return isinstance(owner, dict) and _str(owner, "kind") == "Name" and _str(owner, "id") == "self"
+        return False
     if kind == "If":
         return _expr_supported(node.get("test")) and all(_stmt_supported(stmt) for stmt in _list(node, "body")) and all(
             _stmt_supported(stmt) for stmt in _list(node, "orelse")
@@ -982,9 +984,16 @@ class JuliaSubsetRenderer:
             self._emit(left + ", " + right + " = " + right + ", " + left)
             return
         if kind == "AugAssign":
-            target = _ident(_str(node.get("target"), "id"))
+            target_node = node.get("target")
             op = _str(node, "op")
             value = self._render_expr(node.get("value"))
+            if isinstance(target_node, dict) and _str(target_node, "kind") == "Attribute":
+                owner = self._render_expr(target_node.get("value"))
+                attr = _str(target_node, "attr")
+                lhs = owner + "." + attr
+                self._emit(lhs + " = (" + lhs + " " + _BINOP_TEXT[op] + " " + value + ")")
+                return
+            target = _ident(_str(target_node, "id"))
             self._emit(target + " = (" + target + " " + _BINOP_TEXT[op] + " " + value + ")")
             return
         if kind == "If":

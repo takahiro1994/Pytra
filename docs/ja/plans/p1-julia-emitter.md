@@ -65,3 +65,4 @@
 - 2026-04-03: [ID: P1-JULIA-EMITTER-S1] subset native renderer に property getter / instance method を含む最小 class support を追加し、`property_method_call` も native path に寄せた。
 - 2026-04-03: [ID: P1-JULIA-EMITTER-S1] subset native renderer に bitwise `~`, `&`, `|`, `^` を追加し、`bitwise_invert_basic` も native path に寄せた。
 - 2026-04-03: [ID: P1-JULIA-EMITTER-S1] subset native renderer に `@staticmethod` class support を追加し、`staticmethod_basic` も native path に寄せた。
+- 2026-04-04: [ID: P1-JULIA-EMITTER-S1] subset native renderer に instance field `AugAssign` (`self.field += ...`) を追加し、`class_instance` も native path に寄せた。
