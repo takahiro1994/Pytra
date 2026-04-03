@@ -728,6 +728,17 @@ def _needs_parent_trait_object(ctx: RsEmitContext, class_name: str) -> bool:
     return any(not name.startswith("__") for name in methods)
 
 
+def _inherits_from_class(ctx: RsEmitContext, actual_type: str, expected_type: str) -> bool:
+    cur = actual_type
+    seen: set[str] = set()
+    while cur != "" and cur not in seen:
+        if cur == expected_type:
+            return True
+        seen.add(cur)
+        cur = ctx.class_bases.get(cur, "")
+    return False
+
+
 def _resolved_type_in_context(ctx: RsEmitContext, node: JsonVal) -> str:
     """Get the most precise resolved type available for a node in this scope."""
     if not isinstance(node, dict):
@@ -1340,6 +1351,8 @@ def _emit_isinstance(ctx: RsEmitContext, node: dict[str, JsonVal]) -> str:
     val_str = _emit_expr(ctx, val_node)
     val_rt = _actual_type_in_context(ctx, val_node) if isinstance(val_node, dict) else ""
     expected_id = _str(expected_node, "id") if isinstance(expected_node, dict) else ""
+    if expected_id == "":
+        expected_id = _str(node, "expected_type_name")
 
     # Normalize PYTRA_TID_* constants (used by C++ backend) to type names
     _PYTRA_TID_MAP: dict[str, str] = {}
@@ -1403,9 +1416,19 @@ def _emit_isinstance(ctx: RsEmitContext, node: dict[str, JsonVal]) -> str:
         if rust_type == "":
             # User-defined class or unknown: check via PyRuntimeTypeId downcast
             if expected_id in ctx.class_names:
-                if expected_id in ctx.ref_classes:
-                    return "(" + ref_val + ").downcast_ref::<Rc<RefCell<" + expected_id + ">>>().is_some()"
-                return "(" + ref_val + ").downcast_ref::<" + expected_id + ">().is_some()"
+                candidates = [
+                    class_name
+                    for class_name in sorted(ctx.class_names)
+                    if _inherits_from_class(ctx, class_name, expected_id)
+                ]
+                checks: list[str] = []
+                for candidate in candidates:
+                    if candidate in ctx.ref_classes:
+                        checks.append("(" + ref_val + ").downcast_ref::<Rc<RefCell<" + candidate + ">>>().is_some()")
+                    else:
+                        checks.append("(" + ref_val + ").downcast_ref::<Box<" + candidate + ">>().is_some()")
+                if checks:
+                    return "(" + " || ".join(checks) + ")"
             # Unknown type — fallback to false
             return "false"
         return "(" + ref_val + ").downcast_ref::<" + rust_type + ">().is_some()"
@@ -1419,6 +1442,8 @@ def _emit_isinstance(ctx: RsEmitContext, node: dict[str, JsonVal]) -> str:
     # Direct match after alias normalization.
     mapped_val = _NUMERIC.get(val_rt, val_rt)
     if mapped_val == mapped_expected:
+        return "true"
+    if expected_id in ctx.class_names and val_rt in ctx.class_names and _inherits_from_class(ctx, val_rt, expected_id):
         return "true"
     # Generic list/dict/set compatibility: list[str] isa list, etc.
     if mapped_expected in ("list", "dict", "set") and val_rt.startswith(mapped_expected + "["):
