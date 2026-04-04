@@ -169,6 +169,13 @@ def _exception_ctor_message_expr(node: dict[str, JsonVal]) -> JsonVal | None:
     return args[0]
 
 
+def _declared_field_names(node: dict[str, JsonVal]) -> list[str]:
+    field_types = node.get("field_types")
+    if not isinstance(field_types, dict):
+        return []
+    return [name for name in field_types.keys() if isinstance(name, str)]
+
+
 def _simple_class_supported(node: dict[str, JsonVal]) -> bool:
     body = _list(node, "body")
     if len(body) == 0:
@@ -1694,14 +1701,18 @@ class JuliaSubsetRenderer:
             if isinstance(target, dict):
                 self._emit("self." + _str(target, "attr") + " = " + self._render_expr(stmt.get("value")))
 
+    def _emit_exception_display_methods(self, class_name: str) -> None:
+        self._emit("Base.show(io::IO, e::" + class_name + ") = print(io, e.__pytra_message)")
+        self._emit("Base.showerror(io::IO, e::" + class_name + ") = print(io, e.__pytra_message)")
+        self._emit("__pytra_exception_message(e::" + class_name + ") = string(e.__pytra_message)")
+
     def _emit_exception_class(self, node: dict[str, JsonVal]) -> None:
         class_name = _str(node, "name")
         base_name = _str(node, "base")
         base_type = self._resolve_exception_base_type(base_name)
         if base_type == "":
             raise ValueError("unsupported Julia exception base: " + base_name)
-        field_types = node.get("field_types")
-        field_names = list(field_types.keys()) if isinstance(field_types, dict) else []
+        field_names = _declared_field_names(node)
         self._emit("# inherits from " + base_name)
         self._emit("mutable struct " + class_name + " <: " + base_type)
         self.indent_level += 1
@@ -1710,9 +1721,7 @@ class JuliaSubsetRenderer:
             self._emit(field_name)
         self.indent_level -= 1
         self._emit("end")
-        self._emit("Base.show(io::IO, e::" + class_name + ") = print(io, e.__pytra_message)")
-        self._emit("Base.showerror(io::IO, e::" + class_name + ") = print(io, e.__pytra_message)")
-        self._emit("__pytra_exception_message(e::" + class_name + ") = string(e.__pytra_message)")
+        self._emit_exception_display_methods(class_name)
         self._emit_blank()
         init_fn = _find_init_function(node)
         if init_fn is None:
@@ -1755,8 +1764,7 @@ class JuliaSubsetRenderer:
             self.class_base_names[class_name] = base_name
             if base_name != "":
                 self.class_subclasses.setdefault(base_name, set()).add(class_name)
-            field_types = stmt.get("field_types")
-            self.class_direct_field_names[class_name] = list(field_types.keys()) if isinstance(field_types, dict) else []
+            self.class_direct_field_names[class_name] = _declared_field_names(stmt)
             methods, properties, static_methods = self._collect_class_member_sets(stmt)
             inherited_methods = set(methods)
             inherited_properties = set(properties)
