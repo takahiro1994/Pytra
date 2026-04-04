@@ -494,10 +494,14 @@ def __pytra_float(v: Any): Double = {
 }
 
 // repr-style: strings are quoted, booleans are True/False, collections use Python syntax.
+private def __pytra_float_str(d: Double): String = java.lang.Double.toString(d).replace("E", "e")
+
 def __pytra_repr(v: Any): String = {
     if (v == null) return "None"
     v match {
         case b: Boolean => if (b) "True" else "False"
+        case d: Double => __pytra_float_str(d)
+        case f: Float => __pytra_float_str(f.toDouble)
         case s: String => "'" + s.replace("\\", "\\\\").replace("'", "\\'") + "'"
         case xs: PyTuple =>
             val inner = xs.map(x => __pytra_repr(x.asInstanceOf[Any])).mkString(", ")
@@ -515,6 +519,8 @@ def __pytra_str(v: Any): String = {
     if (v == null) return "None"
     v match {
         case b: Boolean => if (b) "True" else "False"
+        case d: Double => __pytra_float_str(d)
+        case f: Float => __pytra_float_str(f.toDouble)
         case xs: PyTuple =>
             val inner = xs.map(x => __pytra_repr(x.asInstanceOf[Any])).mkString(", ")
             if (xs.size == 1) "(" + inner + ",)" else "(" + inner + ")"

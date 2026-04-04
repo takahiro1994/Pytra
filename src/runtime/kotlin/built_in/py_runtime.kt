@@ -430,9 +430,13 @@ fun __pytra_float(v: Any?): Double {
     return 0.0
 }
 
+private fun __pytra_float_str(v: Double): String = java.lang.Double.toString(v).replace("E", "e")
+
 private fun __pytra_repr(v: Any?): String {
     if (v == null) return "None"
     if (v is Boolean) return if (v) "True" else "False"
+    if (v is Double) return __pytra_float_str(v)
+    if (v is Float) return __pytra_float_str(v.toDouble())
     if (v is String) return "'" + v.replace("\\", "\\\\").replace("'", "\\'") + "'"
     if (v is PyTuple) {
         val inner = v.joinToString(", ") { __pytra_repr(it) }
