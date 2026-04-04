@@ -380,6 +380,13 @@ fun __pytra_list_repeat(value: Any?, count: Any?): MutableList<Any?> {
     return out
 }
 
+fun __pytra_list_concat(a: Any?, b: Any?): MutableList<Any?> {
+    val out = mutableListOf<Any?>()
+    out.addAll(__pytra_as_list(a))
+    out.addAll(__pytra_as_list(b))
+    return out
+}
+
 fun __pytra_enumerate(v: Any?): MutableList<Any?> {
     val items = __pytra_as_list(v)
     val out = mutableListOf<Any?>()
@@ -417,6 +424,38 @@ fun __pytra_range(vararg args: Any?): MutableList<Any?> {
             out.add(i)
             i += step
         }
+    }
+    return out
+}
+
+fun __pytra_sum(xs: Any?): Any? {
+    val lst = __pytra_as_list(xs)
+    var hasFloat = false
+    for (v in lst) {
+        if (v is Double || v is Float) {
+            hasFloat = true
+            break
+        }
+    }
+    if (hasFloat) {
+        var acc = 0.0
+        for (v in lst) acc += __pytra_float(v)
+        return acc
+    }
+    var acc = 0L
+    for (v in lst) acc += __pytra_int(v)
+    return acc
+}
+
+fun __pytra_zip(a: Any?, b: Any?): MutableList<Any?> {
+    val la = __pytra_as_list(a)
+    val lb = __pytra_as_list(b)
+    val n = minOf(la.size, lb.size)
+    val out = mutableListOf<Any?>()
+    var i = 0
+    while (i < n) {
+        out.add(mutableListOf(la[i], lb[i]))
+        i += 1
     }
     return out
 }

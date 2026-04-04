@@ -623,7 +623,7 @@ def _copy_zig_runtime(emit_dir: Path) -> None:
 def _copy_ps1_runtime(emit_dir: Path) -> None:
     """Copy PowerShell runtime files to emit directory."""
     ps1_runtime = ROOT / "src" / "runtime" / "powershell"
-    for bucket in ("built_in", "std"):
+    for bucket in ("built_in", "std", "utils"):
         bucket_dir = ps1_runtime / bucket
         if bucket_dir.exists():
             dest_bucket = emit_dir / bucket
@@ -736,7 +736,9 @@ def _run_target(
         kt_files = sorted(str(p) for p in emit_dir.rglob("*.kt"))
         if len(kt_files) == 0:
             return subprocess.CompletedProcess("", 1, "", "no .kt files found")
-        jar_path = emit_dir / (case_path.stem + "_kotlin.jar")
+        jar_path = work_dir / (case_path.stem + "_kotlin_run.jar")
+        if jar_path.exists():
+            jar_path.unlink()
         build = run_shell(
             "kotlinc "
             + " ".join(shlex.quote(f) for f in kt_files)

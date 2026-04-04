@@ -201,13 +201,29 @@ class KotlinRenderer(CommonRenderer):
         if not isinstance(gen, dict):
             return leaf_stmt
         target = gen.get("target")
-        target_name = self._for_target_name(target)
         iter_expr = self._emit_expr(gen.get("iter"))
+        iter_node = gen.get("iter")
+        iter_type = self._str(iter_node, "resolved_type") if isinstance(iter_node, dict) else ""
+        if iter_type in ("str", "string"):
+            iter_expr = "__pytra_as_list(" + iter_expr + ")"
         inner = self._emit_comp_loops(generators, index + 1, leaf_stmt)
         filters = [self._emit_expr(cond) for cond in self._list(gen, "ifs") if isinstance(cond, dict)]
         if len(filters) > 0:
             inner = "if (" + " && ".join(filters) + ") { " + inner + " }"
-        return "for (" + target_name + " in " + iter_expr + ") { " + inner + " }"
+        loop_var = self._for_target_name(target)
+        prelude: list[str] = []
+        if isinstance(target, dict) and self._str(target, "kind") == "Tuple":
+            loop_var = self._next_tmp("__iterItem")
+            tuple_expr = "__pytra_as_list(" + loop_var + ")"
+            for idx2, elem in enumerate(self._list(target, "elements")):
+                if not isinstance(elem, dict) or self._str(elem, "kind") != "Name":
+                    continue
+                elem_name = _safe_kotlin_ident(self._str(elem, "id"))
+                elem_type = kotlin_type(self._str(elem, "resolved_type"))
+                prelude.append("val " + elem_name + " = (" + tuple_expr + "[" + str(idx2) + "] as " + elem_type + ")")
+        if len(prelude) > 0:
+            inner = " ".join(line + "; " for line in prelude) + inner
+        return "for (" + loop_var + " in " + iter_expr + ") { " + inner + " }"
 
     def _emit_comp_expr(self, node: dict[str, JsonVal], result_type: str, init_expr: str, leaf_stmt: str) -> str:
         result_name = self._next_tmp("__pytraComp")
@@ -1233,6 +1249,8 @@ class KotlinRenderer(CommonRenderer):
                     if attr == "items" and len(arg_nodes) == 0:
                         return "__pytra_dict_items(__pytra_as_dict(" + owner_expr + "))"
                 if owner_type.startswith("list[") or owner_type in ("list", "bytes", "bytearray"):
+                    if attr == "index" and len(arg_nodes) == 1:
+                        return owner_expr + ".indexOf(" + self._emit_expr(arg_nodes[0]) + ").toLong()"
                     if attr == "append" and len(arg_nodes) == 1:
                         return owner_expr + ".add(" + self._emit_expr(arg_nodes[0]) + ")"
                     if attr == "extend" and len(arg_nodes) == 1:
@@ -1260,6 +1278,10 @@ class KotlinRenderer(CommonRenderer):
                 mapped = self.mapping.calls.get(func_id)
                 if isinstance(mapped, str) and mapped != "":
                     func_name = mapped
+                elif func_id == "sum":
+                    return "(__pytra_sum(" + ", ".join(self._emit_expr(arg) for arg in self._list(node, "args")) + ") as " + self._render_type(self._str(node, "resolved_type")) + ")"
+                elif func_id == "zip":
+                    return "__pytra_zip(" + ", ".join(self._emit_expr(arg) for arg in self._list(node, "args")) + ")"
                 if func_id == "bool":
                     arg_nodes = self._list(node, "args")
                     arg_expr = self._emit_expr(arg_nodes[0]) if len(arg_nodes) > 0 else "null"
@@ -1327,6 +1349,8 @@ class KotlinRenderer(CommonRenderer):
                 return "(__pytra_list_repeat(" + left + ", " + right + ") as " + self._render_type(self._str(node, "resolved_type")) + ")"
             if op == "Mult" and (right_type.startswith("list[") or right_type in ("list", "bytes", "bytearray")):
                 return "(__pytra_list_repeat(" + right + ", " + left + ") as " + self._render_type(self._str(node, "resolved_type")) + ")"
+            if op == "Add" and ((left_type.startswith("list[") or left_type in ("list", "tuple", "bytes", "bytearray")) or (right_type.startswith("list[") or right_type in ("list", "tuple", "bytes", "bytearray"))):
+                return "(__pytra_list_concat(" + left + ", " + right + ") as " + self._render_type(self._str(node, "resolved_type")) + ")"
             if op == "Div":
                 return left + ".toDouble() / " + right + ".toDouble()"
             if op == "BitAnd":
