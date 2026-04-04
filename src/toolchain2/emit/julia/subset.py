@@ -268,6 +268,68 @@ def _isinstance_expected_name(node: dict[str, JsonVal]) -> str:
     return ""
 
 
+def _call_keywords_supported(keywords: list[JsonVal]) -> bool:
+    return all(
+        isinstance(item, dict)
+        and isinstance(item.get("arg"), str)
+        and _expr_supported(item.get("value"))
+        for item in keywords
+    )
+
+
+def _attribute_call_supported(node: dict[str, JsonVal], func: dict[str, JsonVal], keywords: list[JsonVal]) -> bool:
+    owner = func.get("value")
+    attr = _str(func, "attr")
+    owner_type = _str(owner, "resolved_type") if isinstance(owner, dict) else ""
+    if not _expr_supported(owner):
+        return False
+    if not all(_expr_supported(arg) for arg in _list(node, "args")):
+        return False
+    if not _call_keywords_supported(keywords):
+        return False
+    if attr in {
+        "add",
+        "append",
+        "appendleft",
+        "clear",
+        "discard",
+        "endswith",
+        "extend",
+        "fabs",
+        "find",
+        "floor",
+        "get",
+        "isdigit",
+        "index",
+        "isalnum",
+        "items",
+        "join",
+        "keys",
+        "lower",
+        "lstrip",
+        "makedirs",
+        "popleft",
+        "pop",
+        "replace",
+        "remove",
+        "reverse",
+        "rstrip",
+        "setdefault",
+        "split",
+        "sort",
+        "sqrt",
+        "values",
+        "write_rgb_png",
+        "startswith",
+        "strip",
+        "upper",
+    }:
+        return True
+    if owner_type not in {"", "str", "bytearray"} and not owner_type.startswith(("list[", "dict[", "set[")):
+        return len(keywords) == 0
+    return False
+
+
 def _expr_supported(node: JsonVal) -> bool:
     if not isinstance(node, dict):
         return False
@@ -328,70 +390,11 @@ def _expr_supported(node: JsonVal) -> bool:
         func = node.get("func")
         keywords = _list(node, "keywords")
         if isinstance(func, dict) and _str(func, "kind") == "Attribute":
-            owner = func.get("value")
-            attr = _str(func, "attr")
-            owner_type = _str(owner, "resolved_type") if isinstance(owner, dict) else ""
-            if not _expr_supported(owner):
-                return False
-            if not all(_expr_supported(arg) for arg in _list(node, "args")):
-                return False
-            if not all(
-                isinstance(item, dict)
-                and isinstance(item.get("arg"), str)
-                and _expr_supported(item.get("value"))
-                for item in keywords
-            ):
-                return False
-            if attr in {
-                "add",
-                "append",
-                "appendleft",
-                "clear",
-                "discard",
-                "endswith",
-                "extend",
-                "fabs",
-                "find",
-                "floor",
-                "get",
-                "isdigit",
-                "index",
-                "isalnum",
-                "items",
-                "join",
-                "keys",
-                "lower",
-                "lstrip",
-                "makedirs",
-                "popleft",
-                "pop",
-                "replace",
-                "remove",
-                "reverse",
-                "rstrip",
-                "setdefault",
-                "split",
-                "sort",
-                "sqrt",
-                "values",
-                "write_rgb_png",
-                "startswith",
-                "strip",
-                "upper",
-            }:
-                return True
-            if owner_type not in {"", "str", "bytearray"} and not owner_type.startswith(("list[", "dict[", "set[")):
-                return len(keywords) == 0
-            return False
+            return _attribute_call_supported(node, func, keywords)
         return (
             _expr_supported(node.get("func"))
             and all(_expr_supported(arg) for arg in _list(node, "args"))
-            and all(
-                isinstance(item, dict)
-                and isinstance(item.get("arg"), str)
-                and _expr_supported(item.get("value"))
-                for item in keywords
-            )
+            and _call_keywords_supported(keywords)
         )
     if kind in {"Box", "Unbox"}:
         return _expr_supported(node.get("value"))
