@@ -752,21 +752,6 @@ class JuliaSubsetRenderer:
             )
         return ""
 
-    def _fallback_method_runtime_key(self, owner_type: str, attr: str) -> str:
-        if owner_type == "str":
-            return "str." + attr
-        if owner_type == "dict" or owner_type.startswith("dict["):
-            return "dict." + attr
-        if owner_type == "set" or owner_type.startswith("set["):
-            return "set." + attr
-        if owner_type == "deque" or owner_type.startswith("deque["):
-            return "deque." + attr
-        if owner_type == "bytearray":
-            return "bytearray." + attr
-        if owner_type == "list" or owner_type.startswith("list["):
-            return "list." + attr
-        return ""
-
     def _render_mapped_method_call(
         self,
         node: dict[str, JsonVal],
@@ -863,12 +848,6 @@ class JuliaSubsetRenderer:
         runtime_call = _str(node, "resolved_runtime_call")
         if runtime_call == "":
             runtime_call = _str(node, "runtime_call")
-        fallback_runtime_key = self._fallback_method_runtime_key(owner_type, attr)
-        if fallback_runtime_key != "":
-            fallback_mapped = self.mapping.calls.get(fallback_runtime_key, "")
-            fallback_expr = self._render_mapped_runtime_call(fallback_mapped, [owner] + args, _str(node, "resolved_type"))
-            if fallback_expr != "":
-                return fallback_expr
         mapped_runtime = self.mapping.calls.get(runtime_call, "")
         if mapped_runtime != "":
             mapped_expr = self._render_mapped_runtime_call(
@@ -879,7 +858,10 @@ class JuliaSubsetRenderer:
             )
             if mapped_expr != "":
                 return mapped_expr
-        return self._render_class_dispatch_call(owner, owner_type, owner_name, attr, args, keywords)
+        class_dispatch = self._render_class_dispatch_call(owner, owner_type, owner_name, attr, args, keywords)
+        if class_dispatch != "":
+            return class_dispatch
+        raise RuntimeError("julia subset: attribute call requires runtime metadata: " + attr)
 
     def _render_name_call(
         self,

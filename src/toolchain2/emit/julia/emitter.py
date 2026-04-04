@@ -59,7 +59,10 @@ class JuliaRenderer(CommonRenderer):
             return ""
         rewritten_doc = self._rewrite_legacy_compatible_doc(prepared)
         if can_render_module_natively(rewritten_doc):
-            return self._render_native_module(rewritten_doc)
+            try:
+                return self._render_native_module(rewritten_doc)
+            except RuntimeError:
+                return self._render_legacy_module(rewritten_doc)
         return self._render_legacy_module(rewritten_doc)
 
 
