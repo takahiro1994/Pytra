@@ -42,6 +42,14 @@ class JuliaRenderer(CommonRenderer):
     def _rewrite_legacy_compatible_doc(self, east3_doc: dict[str, JsonVal]) -> dict[str, JsonVal]:
         return self.rewriter.rewrite_document(east3_doc)
 
+    def _render_native_module(self, east3_doc: dict[str, JsonVal]) -> str:
+        meta = east3_doc.get("meta")
+        subset_meta = meta if isinstance(meta, dict) else {}
+        return JuliaSubsetRenderer(self.mapping, subset_meta).render_module(east3_doc)
+
+    def _render_legacy_module(self, east3_doc: dict[str, JsonVal]) -> str:
+        return self.legacy_bridge.emit_module(east3_doc)
+
     def emit_module(self, east3_doc: dict[str, JsonVal]) -> str:
         return self.render_module(east3_doc)
 
@@ -51,11 +59,8 @@ class JuliaRenderer(CommonRenderer):
             return ""
         rewritten_doc = self._rewrite_legacy_compatible_doc(prepared)
         if can_render_module_natively(rewritten_doc):
-            meta = rewritten_doc.get("meta")
-            subset_meta = meta if isinstance(meta, dict) else {}
-            return JuliaSubsetRenderer(self.mapping, subset_meta).render_module(rewritten_doc)
-        legacy_doc = rewritten_doc
-        return self.legacy_bridge.emit_module(legacy_doc)
+            return self._render_native_module(rewritten_doc)
+        return self._render_legacy_module(rewritten_doc)
 
 
 def emit_julia_module(east3_doc: dict[str, JsonVal]) -> str:
