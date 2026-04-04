@@ -1071,14 +1071,7 @@ class JuliaSubsetRenderer:
             return "((" + ", ".join(args) + ") -> " + body + ")"
         return ""
 
-    def _next_tmp(self, prefix: str) -> str:
-        self.tmp_counter += 1
-        return prefix + str(self.tmp_counter)
-
-    def _render_expr(self, node: JsonVal) -> str:
-        if not isinstance(node, dict):
-            raise RuntimeError("julia subset: expr must be dict")
-        kind = _str(node, "kind")
+    def _render_simple_expr(self, node: dict[str, JsonVal], kind: str) -> str:
         if kind == "Name":
             name = _str(node, "id")
             if name == "main" and "__pytra_main" in self.function_names:
@@ -1123,6 +1116,19 @@ class JuliaSubsetRenderer:
             return expr
         if kind == "ObjStr":
             return "string(" + self._render_expr(node.get("value")) + ")"
+        return ""
+
+    def _next_tmp(self, prefix: str) -> str:
+        self.tmp_counter += 1
+        return prefix + str(self.tmp_counter)
+
+    def _render_expr(self, node: JsonVal) -> str:
+        if not isinstance(node, dict):
+            raise RuntimeError("julia subset: expr must be dict")
+        kind = _str(node, "kind")
+        simple_expr = self._render_simple_expr(node, kind)
+        if simple_expr != "":
+            return simple_expr
         literal_or_comp = self._render_literal_or_comp_expr(node, kind)
         if literal_or_comp != "":
             return literal_or_comp
