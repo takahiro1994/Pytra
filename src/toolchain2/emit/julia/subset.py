@@ -178,6 +178,24 @@ def _declared_field_names(node: dict[str, JsonVal]) -> list[str]:
     return [name for name in field_types.keys() if isinstance(name, str)]
 
 
+def _exception_ctor_stmt_supported(stmt: dict[str, JsonVal], instance_arg: str) -> bool:
+    kind = _str(stmt, "kind")
+    if kind == "Expr":
+        value = stmt.get("value")
+        return isinstance(value, dict) and _str(value, "kind") == "Call" and all(
+            _expr_supported(arg) for arg in _list(value, "args")
+        )
+    if kind not in {"Assign", "AnnAssign"}:
+        return False
+    target = stmt.get("target")
+    if not isinstance(target, dict) or _str(target, "kind") != "Attribute":
+        return False
+    owner = target.get("value")
+    if not isinstance(owner, dict) or _str(owner, "kind") != "Name" or _str(owner, "id") != instance_arg:
+        return False
+    return _expr_supported(stmt.get("value"))
+
+
 def _simple_class_supported(node: dict[str, JsonVal]) -> bool:
     body = _list(node, "body")
     if len(body) == 0:
@@ -222,25 +240,7 @@ def _exception_class_supported(node: dict[str, JsonVal]) -> bool:
         return False
     instance_arg = args[0]
     for stmt in _list(init_fn, "body"):
-        if not isinstance(stmt, dict):
-            return False
-        kind = _str(stmt, "kind")
-        if kind == "Expr":
-            value = stmt.get("value")
-            if not isinstance(value, dict) or _str(value, "kind") != "Call":
-                return False
-            if not all(_expr_supported(arg) for arg in _list(value, "args")):
-                return False
-            continue
-        if kind not in {"Assign", "AnnAssign"}:
-            return False
-        target = stmt.get("target")
-        if not isinstance(target, dict) or _str(target, "kind") != "Attribute":
-            return False
-        owner = target.get("value")
-        if not isinstance(owner, dict) or _str(owner, "kind") != "Name" or _str(owner, "id") != instance_arg:
-            return False
-        if not _expr_supported(stmt.get("value")):
+        if not isinstance(stmt, dict) or not _exception_ctor_stmt_supported(stmt, instance_arg):
             return False
     return True
 
