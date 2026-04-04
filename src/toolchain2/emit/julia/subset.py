@@ -642,6 +642,95 @@ class JuliaSubsetRenderer:
             return ""
         return mapped_runtime
 
+    def _render_mapped_runtime_call(self, mapped: str, args: list[str], result_type: str) -> str:
+        if mapped == "":
+            return ""
+        if mapped == "__CAST__":
+            return self._render_static_cast_call(result_type, result_type, args)
+        if mapped == "__LIST_APPEND__" and len(args) == 2:
+            return "push!(" + args[0] + ", " + args[1] + ")"
+        if mapped == "__LIST_POP__":
+            if len(args) == 1:
+                return "pop!(" + args[0] + ")"
+            if len(args) == 2:
+                return "pop!(" + args[0] + ", " + args[1] + ")"
+            return ""
+        if mapped == "__LIST_EXTEND__" and len(args) == 2:
+            return "append!(" + args[0] + ", " + args[1] + ")"
+        if mapped == "__LIST_INDEX__" and len(args) == 2:
+            return "(findfirst(==(" + args[1] + "), " + args[0] + ") - 1)"
+        if mapped == "__LIST_CLEAR__" and len(args) == 1:
+            return "empty!(" + args[0] + ")"
+        if mapped == "__LIST_REVERSE__" and len(args) == 1:
+            return "reverse!(" + args[0] + ")"
+        if mapped == "__LIST_SORT__" and len(args) == 1:
+            return "sort!(" + args[0] + ")"
+        if mapped == "__DICT_GET__":
+            if len(args) == 2:
+                return "get(" + args[0] + ", " + args[1] + ", nothing)"
+            if len(args) == 3:
+                return "get(" + args[0] + ", " + args[1] + ", " + args[2] + ")"
+            return ""
+        if mapped == "__DICT_POP__":
+            if len(args) == 2:
+                return "pop!(" + args[0] + ", " + args[1] + ")"
+            if len(args) == 3:
+                return "pop!(" + args[0] + ", " + args[1] + ", " + args[2] + ")"
+            return ""
+        if mapped == "__DICT_ITEMS__" and len(args) == 1:
+            return "collect(pairs(" + args[0] + "))"
+        if mapped == "__DICT_KEYS__" and len(args) == 1:
+            return "collect(keys(" + args[0] + "))"
+        if mapped == "__DICT_VALUES__" and len(args) == 1:
+            return "collect(values(" + args[0] + "))"
+        if mapped == "__DICT_SETDEFAULT__" and len(args) == 3:
+            return "get!(" + args[0] + ", " + args[1] + ", " + args[2] + ")"
+        if mapped == "__SET_ADD__" and len(args) == 2:
+            return "push!(" + args[0] + ", " + args[1] + ")"
+        if mapped == "__SET_DISCARD__" and len(args) == 2:
+            return "delete!(" + args[0] + ", " + args[1] + ")"
+        if mapped == "__SET_REMOVE__" and len(args) == 2:
+            return "delete!(" + args[0] + ", " + args[1] + ")"
+        if mapped == "__SET_CTOR__" and len(args) == 0:
+            return "Set()"
+        if mapped == "__STR_REPLACE__" and len(args) == 3:
+            return "replace(" + args[0] + ", " + args[1] + " => " + args[2] + ")"
+        if mapped == "__STR_JOIN__" and len(args) == 2:
+            return "join(" + args[1] + ", " + args[0] + ")"
+        if mapped == "__STR_COUNT__" and len(args) == 2:
+            return "count(" + args[1] + ", " + args[0] + ")"
+        if mapped == "__STR_INDEX__" and len(args) == 2:
+            return "__pytra_str_find(" + args[0] + ", " + args[1] + ")"
+        if mapped == "__STR_ISSPACE__" and len(args) == 1:
+            return "((length(" + args[0] + ") != 0) && all(isspace, " + args[0] + "))"
+        if mapped == "__RANGE__":
+            if len(args) == 1:
+                return "0:(" + args[0] + " - 1)"
+            if len(args) == 2:
+                return args[0] + ":(" + args[1] + " - 1)"
+            if len(args) == 3:
+                step = args[2]
+                if step == "1":
+                    return args[0] + ":(" + args[1] + " - 1)"
+                if step.startswith("-"):
+                    return args[0] + ":" + step + ":(" + args[1] + " + 1)"
+                return (
+                    args[0]
+                    + ":"
+                    + step
+                    + ":(("
+                    + step
+                    + ") > 0 ? ("
+                    + args[1]
+                    + " - 1) : ("
+                    + args[1]
+                    + " + 1))"
+                )
+            return ""
+        if len(args) == 0:
+            return mapped + "()"
+        return mapped + "(" + ", ".join(args) + ")"
+
     def _render_mapped_method_call(
         self,
         node: dict[str, JsonVal],
@@ -654,16 +743,7 @@ class JuliaSubsetRenderer:
         mapped = self.mapping.calls.get(runtime_call, "")
         if mapped == "":
             return ""
-        if runtime_call in {
-            "str.find",
-            "str.isdigit",
-            "str.isalnum",
-            "str.lower",
-            "str.upper",
-            "write_rgb_png",
-        }:
-            return mapped + "(" + ", ".join([owner] + args) + ")"
-        return ""
+        return self._render_mapped_runtime_call(mapped, [owner] + args, _str(node, "resolved_type"))
 
     def _render_collection_method_call_0(self, owner: str, attr: str) -> str:
         if attr == "clear":
@@ -812,8 +892,17 @@ class JuliaSubsetRenderer:
         string_method = self._render_string_base_call(owner, attr, args)
         if string_method != "":
             return string_method
-        if attr == "makedirs" and len(args) == 1 and len(keywords) == 1 and keywords[0].get("arg") == "exist_ok":
-            return owner + ".makedirs(" + args[0] + ", " + self._render_expr(keywords[0].get("value")) + ")"
+        runtime_call = _str(node, "resolved_runtime_call")
+        if runtime_call == "":
+            runtime_call = _str(node, "runtime_call")
+        if runtime_call == "makedirs" and len(args) == 1 and len(keywords) == 1 and keywords[0].get("arg") == "exist_ok":
+            mapped = self.mapping.calls.get(runtime_call, "")
+            if mapped != "":
+                return self._render_mapped_runtime_call(
+                    mapped,
+                    [args[0], self._render_expr(keywords[0].get("value"))],
+                    _str(node, "resolved_type"),
+                )
         return self._render_class_dispatch_call(owner, owner_type, owner_name, attr, args, keywords)
 
     def _render_name_call(
@@ -825,65 +914,17 @@ class JuliaSubsetRenderer:
         result_type: str,
         use_mapped_runtime: str,
     ) -> str:
-        if runtime_call == "static_cast":
-            cast_expr = self._render_static_cast_call(builtin_name, result_type, args)
-            if cast_expr != "":
-                return cast_expr
+        if use_mapped_runtime != "":
+            mapped_expr = self._render_mapped_runtime_call(use_mapped_runtime, args, result_type)
+            if mapped_expr != "":
+                return mapped_expr
         if func == "int" and len(args) == 1:
-            if use_mapped_runtime != "" and use_mapped_runtime != "__CAST__":
-                return use_mapped_runtime + "(" + args[0] + ")"
             return "__pytra_int(" + args[0] + ")"
-        if func == "len" and len(args) == 1:
-            return "length(" + args[0] + ")"
-        if func == "range":
-            if len(args) == 1:
-                return "0:(" + args[0] + " - 1)"
-            if len(args) == 2:
-                return args[0] + ":(" + args[1] + " - 1)"
-            if len(args) == 3:
-                step = args[2]
-                if step == "1":
-                    return args[0] + ":(" + args[1] + " - 1)"
-                if step.startswith("-"):
-                    return args[0] + ":" + step + ":(" + args[1] + " + 1)"
-                return (
-                    args[0]
-                    + ":"
-                    + step
-                    + ":(("
-                    + step
-                    + ") > 0 ? ("
-                    + args[1]
-                    + " - 1) : ("
-                    + args[1]
-                    + " + 1))"
-                )
-        if func == "str" and len(args) == 1:
-            if use_mapped_runtime != "":
-                return use_mapped_runtime + "(" + args[0] + ")"
-            return "__pytra_str(" + args[0] + ")"
-        if func == "bool" and len(args) == 1:
-            if use_mapped_runtime != "":
-                return use_mapped_runtime + "(" + args[0] + ")"
-            return "__pytra_truthy(" + args[0] + ")"
         if func == "set" and len(args) == 0:
             return "Set()"
-        if func == "bytearray" and len(args) == 1:
-            if use_mapped_runtime != "":
-                return use_mapped_runtime + "(" + args[0] + ")"
-            return "__pytra_bytearray(" + args[0] + ")"
         if func == "bytes":
             if len(args) == 0:
                 return "UInt8[]"
-            if use_mapped_runtime != "":
-                return use_mapped_runtime + "(" + args[0] + ")"
-            return "__pytra_bytes(" + args[0] + ")"
-        if func == "reversed" and len(args) == 1:
-            return "reverse(" + args[0] + ")"
-        if use_mapped_runtime != "":
-            if len(args) == 0:
-                return use_mapped_runtime + "()"
-            return use_mapped_runtime + "(" + ", ".join(args) + ")"
         return ""
 
     def _render_constructor_call(self, func: str, args: list[str]) -> str:
