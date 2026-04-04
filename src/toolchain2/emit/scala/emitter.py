@@ -1259,7 +1259,11 @@ class ScalaRenderer(CommonRenderer):
                     parts.append(self._emit_expr(value))
             return "\"\"" if len(parts) == 0 else "(" + " + ".join(parts) + ")"
         if kind == "FormattedValue":
-            return "__pytra_str(" + self._emit_expr(node.get("value")) + ")"
+            format_spec = self._str(node, "format_spec")
+            value_expr = self._emit_expr(node.get("value"))
+            if format_spec != "":
+                return "__pytra_format(" + value_expr + ", " + self._quote_string(format_spec) + ")"
+            return "__pytra_str(" + value_expr + ")"
         raise RuntimeError("scala emitter: unsupported expr kind: " + kind)
 
 

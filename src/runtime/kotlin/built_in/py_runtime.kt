@@ -170,6 +170,22 @@ fun __pytra_tuple(vararg items: Any?): PyTuple {
     return PyTuple(items.toList())
 }
 
+fun __pytra_format(value: Any?, spec: String): String {
+    if (spec.isEmpty()) return __pytra_str(value)
+    if (spec.endsWith("%")) {
+        return __pytra_format(__pytra_float(value) * 100.0, spec.dropLast(1) + "f") + "%"
+    }
+    val kind = spec.last()
+    val flags = spec.dropLast(1).replace("<", "-")
+    val fmt = "%" + flags + kind
+    return when (kind) {
+        'd', 'x', 'X' -> String.format(java.util.Locale.US, fmt, __pytra_int(value))
+        'f' -> String.format(java.util.Locale.US, fmt, __pytra_float(value))
+        's' -> String.format(java.util.Locale.US, fmt, __pytra_str(value))
+        else -> __pytra_str(value)
+    }
+}
+
 fun __pytra_join(sep: Any?, items: Any?): String {
     return __pytra_as_list(items).joinToString(__pytra_str(sep)) { __pytra_str(it) }
 }

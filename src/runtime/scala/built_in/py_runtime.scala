@@ -220,6 +220,22 @@ def __pytra_str(v: Any): String = {
 
 def __pytra_tuple(items: Any*): PyTuple = new PyTuple(items)
 
+def __pytra_format(value: Any, spec: String): String = {
+    if (spec == null || spec == "") return __pytra_str(value)
+    if (spec.endsWith("%")) {
+        return __pytra_format(__pytra_float(value) * 100.0, spec.substring(0, spec.length - 1) + "f") + "%"
+    }
+    val kind = spec.charAt(spec.length - 1)
+    val flags = spec.substring(0, spec.length - 1).replace("<", "-")
+    val fmt = "%" + flags + kind
+    kind match {
+        case 'd' | 'x' | 'X' => String.format(java.util.Locale.US, fmt, java.lang.Long.valueOf(__pytra_int(value)))
+        case 'f' => String.format(java.util.Locale.US, fmt, java.lang.Double.valueOf(__pytra_float(value)))
+        case 's' => String.format(java.util.Locale.US, fmt, __pytra_str(value))
+        case _ => __pytra_str(value)
+    }
+}
+
 def __pytra_len(v: Any): Long = {
     if (v == null) return 0L
     v match {
