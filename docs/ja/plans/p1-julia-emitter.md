@@ -10,11 +10,13 @@
 
 - [ID: P1-JULIA-EMITTER-S1] `src/toolchain2/emit/julia/` に Julia emitter を新規実装する
 - [ID: P1-JULIA-EMITTER-S2] `src/runtime/julia/mapping.json` を作成する
+- [ID: P2-JULIA-LINT-S2] `src/toolchain2/emit/julia/subset.py` の emitter guide 違反 hardcode を mapping / EAST3 metadata 正本へ移す
 
 ## 目的
 
 - 旧 `src/toolchain/emit/julia/` を今後の修正対象から外し、toolchain2 側に Julia backend の正本を用意する。
 - emitter 実装ガイドラインに沿って、profile / mapping / emitter 入口を toolchain2 の標準構成へ揃える。
+- bootstrap 期に残った `subset.py` の hardcode を整理し、runtime symbol / module / type / cast 判定を emitter のローカル知識ではなく `mapping.json` と EAST3 metadata に寄せる。
 
 ## 方針
 
@@ -28,6 +30,7 @@
 - `src/toolchain2/emit/julia/` が import 可能である。
 - `src/runtime/julia/mapping.json` が存在し、最低限の `builtin_prefix` / `calls` / `types` / `skip_modules` / `implicit_promotions` を持つ。
 - bootstrap emitter から Julia ソース文字列を生成できる。
+- `subset.py` に残る guide 違反 hardcode が削減され、runtime / fixture parity を維持したまま `mapping.json` 正本ベースで説明できること。
 
 ## 決定ログ
 
@@ -84,3 +87,4 @@
 - 2026-04-04: [ID: P1-JULIA-EMITTER-S1] subset native renderer の import/runtime 解決は `build_import_alias_map()` / `build_runtime_import_map()` / `should_skip_module()` と `mapping.json` ベースへ寄せ、`pytra.std.*` / `pytra.utils.*` の直分岐を縮小した。
 - 2026-04-04: [ID: P1-JULIA-EMITTER-S1] `src/runtime/julia/mapping.json` に native file / namespace expr の正本を追加し、Julia runtime へ `py_assert_*` / `__pytra_exception` を補っても fixture parity 146/146 PASS を維持した。
 - 2026-04-04: [ID: P1-JULIA-EMITTER-S1] emitter guide 再点検を踏まえ、subset native renderer の `Name/Attribute` call を `mapping.json` 正本へさらに寄せた。`len` / `dict.clear/pop/setdefault` / `list.extend/index/reverse/sort` / `py_range` / `str.strip/lstrip/rstrip/startswith/endswith/replace/split/join/count/index/isspace` の mapping を Julia marker / base function に整理し、local hardcode を削減した上で fixture parity 146/146 PASS を再確認した。
+- 2026-04-04: [ID: P2-JULIA-LINT-S2] guide 再点検の結果、`subset.py` には attr-call whitelist、owner type 名分岐、exception/class contract の文字列判定など hardcode がまだ残っていることを確認した。以後は parity を維持しつつ、これらを `mapping.json` / `runtime_call_adapter_kind` / EAST3 metadata 正本へ順次移す。

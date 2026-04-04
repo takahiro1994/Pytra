@@ -6,7 +6,7 @@
 
 > 領域別 TODO。全体索引は [index.md](./index.md) を参照。
 
-最終更新: 2026-04-03
+最終更新: 2026-04-04
 
 ## 運用ルール
 
@@ -118,3 +118,7 @@
 
 1. [x] [ID: P2-JULIA-LINT-S1] `check_emitter_hardcode_lint.py --lang julia` で全カテゴリ 0 件になることを確認する
    - 2026-04-02: `python3 tools/check/check_emitter_hardcode_lint.py --lang julia` で全カテゴリ 0 件を確認
+2. [ ] [ID: P2-JULIA-LINT-S2] `src/toolchain2/emit/julia/subset.py` の emitter guide 違反 hardcode を mapping / EAST3 metadata 正本へ移す
+   - 2026-04-04: `subset.py` に attr-call method whitelist、owner type 名分岐、exception/class contract の文字列判定など guide 違反の hardcode が残っていることを再確認
+   - 2026-04-04: `write_rgb_png` などの attr symbol 直書きは support checker から除去し、`resolved_runtime_call` / `runtime_call` metadata ベースで受理する方針に修正開始
+   - 完了条件: `subset.py` に残る runtime/module/type 名 hardcode を `mapping.json` / `runtime_call_adapter_kind` / EAST3 metadata へ移し、`runtime_parity_check_fast.py --case-root fixture --targets julia` を PASS させたうえで guide 違反が説明可能な範囲まで減っていること
