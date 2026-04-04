@@ -1555,6 +1555,25 @@ class JuliaSubsetRenderer:
         self.indent_level -= 1
         self._emit("end")
 
+    def _emit_function_header(self, fn_name: str, args: list[str]) -> None:
+        self._emit("function " + fn_name + "(" + ", ".join(args) + ")")
+        self.indent_level += 1
+
+    def _emit_function_end(self) -> None:
+        self.indent_level -= 1
+        self._emit("end")
+
+    def _emit_method_impl(self, class_name: str, impl_fn_name: str, args: list[str], body: list[JsonVal]) -> None:
+        self._emit_function_header(impl_fn_name, args)
+        self._emit_class_scoped_block(class_name, body)
+        self._emit_function_end()
+
+    def _emit_method_wrapper(self, fn_name: str, impl_fn_name: str, args: list[str], arg_order: list[str]) -> None:
+        self._emit_function_header(fn_name, args)
+        call_args = _method_call_args(arg_order)
+        self._emit("return " + impl_fn_name + "(" + ", ".join(call_args) + ")")
+        self._emit_function_end()
+
     def _emit_class_ctor(self, node: dict[str, JsonVal], class_name: str, impl_name: str, field_names: list[str]) -> None:
         init_fn = _find_init_function(node)
         ctor_args = [_ident(arg) for arg in _ctor_arg_order(node)]
@@ -1574,20 +1593,12 @@ class JuliaSubsetRenderer:
             impl_fn_name = self._method_impl_name(class_name, fn_name)
             is_static, arg_order, args = self._method_signature_args(class_name, stmt)
             if is_static:
-                self._emit("function " + fn_name + "(" + ", ".join(args) + ")")
+                self._emit_function_header(fn_name, args)
+                self._emit_class_scoped_block(class_name, _list(stmt, "body"))
+                self._emit_function_end()
             else:
-                self._emit("function " + impl_fn_name + "(" + ", ".join(args) + ")")
-            self.indent_level += 1
-            self._emit_class_scoped_block(class_name, _list(stmt, "body"))
-            self.indent_level -= 1
-            self._emit("end")
-            if not is_static:
-                self._emit("function " + fn_name + "(" + ", ".join(args) + ")")
-                self.indent_level += 1
-                call_args = _method_call_args(arg_order)
-                self._emit("return " + impl_fn_name + "(" + ", ".join(call_args) + ")")
-                self.indent_level -= 1
-                self._emit("end")
+                self._emit_method_impl(class_name, impl_fn_name, args, _list(stmt, "body"))
+                self._emit_method_wrapper(fn_name, impl_fn_name, args, arg_order)
 
     def _emit_simple_stmt(self, node: dict[str, JsonVal], kind: str) -> bool:
         if kind == "Import":
@@ -1703,9 +1714,12 @@ class JuliaSubsetRenderer:
             if message_expr is not None:
                 self._emit("self.__pytra_message = string(" + self._render_expr(message_expr) + ")")
                 continue
-            target = stmt.get("target")
-            if isinstance(target, dict):
-                self._emit("self." + _str(target, "attr") + " = " + self._render_expr(stmt.get("value")))
+            self._emit_exception_ctor_assign(stmt)
+
+    def _emit_exception_ctor_assign(self, stmt: dict[str, JsonVal]) -> None:
+        target = stmt.get("target")
+        if isinstance(target, dict):
+            self._emit("self." + _str(target, "attr") + " = " + self._render_expr(stmt.get("value")))
 
     def _emit_exception_display_methods(self, class_name: str) -> None:
         self._emit("Base.show(io::IO, e::" + class_name + ") = print(io, e.__pytra_message)")
