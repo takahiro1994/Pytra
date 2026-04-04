@@ -140,6 +140,26 @@ object os {
     }
 }
 
+object glob {
+    def glob(pattern: Any): mutable.ArrayBuffer[String] = {
+        val matcher = java.nio.file.FileSystems.getDefault.getPathMatcher("glob:" + __pytra_str(pattern))
+        val cwd = Paths.get("").toAbsolutePath.normalize
+        val out = mutable.ArrayBuffer[String]()
+        val stream = Files.newDirectoryStream(cwd)
+        try {
+            val it = stream.iterator()
+            while (it.hasNext) {
+                val entry = it.next()
+                val name = entry.getFileName.toString
+                if (matcher.matches(Paths.get(name))) out.append(name)
+            }
+        } finally {
+            stream.close()
+        }
+        out
+    }
+}
+
 class PyStdWriter(useErr: Boolean) {
     def write(text: Any): Unit = {
         if (useErr) Console.err.print(__pytra_str(text))
@@ -168,6 +188,10 @@ def sys_set_path(values: Any): Unit = {
 
 def pytra_std_sys_write_stderr(text: Any): Unit = sys_stderr.write(text)
 def pytra_std_sys_write_stdout(text: Any): Unit = sys_stdout.write(text)
+def __pytra_makedirs(path: Any, exist_ok: Any = false): Unit = os.makedirs(path, __pytra_truthy(exist_ok))
+def __pytra_floor(v: Any): Double = scala.math.floor(__pytra_float(v))
+def __pytra_Path(raw: Any): Path = Path(raw)
+def __pytra_glob(pattern: Any): mutable.ArrayBuffer[String] = glob.glob(pattern)
 
 def __pytra_cast(target: Any, value: Any): Any = value
 
@@ -1021,6 +1045,7 @@ class Path(v: Any) {
     private val _value: String = __pytra_str(v)
 
     def /(rhs: Any): Path = Path(__pytra_path_join(_value, __pytra_str(rhs)))
+    def joinpath(rhs: Any): Path = this / rhs
     def resolve(): Path = Path(Paths.get(_value).toAbsolutePath.normalize.toString)
     def exists(): Boolean = __pytra_path_exists(_value)
     def mkdir(parents: Boolean = false, exist_ok: Boolean = false): Unit = {
@@ -1048,7 +1073,7 @@ object Path {
     def apply(v: Any): Path = new Path(v)
 }
 
-private def __pytra_json_escape_string(s: String): String = {
+private def __pytra_json_escape_string(s: String, ensureAscii: Boolean = true): String = {
     val sb = new java.lang.StringBuilder("\"")
     var i = 0
     while (i < s.length) {
@@ -1060,7 +1085,7 @@ private def __pytra_json_escape_string(s: String): String = {
         else if (ch == '\n') sb.append("\\n")
         else if (ch == '\r') sb.append("\\r")
         else if (ch == '\t') sb.append("\\t")
-        else if (ch < 0x20) {
+        else if (ch < 0x20 || (ensureAscii && ch > 0x7f)) {
             sb.append("\\u")
             val hex = Integer.toHexString(ch.toInt)
             var pad = 4 - hex.length
@@ -1108,6 +1133,40 @@ private def __pytra_json_stringify(v: Any): String = {
             }
             "{" + out.mkString(",") + "}"
         case _ => __pytra_json_escape_string(__pytra_str(v))
+    }
+}
+
+private def __pytra_json_pretty(v: Any, ensureAscii: Boolean, indent: Int, depth: Int): String = {
+    val value = __pytra_json_unwrap(v)
+    if (value == null) return "null"
+    value match {
+        case b: Boolean => if (b) "true" else "false"
+        case i: Int => i.toString
+        case i: Long => i.toString
+        case d: Double =>
+            if (!java.lang.Double.isFinite(d)) throw new RuntimeException("json.dumps: non-finite float")
+            if (d.isWhole) d.toLong.toString else d.toString
+        case f: Float =>
+            if (!java.lang.Float.isFinite(f)) throw new RuntimeException("json.dumps: non-finite float")
+            val d = f.toDouble
+            if (d.isWhole) d.toLong.toString else d.toString
+        case s: String => __pytra_json_escape_string(s, ensureAscii)
+        case xs: scala.collection.Seq[?] =>
+            val out = mutable.ArrayBuffer[String]()
+            for (item <- xs) out.append(__pytra_json_pretty(item, ensureAscii, indent, depth + 1))
+            val pad = " " * (indent * (depth + 1))
+            val closePad = " " * (indent * depth)
+            "[\n" + out.map(x => pad + x).mkString(",\n") + "\n" + closePad + "]"
+        case m: scala.collection.Map[?, ?] =>
+            val out = mutable.ArrayBuffer[String]()
+            val mm = m.asInstanceOf[scala.collection.Map[Any, Any]]
+            for ((k, item) <- mm) {
+                out.append(__pytra_json_escape_string(__pytra_str(k), ensureAscii) + ": " + __pytra_json_pretty(item, ensureAscii, indent, depth + 1))
+            }
+            val pad = " " * (indent * (depth + 1))
+            val closePad = " " * (indent * depth)
+            "{\n" + out.map(x => pad + x).mkString(",\n") + "\n" + closePad + "}"
+        case _ => __pytra_json_escape_string(__pytra_str(value), ensureAscii)
     }
 }
 
@@ -1275,6 +1334,93 @@ def pyJsonLoads(v: Any): Any = {
 
 def pyJsonDumps(v: Any): String = {
     __pytra_json_stringify(v)
+}
+
+class JsonArr(var raw: mutable.ArrayBuffer[Any]) {
+    def get(index: Long): JsonValue | Null = {
+        val i = index.toInt
+        if (i < 0 || i >= raw.length) null else new JsonValue(raw(i))
+    }
+    def get_str(index: Long): String | Null = { val v = get(index); if (v == null) null else v.as_str() }
+    def get_int(index: Long): Long | Null = { val v = get(index); if (v == null) null else v.as_int() }
+    def get_float(index: Long): Double | Null = { val v = get(index); if (v == null) null else v.as_float() }
+    def get_bool(index: Long): Boolean | Null = { val v = get(index); if (v == null) null else v.as_bool() }
+    def get_arr(index: Long): JsonArr | Null = { val v = get(index); if (v == null) null else v.as_arr() }
+    def get_obj(index: Long): JsonObj | Null = { val v = get(index); if (v == null) null else v.as_obj() }
+}
+class JsonObj(var raw: mutable.LinkedHashMap[String, Any]) {
+    def get(key: String): JsonValue | Null = if (raw.contains(key)) new JsonValue(raw(key)) else null
+    def get_str(key: String): String | Null = { val v = get(key); if (v == null) null else v.as_str() }
+    def get_int(key: String): Long | Null = { val v = get(key); if (v == null) null else v.as_int() }
+    def get_float(key: String): Double | Null = { val v = get(key); if (v == null) null else v.as_float() }
+    def get_bool(key: String): Boolean | Null = { val v = get(key); if (v == null) null else v.as_bool() }
+    def get_arr(key: String): JsonArr | Null = { val v = get(key); if (v == null) null else v.as_arr() }
+    def get_obj(key: String): JsonObj | Null = { val v = get(key); if (v == null) null else v.as_obj() }
+}
+
+class JsonValue(var raw: Any) {
+    def as_str(): String | Null = raw match {
+        case s: String => s
+        case _ => null
+    }
+    def as_int(): Long | Null = raw match {
+        case n: Long => n
+        case n: Int => n.toLong
+        case _ => null
+    }
+    def as_float(): Double | Null = raw match {
+        case n: Double => n
+        case n: Float => n.toDouble
+        case n: Long => n.toDouble
+        case n: Int => n.toDouble
+        case _ => null
+    }
+    def as_bool(): Boolean | Null = raw match {
+        case b: Boolean => b
+        case _ => null
+    }
+    def as_arr(): JsonArr | Null = raw match {
+        case xs: mutable.ArrayBuffer[_] => new JsonArr(xs.asInstanceOf[mutable.ArrayBuffer[Any]])
+        case _ => null
+    }
+    def as_obj(): JsonObj | Null = raw match {
+        case d: mutable.Map[_, _] =>
+            val out = mutable.LinkedHashMap[String, Any]()
+            d.foreach { case (k, value) => out(__pytra_str(k)) = value }
+            new JsonObj(out)
+        case _ => null
+    }
+}
+
+def __pytra_loads(v: Any): JsonValue = new JsonValue(pyJsonLoads(v))
+def __pytra_loads_arr(v: Any): JsonArr = new JsonArr(__pytra_as_list(pyJsonLoads(v)).asInstanceOf[mutable.ArrayBuffer[Any]])
+def __pytra_loads_obj(v: Any): JsonObj = {
+    val out = mutable.LinkedHashMap[String, Any]()
+    __pytra_as_dict(pyJsonLoads(v)).foreach { case (k, value) => out(__pytra_str(k)) = value }
+    new JsonObj(out)
+}
+private def __pytra_json_unwrap(value: Any): Any = value match {
+    case jv: JsonValue => jv.raw
+    case ja: JsonArr => ja.raw
+    case jo: JsonObj => jo.raw
+    case other => other
+}
+
+def __pytra_dumps(value: Any, ensure_ascii: Any = true, indent: Any = null, separators: Any = null): String = {
+    val normalized = __pytra_json_unwrap(value)
+    val indentValue = indent match {
+        case n: Long => n.toInt
+        case n: Int => n
+        case _ => 0
+    }
+    if (indentValue > 0) __pytra_json_pretty(normalized, __pytra_truthy(ensure_ascii), indentValue, 0)
+    else pyJsonDumps(normalized)
+}
+def __pytra_sub(pattern: Any, repl: Any, text: Any, count: Any = 0L): String = {
+    val regex = __pytra_str(pattern).r
+    val limit = __pytra_int(count)
+    if (limit <= 0L) regex.replaceAllIn(__pytra_str(text), __pytra_str(repl))
+    else regex.replaceFirstIn(__pytra_str(text), __pytra_str(repl))
 }
 
 // Python stdlib shim objects so that EAST-generated code like

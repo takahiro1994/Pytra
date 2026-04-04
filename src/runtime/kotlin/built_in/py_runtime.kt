@@ -81,6 +81,21 @@ object os {
     }
 }
 
+object glob {
+    fun glob(pattern: Any?): MutableList<String> {
+        val matcher = java.nio.file.FileSystems.getDefault().getPathMatcher("glob:" + __pytra_str(pattern))
+        val cwd = Paths.get("").toAbsolutePath().normalize()
+        val out = mutableListOf<String>()
+        java.nio.file.Files.newDirectoryStream(cwd).use { stream ->
+            for (entry in stream) {
+                val name = entry.fileName.toString()
+                if (matcher.matches(java.nio.file.Paths.get(name))) out.add(name)
+            }
+        }
+        return out
+    }
+}
+
 class PyStdWriter(private val useErr: Boolean) {
     fun write(text: Any?) {
         if (useErr) System.err.print(__pytra_str(text))
@@ -109,6 +124,10 @@ fun sys_set_path(values: Any?) {
 
 fun pytra_std_sys_write_stderr(text: Any?) { sys_stderr.write(text) }
 fun pytra_std_sys_write_stdout(text: Any?) { sys_stdout.write(text) }
+fun __pytra_makedirs(path: Any?, exist_ok: Any? = false) { os.makedirs(path, __pytra_truthy(exist_ok)) }
+fun __pytra_floor(v: Any?): Double = floor(__pytra_float(v))
+fun __pytra_Path(raw: Any?): Path = Path(raw)
+fun __pytra_glob(pattern: Any?): MutableList<String> = glob.glob(pattern)
 
 fun __pytra_cast(target: Any?, value: Any?): Any? = value
 
@@ -937,7 +956,87 @@ fun pyJsonLoads(v: Any?): Any? {
     return __PytraJsonParser(__pytra_str(v)).parse()
 }
 
-private fun __pytra_json_stringify(v: Any?): String {
+class JsonValue(var raw: Any?) {
+    fun as_str(): String? = raw as? String
+    fun as_int(): Long? = when (val v = raw) {
+        is Long -> v
+        is Int -> v.toLong()
+        else -> null
+    }
+    fun as_float(): Double? = when (val v = raw) {
+        is Double -> v
+        is Float -> v.toDouble()
+        is Long -> v.toDouble()
+        is Int -> v.toDouble()
+        else -> null
+    }
+    fun as_bool(): Boolean? = raw as? Boolean
+    fun as_arr(): JsonArr? = when (val v = raw) {
+        is MutableList<*> -> JsonArr(v as MutableList<Any?>)
+        else -> null
+    }
+    fun as_obj(): JsonObj? = when (val v = raw) {
+        is MutableMap<*, *> -> {
+            val out = linkedMapOf<String, Any?>()
+            for ((k, value) in v) out[__pytra_str(k)] = value
+            JsonObj(out)
+        }
+        else -> null
+    }
+}
+
+class JsonArr(var raw: MutableList<Any?>) {
+    fun get(index: Long): JsonValue? {
+        val i = index.toInt()
+        return if (i < 0 || i >= raw.size) null else JsonValue(raw[i])
+    }
+    fun get_str(index: Long): String? = get(index)?.as_str()
+    fun get_int(index: Long): Long? = get(index)?.as_int()
+    fun get_float(index: Long): Double? = get(index)?.as_float()
+    fun get_bool(index: Long): Boolean? = get(index)?.as_bool()
+    fun get_arr(index: Long): JsonArr? = get(index)?.as_arr()
+    fun get_obj(index: Long): JsonObj? = get(index)?.as_obj()
+}
+
+class JsonObj(var raw: MutableMap<String, Any?>) {
+    fun get(key: String): JsonValue? = if (raw.containsKey(key)) JsonValue(raw[key]) else null
+    fun get_str(key: String): String? = get(key)?.as_str()
+    fun get_int(key: String): Long? = get(key)?.as_int()
+    fun get_float(key: String): Double? = get(key)?.as_float()
+    fun get_bool(key: String): Boolean? = get(key)?.as_bool()
+    fun get_arr(key: String): JsonArr? = get(key)?.as_arr()
+    fun get_obj(key: String): JsonObj? = get(key)?.as_obj()
+}
+
+private fun __pytra_json_unwrap(value: Any?): Any? = when (value) {
+    is JsonValue -> value.raw
+    is JsonArr -> value.raw
+    is JsonObj -> value.raw
+    else -> value
+}
+
+fun __pytra_loads(v: Any?): JsonValue = JsonValue(pyJsonLoads(v))
+fun __pytra_loads_arr(v: Any?): JsonArr = JsonArr(__pytra_as_list(pyJsonLoads(v)))
+fun __pytra_loads_obj(v: Any?): JsonObj {
+    val out = linkedMapOf<String, Any?>()
+    for ((k, value) in __pytra_as_dict(pyJsonLoads(v))) out[__pytra_str(k)] = value
+    return JsonObj(out)
+}
+fun __pytra_dumps(value: Any?, ensure_ascii: Any? = true, indent: Any? = null, separators: Any? = null): String {
+    val indentValue = when (indent) {
+        is Long -> indent.toInt()
+        is Int -> indent
+        else -> null
+    }
+    return __pytra_json_stringify(__pytra_json_unwrap(value), __pytra_truthy(ensure_ascii), indentValue, 0)
+}
+fun __pytra_sub(pattern: Any?, repl: Any?, text: Any?, count: Any? = 0L): String {
+    val regex = Regex(__pytra_str(pattern))
+    val limit = __pytra_int(count)
+    return if (limit <= 0L) regex.replace(__pytra_str(text), __pytra_str(repl)) else regex.replaceFirst(__pytra_str(text), __pytra_str(repl))
+}
+
+private fun __pytra_json_stringify(v: Any?, ensureAscii: Boolean = true, indent: Int? = null, depth: Int = 0): String {
     if (v == null) return "null"
     if (v is Boolean) return if (v) "true" else "false"
     if (v is Int) return v.toString()
@@ -954,19 +1053,33 @@ private fun __pytra_json_stringify(v: Any?): String {
         }
         return v.toString()
     }
-    if (v is String) return __pytra_json_escape_string(v)
+    if (v is String) return __pytra_json_escape_string(v, ensureAscii)
     if (v is List<*>) {
-        return v.joinToString(prefix = "[", postfix = "]", separator = ",") { __pytra_json_stringify(it) }
-    }
-    if (v is Map<*, *>) {
-        return v.entries.joinToString(prefix = "{", postfix = "}", separator = ",") {
-            __pytra_json_escape_string(__pytra_str(it.key)) + ":" + __pytra_json_stringify(it.value)
+        val parts = v.map { __pytra_json_stringify(__pytra_json_unwrap(it), ensureAscii, indent, depth + 1) }
+        return if (indent != null && indent > 0) {
+            val pad = " ".repeat(indent * (depth + 1))
+            val closePad = " ".repeat(indent * depth)
+            "[\n" + parts.joinToString(",\n") { pad + it } + "\n" + closePad + "]"
+        } else {
+            parts.joinToString(prefix = "[", postfix = "]", separator = ", ")
         }
     }
-    return __pytra_json_escape_string(__pytra_str(v))
+    if (v is Map<*, *>) {
+        val parts = v.entries.map {
+            __pytra_json_escape_string(__pytra_str(it.key), ensureAscii) + ": " + __pytra_json_stringify(__pytra_json_unwrap(it.value), ensureAscii, indent, depth + 1)
+        }
+        return if (indent != null && indent > 0) {
+            val pad = " ".repeat(indent * (depth + 1))
+            val closePad = " ".repeat(indent * depth)
+            "{\n" + parts.joinToString(",\n") { pad + it } + "\n" + closePad + "}"
+        } else {
+            parts.joinToString(prefix = "{", postfix = "}", separator = ", ")
+        }
+    }
+    return __pytra_json_escape_string(__pytra_str(v), ensureAscii)
 }
 
-private fun __pytra_json_escape_string(s: String): String {
+private fun __pytra_json_escape_string(s: String, ensureAscii: Boolean = true): String {
     val out = StringBuilder()
     out.append('"')
     for (ch in s) {
@@ -979,9 +1092,9 @@ private fun __pytra_json_escape_string(s: String): String {
             '\r' -> out.append("\\r")
             '\t' -> out.append("\\t")
             else -> {
-                if (ch.toInt() < 0x20) {
+                if (ch.toInt() < 0x20 || (ensureAscii && ch.code > 0x7f)) {
                     out.append("\\u")
-                    out.append(ch.toInt().toString(16).padStart(4, '0'))
+                    out.append(ch.code.toString(16).padStart(4, '0'))
                 } else {
                     out.append(ch)
                 }
@@ -1263,6 +1376,12 @@ class Path(raw: Any?) {
         }
         return null
     }
+
+    fun joinpath(child: Any?): Path {
+        return Path(Paths.get(value).resolve(__pytra_str(child)).toString())
+    }
+
+    operator fun div(child: Any?): Path = joinpath(child)
 
     fun resolve(): Path {
         return Path(Paths.get(value).toAbsolutePath().normalize().toString())
