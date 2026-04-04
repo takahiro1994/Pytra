@@ -101,6 +101,26 @@ def _quote_string(value: str) -> str:
     return '"' + value.replace("\\", "\\\\").replace('"', '\\"').replace("\n", "\\n") + '"'
 
 
+def _function_arg_order(node: dict[str, JsonVal]) -> list[str]:
+    return [arg for arg in _list(node, "arg_order") if isinstance(arg, str)]
+
+
+def _function_decorators(node: dict[str, JsonVal]) -> set[str]:
+    return {value for value in _list(node, "decorators") if isinstance(value, str)}
+
+
+def _is_init_function(node: dict[str, JsonVal]) -> bool:
+    return _str(node, "kind") == "FunctionDef" and _str(node, "name") == "__init__"
+
+
+def _is_static_method(node: dict[str, JsonVal]) -> bool:
+    return "staticmethod" in _function_decorators(node)
+
+
+def _is_property_method(node: dict[str, JsonVal]) -> bool:
+    return "property" in _function_decorators(node)
+
+
 def _simple_class_supported(node: dict[str, JsonVal]) -> bool:
     body = _list(node, "body")
     if len(body) == 0:
@@ -132,7 +152,7 @@ def _exception_class_supported(node: dict[str, JsonVal]) -> bool:
             if not isinstance(target, dict) or _str(target, "kind") != "Name":
                 return False
             continue
-        if kind == "FunctionDef" and _str(stmt, "name") == "__init__":
+        if _is_init_function(stmt):
             if init_fn is not None:
                 return False
             init_fn = stmt
@@ -140,7 +160,7 @@ def _exception_class_supported(node: dict[str, JsonVal]) -> bool:
         return False
     if init_fn is None:
         return False
-    args = [arg for arg in _list(init_fn, "arg_order") if isinstance(arg, str)]
+    args = _function_arg_order(init_fn)
     if len(args) < 2:
         return False
     instance_arg = args[0]
@@ -1445,12 +1465,12 @@ class JuliaSubsetRenderer:
     def _emit_class_ctor(self, node: dict[str, JsonVal], class_name: str, impl_name: str, field_names: list[str]) -> None:
         init_fn: dict[str, JsonVal] | None = None
         for stmt in _list(node, "body"):
-            if isinstance(stmt, dict) and _str(stmt, "kind") == "FunctionDef" and _str(stmt, "name") == "__init__":
+            if isinstance(stmt, dict) and _is_init_function(stmt):
                 init_fn = stmt
                 break
         ctor_args = []
         if init_fn is not None:
-            ctor_args = [_ident(arg) for arg in _list(init_fn, "arg_order") if isinstance(arg, str) and arg != "self"]
+            ctor_args = [_ident(arg) for arg in _function_arg_order(init_fn)[1:]]
         self._emit("function __pytra_new_" + class_name + "(" + ", ".join(ctor_args) + ")")
         self.indent_level += 1
         ctor_init_args = ", ".join("nothing" for _ in field_names)
@@ -1467,14 +1487,13 @@ class JuliaSubsetRenderer:
 
     def _emit_class_methods(self, node: dict[str, JsonVal], class_name: str) -> None:
         for stmt in _list(node, "body"):
-            if not isinstance(stmt, dict) or _str(stmt, "kind") != "FunctionDef" or _str(stmt, "name") == "__init__":
+            if not isinstance(stmt, dict) or _str(stmt, "kind") != "FunctionDef" or _is_init_function(stmt):
                 continue
             self._emit_blank()
             fn_name = _ident(_str(stmt, "name"))
             impl_fn_name = self._method_impl_name(class_name, fn_name)
-            decorators = [value for value in _list(stmt, "decorators") if isinstance(value, str)]
-            is_static = "staticmethod" in decorators
-            arg_order = [arg for arg in _list(stmt, "arg_order") if isinstance(arg, str)]
+            is_static = _is_static_method(stmt)
+            arg_order = _function_arg_order(stmt)
             args = []
             for index, arg in enumerate(arg_order):
                 if not is_static and index == 0:
@@ -1645,9 +1664,9 @@ class JuliaSubsetRenderer:
         self._emit("__pytra_exception_message(e::" + class_name + ") = string(e.__pytra_message)")
         self._emit_blank()
         init_fn = next(
-            stmt for stmt in _list(node, "body") if isinstance(stmt, dict) and _str(stmt, "kind") == "FunctionDef" and _str(stmt, "name") == "__init__"
+            stmt for stmt in _list(node, "body") if isinstance(stmt, dict) and _is_init_function(stmt)
         )
-        init_args = [arg for arg in _list(init_fn, "arg_order") if isinstance(arg, str)]
+        init_args = _function_arg_order(init_fn)
         args = init_args[1:] if len(init_args) > 0 else []
         self._emit("function __pytra_new_" + class_name + "(" + ", ".join(args) + ")")
         self.indent_level += 1
@@ -1666,12 +1685,11 @@ class JuliaSubsetRenderer:
             if not isinstance(item, dict) or _str(item, "kind") != "FunctionDef":
                 continue
             name = _str(item, "name")
-            if name == "__init__":
+            if _is_init_function(item):
                 continue
-            decorators = [value for value in _list(item, "decorators") if isinstance(value, str)]
-            if "staticmethod" in decorators:
+            if _is_static_method(item):
                 static_methods.add(name)
-            elif "property" in decorators:
+            elif _is_property_method(item):
                 properties.add(name)
             else:
                 methods.add(name)
