@@ -1430,6 +1430,64 @@ class JuliaSubsetRenderer:
             self._emit_stmt(stmt)
         self.indent_level -= 1
 
+    def _emit_class_ctor(self, node: dict[str, JsonVal], class_name: str, impl_name: str, field_names: list[str]) -> None:
+        init_fn: dict[str, JsonVal] | None = None
+        for stmt in _list(node, "body"):
+            if isinstance(stmt, dict) and _str(stmt, "kind") == "FunctionDef" and _str(stmt, "name") == "__init__":
+                init_fn = stmt
+                break
+        ctor_args = []
+        if init_fn is not None:
+            ctor_args = [_ident(arg) for arg in _list(init_fn, "arg_order") if isinstance(arg, str) and arg != "self"]
+        self._emit("function __pytra_new_" + class_name + "(" + ", ".join(ctor_args) + ")")
+        self.indent_level += 1
+        ctor_init_args = ", ".join("nothing" for _ in field_names)
+        self._emit("self = " + impl_name + "(" + ctor_init_args + ")")
+        if init_fn is not None:
+            prev_class_name = self.current_class_name
+            self.current_class_name = class_name
+            for stmt in _list(init_fn, "body"):
+                self._emit_stmt(stmt)
+            self.current_class_name = prev_class_name
+        self._emit("return self")
+        self.indent_level -= 1
+        self._emit("end")
+
+    def _emit_class_methods(self, node: dict[str, JsonVal], class_name: str) -> None:
+        for stmt in _list(node, "body"):
+            if not isinstance(stmt, dict) or _str(stmt, "kind") != "FunctionDef" or _str(stmt, "name") == "__init__":
+                continue
+            self._emit_blank()
+            fn_name = _ident(_str(stmt, "name"))
+            impl_fn_name = self._method_impl_name(class_name, fn_name)
+            decorators = [value for value in _list(stmt, "decorators") if isinstance(value, str)]
+            args = []
+            for arg in _list(stmt, "arg_order"):
+                if isinstance(arg, str):
+                    if arg == "self":
+                        args.append("self::" + class_name)
+                    else:
+                        args.append(_ident(arg))
+            if "staticmethod" in decorators:
+                self._emit("function " + fn_name + "(" + ", ".join(arg for arg in args if not arg.startswith("self::")) + ")")
+            else:
+                self._emit("function " + impl_fn_name + "(" + ", ".join(args) + ")")
+            self.indent_level += 1
+            prev_class_name = self.current_class_name
+            self.current_class_name = class_name
+            for inner in _list(stmt, "body"):
+                self._emit_stmt(inner)
+            self.current_class_name = prev_class_name
+            self.indent_level -= 1
+            self._emit("end")
+            if "staticmethod" not in decorators:
+                self._emit("function " + fn_name + "(" + ", ".join(args) + ")")
+                self.indent_level += 1
+                call_args = [_ident(arg) for arg in _list(stmt, "arg_order") if isinstance(arg, str)]
+                self._emit("return " + impl_fn_name + "(" + ", ".join(call_args) + ")")
+                self.indent_level -= 1
+                self._emit("end")
+
     def _emit_stmt(self, node: JsonVal) -> None:
         if not isinstance(node, dict):
             raise RuntimeError("julia subset: stmt must be dict")
@@ -1528,60 +1586,8 @@ class JuliaSubsetRenderer:
         self.indent_level -= 1
         self._emit("end")
         self._emit_blank()
-        init_fn: dict[str, JsonVal] | None = None
-        for stmt in _list(node, "body"):
-            if isinstance(stmt, dict) and _str(stmt, "kind") == "FunctionDef" and _str(stmt, "name") == "__init__":
-                init_fn = stmt
-                break
-        ctor_args = []
-        if init_fn is not None:
-            ctor_args = [_ident(arg) for arg in _list(init_fn, "arg_order") if isinstance(arg, str) and arg != "self"]
-        self._emit("function __pytra_new_" + class_name + "(" + ", ".join(ctor_args) + ")")
-        self.indent_level += 1
-        ctor_init_args = ", ".join("nothing" for _ in field_names)
-        self._emit("self = " + impl_name + "(" + ctor_init_args + ")")
-        if init_fn is not None:
-            prev_class_name = self.current_class_name
-            self.current_class_name = class_name
-            for stmt in _list(init_fn, "body"):
-                self._emit_stmt(stmt)
-            self.current_class_name = prev_class_name
-        self._emit("return self")
-        self.indent_level -= 1
-        self._emit("end")
-        for stmt in _list(node, "body"):
-            if not isinstance(stmt, dict) or _str(stmt, "kind") != "FunctionDef" or _str(stmt, "name") == "__init__":
-                continue
-            self._emit_blank()
-            fn_name = _ident(_str(stmt, "name"))
-            impl_fn_name = self._method_impl_name(class_name, fn_name)
-            decorators = [value for value in _list(stmt, "decorators") if isinstance(value, str)]
-            args = []
-            for arg in _list(stmt, "arg_order"):
-                if isinstance(arg, str):
-                    if arg == "self":
-                        args.append("self::" + class_name)
-                    else:
-                        args.append(_ident(arg))
-            if "staticmethod" in decorators:
-                self._emit("function " + fn_name + "(" + ", ".join(arg for arg in args if not arg.startswith("self::")) + ")")
-            else:
-                self._emit("function " + impl_fn_name + "(" + ", ".join(args) + ")")
-            self.indent_level += 1
-            prev_class_name = self.current_class_name
-            self.current_class_name = class_name
-            for inner in _list(stmt, "body"):
-                self._emit_stmt(inner)
-            self.current_class_name = prev_class_name
-            self.indent_level -= 1
-            self._emit("end")
-            if "staticmethod" not in decorators:
-                self._emit("function " + fn_name + "(" + ", ".join(args) + ")")
-                self.indent_level += 1
-                call_args = [_ident(arg) for arg in _list(stmt, "arg_order") if isinstance(arg, str)]
-                self._emit("return " + impl_fn_name + "(" + ", ".join(call_args) + ")")
-                self.indent_level -= 1
-                self._emit("end")
+        self._emit_class_ctor(node, class_name, impl_name, field_names)
+        self._emit_class_methods(node, class_name)
 
     def _emit_exception_class(self, node: dict[str, JsonVal]) -> None:
         class_name = _str(node, "name")
