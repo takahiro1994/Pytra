@@ -642,11 +642,19 @@ class JuliaSubsetRenderer:
             return ""
         return mapped_runtime
 
-    def _render_mapped_runtime_call(self, mapped: str, args: list[str], result_type: str) -> str:
+    def _render_mapped_runtime_call(
+        self,
+        mapped: str,
+        args: list[str],
+        result_type: str,
+        builtin_name: str = "",
+    ) -> str:
         if mapped == "":
             return ""
         if mapped == "__CAST__":
-            return self._render_static_cast_call(result_type, result_type, args)
+            return self._render_static_cast_call(builtin_name, result_type, args)
+        if mapped == "__INT__" and len(args) == 1:
+            return "__pytra_int(" + args[0] + ")"
         if mapped == "__LIST_APPEND__" and len(args) == 2:
             return "push!(" + args[0] + ", " + args[1] + ")"
         if mapped == "__LIST_POP__":
@@ -697,6 +705,12 @@ class JuliaSubsetRenderer:
             return "delete!(" + args[0] + ", " + args[1] + ")"
         if mapped == "__SET_CTOR__" and len(args) == 0:
             return "Set()"
+        if mapped == "__BYTES_CTOR__":
+            if len(args) == 0:
+                return "UInt8[]"
+            if len(args) == 1:
+                return "__pytra_bytes(" + args[0] + ")"
+            return ""
         if mapped == "__STR_REPLACE__" and len(args) == 3:
             return "replace(" + args[0] + ", " + args[1] + " => " + args[2] + ")"
         if mapped == "__STR_JOIN__" and len(args) == 2:
@@ -769,6 +783,8 @@ class JuliaSubsetRenderer:
             return ""
         if builtin_name == "int" or result_type in {"int", "int64"}:
             return "__pytra_int(" + args[0] + ")"
+        if result_type.startswith("int") or result_type.startswith("uint"):
+            return args[0]
         if builtin_name == "bool" or result_type == "bool":
             return "__pytra_truthy(" + args[0] + ")"
         if builtin_name == "str" or result_type in {"str", "string"}:
@@ -861,16 +877,9 @@ class JuliaSubsetRenderer:
         use_mapped_runtime: str,
     ) -> str:
         if use_mapped_runtime != "":
-            mapped_expr = self._render_mapped_runtime_call(use_mapped_runtime, args, result_type)
+            mapped_expr = self._render_mapped_runtime_call(use_mapped_runtime, args, result_type, builtin_name)
             if mapped_expr != "":
                 return mapped_expr
-        if func == "int" and len(args) == 1:
-            return "__pytra_int(" + args[0] + ")"
-        if func == "set" and len(args) == 0:
-            return "Set()"
-        if func == "bytes":
-            if len(args) == 0:
-                return "UInt8[]"
         return ""
 
     def _render_constructor_call(self, func: str, args: list[str]) -> str:
