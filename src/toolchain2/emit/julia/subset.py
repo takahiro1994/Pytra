@@ -102,12 +102,6 @@ def _quote_string(value: str) -> str:
 
 
 def _simple_class_supported(node: dict[str, JsonVal]) -> bool:
-    base = _str(node, "base")
-    if base in {"Enum", "IntEnum", "IntFlag"}:
-        body = _list(node, "body")
-        return len(body) == 0 or (
-            len(body) == 1 and isinstance(body[0], dict) and _str(body[0], "kind") == "Pass"
-        )
     body = _list(node, "body")
     if len(body) == 0:
         return True
@@ -118,23 +112,6 @@ def _simple_class_supported(node: dict[str, JsonVal]) -> bool:
             return False
         if _str(stmt, "kind") != "FunctionDef":
             return False
-        decorators = [item for item in _list(stmt, "decorators") if isinstance(item, str)]
-        if any(item not in {"property", "staticmethod"} for item in decorators):
-            return False
-        args = [arg for arg in _list(stmt, "arg_order") if isinstance(arg, str)]
-        if "staticmethod" in decorators:
-            if "property" in decorators or "self" in args:
-                return False
-            if not all(_stmt_supported(inner) for inner in _list(stmt, "body")):
-                return False
-            continue
-        if len(args) == 0 or args[0] != "self":
-            return False
-        name = _str(stmt, "name")
-        if name == "__init__":
-            if not all(_stmt_supported(inner) for inner in _list(stmt, "body")):
-                return False
-            continue
         if not all(_stmt_supported(inner) for inner in _list(stmt, "body")):
             return False
     return True
