@@ -665,6 +665,10 @@ class JuliaSubsetRenderer:
             return "reverse!(" + args[0] + ")"
         if mapped == "__LIST_SORT__" and len(args) == 1:
             return "sort!(" + args[0] + ")"
+        if mapped == "__DEQUE_APPENDLEFT__" and len(args) == 2:
+            return "pushfirst!(" + args[0] + ", " + args[1] + ")"
+        if mapped == "__DEQUE_POPLEFT__" and len(args) == 1:
+            return "popfirst!(" + args[0] + ")"
         if mapped == "__DICT_GET__":
             if len(args) == 2:
                 return "get(" + args[0] + ", " + args[1] + ", nothing)"
@@ -731,6 +735,21 @@ class JuliaSubsetRenderer:
             return mapped + "()"
         return mapped + "(" + ", ".join(args) + ")"
 
+    def _fallback_method_runtime_key(self, owner_type: str, attr: str) -> str:
+        if owner_type == "str":
+            return "str." + attr
+        if owner_type == "dict" or owner_type.startswith("dict["):
+            return "dict." + attr
+        if owner_type == "set" or owner_type.startswith("set["):
+            return "set." + attr
+        if owner_type == "deque" or owner_type.startswith("deque["):
+            return "deque." + attr
+        if owner_type == "bytearray":
+            return "bytearray." + attr
+        if owner_type == "list" or owner_type.startswith("list["):
+            return "list." + attr
+        return ""
+
     def _render_mapped_method_call(
         self,
         node: dict[str, JsonVal],
@@ -744,62 +763,6 @@ class JuliaSubsetRenderer:
         if mapped == "":
             return ""
         return self._render_mapped_runtime_call(mapped, [owner] + args, _str(node, "resolved_type"))
-
-    def _render_collection_method_call_0(self, owner: str, attr: str) -> str:
-        if attr == "clear":
-            return "empty!(" + owner + ")"
-        if attr == "items":
-            return "collect(pairs(" + owner + "))"
-        if attr == "sort":
-            return "sort!(" + owner + ")"
-        if attr == "reverse":
-            return "reverse!(" + owner + ")"
-        if attr == "popleft":
-            return "popfirst!(" + owner + ")"
-        if attr == "pop":
-            return "pop!(" + owner + ")"
-        if attr == "keys":
-            return "collect(keys(" + owner + "))"
-        if attr == "values":
-            return "collect(values(" + owner + "))"
-        return ""
-
-    def _render_collection_method_call_1(self, owner: str, owner_type: str, attr: str, arg: str) -> str:
-        if attr in {"append", "add"}:
-            return "push!(" + owner + ", " + arg + ")"
-        if attr == "appendleft":
-            return "pushfirst!(" + owner + ", " + arg + ")"
-        if attr in {"discard", "remove"}:
-            return "delete!(" + owner + ", " + arg + ")"
-        if attr == "extend":
-            return "append!(" + owner + ", " + arg + ")"
-        if attr == "index":
-            if owner_type.startswith("list["):
-                return "(findfirst(==(" + arg + "), " + owner + ") - 1)"
-            return "__pytra_str_find(" + owner + ", " + arg + ")"
-        if attr == "get":
-            return "get(" + owner + ", " + arg + ", nothing)"
-        if attr == "pop":
-            return "pop!(" + owner + ", " + arg + ")"
-        if attr == "join":
-            return "join(" + arg + ", " + owner + ")"
-        return ""
-
-    def _render_collection_method_call_2(self, owner: str, attr: str, args: list[str]) -> str:
-        if attr == "get":
-            return "get(" + owner + ", " + args[0] + ", " + args[1] + ")"
-        if attr == "setdefault":
-            return "get!(" + owner + ", " + args[0] + ", " + args[1] + ")"
-        return ""
-
-    def _render_collection_method_call(self, owner: str, owner_type: str, attr: str, args: list[str]) -> str:
-        if len(args) == 0:
-            return self._render_collection_method_call_0(owner, attr)
-        if len(args) == 1:
-            return self._render_collection_method_call_1(owner, owner_type, attr, args[0])
-        if len(args) == 2:
-            return self._render_collection_method_call_2(owner, attr, args)
-        return ""
 
     def _render_static_cast_call(self, builtin_name: str, result_type: str, args: list[str]) -> str:
         if len(args) != 1:
@@ -845,23 +808,6 @@ class JuliaSubsetRenderer:
             return _ident(attr) + "(" + ", ".join(call_args) + ")"
         return ""
 
-    def _render_string_base_call(self, owner: str, attr: str, args: list[str]) -> str:
-        if attr == "lstrip" and len(args) == 0:
-            return "lstrip(" + owner + ")"
-        if attr == "split" and len(args) == 1:
-            return "split(" + owner + ", " + args[0] + ")"
-        if attr == "strip" and len(args) == 0:
-            return "strip(" + owner + ")"
-        if attr == "rstrip" and len(args) == 0:
-            return "rstrip(" + owner + ")"
-        if attr == "startswith" and len(args) == 1:
-            return "startswith(" + owner + ", " + args[0] + ")"
-        if attr == "endswith" and len(args) == 1:
-            return "endswith(" + owner + ", " + args[0] + ")"
-        if attr == "replace" and len(args) == 2:
-            return "replace(" + owner + ", " + args[0] + " => " + args[1] + ")"
-        return ""
-
     def _render_attribute_call(
         self,
         node: dict[str, JsonVal],
@@ -886,15 +832,15 @@ class JuliaSubsetRenderer:
         mapped_method = self._render_mapped_method_call(node, owner, args)
         if mapped_method != "":
             return mapped_method
-        collection_method = self._render_collection_method_call(owner, owner_type, attr, args)
-        if collection_method != "":
-            return collection_method
-        string_method = self._render_string_base_call(owner, attr, args)
-        if string_method != "":
-            return string_method
         runtime_call = _str(node, "resolved_runtime_call")
         if runtime_call == "":
             runtime_call = _str(node, "runtime_call")
+        fallback_runtime_key = self._fallback_method_runtime_key(owner_type, attr)
+        if fallback_runtime_key != "":
+            fallback_mapped = self.mapping.calls.get(fallback_runtime_key, "")
+            fallback_expr = self._render_mapped_runtime_call(fallback_mapped, [owner] + args, _str(node, "resolved_type"))
+            if fallback_expr != "":
+                return fallback_expr
         if runtime_call == "makedirs" and len(args) == 1 and len(keywords) == 1 and keywords[0].get("arg") == "exist_ok":
             mapped = self.mapping.calls.get(runtime_call, "")
             if mapped != "":
