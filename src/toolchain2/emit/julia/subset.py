@@ -121,6 +121,20 @@ def _is_property_method(node: dict[str, JsonVal]) -> bool:
     return "property" in _function_decorators(node)
 
 
+def _find_init_function(node: dict[str, JsonVal]) -> dict[str, JsonVal] | None:
+    for stmt in _list(node, "body"):
+        if isinstance(stmt, dict) and _is_init_function(stmt):
+            return stmt
+    return None
+
+
+def _ctor_arg_order(node: dict[str, JsonVal]) -> list[str]:
+    init_fn = _find_init_function(node)
+    if init_fn is None:
+        return []
+    return _function_arg_order(init_fn)[1:]
+
+
 def _is_init_name(name: str) -> bool:
     return name == "__init__"
 
@@ -1489,14 +1503,8 @@ class JuliaSubsetRenderer:
         self.indent_level -= 1
 
     def _emit_class_ctor(self, node: dict[str, JsonVal], class_name: str, impl_name: str, field_names: list[str]) -> None:
-        init_fn: dict[str, JsonVal] | None = None
-        for stmt in _list(node, "body"):
-            if isinstance(stmt, dict) and _is_init_function(stmt):
-                init_fn = stmt
-                break
-        ctor_args = []
-        if init_fn is not None:
-            ctor_args = [_ident(arg) for arg in _function_arg_order(init_fn)[1:]]
+        init_fn = _find_init_function(node)
+        ctor_args = [_ident(arg) for arg in _ctor_arg_order(node)]
         self._emit("function __pytra_new_" + class_name + "(" + ", ".join(ctor_args) + ")")
         self.indent_level += 1
         ctor_init_args = ", ".join("nothing" for _ in field_names)
@@ -1684,11 +1692,10 @@ class JuliaSubsetRenderer:
         self._emit("Base.showerror(io::IO, e::" + class_name + ") = print(io, e.__pytra_message)")
         self._emit("__pytra_exception_message(e::" + class_name + ") = string(e.__pytra_message)")
         self._emit_blank()
-        init_fn = next(
-            stmt for stmt in _list(node, "body") if isinstance(stmt, dict) and _is_init_function(stmt)
-        )
-        init_args = _function_arg_order(init_fn)
-        args = init_args[1:] if len(init_args) > 0 else []
+        init_fn = _find_init_function(node)
+        if init_fn is None:
+            raise ValueError("julia subset: exception class missing __init__: " + class_name)
+        args = _ctor_arg_order(node)
         self._emit("function __pytra_new_" + class_name + "(" + ", ".join(args) + ")")
         self.indent_level += 1
         ctor_args = ['""'] + ["nothing" for _ in field_names]
