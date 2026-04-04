@@ -48,6 +48,8 @@ def _safe_kotlin_ident(name: str) -> str:
 
 
 def kotlin_type(resolved_type: str) -> str:
+    if len(resolved_type) == 1 and resolved_type.isupper():
+        return "Any?"
     if resolved_type in ("", "_unnamed") or resolved_type.startswith("_unnamed"):
         return "Any?"
     if resolved_type in ("pytra.std.json.JsonVal", "pytra_std_json.JsonVal"):

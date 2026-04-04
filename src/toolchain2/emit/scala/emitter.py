@@ -76,6 +76,21 @@ class ScalaRenderer(CommonRenderer):
                 fields.append((attr, decl_type))
         return fields
 
+    def _has_decorator(self, node: dict[str, JsonVal], name: str) -> bool:
+        return any(isinstance(dec, str) and dec == name for dec in self._list(node, "decorators"))
+
+    def _implements_traits(self, node: dict[str, JsonVal]) -> list[str]:
+        traits: list[str] = []
+        for dec in self._list(node, "decorators"):
+            if not isinstance(dec, str) or not dec.startswith("implements(") or not dec.endswith(")"):
+                continue
+            inner = dec[len("implements("):-1]
+            for part in inner.split(","):
+                name = part.strip()
+                if name != "":
+                    traits.append(_safe_scala_ident(name))
+        return traits
+
     def _next_tmp(self, prefix: str) -> str:
         self._tmp_counter += 1
         return prefix + str(self._tmp_counter)
@@ -520,10 +535,37 @@ class ScalaRenderer(CommonRenderer):
     def _emit_class_def(self, node: dict[str, JsonVal]) -> None:
         class_name = _safe_scala_ident(self._str(node, "name"))
         base_name = self._str(node, "base")
+        is_trait = self._has_decorator(node, "trait")
+        implements_traits = self._implements_traits(node)
         prev_class_name = self.current_class_name
         prev_class_base = self.current_class_base
         self.current_class_name = class_name
         self.current_class_base = base_name
+        if is_trait:
+            trait_head = "trait " + class_name
+            if base_name not in ("", "None", "object", "Obj"):
+                trait_head += " extends " + _safe_scala_ident(base_name)
+            self._emit(trait_head + " {")
+            self.state.indent_level += 1
+            for stmt in self._list(node, "body"):
+                if not isinstance(stmt, dict) or self._str(stmt, "kind") not in ("FunctionDef", "ClosureDef"):
+                    continue
+                name = _safe_scala_ident(self._str(stmt, "name"))
+                arg_order = self._list(stmt, "arg_order")
+                arg_types = stmt.get("arg_types")
+                arg_type_map = arg_types if isinstance(arg_types, dict) else {}
+                params: list[str] = []
+                for arg in arg_order:
+                    if not isinstance(arg, str) or arg == "self":
+                        continue
+                    params.append(_safe_scala_ident(arg) + ": " + scala_type(arg_type_map.get(arg, "Any") if isinstance(arg_type_map.get(arg), str) else "Any"))
+                return_type = scala_type(self._str(stmt, "return_type"))
+                self._emit("def " + name + "(" + ", ".join(params) + "): " + return_type)
+            self.state.indent_level -= 1
+            self._emit("}")
+            self.current_class_name = prev_class_name
+            self.current_class_base = prev_class_base
+            return
         instance_fields = self._collect_class_fields(node)
         static_fields: list[tuple[str, str, str]] = []
         static_methods: list[dict[str, JsonVal]] = []
@@ -553,6 +595,10 @@ class ScalaRenderer(CommonRenderer):
             class_head += "(" + ", ".join(ctor_parts) + ")"
         if base_name not in ("", "None", "object", "Obj", "Enum", "IntEnum", "IntFlag"):
             class_head += " extends " + _safe_scala_ident(base_name)
+            if len(implements_traits) > 0:
+                class_head += " with " + " with ".join(implements_traits)
+        elif len(implements_traits) > 0:
+            class_head += " extends " + " with ".join(implements_traits)
         self._emit(class_head + " {")
         self.state.indent_level += 1
         seen_instance_fields: set[str] = set()

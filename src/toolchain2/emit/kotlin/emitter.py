@@ -33,6 +33,8 @@ class KotlinRenderer(CommonRenderer):
         self.class_has_init: dict[str, bool] = {}
         self.class_property_names: dict[str, set[str]] = {}
         self.class_method_names: dict[str, set[str]] = {}
+        self.class_base_names: dict[str, str] = {}
+        self.current_class_interfaces: list[str] = []
         self.current_class_base: str | None = None
         self._tmp_counter = 0
         self._local_var_scopes: list[set[str]] = []
@@ -77,6 +79,28 @@ class KotlinRenderer(CommonRenderer):
                     decl_type = "Any"
                 fields.append((attr, decl_type))
         return fields
+
+    def _has_decorator(self, node: dict[str, JsonVal], name: str) -> bool:
+        return any(isinstance(dec, str) and dec == name for dec in self._list(node, "decorators"))
+
+    def _implements_traits(self, node: dict[str, JsonVal]) -> list[str]:
+        traits: list[str] = []
+        for dec in self._list(node, "decorators"):
+            if not isinstance(dec, str) or not dec.startswith("implements(") or not dec.endswith(")"):
+                continue
+            inner = dec[len("implements("):-1]
+            for part in inner.split(","):
+                name = part.strip()
+                if name != "":
+                    traits.append(_safe_kotlin_ident(name))
+        return traits
+
+    def _collect_trait_methods(self, class_name: str) -> set[str]:
+        methods = set(self.class_method_names.get(class_name, set()))
+        base_name = self.class_base_names.get(class_name, "")
+        if base_name not in ("", "None", "object", "Obj"):
+            methods.update(self._collect_trait_methods(base_name))
+        return methods
 
     def _next_tmp(self, prefix: str) -> str:
         self._tmp_counter += 1
@@ -256,10 +280,12 @@ class KotlinRenderer(CommonRenderer):
         self.class_has_init = {}
         self.class_property_names = {}
         self.class_method_names = {}
+        self.class_base_names = {}
         for stmt in self._list(east3_doc, "body"):
             if not isinstance(stmt, dict) or self._str(stmt, "kind") != "ClassDef":
                 continue
             class_name = self._str(stmt, "name")
+            self.class_base_names[class_name] = self._str(stmt, "base")
             self.class_has_init[class_name] = any(
                 isinstance(item, dict)
                 and self._str(item, "kind") in ("FunctionDef", "ClosureDef")
@@ -562,7 +588,12 @@ class KotlinRenderer(CommonRenderer):
         method_prefix = ""
         if is_method:
             base_methods = self.class_method_names.get(self.current_class_base or "", set())
+            interface_methods: set[str] = set()
+            for iface in self.current_class_interfaces:
+                interface_methods.update(self._collect_trait_methods(iface))
             if self.current_class_base not in (None, "", "None", "object", "Obj") and name in base_methods:
+                method_prefix = "override "
+            elif name in interface_methods:
                 method_prefix = "override "
             elif self.current_class_name in self.subclassed_class_names:
                 method_prefix = "open "
@@ -599,6 +630,8 @@ class KotlinRenderer(CommonRenderer):
     def _emit_class_def(self, node: dict[str, JsonVal]) -> None:
         class_name = _safe_kotlin_ident(self._str(node, "name"))
         base_name = self._str(node, "base")
+        is_trait = self._has_decorator(node, "trait")
+        implements_traits = self._implements_traits(node)
         if base_name in ("IntEnum", "IntFlag"):
             self._emit("object " + class_name + " {")
             self.state.indent_level += 1
@@ -641,8 +674,39 @@ class KotlinRenderer(CommonRenderer):
             return
         prev_class_name = self.current_class_name
         prev_class_base = self.current_class_base
+        prev_class_interfaces = self.current_class_interfaces
         self.current_class_name = class_name
         self.current_class_base = base_name
+        self.current_class_interfaces = implements_traits[:]
+        if is_trait:
+            interface_head = "interface " + class_name
+            bases: list[str] = []
+            if base_name not in ("", "None", "object", "Obj"):
+                bases.append(_safe_kotlin_ident(base_name))
+            if len(bases) > 0:
+                interface_head += " : " + ", ".join(bases)
+            self._emit(interface_head + " {")
+            self.state.indent_level += 1
+            for stmt in self._list(node, "body"):
+                if not isinstance(stmt, dict) or self._str(stmt, "kind") not in ("FunctionDef", "ClosureDef"):
+                    continue
+                name = _safe_kotlin_ident(self._str(stmt, "name"))
+                arg_order = self._list(stmt, "arg_order")
+                arg_types = stmt.get("arg_types")
+                arg_type_map = arg_types if isinstance(arg_types, dict) else {}
+                params: list[str] = []
+                for arg in arg_order:
+                    if not isinstance(arg, str) or arg == "self":
+                        continue
+                    params.append(_safe_kotlin_ident(arg) + ": " + self._render_type(arg_type_map.get(arg, "Any") if isinstance(arg_type_map.get(arg), str) else "Any"))
+                return_type = self._render_type(self._str(stmt, "return_type"))
+                self._emit("fun " + name + "(" + ", ".join(params) + "): " + return_type)
+            self.state.indent_level -= 1
+            self._emit("}")
+            self.current_class_name = prev_class_name
+            self.current_class_base = prev_class_base
+            self.current_class_interfaces = prev_class_interfaces
+            return
         instance_fields = self._collect_class_fields(node)
         class_fields: list[tuple[str, str, str]] = []
         static_methods: list[dict[str, JsonVal]] = []
@@ -670,8 +734,12 @@ class KotlinRenderer(CommonRenderer):
                     part += " = " + default_value
                 ctor_parts.append(part)
             class_head += "(" + ", ".join(ctor_parts) + ")"
+        class_bases: list[str] = []
         if base_name not in ("", "None", "object", "Obj", "Enum", "IntEnum", "IntFlag"):
-            class_head += " : " + _safe_kotlin_ident(base_name) + "()"
+            class_bases.append(_safe_kotlin_ident(base_name) + "()")
+        class_bases.extend(implements_traits)
+        if len(class_bases) > 0:
+            class_head += " : " + ", ".join(class_bases)
         self._emit(class_head + " {")
         self.state.indent_level += 1
         seen_instance_fields: set[str] = set()
@@ -735,6 +803,7 @@ class KotlinRenderer(CommonRenderer):
         self._emit("}")
         self.current_class_name = prev_class_name
         self.current_class_base = prev_class_base
+        self.current_class_interfaces = prev_class_interfaces
 
     def _for_target_name(self, node: JsonVal) -> str:
         if not isinstance(node, dict):

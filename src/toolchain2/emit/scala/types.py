@@ -48,6 +48,8 @@ def _safe_scala_ident(name: str) -> str:
 
 
 def scala_type(resolved_type: str) -> str:
+    if len(resolved_type) == 1 and resolved_type.isupper():
+        return "Any"
     if (resolved_type.startswith("callable[") or resolved_type.startswith("Callable[")) and resolved_type.endswith("]"):
         prefix_len = len("Callable[") if resolved_type.startswith("Callable[") else len("callable[")
         inner = resolved_type[prefix_len:-1]
