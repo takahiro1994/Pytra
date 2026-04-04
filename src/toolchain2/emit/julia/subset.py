@@ -1555,6 +1555,17 @@ class JuliaSubsetRenderer:
         self.indent_level -= 1
         self._emit("end")
 
+    def _emit_mutable_struct(self, struct_name: str, base_type: str, field_names: list[str]) -> None:
+        header = "mutable struct " + struct_name
+        if base_type != "":
+            header += " <: " + base_type
+        self._emit(header)
+        self.indent_level += 1
+        for field_name in field_names:
+            self._emit(field_name)
+        self.indent_level -= 1
+        self._emit("end")
+
     def _emit_function_header(self, fn_name: str, args: list[str]) -> None:
         self._emit("function " + fn_name + "(" + ", ".join(args) + ")")
         self.indent_level += 1
@@ -1692,16 +1703,11 @@ class JuliaSubsetRenderer:
                 self._emit("abstract type " + class_name + " <: " + base_name + " end")
             else:
                 self._emit("abstract type " + class_name + " end")
-            self._emit("mutable struct " + impl_name + " <: " + class_name)
+            self._emit_mutable_struct(impl_name, class_name, field_names)
         elif base_name != "":
-            self._emit("mutable struct " + class_name + " <: " + base_name)
+            self._emit_mutable_struct(class_name, base_name, field_names)
         else:
-            self._emit("mutable struct " + class_name)
-        self.indent_level += 1
-        for field_name in field_names:
-            self._emit(field_name)
-        self.indent_level -= 1
-        self._emit("end")
+            self._emit_mutable_struct(class_name, "", field_names)
         self._emit_blank()
         self._emit_class_ctor(node, class_name, impl_name, field_names)
         self._emit_class_methods(node, class_name)
@@ -1726,6 +1732,9 @@ class JuliaSubsetRenderer:
         self._emit("Base.showerror(io::IO, e::" + class_name + ") = print(io, e.__pytra_message)")
         self._emit("__pytra_exception_message(e::" + class_name + ") = string(e.__pytra_message)")
 
+    def _emit_exception_struct(self, class_name: str, base_type: str, field_names: list[str]) -> None:
+        self._emit_mutable_struct(class_name, base_type, ["__pytra_message", *field_names])
+
     def _emit_exception_class(self, node: dict[str, JsonVal]) -> None:
         class_name = _str(node, "name")
         base_name = _str(node, "base")
@@ -1734,13 +1743,7 @@ class JuliaSubsetRenderer:
             raise ValueError("unsupported Julia exception base: " + base_name)
         field_names = _declared_field_names(node)
         self._emit("# inherits from " + base_name)
-        self._emit("mutable struct " + class_name + " <: " + base_type)
-        self.indent_level += 1
-        self._emit("__pytra_message")
-        for field_name in field_names:
-            self._emit(field_name)
-        self.indent_level -= 1
-        self._emit("end")
+        self._emit_exception_struct(class_name, base_type, field_names)
         self._emit_exception_display_methods(class_name)
         self._emit_blank()
         init_fn = _find_init_function(node)
