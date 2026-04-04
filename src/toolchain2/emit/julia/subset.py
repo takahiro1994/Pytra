@@ -1520,44 +1520,51 @@ class JuliaSubsetRenderer:
                 self.indent_level -= 1
                 self._emit("end")
 
-    def _emit_stmt(self, node: JsonVal) -> None:
-        if not isinstance(node, dict):
-            raise RuntimeError("julia subset: stmt must be dict")
-        kind = _str(node, "kind")
+    def _emit_simple_stmt(self, node: dict[str, JsonVal], kind: str) -> bool:
         if kind == "Import":
             self._emit_import_stmt(node)
-            return
+            return True
         if kind == "ImportFrom":
             self._emit_import_from_stmt(node)
-            return
+            return True
         if kind == "Pass":
             self._emit("nothing")
-            return
+            return True
         if kind == "VarDecl":
             self._emit(_ident(_str(node, "name")) + " = nothing")
-            return
+            return True
         if kind == "Raise":
             self._emit_raise_stmt(node)
-            return
+            return True
         if kind == "Return":
             self._emit_return_stmt(node)
-            return
+            return True
         if kind == "Expr":
             self._emit_expr_stmt(node)
-            return
+            return True
         if kind == "AnnAssign":
             self._emit_annassign_stmt(node)
-            return
+            return True
         if kind == "Assign":
             self._emit_assign_stmt(node)
-            return
+            return True
         if kind == "Swap":
             left = _ident(_str(node.get("left"), "id"))
             right = _ident(_str(node.get("right"), "id"))
             self._emit(left + ", " + right + " = " + right + ", " + left)
-            return
+            return True
         if kind == "AugAssign":
             self._emit_augassign_stmt(node)
+            return True
+        if kind == "TypeAlias":
+            return True
+        return False
+
+    def _emit_stmt(self, node: JsonVal) -> None:
+        if not isinstance(node, dict):
+            raise RuntimeError("julia subset: stmt must be dict")
+        kind = _str(node, "kind")
+        if self._emit_simple_stmt(node, kind):
             return
         if kind == "If":
             self._emit_if_stmt(node)
@@ -1573,8 +1580,6 @@ class JuliaSubsetRenderer:
             return
         if kind == "FunctionDef":
             self._emit_function_stmt(node)
-            return
-        if kind == "TypeAlias":
             return
         if kind == "ClassDef":
             self._emit_class_stmt(node)
