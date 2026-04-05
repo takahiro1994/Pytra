@@ -603,12 +603,119 @@ class DartNativeEmitter:
                     return self._mapping.calls[short_key]
         return self._mapping.calls.get(attr, "")
 
+    def _lookup_owner_mapped_call(self, owner_type: str, attr: str) -> str:
+        candidates: list[str] = []
+        if owner_type == "str":
+            candidates.append("str." + attr)
+        if owner_type == "deque":
+            candidates.append("deque." + attr)
+        if owner_type.startswith("dict[") or owner_type == "dict":
+            candidates.append("dict." + attr)
+        if owner_type.startswith("set[") or owner_type == "set":
+            candidates.append("set." + attr)
+        if owner_type.startswith("list[") or owner_type in {"list", "bytes", "bytearray"}:
+            candidates.append("list." + attr)
+        for key in candidates:
+            mapped = self._mapping.calls.get(key, "")
+            if mapped != "":
+                return mapped
+        return ""
+
     def _expand_mapped_call(self, mapped: str, rendered_args: list[str]) -> str:
         if mapped.startswith("__NUM_METHOD__:"):
             method_name = mapped[len("__NUM_METHOD__:"):]
             if len(rendered_args) == 0:
                 return "0"
             return "(" + rendered_args[0] + " as num)." + method_name + "()"
+        return ""
+
+    def _expand_owner_mapped_call(self, mapped: str, owner: str, rendered_args: list[str], owner_type: str) -> str:
+        all_args = [owner] + rendered_args
+        if mapped == "__LIST_APPEND__" and len(rendered_args) == 1:
+            return owner + ".add(" + rendered_args[0] + ")"
+        if mapped == "__LIST_EXTEND__" and len(rendered_args) == 1:
+            return owner + ".addAll(" + self._coerce_iterable_arg(owner_type, rendered_args[0]) + ")"
+        if mapped == "__LIST_INSERT__" and len(rendered_args) == 2:
+            return owner + ".insert(" + rendered_args[0] + ", " + rendered_args[1] + ")"
+        if mapped == "__LIST_POP__":
+            if len(rendered_args) == 0:
+                return owner + ".removeLast()"
+            return owner + ".removeAt(" + rendered_args[0] + ")"
+        if mapped == "__LIST_CLEAR__" and len(rendered_args) == 0:
+            return owner + ".clear()"
+        if mapped == "__LIST_INDEX__" and len(rendered_args) >= 1:
+            return owner + ".indexOf(" + rendered_args[0] + ")"
+        if mapped == "__LIST_SORT__" and len(rendered_args) == 0:
+            return owner + ".sort()"
+        if mapped == "__LIST_REVERSE__" and len(rendered_args) == 0:
+            return "(" + owner + " = " + owner + ".reversed.toList())"
+        if mapped == "__DEQUE_APPEND__" and len(rendered_args) == 1:
+            return owner + ".add(" + rendered_args[0] + ")"
+        if mapped == "__DEQUE_APPENDLEFT__" and len(rendered_args) == 1:
+            return owner + ".appendleft(" + rendered_args[0] + ")"
+        if mapped == "__DEQUE_POPLEFT__" and len(rendered_args) == 0:
+            return owner + ".popleft()"
+        if mapped == "__DEQUE_POP__" and len(rendered_args) == 0:
+            return owner + ".removeLast()"
+        if mapped == "__DEQUE_CLEAR__" and len(rendered_args) == 0:
+            return owner + ".clear()"
+        if mapped == "__SET_ADD__" and len(rendered_args) == 1:
+            return owner + ".add(" + rendered_args[0] + ")"
+        if mapped == "__SET_DISCARD__" and len(rendered_args) == 1:
+            return owner + ".remove(" + rendered_args[0] + ")"
+        if mapped == "__SET_REMOVE__" and len(rendered_args) == 1:
+            return owner + ".remove(" + rendered_args[0] + ")"
+        if mapped == "__SET_CLEAR__" and len(rendered_args) == 0:
+            return owner + ".clear()"
+        if mapped == "__DICT_GET__":
+            key = rendered_args[0] if len(rendered_args) >= 1 else "null"
+            default = rendered_args[1] if len(rendered_args) >= 2 else "null"
+            return "(" + owner + "[" + key + "] ?? " + default + ")"
+        if mapped == "__DICT_ITEMS__" and len(rendered_args) == 0:
+            return "((" + owner + ") as Map).entries.map((e) => [e.key, e.value]).toList()"
+        if mapped == "__DICT_KEYS__" and len(rendered_args) == 0:
+            return owner + ".keys.toList()"
+        if mapped == "__DICT_VALUES__" and len(rendered_args) == 0:
+            return owner + ".values.toList()"
+        if mapped == "__DICT_UPDATE__" and len(rendered_args) == 1:
+            return owner + ".addAll(" + self._coerce_iterable_arg(owner_type, rendered_args[0]) + ")"
+        if mapped == "__DICT_POP__" and len(rendered_args) >= 1:
+            return owner + ".remove(" + rendered_args[0] + ")!"
+        if mapped == "__DICT_SETDEFAULT__" and len(rendered_args) >= 2:
+            return owner + ".putIfAbsent(" + rendered_args[0] + ", () => " + rendered_args[1] + ")"
+        if mapped == "__DICT_CLEAR__" and len(rendered_args) == 0:
+            return owner + ".clear()"
+        if mapped == "__STR_STRIP__" and len(rendered_args) == 0:
+            return owner + ".trim()"
+        if mapped == "__STR_LSTRIP__" and len(rendered_args) == 0:
+            return owner + ".trimLeft()"
+        if mapped == "__STR_RSTRIP__" and len(rendered_args) == 0:
+            return owner + ".trimRight()"
+        if mapped == "__STR_STARTSWITH__" and len(rendered_args) >= 1:
+            return owner + ".startsWith(" + rendered_args[0] + ")"
+        if mapped == "__STR_ENDSWITH__" and len(rendered_args) >= 1:
+            return owner + ".endsWith(" + rendered_args[0] + ")"
+        if mapped == "__STR_REPLACE__" and len(rendered_args) >= 2:
+            return owner + ".replaceAll(" + rendered_args[0] + ", " + rendered_args[1] + ")"
+        if mapped == "__STR_FIND__" and len(rendered_args) >= 1:
+            return owner + ".indexOf(" + rendered_args[0] + ")"
+        if mapped == "__STR_RFIND__" and len(rendered_args) >= 1:
+            return owner + ".lastIndexOf(" + rendered_args[0] + ")"
+        if mapped == "__STR_SPLIT__":
+            sep = rendered_args[0] if len(rendered_args) >= 1 else "' '"
+            return owner + ".split(" + sep + ")"
+        if mapped == "__STR_JOIN__" and len(rendered_args) >= 1:
+            return "(" + rendered_args[0] + ").join(" + owner + ")"
+        if mapped == "__STR_UPPER__" and len(rendered_args) == 0:
+            return owner + ".toUpperCase()"
+        if mapped == "__STR_LOWER__" and len(rendered_args) == 0:
+            return owner + ".toLowerCase()"
+        if mapped == "__STR_COUNT__" and len(rendered_args) >= 1:
+            return "pytraStrCount(" + owner + ", " + rendered_args[0] + ")"
+        if mapped == "__STR_INDEX__" and len(rendered_args) >= 1:
+            return "pytraStrIndex(" + owner + ", " + rendered_args[0] + ")"
+        if mapped != "":
+            return mapped + "(" + ", ".join(all_args) + ")"
         return ""
 
     # --- type mapping ---
@@ -2753,132 +2860,23 @@ class DartNativeEmitter:
                 runtime_module_id = self._resolve_module_attr_module_id(owner_node)
             if module_alias == "" and runtime_module_id != "" and self._is_module_owner_node(owner_node):
                 module_alias = self._module_aliases.get(canonical_runtime_module_id(runtime_module_id), "")
+            owner = self._render_expr(owner_node)
+            owner_type = self._lookup_expr_type(owner_node)
             mapped_name = self._lookup_mapped_call(runtime_module_id, raw_attr)
+            if mapped_name == "":
+                mapped_name = self._lookup_owner_mapped_call(owner_type, raw_attr)
             mapped_expr = self._expand_mapped_call(mapped_name, rendered_args)
             if mapped_expr != "":
                 return mapped_expr
+            owner_mapped_expr = self._expand_owner_mapped_call(mapped_name, owner, rendered_args, owner_type)
+            if owner_mapped_expr != "":
+                return owner_mapped_expr
             if module_alias != "":
                 return module_alias + "." + attr + "(" + ", ".join(rendered_args + kw_values_in_order) + ")"
-            owner = self._render_expr(owner_node)
-            owner_type = self._lookup_expr_type(owner_node)
             if isinstance(owner_node, dict) and owner_node.get("kind") == "Name":
                 owner_name = _safe_ident(owner_node.get("id"), "")
                 if owner_name in self.imported_modules:
                     return owner + "." + attr + "(" + ", ".join(rendered_args + kw_values_in_order) + ")"
-            # String methods
-            if owner_type == "str" or attr in {
-                "isdigit",
-                "isalpha",
-                "isalnum",
-                "isspace",
-                "strip",
-                "lstrip",
-                "rstrip",
-                "startswith",
-                "endswith",
-                "find",
-                "rfind",
-                "replace",
-                "split",
-                "splitlines",
-                "upper",
-                "lower",
-            }:
-                if attr == "isdigit":
-                    return "pytraStrIsdigit(" + owner + ")"
-                if attr == "isalpha":
-                    return "pytraStrIsalpha(" + owner + ")"
-                if attr == "isalnum":
-                    return "pytraStrIsalnum(" + owner + ")"
-                if attr == "isspace":
-                    return "pytraStrIsspace(" + owner + ")"
-                if attr == "strip":
-                    return owner + ".trim()"
-                if attr == "lstrip":
-                    return owner + ".trimLeft()"
-                if attr == "rstrip":
-                    return owner + ".trimRight()"
-                if attr == "startswith" and len(rendered_args) >= 1:
-                    return owner + ".startsWith(" + rendered_args[0] + ")"
-                if attr == "endswith" and len(rendered_args) >= 1:
-                    return owner + ".endsWith(" + rendered_args[0] + ")"
-                if attr == "join" and len(rendered_args) >= 1:
-                    return "(" + rendered_args[0] + ").join(" + owner + ")"
-                if attr == "find" and len(rendered_args) >= 1:
-                    return owner + ".indexOf(" + rendered_args[0] + ")"
-                if attr == "rfind" and len(rendered_args) >= 1:
-                    return owner + ".lastIndexOf(" + rendered_args[0] + ")"
-                if attr == "count" and len(rendered_args) >= 1:
-                    return "pytraStrCount(" + owner + ", " + rendered_args[0] + ")"
-                if attr == "index" and len(rendered_args) >= 1:
-                    return "pytraStrIndex(" + owner + ", " + rendered_args[0] + ")"
-                if attr == "replace" and len(rendered_args) >= 2:
-                    return owner + ".replaceAll(" + rendered_args[0] + ", " + rendered_args[1] + ")"
-                if attr == "split":
-                    sep = rendered_args[0] if len(rendered_args) >= 1 else "' '"
-                    return owner + ".split(" + sep + ")"
-                if attr == "splitlines":
-                    return owner + ".split('\\n')"
-                if attr == "upper":
-                    return owner + ".toUpperCase()"
-                if attr == "lower":
-                    return owner + ".toLowerCase()"
-            # List methods
-            is_list_like = owner_type.startswith("list[") or owner_type in ("list", "bytes", "bytearray")
-            if is_list_like:
-                if attr == "append" and len(rendered_args) == 1:
-                    return owner + ".add(" + rendered_args[0] + ")"
-                if attr == "extend" and len(rendered_args) == 1:
-                    return owner + ".addAll(" + self._coerce_iterable_arg(owner_type, rendered_args[0]) + ")"
-                if attr == "pop":
-                    if len(rendered_args) == 0:
-                        return owner + ".removeLast()"
-                    return owner + ".removeAt(" + rendered_args[0] + ")"
-                if attr == "insert" and len(rendered_args) == 2:
-                    return owner + ".insert(" + rendered_args[0] + ", " + rendered_args[1] + ")"
-                if attr == "remove" and len(rendered_args) == 1:
-                    return owner + ".remove(" + rendered_args[0] + ")"
-                if attr == "index" and len(rendered_args) >= 1:
-                    return owner + ".indexOf(" + rendered_args[0] + ")"
-                if attr == "sort":
-                    return owner + ".sort()"
-                if attr == "reverse":
-                    return "(" + owner + " = " + owner + ".reversed.toList())"
-                if attr == "copy":
-                    return "List.from(" + owner + ")"
-            if owner_type == "deque":
-                if attr == "append" and len(rendered_args) == 1:
-                    return owner + ".add(" + rendered_args[0] + ")"
-                if attr == "appendleft" and len(rendered_args) == 1:
-                    return owner + ".appendleft(" + rendered_args[0] + ")"
-                if attr == "popleft" and len(rendered_args) == 0:
-                    return owner + ".popleft()"
-                if attr == "pop" and len(rendered_args) == 0:
-                    return owner + ".removeLast()"
-                if attr == "clear" and len(rendered_args) == 0:
-                    return owner + ".clear()"
-            if owner_type.startswith("set[") or owner_type == "set":
-                if attr == "discard" and len(rendered_args) == 1:
-                    return owner + ".remove(" + rendered_args[0] + ")"
-                if attr == "add" and len(rendered_args) == 1:
-                    return owner + ".add(" + rendered_args[0] + ")"
-            # Dict methods
-            if raw_attr == "get":
-                key = rendered_args[0] if len(rendered_args) >= 1 else "null"
-                default = rendered_args[1] if len(rendered_args) >= 2 else "null"
-                return "(" + owner + "[" + key + "] ?? " + default + ")"
-            if attr == "keys":
-                return owner + ".keys.toList()"
-            if attr == "values":
-                return owner + ".values.toList()"
-            if attr == "items":
-                return "((" + owner + ") as Map).entries.map((e) => [e.key, e.value]).toList()"
-            if attr == "update" and len(rendered_args) == 1:
-                return owner + ".addAll(" + self._coerce_iterable_arg(owner_type, rendered_args[0]) + ")"
-            if attr == "pop" and len(rendered_args) >= 1:
-                return owner + ".remove(" + rendered_args[0] + ")!"
-            if attr == "setdefault" and len(rendered_args) >= 2:
-                return owner + ".putIfAbsent(" + rendered_args[0] + ", () => " + rendered_args[1] + ")"
             return owner + "." + attr + "(" + ", ".join(rendered_args + kw_values_in_order) + ")"
         # Lambda immediate call: (lambda x: body)(arg) → ((x) => body)(arg)
         if isinstance(func_any, dict) and func_any.get("kind") == "Lambda":
