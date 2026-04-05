@@ -266,6 +266,16 @@ v1 で canonical に許可される適用対象は次の 1 つだけ:
 - `copy_elision_safe_v1` が **存在しない場合**、backend は Python どおりコピーを生成しなければならない（fail-closed）。
 - backend / runtime はこの metadata を自力で推論・再構築してはならない。canonical source は linker が付与した `Call.meta.copy_elision_safe_v1` だけである。
 
+### 5.2 `Call.meta.mutates_receiver`
+
+resolve は、receiver method call が receiver 自体を変更することを静的に確定できる場合、`Call.meta.mutates_receiver = true` を付与してよい。
+
+- v1 の canonical source は `src/pytra/built_in/containers.py` の `mut[...]` 型注釈
+- 対象は `self: mut[...]` を持つ built-in / runtime method
+- 付与時は receiver 側の `borrow_kind` も `mutable_ref` へ更新してよい
+- フラグが absent または `false` の場合、backend は readonly として扱う
+- backend / emitter は Python メソッド名や `runtime_call` 文字列から同等情報を再推論してはならない
+
 linker が v1 を付与するための必須条件:
 
 1. コピー元 `bytearray` がコピー後に mutate されないこと

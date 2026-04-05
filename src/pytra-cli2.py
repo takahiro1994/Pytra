@@ -95,13 +95,14 @@ def _emit_ts_module(_east_doc: dict[str, JsonVal], strip_types: bool = False) ->
 
 
 
-def _builtin_registry_paths() -> tuple[Path, Path, Path]:
-    """Return absolute builtins/containers/stdlib registry inputs."""
+def _builtin_registry_paths() -> tuple[Path, Path, Path, Path]:
+    """Return absolute builtins/containers/containers source/stdlib registry inputs."""
     root = _repo_root()
     east1_root = root.joinpath("test").joinpath("include").joinpath("east1").joinpath("py")
     return (
         east1_root.joinpath("built_in").joinpath("builtins.py.east1"),
         east1_root.joinpath("built_in").joinpath("containers.py.east1"),
+        root.joinpath("src").joinpath("pytra").joinpath("built_in").joinpath("containers.py"),
         east1_root.joinpath("std"),
     )
 
@@ -347,8 +348,8 @@ def _resolve_one(input_path: Path, output_text: str, pretty: bool) -> int:
         return 1
 
     # Load builtin registry
-    builtins_path, containers_path, stdlib_dir = _builtin_registry_paths()
-    registry = load_builtin_registry(builtins_path, containers_path, stdlib_dir)
+    builtins_path, containers_path, containers_source_path, stdlib_dir = _builtin_registry_paths()
+    registry = load_builtin_registry(builtins_path, containers_path, stdlib_dir, containers_source_path)
 
     result = resolve_file(input_path, registry=registry)
     if output_text != "":
@@ -954,8 +955,8 @@ def _build_pipeline(
     print("build: parsed " + str(len(east1_docs)) + " files")
 
     # 2. Resolve
-    builtins_path, containers_path, stdlib_dir = _builtin_registry_paths()
-    registry = load_builtin_registry(builtins_path, containers_path, stdlib_dir)
+    builtins_path, containers_path, containers_source_path, stdlib_dir = _builtin_registry_paths()
+    registry = load_builtin_registry(builtins_path, containers_path, stdlib_dir, containers_source_path)
 
     east2_docs: list[tuple[str, dict[str, JsonVal]]] = []
     for inp, east1_doc in east1_docs:

@@ -41,6 +41,7 @@ class FuncSig:
     is_method: bool = False
     owner_class: str = ""
     extern_v2: ExternV2 | None = None  # from meta.extern_v2
+    self_is_mutable: bool = False
 
 
 @dataclass
@@ -216,6 +217,60 @@ def _extract_func_sig(node: dict[str, JsonVal], is_method: bool, owner: str) -> 
                 decs.append(d)
     extern_v2: ExternV2 | None = _extract_extern_v2(node)
     return FuncSig(name=name, arg_names=arg_names, arg_types=arg_types, return_type=ret, decorators=decs, vararg_name=vararg_name, vararg_type=vararg_type, is_method=is_method, owner_class=owner, extern_v2=extern_v2)
+
+
+def _overlay_container_mutability_from_source(reg: BuiltinRegistry, source_path: Path) -> None:
+    """Overlay self mutability from canonical containers.py source.
+
+    EAST1 declaration files currently normalize away `mut[...]` annotations, so
+    the built-in registry supplements method signatures from the source of truth.
+    """
+    if not source_path.exists():
+        return
+    current_class = ""
+    class_indent = -1
+    for raw_line in source_path.read_text(encoding="utf-8").splitlines():
+        line = raw_line.rstrip()
+        stripped = line.strip()
+        if stripped == "" or stripped.startswith("#"):
+            continue
+        indent = len(line) - len(line.lstrip(" "))
+        if current_class != "" and indent <= class_indent and not stripped.startswith("@"):
+            current_class = ""
+            class_indent = -1
+        if stripped.startswith("class ") and stripped.endswith(":"):
+            class_name = stripped[len("class "):]
+            if "(" in class_name:
+                class_name = class_name.split("(", 1)[0].strip()
+            if ":" in class_name:
+                class_name = class_name.split(":", 1)[0].strip()
+            current_class = class_name.strip()
+            class_indent = indent
+            continue
+        if current_class == "" or not stripped.startswith("def "):
+            continue
+        open_paren = stripped.find("(")
+        close_paren = stripped.rfind(")")
+        if open_paren <= len("def ") or close_paren <= open_paren:
+            continue
+        method_name = stripped[len("def "):open_paren].strip()
+        signature = stripped[open_paren + 1:close_paren]
+        if method_name == "" or "self" not in signature:
+            continue
+        if "self: mut[" not in signature:
+            continue
+        cls = reg.classes.get(current_class)
+        if cls is None:
+            continue
+        method_sig = cls.methods.get(method_name)
+        if method_sig is None:
+            continue
+        method_sig.self_is_mutable = True
+
+
+def _default_containers_source_path() -> Path:
+    repo_root = Path(__file__).resolve().parents[4]
+    return repo_root / "src" / "pytra" / "built_in" / "containers.py"
 
 
 def _extract_class_sig(node: dict[str, JsonVal]) -> ClassSig:
@@ -449,6 +504,7 @@ def load_builtin_registry(
     builtins_east1_path: Path | None = None,
     containers_east1_path: Path | None = None,
     stdlib_dir: Path | None = None,
+    containers_source_path: Path | None = None,
 ) -> BuiltinRegistry:
     """Load the builtin registry from EAST1 declaration files.
 
@@ -502,5 +558,9 @@ def load_builtin_registry(
                     _register_stdlib_module(reg, canonical, msig)
 
     _retarget_string_method_runtime_modules(reg)
+    if containers_source_path is None:
+        containers_source_path = _default_containers_source_path()
+    if containers_source_path is not None:
+        _overlay_container_mutability_from_source(reg, containers_source_path)
 
     return reg

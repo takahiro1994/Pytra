@@ -74,13 +74,14 @@ class PytraCli2Test(unittest.TestCase):
             with tempfile.TemporaryDirectory() as tmp:
                 os.chdir(tmp)
                 repo_root = pytra_cli2_mod._repo_root()
-                builtins_path, containers_path, stdlib_dir = pytra_cli2_mod._builtin_registry_paths()
+                builtins_path, containers_path, containers_source_path, stdlib_dir = pytra_cli2_mod._builtin_registry_paths()
         finally:
             os.chdir(old_cwd)
 
         self.assertEqual(str(repo_root), str(ROOT))
         self.assertTrue(Path(str(builtins_path)).exists())
         self.assertTrue(Path(str(containers_path)).exists())
+        self.assertTrue(Path(str(containers_source_path)).exists())
         self.assertTrue(Path(str(stdlib_dir)).exists())
 
     def test_pytra_cli2_has_no_cpp_runtime_bundle_top_level_import(self) -> None:

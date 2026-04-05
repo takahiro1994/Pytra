@@ -1843,7 +1843,10 @@ def _emit_call(ctx: CppEmitContext, node: dict[str, JsonVal]) -> str:
             runtime_symbol = _str(func, "runtime_symbol")
             runtime_call = _str(node, "runtime_call")
             resolved_runtime_call = _str(node, "resolved_runtime_call")
-            if attr == "append" and len(args) >= 1:
+            call_meta = node.get("meta")
+            mutates_receiver = isinstance(call_meta, dict) and call_meta.get("mutates_receiver") is True
+            owner_borrow_kind = _str(owner_node, "borrow_kind") if isinstance(owner_node, dict) else ""
+            if mutates_receiver and owner_borrow_kind == "mutable_ref" and len(args) >= 1:
                 item_type = ""
                 if owner_type.startswith("list[") and owner_type.endswith("]"):
                     item_type = owner_type[5:-1]
@@ -4328,10 +4331,6 @@ def _node_mutates_class_storage(ctx: CppEmitContext, node: JsonVal, owner_name: 
 
 
 def _node_mutates_self_fields(node: JsonVal) -> bool:
-    mutating_methods = {
-        "append", "appendleft", "pop", "popleft", "clear",
-        "remove", "discard", "add", "update", "extend",
-    }
     if isinstance(node, dict):
         kind = _str(node, "kind")
         if kind in ("Assign", "AugAssign", "AnnAssign"):
@@ -4347,13 +4346,17 @@ def _node_mutates_self_fields(node: JsonVal) -> bool:
                 if isinstance(owner, dict) and _str(owner, "kind") == "Name" and _str(owner, "id") == "self":
                     return True
         if kind == "Call":
+            meta = node.get("meta")
+            if isinstance(meta, dict) and meta.get("mutates_receiver") is True:
+                return True
             func = node.get("func")
             if isinstance(func, dict) and _str(func, "kind") == "Attribute":
                 owner = func.get("value")
                 if isinstance(owner, dict) and _str(owner, "kind") == "Attribute":
                     base = owner.get("value")
                     if isinstance(base, dict) and _str(base, "kind") == "Name" and _str(base, "id") == "self":
-                        if _str(func, "attr") in mutating_methods:
+                        call_owner = node.get("runtime_owner")
+                        if isinstance(call_owner, dict) and _str(call_owner, "borrow_kind") == "mutable_ref":
                             return True
         for value in node.values():
             if _node_mutates_self_fields(value):

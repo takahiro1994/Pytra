@@ -337,10 +337,6 @@ def _function_self_mutates(node: dict[str, JsonVal]) -> bool:
 
 
 def _node_mutates_self_fields(node: JsonVal) -> bool:
-    mutating_methods = {
-        "append", "appendleft", "pop", "popleft", "clear",
-        "remove", "discard", "add", "update", "extend",
-    }
     if isinstance(node, dict):
         kind = _str(node, "kind")
         if kind in ("Assign", "AugAssign", "AnnAssign"):
@@ -356,13 +352,17 @@ def _node_mutates_self_fields(node: JsonVal) -> bool:
                 if isinstance(owner, dict) and _str(owner, "kind") == "Name" and _str(owner, "id") == "self":
                     return True
         if kind == "Call":
+            meta = node.get("meta")
+            if isinstance(meta, dict) and meta.get("mutates_receiver") is True:
+                return True
             func = node.get("func")
             if isinstance(func, dict) and _str(func, "kind") == "Attribute":
                 owner = func.get("value")
                 if isinstance(owner, dict) and _str(owner, "kind") == "Attribute":
                     base = owner.get("value")
                     if isinstance(base, dict) and _str(base, "kind") == "Name" and _str(base, "id") == "self":
-                        if _str(func, "attr") in mutating_methods:
+                        call_owner = node.get("runtime_owner")
+                        if isinstance(call_owner, dict) and _str(call_owner, "borrow_kind") == "mutable_ref":
                             return True
         for value in node.values():
             if _node_mutates_self_fields(value):

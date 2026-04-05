@@ -73,19 +73,21 @@ class list:
 
 ## 受け入れ基準
 
-- [ ] `Call.meta.mutates_receiver` が spec-east.md に定義されている
-- [ ] resolve が `containers.py` の `mut[T]` 注釈を読んで `mutates_receiver` を導出する
-- [ ] C++ emitter がメソッド名リストを持たず、フラグだけで mutable 判定する
-- [ ] `check_emitter_hardcode_lint.py --lang cpp --category runtime_symbol` が 0 件
+- [x] `Call.meta.mutates_receiver` が spec-east.md に定義されている
+- [x] resolve が `containers.py` の `mut[T]` 注釈を読んで `mutates_receiver` を導出する
+- [x] C++ emitter がメソッド名リストを持たず、フラグだけで mutable 判定する
+- [x] `check_emitter_hardcode_lint.py --lang cpp --category runtime_symbol` が 0 件
 - [ ] fixture + sample parity に回帰がない
 
 ## サブタスク
 
-1. [ ] [ID: P0-CPP-RTSYM-S1] spec-east.md に `Call.meta.mutates_receiver` を定義する
-2. [ ] [ID: P0-CPP-RTSYM-S2] resolve が `src/pytra/built_in/containers.py` を読み、`mut[T]` 注釈付きメソッドの Call に `meta.mutates_receiver: true` を付与する
-3. [ ] [ID: P0-CPP-RTSYM-S3] C++ emitter の mutable メソッド名リストを `meta.mutates_receiver` ベース��判定に置き換える
-4. [ ] [ID: P0-CPP-RTSYM-S4] `check_emitter_hardcode_lint.py --lang cpp --category runtime_symbol` が 0 件になることを確認する
+1. [x] [ID: P0-CPP-RTSYM-S1] spec-east.md に `Call.meta.mutates_receiver` を定義する
+2. [x] [ID: P0-CPP-RTSYM-S2] resolve が `src/pytra/built_in/containers.py` を読み、`mut[T]` 注釈付きメソッドの Call に `meta.mutates_receiver: true` を付与する
+3. [x] [ID: P0-CPP-RTSYM-S3] C++ emitter の mutable メソッド名リストを `meta.mutates_receiver` ベースの判定に置き換える
+4. [x] [ID: P0-CPP-RTSYM-S4] `check_emitter_hardcode_lint.py --lang cpp --category runtime_symbol` が 0 件になることを確認する
 
 ## 決定ログ
 
 - 2026-04-05: `containers.py` を `@extern class` + `mut[T]` 注釈で作成済み。resolve 統合と emitter 移行を計画。emitter guide 違反（メソッド名ハードコード）の根本解決。
+- 2026-04-05: `containers.py.east1` では `mut[...]` が失われていたため、builtin registry が canonical source `src/pytra/built_in/containers.py` を追加で読み、`self_is_mutable` を overlay する方式にした。
+- 2026-04-05: C++ emitter/header の self-mutation 判定は `Call.meta.mutates_receiver` と receiver `borrow_kind=mutable_ref` ベースへ移行し、メソッド名リストを撤去した。

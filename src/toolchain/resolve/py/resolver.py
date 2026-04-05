@@ -2807,9 +2807,16 @@ def _resolve_container_method_call(
 
     # Runtime owner: the receiver expression
     value = func.get("value")
+    if isinstance(value, dict) and method_sig.self_is_mutable:
+        value["borrow_kind"] = "mutable_ref"
     if isinstance(value, dict):
         owner_copy: JsonVal = deep_copy_json(value)
         expr["runtime_owner"] = owner_copy
+    if method_sig.self_is_mutable:
+        meta_val = expr.get("meta")
+        meta: dict[str, JsonVal] = meta_val if isinstance(meta_val, dict) else {}
+        expr["meta"] = meta
+        meta["mutates_receiver"] = True
 
     # Runtime metadata from extern_v2 (正本)
     method_extern: ExternV2 | None = method_sig.extern_v2

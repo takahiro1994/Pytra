@@ -60,6 +60,38 @@ def _load_registry() -> BuiltinRegistry:
 
 
 class Toolchain2SpecConformTests(unittest.TestCase):
+    def test_builtin_registry_overlays_container_self_mutability_from_source(self) -> None:
+        registry = _load_registry()
+        self.assertTrue(registry.classes["list"].methods["append"].self_is_mutable)
+        self.assertTrue(registry.classes["dict"].methods["setdefault"].self_is_mutable)
+        self.assertTrue(registry.classes["set"].methods["discard"].self_is_mutable)
+        self.assertFalse(registry.classes["dict"].methods["get"].self_is_mutable)
+        self.assertFalse(registry.classes["str"].methods["strip"].self_is_mutable)
+
+    def test_resolve_marks_mutating_container_calls_with_receiver_metadata(self) -> None:
+        east1 = parse_python_source(
+            """
+def f(xs: list[int], d: dict[str, int]) -> None:
+    xs.append(1)
+    d.get("x", 0)
+""",
+            "<mem>",
+        ).to_jv()
+        resolve_east1_to_east2(east1, registry=_load_registry())
+
+        calls = [
+            node for node in _walk(east1)
+            if node.get("kind") == "Call"
+        ]
+        append_call = next(node for node in calls if node.get("runtime_call") == "list.append")
+        get_call = next(node for node in calls if node.get("runtime_call") == "dict.get")
+
+        self.assertEqual(append_call.get("meta", {}).get("mutates_receiver"), True)
+        self.assertEqual(append_call.get("runtime_owner", {}).get("borrow_kind"), "mutable_ref")
+        self.assertEqual(append_call.get("func", {}).get("value", {}).get("borrow_kind"), "mutable_ref")
+        self.assertIsNone(get_call.get("meta", {}).get("mutates_receiver"))
+        self.assertEqual(get_call.get("runtime_owner", {}).get("borrow_kind"), "readonly_ref")
+
     def test_optimizer_mode_normalizers_accept_defaults_and_reject_invalid(self) -> None:
         self.assertEqual(resolve_negative_index_mode(""), "const_only")
         self.assertEqual(resolve_negative_index_mode("", 0), "always")
