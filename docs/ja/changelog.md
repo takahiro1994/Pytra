@@ -8,7 +8,7 @@
 
 - **emitter lint に Python メソッド名ハードコード検出追加**: `runtime_symbol` カテゴリに `"append"`, `"extend"`, `"pop"`, `"clear"` 等 23 パターンを追加。emitter が `attr == "append"` のようにメソッド名を文字列で判定している箇所を検出。
 - **parity check の全件 SKIP → FAIL 修正**: toolchain missing で全ターゲットが SKIP のケースを PASS ではなく FAIL に変更。Kotlin / Scala / PowerShell で false PASS が発生していた問題を解消。
-- **pytra-cli2.py のデフォルト出力先を work/tmp/ に変更**: `-o` 省略時に入力ファイルと同じディレクトリに east ファイルを出力する問題を修正。`test/fixture/source/` や `test/stdlib/source/` にゴミファイルが散らばる原因を根絶。
+- **pytra-cli.py のデフォルト出力先を work/tmp/ に変更**: `-o` 省略時に入力ファイルと同じディレクトリに east ファイルを出力する問題を修正。`test/fixture/source/` や `test/stdlib/source/` にゴミファイルが散らばる原因を根絶。
 - **parity check からの lint 自動実行を廃止**: lint は手動実行（`check_emitter_hardcode_lint.py`）または `run_local_ci.py` でのみ走らせる。parity check は transpile + compile + run に集中。
 - **emitter lint 常時 10 カテゴリ**: `--include-runtime` をデフォルト ON に変更し `--skip-runtime` に置き換え。キャッシュ機構を廃止。
 - **callable_optional_none fixture 追加**: `callable | None` の is None ガード + invoke を検証。C++ / Rust emitter で optional callable の unwrap を修正。
@@ -27,7 +27,7 @@
 
 ## 2026-04-03
 
-- **emitter 呼び出し構造の統一**: 共通ランナー `cli_runner.py` を新設。17 言語の cli.py を共通ランナーに移行（Rust のみ独自維持）。`pytra-cli2.py` は subprocess で cli.py を呼ぶ形に統一し、emitter 直接 import を廃止。
+- **emitter 呼び出し構造の統一**: 共通ランナー `cli_runner.py` を新設。17 言語の cli.py を共通ランナーに移行（Rust のみ独自維持）。`pytra-cli.py` は subprocess で cli.py を呼ぶ形に統一し、emitter 直接 import を廃止。
 - **parity check emit ロジック共通化**: `runtime_parity_check_fast.py` の 18 言語 if/elif チェーンを `importlib` 動的 import + 共通ループに置換。新言語追加時に parity check 修正不要に。
 - **`resolved_type: "object"` 全面禁止**: EAST3 validator で `resolved_type: "object"` を fail-fast。trait `cls: object` → `@template T`、`dict.get()` 型推論バグを修正し残存 6 ノードをゼロに。
 - **IsInstance ノードから PYTRA_TID_* 廃止**: `expected_type_name` を直接持つ形に移行。C++ emitter の逆引きテーブルも削除。全言語の emitter が native isinstance（`x is Type`, `instanceof`, `holds_alternative` 等）を使える。
@@ -90,7 +90,7 @@
 - **Rust fixture 132/132 + sample 18/18 PASS**: emitter 新規実装、mapping.json、stdlib argparse parity PASS。
 - **Rust selfhost mod 構造計画**: flat include! → Rust mod + use 構造への移行を設計。
 - **linker に receiver_storage_hint**: peer module のクラス情報を Attribute/Call ノードに付与。
-- **pytra-cli2.py から C++/Rust emit を subprocess 委譲**: selfhost で不要な言語の emitter が依存グラフに入らなくなった。
+- **pytra-cli.py から C++/Rust emit を subprocess 委譲**: selfhost で不要な言語の emitter が依存グラフに入らなくなった。
 - **parity changelog 自動記録**: PASS 件数の変化を progress-preview/changelog.md に自動追記。emitter lint の変化も同じ仕組みで記録。
 - **emitter lint に skip_pure_python カテゴリ**: pure Python モジュールの skip を検出。cli.py を除外リストに追加。
 - **fixture 追加**: tuple_unpack_variants, typed_container_access, in_membership_iterable, callable_higher_order, object_container_access。
@@ -170,7 +170,7 @@
 
 ## 2026-03-26
 
-- **パイプライン再設計完了**: parse → resolve → compile → optimize → link → emit の 6 段パイプライン（`pytra-cli2`）が全段動作。toolchain2 は toolchain に一切依存しない独立実装。
+- **パイプライン再設計完了**: parse → resolve → compile → optimize → link → emit の 6 段パイプライン（`pytra-cli`）が全段動作。toolchain2 は toolchain に一切依存しない独立実装。
 - **Go backend 新パイプライン移行**: Go emitter + runtime を新パイプラインで実装。sample 18/18 emit 成功。旧 Go emitter/runtime を削除。
 - **C++ emitter 新規実装**: `toolchain2/emit/cpp/` に新パイプライン用 C++ emitter を実装。fixture 132/132, sample 18/18 emit 成功。
 - **CodeEmitter 基底クラス**: `mapping.json` による runtime_call 写像を全 emitter で共有。ハードコード除去。
@@ -194,7 +194,7 @@
 
 - **パイプライン再設計着手**: parse/resolve/compile/optimize/emit の 5 段（後に link 追加で 6 段）パイプラインを設計。
 - **toolchain2/ 新規作成**: 現行 toolchain/ とは独立した新パイプライン実装。selfhost 対象（Any/object 禁止、pytra.std のみ）。
-- **pytra-cli2**: 新 CLI。-parse/-resolve/-compile/-optimize/-link/-emit/-build サブコマンド。
+- **pytra-cli**: 新 CLI。-parse/-resolve/-compile/-optimize/-link/-emit/-build サブコマンド。
 - **EAST1 golden file**: spec-east1 準拠で golden を strip（型情報除去）。150 件。
 - **built-in 関数宣言**: `src/include/py/pytra/built_in/builtins.py` + `containers.py`。v2 extern（extern_fn/extern_var/extern_class/extern_method）。
 - **stdlib 宣言**: `src/include/py/pytra/std/` に math/time/glob/os/sys 等の v2 extern 宣言。

@@ -39,7 +39,7 @@ Define the following in `src/runtime/java/mapping.json`:
 
 ### parity check
 
-- Support for `pytra-cli2 -build --target java` is needed (request to infrastructure team)
+- Support for `pytra-cli -build --target java` is needed (request to infrastructure team)
 - Verify with `runtime_parity_check_fast.py --targets java`
 - Three stages: fixture + sample + stdlib
 

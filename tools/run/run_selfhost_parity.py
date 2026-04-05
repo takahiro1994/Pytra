@@ -223,9 +223,9 @@ def _build_selfhost_binary(selfhost_lang: str) -> tuple[Path | None, str]:
     bin_dir.mkdir(parents=True, exist_ok=True)
     bin_path = bin_dir / selfhost_lang
 
-    # Step 1: emit the toolchain CLI to selfhost_lang via pytra-cli2
-    cli2 = ROOT / "src" / "pytra-cli2.py"
-    entry = ROOT / "src" / "pytra-cli2.py"
+    # Step 1: emit the toolchain CLI to selfhost_lang via pytra-cli
+    cli2 = ROOT / "src" / "pytra-cli.py"
+    entry = ROOT / "src" / "pytra-cli.py"
     if not entry.exists():
         return None, f"no entry file for selfhost_lang={selfhost_lang}: {entry}"
 

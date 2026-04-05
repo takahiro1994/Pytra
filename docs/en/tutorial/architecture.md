@@ -171,12 +171,12 @@ Normally you use `./pytra` for a single command, but you can also run each stage
 ./pytra input.py --target cpp --output-dir out/
 
 # Individual stages (for debugging / investigation)
-pytra-cli2 -parse input.py -o input.py.east1
-pytra-cli2 -resolve input.py.east1 -o input.east2
-pytra-cli2 -compile input.east2 -o input.east3
-pytra-cli2 -optimize input.east3 -o input.east3
-pytra-cli2 -link input.east3 -o out/
-pytra-cli2 -emit --target=cpp out/manifest.json -o out/emit/
+pytra-cli -parse input.py -o input.py.east1
+pytra-cli -resolve input.py.east1 -o input.east2
+pytra-cli -compile input.east2 -o input.east3
+pytra-cli -optimize input.east3 -o input.east3
+pytra-cli -link input.east3 -o out/
+pytra-cli -emit --target=cpp out/manifest.json -o out/emit/
 ```
 
 ## Supported Languages

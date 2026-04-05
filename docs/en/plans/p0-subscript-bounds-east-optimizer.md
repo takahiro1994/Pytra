@@ -125,7 +125,7 @@ Subscript processing is handled in two stages: **EAST2 → EAST3 lowering** and 
 ## Subtasks
 
 1. [x] [ID: P0-SUB-BOUNDS-S1] Define `meta.subscript_access_v1` schema in spec-east.md
-2. [ ] [ID: P0-SUB-BOUNDS-S1.5] Rename `--east3-opt-level` to `--opt-level` (pytra-cli2.py, runtime_parity_check_fast.py, optimizer, spec, tutorial — all locations)
+2. [ ] [ID: P0-SUB-BOUNDS-S1.5] Rename `--east3-opt-level` to `--opt-level` (pytra-cli.py, runtime_parity_check_fast.py, optimizer, spec, tutorial — all locations)
 3. [ ] [ID: P0-SUB-BOUNDS-S2] Implement `--opt-level` and `--negative-index-mode` / `--bounds-check-mode` coupling in the optimizer
    - `--opt-level` determines the defaults for `negative_index_mode` / `bounds_check_mode`
    - Individual overrides via `--negative-index-mode` / `--bounds-check-mode` work

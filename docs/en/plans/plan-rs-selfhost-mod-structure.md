@@ -59,7 +59,7 @@ use crate::toolchain2_emit_go::EmitContext as GoEmitContext;
    - Consolidate module-level initialization function calls in `main.rs`
 
 3. **Automatic `Cargo.toml` generation**
-   - `pytra-cli2.py -build --target rs` generates `Cargo.toml`
+   - `pytra-cli.py -build --target rs` generates `Cargo.toml`
    - Configure edition and dependencies (standard library only)
 
 ### Impact on Other Languages
@@ -87,6 +87,6 @@ By giving CommonRenderer / ProgramWriter a shared concept of "1 module = 1 targe
 1. Add a mod structure output mode to the Rust emitter's multifile_writer
 2. Implement automatic generation of `lib.rs` / `Cargo.toml`
 3. Implement emission of cross-module `use crate::` paths
-4. Switch `pytra-cli2.py -build --target rs` to use the mod structure
+4. Switch `pytra-cli.py -build --target rs` to use the mod structure
 5. Confirm that the selfhost build (`cargo build`) succeeds
 6. Confirm parity with `run_selfhost_parity.py --selfhost-lang rs`

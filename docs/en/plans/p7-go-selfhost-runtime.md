@@ -27,7 +27,7 @@ Workarounds for the circular dependency:
 
 ### 3. main() is empty
 
-The Go-translated `main()` does not have the CLI logic of Python's `pytra-cli2`. A minimal CLI wrapper that reads EAST3 JSON and emits code is needed.
+The Go-translated `main()` does not have the CLI logic of Python's `pytra-cli`. A minimal CLI wrapper that reads EAST3 JSON and emits code is needed.
 
 ```go
 // main.go (minimal CLI wrapper)

@@ -17,7 +17,7 @@ Convert Pytra's own transpiler (toolchain2) to C++ and verify that the resulting
 
 ## Flow
 
-1. Convert all toolchain2 `.py` files to C++ with `pytra-cli2 -build --target cpp`
+1. Convert all toolchain2 `.py` files to C++ with `pytra-cli -build --target cpp`
 2. Compile with `g++` to generate a binary
 3. Use the binary to convert fixture/sample, and verify that it produces the same output as Python (P3-SELFHOST-PARITY)
 

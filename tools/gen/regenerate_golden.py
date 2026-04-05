@@ -20,7 +20,7 @@ import json
 import subprocess
 from pathlib import Path
 
-PYTRA_CLI2 = "src/pytra-cli2.py"
+PYTRA_CLI2 = "src/pytra-cli.py"
 
 # --- Source / golden paths ---
 

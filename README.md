@@ -137,7 +137,7 @@ Legend: ✅ = Good / 🔶 = Partial / limited / ❌ = Not supported / difficult
 
 ## Changelog
 
-> **2026-04-04** — Added 23 Python method name hardcode patterns to lint. All-skip parity now FAIL (fixes false PASS for Kotlin/Scala/PS1). pytra-cli2 default output → work/tmp/. Lint always 10 categories. callable_optional_none fixture. Emitter guide §12.6 callable mapping + §14.1 lint docs. mapping.json FQCN key plan. Zig fixture 146/146 PASS. Julia 145/146.
+> **2026-04-04** — Added 23 Python method name hardcode patterns to lint. All-skip parity now FAIL (fixes false PASS for Kotlin/Scala/PS1). pytra-cli default output → work/tmp/. Lint always 10 categories. callable_optional_none fixture. Emitter guide §12.6 callable mapping + §14.1 lint docs. mapping.json FQCN key plan. Zig fixture 146/146 PASS. Julia 145/146.
 
 > **2026-04-03** — Unified emitter call structure (17 languages). `resolved_type: "object"` banned. IsInstance PYTRA_TID_* removed. `--opt-level` rename. Opaque type spec. `builtin_name` removed. `tools/unregistered/` deleted.
 

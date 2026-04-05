@@ -31,7 +31,7 @@
 - `src/toolchain2/emit/cpp/`
 - `src/runtime/cpp/`
 - `src/pytra-cli.py`
-- `src/pytra-cli2.py`
+- `src/pytra-cli.py`
 - C++ parity に必要な test / tooling
 
 ## 非対象
@@ -43,7 +43,7 @@
 ## 受け入れ基準
 
 - `src/runtime/cpp/` が toolchain2 C++ emitter 出力と整合し、旧 `toolchain` 由来の header/type 前提を持ち込まない
-- `pytra-cli.py` / `pytra-cli2.py` の C++ build 経路が toolchain2 ベースで成立する
+- `pytra-cli.py` / `pytra-cli.py` の C++ build 経路が toolchain2 ベースで成立する
 - sample 18 件が `emit + g++ compile + run + stdout 一致` を満たす
 
 ## 確認コマンド
@@ -56,7 +56,7 @@
 
 - [x] [ID: P1-EMIT-CPP-S2-01] runtime symbol 解決と include/path 解決を `mapping.json` / metadata ベースに寄せ、module ID ハードコードと旧 include fallback を整理する。
 - [x] [ID: P1-EMIT-CPP-S2-02] runtime bundle の header/source 生成を toolchain2 C++ 型系に揃え、旧 `toolchain.emit.cpp.emitter.header_builder` 依存を除去する。
-- [x] [ID: P1-EMIT-CPP-S2-03] `pytra-cli.py` / `pytra-cli2.py` の C++ build 経路で runtime bundle と native companion を正しく取り込み、representative fixture compile を通す。
+- [x] [ID: P1-EMIT-CPP-S2-03] `pytra-cli.py` / `pytra-cli.py` の C++ build 経路で runtime bundle と native companion を正しく取り込み、representative fixture compile を通す。
 - [x] [ID: P1-EMIT-CPP-S3-01] sample 18 件の C++ `emit + g++ compile` を通す。
 - [x] [ID: P1-EMIT-CPP-S3-02] sample 18 件の `run + stdout 一致` を確認し、`runtime_parity_check.py --targets cpp` を通す。
 

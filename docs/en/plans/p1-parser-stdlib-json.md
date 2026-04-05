@@ -46,7 +46,7 @@ These are already noted in P2-SELFHOST-S1 remarks as "unsupported parser syntax"
 
 ## Acceptance Criteria
 
-1. `pytra-cli2 -parse src/pytra/std/json.py` succeeds
+1. `pytra-cli -parse src/pytra/std/json.py` succeeds
 2. All stages (parse → resolve → compile → optimize → link) pass
 3. golden is regenerated from the current source
 4. Existing fixture / sample parity is maintained

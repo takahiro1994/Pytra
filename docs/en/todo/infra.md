@@ -40,7 +40,7 @@ Context: [docs/ja/plans/p10-legacy-toolchain-removal.md](../plans/p10-legacy-too
 
 Targets for removal:
 - `src/toolchain/` (old emitter, old compile, old frontends, old misc)
-- `src/pytra-cli.py` (old CLI; `src/pytra-cli2.py` is the canonical version)
+- `src/pytra-cli.py` (old CLI; `src/pytra-cli.py` is the canonical version)
 - References to the old pipeline in tests, specs, and docs
 
 **Pre-work completed (2026-04-05):**
@@ -57,8 +57,8 @@ Targets for removal:
 - `src/toolchain2/emit/zig/emitter.py` uses old `CodeEmitter` class + `runtime_symbol_index` → awaiting Zig owner migration
 
 1. [ ] [ID: P10-LEGACY-RM-S1] Delete `src/toolchain/` (after all 4 languages above are migrated)
-2. [ ] [ID: P10-LEGACY-RM-S2] Delete `src/pytra-cli.py` and rename `src/pytra-cli2.py` to `src/pytra-cli.py` (also update callers to new CLI syntax)
-3. [x] [ID: P10-LEGACY-RM-S3] Update old pipeline references in spec / tutorial / README (`pytra-cli2` → `pytra-cli`)
+2. [ ] [ID: P10-LEGACY-RM-S2] Delete `src/pytra-cli.py` and rename `src/pytra-cli.py` to `src/pytra-cli.py` (also update callers to new CLI syntax)
+3. [x] [ID: P10-LEGACY-RM-S3] Update old pipeline references in spec / tutorial / README (`pytra-cli` → `pytra-cli`)
 4. [ ] [ID: P10-LEGACY-RM-S4] Remove old pipeline references from tools such as `run_local_ci.py` (after S1/S2)
 
 ### P20-DATA-DRIVEN-TESTS: Convert pipeline tests to data-driven format

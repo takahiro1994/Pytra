@@ -46,7 +46,7 @@
 
 ## 受け入れ基準
 
-1. `pytra-cli2 -parse src/pytra/std/json.py` が成功すること
+1. `pytra-cli -parse src/pytra/std/json.py` が成功すること
 2. 全段（parse → resolve → compile → optimize → link）を通過すること
 3. golden が current source から再生成されていること
 4. 既存 fixture / sample の parity が維持されること

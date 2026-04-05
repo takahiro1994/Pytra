@@ -1,4 +1,4 @@
-"""Regression tests for src/pytra-cli2.py."""
+"""Regression tests for src/pytra-cli.py."""
 
 from __future__ import annotations
 
@@ -19,10 +19,10 @@ if str(ROOT / "src") not in sys.path:
 
 from toolchain.link.shared_types import LinkedModule
 
-_CLI2_PATH = ROOT / "src" / "pytra-cli2.py"
+_CLI2_PATH = ROOT / "src" / "pytra-cli.py"
 _SPEC = importlib.util.spec_from_file_location("pytra_cli2_mod", str(_CLI2_PATH))
 if _SPEC is None or _SPEC.loader is None:
-    raise RuntimeError("failed to load pytra-cli2 module spec")
+    raise RuntimeError("failed to load pytra-cli module spec")
 pytra_cli2_mod = importlib.util.module_from_spec(_SPEC)
 _SPEC.loader.exec_module(pytra_cli2_mod)
 

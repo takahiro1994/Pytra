@@ -16,14 +16,14 @@ selfhost マトリクスは「toolchain2 を言語 X に変換し、変換後の
 例: selfhost 言語 = C++、emit 先 = Go の場合:
 
 ```
-1. Python toolchain2 → C++ に変換（pytra-cli2 -build --target cpp）
+1. Python toolchain2 → C++ に変換（pytra-cli -build --target cpp）
 2. C++ をコンパイル（g++ → selfhost バイナリ生成）
 3. selfhost バイナリで fixture の .py → Go に変換
 4. Go コードを go run で実行
 5. Python 直接実行の stdout と比較（parity check）
 ```
 
-ステップ 3 が「Python の pytra-cli2 の代わりに selfhost 済みバイナリを使う」点が新しい。ステップ 4〜5 は既存の parity check インフラを再利用できる。
+ステップ 3 が「Python の pytra-cli の代わりに selfhost 済みバイナリを使う」点が新しい。ステップ 4〜5 は既存の parity check インフラを再利用できる。
 
 ## 設計
 
@@ -43,7 +43,7 @@ python3 tools/run/run_selfhost_parity.py \
 
 ### 処理の流れ
 
-1. **selfhost ビルド**: `pytra-cli2 -build --target <selfhost-lang>` で toolchain2 を変換。ターゲット言語のコンパイラでバイナリを生成
+1. **selfhost ビルド**: `pytra-cli -build --target <selfhost-lang>` で toolchain2 を変換。ターゲット言語のコンパイラでバイナリを生成
 2. **emit**: selfhost バイナリを使って fixture/sample の `.py` をターゲット言語に変換
 3. **parity check**: 既存の parity check の compile + run + stdout 比較ロジックを再利用
 4. **結果記録**: `.parity-results/selfhost_<selfhost-lang>.json` に emit/build/parity の結果を記録

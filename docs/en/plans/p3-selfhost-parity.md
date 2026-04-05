@@ -16,14 +16,14 @@ The selfhost matrix shows "can toolchain2 be converted to language X, and can th
 Example: selfhost language = C++, emit target = Go:
 
 ```
-1. Python toolchain2 → convert to C++ (pytra-cli2 -build --target cpp)
+1. Python toolchain2 → convert to C++ (pytra-cli -build --target cpp)
 2. Compile C++ (g++ → generate selfhost binary)
 3. Use selfhost binary to convert fixture .py → Go
 4. Run Go code with go run
 5. Compare stdout against direct Python execution (parity check)
 ```
 
-Step 3 is new: "use the selfhosted binary instead of Python's pytra-cli2." Steps 4–5 can reuse the existing parity check infrastructure.
+Step 3 is new: "use the selfhosted binary instead of Python's pytra-cli." Steps 4–5 can reuse the existing parity check infrastructure.
 
 ## Design
 
@@ -43,7 +43,7 @@ python3 tools/run/run_selfhost_parity.py \
 
 ### Processing steps
 
-1. **selfhost build**: Convert toolchain2 with `pytra-cli2 -build --target <selfhost-lang>`. Generate a binary using the target language's compiler.
+1. **selfhost build**: Convert toolchain2 with `pytra-cli -build --target <selfhost-lang>`. Generate a binary using the target language's compiler.
 2. **emit**: Use the selfhost binary to convert fixture/sample `.py` files to the target language.
 3. **parity check**: Reuse the existing parity check compile + run + stdout comparison logic.
 4. **Result recording**: Record emit/build/parity results in `.parity-results/selfhost_<selfhost-lang>.json`.

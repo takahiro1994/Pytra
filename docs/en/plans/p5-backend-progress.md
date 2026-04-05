@@ -54,7 +54,7 @@ JSON format:
 
 ### 2. selfhost results
 
-selfhost runs through a separate path from parity check (`pytra-cli2 -build`, `g++`, `go build`, `cargo build`, `tsc`). Results are recorded in `.parity-results/selfhost_<lang>.json`.
+selfhost runs through a separate path from parity check (`pytra-cli -build`, `g++`, `go build`, `cargo build`, `tsc`). Results are recorded in `.parity-results/selfhost_<lang>.json`.
 
 JSON format:
 

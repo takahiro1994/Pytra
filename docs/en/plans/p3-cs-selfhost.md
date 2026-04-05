@@ -13,7 +13,7 @@ After implementing the C# emitter in P1-CS-EMITTER, convert Pytra's own transpil
 
 ## Flow
 
-1. Use `pytra-cli2 -build --target cs` to convert all toolchain2 `.py` files to C#
+1. Use `pytra-cli -build --target cs` to convert all toolchain2 `.py` files to C#
 2. Compile with `mcs` or `dotnet build` to produce a binary
 3. Use the binary to convert fixture/sample/stdlib and verify that the output matches Python (P3-SELFHOST-PARITY)
 

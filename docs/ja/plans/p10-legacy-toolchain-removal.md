@@ -4,7 +4,7 @@
 
 ## 背景
 
-Pytra のトランスパイルパイプラインは旧 toolchain（`src/toolchain/`）から新 toolchain2（`src/toolchain2/`）に移行中。CLI も旧 `src/pytra-cli.py` から `src/pytra-cli2.py` に移行済み。
+Pytra のトランスパイルパイプラインは旧 toolchain（`src/toolchain/`）から新 toolchain2（`src/toolchain2/`）に移行中。CLI も旧 `src/pytra-cli.py` から `src/pytra-cli.py` に移行済み。
 
 全18言語の emitter が toolchain2 に実装（P1-*-EMITTER-S1 完了）された時点で、旧パイプラインへの依存がゼロになるため、削除できる。
 
@@ -26,12 +26,12 @@ Pytra のトランスパイルパイプラインは旧 toolchain（`src/toolchai
 
 ### `src/pytra-cli.py`（旧 CLI）
 
-削除後、`src/pytra-cli2.py` を `src/pytra-cli.py` にリネーム。
+削除後、`src/pytra-cli.py` を `src/pytra-cli.py` にリネーム。
 
 ### 参照箇所の更新
 
 - `docs/ja/spec/` — emitter guide は更新済み（旧 toolchain 参照は 2026-04-03 に削除済み）
-- `docs/ja/tutorial/` — `pytra-cli.py` → `pytra-cli2.py` の参照（リネーム後に戻す）
+- `docs/ja/tutorial/` — `pytra-cli.py` → `pytra-cli.py` の参照（リネーム後に戻す）
 - `tools/run/run_local_ci.py` — 旧パイプライン参照があれば削除
 - `tools/README.md` — ツール台帳の旧パイプライン参照
 - `test/` — 旧パイプラインを使うテスト（移行 or 削除）
@@ -43,13 +43,13 @@ Pytra のトランスパイルパイプラインは旧 toolchain（`src/toolchai
 - **削除前に `git tag v0.x-pre-toolchain-removal` を打つ。** 万一戻す必要がある場合に備える
 - **旧 toolchain に依存する test がないことを確認してから削除。** `grep -r "from toolchain\." tools/ test/` で依存を洗い出す
 - **selfhost golden は toolchain2 で再生成。** 旧 toolchain で生成された golden が残っていないことを確認
-- **`pytra-cli2.py` → `pytra-cli.py` リネーム後、全ドキュメントの CLI 名を更新。** `pytra-cli2` への参照を全て `pytra-cli` に置換
+- **`pytra-cli.py` → `pytra-cli.py` リネーム後、全ドキュメントの CLI 名を更新。** `pytra-cli` への参照を全て `pytra-cli` に置換
 
 ## サブタスク
 
 1. [ ] [ID: P10-LEGACY-RM-S1] 全言語の P1-*-EMITTER-S1 完了を確認する（ゲート）
 2. [ ] [ID: P10-LEGACY-RM-S2] `src/toolchain/` を削除する
-3. [ ] [ID: P10-LEGACY-RM-S3] `src/pytra-cli.py` を削除し、`src/pytra-cli2.py` を `src/pytra-cli.py` にリネームする
+3. [ ] [ID: P10-LEGACY-RM-S3] `src/pytra-cli.py` を削除し、`src/pytra-cli.py` を `src/pytra-cli.py` にリネームする
 4. [ ] [ID: P10-LEGACY-RM-S4] spec / tutorial / README の旧パイプライン参照を更新する
 5. [ ] [ID: P10-LEGACY-RM-S5] `run_local_ci.py` 等のツールから旧パイプライン参照を削除する
 

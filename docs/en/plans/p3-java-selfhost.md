@@ -13,7 +13,7 @@ After implementing the Java emitter in P1-JAVA-EMITTER, convert Pytra's own tran
 
 ## Flow
 
-1. Use `pytra-cli2 -build --target java` to convert all toolchain2 `.py` files to Java
+1. Use `pytra-cli -build --target java` to convert all toolchain2 `.py` files to Java
 2. Compile with `javac` to produce class files
 3. Run with `java` to convert fixture/sample/stdlib and verify that the output matches Python (P3-SELFHOST-PARITY)
 

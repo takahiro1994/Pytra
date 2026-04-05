@@ -17,7 +17,7 @@ Pytra の変換器自身（toolchain2）を C++ に変換し、変換後の C++ 
 
 ## フロー
 
-1. `pytra-cli2 -build --target cpp` で toolchain2 全 `.py` を C++ に変換
+1. `pytra-cli -build --target cpp` で toolchain2 全 `.py` を C++ に変換
 2. `g++` でコンパイルしてバイナリを生成
 3. バイナリで fixture/sample を変換し、Python と同じ出力が得られるか検証（P3-SELFHOST-PARITY）
 

@@ -61,7 +61,7 @@ C++ は `emit_fn(east_doc) → str` ではなく `direct_emit_fn(east_doc, outpu
 ## 非対象
 
 - `toolchain2/emit/common/cli_runner.py` の変更（既に完成済み）
-- `pytra-cli2.py` の変更（subprocess 経由で変更不要）
+- `pytra-cli.py` の変更（subprocess 経由で変更不要）
 - emitter 本体のロジック変更
 
 ## 受け入れ基準

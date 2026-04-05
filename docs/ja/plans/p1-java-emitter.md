@@ -39,7 +39,7 @@ Java が通れば Kotlin（JVM ベース）への展開も近くなる。
 
 ### parity check
 
-- `pytra-cli2 -build --target java` の対応が必要（インフラ担当に依頼）
+- `pytra-cli -build --target java` の対応が必要（インフラ担当に依頼）
 - `runtime_parity_check_fast.py --targets java` で検証
 - fixture + sample + stdlib の3段階
 

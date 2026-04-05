@@ -125,7 +125,7 @@ if i < 0 or i >= len(a):
 ## サブタスク
 
 1. [x] [ID: P0-SUB-BOUNDS-S1] `meta.subscript_access_v1` スキーマを spec-east.md に定義する
-2. [ ] [ID: P0-SUB-BOUNDS-S1.5] `--east3-opt-level` を `--opt-level` に改名する（pytra-cli2.py, runtime_parity_check_fast.py, optimizer, spec, tutorial 全箇所）
+2. [ ] [ID: P0-SUB-BOUNDS-S1.5] `--east3-opt-level` を `--opt-level` に改名する（pytra-cli.py, runtime_parity_check_fast.py, optimizer, spec, tutorial 全箇所）
 3. [ ] [ID: P0-SUB-BOUNDS-S2] optimizer に `--opt-level` と `--negative-index-mode` / `--bounds-check-mode` の連動を実装する
    - `--opt-level` がデフォルトの `negative_index_mode` / `bounds_check_mode` を決定する
    - `--negative-index-mode` / `--bounds-check-mode` で個別上書きできる

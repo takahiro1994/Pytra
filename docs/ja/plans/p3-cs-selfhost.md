@@ -13,7 +13,7 @@ P1-CS-EMITTER で C# emitter を実装した後、Pytra の変換器自身（too
 
 ## フロー
 
-1. `pytra-cli2 -build --target cs` で toolchain2 全 `.py` を C# に変換
+1. `pytra-cli -build --target cs` で toolchain2 全 `.py` を C# に変換
 2. `mcs` または `dotnet build` でコンパイルしてバイナリを生成
 3. バイナリで fixture/sample/stdlib を変換し、Python と同じ出力が得られるか検証（P3-SELFHOST-PARITY）
 

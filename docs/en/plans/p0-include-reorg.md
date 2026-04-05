@@ -48,10 +48,10 @@ test/include/east1/py/
 
 ### パス参照の更新
 
-`pytra-cli2.py` の resolve が `test/include/builtin/east1/py/` を参照している箇所を `test/include/east1/py/built_in/` に更新する。
+`pytra-cli.py` の resolve が `test/include/builtin/east1/py/` を参照している箇所を `test/include/east1/py/built_in/` に更新する。
 
 該当箇所:
-- `src/pytra-cli2.py` の `_resolve_one()` 内の builtins_path / containers_path
+- `src/pytra-cli.py` の `_resolve_one()` 内の builtins_path / containers_path
 - `tools/gen/regenerate_golden.py` の include golden 生成パス
 - `src/toolchain2/resolve/py/` の BuiltinRegistry ロード箇所
 
@@ -63,5 +63,5 @@ test/include/east1/py/
 
 1. `test/include/east1/py/built_in/` と `test/include/east1/py/std/` に golden が配置
 2. `test/include/builtin/` と `test/include/stdlib/` が削除済み
-3. `pytra-cli2` の resolve が新パスで動作（fixture 132 + sample 18 parity 維持）
+3. `pytra-cli` の resolve が新パスで動作（fixture 132 + sample 18 parity 維持）
 4. `regenerate_golden.py` が新パスで golden 生成可能

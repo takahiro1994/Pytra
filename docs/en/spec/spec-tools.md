@@ -86,7 +86,7 @@ Its three purposes are:
 
 The old selfhost tool set (`build_selfhost.py`, `prepare_selfhost_source.py`, `check_selfhost_*.py`, etc.) has been deleted (2026-04-02).
 
-In the new pipeline (`toolchain/`), selfhost is designed to complete within the normal build pipeline (`pytra-cli2 -build --target=cpp`), making dedicated tools unnecessary. See `docs/ja/plans/plan-pipeline-redesign.md` for details.
+In the new pipeline (`toolchain/`), selfhost is designed to complete within the normal build pipeline (`pytra-cli -build --target=cpp`), making dedicated tools unnecessary. See `docs/ja/plans/plan-pipeline-redesign.md` for details.
 
 ### 2.1 Selfhost Golden (P0-SELFHOST-GOLDEN-UNIFIED)
 

@@ -20,7 +20,7 @@ Background:
 
 Scope of this task:
 - Add `toolchain2/emit/zig/`
-- Add the Zig path to `pytra-cli2` / `runtime_parity_check_fast.py` / target profile
+- Add the Zig path to `pytra-cli` / `runtime_parity_check_fast.py` / target profile
 - Add `src/runtime/zig/mapping.json`
 - Add `src/toolchain2/emit/profiles/zig.json`
 

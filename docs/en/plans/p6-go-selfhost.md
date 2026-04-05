@@ -13,7 +13,7 @@ Convert Pytra's own transpiler (toolchain2) to Go and verify that the resulting 
 
 ## Flow
 
-1. Convert all toolchain2 `.py` files to Go with `pytra-cli2 -build --target go`
+1. Convert all toolchain2 `.py` files to Go with `pytra-cli -build --target go`
 2. Compile with `go build` to generate a binary
 3. Use the binary to convert fixture/sample/stdlib, and verify that it produces the same output as Python (`run_selfhost_parity.py` from P3-SELFHOST-PARITY)
 

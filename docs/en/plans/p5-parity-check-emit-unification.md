@@ -61,7 +61,7 @@ Some languages have inconsistent emit function names (ruby: `transpile_to_ruby`,
 ## Out of scope
 
 - Changes to `toolchain2/emit/common/cli_runner.py` (already complete)
-- Changes to `pytra-cli2.py` (no changes needed; called via subprocess)
+- Changes to `pytra-cli.py` (no changes needed; called via subprocess)
 - Changes to emitter logic itself
 
 ## Acceptance Criteria

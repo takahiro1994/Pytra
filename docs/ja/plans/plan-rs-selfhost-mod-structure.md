@@ -59,7 +59,7 @@ use crate::toolchain2_emit_go::EmitContext as GoEmitContext;
    - module-level 初期化関数の呼び出しを `main.rs` に集約
 
 3. **`Cargo.toml` 自動生成**
-   - `pytra-cli2.py -build --target rs` が `Cargo.toml` を生成
+   - `pytra-cli.py -build --target rs` が `Cargo.toml` を生成
    - edition, dependencies (標準ライブラリのみ) を設定
 
 ### 他言語への影響
@@ -87,6 +87,6 @@ CommonRenderer / ProgramWriter に「1 module = 1 target-language namespace unit
 1. Rust emitter の multifile_writer に mod 構造出力モードを追加
 2. `lib.rs` / `Cargo.toml` の自動生成を実装
 3. cross-module `use crate::` パスの emit を実装
-4. `pytra-cli2.py -build --target rs` で mod 構造を使うよう切り替え
+4. `pytra-cli.py -build --target rs` で mod 構造を使うよう切り替え
 5. selfhost build (`cargo build`) が通ることを確認
 6. `run_selfhost_parity.py --selfhost-lang rs` で parity 確認

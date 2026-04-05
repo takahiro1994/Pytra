@@ -28,7 +28,7 @@ python3 tools/gen/regenerate_selfhost_golden.py --target cpp,go
 ```
 
 処理:
-1. toolchain2 全 `.py` を指定言語に emit（`pytra-cli2 -build --target <lang>`）
+1. toolchain2 全 `.py` を指定言語に emit（`pytra-cli -build --target <lang>`）
 2. emit 結果を `test/selfhost/<lang>/` に配置
 3. 既存の golden がある場合は diff を報告
 

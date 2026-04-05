@@ -41,7 +41,7 @@ Prerequisite: P0-RS-TYPEID-CLN completed (type_id table no longer needed)
 2. [x] [ID: P5-RS-CLI-S2] Remove `_generate_type_id_table_rs` and `_manifest_type_id_table`.
    - Completed: Removed Rust-specific type-id table generation from [cli.py](../../src/toolchain2/emit/rs/cli.py).
 3. [x] [ID: P5-RS-CLI-S3] Move runtime copy and package mode to `post_emit` and delegate to the common runner.
-   - Completed: Migrated Rust `cli.py` to `run_emit_cli(...)`-based approach; moved runtime copy and `--package` `Cargo.toml` / `src/lib.rs` / `src/main.rs` generation to the `post_emit` side. Confirmed emit success with both `pytra-cli2 -build ... --target rs` and `--rs-package`.
+   - Completed: Migrated Rust `cli.py` to `run_emit_cli(...)`-based approach; moved runtime copy and `--package` `Cargo.toml` / `src/lib.rs` / `src/main.rs` generation to the `post_emit` side. Confirmed emit success with both `pytra-cli -build ... --target rs` and `--rs-package`.
 4. [x] [ID: P5-RS-CLI-S4] Confirm no regressions in Rust parity.
    - Completed: Broad parity confirmed in `P0-RS-TYPEID-CLN-S3` as `stdlib 16/16 PASS`, `sample 18/18 PASS`, `fixture 145/145 PASS`. After CLI unification, `runtime_parity_check_fast --case-root fixture --targets rs top_level union_basic optional_none` passed `3/3 PASS` with no spot-check regressions.
 

@@ -54,7 +54,7 @@ JSON 形式:
 
 ### 2. selfhost 結果
 
-selfhost は parity check とは別の導線（`pytra-cli2 -build`、`g++`、`go build`、`cargo build`、`tsc`）で実行される。結果は `.parity-results/selfhost_<lang>.json` に記録する。
+selfhost は parity check とは別の導線（`pytra-cli -build`、`g++`、`go build`、`cargo build`、`tsc`）で実行される。結果は `.parity-results/selfhost_<lang>.json` に記録する。
 
 JSON 形式:
 

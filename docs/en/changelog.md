@@ -8,7 +8,7 @@
 
 - **Lint: Python method name hardcode detection**: Added 23 patterns ("append", "extend", "pop", "clear" etc.) to runtime_symbol category.
 - **Parity check: all-skip now FAIL**: Cases where all targets skip (missing toolchain) now report FAIL, not false PASS. Fixes Kotlin/Scala/PowerShell.
-- **pytra-cli2.py default output → work/tmp/**: No more stray .east files in source directories when -o is omitted.
+- **pytra-cli.py default output → work/tmp/**: No more stray .east files in source directories when -o is omitted.
 - **Removed auto-lint from parity check**: Lint runs manually or via run_local_ci only.
 - **Lint always 10 categories**: --include-runtime default ON, replaced with --skip-runtime. Cache mechanism removed.
 - **callable_optional_none fixture**: Tests callable|None is-None guard + invoke. C++/Rust optional callable unwrap fixed.
@@ -23,7 +23,7 @@
 
 ## 2026-04-03
 
-- **Unified emitter call structure**: New common runner `cli_runner.py`. 17 languages migrated (Rust only exception). `pytra-cli2.py` calls cli.py via subprocess, no direct emitter imports.
+- **Unified emitter call structure**: New common runner `cli_runner.py`. 17 languages migrated (Rust only exception). `pytra-cli.py` calls cli.py via subprocess, no direct emitter imports.
 - **Parity check emit unification**: Replaced 18-language if/elif chain with importlib dynamic import + common loop.
 - **`resolved_type: "object"` banned globally**: EAST3 validator fail-fast. Trait `cls: object` → `@template T`, dict.get() type inference bug fixed.
 - **IsInstance PYTRA_TID_* removed**: Migrated to `expected_type_name`. C++ reverse lookup table deleted.
@@ -82,7 +82,7 @@
 - **Rust fixture 132/132 + sample 18/18 PASS**: New emitter implementation, mapping.json, stdlib argparse parity PASS.
 - **Rust selfhost mod structure plan**: Designed migration from flat include! to Rust mod + use structure.
 - **Linker receiver_storage_hint**: Peer module class info attached to Attribute/Call nodes.
-- **pytra-cli2.py C++/Rust emit subprocess delegation**: Selfhost no longer pulls in other language emitters.
+- **pytra-cli.py C++/Rust emit subprocess delegation**: Selfhost no longer pulls in other language emitters.
 - **Parity changelog auto-recording**: PASS count changes auto-appended to progress-preview/changelog.md. Emitter lint changes also recorded.
 - **Emitter lint skip_pure_python category**: Detects pure Python modules in skip_modules. Added cli.py to exclusion list.
 - **New fixtures**: tuple_unpack_variants, typed_container_access, in_membership_iterable, callable_higher_order, object_container_access.
@@ -163,7 +163,7 @@
 
 ## 2026-03-26
 
-- **Pipeline redesign completed**: All 6 stages of the pipeline (`parse → resolve → compile → optimize → link → emit`) via `pytra-cli2` are fully operational. toolchain2 is a completely independent implementation with no dependency on toolchain.
+- **Pipeline redesign completed**: All 6 stages of the pipeline (`parse → resolve → compile → optimize → link → emit`) via `pytra-cli` are fully operational. toolchain2 is a completely independent implementation with no dependency on toolchain.
 - **Go backend migrated to new pipeline**: Go emitter + runtime implemented on the new pipeline. 18/18 samples emit success. Legacy Go emitter/runtime removed.
 - **C++ emitter new implementation**: New pipeline C++ emitter implemented in `toolchain2/emit/cpp/`. fixture 132/132, sample 18/18 emit success.
 - **CodeEmitter base class**: runtime_call mapping via `mapping.json` shared across all emitters. Hardcoding removed.
@@ -187,7 +187,7 @@
 
 - **Pipeline redesign started**: Designed 5-stage pipeline (parse/resolve/compile/optimize/emit), later expanded to 6 stages with link.
 - **toolchain2/ created**: New pipeline implementation independent of existing toolchain/. Selfhost-ready (no Any/object, pytra.std only).
-- **pytra-cli2**: New CLI with -parse/-resolve/-compile/-optimize/-link/-emit/-build subcommands.
+- **pytra-cli**: New CLI with -parse/-resolve/-compile/-optimize/-link/-emit/-build subcommands.
 - **EAST1 golden files**: Golden files stripped (type info removed) conforming to spec-east1. 150 files.
 - **Built-in function declarations**: `src/include/py/pytra/built_in/builtins.py` + `containers.py`. v2 extern (extern_fn/extern_var/extern_class/extern_method).
 - **stdlib declarations**: v2 extern declarations for math/time/glob/os/sys etc. in `src/include/py/pytra/std/`.

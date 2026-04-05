@@ -31,7 +31,7 @@ Bring `P1-EMIT-CPP-S2` and `P1-EMIT-CPP-S3` through to guide-compliant runtime a
 - `src/toolchain2/emit/cpp/`
 - `src/runtime/cpp/`
 - `src/pytra-cli.py`
-- `src/pytra-cli2.py`
+- `src/pytra-cli.py`
 - Tests / tooling required for C++ parity
 
 ## Out of scope
@@ -43,7 +43,7 @@ Bring `P1-EMIT-CPP-S2` and `P1-EMIT-CPP-S3` through to guide-compliant runtime a
 ## Acceptance Criteria
 
 - `src/runtime/cpp/` aligns with toolchain2 C++ emitter output and does not bring in old `toolchain` header/type assumptions
-- C++ build path in `pytra-cli.py` / `pytra-cli2.py` works on a toolchain2 basis
+- C++ build path in `pytra-cli.py` / `pytra-cli.py` works on a toolchain2 basis
 - All 18 samples satisfy `emit + g++ compile + run + stdout match`
 
 ## Verification commands
@@ -56,7 +56,7 @@ Bring `P1-EMIT-CPP-S2` and `P1-EMIT-CPP-S3` through to guide-compliant runtime a
 
 - [x] [ID: P1-EMIT-CPP-S2-01] Place runtime symbol resolution and include/path resolution in `mapping.json` / metadata-based approach; clean up module ID hardcoding and old include fallbacks.
 - [x] [ID: P1-EMIT-CPP-S2-02] Align runtime bundle header/source generation with the toolchain2 C++ type system; remove dependency on the old `toolchain.emit.cpp.emitter.header_builder`.
-- [x] [ID: P1-EMIT-CPP-S2-03] Correctly integrate runtime bundle and native companion in the C++ build path of `pytra-cli.py` / `pytra-cli2.py`; get representative fixture compile passing.
+- [x] [ID: P1-EMIT-CPP-S2-03] Correctly integrate runtime bundle and native companion in the C++ build path of `pytra-cli.py` / `pytra-cli.py`; get representative fixture compile passing.
 - [x] [ID: P1-EMIT-CPP-S3-01] Get `emit + g++ compile` passing for all 18 samples.
 - [x] [ID: P1-EMIT-CPP-S3-02] Confirm `run + stdout match` for all 18 samples; get `runtime_parity_check.py --targets cpp` passing.
 

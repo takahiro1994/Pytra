@@ -31,8 +31,8 @@ class RunSelfhostParityBuildTest(unittest.TestCase):
             emit_dir = root / "work" / "selfhost" / "build" / "cpp" / "emit"
             emit_dir.mkdir(parents=True, exist_ok=True)
             (emit_dir / "entry.cpp").write_text("int main() { return 0; }\n", encoding="utf-8")
-            (root / "src" / "pytra-cli2.py").parent.mkdir(parents=True, exist_ok=True)
-            (root / "src" / "pytra-cli2.py").write_text("", encoding="utf-8")
+            (root / "src" / "pytra-cli.py").parent.mkdir(parents=True, exist_ok=True)
+            (root / "src" / "pytra-cli.py").write_text("", encoding="utf-8")
 
             calls: list[list[str]] = []
 
@@ -52,9 +52,9 @@ class RunSelfhostParityBuildTest(unittest.TestCase):
             self.assertEqual(bin_path, root / "work" / "selfhost" / "bin" / "cpp")
             self.assertEqual(len(calls), 2)
             self.assertEqual(calls[0][0], sys.executable)
-            self.assertEqual(calls[0][1], str(root / "src" / "pytra-cli2.py"))
+            self.assertEqual(calls[0][1], str(root / "src" / "pytra-cli.py"))
             self.assertEqual(calls[0][2], "-build")
-            self.assertEqual(calls[0][3], str(root / "src" / "pytra-cli2.py"))
+            self.assertEqual(calls[0][3], str(root / "src" / "pytra-cli.py"))
             compile_cmd = calls[1]
             self.assertEqual(compile_cmd[0:3], ["g++", "-O2", "-std=c++20"])
             self.assertIn(str(emit_dir), compile_cmd)
@@ -72,8 +72,8 @@ class RunSelfhostParityBuildTest(unittest.TestCase):
             (emit_dir / "target" / "release").mkdir(parents=True, exist_ok=True)
             (emit_dir / "Cargo.toml").write_text("[package]\nname='pytra_selfhost'\nversion='0.1.0'\n", encoding="utf-8")
             (emit_dir / "target" / "release" / "pytra_selfhost").write_text("", encoding="utf-8")
-            (root / "src" / "pytra-cli2.py").parent.mkdir(parents=True, exist_ok=True)
-            (root / "src" / "pytra-cli2.py").write_text("", encoding="utf-8")
+            (root / "src" / "pytra-cli.py").parent.mkdir(parents=True, exist_ok=True)
+            (root / "src" / "pytra-cli.py").write_text("", encoding="utf-8")
 
             calls: list[list[str]] = []
 
@@ -96,7 +96,7 @@ class RunSelfhostParityBuildTest(unittest.TestCase):
             self.assertEqual(err, "")
             self.assertEqual(bin_path, root / "work" / "selfhost" / "bin" / "rs")
             self.assertEqual(len(calls), 2)
-            self.assertEqual(calls[0][0:5], [sys.executable, str(root / "src" / "pytra-cli2.py"), "-build", str(root / "src" / "pytra-cli2.py"), "--target"])
+            self.assertEqual(calls[0][0:5], [sys.executable, str(root / "src" / "pytra-cli.py"), "-build", str(root / "src" / "pytra-cli.py"), "--target"])
             self.assertIn("--rs-package", calls[0])
             self.assertEqual(calls[1], ["cargo", "build", "--release"])
 

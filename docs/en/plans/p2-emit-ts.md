@@ -68,8 +68,8 @@ function escape_count(cx: number, cy: number, max_iter: number): number {
 TS emitter を正本とし、JS 出力は **型注釈を抑制したモード** として実装する。
 
 ```
-pytra-cli2 -emit --target=ts  → 型注釈あり (.ts)
-pytra-cli2 -emit --target=js  → 型注釈なし (.js)  ← 同じ emitter、型注釈を除去するだけ
+pytra-cli -emit --target=ts  → 型注釈あり (.ts)
+pytra-cli -emit --target=js  → 型注釈なし (.js)  ← 同じ emitter、型注釈を除去するだけ
 ```
 
 - emitter は 1 つ（`toolchain2/emit/ts/`）

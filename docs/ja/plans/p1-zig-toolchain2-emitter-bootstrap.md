@@ -20,7 +20,7 @@
 
 今回のスコープ:
 - `toolchain2/emit/zig/` の追加
-- `pytra-cli2` / `runtime_parity_check_fast.py` / target profile への Zig 経路追加
+- `pytra-cli` / `runtime_parity_check_fast.py` / target profile への Zig 経路追加
 - `src/runtime/zig/mapping.json` の追加
 - `src/toolchain2/emit/profiles/zig.json` の追加
 

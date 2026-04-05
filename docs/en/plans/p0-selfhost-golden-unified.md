@@ -28,7 +28,7 @@ python3 tools/gen/regenerate_selfhost_golden.py --target cpp,go
 ```
 
 Steps:
-1. Emit all toolchain2 `.py` files to the specified language (`pytra-cli2 -build --target <lang>`)
+1. Emit all toolchain2 `.py` files to the specified language (`pytra-cli -build --target <lang>`)
 2. Place emit results under `test/selfhost/<lang>/`
 3. If existing golden files are present, report the diff
 
