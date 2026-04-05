@@ -101,8 +101,11 @@ function __pytra_str {
         return "{" + ($parts2 -join ", ") + "}"
     }
     if ($value -is [double] -or $value -is [float]) {
-        $sv = [string]$value
-        if ($sv -notmatch '\.' -and $sv -notmatch 'E' -and $sv -notmatch 'e' -and $sv -ne "NaN" -and $sv -ne "Infinity" -and $sv -ne "-Infinity") { $sv = $sv + ".0" }
+        if ([double]::IsNaN($value)) { return "nan" }
+        if ([double]::IsPositiveInfinity($value)) { return "inf" }
+        if ([double]::IsNegativeInfinity($value)) { return "-inf" }
+        $sv = $value.ToString("R").ToLower()
+        if ($sv -notmatch '\.' -and $sv -notmatch 'e') { $sv = $sv + ".0" }
         return $sv
     }
     return [string]$value
@@ -111,10 +114,14 @@ function __pytra_str {
 function __pytra_int {
     param([object]$value)
     if ($value -eq $null) { return 0 }
+    if ($value -is [bool]) { return $(if ($value) { 1 } else { 0 }) }
+    if ($value -is [double] -or $value -is [float] -or $value -is [decimal]) {
+        # Python int() truncates toward zero (like C cast), not rounds
+        return [long][Math]::Truncate([double]$value)
+    }
     try {
-        return [int]$value
+        return [long]$value
     } catch {
-        if ($value -is [bool]) { return $(if ($value) { 1 } else { 0 }) }
         return 0
     }
 }
@@ -133,11 +140,13 @@ function __pytra_bytearray {
     if ($count -lt 0) {
         throw "[PowerShell backend experimental] negative bytearray size"
     }
-    $result = [System.Collections.Generic.List[object]]::new()
-    for ($i = 0; $i -lt $count; $i++) {
-        [void]$result.Add(0)
+    if ($count -eq 0) {
+        # Empty bytearray: return List for .Add() / .AddRange() support
+        return ,([System.Collections.Generic.List[object]]::new())
     }
-    return ,$result
+    # Non-empty fixed-size bytearray: use int[] for 8x faster allocation and indexed writes
+    # (vs List.Add(0) × n which is 75ms/57K elements in PS1)
+    return ,([int[]]::new($count))
 }
 
 function __pytra_bytes {
@@ -149,10 +158,19 @@ function __pytra_bytes {
         }
         return [int[]]$result
     }
+    if ($value -is [System.Array]) {
+        # Already a PS1 native array (e.g. bytes passed to bytes()), return as-is.
+        return $value
+    }
+    if ($value -is [System.Collections.Generic.List[object]]) {
+        # Fast path for bytearray: elements are already integers from __pytra_bytearray.
+        # ToArray() avoids per-element __pytra_int function calls (major speedup for GIF frames).
+        return $value.ToArray()
+    }
     if ($value -is [System.Collections.ICollection]) {
-        $result = New-Object System.Collections.Generic.List[object]
+        $result = [System.Collections.Generic.List[object]]::new()
         foreach ($item in $value) {
-            [void]$result.Add((__pytra_int $item))
+            [void]($result.Add((__pytra_int $item)))
         }
         return $result.ToArray()
     }
@@ -198,6 +216,16 @@ function __pytra_list {
         return ,$result
     }
     return @()
+}
+
+function __pytra_mklist {
+    # Construct a List[object] from individual arguments, preserving arrays as elements.
+    # Unlike [List]@(elem1, elem2), this avoids PS1's @() flattening of inner arrays.
+    $result = [System.Collections.Generic.List[object]]::new()
+    foreach ($elem in $args) {
+        [void]($result.Add($elem))
+    }
+    return ,$result
 }
 
 function __pytra_set_key {
@@ -318,7 +346,7 @@ function glob {
     return @($items | ForEach-Object { $_.FullName })
 }
 
-function open {
+function __pytra_open {
     param($path, $mode = "r", $encoding = "utf-8")
     # Return a .NET stream object directly so that .write()/.read()/.close()
     # work as native .NET method calls (no hashtable wrapper needed).
@@ -344,8 +372,13 @@ function open {
 function __pytra_file_write {
     param([object]$stream, [object]$data)
     if ($stream -eq $null) { return 0 }
+    if ($data -is [byte[]]) {
+        $stream.Write($data, 0, $data.Length)
+        return $data.Length
+    }
     if ($data -is [array] -or $data -is [System.Collections.IList]) {
-        $bytes = [byte[]]@($data | ForEach-Object { [byte]$_ })
+        # Use direct [byte[]] cast — ~10x faster than ForEach-Object pipeline
+        $bytes = [byte[]]$data
         $stream.Write($bytes, 0, $bytes.Length)
         return $bytes.Length
     }
@@ -516,6 +549,21 @@ function __pytra_sum {
     return $acc
 }
 
+function __pytra_max {
+    param([object]$a, [object]$b)
+    if ($a -ge $b) { return $a } else { return $b }
+}
+
+function __pytra_min {
+    param([object]$a, [object]$b)
+    if ($a -le $b) { return $a } else { return $b }
+}
+
+function __pytra_abs {
+    param([object]$a)
+    if ($a -lt 0) { return -$a } else { return $a }
+}
+
 function __pytra_list_remove {
     param([object]$list, [object]$value)
     $idx = [array]::IndexOf($list, $value)
@@ -545,17 +593,9 @@ function __pytra_getattr {
     return $null
 }
 
-function __pytra_isinstance {
+function __pytra_type_check {
     param([object]$obj, [string]$type_name)
     if ($obj -eq $null) { return $false }
-    # Normalize PYTRA_TID_* names to primitive names
-    if ($type_name -eq "PYTRA_TID_BOOL") { $type_name = "bool" }
-    elseif ($type_name -eq "PYTRA_TID_INT") { $type_name = "int" }
-    elseif ($type_name -eq "PYTRA_TID_FLOAT") { $type_name = "float" }
-    elseif ($type_name -eq "PYTRA_TID_STR") { $type_name = "str" }
-    elseif ($type_name -eq "PYTRA_TID_LIST") { $type_name = "list" }
-    elseif ($type_name -eq "PYTRA_TID_DICT") { $type_name = "dict" }
-    elseif ($type_name -eq "PYTRA_TID_NONE") { return ($obj -eq $null) }
     # Primitive type checks
     if ($type_name -eq "int" -or $type_name -eq "int64") { return ($obj -is [int] -or $obj -is [long]) }
     if ($type_name -eq "float" -or $type_name -eq "float64") { return ($obj -is [double] -or $obj -is [float]) }
@@ -785,6 +825,7 @@ function __pytra_str_isdigit {
     param([object]$s)
     $str = [string]$s
     if ($str.Length -eq 0) { return $false }
+    if ($str.Length -eq 1) { return [char]::IsDigit($str[0]) }
     foreach ($c in $str.ToCharArray()) { if (-not [char]::IsDigit($c)) { return $false } }
     return $true
 }
@@ -793,8 +834,55 @@ function __pytra_str_isalnum {
     param([object]$s)
     $str = [string]$s
     if ($str.Length -eq 0) { return $false }
+    if ($str.Length -eq 1) { return [char]::IsLetterOrDigit($str[0]) }
     foreach ($c in $str.ToCharArray()) { if (-not [char]::IsLetterOrDigit($c)) { return $false } }
     return $true
+}
+
+function __pytra_str_isalpha {
+    param([object]$s)
+    $str = [string]$s
+    if ($str.Length -eq 0) { return $false }
+    if ($str.Length -eq 1) { return [char]::IsLetter($str[0]) }
+    foreach ($c in $str.ToCharArray()) { if (-not [char]::IsLetter($c)) { return $false } }
+    return $true
+}
+
+function __pytra_str_isspace {
+    param([object]$s)
+    $str = [string]$s
+    if ($str.Length -eq 0) { return $false }
+    if ($str.Length -eq 1) { return [char]::IsWhiteSpace($str[0]) }
+    foreach ($c in $str.ToCharArray()) { if (-not [char]::IsWhiteSpace($c)) { return $false } }
+    return $true
+}
+
+function __pytra_str_isupper {
+    param([object]$s)
+    $str = [string]$s
+    if ($str.Length -eq 0) { return $false }
+    $hasLetter = $false
+    foreach ($c in $str.ToCharArray()) {
+        if ([char]::IsLetter($c)) {
+            $hasLetter = $true
+            if ([char]::IsLower($c)) { return $false }
+        }
+    }
+    return $hasLetter
+}
+
+function __pytra_str_islower {
+    param([object]$s)
+    $str = [string]$s
+    if ($str.Length -eq 0) { return $false }
+    $hasLetter = $false
+    foreach ($c in $str.ToCharArray()) {
+        if ([char]::IsLetter($c)) {
+            $hasLetter = $true
+            if ([char]::IsUpper($c)) { return $false }
+        }
+    }
+    return $hasLetter
 }
 
 function __pytra_int_from_str {
