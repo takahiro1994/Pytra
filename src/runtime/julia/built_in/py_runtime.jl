@@ -228,6 +228,10 @@ function __pytra_int(v)
     return Int(floor(v))
 end
 
+function __pytra_float_from_str(v)
+    return parse(Float64, strip(string(v)))
+end
+
 function __pytra_idx(index::Integer, len::Integer)
     if index < 0
         return len + index + 1
@@ -353,6 +357,8 @@ function __pytra_deque(v=nothing)
     end
     return Any[v]
 end
+
+deque(v=nothing) = __pytra_deque(v)
 
 function __pytra_str_find(s, sub)
     r = findfirst(sub, s)
