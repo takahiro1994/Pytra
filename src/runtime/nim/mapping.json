@@ -47,12 +47,7 @@
     "list.extend": "py_extend",
     "list.reverse": "py_reverse",
     "list.sort": "py_sort",
-    "list_ctor": "py_list",
-    "py_chr": "py_chr",
-    "py_float_from_str": "py_float",
-    "py_ord": "py_ord",
-    "set.clear": "py_clear",
-    "str.rfind": "py_rfind"
+    "set.clear": "py_clear"
   },
   "types": {
     "int8": "int8",
