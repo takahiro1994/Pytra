@@ -75,14 +75,15 @@
     "pytra.std.math.fabs": "fabs",
     "pytra.std.math.pi": "pi",
     "pytra.std.math.e": "e",
-    "list_ctor": "pytralist",
+    "list_ctor": "__LIST_CTOR__",
     "py_chr": "__CHR__",
     "py_float_from_str": "pytraFloat",
     "py_int_from_str": "pytraInt",
     "py_max": "pytramax",
     "py_min": "pytramin",
     "py_ord": "__ORD__",
-    "set_ctor": "pytraset"
+    "set_ctor": "__SET_CTOR__",
+    "tuple_ctor": "__TUPLE_CTOR__"
   },
   "types": {
     "int": "int",

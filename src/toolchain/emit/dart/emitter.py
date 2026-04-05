@@ -666,11 +666,42 @@ class DartNativeEmitter:
             if len(rendered_args) == 0:
                 return "[]"
             return "(List.from(" + rendered_args[0] + ")..sort())"
+        if mapped == "__LIST_CTOR__":
+            if len(rendered_args) == 0:
+                return "[]"
+            return "List<dynamic>.from(" + rendered_args[0] + ")"
+        if mapped == "__SET_CTOR__":
+            if len(rendered_args) == 0:
+                return "pytraNewSet()"
+            return "pytraSetFrom(" + rendered_args[0] + ")"
+        if mapped == "__TUPLE_CTOR__":
+            if len(rendered_args) == 0:
+                return "[]"
+            return "List<dynamic>.from(" + rendered_args[0] + ")"
         if mapped.startswith("__NUM_METHOD__:"):
             method_name = mapped[len("__NUM_METHOD__:"):]
             if len(rendered_args) == 0:
                 return "0"
             return "(" + rendered_args[0] + " as num)." + method_name + "()"
+        return ""
+
+    def _expand_core_ctor(self, semantic_tag: str, rendered_args: list[str]) -> str:
+        if semantic_tag == "core.float_ctor":
+            if len(rendered_args) == 0:
+                return "0.0"
+            return "pytraFloat(" + rendered_args[0] + ")"
+        if semantic_tag == "core.dict_ctor":
+            if len(rendered_args) == 0:
+                return "{}"
+            return "Map<dynamic, dynamic>.from(" + rendered_args[0] + ")"
+        if semantic_tag == "core.bytearray_ctor":
+            if len(rendered_args) == 0:
+                return "<int>[]"
+            return "pytraBytearray(" + rendered_args[0] + ")"
+        if semantic_tag == "core.bytes_ctor":
+            if len(rendered_args) == 0:
+                return "<int>[]"
+            return "pytraBytes(" + rendered_args[0] + ")"
         return ""
 
     def _expand_static_cast(self, semantic_tag: str, rendered_args: list[str], args: list[Any]) -> str:
@@ -782,7 +813,7 @@ class DartNativeEmitter:
             return "pytraStrCount(" + owner + ", " + rendered_args[0] + ")"
         if mapped == "__STR_INDEX__" and len(rendered_args) >= 1:
             return "pytraStrIndex(" + owner + ", " + rendered_args[0] + ")"
-        if mapped != "":
+        if mapped.startswith("__"):
             return mapped + "(" + ", ".join(all_args) + ")"
         return ""
 
@@ -2780,6 +2811,9 @@ class DartNativeEmitter:
         if isinstance(func_any, dict) and func_any.get("kind") == "Name":
             raw_fn_name = func_any.get("id") if isinstance(func_any.get("id"), str) else ""
             fn_name = _safe_ident(raw_fn_name, "fn")
+            ctor_expr = self._expand_core_ctor(semantic_tag, rendered_args)
+            if ctor_expr != "":
+                return ctor_expr
             cast_expr = self._expand_static_cast(semantic_tag, rendered_args, args)
             if runtime_call == "static_cast" and cast_expr != "":
                 return cast_expr
@@ -2789,75 +2823,8 @@ class DartNativeEmitter:
             mapped_expr = self._expand_mapped_call(mapped_name, rendered_args)
             if mapped_expr != "":
                 return mapped_expr
-            if raw_fn_name == "cast":
-                # cast(Type, value) → (value as Type)
-                if len(rendered_args) >= 2:
-                    # First arg is the type — get the raw type name from the EAST node
-                    type_arg = args[0] if len(args) > 0 else None
-                    type_name = ""
-                    if isinstance(type_arg, dict) and type_arg.get("kind") == "Name":
-                        type_name = type_arg.get("id", "")
-                    dart_type = self._dart_type(type_name) if type_name != "" else "dynamic"
-                    if dart_type == "dynamic":
-                        return rendered_args[1]
-                    return "(" + rendered_args[1] + " as " + dart_type + ")"
-                if len(rendered_args) == 1:
-                    return rendered_args[0]
-                return "null"
-            if raw_fn_name == "float":
-                if len(rendered_args) == 0:
-                    return "0.0"
-                return "pytraFloat(" + rendered_args[0] + ")"
-            if raw_fn_name == "max":
-                self._needs_math_import = True
-                if len(rendered_args) == 0:
-                    return "0"
-                if len(rendered_args) == 2:
-                    return "((" + rendered_args[0] + ") > (" + rendered_args[1] + ") ? (" + rendered_args[0] + ") : (" + rendered_args[1] + "))"
-                return "[" + ", ".join(rendered_args) + "].reduce((a, b) => a > b ? a : b)"
-            if raw_fn_name == "min":
-                self._needs_math_import = True
-                if len(rendered_args) == 0:
-                    return "0"
-                if len(rendered_args) == 2:
-                    return "((" + rendered_args[0] + ") < (" + rendered_args[1] + ") ? (" + rendered_args[0] + ") : (" + rendered_args[1] + "))"
-                return "[" + ", ".join(rendered_args) + "].reduce((a, b) => a < b ? a : b)"
-            if raw_fn_name == "abs":
-                if len(rendered_args) == 0:
-                    return "0"
-                return "(" + rendered_args[0] + ").abs()"
-            if raw_fn_name == "enumerate":
-                if len(rendered_args) == 0:
-                    return "[]"
-                return "(" + rendered_args[0] + ").asMap().entries.map((e) => [e.key, e.value]).toList()"
-            if raw_fn_name == "reversed":
-                if len(rendered_args) == 0:
-                    return "[]"
-                return "(" + rendered_args[0] + ").reversed.toList()"
-            if raw_fn_name == "set" or raw_fn_name == "set_":
-                if len(rendered_args) == 0:
-                    return "pytraNewSet()"
-                return "pytraSetFrom(" + rendered_args[0] + ")"
-            if raw_fn_name == "list":
-                if len(rendered_args) == 0:
-                    return "[]"
-                return "List<dynamic>.from(" + rendered_args[0] + ")"
-            if raw_fn_name == "dict":
-                if len(rendered_args) == 0:
-                    return "{}"
-                return "Map<dynamic, dynamic>.from(" + rendered_args[0] + ")"
-            if raw_fn_name == "tuple":
-                if len(rendered_args) == 0:
-                    return "[]"
-                return "List<dynamic>.from(" + rendered_args[0] + ")"
-            if raw_fn_name == "bytearray":
-                if len(rendered_args) == 0:
-                    return "<int>[]"
-                return "pytraBytearray(" + rendered_args[0] + ")"
-            if raw_fn_name == "bytes":
-                if len(rendered_args) == 0:
-                    return "<int>[]"
-                return "pytraBytes(" + rendered_args[0] + ")"
+            if mapped_name != "":
+                return mapped_name + "(" + ", ".join(rendered_args) + ")"
             if fn_name in self.class_names:
                 return fn_name + "(" + ", ".join(rendered_args + kw_values_in_order) + ")"
             # Use alias if calling a top-level function that conflicts with a class method name

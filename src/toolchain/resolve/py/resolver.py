@@ -2365,11 +2365,27 @@ def _resolve_simple_call(expr: dict[str, JsonVal], func: dict[str, JsonVal], ctx
     if name == "bytearray":
         expr["resolved_type"] = "bytearray"
         func["resolved_type"] = "type"
+        expr["lowered_kind"] = "BuiltinCall"
+        expr["semantic_tag"] = "core.bytearray_ctor"
         return "bytearray"
     if name == "bytes":
         expr["resolved_type"] = "bytes"
         func["resolved_type"] = "type"
+        expr["lowered_kind"] = "BuiltinCall"
+        expr["semantic_tag"] = "core.bytes_ctor"
         return "bytes"
+    if name == "dict":
+        arg_types = _collect_call_arg_types(expr)
+        ret = "dict[unknown, unknown]"
+        if len(arg_types) >= 1:
+            src_type: str = _ctx_normalize_type(arg_types[0], ctx)
+            if src_type.startswith("dict[") and src_type.endswith("]"):
+                ret = src_type
+        expr["resolved_type"] = ret
+        func["resolved_type"] = "type"
+        expr["lowered_kind"] = "BuiltinCall"
+        expr["semantic_tag"] = "core.dict_ctor"
+        return ret
     if name == "list":
         arg_types = _collect_call_arg_types(expr)
         ret = "list[unknown]"
@@ -2541,6 +2557,8 @@ def _resolve_builtin_call(
         expr["runtime_call_adapter_kind"] = adapter
         if extern.tag != "":
             expr["semantic_tag"] = extern.tag
+        if name == "float" and len(arg_types) == 0:
+            expr["semantic_tag"] = "core.float_ctor"
         # Track implicit builtin module
         ctx.used_builtin_modules.add(extern.module)
     elif specialized_rc != "":
