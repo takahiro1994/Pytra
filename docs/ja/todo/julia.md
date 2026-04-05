@@ -53,7 +53,8 @@
 
 1. [x] [ID: P2-JULIA-LINT-S1] `check_emitter_hardcode_lint.py --lang julia` で全カテゴリ 0 件になることを確認する
    - 2026-04-02: `python3 tools/check/check_emitter_hardcode_lint.py --lang julia` で全カテゴリ 0 件を確認
-2. [ ] [ID: P2-JULIA-LINT-S2] `src/toolchain2/emit/julia/subset.py` の emitter guide 違反 hardcode を mapping / EAST3 metadata 正本へ移す
+2. [x] [ID: P2-JULIA-LINT-S2] `src/toolchain2/emit/julia/subset.py` の emitter guide 違反 hardcode を mapping / EAST3 metadata 正本へ移す
    - 2026-04-04: `subset.py` に attr-call method whitelist、owner type 名分岐、exception/class contract の文字列判定など guide 違反の hardcode が残っていることを再確認
    - 2026-04-04: `write_rgb_png` などの attr symbol 直書きは support checker から除去し、`resolved_runtime_call` / `runtime_call` metadata ベースで受理する方針に修正開始
-   - 完了条件: `subset.py` に残る runtime/module/type 名 hardcode を `mapping.json` / `runtime_call_adapter_kind` / EAST3 metadata へ移し、`runtime_parity_check_fast.py --case-root fixture --targets julia` を PASS させたうえで guide 違反が説明可能な範囲まで減っていること
+   - 完了メモ: legacy bridge を `toolchain_` 依存から外したうえで、`subset.py` の attr-call 判定を `resolved_runtime_call` / `runtime_call` / `runtime_symbol + runtime_module_id` 優先に寄せ、module attr call fallback と `MultiAssign` unpack を追加した。`bytearray.append` は現行 EAST3 に metadata 欠落があるため owner `resolved_type` から canonical runtime key を補う fail-closed fallback を残した。
+   - 完了メモ: `runtime_parity_check_fast.py --case-root fixture --targets julia` は PASS。`check_emitter_hardcode_lint.py --lang julia` の残差は `rt:call_coverage` に載る `mapping.json` dead entry 由来で、`subset.py` 本体の guide 違反 hardcode ではない。mapping cleanup は別途整理対象。
