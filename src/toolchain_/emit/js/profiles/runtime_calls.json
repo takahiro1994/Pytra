@@ -1,9 +1,0 @@
-{
-  "runtime_calls": {
-    "name_call": {
-      "print": "console.log",
-      "len": "length"
-    },
-    "module_attr_call": {}
-  }
-}
