@@ -1,1 +1,1 @@
-"""PHP backend package."""
+"""PHP emitter for toolchain."""

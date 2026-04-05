@@ -45,16 +45,16 @@ target = sys.argv[2]
 east3_path = sys.argv[3]
 doc = json.loads(open(east3_path, encoding='utf-8').read())
 if target == 'go':
-    from toolchain2.emit.go.emitter import emit_go_module
+    from toolchain.emit.go.emitter import emit_go_module
     print(emit_go_module(doc), end='')
 elif target == 'rs':
-    from toolchain2.emit.rs.emitter import emit_rs_module
+    from toolchain.emit.rs.emitter import emit_rs_module
     print(emit_rs_module(doc), end='')
 elif target == 'ts':
-    from toolchain2.emit.ts.emitter import emit_ts_module
+    from toolchain.emit.ts.emitter import emit_ts_module
     print(emit_ts_module(doc), end='')
 elif target == 'cpp':
-    from toolchain2.emit.cpp.emitter import emit_cpp_module
+    from toolchain.emit.cpp.emitter import emit_cpp_module
     print(emit_cpp_module(doc), end='')
 else:
     raise ValueError('unsupported target: ' + target)
@@ -84,7 +84,7 @@ def _collect_golden_params() -> list[tuple[str, str, Path, Path]]:
             sp = ("src/toolchain2/" + sp_raw[idx + len(_tc_suffix):]) if idx >= 0 else ""
         if not sp:
             continue
-        # Use full module_id (toolchain2.* prefix) to match golden file naming
+        # Use full module_id (toolchain.* prefix) to match golden file naming
         module_id = sp.removeprefix("src/").replace("/", ".").removesuffix(".py")
         for target, ext in _EXT.items():
             fname = module_id.replace(".", "_") + ext

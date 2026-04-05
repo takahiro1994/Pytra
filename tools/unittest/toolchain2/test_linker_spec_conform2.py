@@ -17,34 +17,34 @@ if str(ROOT / "src") not in sys.path:
     sys.path.insert(0, str(ROOT / "src"))
 
 
-from toolchain2.link.linker import LinkedModule, link_modules
-from toolchain2.link.dependencies import build_all_resolved_dependencies
-from toolchain2.link.dependencies import is_type_only_dependency_module_id
-from toolchain2.link.expand_defaults import expand_cross_module_defaults
-from toolchain2.link.manifest_loader import load_linked_output
-from toolchain2.link.runtime_discovery import discover_runtime_modules
-from toolchain2.link.runtime_discovery import is_runtime_internal_helper_module
-from toolchain2.link.runtime_discovery import is_runtime_namespace_module
-from toolchain2.link.runtime_discovery import resolve_runtime_east_path
-from toolchain2.link.runtime_discovery import resolve_runtime_module_rel_tail
-from toolchain2.link.type_id import build_type_id_table
-from toolchain2.common.jv import deep_copy_json
-from toolchain2.parse.py.parse_python import parse_python_file
-from toolchain2.resolve.py.builtin_registry import load_builtin_registry
-from toolchain2.resolve.py.resolver import resolve_east1_to_east2
-from toolchain2.compile.lower import lower_east2_to_east3
-from toolchain2.optimize.optimizer import optimize_east3_document
-from toolchain2.emit.go.emitter import emit_go_module
-from toolchain2.emit.cpp.emitter import emit_cpp_module
-from toolchain2.emit.php.emitter import emit_php_module
-from toolchain2.emit.cpp.header_gen import build_cpp_header_from_east3
-from toolchain2.emit.cpp.runtime_bundle import emit_runtime_module_artifacts
-from toolchain2.emit.cpp.runtime_paths import collect_cpp_dependency_module_ids
-from toolchain2.emit.cpp.runtime_paths import cpp_include_for_module
-from toolchain2.emit.cpp.runtime_paths import runtime_rel_tail_for_module
-from toolchain2.emit.cpp.types import cpp_signature_type
-from toolchain2.emit.common.code_emitter import RuntimeMapping
-from toolchain2.emit.common.code_emitter import load_runtime_mapping
+from toolchain.link.linker import LinkedModule, link_modules
+from toolchain.link.dependencies import build_all_resolved_dependencies
+from toolchain.link.dependencies import is_type_only_dependency_module_id
+from toolchain.link.expand_defaults import expand_cross_module_defaults
+from toolchain.link.manifest_loader import load_linked_output
+from toolchain.link.runtime_discovery import discover_runtime_modules
+from toolchain.link.runtime_discovery import is_runtime_internal_helper_module
+from toolchain.link.runtime_discovery import is_runtime_namespace_module
+from toolchain.link.runtime_discovery import resolve_runtime_east_path
+from toolchain.link.runtime_discovery import resolve_runtime_module_rel_tail
+from toolchain.link.type_id import build_type_id_table
+from toolchain.common.jv import deep_copy_json
+from toolchain.parse.py.parse_python import parse_python_file
+from toolchain.resolve.py.builtin_registry import load_builtin_registry
+from toolchain.resolve.py.resolver import resolve_east1_to_east2
+from toolchain.compile.lower import lower_east2_to_east3
+from toolchain.optimize.optimizer import optimize_east3_document
+from toolchain.emit.go.emitter import emit_go_module
+from toolchain.emit.cpp.emitter import emit_cpp_module
+from toolchain.emit.php.emitter import emit_php_module
+from toolchain.emit.cpp.header_gen import build_cpp_header_from_east3
+from toolchain.emit.cpp.runtime_bundle import emit_runtime_module_artifacts
+from toolchain.emit.cpp.runtime_paths import collect_cpp_dependency_module_ids
+from toolchain.emit.cpp.runtime_paths import cpp_include_for_module
+from toolchain.emit.cpp.runtime_paths import runtime_rel_tail_for_module
+from toolchain.emit.cpp.types import cpp_signature_type
+from toolchain.emit.common.code_emitter import RuntimeMapping
+from toolchain.emit.common.code_emitter import load_runtime_mapping
 
 
 def _module_doc(
@@ -409,13 +409,13 @@ def has_key(env: dict[str, int], name: str) -> bool:
             else:
                 self.fail("expected unresolved import dependency")
 
-        self.assertIn("toolchain2.compile.jv", msg)
-        self.assertIn("toolchain2.link.expand_defaults", msg)
-        self.assertIn("toolchain2.optimize.passes", msg)
-        self.assertIn("toolchain2.parse.py.nodes", msg)
-        self.assertIn("toolchain2.parse.py.parser", msg)
-        self.assertIn("toolchain2.resolve.py.builtin_registry", msg)
-        self.assertIn("toolchain2.resolve.py.normalize_order", msg)
+        self.assertIn("toolchain.compile.jv", msg)
+        self.assertIn("toolchain.link.expand_defaults", msg)
+        self.assertIn("toolchain.optimize.passes", msg)
+        self.assertIn("toolchain.parse.py.nodes", msg)
+        self.assertIn("toolchain.parse.py.parser", msg)
+        self.assertIn("toolchain.resolve.py.builtin_registry", msg)
+        self.assertIn("toolchain.resolve.py.normalize_order", msg)
 
     def test_type_id_builder_accepts_single_base_from_bases_array(self) -> None:
         modules = [
@@ -500,7 +500,7 @@ def has_key(env: dict[str, int], name: str) -> bool:
             )
         }
 
-        with patch("toolchain2.link.runtime_discovery.resolve_runtime_east_path", return_value=""):
+        with patch("toolchain.link.runtime_discovery.resolve_runtime_east_path", return_value=""):
             with self.assertRaisesRegex(RuntimeError, "runtime EAST module not found"):
                 discover_runtime_modules(module_map)
 
@@ -515,7 +515,7 @@ def has_key(env: dict[str, int], name: str) -> bool:
                 )
             }
 
-            with patch("toolchain2.link.runtime_discovery.resolve_runtime_east_path", return_value=str(bad_runtime)):
+            with patch("toolchain.link.runtime_discovery.resolve_runtime_east_path", return_value=str(bad_runtime)):
                 with self.assertRaisesRegex(RuntimeError, "failed to parse runtime EAST"):
                     discover_runtime_modules(module_map)
 
@@ -549,7 +549,7 @@ def has_key(env: dict[str, int], name: str) -> bool:
                     return ""
                 return ""
 
-            with patch("toolchain2.link.runtime_discovery.resolve_runtime_east_path", side_effect=_resolve):
+            with patch("toolchain.link.runtime_discovery.resolve_runtime_east_path", side_effect=_resolve):
                 result = discover_runtime_modules(module_map)
 
             self.assertIn(str(runtime_path), result)
@@ -588,7 +588,7 @@ def has_key(env: dict[str, int], name: str) -> bool:
                     return ""
                 return ""
 
-            with patch("toolchain2.link.runtime_discovery.resolve_runtime_east_path", side_effect=_resolve):
+            with patch("toolchain.link.runtime_discovery.resolve_runtime_east_path", side_effect=_resolve):
                 result = discover_runtime_modules(module_map)
 
             self.assertIn(str(runtime_path), result)
@@ -1336,7 +1336,7 @@ def has_key(env: dict[str, int], name: str) -> bool:
             calls={},
             skip_module_prefixes=["runtime."],
         )
-        with patch("toolchain2.emit.cpp.emitter.load_runtime_mapping", return_value=mapping):
+        with patch("toolchain.emit.cpp.emitter.load_runtime_mapping", return_value=mapping):
             cpp_code = emit_cpp_module(doc)
 
         self.assertIn("rt_helper();", cpp_code)
@@ -2792,7 +2792,7 @@ def has_key(env: dict[str, int], name: str) -> bool:
             calls={},
             skip_module_prefixes=["runtime."],
         )
-        with patch("toolchain2.emit.go.emitter.load_runtime_mapping", return_value=mapping):
+        with patch("toolchain.emit.go.emitter.load_runtime_mapping", return_value=mapping):
             go_code = emit_go_module(doc)
 
         self.assertIn("rt_helper()", go_code)
@@ -5039,7 +5039,7 @@ def has_key(env: dict[str, int], name: str) -> bool:
             calls={},
             skip_module_prefixes=["runtime."],
         )
-        with patch("toolchain2.emit.cpp.emitter.load_runtime_mapping", return_value=mapping):
+        with patch("toolchain.emit.cpp.emitter.load_runtime_mapping", return_value=mapping):
             cpp_code = emit_cpp_module(doc)
 
         self.assertIn("rt_helper();", cpp_code)

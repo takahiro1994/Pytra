@@ -2,11 +2,11 @@ from __future__ import annotations
 
 import unittest
 
-from toolchain2.emit.common.common_renderer import CommonRenderer
-from toolchain2.emit.common.profile_loader import load_profile_doc
-from toolchain2.emit.cpp.emitter import _emit_expr as emit_cpp_expr, _emit_stmt as emit_cpp_stmt, CppEmitContext
-from toolchain2.emit.cpp.emitter import _emit_tuple_unpack as emit_cpp_tuple_unpack
-from toolchain2.emit.go.emitter import _emit_expr as emit_go_expr, _emit_stmt as emit_go_stmt, EmitContext
+from toolchain.emit.common.common_renderer import CommonRenderer
+from toolchain.emit.common.profile_loader import load_profile_doc
+from toolchain.emit.cpp.emitter import _emit_expr as emit_cpp_expr, _emit_stmt as emit_cpp_stmt, CppEmitContext
+from toolchain.emit.cpp.emitter import _emit_tuple_unpack as emit_cpp_tuple_unpack
+from toolchain.emit.go.emitter import _emit_expr as emit_go_expr, _emit_stmt as emit_go_stmt, EmitContext
 
 
 class DummyRenderer(CommonRenderer):

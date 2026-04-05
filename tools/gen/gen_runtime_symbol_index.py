@@ -16,7 +16,18 @@ if str(ROOT) not in sys.path:
 if str(ROOT / "src") not in sys.path:
     sys.path.insert(0, str(ROOT / "src"))
 
-from toolchain.frontends.transpile_cli import extract_function_signatures_from_python_source
+def extract_function_signatures_from_python_source(src_path: Path) -> dict[str, dict[str, object]]:
+    """Return top-level function names found in a Python source file."""
+    try:
+        text = src_path.read_text(encoding="utf-8")
+        tree = ast.parse(text, filename=str(src_path))
+    except Exception:
+        return {}
+    out: dict[str, dict[str, object]] = {}
+    for node in ast.iter_child_nodes(tree):
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            out[node.name] = {}
+    return out
 
 
 SCHEMA_VERSION = 1

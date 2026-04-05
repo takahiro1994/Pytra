@@ -14,29 +14,29 @@ if str(ROOT / "src") not in sys.path:
     sys.path.insert(0, str(ROOT / "src"))
 
 
-from toolchain2.common.jv import deep_copy_json
-from toolchain2.compile.jv import CompileContext
-from toolchain2.compile.lower import lower_east2_to_east3
-from toolchain2.compile.validate_east3 import validate_east3
-from toolchain2.compile.passes import apply_guard_narrowing
-from toolchain2.emit.common.code_emitter import (
+from toolchain.common.jv import deep_copy_json
+from toolchain.compile.jv import CompileContext
+from toolchain.compile.lower import lower_east2_to_east3
+from toolchain.compile.validate_east3 import validate_east3
+from toolchain.compile.passes import apply_guard_narrowing
+from toolchain.emit.common.code_emitter import (
     RuntimeMapping,
     build_runtime_import_map,
     resolve_runtime_symbol_name,
 )
-from toolchain2.link.linker import link_modules
-from toolchain2.optimize.optimizer import optimize_east3_document
-from toolchain2.optimize.optimizer import make_pass_context
-from toolchain2.optimize.optimizer import resolve_bounds_check_mode
-from toolchain2.optimize.optimizer import resolve_negative_index_mode
-from toolchain2.optimize.passes.subscript_access_annotation import SubscriptAccessAnnotationPass
-from toolchain2.optimize.passes.typed_enumerate_normalization import TypedEnumerateNormalizationPass
-from toolchain2.optimize.passes.typed_repeat_materialization import TypedRepeatMaterializationPass
-from toolchain2.parse.py.parser import parse_python_source
-from toolchain2.parse.py.parse_python import parse_python_file
-from toolchain2.resolve.py.builtin_registry import BuiltinRegistry, load_builtin_registry
-from toolchain2.resolve.py.resolver import resolve_east1_to_east2
-from toolchain2.resolve.py.validate_east2 import validate_east2
+from toolchain.link.linker import link_modules
+from toolchain.optimize.optimizer import optimize_east3_document
+from toolchain.optimize.optimizer import make_pass_context
+from toolchain.optimize.optimizer import resolve_bounds_check_mode
+from toolchain.optimize.optimizer import resolve_negative_index_mode
+from toolchain.optimize.passes.subscript_access_annotation import SubscriptAccessAnnotationPass
+from toolchain.optimize.passes.typed_enumerate_normalization import TypedEnumerateNormalizationPass
+from toolchain.optimize.passes.typed_repeat_materialization import TypedRepeatMaterializationPass
+from toolchain.parse.py.parser import parse_python_source
+from toolchain.parse.py.parse_python import parse_python_file
+from toolchain.resolve.py.builtin_registry import BuiltinRegistry, load_builtin_registry
+from toolchain.resolve.py.resolver import resolve_east1_to_east2
+from toolchain.resolve.py.validate_east2 import validate_east2
 
 
 def _walk(node: object) -> list[dict[str, object]]:

@@ -16,8 +16,8 @@ if str(ROOT) not in sys.path:
 if str(ROOT / "src") not in sys.path:
     sys.path.insert(0, str(ROOT / "src"))
 
-from toolchain2.emit.julia.emitter import transpile_to_julia
-from toolchain2.emit.julia.emitter import transpile_to_julia_native
+from toolchain.emit.julia.emitter import transpile_to_julia
+from toolchain.emit.julia.emitter import transpile_to_julia_native
 from toolchain.misc.transpile_cli import load_east3_document
 
 RUNTIME_SRC = ROOT / "src" / "runtime" / "julia" / "built_in" / "py_runtime.jl"

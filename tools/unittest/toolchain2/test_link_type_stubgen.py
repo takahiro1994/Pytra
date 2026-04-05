@@ -15,13 +15,13 @@ if str(ROOT / "src") not in sys.path:
     sys.path.insert(0, str(ROOT / "src"))
 
 
-from toolchain2.parse.py.parse_python import parse_python_file
-from toolchain2.resolve.py.builtin_registry import load_builtin_registry
-from toolchain2.resolve.py.resolver import resolve_east1_to_east2
-from toolchain2.compile.lower import lower_east2_to_east3
-from toolchain2.optimize.optimizer import optimize_east3_document
-from toolchain2.link.linker import link_modules
-from toolchain2.link.type_stubgen import (
+from toolchain.parse.py.parse_python import parse_python_file
+from toolchain.resolve.py.builtin_registry import load_builtin_registry
+from toolchain.resolve.py.resolver import resolve_east1_to_east2
+from toolchain.compile.lower import lower_east2_to_east3
+from toolchain.optimize.optimizer import optimize_east3_document
+from toolchain.link.linker import link_modules
+from toolchain.link.type_stubgen import (
     available_type_stub_module_ids,
     build_type_stub_doc,
     write_type_stub_files,
@@ -66,16 +66,16 @@ class Toolchain2LinkTypeStubgenTests(unittest.TestCase):
     def test_type_stub_registry_covers_current_selfhost_missing_modules(self) -> None:
         available = set(available_type_stub_module_ids())
 
-        self.assertIn("toolchain2.compile.jv", available)
-        self.assertIn("toolchain2.link.expand_defaults", available)
-        self.assertIn("toolchain2.optimize.passes", available)
-        self.assertIn("toolchain2.parse.py.nodes", available)
-        self.assertIn("toolchain2.parse.py.parser", available)
-        self.assertIn("toolchain2.resolve.py.builtin_registry", available)
-        self.assertIn("toolchain2.resolve.py.normalize_order", available)
+        self.assertIn("toolchain.compile.jv", available)
+        self.assertIn("toolchain.link.expand_defaults", available)
+        self.assertIn("toolchain.optimize.passes", available)
+        self.assertIn("toolchain.parse.py.nodes", available)
+        self.assertIn("toolchain.parse.py.parser", available)
+        self.assertIn("toolchain.resolve.py.builtin_registry", available)
+        self.assertIn("toolchain.resolve.py.normalize_order", available)
 
     def test_build_type_stub_doc_exposes_key_declarations(self) -> None:
-        compile_jv = build_type_stub_doc("toolchain2.compile.jv")
+        compile_jv = build_type_stub_doc("toolchain.compile.jv")
         names = {
             node.get("name")
             for node in compile_jv["body"]
@@ -84,7 +84,7 @@ class Toolchain2LinkTypeStubgenTests(unittest.TestCase):
         self.assertIn("CompileContext", names)
         self.assertIn("nd_kind", names)
 
-        registry_doc = build_type_stub_doc("toolchain2.resolve.py.builtin_registry")
+        registry_doc = build_type_stub_doc("toolchain.resolve.py.builtin_registry")
         reg_names = {
             node.get("name")
             for node in registry_doc["body"]
@@ -95,13 +95,13 @@ class Toolchain2LinkTypeStubgenTests(unittest.TestCase):
 
     def test_selfhost_link_succeeds_when_missing_modules_are_stubbed(self) -> None:
         missing_modules = [
-            "toolchain2.compile.jv",
-            "toolchain2.link.expand_defaults",
-            "toolchain2.optimize.passes",
-            "toolchain2.parse.py.nodes",
-            "toolchain2.parse.py.parser",
-            "toolchain2.resolve.py.builtin_registry",
-            "toolchain2.resolve.py.normalize_order",
+            "toolchain.compile.jv",
+            "toolchain.link.expand_defaults",
+            "toolchain.optimize.passes",
+            "toolchain.parse.py.nodes",
+            "toolchain.parse.py.parser",
+            "toolchain.resolve.py.builtin_registry",
+            "toolchain.resolve.py.normalize_order",
         ]
 
         with tempfile.TemporaryDirectory() as tmp:

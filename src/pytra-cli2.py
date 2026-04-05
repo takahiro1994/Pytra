@@ -12,7 +12,7 @@
   -emit       *.east3 → *.cpp 等      target コード生成
   -build      .py → target            一括実行
 
-selfhost 対象 (§5.7): toolchain2/ + pytra.std.* のみ使用。
+selfhost 対象 (§5.7): toolchain/ + pytra.std.* のみ使用。
 golden file 生成は tools/gen/generate_golden.py に分離。
 """
 
@@ -23,23 +23,23 @@ from pytra.std import json
 from pytra.std import subprocess as py_subprocess
 from pytra.std.json import JsonVal
 from pytra.std.pathlib import Path
-from toolchain2.common.jv import deep_copy_json
-from toolchain2.compile.lower import lower_east2_to_east3
-from toolchain2.link.linker import LinkResult
-from toolchain2.link.linker import link_modules
-from toolchain2.link.shared_types import LinkedModule
-from toolchain2.link.shared_types import linked_module_id
-from toolchain2.link.shared_types import linked_module_is_entry
-from toolchain2.link.shared_types import linked_module_mark_non_entry
-from toolchain2.link.shared_types import linked_module_source_path
-from toolchain2.optimize.optimizer import optimize_east3_doc_only
-from toolchain2.optimize.optimizer import resolve_bounds_check_mode
-from toolchain2.optimize.optimizer import resolve_negative_index_mode
-from toolchain2.parse.py.parse_python import parse_python_file
-from toolchain2.resolve.py.builtin_registry import load_builtin_registry
-from toolchain2.resolve.py.resolver import east2_output_path_from_east1
-from toolchain2.resolve.py.resolver import resolve_east1_to_east2
-from toolchain2.resolve.py.resolver import resolve_file
+from toolchain.common.jv import deep_copy_json
+from toolchain.compile.lower import lower_east2_to_east3
+from toolchain.link.linker import LinkResult
+from toolchain.link.linker import link_modules
+from toolchain.link.shared_types import LinkedModule
+from toolchain.link.shared_types import linked_module_id
+from toolchain.link.shared_types import linked_module_is_entry
+from toolchain.link.shared_types import linked_module_mark_non_entry
+from toolchain.link.shared_types import linked_module_source_path
+from toolchain.optimize.optimizer import optimize_east3_doc_only
+from toolchain.optimize.optimizer import resolve_bounds_check_mode
+from toolchain.optimize.optimizer import resolve_negative_index_mode
+from toolchain.parse.py.parse_python import parse_python_file
+from toolchain.resolve.py.builtin_registry import load_builtin_registry
+from toolchain.resolve.py.resolver import east2_output_path_from_east1
+from toolchain.resolve.py.resolver import resolve_east1_to_east2
+from toolchain.resolve.py.resolver import resolve_file
 
 
 def _repo_root() -> Path:
@@ -71,26 +71,26 @@ def _run_subprocess(cmd: list[str]) -> int:
 
 
 def _emit_target_subprocess(target: str, manifest_path: Path, output_dir: Path) -> int:
-    """Emit via subprocess: python3 -m toolchain2.emit.<target>.cli manifest -o dir."""
-    cmd = [_python(), "-m", "toolchain2.emit." + target + ".cli", str(manifest_path), "--output-dir", str(output_dir)]
+    """Emit via subprocess: python3 -m toolchain.emit.<target>.cli manifest -o dir."""
+    cmd = [_python(), "-m", "toolchain.emit." + target + ".cli", str(manifest_path), "--output-dir", str(output_dir)]
     return _run_subprocess(cmd)
 
 
 
 def _emit_rs_module(_east_doc: dict[str, JsonVal], package_mode: bool = False) -> str:
     _ = package_mode
-    _unsupported_target_attr("toolchain2.emit.rs.emitter", "emit_rs_module")
+    _unsupported_target_attr("toolchain.emit.rs.emitter", "emit_rs_module")
     return ""
 
 
 def _emit_nim_module(_east_doc: dict[str, JsonVal]) -> str:
-    _unsupported_target_attr("toolchain2.emit.nim.emitter", "emit_nim_module")
+    _unsupported_target_attr("toolchain.emit.nim.emitter", "emit_nim_module")
     return ""
 
 
 def _emit_ts_module(_east_doc: dict[str, JsonVal], strip_types: bool = False) -> str:
     _ = strip_types
-    _unsupported_target_attr("toolchain2.emit.ts.emitter", "emit_ts_module")
+    _unsupported_target_attr("toolchain.emit.ts.emitter", "emit_ts_module")
     return ""
 
 
@@ -142,7 +142,7 @@ def _copy_java_runtime_files(output_dir: Path) -> int:
 
 
 def _module_source_path(module_id: str) -> Path:
-    """Resolve a user module_id like toolchain2.parse.py.parse_python to src path."""
+    """Resolve a user module_id like toolchain.parse.py.parse_python to src path."""
     src_root = _repo_root().joinpath("src")
     module_path = src_root.joinpath(module_id.replace(".", "/") + ".py")
     if module_path.exists():
@@ -810,7 +810,7 @@ def cmd_emit(args: list[str]) -> int:
 
 def _emit_rs(manifest_path: Path, output_dir: Path, *, package_mode: bool = False) -> int:
     """Rust emit: linked output → subprocess delegated Rust emitter."""
-    cmd = [_python(), "-m", "toolchain2.emit.rs.cli", str(manifest_path), "--output-dir", str(output_dir)]
+    cmd = [_python(), "-m", "toolchain.emit.rs.cli", str(manifest_path), "--output-dir", str(output_dir)]
     if package_mode:
         cmd.append("--package")
     return _run_subprocess(cmd)
@@ -822,12 +822,12 @@ def _emit_nim(manifest_path: Path, output_dir: Path) -> int:
     _output_dir = output_dir
     _ = _manifest_path
     _ = _output_dir
-    _unsupported_target_attr("toolchain2.emit.nim.emitter", "emit_nim_module")
+    _unsupported_target_attr("toolchain.emit.nim.emitter", "emit_nim_module")
     return 1
 
 
 def _copy_ts_runtime_files(_output_dir: Path) -> int:
-    _unsupported_target_attr("toolchain2.emit.ts.emitter", "emit_ts_module")
+    _unsupported_target_attr("toolchain.emit.ts.emitter", "emit_ts_module")
     return 0
 
 
@@ -835,13 +835,13 @@ def _emit_ts(_manifest_path: Path, _output_dir: Path, *, strip_types: bool = Fal
     """TypeScript/JavaScript emit: linked output → TS/JS source files."""
     _unused_strip_types = strip_types
     _ = _unused_strip_types
-    _unsupported_target_attr("toolchain2.emit.ts.emitter", "emit_ts_module")
+    _unsupported_target_attr("toolchain.emit.ts.emitter", "emit_ts_module")
     return 1
 
 
 def _emit_cpp(manifest_path: Path, output_dir: Path) -> int:
     """C++ emit: linked output → subprocess delegated C++ emitter."""
-    cmd = [_python(), "-m", "toolchain2.emit.cpp.cli", str(manifest_path), "--output-dir", str(output_dir)]
+    cmd = [_python(), "-m", "toolchain.emit.cpp.cli", str(manifest_path), "--output-dir", str(output_dir)]
     return _run_subprocess(cmd)
 
 
@@ -989,10 +989,10 @@ def _build_pipeline(
     for inp, east3_opt_doc in east3_opt_docs:
         # Use source_path-derived name to avoid collisions (e.g. two types.py in different dirs)
         source_path_val = east3_opt_doc.get("source_path", "")
-        if isinstance(source_path_val, str) and "/src/toolchain2/" in source_path_val:
-            idx = source_path_val.index("/src/toolchain2/")
+        if isinstance(source_path_val, str) and "/src/toolchain/" in source_path_val:
+            idx = source_path_val.index("/src/toolchain/")
             stem = source_path_val[idx + len("/src/"):].replace("/", ".").replace(".py", "")
-        elif isinstance(source_path_val, str) and source_path_val.startswith("src/toolchain2/"):
+        elif isinstance(source_path_val, str) and source_path_val.startswith("src/toolchain/"):
             stem = source_path_val.replace("src/", "").replace("/", ".").replace(".py", "")
         else:
             stem = Path(inp).stem

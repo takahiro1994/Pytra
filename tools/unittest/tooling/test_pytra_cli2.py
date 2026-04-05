@@ -17,7 +17,7 @@ if str(ROOT) not in sys.path:
 if str(ROOT / "src") not in sys.path:
     sys.path.insert(0, str(ROOT / "src"))
 
-from toolchain2.link.shared_types import LinkedModule
+from toolchain.link.shared_types import LinkedModule
 
 _CLI2_PATH = ROOT / "src" / "pytra-cli2.py"
 _SPEC = importlib.util.spec_from_file_location("pytra_cli2_mod", str(_CLI2_PATH))
@@ -85,11 +85,11 @@ class PytraCli2Test(unittest.TestCase):
 
     def test_pytra_cli2_has_no_cpp_runtime_bundle_top_level_import(self) -> None:
         source = _CLI2_PATH.read_text(encoding="utf-8")
-        self.assertNotIn("toolchain2.emit.cpp.runtime_bundle", source)
-        self.assertIn('"-m", "toolchain2.emit.cpp.cli"', source)
-        self.assertNotIn("from toolchain2.emit.rs.emitter import", source)
-        self.assertNotIn("from toolchain2.link.manifest_loader import", source)
-        self.assertIn('"-m", "toolchain2.emit.rs.cli"', source)
+        self.assertNotIn("toolchain.emit.cpp.runtime_bundle", source)
+        self.assertIn('"-m", "toolchain.emit.cpp.cli"', source)
+        self.assertNotIn("from toolchain.emit.rs.emitter import", source)
+        self.assertNotIn("from toolchain.link.manifest_loader import", source)
+        self.assertIn('"-m", "toolchain.emit.rs.cli"', source)
 
 
 if __name__ == "__main__":

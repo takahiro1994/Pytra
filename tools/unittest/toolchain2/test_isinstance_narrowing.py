@@ -13,11 +13,11 @@ if str(ROOT / "src") not in sys.path:
     sys.path.insert(0, str(ROOT / "src"))
 
 
-from toolchain2.parse.py.parse_python import parse_python_file
-from toolchain2.resolve.py.builtin_registry import load_builtin_registry
-from toolchain2.resolve.py.resolver import resolve_east1_to_east2
-from toolchain2.compile.lower import lower_east2_to_east3
-from toolchain2.emit.go.emitter import emit_go_module
+from toolchain.parse.py.parse_python import parse_python_file
+from toolchain.resolve.py.builtin_registry import load_builtin_registry
+from toolchain.resolve.py.resolver import resolve_east1_to_east2
+from toolchain.compile.lower import lower_east2_to_east3
+from toolchain.emit.go.emitter import emit_go_module
 
 
 def _load_registry() -> object:

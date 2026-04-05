@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import unittest
 
-from toolchain2.emit.rs.emitter import emit_rs_module
+from toolchain.emit.rs.emitter import emit_rs_module
 
 
 def _module_doc(body: list[dict[str, object]]) -> dict[str, object]:

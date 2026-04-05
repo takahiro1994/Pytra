@@ -1,1 +1,1 @@
-"""Ruby backend package."""
+"""Ruby emitter for toolchain."""

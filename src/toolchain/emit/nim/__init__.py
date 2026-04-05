@@ -1,1 +1,1 @@
-"""Nim backend package."""
+"""Nim emitter for toolchain."""

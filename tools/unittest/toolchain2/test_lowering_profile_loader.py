@@ -3,7 +3,7 @@ from __future__ import annotations
 import unittest
 from pathlib import Path
 
-from toolchain2.emit.common.profile_loader import (
+from toolchain.emit.common.profile_loader import (
     load_lowering_profile,
     load_profile_with_includes,
     parse_lowering_profile,

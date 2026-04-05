@@ -21,7 +21,7 @@ from pathlib import Path
 if str((Path(__file__).resolve().parents[2] / "src")) not in sys.path:
     sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "src"))
 
-from toolchain.misc.pytra_cli_profiles import get_target_profile, list_parity_targets
+from toolchain.misc.target_profiles import get_target_profile, list_parity_targets
 
 ROOT = Path(__file__).resolve().parents[2]
 FIXTURE_ROOT = ROOT / "test" / "fixture" / "source" / "py"

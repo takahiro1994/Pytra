@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import unittest
 
-from toolchain2.parse.py.parser import parse_python_source
+from toolchain.parse.py.parser import parse_python_source
 
 
 BARE_RAISE_SOURCE = """

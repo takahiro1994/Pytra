@@ -3,9 +3,9 @@ from __future__ import annotations
 import unittest
 from pathlib import Path
 
-from toolchain2.parse.py.parser import parse_python_source
-from toolchain2.resolve.py.builtin_registry import load_builtin_registry
-from toolchain2.resolve.py.resolver import resolve_east1_to_east2
+from toolchain.parse.py.parser import parse_python_source
+from toolchain.resolve.py.builtin_registry import load_builtin_registry
+from toolchain.resolve.py.resolver import resolve_east1_to_east2
 
 
 class CallableParamRefinementTests(unittest.TestCase):

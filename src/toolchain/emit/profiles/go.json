@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "language": "go",
+
+  "types": {
+    "int8": "int8",
+    "uint8": "uint8",
+    "int16": "int16",
+    "uint16": "uint16",
+    "int32": "int32",
+    "uint32": "uint32",
+    "int64": "int64",
+    "uint64": "uint64",
+    "float32": "float32",
+    "float64": "float64",
+    "bool": "bool",
+    "str": "string",
+    "None": "",
+    "Any": "any",
+    "Path": "string"
+  },
+
+  "generic_types": {
+    "list": "[]({T})",
+    "dict": "map[{K}]{V}",
+    "set": "map[{T}]struct{}",
+    "tuple": "struct{{ {fields} }}",
+    "optional": "*{T}"
+  },
+
+  "operators": {
+    "bin": {
+      "FloorDiv": "__floordiv",
+      "Pow": "__pow"
+    },
+    "bool": {
+      "And": "&&",
+      "Or": "||"
+    },
+    "unary": {
+      "Not": "!"
+    }
+  },
+
+  "syntax": {
+    "if": "if {cond} {",
+    "elif": "} else if {cond} {",
+    "else": "} else {",
+    "while": "for {cond} {",
+    "block_close": "}",
+    "return": "return",
+    "break": "break",
+    "continue": "continue",
+    "comment_prefix": "//"
+  },
+
+  "lowering": {
+    "tuple_unpack_style": "multi_return",
+    "container_covariance": false,
+    "closure_style": "closure_syntax",
+    "with_style": "defer",
+    "property_style": "method_call",
+    "swap_style": "multi_assign",
+    "none_literal": "nil",
+    "bool_literals": ["true", "false"],
+    "self_keyword": "",
+    "type_position": "postfix_space",
+    "condition_parens": false,
+    "block_braces": "braces",
+    "stmt_terminator": "",
+    "string_type_owned": true,
+    "exception_style": "union_return"
+  }
+}

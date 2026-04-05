@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "language": "lua",
+
+  "types": {
+    "int8": "number",
+    "uint8": "number",
+    "int16": "number",
+    "uint16": "number",
+    "int32": "number",
+    "uint32": "number",
+    "int64": "number",
+    "uint64": "number",
+    "float32": "number",
+    "float64": "number",
+    "bool": "boolean",
+    "str": "string",
+    "None": "nil",
+    "Any": "any",
+    "Path": "table"
+  },
+
+  "generic_types": {
+    "list": "table",
+    "dict": "table",
+    "set": "table",
+    "tuple": "table",
+    "optional": "{T}"
+  },
+
+  "operators": {
+    "bin": {
+      "Add": "+",
+      "Sub": "-",
+      "Mult": "*",
+      "Div": "/",
+      "FloorDiv": "__floordiv",
+      "Mod": "%",
+      "Pow": "^",
+      "BitAnd": "__bitand",
+      "BitOr": "__bitor",
+      "BitXor": "__bitxor",
+      "LShift": "__lshift",
+      "RShift": "__rshift"
+    },
+    "bool": {
+      "And": "and",
+      "Or": "or"
+    },
+    "cmp": {
+      "Eq": "==",
+      "NotEq": "~=",
+      "Lt": "<",
+      "LtE": "<=",
+      "Gt": ">",
+      "GtE": ">="
+    },
+    "unary": {
+      "Not": "not ",
+      "USub": "-",
+      "Invert": "__bitnot"
+    }
+  },
+
+  "syntax": {
+    "if": "if {cond} then",
+    "elif": "elseif {cond} then",
+    "else": "else",
+    "while": "while {cond} do",
+    "block_close": "end",
+    "return": "return",
+    "break": "break",
+    "continue": "goto __continue__",
+    "comment_prefix": "--",
+    "try": "local __ok__, __err__ = pcall(function()",
+    "raise": "error"
+  },
+
+  "lowering": {
+    "tuple_unpack_style": "multi_return",
+    "container_covariance": false,
+    "closure_style": "closure_syntax",
+    "with_style": "try_finally",
+    "property_style": "method_call",
+    "swap_style": "multi_assign",
+    "none_literal": "nil",
+    "bool_literals": ["true", "false"],
+    "self_keyword": "self",
+    "type_position": "none",
+    "condition_parens": false,
+    "block_braces": "end_keyword",
+    "stmt_terminator": "",
+    "string_type_owned": true,
+    "exception_style": "union_return"
+  }
+}

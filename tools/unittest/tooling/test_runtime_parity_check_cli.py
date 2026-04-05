@@ -20,7 +20,7 @@ if str(ROOT) not in sys.path:
 if str(ROOT / "src") not in sys.path:
     sys.path.insert(0, str(ROOT / "src"))
 
-from toolchain2.link.shared_types import LinkedModule
+from toolchain.link.shared_types import LinkedModule
 
 
 def _load_runtime_parity_module():

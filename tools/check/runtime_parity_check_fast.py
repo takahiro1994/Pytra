@@ -35,21 +35,21 @@ if str(ROOT / "src") not in sys.path:
     sys.path.insert(0, str(ROOT / "src"))
 
 # --- toolchain2 imports (in-memory pipeline) ---
-from toolchain2.common.jv import deep_copy_json  # type: ignore
-from toolchain2.compile.lower import lower_east2_to_east3  # type: ignore
-from toolchain2.emit.cpp.emitter import emit_cpp_module  # type: ignore
-from toolchain2.emit.cpp.header_gen import build_cpp_header_from_east3  # type: ignore
-from toolchain2.emit.cpp.runtime_bundle import emit_runtime_module_artifacts  # type: ignore
-from toolchain2.emit.java.types import java_module_class_name  # type: ignore
-from toolchain2.emit.cpp.runtime_paths import runtime_rel_tail_for_module  # type: ignore
-from toolchain2.link.linker import link_modules  # type: ignore
-from toolchain2.optimize.optimizer import optimize_east3_document  # type: ignore
-from toolchain2.optimize.optimizer import optimize_east3_doc_only  # type: ignore
-from toolchain2.optimize.optimizer import resolve_bounds_check_mode  # type: ignore
-from toolchain2.optimize.optimizer import resolve_negative_index_mode  # type: ignore
-from toolchain2.parse.py.parse_python import parse_python_file  # type: ignore
-from toolchain2.resolve.py.builtin_registry import load_builtin_registry  # type: ignore
-from toolchain2.resolve.py.resolver import resolve_east1_to_east2  # type: ignore
+from toolchain.common.jv import deep_copy_json  # type: ignore
+from toolchain.compile.lower import lower_east2_to_east3  # type: ignore
+from toolchain.emit.cpp.emitter import emit_cpp_module  # type: ignore
+from toolchain.emit.cpp.header_gen import build_cpp_header_from_east3  # type: ignore
+from toolchain.emit.cpp.runtime_bundle import emit_runtime_module_artifacts  # type: ignore
+from toolchain.emit.java.types import java_module_class_name  # type: ignore
+from toolchain.emit.cpp.runtime_paths import runtime_rel_tail_for_module  # type: ignore
+from toolchain.link.linker import link_modules  # type: ignore
+from toolchain.optimize.optimizer import optimize_east3_document  # type: ignore
+from toolchain.optimize.optimizer import optimize_east3_doc_only  # type: ignore
+from toolchain.optimize.optimizer import resolve_bounds_check_mode  # type: ignore
+from toolchain.optimize.optimizer import resolve_negative_index_mode  # type: ignore
+from toolchain.parse.py.parse_python import parse_python_file  # type: ignore
+from toolchain.resolve.py.builtin_registry import load_builtin_registry  # type: ignore
+from toolchain.resolve.py.resolver import resolve_east1_to_east2  # type: ignore
 
 # --- reuse existing parity infrastructure ---
 from runtime_parity_check import (  # type: ignore
@@ -77,7 +77,7 @@ from runtime_parity_check import (  # type: ignore
     normalize,
     run_shell,
 )
-from toolchain.misc.pytra_cli_profiles import get_target_profile, list_parity_targets  # type: ignore
+from toolchain.misc.target_profiles import get_target_profile, list_parity_targets
 
 
 # ---------------------------------------------------------------------------
@@ -170,7 +170,7 @@ def _inject_module_meta(
 def _call_runtime_copier(lang: str, emit_dir: Path) -> None:
     """Copy runtime files for lang. Tries cli.py first, falls back to local functions."""
     try:
-        cli_mod = importlib.import_module(f"toolchain2.emit.{lang}.cli")
+        cli_mod = importlib.import_module(f"toolchain.emit.{lang}.cli")
         fn = getattr(cli_mod, f"_copy_{lang}_runtime", None)
         if fn is not None:
             fn(emit_dir)
@@ -332,7 +332,7 @@ def _transpile_in_memory(
                     code, encoding="utf-8"
                 )
         elif target == "java":
-            emit_java_module = importlib.import_module("toolchain2.emit.java.emitter").emit_java_module
+            emit_java_module = importlib.import_module("toolchain.emit.java.emitter").emit_java_module
             for m in link_result.linked_modules:
                 if m.module_kind == "runtime":
                     continue
@@ -343,7 +343,7 @@ def _transpile_in_memory(
                 emit_dir.joinpath(out_name).write_text(code, encoding="utf-8")
             _copy_java_runtime(emit_dir)
         elif target == "js":
-            emit_ts_module = importlib.import_module("toolchain2.emit.ts.emitter").emit_ts_module
+            emit_ts_module = importlib.import_module("toolchain.emit.ts.emitter").emit_ts_module
             for m in link_result.linked_modules:
                 code = emit_ts_module(m.east_doc, strip_types=True)
                 if code.strip() == "":
@@ -361,7 +361,7 @@ def _transpile_in_memory(
             ext, hierarchical, inject_type, filter_type = cfg
             # js → ts emitter directory; ps1 → powershell emitter directory
             lang = "ts" if target == "js" else ("powershell" if target == "ps1" else target)
-            emit_mod = importlib.import_module(f"toolchain2.emit.{lang}.emitter")
+            emit_mod = importlib.import_module(f"toolchain.emit.{lang}.emitter")
             # function name uses target name (emit_ps1_module, not emit_powershell_module)
             emit_fn = getattr(emit_mod, f"emit_{target}_module")
             for m in link_result.linked_modules:

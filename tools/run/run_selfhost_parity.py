@@ -319,13 +319,13 @@ def _transpile_via_selfhost_binary(
     """
     try:
         # Import in-memory pipeline
-        from toolchain2.common.jv import deep_copy_json  # type: ignore
-        from toolchain2.compile.lower import lower_east2_to_east3  # type: ignore
-        from toolchain2.link.linker import link_modules  # type: ignore
-        from toolchain2.optimize.optimizer import optimize_east3_document  # type: ignore
-        from toolchain2.parse.py.parse_python import parse_python_file  # type: ignore
-        from toolchain2.resolve.py.builtin_registry import load_builtin_registry  # type: ignore
-        from toolchain2.resolve.py.resolver import resolve_east1_to_east2  # type: ignore
+        from toolchain.common.jv import deep_copy_json  # type: ignore
+        from toolchain.compile.lower import lower_east2_to_east3  # type: ignore
+        from toolchain.link.linker import link_modules  # type: ignore
+        from toolchain.optimize.optimizer import optimize_east3_document  # type: ignore
+        from toolchain.parse.py.parse_python import parse_python_file  # type: ignore
+        from toolchain.resolve.py.builtin_registry import load_builtin_registry  # type: ignore
+        from toolchain.resolve.py.resolver import resolve_east1_to_east2  # type: ignore
 
         pipeline_target = "ts" if emit_target == "js" else emit_target
 
@@ -488,7 +488,7 @@ def run_compiled_selfhost(
         _tool_env_for_target,
         can_run,
     )
-    from toolchain.misc.pytra_cli_profiles import get_target_profile  # type: ignore
+    from toolchain.misc.target_profiles import get_target_profile
     from runtime_parity_check import Target  # type: ignore
 
     now = _now()

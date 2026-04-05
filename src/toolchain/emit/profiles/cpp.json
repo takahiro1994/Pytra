@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "language": "cpp",
+
+  "types": {
+    "int": "int64",
+    "int8": "int8_t",
+    "uint8": "uint8_t",
+    "int16": "int16_t",
+    "uint16": "uint16_t",
+    "int32": "int32_t",
+    "uint32": "uint32_t",
+    "int64": "int64",
+    "uint64": "uint64",
+    "float32": "float",
+    "float64": "double",
+    "bool": "bool",
+    "str": "str",
+    "None": "void",
+    "Any": "object",
+    "Path": "str"
+  },
+
+  "literal_nowrap_ranges": {
+    "int": [-2147483648, 2147483647],
+    "int32": [-2147483648, 2147483647],
+    "int64": [-2147483648, 2147483647]
+  },
+
+  "generic_types": {
+    "list": "Object<list<{T}>>",
+    "dict": "Object<dict<{K}, {V}>>",
+    "set": "Object<set<{T}>>",
+    "tuple": "std::tuple<{...}>",
+    "optional": "std::optional<{T}>"
+  },
+
+  "operators": {
+    "bin": {
+      "FloorDiv": "__floordiv",
+      "Pow": "__pow"
+    },
+    "bool": {
+      "And": "&&",
+      "Or": "||"
+    },
+    "unary": {
+      "Not": "!"
+    },
+    "precedence": {
+      "Mult": 12,
+      "Div": 12,
+      "Mod": 12,
+      "Add": 11,
+      "Sub": 11,
+      "LShift": 10,
+      "RShift": 10,
+      "Lt": 9,
+      "LtE": 9,
+      "Gt": 9,
+      "GtE": 9,
+      "In": 9,
+      "NotIn": 9,
+      "Eq": 8,
+      "NotEq": 8,
+      "Is": 8,
+      "IsNot": 8,
+      "BitAnd": 7,
+      "BitXor": 6,
+      "BitOr": 5,
+      "And": 4,
+      "Or": 3,
+      "USub": 13,
+      "UAdd": 13,
+      "Not": 13,
+      "Invert": 13
+    }
+  },
+
+  "syntax": {
+    "if": "if ({cond}) {",
+    "elif": "} else if ({cond}) {",
+    "else": "} else {",
+    "while": "while ({cond}) {"
+  },
+
+  "lowering": {
+    "tuple_unpack_style": "structured_binding",
+    "container_covariance": false,
+    "closure_style": "closure_syntax",
+    "with_style": "raii",
+    "property_style": "method_call",
+    "swap_style": "std_swap",
+    "none_literal": "std::nullopt",
+    "bool_literals": ["true", "false"],
+    "self_keyword": "this",
+    "type_position": "prefix",
+    "condition_parens": true,
+    "block_braces": "braces",
+    "stmt_terminator": ";",
+    "string_type_owned": false,
+    "exception_style": "native_throw"
+  }
+}

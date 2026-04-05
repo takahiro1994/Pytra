@@ -1,1 +1,1 @@
-"""TypeScript backend package."""
+"""TypeScript emitter for toolchain."""

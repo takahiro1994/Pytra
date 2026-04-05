@@ -1,1 +1,1 @@
-"""Julia backend package."""
+"""Julia emitter for toolchain."""

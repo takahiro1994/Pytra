@@ -122,12 +122,12 @@ class RunSelfhostParityBuildTest(unittest.TestCase):
                 return subprocess.CompletedProcess(cmd, 0, stdout="", stderr="")
 
             with patch.object(mod, "ROOT", root), \
-                patch("toolchain2.parse.py.parse_python.parse_python_file", return_value={}), \
-                patch("toolchain2.resolve.py.builtin_registry.load_builtin_registry", return_value=object()), \
-                patch("toolchain2.resolve.py.resolver.resolve_east1_to_east2"), \
-                patch("toolchain2.compile.lower.lower_east2_to_east3", return_value={}), \
-                patch("toolchain2.optimize.optimizer.optimize_east3_document", return_value=({}, {})), \
-                patch("toolchain2.link.linker.link_modules", return_value=link_result), \
+                patch("toolchain.parse.py.parse_python.parse_python_file", return_value={}), \
+                patch("toolchain.resolve.py.builtin_registry.load_builtin_registry", return_value=object()), \
+                patch("toolchain.resolve.py.resolver.resolve_east1_to_east2"), \
+                patch("toolchain.compile.lower.lower_east2_to_east3", return_value={}), \
+                patch("toolchain.optimize.optimizer.optimize_east3_document", return_value=({}, {})), \
+                patch("toolchain.link.linker.link_modules", return_value=link_result), \
                 patch.object(mod.subprocess, "run", side_effect=_fake_run):
                 ok, err = mod._transpile_via_selfhost_binary(root / "bin" / "rs", "rs", case_path, out_dir)
 

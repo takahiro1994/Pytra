@@ -35,6 +35,33 @@ RUNTIME_DIR = ROOT / "src" / "runtime"
 # mapping.json の calls テーブルで無視するメタキー
 _META_KEY_PREFIXES = ("env.",)
 
+# EAST3 golden の short-qualified runtime_call を FQCN に正規化するプレフィックス表
+# 例: "math.sqrt" → "pytra.std.math.sqrt"
+_SHORT_TO_FQCN_PREFIXES: list[tuple[str, str]] = [
+    ("os.path.", "pytra.std.os_path."),
+    ("os_path.", "pytra.std.os_path."),
+    ("math.", "pytra.std.math."),
+    ("time.", "pytra.std.time."),
+    ("glob.", "pytra.std.glob."),
+    ("path.", "pytra.std.os_path."),
+    ("json.", "pytra.std.json."),
+    ("random.", "pytra.std.random."),
+]
+
+
+def _normalize_call_key(key: str) -> str:
+    """EAST3 golden の runtime_call を mapping.json の FQCN キーに正規化する。
+
+    例: "math.sqrt" → "pytra.std.math.sqrt"
+    既に FQCN (pytra. で始まる) のキーはそのまま返す。
+    """
+    if key.startswith("pytra."):
+        return key
+    for short_prefix, fqcn_prefix in _SHORT_TO_FQCN_PREFIXES:
+        if key.startswith(short_prefix):
+            return fqcn_prefix + key[len(short_prefix):]
+    return key
+
 
 def _is_meta_key(key: str) -> bool:
     return any(key.startswith(p) for p in _META_KEY_PREFIXES)
@@ -48,7 +75,7 @@ def collect_runtime_calls_from_goldens() -> dict[str, set[str]]:
             for key in ("runtime_call", "resolved_runtime_call"):
                 val = node.get(key)
                 if isinstance(val, str) and val:
-                    results.add(val)
+                    results.add(_normalize_call_key(val))
             for v in node.values():
                 _walk(v, results)
         elif isinstance(node, list):

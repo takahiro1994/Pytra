@@ -3,10 +3,10 @@ from __future__ import annotations
 import unittest
 from unittest.mock import patch
 
-from toolchain2.compile.lower import lower_east2_to_east3
-from toolchain2.emit.common.profile_loader import LoweringProfile
-from toolchain2.emit.cpp.emitter import emit_cpp_module
-from toolchain2.emit.go.emitter import emit_go_module
+from toolchain.compile.lower import lower_east2_to_east3
+from toolchain.emit.common.profile_loader import LoweringProfile
+from toolchain.emit.cpp.emitter import emit_cpp_module
+from toolchain.emit.go.emitter import emit_go_module
 
 
 def _walk(node: object) -> list[dict[str, object]]:
@@ -64,7 +64,7 @@ class ProfileLoweringSemanticsTests(unittest.TestCase):
             exception_style="native_throw",
         )
 
-        with patch("toolchain2.compile.lower.load_lowering_profile", return_value=profile):
+        with patch("toolchain.compile.lower.load_lowering_profile", return_value=profile):
             east3 = lower_east2_to_east3(east2, target_language="core")
 
         fn = next(node for node in _walk(east3) if node.get("kind") == "FunctionDef" and node.get("name") == "f")
@@ -115,7 +115,7 @@ class ProfileLoweringSemanticsTests(unittest.TestCase):
             exception_style="native_throw",
         )
 
-        with patch("toolchain2.compile.lower.load_lowering_profile", return_value=profile):
+        with patch("toolchain.compile.lower.load_lowering_profile", return_value=profile):
             east3 = lower_east2_to_east3(east2, target_language="core")
 
         attr = next(node for node in _walk(east3) if node.get("kind") == "Attribute")

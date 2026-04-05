@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from toolchain2.link.linker import link_modules
+from toolchain.link.linker import link_modules
 
 
 def _module_doc(module_id: str, body: list[dict[str, object]]) -> dict[str, object]:
