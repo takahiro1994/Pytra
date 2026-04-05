@@ -31,66 +31,6 @@ Go は `any` + type switch がネイティブにあるので `pytra_isinstance` 
 2. [ ] [ID: P0-GO-TYPEID-CLN-S2] Go emitter の isinstance を `switch v := x.(type)` に置換する
 3. [ ] [ID: P0-GO-TYPEID-CLN-S3] fixture + sample + stdlib parity に回帰がないことを確認する
 
-### P0-GO-BOOLOP-BOOL-SHORTCIRCUIT: bool 型の and/or を && / || で出力する
-
-`if t > 0.0 and t < t_min:` のように両辺が比較式で期待型が `bool` の場合、Go では `if t > 0.0 && t < t_min {` と出力すべき。現状は値選択式として即時実行クロージャに展開しており、コードが著しく読みにくい。
-
-spec-east.md §7: 「期待型が `bool` のときは真偽演算（`&&`/`||`）として出力する。期待型が `bool` 以外のときは値選択式として出力する。」
-
-1. [x] [ID: P0-GO-BOOLOP-S1] Go emitter の BoolOp emit で、`resolved_type` が `bool` の場合は `&&` / `||` で出力するよう修正する
-2. [x] [ID: P0-GO-BOOLOP-S2] `boolop_value_select` fixture + sample 02/全件で Go parity PASS を確認する — typing 23/23, stdlib 16/16, sample 02 PASS
-
-### P0-GO-TUPLE-MULTIRETURN: tuple multi-return 展開の不完全さを修正する
-
-Review 指摘: `py_splitext` を多値返却にした後、emitter の `_emit_assign`（`emitter.py:3780`）は `tuple[...] = Call(...)` を `name_0, name_1 := ...` に展開するが、元の `name` 自体は束縛しないため `return name` / `f(name)` が未定義参照になる。さらに `_emit_subscript`（`emitter.py:2915`）は `ctx.tup_multi_vars` に載った Name しか救済しないため、`os.path.splitext(p)[0]` のような直接添字が不正コードになる。
-
-1. [x] [ID: P0-GO-TUPLE-MR-S1] tuple multi-return 展開で元の変数名も束縛するか、直接添字（`Call(...)[0]`）を multi-return の要素選択として emit する — `Call(...)[i]` を IIFE で展開する実装を追加
-2. [x] [ID: P0-GO-TUPLE-MR-S2] `os_glob_extended` / `pathlib_extended` fixture が Go で compile + run parity PASS することを確認する — stdlib 4件・typing 23/23 PASS
-
-### P0-RESOLVE-INT-PROMOTION: BinOp の全演算子で整数昇格 cast がオペランドに付くよう修正する
-
-全ての BinOp（`+`, `-`, `*`, `/`, `//`, `%`, `&`, `|`, `^`, `<<`, `>>`）で、異なるサイズの整数型が混在する場合に、resolve が **演算の前に** 両オペランドを結果型に cast すべき。現状は小さい側を相手のサイズに cast するだけで、結果型への昇格 cast が付かない。Go/Rust は暗黙昇格がないのでコンパイルエラーになる。
-
-例: `m8: int8 = 100; m16: int16 = 100; r5: int32 = m8 * m16`
-- NG: `int16(m8) * m16` → 結果は int16（overflow あり）、int32 への cast なし
-- OK: `int32(m8) * int32(m16)` → 結果は int32、overflow なし
-
-1. [x] [ID: P0-RESOLVE-INTPROMO-S1] resolve の BinOp 整数昇格で、全演算子について cast を「結果型にまで昇格」に修正する — 両オペランドに結果型への cast を付ける
-2. [x] [ID: P0-RESOLVE-INTPROMO-S2] `integer_promotion` fixture が Go で compile + run parity PASS することを確認する
-3. [x] [ID: P0-RESOLVE-INTPROMO-S3] 他の fixture に影響がないことを確認する（golden 再生成）— typing 23/23, stdlib 16/16, sample 18/18 全 PASS
-
-### P2-COMMON-RENDERER-PARENS: CommonRenderer に演算子優先順位ベースの括弧制御を実装する
-
-仕様: [spec-emitter-guide.md](../spec/spec-emitter-guide.md) §1.4
-
-1. [x] [ID: P2-CR-PARENS-S1] CommonRenderer に演算子優先順位テーブルを受け取る仕組みを追加する — 各言語の emitter が自分の優先順位テーブルを渡す。Go の優先順位テーブルをプロトタイプとして最初に実装する
-2. [x] [ID: P2-CR-PARENS-S2] BinOp / UnaryOp / Compare の出力時に「親の優先順位 ≥ 子の優先順位なら括弧を付ける」ロジックを実装する — 不要な括弧を出力しない
-3. [x] [ID: P2-CR-PARENS-S3] 最外の冗長括弧（`x = (expr);` の外側）を除去する
-4. [x] [ID: P2-CR-PARENS-S4] Go fixture + sample parity に影響がないことを確認する — typing 23/23, stdlib 16/16, sample 18/18 全 PASS
-
-### P3-GO-LINT-FIX: Go emitter のハードコード違反を修正する
-
-仕様: [spec-emitter-guide.md](../spec/spec-emitter-guide.md) §1, §7
-
-違反一覧（`check_emitter_hardcode_lint.py` 検出）:
-- module_name 6件: `ctx.imports_needed.add("math")` / `"os"` — native import のハードコード
-- runtime_symbol 2件: `dispatch == "py_print"` / `"py_len"` — mapping.json 経由の値を再度文字列マッチ
-- class_name 19件: `"Exception"` / `"Path"` / `"ArgumentParser"` 等 — P0-GO-TYPE-MAPPING で一部解消済み、残りを除去
-
-1. [x] [ID: P3-GO-LINT-S1] module_name 違反を修正する — native import を runtime manifest または mapping.json から導出する — mapping.json に go_pkg_imports 追加、ctx.go_pkg_math / ctx.go_pkg_os 経由に変更
-2. [x] [ID: P3-GO-LINT-S2] runtime_symbol 違反を修正する — `py_print` / `py_len` の文字列マッチを除去 — mapping.json に go_builtin_dispatch 追加、ctx.dispatch_print / ctx.dispatch_len 経由に変更
-3. [x] [ID: P3-GO-LINT-S3] class_name 違反を修正する — `types` テーブル or EAST3 の型情報から解決する — mapping.json に go_class_names 追加、_BUILTIN_EXCEPTION_BOUNDS を ctx.builtin_exc_bounds へ、ArgumentParser / Path を ctx フィールドへ移動
-4. [x] [ID: P3-GO-LINT-S4] `check_emitter_hardcode_lint.py` で Go の違反が 0 件になることを確認する — 全 7 カテゴリ 🟩 PASS
-
-### P6-GO-SELFHOST: Go emitter で toolchain2 を Go に変換し go build を通す
-
-文脈: [docs/ja/plans/p6-go-selfhost.md](../plans/p6-go-selfhost.md)
-
-1. [x] [ID: P6-GO-SELFHOST-S0] selfhost 対象コード（`src/toolchain2/` 全 .py）で戻り値型の注釈が欠けている関数に型注釈を追加する — resolve が `inference_failure` にならない状態にする — 全関数に戻り値型注釈済み、east3-opt に inference_failure ゼロ
-2. [x] [ID: P6-GO-SELFHOST-S1] toolchain2 全 .py を Go に emit し、go build が通ることを確認する
-3. [x] [ID: P6-GO-SELFHOST-S2] go build 失敗ケースを emitter/runtime の修正で解消する（EAST の workaround 禁止）
-4. [x] [ID: P6-GO-SELFHOST-S3] selfhost 用 Go golden を配置し、回帰テストとして維持する — test_selfhost_golden.py -k go: 5 passed, 2 skipped
-
 ### P7-GO-SELFHOST-RUNTIME: Go selfhost バイナリを実際に動かして parity PASS する
 
 文脈: [docs/ja/plans/p7-go-selfhost-runtime.md](../plans/p7-go-selfhost-runtime.md)

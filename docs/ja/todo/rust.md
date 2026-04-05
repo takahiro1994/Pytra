@@ -28,23 +28,6 @@
 
 ## 未完了タスク
 
-### P5-RS-CLI-COMMON: Rust cli.py を共通ランナーに移行する
-
-文脈: [docs/ja/plans/p5-rs-cli-common-runner.md](../plans/p5-rs-cli-common-runner.md)
-
-全17言語中 Rust のみ独自 cli.py（235行）。type_id テーブル廃止（P0-RS-TYPEID-CLN）後に共通ランナーへ移行可能。
-
-前提: P0-RS-TYPEID-CLN 完了（type_id テーブル不要化）
-
-1. [x] [ID: P5-RS-CLI-S1] Rust emitter を `expected_type_name` ベースに移行する
-   - 完了: Rust emitter の `isinstance` / class hierarchy 判定は `expected_type_name` fallback と `PyAny::TypeId` / downcast ベースに整理済みで、manifest type-id table を前提にしない形へ移行した。
-2. [x] [ID: P5-RS-CLI-S2] `_generate_type_id_table_rs` と `_manifest_type_id_table` を削除する
-   - 完了: [cli.py](../../src/toolchain2/emit/rs/cli.py) から Rust 独自の type-id table 生成を削除した。
-3. [x] [ID: P5-RS-CLI-S3] runtime コピーと package mode を `post_emit` に移動し、共通ランナーに委譲する
-   - 完了: Rust `cli.py` を `run_emit_cli(...)` ベースへ移行し、runtime コピーと `--package` の `Cargo.toml` / `src/lib.rs` / `src/main.rs` 生成を `post_emit` 側へ移した。`pytra-cli2 -build ... --target rs` と `--rs-package` の両方で emit 成功を確認。
-4. [x] [ID: P5-RS-CLI-S4] Rust parity に回帰がないことを確認する
-   - 完了: broad parity は `P0-RS-TYPEID-CLN-S3` で `stdlib 16/16 PASS`, `sample 18/18 PASS`, `fixture 145/145 PASS` を確認済み。CLI 共通化後も `runtime_parity_check_fast --case-root fixture --targets rs top_level union_basic optional_none` が `3/3 PASS` で、spot check に回帰がないことを確認。
-
 ### P9-RS-SELFHOST: Rust emitter で toolchain2 を Rust に変換し cargo build を通す
 
 前提: P7-RS-EMITTER 完了後に着手。

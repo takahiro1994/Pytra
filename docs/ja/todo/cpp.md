@@ -21,35 +21,6 @@
 
 ## 未完了タスク
 
-### P0-CPP-VARIANT: C++ を std::variant ベースに移行し object/box/unbox を廃止する
-
-文脈: [docs/ja/plans/plan-cpp-variant-migration.md](../plans/plan-cpp-variant-migration.md)
-仕様: [docs/ja/spec/spec-adt.md](../spec/spec-adt.md)
-
-Phase 1（variant 出力追加）、Phase 2 の S5 まで完了済み（[archive/20260402.md](archive/20260402.md) 参照）。
-
-**Phase 2: object 型を削除（残）**
-
-1. [x] [ID: P0-CPP-VARIANT-S6] `object.h` の `object` クラス削除に向けた blocker を分離し、削除順を固定する
-   - 完了メモ: blocker は `P0-CPP-VARIANT-S6A`, `P0-CPP-VARIANT-S10A`, `P0-CPP-VARIANT-S10B` に分割して固定した。`object.h` 削除前の seam は [p0-cpp-object-seam-inventory.md](../plans/p0-cpp-object-seam-inventory.md) に棚卸しし、iter boundary の残件は [p0-cpp-iter-boundary-runtime-contract.md](../plans/p0-cpp-iter-boundary-runtime-contract.md) に切り出した。現時点で non-explicit dynamic path の `resolved_type=\"object\"` は除去済みで、残件は explicit object / bare `Callable` / iter runtime 契約に限定されている。
-2. [x] [ID: P0-CPP-VARIANT-S6A] C++ runtime / emitter に残っている不要な `PYTRA_TID_OBJECT` / object-type-id 正規化の残骸を削除する
-   - 完了メモ: `isinstance(x, object)` / `issubclass(X, object)` は lower で constant `True` に潰すようにし、`_builtin_type_id_symbol()` から `object -> PYTRA_TID_OBJECT` を削除した。あわせて C++ emitter の `PYTRA_TID_OBJECT -> object` 正規化も撤去し、`src/toolchain2/emit/cpp`, `src/toolchain2/compile`, `src/runtime/cpp` 直下の `PYTRA_TID_OBJECT` 残件は 0 を確認した。
-3. [x] [ID: P0-CPP-VARIANT-S7] fixture 全件 + sample 全件が `object` 型なしで PASS することを確認する
-   - 完了メモ: fresh in-memory probe で `in_membership`, `iterable`, `callable_higher_order`, `finally`, `float`, `type_ignore_from_import` を再確認し、generated C++ entry `.cpp` から `object(` / `.unbox<...>()` / `.as<...>()` が消えていることを確認した。最後の blocker だった `type_ignore_from_import` は resolver が `main -> __pytra_main` rename を考慮して bare `Callable` を `callable[[],None]` に refine するよう修正し、`runtime_parity_check_fast --case-root fixture --targets cpp type_ignore_from_import` も `PASS` を確認した。sample broad parity の `18/18 PASS` と、直前の fixture broad parity `139/139 PASS` から、fresh probe の最終 blocker 解消をもって完了扱いとする。
-
-**Phase 3: box/unbox 削除**
-
-4. [x] [ID: P0-CPP-VARIANT-S8] C++ emitter の box/unbox 処理を削除し、variant 代入 / `std::get` に置換する
-   - 完了メモ: fresh `parity-fast` の generated C++ entry `.cpp` では `.unbox<...>()` / `.as<...>()` は 0 件まで減っている。runtime EAST の stale も切り分けて `[src/runtime/east/utils/assertions.east](/workspace/Pytra/src/runtime/east/utils/assertions.east)` を canonical source に再同期した。さらに `[src/pytra/utils/assertions.py](/workspace/Pytra/src/pytra/utils/assertions.py)` の `py_assert_stdout` を `callable[[], None]` に上げたことで、fresh in-memory transpile では `_case_main` harness の `([&](object) -> object { ... })` bridge も消えている。fresh probe で残る `object` 経路は explicit bare `Callable` を `::std::function<object(object)>` に落としている `type_ignore_from_import` だけで、box/unbox 残件ではない。
-
-**Phase 4: EAST から object 退化 / box / unbox を削除**
-
-5. [x] [ID: P0-CPP-VARIANT-S10A] lower.py の non-explicit dynamic path から `resolved_type="object"` 生成を除去する
-   - 完了メモ: C++ backend は `target_language="cpp"` では iter boundary lower を抑止して `py_iter_or_raise` / `py_next_or_stop` call をそのまま残す方針に固定した。さらに C++ 向け dynamic target `Box` では `resolved_type="object"` を固定せず target type を保持するようにし、代表ケースに対して `resolved_type="object"` が出ないことを `test_compile_uses_dynamic_target_resolved_type_for_cpp_box` / `test_compile_uses_union_target_resolved_type_for_cpp_box` / `test_compile_cpp_lowering_avoids_object_resolved_type_for_representative_dynamic_cases` で固定済み。fixture 全体を C++ 向けに lower して走査した結果、残る `resolved_type="object"` は `trait_basic`, `trait_with_inheritance`, `typed_container_access` の explicit dynamic/object 契約 6 ノードだけで、non-explicit dynamic path の残件は 0 を確認した。
-6. [x] [ID: P0-CPP-VARIANT-S10B] iter boundary と explicit object / bare `Callable` 境界の残件を別契約として整理し、削除順を固定する
-   - 完了メモ: C++ 向け lower の fixture 全走査を取り直し、non-explicit dynamic path の `resolved_type="object"` は 0、残件は `trait_basic`, `trait_with_inheritance`, `typed_container_access` の explicit object 契約 6 ノードだけであることを再確認した。あわせて iter boundary seam は旧 `iter_ops` ではなく `src/runtime/east/built_in/predicates.east` の generic `py_any` / `py_all` に残っていることを確認し、[p0-cpp-iter-boundary-runtime-contract.md](../plans/p0-cpp-iter-boundary-runtime-contract.md) を更新した。これにより `S10` 本体の残件は explicit object / bare `Callable` / runtime generic iter helper の 3 系統へ固定された。
-7. [x] [ID: P0-CPP-VARIANT-S11] EAST3 validation に「`resolved_type: "object"` ならエラー」を追加する
-   - 完了メモ: `toolchain2.compile.validate_east3` を新設し、`lower_east2_to_east3()` の終端で `resolved_type: "object"` を検出したら `RuntimeError` を投げるようにした。validator unit と `object` 注釈 source が compile で落ちる回帰を追加済み。
 ### P20-CPP-SELFHOST: C++ emitter で toolchain2 を C++ に変換し g++ build を通す
 
 文脈: [docs/ja/plans/p4-cpp-selfhost.md](../plans/p4-cpp-selfhost.md)

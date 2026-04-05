@@ -40,10 +40,6 @@
 5. [ ] [ID: P1-NIM-EMITTER-S5] fixture + sample の Nim compile + run parity を通す（`nim c -r`）— Nim コンパイラ要
 6. [ ] [ID: P1-NIM-EMITTER-S6] stdlib の Nim parity を通す（`--case-root stdlib`）— Nim コンパイラ要
 
-### P2-NIM-LINT-FIX: Nim emitter のハードコード違反を修正する
-
-1. [x] [ID: P2-NIM-LINT-S1] `check_emitter_hardcode_lint.py` で Nim の違反が 0 件になることを確認する — 完了: 2026-04-02 (`--lang nim --include-runtime --no-write` で 0 件)
-
 ### P20-NIM-SELFHOST: Nim emitter で toolchain2 を Nim に変換し実行できるようにする
 
 1. [ ] [ID: P20-NIM-SELFHOST-S0] selfhost 対象コードの型注釈補完（他言語と共通）

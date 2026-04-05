@@ -62,11 +62,6 @@
 6. [ ] [ID: P1-KOTLIN-EMITTER-S6] stdlib の Kotlin parity を通す（`--case-root stdlib`）
 7. [ ] [ID: P1-KOTLIN-EMITTER-S7] sample の Kotlin parity を通す（`--case-root sample`）
 
-### P2-JVM-LINT: emitter hardcode lint の Scala / Kotlin 違反を解消する
-
-1. [x] [ID: P2-JVM-LINT-S1] `check_emitter_hardcode_lint.py --lang scala` で全カテゴリ 0 件になることを確認する
-2. [x] [ID: P2-JVM-LINT-S2] `check_emitter_hardcode_lint.py --lang kotlin` で全カテゴリ 0 件になることを確認する
-
 ### P3-JAVA-SELFHOST: Java emitter で toolchain2 を Java に変換し build を通す
 
 文脈: [docs/ja/plans/p3-java-selfhost.md](../plans/p3-java-selfhost.md)
