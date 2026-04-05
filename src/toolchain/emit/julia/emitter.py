@@ -29,7 +29,7 @@ class JuliaRenderer(CommonRenderer):
         mapping_path = Path(__file__).resolve().parents[3] / "runtime" / "julia" / "mapping.json"
         self.mapping = load_runtime_mapping(mapping_path)
         self.rewriter = JuliaBootstrapRewriter()
-        self.legacy_bridge = JuliaLegacyEmitterBridge()
+        self.legacy_bridge = JuliaLegacyEmitterBridge(self.mapping)
 
     mapping: RuntimeMapping
 

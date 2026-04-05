@@ -35,8 +35,10 @@
 
 依存箇所: `from toolchain_.emit.julia.emitter.julia_native_emitter import JuliaNativeEmitter`
 
-1. [ ] [ID: P0-JULIA-LEGACY-S1] `bootstrap.py` の `JuliaNativeEmitter` 依存を toolchain の Julia emitter に移行する（旧 emitter のロジックを新 emitter に統合）
-2. [ ] [ID: P0-JULIA-LEGACY-S2] `toolchain_` への import がゼロになることを確認する
+1. [x] [ID: P0-JULIA-LEGACY-S1] `bootstrap.py` の `JuliaNativeEmitter` 依存を toolchain の Julia emitter に移行する（旧 emitter のロジックを新 emitter に統合）
+   - 完了メモ: `src/toolchain/emit/julia/bootstrap.py` の bridge を `toolchain_` legacy emitter から切り離し、toolchain-native な `JuliaSubsetRenderer` fallback に差し替えた。`toolchain_` 非依存で emit 可能。
+2. [x] [ID: P0-JULIA-LEGACY-S2] `toolchain_` への import がゼロになることを確認する
+   - 完了メモ: `rg -n "from toolchain_|import toolchain_" src/toolchain/emit/julia` で 0 件を確認。
 
 ### P0-JULIA-NEW-FIXTURE-PARITY: 新規追加 fixture / stdlib の parity 確認
 
@@ -44,7 +46,8 @@
 
 対象: `bytes_copy_semantics`, `negative_index_comprehensive`, `negative_index_out_of_range`, `callable_optional_none`, `str_find_index`, `eo_extern_opaque_basic`(emit-only), `math_extended`(stdlib), `os_glob_extended`(stdlib)
 
-1. [ ] [ID: P0-JULIA-NEWFIX-S1] 上記 fixture/stdlib の parity を確認する（対象 fixture のみ実行）
+1. [x] [ID: P0-JULIA-NEWFIX-S1] 上記 fixture/stdlib の parity を確認する（対象 fixture のみ実行）
+   - 完了メモ: `runtime_parity_check_fast.py` で fixture 6件（`bytes_copy_semantics`, `negative_index_comprehensive`, `negative_index_out_of_range`, `callable_optional_none`, `str_find_index`, `eo_extern_opaque_basic`）と stdlib 2件（`math_extended`, `os_glob_extended`）の Julia parity/emit-only を確認。subset 側で module attr call fallback、`bytearray.append` owner-type fallback、`MultiAssign` unpack、`str.index` の `ValueError` semantics を補完し、Julia runtime mapping に `pytra.std.glob` / `os.path.abspath` / `PytraError` 系 exception base を追加した。
 
 ### P2-JULIA-LINT: emitter hardcode lint の Julia 違反を解消する
 

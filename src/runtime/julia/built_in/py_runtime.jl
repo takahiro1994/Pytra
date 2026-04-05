@@ -347,6 +347,14 @@ function __pytra_str_rfind(s, sub)
     return first(r) - 1
 end
 
+function __pytra_str_index(s, sub)
+    pos = __pytra_str_find(s, sub)
+    if pos < 0
+        throw(__pytra_value_error("substring not found"))
+    end
+    return pos
+end
+
 function __pytra_str_isdigit(s)
     if length(s) == 0
         return false

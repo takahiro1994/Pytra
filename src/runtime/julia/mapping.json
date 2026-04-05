@@ -131,6 +131,7 @@
   "module_native_files": {
     "math": "std/math_native.jl",
     "time": "std/time_native.jl",
+    "pytra.std.glob": "std/glob_native.jl",
     "pytra.std.os": "std/os_native.jl|std/os_path_native.jl",
     "pytra.std.os_path": "std/os_path_native.jl",
     "pytra.utils.png": "utils/png.jl",
@@ -140,7 +141,8 @@
   "module_namespace_exprs": {
     "math": "(ceil=__MathNative.ceil, cos=__MathNative.cos, e=__MathNative.e, exp=__MathNative.exp, fabs=__MathNative.fabs, floor=__MathNative.floor, log=__MathNative.log, log10=__MathNative.log10, pi=__MathNative.pi, pow=__MathNative.pow, sin=__MathNative.sin, sqrt=__MathNative.sqrt, tan=__MathNative.tan)",
     "pytra.std.env": "(target=\"julia\",)",
-    "pytra.std.os": "(getcwd=__OsNative.getcwd, makedirs=__OsNative.makedirs, mkdir=__OsNative.mkdir, path=(join=__OsPathNative.join, splitext=__OsPathNative.splitext, basename=__OsPathNative.basename, dirname=__OsPathNative.dirname, exists=__OsPathNative.exists))",
+    "pytra.std.glob": "(glob=__GlobNative.glob,)",
+    "pytra.std.os": "(getcwd=__OsNative.getcwd, makedirs=__OsNative.makedirs, mkdir=__OsNative.mkdir, path=(join=__OsPathNative.join, splitext=__OsPathNative.splitext, basename=__OsPathNative.basename, dirname=__OsPathNative.dirname, exists=__OsPathNative.exists, abspath=__OsPathNative.abspath))",
     "pytra.utils.png": "(_adler32=_adler32, _chunk=_chunk, _crc32=_crc32, _png_append_list=_png_append_list, _png_u16le=_png_u16le, _png_u32be=_png_u32be, _zlib_deflate_store=_zlib_deflate_store, write_rgb_png=write_rgb_png)"
   },
   "types": {
@@ -159,6 +161,8 @@
     "None": "Nothing",
     "Any": "Any",
     "Path": "String",
+    "PytraError": "PytraException",
+    "BaseException": "PytraException",
     "Exception": "Exception"
   },
   "predicate_types": {
@@ -173,6 +177,8 @@
     "PYTRA_TID_STR": "AbstractString",
     "PYTRA_TID_STRING": "AbstractString",
     "PYTRA_TID_TUPLE": "Tuple",
+    "PytraError": "PytraException",
+    "BaseException": "PytraException",
     "Exception": "PytraException",
     "IndexError": "BoundsError",
     "ValueError": "PytraValueError",

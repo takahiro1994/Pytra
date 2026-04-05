@@ -282,6 +282,18 @@ def _ident(name: str) -> str:
     return name
 
 
+def _owner_type_runtime_prefix(owner_type: str) -> str:
+    if owner_type.startswith("list["):
+        return "list"
+    if owner_type.startswith("dict["):
+        return "dict"
+    if owner_type.startswith("set["):
+        return "set"
+    if owner_type.startswith("tuple["):
+        return "tuple"
+    return owner_type
+
+
 def _import_supported(names: list[JsonVal]) -> bool:
     return all(isinstance(item, dict) and _str(item, "name") != "" for item in names)
 
@@ -781,7 +793,7 @@ class JuliaSubsetRenderer:
         if mapped == "__STR_COUNT__" and len(args) == 2:
             return "count(" + args[1] + ", " + args[0] + ")"
         if mapped == "__STR_INDEX__" and len(args) == 2:
-            return "__pytra_str_find(" + args[0] + ", " + args[1] + ")"
+            return "__pytra_str_index(" + args[0] + ", " + args[1] + ")"
         if mapped == "__STR_ISSPACE__" and len(args) == 1:
             return "((length(" + args[0] + ") != 0) && all(isspace, " + args[0] + "))"
         return ""
@@ -822,6 +834,15 @@ class JuliaSubsetRenderer:
         runtime_call = _str(node, "resolved_runtime_call")
         if runtime_call == "":
             runtime_call = _str(node, "runtime_call")
+        if runtime_call == "":
+            func_node = node.get("func")
+            if isinstance(func_node, dict) and _str(func_node, "kind") == "Attribute":
+                owner_node = func_node.get("value")
+                attr = _str(func_node, "attr")
+                owner_type = _str(owner_node, "resolved_type") if isinstance(owner_node, dict) else ""
+                runtime_prefix = _owner_type_runtime_prefix(owner_type)
+                if runtime_prefix != "":
+                    runtime_call = runtime_prefix + "." + attr
         mapped = self.mapping.calls.get(runtime_call, "")
         if mapped == "":
             return ""
@@ -919,6 +940,25 @@ class JuliaSubsetRenderer:
             )
             if mapped_expr != "":
                 return mapped_expr
+        if isinstance(owner_node, dict):
+            owner_module_id = _str(owner_node, "runtime_module_id")
+            runtime_symbol = _str(node, "runtime_symbol")
+            if owner_module_id != "" and runtime_symbol != "":
+                module_key = owner_module_id + "." + runtime_symbol
+                mapped_runtime = self.mapping.calls.get(module_key, "")
+                if mapped_runtime != "":
+                    mapped_expr = self._render_mapped_runtime_call(
+                        mapped_runtime,
+                        args,
+                        _str(node, "resolved_type"),
+                        keywords=keywords,
+                    )
+                    if mapped_expr != "":
+                        return mapped_expr
+            if _str(owner_node, "resolved_type") == "module" or owner_module_id != "":
+                rendered_args = ", ".join(args)
+                if len(keywords) == 0:
+                    return owner + "." + attr + "(" + rendered_args + ")"
         class_dispatch = self._render_class_dispatch_call(owner, owner_type, owner_name, attr, args, keywords)
         if class_dispatch != "":
             return class_dispatch
@@ -1386,6 +1426,16 @@ class JuliaSubsetRenderer:
             return
         self._emit(_ident(_str(target, "id")) + " = " + self._render_expr(node.get("value")))
 
+    def _emit_multi_assign_stmt(self, node: dict[str, JsonVal]) -> None:
+        value_expr = self._render_expr(node.get("value"))
+        tmp_name = self._next_tmp("__pytra_multi_")
+        self._emit(tmp_name + " = " + value_expr)
+        for index, target in enumerate(_list(node, "targets")):
+            if not isinstance(target, dict):
+                continue
+            item_expr = tmp_name + "[__pytra_idx(" + str(index) + ", length(" + tmp_name + "))]"
+            self._emit_assign_target(target, item_expr)
+
     def _emit_augassign_stmt(self, node: dict[str, JsonVal]) -> None:
         target_node = node.get("target")
         op = _str(node, "op")
@@ -1641,6 +1691,9 @@ class JuliaSubsetRenderer:
             return True
         if kind == "Assign":
             self._emit_assign_stmt(node)
+            return True
+        if kind in {"MultiAssign", "TupleUnpack"}:
+            self._emit_multi_assign_stmt(node)
             return True
         if kind == "Swap":
             left = _ident(_str(node.get("left"), "id"))

@@ -11,7 +11,7 @@ import copy
 
 from pytra.std.json import JsonVal
 
-from toolchain_.emit.julia.emitter.julia_native_emitter import JuliaNativeEmitter
+from toolchain.emit.common.code_emitter import RuntimeMapping
 from toolchain.link.expand_defaults import expand_cross_module_defaults
 
 
@@ -267,7 +267,19 @@ class JuliaBootstrapRewriter:
 
 
 class JuliaLegacyEmitterBridge:
-    """Thin bridge from toolchain bootstrap output to the legacy Julia emitter."""
+    """Fallback bridge for Julia bootstrap output.
+
+    The deprecated toolchain_ Julia emitter has been removed from the runtime
+    path. Keep the bridge entrypoint, but delegate to the toolchain-native
+    subset renderer so callers no longer depend on toolchain_.
+    """
+
+    def __init__(self, mapping: RuntimeMapping | None = None) -> None:
+        self.mapping = mapping if mapping is not None else RuntimeMapping()
 
     def emit_module(self, east3_doc: dict[str, JsonVal]) -> str:
-        return JuliaNativeEmitter(east3_doc).transpile()
+        from toolchain.emit.julia.subset import JuliaSubsetRenderer
+
+        meta = east3_doc.get("meta")
+        subset_meta = meta if isinstance(meta, dict) else {}
+        return JuliaSubsetRenderer(self.mapping, subset_meta).render_module(east3_doc)
