@@ -648,6 +648,20 @@ class DartNativeEmitter:
             if len(rendered_args) == 0:
                 return "''"
             return "pytraStr(" + rendered_args[0] + ")"
+        if mapped == "__SUM__":
+            if len(rendered_args) == 0:
+                return "0"
+            return "((" + rendered_args[0] + ").fold<num>(0, (a, b) => a + (b as num)))"
+        if mapped == "__ZIP__":
+            if len(rendered_args) < 2:
+                return "[]"
+            return "pytraZip(" + ", ".join(rendered_args) + ")"
+        if mapped == "__RANGE__":
+            if len(rendered_args) == 1:
+                return "List.generate(" + rendered_args[0] + ", (i) => i)"
+            if len(rendered_args) == 2:
+                return "List.generate((" + rendered_args[1] + ") - (" + rendered_args[0] + "), (i) => i + (" + rendered_args[0] + "))"
+            return "List.generate(((" + rendered_args[1] + ") - (" + rendered_args[0] + ")) ~/ (" + rendered_args[2] + "), (i) => (" + rendered_args[0] + ") + i * (" + rendered_args[2] + "))"
         if mapped.startswith("__NUM_METHOD__:"):
             method_name = mapped[len("__NUM_METHOD__:"):]
             if len(rendered_args) == 0:
@@ -2808,10 +2822,6 @@ class DartNativeEmitter:
                 if len(rendered_args) == 0:
                     return "0"
                 return "(" + rendered_args[0] + ").abs()"
-            if raw_fn_name == "sum":
-                if len(rendered_args) == 0:
-                    return "0"
-                return "((" + rendered_args[0] + ").fold<num>(0, (a, b) => a + (b as num)))"
             if raw_fn_name == "enumerate":
                 if len(rendered_args) == 0:
                     return "[]"
@@ -2824,16 +2834,6 @@ class DartNativeEmitter:
                 if len(rendered_args) == 0:
                     return "[]"
                 return "(" + rendered_args[0] + ").reversed.toList()"
-            if raw_fn_name == "zip":
-                if len(rendered_args) < 2:
-                    return "[]"
-                return "pytraZip(" + ", ".join(rendered_args) + ")"
-            if raw_fn_name == "range":
-                if len(rendered_args) == 1:
-                    return "List.generate(" + rendered_args[0] + ", (i) => i)"
-                if len(rendered_args) == 2:
-                    return "List.generate((" + rendered_args[1] + ") - (" + rendered_args[0] + "), (i) => i + (" + rendered_args[0] + "))"
-                return "List.generate(((" + rendered_args[1] + ") - (" + rendered_args[0] + ")) ~/ (" + rendered_args[2] + "), (i) => (" + rendered_args[0] + ") + i * (" + rendered_args[2] + "))"
             if raw_fn_name == "set" or raw_fn_name == "set_":
                 if len(rendered_args) == 0:
                     return "pytraNewSet()"

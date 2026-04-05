@@ -14,6 +14,8 @@
     "int": "__INT__",
     "bool": "__BOOL__",
     "py_range": "__RANGE__",
+    "sum": "__SUM__",
+    "zip": "__ZIP__",
     "list.append": "__LIST_APPEND__",
     "list.extend": "__LIST_EXTEND__",
     "list.insert": "__LIST_INSERT__",
