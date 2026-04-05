@@ -74,6 +74,12 @@ __pytra_new_TypeError(msg="error") = __pytra_type_error(msg)
 __pytra_new_IndexError(msg="error") = __pytra_index_error(msg)
 __pytra_new_KeyError(msg="error") = __pytra_key_error(msg)
 
+const ValueError = __PytraValueError
+const RuntimeError = __PytraRuntimeError
+const TypeError = __PytraTypeError
+const IndexError = __PytraIndexError
+const KeyError = __PytraKeyError
+
 function __pytra_exception_message(v)
     return string(v)
 end

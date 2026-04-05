@@ -991,8 +991,6 @@ class JuliaSubsetRenderer:
             return "__pytra_new_" + func + "(" + ", ".join(args) + ")"
         if func in self.class_names:
             return "__pytra_new_" + func + "(" + ", ".join(args) + ")"
-        if (func in self.mapping.predicate_types and func.endswith("Error")) or func in {"BaseException", "Exception"}:
-            return "__pytra_new_" + func + "(" + ", ".join(args) + ")"
         if func == "bytearray":
             if len(args) == 0:
                 return "__pytra_bytearray()"
