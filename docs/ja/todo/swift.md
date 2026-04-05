@@ -37,8 +37,10 @@
 - `from toolchain_.frontends.runtime_symbol_index import canonical_runtime_module_id`
 - `from toolchain_.frontends.runtime_symbol_index import lookup_runtime_module_extern_contract`
 
-1. [ ] [ID: P0-SWIFT-LEGACY-S1] `runtime_symbol_index` の必要な機能を toolchain 側に移行するか、emitter 内で EAST3 メタデータから直接取得するように修正する
-2. [ ] [ID: P0-SWIFT-LEGACY-S2] `toolchain_` への import がゼロになることを確認する
+1. [x] [ID: P0-SWIFT-LEGACY-S1] `runtime_symbol_index` の必要な機能を toolchain 側に移行するか、emitter 内で EAST3 メタデータから直接取得するように修正する
+   完了メモ: `src/toolchain/emit/swift/emitter.py` に `runtime_symbol_index.json` 読み取りの最小 helper を内蔵し、`canonical_runtime_module_id` / `lookup_runtime_module_extern_contract` の `toolchain_` 依存を除去。
+2. [x] [ID: P0-SWIFT-LEGACY-S2] `toolchain_` への import がゼロになることを確認する
+   完了メモ: `rg -n 'from toolchain_|import toolchain_' src/toolchain/emit/swift` は 0 件。
 
 ### P0-SWIFT-NEW-FIXTURE-PARITY: 新規追加 fixture / stdlib の parity 確認
 
@@ -46,11 +48,17 @@
 
 対象: `bytes_copy_semantics`, `negative_index_comprehensive`, `negative_index_out_of_range`, `callable_optional_none`, `str_find_index`, `eo_extern_opaque_basic`(emit-only), `math_extended`(stdlib), `os_glob_extended`(stdlib)
 
-1. [ ] [ID: P0-SWIFT-NEWFIX-S1] 上記 fixture/stdlib の parity を確認する（対象 fixture のみ実行）
+1. [x] [ID: P0-SWIFT-NEWFIX-S1] 上記 fixture/stdlib の parity を確認する（対象 fixture のみ実行）
+   完了メモ: `runtime_parity_check_fast.py` で fixture 6 件 (`bytes_copy_semantics`, `negative_index_comprehensive`, `negative_index_out_of_range`, `callable_optional_none`, `str_find_index`, `eo_extern_opaque_basic`) と stdlib 2 件 (`math_extended`, `os_glob_extended`) を Swift で PASS 確認。
 
-### P2-SWIFT-LINT: emitter hardcode lint の Swift 違反を解消する
+### P2-SWIFT-LINT: emitter guide 準拠の確認と違反箇所の修正
 
-1. [ ] [ID: P2-SWIFT-LINT-S1] `check_emitter_hardcode_lint.py --lang swift` で全カテゴリ 0 件になることを確認する
+emitter guide（`docs/ja/spec/spec-emitter-guide.md`）に照らし合わせて、Swift emitter の違反箇所を修正する。lint 0 件にすること自体が目標ではなく、emitter guide に準拠することが目標。lint はその検証手段。
+
+1. [x] [ID: P2-SWIFT-LINT-S1] `check_emitter_hardcode_lint.py --lang swift` の各違反を emitter guide に照らし合わせて修正する。EAST3 の情報（`runtime_call`, `semantic_tag`, `runtime_module_id`, `runtime_symbol` 等）を使い、文字列ハードコードを削除する
+   完了メモ: bare method 名比較を `runtime_call` / `runtime_symbol` ベースへ寄せ、`check_emitter_hardcode_lint.py --lang swift` は 0 件。
+2. [x] [ID: P2-SWIFT-LINT-S2] mapping.json の `calls` テーブルが §7.1 / §7.1.1 に準拠していることを確認する（dead エントリ削除、FQCN キー統一）
+   完了メモ: `print`, `py_len`, `float`, `py_bool`, `py_truthy`, `py_floordiv`, `py_in`, `py_slice`, `bytearray`, `bytes` を `calls` から除外し、`check_runtime_call_coverage.py --lang swift --direction mapping-to-east` は 0 件。
 
 ### P20-SWIFT-SELFHOST: Swift emitter で toolchain2 を Swift に変換し build を通す
 

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from typing import Any
 
 from pytra.std.pathlib import Path
@@ -9,17 +10,9 @@ from pytra.std.pathlib import Path
 from toolchain.emit.common.code_emitter import (
     load_runtime_mapping,
     should_skip_module,
-)
-from toolchain.emit.common.emitter.code_emitter import (
     build_import_alias_map,
-    collect_reassigned_params,
-    mutable_param_name,
-    reject_backend_general_union_type_exprs,
-    reject_backend_homogeneous_tuple_ellipsis_type_exprs,
-    reject_backend_typed_vararg_signatures,
 )
-from toolchain_.frontends.runtime_symbol_index import canonical_runtime_module_id
-from toolchain_.frontends.runtime_symbol_index import lookup_runtime_module_extern_contract
+from toolchain.compile.type_summary import summarize_type_expr
 
 
 _SWIFT_KEYWORDS = {
@@ -70,6 +63,7 @@ _CLASS_METHODS: list[dict[str, set[str]]] = [{}]
 _MAIN_CALL_ALIAS: list[str] = [""]
 _RELATIVE_IMPORT_NAME_ALIASES: list[dict[str, str]] = [{}]
 _THROWING_FUNCTIONS: list[set[str]] = [set()]
+_IN_TRY_BODY_DEPTH: list[int] = [0]
 _INOUT_PARAM_POSITIONS: list[dict[str, set[int]]] = [{}]
 _CURRENT_MODULE_ID: list[str] = [""]
 _FUNCTION_VARARG_ELEM_TYPES: list[dict[str, str]] = [{}]
@@ -78,6 +72,282 @@ _CURRENT_LOCAL_TYPES: list[dict[str, str]] = [{}]
 _FUNCTION_SIGNATURES: list[dict[str, str]] = [{}]
 _SWIFT_RUNTIME_ROOT = Path(__file__).resolve().parents[3] / "runtime" / "swift"
 _SWIFT_RUNTIME_MAPPING = load_runtime_mapping(_SWIFT_RUNTIME_ROOT / "mapping.json")
+_RUNTIME_SYMBOL_INDEX_PATH = Path(__file__).resolve().parents[3].joinpath("tools").joinpath("runtime_symbol_index.json")
+_RUNTIME_SYMBOL_INDEX_CACHE: dict[str, Any] | None = None
+
+
+def _load_runtime_symbol_index() -> dict[str, Any]:
+    global _RUNTIME_SYMBOL_INDEX_CACHE
+    if _RUNTIME_SYMBOL_INDEX_CACHE is not None:
+        return _RUNTIME_SYMBOL_INDEX_CACHE
+    if not _RUNTIME_SYMBOL_INDEX_PATH.exists():
+        _RUNTIME_SYMBOL_INDEX_CACHE = {}
+        return _RUNTIME_SYMBOL_INDEX_CACHE
+    try:
+        raw = json.loads(_RUNTIME_SYMBOL_INDEX_PATH.read_text(encoding="utf-8"))
+        _RUNTIME_SYMBOL_INDEX_CACHE = raw if isinstance(raw, dict) else {}
+    except Exception:
+        _RUNTIME_SYMBOL_INDEX_CACHE = {}
+    return _RUNTIME_SYMBOL_INDEX_CACHE
+
+
+def _runtime_module_doc(module_id: str) -> dict[str, Any]:
+    modules = _load_runtime_symbol_index().get("modules")
+    if not isinstance(modules, dict):
+        return {}
+    doc = modules.get(module_id)
+    return doc if isinstance(doc, dict) else {}
+
+
+def canonical_runtime_module_id(module_id: str) -> str:
+    mod = module_id.strip()
+    if mod.startswith("pytra.") or mod.startswith("toolchain."):
+        return mod
+    if "." not in mod and mod != "":
+        candidate = ".".join(["pytra", "std", mod])
+        if len(_runtime_module_doc(candidate)) > 0:
+            return candidate
+    return mod
+
+
+def lookup_runtime_module_extern_contract(module_id: str) -> dict[str, Any]:
+    extern_contract = _runtime_module_doc(canonical_runtime_module_id(module_id)).get("extern_contract_v1")
+    return extern_contract if isinstance(extern_contract, dict) else {}
+
+
+def _type_expr_to_string(expr: dict[str, Any]) -> str:
+    summary = summarize_type_expr(expr)
+    mirror = summary.get("mirror")
+    return mirror if isinstance(mirror, str) else "unknown"
+
+
+def _is_type_expr_payload(value: object) -> bool:
+    return isinstance(value, dict) and isinstance(value.get("kind"), str)
+
+
+def _make_user_error(summary: str, details: list[str]) -> Exception:
+    lines = [summary]
+    for item in details:
+        lines.append("- " + item)
+    return RuntimeError("\n".join(lines))
+
+
+def _find_general_union_lane(type_expr: object) -> dict[str, Any] | None:
+    if not _is_type_expr_payload(type_expr) or not isinstance(type_expr, dict):
+        return None
+    kind = str(type_expr.get("kind", ""))
+    if kind == "UnionType":
+        union_mode = str(type_expr.get("union_mode", "")).strip()
+        if union_mode != "dynamic":
+            return type_expr
+        options_obj = type_expr.get("options")
+        if isinstance(options_obj, list):
+            for option in options_obj:
+                found = _find_general_union_lane(option)
+                if found is not None:
+                    return found
+        return None
+    if kind == "OptionalType":
+        return _find_general_union_lane(type_expr.get("inner"))
+    if kind == "GenericType":
+        args_obj = type_expr.get("args")
+        if isinstance(args_obj, list):
+            for arg in args_obj:
+                found = _find_general_union_lane(arg)
+                if found is not None:
+                    return found
+    return None
+
+
+def _collect_general_union_type_expr_issues(doc: object, *, path: str, out: list[dict[str, str]]) -> None:
+    if _is_type_expr_payload(doc):
+        lane = _find_general_union_lane(doc)
+        if lane is not None and isinstance(doc, dict):
+            out.append({"path": path, "carrier": _type_expr_to_string(doc), "lane": _type_expr_to_string(lane)})
+        return
+    if isinstance(doc, dict):
+        for key, value in doc.items():
+            if isinstance(key, str):
+                _collect_general_union_type_expr_issues(value, path=path + "." + key, out=out)
+        return
+    if isinstance(doc, list):
+        for idx, item in enumerate(doc):
+            _collect_general_union_type_expr_issues(item, path=path + "[" + str(idx) + "]", out=out)
+
+
+def reject_backend_general_union_type_exprs(doc: object, *, backend_name: str) -> None:
+    issues: list[dict[str, str]] = []
+    _collect_general_union_type_expr_issues(doc, path="$", out=issues)
+    if len(issues) == 0:
+        return
+    first = issues[0]
+    details = [
+        first.get("path", "$") + ": " + first.get("carrier", "unknown"),
+        "unsupported general-union lane: " + first.get("lane", "unknown"),
+    ]
+    if len(issues) > 1:
+        details.append("additional general-union TypeExpr carriers: " + str(len(issues) - 1))
+    details.append("Use Optional[T], a dynamic union, or a nominal ADT lane instead.")
+    raise _make_user_error(backend_name + " does not support general union TypeExpr yet", details)
+
+
+def _find_homogeneous_tuple_ellipsis_lane(type_expr: object) -> dict[str, Any] | None:
+    if not _is_type_expr_payload(type_expr) or not isinstance(type_expr, dict):
+        return None
+    kind = str(type_expr.get("kind", ""))
+    if kind == "GenericType":
+        tuple_shape = str(type_expr.get("tuple_shape", "")).strip()
+        base = str(type_expr.get("base", "")).strip()
+        if tuple_shape == "homogeneous_ellipsis" and base == "tuple":
+            return type_expr
+        args_obj = type_expr.get("args")
+        if isinstance(args_obj, list):
+            for arg in args_obj:
+                found = _find_homogeneous_tuple_ellipsis_lane(arg)
+                if found is not None:
+                    return found
+        return None
+    if kind == "OptionalType":
+        return _find_homogeneous_tuple_ellipsis_lane(type_expr.get("inner"))
+    if kind == "UnionType":
+        options_obj = type_expr.get("options")
+        if isinstance(options_obj, list):
+            for option in options_obj:
+                found = _find_homogeneous_tuple_ellipsis_lane(option)
+                if found is not None:
+                    return found
+    return None
+
+
+def _collect_homogeneous_tuple_ellipsis_issues(doc: object, *, path: str, out: list[dict[str, str]]) -> None:
+    if _is_type_expr_payload(doc):
+        lane = _find_homogeneous_tuple_ellipsis_lane(doc)
+        if lane is not None and isinstance(doc, dict):
+            out.append({"path": path, "carrier": _type_expr_to_string(doc), "lane": _type_expr_to_string(lane)})
+        return
+    if isinstance(doc, dict):
+        for key, value in doc.items():
+            if isinstance(key, str):
+                _collect_homogeneous_tuple_ellipsis_issues(value, path=path + "." + key, out=out)
+        return
+    if isinstance(doc, list):
+        for idx, item in enumerate(doc):
+            _collect_homogeneous_tuple_ellipsis_issues(item, path=path + "[" + str(idx) + "]", out=out)
+
+
+def reject_backend_homogeneous_tuple_ellipsis_type_exprs(doc: object, *, backend_name: str) -> None:
+    issues: list[dict[str, str]] = []
+    _collect_homogeneous_tuple_ellipsis_issues(doc, path="$", out=issues)
+    if len(issues) == 0:
+        return
+    first = issues[0]
+    details = [
+        first.get("path", "$") + ": " + first.get("carrier", "unknown"),
+        "unsupported homogeneous tuple lane: " + first.get("lane", "unknown"),
+    ]
+    if len(issues) > 1:
+        details.append("additional homogeneous tuple carriers: " + str(len(issues) - 1))
+    details.append("Representative tuple[T, ...] rollout is implemented only in the C++ backend right now.")
+    raise _make_user_error(backend_name + " does not support homogeneous tuple ellipsis TypeExpr yet", details)
+
+
+def _format_typed_vararg_signature_lane(node: dict[str, Any]) -> str:
+    name_any = node.get("name")
+    name = name_any if isinstance(name_any, str) and name_any.strip() != "" else "<anonymous>"
+    vararg_name_any = node.get("vararg_name")
+    vararg_name = vararg_name_any if isinstance(vararg_name_any, str) and vararg_name_any.strip() != "" else "args"
+    vararg_type_any = node.get("vararg_type")
+    vararg_type = vararg_type_any if isinstance(vararg_type_any, str) else ""
+    if vararg_type.strip() == "":
+        type_expr = node.get("vararg_type_expr")
+        if _is_type_expr_payload(type_expr) and isinstance(type_expr, dict):
+            vararg_type = _type_expr_to_string(type_expr)
+    if vararg_type.strip() == "":
+        return "FunctionDef " + name + "(*" + vararg_name + ")"
+    return "FunctionDef " + name + "(*" + vararg_name + ": " + vararg_type + ")"
+
+
+def _collect_typed_vararg_signature_issues(doc: object, *, path: str, out: list[dict[str, str]]) -> None:
+    if isinstance(doc, dict):
+        kind = doc.get("kind", "")
+        if kind == "FunctionDef":
+            vararg_name_any = doc.get("vararg_name")
+            vararg_name = vararg_name_any if isinstance(vararg_name_any, str) else ""
+            if vararg_name.strip() != "":
+                out.append({"path": path, "lane": _format_typed_vararg_signature_lane(doc)})
+        for key, value in doc.items():
+            if isinstance(key, str):
+                _collect_typed_vararg_signature_issues(value, path=path + "." + key, out=out)
+        return
+    if isinstance(doc, list):
+        for idx, item in enumerate(doc):
+            _collect_typed_vararg_signature_issues(item, path=path + "[" + str(idx) + "]", out=out)
+
+
+def reject_backend_typed_vararg_signatures(doc: object, *, backend_name: str) -> None:
+    issues: list[dict[str, str]] = []
+    _collect_typed_vararg_signature_issues(doc, path="$", out=issues)
+    if len(issues) == 0:
+        return
+    first = issues[0]
+    details = [
+        first.get("path", "$") + ": " + first.get("lane", "FunctionDef <anonymous>(*args)"),
+        "unsupported typed varargs lane: " + first.get("lane", "FunctionDef <anonymous>(*args)"),
+    ]
+    if len(issues) > 1:
+        details.append("additional typed *args signatures: " + str(len(issues) - 1))
+    details.append("Representative typed *args signature rollout is implemented only in the C++ backend right now.")
+    raise _make_user_error(backend_name + " does not support typed *args signatures yet", details)
+
+
+def _scan_reassigned_names(node: Any, param_names: set[str], out: set[str]) -> None:
+    if isinstance(node, list):
+        for item in node:
+            _scan_reassigned_names(item, param_names, out)
+        return
+    if not isinstance(node, dict):
+        return
+    kind = node.get("kind", "")
+    if kind in {"Assign", "AnnAssign", "AugAssign"}:
+        target = node.get("target")
+        if isinstance(target, dict):
+            if target.get("kind") == "Name":
+                name = target.get("id", "")
+                if name in param_names:
+                    out.add(name)
+            elif target.get("kind") == "Tuple":
+                elements = target.get("elements")
+                if isinstance(elements, list):
+                    for elem in elements:
+                        if isinstance(elem, dict) and elem.get("kind") == "Name":
+                            name = elem.get("id", "")
+                            if name in param_names:
+                                out.add(name)
+    if kind == "ForCore":
+        target_plan = node.get("target_plan")
+        if isinstance(target_plan, dict) and target_plan.get("kind") == "NameTarget":
+            name = target_plan.get("id", "")
+            if name in param_names:
+                out.add(name)
+    for value in node.values():
+        if isinstance(value, (dict, list)):
+            _scan_reassigned_names(value, param_names, out)
+
+
+def collect_reassigned_params(func_def: dict[str, Any]) -> set[str]:
+    arg_order = func_def.get("arg_order")
+    if not isinstance(arg_order, list) or len(arg_order) == 0:
+        return set()
+    param_names = {arg for arg in arg_order if isinstance(arg, str) and arg != ""}
+    if len(param_names) == 0:
+        return set()
+    reassigned: set[str] = set()
+    _scan_reassigned_names(func_def.get("body"), param_names, reassigned)
+    return reassigned
+
+
+def mutable_param_name(name: str) -> str:
+    return name + "_"
 
 
 def _safe_ident(name: Any, fallback: str) -> str:
@@ -1301,6 +1571,18 @@ def _is_argument_parser_method(expr: dict[str, Any], method_name: str) -> bool:
     return semantic_tag == "stdlib.method." + method_name and _runtime_symbol_name(expr).endswith("." + method_name)
 
 
+def _matches_runtime_method(expr: dict[str, Any], *runtime_calls: str) -> bool:
+    runtime_call, resolved_source = _resolved_runtime_call(expr)
+    if runtime_call != "" and runtime_call in runtime_calls:
+        return True
+    runtime_symbol = _runtime_symbol_name(expr)
+    if runtime_symbol in runtime_calls:
+        return True
+    if resolved_source == "resolved_runtime_call" and runtime_call in runtime_calls:
+        return True
+    return False
+
+
 def _is_perf_counter_call(expr: dict[str, Any]) -> bool:
     return _expr_semantic_tag(expr) == "stdlib.fn.perf_counter"
 
@@ -1413,6 +1695,12 @@ def _render_attribute_expr(expr: dict[str, Any]) -> str:
         return "sys_native_stderr()"
     if semantic_tag == "stdlib.symbol.stdout":
         return "sys_native_stdout()"
+    if _is_math_constant(expr):
+        runtime_name = _runtime_symbol_name(expr)
+        if runtime_name == "pi":
+            return "Double.pi"
+        if runtime_name == "e":
+            return "Foundation.exp(1.0)"
     runtime_call, _ = _resolved_runtime_call(expr)
     if semantic_tag.startswith("stdlib.") and runtime_call == "" and not _is_math_constant(expr) and not _is_math_runtime(expr):
         raise RuntimeError("swift native emitter: unresolved stdlib runtime attribute: " + semantic_tag)
@@ -1616,12 +1904,16 @@ def _render_call_via_runtime_call(
             rendered_print_args.append(_render_expr(args[i]))
             i += 1
         return "__pytra_print(" + ", ".join(rendered_print_args) + ")"
-    if runtime_call in {"index", "__pytra_index"} and len(args) == 2:
+    if runtime_call in {"index", "__pytra_index", "str.index", "list.index"} and len(args) == 2:
         arg0 = args[0]
         arg0_type = arg0.get("resolved_type") if isinstance(arg0, dict) else ""
         if arg0_type == "str":
-            return "__pytra_index_str(" + _render_expr(args[0]) + ", " + _render_expr(args[1]) + ")"
-        return "__pytra_list_index(" + _render_expr(args[0]) + ", " + _render_expr(args[1]) + ")"
+            helper = "__pytra_index_str_throwing" if _IN_TRY_BODY_DEPTH[0] > 0 else "__pytra_index_str"
+            prefix = "try " if _IN_TRY_BODY_DEPTH[0] > 0 else ""
+            return prefix + helper + "(" + _render_expr(args[0]) + ", " + _render_expr(args[1]) + ")"
+        helper = "__pytra_list_index_throwing" if _IN_TRY_BODY_DEPTH[0] > 0 else "__pytra_list_index"
+        prefix = "try " if _IN_TRY_BODY_DEPTH[0] > 0 else ""
+        return prefix + helper + "(" + _render_expr(args[0]) + ", " + _render_expr(args[1]) + ")"
     if runtime_call == "py_to_string" and len(args) == 1:
         arg0 = args[0]
         if isinstance(arg0, dict):
@@ -1673,36 +1965,45 @@ def _render_call_via_runtime_call(
                 rt = runtime_owner.get("resolved_type")
                 owner_type = rt if isinstance(rt, str) else ""
             if owner_expr != "":
-                method_name = runtime_call.split(".")[-1].strip()
-                if method_name == "__init__":
+                if _matches_runtime_method(expr, "str.index") and len(args) == 1:
+                    helper = "__pytra_index_str_throwing" if _IN_TRY_BODY_DEPTH[0] > 0 else "__pytra_index_str"
+                    prefix = "try " if _IN_TRY_BODY_DEPTH[0] > 0 else ""
+                    return prefix + helper + "(" + owner_expr + ", " + _render_expr(args[0]) + ")"
+                if _matches_runtime_method(expr, "list.index") and len(args) == 1:
+                    helper = "__pytra_list_index_throwing" if _IN_TRY_BODY_DEPTH[0] > 0 else "__pytra_list_index"
+                    prefix = "try " if _IN_TRY_BODY_DEPTH[0] > 0 else ""
+                    return prefix + helper + "(" + owner_expr + ", " + _render_expr(args[0]) + ")"
+                if _matches_runtime_method(expr, "__init__"):
                     rendered_runtime_args: list[str] = []
                     i = 0
                     while i < len(args):
                         rendered_runtime_args.append(_render_expr(args[i]))
                         i += 1
                     return owner_expr + ".init(" + ", ".join(rendered_runtime_args) + ")"
-                if method_name == "clear":
+                if _matches_runtime_method(expr, "list.clear", "dict.clear", "set.clear", "bytearray.clear"):
                     return owner_expr + ".removeAll()"
-                if method_name == "extend" and len(args) == 1:
+                if _matches_runtime_method(expr, "list.extend") and len(args) == 1:
                     return "__pytra_extend(&" + owner_expr + ", " + _render_expr(args[0]) + ")"
-                if method_name == "reverse":
+                if _matches_runtime_method(expr, "list.reverse", "bytearray.reverse") or (
+                    _matches_runtime_method(expr, "bytes.reverse", "deque.reverse")
+                ):
                     return owner_expr + ".reverse()"
-                if method_name == "sort":
+                if _matches_runtime_method(expr, "list.sort") or _matches_runtime_method(expr, "bytes.sort", "bytearray.sort"):
                     return owner_expr + ".sort { __pytra_float($0) < __pytra_float($1) }"
-                if method_name == "append" and len(args) == 1:
+                if _matches_runtime_method(expr, "list.append", "deque.append") and len(args) == 1:
                     return owner_expr + ".append(" + _render_expr(args[0]) + ")"
-                if method_name == "add" and len(args) == 1:
+                if _matches_runtime_method(expr, "set.add") and len(args) == 1:
                     return "__pytra_set_add(&" + owner_expr + ", " + _render_expr(args[0]) + ")"
-                if method_name == "discard" and len(args) == 1:
+                if _matches_runtime_method(expr, "set.discard") and len(args) == 1:
                     return "__pytra_discard(&" + owner_expr + ", " + _render_expr(args[0]) + ")"
-                if method_name == "remove" and len(args) == 1:
+                if _matches_runtime_method(expr, "set.remove") and len(args) == 1:
                     return "__pytra_remove(&" + owner_expr + ", " + _render_expr(args[0]) + ")"
-                if method_name == "pop" and owner_type.startswith("dict[") and len(args) == 1:
+                if _matches_runtime_method(expr, "dict.pop") and owner_type.startswith("dict[") and len(args) == 1:
                     return _cast_from_any(
                         "__pytra_dict_pop(&" + owner_expr + ", " + _render_expr(args[0]) + ")",
                         _swift_type(expr.get("resolved_type"), allow_void=False),
                     )
-                if method_name == "setdefault" and owner_type.startswith("dict[") and len(args) == 2:
+                if _matches_runtime_method(expr, "dict.setdefault") and owner_type.startswith("dict[") and len(args) == 2:
                     return _cast_from_any(
                         "__pytra_dict_setdefault(&" + owner_expr + ", " + _render_expr(args[0]) + ", " + _render_expr(args[1]) + ")",
                         _swift_type(expr.get("resolved_type"), allow_void=False),
@@ -1950,8 +2251,12 @@ def _render_call_expr(expr: dict[str, Any]) -> str:
         first_any = args[0]
         first_type = first_any.get("resolved_type") if isinstance(first_any, dict) else ""
         if first_type == "str":
-            return "__pytra_index_str(" + _render_expr(args[0]) + ", " + _render_expr(args[1]) + ")"
-        return "__pytra_list_index(" + _render_expr(args[0]) + ", " + _render_expr(args[1]) + ")"
+            helper = "__pytra_index_str_throwing" if _IN_TRY_BODY_DEPTH[0] > 0 else "__pytra_index_str"
+            prefix = "try " if _IN_TRY_BODY_DEPTH[0] > 0 else ""
+            return prefix + helper + "(" + _render_expr(args[0]) + ", " + _render_expr(args[1]) + ")"
+        helper = "__pytra_list_index_throwing" if _IN_TRY_BODY_DEPTH[0] > 0 else "__pytra_list_index"
+        prefix = "try " if _IN_TRY_BODY_DEPTH[0] > 0 else ""
+        return prefix + helper + "(" + _render_expr(args[0]) + ", " + _render_expr(args[1]) + ")"
     if callee_name == "enumerate":
         if len(args) == 0:
             return "__pytra_enumerate([])"
@@ -2044,16 +2349,20 @@ def _render_call_expr(expr: dict[str, Any]) -> str:
             if attr_name == "__init__":
                 return "super.init(" + ", ".join(rendered_super_args) + ")"
             return "super." + attr_name + "(" + ", ".join(rendered_super_args) + ")"
-        if attr_name == "isdigit" and len(args) == 0:
+        if _matches_runtime_method(expr, "str.isdigit") and len(args) == 0:
             return "__pytra_isdigit(" + _render_expr(owner_any) + ")"
-        if attr_name == "isalpha" and len(args) == 0:
+        if _matches_runtime_method(expr, "str.isalpha") and len(args) == 0:
             return "__pytra_isalpha(" + _render_expr(owner_any) + ")"
         if attr_name == "index" and len(args) == 1:
             if isinstance(owner_any, dict):
                 owner_type = owner_any.get("resolved_type")
                 if owner_type == "str":
-                    return "__pytra_index_str(" + _render_expr(owner_any) + ", " + _render_expr(args[0]) + ")"
-            return "__pytra_list_index(" + _render_expr(owner_any) + ", " + _render_expr(args[0]) + ")"
+                    helper = "__pytra_index_str_throwing" if _IN_TRY_BODY_DEPTH[0] > 0 else "__pytra_index_str"
+                    prefix = "try " if _IN_TRY_BODY_DEPTH[0] > 0 else ""
+                    return prefix + helper + "(" + _render_expr(owner_any) + ", " + _render_expr(args[0]) + ")"
+            helper = "__pytra_list_index_throwing" if _IN_TRY_BODY_DEPTH[0] > 0 else "__pytra_list_index"
+            prefix = "try " if _IN_TRY_BODY_DEPTH[0] > 0 else ""
+            return prefix + helper + "(" + _render_expr(owner_any) + ", " + _render_expr(args[0]) + ")"
         owner_expr = _render_expr(owner_any)
         owner_type = owner_any.get("resolved_type", "") if isinstance(owner_any, dict) else ""
         if isinstance(owner_type, str):
@@ -2063,35 +2372,43 @@ def _render_call_expr(expr: dict[str, Any]) -> str:
                 or owner_type.startswith("set[")
                 or owner_type in {"bytes", "bytearray", "str", "deque"}
             ):
-                if attr_name == "clear" and len(args) == 0:
+                if _matches_runtime_method(expr, "list.clear", "dict.clear", "set.clear", "bytearray.clear") and len(args) == 0:
                     return owner_expr + ".removeAll()"
-                if (owner_type.startswith("list[") or owner_type in {"bytes", "bytearray"}) and attr_name == "append" and len(args) == 1:
+                if (
+                    (owner_type.startswith("list[") or owner_type in {"bytes", "bytearray"})
+                    and _matches_runtime_method(expr, "list.append", "bytearray.append")
+                    and len(args) == 1
+                ):
                     if owner_type in {"bytes", "bytearray"}:
                         return owner_expr + ".append(UInt8(clamping: __pytra_int(" + _render_expr(args[0]) + ")))"
                     return owner_expr + ".append(" + _render_expr(args[0]) + ")"
-                if owner_type.startswith("list[") and attr_name == "extend" and len(args) == 1:
+                if owner_type.startswith("list[") and _matches_runtime_method(expr, "list.extend") and len(args) == 1:
                     return "__pytra_extend(&" + owner_expr + ", " + _render_expr(args[0]) + ")"
-                if owner_type == "deque" and attr_name == "append" and len(args) == 1:
+                if owner_type == "deque" and _matches_runtime_method(expr, "deque.append") and len(args) == 1:
                     return owner_expr + ".append(" + _render_expr(args[0]) + ")"
                 if owner_type == "deque" and attr_name == "appendleft" and len(args) == 1:
                     return "__pytra_deque_appendleft(&" + owner_expr + ", " + _render_expr(args[0]) + ")"
                 if owner_type == "deque" and attr_name == "popleft" and len(args) == 0:
                     return "__pytra_deque_popleft(&" + owner_expr + ")"
-                if owner_type == "deque" and attr_name == "pop" and len(args) == 0:
+                if owner_type == "deque" and _matches_runtime_method(expr, "deque.pop") and len(args) == 0:
                     return "__pytra_deque_pop(&" + owner_expr + ")"
-                if (owner_type.startswith("list[") or owner_type in {"bytes", "bytearray"}) and attr_name == "reverse" and len(args) == 0:
+                if (
+                    (owner_type.startswith("list[") or owner_type in {"bytes", "bytearray"})
+                    and _matches_runtime_method(expr, "list.reverse")
+                    and len(args) == 0
+                ):
                     return owner_expr + ".reverse()"
-                if owner_type.startswith("list[") and attr_name == "sort" and len(args) == 0:
+                if owner_type.startswith("list[") and _matches_runtime_method(expr, "list.sort") and len(args) == 0:
                     return owner_expr + ".sort { __pytra_float($0) < __pytra_float($1) }"
-                if owner_type.startswith("dict[") and attr_name == "pop" and len(args) == 1:
+                if owner_type.startswith("dict[") and _matches_runtime_method(expr, "dict.pop") and len(args) == 1:
                     return "__pytra_dict_pop(&" + owner_expr + ", " + _render_expr(args[0]) + ")"
-                if owner_type.startswith("dict[") and attr_name == "setdefault" and len(args) == 2:
+                if owner_type.startswith("dict[") and _matches_runtime_method(expr, "dict.setdefault") and len(args) == 2:
                     return "__pytra_dict_setdefault(&" + owner_expr + ", " + _render_expr(args[0]) + ", " + _render_expr(args[1]) + ")"
                 if owner_type.startswith("set[") and attr_name == "add" and len(args) == 1:
                     return "__pytra_set_add(&" + owner_expr + ", " + _render_expr(args[0]) + ")"
-                if owner_type.startswith("set[") and attr_name == "discard" and len(args) == 1:
+                if owner_type.startswith("set[") and _matches_runtime_method(expr, "set.discard") and len(args) == 1:
                     return "__pytra_discard(&" + owner_expr + ", " + _render_expr(args[0]) + ")"
-                if owner_type.startswith("set[") and attr_name == "remove" and len(args) == 1:
+                if owner_type.startswith("set[") and _matches_runtime_method(expr, "set.remove") and len(args) == 1:
                     return "__pytra_remove(&" + owner_expr + ", " + _render_expr(args[0]) + ")"
         if attr_name == "get":
             if len(args) >= 2:
@@ -3292,7 +3609,7 @@ def _emit_stmt(stmt: Any, *, indent: str, ctx: dict[str, Any]) -> list[str]:
             func_any = value_any.get("func")
             if isinstance(func_any, dict) and func_any.get("kind") == "Attribute":
                 attr = _safe_ident(func_any.get("attr"), "")
-                if attr == "append":
+                if _matches_runtime_method(value_any, "list.append", "bytearray.append", "deque.append"):
                     owner_any = func_any.get("value")
                     owner = _render_expr(owner_any)
                     owner_type = ""
@@ -3318,7 +3635,7 @@ def _emit_stmt(stmt: Any, *, indent: str, ctx: dict[str, Any]) -> list[str]:
                         if alias_root != "":
                             lines.append(indent + alias_root + " = " + owner)
                         return lines
-                if attr == "pop":
+                if _matches_runtime_method(value_any, "list.pop", "deque.pop"):
                     owner = _render_expr(func_any.get("value"))
                     args_any = value_any.get("args")
                     args = args_any if isinstance(args_any, list) else []
@@ -3701,10 +4018,14 @@ def _emit_stmt(stmt: Any, *, indent: str, ctx: dict[str, Any]) -> list[str]:
         lines.append(indent + "do {")
         body_any = sd2.get("body")
         body = body_any if isinstance(body_any, list) else []
-        i = 0
-        while i < len(body):
-            lines.extend(_emit_stmt(body[i], indent=indent + "    ", ctx=ctx))
-            i += 1
+        _IN_TRY_BODY_DEPTH[0] += 1
+        try:
+            i = 0
+            while i < len(body):
+                lines.extend(_emit_stmt(body[i], indent=indent + "    ", ctx=ctx))
+                i += 1
+        finally:
+            _IN_TRY_BODY_DEPTH[0] -= 1
         handlers_any = sd2.get("handlers")
         handlers = handlers_any if isinstance(handlers_any, list) else []
         i = 0

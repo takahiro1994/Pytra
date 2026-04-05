@@ -895,8 +895,25 @@ func __pytra_find(_ v: Any?, _ sub: Any?) -> Int64 {
     return -1
 }
 
+func __pytra_rfind(_ v: Any?, _ sub: Any?) -> Int64 {
+    let s = __pytra_str(v)
+    let t = __pytra_str(sub)
+    if let range = s.range(of: t, options: .backwards) {
+        return Int64(s.distance(from: s.startIndex, to: range.lowerBound))
+    }
+    return -1
+}
+
 func __pytra_index_str(_ v: Any?, _ sub: Any?) -> Int64 {
     return __pytra_find(v, sub)
+}
+
+func __pytra_index_str_throwing(_ v: Any?, _ sub: Any?) throws -> Int64 {
+    let pos = __pytra_find(v, sub)
+    if pos < 0 {
+        throw ValueError("substring not found")
+    }
+    return pos
 }
 
 func __pytra_list_index(_ v: Any?, _ needle: Any?) -> Int64 {
@@ -910,6 +927,14 @@ func __pytra_list_index(_ v: Any?, _ needle: Any?) -> Int64 {
         i += 1
     }
     return -1
+}
+
+func __pytra_list_index_throwing(_ v: Any?, _ needle: Any?) throws -> Int64 {
+    let pos = __pytra_list_index(v, needle)
+    if pos < 0 {
+        throw ValueError("value not in list")
+    }
+    return pos
 }
 
 func __pytra_isalnum(_ v: Any?) -> Bool {
