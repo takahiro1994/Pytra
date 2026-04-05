@@ -137,11 +137,11 @@ Legend: ✅ = Good / 🔶 = Partial / limited / ❌ = Not supported / difficult
 
 ## Changelog
 
-> **2026-04-03** — Unified emitter invocation structure (common runner `cli_runner.py` supports 17 languages). Banned `resolved_type: "object"` across the board in the EAST3 validator. Removed `PYTRA_TID_*` from IsInstance and migrated to `expected_type_name`. Renamed `--east3-opt-level` to `--opt-level`. Finalized `@extern class` opaque type spec. Removed `builtin_name`. Added runtime_call coverage lint. Changed all-SKIP results to FAIL. Deleted `tools/unregistered/`. Added TODO entries for Julia / Zig / PowerShell / Swift / Dart backends.
+> **2026-04-04** — Added 23 Python method name hardcode patterns to lint. All-skip parity now FAIL (fixes false PASS for Kotlin/Scala/PS1). pytra-cli2 default output → work/tmp/. Lint always 10 categories. callable_optional_none fixture. Emitter guide §12.6 callable mapping + §14.1 lint docs. mapping.json FQCN key plan. Zig fixture 146/146 PASS. Julia 145/146.
 
-> **2026-04-02** — Migrated C++ monostate to `optional<variant>`. Moved bounds check / negative index handling to the EAST optimizer (sample 01 mandelbrot: 12.8s → 0.82s). Optimized `extend` in png.py / gif.py (faster across all languages). Added emitter guide §12.4–12.6 (Optional/union/callable type mappings). Renamed fixtures (any_* → union_*/optional_none).
+> **2026-04-03** — Unified emitter call structure (17 languages). `resolved_type: "object"` banned. IsInstance PYTRA_TID_* removed. `--opt-level` rename. Opaque type spec. `builtin_name` removed. `tools/unregistered/` deleted.
 
-> **2026-04-01** — Added emitter hardcode lint runtime cache mechanism. Established rule prohibiting modification of canonical files. Filed EAST3 copy elision metadata plan. Fixed C++ prefix_match lint.
+> **2026-04-02** — C++ monostate → `optional<variant>`. Bounds check → EAST optimizer (mandelbrot 12.8s → 0.82s). png.py/gif.py extend optimization. Emitter guide §12.4-12.6.
 
 ## License
 

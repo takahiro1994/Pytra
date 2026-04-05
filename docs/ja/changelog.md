@@ -4,6 +4,27 @@
 
 # 更新履歴
 
+## 2026-04-04
+
+- **emitter lint に Python メソッド名ハードコード検出追加**: `runtime_symbol` カテゴリに `"append"`, `"extend"`, `"pop"`, `"clear"` 等 23 パターンを追加。emitter が `attr == "append"` のようにメソッド名を文字列で判定している箇所を検出。
+- **parity check の全件 SKIP → FAIL 修正**: toolchain missing で全ターゲットが SKIP のケースを PASS ではなく FAIL に変更。Kotlin / Scala / PowerShell で false PASS が発生していた問題を解消。
+- **pytra-cli2.py のデフォルト出力先を work/tmp/ に変更**: `-o` 省略時に入力ファイルと同じディレクトリに east ファイルを出力する問題を修正。`test/fixture/source/` や `test/stdlib/source/` にゴミファイルが散らばる原因を根絶。
+- **parity check からの lint 自動実行を廃止**: lint は手動実行（`check_emitter_hardcode_lint.py`）または `run_local_ci.py` でのみ走らせる。parity check は transpile + compile + run に集中。
+- **emitter lint 常時 10 カテゴリ**: `--include-runtime` をデフォルト ON に変更し `--skip-runtime` に置き換え。キャッシュ機構を廃止。
+- **callable_optional_none fixture 追加**: `callable | None` の is None ガード + invoke を検証。C++ / Rust emitter で optional callable の unwrap を修正。
+- **emitter guide §12.6 callable 型写像**: 全言語の callable 型写像と `callable | None` の表現（Zig: `?fn`, Rust: `Option<Box<dyn Fn>>` 等）を文書化。
+- **emitter guide §14.1 lint ドキュメント追加**: 10 カテゴリの説明、実行方法、parity check との関係を明記。
+- **mapping.json 完全修飾キー計画起票**: bare symbol（`"sin"` 等）がユーザー定義関数と衝突するリスク。`"pytra.std.math.sin"` への統一を計画（P0-MAPPING-FQCN-KEY）。
+- **stray east ファイル掃除**: `out/`、`src/include/`、`test/fixture/source/`、`test/stdlib/source/` に散らばった east ファイルを削除。
+- **Nim PyObj boxing 方針**: spec-adt.md §3.1 に従い object variants を使うべき。PyObj 退化は禁止。
+- **PowerShell emitter isinstance 方針**: emitter が型比較で定数に畳み込むのは optimizer の責務侵害。`-is` 演算子を使うべき。
+- **Zig emitter 旧 toolchain 修正を差し戻し**: `src/toolchain/emit/zig/` は変更不可。toolchain2 で修正すること。
+- **C++ / Rust 完了タスクをアーカイブ**: CPP-RT-TID-REMOVAL、RS-TYPE-ID-CLEANUP 他 6 件。
+- **Go fixture 回帰**: 133→132 (-1) が発生。
+- **Julia fixture 大幅進展**: 116→145 (+29)。ただし一時的に regression あり（146→116→145）。
+- **Zig fixture/stdlib 完了**: fixture 146/146 PASS、stdlib 進行中。
+- **PowerShell stdlib 進展**: 0→6 (+6)。
+
 ## 2026-04-03
 
 - **emitter 呼び出し構造の統一**: 共通ランナー `cli_runner.py` を新設。17 言語の cli.py を共通ランナーに移行（Rust のみ独自維持）。`pytra-cli2.py` は subprocess で cli.py を呼ぶ形に統一し、emitter 直接 import を廃止。

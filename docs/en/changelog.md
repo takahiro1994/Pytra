@@ -4,6 +4,23 @@
 
 # Changelog
 
+## 2026-04-04
+
+- **Lint: Python method name hardcode detection**: Added 23 patterns ("append", "extend", "pop", "clear" etc.) to runtime_symbol category.
+- **Parity check: all-skip now FAIL**: Cases where all targets skip (missing toolchain) now report FAIL, not false PASS. Fixes Kotlin/Scala/PowerShell.
+- **pytra-cli2.py default output → work/tmp/**: No more stray .east files in source directories when -o is omitted.
+- **Removed auto-lint from parity check**: Lint runs manually or via run_local_ci only.
+- **Lint always 10 categories**: --include-runtime default ON, replaced with --skip-runtime. Cache mechanism removed.
+- **callable_optional_none fixture**: Tests callable|None is-None guard + invoke. C++/Rust optional callable unwrap fixed.
+- **Emitter guide §12.6 callable mapping**: All languages' callable type mapping and callable|None representation documented.
+- **Emitter guide §14.1 lint docs**: All 10 categories explained, execution instructions added.
+- **mapping.json FQCN key plan**: Bare symbols ("sin") risk collision with user functions. Plan to use "pytra.std.math.sin" (P0-MAPPING-FQCN-KEY).
+- **Stray east file cleanup**: Removed from out/, src/include/, test/fixture/source/, test/stdlib/source/.
+- **Nim PyObj boxing rejected**: Must use object variants per spec-adt.md §3.1.
+- **Zig old toolchain edit reverted**: src/toolchain/emit/zig/ is read-only.
+- **Zig fixture/stdlib**: fixture 146/146 PASS, stdlib in progress.
+- **Julia fixture**: 116→145 (+29). PowerShell stdlib: 0→6 (+6).
+
 ## 2026-04-03
 
 - **Unified emitter call structure**: New common runner `cli_runner.py`. 17 languages migrated (Rust only exception). `pytra-cli2.py` calls cli.py via subprocess, no direct emitter imports.
