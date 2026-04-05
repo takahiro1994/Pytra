@@ -662,6 +662,10 @@ class DartNativeEmitter:
             if len(rendered_args) == 2:
                 return "List.generate((" + rendered_args[1] + ") - (" + rendered_args[0] + "), (i) => i + (" + rendered_args[0] + "))"
             return "List.generate(((" + rendered_args[1] + ") - (" + rendered_args[0] + ")) ~/ (" + rendered_args[2] + "), (i) => (" + rendered_args[0] + ") + i * (" + rendered_args[2] + "))"
+        if mapped == "__SORTED__":
+            if len(rendered_args) == 0:
+                return "[]"
+            return "(List.from(" + rendered_args[0] + ")..sort())"
         if mapped.startswith("__NUM_METHOD__:"):
             method_name = mapped[len("__NUM_METHOD__:"):]
             if len(rendered_args) == 0:
@@ -2826,10 +2830,6 @@ class DartNativeEmitter:
                 if len(rendered_args) == 0:
                     return "[]"
                 return "(" + rendered_args[0] + ").asMap().entries.map((e) => [e.key, e.value]).toList()"
-            if raw_fn_name == "sorted":
-                if len(rendered_args) == 0:
-                    return "[]"
-                return "(List.from(" + rendered_args[0] + ")..sort())"
             if raw_fn_name == "reversed":
                 if len(rendered_args) == 0:
                     return "[]"
