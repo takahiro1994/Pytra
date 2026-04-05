@@ -52,12 +52,8 @@ emitter が `runtime_call == "list.append"` のような文字列で判定する
 
 **正しい解決方法**: `src/pytra/built_in/containers.py` にコンテナのメソッドシグネチャが `@extern class` + `mut[T]` 注釈で定義済み。resolve がこの定義を読んで `borrow_kind: "mutable_ref"` と `meta.mutates_receiver: true` を EAST3 に付与する。emitter はメソッド名を一切知らず、`mutates_receiver` フラグだけを見る。
 
-前提:
-1. infra 担当が resolve を修正し、`containers.py` の `mut[T]` 注釈から `mutates_receiver` を導出するようにする
-2. spec-east.md に `Call.meta.mutates_receiver` スキーマを定義する
-
-1. [ ] [ID: P0-CPP-RTSYM-S1] spec-east.md に `Call.meta.mutates_receiver` を定義し、`containers.py` の `mut[T]` から resolve が導出する仕組みを spec 化する（infra 担当に依頼）
-2. [ ] [ID: P0-CPP-RTSYM-S2] infra 担当: resolve が `src/pytra/built_in/containers.py` を読み、`mut[T]` 注釈付きメソッドの Call に `meta.mutates_receiver: true` を付与する
+1. [ ] [ID: P0-CPP-RTSYM-S1] spec-east.md に `Call.meta.mutates_receiver` スキーマを定義する
+2. [ ] [ID: P0-CPP-RTSYM-S2] resolve が `src/pytra/built_in/containers.py` を読み、`mut[T]` 注釈付きメソッドの Call に `meta.mutates_receiver: true` を付与するよう修正する
 3. [ ] [ID: P0-CPP-RTSYM-S3] C++ emitter の mutable メソッド名リストを `meta.mutates_receiver` ベースの判定に置き換える
 4. [ ] [ID: P0-CPP-RTSYM-S4] `check_emitter_hardcode_lint.py --lang cpp --category runtime_symbol` が 0 件になることを確認する
 
