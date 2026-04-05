@@ -148,9 +148,9 @@ The emitter simply maps this `pytra_isinstance` call to each target language.
 For debugging and investigation, you can run each stage individually:
 
 ```bash
-pytra-cli2 -parse input.py -o input.py.east1
-pytra-cli2 -resolve input.py.east1 -o input.east2
-pytra-cli2 -compile input.east2 -o input.east3
+pytra-cli -parse input.py -o input.py.east1
+pytra-cli -resolve input.py.east1 -o input.east2
+pytra-cli -compile input.east2 -o input.east3
 ```
 
 Open the JSON files to see what happened at each stage.

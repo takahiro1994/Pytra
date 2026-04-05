@@ -87,7 +87,7 @@ def cmd_emit(argv: list[str]) -> int:
         _fatal("pytra emit: --target is required")
     src_dir = _find_src_dir()
     if target == "julia":
-        cmd = [_python(), "-m", "toolchain2.emit.julia.cli"] + remaining
+        cmd = [_python(), "-m", "toolchain.emit.julia.cli"] + remaining
         result = _run(cmd)
         return result.returncode
     emit_script = src_dir + "/toolchain/emit/" + target + ".py"
