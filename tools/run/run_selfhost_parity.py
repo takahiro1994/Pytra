@@ -4,7 +4,7 @@
 For --selfhost-lang python, aggregates results from existing parity results files
 and writes selfhost_python.json.
 
-For other selfhost langs (cpp, go, rs, ts, js), builds or locates a selfhost binary,
+For other selfhost langs (cpp, go, rs, swift, ts, js), builds or locates a selfhost binary,
 then transpiles fixture/sample .py files via the binary and checks parity.
 
 Usage:
@@ -51,7 +51,7 @@ except ModuleNotFoundError:
 PARITY_DIR = ROOT / ".parity-results"
 
 # Emit targets supported by the selfhost binary
-SUPPORTED_EMIT_TARGETS = ["cpp", "go", "rs", "ts", "js"]
+SUPPORTED_EMIT_TARGETS = ["cpp", "go", "rs", "swift", "ts", "js"]
 
 # Parity targets used to populate the Python row
 PARITY_LANGS = [
@@ -301,6 +301,29 @@ def _build_selfhost_binary(selfhost_lang: str) -> tuple[Path | None, str]:
         shutil.copy2(built_bin, bin_path)
         return bin_path, ""
 
+    if selfhost_lang == "swift":
+        swift_runtime = ROOT / "src" / "runtime" / "swift"
+        built_in = swift_runtime / "built_in" / "py_runtime.swift"
+        if built_in.exists():
+            shutil.copy2(built_in, emit_dir / built_in.name)
+        image_runtime = swift_runtime / "image_runtime.swift"
+        if image_runtime.exists():
+            shutil.copy2(image_runtime, emit_dir / image_runtime.name)
+        std_dir = swift_runtime / "std"
+        if std_dir.exists():
+            for swift_file in sorted(std_dir.glob("*.swift")):
+                shutil.copy2(swift_file, emit_dir / swift_file.name)
+        swift_files = sorted(str(p) for p in emit_dir.rglob("*.swift"))
+        if not swift_files:
+            return None, "no .swift files emitted"
+        compile_result = subprocess.run(
+            ["swiftc", "-O"] + swift_files + ["-o", str(bin_path)],
+            cwd=str(emit_dir), capture_output=True, text=True,
+        )
+        if compile_result.returncode != 0:
+            return None, f"swiftc failed: {compile_result.stderr.strip()}"
+        return bin_path, ""
+
     return None, f"unsupported selfhost_lang for build: {selfhost_lang}"
 
 
@@ -418,6 +441,21 @@ def _run_target_emit(
         exe = emit_dir / (stem + ".out")
         build = _shell(
             f"rustc -O {shlex.quote(str(entry_rs))} -o {shlex.quote(str(exe))}",
+            cwd=work_dir, env=env, timeout_sec=timeout_sec,
+        )
+        if build.returncode != 0:
+            return build
+        return _shell(shlex.quote(str(exe)), cwd=work_dir, env=env, timeout_sec=timeout_sec)
+    if emit_target == "swift":
+        swift_files = sorted(str(p) for p in emit_dir.rglob("*.swift"))
+        if not swift_files:
+            return subprocess.CompletedProcess("", 1, "", "no .swift files")
+        exe = emit_dir / (case_path.stem + ".out")
+        build = _shell(
+            "swiftc -O "
+            + " ".join(shlex.quote(f) for f in swift_files)
+            + " -o "
+            + shlex.quote(str(exe)),
             cwd=work_dir, env=env, timeout_sec=timeout_sec,
         )
         if build.returncode != 0:
@@ -643,7 +681,7 @@ def main() -> int:
     )
     parser.add_argument(
         "--selfhost-lang", required=True,
-        help="Language toolchain is compiled to (python | cpp | go | rs | ts | js)"
+        help="Language toolchain is compiled to (python | cpp | go | rs | swift | ts | js)"
     )
     parser.add_argument(
         "--emit-target", default="",

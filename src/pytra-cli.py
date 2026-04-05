@@ -160,6 +160,21 @@ def _copy_json_doc(doc: dict[str, JsonVal]) -> dict[str, JsonVal]:
     return doc
 
 
+def _module_stem_from_source_path(source_path: str, fallback_input: str) -> str:
+    if source_path != "" and "/src/toolchain/" in source_path:
+        idx = source_path.index("/src/toolchain/")
+        rel = source_path[idx + len("/src/"):]
+        if rel.endswith(".py"):
+            rel = rel[:-3]
+        return rel.replace("/", ".")
+    if source_path.startswith("src/toolchain/"):
+        rel = source_path[len("src/"):]
+        if rel.endswith(".py"):
+            rel = rel[:-3]
+        return rel.replace("/", ".")
+    return Path(fallback_input).stem
+
+
 def _lower_cpp_doc(east2_doc: dict[str, JsonVal]) -> dict[str, JsonVal]:
     mutable_east2_doc: dict[str, JsonVal] = east2_doc
     typed_east3_doc: dict[str, JsonVal] = lower_east2_to_east3(mutable_east2_doc, target_language="cpp")
@@ -920,8 +935,8 @@ def cmd_build(args: list[str]) -> int:
         print("error: at least one input .py file is required")
         return 1
 
-    if target not in ["cpp", "go", "rs", "cs", "java", "scala", "kotlin", "ts", "js"]:
-        print("error: unsupported target: " + target + " (available: cpp, go, rs, cs, java, scala, kotlin, ts, js, zig)")
+    if target not in ["cpp", "go", "rs", "cs", "java", "scala", "kotlin", "ts", "js", "nim", "swift", "julia", "powershell", "ps1"]:
+        print("error: unsupported target: " + target + " (available: cpp, go, rs, cs, java, scala, kotlin, ts, js, nim, swift, julia, powershell, zig)")
         return 1
 
     try:
@@ -990,13 +1005,8 @@ def _build_pipeline(
     for inp, east3_opt_doc in east3_opt_docs:
         # Use source_path-derived name to avoid collisions (e.g. two types.py in different dirs)
         source_path_val = east3_opt_doc.get("source_path", "")
-        if isinstance(source_path_val, str) and "/src/toolchain/" in source_path_val:
-            idx = source_path_val.index("/src/toolchain/")
-            stem = source_path_val[idx + len("/src/"):].replace("/", ".").replace(".py", "")
-        elif isinstance(source_path_val, str) and source_path_val.startswith("src/toolchain/"):
-            stem = source_path_val.replace("src/", "").replace("/", ".").replace(".py", "")
-        else:
-            stem = Path(inp).stem
+        source_path_text = source_path_val if isinstance(source_path_val, str) else ""
+        stem = _module_stem_from_source_path(source_path_text, inp)
         out_path = east3_opt_dir.joinpath(stem + ".east3")
         out_path.write_text(
             json.dumps(east3_opt_doc, ensure_ascii=False, indent=2) + "\n",
@@ -1039,19 +1049,21 @@ def _build_pipeline(
     if target == "go":
         return _emit_go(linked_dir.joinpath("manifest.json"), output_dir)
     if target == "cs":
-        return _emit_cs(linked_dir.joinpath("manifest.json"), output_dir)
+        return _emit_target_subprocess("cs", linked_dir.joinpath("manifest.json"), output_dir)
     if target == "java":
-        return _emit_java(linked_dir.joinpath("manifest.json"), output_dir)
+        return _emit_target_subprocess("java", linked_dir.joinpath("manifest.json"), output_dir)
     if target == "scala":
-        return _emit_scala(linked_dir.joinpath("manifest.json"), output_dir)
+        return _emit_target_subprocess("scala", linked_dir.joinpath("manifest.json"), output_dir)
     if target == "kotlin":
-        return _emit_kotlin(linked_dir.joinpath("manifest.json"), output_dir)
+        return _emit_target_subprocess("kotlin", linked_dir.joinpath("manifest.json"), output_dir)
     if target == "ts" or target == "js":
         return _emit_ts(linked_dir.joinpath("manifest.json"), output_dir, strip_types=(target == "js"))
     if target == "nim":
         return _emit_nim(linked_dir.joinpath("manifest.json"), output_dir)
     if target == "powershell" or target == "ps1":
         return _emit_target_subprocess("powershell", linked_dir.joinpath("manifest.json"), output_dir)
+    if target == "swift" or target == "julia":
+        return _emit_target_subprocess(target, linked_dir.joinpath("manifest.json"), output_dir)
     return _emit_cpp(linked_dir.joinpath("manifest.json"), output_dir)
 
 

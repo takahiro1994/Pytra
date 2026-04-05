@@ -92,6 +92,48 @@ class PytraCli2Test(unittest.TestCase):
         self.assertNotIn("from toolchain.link.manifest_loader import", source)
         self.assertIn('"-m", "toolchain.emit.rs.cli"', source)
 
+    def test_build_pipeline_accepts_swift_target_and_uses_subprocess_emitter(self) -> None:
+        with patch.object(pytra_cli2_mod, "_build_pipeline", return_value=0) as build_pipeline:
+            rc = pytra_cli2_mod.cmd_build(["entry.py", "--target", "swift"])
+        self.assertEqual(rc, 0)
+        build_pipeline.assert_called_once()
+        self.assertEqual(build_pipeline.call_args[0][2], "swift")
+
+    def test_module_stem_from_source_path_preserves_py_package_segment(self) -> None:
+        stem = pytra_cli2_mod._module_stem_from_source_path(
+            "/workspace/Pytra/src/toolchain/parse/py/parse_python.py",
+            "fallback.py",
+        )
+        self.assertEqual(stem, "toolchain.parse.py.parse_python")
+
+    def test_build_pipeline_dispatches_swift_to_subprocess_emitter(self) -> None:
+        entry_path = str((ROOT / "entry.py").resolve())
+        linked_module = LinkedModule(
+            "toolchain.cli.main",
+            "",
+            entry_path,
+            True,
+            {"source_path": entry_path},
+            "user",
+        )
+        link_result = type("LinkResultStub", (), {"linked_modules": [linked_module], "manifest": {}})()
+        with tempfile.TemporaryDirectory() as td:
+            out_dir = Path(td) / "emit"
+            with patch.object(pytra_cli2_mod, "_collect_build_sources", return_value=[("entry.py", {})]), \
+                patch.object(pytra_cli2_mod, "_builtin_registry_paths", return_value=(Path("a"), Path("b"), Path("c"), Path("d"))), \
+                patch.object(pytra_cli2_mod, "load_builtin_registry", return_value=object()), \
+                patch.object(pytra_cli2_mod, "resolve_east1_to_east2"), \
+                patch.object(pytra_cli2_mod, "lower_east2_to_east3", return_value={"source_path": entry_path}), \
+                patch.object(pytra_cli2_mod, "optimize_east3_doc_only", return_value={"source_path": entry_path}), \
+                patch.object(pytra_cli2_mod, "link_modules", return_value=link_result), \
+                patch.object(pytra_cli2_mod, "_optimize_linked_runtime_modules"), \
+                patch.object(pytra_cli2_mod, "_write_link_output"), \
+                patch.object(pytra_cli2_mod, "_emit_target_subprocess", return_value=0) as emit_subprocess:
+                rc = pytra_cli2_mod._build_pipeline(["entry.py"], str(out_dir), "swift")
+        self.assertEqual(rc, 0)
+        emit_subprocess.assert_called_once()
+        self.assertEqual(emit_subprocess.call_args[0][0], "swift")
+
 
 if __name__ == "__main__":
     unittest.main()

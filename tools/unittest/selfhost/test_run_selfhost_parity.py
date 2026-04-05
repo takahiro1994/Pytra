@@ -100,6 +100,43 @@ class RunSelfhostParityBuildTest(unittest.TestCase):
             self.assertIn("--rs-package", calls[0])
             self.assertEqual(calls[1], ["cargo", "build", "--release"])
 
+    def test_build_selfhost_binary_swift_uses_swiftc_on_emitted_sources(self) -> None:
+        mod = _load_module()
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            emit_dir = root / "work" / "selfhost" / "build" / "swift" / "emit"
+            emit_dir.mkdir(parents=True, exist_ok=True)
+            (emit_dir / "main.swift").write_text("print(1)\n", encoding="utf-8")
+            (root / "src" / "pytra-cli.py").parent.mkdir(parents=True, exist_ok=True)
+            (root / "src" / "pytra-cli.py").write_text("", encoding="utf-8")
+            runtime_root = root / "src" / "runtime" / "swift"
+            (runtime_root / "built_in").mkdir(parents=True, exist_ok=True)
+            (runtime_root / "std").mkdir(parents=True, exist_ok=True)
+            (runtime_root / "built_in" / "py_runtime.swift").write_text("// runtime\n", encoding="utf-8")
+            (runtime_root / "std" / "pytra_std_pathlib.swift").write_text("// std\n", encoding="utf-8")
+
+            calls: list[list[str]] = []
+
+            def _fake_run(cmd: list[str], cwd: str, capture_output: bool, text: bool):
+                calls.append(cmd)
+                if cmd and cmd[0] == sys.executable:
+                    emit_dir.mkdir(parents=True, exist_ok=True)
+                    (emit_dir / "main.swift").write_text("print(1)\n", encoding="utf-8")
+                return subprocess.CompletedProcess(cmd, 0, stdout="", stderr="")
+
+            with patch.object(mod, "ROOT", root), patch.object(mod.subprocess, "run", side_effect=_fake_run):
+                bin_path, err = mod._build_selfhost_binary("swift")
+
+            self.assertEqual(err, "")
+            self.assertEqual(bin_path, root / "work" / "selfhost" / "bin" / "swift")
+            self.assertEqual(len(calls), 2)
+            self.assertEqual(calls[0][0:5], [sys.executable, str(root / "src" / "pytra-cli.py"), "-build", str(root / "src" / "pytra-cli.py"), "--target"])
+            self.assertEqual(calls[1][0:2], ["swiftc", "-O"])
+            self.assertIn(str(emit_dir / "main.swift"), calls[1])
+            self.assertIn(str(emit_dir / "py_runtime.swift"), calls[1])
+            self.assertIn(str(emit_dir / "pytra_std_pathlib.swift"), calls[1])
+            self.assertEqual(calls[1][-2:], ["-o", str(root / "work" / "selfhost" / "bin" / "swift")])
+
     def test_transpile_via_selfhost_binary_uses_emit_manifest_bundle(self) -> None:
         mod = _load_module()
         with tempfile.TemporaryDirectory() as td:

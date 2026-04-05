@@ -307,7 +307,8 @@ def _scan_reassigned_names(node: Any, param_names: set[str], out: set[str]) -> N
         return
     if not isinstance(node, dict):
         return
-    kind = node.get("kind", "")
+    kind_value = node.get("kind", "")
+    kind = kind_value if isinstance(kind_value, str) else ""
     if kind in {"Assign", "AnnAssign", "AugAssign"}:
         target = node.get("target")
         if isinstance(target, dict):
@@ -348,6 +349,63 @@ def collect_reassigned_params(func_def: dict[str, Any]) -> set[str]:
 
 def mutable_param_name(name: str) -> str:
     return name + "_"
+
+
+def _emit_runtime_iter_target_bindings(
+    target_plan: dict[str, Any],
+    source_expr: str,
+    *,
+    indent: str,
+    ctx: dict[str, Any],
+    body_ctx: dict[str, Any],
+) -> list[str]:
+    lines: list[str] = []
+    target_kind_any = target_plan.get("kind")
+    target_kind = target_kind_any if isinstance(target_kind_any, str) else ""
+    if target_kind == "NameTarget":
+        target_name = _safe_ident(target_plan.get("id"), "item")
+        if target_name == "_":
+            return lines
+        target_type = _swift_type(target_plan.get("target_type"), allow_void=False)
+        if target_type == "Any":
+            lines.append(indent + "let " + target_name + " = " + source_expr)
+        else:
+            lines.append(indent + "let " + target_name + ": " + target_type + " = " + _cast_from_any(source_expr, target_type))
+        _declared_set(body_ctx).add(target_name)
+        _type_map(body_ctx)[target_name] = target_type
+        return lines
+    if target_kind == "TupleTarget":
+        tuple_tmp = _fresh_tmp(ctx, "tuple")
+        lines.append(indent + "let " + tuple_tmp + " = __pytra_as_list(" + source_expr + ")")
+        elems_any = target_plan.get("elements")
+        elems = elems_any if isinstance(elems_any, list) else []
+        i = 0
+        while i < len(elems):
+            elem = elems[i]
+            if isinstance(elem, dict):
+                lines.extend(
+                    _emit_runtime_iter_target_bindings(
+                        elem,
+                        tuple_tmp + "[Int(" + str(i) + ")]",
+                        indent=indent,
+                        ctx=ctx,
+                        body_ctx=body_ctx,
+                    )
+                )
+            i += 1
+        return lines
+    raise RuntimeError("swift native emitter: unsupported RuntimeIter target_plan")
+
+
+def _is_top_level_global_decl_node(node: dict[str, Any]) -> bool:
+    kind_any = node.get("kind")
+    kind = kind_any if isinstance(kind_any, str) else ""
+    if kind not in {"Assign", "AnnAssign"}:
+        return False
+    if not bool(node.get("declare")):
+        return False
+    target_any = node.get("target")
+    return isinstance(target_any, dict) and target_any.get("kind") == "Name"
 
 
 def _safe_ident(name: Any, fallback: str) -> str:
@@ -3396,29 +3454,15 @@ def _emit_for_core(stmt: dict[str, Any], *, indent: str, ctx: dict[str, Any]) ->
             _declared_set(body_ctx).add(target_name)
             _type_map(body_ctx)[target_name] = target_type
         elif target_kind == "TupleTarget":
-            tuple_tmp = _fresh_tmp(ctx, "tuple")
-            lines.append(indent + "    let " + tuple_tmp + " = __pytra_as_list(" + iter_tmp + "[Int(" + idx_tmp + ")])")
-            elems_any = td.get("elements")
-            elems = elems_any if isinstance(elems_any, list) else []
-            i = 0
-            while i < len(elems):
-                elem = elems[i]
-                if not isinstance(elem, dict):
-                    raise RuntimeError("swift native emitter: unsupported RuntimeIter tuple target element")
-                ed2: dict[str, Any] = elem
-                if ed2.get("kind") != "NameTarget":
-                    raise RuntimeError("swift native emitter: unsupported RuntimeIter tuple target element")
-                name = _safe_ident(ed2.get("id"), "item_" + str(i))
-                if name != "_":
-                    elem_type = _swift_type(ed2.get("target_type"), allow_void=False)
-                    rhs = tuple_tmp + "[Int(" + str(i) + ")]"
-                    if elem_type == "Any":
-                        lines.append(indent + "    let " + name + " = " + rhs)
-                    else:
-                        lines.append(indent + "    let " + name + ": " + elem_type + " = " + _cast_from_any(rhs, elem_type))
-                    _declared_set(body_ctx).add(name)
-                    _type_map(body_ctx)[name] = elem_type
-                i += 1
+            lines.extend(
+                _emit_runtime_iter_target_bindings(
+                    td,
+                    iter_tmp + "[Int(" + idx_tmp + ")]",
+                    indent=indent + "    ",
+                    ctx=ctx,
+                    body_ctx=body_ctx,
+                )
+            )
         else:
             raise RuntimeError("swift native emitter: unsupported RuntimeIter target_plan")
         i = 0
@@ -4893,7 +4937,8 @@ struct Main {
     classes: list[dict[str, Any]] = []
     functions: list[dict[str, Any]] = []
     extern_var_lines: list[str] = []
-    top_level_nodes: list[dict[str, Any]] = []
+    top_level_decl_nodes: list[dict[str, Any]] = []
+    top_level_exec_nodes: list[dict[str, Any]] = []
     i = 0
     while i < len(body_any):
         node = body_any[i]
@@ -4921,7 +4966,10 @@ struct Main {
                         native_fn = _extern_module_stem + "_native_" + sym_name
                         extern_var_lines.append("let " + var_name + ": " + swift_type + " = " + native_fn + "()")
                 else:
-                    top_level_nodes.append(nd)
+                    if _is_top_level_global_decl_node(nd):
+                        top_level_decl_nodes.append(nd)
+                    else:
+                        top_level_exec_nodes.append(nd)
         i += 1
 
     _CLASS_NAMES[0] = set()
@@ -5038,7 +5086,7 @@ struct Main {
         lines.extend(_emit_function(functions[i], indent="", receiver_name=None))
         i += 1
 
-    if len(top_level_nodes) > 0:
+    if len(top_level_decl_nodes) > 0:
         top_level_ctx: dict[str, Any] = {
             "tmp": 0,
             "declared": set(),
@@ -5049,10 +5097,39 @@ struct Main {
             "continue_prefix": "",
         }
         i = 0
-        while i < len(top_level_nodes):
+        while i < len(top_level_decl_nodes):
             lines.append("")
-            lines.extend(_emit_stmt(top_level_nodes[i], indent="", ctx=top_level_ctx))
+            lines.extend(_emit_stmt(top_level_decl_nodes[i], indent="", ctx=top_level_ctx))
             i += 1
+
+    if len(top_level_exec_nodes) > 0:
+        init_suffix = _safe_ident(str(module_id).replace(".", "_"), "module")
+        init_name = "__pytra_module_init_" + init_suffix
+        token_name = "__pytra_module_init_token_" + init_suffix
+        lines.append("")
+        lines.append("func " + init_name + "() throws {")
+        top_level_exec_ctx: dict[str, Any] = {
+            "tmp": 0,
+            "declared": set(),
+            "types": {},
+            "ref_vars": set(),
+            "alias_map": {},
+            "return_type": "",
+            "continue_prefix": "",
+        }
+        i = 0
+        while i < len(top_level_exec_nodes):
+            lines.extend(_emit_stmt(top_level_exec_nodes[i], indent="    ", ctx=top_level_exec_ctx))
+            i += 1
+        lines.append("}")
+        lines.append("")
+        lines.append("let " + token_name + ": Void = {")
+        lines.append("    do {")
+        lines.append("        try " + init_name + "()")
+        lines.append("    } catch {")
+        lines.append("        fatalError(__pytra_py_to_string(error))")
+        lines.append("    }")
+        lines.append("}()")
 
     # §4: extern() variable declarations (e.g., pi, e)
     if len(extern_var_lines) > 0:
