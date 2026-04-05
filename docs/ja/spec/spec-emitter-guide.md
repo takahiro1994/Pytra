@@ -713,6 +713,17 @@ def _transpile(east_doc: dict) -> str:
 
 定数（`math.pi` → `M_PI`）は `extern_var_v1` メタデータが付いた `AnnAssign` ノードに対して解決される。emitter は `calls` テーブルの値をそのまま出力するため、ターゲット言語で有効な式でなければならない。
 
+### 7.1.1 `calls` に入れるべきでないもの
+
+| 種別 | 例 | 理由 |
+|---|---|---|
+| 例外クラスコンストラクタ | `ValueError`, `TypeError`, `IndexError` | `@extern class`（`src/pytra/built_in/error.py`）として定義済み。通常のクラスコンストラクタとして解決される。`runtime_call` は付かない |
+| コンテナコンストラクタ | `list()`, `dict()`, `set()` | EAST3 で専用ノード（`List`, `Dict`, `Set`）に lowering される。`runtime_call` 経由ではない |
+| `bytes()` / `bytearray()` | `bytes_ctor`, `bytearray_ctor` | コンストラクタは EAST3 で直接解決。mapping.json に入れても `runtime_call` とマッチしない |
+| C++ 固有シンボル | `std::runtime_error` | ターゲット言語固有の実装詳細。EAST3 は言語非依存なので `runtime_call` に出現しない |
+
+**`calls` に入れるのは、EAST3 の `runtime_call` / `runtime_symbol` として実際に出現するもののみ。** EAST3 golden に出現しないエントリは `rt: call_cov` lint で検出される。
+
 ### 7.2 文字列リテラル定数の写像
 
 ターゲット言語のマクロ定数ではなく、文字列リテラルそのものを埋め込みたい場合（例: `env.target` → `"cpp"`）は、値にクォートを含めて記述する:
