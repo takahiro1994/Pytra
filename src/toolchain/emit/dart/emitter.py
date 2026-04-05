@@ -704,31 +704,6 @@ class DartNativeEmitter:
             return "pytraBytes(" + rendered_args[0] + ")"
         return ""
 
-    def _expand_type_ctor_fallback(self, expr: dict[str, Any], func_any: Any, rendered_args: list[str]) -> str:
-        if not isinstance(func_any, dict):
-            return ""
-        if func_any.get("resolved_type") != "type":
-            return ""
-        resolved_type_any = expr.get("resolved_type")
-        resolved_type = resolved_type_any if isinstance(resolved_type_any, str) else ""
-        if resolved_type == "bytearray":
-            if len(rendered_args) == 0:
-                return "<int>[]"
-            return "pytraBytearray(" + rendered_args[0] + ")"
-        if resolved_type == "bytes":
-            if len(rendered_args) == 0:
-                return "<int>[]"
-            return "pytraBytes(" + rendered_args[0] + ")"
-        if resolved_type == "dict[unknown, unknown]" or resolved_type.startswith("dict["):
-            if len(rendered_args) == 0:
-                return "{}"
-            return "Map<dynamic, dynamic>.from(" + rendered_args[0] + ")"
-        if resolved_type == "float64":
-            if len(rendered_args) == 0:
-                return "0.0"
-            return "pytraFloat(" + rendered_args[0] + ")"
-        return ""
-
     def _expand_static_cast(self, semantic_tag: str, rendered_args: list[str], args: list[Any]) -> str:
         if semantic_tag == "cast.int":
             if len(rendered_args) == 0:
@@ -1907,6 +1882,9 @@ class DartNativeEmitter:
         if kind == "While":
             self._emit_while(stmt)
             return
+        if kind == "With":
+            self._emit_with(stmt)
+            return
         if kind == "Pass":
             self._emit_line("/* pass */")
             return
@@ -1923,6 +1901,64 @@ class DartNativeEmitter:
             self._emit_var_decl(stmt)
             return
         raise RuntimeError("lang=dart unsupported stmt kind: " + str(kind))
+
+    def _emit_with(self, stmt: dict[str, Any]) -> None:
+        items_any = stmt.get("items")
+        items = items_any if isinstance(items_any, list) else []
+        body = self._dict_list(stmt.get("body"))
+        ctx_vars: list[tuple[str, str]] = []
+
+        if len(items) == 0:
+            fallback_item: dict[str, Any] = {}
+            context_expr = stmt.get("context_expr")
+            if isinstance(context_expr, dict):
+                fallback_item["context_expr"] = context_expr
+            optional_vars = stmt.get("optional_vars")
+            if isinstance(optional_vars, dict):
+                fallback_item["optional_vars"] = optional_vars
+            var_name = stmt.get("var_name")
+            if "optional_vars" not in fallback_item and isinstance(var_name, str) and var_name != "":
+                fallback_item["optional_vars"] = {"kind": "Name", "id": var_name}
+            if len(fallback_item) > 0:
+                items = [fallback_item]
+
+        for item in items:
+            if not isinstance(item, dict):
+                continue
+            ctx_expr = item.get("context_expr")
+            opt_var = item.get("optional_vars")
+            ctx_code = self._render_expr(ctx_expr) if isinstance(ctx_expr, dict) else "null"
+            var_name = ""
+            if isinstance(opt_var, dict):
+                var_name = _safe_ident(opt_var.get("id"), "ctx")
+            ctx_vars.append((ctx_code, var_name))
+
+        i = 0
+        while i < len(ctx_vars):
+            ctx_code, var_name = ctx_vars[i]
+            if var_name != "":
+                self._emit_line("final dynamic " + var_name + " = " + ctx_code + ";")
+            else:
+                self._emit_line(ctx_code + ";")
+            i += 1
+
+        self._emit_line("try {")
+        self.indent += 1
+        i = 0
+        while i < len(body):
+            self._emit_stmt(body[i])
+            i += 1
+        self.indent -= 1
+        self._emit_line("} finally {")
+        self.indent += 1
+        i = 0
+        while i < len(ctx_vars):
+            _, var_name = ctx_vars[i]
+            if var_name != "":
+                self._emit_line(var_name + ".close();")
+            i += 1
+        self.indent -= 1
+        self._emit_line("}")
 
     def _fn_emit_name(self, name: str) -> str:
         """Return the Dart name for a top-level function, avoiding class method conflicts."""
@@ -2839,9 +2875,6 @@ class DartNativeEmitter:
             ctor_expr = self._expand_core_ctor(semantic_tag, rendered_args)
             if ctor_expr != "":
                 return ctor_expr
-            ctor_fallback_expr = self._expand_type_ctor_fallback(expr, func_any, rendered_args)
-            if ctor_fallback_expr != "":
-                return ctor_fallback_expr
             cast_expr = self._expand_static_cast(semantic_tag, rendered_args, args)
             if runtime_call == "static_cast" and cast_expr != "":
                 return cast_expr
