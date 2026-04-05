@@ -622,11 +622,61 @@ class DartNativeEmitter:
         return ""
 
     def _expand_mapped_call(self, mapped: str, rendered_args: list[str]) -> str:
+        if mapped == "__PRINT__":
+            return "pytraPrint([" + ", ".join(rendered_args) + "])"
+        if mapped == "__LEN__":
+            if len(rendered_args) == 0:
+                return "0"
+            return "(" + rendered_args[0] + ").length"
+        if mapped == "__INT__":
+            if len(rendered_args) == 0:
+                return "0"
+            return "pytraInt(" + rendered_args[0] + ")"
+        if mapped == "__BOOL__":
+            if len(rendered_args) == 0:
+                return "false"
+            return "pytraTruthy(" + rendered_args[0] + ")"
+        if mapped == "__CHR__":
+            if len(rendered_args) == 0:
+                return "''"
+            return "String.fromCharCode(" + rendered_args[0] + ")"
+        if mapped == "__ORD__":
+            if len(rendered_args) == 0:
+                return "0"
+            return "(" + rendered_args[0] + ").codeUnitAt(0)"
+        if mapped == "__TO_STRING__":
+            if len(rendered_args) == 0:
+                return "''"
+            return "pytraStr(" + rendered_args[0] + ")"
         if mapped.startswith("__NUM_METHOD__:"):
             method_name = mapped[len("__NUM_METHOD__:"):]
             if len(rendered_args) == 0:
                 return "0"
             return "(" + rendered_args[0] + " as num)." + method_name + "()"
+        return ""
+
+    def _expand_static_cast(self, semantic_tag: str, rendered_args: list[str], args: list[Any]) -> str:
+        if semantic_tag == "cast.int":
+            if len(rendered_args) == 0:
+                return "0"
+            return "pytraInt(" + rendered_args[0] + ")"
+        if semantic_tag == "cast.bool":
+            if len(rendered_args) == 0:
+                return "false"
+            return "pytraTruthy(" + rendered_args[0] + ")"
+        if semantic_tag == "cast.str":
+            if len(rendered_args) == 0:
+                return "''"
+            arg0 = args[0] if len(args) > 0 else None
+            if isinstance(arg0, dict):
+                arg_type = self._lookup_expr_type(arg0)
+                if arg0.get("kind") == "Tuple" or arg_type.startswith("tuple["):
+                    return "pytraTupleStr(pytraTupleView(" + rendered_args[0] + "))"
+            return "pytraStr(" + rendered_args[0] + ")"
+        if semantic_tag == "cast.float":
+            if len(rendered_args) == 0:
+                return "0.0"
+            return "pytraFloat(" + rendered_args[0] + ")"
         return ""
 
     def _expand_owner_mapped_call(self, mapped: str, owner: str, rendered_args: list[str], owner_type: str) -> str:
@@ -2712,6 +2762,15 @@ class DartNativeEmitter:
         if isinstance(func_any, dict) and func_any.get("kind") == "Name":
             raw_fn_name = func_any.get("id") if isinstance(func_any.get("id"), str) else ""
             fn_name = _safe_ident(raw_fn_name, "fn")
+            cast_expr = self._expand_static_cast(semantic_tag, rendered_args, args)
+            if runtime_call == "static_cast" and cast_expr != "":
+                return cast_expr
+            mapped_name = self._mapping.calls.get(runtime_call, "")
+            if mapped_name == "":
+                mapped_name = self._mapping.calls.get(raw_fn_name, "")
+            mapped_expr = self._expand_mapped_call(mapped_name, rendered_args)
+            if mapped_expr != "":
+                return mapped_expr
             if raw_fn_name == "cast":
                 # cast(Type, value) → (value as Type)
                 if len(rendered_args) >= 2:
@@ -2727,33 +2786,10 @@ class DartNativeEmitter:
                 if len(rendered_args) == 1:
                     return rendered_args[0]
                 return "null"
-            if raw_fn_name == "print":
-                return "pytraPrint([" + ", ".join(rendered_args) + "])"
-            if raw_fn_name == "int":
-                if len(rendered_args) == 0:
-                    return "0"
-                return "pytraInt(" + rendered_args[0] + ")"
             if raw_fn_name == "float":
                 if len(rendered_args) == 0:
                     return "0.0"
                 return "pytraFloat(" + rendered_args[0] + ")"
-            if raw_fn_name == "bool":
-                if len(rendered_args) == 0:
-                    return "false"
-                return "pytraTruthy(" + rendered_args[0] + ")"
-            if raw_fn_name == "str" or raw_fn_name == "py_to_string":
-                if len(rendered_args) == 0:
-                    return "''"
-                arg0 = args[0] if len(args) > 0 else None
-                if isinstance(arg0, dict):
-                    arg_type = self._lookup_expr_type(arg0)
-                    if arg0.get("kind") == "Tuple" or arg_type.startswith("tuple["):
-                        return "pytraTupleStr(pytraTupleView(" + rendered_args[0] + "))"
-                return "pytraStr(" + rendered_args[0] + ")"
-            if raw_fn_name == "len":
-                if len(rendered_args) == 0:
-                    return "0"
-                return "(" + rendered_args[0] + ").length"
             if raw_fn_name == "max":
                 self._needs_math_import = True
                 if len(rendered_args) == 0:
@@ -2814,14 +2850,6 @@ class DartNativeEmitter:
                 if len(rendered_args) == 0:
                     return "[]"
                 return "List<dynamic>.from(" + rendered_args[0] + ")"
-            if raw_fn_name == "chr":
-                if len(rendered_args) == 0:
-                    return "''"
-                return "String.fromCharCode(" + rendered_args[0] + ")"
-            if raw_fn_name == "ord":
-                if len(rendered_args) == 0:
-                    return "0"
-                return "(" + rendered_args[0] + ").codeUnitAt(0)"
             if raw_fn_name == "bytearray":
                 if len(rendered_args) == 0:
                     return "<int>[]"
@@ -2830,10 +2858,6 @@ class DartNativeEmitter:
                 if len(rendered_args) == 0:
                     return "<int>[]"
                 return "pytraBytes(" + rendered_args[0] + ")"
-            mapped_name = self._mapping.calls.get(raw_fn_name, "")
-            mapped_expr = self._expand_mapped_call(mapped_name, rendered_args)
-            if mapped_expr != "":
-                return mapped_expr
             if fn_name in self.class_names:
                 return fn_name + "(" + ", ".join(rendered_args + kw_values_in_order) + ")"
             # Use alias if calling a top-level function that conflicts with a class method name
