@@ -11,6 +11,8 @@ def run_case() -> None:
     ok = ok and (os.path.dirname(joined) == "alpha")
     # Use a guaranteed existing relative path to avoid dependency on runtime cwd.
     ok = ok and os.path.exists(".")
+    abs_path: str = os.path.abspath(".")
+    ok = ok and (len(abs_path) > 0)
     ok = ok and (len(glob.glob("*.cpp")) > 0)
     print(ok)
 
