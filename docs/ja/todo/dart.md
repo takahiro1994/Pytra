@@ -31,4 +31,13 @@
 
 ## 未完了タスク
 
+### P0-DART-TOOLCHAIN-LEGACY: toolchain_ 依存を解消する
+
+`src/toolchain/emit/dart/emitter.py` が旧 toolchain（`toolchain_`）の `runtime_symbol_index` を参照している。`toolchain_` は deprecated で今後削除される。
+
+依存箇所: `from toolchain_.frontends.runtime_symbol_index import canonical_runtime_module_id, resolve_import_binding_doc`
+
+1. [ ] [ID: P0-DART-LEGACY-S1] `runtime_symbol_index` の必要な機能を toolchain 側に移行するか、emitter 内で EAST3 メタデータから直接取得するように修正する
+2. [ ] [ID: P0-DART-LEGACY-S2] `toolchain_` への import がゼロになることを確認する
+
 - なし。次の Dart タスクは新規起票待ち。

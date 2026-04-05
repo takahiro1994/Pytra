@@ -29,6 +29,15 @@
 
 ## 未完了タスク
 
+### P0-JULIA-TOOLCHAIN-LEGACY: toolchain_ 依存を解消する
+
+`src/toolchain/emit/julia/bootstrap.py` が旧 toolchain（`toolchain_`）の `JuliaNativeEmitter` を参照している。`toolchain_` は deprecated で今後削除される。toolchain 内部の実装に移行すること。
+
+依存箇所: `from toolchain_.emit.julia.emitter.julia_native_emitter import JuliaNativeEmitter`
+
+1. [ ] [ID: P0-JULIA-LEGACY-S1] `bootstrap.py` の `JuliaNativeEmitter` 依存を toolchain の Julia emitter に移行する（旧 emitter のロジックを新 emitter に統合）
+2. [ ] [ID: P0-JULIA-LEGACY-S2] `toolchain_` への import がゼロになることを確認する
+
 ### P0-JULIA-NEW-FIXTURE-PARITY: 新規追加 fixture / stdlib の parity 確認
 
 今セッション（2026-04-01〜05）で追加・更新した fixture と stdlib の parity を確認する。

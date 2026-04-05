@@ -29,6 +29,15 @@
 
 ## 未完了タスク
 
+### P0-ZIG-TOOLCHAIN-LEGACY: toolchain_ 依存を解消する
+
+`src/toolchain/emit/zig/emitter.py` が旧 toolchain（`toolchain_`）の `runtime_symbol_index` を参照している。`toolchain_` は deprecated で今後削除される。
+
+依存箇所: `from toolchain_.frontends.runtime_symbol_index import canonical_runtime_module_id, lookup_runtime_module_symbols`
+
+1. [ ] [ID: P0-ZIG-LEGACY-S1] `runtime_symbol_index` の必要な機能を toolchain 側に移行するか、emitter 内で EAST3 メタデータから直接取得するように修正する
+2. [ ] [ID: P0-ZIG-LEGACY-S2] `toolchain_` への import がゼロになることを確認する
+
 ### P0-ZIG-NEW-FIXTURE-PARITY: 新規追加 fixture / stdlib の parity 確認
 
 今セッション（2026-04-01〜05）で追加・更新した fixture と stdlib の parity を確認する。
