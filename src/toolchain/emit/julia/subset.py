@@ -610,6 +610,7 @@ class JuliaSubsetRenderer:
         self.class_property_names: dict[str, set[str]] = {}
         self.class_static_method_names: dict[str, set[str]] = {}
         self.current_class_name: str = ""
+        self.local_names_stack: list[set[str]] = []
         self.import_alias_modules: dict[str, str] = build_import_alias_map(self.meta)
         self.runtime_imports: dict[str, str] = build_runtime_import_map(self.meta, self.mapping)
         self.emitted_native_files: set[str] = set()
@@ -671,6 +672,11 @@ class JuliaSubsetRenderer:
 
     def _indent(self) -> str:
         return "    " * self.indent_level
+
+    def _current_local_names(self) -> set[str]:
+        if len(self.local_names_stack) == 0:
+            return set()
+        return self.local_names_stack[-1]
 
     def _emit(self, line: str) -> None:
         self.lines.append(self._indent() + line)
@@ -757,6 +763,11 @@ class JuliaSubsetRenderer:
     def _render_scalar_runtime_call(self, mapped: str, args: list[str]) -> str:
         if mapped == "__INT__" and len(args) == 1:
             return "__pytra_int(" + args[0] + ")"
+        if mapped == "__PYFILE_READ__":
+            if len(args) == 1:
+                return "read(" + args[0] + ", String)"
+            if len(args) == 2:
+                return "read(" + args[0] + ", " + args[1] + ")"
         if mapped == "__BYTES_CTOR__":
             if len(args) == 0:
                 return "UInt8[]"
@@ -1473,7 +1484,9 @@ class JuliaSubsetRenderer:
         if isinstance(target, dict) and _str(target, "kind") in {"Tuple", "List"}:
             self._emit_assign_target(target, self._render_expr(node.get("value")))
             return
-        self._emit(_ident(_str(target, "id")) + " = " + self._render_expr(node.get("value")))
+        target_name = _ident(_str(target, "id"))
+        self._current_local_names().add(target_name)
+        self._emit(target_name + " = " + self._render_expr(node.get("value")))
 
     def _emit_multi_assign_stmt(self, node: dict[str, JsonVal]) -> None:
         value_expr = self._render_expr(node.get("value"))
@@ -1530,6 +1543,7 @@ class JuliaSubsetRenderer:
                 self._emit(owner + "." + attr + " = " + self._render_expr(value))
             return
         target_name = _ident(_str(target, "id"))
+        self._current_local_names().add(target_name)
         if value is None:
             self._emit(target_name + " = nothing")
         else:
@@ -1574,9 +1588,13 @@ class JuliaSubsetRenderer:
             args.append(_ident(vararg_name))
         self._emit("function " + name + "(" + ", ".join(args) + ")")
         self.indent_level += 1
-        for stmt in _list(node, "body"):
-            self._emit_stmt(stmt)
-        self.indent_level -= 1
+        self.local_names_stack.append(set(args))
+        try:
+            for stmt in _list(node, "body"):
+                self._emit_stmt(stmt)
+        finally:
+            self.local_names_stack.pop()
+            self.indent_level -= 1
         self._emit("end")
 
     def _emit_raise_stmt(self, node: dict[str, JsonVal]) -> None:
@@ -1742,6 +1760,7 @@ class JuliaSubsetRenderer:
             self._emit("nothing")
             return True
         if kind == "VarDecl":
+            self._current_local_names().add(_str(node, "name"))
             self._emit(_ident(_str(node, "name")) + " = nothing")
             return True
         if kind == "Raise":
@@ -1803,6 +1822,13 @@ class JuliaSubsetRenderer:
     def _emit_try(self, node: dict[str, JsonVal]) -> None:
         handlers = _list(node, "handlers")
         finalbody = _list(node, "finalbody")
+        hoisted = self._collect_try_hoisted_names(node)
+        current_locals = self._current_local_names()
+        for name in hoisted:
+            if name in current_locals:
+                continue
+            current_locals.add(name)
+            self._emit(_ident(name) + " = nothing")
         self._emit("try")
         self.indent_level += 1
         for stmt in _list(node, "body"):
@@ -1813,6 +1839,48 @@ class JuliaSubsetRenderer:
         if len(finalbody) > 0:
             self._emit_try_finally(finalbody)
         self._emit("end")
+
+    def _collect_try_hoisted_names(self, node: dict[str, JsonVal]) -> list[str]:
+        out: list[str] = []
+        seen: set[str] = set()
+
+        def add_name(name: str) -> None:
+            if name == "" or name in seen:
+                return
+            seen.add(name)
+            out.append(name)
+
+        def walk(stmts: list[JsonVal]) -> None:
+            for stmt in stmts:
+                if not isinstance(stmt, dict):
+                    continue
+                kind = _str(stmt, "kind")
+                if kind == "AnnAssign":
+                    target = stmt.get("target")
+                    if isinstance(target, dict) and _str(target, "kind") == "Name":
+                        add_name(_str(target, "id"))
+                elif kind == "Assign":
+                    target = stmt.get("target")
+                    if not isinstance(target, dict):
+                        targets = _list(stmt, "targets")
+                        if len(targets) > 0 and isinstance(targets[0], dict):
+                            target = targets[0]
+                    if isinstance(target, dict) and _str(target, "kind") == "Name":
+                        add_name(_str(target, "id"))
+                elif kind in {"If", "While", "Try", "ForCore"}:
+                    walk(_list(stmt, "body"))
+                    walk(_list(stmt, "orelse"))
+                    walk(_list(stmt, "finalbody"))
+                    for handler in _list(stmt, "handlers"):
+                        if isinstance(handler, dict):
+                            walk(_list(handler, "body"))
+
+        walk(_list(node, "body"))
+        walk(_list(node, "finalbody"))
+        for handler in _list(node, "handlers"):
+            if isinstance(handler, dict):
+                walk(_list(handler, "body"))
+        return out
 
     def _emit_class(self, node: dict[str, JsonVal]) -> None:
         class_name = _str(node, "name")
