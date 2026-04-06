@@ -140,6 +140,7 @@
     "JsonVal": "Object",
     "Node": "HashMap<String, Object>",
     "ArgumentParser": "argparse.ArgumentParser",
+    "ArgValue": "Object",
     "JsonValue": "json.JsonValue",
     "JsonArr": "json.JsonArr",
     "JsonObj": "json.JsonObj",
