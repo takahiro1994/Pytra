@@ -8,6 +8,7 @@ import 'dart:core';
 import 'dart:core' as core;
 import 'dart:async';
 import 'dart:collection';
+import 'dart:convert';
 import 'dart:io';
 
 class PytraBaseException implements core.Exception {
@@ -447,13 +448,25 @@ List<int> pytraBytes([dynamic arg]) {
 // --- file I/O (Python open/write/close bridge) ---
 class PytraFile {
   final RandomAccessFile _raf;
-  PytraFile(this._raf);
+  final String _mode;
+  PytraFile(this._raf, this._mode);
   void write(dynamic data) {
     if (data is List<int>) {
       _raf.writeFromSync(data);
     } else if (data is String) {
       _raf.writeStringSync(data);
     }
+  }
+  dynamic read([dynamic count]) {
+    var remaining = _raf.lengthSync() - _raf.positionSync();
+    if (count is int && count >= 0 && count < remaining) {
+      remaining = count;
+    }
+    final data = _raf.readSync(remaining);
+    if (_mode.contains("b")) {
+      return data;
+    }
+    return utf8.decode(data);
   }
   void close() => _raf.closeSync();
 }
@@ -462,7 +475,7 @@ PytraFile open(String path, [String mode = "r"]) {
   FileMode fm = FileMode.read;
   if (mode == "wb" || mode == "w") fm = FileMode.write;
   if (mode == "ab" || mode == "a") fm = FileMode.append;
-  return PytraFile(File(path).openSync(mode: fm));
+  return PytraFile(File(path).openSync(mode: fm), mode);
 }
 
 // --- IO helpers (for sys.stderr/stdout stubs) ---

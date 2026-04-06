@@ -1667,27 +1667,36 @@ class DartNativeEmitter:
                     decl_type = self._infer_decl_type_from_expr(value_node)
                 dart_t_raw = self._dart_type(decl_type) if decl_type != "" else "var"
                 dart_t = "var" if (dart_t_raw.startswith("List<") or dart_t_raw.startswith("Map<") or dart_t_raw.startswith("Set<")) else dart_t_raw
+                is_module_level = len(self._local_var_stack) == 0
+                already_declared = not is_module_level and target_name in self._current_local_vars()
                 if value_node is None and bool(stmt.get("declare")):
                     if decl_type in _NIL_FREE_DECL_TYPES:
                         if decl_type != "":
                             self._current_type_map()[target_name] = decl_type
-                        if len(self._local_var_stack) > 0:
+                        if not is_module_level:
                             self._current_local_vars().add(target_name)
-                        self._emit_line(dart_t + " " + target + ";")
+                        if not already_declared:
+                            self._emit_line(dart_t + " " + target + ";")
                         return
                 # null assignment to non-nullable type → use late or nullable
                 if value == "null" and dart_t not in {"var", "dynamic"} and not dart_t.endswith("?"):
                     if decl_type != "":
                         self._current_type_map()[target_name] = decl_type
-                    if len(self._local_var_stack) > 0:
+                    if not is_module_level:
                         self._current_local_vars().add(target_name)
-                    self._emit_line("late " + dart_t + " " + target + ";")
+                    if not already_declared:
+                        self._emit_line("late " + dart_t + " " + target + ";")
+                    else:
+                        self._emit_line(target + " = " + value + ";")
                     return
                 if decl_type != "":
                     self._current_type_map()[target_name] = decl_type
-                if len(self._local_var_stack) > 0:
+                if not is_module_level:
                     self._current_local_vars().add(target_name)
-                self._emit_line(dart_t + " " + target + " = " + value + ";")
+                if already_declared:
+                    self._emit_line(target + " = " + value + ";")
+                else:
+                    self._emit_line(dart_t + " " + target + " = " + value + ";")
             else:
                 self._emit_line(target + " = " + value + ";")
             return
@@ -1822,6 +1831,34 @@ class DartNativeEmitter:
             return
         if kind == "Try":
             body = self._dict_list(stmt.get("body"))
+            hoisted_stmts: list[dict[str, Any]] = list(body)
+            orelse = self._dict_list(stmt.get("orelse"))
+            handlers_any = stmt.get("handlers")
+            handlers = handlers_any if isinstance(handlers_any, list) else []
+            i = 0
+            while i < len(handlers):
+                h = handlers[i]
+                if isinstance(h, dict):
+                    hoisted_stmts.extend(self._dict_list(h.get("body")))
+                i += 1
+            finalbody = self._dict_list(stmt.get("finalbody"))
+            hoisted_stmts.extend(orelse)
+            hoisted_stmts.extend(finalbody)
+            hoisted = self._collect_hoisted_names(hoisted_stmts)
+            i = 0
+            while i < len(hoisted):
+                name, decl_type = hoisted[i]
+                if name not in self._current_local_vars():
+                    if decl_type != "":
+                        self._current_type_map()[name] = decl_type
+                    self._current_local_vars().add(name)
+                    dart_t_raw = self._dart_type(decl_type) if decl_type != "" else "var"
+                    dart_t = "var" if (dart_t_raw.startswith("List<") or dart_t_raw.startswith("Map<") or dart_t_raw.startswith("Set<")) else dart_t_raw
+                    if decl_type in _NIL_FREE_DECL_TYPES:
+                        self._emit_line(dart_t + " " + name + ";")
+                    else:
+                        self._emit_line("late " + dart_t + " " + name + ";")
+                i += 1
             self._emit_line("try {")
             self.indent += 1
             i = 0
@@ -1829,8 +1866,6 @@ class DartNativeEmitter:
                 self._emit_stmt(body[i])
                 i += 1
             self.indent -= 1
-            handlers_any = stmt.get("handlers")
-            handlers = handlers_any if isinstance(handlers_any, list) else []
             if len(handlers) > 0:
                 i = 0
                 while i < len(handlers):
@@ -1862,7 +1897,6 @@ class DartNativeEmitter:
                 self.indent += 1
                 self._emit_line("// handler")
                 self.indent -= 1
-            finalbody = self._dict_list(stmt.get("finalbody"))
             if len(finalbody) > 0:
                 self._emit_line("} finally {")
                 self.indent += 1
@@ -1922,6 +1956,22 @@ class DartNativeEmitter:
             if len(fallback_item) > 0:
                 items = [fallback_item]
 
+        hoisted = self._collect_hoisted_names(body)
+        i = 0
+        while i < len(hoisted):
+            name, decl_type = hoisted[i]
+            if name not in self._current_local_vars():
+                if decl_type != "":
+                    self._current_type_map()[name] = decl_type
+                self._current_local_vars().add(name)
+                dart_t_raw = self._dart_type(decl_type) if decl_type != "" else "var"
+                dart_t = "var" if (dart_t_raw.startswith("List<") or dart_t_raw.startswith("Map<") or dart_t_raw.startswith("Set<")) else dart_t_raw
+                if decl_type in _NIL_FREE_DECL_TYPES:
+                    self._emit_line(dart_t + " " + name + ";")
+                else:
+                    self._emit_line("late " + dart_t + " " + name + ";")
+            i += 1
+
         for item in items:
             if not isinstance(item, dict):
                 continue
@@ -1959,6 +2009,59 @@ class DartNativeEmitter:
             i += 1
         self.indent -= 1
         self._emit_line("}")
+
+    def _collect_hoisted_names(self, body: list[dict[str, Any]]) -> list[tuple[str, str]]:
+        out: list[tuple[str, str]] = []
+        seen: set[str] = set()
+
+        def add_name(name: str, decl_type: str) -> None:
+            if name == "" or name in seen:
+                return
+            seen.add(name)
+            out.append((name, decl_type))
+
+        def walk(stmts: list[dict[str, Any]]) -> None:
+            i = 0
+            while i < len(stmts):
+                node = stmts[i]
+                kind = node.get("kind")
+                if kind == "AnnAssign":
+                    target = node.get("target")
+                    if isinstance(target, dict) and target.get("kind") == "Name":
+                        name = _safe_ident(target.get("id"), "value")
+                        decl_type_any = node.get("decl_type")
+                        decl_type = decl_type_any.strip() if isinstance(decl_type_any, str) else ""
+                        if decl_type == "":
+                            anno_any = node.get("annotation")
+                            if isinstance(anno_any, str):
+                                decl_type = anno_any.strip()
+                        add_name(name, decl_type)
+                elif kind == "Assign":
+                    target = node.get("target")
+                    if isinstance(target, dict) and target.get("kind") == "Name":
+                        name = _safe_ident(target.get("id"), "value")
+                        decl_type_any = node.get("decl_type")
+                        decl_type = decl_type_any.strip() if isinstance(decl_type_any, str) else ""
+                        if decl_type == "":
+                            decl_type = self._infer_decl_type_from_expr(node.get("value"))
+                        add_name(name, decl_type)
+                elif kind == "If":
+                    walk(self._dict_list(node.get("body")))
+                    walk(self._dict_list(node.get("orelse")))
+                elif kind == "Try":
+                    walk(self._dict_list(node.get("body")))
+                    handlers = self._dict_list(node.get("handlers"))
+                    j = 0
+                    while j < len(handlers):
+                        walk(self._dict_list(handlers[j].get("body")))
+                        j += 1
+                    walk(self._dict_list(node.get("finalbody")))
+                elif kind == "ForCore" or kind == "While" or kind == "With":
+                    walk(self._dict_list(node.get("body")))
+                i += 1
+
+        walk(body)
+        return out
 
     def _fn_emit_name(self, name: str) -> str:
         """Return the Dart name for a top-level function, avoiding class method conflicts."""
