@@ -746,6 +746,7 @@ def _emit_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
     # BuiltinCall: runtime function
     lowered = _str(node, "lowered_kind")
     if lowered == "BuiltinCall" or lowered == "RuntimeCall":
+        semantic_tag = _str(node, "semantic_tag")
         # When func is Attribute (e.g., checks.append), prepend owner to args
         method_owner = ""
         builtin_arg_strs = list(all_arg_strs)
@@ -753,6 +754,29 @@ def _emit_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
             owner_val = func.get("value")
             method_owner = _emit_expr(ctx, owner_val)
             builtin_arg_strs = [method_owner] + list(arg_strs)
+
+        if semantic_tag == "core.list_ctor":
+            rt = _str(node, "resolved_type")
+            if len(all_arg_strs) >= 1:
+                return "Array.from(" + all_arg_strs[0] + ")"
+            if not ctx.strip_types and rt.startswith("list[") and rt.endswith("]"):
+                elem_type = ts_type(rt[5:-1])
+                return "<" + ts_array_type(elem_type) + ">[]"
+            return "[]"
+        if semantic_tag == "core.set_ctor":
+            rt = _str(node, "resolved_type")
+            if not ctx.strip_types and rt.startswith("set[") and rt.endswith("]"):
+                elem_type = ts_type(rt[4:-1])
+                return "new Set<" + elem_type + ">([" + ", ".join(all_arg_strs) + "])"
+            return "new Set([" + ", ".join(all_arg_strs) + "])"
+        if semantic_tag == "error.raise_ctor":
+            exc_name = _str(node, "runtime_symbol")
+            if exc_name == "" and isinstance(func, dict):
+                exc_name = _str(func, "id")
+            msg = all_arg_strs[0] if len(all_arg_strs) >= 1 else ('"' + (exc_name or "RuntimeError") + '"')
+            if exc_name == "":
+                exc_name = "RuntimeError"
+            return _exception_ctor_expr(exc_name, msg)
 
         fn_name = _resolve_runtime_call_name(ctx, node, func)
         if fn_name != "" and fn_name != "__CAST__" and fn_name != "__PANIC__":
