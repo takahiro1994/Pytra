@@ -6,7 +6,7 @@
 
 > 領域別 TODO。全体索引は [index.md](./index.md) を参照。
 
-最終更新: 2026-04-04
+最終更新: 2026-04-05
 
 ## 運用ルール
 
@@ -49,9 +49,11 @@
 1. [x] [ID: P0-JULIA-NEWFIX-S1] 上記 fixture/stdlib の parity を確認する（対象 fixture のみ実行）
    - 完了メモ: `runtime_parity_check_fast.py` で fixture 6件（`bytes_copy_semantics`, `negative_index_comprehensive`, `negative_index_out_of_range`, `callable_optional_none`, `str_find_index`, `eo_extern_opaque_basic`）と stdlib 2件（`math_extended`, `os_glob_extended`）の Julia parity/emit-only を確認。subset 側で module attr call fallback、`bytearray.append` owner-type fallback、`MultiAssign` unpack、`str.index` の `ValueError` semantics を補完し、Julia runtime mapping に `pytra.std.glob` / `os.path.abspath` / `PytraError` 系 exception base を追加した。
 
-### P2-JULIA-LINT: emitter hardcode lint の Julia 違反を解消する
+### P2-JULIA-LINT: emitter guide 準拠の確認と違反箇所の修正
 
-1. [x] [ID: P2-JULIA-LINT-S1] `check_emitter_hardcode_lint.py --lang julia` で全カテゴリ 0 件になることを確認する
+emitter guide（`docs/ja/spec/spec-emitter-guide.md`）に照らし合わせて、Julia emitter の違反箇所を修正する。lint 0 件にすること自体が目標ではなく、emitter guide に準拠することが目標。lint はその検証手段。
+
+1. [x] [ID: P2-JULIA-LINT-S1] `check_emitter_hardcode_lint.py --lang julia` の各違反を emitter guide に照らし合わせて修正する。EAST3 の情報（`runtime_call`, `semantic_tag`, `runtime_module_id`, `runtime_symbol` 等）を使い、文字列ハードコードを削除する
    - 2026-04-02: `python3 tools/check/check_emitter_hardcode_lint.py --lang julia` で全カテゴリ 0 件を確認
 2. [x] [ID: P2-JULIA-LINT-S2] `src/toolchain2/emit/julia/subset.py` の emitter guide 違反 hardcode を mapping / EAST3 metadata 正本へ移す
    - 2026-04-04: `subset.py` に attr-call method whitelist、owner type 名分岐、exception/class contract の文字列判定など guide 違反の hardcode が残っていることを再確認

@@ -57,6 +57,7 @@ __pycache__/
 /test/pytra/east3/
 /test/pytra/east3-opt/
 /test/selfhost/
+/test/include/east1/
 
 # Node.js
 /node_modules/

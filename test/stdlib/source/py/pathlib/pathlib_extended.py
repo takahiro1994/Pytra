@@ -16,6 +16,17 @@ def run_pathlib_extended() -> bool:
     checks.append(py_assert_eq(child.stem, "values", "stem"))
     checks.append(py_assert_eq((child.parent / "values.txt").exists(), True, "parent_join_exists"))
     checks.append(py_assert_eq(child.read_text(), "42", "read_text"))
+
+    # joinpath — equivalent to / operator
+    joined = root.joinpath("sub", "deep.txt")
+    checks.append(py_assert_eq(str(joined).replace("\\", "/"),
+                                "work/transpile/obj/pathlib_case32/sub/deep.txt",
+                                "joinpath_multi"))
+    joined_single = root.joinpath("flat.txt")
+    checks.append(py_assert_eq(str(joined_single).replace("\\", "/"),
+                                "work/transpile/obj/pathlib_case32/flat.txt",
+                                "joinpath_single"))
+
     return py_assert_all(checks, "pathlib_extended")
 
 if __name__ == "__main__":
