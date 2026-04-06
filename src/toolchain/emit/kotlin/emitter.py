@@ -134,6 +134,16 @@ class KotlinRenderer(CommonRenderer):
             return import_path
         return kotlin_type(resolved_type)
 
+    def _nullable_type(self, resolved_type: str) -> str:
+        rendered = self._render_type(resolved_type)
+        if rendered.endswith("?"):
+            return rendered
+        if rendered in ("Long", "Double", "Boolean", "String", "Path"):
+            return rendered + "?"
+        if rendered.endswith(">"):
+            return rendered + "?"
+        return rendered + "?"
+
     def _emit_store_target(self, target: JsonVal, value_code: str) -> None:
         if not isinstance(target, dict):
             raise RuntimeError("kotlin emitter: store target must be dict")
@@ -212,6 +222,30 @@ class KotlinRenderer(CommonRenderer):
                     continue
             parts.append(self._emit_expr(arg))
         return parts
+
+    def _try_hoisted_names(self, node: dict[str, JsonVal]) -> list[tuple[str, str]]:
+        out: list[tuple[str, str]] = []
+        seen: set[str] = set()
+        for stmt in self._list(node, "body"):
+            if not isinstance(stmt, dict):
+                continue
+            kind = self._str(stmt, "kind")
+            target = stmt.get("target")
+            if not isinstance(target, dict) or self._str(target, "kind") not in ("Name", "NameTarget"):
+                continue
+            name = self._str(target, "id")
+            if name == "" or name in seen:
+                continue
+            decl_type = ""
+            if kind == "AnnAssign":
+                decl_type = self._str(stmt, "decl_type") or self._str(stmt, "annotation") or self._str(target, "resolved_type")
+            elif kind == "Assign" and bool(stmt.get("declare")):
+                decl_type = self._str(stmt, "decl_type") or self._str(target, "resolved_type")
+            if decl_type == "":
+                continue
+            seen.add(name)
+            out.append((name, decl_type))
+        return out
 
     def _emit_keyword_parts(self, keywords: list[JsonVal]) -> list[str]:
         parts: list[str] = []
@@ -614,6 +648,13 @@ class KotlinRenderer(CommonRenderer):
             self._emit("break")
             return
         if kind == "Try":
+            for hoisted_name, hoisted_type in self._try_hoisted_names(node):
+                safe_name = _safe_kotlin_ident(hoisted_name)
+                if self._is_declared_local(safe_name):
+                    continue
+                self._declare_local(safe_name)
+                self._emit("var " + safe_name + ": " + self._nullable_type(hoisted_type) + " = null")
+                self._record_local_type(safe_name, hoisted_type)
             self._emit("try {")
             self.state.indent_level += 1
             for stmt in self._list(node, "body"):
@@ -1333,8 +1374,12 @@ class KotlinRenderer(CommonRenderer):
                         return "__pytra_replace(" + owner_expr + ", " + self._emit_expr(arg_nodes[0]) + ", " + self._emit_expr(arg_nodes[1]) + ")"
                     if attr == "find" and len(arg_nodes) >= 1:
                         return "__pytra_find(" + owner_expr + ", " + self._emit_expr(arg_nodes[0]) + ")"
+                    if attr == "count" and len(arg_nodes) >= 1:
+                        return "__pytra_count_substr(" + owner_expr + ", " + self._emit_expr(arg_nodes[0]) + ")"
                     if attr == "index" and len(arg_nodes) >= 1:
-                        return "__pytra_find(" + owner_expr + ", " + self._emit_expr(arg_nodes[0]) + ")"
+                        return "__pytra_str_index(" + owner_expr + ", " + self._emit_expr(arg_nodes[0]) + ")"
+                    if attr == "rfind" and len(arg_nodes) >= 1:
+                        return "__pytra_rfind(" + owner_expr + ", " + self._emit_expr(arg_nodes[0]) + ")"
                     if attr == "split":
                         sep = self._emit_expr(arg_nodes[0]) if len(arg_nodes) >= 1 else "null"
                         return "(__pytra_split(" + owner_expr + ", " + sep + ") as MutableList<String>)"
@@ -1430,6 +1475,17 @@ class KotlinRenderer(CommonRenderer):
                     if isinstance(mapped, str) and mapped != "":
                         func_name = mapped
                         func_is_named_function = True
+                semantic_tag = self._str(node, "semantic_tag")
+                if semantic_tag == "core.bytearray_ctor":
+                    args_rendered = [self._emit_expr(arg) for arg in self._list(node, "args")]
+                    if len(args_rendered) == 0:
+                        return "__pytra_bytearray()"
+                    return "__pytra_bytearray(" + ", ".join(args_rendered) + ")"
+                if semantic_tag == "core.bytes_ctor":
+                    args_rendered = [self._emit_expr(arg) for arg in self._list(node, "args")]
+                    if len(args_rendered) == 0:
+                        return "__pytra_bytes()"
+                    return "__pytra_bytes(" + ", ".join(args_rendered) + ")"
                 if func_id == "sum":
                     return "(__pytra_sum(" + ", ".join(self._emit_expr(arg) for arg in self._list(node, "args")) + ") as " + self._render_type(self._str(node, "resolved_type")) + ")"
                 if func_id == "zip":

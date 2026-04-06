@@ -140,7 +140,7 @@ class _ArgSpec(
     var action: String = "",
     var choices: MutableList<String> = mutableListOf(),
     var default: Any? = null,
-    var help_text: String = "",
+    var help_text: String = ""
 ) {
     var is_optional: Boolean = names.isNotEmpty() && names[0].startsWith("-")
     var dest: String = if (is_optional) names.last().trimStart('-').replace("-", "_") else if (names.isNotEmpty()) names[0] else ""
@@ -157,7 +157,7 @@ class ArgumentParser(var description: String = "") {
         action: String = "",
         choices: Any? = null,
         default: Any? = null,
-        help_text: String = "",
+        help_text: String = ""
     ) {
         val raw = mutableListOf<Any?>(name1)
         if (name2 != null) raw.add(name2)
@@ -625,9 +625,33 @@ fun __pytra_split(v: Any?, sep: Any?): MutableList<String> {
 fun __pytra_startswith(v: Any?, prefix: Any?): Boolean = __pytra_str(v).startsWith(__pytra_str(prefix))
 fun __pytra_endswith(v: Any?, suffix: Any?): Boolean = __pytra_str(v).endsWith(__pytra_str(suffix))
 fun __pytra_replace(v: Any?, old: Any?, newValue: Any?): String = __pytra_str(v).replace(__pytra_str(old), __pytra_str(newValue))
-fun __pytra_upper(v: Any?): String = __pytra_str(v).uppercase()
-fun __pytra_lower(v: Any?): String = __pytra_str(v).lowercase()
+fun __pytra_upper(v: Any?): String = __pytra_str(v).toUpperCase()
+fun __pytra_lower(v: Any?): String = __pytra_str(v).toLowerCase()
 fun __pytra_find(v: Any?, sub: Any?): Long = __pytra_str(v).indexOf(__pytra_str(sub)).toLong()
+fun __pytra_rfind(v: Any?, sub: Any?): Long = __pytra_str(v).lastIndexOf(__pytra_str(sub)).toLong()
+fun __pytra_str_index(v: Any?, sub: Any?): Long {
+    val found = __pytra_find(v, sub)
+    if (found < 0L) {
+        val err = ValueError()
+        err.__init__("substring not found")
+        throw err
+    }
+    return found
+}
+fun __pytra_count_substr(v: Any?, sub: Any?): Long {
+    val s = __pytra_str(v)
+    val t = __pytra_str(sub)
+    if (t.isEmpty()) return (s.length + 1).toLong()
+    var count = 0L
+    var idx = 0
+    while (true) {
+        val found = s.indexOf(t, idx)
+        if (found < 0) break
+        count += 1L
+        idx = found + t.length
+    }
+    return count
+}
 fun __pytra_isalnum(v: Any?): Boolean {
     val s = __pytra_str(v)
     if (s.isEmpty()) return false
@@ -1223,9 +1247,10 @@ private fun __pytra_json_escape_string(s: String, ensureAscii: Boolean = true): 
             '\r' -> out.append("\\r")
             '\t' -> out.append("\\t")
             else -> {
-                if (ch.toInt() < 0x20 || (ensureAscii && ch.code > 0x7f)) {
+                val chCode = ch.toInt()
+                if (chCode < 0x20 || (ensureAscii && chCode > 0x7f)) {
                     out.append("\\u")
-                    out.append(ch.code.toString(16).padStart(4, '0'))
+                    out.append(chCode.toString(16).padStart(4, '0'))
                 } else {
                     out.append(ch)
                 }
@@ -1510,6 +1535,10 @@ class Path(raw: Any?) {
 
     fun joinpath(child: Any?): Path {
         return Path(Paths.get(value).resolve(__pytra_str(child)).toString())
+    }
+
+    fun joinpath(child1: Any?, child2: Any?): Path {
+        return Path(Paths.get(value).resolve(__pytra_str(child1)).resolve(__pytra_str(child2)).toString())
     }
 
     operator fun div(child: Any?): Path = joinpath(child)

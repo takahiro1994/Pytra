@@ -755,8 +755,9 @@ def _run_target(
         )
         if build.returncode != 0:
             return build
+        main_class = case_path.stem
         return run_shell(
-            "java -jar " + shlex.quote(str(jar_path)),
+            "java -cp " + shlex.quote(str(jar_path)) + " " + shlex.quote(main_class),
             cwd=work_dir,
             env=env,
             timeout_sec=timeout_sec,
