@@ -6,11 +6,10 @@
 
 > 領域別 TODO。全体索引は [index.md](./index.md) を参照。
 
-最終更新: 2026-04-02
+最終更新: 2026-04-06
 
 ## 運用ルール
 
-- **旧 toolchain1（`src/toolchain/emit/cpp/`）は変更不可。** 新規開発・修正は全て `src/toolchain2/emit/cpp/` で行う（[spec-emitter-guide.md](../spec/spec-emitter-guide.md) §1）。
 - 各タスクは `ID` と文脈ファイル（`docs/ja/plans/*.md`）を必須にする。
 - 優先度順（小さい P 番号から）に着手する。
 - 進捗メモとコミットメッセージは同一 `ID` を必ず含める。
@@ -21,69 +20,24 @@
 
 ## 未完了タスク
 
-### P0-CPP-MAPPING-CLEANUP: C++ mapping.json の死んだエントリを掃除する
+### P0-CPP-WITH: with 文を __enter__ / __exit__ プロトコルで実装する
 
-`check_emitter_hardcode_lint.py --lang cpp` の `rt:call_cov` で 14 件の mapping.json エントリが EAST3 golden に出現しない。以下の 3 種類に分類して対処する。
+文脈: [docs/ja/plans/p0-with-context-manager.md](../plans/p0-with-context-manager.md)
 
-**A. 旧キー名（完全修飾化漏れ or 死んだエントリ）— 削除 or FQCN 化:**
-- `py_len` — EAST3 は `runtime_call: "len"` を使う。FQCN 化済みなら旧キーを削除
-- `py_dumps` / `py_dumps_jv` / `py_loads` / `py_loads_arr` / `py_loads_obj` — JSON 系。FQCN キーが別途あるなら旧キーを削除
-- `py_float_from_str` — `float()` コンストラクタ。FQCN キーがあるか確認して統合
-- `py_floordiv` — `//` 演算子。EAST3 で `runtime_call` として使われているか確認
-- `py_write_text` — pathlib 系。FQCN キーがあるか確認
+`With` ノードを context manager プロトコル（`__enter__` / `__exit__`）として正しく変換する。CommonRenderer にデフォルトの try/finally + hoist 変換を実装し、C++ emitter はそれを利用する。`PyFile` 廃止と `io.*` 型定義も含む。
 
-**B. EAST3 が別経路で解決するエントリ — 削除:**
-- `bytearray_ctor` / `bytes_ctor` — コンストラクタは EAST3 で `runtime_call` を経由しない
-- `open` — ファイルオープンは `@extern` 経由
-- `std::runtime_error` — C++ 固有のシンボル。EAST3 の `runtime_call` ではない
+Phase 1〜2 はインフラ（resolve/compile/CommonRenderer）修正、Phase 3 は `PyFile` 廃止、Phase 4 は parity 確認。
 
-**C. fixture カバレッジ不足 — fixture 追加済み or 追加予定:**
-- `str.index` — `str_find_index` fixture 追加済み（golden 再生成で解消見込み）
-
-1. [x] [ID: P0-CPP-MAPCLN-S1] 上記 A の旧キーを削除 or FQCN キーに統合する
-   - 完了メモ: `len` / `json.loads*` / `json.dumps` / `Path.write_text` に canonical key を寄せ、旧 `py_*` key を整理。
-2. [x] [ID: P0-CPP-MAPCLN-S2] 上記 B の不要エントリを mapping.json から削除する
-   - 完了メモ: `bytearray_ctor` / `bytes_ctor` / `py_dumps_jv` / `py_floordiv` / `str.index` を current EAST3 usage と emitter guide に照らして撤去。
-3. [x] [ID: P0-CPP-MAPCLN-S3] `check_emitter_hardcode_lint.py --lang cpp --category rt:call_coverage` が 0 件になることを確認する
-   - 完了メモ: coverage roots を `east3-opt` / `linked` / `selfhost` / `pytra` まで拡張し、guide 準拠の actual EAST3 usage 基準で 0 件を確認。
-
-### P0-CPP-RUNTIME-SYMBOL: C++ emitter のメソッド名ハードコードを解消する
-
-文脈: [docs/ja/plans/p0-cpp-runtime-symbol.md](../plans/p0-cpp-runtime-symbol.md)
-
-`emitter.py` と `header_gen.py` に `"append"`, `"clear"`, `"discard"` 等の Python メソッド名をリストで持っている箇所がある（lint `runtime_symbol` 違反 5 件）。container の mutable/immutable 判定に使用。
-
-emitter が `runtime_call == "list.append"` のような文字列で判定するのも同じ emitter guide 違反。
-
-**正しい解決方法**: `src/pytra/built_in/containers.py` にコンテナのメソッドシグネチャが `@extern class` + `mut[T]` 注釈で定義済み。resolve がこの定義を読んで `borrow_kind: "mutable_ref"` と `meta.mutates_receiver: true` を EAST3 に付与する。emitter はメソッド名を一切知らず、`mutates_receiver` フラグだけを見る。
-
-1. [x] [ID: P0-CPP-RTSYM-S1] spec-east.md に `Call.meta.mutates_receiver` スキーマを定義する
-   - 完了メモ: `Call.meta.mutates_receiver` を spec-east.md に追加し、backend がメソッド名を再推論しない契約を明記。
-2. [x] [ID: P0-CPP-RTSYM-S2] resolve が `src/pytra/built_in/containers.py` を読み、`mut[T]` 注釈付きメソッドの Call に `meta.mutates_receiver: true` を付与するよう修正する
-   - 完了メモ: builtin registry が canonical source `src/pytra/built_in/containers.py` から `self: mut[...]` を overlay し、mutating call の receiver に `borrow_kind: "mutable_ref"` と `meta.mutates_receiver: true` を付与。
-3. [x] [ID: P0-CPP-RTSYM-S3] C++ emitter の mutable メソッド名リストを `meta.mutates_receiver` ベースの判定に置き換える
-   - 完了メモ: `emitter.py` / `header_gen.py` の self-mutation 判定を `meta.mutates_receiver` と receiver `borrow_kind` ベースへ移行。
-4. [x] [ID: P0-CPP-RTSYM-S4] `check_emitter_hardcode_lint.py --lang cpp --category runtime_symbol` が 0 件になることを確認する
-   - 完了メモ: runtime_symbol lint 0 件を確認。最小回帰として registry/resolve/CLI の unit test も追加。
-
-### P0-CPP-NEW-FIXTURE-PARITY: 新規追加 fixture / stdlib の C++ parity 確認
-
-今セッションで追加・更新した fixture と stdlib の C++ parity を確認する。
-
-対象:
-- `bytes_copy_semantics` — bytes(bytearray) コピーセマンティクス
-- `negative_index_comprehensive` — list/str/bytes/bytearray の負数インデックス
-- `negative_index_out_of_range` — a[-100] の IndexError（opt-level 1 では FAIL が仕様通り）
-- `callable_optional_none` — callable|None の is None ガード + invoke
-- `str_find_index` — str.find / str.rfind / str.index + ValueError
-- `eo_extern_opaque_basic` — @extern class の emit-only
-- `math_extended`（stdlib 更新）— math.pi / math.e 追加
-- `os_glob_extended`（stdlib 更新）— os.path.abspath 追加
-
-1. [x] [ID: P0-CPP-NEWFIX-S1] 上記 fixture/stdlib の C++ parity を確認する（対象 fixture のみ実行。golden は再生成済み）
-   - 完了メモ: `runtime_parity_check_fast.py` で fixture 6件（`bytes_copy_semantics`, `negative_index_comprehensive`, `negative_index_out_of_range`, `callable_optional_none`, `str_find_index`, `eo_extern_opaque_basic`）と stdlib 2件（`math_extended`, `os_glob_extended`）の C++ parity/emit-only を確認。
-2. [x] [ID: P0-CPP-NEWFIX-S2] FAIL があれば emitter/runtime を修正する
-   - 完了メモ: `str.index` を current C++ runtime path に復旧。`containers.py` source overlay で不足メソッド署名を補完し、`str.index -> py_str_index` mapping、runtime discovery allowlist、`pytra.built_in.string_ops` / `src/runtime/east/built_in/string_ops.east` を更新して `ValueError` semantics まで一致させた。
+1. [x] [ID: P0-CPP-WITH-S1] resolve が `With` の `context_expr` に `__enter__` / `__exit__` の解決済み情報（`runtime_call` 等）を metadata として付与する
+   完了メモ: `resolver.py` が `with_enter_*` / `with_exit_*` metadata と `with_enter_type` を付与するよう修正。`built_in/io.py` を registry に載せて `open()` / user-defined context manager の両方で解決する。
+2. [x] [ID: P0-CPP-WITH-S2] CommonRenderer に `With` のデフォルト変換（try/finally + hoist）を実装する
+   完了メモ: `common_renderer.py` に `With` の try/finally + hoist lowering を追加。C++ 側はそのデフォルトを使い、self-return nominal context だけ body 内参照束縛で alias を維持する。
+3. [x] [ID: P0-CPP-WITH-S3] resolver の `open()` ハードコードを修正し、mode 引数に応じて `TextIOWrapper` / `BufferedWriter` / `BufferedReader` を返すようにする（`src/pytra/built_in/io.py` は定義済み）
+   完了メモ: `open()` は mode リテラルに応じて `TextIOWrapper` / `BufferedWriter` / `BufferedReader`、不明時は `IOBase` を返す。C++ type map は runtime 実体の `PyFile` に正規化。
+4. [x] [ID: P0-CPP-WITH-S4] resolver の `PyFile` メソッドハードコードを削除し、`built_in/io.py` から型を解決するように修正する。EAST3 golden を再生成する
+   完了メモ: `PyFile` 特例を resolver から除去。`src/runtime/east/utils/assertions.east` を current runtime surface に合わせて更新し、`TextIOWrapper` / `Buffered*` の `__enter__` 正本も追加。
+5. [x] [ID: P0-CPP-WITH-S5] `with_context_manager` + `with_statement` fixture で C++ parity PASS を確認する
+   完了メモ: `python3 tools/check/runtime_parity_check_fast.py --case-root fixture --targets cpp with_context_manager with_statement` で `2/2 PASS`。`pathlib_extended:cpp`、`check_runtime_call_coverage.py --lang cpp --direction mapping-to-east`、`check_emitter_hardcode_lint.py --lang cpp` も確認済み。
 
 ### P20-CPP-SELFHOST: C++ emitter で toolchain2 を C++ に変換し g++ build を通す
 
