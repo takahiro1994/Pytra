@@ -98,6 +98,15 @@ def __pytra_perf_counter(): Double = {
     System.nanoTime().toDouble / 1_000_000_000.0
 }
 
+object __pytra_path {
+    def join(a: Any, b: Any): String = os_path.join(a, b)
+    def splitext(p: Any): mutable.ArrayBuffer[Any] = os_path.splitext(p)
+    def basename(p: Any): String = os_path.basename(p)
+    def dirname(p: Any): String = os_path.dirname(p)
+    def exists(p: Any): Boolean = os_path.exists(p)
+    def abspath(p: Any): String = os_path.abspath(p)
+}
+
 object env {
     val target: String = "scala"
 }
@@ -1176,12 +1185,34 @@ def pyMathCeil(v: Any): Double = scala.math.ceil(__pytra_float(v))
 def pyMathPow(a: Any, b: Any): Double = scala.math.pow(__pytra_float(a), __pytra_float(b))
 def pyMathPi(): Double = scala.math.Pi
 def pyMathE(): Double = scala.math.E
+def __pytra_tan(v: Any): Double = pyMathTan(v)
+def __pytra_exp(v: Any): Double = pyMathExp(v)
+def __pytra_log(v: Any): Double = pyMathLog(v)
+def __pytra_log10(v: Any): Double = scala.math.log10(__pytra_float(v))
+def __pytra_fabs(v: Any): Double = pyMathFabs(v)
+def __pytra_ceil(v: Any): Double = pyMathCeil(v)
+def __pytra_pow(a: Any, b: Any): Double = pyMathPow(a, b)
+
+class bytearray extends mutable.ArrayBuffer[Long] {
+    def __init__(initValue: Any = null): Unit = {
+        this.clear()
+        this.addAll(__pytra_bytearray(initValue))
+    }
+}
+
+class bytes extends mutable.ArrayBuffer[Long] {
+    def __init__(initValue: Any = null): Unit = {
+        this.clear()
+        this.addAll(__pytra_bytes(initValue))
+    }
+}
 
 class Path(v: Any) {
     private val _value: String = __pytra_str(v)
 
     def /(rhs: Any): Path = Path(__pytra_path_join(_value, __pytra_str(rhs)))
     def joinpath(rhs: Any): Path = this / rhs
+    def joinpath(first: Any, second: Any): Path = (this / first) / second
     def resolve(): Path = Path(Paths.get(_value).toAbsolutePath.normalize.toString)
     def exists(): Boolean = __pytra_path_exists(_value)
     def mkdir(parents: Boolean = false, exist_ok: Boolean = false): Unit = {

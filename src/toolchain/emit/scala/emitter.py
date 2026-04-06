@@ -542,10 +542,14 @@ class ScalaRenderer(CommonRenderer):
             return
         if kind == "While":
             test = self._emit_expr(node.get("test"))
+            self._emit("scala.util.control.Breaks.breakable {")
+            self.state.indent_level += 1
             self._emit("while (__pytra_truthy(" + test + ")) {")
             self.state.indent_level += 1
             for stmt in self._list(node, "body"):
                 self._emit_stmt(stmt)
+            self.state.indent_level -= 1
+            self._emit("}")
             self.state.indent_level -= 1
             self._emit("}")
             return
@@ -571,7 +575,7 @@ class ScalaRenderer(CommonRenderer):
                     self._emit("()")
                     return
                 if ident == "break":
-                    self._emit("()")
+                    self._emit("scala.util.control.Breaks.break()")
                     return
             self._emit(self._emit_expr(value))
             return
@@ -897,6 +901,8 @@ class ScalaRenderer(CommonRenderer):
             descending = self._str(iter_plan, "range_mode") == "descending" or step.strip().startswith("-")
             cmp_op = ">" if descending else "<"
             update = idx_name + " = " + idx_name + " + (" + step + ")"
+            self._emit("scala.util.control.Breaks.breakable {")
+            self.state.indent_level += 1
             self._emit("var " + idx_name + " = " + start)
             self._emit("while (" + idx_name + " " + cmp_op + " " + stop + ") {")
             self.state.indent_level += 1
@@ -904,6 +910,8 @@ class ScalaRenderer(CommonRenderer):
             for stmt in body:
                 self._emit_stmt(stmt)
             self._emit(update)
+            self.state.indent_level -= 1
+            self._emit("}")
             self.state.indent_level -= 1
             self._emit("}")
             return
@@ -932,12 +940,16 @@ class ScalaRenderer(CommonRenderer):
                 if loop_var != target_name:
                     prelude.append("val " + target_name + " = " + loop_var + ".asInstanceOf[" + scala_type(resolved_target_type) + "]")
             self._record_local_type(target_name, resolved_target_type if resolved_target_type != "" else "Any")
+        self._emit("scala.util.control.Breaks.breakable {")
+        self.state.indent_level += 1
         self._emit("for (" + loop_var + " <- " + iter_expr + ") {")
         self.state.indent_level += 1
         for line in prelude:
             self._emit(line)
         for stmt in body:
             self._emit_stmt(stmt)
+        self.state.indent_level -= 1
+        self._emit("}")
         self.state.indent_level -= 1
         self._emit("}")
 
