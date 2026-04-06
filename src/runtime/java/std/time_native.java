@@ -8,3 +8,12 @@ public final class time_native {
         return (double) System.nanoTime() / 1_000_000_000.0;
     }
 }
+
+final class pytra_std_time {
+    private pytra_std_time() {
+    }
+
+    public static double perf_counter() {
+        return time_native.perf_counter();
+    }
+}

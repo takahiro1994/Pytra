@@ -1114,7 +1114,7 @@ final class PyRuntime {
         return out;
     }
 
-    private static byte[] __pytra_bytes(List<?> data) {
+    private static byte[] __pytra_bytes_raw(List<?> data) {
         byte[] out = new byte[data.size()];
         int i = 0;
         while (i < data.size()) {
@@ -1122,6 +1122,10 @@ final class PyRuntime {
             i += 1;
         }
         return out;
+    }
+
+    static ArrayList<Long> __pytra_bytes(Object data) {
+        return __pytra_bytearray(data);
     }
 
     static ArrayList<Long> __pytra_grayscale_palette() {
@@ -1203,7 +1207,7 @@ final class PyRuntime {
             if (parent != null) {
                 Files.createDirectories(parent);
             }
-            Files.write(outPath, __pytra_bytes(out));
+            Files.write(outPath, __pytra_bytes_raw(out));
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
@@ -1568,6 +1572,10 @@ final class PyRuntime {
         return __pytra_bytearray(0L);
     }
 
+    static void __pytra_write_rgb_png(String path, long width, long height, Object pixels) {
+        pyWriteRgbPng(path, width, height, __pytra_bytearray(pixels));
+    }
+
     static final class deque extends java.util.ArrayList<Object> {
         deque() {
             super();
@@ -1843,5 +1851,114 @@ final class PyRuntime {
             return !((java.util.List<?>) value).isEmpty();
         }
         return true;
+    }
+}
+
+final class os_path {
+    os_path() {
+    }
+
+    static String join(String a, String b) {
+        return PyRuntime.__pytra_join(a, b);
+    }
+
+    static ArrayList<Object> splitext(String p) {
+        return PyRuntime.__pytra_splitext(p);
+    }
+
+    static String basename(String p) {
+        return PyRuntime.__pytra_basename(p);
+    }
+
+    static String dirname(String p) {
+        return PyRuntime.__pytra_dirname(p);
+    }
+
+    static boolean exists(String p) {
+        return PyRuntime.__pytra_exists(p);
+    }
+
+    static String abspath(String p) {
+        return Paths.get(p).toAbsolutePath().normalize().toString();
+    }
+}
+
+final class os {
+    static final os_path path = new os_path();
+
+    os() {
+    }
+
+    static void makedirs(String path, boolean existOk) {
+        PyRuntime.pyMakedirs(path, existOk);
+    }
+}
+
+final class glob {
+    glob() {
+    }
+
+    static ArrayList<String> glob(String pattern) {
+        return PyRuntime.__pytra_glob(pattern);
+    }
+}
+
+final class pytra_std_os {
+    static final os os = new os();
+}
+
+final class pytra_std_glob {
+    static final glob glob = new glob();
+}
+
+final class math {
+    static final double pi = math_native.pi;
+    static final double e = math_native.e;
+
+    math() {
+    }
+
+    static double sqrt(double x) {
+        return math_native.sqrt(x);
+    }
+
+    static double sin(double x) {
+        return math_native.sin(x);
+    }
+
+    static double cos(double x) {
+        return math_native.cos(x);
+    }
+
+    static double tan(double x) {
+        return math_native.tan(x);
+    }
+
+    static double exp(double x) {
+        return math_native.exp(x);
+    }
+
+    static double log(double x) {
+        return math_native.log(x);
+    }
+
+    static double log10(double x) {
+        return math_native.log10(x);
+    }
+
+    static double fabs(double x) {
+        return math_native.fabs(x);
+    }
+
+    static double floor(double x) {
+        return math_native.floor(x);
+    }
+
+    static double ceil(double x) {
+        return math_native.ceil(x);
+    }
+
+    static double pow(double x, double y) {
+        return math_native.pow(x, y);
     }
 }

@@ -58,6 +58,10 @@ public final class pathlib {
             return __truediv__(other);
         }
 
+        public Path joinpath(String first, String second) {
+            return __truediv__(first).__truediv__(second);
+        }
+
         public Path parent() {
             java.nio.file.Path p = Paths.get(_path).getParent();
             if (p == null) {

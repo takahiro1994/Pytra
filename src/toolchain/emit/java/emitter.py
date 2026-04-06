@@ -844,8 +844,9 @@ def _module_owner_info(ctx: EmitContext, owner_node: JsonVal) -> tuple[bool, str
     node = _unwrap_node(owner_node)
     if not isinstance(node, dict):
         return (False, "", "")
+    kind = _str(node, "kind")
     runtime_module_id = _str(node, "runtime_module_id")
-    if runtime_module_id != "":
+    if runtime_module_id != "" and kind in ("Name", "Attribute"):
         owner_key = _str(node, "repr")
         if owner_key == "" and _str(node, "kind") == "Name":
             owner_key = _str(node, "id")
@@ -1216,6 +1217,9 @@ def _emit_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
         func_kind = _str(func, "kind")
         if func_kind == "Attribute":
             owner_node = func.get("value")
+            runtime_owner = node.get("runtime_owner")
+            if isinstance(runtime_owner, dict):
+                owner_node = runtime_owner
             attr = _str(func, "attr")
             owner = _emit_expr(ctx, owner_node)
             call_arg_strs = list(arg_strs)
