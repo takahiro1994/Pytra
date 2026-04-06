@@ -407,9 +407,12 @@ class ScalaRenderer(CommonRenderer):
                 is_entry = bool(meta.get("is_entry"))
         object_name = _safe_scala_ident(module_id.replace(".", "_") if module_id != "" else "Main")
         self._emit("import scala.collection.mutable")
+        self._emit("import scala.util.control.NoStackTrace")
         self._emit_blank()
         self._emit("object " + object_name + " {")
         self.state.indent_level += 1
+        self._emit("private object __pytra_continue_signal extends Throwable with NoStackTrace")
+        self._emit_blank()
         body = self._list(east3_doc, "body")
         main_guard_body = self._list(east3_doc, "main_guard_body")
         if len(body) == 0:
@@ -555,8 +558,16 @@ class ScalaRenderer(CommonRenderer):
             self.state.indent_level += 1
             self._emit("while (__pytra_truthy(" + test + ")) {")
             self.state.indent_level += 1
+            self._emit("try {")
+            self.state.indent_level += 1
             for stmt in self._list(node, "body"):
                 self._emit_stmt(stmt)
+            self.state.indent_level -= 1
+            self._emit("} catch {")
+            self.state.indent_level += 1
+            self._emit("case _: __pytra_continue_signal.type => ()")
+            self.state.indent_level -= 1
+            self._emit("}")
             self.state.indent_level -= 1
             self._emit("}")
             self.state.indent_level -= 1
@@ -581,7 +592,7 @@ class ScalaRenderer(CommonRenderer):
             if isinstance(value, dict) and self._str(value, "kind") == "Name":
                 ident = self._str(value, "id")
                 if ident == "continue":
-                    self._emit("()")
+                    self._emit("throw __pytra_continue_signal")
                     return
                 if ident == "break":
                     self._emit("scala.util.control.Breaks.break()")
@@ -916,8 +927,16 @@ class ScalaRenderer(CommonRenderer):
             self._emit("while (" + idx_name + " " + cmp_op + " " + stop + ") {")
             self.state.indent_level += 1
             self._emit("val " + target_name + " = " + idx_name)
+            self._emit("try {")
+            self.state.indent_level += 1
             for stmt in body:
                 self._emit_stmt(stmt)
+            self.state.indent_level -= 1
+            self._emit("} catch {")
+            self.state.indent_level += 1
+            self._emit("case _: __pytra_continue_signal.type => ()")
+            self.state.indent_level -= 1
+            self._emit("}")
             self._emit(update)
             self.state.indent_level -= 1
             self._emit("}")
@@ -955,8 +974,16 @@ class ScalaRenderer(CommonRenderer):
         self.state.indent_level += 1
         for line in prelude:
             self._emit(line)
+        self._emit("try {")
+        self.state.indent_level += 1
         for stmt in body:
             self._emit_stmt(stmt)
+        self.state.indent_level -= 1
+        self._emit("} catch {")
+        self.state.indent_level += 1
+        self._emit("case _: __pytra_continue_signal.type => ()")
+        self.state.indent_level -= 1
+        self._emit("}")
         self.state.indent_level -= 1
         self._emit("}")
         self.state.indent_level -= 1
@@ -1383,7 +1410,9 @@ class ScalaRenderer(CommonRenderer):
                     return "__pytra_zip(" + ", ".join(self._emit_expr(arg) for arg in self._list(node, "args")) + ")"
                 if resolved == "" and (func_id in self.module_class_names or (call_result_type != "" and call_result_type == func_id)):
                     ctor_args = [self._emit_expr(arg) for arg in self._list(node, "args")]
-                    class_name = func_name if "." in func_name else _safe_scala_ident(func_id)
+                    if func_name != "" and (func_name.startswith("__pytra_") or "." in func_name):
+                        return func_name + "(" + ", ".join(ctor_args) + ")"
+                    class_name = _safe_scala_ident(func_id)
                     tmp_name = "__pytra_obj"
                     if self.class_has_init.get(func_id, True):
                         return "{ val " + tmp_name + " = new " + class_name + "(); " + tmp_name + ".__init__(" + ", ".join(ctor_args) + "); " + tmp_name + " }"
