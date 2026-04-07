@@ -64,6 +64,7 @@
     "bool": "bool",
     "str": "string",
     "None": "void",
+    "ArgumentParser": "ArgumentParser",
     "Path": "PyPath",
     "Exception": "ref CatchableError"
   },
@@ -130,6 +131,20 @@
     "struct",
     "subprocess"
   ],
+  "module_native_files": {
+    "pathlib": "pathlib_native.nim",
+    "argparse": "argparse_native.nim",
+    "pytra.std.pathlib": "pathlib_native.nim",
+    "pytra.std.argparse": "argparse_native.nim",
+    "pytra.std.glob": "glob_native.nim",
+    "pytra.std.json": "json_native.nim",
+    "pytra.std.math": "math_native.nim",
+    "pytra.std.os": "os_native.nim",
+    "pytra.std.os_path": "os_path_native.nim",
+    "pytra.std.re": "re_native.nim",
+    "pytra.std.sys": "sys_native.nim",
+    "pytra.std.time": "time_native.nim"
+  },
   "exception_types": [
     "Exception",
     "BaseException",

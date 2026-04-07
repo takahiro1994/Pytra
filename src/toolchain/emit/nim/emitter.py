@@ -26,13 +26,6 @@ from toolchain.emit.common.code_emitter import (
 from toolchain.emit.common.common_renderer import CommonRenderer
 from toolchain.link.expand_defaults import expand_cross_module_defaults
 
-_MODULE_OS = "o" + "s"
-_MODULE_PATHLIB = "path" + "lib"
-_MODULE_PYTRA_STD_PATHLIB = "pytra.std.pa" + "thlib"
-_MODULE_PYTRA_STD_ARGPARSE = "pytra.std.arg" + "parse"
-_CLASS_PATH = "Pa" + "th"
-_CLASS_ARGUMENT_PARSER = "Argument" + "Parser"
-
 
 def _emit_discard(ctx: "EmitContext") -> None:
     _emit(ctx, "discard")
@@ -117,6 +110,25 @@ def _str(node: JsonVal, key: str) -> str:
         value = node.get(key)
         if isinstance(value, str):
             return value
+    return ""
+
+
+def _mapped_target_type(ctx: EmitContext, type_name: str) -> str:
+    if type_name == "":
+        return ""
+    return ctx.mapping.types.get(type_name, type_name)
+
+
+def _native_module_name(ctx: EmitContext, module_name: str) -> str:
+    native_module = ctx.mapping.module_native_files.get(module_name, "")
+    if native_module != "":
+        return native_module.rsplit(".", 1)[0]
+    if "." not in module_name:
+        for runtime_module_id in ctx.mapping.module_native_files:
+            if runtime_module_id.rsplit(".", 1)[-1] == module_name:
+                mapped_name = ctx.mapping.module_native_files.get(runtime_module_id, "")
+                if mapped_name != "":
+                    return mapped_name.rsplit(".", 1)[0]
     return ""
 
 
@@ -1173,15 +1185,6 @@ def _emit_expr_with_expected_type(ctx: EmitContext, node: JsonVal, expected_type
             zero = nim_zero_value(expected_type)
             if zero != "":
                 return zero
-    if (
-        expected_type == _CLASS_ARGUMENT_PARSER
-        and isinstance(node, dict)
-        and _str(node, "kind") == "Call"
-        and isinstance(node.get("func"), dict)
-        and _str(node.get("func"), "kind") == "Name"
-        and _str(node.get("func"), "id") == _CLASS_ARGUMENT_PARSER
-    ):
-        return "newArgumentParser(" + ", ".join(_emit_expr(ctx, a) for a in _list(node, "args")) + ")"
     if isinstance(node, dict):
         node_rt = _str(node, "resolved_type")
         if _render_type(ctx, node_rt) == "PyObj":
@@ -1626,8 +1629,6 @@ def _emit_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
             return "int64(py_int(" + _emit_expr(ctx, args[0]) + "))"
         if fn_name == "float" and len(args) == 1:
             return "float64(py_float(" + _emit_expr(ctx, args[0]) + "))"
-        if fn_name == _CLASS_ARGUMENT_PARSER:
-            return "newArgumentParser(" + ", ".join(_emit_expr(ctx, a) for a in args) + ")"
         if fn_name == "deque":
             return _emit_list_ctor(ctx, node, args)
         if fn_name == "bytes" or fn_name == "bytearray":
@@ -3635,28 +3636,30 @@ def _should_emit_list_alias_template(target_rt: str, value: JsonVal) -> bool:
 def _emit_module_imports(ctx: EmitContext, body: list[JsonVal]) -> None:
     """Emit import statements for user modules."""
     src_pytra_root = Path(__file__).resolve().parents[3] / "pytra"
-    native_std_modules = {
-        _MODULE_PYTRA_STD_ARGPARSE: "argparse_native",
-        "pytra.std.glob": "glob_native",
-        "pytra.std.json": "json_native",
-        "pytra.std.math": "math_native",
-        "pytra.std.os": "os_native",
-        "pytra.std.os_path": "os_path_native",
-        _MODULE_PYTRA_STD_PATHLIB: "pathlib_native",
-        "pytra.std.re": "re_native",
-        "pytra.std.sys": "sys_native",
-        "pytra.std.time": "time_native",
-        _MODULE_PATHLIB: "pathlib_native",
+    native_helper_imports: dict[str, dict[str, list[str]]] = {
+        "argparse_native": {
+            "*": ["add_argument", "parse_args"],
+        },
+        "pathlib_native": {
+            "*": ["parent", "name", "stem", "mkdir", "joinpath", "exists", "write_text", "read_text"],
+        },
+        "sys_native": {
+            "*": ["set_argv", "set_path"],
+        },
     }
 
     def _native_module_for(module_name: str) -> str:
-        native_module = native_std_modules.get(module_name, "")
-        if native_module == "" and "." not in module_name:
-            for runtime_module_id, mapped_name in native_std_modules.items():
-                if runtime_module_id.rsplit(".", 1)[-1] == module_name:
-                    native_module = mapped_name
-                    break
-        return native_module
+        return _native_module_name(ctx, module_name)
+
+    def _extend_native_helper_imports(native_module: str, imported_names: list[str]) -> list[str]:
+        helper_spec = native_helper_imports.get(native_module, {})
+        if len(helper_spec) == 0:
+            return imported_names
+        out = list(imported_names)
+        for helper_name in helper_spec.get("*", []):
+            if helper_name not in out:
+                out.append(helper_name)
+        return out
 
     for stmt in body:
         if not isinstance(stmt, dict):
@@ -3678,7 +3681,7 @@ def _emit_module_imports(ctx: EmitContext, body: list[JsonVal]) -> None:
                     alias_name = asname if asname != "" else imported_name
                     native_import = native_module if ctx.root_rel_prefix == "" else ctx.root_rel_prefix + native_module
                     _emit(ctx, "import " + native_import + " as " + _nim_name(ctx, alias_name))
-                    if imported_name == _MODULE_OS:
+                    if native_module == "os_native":
                         py_path_import = "os_path_native" if ctx.root_rel_prefix == "" else ctx.root_rel_prefix + "os_path_native"
                         _emit(ctx, "import " + py_path_import + " as py_path")
                 continue
@@ -3695,18 +3698,7 @@ def _emit_module_imports(ctx: EmitContext, body: list[JsonVal]) -> None:
                         imported_name = _str(name_entry, "name")
                         if imported_name != "" and imported_name not in _NIM_SKIPPED_IMPORT_NAMES:
                             imported_names.append(imported_name)
-                    if module_id == _MODULE_PYTRA_STD_ARGPARSE and _CLASS_ARGUMENT_PARSER in imported_names:
-                        for helper_name in ("newArgumentParser", "add_argument", "parse_args"):
-                            if helper_name not in imported_names:
-                                imported_names.append(helper_name)
-                    if module_id in (_MODULE_PATHLIB, _MODULE_PYTRA_STD_PATHLIB) and _CLASS_PATH in imported_names:
-                        for helper_name in ("parent", "name", "stem", "mkdir", "joinpath", "exists", "write_text", "read_text"):
-                            if helper_name not in imported_names:
-                                imported_names.append(helper_name)
-                    if module_id == "pytra.std.sys":
-                        for helper_name in ("set_argv", "set_path"):
-                            if helper_name not in imported_names:
-                                imported_names.append(helper_name)
+                    imported_names = _extend_native_helper_imports(native_module, imported_names)
                     if len(imported_names) > 0:
                         native_import = native_module if ctx.root_rel_prefix == "" else ctx.root_rel_prefix + native_module
                         _emit(ctx, "from " + native_import + " import " + ", ".join(imported_names))
@@ -3763,7 +3755,7 @@ def _emit_module_imports(ctx: EmitContext, body: list[JsonVal]) -> None:
                         alias_name = asname if asname != "" else mod_name.rsplit(".", 1)[-1]
                         native_import = native_module if ctx.root_rel_prefix == "" else ctx.root_rel_prefix + native_module
                         _emit(ctx, "import " + native_import + " as " + _nim_name(ctx, alias_name))
-                        if mod_name == _MODULE_OS:
+                        if native_module == "os_native":
                             py_path_import = "os_path_native" if ctx.root_rel_prefix == "" else ctx.root_rel_prefix + "os_path_native"
                             _emit(ctx, "import " + py_path_import + " as py_path")
                     continue
