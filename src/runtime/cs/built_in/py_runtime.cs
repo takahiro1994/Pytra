@@ -103,6 +103,18 @@ namespace Pytra.CsModule
             }
         }
 
+        public PyFile __enter__()
+        {
+            EnsureOpen();
+            return this;
+        }
+
+        public object __exit__(object excType, object excValue, object traceback)
+        {
+            close();
+            return null;
+        }
+
         public void close()
         {
             if (_closed)
@@ -773,6 +785,28 @@ namespace Pytra.CsModule
             return idx;
         }
 
+        public static long count(string source, string value)
+        {
+            string haystack = source ?? "";
+            string needle = value ?? "";
+            if (needle.Length == 0)
+            {
+                return haystack.Length + 1L;
+            }
+            long total = 0L;
+            int pos = 0;
+            while (true)
+            {
+                int next = haystack.IndexOf(needle, pos, StringComparison.Ordinal);
+                if (next < 0)
+                {
+                    return total;
+                }
+                total += 1L;
+                pos = next + needle.Length;
+            }
+        }
+
         public static List<long> range(long stop)
         {
             return range(0L, stop, 1L);
@@ -838,6 +872,13 @@ namespace Pytra.CsModule
         public static T max<T>(T left, T right) where T : IComparable<T>
         {
             return left.CompareTo(right) >= 0 ? left : right;
+        }
+
+        public static List<T> py_sorted<T>(List<T> source)
+        {
+            var outv = new List<T>(source ?? new List<T>());
+            outv.Sort();
+            return outv;
         }
 
         public static List<byte> py_int_to_bytes(object valueLike, object lengthLike, object byteorderLike)

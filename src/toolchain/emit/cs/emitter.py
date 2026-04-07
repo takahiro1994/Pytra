@@ -805,30 +805,39 @@ def _container_method_call(
     method_name: str,
     args: list[str],
 ) -> str:
+    list_marker = ""
+    for key in (owner_type + "." + method_name, "list." + method_name):
+        if key in ctx.mapping.calls:
+            list_marker = ctx.mapping.calls[key]
+            break
+    dict_marker = ctx.mapping.calls.get("dict." + method_name, "")
+    set_marker = ctx.mapping.calls.get("set." + method_name, "")
+    str_marker = ctx.mapping.calls.get("str." + method_name, "")
+
     if owner_type.startswith("list[") or owner_type in ("bytes", "bytearray"):
-        if method_name == "append" and len(args) >= 1:
+        if list_marker == "py_runtime.py_append" and len(args) >= 1:
             return "py_runtime.py_append(" + owner_expr + ", " + args[0] + ")"
-        if method_name == "extend" and len(args) >= 1:
+        if list_marker == "py_runtime.extend" and len(args) >= 1:
             return "py_runtime.extend(" + owner_expr + ", " + args[0] + ")"
-        if method_name == "pop":
+        if list_marker == "py_runtime.py_pop":
             if len(args) >= 1:
                 return "py_runtime.py_pop(" + owner_expr + ", " + args[0] + ")"
             return "py_runtime.py_pop(" + owner_expr + ")"
     if owner_type.startswith("dict["):
-        if method_name == "get" and len(args) >= 1:
+        if dict_marker == "py_runtime.get" and len(args) >= 1:
             default_expr = args[1] if len(args) > 1 else "null"
             temp_name = _next_temp(ctx, "__dict_value")
             return "(" + owner_expr + ".TryGetValue(" + args[0] + ", out var " + temp_name + ") ? " + temp_name + " : " + default_expr + ")"
-        if method_name == "items":
+        if dict_marker == "py_runtime.py_dict_items":
             return "py_runtime.py_dict_items(" + owner_expr + ")"
-        if method_name == "keys":
+        if dict_marker == "py_runtime.py_dict_keys":
             key_type = "object"
             inner = owner_type[5:-1].strip()
             parts = [part.strip() for part in inner.split(",", 1)]
             if len(parts) >= 1 and parts[0] != "":
                 key_type = _render_type(ctx, parts[0])
             return "new List<" + key_type + ">(" + owner_expr + ".Keys)"
-        if method_name == "values":
+        if dict_marker == "py_runtime.py_dict_values":
             value_type = "object"
             inner2 = owner_type[5:-1].strip()
             parts2 = [part.strip() for part in inner2.split(",", 1)]
@@ -836,26 +845,30 @@ def _container_method_call(
                 value_type = _render_type(ctx, parts2[1])
             return "new List<" + value_type + ">(" + owner_expr + ".Values)"
     if owner_type.startswith("set["):
-        if method_name == "add" and len(args) >= 1:
+        if set_marker == "py_runtime.py_set_add" and len(args) >= 1:
             return owner_expr + ".Add(" + args[0] + ")"
-        if method_name in ("discard", "remove") and len(args) >= 1:
+        if set_marker in ("py_runtime.py_set_discard", "py_runtime.py_set_remove") and len(args) >= 1:
             return owner_expr + ".Remove(" + args[0] + ")"
     if owner_type == "str":
-        if method_name == "join" and len(args) == 1:
+        if str_marker == "py_runtime.join" and len(args) == 1:
             return "string.Join(" + owner_expr + ", " + args[0] + ")"
-        if method_name == "find":
+        if str_marker == "py_runtime.count":
+            return "py_runtime.count(" + owner_expr + (", " + ", ".join(args) if len(args) > 0 else "") + ")"
+        if str_marker == "py_runtime.find":
             return "py_runtime.find(" + owner_expr + (", " + ", ".join(args) if len(args) > 0 else "") + ")"
-        if method_name == "rfind":
+        if str_marker == "py_runtime.index":
+            return "py_runtime.index(" + owner_expr + (", " + ", ".join(args) if len(args) > 0 else "") + ")"
+        if str_marker == "py_runtime.rfind":
             return "py_runtime.rfind(" + owner_expr + (", " + ", ".join(args) if len(args) > 0 else "") + ")"
-        if method_name == "split":
+        if str_marker == "py_runtime.split":
             return "py_runtime.split(" + owner_expr + (", " + ", ".join(args) if len(args) > 0 else "") + ")"
-        if method_name == "isspace":
+        if str_marker == "py_runtime.isspace":
             return "py_runtime.isspace(" + owner_expr + ")"
-        if method_name == "isalnum":
+        if str_marker == "py_runtime.isalnum":
             return "py_runtime.isalnum(" + owner_expr + ")"
-        if method_name == "lower":
+        if str_marker == "py_runtime.lower":
             return "py_runtime.lower(" + owner_expr + ")"
-        if method_name == "lstrip":
+        if str_marker == "py_runtime.lstrip":
             return "py_runtime.lstrip(" + owner_expr + (", " + ", ".join(args) if len(args) > 0 else "") + ")"
     return ""
 
@@ -1030,7 +1043,7 @@ def _emit_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
             module_id = ctx.import_alias_modules.get(func_name, "")
             if module_id != "" and not should_skip_module(module_id, ctx.mapping):
                 return _module_class_name(module_id) + "." + _safe_name(ctx, func_name) + "(" + ", ".join(call_parts) + ")"
-        if owner_expr != "" and func_name in ("append", "pop", "get", "items", "keys", "values", "add", "discard", "remove"):
+        if owner_expr != "":
             owner_call = _container_method_call(ctx, owner_expr, owner_type, func_name, args)
             if owner_call != "":
                 return _maybe_cast_dynamic_call(ctx, node, owner_call)
@@ -1468,6 +1481,32 @@ class _CsStmtCommonRenderer(CommonRenderer):
         body = _list(node, "body")
         handlers = _list(node, "handlers")
         finalbody = _list(node, "finalbody")
+        hoisted: list[tuple[str, str]] = []
+        seen: set[str] = set()
+        for stmt in body:
+            if not isinstance(stmt, dict):
+                continue
+            kind = _str(stmt, "kind")
+            if kind not in ("Assign", "AnnAssign"):
+                continue
+            target = stmt.get("target")
+            if not isinstance(target, dict) or _str(target, "kind") not in ("Name", "NameTarget"):
+                continue
+            name = _safe_name(self.ctx, _str(target, "id"))
+            if name == "" or name in seen or name in self.ctx.var_types:
+                continue
+            resolved_type = _str(stmt, "decl_type")
+            if resolved_type == "":
+                resolved_type = _str(stmt, "resolved_type")
+            if resolved_type == "":
+                resolved_type = _str(target, "resolved_type")
+            seen.add(name)
+            hoisted.append((name, resolved_type))
+        for name, resolved_type in hoisted:
+            self.ctx.var_types[name] = resolved_type if resolved_type != "" else "object"
+            decl_type = _render_type(self.ctx, resolved_type if resolved_type != "" else "object")
+            init = cs_zero_value(resolved_type, mapping=self.ctx.mapping) if resolved_type != "" else "null"
+            self._emit_stmt_line(decl_type + " " + name + " = " + init)
         self._emit("try {")
         self.state.indent_level += 1
         self.emit_body(body)
