@@ -34,6 +34,10 @@ _CLASS_PATH = "Pa" + "th"
 _CLASS_ARGUMENT_PARSER = "Argument" + "Parser"
 
 
+def _emit_discard(ctx: "EmitContext") -> None:
+    _emit(ctx, "discard")
+
+
 # ---------------------------------------------------------------------------
 # Emit context
 # ---------------------------------------------------------------------------
@@ -376,7 +380,7 @@ def _emit_general_union_defs(ctx: EmitContext) -> None:
                         continue
                     _emit(ctx, "of " + _union_tag_name(union_type, option) + ":")
                     ctx.indent_level += 1
-                    _emit(ctx, "discard")
+                    _emit_discard(ctx)
                     ctx.indent_level -= 1
                 ctx.indent_level -= 1
                 _emit_blank(ctx)
@@ -1501,37 +1505,6 @@ def _emit_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
         if bare_name == "float" and len(args) == 1:
             return "float64(py_float(" + _emit_expr(ctx, args[0]) + "))"
 
-    if isinstance(func_node, dict) and _str(func_node, "kind") == "Attribute":
-        owner_node = func_node.get("value")
-        owner_rt = _str(owner_node, "resolved_type") if isinstance(owner_node, dict) else ""
-        if isinstance(owner_node, dict) and _str(owner_node, "kind") == "Name":
-            owner_name = _nim_name(ctx, _str(owner_node, "id"))
-            actual_owner_rt = ctx.var_types.get(owner_name, "")
-            if actual_owner_rt != "":
-                owner_rt = actual_owner_rt
-        attr = _str(func_node, "attr")
-        if owner_rt.startswith("dict[") or owner_rt == "dict":
-            if attr == "keys":
-                return "toSeq(" + _emit_expr(ctx, owner_node) + ".keys)"
-            if attr == "values":
-                return "toSeq(" + _emit_expr(ctx, owner_node) + ".values)"
-            if attr == "items":
-                return "toSeq(" + _emit_expr(ctx, owner_node) + ".pairs)"
-        if is_general_union_type(owner_rt):
-            dict_option = ""
-            for option in union_options(owner_rt):
-                if option.startswith("dict["):
-                    dict_option = option
-                    break
-            if dict_option != "":
-                dict_expr = _emit_union_case_access(ctx, _emit_expr(ctx, owner_node), owner_rt, dict_option, fallback="default(" + _render_type(ctx, dict_option) + ")")
-                if attr == "keys":
-                    return "toSeq(" + dict_expr + ".keys)"
-                if attr == "values":
-                    return "toSeq(" + dict_expr + ".values)"
-                if attr == "items":
-                    return "toSeq(" + dict_expr + ".pairs)"
-
     # Check for runtime call resolution
     runtime_name = _resolve_runtime_call_name(ctx, node)
     resolved_runtime_source = _str(node, "resolved_runtime_source")
@@ -1580,9 +1553,6 @@ def _emit_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
         return _emit_method_on_owner(ctx, node, "keys", args)
     if runtime_name == "__DICT_VALUES__":
         return _emit_method_on_owner(ctx, node, "values", args)
-    if runtime_name == "dict.keys" or runtime_name == "dict.values" or runtime_name == "dict.items" or runtime_name == "dict.get":
-        if isinstance(func_node, dict) and _str(func_node, "kind") == "Attribute":
-            return _emit_method_call(ctx, func_node, args)
     if runtime_name == "__SET_ADD__":
         return _emit_method_on_owner(ctx, node, "incl", args)
     if runtime_name == "__SET_DISCARD__":
@@ -1613,7 +1583,7 @@ def _emit_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
             owner_id = _str(owner_node, "id") if isinstance(owner_node, dict) else ""
             if owner_id == "collections":
                 return _emit_list_ctor(ctx, node, args)
-        return _emit_method_call(ctx, func_node, args)
+        return _emit_method_call(ctx, node, runtime_name, args)
 
     # Resolved runtime name -> direct call
     if runtime_name != "":
@@ -1633,6 +1603,10 @@ def _emit_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
                 for extra in args[2:]:
                     rendered_args.append(_emit_expr(ctx, extra))
                 return runtime_name + "(" + ", ".join(rendered_args) + ")"
+            rendered_args = []
+            for arg in args:
+                rendered_args.append(_emit_expr(ctx, arg))
+            return runtime_name + "(" + ", ".join(rendered_args) + ")"
         arg_strs = [_render_call_arg(a) for a in args]
         if builtin_name == "print":
             rendered_args: list[str] = []
@@ -1948,9 +1922,14 @@ def _emit_bytes_ctor(ctx: EmitContext, ctor_name: str, args: list[JsonVal]) -> s
     return "@(" + arg_code + ")"
 
 
-def _emit_method_call(ctx: EmitContext, func_node: dict[str, JsonVal], args: list[JsonVal]) -> str:
+def _emit_method_call(ctx: EmitContext, node: dict[str, JsonVal], runtime_name: str, args: list[JsonVal]) -> str:
+    func_node = node.get("func")
+    if not isinstance(func_node, dict):
+        return ""
     owner_node = func_node.get("value")
     attr = _str(func_node, "attr")
+    semantic_tag = _str(node, "semantic_tag")
+    method_tag = runtime_name if runtime_name != "" else semantic_tag
     owner_code = _emit_expr(ctx, owner_node)
     owner_rt = _str(owner_node, "resolved_type") if isinstance(owner_node, dict) else ""
     if isinstance(owner_node, dict) and _str(owner_node, "kind") == "Name":
@@ -1988,76 +1967,64 @@ def _emit_method_call(ctx: EmitContext, func_node: dict[str, JsonVal], args: lis
                 return dict_expr + ".getOrDefault(" + key_code + ", default(" + _render_type(ctx, _split_generic_args(dict_option[5:-1])[1]) + "))"
 
     # str methods
-    if owner_rt == "str":
-        str_method_map: dict[str, str] = {
-            "strip": "py_str_strip", "lstrip": "py_str_lstrip", "rstrip": "py_str_rstrip",
-            "startswith": "py_str_startswith", "endswith": "py_str_endswith",
-            "replace": "py_str_replace", "find": "py_str_find", "rfind": "py_str_rfind",
-            "split": "py_str_split", "join": "py_str_join",
-            "upper": "py_str_upper", "lower": "py_str_lower",
-            "count": "py_str_count", "index": "py_str_index",
-            "isdigit": "py_str_isdigit", "isalpha": "py_str_isalpha",
-            "isalnum": "py_str_isalnum", "isspace": "py_str_isspace",
-        }
-        mapped = str_method_map.get(attr, "")
-        if mapped != "":
-            return mapped + "(" + owner_code + ", " + ", ".join(arg_strs) + ")" if len(arg_strs) > 0 else mapped + "(" + owner_code + ")"
+    if owner_rt == "str" and runtime_name != "":
+        return runtime_name + "(" + owner_code + ", " + ", ".join(arg_strs) + ")" if len(arg_strs) > 0 else runtime_name + "(" + owner_code + ")"
 
     # list methods
     if owner_rt.startswith("list[") or owner_rt in ("list", "bytes", "bytearray"):
-        list_method_map: dict[str, str] = {
-            "append": "add", "extend": "add", "pop": "pop",
-            "clear": "setLen", "reverse": "reverse", "sort": "sort",
-            "insert": "insert", "remove": "delete", "index": "find",
-        }
-        mapped = list_method_map.get(attr, "")
-        if mapped != "":
-            if mapped == "setLen":
-                return owner_code + ".setLen(0)"
-            if mapped == "pop":
-                if len(arg_strs) == 0:
-                    return "py_runtime.pop(" + owner_code + ")"
-                return "py_runtime.pop(" + owner_code + ", " + ", ".join(arg_strs) + ")"
-            if owner_rt in ("bytes", "bytearray"):
-                if attr == "append" and len(arg_strs) == 1:
-                    return owner_code + ".add(uint8(" + arg_strs[0] + "))"
-                if attr == "extend" and len(arg_strs) == 1:
-                    return owner_code + ".add(" + arg_strs[0] + ".mapIt(uint8(it)))"
-            return owner_code + "." + mapped + "(" + ", ".join(arg_strs) + ")"
+        if runtime_name == "__LIST_CLEAR__" or method_tag == "stdlib.method.clear":
+            return owner_code + ".setLen(0)"
+        if runtime_name == "__LIST_POP__" or method_tag == "stdlib.method.pop":
+            if len(arg_strs) == 0:
+                return "py_runtime.pop(" + owner_code + ")"
+            return "py_runtime.pop(" + owner_code + ", " + ", ".join(arg_strs) + ")"
+        if owner_rt in ("bytes", "bytearray"):
+            if (runtime_name == "__LIST_APPEND__" or method_tag == "stdlib.method.append") and len(arg_strs) == 1:
+                return owner_code + ".add(uint8(" + arg_strs[0] + "))"
+            if (runtime_name == "py_extend" or method_tag == "stdlib.method.extend") and len(arg_strs) == 1:
+                return owner_code + ".add(" + arg_strs[0] + ".mapIt(uint8(it)))"
+        if runtime_name == "__LIST_APPEND__" or runtime_name == "py_extend" or method_tag in ("stdlib.method.append", "stdlib.method.extend"):
+            return owner_code + ".add(" + ", ".join(arg_strs) + ")"
+        if runtime_name == "__LIST_INDEX__" or method_tag == "stdlib.method.index":
+            if owner_rt.startswith("list[str]") and len(arg_strs) > 0:
+                return owner_code + ".find($(" + arg_strs[0] + "))"
+            return owner_code + ".find(" + ", ".join(arg_strs) + ")"
+        if runtime_name != "":
+            return owner_code + "." + runtime_name + "(" + ", ".join(arg_strs) + ")"
 
     if owner_rt == "deque" or owner_rt.startswith("deque["):
-        if attr == "append":
+        if runtime_name == "__LIST_APPEND__" or method_tag == "stdlib.method.append":
             return owner_code + ".add(" + ", ".join(arg_strs) + ")"
         if attr == "appendleft" and len(arg_strs) == 1:
             return owner_code + ".insert(" + arg_strs[0] + ", 0)"
         if attr == "popleft":
             return "py_runtime.pop(" + owner_code + ", 0)"
-        if attr == "pop":
+        if runtime_name == "__LIST_POP__" or method_tag == "stdlib.method.pop":
             return "py_runtime.pop(" + owner_code + ")"
-        if attr == "clear":
+        if runtime_name == "__LIST_CLEAR__" or method_tag == "stdlib.method.clear":
             return owner_code + ".setLen(0)"
 
     # dict methods
     if owner_rt.startswith("dict[") or owner_rt == "dict":
-        if attr == "get":
+        if runtime_name == "__DICT_GET__" or runtime_name == "dict.get" or method_tag == "stdlib.method.get":
             if len(arg_strs) > 1:
                 return owner_code + ".getOrDefault(" + ", ".join(arg_strs) + ")"
             if len(arg_strs) == 1:
                 return owner_code + ".getOrDefault(" + arg_strs[0] + ")"
-        if attr == "keys":
+        if runtime_name == "__DICT_KEYS__" or runtime_name == "dict.keys" or method_tag == "stdlib.method.keys":
             return "toSeq(" + owner_code + ".keys)"
-        if attr == "values":
+        if runtime_name == "__DICT_VALUES__" or runtime_name == "dict.values" or method_tag == "stdlib.method.values":
             return "toSeq(" + owner_code + ".values)"
-        if attr == "items":
+        if runtime_name == "__DICT_ITEMS__" or runtime_name == "dict.items" or method_tag == "stdlib.method.items":
             return "toSeq(" + owner_code + ".pairs)"
-        if attr == "pop":
+        if runtime_name == "__DICT_POP__" or method_tag == "stdlib.method.pop":
             if len(arg_strs) > 0:
-                temp = _next_temp(ctx, "pop")
+                temp = _next_temp(ctx, "tmp_dict_value")
                 return "(let " + temp + " = " + owner_code + "[" + arg_strs[0] + "]; " + owner_code + ".del(" + arg_strs[0] + "); " + temp + ")"
-        if attr == "update":
+        if runtime_name == "py_update" or method_tag == "stdlib.method.update":
             if len(arg_strs) > 0:
                 return "(for k, v in " + arg_strs[0] + ": " + owner_code + "[k] = v)"
-        if attr == "setdefault":
+        if runtime_name == "__DICT_SETDEFAULT__" or method_tag == "stdlib.method.setdefault":
             if len(arg_strs) == 2:
                 return owner_code + ".mgetOrPut(" + arg_strs[0] + ", " + arg_strs[1] + ")"
             if len(arg_strs) == 1:
@@ -2065,17 +2032,14 @@ def _emit_method_call(ctx: EmitContext, func_node: dict[str, JsonVal], args: lis
 
     # set methods
     if owner_rt.startswith("set[") or owner_rt == "set":
-        if attr == "add":
+        if runtime_name == "__SET_ADD__" or method_tag == "stdlib.method.add":
             return owner_code + ".incl(" + ", ".join(arg_strs) + ")"
-        if attr == "discard":
+        if runtime_name == "__SET_DISCARD__" or method_tag == "stdlib.method.discard":
             return owner_code + ".excl(" + ", ".join(arg_strs) + ")"
-        if attr == "remove":
+        if runtime_name == "__SET_REMOVE__" or method_tag == "stdlib.method.remove":
             return owner_code + ".excl(" + ", ".join(arg_strs) + ")"
-        if attr == "clear":
+        if runtime_name == "__SET_CLEAR__" or method_tag == "stdlib.method.clear":
             return owner_code + ".clear()"
-
-    if owner_rt.startswith("list[str]") and attr in ("find", "index") and len(arg_strs) > 0:
-        return owner_code + ".find($(" + arg_strs[0] + "))"
 
     # super() call
     if attr == "__init__" and _is_super_call(owner_node):
@@ -2275,7 +2239,7 @@ def _emit_for_core_stmt(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
 
 def _emit_body(ctx: EmitContext, body: list[JsonVal]) -> None:
     if len(body) == 0:
-        _emit(ctx, "discard")
+        _emit_discard(ctx)
         return
     for stmt in body:
         _emit_stmt(ctx, stmt)
@@ -2338,7 +2302,7 @@ def _emit_stmt(ctx: EmitContext, node: JsonVal) -> None:
     elif kind == "ClassDef":
         _emit_class_def(ctx, node)
     elif kind == "Pass":
-        _emit(ctx, "discard")
+        _emit_discard(ctx)
     elif kind == "Break":
         _emit(ctx, "break")
     elif kind == "Continue":
@@ -2911,26 +2875,76 @@ def _emit_delete_stmt(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
 
 
 def _emit_with_stmt(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
-    # Use defer style for with statements
     items = _list(node, "items")
+    if len(items) == 0:
+        items = [node]
     for item in items:
         if not isinstance(item, dict):
             continue
         context_expr = item.get("context_expr")
-        optional_vars = item.get("optional_vars")
         ctx_code = _emit_expr(ctx, context_expr)
-        if isinstance(optional_vars, dict):
-            var_name = _str(optional_vars, "id")
-            if var_name != "":
-                safe = _nim_name(ctx, var_name)
-                _emit(ctx, "var " + safe + " = " + ctx_code)
+        ctx_name = _next_temp(ctx, "pytra_with_ctx")
+        _emit(ctx, "var " + ctx_name + " = " + ctx_code)
+
+        var_name = _str(item, "var_name")
+        if var_name == "":
+            optional_vars = item.get("optional_vars")
+            if isinstance(optional_vars, dict):
+                var_name = _str(optional_vars, "id")
+
+        if var_name != "":
+            safe = _nim_name(ctx, var_name)
+            if safe in ctx.declared_vars:
+                _emit(ctx, safe + " = v_enter(" + ctx_name + ")")
+            else:
+                _emit(ctx, "var " + safe + " = v_enter(" + ctx_name + ")")
                 ctx.declared_vars.add(safe)
-                _emit(ctx, "defer: " + safe + ".close()")
+            enter_type = _str(item, "with_enter_type")
+            if enter_type != "":
+                ctx.var_types[safe] = enter_type
         else:
-            temp = _next_temp(ctx, "ctx")
-            _emit(ctx, "var " + temp + " = " + ctx_code)
-            _emit(ctx, "defer: " + temp + ".close()")
-    _emit_body(ctx, _list(node, "body"))
+            _emit(ctx, "discard v_enter(" + ctx_name + ")")
+
+        hoisted: list[tuple[str, str]] = []
+        seen: set[str] = set()
+        for stmt in _list(item, "body"):
+            if not isinstance(stmt, dict):
+                continue
+            kind = _str(stmt, "kind")
+            if kind not in ("Assign", "AnnAssign"):
+                continue
+            target = stmt.get("target")
+            if not isinstance(target, dict) or _str(target, "kind") not in ("Name", "NameTarget"):
+                continue
+            name = _str(target, "id")
+            if name == "":
+                continue
+            safe_target = _nim_name(ctx, name)
+            if safe_target in seen or safe_target in ctx.declared_vars:
+                continue
+            resolved_type = _str(stmt, "decl_type")
+            if resolved_type == "":
+                resolved_type = _str(stmt, "resolved_type")
+            if resolved_type == "":
+                resolved_type = _str(target, "resolved_type")
+            seen.add(safe_target)
+            hoisted.append((safe_target, resolved_type))
+        for safe_target, resolved_type in hoisted:
+            ann = _type_annotation(ctx, resolved_type)
+            zero = nim_zero_value(resolved_type)
+            _emit(ctx, "var " + safe_target + ann + " = " + zero)
+            ctx.declared_vars.add(safe_target)
+            if resolved_type != "":
+                ctx.var_types[safe_target] = resolved_type
+
+        _emit(ctx, "try:")
+        ctx.indent_level += 1
+        _emit_body(ctx, _list(item, "body"))
+        ctx.indent_level -= 1
+        _emit(ctx, "finally:")
+        ctx.indent_level += 1
+        _emit(ctx, "v_exit(" + ctx_name + ", nil, nil, nil)")
+        ctx.indent_level -= 1
 
 
 # ---------------------------------------------------------------------------
@@ -3013,11 +3027,11 @@ def _node_uses_mutating_method_on_name(node: JsonVal, arg_name: str) -> bool:
             if isinstance(func, dict) and _str(func, "kind") == "Attribute":
                 owner = func.get("value")
                 owner_id = _str(owner, "id") if isinstance(owner, dict) else ""
-                attr = _str(func, "attr")
-                if owner_id == arg_name and attr in {
-                    "append", "extend", "add", "clear", "insert", "pop",
-                    "update", "setdefault", "discard", "remove", "reverse", "sort",
-                }:
+                meta = func.get("meta")
+                mutates_receiver = False
+                if isinstance(meta, dict) and meta.get("mutates_receiver") is True:
+                    mutates_receiver = True
+                if owner_id == arg_name and (mutates_receiver or _str(owner, "borrow_kind") == "mutable_ref"):
                     return True
         if kind == "Assign":
             target = node.get("target")
@@ -3138,7 +3152,7 @@ def _emit_function_def(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
 
     ctx.indent_level += 1
     if len(body) == 0:
-        _emit(ctx, "discard")
+        _emit_discard(ctx)
     else:
         _emit_body(ctx, body)
     ctx.indent_level -= 1
@@ -3255,7 +3269,7 @@ def _emit_class_def(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
         for fname, ftype in fields:
             _emit(ctx, _safe_nim_ident(fname) + "*: " + _render_type(ctx, ftype))
     else:
-        _emit(ctx, "discard")
+        _emit_discard(ctx)
     ctx.indent_level -= 1
     _emit_blank(ctx)
 

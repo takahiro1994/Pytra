@@ -29,6 +29,7 @@
     "str.endswith": "py_str_endswith",
     "str.replace": "py_str_replace",
     "str.find": "py_str_find",
+    "str.index": "py_str_index",
     "str.split": "py_str_split",
     "str.join": "py_str_join",
     "str.upper": "py_str_upper",
@@ -42,12 +43,12 @@
     "py_assert_eq": "py_assert_eq",
     "py_assert_all": "py_assert_all",
     "dict.clear": "py_clear",
-    "dict.pop": "py_pop",
-    "dict.setdefault": "py_setdefault",
+    "dict.pop": "__DICT_POP__",
+    "dict.setdefault": "__DICT_SETDEFAULT__",
     "list.extend": "py_extend",
-    "list.reverse": "py_reverse",
-    "list.sort": "py_sort",
-    "set.clear": "py_clear"
+    "list.reverse": "reverse",
+    "list.sort": "sort",
+    "set.clear": "__SET_CLEAR__"
   },
   "types": {
     "int8": "int8",

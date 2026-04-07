@@ -84,11 +84,11 @@ template py_is_float*(v: typed): bool =
 proc py_open*(path: string, mode: string): PyFile =
   var f: File
   var file_mode = fmRead
-  if mode == "wb":
+  if mode == "w" or mode == "wb":
     file_mode = fmWrite
-  elif mode == "ab":
+  elif mode == "a" or mode == "ab":
     file_mode = fmAppend
-  elif mode == "rb":
+  elif mode == "r" or mode == "rb":
     file_mode = fmRead
   if not open(f, path, file_mode):
     raise newException(IOError, "failed to open file: " & path)
@@ -98,6 +98,20 @@ proc write*(f: var PyFile, data: seq[uint8]): int =
   if data.len > 0:
     discard writeBytes(f, data, 0, data.len)
   return data.len
+
+proc write*(f: var PyFile, data: string): int =
+  system.write(f, data)
+  return data.len
+
+proc read*(f: var PyFile): string =
+  setFilePos(f, 0)
+  return system.readAll(f)
+
+proc v_enter*(f: var PyFile): PyFile =
+  return f
+
+proc v_exit*(f: var PyFile, exc_type: PyObj, exc_val: PyObj, exc_tb: PyObj) =
+  close(f)
 
 proc close*(f: var PyFile) =
   system.close(f)
