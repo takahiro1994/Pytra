@@ -834,23 +834,6 @@ def _resolve_runtime_call_name(ctx: EmitContext, node: dict[str, JsonVal], func:
     return resolve_runtime_call(runtime_call, builtin_name, adapter_kind, ctx.mapping)
 
 
-def _translate_method_name(owner_rt: str, attr: str) -> str:
-    """Translate Python method names to PHP equivalents when not handled by mapping."""
-    # String methods
-    if owner_rt == "str" or owner_rt == "string":
-        if attr == "upper":
-            return "strtoupper"
-        if attr == "lower":
-            return "strtolower"
-        if attr == "strip":
-            return "trim"
-        if attr == "lstrip":
-            return "ltrim"
-        if attr == "rstrip":
-            return "rtrim"
-    return ""
-
-
 def _is_float_type(rt: str) -> bool:
     return rt in ("float64", "float32", "float")
 
@@ -1114,100 +1097,73 @@ def _emit_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
 
         # String methods that take self as first arg → PHP string function
         owner_rt = _str(owner_val, "resolved_type") if isinstance(owner_val, dict) else ""
+        owner_method_key = ""
         if owner_rt.startswith("list[") or owner_rt in ("list", "bytes", "bytearray"):
-            if attr == "append":
-                item = all_arg_strs[0] if len(all_arg_strs) >= 1 else "null"
-                return owner_code + "[] = " + item
-            if attr == "clear":
-                return owner_code + " = []"
-            if attr == "extend":
-                other = all_arg_strs[0] if len(all_arg_strs) >= 1 else "[]"
-                return "__pytra_list_extend(" + owner_code + ", " + other + ")"
-            if attr == "pop":
-                if len(all_arg_strs) >= 1:
-                    return "array_splice(" + owner_code + ", " + all_arg_strs[0] + ", 1)[0]"
-                return "array_pop(" + owner_code + ")"
-            if attr == "index":
-                item = all_arg_strs[0] if len(all_arg_strs) >= 1 else "null"
-                return "array_search(" + item + ", " + owner_code + ", true)"
-        if owner_rt.startswith("dict[") or owner_rt == "dict":
-            if attr == "get":
-                key = all_arg_strs[0] if len(all_arg_strs) >= 1 else "null"
-                default = all_arg_strs[1] if len(all_arg_strs) >= 2 else "null"
-                return "(array_key_exists(" + key + ", " + owner_code + ") ? " + owner_code + "[" + key + "] : " + default + ")"
-            if attr == "keys":
-                return "array_keys(" + owner_code + ")"
-            if attr == "values":
-                return "array_values(" + owner_code + ")"
-            if attr == "items":
-                return "__pytra_dict_items(" + owner_code + ")"
-        if owner_rt in ("str", "string"):
-            if attr == "join":
-                # str.join(iterable) → implode(str, iterable)
-                return "implode(" + owner_code + ", " + (all_arg_strs[0] if len(all_arg_strs) >= 1 else "[]") + ")"
-            if attr == "split":
-                sep = all_arg_strs[0] if len(all_arg_strs) >= 1 else '" "'
-                return "explode(" + sep + ", " + owner_code + ")"
-            if attr == "replace":
-                old = all_arg_strs[0] if len(all_arg_strs) >= 1 else '""'
-                new = all_arg_strs[1] if len(all_arg_strs) >= 2 else '""'
-                return "str_replace(" + old + ", " + new + ", " + owner_code + ")"
-            if attr == "startswith":
-                prefix = all_arg_strs[0] if len(all_arg_strs) >= 1 else '""'
-                return "__pytra_str_startswith(" + owner_code + ", " + prefix + ")"
-            if attr == "endswith":
-                suffix = all_arg_strs[0] if len(all_arg_strs) >= 1 else '""'
-                return "__pytra_str_endswith(" + owner_code + ", " + suffix + ")"
-            if attr == "find":
-                needle = all_arg_strs[0] if len(all_arg_strs) >= 1 else '""'
-                return "(($__pos = strpos(" + owner_code + ", " + needle + ")) !== false ? $__pos : -1)"
-            if attr == "rfind":
-                needle = all_arg_strs[0] if len(all_arg_strs) >= 1 else '""'
-                return "(($__pos = strrpos(" + owner_code + ", " + needle + ")) !== false ? $__pos : -1)"
-            if attr == "count":
-                sub = all_arg_strs[0] if len(all_arg_strs) >= 1 else '""'
-                return "substr_count(" + owner_code + ", " + sub + ")"
-            if attr in ("strip", "trim"):
-                return "trim(" + owner_code + ")"
-            if attr in ("lstrip", "ltrim"):
-                return "ltrim(" + owner_code + ")"
-            if attr in ("rstrip", "rtrim"):
-                return "rtrim(" + owner_code + ")"
-            if attr == "upper":
-                return "strtoupper(" + owner_code + ")"
-            if attr == "lower":
-                return "strtolower(" + owner_code + ")"
-            if attr == "isdigit":
-                return "ctype_digit(" + owner_code + ")"
-            if attr == "isalpha":
-                return "ctype_alpha(" + owner_code + ")"
-            if attr == "isalnum":
-                return "ctype_alnum(" + owner_code + ")"
-            if attr == "isspace":
-                return "ctype_space(" + owner_code + ")"
+            owner_method_key = ("bytearray." if owner_rt == "bytearray" else "list.") + attr
+        elif owner_rt.startswith("dict[") or owner_rt == "dict":
+            owner_method_key = "dict." + attr
+        elif owner_rt in ("str", "string"):
+            owner_method_key = "str." + attr
+        elif owner_rt.startswith("set[") or owner_rt == "set":
+            owner_method_key = "set." + attr
 
-        if attr == "extend":
-            other = all_arg_strs[0] if len(all_arg_strs) >= 1 else "[]"
-            return "__pytra_list_extend(" + owner_code + ", " + other + ")"
-        if attr == "items":
-            return "__pytra_dict_items(" + owner_code + ")"
-        if attr == "keys":
-            return "array_keys(" + owner_code + ")"
-        if attr == "values":
-            return "array_values(" + owner_code + ")"
-        if attr == "get":
-            key = all_arg_strs[0] if len(all_arg_strs) >= 1 else "null"
-            default = all_arg_strs[1] if len(all_arg_strs) >= 2 else "null"
-            return "(array_key_exists(" + key + ", " + owner_code + ") ? " + owner_code + "[" + key + "] : " + default + ")"
-        if attr == "add":
-            item = all_arg_strs[0] if len(all_arg_strs) >= 1 else "null"
-            return "__pytra_set_add(" + owner_code + ", " + item + ")"
-        if attr == "startswith":
-            prefix = all_arg_strs[0] if len(all_arg_strs) >= 1 else '""'
-            return "__pytra_str_startswith(" + owner_code + ", " + prefix + ")"
-        if attr == "endswith":
-            suffix = all_arg_strs[0] if len(all_arg_strs) >= 1 else '""'
-            return "__pytra_str_endswith(" + owner_code + ", " + suffix + ")"
+        if owner_method_key != "":
+            mapped_owner = ctx.mapping.calls.get(owner_method_key, "")
+            owner_args = [owner_code] + all_arg_strs
+            if mapped_owner == "__LIST_APPEND__":
+                item = owner_args[1] if len(owner_args) >= 2 else "null"
+                return owner_args[0] + "[] = " + item
+            if mapped_owner == "__LIST_CLEAR__":
+                return owner_args[0] + " = []"
+            if mapped_owner == "__LIST_EXTEND__":
+                other = owner_args[1] if len(owner_args) >= 2 else "[]"
+                return "__pytra_list_extend(" + owner_args[0] + ", " + other + ")"
+            if mapped_owner == "__LIST_POP__":
+                if len(owner_args) >= 2:
+                    return "array_splice(" + owner_args[0] + ", " + owner_args[1] + ", 1)[0]"
+                return "array_pop(" + owner_args[0] + ")"
+            if mapped_owner == "__LIST_INDEX__":
+                item = owner_args[1] if len(owner_args) >= 2 else "null"
+                return "array_search(" + item + ", " + owner_args[0] + ", true)"
+            if mapped_owner == "__DICT_GET__":
+                key = owner_args[1] if len(owner_args) >= 2 else "null"
+                default = owner_args[2] if len(owner_args) >= 3 else "null"
+                return "(array_key_exists(" + key + ", " + owner_args[0] + ") ? " + owner_args[0] + "[" + key + "] : " + default + ")"
+            if mapped_owner == "__DICT_ITEMS__":
+                return "__pytra_dict_items(" + owner_args[0] + ")"
+            if mapped_owner == "__DICT_KEYS__":
+                return "array_keys(" + owner_args[0] + ")"
+            if mapped_owner == "__DICT_VALUES__":
+                return "array_values(" + owner_args[0] + ")"
+            if mapped_owner == "implode":
+                return "implode(" + owner_args[0] + ", " + (owner_args[1] if len(owner_args) >= 2 else "[]") + ")"
+            if mapped_owner == "__pytra_str_split":
+                return "__pytra_str_split(" + owner_args[0] + ", " + (owner_args[1] if len(owner_args) >= 2 else '" "') + ")"
+            if mapped_owner == "str_replace":
+                return "str_replace(" + (owner_args[1] if len(owner_args) >= 2 else '""') + ", " + (owner_args[2] if len(owner_args) >= 3 else '""') + ", " + owner_args[0] + ")"
+            if mapped_owner == "__pytra_str_startswith":
+                return "__pytra_str_startswith(" + owner_args[0] + ", " + (owner_args[1] if len(owner_args) >= 2 else '""') + ")"
+            if mapped_owner == "__pytra_str_endswith":
+                return "__pytra_str_endswith(" + owner_args[0] + ", " + (owner_args[1] if len(owner_args) >= 2 else '""') + ")"
+            if mapped_owner == "__pytra_str_find":
+                return "__pytra_str_find(" + owner_args[0] + ", " + (owner_args[1] if len(owner_args) >= 2 else '""') + ")"
+            if mapped_owner == "__pytra_str_rfind":
+                return "__pytra_str_rfind(" + owner_args[0] + ", " + (owner_args[1] if len(owner_args) >= 2 else '""') + ")"
+            if mapped_owner == "substr_count":
+                return "substr_count(" + owner_args[0] + ", " + (owner_args[1] if len(owner_args) >= 2 else '""') + ")"
+            if mapped_owner in {"trim", "ltrim", "rtrim", "strtoupper", "strtolower", "__pytra_str_isdigit", "__pytra_str_isalpha", "__pytra_str_isalnum", "__pytra_str_isspace"}:
+                return mapped_owner + "(" + ", ".join(owner_args) + ")"
+            if mapped_owner == "__SET_ADD__":
+                item = owner_args[1] if len(owner_args) >= 2 else "null"
+                return "__pytra_set_add(" + owner_args[0] + ", " + item + ")"
+            if mapped_owner == "__SET_DISCARD__":
+                item = owner_args[1] if len(owner_args) >= 2 else "null"
+                return "__pytra_set_discard(" + owner_args[0] + ", " + item + ")"
+            if mapped_owner == "__SET_REMOVE__":
+                item = owner_args[1] if len(owner_args) >= 2 else "null"
+                return "__pytra_set_remove(" + owner_args[0] + ", " + item + ")"
+            if mapped_owner == "__SET_CLEAR__":
+                return "__pytra_set_clear(" + owner_args[0] + ")"
 
         return owner_code + "->" + _safe_php_ident(attr) + "(" + ", ".join(all_arg_strs) + ")"
 
