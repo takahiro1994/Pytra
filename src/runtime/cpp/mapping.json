@@ -109,8 +109,7 @@
     "IOBase": "pytra::runtime::cpp::base::PyFile",
     "TextIOWrapper": "pytra::runtime::cpp::base::PyFile",
     "BufferedWriter": "pytra::runtime::cpp::base::PyFile",
-    "BufferedReader": "pytra::runtime::cpp::base::PyFile",
-    "PyFile": "pytra::runtime::cpp::base::PyFile"
+    "BufferedReader": "pytra::runtime::cpp::base::PyFile"
   },
   "skip_modules": [
     "pytra.built_in.",

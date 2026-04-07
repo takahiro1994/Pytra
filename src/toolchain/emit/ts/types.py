@@ -46,8 +46,10 @@ _TYPE_MAP: dict[str, str] = {
     "IndexError": "Error",
     "KeyError": "Error",
     "Path": "PyPath",
-    "PyFile": "any",
+    "IOBase": "any",
     "TextIOWrapper": "any",
+    "BufferedReader": "any",
+    "BufferedWriter": "any",
 }
 
 _TS_KEYWORDS: set[str] = {
@@ -94,7 +96,7 @@ TS_BUILTIN_RUNTIME_SYMBOLS: tuple[str, ...] = (
     "pymakedirs",
     "ArgumentParser",
     "pywrite_rgb_png",
-    "pyopen", "PyFile",
+    "pyopen",
     "pyPerfCounter",
     "sys", "pyset_argv", "pyset_path",
     "sub", "match", "search", "findall", "split",

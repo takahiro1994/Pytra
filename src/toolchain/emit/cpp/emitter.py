@@ -4102,7 +4102,7 @@ _BUILTIN_RESOLVED_TYPE_NAMES: set[str] = {
     "bool", "str", "bytes", "bytearray",
     "None", "none", "object", "Any", "Obj",
     "JsonVal", "Callable", "callable", "type",
-    "unknown", "PyFile",
+    "unknown",
 }
 
 

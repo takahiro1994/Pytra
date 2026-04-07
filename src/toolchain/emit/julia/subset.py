@@ -325,7 +325,7 @@ def _owner_type_runtime_prefix(owner_type: str) -> str:
 
 
 def _is_io_owner_type(owner_type: str) -> bool:
-    return owner_type in {"IOBase", "PyFile", "TextIOWrapper", "BufferedWriter", "BufferedReader"}
+    return owner_type in {"IOBase", "TextIOWrapper", "BufferedWriter", "BufferedReader"}
 
 
 def _import_supported(names: list[JsonVal]) -> bool:

@@ -40,7 +40,6 @@ _TYPE_MAP: dict[str, str] = {
     "float64": "float64",
     "bool": "bool",
     "str": "str",
-    "PyFile": "pytra::runtime::cpp::base::PyFile",
     "None": "void",
     "none": "void",
     "bytes": "bytes",
