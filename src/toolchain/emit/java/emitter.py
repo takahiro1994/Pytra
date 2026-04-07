@@ -224,15 +224,22 @@ def _is_float_type(resolved_type: str) -> bool:
 
 
 def _is_dynamic_type(resolved_type: str) -> bool:
-    return resolved_type in ("", "Any", "Obj", "object", "unknown", "JsonVal")
+    return resolved_type in ("", "Any", "Obj", "Object", "object", "unknown", "JsonVal")
 
 
 def _java_type_in_ctx(ctx: EmitContext, resolved_type: str, *, allow_void: bool = False) -> str:
+    if resolved_type in ("Callable", "callable"):
+        return "Object"
+    if _parse_callable_type(resolved_type) is not None:
+        return _safe_java_ident(resolved_type)
     if resolved_type in ctx.enum_like_names:
         return "long"
     if resolved_type in ctx.class_names or resolved_type in ctx.class_bases:
         return _safe_java_ident(resolved_type)
-    return java_type(resolved_type, ctx.mapping.types, allow_void=allow_void)
+    jt = java_type(resolved_type, ctx.mapping.types, allow_void=allow_void)
+    if jt == _safe_java_ident(resolved_type) and resolved_type.isidentifier() and resolved_type[:1].isupper():
+        return "Object"
+    return jt
 
 
 def _linked_type_id(ctx: EmitContext, resolved_type: str) -> int | None:
@@ -318,6 +325,10 @@ def _collect_callable_types(node: JsonVal, out: set[str]) -> None:
             if normalized != "":
                 out.add(normalized)
         for value in node.values():
+            if isinstance(value, str):
+                normalized = _normalized_callable_type(value)
+                if normalized != "":
+                    out.add(normalized)
             _collect_callable_types(value, out)
         return
     if isinstance(node, list):
@@ -390,7 +401,9 @@ def _wrap_callable_arg(ctx: EmitContext, arg_node: JsonVal, rendered: str) -> st
                 arg_types, _return_type = sig
                 if len(arg_types) == 0:
                     if parsed is None:
-                        return "(__unused) -> { " + mapped_name + "(); return null; }"
+                        if _return_type in ("", "None", "none"):
+                            return "() -> " + mapped_name + "()"
+                        return "() -> { return " + mapped_name + "(); }"
                     return "() -> " + mapped_name + "()"
                 params: list[str] = []
                 call_args: list[str] = []
@@ -550,9 +563,9 @@ def _emit_container_method_call(ctx: EmitContext, owner_node: JsonVal, arg_strs:
             return fn_name + "(" + ", ".join([owner] + arg_strs) + ")"
     if _is_dict_type(owner_type) or _is_dynamic_type(owner_type):
         attr = _str(_unwrap_node(node.get("func")), "attr")
+        if _is_dict_type(owner_type) or _is_dynamic_type(owner_type):
+            owner_access = "((java.util.Map<?, ?>) (" + owner + "))"
         if attr == "get":
-            if _is_dynamic_type(owner_type):
-                owner_access = "((HashMap<Object, Object>) (" + owner + "))"
             if len(arg_strs) >= 2:
                 return _maybe_cast_dynamic_call(
                     ctx,
@@ -562,18 +575,12 @@ def _emit_container_method_call(ctx: EmitContext, owner_node: JsonVal, arg_strs:
             if len(arg_strs) >= 1:
                 return _maybe_cast_dynamic_call(ctx, node, owner_access + ".get(" + arg_strs[0] + ")")
         if attr == "keys":
-            if _is_dynamic_type(owner_type):
-                owner_access = "((HashMap<Object, Object>) (" + owner + "))"
             jt = _java_type_in_ctx(ctx, call_type)
             return "(" + jt + ") (ArrayList<?>) PyRuntime.pyDictKeys(" + owner_access + ")"
         if attr == "values":
-            if _is_dynamic_type(owner_type):
-                owner_access = "((HashMap<Object, Object>) (" + owner + "))"
             jt = _java_type_in_ctx(ctx, call_type)
             return "(" + jt + ") (ArrayList<?>) PyRuntime.pyDictValues(" + owner_access + ")"
         if attr == "items":
-            if _is_dynamic_type(owner_type):
-                owner_access = "((HashMap<Object, Object>) (" + owner + "))"
             jt = _java_type_in_ctx(ctx, call_type)
             return "(" + jt + ") (ArrayList<?>) PyRuntime.pyDictItems(" + owner_access + ")"
     return ""
@@ -1142,6 +1149,8 @@ def _emit_cast_expr(ctx: EmitContext, target_type: str, arg_code: str) -> str:
             return "((" + nullable_arg + ") == null ? null : Boolean.valueOf(PyRuntime.pyBool(" + nullable_arg + ")))"
         if optional_inner == "str":
             return "((" + nullable_arg + ") == null ? null : PyRuntime.pyToString(" + nullable_arg + "))"
+        if _is_dict_type(optional_inner):
+            return "((" + nullable_arg + ") == null ? null : (" + _java_type_in_ctx(ctx, target_type) + ") (HashMap<?, ?>) (" + nullable_arg + "))"
         return "((" + nullable_arg + ") == null ? null : (" + _java_type_in_ctx(ctx, target_type) + ") (" + nullable_arg + "))"
     if target_type in ("int", "int8", "int16", "int32", "int64", "uint8", "uint16", "uint32", "uint64"):
         return "PyRuntime.pyToLong(" + arg_code + ")"
@@ -1151,11 +1160,20 @@ def _emit_cast_expr(ctx: EmitContext, target_type: str, arg_code: str) -> str:
         return "PyRuntime.pyBool(" + arg_code + ")"
     if target_type == "str":
         return "PyRuntime.pyToString(" + arg_code + ")"
+    if _is_dict_type(target_type):
+        return "(" + _java_type_in_ctx(ctx, target_type) + ") (HashMap<?, ?>) (" + arg_code + ")"
     return "(" + _java_type_in_ctx(ctx, target_type) + ") (" + arg_code + ")"
 
 
 def _emit_builtin_placeholder(ctx: EmitContext, fn_name: str, all_arg_strs: list[str], node: dict[str, JsonVal]) -> str:
     owner = "(" + all_arg_strs[0] + ")" if len(all_arg_strs) >= 1 else "null"
+    owner_node = node.get("runtime_owner")
+    if not isinstance(owner_node, dict):
+        args = _list(node, "args")
+        if len(args) >= 1 and isinstance(args[0], dict):
+            owner_node = args[0]
+    owner_type = _node_type(ctx, owner_node)
+    dict_owner = "((java.util.Map<?, ?>) " + owner + ")" if (_is_dict_type(owner_type) or _is_dynamic_type(owner_type)) else owner
     if fn_name == "__CAST__":
         if len(all_arg_strs) == 0:
             return "null"
@@ -1195,22 +1213,22 @@ def _emit_builtin_placeholder(ctx: EmitContext, fn_name: str, all_arg_strs: list
             return _maybe_cast_dynamic_call(
                 ctx,
                 node,
-                "PyRuntime.__pytra_dict_get_default(" + owner + ", " + all_arg_strs[1] + ", " + all_arg_strs[2] + ")",
+                "PyRuntime.__pytra_dict_get_default(" + dict_owner + ", " + all_arg_strs[1] + ", " + all_arg_strs[2] + ")",
             )
         if len(all_arg_strs) >= 2:
-            return _maybe_cast_dynamic_call(ctx, node, owner + ".get(" + all_arg_strs[1] + ")")
+            return _maybe_cast_dynamic_call(ctx, node, dict_owner + ".get(" + all_arg_strs[1] + ")")
     if fn_name == "__DICT_KEYS__" and len(all_arg_strs) >= 1:
         call_type = _str(node, "resolved_type")
         jt = _java_type_in_ctx(ctx, call_type)
-        return "(" + jt + ") (ArrayList<?>) PyRuntime.pyDictKeys(" + owner + ")"
+        return "(" + jt + ") (ArrayList<?>) PyRuntime.pyDictKeys(" + dict_owner + ")"
     if fn_name == "__DICT_VALUES__" and len(all_arg_strs) >= 1:
         call_type = _str(node, "resolved_type")
         jt = _java_type_in_ctx(ctx, call_type)
-        return "(" + jt + ") (ArrayList<?>) PyRuntime.pyDictValues(" + owner + ")"
+        return "(" + jt + ") (ArrayList<?>) PyRuntime.pyDictValues(" + dict_owner + ")"
     if fn_name == "__DICT_ITEMS__" and len(all_arg_strs) >= 1:
         call_type = _str(node, "resolved_type")
         jt = _java_type_in_ctx(ctx, call_type)
-        return "(" + jt + ") (ArrayList<?>) PyRuntime.pyDictItems(" + owner + ")"
+        return "(" + jt + ") (ArrayList<?>) PyRuntime.pyDictItems(" + dict_owner + ")"
     if fn_name == "__SET_ADD__" and len(all_arg_strs) >= 2:
         return owner + ".add(" + all_arg_strs[1] + ")"
     if fn_name in ("__SET_DISCARD__", "__SET_REMOVE__") and len(all_arg_strs) >= 2:
@@ -1550,6 +1568,8 @@ def _emit_assign(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
     target_type = _decl_type(node, value)
     value_code = _emit_expr(ctx, value) if isinstance(value, dict) else "null"
     value_code = _coerce_callable_assignment(ctx, value, target_type, value_code)
+    if isinstance(value, dict) and _optional_inner_type(target_type) != "" and _str(value, "resolved_type") != target_type:
+        value_code = _emit_cast_expr(ctx, target_type, value_code)
     if target_kind in ("Name", "NameTarget"):
         _emit_name_assignment(ctx, _str(target, "id"), target_type, value_code, annotated=False)
         return
@@ -1576,6 +1596,8 @@ def _emit_ann_assign(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
     value = node.get("value")
     value_code = _emit_expr(ctx, value) if isinstance(value, dict) else java_zero_value(target_type)
     value_code = _coerce_callable_assignment(ctx, value, target_type, value_code)
+    if isinstance(value, dict) and _optional_inner_type(target_type) != "" and _str(value, "resolved_type") != target_type:
+        value_code = _emit_cast_expr(ctx, target_type, value_code)
     target_kind = _str(target, "kind")
     if target_kind in ("Name", "NameTarget"):
         _emit_name_assignment(ctx, _str(target, "id"), target_type, value_code, annotated=True)
@@ -1769,7 +1791,7 @@ def _function_return_type(node: dict[str, JsonVal]) -> str:
             value_type = _str(value, "resolved_type")
             if value_type != "" and value_type != "None":
                 return value_type
-    return return_type
+    return "None" if return_type in ("", "None") else return_type
 
 
 def _closure_helper_info(ctx: EmitContext, owner_name: str, node: dict[str, JsonVal]) -> dict[str, JsonVal]:

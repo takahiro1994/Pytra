@@ -840,6 +840,59 @@ final class PyRuntime {
         return value.toUpperCase();
     }
 
+    static String __pytra_lower(String value) {
+        return value.toLowerCase();
+    }
+
+    static boolean __pytra_isalnum(String value) {
+        if (value.isEmpty()) {
+            return false;
+        }
+        for (int i = 0; i < value.length(); i++) {
+            if (!Character.isLetterOrDigit(value.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    static String __pytra_lstrip(String value) {
+        int start = 0;
+        while (start < value.length() && Character.isWhitespace(value.charAt(start))) {
+            start += 1;
+        }
+        return value.substring(start);
+    }
+
+    static ArrayList<String> __pytra_split(String value, String sep) {
+        ArrayList<String> parts = new ArrayList<>();
+        if (sep.isEmpty()) {
+            throw new RuntimeException("empty separator");
+        }
+        int start = 0;
+        while (true) {
+            int index = value.indexOf(sep, start);
+            if (index < 0) {
+                parts.add(value.substring(start));
+                return parts;
+            }
+            parts.add(value.substring(start, index));
+            start = index + sep.length();
+        }
+    }
+
+    static boolean __pytra_isspace(String value) {
+        if (value.isEmpty()) {
+            return false;
+        }
+        for (int i = 0; i < value.length(); i++) {
+            if (!Character.isWhitespace(value.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     static long __pytra_find(Object value, Object sub) {
         return pyToString(value).indexOf(pyToString(sub));
     }

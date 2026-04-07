@@ -103,6 +103,7 @@
     "set.clear": "__CLEAR__",
     "str.count": "PyRuntime.__pytra_count_substr",
     "str.find": "PyRuntime.__pytra_find",
+    "str.isspace": "PyRuntime.__pytra_isspace",
     "str.isalnum": "PyRuntime.__pytra_isalnum",
     "str.lower": "PyRuntime.__pytra_lower",
     "str.lstrip": "PyRuntime.__pytra_lstrip",
