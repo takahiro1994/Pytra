@@ -1515,6 +1515,8 @@ def _emit_compare(ctx: RsEmitContext, node: dict[str, JsonVal]) -> str:
             # Comparing to None: if LHS is not Optional, the result is known statically
             left_type = _expr_type(current_left_node)
             right_type = _expr_type(comparator)
+            left_rt = _infer_node_rust_type(ctx, current_left_node)
+            right_rt = _infer_node_rust_type(ctx, comparator)
             is_none_cmp = (right == "None" or current_left == "None")
             if is_none_cmp:
                 left_is_pyany = _rs_type_for_context(ctx, left_type) == "PyAny"
@@ -1548,10 +1550,24 @@ def _emit_compare(ctx: RsEmitContext, node: dict[str, JsonVal]) -> str:
                     else:
                         # Non-optional, non-Any type compared to None: always not-None
                         parts.append("true" if rs_op == "!=" else "false")
+                elif (
+                    rs_op in ("==", "!=")
+                    and left_rt.startswith("Rc<RefCell<")
+                    and right_rt.startswith("Rc<RefCell<")
+                ):
+                    ptr_eq = "Rc::ptr_eq(&" + _cmp_operand(current_left) + ", &" + _cmp_operand(right) + ")"
+                    parts.append("!" + ptr_eq if rs_op == "!=" else ptr_eq)
                 else:
                     parts.append("(" + current_left + " " + rs_op + " " + right + ")")
             else:
-                if _types_always_unequal(left_type, right_type):
+                if (
+                    rs_op in ("==", "!=")
+                    and left_rt.startswith("Rc<RefCell<")
+                    and right_rt.startswith("Rc<RefCell<")
+                ):
+                    ptr_eq = "Rc::ptr_eq(&" + _cmp_operand(current_left) + ", &" + _cmp_operand(right) + ")"
+                    parts.append("!" + ptr_eq if rs_op == "!=" else ptr_eq)
+                elif _types_always_unequal(left_type, right_type):
                     parts.append("false" if rs_op == "==" else "true")
                 else:
                     parts.append("(" + _cmp_operand(current_left) + " " + rs_op + " " + _cmp_operand(right) + ")")
@@ -2850,18 +2866,20 @@ def _emit_method_call(
                 if isinstance(kw, dict):
                     rendered_args.append(_emit_expr(ctx, kw.get("value")))
             if elem_type.startswith("set[") or elem_type == "set":
+                elem_set_marker = ctx.mapping.calls.get("set." + method, "")
                 target = "__list[__idx]"
-                if method == "add" and len(rendered_args) == 1:
+                if elem_set_marker == "__SET_ADD__" and len(rendered_args) == 1:
                     return "{ let mut __list = " + base_expr + ".py_borrow_mut(); let __raw = " + idx_expr + "; let __idx = if __raw < 0 { (__list.len() as i64 + __raw) as usize } else { __raw as usize }; " + target + ".insert(" + rendered_args[0] + "); }"
-                if method in ("remove", "discard") and len(rendered_args) == 1:
+                if elem_set_marker in ("py_remove", "py_discard") and len(rendered_args) == 1:
                     return "{ let mut __list = " + base_expr + ".py_borrow_mut(); let __raw = " + idx_expr + "; let __idx = if __raw < 0 { (__list.len() as i64 + __raw) as usize } else { __raw as usize }; " + target + ".remove(&" + rendered_args[0] + "); }"
-                if method == "clear":
+                if elem_set_marker == "py_clear":
                     return "{ let mut __list = " + base_expr + ".py_borrow_mut(); let __raw = " + idx_expr + "; let __idx = if __raw < 0 { (__list.len() as i64 + __raw) as usize } else { __raw as usize }; " + target + ".clear(); }"
             if elem_type.startswith("dict[") or elem_type == "dict":
+                elem_dict_marker = ctx.mapping.calls.get("dict." + method, "")
                 target = "__list[__idx]"
-                if method == "clear":
+                if elem_dict_marker == "py_clear":
                     return "{ let mut __list = " + base_expr + ".py_borrow_mut(); let __raw = " + idx_expr + "; let __idx = if __raw < 0 { (__list.len() as i64 + __raw) as usize } else { __raw as usize }; " + target + ".clear(); }"
-                if method == "update" and len(rendered_args) == 1:
+                if elem_dict_marker == "__DICT_UPDATE__" and len(rendered_args) == 1:
                     return "{ let mut __list = " + base_expr + ".py_borrow_mut(); let __raw = " + idx_expr + "; let __idx = if __raw < 0 { (__list.len() as i64 + __raw) as usize } else { __raw as usize }; for (k, v) in " + rendered_args[0] + ".iter() { " + target + ".insert(k.clone(), v.clone()); } }"
 
     # super().method(args) → call parent class method via temp instance with inherited fields
@@ -3021,6 +3039,23 @@ def _emit_method_call(
                 kw_val = kw.get("value")
                 rendered_args.append(_emit_expr(ctx, kw_val))
 
+    def _internal_marker(prefix: str, method_name: str) -> str:
+        token = method_name
+        if token.startswith("__") and token.endswith("__") and len(token) > 4:
+            token = token[2:-2]
+        token = safe_rs_ident(token).upper()
+        return "__" + prefix + "_" + token + "__"
+
+    list_marker = ""
+    if obj_type in ("bytes", "bytearray"):
+        list_marker = ctx.mapping.calls.get(obj_type + "." + method, "")
+    if list_marker == "":
+        list_marker = ctx.mapping.calls.get("list." + method, _internal_marker("LIST", method))
+    str_marker = ctx.mapping.calls.get("str." + method, "")
+    dict_marker = ctx.mapping.calls.get("dict." + method, _internal_marker("DICT", method))
+    set_marker = ctx.mapping.calls.get("set." + method, _internal_marker("SET", method))
+    deque_marker = ctx.mapping.calls.get("deque." + method, _internal_marker("DEQUE", method))
+
     if obj_id == "self" and len(ctx.constructor_field_locals) > 0 and ctx.current_class != "":
         method_node = ctx.class_instance_methods.get(ctx.current_class, {}).get(method)
         class_fields = ctx.class_fields.get(ctx.current_class, {})
@@ -3102,7 +3137,7 @@ def _emit_method_call(
 
     # PyList methods (list, bytes, bytearray all use PyList<T>)
     if obj_type.startswith("list[") or obj_type == "list" or obj_type in ("bytes", "bytearray"):
-        if method == "append":
+        if list_marker == "__LIST_APPEND__":
             append_arg = rendered_args[0] if rendered_args else ""
             if len(args) >= 1 and isinstance(args[0], dict) and _str(args[0], "kind") == "Name":
                 arg_rt = _resolved_type_in_context(ctx, args[0])
@@ -3117,32 +3152,32 @@ def _emit_method_call(
                 ):
                     append_arg = append_arg + ".clone()"
             return raw_obj_str + ".push(" + append_arg + ")"
-        if method == "pop":
+        if list_marker == "__LIST_POP__":
             if len(rendered_args) == 0:
                 return raw_obj_str + ".pop().unwrap_or_default()"
             return "{ let __pop_idx = " + rendered_args[0] + "; let __v = " + raw_obj_str + ".get(__pop_idx); " + raw_obj_str + ".py_borrow_mut().remove(__pop_idx as usize); __v }"
-        if method == "clear":
+        if list_marker == "__LIST_CLEAR__":
             return "{ " + raw_obj_str + ".py_borrow_mut().clear(); }"
-        if method == "extend":
+        if list_marker == "__LIST_EXTEND__":
             if len(args) >= 1 and isinstance(args[0], dict):
                 arg_rt = _resolved_type_in_context(ctx, args[0])
                 if arg_rt.startswith("list[") or arg_rt == "list" or arg_rt in ("bytes", "bytearray"):
                     return raw_obj_str + ".py_borrow_mut().extend(" + rendered_args[0] + ".iter_snapshot())"
             return raw_obj_str + ".py_borrow_mut().extend(" + ", ".join(rendered_args) + ")"
-        if method == "insert":
+        if list_marker == "__LIST_INSERT__":
             if len(rendered_args) >= 2:
                 return raw_obj_str + ".py_borrow_mut().insert(" + rendered_args[0] + " as usize, " + rendered_args[1] + ")"
-        if method == "remove":
+        if list_marker == "__LIST_REMOVE__":
             return "{ let __remove_val = " + rendered_args[0] + "; let mut __v = " + raw_obj_str + ".py_borrow_mut(); if let Some(pos) = __v.iter().position(|x| *x == __remove_val) { __v.remove(pos); } }"
-        if method == "index":
+        if list_marker == "py_index":
             return raw_obj_str + ".py_borrow().iter().position(|x| *x == " + rendered_args[0] + ").unwrap_or(usize::MAX) as i64"
-        if method == "count":
+        if list_marker == "__LIST_COUNT__":
             return raw_obj_str + ".py_borrow().iter().filter(|x| **x == " + rendered_args[0] + ").count() as i64"
-        if method == "sort":
+        if list_marker == "py_sort":
             return "{ " + raw_obj_str + ".py_borrow_mut().sort(); }"
-        if method == "reverse":
+        if list_marker == "py_reverse":
             return "{ " + raw_obj_str + ".py_borrow_mut().reverse(); }"
-        if method == "copy":
+        if list_marker == "__LIST_COPY__":
             return raw_obj_str + ".clone()"
 
     # str methods (on &str or String)
@@ -3150,17 +3185,13 @@ def _emit_method_call(
         if method == "format":
             # Basic: emit format!(...) - simplified
             return "format!(\"...\", " + ", ".join(rendered_args) + ")"
-        if method in ("upper", "lower", "strip", "lstrip", "rstrip",
-                      "startswith", "endswith", "replace", "split", "find",
-                      "rfind", "join", "count", "index", "isdigit", "isalpha",
-                      "isalnum", "isspace"):
-            if method in ("strip", "lstrip", "rstrip") and len(rendered_args) >= 1:
-                return "py_str_" + method + "_chars(" + ", ".join(["&" + obj_str] + rendered_args) + ")"
-            if method == "split" and len(rendered_args) >= 2:
+        if str_marker != "":
+            if str_marker in ("py_str_strip", "py_str_lstrip", "py_str_rstrip") and len(rendered_args) >= 1:
+                return str_marker + "_chars(" + ", ".join(["&" + obj_str] + rendered_args) + ")"
+            if str_marker == "py_str_split" and len(rendered_args) >= 2:
                 return "py_str_split_n(" + ", ".join(["&" + obj_str, "&" + rendered_args[0], "&" + rendered_args[1]]) + ")"
-            mapped_fn = "py_str_" + method
             rendered_str_args = [a if a.startswith("&") else "&" + a for a in rendered_args]
-            return mapped_fn + "(" + ", ".join(["&" + obj_str] + rendered_str_args) + ")"
+            return str_marker + "(" + ", ".join(["&" + obj_str] + rendered_str_args) + ")"
 
     # JsonVal method calls (JsonVal → PyAny, dict-like .get())
     if obj_type == "JsonVal":
@@ -3220,22 +3251,22 @@ def _emit_method_call(
                 if value_is_pyany or _call_result_is_pyany:
                     return obj_str + ".get(&" + rendered_args[0] + ").cloned().unwrap_or(PyAny::None)"
                 return obj_str + ".get(&" + rendered_args[0] + ").cloned()"
-        if method == "keys":
+        if dict_marker == "__DICT_KEYS__":
             return "PyList::from_vec(" + obj_str + ".keys().cloned().collect())"
-        if method == "values":
+        if dict_marker == "__DICT_VALUES__":
             return "PyList::from_vec(" + obj_str + ".values().cloned().collect())"
-        if method == "items":
+        if dict_marker == "__DICT_ITEMS__":
             return "PyList::from_vec(" + obj_str + ".iter().map(|(k, v)| (k.clone(), v.clone())).collect())"
-        if method in ("pop", "remove"):
+        if dict_marker == "py_pop":
             if len(rendered_args) >= 1:
                 return obj_str + ".remove(&" + rendered_args[0] + ").unwrap_or_default()"
-        if method == "setdefault" and len(rendered_args) >= 2:
+        if dict_marker == "py_setdefault" and len(rendered_args) >= 2:
             return "py_setdefault(&mut " + obj_str + ", " + rendered_args[0] + ", " + rendered_args[1] + ")"
-        if method == "update":
+        if dict_marker == "__DICT_UPDATE__":
             return "{ for (k, v) in " + rendered_args[0] + ".iter() { " + obj_str + ".insert(k.clone(), v.clone()); } }"
-        if method == "clear":
+        if dict_marker == "py_clear":
             return "{ " + obj_str + ".clear(); }"
-        if method == "insert" and len(rendered_args) >= 2:
+        if dict_marker == "__DICT_INSERT__" and len(rendered_args) >= 2:
             insert_val = rendered_args[1]
             if len(args) >= 2 and isinstance(args[1], dict) and _str(args[1], "kind") == "Name":
                 insert_rt = _infer_node_rust_type(ctx, args[1]) or _rs_type_for_context(ctx, _actual_type_in_context(ctx, args[1]))
@@ -3254,30 +3285,30 @@ def _emit_method_call(
 
     # set methods
     if obj_type.startswith("set[") or obj_type == "set":
-        if method == "add":
+        if set_marker == "__SET_ADD__":
             return obj_str + ".insert(" + ", ".join(rendered_args) + ")"
-        if method == "remove" or method == "discard":
+        if set_marker in ("py_remove", "py_discard"):
             return obj_str + ".remove(&" + rendered_args[0] + ")"
-        if method == "clear":
+        if set_marker == "py_clear":
             return obj_str + ".clear()"
-        if method == "union":
+        if set_marker == "__SET_UNION__":
             return obj_str + ".union(&" + rendered_args[0] + ").cloned().collect::<HashSet<_>>()"
-        if method == "intersection":
+        if set_marker == "__SET_INTERSECTION__":
             return obj_str + ".intersection(&" + rendered_args[0] + ").cloned().collect::<HashSet<_>>()"
 
     # deque methods — lower to VecDeque<PyAny> primitives
     if obj_type == "deque":
-        if method == "append" and len(rendered_args) == 1:
+        if deque_marker == "__DEQUE_APPEND__" and len(rendered_args) == 1:
             return obj_str + ".push_back(PyAny::Int(py_int(&" + rendered_args[0] + ")))"
-        if method == "appendleft" and len(rendered_args) == 1:
+        if deque_marker == "__DEQUE_APPENDLEFT__" and len(rendered_args) == 1:
             return obj_str + ".push_front(PyAny::Int(py_int(&" + rendered_args[0] + ")))"
-        if method == "popleft":
+        if deque_marker == "__DEQUE_POPLEFT__":
             return obj_str + ".pop_front().map(|v| py_int(&v)).unwrap_or_else(|| panic!(\"pop from empty deque\"))"
-        if method == "pop":
+        if deque_marker == "__DEQUE_POP__":
             return obj_str + ".pop_back().map(|v| py_int(&v)).unwrap_or_else(|| panic!(\"pop from empty deque\"))"
-        if method == "__len__":
+        if deque_marker == "__DEQUE_LEN__":
             return obj_str + ".len()"
-        if method == "clear":
+        if deque_marker == "__DEQUE_CLEAR__":
             return "{ " + obj_str + ".clear(); }"
         all_args_str = ", ".join(rendered_args)
         return obj_str + "." + safe_rs_ident(method) + "(" + all_args_str + ")"
@@ -3860,7 +3891,8 @@ def _emit_expr(ctx: RsEmitContext, node: JsonVal) -> str:
                     owner = call_func.get("value")
                     owner_rt = _actual_type_in_context(ctx, owner)
                     method = _str(call_func, "attr")
-                    if (owner_rt.startswith("list[") or owner_rt == "list") and method in ("pop",):
+                    owner_list_marker = ctx.mapping.calls.get("list." + method, "")
+                    if (owner_rt.startswith("list[") or owner_rt == "list") and owner_list_marker == "__LIST_POP__":
                         return inner_expr
             if inner_rs == "Box<dyn std::any::Any>":
                 if outer_rt in ctx.ref_classes:
@@ -4128,9 +4160,11 @@ def _emit_return(ctx: RsEmitContext, node: dict[str, JsonVal]) -> None:
         and _str(value, "kind") == "Name"
         and _str(value, "id") == "self"
         and ctx.current_return_type in ctx.class_names
-        and ctx.current_return_type not in ctx.ref_classes
     ):
-        rendered = "Box::new(self.clone())"
+        if ctx.current_return_type in ctx.ref_classes:
+            rendered = "Rc::new(RefCell::new(self.clone()))"
+        else:
+            rendered = "Box::new(self.clone())"
     # If function has no return type (void), drop the return value
     if ctx.current_return_type in ("", "None", "none"):
         _emit(ctx, "return;")
@@ -5499,25 +5533,111 @@ def _emit_remaining_orelse(ctx: RsEmitContext, if_node: dict[str, JsonVal]) -> N
 def _emit_with(ctx: RsEmitContext, node: dict[str, JsonVal]) -> None:
     items = _list(node, "items")
     body = _list(node, "body")
-    # Simplified: emit body only, RAII handles cleanup
-    _emit(ctx, "// with block (RAII-based)")
     if len(items) == 0:
-        context_expr = node.get("context_expr")
-        var_name = _str(node, "var_name")
-        if context_expr is not None and var_name != "":
-            _emit(ctx, "let mut " + safe_rs_ident(var_name) + " = " + _emit_expr(ctx, context_expr) + ";")
+        items = [node]
+
+    hoisted: list[tuple[str, str]] = []
+    seen: set[str] = set()
+
+    def _add_hoisted(name: str, resolved_type: str) -> None:
+        if name == "" or name in seen:
+            return
+        seen.add(name)
+        hoisted.append((name, resolved_type))
+
+    def _walk_hoisted(stmts: list[JsonVal]) -> None:
+        for raw_stmt in stmts:
+            if not isinstance(raw_stmt, dict):
+                continue
+            kind = _str(raw_stmt, "kind")
+            if kind == "AnnAssign":
+                target = raw_stmt.get("target")
+                if isinstance(target, dict) and _str(target, "kind") in ("Name", "NameTarget"):
+                    _add_hoisted(_str(target, "id"), _str(raw_stmt, "decl_type") or _str(raw_stmt, "resolved_type"))
+            elif kind == "Assign":
+                target = raw_stmt.get("target")
+                if not isinstance(target, dict):
+                    targets = _list(raw_stmt, "targets")
+                    if len(targets) > 0 and isinstance(targets[0], dict):
+                        target = targets[0]
+                if isinstance(target, dict) and _str(target, "kind") in ("Name", "NameTarget"):
+                    _add_hoisted(_str(target, "id"), _str(raw_stmt, "decl_type") or _str(raw_stmt, "resolved_type"))
+            elif kind in ("If", "While", "With", "Try", "ForCore"):
+                _walk_hoisted(_list(raw_stmt, "body"))
+                _walk_hoisted(_list(raw_stmt, "orelse"))
+                _walk_hoisted(_list(raw_stmt, "finalbody"))
+                for handler in _list(raw_stmt, "handlers"):
+                    if isinstance(handler, dict):
+                        _walk_hoisted(_list(handler, "body"))
+
+    _walk_hoisted(body)
+    for name, resolved_type in hoisted:
+        if name in ctx.declared_vars:
+            continue
+        ctx.declared_vars.add(name)
+        if resolved_type != "":
+            ctx.var_types[name] = resolved_type
+        rs_name = _rs_var_name(ctx, name)
+        rs_type = _rs_type_for_context(ctx, resolved_type) if resolved_type != "" else ""
+        if rs_type != "" and rs_type != "()":
+            _emit(ctx, "let mut " + rs_name + ": " + rs_type + " = Default::default();")
+        else:
+            _emit(ctx, "let mut " + rs_name + " = Default::default();")
+
+    ctx_entries: list[tuple[str, str, str]] = []
     for item in items:
-        if isinstance(item, dict):
-            context_expr = item.get("context_expr")
-            opt_vars = item.get("optional_vars")
-            if context_expr is not None:
-                ctx_str = _emit_expr(ctx, context_expr)
-                if opt_vars is not None:
-                    var_str = _emit_expr(ctx, opt_vars)
-                    _emit(ctx, "let mut " + var_str + " = " + ctx_str + ";")
-    _emit(ctx, "{")
+        if not isinstance(item, dict):
+            continue
+        context_expr = item.get("context_expr")
+        if not isinstance(context_expr, dict):
+            continue
+        ctx_expr = _emit_expr(ctx, context_expr)
+        ctx_rt = _actual_type_in_context(ctx, context_expr)
+        ctx_rs = _rs_type_for_context(ctx, ctx_rt) if ctx_rt != "" else ""
+        ctx_tmp = _next_temp(ctx, "__with_ctx")
+        if ctx_rs.startswith("Rc<RefCell<"):
+            _emit(ctx, "let mut " + ctx_tmp + " = " + ctx_expr + ".clone();")
+        else:
+            _emit(ctx, "let mut " + ctx_tmp + " = " + ctx_expr + ";")
+        var_name = ""
+        opt_vars = item.get("optional_vars")
+        if isinstance(opt_vars, dict):
+            var_name = _str(opt_vars, "id")
+        if var_name == "":
+            var_name = _str(item, "var_name")
+        var_rs = _rs_var_name(ctx, var_name) if var_name != "" else ""
+        if var_name != "":
+            if var_name not in ctx.declared_vars:
+                ctx.declared_vars.add(var_name)
+                if _str(item, "with_enter_type") != "":
+                    ctx.var_types[var_name] = _str(item, "with_enter_type")
+                if ctx_rs.startswith("Rc<RefCell<"):
+                    _emit(ctx, "let mut " + var_rs + " = " + ctx_tmp + ".clone();")
+                else:
+                    _emit(ctx, "let mut " + var_rs + " = " + ctx_tmp + ";")
+            else:
+                if ctx_rs.startswith("Rc<RefCell<"):
+                    _emit(ctx, var_rs + " = " + ctx_tmp + ".clone();")
+                else:
+                    _emit(ctx, var_rs + " = " + ctx_tmp + ";")
+        if ctx_rs.startswith("Rc<RefCell<"):
+            _emit(ctx, ctx_tmp + ".borrow_mut().__enter__();")
+        ctx_entries.append((ctx_tmp, var_rs, ctx_rs))
+
+    _emit(ctx, "let __with_result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {")
     ctx.indent_level += 1
     _emit_body(ctx, body)
+    ctx.indent_level -= 1
+    _emit(ctx, "}));")
+    for ctx_tmp, var_rs, ctx_rs in reversed(ctx_entries):
+        target = var_rs if var_rs != "" else ctx_tmp
+        if ctx_rs.startswith("Rc<RefCell<"):
+            _emit(ctx, target + ".borrow_mut().__exit__(PyAny::None, PyAny::None, PyAny::None);")
+        else:
+            _emit(ctx, target + ".close();")
+    _emit(ctx, "if let Err(__with_err) = __with_result {")
+    ctx.indent_level += 1
+    _emit(ctx, "std::panic::resume_unwind(__with_err);")
     ctx.indent_level -= 1
     _emit(ctx, "}")
 
