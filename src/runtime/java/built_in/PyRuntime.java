@@ -2020,6 +2020,15 @@ final class pytra_std_glob {
     }
 }
 
+final class pytra_utils_png {
+    private pytra_utils_png() {
+    }
+
+    static void write_rgb_png(String path, long width, long height, Object pixels) {
+        PyRuntime.__pytra_write_rgb_png(path, width, height, pixels);
+    }
+}
+
 final class pytra_std_collections {
     static PyRuntime.deque deque() {
         return PyRuntime.deque();
