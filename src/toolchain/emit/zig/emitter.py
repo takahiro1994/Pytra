@@ -322,6 +322,9 @@ class _ZigStmtCommonRenderer(CommonRenderer):
     def render_exception_dispatch_open(self, caught_type_expr: str) -> str:
         return "if (" + caught_type_expr + " != null) {"
 
+    def render_exception_dispatch_close(self) -> str:
+        return "}"
+
     def emit_exception_dispatch_state_init(self, handled_name: str) -> None:
         self.owner._emit_line("var " + handled_name + " = false;")
 
@@ -333,6 +336,10 @@ class _ZigStmtCommonRenderer(CommonRenderer):
     ) -> str:
         cond = self.render_exception_match_condition(handler, caught_type_expr)
         return "if (!" + handled_name + " and (" + cond + ")) {"
+
+    def render_exception_handler_guard_close(self, handler: dict[str, Any]) -> str:
+        del handler
+        return "}"
 
     def emit_exception_handler_mark_handled(self, handled_name: str) -> None:
         self.owner._emit_line(handled_name + " = true;")
@@ -1985,9 +1992,9 @@ class ZigNativeEmitter:
                 renderer.emit_exception_handler_mark_handled(handled)
                 renderer.emit_exception_handler(h)
                 self.indent -= 1
-                self._emit_line("}")
+                self._emit_line(renderer.render_exception_handler_guard_close(h))
             self.indent -= 1
-            self._emit_line("}")
+            self._emit_line(renderer.render_exception_dispatch_close())
         if len(orelse) > 0:
             self._emit_line("if (__pytra_exc_type == null) {")
             self.indent += 1

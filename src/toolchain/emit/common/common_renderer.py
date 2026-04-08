@@ -396,6 +396,9 @@ class CommonRenderer:
         del caught_type_expr
         return ""
 
+    def render_exception_dispatch_close(self) -> str:
+        return "}"
+
     def emit_exception_dispatch_state_init(self, handled_name: str) -> None:
         del handled_name
         return None
@@ -408,6 +411,10 @@ class CommonRenderer:
     ) -> str:
         del handler, handled_name, caught_type_expr
         raise RuntimeError("common renderer requires exception handler guard hook for " + self.language)
+
+    def render_exception_handler_guard_close(self, handler: dict[str, JsonVal]) -> str:
+        del handler
+        return "}"
 
     def partition_exception_handlers(
         self,
