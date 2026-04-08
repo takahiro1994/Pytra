@@ -4,6 +4,42 @@
 
 # 更新履歴
 
+## 2026-04-07
+
+- **lint 149 件 / 14 言語 10/10 PASS 達成**: C++, JS, TS, Dart, Swift, Julia, Zig, Java, Scala, Kotlin, Ruby, Lua, PHP, Nim（ただし Nim のみ 9/10）。4/4 時点の 697 件から大幅削減。
+- **PyFile 廃止**: resolver の `open()` が返す架空の型名 `PyFile` を廃止。Python の `io` モジュールに基づく `IOBase` / `TextIOWrapper` / `BufferedWriter` / `BufferedReader` に置き換え。`src/pytra/built_in/io.py` に `@extern class` で型階層を定義。
+- **emitter guide §12.7 file I/O 型写像**: `open()` の mode 別 resolved_type、io.py の型階層、emitter/runtime の命名規約を文書化。emitter は型名文字列で分岐してはならない。runtime 実装名も built_in/io.py に揃える。
+- **lint に PyFile 検出追加**: `class_name` カテゴリで emitter の `"PyFile"` 参照を検出。`rt:type_id` カテゴリで mapping.json types テーブルの deprecated `PyFile` キーを検出。
+- **全言語横断 PyFile coupling 除去**: Java / Swift / Ruby / Lua / C++ / TS / Julia から emitter の PyFile 直参照を除去。
+- **Go / Rust / C# / PHP emitter guide 整合**: 各言語で mapping-driven method lowering への移行、stale mapping entries 削除、parity 復旧。
+- **Ruby / Lua hardcode 除去 + parity 復旧**: emitter hardcode 削除と stale mapping entries 整理。Ruby / Lua / PHP の parity を復旧。
+- **JVM backend 継続**: Java stdlib/sample parity 復旧。Kotlin emitter 完了（sample 18/18 PASS）。
+- **TODO 整理**: C++, Swift, Julia, TS, Dart, JVM の完了タスクを archive へ移動。
+
+## 2026-04-06
+
+- **with 文を __enter__ / __exit__ プロトコルで実装**: CommonRenderer にデフォルトの try/finally + hoist 変換を実装。C++ emitter で parity PASS 確認。plan を `p0-with-context-manager.md` に文書化。
+- **with fixture 追加**: `with_statement`（`with open()` のファイル I/O）と `with_context_manager`（ユーザー定義 `__enter__` / `__exit__` の呼び出し順序 + 例外安全）。
+- **parity check FAIL 時に work dir を保持**: FAIL 時は `[INFO] work dir kept for inspection: <path>` を表示して生成物を残す。PASS 時は従来通り削除。
+- **progress summary 再生成バグ修正**: `_maybe_regenerate_progress()` が `backend-progress-fixture.md` の mtime をマーカーに使っていたため、parity 結果更新後に summary が再生成されないケースがあった。専用マーカー `.parity-results/.progress_generated` に変更。
+- **pathlib_extended に joinpath 追加**: `Path.joinpath()` の single / multi 引数テストを追加。Julia の mapping-to-east coverage warn を解消。
+- **.east* 生成物を git 管理から除去**: `test/include/east1/` の 12 ファイルと `src/runtime/east/` の 1 ファイルを `git rm --cached`。`.gitignore` に `test/include/east1/` を追加。
+- **TS/JS shim cleanup 完了**: `py_runtime.ts` / `py_runtime.js` の Python ビルトイン shim（`int=Number` 等）を廃止。emitter が mapping.json 経由で解決するように移行。
+- **Dart emitter guide 準拠**: toolchain_ 依存解消。module-prefix hardcode 除去、method lowering / builtin call / range / sorted / ctor を metadata ベースへ移行。With 対応。linked ctor metadata regression test 追加。
+- **JVM backend 大幅進展**: Java/Scala/Kotlin の mapping.json 正規化、fixture parity 復旧。Scala/Kotlin emitter を新規実装。Java/Scala の stdlib/sample parity 復旧。Kotlin fixture/stdlib parity 確認。
+- **C++ / Swift / Julia / Dart with fixture 対応**: 各言語で `with_statement` fixture の emit/compile/run を通す。
+- **P2-*-LINT タスクの方針を全言語で「emitter guide 準拠」に統一**: lint 0 件が目標ではなく、emitter guide に準拠することが目標。
+
+## 2026-04-05
+
+- **containers.py に mut[T] 注釈**: `src/pytra/built_in/containers.py` をコンテナクラスのメソッドシグネチャの正本として定義。resolve が `mut[T]` 注釈を読んで `meta.mutates_receiver: true` を EAST3 に付与。
+- **C++ emitter のメソッド名ハードコード解消**: `emitter.py` / `header_gen.py` の mutable メソッド名リストを `meta.mutates_receiver` ベースの判定に置き換え。lint `runtime_symbol` 0 件。
+- **C++ mapping.json cleanup**: 14 件の dead エントリを分類・削除。`rt:call_coverage` 0 件。
+- **C++ 新規 fixture parity 確認**: `bytes_copy_semantics`, `negative_index_comprehensive`, `callable_optional_none`, `str_find_index`, `eo_extern_opaque_basic`, `math_extended`, `os_glob_extended` で C++ parity PASS。
+- **mapping.json FQCN キー統一完了**: 全言語の mapping.json calls キーを完全修飾に統一（`"sin"` → `"pytra.std.math.sin"`）。
+- **旧 toolchain リネーム完了**: `toolchain` → `toolchain_`、`toolchain2` → `toolchain`。`toolchain_` は gitignore 化。
+- **str_count / sorted_basic / exception_types / float_constructor fixture 追加**: 各種ビルトイン機能のテストカバレッジ強化。
+
 ## 2026-04-04
 
 - **emitter lint に Python メソッド名ハードコード検出追加**: `runtime_symbol` カテゴリに `"append"`, `"extend"`, `"pop"`, `"clear"` 等 23 パターンを追加。emitter が `attr == "append"` のようにメソッド名を文字列で判定している箇所を検出。

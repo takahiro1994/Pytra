@@ -4,6 +4,42 @@
 
 # Changelog
 
+## 2026-04-07
+
+- **Lint down to 149 / 14 languages at 10/10 PASS**: C++, JS, TS, Dart, Swift, Julia, Zig, Java, Scala, Kotlin, Ruby, Lua, PHP, Nim (Nim 9/10). Down from 697 on Apr 4.
+- **PyFile abolished**: Replaced fake `PyFile` type with Python's `io` module hierarchy: `IOBase` / `TextIOWrapper` / `BufferedWriter` / `BufferedReader`. Defined in `src/pytra/built_in/io.py` as `@extern class`.
+- **Emitter guide §12.7 file I/O type mapping**: Documented mode-based resolved_type, io.py hierarchy, naming conventions. Emitters must not branch on type name strings. Runtime implementations must match built_in/io.py names.
+- **Lint: PyFile detection**: `class_name` category detects `"PyFile"` in emitters. `rt:type_id` detects deprecated `PyFile` key in mapping.json types.
+- **Cross-language PyFile coupling removal**: Removed PyFile references from Java, Swift, Ruby, Lua, C++, TS, Julia emitters.
+- **Go / Rust / C# / PHP emitter guide alignment**: Mapping-driven method lowering, stale mapping cleanup, parity restoration.
+- **Ruby / Lua hardcode removal + parity restoration**: Emitter hardcode cleanup and stale mapping entries removed.
+- **JVM backend continued**: Java stdlib/sample parity restored. Kotlin emitter complete (sample 18/18 PASS).
+- **TODO cleanup**: Archived completed tasks for C++, Swift, Julia, TS, Dart, JVM.
+
+## 2026-04-06
+
+- **With statement via __enter__ / __exit__ protocol**: CommonRenderer default try/finally + hoist. C++ parity PASS. Plan in `p0-with-context-manager.md`.
+- **With fixtures**: `with_statement` (file I/O) and `with_context_manager` (user-defined __enter__/__exit__ call order + exception safety).
+- **Parity check: keep work dir on FAIL**: Failed cases now print `[INFO] work dir kept for inspection: <path>` and preserve generated files.
+- **Progress summary regeneration fix**: Changed marker from `backend-progress-fixture.md` mtime to dedicated `.parity-results/.progress_generated`.
+- **pathlib_extended joinpath**: Added Path.joinpath() tests. Resolved Julia mapping-to-east coverage warning.
+- **.east* removed from git**: Untracked 12 files in test/include/east1/ and 1 in src/runtime/east/. Added to .gitignore.
+- **TS/JS shim cleanup complete**: Removed Python builtin shims (`int=Number` etc.) from py_runtime.ts/js. Emitter uses mapping.json.
+- **Dart emitter guide compliance**: Removed toolchain_ dependency. Module-prefix hardcode removal, metadata-based method lowering/ctor/With support.
+- **JVM backend major progress**: Java/Scala/Kotlin mapping.json canonicalization, fixture parity restoration. Scala/Kotlin emitters implemented. Stdlib/sample parity restored.
+- **C++ / Swift / Julia / Dart with fixture support**: Each language passes with_statement fixture.
+- **P2-*-LINT policy unified**: All languages' lint tasks now focus on emitter guide compliance, not just zero violations.
+
+## 2026-04-05
+
+- **containers.py mut[T] annotations**: Defined container method signatures as source of truth in `src/pytra/built_in/containers.py`. Resolve derives `meta.mutates_receiver: true` from `mut[T]`.
+- **C++ method name hardcode removed**: Replaced mutable method name lists in emitter.py/header_gen.py with `meta.mutates_receiver`. Lint runtime_symbol 0.
+- **C++ mapping.json cleanup**: Classified and removed 14 dead entries. rt:call_coverage 0.
+- **C++ new fixture parity**: bytes_copy_semantics, negative_index_comprehensive, callable_optional_none, str_find_index, eo_extern_opaque_basic, math_extended, os_glob_extended all PASS.
+- **mapping.json FQCN key unification**: All languages' mapping.json calls keys unified to fully qualified names.
+- **Toolchain rename complete**: toolchain → toolchain_, toolchain2 → toolchain. toolchain_ gitignored.
+- **New fixtures**: str_count, sorted_basic, exception_types, float_constructor.
+
 ## 2026-04-04
 
 - **Lint: Python method name hardcode detection**: Added 23 patterns ("append", "extend", "pop", "clear" etc.) to runtime_symbol category.
