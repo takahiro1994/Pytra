@@ -8,9 +8,6 @@ type ArgumentParser* = object
 proc newArgumentParser*(prog: string): ArgumentParser =
   ArgumentParser(prog: prog, specs: @[])
 
-proc ArgumentParser*(prog: string): ArgumentParser =
-  newArgumentParser(prog)
-
 proc add_argument*(parser: var ArgumentParser, args: varargs[string]): void =
   var spec: seq[string] = @[]
   for arg in args:

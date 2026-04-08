@@ -5,6 +5,7 @@
     "py_print": "py_print",
     "len": "py_len",
     "str": "py_str",
+    "pytra.std.argparse.ArgumentParser": "newArgumentParser",
     "py_to_string": "py_to_string",
     "static_cast": "__CAST__",
     "py_max": "max",

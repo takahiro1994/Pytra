@@ -3733,6 +3733,16 @@ def _emit_module_imports(ctx: EmitContext, body: list[JsonVal]) -> None:
                         imported_name = _str(name_entry, "name")
                         if imported_name != "" and imported_name not in _NIM_SKIPPED_IMPORT_NAMES:
                             imported_names.append(imported_name)
+                            asname = _str(name_entry, "asname")
+                            local_name = asname if asname != "" else imported_name
+                            mapped_name = ctx.runtime_imports.get(local_name, "")
+                            if (
+                                isinstance(mapped_name, str)
+                                and mapped_name != ""
+                                and mapped_name not in imported_names
+                                and "." not in mapped_name
+                            ):
+                                imported_names.append(mapped_name)
                     imported_names = _extend_native_helper_imports(native_module, imported_names)
                     if len(imported_names) > 0:
                         native_import = native_module if ctx.root_rel_prefix == "" else ctx.root_rel_prefix + native_module

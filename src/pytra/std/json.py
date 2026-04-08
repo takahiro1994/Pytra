@@ -490,11 +490,12 @@ def _dump_json_list(
             dumped_txt: str = _dump_json_value(x, ensure_ascii, indent, item_sep, key_sep, level)
             dumped.append(dumped_txt)
         return "[" + _join_strs(dumped, item_sep) + "]"
-    indent_i: int = _json_indent_value(indent)
+    indent_value: int = cast(int, indent)
+    indent_i: int = _json_indent_value(indent_value)
     inner: list[str] = []
     for x in values:
         prefix: str = " " * (indent_i * (level + 1))
-        value_txt: str = _dump_json_value(x, ensure_ascii, indent, item_sep, key_sep, level + 1)
+        value_txt: str = _dump_json_value(x, ensure_ascii, indent_value, item_sep, key_sep, level + 1)
         inner.append(prefix + value_txt)
     return "[\n" + _join_strs(inner, _COMMA_NL) + "\n" + (" " * (indent_i * level)) + "]"
 
@@ -521,12 +522,13 @@ def _dump_json_dict(
             v_txt: str = _dump_json_value(x, ensure_ascii, indent, item_sep, key_sep, level)
             parts.append(k_txt + key_sep + v_txt)
         return "{" + _join_strs(parts, item_sep) + "}"
-    indent_i: int = _json_indent_value(indent)
+    indent_value: int = cast(int, indent)
+    indent_i: int = _json_indent_value(indent_value)
     inner: list[str] = []
     for k, x in values.items():
         prefix: str = " " * (indent_i * (level + 1))
         k_txt: str = _escape_str(str(k), ensure_ascii)
-        v_txt: str = _dump_json_value(x, ensure_ascii, indent, item_sep, key_sep, level + 1)
+        v_txt: str = _dump_json_value(x, ensure_ascii, indent_value, item_sep, key_sep, level + 1)
         inner.append(prefix + k_txt + key_sep + v_txt)
     return "{\n" + _join_strs(inner, _COMMA_NL) + "\n" + (" " * (indent_i * level)) + "}"
 

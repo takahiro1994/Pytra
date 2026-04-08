@@ -12,7 +12,7 @@ from pytra.std.json import JsonVal
 from pytra.std.pathlib import Path
 
 from toolchain.emit.common.code_emitter import (
-    RuntimeMapping, load_runtime_mapping, resolve_runtime_call,
+    RuntimeMapping, load_runtime_mapping, resolve_runtime_call, resolve_runtime_symbol_name,
     should_skip_module, build_import_alias_map,
 )
 from toolchain.emit.common.common_renderer import CommonRenderer
@@ -190,6 +190,14 @@ def _resolve_runtime_symbol_expr(
         mapped = mapping.calls[symbol_name]
         if isinstance(mapped, str):
             return mapped
+    if runtime_module_id != "":
+        resolved = resolve_runtime_symbol_name(symbol_name, mapping, module_id=runtime_module_id)
+        if isinstance(resolved, str) and resolved != "":
+            return resolved
+    if source_module_id != "":
+        resolved = resolve_runtime_symbol_name(symbol_name, mapping, module_id=source_module_id)
+        if isinstance(resolved, str) and resolved != "":
+            return resolved
     return ""
 
 
@@ -206,12 +214,16 @@ def _build_cs_runtime_import_map(meta: dict[str, JsonVal], mapping: RuntimeMappi
         local_name = binding.get("local_name")
         if not isinstance(local_name, str) or local_name == "":
             continue
+        runtime_symbol_kind = binding.get("runtime_symbol_kind")
         mapped_type = mapping.types.get(local_name)
-        if isinstance(mapped_type, str) and mapped_type != "":
+        if (
+            isinstance(mapped_type, str)
+            and mapped_type != ""
+            and (not isinstance(runtime_symbol_kind, str) or runtime_symbol_kind not in ("function", "method", "callable"))
+        ):
             continue
         if binding.get("resolved_binding_kind") == "module":
             continue
-        runtime_symbol_kind = binding.get("runtime_symbol_kind")
         if isinstance(runtime_symbol_kind, str) and runtime_symbol_kind not in ("", "function", "method", "callable"):
             continue
         runtime_symbol = binding.get("runtime_symbol")
@@ -1070,12 +1082,29 @@ def _emit_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
             return container_call
     if isinstance(func, dict) and _str(func, "kind") == "Name":
         func_name = _str(func, "id")
+        if func_name in ctx.module_function_names and func_name not in ctx.import_alias_modules:
+            qualified = _module_class_name(ctx.module_id) + "." + _safe_name(ctx, func_name)
+            return _maybe_cast_dynamic_call(ctx, node, qualified + "(" + ", ".join(call_parts) + ")")
+        resolved_call = ""
+        runtime_first_exclude = {"bool", "bytearray", "bytes", "list", "dict", "set", "tuple", "str"}
+        if func_name not in runtime_first_exclude:
+            if runtime_call != "" or adapter != "":
+                resolved_call = resolve_runtime_call(runtime_call, builtin_name, adapter, ctx.mapping)
+            elif builtin_name in ctx.mapping.calls:
+                resolved_call = resolve_runtime_call(runtime_call, builtin_name, adapter, ctx.mapping)
+        if resolved_call == "__CAST__":
+            return _render_cast_expr(ctx, node, args)
+        if resolved_call != "" and not resolved_call.startswith("__"):
+            return _maybe_cast_dynamic_call(ctx, node, resolved_call + "(" + ", ".join(call_parts) + ")")
         if func_name == "cast":
             return _render_cast_expr(ctx, node, args)
         if func_name in ("bool", "bytearray", "bytes", "list", "dict", "set", "tuple"):
             return _emit_builtin_ctor(ctx, func_name, node, call_parts)
         if func_name in ctx.runtime_imports and "." in ctx.runtime_imports[func_name]:
-            return _maybe_cast_dynamic_call(ctx, node, ctx.runtime_imports[func_name] + "(" + ", ".join(call_parts) + ")")
+            imported_symbol = ctx.runtime_imports[func_name]
+            if _str(func, "resolved_type") == "type" or _str(node, "resolved_type") == func_name:
+                return "new " + imported_symbol + "(" + ", ".join(call_parts) + ")"
+            return _maybe_cast_dynamic_call(ctx, node, imported_symbol + "(" + ", ".join(call_parts) + ")")
         if func_name == "str":
             if len(args) == 0:
                 return "\"\""
@@ -1099,11 +1128,16 @@ def _emit_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
                 mapped_ctor_type = ctx.mapping.types.get(func_name, "")
                 if isinstance(mapped_ctor_type, str) and mapped_ctor_type != "":
                     return "new " + _render_type(ctx, func_name) + "(" + ", ".join(call_parts) + ")"
+                if _str(node, "resolved_type") == func_name:
+                    return "new " + _module_class_name(module_id) + "." + _safe_name(ctx, func_name) + "(" + ", ".join(call_parts) + ")"
                 return _module_class_name(module_id) + "." + _safe_name(ctx, func_name) + "(" + ", ".join(call_parts) + ")"
         if owner_expr != "":
             owner_call = _container_method_call(ctx, owner_expr, owner_type, func_name, args)
             if owner_call != "":
                 return _maybe_cast_dynamic_call(ctx, node, owner_call)
+        runtime_fallback = resolve_runtime_symbol_name(func_name, ctx.mapping, module_id="pytra.core.py_runtime")
+        if isinstance(runtime_fallback, str) and "." in runtime_fallback:
+            return _maybe_cast_dynamic_call(ctx, node, runtime_fallback + "(" + ", ".join(call_parts) + ")")
     if isinstance(func, dict) and _str(func, "kind") == "Lambda":
         delegate_type = _render_type(ctx, _str(func, "resolved_type"))
         return "((" + delegate_type + ")(" + _emit_expr(ctx, func) + "))(" + ", ".join(call_parts) + ")"

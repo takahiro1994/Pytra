@@ -452,6 +452,17 @@ func (f *PyFile) __exit__(excType any, excVal any, excTb any) {
 
 type SystemExit int64
 
+func NewSystemExit(code int64) *PytraErrorCarrier {
+	return &PytraErrorCarrier{
+		TypeId: pytraTypeRangeMin(EXCEPTION_TID),
+		TypeMin: pytraTypeRangeMin(EXCEPTION_TID),
+		TypeMax: pytraTypeRangeMax(EXCEPTION_TID),
+		Name: "SystemExit",
+		Msg:  "SystemExit(" + py_str(code) + ")",
+		Value: code,
+	}
+}
+
 type PytraErrorCarrier struct {
 	TypeId  int64
 	TypeMin int64

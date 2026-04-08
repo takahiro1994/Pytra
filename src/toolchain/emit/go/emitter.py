@@ -2076,7 +2076,31 @@ def _emit_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
                 and _str(expected_node, "kind") == "Name"
             ):
                 actual_value = _emit_expr(ctx, actual_node.get("value"))
+                builtin_type_helpers: dict[str, str] = {
+                    "bool": "py_is_bool_type",
+                    "int": "py_is_int",
+                    "int64": "py_is_exact_int64",
+                    "float": "py_is_float",
+                    "float64": "py_is_exact_float64",
+                    "str": "py_is_str",
+                    "list": "py_is_list",
+                    "dict": "py_is_dict",
+                    "set": "py_is_set",
+                }
+                helper_name = builtin_type_helpers.get(expected_type_name, "")
+                if helper_name != "":
+                    return helper_name + "(" + actual_value + ")"
                 marker_method = _go_class_marker_method_name(ctx, expected_type_name)
+                marker_helpers: dict[str, str] = {
+                    "__pytra_is_str": "py_is_str",
+                    "__pytra_is_list": "py_is_list",
+                    "__pytra_is_dict": "py_is_dict",
+                    "__pytra_is_set": "py_is_set",
+                    "__pytra_is_bool": "py_is_bool_type",
+                }
+                marker_helper = marker_helpers.get(marker_method, "")
+                if marker_helper != "":
+                    return marker_helper + "(" + actual_value + ")"
                 return "func() bool { _, ok := any(" + actual_value + ").(interface{ " + marker_method + "() }); return ok }()"
         if func_kind == "Attribute":
             owner_node = func.get("value")
@@ -2294,6 +2318,11 @@ def _emit_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
                             adjusted_args.append(arg_code)
                             continue
                         if _optional_inner_type(expected_type) != "":
+                            if isinstance(arg_node, dict) and _str(arg_node, "kind") == "Name":
+                                scope_name = _go_symbol_name(ctx, _str(arg_node, "id"))
+                                if go_type(ctx.var_types.get(scope_name, "")) == go_type(expected_type):
+                                    adjusted_args.append(scope_name)
+                                    continue
                             arg_code = _wrap_optional_value_code(ctx, arg_code, expected_type, arg_node)
                         else:
                             arg_code = _maybe_coerce_expr_to_type(ctx, arg_node, arg_code, expected_type)
@@ -2315,6 +2344,11 @@ def _emit_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
                                 adjusted_args.append(kw_code)
                                 continue
                             if _optional_inner_type(expected_type2) != "":
+                                if isinstance(kw_node, dict) and _str(kw_node, "kind") == "Name":
+                                    scope_name2 = _go_symbol_name(ctx, _str(kw_node, "id"))
+                                    if go_type(ctx.var_types.get(scope_name2, "")) == go_type(expected_type2):
+                                        adjusted_args.append(scope_name2)
+                                        continue
                                 kw_code = _wrap_optional_value_code(ctx, kw_code, expected_type2, kw_node)
                         adjusted_args.append(kw_code)
                 if (
@@ -2603,10 +2637,10 @@ def _emit_builtin_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
                 cast_prefix = "float32" if gt == "float32" else ""
                 inner = "py_str_to_float64(" + arg_strs[0] + ")"
                 return cast_prefix + "(" + inner + ")" if cast_prefix != "" else inner
+            if gt == "bool":
+                return "py_bool(" + arg_strs[0] + ")"
             if src_is_dynamic and gt in ("int64", "int32", "int16", "int8", "uint8", "uint16", "uint32", "uint64"):
                 return _coerce_from_any(arg_strs[0], rt)
-            if src_is_dynamic and gt == "bool":
-                return "py_bool(" + arg_strs[0] + ")"
         if len(arg_strs) >= 1:
             return gt + "(" + arg_strs[0] + ")"
         return gt + "(0)"
@@ -3648,6 +3682,16 @@ def _emit_isinstance(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
     if expected_name == "":
         return "false"
     marker_method = _go_class_marker_method_name(ctx, expected_name)
+    marker_helpers: dict[str, str] = {
+        "__pytra_is_str": "py_is_str",
+        "__pytra_is_list": "py_is_list",
+        "__pytra_is_dict": "py_is_dict",
+        "__pytra_is_set": "py_is_set",
+        "__pytra_is_bool": "py_is_bool_type",
+    }
+    marker_helper = marker_helpers.get(marker_method, "")
+    if marker_helper != "":
+        return marker_helper + "(" + value + ")"
     return "func() bool { _, ok := any(" + value + ").(interface{ " + marker_method + "() }); return ok }()"
 
 

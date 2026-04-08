@@ -10,6 +10,7 @@
     "py_int_from_str": "long.Parse",
     "py_float_from_str": "double.Parse",
     "static_cast": "__CAST__",
+    "SystemExit": "py_runtime.SystemExit",
     "sum": "py_runtime.sum",
     "zip": "py_runtime.zip",
     "list.append": "py_runtime.py_append",

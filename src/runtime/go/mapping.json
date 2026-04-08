@@ -4,6 +4,7 @@
     "env.target": "\"go\"",
     "py_print": "py_print",
     "py_to_string": "py_str",
+    "SystemExit": "NewSystemExit",
     "static_cast": "__CAST__",
     "py_int_from_str": "py_str_to_int64",
     "py_float_from_str": "py_str_to_float64",
