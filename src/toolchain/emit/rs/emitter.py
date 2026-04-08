@@ -1043,7 +1043,23 @@ class _RsStmtCommonRenderer(CommonRenderer):
         finalbody: list[JsonVal],
     ) -> None:
         self.ctx.indent_level = self.state.indent_level
-        _emit_try(self.ctx, node)
+        _emit(self.ctx, "let __try_result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {")
+        self.ctx.indent_level += 1
+        _emit_body(self.ctx, body)
+        self.ctx.indent_level -= 1
+        _emit(self.ctx, "}));")
+        if finalbody:
+            _emit_body(self.ctx, finalbody)
+        body_has_ret = _body_has_return(body) and self.ctx.current_return_type not in ("", "None")
+        if body_has_ret:
+            _emit(self.ctx, "match __try_result {")
+            self.ctx.indent_level += 1
+            _emit(self.ctx, "Ok(__try_ok) => { return __try_ok; }")
+            _emit(self.ctx, "Err(__try_err) => { std::panic::resume_unwind(__try_err); }")
+            self.ctx.indent_level -= 1
+            _emit(self.ctx, "}")
+        else:
+            _emit(self.ctx, "if let Err(__try_err) = __try_result { std::panic::resume_unwind(__try_err); };")
         self.state.indent_level = self.ctx.indent_level
 
     def emit_try_with_handlers_stmt(
