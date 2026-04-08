@@ -1941,16 +1941,17 @@ class ZigNativeEmitter:
                 self._emit_line("__pytra_exc_type = null;")
                 self._emit_line("__pytra_exc_msg = null;")
                 self._emit_line("__pytra_exc_line = 0;")
-                hname = h.get("name")
+                hname = renderer.exception_handler_name(h)
                 pushed_exc = False
                 if isinstance(hname, str) and hname != "":
                     safe_hname = _safe_ident(hname, "err")
-                    if self._body_uses_name_runtime(self._dict_list(h.get("body")), safe_hname):
+                    handler_body = renderer.exception_handler_body(h)
+                    if self._body_uses_name_runtime(handler_body, safe_hname):
                         self._emit_line("const " + safe_hname + " = __PytraError{ .msg = (__pytra_caught_msg orelse \"\"), .line = __pytra_caught_line };")
                         self._exception_var_stack.append({safe_hname})
                         pushed_exc = True
                 self._emit_line(handled + " = true;")
-                for sub in self._dict_list(h.get("body")):
+                for sub in renderer.exception_handler_body(h):
                     self._emit_stmt(sub)
                 if pushed_exc:
                     self._exception_var_stack.pop()

@@ -4904,8 +4904,8 @@ def _emit_try(ctx: RsEmitContext, node: dict[str, JsonVal]) -> None:
             for i, handler in enumerate(user_handlers):
                 type_node = handler.get("type")
                 handler_type_id = _str(type_node, "id") if isinstance(type_node, dict) else ""
-                exc_name = _str(handler, "name")
-                handler_body = _list(handler, "body")
+                exc_name = renderer.exception_handler_name(handler)
+                handler_body = renderer.exception_handler_body(handler)
                 rs_type = safe_rs_ident(handler_type_id)
                 if i == 0:
                     _emit(ctx, "if let Some(" + safe_rs_ident(exc_name) + ") = __catch_err.downcast_ref::<" + rs_type + ">() {")
@@ -4922,8 +4922,8 @@ def _emit_try(ctx: RsEmitContext, node: dict[str, JsonVal]) -> None:
                 _emit(ctx, "let __err_msg: String = if let Some(__s) = __catch_err.downcast_ref::<String>() { __s.clone() } else if let Some(__s) = __catch_err.downcast_ref::<&str>() { __s.to_string() } else { \"exception\".to_string() };")
                 ctx.catch_err_msg_var = "__err_msg"
                 for handler in string_handlers:
-                    exc_name = _str(handler, "name")
-                    handler_body = _list(handler, "body")
+                    exc_name = renderer.exception_handler_name(handler)
+                    handler_body = renderer.exception_handler_body(handler)
                     if exc_name != "":
                         _emit(ctx, "let " + safe_rs_ident(exc_name) + " = __err_msg.clone();")
                         ctx.declared_vars.add(exc_name)
@@ -4935,8 +4935,8 @@ def _emit_try(ctx: RsEmitContext, node: dict[str, JsonVal]) -> None:
             _emit(ctx, "let __err_msg: String = if let Some(__s) = __catch_err.downcast_ref::<String>() { __s.clone() } else if let Some(__s) = __catch_err.downcast_ref::<&str>() { __s.to_string() } else { \"exception\".to_string() };")
             ctx.catch_err_msg_var = "__err_msg"
             for handler in string_handlers:
-                exc_name = _str(handler, "name")
-                handler_body = _list(handler, "body")
+                exc_name = renderer.exception_handler_name(handler)
+                handler_body = renderer.exception_handler_body(handler)
                 if exc_name != "":
                     _emit(ctx, "let " + safe_rs_ident(exc_name) + " = __err_msg.clone();")
                     ctx.declared_vars.add(exc_name)
