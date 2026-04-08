@@ -380,6 +380,10 @@ class CommonRenderer:
         del handler, caught_expr, is_first
         raise RuntimeError("common renderer requires user exception handler open override for " + self.language)
 
+    def emit_string_exception_binding(self, caught_expr: str, target_name: str) -> None:
+        del caught_expr, target_name
+        return None
+
     def partition_exception_handlers(
         self,
         handlers: list[JsonVal],

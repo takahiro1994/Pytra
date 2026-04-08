@@ -1097,6 +1097,18 @@ class _RsStmtCommonRenderer(CommonRenderer):
         prefix = "if" if is_first else "} else if"
         return prefix + " let Some(" + safe_rs_ident(exc_name) + ") = " + caught_expr + ".downcast_ref::<" + rs_type + ">() {"
 
+    def emit_string_exception_binding(self, caught_expr: str, target_name: str) -> None:
+        _emit(
+            self.ctx,
+            "let "
+            + target_name
+            + ": String = if let Some(__s) = "
+            + caught_expr
+            + ".downcast_ref::<String>() { __s.clone() } else if let Some(__s) = "
+            + caught_expr
+            + ".downcast_ref::<&str>() { __s.to_string() } else { \"exception\".to_string() };",
+        )
+
     def is_user_exception_handler(self, handler: dict[str, JsonVal]) -> bool:
         type_node = handler.get("type")
         if not isinstance(type_node, dict):
@@ -4952,7 +4964,7 @@ def _emit_try(ctx: RsEmitContext, node: dict[str, JsonVal]) -> None:
             if len(string_handlers) > 0:
                 _emit(ctx, "} else {")
                 ctx.indent_level += 1
-                _emit(ctx, "let __err_msg: String = if let Some(__s) = __catch_err.downcast_ref::<String>() { __s.clone() } else if let Some(__s) = __catch_err.downcast_ref::<&str>() { __s.to_string() } else { \"exception\".to_string() };")
+                renderer.emit_string_exception_binding("__catch_err", "__err_msg")
                 ctx.catch_err_msg_var = "__err_msg"
                 for handler in string_handlers:
                     renderer.emit_exception_handler(handler)
@@ -4960,7 +4972,7 @@ def _emit_try(ctx: RsEmitContext, node: dict[str, JsonVal]) -> None:
             _emit(ctx, "}")
         else:
             # Only string handlers (original behavior)
-            _emit(ctx, "let __err_msg: String = if let Some(__s) = __catch_err.downcast_ref::<String>() { __s.clone() } else if let Some(__s) = __catch_err.downcast_ref::<&str>() { __s.to_string() } else { \"exception\".to_string() };")
+            renderer.emit_string_exception_binding("__catch_err", "__err_msg")
             ctx.catch_err_msg_var = "__err_msg"
             for handler in string_handlers:
                 renderer.emit_exception_handler(handler)
