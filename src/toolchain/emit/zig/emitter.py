@@ -360,6 +360,11 @@ class _ZigStmtCommonRenderer(CommonRenderer):
             return
         self.emit_backend_line(return_stmt)
 
+    def emit_bare_raise_restore(self) -> None:
+        self.emit_backend_line("__pytra_exc_type = __pytra_caught_type;")
+        self.emit_backend_line("__pytra_exc_msg = __pytra_caught_msg;")
+        self.emit_backend_line("__pytra_exc_line = __pytra_caught_line;")
+
     def render_try_body_open(self, try_label: str) -> str:
         return try_label + ": {"
 
@@ -1940,10 +1945,8 @@ class ZigNativeEmitter:
         return_stmt = self._exception_return_stmt()
         exc_any = stmt.get("exc")
         if exc_any is None:
-            self._emit_line("__pytra_exc_type = __pytra_caught_type;")
-            self._emit_line("__pytra_exc_msg = __pytra_caught_msg;")
-            self._emit_line("__pytra_exc_line = __pytra_caught_line;")
             renderer.state.indent_level = self.indent
+            renderer.emit_bare_raise_restore()
             renderer.emit_raise_propagation(try_label, return_stmt)
             self.indent = renderer.state.indent_level
             return

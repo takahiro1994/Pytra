@@ -550,6 +550,9 @@ class CommonRenderer:
         del try_label, return_stmt
         return None
 
+    def emit_bare_raise_restore(self) -> None:
+        return None
+
     def emit_bare_raise_stmt(self, node: dict[str, JsonVal]) -> None:
         keyword = self._syntax_text("raise", "throw")
         self._emit_stmt_line(keyword)
