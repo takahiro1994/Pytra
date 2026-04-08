@@ -87,6 +87,18 @@ class CommonRenderer:
         value = self._lowering().get("exception_style")
         return value if isinstance(value, str) and value != "" else "native_throw"
 
+    def _require_exception_style(self, expected: str) -> None:
+        actual = self._exception_style()
+        if actual != expected:
+            raise RuntimeError(
+                "exception_style mismatch for "
+                + self.language
+                + ": expected "
+                + expected
+                + ", got "
+                + actual
+            )
+
     def _bool_literal(self, value: bool) -> str:
         raw = self._lowering().get("bool_literals")
         if isinstance(raw, list) and len(raw) == 2:

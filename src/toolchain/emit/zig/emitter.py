@@ -350,17 +350,20 @@ class _ZigStmtCommonRenderer(CommonRenderer):
         self.emit_backend_line(handled_name + " = true;")
 
     def emit_try_body_post_stmt(self, stmt: dict[str, Any], try_label: str) -> None:
+        self._require_exception_style("manual_exception_slot")
         if stmt.get("kind") in {"Return", "Raise", "Break", "Continue"}:
             return
         self.emit_backend_line("if (__pytra_exc_type != null) break :" + try_label + ";")
 
     def emit_raise_propagation(self, try_label: str, return_stmt: str) -> None:
+        self._require_exception_style("manual_exception_slot")
         if try_label != "":
             self.emit_backend_line("break :" + try_label + ";")
             return
         self.emit_backend_line(return_stmt)
 
     def emit_bare_raise_restore(self) -> None:
+        self._require_exception_style("manual_exception_slot")
         self.emit_backend_line("__pytra_exc_type = __pytra_caught_type;")
         self.emit_backend_line("__pytra_exc_msg = __pytra_caught_msg;")
         self.emit_backend_line("__pytra_exc_line = __pytra_caught_line;")
@@ -371,6 +374,7 @@ class _ZigStmtCommonRenderer(CommonRenderer):
         exc_msg_expr: str,
         exc_line_expr: str,
     ) -> None:
+        self._require_exception_style("manual_exception_slot")
         self.emit_backend_line("__pytra_exc_type = " + exc_type_expr + ";")
         self.emit_backend_line("__pytra_exc_msg = " + exc_msg_expr + ";")
         self.emit_backend_line("__pytra_exc_line = " + exc_line_expr + ";")

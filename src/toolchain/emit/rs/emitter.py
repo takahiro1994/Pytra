@@ -1177,6 +1177,7 @@ class _RsStmtCommonRenderer(CommonRenderer):
         return "}"
 
     def emit_try_capture(self, result_name: str, body: list[JsonVal]) -> None:
+        self._require_exception_style("panic_catch_unwind")
         _emit(self.ctx, "let " + result_name + " = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {")
         self.ctx.indent_level += 1
         _emit_body(self.ctx, body)
