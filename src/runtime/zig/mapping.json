@@ -46,6 +46,7 @@
     "set_ctor": "pytra.set",
     "str.endswith": "pytra.endswith",
     "str.find": "pytra.find",
+    "str.rfind": "pytra.rfind",
     "str.isalnum": "pytra.isalnum",
     "str.lower": "pytra.lower",
     "str.lstrip": "pytra.lstrip",
@@ -71,7 +72,8 @@
     "str": "[]const u8",
     "None": "void",
     "Path": "pathlib.Path",
-    "Exception": "pytra.PyObject"
+    "Exception": "pytra.PyObject",
+    "BaseException": "pytra.PyObject"
   },
   "implicit_promotions": [
     [
@@ -111,6 +113,15 @@
     "pytra.std.pathlib": "std/pathlib_native.zig",
     "pytra.std.glob": "std/glob_native.zig"
   },
+  "exception_types": [
+    "BaseException",
+    "Exception",
+    "IndexError",
+    "KeyError",
+    "RuntimeError",
+    "TypeError",
+    "ValueError"
+  ],
   "skip_modules": [
     "pytra.built_in.",
     "pytra.std.glob",

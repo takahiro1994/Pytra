@@ -7,6 +7,7 @@ from pathlib import Path
 
 from toolchain.emit.common.code_emitter import build_import_alias_map
 from toolchain.emit.common.code_emitter import load_runtime_mapping
+from toolchain.emit.common.common_renderer import CommonRenderer
 
 from toolchain_.frontends.runtime_symbol_index import (
     canonical_runtime_module_id,
@@ -195,6 +196,56 @@ def _zig_string(text: str) -> str:
     out = out.replace("\r", "\\r")
     out = out.replace("\n", "\\n")
     return '"' + out + '"'
+
+
+class _ZigStmtCommonRenderer(CommonRenderer):
+    def __init__(self, owner: "ZigNativeEmitter") -> None:
+        self.owner = owner
+        super().__init__("zig")
+
+    def render_name(self, node: dict[str, Any]) -> str:
+        return self.owner._render_expr(node)
+
+    def render_constant(self, node: dict[str, Any]) -> str:
+        if node.get("value") is None:
+            return "pytra.union_new_none()"
+        return self.owner._render_expr(node)
+
+    def render_expr(self, node: Any) -> str:
+        return self.owner._render_expr(node)
+
+    def render_condition_expr(self, node: Any) -> str:
+        return self.owner._render_expr(node)
+
+    def render_attribute(self, node: dict[str, Any]) -> str:
+        return self.owner._render_expr(node)
+
+    def render_call(self, node: dict[str, Any]) -> str:
+        return self.owner._render_expr(node)
+
+    def render_assign_stmt(self, node: dict[str, Any]) -> str:
+        raise RuntimeError("zig common renderer assign string hook is not used directly")
+
+    def render_raise_value(self, node: dict[str, Any]) -> str:
+        raise RuntimeError("zig common renderer raise value hook is not used directly")
+
+    def render_except_open(self, handler: dict[str, Any]) -> str:
+        raise RuntimeError("zig common renderer except hook is not used directly")
+
+    def emit_assign_stmt(self, node: dict[str, Any]) -> None:
+        self.owner.indent = self.state.indent_level
+        self.owner._emit_stmt(node)
+        self.state.indent_level = self.owner.indent
+
+    def emit_expr_stmt(self, node: dict[str, Any]) -> None:
+        self.owner.indent = self.state.indent_level
+        self.owner._emit_stmt(node)
+        self.state.indent_level = self.owner.indent
+
+    def emit_try_stmt(self, node: dict[str, Any]) -> None:
+        self.owner.indent = self.state.indent_level
+        self.owner._emit_stmt(node)
+        self.state.indent_level = self.owner.indent
 
 
 def _binop_precedence(op: str) -> int:
@@ -387,6 +438,9 @@ class ZigNativeEmitter:
         self._try_label_stack: list[str] = []
         mapping_path = Path(__file__).resolve().parents[3] / "runtime" / "zig" / "mapping.json"
         self._runtime_mapping = load_runtime_mapping(mapping_path)
+        self._catch_all_exception_types: set[str] = {
+            name for name, mapped in self._runtime_mapping.types.items() if mapped == "pytra.PyObject"
+        }
 
     def _union_storage_zig(self) -> str:
         return "*pytra.UnionVal"
@@ -2122,7 +2176,7 @@ class ZigNativeEmitter:
                     if isinstance(type_node, dict):
                         type_name = _safe_ident(type_node.get("id"), "")
                     cond = "true"
-                    if type_name in {"Exception", "BaseException"}:
+                    if type_name in self._catch_all_exception_types:
                         cond = "true"
                     elif type_name != "":
                         type_checks: list[str] = []
@@ -2167,51 +2221,61 @@ class ZigNativeEmitter:
                 self._emit_stmt(sub)
             return
         if kind == "With":
-            context_expr = stmt.get("context_expr")
-            body = self._dict_list(stmt.get("body"))
-            var_name_any = stmt.get("var_name")
-            var_name = _safe_ident(var_name_any, "ctx") if isinstance(var_name_any, str) and var_name_any != "" else ""
+            items = stmt.get("items")
             enter_type = str(stmt.get("with_enter_type", ""))
-            ctx_name = "__with_ctx_" + str(self.tmp_seq)
-            self.tmp_seq += 1
-            with_blk = "__with_blk_" + str(self.tmp_seq)
-            self.tmp_seq += 1
-            ctx_expr = self._render_expr(context_expr)
-            self._emit_line("const " + ctx_name + " = " + ctx_expr + ";")
-            if var_name != "":
-                self._current_type_map()[var_name] = enter_type
-                already_declared = len(self._local_var_stack) > 0 and var_name in self._current_local_vars()
-                reassigned = len(self._reassigned_name_stack) > 0 and var_name in self._reassigned_name_stack[-1]
+            if isinstance(items, list) and len(items) > 1 or enter_type == "TextIOWrapper":
+                context_expr = stmt.get("context_expr")
+                body = self._dict_list(stmt.get("body"))
+                var_name_any = stmt.get("var_name")
+                var_name = _safe_ident(var_name_any, "ctx") if isinstance(var_name_any, str) and var_name_any != "" else ""
+                ctx_name = "__with_ctx_" + str(self.tmp_seq)
+                self.tmp_seq += 1
+                with_blk = "__with_blk_" + str(self.tmp_seq)
+                self.tmp_seq += 1
+                ctx_expr = self._render_expr(context_expr)
+                self._emit_line("const " + ctx_name + " = " + ctx_expr + ";")
+                if var_name != "":
+                    self._current_type_map()[var_name] = enter_type
+                    already_declared = len(self._local_var_stack) > 0 and var_name in self._current_local_vars()
+                    reassigned = len(self._reassigned_name_stack) > 0 and var_name in self._reassigned_name_stack[-1]
+                    if enter_type == "TextIOWrapper":
+                        if already_declared:
+                            self._emit_line(var_name + " = " + ctx_name + ";")
+                        else:
+                            self._emit_line(("var " if reassigned else "const ") + var_name + " = " + ctx_name + ";")
+                    else:
+                        if already_declared:
+                            self._emit_line(var_name + " = " + ctx_name + ".__enter__();")
+                        else:
+                            self._emit_line(("var " if reassigned else "const ") + var_name + " = " + ctx_name + ".__enter__();")
+                    if not already_declared and len(self._local_var_stack) > 0:
+                        self._current_local_vars().add(var_name)
+                elif enter_type != "TextIOWrapper":
+                    self._emit_line("_ = " + ctx_name + ".__enter__();")
+                self._emit_line(with_blk + ": {")
+                self.indent += 1
+                self._try_depth += 1
+                self._try_label_stack.append(with_blk)
+                for sub in body:
+                    self._emit_stmt(sub)
+                    if sub.get("kind") not in {"Return", "Raise", "Break", "Continue"}:
+                        self._emit_line("if (__pytra_exc_type != null) break :" + with_blk + ";")
+                self._try_label_stack.pop()
+                self._try_depth -= 1
+                self.indent -= 1
+                self._emit_line("}")
                 if enter_type == "TextIOWrapper":
-                    if already_declared:
-                        self._emit_line(var_name + " = " + ctx_name + ";")
-                    else:
-                        self._emit_line(("var " if reassigned else "const ") + var_name + " = " + ctx_name + ";")
+                    self._emit_line("pytra.file_close(" + ctx_name + ");")
                 else:
-                    if already_declared:
-                        self._emit_line(var_name + " = " + ctx_name + ".__enter__();")
-                    else:
-                        self._emit_line(("var " if reassigned else "const ") + var_name + " = " + ctx_name + ".__enter__();")
-                if not already_declared and len(self._local_var_stack) > 0:
-                    self._current_local_vars().add(var_name)
-            elif enter_type != "TextIOWrapper":
-                self._emit_line("_ = " + ctx_name + ".__enter__();")
-            self._emit_line(with_blk + ": {")
-            self.indent += 1
-            self._try_depth += 1
-            self._try_label_stack.append(with_blk)
-            for sub in body:
-                self._emit_stmt(sub)
-                if sub.get("kind") not in {"Return", "Raise", "Break", "Continue"}:
-                    self._emit_line("if (__pytra_exc_type != null) break :" + with_blk + ";")
-            self._try_label_stack.pop()
-            self._try_depth -= 1
-            self.indent -= 1
-            self._emit_line("}")
-            if enter_type == "TextIOWrapper":
-                self._emit_line("pytra.file_close(" + ctx_name + ");")
+                    self._emit_line("_ = " + ctx_name + ".__exit__(pytra.union_new_none(), pytra.union_new_none(), pytra.union_new_none());")
             else:
-                self._emit_line("_ = " + ctx_name + ".__exit__(pytra.union_new_none(), pytra.union_new_none(), pytra.union_new_none());")
+                renderer = _ZigStmtCommonRenderer(self)
+                renderer.state.lines = self.lines
+                renderer.state.indent_level = self.indent
+                renderer.state.tmp_counter = self.tmp_seq
+                renderer.emit_with_stmt(stmt)
+                self.indent = renderer.state.indent_level
+                self.tmp_seq = renderer.state.tmp_counter
             return
         if kind == "If":
             self._emit_if(stmt)
@@ -4818,7 +4882,14 @@ class ZigNativeEmitter:
                     if obj_type.startswith("list[") and obj_type.endswith("]"):
                         elem_type = self._zig_type(obj_type[5:-1].strip())
                         return "pytra.list_index(" + obj + ", " + elem_type + ", " + arg_strs[0] + ")"
-                if attr == "rfind" and len(arg_strs) > 0:
+                call_name = ""
+                resolved_runtime_call = node.get("resolved_runtime_call")
+                runtime_call = node.get("runtime_call")
+                if isinstance(resolved_runtime_call, str) and resolved_runtime_call != "":
+                    call_name = resolved_runtime_call
+                elif isinstance(runtime_call, str):
+                    call_name = runtime_call
+                if call_name == "str.rfind" and len(arg_strs) > 0:
                     return "pytra.str_rfind(" + obj + ", " + arg_strs[0] + ")"
                 if attr == "replace" and len(arg_strs) >= 2:
                     return "pytra.str_replace(" + obj + ", " + arg_strs[0] + ", " + arg_strs[1] + ")"
@@ -4980,6 +5051,12 @@ class ZigNativeEmitter:
                         return "pytra.file_write(" + obj + ", " + arg_strs[0] + ")"
                 if attr == "read":
                     return "pytra.file_read(" + obj + ")"
+                if attr == "__exit__":
+                    coerced_args = [
+                        "pytra.union_new_none()" if isinstance(arg, dict) and arg.get("kind") == "Constant" and arg.get("value") is None else arg_strs[i]
+                        for i, arg in enumerate(args)
+                    ]
+                    return obj + ".__exit__(" + ", ".join(coerced_args) + ")"
                 if attr == "close":
                     return "pytra.file_close(" + obj + ")"
                 if attr == "sqrt":
