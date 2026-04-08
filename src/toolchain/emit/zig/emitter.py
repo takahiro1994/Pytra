@@ -2003,12 +2003,12 @@ class ZigNativeEmitter:
             renderer.emit_exception_dispatch_handlers("__pytra_exc_type", handled, handlers)
             self.indent = renderer.state.indent_level
         if len(orelse) > 0:
-            self._emit_line("if (__pytra_exc_type == null) {")
+            self._emit_line(renderer.render_try_orelse_open())
             self.indent += 1
             for sub in orelse:
                 self._emit_stmt(sub)
             self.indent -= 1
-            self._emit_line("}")
+            self._emit_line(renderer.render_try_orelse_close())
         for sub in finalbody:
             self._emit_stmt(sub)
 

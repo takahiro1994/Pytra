@@ -536,6 +536,12 @@ class CommonRenderer:
         del try_label
         return self._syntax_text("block_close", "}")
 
+    def render_try_orelse_open(self) -> str:
+        return "if (__pytra_exc_type == null) {"
+
+    def render_try_orelse_close(self) -> str:
+        return self._syntax_text("block_close", "}")
+
     def emit_bare_raise_stmt(self, node: dict[str, JsonVal]) -> None:
         keyword = self._syntax_text("raise", "throw")
         self._emit_stmt_line(keyword)
