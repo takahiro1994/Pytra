@@ -4980,18 +4980,18 @@ def _emit_try(ctx: RsEmitContext, node: dict[str, JsonVal]) -> None:
             if len(string_handlers) > 0:
                 _emit(ctx, renderer.render_string_exception_handler_else_open())
                 ctx.indent_level += 1
-                renderer.emit_string_exception_binding("__catch_err", "__err_msg")
+                renderer.state.indent_level = ctx.indent_level
                 ctx.catch_err_msg_var = "__err_msg"
-                for handler in string_handlers:
-                    renderer.emit_exception_handler(handler)
+                renderer.emit_string_exception_handler_chain("__catch_err", "__err_msg", string_handlers)
+                ctx.indent_level = renderer.state.indent_level
                 ctx.indent_level -= 1
             _emit(ctx, renderer.render_string_exception_handler_else_close())
         else:
             # Only string handlers (original behavior)
-            renderer.emit_string_exception_binding("__catch_err", "__err_msg")
+            renderer.state.indent_level = ctx.indent_level
             ctx.catch_err_msg_var = "__err_msg"
-            for handler in string_handlers:
-                renderer.emit_exception_handler(handler)
+            renderer.emit_string_exception_handler_chain("__catch_err", "__err_msg", string_handlers)
+            ctx.indent_level = renderer.state.indent_level
 
         ctx.catch_err_msg_var = old_catch_var
         ctx.indent_level -= 1

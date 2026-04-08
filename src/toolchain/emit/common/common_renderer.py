@@ -488,6 +488,16 @@ class CommonRenderer:
             self.emit_exception_handler(handler)
             self.state.indent_level -= 1
 
+    def emit_string_exception_handler_chain(
+        self,
+        caught_expr: str,
+        bind_name: str,
+        handlers: list[dict[str, JsonVal]],
+    ) -> None:
+        self.emit_string_exception_binding(caught_expr, bind_name)
+        for handler in handlers:
+            self.emit_exception_handler(handler)
+
     def emit_bare_raise_stmt(self, node: dict[str, JsonVal]) -> None:
         keyword = self._syntax_text("raise", "throw")
         self._emit_stmt_line(keyword)
