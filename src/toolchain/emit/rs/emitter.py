@@ -1043,11 +1043,7 @@ class _RsStmtCommonRenderer(CommonRenderer):
         finalbody: list[JsonVal],
     ) -> None:
         self.ctx.indent_level = self.state.indent_level
-        _emit(self.ctx, "let __try_result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {")
-        self.ctx.indent_level += 1
-        _emit_body(self.ctx, body)
-        self.ctx.indent_level -= 1
-        _emit(self.ctx, "}));")
+        self.emit_try_capture("__try_result", body)
         if finalbody:
             _emit_body(self.ctx, finalbody)
         body_has_ret = _body_has_return(body) and self.ctx.current_return_type not in ("", "None")
@@ -1059,7 +1055,7 @@ class _RsStmtCommonRenderer(CommonRenderer):
             self.ctx.indent_level -= 1
             _emit(self.ctx, "}")
         else:
-            _emit(self.ctx, "if let Err(__try_err) = __try_result { std::panic::resume_unwind(__try_err); };")
+            _emit(self.ctx, self.render_try_rethrow_fallback("__try_result", "__try_err"))
         self.state.indent_level = self.ctx.indent_level
 
     def emit_try_with_handlers_stmt(
@@ -1143,6 +1139,9 @@ class _RsStmtCommonRenderer(CommonRenderer):
     def render_try_error_arm_open(self, err_binding: str, borrowed: bool = False) -> str:
         prefix = "ref " if borrowed else ""
         return "Err(" + prefix + err_binding + ") => {"
+
+    def render_try_rethrow_fallback(self, result_name: str, err_binding: str) -> str:
+        return "if let Err(" + err_binding + ") = " + result_name + " { std::panic::resume_unwind(" + err_binding + "); };"
 
     def render_try_match_open(self, result_name: str) -> str:
         return "match " + result_name + " {"

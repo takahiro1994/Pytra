@@ -415,6 +415,10 @@ class CommonRenderer:
         del result_name, body
         raise RuntimeError("common renderer requires try capture hook for " + self.language)
 
+    def render_try_rethrow_fallback(self, result_name: str, err_binding: str) -> str:
+        del result_name, err_binding
+        raise RuntimeError("common renderer requires try rethrow fallback hook for " + self.language)
+
     def render_exception_dispatch_open(self, caught_type_expr: str) -> str:
         del caught_type_expr
         return ""
