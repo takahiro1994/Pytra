@@ -524,6 +524,10 @@ class CommonRenderer:
             return
         self.emit_string_exception_handler_chain(caught_expr, string_bind_name, string_handlers)
 
+    def emit_try_body_post_stmt(self, stmt: dict[str, JsonVal], try_label: str) -> None:
+        del stmt, try_label
+        return None
+
     def emit_bare_raise_stmt(self, node: dict[str, JsonVal]) -> None:
         keyword = self._syntax_text("raise", "throw")
         self._emit_stmt_line(keyword)
