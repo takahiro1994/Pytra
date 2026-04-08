@@ -388,6 +388,10 @@ class CommonRenderer:
         del ok_binding, returns_value
         raise RuntimeError("common renderer requires try success arm override for " + self.language)
 
+    def render_try_error_arm_open(self, err_binding: str, borrowed: bool = False) -> str:
+        del err_binding, borrowed
+        raise RuntimeError("common renderer requires try error arm hook for " + self.language)
+
     def partition_exception_handlers(
         self,
         handlers: list[JsonVal],

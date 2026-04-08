@@ -1114,6 +1114,10 @@ class _RsStmtCommonRenderer(CommonRenderer):
             return "Ok(" + ok_binding + ") => { return " + ok_binding + "; }"
         return "Ok(_) => {}"
 
+    def render_try_error_arm_open(self, err_binding: str, borrowed: bool = False) -> str:
+        prefix = "ref " if borrowed else ""
+        return "Err(" + prefix + err_binding + ") => {"
+
     def is_user_exception_handler(self, handler: dict[str, JsonVal]) -> bool:
         type_node = handler.get("type")
         if not isinstance(type_node, dict):
@@ -4929,7 +4933,7 @@ def _emit_try(ctx: RsEmitContext, node: dict[str, JsonVal]) -> None:
             _emit(ctx, "match __try_result {")
             ctx.indent_level += 1
             _emit(ctx, renderer.render_try_success_arm("__try_ok", True))
-            _emit(ctx, "Err(__try_err) => { std::panic::resume_unwind(__try_err); }")
+            _emit(ctx, renderer.render_try_error_arm_open("__try_err") + " std::panic::resume_unwind(__try_err); }")
             ctx.indent_level -= 1
             _emit(ctx, "}")
         else:
@@ -4946,7 +4950,7 @@ def _emit_try(ctx: RsEmitContext, node: dict[str, JsonVal]) -> None:
         _emit(ctx, "match __try_result {")
         ctx.indent_level += 1
         _emit(ctx, renderer.render_try_success_arm("__try_ok", body_has_ret))
-        _emit(ctx, "Err(ref __catch_err) => {")
+        _emit(ctx, renderer.render_try_error_arm_open("__catch_err", borrowed=True))
         ctx.indent_level += 1
         old_catch_var = ctx.catch_err_msg_var
 
