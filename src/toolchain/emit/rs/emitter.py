@@ -1118,6 +1118,12 @@ class _RsStmtCommonRenderer(CommonRenderer):
         prefix = "ref " if borrowed else ""
         return "Err(" + prefix + err_binding + ") => {"
 
+    def render_try_match_open(self, result_name: str) -> str:
+        return "match " + result_name + " {"
+
+    def render_try_match_close(self) -> str:
+        return "}"
+
     def is_user_exception_handler(self, handler: dict[str, JsonVal]) -> bool:
         type_node = handler.get("type")
         if not isinstance(type_node, dict):
@@ -4930,12 +4936,12 @@ def _emit_try(ctx: RsEmitContext, node: dict[str, JsonVal]) -> None:
             _emit_body(ctx, finalbody)
         body_has_ret = _body_has_return(body) and ctx.current_return_type not in ("", "None")
         if body_has_ret:
-            _emit(ctx, "match __try_result {")
+            _emit(ctx, renderer.render_try_match_open("__try_result"))
             ctx.indent_level += 1
             _emit(ctx, renderer.render_try_success_arm("__try_ok", True))
             _emit(ctx, renderer.render_try_error_arm_open("__try_err") + " std::panic::resume_unwind(__try_err); }")
             ctx.indent_level -= 1
-            _emit(ctx, "}")
+            _emit(ctx, renderer.render_try_match_close())
         else:
             _emit(ctx, "if let Err(__try_err) = __try_result { std::panic::resume_unwind(__try_err); };")
     else:
@@ -4947,7 +4953,7 @@ def _emit_try(ctx: RsEmitContext, node: dict[str, JsonVal]) -> None:
         _emit(ctx, "}));")
         # If the try body can return a value, use match to propagate Ok result.
         body_has_ret = _body_has_return(body) and ctx.current_return_type not in ("", "None")
-        _emit(ctx, "match __try_result {")
+        _emit(ctx, renderer.render_try_match_open("__try_result"))
         ctx.indent_level += 1
         _emit(ctx, renderer.render_try_success_arm("__try_ok", body_has_ret))
         _emit(ctx, renderer.render_try_error_arm_open("__catch_err", borrowed=True))
@@ -4987,7 +4993,7 @@ def _emit_try(ctx: RsEmitContext, node: dict[str, JsonVal]) -> None:
         ctx.indent_level -= 1
         _emit(ctx, "}")  # close Err arm
         ctx.indent_level -= 1
-        _emit(ctx, "}")  # close match
+        _emit(ctx, renderer.render_try_match_close())
         if finalbody:
             _emit_body(ctx, finalbody)
 
