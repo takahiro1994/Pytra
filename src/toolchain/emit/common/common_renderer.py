@@ -350,6 +350,14 @@ class CommonRenderer:
             return self._str(type_node, "id")
         return ""
 
+    def render_exception_match_condition(
+        self,
+        handler: dict[str, JsonVal],
+        caught_type_expr: str,
+    ) -> str:
+        del handler, caught_type_expr
+        return "true"
+
     def partition_exception_handlers(
         self,
         handlers: list[JsonVal],

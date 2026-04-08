@@ -299,6 +299,21 @@ class _ZigStmtCommonRenderer(CommonRenderer):
             current = self.owner._class_base.get(current, "")
         return out
 
+    def render_exception_match_condition(
+        self,
+        handler: dict[str, Any],
+        caught_type_expr: str,
+    ) -> str:
+        if self.is_catch_all_exception_handler(handler):
+            return "true"
+        type_name = _safe_ident(self.exception_handler_type_name(handler), "")
+        if type_name == "":
+            return "true"
+        return " or ".join(
+            "std.mem.eql(u8, " + caught_type_expr + ".?, " + _zig_string(current) + ")"
+            for current in self.iter_exception_match_type_names(handler)
+        )
+
     def build_with_enter_assign(
         self,
         node: dict[str, Any],
@@ -1915,15 +1930,7 @@ class ZigNativeEmitter:
             for h in handlers:
                 if not isinstance(h, dict):
                     continue
-                type_name = _safe_ident(renderer.exception_handler_type_name(h), "")
-                cond = "true"
-                if renderer.is_catch_all_exception_handler(h):
-                    cond = "true"
-                elif type_name != "":
-                    type_checks: list[str] = []
-                    for current in renderer.iter_exception_match_type_names(h):
-                        type_checks.append("std.mem.eql(u8, __pytra_exc_type.?, " + _zig_string(current) + ")")
-                    cond = " or ".join(type_checks)
+                cond = renderer.render_exception_match_condition(h, "__pytra_exc_type")
                 self._emit_line("if (!" + handled + " and (" + cond + ")) {")
                 self.indent += 1
                 self._emit_line("__pytra_caught_type = __pytra_exc_type;")
