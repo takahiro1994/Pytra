@@ -1015,7 +1015,23 @@ class _RsStmtCommonRenderer(CommonRenderer):
             _emit_assign(self.ctx, node)
         self.state.indent_level = self.ctx.indent_level
 
-    def emit_raise_stmt(self, node: dict[str, JsonVal]) -> None:
+    def emit_bare_raise_stmt(self, node: dict[str, JsonVal]) -> None:
+        self.ctx.indent_level = self.state.indent_level
+        _emit_raise(self.ctx, node)
+        self.state.indent_level = self.ctx.indent_level
+
+    def emit_raise_call_stmt(
+        self,
+        node: dict[str, JsonVal],
+        call_node: dict[str, JsonVal],
+        func_name: str,
+        args: list[JsonVal],
+    ) -> None:
+        self.ctx.indent_level = self.state.indent_level
+        _emit_raise(self.ctx, node)
+        self.state.indent_level = self.ctx.indent_level
+
+    def emit_raise_value_stmt(self, node: dict[str, JsonVal], value: JsonVal) -> None:
         self.ctx.indent_level = self.state.indent_level
         _emit_raise(self.ctx, node)
         self.state.indent_level = self.ctx.indent_level

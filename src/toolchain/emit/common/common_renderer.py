@@ -324,13 +324,38 @@ class CommonRenderer:
     def emit_try_handler_body(self, handler: dict[str, JsonVal]) -> None:
         self.emit_body(self._list(handler, "body"))
 
-    def emit_raise_stmt(self, node: dict[str, JsonVal]) -> None:
-        value = self.render_raise_value(node)
+    def emit_bare_raise_stmt(self, node: dict[str, JsonVal]) -> None:
         keyword = self._syntax_text("raise", "throw")
-        if value != "":
-            self._emit_stmt_line(keyword + " " + value)
+        self._emit_stmt_line(keyword)
+
+    def emit_raise_call_stmt(
+        self,
+        node: dict[str, JsonVal],
+        call_node: dict[str, JsonVal],
+        func_name: str,
+        args: list[JsonVal],
+    ) -> None:
+        self.emit_raise_value_stmt(node, call_node)
+
+    def emit_raise_value_stmt(self, node: dict[str, JsonVal], value: JsonVal) -> None:
+        rendered = self.render_raise_value(node)
+        keyword = self._syntax_text("raise", "throw")
+        if rendered != "":
+            self._emit_stmt_line(keyword + " " + rendered)
         else:
             self._emit_stmt_line(keyword)
+
+    def emit_raise_stmt(self, node: dict[str, JsonVal]) -> None:
+        exc = node.get("exc")
+        if exc is None:
+            self.emit_bare_raise_stmt(node)
+            return
+        if isinstance(exc, dict) and self._str(exc, "kind") == "Call":
+            func = exc.get("func")
+            if isinstance(func, dict) and self._str(func, "kind") == "Name":
+                self.emit_raise_call_stmt(node, exc, self._str(func, "id"), self._list(exc, "args"))
+                return
+        self.emit_raise_value_stmt(node, exc)
 
     def emit_try_stmt(self, node: dict[str, JsonVal]) -> None:
         if len(self._list(node, "orelse")) > 0:
