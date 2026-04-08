@@ -214,6 +214,15 @@ def _is_exception_type_name(ctx: EmitContext, type_name: str) -> bool:
     return False
 
 
+def _nim_exception_type_name(ctx: EmitContext, type_name: str) -> str:
+    exc_type = _render_type(ctx, type_name)
+    if exc_type.startswith("ref "):
+        exc_type = exc_type[4:]
+    if exc_type == "IndexError":
+        return "py_runtime.IndexError"
+    return exc_type
+
+
 def _decorators(node: dict[str, JsonVal]) -> list[str]:
     decorators: list[str] = []
     for value in _list(node, "decorators"):
@@ -2109,9 +2118,7 @@ def _emit_constructor(ctx: EmitContext, class_name: str, args: list[JsonVal]) ->
     # Builtin exception classes
     if _is_exception_type_name(ctx, class_name):
         msg = arg_strs[0] if len(arg_strs) > 0 else _nim_string(class_name)
-        exc_type = _render_type(ctx, class_name)
-        if exc_type.startswith("ref "):
-            exc_type = exc_type[4:]
+        exc_type = _nim_exception_type_name(ctx, class_name)
         if exc_type == "":
             exc_type = "CatchableError"
         return "newException(" + exc_type + ", " + msg + ")"
@@ -2846,10 +2853,7 @@ def _emit_try_stmt(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
         exc_name = _str(handler, "name")
 
         if exc_type != "":
-            nim_exc_type = _render_type(ctx, exc_type)
-            # Normalize to CatchableError for common exception types
-            if nim_exc_type.startswith("ref "):
-                nim_exc_type = nim_exc_type[4:]
+            nim_exc_type = _nim_exception_type_name(ctx, exc_type)
             if exc_name != "":
                 _emit(ctx, "except " + nim_exc_type + " as " + _safe_nim_ident(exc_name) + ":")
                 saved_exc = ctx.current_exc_var

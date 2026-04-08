@@ -1692,6 +1692,11 @@ func _toF64(v any) float64 {
 	switch t := v.(type) {
 	case float64:
 		return t
+	case bool:
+		if t {
+			return 1.0
+		}
+		return 0.0
 	case int64:
 		return float64(t)
 	case int:

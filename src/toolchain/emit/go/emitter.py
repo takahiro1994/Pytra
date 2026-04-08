@@ -2637,6 +2637,10 @@ def _emit_builtin_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
                 cast_prefix = "float32" if gt == "float32" else ""
                 inner = "py_str_to_float64(" + arg_strs[0] + ")"
                 return cast_prefix + "(" + inner + ")" if cast_prefix != "" else inner
+            if gt in ("float64", "float32") and (src_type == "bool" or src_is_dynamic):
+                cast_prefix = "float32" if gt == "float32" else ""
+                inner = "py_to_float64(" + arg_strs[0] + ")"
+                return cast_prefix + "(" + inner + ")" if cast_prefix != "" else inner
             if gt == "bool":
                 return "py_bool(" + arg_strs[0] + ")"
             if src_is_dynamic and gt in ("int64", "int32", "int16", "int8", "uint8", "uint16", "uint32", "uint64"):

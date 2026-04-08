@@ -293,6 +293,11 @@ function __pytra_float {
     }
 }
 
+function __pytra_float_from_str {
+    param([string]$value)
+    return (__pytra_float $value)
+}
+
 function __pytra_pow {
     param([object]$base, [object]$exp)
     $left = __pytra_float $base

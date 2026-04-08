@@ -767,9 +767,8 @@ def _render_call(ctx: EmitContext, expr: dict[str, JsonVal]) -> str:
                     return "([long][Math]::Truncate([double](" + rendered_args[0] + ")))"
                 return "0"
             if fn_name == "float":
-                # Inline float() as direct double cast (avoids PS1 function-call overhead).
                 if len(rendered_args) > 0:
-                    return "([double](" + rendered_args[0] + "))"
+                    return "(__pytra_float " + rendered_args[0] + ")"
                 return "0.0"
             if fn_name == "bool":
                 return "(__pytra_bool " + rendered_args[0] + ")" if len(rendered_args) > 0 else "(__pytra_bool)"

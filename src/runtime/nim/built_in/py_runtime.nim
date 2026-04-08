@@ -23,6 +23,9 @@ type PyBoolObj* = ref object of PyObj
   value*: bool
 type PyFloatObj* = ref object of PyObj
   value*: float64
+type RuntimeError* = object of CatchableError
+type TypeError* = object of CatchableError
+type IndexError* = object of CatchableError
 type PyPath* = string
 type PyFile* = File
 
