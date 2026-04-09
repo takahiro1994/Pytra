@@ -3912,9 +3912,10 @@ class ZigNativeEmitter:
                 if list_type.startswith("list[") and list_type.endswith("]"):
                     elem_type = self._zig_type(list_type[5:-1].strip())
                     blk, out_name, item_name = _ZigStmtCommonRenderer(self).next_list_concat_names()
-                    return (
-                        _ZigStmtCommonRenderer(self).render_block_expr_open(blk)
-                        + " const "
+                    renderer = _ZigStmtCommonRenderer(self)
+                    return renderer.render_simple_block_expr(
+                        blk,
+                        "const "
                         + out_name
                         + " = pytra.make_list("
                         + elem_type
@@ -3942,8 +3943,8 @@ class ZigNativeEmitter:
                         + elem_type
                         + ", "
                         + item_name
-                        + "); } "
-                        + _ZigStmtCommonRenderer(self).render_block_expr_close(blk, out_name)
+                        + "); }",
+                        out_name,
                     )
             # list * int → list replication (ブロック式)
             if op == "Mult":
@@ -3958,9 +3959,10 @@ class ZigNativeEmitter:
                     elif left_type in {"bytearray", "bytes"}:
                         elem_type = "u8"
                     blk, src_name, item_name = _ZigStmtCommonRenderer(self).next_list_repeat_names()
-                    return (
-                        _ZigStmtCommonRenderer(self).render_block_expr_open(blk)
-                        + " const "
+                    renderer = _ZigStmtCommonRenderer(self)
+                    return renderer.render_simple_block_expr(
+                        blk,
+                        "const "
                         + src_name
                         + " = "
                         + left
@@ -3978,8 +3980,8 @@ class ZigNativeEmitter:
                         + elem_type
                         + ", "
                         + item_name
-                        + "); } } "
-                        + _ZigStmtCommonRenderer(self).render_block_expr_close(blk, "__rl")
+                        + "); } }",
+                        "__rl",
                     )
             if op == "Pow":
                 return "std.math.pow(f64, " + left + ", " + right + ")"
