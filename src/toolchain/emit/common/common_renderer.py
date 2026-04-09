@@ -707,8 +707,12 @@ class CommonRenderer:
         del try_label
         return self._syntax_text("block_close", "}")
 
+    def active_exception_slot_names(self) -> tuple[str, str, str]:
+        return ("__pytra_exc_type", "__pytra_exc_msg", "__pytra_exc_line")
+
     def render_try_orelse_open(self) -> str:
-        return "if (__pytra_exc_type == null) {"
+        exc_type, _exc_msg, _exc_line = self.active_exception_slot_names()
+        return "if (" + exc_type + " == null) {"
 
     def render_try_orelse_close(self) -> str:
         return self._syntax_text("block_close", "}")
