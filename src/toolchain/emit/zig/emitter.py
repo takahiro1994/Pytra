@@ -1797,7 +1797,7 @@ class ZigNativeEmitter:
 
     def _emit_block(self, body_any: Any) -> None:
         body = self._dict_list(body_any)
-        exc_type = _ZigStmtCommonRenderer(self).active_exception_slot_names()[0]
+        exc_type = _ZigStmtCommonRenderer(self).active_exception_type_slot_name()
         for stmt in body:
             self._emit_stmt(stmt)
             if self._function_depth > 0 and self._try_depth == 0:
@@ -2192,7 +2192,7 @@ class ZigNativeEmitter:
         if len(handlers) > 0:
             handled = renderer.next_exception_dispatch_state_name()
             renderer.state.indent_level = self.indent
-            renderer.emit_exception_dispatch_handlers(renderer.active_exception_slot_names()[0], handled, handlers)
+            renderer.emit_exception_dispatch_handlers(renderer.active_exception_type_slot_name(), handled, handlers)
             self.indent = renderer.state.indent_level
         if len(orelse) > 0:
             self._emit_line(renderer.render_try_orelse_open())
