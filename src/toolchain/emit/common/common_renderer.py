@@ -1049,6 +1049,27 @@ class CommonRenderer:
             return
         self.emit_with_close_fallback(target_name, target_type)
 
+    def build_with_entry(
+        self,
+        ctx_name: str,
+        bound_name: str,
+        source_type: str,
+        enter_target_type: str,
+        exit_runtime_call: str,
+        exit_runtime_symbol: str,
+    ) -> tuple[str, str, str, str, str, str]:
+        return (
+            ctx_name,
+            bound_name,
+            source_type,
+            enter_target_type,
+            exit_runtime_call,
+            exit_runtime_symbol,
+        )
+
+    def select_with_exit_target(self, ctx_name: str, bound_name: str) -> str:
+        return bound_name if bound_name != "" else ctx_name
+
     def build_with_protocol_call(
         self,
         target_name: str,

@@ -5719,7 +5719,7 @@ def _emit_with(ctx: RsEmitContext, node: dict[str, JsonVal]) -> None:
             )) + ";")
         if ctx_rs.startswith("Rc<RefCell<"):
             renderer.emit_with_fallback_enter(ctx_tmp, ctx_rt)
-        ctx_entries.append((
+        ctx_entries.append(renderer.build_with_entry(
             ctx_tmp,
             var_rs,
             ctx_rs,
@@ -5735,7 +5735,7 @@ def _emit_with(ctx: RsEmitContext, node: dict[str, JsonVal]) -> None:
     ctx.indent_level -= 1
     _emit(ctx, renderer.render_try_capture_close())
     for ctx_tmp, var_rs, ctx_rs, target_type, exit_runtime_call, exit_runtime_symbol in reversed(ctx_entries):
-        target = var_rs if var_rs != "" else ctx_tmp
+        target = renderer.select_with_exit_target(ctx_tmp, var_rs)
         renderer.emit_with_exit_action(
             target,
             target_type,
