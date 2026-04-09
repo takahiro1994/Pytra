@@ -1184,9 +1184,12 @@ class CommonRenderer:
     ) -> None:
         return None
 
-    def emit_with_fallback_enter(self, target_name: str, target_type: str) -> None:
+    def render_with_fallback_enter_stmt(self, target_name: str, target_type: str) -> str:
         del target_name, target_type
-        return None
+        raise RuntimeError("common renderer requires with fallback enter stmt for " + self.language)
+
+    def emit_with_fallback_enter(self, target_name: str, target_type: str) -> None:
+        self.emit_backend_line(self.render_with_fallback_enter_stmt(target_name, target_type))
 
     def emit_with_enter_action(
         self,
@@ -1231,13 +1234,29 @@ class CommonRenderer:
     ) -> None:
         self.emit_assign_stmt(self.build_with_enter_assign(node, enter_name, enter_type, value, bind_ref=bind_ref))
 
-    def emit_with_fallback_exit(self, target_name: str, target_type: str) -> None:
+    def render_with_fallback_exit_stmt(self, target_name: str, target_type: str) -> str:
         del target_name, target_type
-        return None
+        raise RuntimeError("common renderer requires with fallback exit stmt for " + self.language)
+
+    def emit_with_fallback_exit(self, target_name: str, target_type: str) -> None:
+        self.emit_backend_line(self.render_with_fallback_exit_stmt(target_name, target_type))
+
+    def render_with_close_fallback_stmt(self, target_name: str, target_type: str) -> str:
+        del target_name, target_type
+        raise RuntimeError("common renderer requires with close fallback stmt for " + self.language)
 
     def emit_with_close_fallback(self, target_name: str, target_type: str) -> None:
-        del target_name, target_type
-        return None
+        self.emit_backend_line(self.render_with_close_fallback_stmt(target_name, target_type))
+
+    def render_with_context_bind_stmt(
+        self,
+        target_name: str,
+        source_name: str,
+        source_type: str,
+        declare: bool,
+    ) -> str:
+        del target_name, source_name, source_type, declare
+        raise RuntimeError("common renderer requires with context bind stmt for " + self.language)
 
     def emit_with_context_bind(
         self,
@@ -1246,8 +1265,9 @@ class CommonRenderer:
         source_type: str,
         declare: bool,
     ) -> None:
-        del target_name, source_name, source_type, declare
-        return None
+        self.emit_backend_line(
+            self.render_with_context_bind_stmt(target_name, source_name, source_type, declare)
+        )
 
     def with_source_uses_enter_fallback(self, source_type: str) -> bool:
         del source_type

@@ -1115,28 +1115,28 @@ class _RsStmtCommonRenderer(CommonRenderer):
         _emit(self.ctx, "let " + safe_rs_ident(exc_name) + " = " + self.ctx.catch_err_msg_var + ".clone();")
         self.ctx.declared_vars.add(exc_name)
 
-    def emit_with_fallback_enter(self, target_name: str, target_type: str) -> None:
+    def render_with_fallback_enter_stmt(self, target_name: str, target_type: str) -> str:
         del target_type
-        _emit(self.ctx, target_name + ".borrow_mut().__enter__();")
+        return target_name + ".borrow_mut().__enter__();"
 
-    def emit_with_fallback_exit(self, target_name: str, target_type: str) -> None:
+    def render_with_fallback_exit_stmt(self, target_name: str, target_type: str) -> str:
         del target_type
-        _emit(self.ctx, target_name + ".borrow_mut().__exit__(PyAny::None, PyAny::None, PyAny::None);")
+        return target_name + ".borrow_mut().__exit__(PyAny::None, PyAny::None, PyAny::None);"
 
-    def emit_with_close_fallback(self, target_name: str, target_type: str) -> None:
+    def render_with_close_fallback_stmt(self, target_name: str, target_type: str) -> str:
         del target_type
-        _emit(self.ctx, target_name + ".close();")
+        return target_name + ".close();"
 
-    def emit_with_context_bind(
+    def render_with_context_bind_stmt(
         self,
         target_name: str,
         source_name: str,
         source_type: str,
         declare: bool,
-    ) -> None:
+    ) -> str:
         prefix = "let mut " if declare else ""
         suffix = ".clone()" if source_type.startswith("Rc<RefCell<") else ""
-        _emit(self.ctx, prefix + target_name + " = " + source_name + suffix + ";")
+        return prefix + target_name + " = " + source_name + suffix + ";"
 
     def with_source_uses_enter_fallback(self, source_type: str) -> bool:
         return source_type.startswith("Rc<RefCell<")

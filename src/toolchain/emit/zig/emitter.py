@@ -404,32 +404,32 @@ class _ZigStmtCommonRenderer(CommonRenderer):
         del handler
         self.owner._end_pending_exception_binding()
 
-    def emit_with_fallback_enter(self, target_name: str, target_type: str) -> None:
+    def render_with_fallback_enter_stmt(self, target_name: str, target_type: str) -> str:
         del target_type
-        self.emit_backend_line("_ = " + target_name + ".__enter__();")
+        return "_ = " + target_name + ".__enter__();"
 
-    def emit_with_fallback_exit(self, target_name: str, target_type: str) -> None:
+    def render_with_fallback_exit_stmt(self, target_name: str, target_type: str) -> str:
         del target_type
-        self.emit_backend_line(
+        return (
             "_ = "
             + target_name
             + ".__exit__(pytra.union_new_none(), pytra.union_new_none(), pytra.union_new_none());"
         )
 
-    def emit_with_close_fallback(self, target_name: str, target_type: str) -> None:
+    def render_with_close_fallback_stmt(self, target_name: str, target_type: str) -> str:
         del target_type
-        self.emit_backend_line("pytra.file_close(" + target_name + ");")
+        return "pytra.file_close(" + target_name + ");"
 
-    def emit_with_context_bind(
+    def render_with_context_bind_stmt(
         self,
         target_name: str,
         source_name: str,
         source_type: str,
         declare: bool,
-    ) -> None:
+    ) -> str:
         del source_type
         prefix = "var " if declare else ""
-        self.emit_backend_line(prefix + target_name + " = " + source_name + ";")
+        return prefix + target_name + " = " + source_name + ";"
 
     def build_with_enter_assign(
         self,
