@@ -353,12 +353,12 @@ class _ZigStmtCommonRenderer(CommonRenderer):
         self._require_exception_style("manual_exception_slot")
         if stmt.get("kind") in {"Return", "Raise", "Break", "Continue"}:
             return
-        self.emit_backend_line("if (__pytra_exc_type != null) break :" + try_label + ";")
+        self.emit_backend_line("if (__pytra_exc_type != null) " + self.render_try_break(try_label))
 
     def emit_raise_propagation(self, try_label: str, return_stmt: str) -> None:
         self._require_exception_style("manual_exception_slot")
         if try_label != "":
-            self.emit_backend_line("break :" + try_label + ";")
+            self.emit_backend_line(self.render_try_break(try_label))
             return
         self.emit_backend_line(return_stmt)
 
@@ -381,6 +381,9 @@ class _ZigStmtCommonRenderer(CommonRenderer):
 
     def render_try_body_open(self, try_label: str) -> str:
         return try_label + ": {"
+
+    def render_try_break(self, try_label: str) -> str:
+        return "break :" + try_label + ";"
 
     def render_try_body_close(self, try_label: str) -> str:
         del try_label

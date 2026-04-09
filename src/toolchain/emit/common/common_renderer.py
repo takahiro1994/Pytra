@@ -544,6 +544,10 @@ class CommonRenderer:
         del stmt, try_label
         return None
 
+    def render_try_break(self, try_label: str) -> str:
+        del try_label
+        raise RuntimeError("common renderer requires try break hook for " + self.language)
+
     def render_try_body_open(self, try_label: str) -> str:
         del try_label
         return self._syntax_text("try", "try {")
