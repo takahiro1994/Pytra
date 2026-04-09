@@ -474,6 +474,12 @@ class CommonRenderer:
     def next_callable_invoke_names(self) -> tuple[str, str]:
         return (self._next_tmp("__call_blk"), self._next_tmp("__call_fn"))
 
+    def next_try_block_name(self) -> str:
+        return self._next_tmp("__try_blk")
+
+    def next_with_block_name(self) -> str:
+        return self._next_tmp("__with_blk")
+
     def render_exception_handler_guard_open(
         self,
         handler: dict[str, JsonVal],

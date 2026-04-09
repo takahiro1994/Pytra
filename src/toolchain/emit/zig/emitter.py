@@ -372,6 +372,28 @@ class _ZigStmtCommonRenderer(CommonRenderer):
     def emit_exception_dispatch_state_init(self, handled_name: str) -> None:
         self.emit_backend_line("var " + handled_name + " = false;")
 
+    def next_exception_dispatch_state_name(self) -> str:
+        name = "__pytra_handled_" + str(self.owner.tmp_seq)
+        self.owner.tmp_seq += 1
+        return name
+
+    def next_callable_invoke_names(self) -> tuple[str, str]:
+        blk = "__call_blk_" + str(self.owner.tmp_seq)
+        self.owner.tmp_seq += 1
+        fn = "__call_fn_" + str(self.owner.tmp_seq)
+        self.owner.tmp_seq += 1
+        return (blk, fn)
+
+    def next_try_block_name(self) -> str:
+        name = "__try_blk_" + str(self.owner.tmp_seq)
+        self.owner.tmp_seq += 1
+        return name
+
+    def next_with_block_name(self) -> str:
+        name = "__with_blk_" + str(self.owner.tmp_seq)
+        self.owner.tmp_seq += 1
+        return name
+
     def render_exception_handler_guard_open(
         self,
         handler: dict[str, Any],
@@ -2079,8 +2101,7 @@ class ZigNativeEmitter:
         handlers = handlers_any if isinstance(handlers_any, list) else []
         orelse = self._dict_list(stmt.get("orelse"))
         finalbody = self._dict_list(stmt.get("finalbody"))
-        try_blk = "__try_blk_" + str(self.tmp_seq)
-        self.tmp_seq += 1
+        try_blk = renderer.next_try_block_name()
         self._emit_line(renderer.render_try_body_open(try_blk))
         self.indent += 1
         self._try_depth += 1
@@ -2488,8 +2509,7 @@ class ZigNativeEmitter:
                 var_name = _safe_ident(var_name_any, "ctx") if isinstance(var_name_any, str) and var_name_any != "" else ""
                 ctx_name = "__with_ctx_" + str(self.tmp_seq)
                 self.tmp_seq += 1
-                with_blk = "__with_blk_" + str(self.tmp_seq)
-                self.tmp_seq += 1
+                with_blk = renderer.next_with_block_name()
                 ctx_expr = self._render_expr(context_expr)
                 self._emit_line("const " + ctx_name + " = " + ctx_expr + ";")
                 if var_name != "":
