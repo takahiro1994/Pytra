@@ -401,18 +401,18 @@ class _ZigStmtCommonRenderer(CommonRenderer):
         self._require_exception_style("manual_exception_slot")
         return super().render_inline_exception_state(exc_type_expr, exc_msg_expr, exc_line_expr)
 
-    def render_break_with_value(self, block_label: str, value_expr: str) -> str:
-        return "break :" + block_label + " " + value_expr + ";"
+    def render_labeled_block_open(self, block_label: str) -> str:
+        return block_label + ": {"
 
-    def render_try_body_open(self, try_label: str) -> str:
-        return try_label + ": {"
-
-    def render_try_break(self, try_label: str) -> str:
-        return "break :" + try_label + ";"
-
-    def render_try_body_close(self, try_label: str) -> str:
-        del try_label
+    def render_labeled_block_close(self, block_label: str) -> str:
+        del block_label
         return "}"
+
+    def render_break_to_label(self, block_label: str) -> str:
+        return "break :" + block_label + ";"
+
+    def render_break_to_label_value(self, block_label: str, value_expr: str) -> str:
+        return "break :" + block_label + " " + value_expr + ";"
 
     def emit_exception_handler_prelude(self, handler: dict[str, Any]) -> None:
         current_indent = self.owner.indent

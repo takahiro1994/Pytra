@@ -784,17 +784,30 @@ class CommonRenderer:
         del stmt, try_label
         return None
 
-    def render_try_break(self, try_label: str) -> str:
-        del try_label
-        raise RuntimeError("common renderer requires try break hook for " + self.language)
-
-    def render_try_body_open(self, try_label: str) -> str:
-        del try_label
+    def render_labeled_block_open(self, block_label: str) -> str:
+        del block_label
         return self._syntax_text("try", "try {")
 
-    def render_try_body_close(self, try_label: str) -> str:
-        del try_label
+    def render_labeled_block_close(self, block_label: str) -> str:
+        del block_label
         return self._syntax_text("block_close", "}")
+
+    def render_break_to_label(self, block_label: str) -> str:
+        del block_label
+        raise RuntimeError("common renderer requires label-break hook for " + self.language)
+
+    def render_break_to_label_value(self, block_label: str, value_expr: str) -> str:
+        del block_label, value_expr
+        raise RuntimeError("common renderer requires labeled break-value hook for " + self.language)
+
+    def render_try_break(self, try_label: str) -> str:
+        return self.render_break_to_label(try_label)
+
+    def render_try_body_open(self, try_label: str) -> str:
+        return self.render_labeled_block_open(try_label)
+
+    def render_try_body_close(self, try_label: str) -> str:
+        return self.render_labeled_block_close(try_label)
 
     def active_exception_slot_names(self) -> tuple[str, str, str]:
         return ("__pytra_exc_type", "__pytra_exc_msg", "__pytra_exc_line")
@@ -854,8 +867,7 @@ class CommonRenderer:
         )
 
     def render_break_with_value(self, block_label: str, value_expr: str) -> str:
-        del block_label, value_expr
-        raise RuntimeError("common renderer requires break-with-value hook for " + self.language)
+        return self.render_break_to_label_value(block_label, value_expr)
 
     def render_inline_exception_break(
         self,
