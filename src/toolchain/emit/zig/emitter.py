@@ -450,6 +450,42 @@ class _ZigStmtCommonRenderer(CommonRenderer):
         self.owner.tmp_seq += 1
         return name
 
+    def next_sum_names(self) -> tuple[str, str, str]:
+        blk = "__sum_blk_" + str(self.owner.tmp_seq)
+        self.owner.tmp_seq += 1
+        acc = "__sum_acc_" + str(self.owner.tmp_seq)
+        self.owner.tmp_seq += 1
+        item = "__sum_item_" + str(self.owner.tmp_seq)
+        self.owner.tmp_seq += 1
+        return (blk, acc, item)
+
+    def next_zip_names(self) -> tuple[str, str, str, str, str]:
+        blk = "__zip_blk_" + str(self.owner.tmp_seq)
+        self.owner.tmp_seq += 1
+        left = "__zip_left_" + str(self.owner.tmp_seq)
+        self.owner.tmp_seq += 1
+        right = "__zip_right_" + str(self.owner.tmp_seq)
+        self.owner.tmp_seq += 1
+        out = "__zip_out_" + str(self.owner.tmp_seq)
+        self.owner.tmp_seq += 1
+        idx = "__zip_i_" + str(self.owner.tmp_seq)
+        self.owner.tmp_seq += 1
+        return (blk, left, right, out, idx)
+
+    def next_splitext_names(self) -> tuple[str, str]:
+        blk = "__splitext_blk_" + str(self.owner.tmp_seq)
+        self.owner.tmp_seq += 1
+        tmp = "__splitext_tmp_" + str(self.owner.tmp_seq)
+        self.owner.tmp_seq += 1
+        return (blk, tmp)
+
+    def next_str_index_names(self) -> tuple[str, str]:
+        blk = "__str_index_blk_" + str(self.owner.tmp_seq)
+        self.owner.tmp_seq += 1
+        val = "__str_index_val_" + str(self.owner.tmp_seq)
+        self.owner.tmp_seq += 1
+        return (blk, val)
+
     def render_exception_handler_guard_open(
         self,
         handler: dict[str, Any],
@@ -4870,12 +4906,7 @@ class ZigNativeEmitter:
                             elem_t = self._zig_type(arg_t[5:-1].strip())
                             if elem_t in {"f64", "f32"}:
                                 acc_zero = "0.0"
-                        blk = "__sum_blk_" + str(self.tmp_seq)
-                        self.tmp_seq += 1
-                        acc_name = "__sum_acc_" + str(self.tmp_seq)
-                        self.tmp_seq += 1
-                        item_name = "__sum_item_" + str(self.tmp_seq)
-                        self.tmp_seq += 1
+                        blk, acc_name, item_name = _ZigStmtCommonRenderer(self).next_sum_names()
                         return (
                             _ZigStmtCommonRenderer(self).render_block_expr_open(blk)
                             + " var "
@@ -4922,16 +4953,7 @@ class ZigNativeEmitter:
                         call_t = self._get_expr_type(node)
                         if call_t.startswith("list[tuple[") and call_t.endswith("]]"):
                             tuple_type = self._zig_type(call_t[5:-1].strip())
-                        blk = "__zip_blk_" + str(self.tmp_seq)
-                        self.tmp_seq += 1
-                        left_name = "__zip_left_" + str(self.tmp_seq)
-                        self.tmp_seq += 1
-                        right_name = "__zip_right_" + str(self.tmp_seq)
-                        self.tmp_seq += 1
-                        out_name = "__zip_out_" + str(self.tmp_seq)
-                        self.tmp_seq += 1
-                        idx_name = "__zip_i_" + str(self.tmp_seq)
-                        self.tmp_seq += 1
+                        blk, left_name, right_name, out_name, idx_name = _ZigStmtCommonRenderer(self).next_zip_names()
                         return (
                             _ZigStmtCommonRenderer(self).render_block_expr_open(blk)
                             + " const "
@@ -5131,10 +5153,7 @@ class ZigNativeEmitter:
                 if attr == "isspace":
                     return "pytra.str_isspace(" + obj + ")"
                 if attr == "splitext" and len(arg_strs) > 0:
-                    blk = "__splitext_blk_" + str(self.tmp_seq)
-                    self.tmp_seq += 1
-                    tmp = "__splitext_tmp_" + str(self.tmp_seq)
-                    self.tmp_seq += 1
+                    blk, tmp = _ZigStmtCommonRenderer(self).next_splitext_names()
                     return (
                         _ZigStmtCommonRenderer(self).render_block_expr_open(blk)
                         + " const "
@@ -5180,10 +5199,7 @@ class ZigNativeEmitter:
                 if attr == "index" and len(arg_strs) > 0:
                     obj_type = self._lookup_expr_type(obj_node_for_attr)
                     if obj_type == "str":
-                        blk = "__str_index_blk_" + str(self.tmp_seq)
-                        self.tmp_seq += 1
-                        val_name = "__str_index_val_" + str(self.tmp_seq)
-                        self.tmp_seq += 1
+                        blk, val_name = _ZigStmtCommonRenderer(self).next_str_index_names()
                         renderer = _ZigStmtCommonRenderer(self)
                         return (
                             renderer.render_block_expr_open(blk)

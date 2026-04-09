@@ -516,6 +516,28 @@ class CommonRenderer:
     def next_tuple_target_name(self, prefix: str) -> str:
         return self._next_tmp(prefix)
 
+    def next_sum_names(self) -> tuple[str, str, str]:
+        return (
+            self._next_tmp("__sum_blk"),
+            self._next_tmp("__sum_acc"),
+            self._next_tmp("__sum_item"),
+        )
+
+    def next_zip_names(self) -> tuple[str, str, str, str, str]:
+        return (
+            self._next_tmp("__zip_blk"),
+            self._next_tmp("__zip_left"),
+            self._next_tmp("__zip_right"),
+            self._next_tmp("__zip_out"),
+            self._next_tmp("__zip_i"),
+        )
+
+    def next_splitext_names(self) -> tuple[str, str]:
+        return (self._next_tmp("__splitext_blk"), self._next_tmp("__splitext_tmp"))
+
+    def next_str_index_names(self) -> tuple[str, str]:
+        return (self._next_tmp("__str_index_blk"), self._next_tmp("__str_index_val"))
+
     def render_exception_handler_guard_open(
         self,
         handler: dict[str, JsonVal],
