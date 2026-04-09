@@ -5702,16 +5702,13 @@ def _emit_with(ctx: RsEmitContext, node: dict[str, JsonVal]) -> None:
                 renderer.emit_with_context_bind(var_rs, ctx_tmp, ctx_rs, True)
             else:
                 renderer.emit_with_context_bind(var_rs, ctx_tmp, ctx_rs, False)
-        enter_runtime_call = _str(item, "with_enter_runtime_call")
-        if enter_runtime_call != "":
-            _emit(ctx, _emit_expr(ctx, renderer.build_with_protocol_call(
-                enter_target_name,
-                enter_target_type,
-                "__enter__",
-                enter_runtime_call,
-                _str(item, "with_enter_runtime_symbol"),
-                enter_target_type,
-            )) + ";")
+        renderer.emit_with_enter_action(
+            enter_target_name,
+            enter_target_type,
+            _str(item, "with_enter_runtime_call"),
+            _str(item, "with_enter_runtime_symbol"),
+            enter_target_type,
+        )
         if ctx_rs.startswith("Rc<RefCell<"):
             renderer.emit_with_fallback_enter(ctx_tmp, ctx_rt)
         ctx_entries.append(renderer.build_with_entry(

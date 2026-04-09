@@ -1135,6 +1135,30 @@ class CommonRenderer:
         del target_name, target_type
         return None
 
+    def emit_with_enter_action(
+        self,
+        target_name: str,
+        target_type: str,
+        enter_runtime_call: str,
+        enter_runtime_symbol: str,
+        resolved_type: str,
+    ) -> None:
+        if enter_runtime_call == "":
+            return
+        self.emit_expr_stmt(
+            {
+                "kind": "Expr",
+                "value": self.build_with_protocol_call(
+                    target_name,
+                    target_type,
+                    "__enter__",
+                    enter_runtime_call,
+                    enter_runtime_symbol,
+                    resolved_type,
+                ),
+            }
+        )
+
     def emit_with_enter_binding(
         self,
         node: dict[str, JsonVal],
