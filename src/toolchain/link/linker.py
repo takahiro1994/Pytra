@@ -2002,6 +2002,10 @@ def link_modules(
     module_entries: list[dict[str, JsonVal]] = []
 
     copied_rows = _copy_doc_rows(copied_docs)
+    # Re-apply copy-elision annotations on the final linked rows as well.
+    # Earlier linker transforms can rewrite nodes after the first pass, so the
+    # final emission rows need their own annotation pass.
+    _annotate_copy_elision_safe_v1(copied_rows)
     for row in copied_rows:
         module = row[0]
         doc = row[1]

@@ -686,6 +686,15 @@ def _emit_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
     keywords = _list(node, "keywords")
     func_node = node.get("func")
 
+    meta = node.get("meta")
+    copy_elision_meta = meta.get("copy_elision_safe_v1") if isinstance(meta, dict) else None
+    copy_elision_safe = (
+        isinstance(copy_elision_meta, dict)
+        and copy_elision_meta.get("schema_version") == 1
+        and copy_elision_meta.get("operation") == "bytes_from_bytearray"
+        and len(arg_strs) >= 1
+    )
+
     if (
         (runtime_call == "py_to_string" or resolved_rt_call == "py_to_string" or _str(node, "builtin_name") == "str")
         and len(args) >= 1
@@ -704,6 +713,8 @@ def _emit_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
             return "__pytra_bytearray(" + arg_strs[0] + ")"
         return "__pytra_bytearray()"
     if semantic_tag == "core.bytes_ctor":
+        if copy_elision_safe:
+            return "__pytra_bytes_alias(" + arg_strs[0] + ")"
         if len(arg_strs) >= 1:
             return "__pytra_bytes(" + arg_strs[0] + ")"
         return "__pytra_bytes()"
@@ -750,15 +761,6 @@ def _emit_call(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
         mapped = ctx.mapping.calls.get(resolved_rt_call, "")
         if mapped != "":
             call_name = mapped
-
-    meta = node.get("meta")
-    copy_elision_meta = meta.get("copy_elision_safe_v1") if isinstance(meta, dict) else None
-    copy_elision_safe = (
-        isinstance(copy_elision_meta, dict)
-        and copy_elision_meta.get("schema_version") == 1
-        and copy_elision_meta.get("operation") == "bytes_from_bytearray"
-        and len(arg_strs) >= 1
-    )
 
     if (
         (
