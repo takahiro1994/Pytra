@@ -1144,6 +1144,10 @@ class _RsStmtCommonRenderer(CommonRenderer):
     def with_source_uses_exit_fallback(self, source_type: str) -> bool:
         return source_type.startswith("Rc<RefCell<")
 
+    def with_item_bound_target_name(self, item: dict[str, JsonVal]) -> str:
+        bound_name = self.with_item_bound_name(item)
+        return _rs_var_name(self.ctx, bound_name) if bound_name != "" else ""
+
     def emit_backend_line(self, text: str) -> None:
         _emit(self.ctx, text)
 
@@ -5696,7 +5700,7 @@ def _emit_with(ctx: RsEmitContext, node: dict[str, JsonVal]) -> None:
         ctx_rs = _rs_type_for_context(ctx, ctx_rt) if ctx_rt != "" else ""
         ctx_tmp = renderer.emit_with_context_capture(ctx_expr, ctx_rs)
         var_name = renderer.with_item_bound_name(item)
-        var_rs = _rs_var_name(ctx, var_name) if var_name != "" else ""
+        var_rs = renderer.with_item_bound_target_name(item)
         enter_target_name = renderer.with_item_enter_target_name(item, ctx_tmp)
         enter_target_type = renderer.with_item_enter_target_type(item, ctx_rt)
         if var_name != "":

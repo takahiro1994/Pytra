@@ -1300,6 +1300,9 @@ class CommonRenderer:
         if enter_target_type != "":
             type_map[bound_name] = enter_target_type
 
+    def with_item_bound_target_name(self, item: dict[str, JsonVal]) -> str:
+        return self.with_item_bound_name(item)
+
     def select_with_exit_target(self, ctx_name: str, bound_name: str) -> str:
         return bound_name if bound_name != "" else ctx_name
 
