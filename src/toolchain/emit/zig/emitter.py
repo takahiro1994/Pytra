@@ -4818,11 +4818,8 @@ class ZigNativeEmitter:
                             + acc_name
                             + " += "
                             + item_name
-                            + "; } break :"
-                            + blk
-                            + " "
-                            + acc_name
                             + "; }"
+                            + _ZigStmtCommonRenderer(self).render_block_expr_close(blk, acc_name)
                         )
                     return "0"
                 if fname == "zip":
@@ -4895,11 +4892,8 @@ class ZigNativeEmitter:
                             + right_name
                             + "["
                             + idx_name
-                            + "] }); } break :"
-                            + blk
-                            + " "
-                            + out_name
-                            + "; }"
+                            + "] }); }"
+                            + _ZigStmtCommonRenderer(self).render_block_expr_close(blk, out_name)
                         )
                 if fname == "min":
                     if len(arg_strs) >= 2:
@@ -5073,13 +5067,15 @@ class ZigNativeEmitter:
                         + obj
                         + ".splitext("
                         + arg_strs[0]
-                        + "); break :"
-                        + blk
-                        + " .{ ._0 = "
-                        + tmp
-                        + "._0, ._1 = "
-                        + tmp
-                        + "._1 }; }"
+                        + ");"
+                        + _ZigStmtCommonRenderer(self).render_block_expr_close(
+                            blk,
+                            ".{ ._0 = "
+                            + tmp
+                            + "._0, ._1 = "
+                            + tmp
+                            + "._1 }",
+                        )
                     )
                 if attr == "upper":
                     return "pytra.str_upper(" + obj + ")"
@@ -5364,14 +5360,24 @@ class ZigNativeEmitter:
         if self._is_optional_callable_type(fn_type):
             local_init = fn_expr + " orelse unreachable"
         return (
-            blk_label + ": { const " + fn_local + " = " + local_init + "; break :" + blk_label + " switch (@typeInfo(@TypeOf(" + fn_local + "))) { "
-            + ".@\"struct\", .@\"union\", .@\"enum\", .@\"opaque\" => if (@hasDecl(@TypeOf(" + fn_local + "), \"call\")) "
-            + method_call.replace(fn_expr, fn_local, 1)
-            + " else "
-            + direct_call.replace(fn_expr, fn_local, 1)
-            + ", else => "
-            + direct_call.replace(fn_expr, fn_local, 1)
-            + ", }; }"
+            _ZigStmtCommonRenderer(self).render_block_expr_open(blk_label)
+            + " const "
+            + fn_local
+            + " = "
+            + local_init
+            + "; "
+            + _ZigStmtCommonRenderer(self).render_break_with_value(
+                blk_label,
+                "switch (@typeInfo(@TypeOf(" + fn_local + "))) { "
+                + ".@\"struct\", .@\"union\", .@\"enum\", .@\"opaque\" => if (@hasDecl(@TypeOf(" + fn_local + "), \"call\")) "
+                + method_call.replace(fn_expr, fn_local, 1)
+                + " else "
+                + direct_call.replace(fn_expr, fn_local, 1)
+                + ", else => "
+                + direct_call.replace(fn_expr, fn_local, 1)
+                + ", }",
+            )
+            + " }"
         )
 
     def _coerce_call_args_for_signature(self, arg_strs: list[str], args: list[Any], fn_type: str, func_any: Any = None) -> list[str]:
