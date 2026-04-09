@@ -37,8 +37,8 @@
 2. [x] [ID: P0-ZIG-CREXC-S2] Zig の `with` lowering を CommonRenderer 正本へ戻し、`with_statement` / `with_context_manager` parity を維持する
 3. [x] [ID: P0-ZIG-CREXC-S3] CommonRenderer に exception strategy hook を追加し、Rust / Zig の `try` / `raise` を hook 実装へ分離する
 4. [ ] [ID: P0-ZIG-CREXC-S4] Rust / Zig の `exception_types` / `try_raise` / `exception_bare_reraise` parity を維持したまま custom lowering を縮小する
-   進捗: `with` の alias hoist / file lane は CommonRenderer hook 化済み。Rust は `Try` statement entry と `catch_unwind` / handler dispatch の骨格が CommonRenderer entry 側へ移動済み。Zig は handler dispatch loop、`try` body post-stmt propagation、body/orelse wrapper、bare re-raise restore、raise propagation、raise state writes を hook 化済み。
-   残件: Zig の exception slot モデルそのものと block-label protocol、Rust / Zig の profile (`lowering.exception_style`) 連携。
+   進捗: `with` の alias hoist / file lane は CommonRenderer hook 化済み。Rust は `Try` statement entry と `catch_unwind` / handler dispatch の骨格が CommonRenderer entry 側へ移動済み。Zig は handler dispatch loop、`try`/`with` body post-stmt propagation、body/orelse wrapper、bare re-raise restore、raise propagation、raise state writes、handler capture を hook 化済み。`lowering.exception_style` も `rs/zig` profile に反映済み。
+   残件: Zig の global exception slot 宣言と slot 名そのものの抽象化、expression/helper 内に散っている inline exception escape の共通化。
 
 ### P0-ZIG-TOOLCHAIN-LEGACY: toolchain_ 依存を解消する
 
