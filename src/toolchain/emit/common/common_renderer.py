@@ -600,6 +600,11 @@ class CommonRenderer:
     def next_with_context_name(self) -> str:
         return self._next_tmp("__with_ctx")
 
+    def emit_with_context_capture(self, source_name: str, source_type: str) -> str:
+        ctx_name = self.next_with_context_name()
+        self.emit_with_context_bind(ctx_name, source_name, source_type, True)
+        return ctx_name
+
     def next_bounds_checked_index_names(self) -> tuple[str, str, str]:
         return (
             self._next_tmp("__idx_blk"),

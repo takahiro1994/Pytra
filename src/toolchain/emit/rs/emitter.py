@@ -5688,8 +5688,7 @@ def _emit_with(ctx: RsEmitContext, node: dict[str, JsonVal]) -> None:
         ctx_expr = _emit_expr(ctx, context_expr)
         ctx_rt = _actual_type_in_context(ctx, context_expr)
         ctx_rs = _rs_type_for_context(ctx, ctx_rt) if ctx_rt != "" else ""
-        ctx_tmp = renderer.next_with_context_name()
-        renderer.emit_with_context_bind(ctx_tmp, ctx_expr, ctx_rs, True)
+        ctx_tmp = renderer.emit_with_context_capture(ctx_expr, ctx_rs)
         var_name = renderer.with_item_bound_name(item)
         var_rs = _rs_var_name(ctx, var_name) if var_name != "" else ""
         enter_target_name = renderer.with_item_enter_target_name(item, ctx_tmp)
