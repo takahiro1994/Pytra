@@ -698,6 +698,24 @@ class ZigNativeEmitter:
             name for name, mapped in self._runtime_mapping.types.items() if mapped == "pytra.PyObject"
         }
 
+    def _make_stmt_renderer(self) -> _ZigStmtCommonRenderer:
+        renderer = _ZigStmtCommonRenderer(self)
+        renderer.state.lines = self.lines
+        renderer.state.indent_level = self.indent
+        renderer.state.tmp_counter = self.tmp_seq
+        return renderer
+
+    def _sync_from_stmt_renderer(self, renderer: _ZigStmtCommonRenderer) -> None:
+        self.indent = renderer.state.indent_level
+        self.tmp_seq = renderer.state.tmp_counter
+
+    def _run_stmt_renderer(self, method_name: str, *args: Any) -> _ZigStmtCommonRenderer:
+        renderer = self._make_stmt_renderer()
+        method = getattr(renderer, method_name)
+        method(*args)
+        self._sync_from_stmt_renderer(renderer)
+        return renderer
+
     def _union_storage_zig(self) -> str:
         return "*pytra.UnionVal"
 
@@ -2431,24 +2449,13 @@ class ZigNativeEmitter:
                 self._emit_line("_ = " + expr_text + ";")
             return
         if kind == "Raise":
-            renderer = _ZigStmtCommonRenderer(self)
-            renderer.state.lines = self.lines
-            renderer.state.indent_level = self.indent
-            renderer.state.tmp_counter = self.tmp_seq
-            renderer.emit_raise_stmt(stmt)
-            self.indent = renderer.state.indent_level
-            self.tmp_seq = renderer.state.tmp_counter
+            self._run_stmt_renderer("emit_raise_stmt", stmt)
             return
         if kind == "Try":
-            renderer = _ZigStmtCommonRenderer(self)
-            renderer.state.lines = self.lines
-            renderer.state.indent_level = self.indent
-            renderer.state.tmp_counter = self.tmp_seq
-            renderer.emit_try_stmt(stmt)
-            self.indent = renderer.state.indent_level
-            self.tmp_seq = renderer.state.tmp_counter
+            self._run_stmt_renderer("emit_try_stmt", stmt)
             return
         if kind == "With":
+            renderer = self._make_stmt_renderer()
             items = stmt.get("items")
             if isinstance(items, list) and len(items) > 1:
                 context_expr = stmt.get("context_expr")
@@ -2526,13 +2533,8 @@ class ZigNativeEmitter:
                     renderer.emit_with_fallback_exit(ctx_name, enter_type)
                 self.indent = renderer.state.indent_level
             else:
-                renderer = _ZigStmtCommonRenderer(self)
-                renderer.state.lines = self.lines
-                renderer.state.indent_level = self.indent
-                renderer.state.tmp_counter = self.tmp_seq
                 renderer.emit_with_stmt(stmt)
-                self.indent = renderer.state.indent_level
-                self.tmp_seq = renderer.state.tmp_counter
+            self._sync_from_stmt_renderer(renderer)
             return
         if kind == "If":
             self._emit_if(stmt)
