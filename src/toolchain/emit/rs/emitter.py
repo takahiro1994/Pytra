@@ -1138,6 +1138,12 @@ class _RsStmtCommonRenderer(CommonRenderer):
         suffix = ".clone()" if source_type.startswith("Rc<RefCell<") else ""
         _emit(self.ctx, prefix + target_name + " = " + source_name + suffix + ";")
 
+    def with_source_uses_enter_fallback(self, source_type: str) -> bool:
+        return source_type.startswith("Rc<RefCell<")
+
+    def with_source_uses_exit_fallback(self, source_type: str) -> bool:
+        return source_type.startswith("Rc<RefCell<")
+
     def emit_backend_line(self, text: str) -> None:
         _emit(self.ctx, text)
 
@@ -5709,7 +5715,7 @@ def _emit_with(ctx: RsEmitContext, node: dict[str, JsonVal]) -> None:
         renderer.emit_with_enter_fallback_action(
             ctx_tmp,
             ctx_rt,
-            ctx_rs.startswith("Rc<RefCell<"),
+            renderer.with_source_uses_enter_fallback(ctx_rs),
         )
         ctx_entries.append(renderer.build_with_entry(
             ctx_tmp,
@@ -5733,7 +5739,7 @@ def _emit_with(ctx: RsEmitContext, node: dict[str, JsonVal]) -> None:
             target_type,
             exit_runtime_call,
             exit_runtime_symbol,
-            ctx_rs.startswith("Rc<RefCell<"),
+            renderer.with_source_uses_exit_fallback(ctx_rs),
         )
     _emit(ctx, "if let Err(" + with_err + ") = " + with_result + " {")
     ctx.indent_level += 1

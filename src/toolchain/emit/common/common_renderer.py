@@ -1201,6 +1201,14 @@ class CommonRenderer:
         del target_name, source_name, source_type, declare
         return None
 
+    def with_source_uses_enter_fallback(self, source_type: str) -> bool:
+        del source_type
+        return False
+
+    def with_source_uses_exit_fallback(self, source_type: str) -> bool:
+        del source_type
+        return False
+
     def emit_with_exit_action(
         self,
         target_name: str,
