@@ -5356,10 +5356,7 @@ class ZigNativeEmitter:
         return fn_expr + "(" + ", ".join(call_arg_strs) + ")"
 
     def _render_callable_invoke(self, fn_expr: str, arg_strs: list[str], fn_type: str = "") -> str:
-        blk_label = "__call_blk_" + str(self.tmp_seq)
-        self.tmp_seq += 1
-        fn_local = "__call_fn_" + str(self.tmp_seq)
-        self.tmp_seq += 1
+        blk_label, fn_local = _ZigStmtCommonRenderer(self).next_callable_invoke_names()
         call_args = ", ".join(arg_strs)
         if call_args == "":
             direct_call = fn_expr + "()"

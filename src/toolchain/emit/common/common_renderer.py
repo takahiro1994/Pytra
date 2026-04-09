@@ -471,6 +471,9 @@ class CommonRenderer:
     def next_exception_dispatch_state_name(self) -> str:
         return self._next_tmp("__pytra_handled")
 
+    def next_callable_invoke_names(self) -> tuple[str, str]:
+        return (self._next_tmp("__call_blk"), self._next_tmp("__call_fn"))
+
     def render_exception_handler_guard_open(
         self,
         handler: dict[str, JsonVal],
