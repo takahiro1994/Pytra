@@ -331,6 +331,13 @@ class CommonRenderer:
         )
 
     def _next_tmp(self, prefix: str) -> str:
+        owner = getattr(self, "owner", None)
+        owner_seq = getattr(owner, "tmp_seq", None)
+        if isinstance(owner_seq, int):
+            name = prefix + "_" + str(owner_seq)
+            owner.tmp_seq += 1
+            self.state.tmp_counter = owner.tmp_seq
+            return name
         self.state.tmp_counter += 1
         return prefix + "_" + str(self.state.tmp_counter)
 

@@ -357,21 +357,6 @@ class _ZigStmtCommonRenderer(CommonRenderer):
         self.owner.tmp_seq += 1
         return (blk, fn)
 
-    def next_try_block_name(self) -> str:
-        name = "__try_blk_" + str(self.owner.tmp_seq)
-        self.owner.tmp_seq += 1
-        return name
-
-    def next_with_block_name(self) -> str:
-        name = "__with_blk_" + str(self.owner.tmp_seq)
-        self.owner.tmp_seq += 1
-        return name
-
-    def next_with_context_name(self) -> str:
-        name = "__with_ctx_" + str(self.owner.tmp_seq)
-        self.owner.tmp_seq += 1
-        return name
-
     def next_bounds_checked_index_names(self) -> tuple[str, str, str]:
         blk = "__idx_blk_" + str(self.owner.tmp_seq)
         self.owner.tmp_seq += 1
