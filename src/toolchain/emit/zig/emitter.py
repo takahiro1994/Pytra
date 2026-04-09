@@ -5664,8 +5664,7 @@ class ZigNativeEmitter:
         self._local_type_stack.pop()
         blk, out_name = _ZigStmtCommonRenderer(self).next_set_comp_names()
         parts: list[str] = []
-        parts.append(_ZigStmtCommonRenderer(self).render_block_expr_open(blk))
-        parts.append(" const " + out_name + " = pytra.make_list(" + elem_type + ");")
+        parts.append("const " + out_name + " = pytra.make_list(" + elem_type + ");")
         parts.append(" for (" + iter_expr + ") |" + target_name + "| {")
         for line in unpack_lines:
             parts.append("  " + line)
@@ -5675,8 +5674,7 @@ class ZigNativeEmitter:
         if loop_cond != "true":
             parts.append("  }")
         parts.append(" }")
-        parts.append(_ZigStmtCommonRenderer(self).render_block_expr_close(blk, out_name))
-        return "".join(parts)
+        return _ZigStmtCommonRenderer(self).render_simple_block_expr(blk, "".join(parts), out_name)
 
     def _render_list_comp(self, node: dict[str, Any]) -> str:
         gens_any = node.get("generators")
@@ -5711,8 +5709,7 @@ class ZigNativeEmitter:
         self._local_type_stack.pop()
         blk, out_name = _ZigStmtCommonRenderer(self).next_list_comp_names()
         parts: list[str] = []
-        parts.append(_ZigStmtCommonRenderer(self).render_block_expr_open(blk))
-        parts.append(" const " + out_name + " = pytra.make_list(" + result_elem_type + ");")
+        parts.append("const " + out_name + " = pytra.make_list(" + result_elem_type + ");")
         parts.append(" for (" + iter_expr + ") |" + target_name + "| {")
         for line in unpack_lines:
             parts.append("  " + line)
@@ -5722,8 +5719,7 @@ class ZigNativeEmitter:
         if loop_cond != "true":
             parts.append("  }")
         parts.append(" }")
-        parts.append(_ZigStmtCommonRenderer(self).render_block_expr_close(blk, out_name))
-        return "".join(parts)
+        return _ZigStmtCommonRenderer(self).render_simple_block_expr(blk, "".join(parts), out_name)
 
     def _comp_iter_parts(self, iter_node: dict[str, Any], capture_name: str, target: dict[str, Any]) -> tuple[str, str, list[str], dict[str, str]]:
         iter_expr = self._render_expr(iter_node)
@@ -5793,8 +5789,7 @@ class ZigNativeEmitter:
             key_expr = "pytra.to_str(" + key_expr + ")"
         blk = _ZigStmtCommonRenderer(self).next_dict_comp_name()
         parts: list[str] = []
-        parts.append(_ZigStmtCommonRenderer(self).render_block_expr_open(blk))
-        parts.append(" var __dc = pytra.make_str_dict(" + val_zig + ");")
+        parts.append("var __dc = pytra.make_str_dict(" + val_zig + ");")
         parts.append(" for (pytra.list_items(" + iter_expr + ", " + iter_elem_type + ")) |" + target_name + "| {")
         if loop_cond != "true":
             parts.append("  if (" + loop_cond + ") {")
@@ -5802,8 +5797,7 @@ class ZigNativeEmitter:
         if loop_cond != "true":
             parts.append("  }")
         parts.append(" }")
-        parts.append(_ZigStmtCommonRenderer(self).render_block_expr_close(blk, "__dc"))
-        return "".join(parts)
+        return _ZigStmtCommonRenderer(self).render_simple_block_expr(blk, "".join(parts), "__dc")
 
     def _normalize_type(self, t: str) -> str:
         """Python 型名を内部正規表現へ変換する。"""
