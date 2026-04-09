@@ -1263,6 +1263,12 @@ class CommonRenderer:
         item_type = self._str(item, "with_enter_type")
         return item_type if item_type != "" else fallback_type
 
+    def with_item_exit_runtime_call(self, item: dict[str, JsonVal]) -> str:
+        return self._str(item, "with_exit_runtime_call")
+
+    def with_item_exit_runtime_symbol(self, item: dict[str, JsonVal]) -> str:
+        return self._str(item, "with_exit_runtime_symbol")
+
     def select_with_exit_target(self, ctx_name: str, bound_name: str) -> str:
         return bound_name if bound_name != "" else ctx_name
 

@@ -5719,8 +5719,8 @@ def _emit_with(ctx: RsEmitContext, node: dict[str, JsonVal]) -> None:
             var_rs,
             ctx_rs,
             enter_target_type,
-            _str(item, "with_exit_runtime_call"),
-            _str(item, "with_exit_runtime_symbol"),
+            renderer.with_item_exit_runtime_call(item),
+            renderer.with_item_exit_runtime_symbol(item),
         ))
 
     ctx.temp_counter = renderer.state.tmp_counter
