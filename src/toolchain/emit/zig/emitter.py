@@ -4248,12 +4248,10 @@ class ZigNativeEmitter:
                         return "pytra.make_list(" + zig_elem + ")"
                     blk_label, list_name = _ZigStmtCommonRenderer(self).next_tuple_list_literal_names()
                     parts: list[str] = []
-                    parts.append(_ZigStmtCommonRenderer(self).render_block_expr_open(blk_label))
-                    parts.append(" const " + list_name + " = pytra.make_list(" + zig_elem + ");")
+                    parts.append("const " + list_name + " = pytra.make_list(" + zig_elem + ");")
                     for item in items:
                         parts.append(" pytra.list_append(" + list_name + ", " + zig_elem + ", " + item + ");")
-                    parts.append(_ZigStmtCommonRenderer(self).render_block_expr_close(blk_label, list_name))
-                    return "".join(parts)
+                    return _ZigStmtCommonRenderer(self).render_simple_block_expr(blk_label, "".join(parts), list_name)
                 return "pytra.list_from(" + zig_elem + ", &[_]" + zig_elem + "{ " + ", ".join(items) + " })"
             if len(items) == 0:
                 return "pytra.list_from(i64, &[_]i64{})"
@@ -4930,9 +4928,9 @@ class ZigNativeEmitter:
                             if elem_t in {"f64", "f32"}:
                                 acc_zero = "0.0"
                         blk, acc_name, item_name = _ZigStmtCommonRenderer(self).next_sum_names()
-                        return (
-                            _ZigStmtCommonRenderer(self).render_block_expr_open(blk)
-                            + " var "
+                        return _ZigStmtCommonRenderer(self).render_simple_block_expr(
+                            blk,
+                            "var "
                             + acc_name
                             + ": "
                             + elem_t
@@ -4948,8 +4946,8 @@ class ZigNativeEmitter:
                             + acc_name
                             + " += "
                             + item_name
-                            + "; }"
-                            + _ZigStmtCommonRenderer(self).render_block_expr_close(blk, acc_name)
+                            + "; }",
+                            acc_name,
                         )
                     return "0"
                 if fname == "zip":
@@ -4977,9 +4975,9 @@ class ZigNativeEmitter:
                         if call_t.startswith("list[tuple[") and call_t.endswith("]]"):
                             tuple_type = self._zig_type(call_t[5:-1].strip())
                         blk, left_name, right_name, out_name, idx_name = _ZigStmtCommonRenderer(self).next_zip_names()
-                        return (
-                            _ZigStmtCommonRenderer(self).render_block_expr_open(blk)
-                            + " const "
+                        return _ZigStmtCommonRenderer(self).render_simple_block_expr(
+                            blk,
+                            "const "
                             + left_name
                             + " = "
                             + left_items
@@ -5013,8 +5011,8 @@ class ZigNativeEmitter:
                             + right_name
                             + "["
                             + idx_name
-                            + "] }); }"
-                            + _ZigStmtCommonRenderer(self).render_block_expr_close(blk, out_name)
+                            + "] }); }",
+                            out_name,
                         )
                 if fname == "min":
                     if len(arg_strs) >= 2:
@@ -5177,23 +5175,10 @@ class ZigNativeEmitter:
                     return "pytra.str_isspace(" + obj + ")"
                 if attr == "splitext" and len(arg_strs) > 0:
                     blk, tmp = _ZigStmtCommonRenderer(self).next_splitext_names()
-                    return (
-                        _ZigStmtCommonRenderer(self).render_block_expr_open(blk)
-                        + " const "
-                        + tmp
-                        + " = "
-                        + obj
-                        + ".splitext("
-                        + arg_strs[0]
-                        + ");"
-                        + _ZigStmtCommonRenderer(self).render_block_expr_close(
-                            blk,
-                            ".{ ._0 = "
-                            + tmp
-                            + "._0, ._1 = "
-                            + tmp
-                            + "._1 }",
-                        )
+                    return _ZigStmtCommonRenderer(self).render_simple_block_expr(
+                        blk,
+                        "const " + tmp + " = " + obj + ".splitext(" + arg_strs[0] + ");",
+                        ".{ ._0 = " + tmp + "._0, ._1 = " + tmp + "._1 }",
                     )
                 if attr == "upper":
                     return "pytra.str_upper(" + obj + ")"
