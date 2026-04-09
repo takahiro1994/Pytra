@@ -1157,21 +1157,6 @@ class _RsStmtCommonRenderer(CommonRenderer):
         ctx_tmp = self.emit_with_context_capture(ctx_expr, ctx_rs)
         return (ctx_tmp, ctx_rt, ctx_rs)
 
-    def emit_with_items(
-        self,
-        items: list[JsonVal],
-        declared_names: set[str],
-        type_map: dict[str, str],
-    ) -> list[tuple[str, str, str, str, str, str]]:
-        entries: list[tuple[str, str, str, str, str, str]] = []
-        for item in items:
-            if not isinstance(item, dict):
-                continue
-            entry = self.emit_with_item(item, declared_names, type_map)
-            if entry is not None:
-                entries.append(entry)
-        return entries
-
     def emit_with_hoisted_bindings(
         self,
         body: list[JsonVal],
@@ -1204,24 +1189,6 @@ class _RsStmtCommonRenderer(CommonRenderer):
         _emit(self.ctx, self.render_resume_unwind(with_err))
         self.ctx.indent_level -= 1
         _emit(self.ctx, "}")
-
-    def emit_custom_with_stmt(
-        self,
-        node: dict[str, JsonVal],
-        items: list[JsonVal],
-        body: list[JsonVal],
-    ) -> None:
-        del node
-        self.ctx.indent_level = self.state.indent_level
-        with_result = self.next_with_result_name()
-        with_err = self.next_with_error_name()
-        self.emit_with_hoisted_bindings(body, self.ctx.declared_vars, self.ctx.var_types)
-        ctx_entries = self.emit_with_items(items, self.ctx.declared_vars, self.ctx.var_types)
-        self.ctx.temp_counter = self.state.tmp_counter
-        self.emit_with_capture_body(with_result, body)
-        self.emit_with_exit_actions(ctx_entries)
-        self.emit_with_resume_unwind(with_result, with_err)
-        self.state.indent_level = self.ctx.indent_level
 
     def emit_backend_line(self, text: str) -> None:
         _emit(self.ctx, text)
@@ -5651,7 +5618,8 @@ def _emit_stmt(ctx: RsEmitContext, node: JsonVal) -> None:
             body = _list(node, "body")
             if len(items) == 0:
                 items = [node]
-            renderer.emit_custom_with_stmt(node, items, body)
+            renderer.emit_custom_with_stmt(node, items, body, ctx.declared_vars, ctx.var_types)
+            ctx.temp_counter = renderer.state.tmp_counter
         else:
             renderer.emit_stmt(node)
         ctx.indent_level = renderer.state.indent_level

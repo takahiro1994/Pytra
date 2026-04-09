@@ -1349,6 +1349,21 @@ class CommonRenderer:
             self.with_item_exit_runtime_symbol(item),
         )
 
+    def emit_with_items(
+        self,
+        items: list[JsonVal],
+        declared_names: set[str],
+        type_map: dict[str, str],
+    ) -> list[tuple[str, str, str, str, str, str]]:
+        entries: list[tuple[str, str, str, str, str, str]] = []
+        for item in items:
+            if not isinstance(item, dict):
+                continue
+            entry = self.emit_with_item(item, declared_names, type_map)
+            if entry is not None:
+                entries.append(entry)
+        return entries
+
     def emit_with_exit_actions(
         self,
         entries: list[tuple[str, str, str, str, str, str]],
@@ -1362,6 +1377,40 @@ class CommonRenderer:
                 exit_runtime_symbol,
                 self.with_source_uses_exit_fallback(source_type),
             )
+
+    def emit_with_hoisted_bindings(
+        self,
+        body: list[JsonVal],
+        declared_names: set[str],
+        type_map: dict[str, str],
+    ) -> None:
+        del body, declared_names, type_map
+        raise RuntimeError("common renderer requires hoisted with binding hook for " + self.language)
+
+    def emit_with_capture_body(self, with_result: str, body: list[JsonVal]) -> None:
+        del with_result, body
+        raise RuntimeError("common renderer requires with capture body hook for " + self.language)
+
+    def emit_with_resume_unwind(self, with_result: str, with_err: str) -> None:
+        del with_result, with_err
+        raise RuntimeError("common renderer requires with resume unwind hook for " + self.language)
+
+    def emit_custom_with_stmt(
+        self,
+        node: dict[str, JsonVal],
+        items: list[JsonVal],
+        body: list[JsonVal],
+        declared_names: set[str],
+        type_map: dict[str, str],
+    ) -> None:
+        del node
+        with_result = self.next_with_result_name()
+        with_err = self.next_with_error_name()
+        self.emit_with_hoisted_bindings(body, declared_names, type_map)
+        entries = self.emit_with_items(items, declared_names, type_map)
+        self.emit_with_capture_body(with_result, body)
+        self.emit_with_exit_actions(entries)
+        self.emit_with_resume_unwind(with_result, with_err)
 
     def with_item_bound_name(self, item: dict[str, JsonVal]) -> str:
         opt_vars = item.get("optional_vars")
