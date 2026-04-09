@@ -1278,6 +1278,20 @@ class CommonRenderer:
         bound_name = self.with_item_bound_name(item)
         return bound_name != "" and bound_name not in declared_names
 
+    def register_with_bound_name(
+        self,
+        item: dict[str, JsonVal],
+        declared_names: set[str],
+        type_map: dict[str, str],
+        enter_target_type: str,
+    ) -> None:
+        bound_name = self.with_item_bound_name(item)
+        if bound_name == "" or bound_name in declared_names:
+            return
+        declared_names.add(bound_name)
+        if enter_target_type != "":
+            type_map[bound_name] = enter_target_type
+
     def select_with_exit_target(self, ctx_name: str, bound_name: str) -> str:
         return bound_name if bound_name != "" else ctx_name
 

@@ -5695,9 +5695,7 @@ def _emit_with(ctx: RsEmitContext, node: dict[str, JsonVal]) -> None:
         enter_target_type = renderer.with_item_enter_target_type(item, ctx_rt)
         if var_name != "":
             if renderer.with_item_declares_bound_name(item, ctx.declared_vars):
-                ctx.declared_vars.add(var_name)
-                if enter_target_type != "":
-                    ctx.var_types[var_name] = enter_target_type
+                renderer.register_with_bound_name(item, ctx.declared_vars, ctx.var_types, enter_target_type)
                 renderer.emit_with_context_bind(var_rs, ctx_tmp, ctx_rs, True)
             else:
                 renderer.emit_with_context_bind(var_rs, ctx_tmp, ctx_rs, False)
