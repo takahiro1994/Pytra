@@ -573,9 +573,12 @@ class CommonRenderer:
     def render_exception_dispatch_close(self) -> str:
         return "}"
 
-    def emit_exception_dispatch_state_init(self, handled_name: str) -> None:
+    def render_exception_dispatch_state_init_stmt(self, handled_name: str) -> str:
         del handled_name
-        return None
+        raise RuntimeError("common renderer requires exception dispatch state init stmt for " + self.language)
+
+    def emit_exception_dispatch_state_init(self, handled_name: str) -> None:
+        self.emit_backend_line(self.render_exception_dispatch_state_init_stmt(handled_name))
 
     def next_exception_dispatch_state_name(self) -> str:
         return self._next_tmp("__pytra_handled")
@@ -729,9 +732,12 @@ class CommonRenderer:
                 other_handlers.append(handler)
         return user_handlers, other_handlers
 
-    def emit_exception_handler_mark_handled(self, handled_name: str) -> None:
+    def render_exception_handler_mark_handled_stmt(self, handled_name: str) -> str:
         del handled_name
-        return None
+        raise RuntimeError("common renderer requires exception handled stmt for " + self.language)
+
+    def emit_exception_handler_mark_handled(self, handled_name: str) -> None:
+        self.emit_backend_line(self.render_exception_handler_mark_handled_stmt(handled_name))
 
     def emit_exception_dispatch_handlers(
         self,

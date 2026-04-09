@@ -342,8 +342,8 @@ class _ZigStmtCommonRenderer(CommonRenderer):
     def render_exception_dispatch_condition(self, caught_type_expr: str) -> str:
         return caught_type_expr + " != null"
 
-    def emit_exception_dispatch_state_init(self, handled_name: str) -> None:
-        self.emit_backend_line("var " + handled_name + " = false;")
+    def render_exception_dispatch_state_init_stmt(self, handled_name: str) -> str:
+        return "var " + handled_name + " = false;"
 
     def render_exception_handler_guard_condition(
         self,
@@ -354,8 +354,8 @@ class _ZigStmtCommonRenderer(CommonRenderer):
         cond = self.render_exception_match_condition(handler, caught_type_expr)
         return "!" + handled_name + " and (" + cond + ")"
 
-    def emit_exception_handler_mark_handled(self, handled_name: str) -> None:
-        self.emit_backend_line(handled_name + " = true;")
+    def render_exception_handler_mark_handled_stmt(self, handled_name: str) -> str:
+        return handled_name + " = true;"
 
     def emit_try_body_post_stmt(self, stmt: dict[str, Any], try_label: str) -> None:
         self._require_exception_style("manual_exception_slot")
