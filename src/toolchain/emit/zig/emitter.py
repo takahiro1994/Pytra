@@ -357,15 +357,11 @@ class _ZigStmtCommonRenderer(CommonRenderer):
     def render_exception_handler_mark_handled_stmt(self, handled_name: str) -> str:
         return handled_name + " = true;"
 
-    def emit_try_body_post_stmt(self, stmt: dict[str, Any], try_label: str) -> None:
+    def render_try_body_post_stmt_stmt(self, stmt: dict[str, Any], try_label: str) -> str:
         self._require_exception_style("manual_exception_slot")
         if stmt.get("kind") in {"Return", "Raise", "Break", "Continue"}:
-            return
-        self.emit_backend_line("if (" + self.render_active_exception_check() + ") " + self.render_try_break(try_label))
-
-    def emit_raise_propagation(self, try_label: str, return_stmt: str) -> None:
-        self._require_exception_style("manual_exception_slot")
-        self.emit_backend_line(self.render_raise_propagation_stmt(try_label, return_stmt))
+            return ""
+        return "if (" + self.render_active_exception_check() + ") " + self.render_try_break(try_label)
 
     def render_labeled_block_open(self, block_label: str) -> str:
         return block_label + ": {"

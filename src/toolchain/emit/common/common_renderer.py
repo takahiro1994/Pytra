@@ -801,9 +801,14 @@ class CommonRenderer:
             return
         self.emit_string_exception_handler_chain(caught_expr, string_bind_name, string_handlers)
 
-    def emit_try_body_post_stmt(self, stmt: dict[str, JsonVal], try_label: str) -> None:
+    def render_try_body_post_stmt_stmt(self, stmt: dict[str, JsonVal], try_label: str) -> str:
         del stmt, try_label
-        return None
+        return ""
+
+    def emit_try_body_post_stmt(self, stmt: dict[str, JsonVal], try_label: str) -> None:
+        stmt_text = self.render_try_body_post_stmt_stmt(stmt, try_label)
+        if stmt_text != "":
+            self.emit_backend_line(stmt_text)
 
     def render_labeled_block_open(self, block_label: str) -> str:
         del block_label
@@ -845,8 +850,7 @@ class CommonRenderer:
         try_label: str,
         return_stmt: str,
     ) -> None:
-        del try_label, return_stmt
-        return None
+        self.emit_backend_line(self.render_raise_propagation_stmt(try_label, return_stmt))
 
     def render_raise_propagation_stmt(self, try_label: str, return_stmt: str) -> str:
         del try_label, return_stmt
