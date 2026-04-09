@@ -2095,8 +2095,7 @@ class ZigNativeEmitter:
         self.indent -= 1
         self._emit_line(renderer.render_try_body_close(try_blk))
         if len(handlers) > 0:
-            handled = "__pytra_handled_" + str(self.tmp_seq)
-            self.tmp_seq += 1
+            handled = renderer.next_exception_dispatch_state_name()
             renderer.state.indent_level = self.indent
             renderer.emit_exception_dispatch_handlers(renderer.active_exception_slot_names()[0], handled, handlers)
             self.indent = renderer.state.indent_level

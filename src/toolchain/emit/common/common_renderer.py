@@ -468,6 +468,9 @@ class CommonRenderer:
         del handled_name
         return None
 
+    def next_exception_dispatch_state_name(self) -> str:
+        return self._next_tmp("__pytra_handled")
+
     def render_exception_handler_guard_open(
         self,
         handler: dict[str, JsonVal],
