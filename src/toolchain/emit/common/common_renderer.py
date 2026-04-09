@@ -538,6 +538,12 @@ class CommonRenderer:
     def next_str_index_names(self) -> tuple[str, str]:
         return (self._next_tmp("__str_index_blk"), self._next_tmp("__str_index_val"))
 
+    def next_tuple_assign_temp_name(self) -> str:
+        return self._next_tmp("__tmp")
+
+    def next_swap_temp_name(self) -> str:
+        return self._next_tmp("__swap_tmp")
+
     def next_for_tuple_name(self) -> str:
         return self._next_tmp("__for_tuple")
 

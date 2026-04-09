@@ -486,6 +486,16 @@ class _ZigStmtCommonRenderer(CommonRenderer):
         self.owner.tmp_seq += 1
         return (blk, val)
 
+    def next_tuple_assign_temp_name(self) -> str:
+        name = "__tmp_" + str(self.owner.tmp_seq)
+        self.owner.tmp_seq += 1
+        return name
+
+    def next_swap_temp_name(self) -> str:
+        name = "__swap_tmp_" + str(self.owner.tmp_seq)
+        self.owner.tmp_seq += 1
+        return name
+
     def next_for_tuple_name(self) -> str:
         name = "__for_tuple_" + str(self.owner.tmp_seq)
         self.owner.tmp_seq += 1
@@ -3682,8 +3692,7 @@ class ZigNativeEmitter:
                 tuple_type = inner_tuple
         if value_zig.startswith("?") or (value_type != "" and self._strip_optional_type(value_type) != value_type):
             value_expr = value_expr + ".?"
-        tmp = "__tmp_" + str(self.tmp_seq)
-        self.tmp_seq += 1
+        tmp = _ZigStmtCommonRenderer(self).next_tuple_assign_temp_name()
         self._emit_line("const " + tmp + " = " + value_expr + ";")
         i = 0
         while i < len(elts):
@@ -3733,8 +3742,7 @@ class ZigNativeEmitter:
         lhs_is_list_sub = self._is_list_subscript(lhs_node)
         rhs_is_list_sub = self._is_list_subscript(rhs_node)
         if lhs_is_list_sub and rhs_is_list_sub:
-            tmp = "__swap_tmp_" + str(self.tmp_seq)
-            self.tmp_seq += 1
+            tmp = _ZigStmtCommonRenderer(self).next_swap_temp_name()
             lobj, lidx, lelem = self._list_subscript_parts(lhs_node)
             robj, ridx, relem = self._list_subscript_parts(rhs_node)
             self._emit_line("const " + tmp + " = pytra.list_get(" + lobj + ", " + lelem + ", " + lidx + ");")
@@ -3743,8 +3751,7 @@ class ZigNativeEmitter:
             return
         left = self._render_target(lhs_node)
         right = self._render_target(rhs_node)
-        tmp = "__swap_tmp_" + str(self.tmp_seq)
-        self.tmp_seq += 1
+        tmp = _ZigStmtCommonRenderer(self).next_swap_temp_name()
         self._emit_line("const " + tmp + " = " + left + ";")
         self._emit_line(left + " = " + right + ";")
         self._emit_line(right + " = " + tmp + ";")
