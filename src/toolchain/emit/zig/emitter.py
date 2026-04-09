@@ -294,6 +294,17 @@ class _ZigStmtCommonRenderer(CommonRenderer):
         self.owner._emit_line(text)
         self.state.indent_level = self.owner.indent
 
+    def exception_slot_decl_lines(self) -> list[str]:
+        self._require_exception_style("manual_exception_slot")
+        return [
+            "var __pytra_exc_type: ?[]const u8 = null;",
+            "var __pytra_exc_msg: ?[]const u8 = null;",
+            "var __pytra_exc_line: i64 = 0;",
+            "var __pytra_caught_type: ?[]const u8 = null;",
+            "var __pytra_caught_msg: ?[]const u8 = null;",
+            "var __pytra_caught_line: i64 = 0;",
+        ]
+
     def is_catch_all_exception_handler(self, handler: dict[str, Any]) -> bool:
         type_name = _safe_ident(self.exception_handler_type_name(handler), "")
         return type_name in self.owner._catch_all_exception_types
@@ -1290,6 +1301,7 @@ class ZigNativeEmitter:
         self._emit_line(prefix + target_name + ": " + zig_ty + " = " + value + ";")
 
     def transpile(self) -> str:
+        renderer = _ZigStmtCommonRenderer(self)
         module_comments = self._module_leading_comment_lines(prefix="// ")
         if len(module_comments) > 0:
             self.lines.extend(module_comments)
@@ -1298,12 +1310,7 @@ class ZigNativeEmitter:
         rt_path = self._root_rel_prefix() + "built_in/py_runtime.zig"
         self.lines.append("const pytra = @import(\"" + rt_path + "\");")
         self.lines.append("const __PytraError = struct { msg: []const u8, line: i64 };")
-        self.lines.append("var __pytra_exc_type: ?[]const u8 = null;")
-        self.lines.append("var __pytra_exc_msg: ?[]const u8 = null;")
-        self.lines.append("var __pytra_exc_line: i64 = 0;")
-        self.lines.append("var __pytra_caught_type: ?[]const u8 = null;")
-        self.lines.append("var __pytra_caught_msg: ?[]const u8 = null;")
-        self.lines.append("var __pytra_caught_line: i64 = 0;")
+        self.lines.extend(renderer.exception_slot_decl_lines())
         body = self._dict_list(self.east_doc.get("body"))
         main_guard = self._dict_list(self.east_doc.get("main_guard_body"))
         self._scan_module_symbols(body)

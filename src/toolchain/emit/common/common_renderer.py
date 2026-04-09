@@ -292,6 +292,9 @@ class CommonRenderer:
     def emit_backend_line(self, text: str) -> None:
         self._emit(text)
 
+    def exception_slot_decl_lines(self) -> list[str]:
+        return []
+
     def _next_tmp(self, prefix: str) -> str:
         self.state.tmp_counter += 1
         return prefix + "_" + str(self.state.tmp_counter)
