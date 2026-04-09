@@ -2500,7 +2500,7 @@ class ZigNativeEmitter:
                         self._current_local_vars().add(var_name)
                 elif enter_type != "TextIOWrapper":
                     self._emit_line("_ = " + ctx_name + ".__enter__();")
-                self._emit_line(with_blk + ": {")
+                self._emit_line(renderer.render_try_body_open(with_blk))
                 self.indent += 1
                 self._try_depth += 1
                 self._try_label_stack.append(with_blk)
@@ -4424,7 +4424,8 @@ class ZigNativeEmitter:
                     if self._is_callable_type(obj_type) and not self._is_optional_callable_type(obj_type):
                         bool_text = "false" if op_str in {"Is", "Eq"} else "true"
                         parts.append(
-                            "blk: { _ = "
+                            _ZigStmtCommonRenderer(self).render_block_expr_open("blk")
+                            + " _ = "
                             + (prev if right == "null" else right)
                             + "; "
                             + _ZigStmtCommonRenderer(self).render_break_with_value("blk", bool_text)
