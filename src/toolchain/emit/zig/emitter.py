@@ -547,11 +547,10 @@ class _ZigStmtCommonRenderer(CommonRenderer):
 
     def emit_bare_raise_restore(self) -> None:
         self._require_exception_style("manual_exception_slot")
-        exc_type, exc_msg, exc_line = self.active_exception_slot_names()
-        caught_type, caught_msg, caught_line = self.caught_exception_slot_names()
-        self.emit_backend_line(exc_type + " = " + caught_type + ";")
-        self.emit_backend_line(exc_msg + " = " + caught_msg + ";")
-        self.emit_backend_line(exc_line + " = " + caught_line + ";")
+        self.emit_copy_exception_slot(
+            self.active_exception_slot_names(),
+            self.caught_exception_slot_names(),
+        )
 
     def emit_raise_exception_state(
         self,
@@ -623,14 +622,11 @@ class _ZigStmtCommonRenderer(CommonRenderer):
         self.owner.indent = current_indent
 
     def emit_exception_handler_capture(self) -> None:
-        exc_type, exc_msg, exc_line = self.active_exception_slot_names()
-        caught_type, caught_msg, caught_line = self.caught_exception_slot_names()
-        self.emit_backend_line(caught_type + " = " + exc_type + ";")
-        self.emit_backend_line(caught_msg + " = " + exc_msg + ";")
-        self.emit_backend_line(caught_line + " = " + exc_line + ";")
-        self.emit_backend_line(exc_type + " = null;")
-        self.emit_backend_line(exc_msg + " = null;")
-        self.emit_backend_line(exc_line + " = 0;")
+        self.emit_copy_exception_slot(
+            self.caught_exception_slot_names(),
+            self.active_exception_slot_names(),
+        )
+        self.emit_clear_exception_slot(self.active_exception_slot_names())
 
     def emit_exception_handler_teardown(self, handler: dict[str, Any]) -> None:
         del handler

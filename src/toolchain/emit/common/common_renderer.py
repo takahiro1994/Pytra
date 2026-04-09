@@ -369,6 +369,23 @@ class CommonRenderer:
     def emit_exception_handler_capture(self) -> None:
         return None
 
+    def emit_copy_exception_slot(
+        self,
+        dst_slot: tuple[str, str, str],
+        src_slot: tuple[str, str, str],
+    ) -> None:
+        dst_type, dst_msg, dst_line = dst_slot
+        src_type, src_msg, src_line = src_slot
+        self.emit_backend_line(dst_type + " = " + src_type + ";")
+        self.emit_backend_line(dst_msg + " = " + src_msg + ";")
+        self.emit_backend_line(dst_line + " = " + src_line + ";")
+
+    def emit_clear_exception_slot(self, slot: tuple[str, str, str]) -> None:
+        slot_type, slot_msg, slot_line = slot
+        self.emit_backend_line(slot_type + " = null;")
+        self.emit_backend_line(slot_msg + " = null;")
+        self.emit_backend_line(slot_line + " = 0;")
+
     def emit_exception_handler_teardown(self, handler: dict[str, JsonVal]) -> None:
         del handler
         return None
