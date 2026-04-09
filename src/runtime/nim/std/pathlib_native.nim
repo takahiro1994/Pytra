@@ -20,8 +20,10 @@ proc stem*(path: PyPath): string =
 proc mkdir*(path: PyPath): void =
   std_os.createDir(path)
 
-proc joinpath*(path: PyPath, child: string): PyPath =
-  std_os.joinPath(path, child)
+proc joinpath*(path: PyPath, child: string, more: varargs[string]): PyPath =
+  result = std_os.joinPath(path, child)
+  for part in more:
+    result = std_os.joinPath(result, part)
 
 proc `/`*(path: PyPath, child: string): PyPath =
   std_os.joinPath(path, child)

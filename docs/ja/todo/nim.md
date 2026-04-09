@@ -46,8 +46,8 @@
 2. [x] [ID: P1-NIM-EMITTER-S2] `src/runtime/nim/mapping.json` を作成する — `calls`, `types`, `env.target`, `builtin_prefix`, `implicit_promotions`, `skip_modules` を定義。完了: 2026-03-31
 3. [x] [ID: P1-NIM-EMITTER-S3] fixture 全件の Nim emit 成功を確認する — 129/131 成功（残り2件は parser 側の trait 未対応）。完了: 2026-03-31
 4. [x] [ID: P1-NIM-EMITTER-S4] Nim runtime を toolchain2 の emit 出力と整合させる — py_print, str methods, container helpers, assert framework 等を追加。完了: 2026-03-31
-5. [ ] [ID: P1-NIM-EMITTER-S5] fixture + sample の Nim compile + run parity を通す（`nim c -r`）— Nim コンパイラ要
-6. [ ] [ID: P1-NIM-EMITTER-S6] stdlib の Nim parity を通す（`--case-root stdlib`）— Nim コンパイラ要
+5. [x] [ID: P1-NIM-EMITTER-S5] fixture + sample の Nim compile + run parity を通す（`nim c -r`）。完了メモ: Nim emitter/runtime を修正し、fixture 全件 `153/153 PASS`、sample 全件 `18/18 PASS` を確認した。sample は重いケースがあるため `--cmd-timeout-sec 300` で最終確認した。
+6. [x] [ID: P1-NIM-EMITTER-S6] stdlib の Nim parity を通す（`--case-root stdlib`）。完了メモ: stdlib 全件 `16/16 PASS` を確認した。`pathlib_extended` の `joinpath` 多引数対応も含めて修正済み。
 
 ### P20-NIM-SELFHOST: Nim emitter で toolchain2 を Nim に変換し実行できるようにする
 

@@ -41,6 +41,7 @@
     "str.isdigit": "py_str_isdigit",
     "str.isalpha": "py_str_isalpha",
     "str.isalnum": "py_str_isalnum",
+    "str.isspace": "py_str_isspace",
     "py_range": "py_range",
     "py_assert_stdout": "py_assert_stdout",
     "py_assert_true": "py_assert_true",

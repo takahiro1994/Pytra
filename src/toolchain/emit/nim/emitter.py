@@ -416,6 +416,27 @@ def _emit_general_union_defs(ctx: EmitContext) -> None:
                     ctx.indent_level -= 1
                 ctx.indent_level -= 1
                 _emit_blank(ctx)
+                _emit(ctx, "iterator items*(v: " + union_name + "): (" + key_type + ", " + value_type + ") =")
+                ctx.indent_level += 1
+                _emit(ctx, "for item in v.pairs:")
+                ctx.indent_level += 1
+                _emit(ctx, "yield item")
+                ctx.indent_level -= 2
+                _emit_blank(ctx)
+                _emit(ctx, "iterator keys*(v: " + union_name + "): " + key_type + " =")
+                ctx.indent_level += 1
+                _emit(ctx, "for item in v.pairs:")
+                ctx.indent_level += 1
+                _emit(ctx, "yield item[0]")
+                ctx.indent_level -= 2
+                _emit_blank(ctx)
+                _emit(ctx, "iterator values*(v: " + union_name + "): " + value_type + " =")
+                ctx.indent_level += 1
+                _emit(ctx, "for item in v.pairs:")
+                ctx.indent_level += 1
+                _emit(ctx, "yield item[1]")
+                ctx.indent_level -= 2
+                _emit_blank(ctx)
         _emit(ctx, "proc py_to_string*(v: " + union_name + "): string =")
         ctx.indent_level += 1
         _emit(ctx, "case v.kind")
@@ -787,7 +808,10 @@ def _emit_subscript(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
 
 def _emit_subscript_target(ctx: EmitContext, node: dict[str, JsonVal]) -> str:
     owner_node = node.get("value")
-    owner = _emit_expr(ctx, owner_node)
+    if isinstance(owner_node, dict) and _str(owner_node, "kind") == "Subscript":
+        owner = _emit_subscript_target(ctx, owner_node)
+    else:
+        owner = _emit_expr(ctx, owner_node)
     slice_node = node.get("slice")
     slice_code = _emit_expr(ctx, slice_node)
     return owner + "[" + slice_code + "]"
@@ -1870,16 +1894,25 @@ def _emit_method_on_owner(ctx: EmitContext, node: dict[str, JsonVal], method: st
 def _emit_list_pop(ctx: EmitContext, node: dict[str, JsonVal], args: list[JsonVal]) -> str:
     func_node = node.get("func")
     owner_code = ""
+    owner_rt = ""
     if isinstance(func_node, dict):
         owner_node = func_node.get("value")
         if isinstance(owner_node, dict):
             owner_code = _emit_expr(ctx, owner_node)
+            owner_rt = _str(owner_node, "resolved_type")
     if owner_code == "":
         owner_code = "self"
+    call = ""
     if len(args) > 0:
         idx_code = _emit_expr(ctx, args[0])
-        return "py_runtime.pop(" + owner_code + ", " + idx_code + ")"
-    return "py_runtime.pop(" + owner_code + ")"
+        call = "py_runtime.pop(" + owner_code + ", " + idx_code + ")"
+    else:
+        call = "py_runtime.pop(" + owner_code + ")"
+    if owner_rt in ("bytes", "bytearray", "list[byte]", "list[uint8]"):
+        expected_rt = _str(node, "resolved_type")
+        if expected_rt in ("int", "int64"):
+            return "int64(" + call + ")"
+    return call
 
 
 def _emit_dict_get(ctx: EmitContext, node: dict[str, JsonVal], args: list[JsonVal]) -> str:
@@ -1985,6 +2018,24 @@ def _emit_method_call(ctx: EmitContext, node: dict[str, JsonVal], runtime_name: 
     method_tag = runtime_name if runtime_name != "" else semantic_tag
     owner_code = _emit_expr(ctx, owner_node)
     owner_rt = _str(owner_node, "resolved_type") if isinstance(owner_node, dict) else ""
+    if isinstance(owner_node, dict) and _str(owner_node, "kind") == "Subscript":
+        if method_tag in {
+            "__LIST_APPEND__",
+            "__LIST_POP__",
+            "__LIST_CLEAR__",
+            "__SET_ADD__",
+            "__SET_DISCARD__",
+            "__SET_REMOVE__",
+            "__DICT_SETDEFAULT__",
+            "stdlib.method.append",
+            "stdlib.method.pop",
+            "stdlib.method.clear",
+            "stdlib.method.add",
+            "stdlib.method.discard",
+            "stdlib.method.remove",
+            "stdlib.method.setdefault",
+        }:
+            owner_code = _emit_subscript_target(ctx, owner_node)
     if isinstance(owner_node, dict) and _str(owner_node, "kind") == "Name":
         actual_owner_rt = ctx.var_types.get(owner_code, "")
         if actual_owner_rt == "":
@@ -2028,14 +2079,26 @@ def _emit_method_call(ctx: EmitContext, node: dict[str, JsonVal], runtime_name: 
         if runtime_name == "__LIST_CLEAR__" or method_tag == "stdlib.method.clear":
             return owner_code + ".setLen(0)"
         if runtime_name == "__LIST_POP__" or method_tag == "stdlib.method.pop":
+            pop_call = ""
             if len(arg_strs) == 0:
-                return "py_runtime.pop(" + owner_code + ")"
-            return "py_runtime.pop(" + owner_code + ", " + ", ".join(arg_strs) + ")"
+                pop_call = "py_runtime.pop(" + owner_code + ")"
+            else:
+                pop_call = "py_runtime.pop(" + owner_code + ", " + ", ".join(arg_strs) + ")"
+            if _is_nim_byte_seq_type(ctx, owner_rt):
+                expected_rt = _str(node, "resolved_type")
+                if expected_rt in ("int", "int64"):
+                    return "int64(" + pop_call + ")"
+            return pop_call
         if _is_nim_byte_seq_type(ctx, owner_rt):
             if (runtime_name == "__LIST_APPEND__" or method_tag == "stdlib.method.append") and len(arg_strs) == 1:
                 return owner_code + ".add(uint8(" + arg_strs[0] + "))"
             if (runtime_name == "py_extend" or method_tag == "stdlib.method.extend") and len(arg_strs) == 1:
                 return owner_code + ".add(" + arg_strs[0] + ".mapIt(uint8(it)))"
+        if (runtime_name == "__LIST_APPEND__" or method_tag == "stdlib.method.append") and len(args) == 1 and owner_rt.startswith("list[") and owner_rt.endswith("]"):
+            item_type = owner_rt[5:-1]
+            item_code = _emit_expr_with_expected_type(ctx, args[0], item_type)
+            item_code = _maybe_cast_expr_to_type(ctx, item_code, args[0], item_type)
+            return owner_code + ".add(" + item_code + ")"
         if runtime_name == "__LIST_APPEND__" or runtime_name == "py_extend" or method_tag in ("stdlib.method.append", "stdlib.method.extend"):
             return owner_code + ".add(" + ", ".join(arg_strs) + ")"
         if runtime_name == "__LIST_INDEX__" or method_tag == "stdlib.method.index":
@@ -2060,10 +2123,7 @@ def _emit_method_call(ctx: EmitContext, node: dict[str, JsonVal], runtime_name: 
     # dict methods
     if owner_rt.startswith("dict[") or owner_rt == "dict":
         if runtime_name == "__DICT_GET__" or runtime_name == "dict.get" or method_tag == "stdlib.method.get":
-            if len(arg_strs) > 1:
-                return owner_code + ".getOrDefault(" + ", ".join(arg_strs) + ")"
-            if len(arg_strs) == 1:
-                return owner_code + ".getOrDefault(" + arg_strs[0] + ")"
+            return _emit_dict_get(ctx, node, args)
         if runtime_name == "__DICT_KEYS__" or runtime_name == "dict.keys" or method_tag == "stdlib.method.keys":
             return "toSeq(" + owner_code + ".keys)"
         if runtime_name == "__DICT_VALUES__" or runtime_name == "dict.values" or method_tag == "stdlib.method.values":
@@ -2505,6 +2565,8 @@ def _emit_assign_stmt(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
         _emit(ctx, safe + " = " + value_code)
     else:
         rt = decl_type if decl_type != "" else (_str(target, "resolved_type") if isinstance(target, dict) else "")
+        if rt == "" and isinstance(value, dict):
+            rt = _str(value, "resolved_type")
         ann = _type_annotation(ctx, rt)
         if ((_is_top_level_union_type(rt) and "None" not in rt and _render_type(ctx, rt) == "PyObj") or rt.startswith("tuple[")):
             ann = ""
@@ -2902,8 +2964,8 @@ def _emit_try_stmt(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
 def _emit_swap_stmt(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
     left = node.get("left")
     right = node.get("right")
-    left_code = _emit_expr(ctx, left)
-    right_code = _emit_expr(ctx, right)
+    left_code = _emit_subscript_target(ctx, left) if isinstance(left, dict) and _str(left, "kind") == "Subscript" else _emit_expr(ctx, left)
+    right_code = _emit_subscript_target(ctx, right) if isinstance(right, dict) and _str(right, "kind") == "Subscript" else _emit_expr(ctx, right)
     _emit(ctx, "swap(" + left_code + ", " + right_code + ")")
 
 
