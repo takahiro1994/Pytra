@@ -588,6 +588,19 @@ class CommonRenderer:
         del exc_type_expr, exc_msg_expr, exc_line_expr
         return None
 
+    def render_inline_exception_state(
+        self,
+        exc_type_expr: str,
+        exc_msg_expr: str,
+        exc_line_expr: str,
+    ) -> str:
+        del exc_type_expr, exc_msg_expr, exc_line_expr
+        raise RuntimeError("common renderer requires inline exception state hook for " + self.language)
+
+    def render_break_with_value(self, block_label: str, value_expr: str) -> str:
+        del block_label, value_expr
+        raise RuntimeError("common renderer requires break-with-value hook for " + self.language)
+
     def emit_bare_raise_stmt(self, node: dict[str, JsonVal]) -> None:
         keyword = self._syntax_text("raise", "throw")
         self._emit_stmt_line(keyword)

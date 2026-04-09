@@ -390,6 +390,25 @@ class _ZigStmtCommonRenderer(CommonRenderer):
         self.emit_backend_line("__pytra_exc_msg = " + exc_msg_expr + ";")
         self.emit_backend_line("__pytra_exc_line = " + exc_line_expr + ";")
 
+    def render_inline_exception_state(
+        self,
+        exc_type_expr: str,
+        exc_msg_expr: str,
+        exc_line_expr: str,
+    ) -> str:
+        return (
+            "__pytra_exc_type = "
+            + exc_type_expr
+            + "; __pytra_exc_msg = "
+            + exc_msg_expr
+            + "; __pytra_exc_line = "
+            + exc_line_expr
+            + ";"
+        )
+
+    def render_break_with_value(self, block_label: str, value_expr: str) -> str:
+        return "break :" + block_label + " " + value_expr + ";"
+
     def render_try_body_open(self, try_label: str) -> str:
         return try_label + ": {"
 
@@ -5048,6 +5067,7 @@ class ZigNativeEmitter:
                         self.tmp_seq += 1
                         val_name = "__str_index_val_" + str(self.tmp_seq)
                         self.tmp_seq += 1
+                        renderer = _ZigStmtCommonRenderer(self)
                         return (
                             blk
                             + ": { const "
@@ -5058,13 +5078,13 @@ class ZigNativeEmitter:
                             + arg_strs[0]
                             + "); if ("
                             + val_name
-                            + " < 0) { __pytra_exc_type = \"ValueError\"; __pytra_exc_msg = \"substring not found\"; break :"
-                            + blk
-                            + " @as(i64, 0); } break :"
-                            + blk
+                            + " < 0) { "
+                            + renderer.render_inline_exception_state("\"ValueError\"", "\"substring not found\"", "0")
                             + " "
-                            + val_name
-                            + "; }"
+                            + renderer.render_break_with_value(blk, "@as(i64, 0)")
+                            + " } "
+                            + renderer.render_break_with_value(blk, val_name)
+                            + " }"
                         )
                     if obj_type.startswith("list[") and obj_type.endswith("]"):
                         elem_type = self._zig_type(obj_type[5:-1].strip())
@@ -5918,6 +5938,7 @@ class ZigNativeEmitter:
         real_name = "__idx_real_" + str(self.tmp_seq)
         self.tmp_seq += 1
         zero = self._zig_zero_value(result_zig_type)
+        renderer = _ZigStmtCommonRenderer(self)
         return (
             blk
             + ": { const "
@@ -5940,15 +5961,13 @@ class ZigNativeEmitter:
             + real_name
             + " >= "
             + len_name
-            + ") { __pytra_exc_type = \"IndexError\"; __pytra_exc_msg = \"index out of range\"; break :"
-            + blk
+            + ") { "
+            + renderer.render_inline_exception_state("\"IndexError\"", "\"index out of range\"", "0")
             + " "
-            + zero
-            + "; } break :"
-            + blk
-            + " "
-            + value_expr
-            + "; }"
+            + renderer.render_break_with_value(blk, zero)
+            + " } "
+            + renderer.render_break_with_value(blk, value_expr)
+            + " }"
         )
 
     def _dict_storage_spec(self, dict_type: str) -> tuple[str, bool, bool]:
