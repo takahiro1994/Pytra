@@ -4,7 +4,7 @@
 
 # P0-ZIG-RS-COMMON-RENDERER-EXC: Zig / Rust の `with`・例外 lowering を CommonRenderer へ押し戻す
 
-最終更新: 2026-04-08
+最終更新: 2026-04-09
 ステータス: 進行中
 
 ## 背景
@@ -85,4 +85,5 @@
 - 2026-04-08: Zig / Rust ともに emitter 側へ `with` / `raise` / `try` の lowering policy が残っていることを確認。特に Rust は `panic!` / `catch_unwind`、Zig は exception slot + block label escape を emitter 本体が直接生成している。最初の slice は Rust の `with` を CommonRenderer に戻すことにする。
 - 2026-04-08: `with` は user-defined context manager と `try/raise` の入口まで CommonRenderer へ戻した。次のボトルネックは `TextIOWrapper` 系で、fallback を単純に外すと Rust は `PyFile` 実体と `TextIOWrapper` 宣言型のズレで崩れ、Zig は `with ... as f` の alias hoist が不足して崩れる。S4 は custom lowering の単純削除ではなく、`io` 系 metadata / type lane / alias hoist の整理として進める。
 - 2026-04-08: S4 を継続。Rust は `Try` statement entry を CommonRenderer renderer 経由へ切り替え、`catch_unwind` wrapper、`match __try_result` arms、user/string handler chain、no-handler fallback まで hook ベースへ寄せた。未使用の `_emit_try()` は削除済み。
-- 2026-04-09: Zig は handler dispatch loop、`try`/`with` body post-stmt propagation、body/orelse wrapper、bare re-raise restore、raise propagation、raise state writes、handler capture を CommonRenderer hook に寄せた。Rust / Zig の emit profile には `exception_style` を実態どおり宣言し、hook 側で style guard も入れた。現時点の残件は、Zig の global exception slot 宣言と slot 名そのものの抽象化、expression/helper 内に散っている inline exception escape の共通化である。
+- 2026-04-09: Zig は handler dispatch loop、`try`/`with` body post-stmt propagation、body/orelse wrapper、bare re-raise restore、raise propagation、raise state writes、handler capture を CommonRenderer hook に寄せた。Rust / Zig の emit profile には `exception_style` を実態どおり宣言し、hook 側で style guard も入れた。
+- 2026-04-09: S4 をさらに継続。Zig の global exception slot 宣言と slot 名そのものの抽象化は CommonRenderer hook 化済みで、`dict.get(..., default)` の bogus optional unwrap も修正した。現時点の残件は、expression/helper 内に散っている inline exception escape の共通化と、manual exception slot protocol を backend line 単位ではなく profile/strategy 単位へさらに寄せること。
