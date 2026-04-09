@@ -4,7 +4,7 @@
 
 # P0-ZIG-RS-COMMON-RENDERER-EXC: Zig / Rust の `with`・例外 lowering を CommonRenderer へ押し戻す
 
-最終更新: 2026-04-09
+最終更新: 2026-04-10
 ステータス: 進行中
 
 ## 背景
@@ -90,3 +90,4 @@
 - 2026-04-09: Rust も `__try_*` / `__with_*` / `__catch_*` / `__err_*` の固定 temp 名を CommonRenderer hook 化し、`catch_unwind` wrapper、`resume_unwind`、user-defined exception raise の `panic_any` も hook 経由へ寄せた。Rust emitter に残る panic protocol 文字列は、実質 hook 実装そのものだけになっている。
 - 2026-04-09: Rust の `with` custom path も追加で縮小した。hoist 収集、protocol call builder、`Rc<RefCell<...>>` bind/clone 分岐、`__exit__` / `close()` fallback、entry tuple と exit target 選択を CommonRenderer helper に寄せており、残る本体は item loop と Rust 型判定中心になっている。
 - 2026-04-09: Zig の expression helper 側も追加で整理した。guarded inline exception block と simple block expression の skeleton を CommonRenderer helper に寄せ、`str.index` / bounds-check index / list concat / list repeat / tuple-list literal / splitext / sum / zip / comprehension / compare callable block まで移行済み。Zig emitter から `render_block_expr_open/close` の直組みは消えている。
+- 2026-04-10: Zig の `manual_exception_slot` もさらに薄くした。bound exception value、raise state write、inline exception state、active exception type slot access、handler capture、bare re-raise restore を CommonRenderer の generic builder / helper に寄せ、fallback `with` 側も `__enter__` bind、fallback `__enter__` / `__exit__` / `file_close`、`TextIOWrapper` bind を helper 経由へ統一した。現時点の Zig custom lowering は、主に labeled block / `break :label` といった Zig 構文断片が中心になっている。
