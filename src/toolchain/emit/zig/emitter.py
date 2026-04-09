@@ -43,6 +43,9 @@ _ZIG_RESERVED_BUILTINS = {
 }
 _NIL_FREE_DECL_TYPES = {"int", "int64", "float", "float64", "bool", "str"}
 _COMPILETIME_STD_IMPORT_SYMBOLS = {"abi", "template", "extern"}
+_ZIG_ACTIVE_EXCEPTION_SLOTS = ("__pytra_exc_type", "__pytra_exc_msg", "__pytra_exc_line")
+_ZIG_CAUGHT_EXCEPTION_SLOTS = ("__pytra_caught_type", "__pytra_caught_msg", "__pytra_caught_line")
+_ZIG_BOUND_EXCEPTION_RECORD = "__PytraError"
 
 
 def _safe_ident(name: Any, fallback: str = "value") -> str:
@@ -296,15 +299,15 @@ class _ZigStmtCommonRenderer(CommonRenderer):
 
     def active_exception_slot_names(self) -> tuple[str, str, str]:
         self._require_exception_style("manual_exception_slot")
-        return ("__pytra_exc_type", "__pytra_exc_msg", "__pytra_exc_line")
+        return _ZIG_ACTIVE_EXCEPTION_SLOTS
 
     def caught_exception_slot_names(self) -> tuple[str, str, str]:
         self._require_exception_style("manual_exception_slot")
-        return ("__pytra_caught_type", "__pytra_caught_msg", "__pytra_caught_line")
+        return _ZIG_CAUGHT_EXCEPTION_SLOTS
 
     def bound_exception_record_type_name(self) -> str:
         self._require_exception_style("manual_exception_slot")
-        return "__PytraError"
+        return _ZIG_BOUND_EXCEPTION_RECORD
 
     def is_catch_all_exception_handler(self, handler: dict[str, Any]) -> bool:
         type_name = _safe_ident(self.exception_handler_type_name(handler), "")
@@ -615,14 +618,6 @@ def _pascal_symbol_name(name: str) -> str:
 
 
 def _runtime_symbol_alias_expr(runtime_module_id: str, runtime_symbol: str) -> str:
-    doc = lookup_runtime_symbol_doc(runtime_module_id, runtime_symbol)
-    if doc is None:
-        return "__pytra_" + runtime_symbol
-    adapter = doc.call_adapter_kind
-    if adapter == "direct":
-        return "__pytra_" + runtime_symbol
-    if adapter == "method":
-        return "__pytra_" + runtime_symbol
     return "__pytra_" + runtime_symbol
 
 
