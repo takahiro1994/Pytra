@@ -2606,7 +2606,7 @@ class ZigNativeEmitter:
                 self._try_label_stack.pop()
                 self._try_depth -= 1
                 self.indent -= 1
-                self._emit_line("}")
+                self._emit_line(renderer.render_try_body_close(with_blk))
                 if enter_type == "TextIOWrapper":
                     self._emit_line("pytra.file_close(" + ctx_name + ");")
                 else:
