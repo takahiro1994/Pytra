@@ -15,7 +15,7 @@ from pytra.std.pathlib import Path
 from toolchain.emit.lua.types import (
     lua_type, lua_zero_value, _safe_lua_ident, _split_generic_args,
     is_numeric_type, is_integer_type,
-    LUA_EXCEPTION_TYPE_NAMES, LUA_PATH_TYPE_NAMES, LUA_BUILTIN_MODULE_PREFIX,
+    LUA_EXCEPTION_TYPE_NAMES, LUA_PATH_TYPE_NAMES,
     LUA_NON_INHERITABLE_BASES, LUA_PYTRA_ISINSTANCE_NAME,
 )
 from toolchain.emit.common.code_emitter import (
@@ -58,7 +58,6 @@ class EmitContext:
     tid_const_types: dict[str, str] = field(default_factory=dict)
     renamed_symbols: dict[str, str] = field(default_factory=dict)
     temp_counter: int = 0
-    is_type_id_table: bool = False
     current_exc_var: str = ""
     catch_stack: list[tuple[str, str]] = field(default_factory=list)
     vararg_functions: set[str] = field(default_factory=set)
@@ -2520,8 +2519,6 @@ def _emit_import_stmt(ctx: EmitContext, node: dict[str, JsonVal]) -> None:
         module = _str(node, "module")
         if should_skip_module(module, ctx.mapping):
             return
-        if module.startswith("typing") or module.startswith("__future__") or module.startswith("dataclasses"):
-            return
         names = _list(node, "names")
         loaded_any = False
         for item in names:
@@ -2897,97 +2894,6 @@ def _collect_module_class_info(ctx: EmitContext, body: list[JsonVal]) -> None:
 
 
 # ---------------------------------------------------------------------------
-# Module header (dofile for runtime)
-# ---------------------------------------------------------------------------
-
-def _emit_module_header(ctx: EmitContext, body: list[JsonVal]) -> None:
-    """Emit the Lua module header with dofile for runtime."""
-    _emit(ctx, "function " + LUA_PYTRA_ISINSTANCE_NAME + "(obj, class_tbl)")
-    ctx.indent_level += 1
-    _emit(ctx, 'if type(class_tbl) == "number" then')
-    ctx.indent_level += 1
-    _emit(ctx, "if class_tbl == PYTRA_TID_OBJECT then")
-    ctx.indent_level += 1
-    _emit(ctx, "return true")
-    ctx.indent_level -= 1
-    _emit(ctx, "end")
-    _emit(ctx, "if class_tbl == PYTRA_TID_STR then")
-    ctx.indent_level += 1
-    _emit(ctx, 'return type(obj) == "string"')
-    ctx.indent_level -= 1
-    _emit(ctx, "end")
-    _emit(ctx, "if class_tbl == PYTRA_TID_BOOL then")
-    ctx.indent_level += 1
-    _emit(ctx, 'return type(obj) == "boolean"')
-    ctx.indent_level -= 1
-    _emit(ctx, "end")
-    _emit(ctx, "if class_tbl == PYTRA_TID_INT or class_tbl == PYTRA_TID_FLOAT then")
-    ctx.indent_level += 1
-    _emit(ctx, 'return type(obj) == "number"')
-    ctx.indent_level -= 1
-    _emit(ctx, "end")
-    _emit(ctx, "if class_tbl == PYTRA_TID_LIST then")
-    ctx.indent_level += 1
-    _emit(ctx, 'if type(obj) ~= "table" then')
-    ctx.indent_level += 1
-    _emit(ctx, "return false")
-    ctx.indent_level -= 1
-    _emit(ctx, "end")
-    _emit(ctx, "local n = #obj")
-    _emit(ctx, "local key_count = 0")
-    _emit(ctx, "for k, _ in pairs(obj) do")
-    ctx.indent_level += 1
-    _emit(ctx, "key_count = key_count + 1")
-    _emit(ctx, 'if type(k) ~= "number" or k < 1 or math.floor(k) ~= k or k > n then')
-    ctx.indent_level += 1
-    _emit(ctx, "return false")
-    ctx.indent_level -= 1
-    _emit(ctx, "end")
-    ctx.indent_level -= 1
-    _emit(ctx, "end")
-    _emit(ctx, "return key_count == n")
-    ctx.indent_level -= 1
-    _emit(ctx, "end")
-    _emit(ctx, "if class_tbl == PYTRA_TID_DICT or class_tbl == PYTRA_TID_SET then")
-    ctx.indent_level += 1
-    _emit(ctx, 'return type(obj) == "table"')
-    ctx.indent_level -= 1
-    _emit(ctx, "end")
-    _emit(ctx, "return false")
-    ctx.indent_level -= 1
-    _emit(ctx, "end")
-    _emit(ctx, 'if type(obj) ~= "table" then')
-    ctx.indent_level += 1
-    _emit(ctx, "return false")
-    ctx.indent_level -= 1
-    _emit(ctx, "end")
-    _emit(ctx, "local mt = getmetatable(obj)")
-    _emit(ctx, "while mt do")
-    ctx.indent_level += 1
-    _emit(ctx, "if mt == class_tbl then")
-    ctx.indent_level += 1
-    _emit(ctx, "return true")
-    ctx.indent_level -= 1
-    _emit(ctx, "end")
-    _emit(ctx, "local parent = getmetatable(mt)")
-    _emit(ctx, 'if type(parent) == "table" and type(parent.__index) == "table" then')
-    ctx.indent_level += 1
-    _emit(ctx, "mt = parent.__index")
-    ctx.indent_level -= 1
-    _emit(ctx, "else")
-    ctx.indent_level += 1
-    _emit(ctx, "mt = nil")
-    ctx.indent_level -= 1
-    _emit(ctx, "end")
-    ctx.indent_level -= 1
-    _emit(ctx, "end")
-    _emit(ctx, "return false")
-    ctx.indent_level -= 1
-    _emit(ctx, "end")
-    _emit_blank(ctx)
-
-
-# ---------------------------------------------------------------------------
 # Public API
 # ---------------------------------------------------------------------------
 
@@ -3011,12 +2917,8 @@ def emit_lua_module(east3_doc: dict[str, JsonVal]) -> str:
     mapping_path = Path(__file__).resolve().parents[3] / "runtime" / "lua" / "mapping.json"
     mapping = load_runtime_mapping(mapping_path)
 
-    # Skip runtime/built_in modules
+    # Skip runtime/native modules
     if should_skip_module(module_id, mapping):
-        return ""
-
-    # built_in.error is emitted as pure Python exception classes.
-    if module_id.startswith(LUA_BUILTIN_MODULE_PREFIX) and module_id != "pytra.built_in.error":
         return ""
 
     renamed_symbols_raw = east3_doc.get("renamed_symbols")
@@ -3026,15 +2928,12 @@ def emit_lua_module(east3_doc: dict[str, JsonVal]) -> str:
             if isinstance(orig, str) and isinstance(rn, str):
                 renamed_symbols[orig] = rn
 
-    is_type_id_table = (module_id == "pytra.built_in.type_id_table")
-
     ctx = EmitContext(
         module_id=module_id,
         source_path=_str(east3_doc, "source_path"),
         is_entry=_bool(emit_ctx_meta, "is_entry") if emit_ctx_meta else False,
         mapping=mapping,
         renamed_symbols=renamed_symbols,
-        is_type_id_table=is_type_id_table,
     )
 
     body = _list(east3_doc, "body")
@@ -3073,8 +2972,6 @@ def emit_lua_module(east3_doc: dict[str, JsonVal]) -> str:
     # First pass: collect class info
     _collect_module_class_info(ctx, body)
 
-    _emit_module_header(ctx, body)
-
     # Emit runtime dofile for entry modules
     if ctx.is_entry:
         _emit(ctx, '-- Load runtime')
@@ -3103,15 +3000,6 @@ def emit_lua_module(east3_doc: dict[str, JsonVal]) -> str:
         _emit(ctx, "-- main")
         _emit_body(ctx, main_guard)
 
-    # type_id_table: emit pytra_isinstance
-    if is_type_id_table:
-        _emit_blank(ctx)
-        _emit(ctx, "function pytra_isinstance(actual, tid)")
-        ctx.indent_level += 1
-        _emit(ctx, "return id_table[tid * 2 + 1] <= actual and actual <= id_table[tid * 2 + 2]")
-        ctx.indent_level -= 1
-        _emit(ctx, "end")
-
     output = "\n".join(ctx.lines).rstrip() + "\n"
     return output
 
@@ -3124,7 +3012,4 @@ def transpile_to_lua(east3_doc: dict[str, JsonVal]) -> str:
     meta = east3_doc.get("meta", {})
     emit_ctx = meta.get("emit_context", {}) if isinstance(meta, dict) else {}
     module_id = emit_ctx.get("module_id", "") if isinstance(emit_ctx, dict) else ""
-    # built_in.error is emitted as pure Python exception classes.
-    if isinstance(module_id, str) and module_id.startswith(LUA_BUILTIN_MODULE_PREFIX) and module_id != "pytra.built_in.error":
-        return ""
     return emit_lua_module(east3_doc)

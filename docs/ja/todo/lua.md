@@ -6,7 +6,7 @@
 
 > 領域別 TODO。全体索引は [index.md](./index.md) を参照。
 
-最終更新: 2026-04-02（Lua fixture 144/144、stdlib 16/16、sample は一部再計測）
+最終更新: 2026-04-10（guide cleanup 着手、Lua fixture/stdlib は 2026-04-02 基準）
 
 ## 運用ルール
 
@@ -29,6 +29,14 @@
 
 ## 未完了タスク
 
+### P0-LUA-EMITTER-GUIDE-CLEANUP: Lua emitter の guide 違反を除去する
+
+文脈: [docs/ja/plans/p0-lua-emitter-guide-cleanup.md](../plans/p0-lua-emitter-guide-cleanup.md)
+
+1. [x] [ID: P0-LUA-EMITGUIDE-S1] import skip / built-in module skip の hardcode を emitter から外す（2026-04-10）— `typing` / `__future__` / `dataclasses` の `ImportFrom` 直判定と `pytra.built_in.*` prefix 判定を削除し、`should_skip_module(...)` に一本化
+2. [x] [ID: P0-LUA-EMITGUIDE-S2] `pytra_isinstance` を emitter 直生成から runtime helper へ戻す（2026-04-10）— `py_runtime.lua` に常設し、module header / `type_id_table` special-case emit を削除
+3. [x] [ID: P0-LUA-EMITGUIDE-S3] Lua parity を再確認して task を完了化する（2026-04-10）— guide cleanup に関係する representative fixture / sample / stdlib を再確認
+
 ### P0-LUA-NEW-FIXTURE-PARITY: 新規追加 fixture / stdlib の parity 確認
 
 今セッション（2026-04-01〜05）で追加・更新した fixture と stdlib の parity を確認する。
@@ -41,10 +49,10 @@
 
 仕様: [docs/ja/spec/spec-adt.md](../spec/spec-adt.md) §6
 
-Lua は `type()` がネイティブにあるので `__pytra_isinstance` は不要。
+このタスクは 2026-04-10 の guide cleanup で実質 superseded。runtime helper 削除ではなく、emitter 直生成をやめて runtime 常設 helper に戻す方針へ変更した。
 
 1. [x] [ID: P0-LUA-TYPEID-CLN-S1] `src/runtime/lua/built_in/py_runtime.lua` から `__pytra_isinstance` を削除する（2026-04-02）— metatable/type-id 判定 helper は emitter 生成の `pytra_isinstance(...)` に移設
-2. [ ] [ID: P0-LUA-TYPEID-CLN-S2] fixture + sample parity に回帰がないことを確認する
+2. [x] [ID: P0-LUA-TYPEID-CLN-S2] fixture + sample parity に回帰がないことを確認する（2026-04-10）— `P0-LUA-EMITGUIDE-S3` で guide cleanup 後の parity を再確認し、runtime helper 常設へ戻した状態でも無回帰を確認
 
 ### P1-LUA-EMITTER: Lua emitter を toolchain2 に新規実装する
 

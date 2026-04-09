@@ -153,6 +153,57 @@ function __pytra_type_name(v)
     return "table"
 end
 
+function pytra_isinstance(obj, class_tbl)
+    if type(class_tbl) == "number" then
+        if class_tbl == PYTRA_TID_OBJECT then
+            return true
+        end
+        if class_tbl == PYTRA_TID_STR then
+            return type(obj) == "string"
+        end
+        if class_tbl == PYTRA_TID_BOOL then
+            return type(obj) == "boolean"
+        end
+        if class_tbl == PYTRA_TID_INT or class_tbl == PYTRA_TID_FLOAT then
+            return type(obj) == "number"
+        end
+        if class_tbl == PYTRA_TID_LIST then
+            if type(obj) ~= "table" then
+                return false
+            end
+            local n = #obj
+            local key_count = 0
+            for k, _ in pairs(obj) do
+                key_count = key_count + 1
+                if type(k) ~= "number" or k < 1 or math.floor(k) ~= k or k > n then
+                    return false
+                end
+            end
+            return key_count == n
+        end
+        if class_tbl == PYTRA_TID_DICT or class_tbl == PYTRA_TID_SET then
+            return type(obj) == "table"
+        end
+        return false
+    end
+    if type(obj) ~= "table" then
+        return false
+    end
+    local mt = getmetatable(obj)
+    while mt do
+        if mt == class_tbl then
+            return true
+        end
+        local parent = getmetatable(mt)
+        if type(parent) == "table" and type(parent.__index) == "table" then
+            mt = parent.__index
+        else
+            mt = nil
+        end
+    end
+    return false
+end
+
 function __pytra_repeat_seq(a, b)
     local seq = a
     local count = b
