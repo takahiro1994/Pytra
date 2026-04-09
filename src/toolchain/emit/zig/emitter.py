@@ -5222,27 +5222,21 @@ class ZigNativeEmitter:
                     if obj_type == "str":
                         blk, val_name = _ZigStmtCommonRenderer(self).next_str_index_names()
                         renderer = _ZigStmtCommonRenderer(self)
-                        return (
-                            renderer.render_block_expr_open(blk)
-                            + " const "
+                        return renderer.render_guarded_block_expr(
+                            blk,
+                            "const "
                             + val_name
                             + ": i64 = pytra.str_index_of("
                             + obj
                             + ", "
                             + arg_strs[0]
-                            + "); if ("
-                            + val_name
-                            + " < 0) { "
-                            + renderer.render_inline_exception_break(
-                                blk,
-                                "\"ValueError\"",
-                                "\"substring not found\"",
-                                "0",
-                                "@as(i64, 0)",
-                            )
-                            + " } "
-                            + renderer.render_break_with_value(blk, val_name)
-                            + " }"
+                            + ");",
+                            val_name + " < 0",
+                            "\"ValueError\"",
+                            "\"substring not found\"",
+                            "0",
+                            "@as(i64, 0)",
+                            val_name,
                         )
                     if obj_type.startswith("list[") and obj_type.endswith("]"):
                         elem_type = self._zig_type(obj_type[5:-1].strip())
@@ -6092,9 +6086,9 @@ class ZigNativeEmitter:
         renderer = _ZigStmtCommonRenderer(self)
         blk, len_name, real_name = renderer.next_bounds_checked_index_names()
         zero = self._zig_zero_value(result_zig_type)
-        return (
-            renderer.render_block_expr_open(blk)
-            + " const "
+        return renderer.render_guarded_block_expr(
+            blk,
+            "const "
             + len_name
             + ": i64 = @intCast("
             + len_expr
@@ -6108,23 +6102,13 @@ class ZigNativeEmitter:
             + len_name
             + " else "
             + idx
-            + "; if ("
-            + real_name
-            + " < 0 or "
-            + real_name
-            + " >= "
-            + len_name
-            + ") { "
-            + renderer.render_inline_exception_break(
-                blk,
-                "\"IndexError\"",
-                "\"index out of range\"",
-                "0",
-                zero,
-            )
-            + " } "
-            + renderer.render_break_with_value(blk, value_expr)
-            + " }"
+            + ";",
+            real_name + " < 0 or " + real_name + " >= " + len_name,
+            "\"IndexError\"",
+            "\"index out of range\"",
+            "0",
+            zero,
+            value_expr,
         )
 
     def _dict_storage_spec(self, dict_type: str) -> tuple[str, bool, bool]:

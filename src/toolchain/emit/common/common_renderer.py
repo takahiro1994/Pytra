@@ -766,6 +766,35 @@ class CommonRenderer:
     def render_block_expr_open(self, block_label: str) -> str:
         return block_label + ": {"
 
+    def render_guarded_block_expr(
+        self,
+        block_label: str,
+        prelude_expr: str,
+        guard_expr: str,
+        exc_type_expr: str,
+        exc_msg_expr: str,
+        exc_line_expr: str,
+        fallback_value: str,
+        value_expr: str,
+    ) -> str:
+        return (
+            self.render_block_expr_open(block_label)
+            + " "
+            + prelude_expr
+            + " if ("
+            + guard_expr
+            + ") { "
+            + self.render_inline_exception_break(
+                block_label,
+                exc_type_expr,
+                exc_msg_expr,
+                exc_line_expr,
+                fallback_value,
+            )
+            + " }"
+            + self.render_block_expr_close(block_label, value_expr)
+        )
+
     def emit_bare_raise_stmt(self, node: dict[str, JsonVal]) -> None:
         keyword = self._syntax_text("raise", "throw")
         self._emit_stmt_line(keyword)
