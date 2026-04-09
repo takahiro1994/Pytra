@@ -2,19 +2,13 @@
 
 from __future__ import annotations
 
+import json
 from typing import Any
 from pathlib import Path
 
 from toolchain.emit.common.code_emitter import build_import_alias_map
 from toolchain.emit.common.code_emitter import load_runtime_mapping
 from toolchain.emit.common.common_renderer import CommonRenderer
-
-from toolchain_.frontends.runtime_symbol_index import (
-    canonical_runtime_module_id,
-    lookup_runtime_module_symbols,
-    lookup_runtime_symbol_doc,
-    resolve_import_binding_doc,
-)
 
 
 _ZIG_KEYWORDS = {
@@ -46,6 +40,81 @@ _COMPILETIME_STD_IMPORT_SYMBOLS = {"abi", "template", "extern"}
 _ZIG_ACTIVE_EXCEPTION_SLOTS = ("__pytra_exc_type", "__pytra_exc_msg", "__pytra_exc_line")
 _ZIG_CAUGHT_EXCEPTION_SLOTS = ("__pytra_caught_type", "__pytra_caught_msg", "__pytra_caught_line")
 _ZIG_BOUND_EXCEPTION_RECORD = "__PytraError"
+_RUNTIME_SYMBOL_INDEX_PATH = Path(__file__).resolve().parents[4] / "tools" / "runtime_symbol_index.json"
+_RUNTIME_SYMBOL_INDEX_CACHE: dict[str, Any] | None = None
+
+
+def _load_runtime_symbol_index() -> dict[str, Any]:
+    global _RUNTIME_SYMBOL_INDEX_CACHE
+    if _RUNTIME_SYMBOL_INDEX_CACHE is not None:
+        return _RUNTIME_SYMBOL_INDEX_CACHE
+    if not _RUNTIME_SYMBOL_INDEX_PATH.exists():
+        _RUNTIME_SYMBOL_INDEX_CACHE = {}
+        return _RUNTIME_SYMBOL_INDEX_CACHE
+    try:
+        raw = json.loads(_RUNTIME_SYMBOL_INDEX_PATH.read_text())
+        _RUNTIME_SYMBOL_INDEX_CACHE = raw if isinstance(raw, dict) else {}
+    except Exception:
+        _RUNTIME_SYMBOL_INDEX_CACHE = {}
+    return _RUNTIME_SYMBOL_INDEX_CACHE
+
+
+def _runtime_module_doc(module_id: str) -> dict[str, Any]:
+    modules = _load_runtime_symbol_index().get("modules")
+    if not isinstance(modules, dict):
+        return {}
+    doc = modules.get(module_id)
+    return doc if isinstance(doc, dict) else {}
+
+
+def _runtime_module_exists(module_id: str) -> bool:
+    return len(_runtime_module_doc(module_id)) > 0
+
+
+def _find_runtime_modules_by_leaf(module_id: str) -> list[str]:
+    mod = module_id.strip()
+    if mod == "":
+        return []
+    modules = _load_runtime_symbol_index().get("modules")
+    if not isinstance(modules, dict):
+        return []
+    matches: list[str] = []
+    for candidate_any in modules.keys():
+        if not isinstance(candidate_any, str):
+            continue
+        candidate = candidate_any.strip()
+        if candidate == "":
+            continue
+        parts = candidate.split(".")
+        if len(parts) > 0 and parts[-1] == mod:
+            matches.append(candidate)
+    return matches
+
+
+def canonical_runtime_module_id(module_id: str) -> str:
+    mod = module_id.strip()
+    if mod == "":
+        return ""
+    if _runtime_module_exists(mod):
+        return mod
+    if "." not in mod:
+        matches = _find_runtime_modules_by_leaf(mod)
+        if len(matches) == 1:
+            return matches[0]
+    return mod
+
+
+def lookup_runtime_module_symbols(module_id: str) -> dict[str, Any]:
+    symbols = _runtime_module_doc(module_id).get("symbols")
+    return symbols if isinstance(symbols, dict) else {}
+
+
+def lookup_runtime_symbol_doc(module_id: str, symbol_name: str) -> dict[str, Any]:
+    mod = canonical_runtime_module_id(module_id.strip())
+    if mod == "":
+        return {}
+    symbol = lookup_runtime_module_symbols(mod).get(symbol_name.strip())
+    return symbol if isinstance(symbol, dict) else {}
 
 
 def _safe_ident(name: Any, fallback: str = "value") -> str:
@@ -541,23 +610,19 @@ def _cmp_symbol(op: str) -> str:
 
 def _runtime_module_symbol_names(runtime_module_id: str) -> tuple[str, ...]:
     symbols = lookup_runtime_module_symbols(runtime_module_id)
-    if symbols is None:
-        return ()
-    return tuple(s.name for s in symbols)
+    return tuple(name for name in symbols.keys() if isinstance(name, str))
 
 
 def _runtime_symbol_call_adapter_kind(runtime_module_id: str, runtime_symbol: str) -> str:
     doc = lookup_runtime_symbol_doc(runtime_module_id, runtime_symbol)
-    if doc is None:
-        return ""
-    return doc.call_adapter_kind
+    adapter_kind = doc.get("call_adapter_kind")
+    return adapter_kind if isinstance(adapter_kind, str) else ""
 
 
 def _runtime_symbol_semantic_tag(runtime_module_id: str, runtime_symbol: str) -> str:
     doc = lookup_runtime_symbol_doc(runtime_module_id, runtime_symbol)
-    if doc is None:
-        return ""
-    return doc.semantic_tag
+    semantic_tag = doc.get("semantic_tag")
+    return semantic_tag if isinstance(semantic_tag, str) else ""
 
 
 def _is_math_runtime_symbol(runtime_module_id: str, runtime_symbol: str) -> bool:

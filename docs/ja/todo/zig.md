@@ -46,8 +46,10 @@
 
 依存箇所: `from toolchain_.frontends.runtime_symbol_index import canonical_runtime_module_id, lookup_runtime_module_symbols`
 
-1. [ ] [ID: P0-ZIG-LEGACY-S1] `runtime_symbol_index` の必要な機能を toolchain 側に移行するか、emitter 内で EAST3 メタデータから直接取得するように修正する
-2. [ ] [ID: P0-ZIG-LEGACY-S2] `toolchain_` への import がゼロになることを確認する
+1. [x] [ID: P0-ZIG-LEGACY-S1] `runtime_symbol_index` の必要な機能を toolchain 側に移行するか、emitter 内で EAST3 メタデータから直接取得するように修正する
+   完了メモ: Zig emitter 内に `runtime_symbol_index.json` を直接読む local helper を追加し、`canonical_runtime_module_id` / module-symbol lookup / symbol doc lookup を emitter 側へ内包した。`toolchain_.frontends.runtime_symbol_index` 依存は削除済み。
+2. [x] [ID: P0-ZIG-LEGACY-S2] `toolchain_` への import がゼロになることを確認する
+   完了メモ: `rg "toolchain_" src/toolchain/emit/zig` で 0 件を確認した。
 
 ### P0-ZIG-NEW-FIXTURE-PARITY: 新規追加 fixture / stdlib の parity 確認
 
