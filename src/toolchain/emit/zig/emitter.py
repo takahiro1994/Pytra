@@ -2493,25 +2493,23 @@ class ZigNativeEmitter:
                 if var_name != "":
                     self._current_type_map()[var_name] = enter_type
                     already_declared = len(self._local_var_stack) > 0 and var_name in self._current_local_vars()
-                    reassigned = len(self._reassigned_name_stack) > 0 and var_name in self._reassigned_name_stack[-1]
                     if enter_type == "TextIOWrapper":
                         if already_declared:
-                            renderer.state.indent_level = self.indent
-                            renderer.emit_with_context_bind(var_name, ctx_name, enter_type, False)
-                            self.indent = renderer.state.indent_level
+                            self._call_stmt_renderer(renderer, "emit_with_context_bind", var_name, ctx_name, enter_type, False)
                         else:
-                            renderer.state.indent_level = self.indent
-                            renderer.emit_with_enter_binding(
+                            self._call_stmt_renderer(
+                                renderer,
+                                "emit_with_enter_binding",
                                 stmt,
                                 var_name,
                                 enter_type,
                                 {"kind": "Name", "id": ctx_name, "resolved_type": ctx_type},
                                 bind_ref=True,
                             )
-                            self.indent = renderer.state.indent_level
                     else:
-                        renderer.state.indent_level = self.indent
-                        renderer.emit_with_enter_binding(
+                        self._call_stmt_renderer(
+                            renderer,
+                            "emit_with_enter_binding",
                             stmt,
                             var_name,
                             enter_type,
@@ -2528,32 +2526,15 @@ class ZigNativeEmitter:
                                 "resolved_type": enter_type,
                             },
                         )
-                        self.indent = renderer.state.indent_level
                     if not already_declared and len(self._local_var_stack) > 0:
                         self._current_local_vars().add(var_name)
                 elif enter_type != "TextIOWrapper":
-                    renderer.state.indent_level = self.indent
-                    renderer.emit_with_fallback_enter(ctx_name, enter_type)
-                    self.indent = renderer.state.indent_level
-                self._emit_line(renderer.render_try_body_open(with_blk))
-                self.indent += 1
-                self._try_depth += 1
-                self._try_label_stack.append(with_blk)
-                for sub in body:
-                    self._emit_stmt(sub)
-                    renderer.state.indent_level = self.indent
-                    renderer.emit_try_body_post_stmt(sub, with_blk)
-                    self.indent = renderer.state.indent_level
-                self._try_label_stack.pop()
-                self._try_depth -= 1
-                self.indent -= 1
-                self._emit_line(renderer.render_try_body_close(with_blk))
-                renderer.state.indent_level = self.indent
+                    self._call_stmt_renderer(renderer, "emit_with_fallback_enter", ctx_name, enter_type)
+                self._emit_try_body_with_renderer(renderer, with_blk, body)
                 if enter_type == "TextIOWrapper":
-                    renderer.emit_with_close_fallback(ctx_name, enter_type)
+                    self._call_stmt_renderer(renderer, "emit_with_close_fallback", ctx_name, enter_type)
                 else:
-                    renderer.emit_with_fallback_exit(ctx_name, enter_type)
-                self.indent = renderer.state.indent_level
+                    self._call_stmt_renderer(renderer, "emit_with_fallback_exit", ctx_name, enter_type)
             else:
                 renderer.emit_with_stmt(stmt)
             self._sync_from_stmt_renderer(renderer)
