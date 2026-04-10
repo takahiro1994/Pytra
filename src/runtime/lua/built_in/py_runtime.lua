@@ -564,21 +564,34 @@ end
 function __pytra_write_byte_table(f, data)
     local n = #data
     local i = 1
-    local chunk_size = 4096
+    local chunk_size = 2048
     while i <= n do
         local stop = i + chunk_size - 1
         if stop > n then
             stop = n
         end
-        local parts = {}
-        local out_i = 1
+        local fast = true
         local j = i
         while j <= stop do
-            parts[out_i] = string.char((tonumber(data[j]) or 0) % 256)
-            out_i = out_i + 1
+            if type(data[j]) ~= "number" then
+                fast = false
+                break
+            end
             j = j + 1
         end
-        f:write(table.concat(parts))
+        if fast then
+            f:write(string.char(table.unpack(data, i, stop)))
+        else
+            local parts = {}
+            local out_i = 1
+            j = i
+            while j <= stop do
+                parts[out_i] = string.char((tonumber(data[j]) or 0) % 256)
+                out_i = out_i + 1
+                j = j + 1
+            end
+            f:write(table.concat(parts))
+        end
         i = stop + 1
     end
 end
@@ -665,11 +678,11 @@ function __pytra_slice(seq, start_idx, stop_idx)
     if j < 0 then j = 0 end
     if i > n then i = n end
     if j > n then j = n end
-    local out = {}
     local from = math.floor(i) + 1
     local to = math.floor(j)
-    for k = from, to do
-        out[#out + 1] = seq[k]
+    local out = {}
+    if from <= to then
+        table.move(seq, from, to, 1, out)
     end
     return out
 end
