@@ -1415,7 +1415,9 @@ def _lower_representative_json_decode_call(out_call: Node, ctx: CompileContext) 
     out_call["lowered_kind"] = JSON_DECODE_CALL
     out_call["json_decode_receiver"] = receiver_node
     base_meta = _build_json_decode_meta(out_call, jv_str(out_call.get("semantic_tag", "")), ctx)
-    meta: Node = _copy_node(base_meta)
+    meta: Node = {}
+    for key_s, value_jv in base_meta.items():
+        meta[key_s] = value_jv
     meta["ir_category"] = JSON_DECODE_CALL
     meta["decode_entry"] = "json.value.as_obj"
     meta["contract_source"] = cs
@@ -1652,13 +1654,20 @@ def _lower_isinstance_call(
     ctx: CompileContext,
 ) -> Node:
     args = out_call.get("args")
-    al: list[JsonVal] = cast(list[JsonVal], args) if isinstance(args, list) else []
+    al: list[JsonVal] = _empty_jv_list()
+    if isinstance(args, list):
+        al = jv_list(args)
     if len(al) != 2:
         return out_call
     value_expr = al[0]
     specs = _collect_expected_type_id_specs(al[1], dispatch_mode=dispatch_mode, ctx=ctx)
     type_names = [jv_str(s.get("type_name_str", "")) for s in specs if isinstance(s, dict)]
-    if all(tn == "" for tn in type_names):
+    all_empty = True
+    for tn in type_names:
+        if tn != "":
+            all_empty = False
+            break
+    if all_empty:
         fo = _const_bool_node(False)
         _copy_source_span_and_repr(out_call, fo)
         return fo
@@ -1671,7 +1680,7 @@ def _lower_isinstance_call(
             return to
     checks: list[Node] = []
     for spec in specs:
-        spec_node: Node = cast(dict[str, JsonVal], spec)
+        spec_node: Node = jv_dict(spec)
         type_name = jv_str(spec_node.get("type_name_str", ""))
         if type_name == "":
             continue
@@ -1681,7 +1690,9 @@ def _lower_isinstance_call(
             ctx=ctx,
         )
         ttm = spec_node.get("nominal_adt_test_v1")
-        ttm_node: Node | None = cast(dict[str, JsonVal], ttm) if isinstance(ttm, dict) else None
+        ttm_node: Node | None = None
+        if isinstance(ttm, dict):
+            ttm_node = jv_dict(ttm)
         check = _attach_nominal_adt_type_test_meta(check, ttm_node)
         checks.append(check)
     return _build_or_of_checks(checks, out_call)
@@ -1692,7 +1703,9 @@ def _lower_issubclass_call(
     ctx: CompileContext,
 ) -> Node:
     args = out_call.get("args")
-    al: list[JsonVal] = cast(list[JsonVal], args) if isinstance(args, list) else []
+    al: list[JsonVal] = _empty_jv_list()
+    if isinstance(args, list):
+        al = jv_list(args)
     if len(al) != 2:
         return out_call
     atid = _type_ref_to_type_id(al[0], dispatch_mode=dispatch_mode, ctx=ctx)
@@ -1712,15 +1725,16 @@ def _lower_issubclass_call(
         type_ref_expr = spec.get("type_ref_expr")
         if not isinstance(type_ref_expr, dict):
             continue
-        if type_ref_expr.get("kind") != NAME:
+        type_ref_node = jv_dict(type_ref_expr)
+        if nd_kind(type_ref_node) != NAME:
             continue
-        if _normalize_type_predicate_target_name(jv_str(type_ref_expr.get("id", ""))) == "object":
+        if _normalize_type_predicate_target_name(jv_str(type_ref_node.get("id", ""))) == "object":
             to = _const_bool_node(True)
             _copy_source_span_and_repr(out_call, to)
             return to
     checks: list[Node] = []
     for spec in specs:
-        spec_node: Node = cast(dict[str, JsonVal], spec)
+        spec_node: Node = jv_dict(spec)
         tid = spec_node.get("type_id_expr")
         if tid is None:
             continue
@@ -1730,7 +1744,9 @@ def _lower_issubclass_call(
             ctx=ctx,
         )
         ttm = spec_node.get("nominal_adt_test_v1")
-        ttm_node: Node | None = cast(dict[str, JsonVal], ttm) if isinstance(ttm, dict) else None
+        ttm_node: Node | None = None
+        if isinstance(ttm, dict):
+            ttm_node = jv_dict(ttm)
         check = _attach_nominal_adt_type_test_meta(check, ttm_node)
         checks.append(check)
     return _build_or_of_checks(checks, out_call)
@@ -1756,8 +1772,8 @@ def _lower_type_id_call_expr(
     func_obj = out_call.get("func")
     if not isinstance(func_obj, dict):
         return out_call
-    func_node: Node = cast(dict[str, JsonVal], func_obj)
-    if func_node.get("kind") != NAME:
+    func_node: Node = jv_dict(func_obj)
+    if nd_kind(func_node) != NAME:
         return out_call
     fn = jv_str(func_node.get("id", ""))
     if not legacy_compat:
@@ -1768,7 +1784,9 @@ def _lower_type_id_call_expr(
         return _lower_issubclass_call(out_call, dispatch_mode=dispatch_mode, ctx=ctx)
     if fn == "py_isinstance" or fn == "py_tid_isinstance":
         al2 = out_call.get("args")
-        a2: list[JsonVal] = cast(list[JsonVal], al2) if isinstance(al2, list) else []
+        a2: list[JsonVal] = _empty_jv_list()
+        if isinstance(al2, list):
+            a2 = jv_list(al2)
         if len(a2) == 2:
             _tid_expr = a2[1]
             _tid_map = {"PYTRA_TID_NONE": "None", "PYTRA_TID_STR": "str", "PYTRA_TID_LIST": "list", "PYTRA_TID_DICT": "dict", "PYTRA_TID_SET": "set"}
@@ -1777,17 +1795,23 @@ def _lower_type_id_call_expr(
             return _make_type_predicate_expr(kind=jv_str(IS_INSTANCE), left_key="value", left_expr=a2[0], expected_type_name=_type_name, source_expr=out_call, ctx=ctx)
     if fn == "py_issubclass" or fn == "py_tid_issubclass":
         al2 = out_call.get("args")
-        a2: list[JsonVal] = cast(list[JsonVal], al2) if isinstance(al2, list) else []
+        a2: list[JsonVal] = _empty_jv_list()
+        if isinstance(al2, list):
+            a2 = jv_list(al2)
         if len(a2) == 2:
             return _make_type_predicate_expr(kind=jv_str(IS_SUBCLASS), left_key="actual_type_id", left_expr=a2[0], expected_type_id_expr=a2[1], source_expr=out_call, ctx=ctx)
     if fn == "py_is_subtype" or fn == "py_tid_is_subtype":
         al2 = out_call.get("args")
-        a2: list[JsonVal] = cast(list[JsonVal], al2) if isinstance(al2, list) else []
+        a2: list[JsonVal] = _empty_jv_list()
+        if isinstance(al2, list):
+            a2 = jv_list(al2)
         if len(a2) == 2:
             return _make_type_predicate_expr(kind=jv_str(IS_SUBTYPE), left_key="actual_type_id", left_expr=a2[0], expected_type_id_expr=a2[1], source_expr=out_call, ctx=ctx)
     if fn == "py_runtime_type_id" or fn == "py_tid_runtime_type_id":
         al2 = out_call.get("args")
-        a2: list[JsonVal] = cast(list[JsonVal], al2) if isinstance(al2, list) else []
+        a2: list[JsonVal] = _empty_jv_list()
+        if isinstance(al2, list):
+            a2 = jv_list(al2)
         if len(a2) == 1:
             return _make_boundary_expr(kind=jv_str(OBJ_TYPE_ID), value_key="value", value_node=a2[0], resolved_type="int64", source_expr=out_call, ctx=ctx)
     return out_call
