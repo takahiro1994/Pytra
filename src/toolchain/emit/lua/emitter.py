@@ -1761,6 +1761,8 @@ def _emit_stmt(ctx: EmitContext, node: JsonVal) -> None:
     if kind == "Expr":
         value = node.get("value")
         if isinstance(value, dict):
+            if _emit_direct_expr_stmt_call(ctx, value):
+                return
             if _str(value, "kind") == "Name" and _str(value, "id") == "break":
                 _emit(ctx, "break")
                 return
@@ -1771,8 +1773,8 @@ def _emit_stmt(ctx: EmitContext, node: JsonVal) -> None:
             if _str(value, "kind") == "Constant" and isinstance(value.get("value"), str):
                 return
             code = _emit_expr(ctx, value)
-            if code != "" and code != "nil":
-                _emit(ctx, code)
+        if code != "" and code != "nil":
+            _emit(ctx, code)
     elif kind == "Return":
         _emit_return(ctx, node)
     elif kind == "Assign" or kind == "AnnAssign":
@@ -1834,6 +1836,35 @@ def _emit_stmt(ctx: EmitContext, node: JsonVal) -> None:
         _emit_delete(ctx, node)
     else:
         _emit(ctx, "-- unsupported stmt: " + kind)
+
+
+def _emit_direct_expr_stmt_call(ctx: EmitContext, node: dict[str, JsonVal]) -> bool:
+    if _str(node, "kind") != "Call":
+        return False
+    func_node = node.get("func")
+    if not isinstance(func_node, dict):
+        return False
+    args = _list(node, "args")
+    if len(args) != 1:
+        return False
+    runtime_call = _str(node, "runtime_call")
+    resolved_rt_call = _str(node, "resolved_runtime_call")
+    call_name = ""
+    if runtime_call != "":
+        call_name = ctx.mapping.calls.get(runtime_call, "")
+    if call_name == "" and resolved_rt_call != "":
+        call_name = ctx.mapping.calls.get(resolved_rt_call, "")
+    if call_name != "__LIST_APPEND__":
+        return False
+    if _str(func_node, "kind") != "Attribute":
+        return False
+    owner_node = func_node.get("value")
+    if not isinstance(owner_node, dict):
+        return False
+    owner = _emit_expr(ctx, owner_node)
+    value_code = _emit_expr(ctx, args[0])
+    _emit(ctx, owner + "[#" + owner + " + 1] = " + value_code)
+    return True
 
 
 def _emit_body(ctx: EmitContext, body: list[JsonVal]) -> None:
