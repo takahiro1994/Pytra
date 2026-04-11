@@ -1,6 +1,6 @@
 # P3-COPY-ELISION: EAST3 / linker に copy elision メタデータを追加する
 
-最終更新: 2026-04-02
+最終更新: 2026-04-11
 
 ## 背景
 
@@ -49,7 +49,7 @@ EAST3 / linker に関連する既存メタデータ:
 1. [ ] [ID: P3-COPY-ELISION-S1] `bytes(bytearray)` のコピー省略が安全な条件を形式化し、spec-east.md に `copy_elision_safe_v1` スキーマを定義する
 2. [ ] [ID: P3-COPY-ELISION-S2] linker の def-use / non-escape 解析で copy elision 判定を実装する
 3. [ ] [ID: P3-COPY-ELISION-S3] Lua emitter で `copy_elision_safe_v1` を参照してコピー省略を実装する
-4. [ ] [ID: P3-COPY-ELISION-S4] `07_game_of_life_loop` の Lua parity が PASS し、性能が改善されることを確認する
+4. [x] [ID: P3-COPY-ELISION-S4] `07_game_of_life_loop` の Lua parity が PASS し、性能が改善されることを確認する
 
 ## 決定ログ
 
@@ -61,3 +61,4 @@ EAST3 / linker に関連する既存メタデータ:
 - 2026-04-10: readonly subscript owner も non-escape 判定に含め、`pytra.utils.gif._lzw_encode()` の `return bytes(out)` も `__pytra_bytes_alias(out)` へ切り替わることを確認。残る hot path は cross-module の `grayscale_palette()` と `f.write(bytes(out))`。
 - 2026-04-10: callsite 走査を cross-module に広げ、readonly parameter へ直接渡されるケースも拾えるようにした。これで `pytra.utils.gif.grayscale_palette()` の `return bytes(p)` も `__pytra_bytes_alias(p)` に変わることを確認。残る hot path は `f.write(bytes(out))`。
 - 2026-04-10: local readonly callsite も annotate 対象に広げ、同一 module の top-level 関数 `arg_usage` と `*.write(...)` の readonly input contract を使って `bytes(fr_buf)` / `bytes(out)` の callsite も alias 化した。`pytra.utils.gif` の hot path は概ね `__pytra_bytes_alias(...)` に置き換わったので、残りは長時間 parity の完走確認。
+- 2026-04-11: Lua emitter に `subscript_access_v1` を接続して `bounds_check=off` / `negative_index=skip` の read を direct 化し、さらに statement 位置の `list.append(...)` を `t[#t + 1] = v` へ direct emit するようにして `next_state()` / frame 収集の call overhead を削減した。`runtime_parity_check_fast.py --targets lua --case-root sample --cmd-timeout-sec 15000 07_game_of_life_loop` で `artifact_size=59020356` / `artifact_crc32=0xd27e32ee` 一致の PASS を確認し、`P3-COPY-ELISION-S4` を完了。
