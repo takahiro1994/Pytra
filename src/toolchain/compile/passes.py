@@ -125,11 +125,7 @@ def _replace_yield_with_append(node: JsonVal, acc: str, list_type: str) -> JsonV
             hs: list[JsonVal] = _empty_jv_list()
             for h in handlers:
                 if isinstance(h, dict):
-                    hd: Node = jv_dict(h)
-                    nh: Node = {}
-                    for hk_s in hd.keys():
-                        hv_jv = hd[hk_s]
-                        nh[hk_s] = hv_jv
+                    nh: Node = jv_dict(deep_copy_json(h))
                     if "body" in nh:
                         nh["body"] = _replace_yield_with_append(nh["body"], acc, list_type)
                     hs.append(nh)
@@ -198,17 +194,17 @@ def _yield_walk(node: JsonVal) -> None:
         return
     nd: Node = jv_dict(node)
     if _is_function_like_kind(nd_kind(nd)):
-        body_jv = nd.get("body")
+        body_jv: JsonVal = nd.get("body")
         if isinstance(body_jv, list) and _contains_yield(body_jv):
             _lower_generator_function(nd)
-        body2_jv = nd.get("body")
+        body2_jv: JsonVal = nd.get("body")
         if isinstance(body2_jv, list):
             body2_list: list[JsonVal] = jv_list(body2_jv)
             for s in body2_list:
                 _yield_walk(s)
         return
     if nd_kind(nd) == CLASS_DEF or nd_kind(nd) == MODULE:
-        body_jv = nd.get("body")
+        body_jv: JsonVal = nd.get("body")
         if isinstance(body_jv, list):
             body_list: list[JsonVal] = jv_list(body_jv)
             for s in body_list:
@@ -238,7 +234,7 @@ def _build_lc_target_plan(target: JsonVal) -> Node:
         if kind == NAME:
             plan: Node = {}
             plan["kind"] = NAME_TARGET
-            plan["id"] = target_node.get("id", "_")
+            plan["id"] = target_node["id"] if "id" in target_node else "_"
             rt: str = jv_str(target_node.get("resolved_type", ""))
             if rt not in ("", "unknown"):
                 plan["target_type"] = rt
@@ -431,21 +427,21 @@ def _lc_in_stmts(stmts: list[JsonVal], ctx: CompileContext) -> list[JsonVal]:
                 if isinstance(target, dict):
                     target_node = jv_dict(target)
                     if nd_kind(target_node) == NAME:
-                        tn = jv_str(target_node.get("id", ""))
+                        tn = jv_str(target_node["id"] if "id" in target_node else "")
                 cn = tn if tn != "" else _lc_temp_name(stmt_node, stmt_idx)
                 at = ""
                 if kind == ANN_ASSIGN:
                     ann = stmt_node.get("annotation")
-                    ann_s = jv_str(ann)
-                    if ann_s != "" and "unknown" not in ann_s:
-                        at = ann_s
+                    ann_text: str = jv_str(ann)
+                    if ann_text != "" and "unknown" not in ann_text:
+                        at = ann_text
                 value_node = jv_dict(value)
                 expanded = _expand_lc_to_stmts(value_node, cn, at)
                 if cn != tn and isinstance(target, dict):
                     assign_value: Node = {}
                     assign_value["kind"] = NAME
                     assign_value["id"] = cn
-                    assign_value["resolved_type"] = jv_str(value_node.get("resolved_type", ""))
+                    assign_value["resolved_type"] = jv_str(value_node["resolved_type"] if "resolved_type" in value_node else "")
                     assign_stmt: Node = {}
                     assign_stmt["kind"] = ASSIGN
                     assign_stmt["target"] = deep_copy_json(target)
@@ -460,7 +456,7 @@ def _lc_in_stmts(stmts: list[JsonVal], ctx: CompileContext) -> list[JsonVal]:
             ev = stmt_node.get("value")
             if isinstance(ev, dict) and nd_kind(jv_dict(ev)) == LIST_COMP:
                 tmp = _lc_temp_name(stmt_node, stmt_idx)
-                expanded_expr = _expand_lc_to_stmts(ev, tmp)
+                expanded_expr = _expand_lc_to_stmts(jv_dict(ev), tmp)
                 for ex in expanded_expr:
                     result.append(ex)
                 stmt_idx += 1
@@ -508,18 +504,18 @@ def _collect_function_locals(stmts: list[JsonVal], out: dict[str, str]) -> None:
             continue
         kind = _sk(stmt)
         if _is_function_like_kind(kind) or kind == CLASS_DEF:
-            name = jv_str(stmt.get("name", ""))
-            if name != "" and name not in out:
+            name_s: str = jv_str(stmt.get("name", ""))
+            if name_s != "" and name_s not in out:
                 if kind == CLASS_DEF:
-                    out[name] = name
+                    out[name_s] = name_s
                 else:
-                    out[name] = _closure_callable_type(stmt)
+                    out[name_s] = _closure_callable_type(jv_dict(stmt))
             continue
         if kind == VAR_DECL:
-            name2 = jv_str(stmt.get("name", ""))
-            type2 = jv_str(stmt.get("type", ""))
-            if name2 != "" and name2 not in out:
-                out[name2] = type2
+            name2_s: str = jv_str(stmt.get("name", ""))
+            type2_s: str = jv_str(stmt.get("type", ""))
+            if name2_s != "" and name2_s not in out:
+                out[name2_s] = type2_s
         elif kind in (ASSIGN, ANN_ASSIGN, AUG_ASSIGN):
             _collect_assign_names(stmt, out)
         elif kind == FOR:
@@ -768,8 +764,8 @@ def _closure_callable_type(node: Node) -> str:
                 continue
             if arg == "self":
                 continue
-            arg_type = arg_types_node.get(arg)
-            params.append(arg_type if isinstance(arg_type, str) and arg_type != "" else "unknown")
+            arg_type_s: str = jv_str(arg_types_node[arg] if arg in arg_types_node else "")
+            params.append(arg_type_s if arg_type_s != "" else "unknown")
     ret = jv_str(node.get("return_type", ""))
     if ret == "":
         ret = "unknown"
