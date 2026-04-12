@@ -100,7 +100,7 @@ def _replace_yield_with_append(node: JsonVal, acc: str, list_type: str) -> JsonV
             value = value_node
         call_args: list[Node] = []
         if isinstance(value, dict):
-            call_args.append(cast(dict[str, JsonVal], value))
+            call_args.append(jv_dict(value))
         call_node = _make_container_method_call(
             acc,
             list_type,
@@ -198,19 +198,19 @@ def _yield_walk(node: JsonVal) -> None:
         return
     nd: Node = jv_dict(node)
     if _is_function_like_kind(nd_kind(nd)):
-        body_obj = nd.get("body")
-        if isinstance(body_obj, list) and _contains_yield(body_obj):
+        body_jv = nd.get("body")
+        if isinstance(body_jv, list) and _contains_yield(body_jv):
             _lower_generator_function(nd)
-        body2_obj = nd.get("body")
-        if isinstance(body2_obj, list):
-            body2_list: list[JsonVal] = jv_list(body2_obj)
+        body2_jv = nd.get("body")
+        if isinstance(body2_jv, list):
+            body2_list: list[JsonVal] = jv_list(body2_jv)
             for s in body2_list:
                 _yield_walk(s)
         return
     if nd_kind(nd) == CLASS_DEF or nd_kind(nd) == MODULE:
-        body_obj = nd.get("body")
-        if isinstance(body_obj, list):
-            body_list: list[JsonVal] = jv_list(body_obj)
+        body_jv = nd.get("body")
+        if isinstance(body_jv, list):
+            body_list: list[JsonVal] = jv_list(body_jv)
             for s in body_list:
                 _yield_walk(s)
         return
@@ -439,12 +439,13 @@ def _lc_in_stmts(stmts: list[JsonVal], ctx: CompileContext) -> list[JsonVal]:
                     ann_s = jv_str(ann)
                     if ann_s != "" and "unknown" not in ann_s:
                         at = ann_s
-                expanded = _expand_lc_to_stmts(value, cn, at)
+                value_node = jv_dict(value)
+                expanded = _expand_lc_to_stmts(value_node, cn, at)
                 if cn != tn and isinstance(target, dict):
                     assign_value: Node = {}
                     assign_value["kind"] = NAME
                     assign_value["id"] = cn
-                    assign_value["resolved_type"] = jv_str(value.get("resolved_type", ""))
+                    assign_value["resolved_type"] = jv_str(value_node.get("resolved_type", ""))
                     assign_stmt: Node = {}
                     assign_stmt["kind"] = ASSIGN
                     assign_stmt["target"] = deep_copy_json(target)
@@ -662,11 +663,15 @@ def _collect_reassigned_lexical(stmts: list[JsonVal], out: dict[str, int]) -> No
             _collect_target_plan_write_counts(stmt.get("target_plan"), out)
         if _is_function_like_kind(kind) or kind == CLASS_DEF:
             continue
-        for key in ("body", "orelse", "finalbody"):
-            nested = stmt.get(key)
-            if isinstance(nested, list):
-                nested_list: list[JsonVal] = cast(list[JsonVal], nested)
-                _collect_reassigned_lexical(nested_list, out)
+        nested = stmt.get("body")
+        if isinstance(nested, list):
+            _collect_reassigned_lexical(jv_list(nested), out)
+        nested = stmt.get("orelse")
+        if isinstance(nested, list):
+            _collect_reassigned_lexical(jv_list(nested), out)
+        nested = stmt.get("finalbody")
+        if isinstance(nested, list):
+            _collect_reassigned_lexical(jv_list(nested), out)
         handlers = stmt.get("handlers")
         if isinstance(handlers, list):
             handler_list: list[JsonVal] = jv_list(handlers)
@@ -684,7 +689,8 @@ def _collect_target_write_counts(target: JsonVal, out: dict[str, int]) -> None:
         return
     kind = _sk(target)
     if kind == NAME:
-        name = jv_str(target.get("id", ""))
+        target_node = jv_dict(target)
+        name = jv_str(target_node.get("id", ""))
         if name != "":
             _bump_reassigned(out, name)
         return
@@ -700,7 +706,8 @@ def _collect_target_plan_write_counts(target_plan: JsonVal, out: dict[str, int])
         return
     kind = _sk(target_plan)
     if kind == NAME_TARGET:
-        name = jv_str(target_plan.get("id", ""))
+        target_plan_node = jv_dict(target_plan)
+        name = jv_str(target_plan_node.get("id", ""))
         if name != "":
             _bump_reassigned(out, name)
         return
