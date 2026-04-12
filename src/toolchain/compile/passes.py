@@ -1123,13 +1123,13 @@ def _tte_walk(node: JsonVal, ctx: CompileContext) -> None:
     if nd_kind(nd) == FOR_CORE:
         tp = nd.get("target_plan")
         if isinstance(tp, dict):
-            tp_node: Node = cast(dict[str, JsonVal], tp)
+            tp_node: Node = jv_dict(tp)
             if nd_kind(tp_node) != TUPLE_TARGET:
                 pass
             else:
                 elements = tp_node.get("elements")
                 if isinstance(elements, list):
-                    elements_list: list[JsonVal] = cast(list[JsonVal], elements)
+                    elements_list: list[JsonVal] = jv_list(elements)
                     if len(elements_list) < 2:
                         pass
                     else:
@@ -1141,12 +1141,12 @@ def _tte_walk(node: JsonVal, ctx: CompileContext) -> None:
                             if not isinstance(elem, dict):
                                 all_flat_names = False
                                 continue
-                            elem_node: Node = cast(dict[str, JsonVal], elem)
+                            elem_node: Node = jv_dict(elem)
                             if nd_kind(elem_node) != NAME_TARGET:
                                 all_flat_names = False
                                 continue
-                            en = elem_node.get("id", "")
-                            et = elem_node.get("target_type", "")
+                            en = elem_node["id"] if "id" in elem_node else ""
+                            et = elem_node["target_type"] if "target_type" in elem_node else ""
                             if not isinstance(en, str) or en == "":
                                 all_flat_names = False
                                 continue
@@ -1174,7 +1174,7 @@ def _tte_walk(node: JsonVal, ctx: CompileContext) -> None:
                             nd["target_plan"] = tp_out
                             body = nd.get("body")
                             if isinstance(body, list):
-                                body_list: list[JsonVal] = cast(list[JsonVal], body)
+                                body_list: list[JsonVal] = jv_list(body)
                                 new_body: list[JsonVal] = []
                                 for stmt in assigns:
                                     new_body.append(stmt)
@@ -1588,26 +1588,28 @@ def _try_lower_enum_forcore(stmt: Node, ctx: CompileContext) -> JsonVal:
     ip = stmt.get("iter_plan")
     if not isinstance(ip, dict):
         return None
-    ip_node: Node = cast(dict[str, JsonVal], ip)
+    ip_node: Node = jv_dict(ip)
     if nd_kind(ip_node) != RUNTIME_ITER_FOR_PLAN:
         return None
     ie = ip_node.get("iter_expr")
     if not isinstance(ie, dict):
         return None
-    ie_node: Node = cast(dict[str, JsonVal], ie)
+    ie_node: Node = jv_dict(ie)
     st: str = jv_str(ie_node.get("semantic_tag", ""))
     is_enum = st == "iter.enumerate"
     if not is_enum:
         func = ie_node.get("func")
         if isinstance(func, dict):
-            func_node: Node = cast(dict[str, JsonVal], func)
-            is_enum = func_node.get("id") == "enumerate" or func_node.get("attr") == "enumerate"
+            func_node: Node = jv_dict(func)
+            func_id: str = jv_str(func_node["id"] if "id" in func_node else "")
+            func_attr: str = jv_str(func_node["attr"] if "attr" in func_node else "")
+            is_enum = func_id == "enumerate" or func_attr == "enumerate"
     if not is_enum:
         return None
     args_obj = ie_node.get("args")
     if not isinstance(args_obj, list):
         return None
-    args_list: list[JsonVal] = cast(list[JsonVal], args_obj)
+    args_list: list[JsonVal] = jv_list(args_obj)
     if len(args_list) < 1:
         return None
     iterable = args_list[0]
@@ -1615,18 +1617,18 @@ def _try_lower_enum_forcore(stmt: Node, ctx: CompileContext) -> JsonVal:
     if len(args_list) >= 2:
         sa = args_list[1]
         if isinstance(sa, dict) and nd_kind(jv_dict(sa)) == CONSTANT:
-            sa_node: Node = cast(dict[str, JsonVal], sa)
+            sa_node: Node = jv_dict(sa)
             sv = sa_node.get("value")
             if isinstance(sv, int):
                 start_val = sv
     tp = stmt.get("target_plan")
     if not isinstance(tp, dict):
         return None
-    tp_node: Node = cast(dict[str, JsonVal], tp)
+    tp_node: Node = jv_dict(tp)
     body_obj = stmt.get("body")
     if not isinstance(body_obj, list):
         return None
-    body_list: list[JsonVal] = cast(list[JsonVal], body_obj)
+    body_list: list[JsonVal] = jv_list(body_obj)
     idx_name = ""
     val_name = ""
     remaining: list[JsonVal] = []
@@ -1635,26 +1637,26 @@ def _try_lower_enum_forcore(stmt: Node, ctx: CompileContext) -> JsonVal:
         if not isinstance(s, dict):
             remaining.append(s)
             continue
-        s_node: Node = cast(dict[str, JsonVal], s)
+        s_node: Node = jv_dict(s)
         if nd_kind(s_node) == ASSIGN:
             target = s_node.get("target")
             value = s_node.get("value")
             if isinstance(target, dict) and isinstance(value, dict):
-                target_node: Node = cast(dict[str, JsonVal], target)
-                value_node: Node = cast(dict[str, JsonVal], value)
+                target_node: Node = jv_dict(target)
+                value_node: Node = jv_dict(value)
                 if nd_kind(value_node) != SUBSCRIPT:
                     remaining.append(s)
                     continue
                 sl = value_node.get("slice")
                 if isinstance(sl, dict):
-                    sl_node: Node = cast(dict[str, JsonVal], sl)
+                    sl_node: Node = jv_dict(sl)
                     if nd_kind(sl_node) != CONSTANT:
                         remaining.append(s)
                         continue
                     idx_v = sl_node.get("value")
                     owner = value_node.get("value")
                     if isinstance(owner, dict):
-                        owner_node: Node = cast(dict[str, JsonVal], owner)
+                        owner_node: Node = jv_dict(owner)
                         if jv_str(owner_node.get("id", "")) != iter_tmp:
                             remaining.append(s)
                             continue
@@ -1758,7 +1760,7 @@ def _try_lower_enum_forcore(stmt: Node, ctx: CompileContext) -> JsonVal:
         nd_nf["body"] = nd_nb
         orelse_obj = stmt.get("orelse")
         if isinstance(orelse_obj, list):
-            nd_nf["orelse"] = cast(list[JsonVal], orelse_obj)
+            nd_nf["orelse"] = jv_list(orelse_obj)
         else:
             nd_nf["orelse"] = _empty_jv_list()
         nd_out: list[JsonVal] = _empty_jv_list()
