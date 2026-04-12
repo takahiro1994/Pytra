@@ -12,7 +12,7 @@ from typing import Union
 
 from pytra.typing import cast
 from toolchain.compile.jv import JsonVal, Node, CompileContext, deep_copy_json
-from toolchain.compile.jv import jv_str, jv_dict, jv_list, jv_is_dict, jv_is_list
+from toolchain.compile.jv import jv_str, jv_int, jv_bool, jv_dict, jv_list, jv_is_dict, jv_is_list
 from toolchain.compile.jv import nd_kind, nd_get_str, nd_get_str_or, nd_get_dict, nd_get_list, nd_get_int, nd_get_bool
 from toolchain.compile.source_span import walk_normalize_spans
 from toolchain.compile.validate_east3 import validate_east3, format_result
@@ -1714,7 +1714,14 @@ def _lower_issubclass_call(
         _copy_source_span_and_repr(out_call, fo)
         return fo
     specs = _collect_expected_type_id_specs(al[1], dispatch_mode=dispatch_mode, ctx=ctx)
-    expected = [s.get("type_id_expr") for s in specs if isinstance(s, dict)]
+    expected: list[JsonVal] = _empty_jv_list()
+    for spec in specs:
+        if not isinstance(spec, dict):
+            continue
+        spec_node0: Node = jv_dict(spec)
+        type_id_expr = spec_node0.get("type_id_expr")
+        if type_id_expr is not None:
+            expected.append(type_id_expr)
     if len(expected) == 0:
         fo = _const_bool_node(False)
         _copy_source_span_and_repr(out_call, fo)
@@ -2290,16 +2297,19 @@ def lower_east2_to_east3(
     target_language: str = "core",
 ) -> Node:
     """EAST2 Module を EAST3 へ lower する。"""
-    if not isinstance(east_module, dict):
-        return east_module
+    module_input: Node = {}
+    for key_s, value_jv in east_module.items():
+        module_input[key_s] = value_jv
     # 1. Normalize source spans (col → col_offset, remove Module source_span)
     normalized = walk_normalize_spans(east_module)
     if not isinstance(normalized, dict):
-        return east_module
+        return module_input
     normalized_node: Node = jv_dict(normalized)
-    east_module = normalized_node
+    module_node: Node = {}
+    for key_s, value_jv in normalized_node.items():
+        module_node[key_s] = value_jv
 
-    meta_obj = east_module.get("meta")
+    meta_obj = module_node.get("meta")
     dispatch_mode = "native"
     if object_dispatch_mode != "":
         dispatch_mode = _normalize_dispatch_mode(object_dispatch_mode)
@@ -2310,18 +2320,18 @@ def lower_east2_to_east3(
     ctx: CompileContext = CompileContext()
     ctx.lowering_profile = load_lowering_profile(target_language)
     ctx.target_language = target_language
-    ctx.nominal_adt_table = collect_nominal_adt_table(east_module)
+    ctx.nominal_adt_table = collect_nominal_adt_table(module_node)
     ctx.legacy_compat_bridge = True
     if isinstance(meta_obj, dict):
         md2: Node = jv_dict(meta_obj)
         lo = md2.get("legacy_compat_bridge")
         if isinstance(lo, bool):
-            ctx.legacy_compat_bridge = lo
+            ctx.legacy_compat_bridge = jv_bool(lo)
 
-    lowered = _lower_node(east_module, dispatch_mode=dispatch_mode, ctx=ctx)
+    lowered = _lower_node(module_node, dispatch_mode=dispatch_mode, ctx=ctx)
 
     if not isinstance(lowered, dict):
-        return east_module
+        return module_input
     lowered_node: Node = jv_dict(lowered)
     if nd_kind(lowered_node) != MODULE:
         return lowered_node
@@ -2332,43 +2342,53 @@ def lower_east2_to_east3(
     if len(vt) != 0:
         lowered = _apply_vararg_walk(lowered_node, vt)
         if not isinstance(lowered, dict):
-            return east_module
+            return module_input
         lowered_node = jv_dict(lowered)
 
+    module_out: Node = {}
+    for key_s, value_jv in lowered_node.items():
+        module_out[key_s] = value_jv
+
     # Post-lowering passes
-    lower_yield_generators(lowered_node, ctx)
-    lower_listcomp(lowered_node, ctx)
-    lower_nested_function_defs(lowered_node, ctx)
-    expand_default_arguments(lowered_node, ctx)
-    expand_forcore_tuple_targets(lowered_node, ctx)
-    expand_tuple_unpack(lowered_node, ctx)
-    lower_enumerate(lowered_node, ctx)
-    lower_reversed(lowered_node, ctx)
-    hoist_block_scope_variables(lowered_node, ctx)
-    apply_integer_promotion(lowered_node, ctx)
-    apply_guard_narrowing(lowered_node, ctx)
-    apply_type_propagation(lowered_node, ctx)
-    apply_yields_dynamic(lowered_node, ctx)
-    apply_profile_lowering(lowered_node, ctx)
-    detect_swap_patterns(lowered_node, ctx)
-    detect_mutates_self(lowered_node, ctx)
-    detect_unused_variables(lowered_node, ctx)
-    mark_main_guard_discard(lowered_node, ctx)
+    lower_yield_generators(module_out, ctx)
+    lower_listcomp(module_out, ctx)
+    lower_nested_function_defs(module_out, ctx)
+    expand_default_arguments(module_out, ctx)
+    expand_forcore_tuple_targets(module_out, ctx)
+    expand_tuple_unpack(module_out, ctx)
+    lower_enumerate(module_out, ctx)
+    lower_reversed(module_out, ctx)
+    hoist_block_scope_variables(module_out, ctx)
+    apply_integer_promotion(module_out, ctx)
+    apply_guard_narrowing(module_out, ctx)
+    apply_type_propagation(module_out, ctx)
+    apply_yields_dynamic(module_out, ctx)
+    apply_profile_lowering(module_out, ctx)
+    detect_swap_patterns(module_out, ctx)
+    detect_mutates_self(module_out, ctx)
+    detect_unused_variables(module_out, ctx)
+    mark_main_guard_discard(module_out, ctx)
 
-    lowered_node["east_stage"] = 3
-    sv = lowered_node.get("schema_version")
-    schema_version = 1
-    if isinstance(sv, int) and sv > 0:
-        schema_version = sv
-    lowered_node["schema_version"] = schema_version
+    module_out["east_stage"] = 3
+    sv = module_out.get("schema_version")
+    if isinstance(sv, int):
+        schema_version = jv_int(sv)
+        if schema_version > 0:
+            module_out["schema_version"] = schema_version
+        else:
+            module_out["schema_version"] = 1
+    else:
+        module_out["schema_version"] = 1
 
-    mn = lowered_node.get("meta")
+    mn = module_out.get("meta")
     meta_norm: Node = {}
     if isinstance(mn, dict):
-        meta_norm = jv_dict(mn)
-    lowered_node["meta"] = meta_norm
+        mn_dict: Node = jv_dict(mn)
+        for key_s, value_jv in mn_dict.items():
+            meta_norm[key_s] = value_jv
     meta_norm["dispatch_mode"] = dispatch_mode
-    validation = validate_east3(lowered_node)
+    module_out["meta"] = meta_norm
+    validation = validate_east3(module_out)
     if len(validation.errors) != 0:
         raise RuntimeError("EAST3 validation failed\n" + format_result(validation))
-    return lowered_node
+    return module_out

@@ -9,6 +9,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 from pytra.std.json import JsonVal
+from toolchain.compile.jv import Node
 
 
 @dataclass
@@ -23,7 +24,7 @@ class ValidationResult:
         return len(self.errors) == 0
 
 
-def validate_east3(doc: dict[str, JsonVal]) -> ValidationResult:
+def validate_east3(doc: Node) -> ValidationResult:
     result = ValidationResult()
     sp = doc.get("source_path")
     result.source_path = str(sp) if isinstance(sp, str) else ""

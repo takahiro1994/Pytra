@@ -11,7 +11,7 @@ from typing import Union
 from pytra.typing import cast
 
 from toolchain.compile.jv import JsonVal, Node, CompileContext, deep_copy_json
-from toolchain.compile.jv import jv_str, jv_is_dict, jv_is_list
+from toolchain.compile.jv import jv_str, jv_is_dict, jv_is_list, jv_dict, nd_kind
 from toolchain.compile.jv import normalize_type_name
 from toolchain.common.kinds import (
     MODULE, FUNCTION_DEF, CLOSURE_DEF, CLASS_DEF, VAR_DECL,
@@ -33,7 +33,7 @@ def _is_function_like_kind(kind: str) -> bool:
 
 
 def _is_function_like(node: JsonVal) -> bool:
-    return isinstance(node, dict) and _is_function_like_kind(jv_str(node.get("kind", "")))
+    return isinstance(node, dict) and _is_function_like_kind(nd_kind(jv_dict(node)))
 
 # Re-export stubs — these are imported by lower.py
 # Each function mutates the module in place and returns it.
@@ -44,7 +44,7 @@ def _is_function_like(node: JsonVal) -> bool:
 
 def _contains_yield(node: JsonVal) -> bool:
     if isinstance(node, dict):
-        if node.get("kind") == YIELD:
+        if nd_kind(jv_dict(node)) == YIELD:
             return True
         for v in node.values():
             if _contains_yield(v):
@@ -70,8 +70,8 @@ def _replace_yield_with_append(node: JsonVal, acc: str, list_type: str) -> JsonV
         return result
     if not isinstance(node, dict):
         return node
-    nd: Node = node
-    kind = nd.get("kind", "")
+    nd: Node = jv_dict(node)
+    kind = nd_kind(nd)
     if kind == YIELD:
         value = nd.get("value")
         if value is None:
@@ -181,7 +181,7 @@ def _yield_walk(node: JsonVal) -> None:
     if not isinstance(node, dict):
         return
     nd: Node = node
-    kind = nd.get("kind", "")
+    kind = nd_kind(nd)
     if _is_function_like_kind(kind):
         body = nd.get("body")
         if isinstance(body, list) and _contains_yield(body):
@@ -192,7 +192,7 @@ def _yield_walk(node: JsonVal) -> None:
             for s in body2_list:
                 _yield_walk(s)
         return
-    if kind in (CLASS_DEF, MODULE):
+    if kind == CLASS_DEF or kind == MODULE:
         body = nd.get("body")
         if isinstance(body, list):
             body_list: list[JsonVal] = cast(list[JsonVal], body)
@@ -217,17 +217,18 @@ def lower_yield_generators(module: Node, ctx: CompileContext) -> Node:
 
 def _build_lc_target_plan(target: JsonVal) -> Node:
     if isinstance(target, dict):
-        kind = target.get("kind", "")
+        target_node: Node = jv_dict(target)
+        kind = nd_kind(target_node)
         if kind == NAME:
             plan: Node = {}
             plan["kind"] = NAME_TARGET
-            plan["id"] = target.get("id", "_")
-            rt: str = jv_str(target.get("resolved_type", ""))
+            plan["id"] = target_node.get("id", "_")
+            rt: str = jv_str(target_node.get("resolved_type", ""))
             if rt not in ("", "unknown"):
                 plan["target_type"] = rt
             return plan
         if kind == TUPLE:
-            elements = target.get("elements") or target.get("elts") or []
+            elements = target_node.get("elements") or target_node.get("elts") or []
             eps: list[JsonVal] = []
             if isinstance(elements, list):
                 for elem in elements:
@@ -235,7 +236,7 @@ def _build_lc_target_plan(target: JsonVal) -> Node:
             plan: Node = {}
             plan["kind"] = TUPLE_TARGET
             plan["elements"] = eps
-            rt: str = jv_str(target.get("resolved_type", ""))
+            rt: str = jv_str(target_node.get("resolved_type", ""))
             if rt not in ("", "unknown"):
                 plan["target_type"] = rt
             return plan
@@ -275,7 +276,7 @@ def _expand_lc_to_stmts(lc: Node, result_name: str, annotation_type: str = "") -
     if isinstance(append_arg, dict) and elem_type != "":
         append_node: Node = cast(dict[str, JsonVal], append_arg)
         append_node["call_arg_type"] = elem_type
-        append_kind = append_node.get("kind", "")
+        append_kind = nd_kind(append_node)
         append_rt: str = jv_str(append_node.get("resolved_type", ""))
         if append_kind == LIST and append_rt in ("", "unknown", "list[unknown]"):
             append_node["resolved_type"] = elem_type
@@ -327,7 +328,7 @@ def _expand_lc_to_stmts(lc: Node, result_name: str, annotation_type: str = "") -
         iter_node: Node = {}
         if isinstance(iter_expr, dict):
             iter_node = cast(dict[str, JsonVal], iter_expr)
-            iter_kind = jv_str(iter_node.get("kind", ""))
+            iter_kind = nd_kind(iter_node)
         tp = _build_lc_target_plan(target)
         if iter_kind in ("RangeExpr", FOR_RANGE):
             iter_plan: Node = {}
@@ -389,18 +390,19 @@ def _lc_in_stmts(stmts: list[JsonVal], ctx: CompileContext) -> list[JsonVal]:
         if not isinstance(stmt, dict):
             result.append(stmt)
             continue
-        kind = stmt.get("kind", "")
+        stmt_node: Node = jv_dict(stmt)
+        kind = nd_kind(stmt_node)
         if kind in (ASSIGN, ANN_ASSIGN):
-            value = stmt.get("value")
-            if isinstance(value, dict) and value.get("kind") == LIST_COMP:
-                target = stmt.get("target")
+            value = stmt_node.get("value")
+            if isinstance(value, dict) and nd_kind(jv_dict(value)) == LIST_COMP:
+                target = stmt_node.get("target")
                 tn = ""
-                if isinstance(target, dict) and target.get("kind") == NAME:
+                if isinstance(target, dict) and nd_kind(jv_dict(target)) == NAME:
                     tn = jv_str(target.get("id", ""))
                 cn = tn if tn != "" else ctx.next_comp_name()
                 at = ""
                 if kind == ANN_ASSIGN:
-                    ann = stmt.get("annotation")
+                    ann = stmt_node.get("annotation")
                     if isinstance(ann, str) and ann != "" and "unknown" not in ann:
                         at = ann
                 expanded = _expand_lc_to_stmts(value, cn, at)
@@ -419,8 +421,8 @@ def _lc_in_stmts(stmts: list[JsonVal], ctx: CompileContext) -> list[JsonVal]:
                     result.append(ex)
                 continue
         if kind == EXPR:
-            ev = stmt.get("value")
-            if isinstance(ev, dict) and ev.get("kind") == LIST_COMP:
+            ev = stmt_node.get("value")
+            if isinstance(ev, dict) and nd_kind(jv_dict(ev)) == LIST_COMP:
                 tmp: str = ctx.next_comp_name()
                 expanded_expr = _expand_lc_to_stmts(ev, tmp)
                 for ex in expanded_expr:
@@ -428,11 +430,11 @@ def _lc_in_stmts(stmts: list[JsonVal], ctx: CompileContext) -> list[JsonVal]:
                 continue
         # Recurse
         for key in ("body", "orelse", "finalbody"):
-            nested = stmt.get(key)
+            nested = stmt_node.get(key)
             if isinstance(nested, list):
-                stmt[key] = _lc_in_stmts(nested, ctx)
+                stmt_node[key] = _lc_in_stmts(nested, ctx)
         if kind == TRY:
-            hs = stmt.get("handlers")
+            hs = stmt_node.get("handlers")
             if isinstance(hs, list):
                 for h in hs:
                     if isinstance(h, dict):
@@ -856,7 +858,7 @@ def _collect_fn_sigs(module: Node) -> dict[str, Node]:
 
 
 def _collect_sig_node(node: Node, sigs: dict[str, Node], class_name: str) -> None:
-    kind = node.get("kind", "")
+    kind = nd_kind(node)
     if _is_function_like_kind(kind):
         name: str = jv_str(node.get("name", ""))
         if name == "":
@@ -905,9 +907,9 @@ def _collect_sig_node(node: Node, sigs: dict[str, Node], class_name: str) -> Non
         value_node2: Node = cast(dict[str, JsonVal], value) if isinstance(value, dict) else {}
         if (
             isinstance(target, dict)
-            and target.get("kind") == NAME
+            and nd_kind(jv_dict(target)) == NAME
             and isinstance(value, dict)
-            and value_node2.get("kind") == "Lambda"
+            and nd_kind(value_node2) == "Lambda"
         ):
             target_node: Node = cast(dict[str, JsonVal], target)
             value_node: Node = value_node2
@@ -942,14 +944,15 @@ def _expand_defaults_walk(node: JsonVal, sigs: dict[str, Node]) -> None:
     if not isinstance(node, dict):
         return
     nd: Node = node
-    if nd.get("kind") == CALL:
+    if nd_kind(nd) == CALL:
         func = nd.get("func")
         cn = ""
         if isinstance(func, dict):
             func_node: Node = cast(dict[str, JsonVal], func)
-            if func_node.get("kind") == NAME:
+            func_kind = nd_kind(func_node)
+            if func_kind == NAME:
                 cn = jv_str(func_node.get("id", ""))
-            elif func_node.get("kind") == ATTRIBUTE:
+            elif func_kind == ATTRIBUTE:
                 attr: str = jv_str(func_node.get("attr", ""))
                 owner = func_node.get("value")
                 if isinstance(owner, dict):
@@ -1053,11 +1056,11 @@ def _tte_walk(node: JsonVal, ctx: CompileContext) -> None:
     if not isinstance(node, dict):
         return
     nd: Node = node
-    if nd.get("kind") == FOR_CORE:
+    if nd_kind(nd) == FOR_CORE:
         tp = nd.get("target_plan")
         if isinstance(tp, dict):
             tp_node: Node = cast(dict[str, JsonVal], tp)
-            if tp_node.get("kind") != TUPLE_TARGET:
+            if nd_kind(tp_node) != TUPLE_TARGET:
                 pass
             else:
                 elements = tp_node.get("elements")
@@ -1075,7 +1078,7 @@ def _tte_walk(node: JsonVal, ctx: CompileContext) -> None:
                                 all_flat_names = False
                                 continue
                             elem_node: Node = cast(dict[str, JsonVal], elem)
-                            if elem_node.get("kind") != NAME_TARGET:
+                            if nd_kind(elem_node) != NAME_TARGET:
                                 all_flat_names = False
                                 continue
                             en = elem_node.get("id", "")
@@ -1304,8 +1307,8 @@ def _same_lvalue(a: Node, b: Node) -> bool:
     """Check if two nodes refer to the same l-value (Name or Subscript)."""
     if not isinstance(a, dict) or not isinstance(b, dict):
         return False
-    ak = a.get("kind", "")
-    bk = b.get("kind", "")
+    ak = nd_kind(a)
+    bk = nd_kind(b)
     if ak != bk:
         return False
     if ak == NAME:
@@ -1328,7 +1331,7 @@ def _same_lvalue(a: Node, b: Node) -> bool:
         if isinstance(bsl, dict):
             bsl_node = cast(dict[str, JsonVal], bsl)
         return _same_lvalue(av_node, bv_node) and _same_lvalue(asl_node, bsl_node)
-    if ak == "Constant":
+    if ak == CONSTANT:
         return a.get("value") == b.get("value")
     if ak == ATTRIBUTE:
         av = a.get("value")
@@ -1522,7 +1525,7 @@ def _try_lower_enum_forcore(stmt: Node, ctx: CompileContext) -> JsonVal:
     if not isinstance(ip, dict):
         return None
     ip_node: Node = cast(dict[str, JsonVal], ip)
-    if ip_node.get("kind") != RUNTIME_ITER_FOR_PLAN:
+    if nd_kind(ip_node) != RUNTIME_ITER_FOR_PLAN:
         return None
     ie = ip_node.get("iter_expr")
     if not isinstance(ie, dict):
@@ -1547,7 +1550,7 @@ def _try_lower_enum_forcore(stmt: Node, ctx: CompileContext) -> JsonVal:
     start_val = 0
     if len(args_list) >= 2:
         sa = args_list[1]
-        if isinstance(sa, dict) and sa.get("kind") == CONSTANT:
+        if isinstance(sa, dict) and nd_kind(jv_dict(sa)) == CONSTANT:
             sa_node: Node = cast(dict[str, JsonVal], sa)
             sv = sa_node.get("value")
             if isinstance(sv, int):
@@ -1569,19 +1572,19 @@ def _try_lower_enum_forcore(stmt: Node, ctx: CompileContext) -> JsonVal:
             remaining.append(s)
             continue
         s_node: Node = cast(dict[str, JsonVal], s)
-        if s_node.get("kind") == ASSIGN:
+        if nd_kind(s_node) == ASSIGN:
             target = s_node.get("target")
             value = s_node.get("value")
             if isinstance(target, dict) and isinstance(value, dict):
                 target_node: Node = cast(dict[str, JsonVal], target)
                 value_node: Node = cast(dict[str, JsonVal], value)
-                if value_node.get("kind") != SUBSCRIPT:
+                if nd_kind(value_node) != SUBSCRIPT:
                     remaining.append(s)
                     continue
                 sl = value_node.get("slice")
                 if isinstance(sl, dict):
                     sl_node: Node = cast(dict[str, JsonVal], sl)
-                    if sl_node.get("kind") != CONSTANT:
+                    if nd_kind(sl_node) != CONSTANT:
                         remaining.append(s)
                         continue
                     idx_v = sl_node.get("value")
