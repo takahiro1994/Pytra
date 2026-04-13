@@ -6,7 +6,7 @@
 
 > 領域別 TODO。全体索引は [index.md](./index.md) を参照。
 
-最終更新: 2026-04-11
+最終更新: 2026-04-13
 
 ## 運用ルール
 
@@ -50,6 +50,36 @@
 
 ## 未完了タスク
 
+### P0-RESOLVE-ISINSTANCE-NARROWING: union 型に対する isinstance narrowing を修正する
+
+**発端**: C++ selfhost build で `isinstance(value, dict)` 後の narrowing が bare `dict`（パラメータなし）になり、emitter が `dict` と `dict[str, JsonVal]` を別の型と誤判定して covariant copy ラムダを生成 → g++ で `push_back` 未定義エラー。
+
+**問題**: `value` の型が `JsonVal`（= `None | bool | int | float | str | list[JsonVal] | dict[str, JsonVal]`）のとき、`isinstance(value, dict)` で narrowing すると `dict`（bare）になる。union の構成要素に `dict[str, JsonVal]` しかないのだから、narrowing 結果は `dict[str, JsonVal]` であるべき。
+
+**方針**: resolve の isinstance narrowing が、union 型の構成要素からマッチする型をパラメータ付きで取り出すようにする。
+
+1. [ ] [ID: P0-RESOLVE-NARROW-S1] resolve の isinstance narrowing で、union 型の構成要素から `isinstance` の判定対象にマッチする型をパラメータ付きで取り出すよう修正する
+2. [ ] [ID: P0-RESOLVE-NARROW-S2] `isinstance(value, dict)` で `dict[str, JsonVal]` に narrowing されることを確認するテストを追加する
+3. [ ] [ID: P0-RESOLVE-NARROW-S3] 全言語の fixture parity に回帰がないことを確認する
+
+### P0-RESOLVE-TYPE-ALIAS: 型エイリアスの同値性判定を正しく実装する
+
+**発端**: `Node = dict[str, JsonVal]` のとき、`list[Node]` に `dict[str, JsonVal]` を append すると emitter が型不一致と判定する。
+
+**問題**: `normalize_type` が型エイリアス展開と構文正規化を混在させており、再帰型（`JsonVal`）を展開すると `Any` に退化する。結果として型エイリアスの同値性が保証されない。
+
+**方針**:
+- 非再帰型エイリアスは完全展開する
+- 自己再帰型エイリアスは名前を保持する（展開しない）
+- 相互再帰型エイリアスは禁止する（parse 時にエラー）
+- これにより、展開後の型表現が一意に定まり、`Node` と `dict[str, JsonVal]` の同値性が保証される
+
+1. [ ] [ID: P0-RESOLVE-ALIAS-S1] `normalize_type` の再帰型ガードを `Any` 退化から名前保持に変更する
+2. [ ] [ID: P0-RESOLVE-ALIAS-S2] 相互再帰型エイリアスを parse 時にエラーにする
+3. [ ] [ID: P0-RESOLVE-ALIAS-S3] `Node` → `dict[str, JsonVal]` 展開、`JsonVal` → 名前保持のテストを追加する
+4. [ ] [ID: P0-RESOLVE-ALIAS-S4] 全言語の fixture parity に回帰がないことを確認する
+5. [ ] [ID: P0-RESOLVE-ALIAS-S5] spec に「型エイリアスの相互再帰は禁止。自己再帰は名前保持」を明記する
+
 ### P20-CPP-SELFHOST: C++ emitter で toolchain を C++ に変換し g++ build を通す
 
 文脈: [docs/ja/plans/p4-cpp-selfhost.md](../plans/p4-cpp-selfhost.md)
@@ -60,5 +90,6 @@ S0〜S4 完了済み（[archive/20260402.md](archive/20260402.md) 参照）。
    - build 失敗の都度、backend で直るか EAST 修正が必要か判断する
    - EAST 修正が必要と思われる場合は **作業を停止し、問題報告フォーマットで報告する**
    - 2026-04-11: `expand_defaults.py → type_norm.py` の transitive closure 疑いは infra 側で誤診と確定。closure 自体は保持されており、現在は g++ build の残 blocker に戻っている。
+   - **2026-04-13 停止中**: isinstance narrowing（P0-RESOLVE-ISINSTANCE-NARROWING）と型エイリアス同値性（P0-RESOLVE-TYPE-ALIAS）の resolve 修正待ち。両方完了後に再開する。
 2. [ ] [ID: P20-CPP-SELFHOST-S6] `run_selfhost_parity.py --selfhost-lang cpp --emit-target cpp --case-root fixture` で fixture parity が PASS することを確認する
 3. [ ] [ID: P20-CPP-SELFHOST-S7] `run_selfhost_parity.py --selfhost-lang cpp --emit-target cpp --case-root sample` で sample parity が PASS することを確認する
