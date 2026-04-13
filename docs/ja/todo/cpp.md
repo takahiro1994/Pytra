@@ -52,6 +52,8 @@
 
 ### P0-RESOLVE-ISINSTANCE-NARROWING: union 型に対する isinstance narrowing を修正する
 
+文脈: [docs/ja/plans/p0-resolve-isinstance-narrowing.md](../plans/p0-resolve-isinstance-narrowing.md)
+
 **発端**: C++ selfhost build で `isinstance(value, dict)` 後の narrowing が bare `dict`（パラメータなし）になり、emitter が `dict` と `dict[str, JsonVal]` を別の型と誤判定して covariant copy ラムダを生成 → g++ で `push_back` 未定義エラー。
 
 **問題**: `value` の型が `JsonVal`（= `None | bool | int | float | str | list[JsonVal] | dict[str, JsonVal]`）のとき、`isinstance(value, dict)` で narrowing すると `dict`（bare）になる。union の構成要素に `dict[str, JsonVal]` しかないのだから、narrowing 結果は `dict[str, JsonVal]` であるべき。
@@ -63,6 +65,8 @@
 3. [ ] [ID: P0-RESOLVE-NARROW-S3] 全言語の fixture parity に回帰がないことを確認する
 
 ### P0-RESOLVE-TYPE-ALIAS: 型エイリアスの同値性判定を正しく実装する
+
+文脈: [docs/ja/plans/p0-resolve-type-alias.md](../plans/p0-resolve-type-alias.md)
 
 **発端**: `Node = dict[str, JsonVal]` のとき、`list[Node]` に `dict[str, JsonVal]` を append すると emitter が型不一致と判定する。
 
